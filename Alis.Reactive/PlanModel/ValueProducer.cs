@@ -37,6 +37,10 @@ namespace Alis.Reactive.PlanModel
         internal static ValueProducer Null() =>
             new LiteralProducer(null, Shape.None);
 
+        internal static readonly ValueProducer None = new NoneProducer();
+
+        internal bool IsNone => this is NoneProducer;
+
         /// <summary>
         /// Creates a literal with any JSON-serializable value.
         /// System.Text.Json handles serialization at Render time.
@@ -71,13 +75,13 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the constant value embedded in the plan.</summary>
         [JsonInclude]
         public object Value { get; }
-        /// <summary>Gets the expected type shape, or <see langword="null"/> when not specified.</summary>
+        /// <summary>Gets the expected type shape. Defaults to <see cref="PlanModel.Shape.None"/> when not specified.</summary>
         public Shape Shape { get; }
 
         internal LiteralProducer(object value, Shape shape)
         {
             Value = value;
-            Shape = shape == Shape.None ? null : shape;
+            Shape = shape ?? Shape.None;
         }
     }
 
@@ -96,20 +100,22 @@ namespace Alis.Reactive.PlanModel
         public Source From { get; }
         /// <summary>Gets the property or method name to read on the source.</summary>
         public string Member { get; }
-        /// <summary>Gets the nested property path, or <see langword="null"/> for direct reads.</summary>
+        /// <summary>Gets the nested property path. Defaults to empty for direct reads.</summary>
         public Path Path { get; }
-        /// <summary>Gets the expected type shape, or <see langword="null"/> when not specified.</summary>
+        /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
         public Shape Shape { get; }
-        /// <summary>Gets optional method arguments, or <see langword="null"/> for property reads.</summary>
+        /// <summary>Gets method arguments. Empty when the read targets a property.</summary>
         public IReadOnlyList<ValueProducer> Args { get; }
 
-        internal ReadProducer(Source from, string member, Path path, Shape shape, List<ValueProducer> args = null)
+        internal ReadProducer(Source from, string member, Path path = null, Shape shape = null, List<ValueProducer> args = null)
         {
             From = from ?? throw new ArgumentNullException(nameof(from));
             Member = member ?? throw new ArgumentNullException(nameof(member));
-            Path = path == null || path.IsNone ? null : path;
-            Shape = shape == null || shape.IsNone ? null : shape;
-            Args = args != null && args.Count > 0 ? args : null;
+            Path = path ?? Path.None;
+            Shape = shape ?? Shape.None;
+            Args = args != null && args.Count > 0
+                ? (IReadOnlyList<ValueProducer>)args
+                : System.Array.Empty<ValueProducer>();
         }
     }
 
@@ -120,13 +126,13 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "object";
         /// <summary>Gets the named fields and their value expressions.</summary>
         public IReadOnlyDictionary<string, ValueProducer> Fields { get; }
-        /// <summary>Gets the expected type shape, or <see langword="null"/> when not specified.</summary>
+        /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
         public Shape Shape { get; }
 
-        internal ObjectProducer(Dictionary<string, ValueProducer> fields, Shape shape)
+        internal ObjectProducer(Dictionary<string, ValueProducer> fields, Shape shape = null)
         {
             Fields = fields ?? throw new ArgumentNullException(nameof(fields));
-            Shape = shape == null || shape.IsNone ? null : shape;
+            Shape = shape ?? Shape.None;
         }
 
         /// <summary>Gets the underlying mutable dictionary for building nested structures.</summary>
@@ -140,13 +146,22 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "array";
         /// <summary>Gets the ordered item expressions.</summary>
         public IReadOnlyList<ValueProducer> Items { get; }
-        /// <summary>Gets the expected type shape, or <see langword="null"/> when not specified.</summary>
+        /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
         public Shape Shape { get; }
 
-        internal ArrayProducer(List<ValueProducer> items, Shape shape)
+        internal ArrayProducer(List<ValueProducer> items, Shape shape = null)
         {
             Items = items ?? throw new ArgumentNullException(nameof(items));
-            Shape = shape == null || shape.IsNone ? null : shape;
+            Shape = shape ?? Shape.None;
         }
+    }
+
+    /// <summary>Sentinel for "no value specified." Not constructed in application code.</summary>
+    public sealed class NoneProducer : ValueProducer
+    {
+        /// <summary>Gets the kind. Always <c>"none"</c>.</summary>
+        public string Kind => "none";
+
+        internal NoneProducer() { }
     }
 }

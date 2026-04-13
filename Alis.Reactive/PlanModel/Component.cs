@@ -36,7 +36,7 @@ namespace Alis.Reactive.PlanModel
     internal sealed class ContainerScope
     {
         public List<string> Components { get; }
-        public List<ComponentValidation>? ValidationRules { get; internal set; }
+        public List<ComponentValidation> ValidationRules { get; internal set; } = new List<ComponentValidation>();
 
         internal ContainerScope(List<string> components)
         {
@@ -74,19 +74,15 @@ namespace Alis.Reactive.PlanModel
     {
         public string Name { get; }
         public string Message { get; }
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public ValueProducer? Constraint { get; internal set; }
+        public ValueProducer Constraint { get; internal set; } = ValueProducer.None;
 
         /// <summary>For peer-comparison rules (equalTo, notEqualTo, min/max with cross-field).
         /// Pre-resolved by the orchestrator before passing to the pure rule engine.</summary>
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public ValueProducer? OtherValue { get; internal set; }
+        public ValueProducer OtherValue { get; internal set; } = ValueProducer.None;
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public Condition? When { get; internal set; }
+        public Condition When { get; internal set; } = Condition.None;
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public Shape? Shape { get; internal set; }
+        public Shape Shape { get; internal set; } = Shape.None;
 
         internal ValidationRule(string name, string message)
         {

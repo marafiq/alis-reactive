@@ -2,7 +2,7 @@
 // Pure function: resolves {param} placeholders using evaluated ValueProducers.
 // Fail-fast: throws on unresolved placeholder, null value, or stringify failure.
 
-import type { Plan, ValueProducer, ExecContext } from "../types";
+import { type Plan, type ValueProducer, type ExecContext, isEvaluable } from "../types";
 import { evaluateValue } from "./evaluate";
 import { formatForWire } from "./wire-format";
 import { toString } from "./shape-convert";
@@ -22,6 +22,9 @@ export function resolveRouteParams(
       // Build-time validation ensures every RouteParam matches a placeholder.
       // If we get here, the plan JSON is malformed — fail fast.
       throw new Error(`[alis] unresolved route param: "${paramName}" in URL template "${urlTemplate}"`);
+    }
+    if (!isEvaluable(producer)) {
+      throw new Error(`[alis] route param "${paramName}" has NoneProducer — pipeline bug`);
     }
     const raw = evaluateValue(producer, plan, ctx);
     if (raw == null) {

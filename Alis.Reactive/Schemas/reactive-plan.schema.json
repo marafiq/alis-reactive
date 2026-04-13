@@ -25,6 +25,7 @@
   "$defs": {
     "JsType": {
       "type": "object",
+      "required": ["properties", "methods", "events"],
       "properties": {
         "properties": {
           "type": "object",
@@ -54,7 +55,7 @@
     },
     "Method": {
       "type": "object",
-      "required": ["path"],
+      "required": ["path", "args", "returns"],
       "properties": {
         "path": { "$ref": "#/$defs/Path" },
         "args": {
@@ -90,7 +91,7 @@
     },
     "ContainerScope": {
       "type": "object",
-      "required": ["components"],
+      "required": ["components", "validationRules"],
       "properties": {
         "components": {
           "type": "array",
@@ -117,7 +118,7 @@
     },
     "ValidationRule": {
       "type": "object",
-      "required": ["name", "message"],
+      "required": ["name", "message", "constraint", "otherValue", "when", "shape"],
       "properties": {
         "name": {
           "type": "string",
@@ -296,7 +297,7 @@
     },
     "BranchCase": {
       "type": "object",
-      "required": ["reaction"],
+      "required": ["when", "reaction"],
       "properties": {
         "when": { "$ref": "#/$defs/Condition" },
         "reaction": { "$ref": "#/$defs/Reaction" }
@@ -314,7 +315,7 @@
     },
     "CallReaction": {
       "type": "object",
-      "required": ["kind", "on", "method"],
+      "required": ["kind", "on", "method", "args"],
       "properties": {
         "kind": { "const": "call" },
         "on": { "$ref": "#/$defs/Source" },
@@ -335,7 +336,7 @@
     },
     "DispatchReaction": {
       "type": "object",
-      "required": ["kind", "event"],
+      "required": ["kind", "event", "data"],
       "properties": {
         "kind": { "const": "dispatch" },
         "event": { "type": "string", "minLength": 1 },
@@ -362,7 +363,7 @@
     },
     "Request": {
       "type": "object",
-      "required": ["method", "url"],
+      "required": ["method", "url", "before", "success", "error", "complete", "headers", "routeParams"],
       "properties": {
         "method": {
           "type": "string",
@@ -455,12 +456,13 @@
         { "$ref": "#/$defs/LiteralProducer" },
         { "$ref": "#/$defs/ReadProducer" },
         { "$ref": "#/$defs/ObjectProducer" },
-        { "$ref": "#/$defs/ArrayProducer" }
+        { "$ref": "#/$defs/ArrayProducer" },
+        { "$ref": "#/$defs/NoneProducer" }
       ]
     },
     "LiteralProducer": {
       "type": "object",
-      "required": ["kind", "value"],
+      "required": ["kind", "value", "shape"],
       "properties": {
         "kind": { "const": "literal" },
         "value": {
@@ -476,7 +478,7 @@
     },
     "ReadProducer": {
       "type": "object",
-      "required": ["kind", "from", "member"],
+      "required": ["kind", "from", "member", "path", "shape", "args"],
       "properties": {
         "kind": { "const": "read" },
         "from": { "$ref": "#/$defs/Source" },
@@ -491,7 +493,7 @@
     },
     "ObjectProducer": {
       "type": "object",
-      "required": ["kind", "fields"],
+      "required": ["kind", "fields", "shape"],
       "properties": {
         "kind": { "const": "object" },
         "fields": {
@@ -503,7 +505,7 @@
     },
     "ArrayProducer": {
       "type": "object",
-      "required": ["kind", "items"],
+      "required": ["kind", "items", "shape"],
       "properties": {
         "kind": { "const": "array" },
         "items": {
@@ -513,18 +515,27 @@
         "shape": { "$ref": "#/$defs/Shape" }
       }
     },
+    "NoneProducer": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
+      }
+    },
     "Condition": {
       "oneOf": [
         { "$ref": "#/$defs/CompareCondition" },
         { "$ref": "#/$defs/AllCondition" },
         { "$ref": "#/$defs/AnyCondition" },
         { "$ref": "#/$defs/NotCondition" },
-        { "$ref": "#/$defs/ConfirmCondition" }
+        { "$ref": "#/$defs/ConfirmCondition" },
+        { "$ref": "#/$defs/NoneCondition" }
       ]
     },
     "CompareCondition": {
       "type": "object",
-      "required": ["kind", "left", "op"],
+      "required": ["kind", "left", "op", "right", "shape", "itemShape"],
       "properties": {
         "kind": { "const": "compare" },
         "left": { "$ref": "#/$defs/ValueProducer" },
@@ -580,6 +591,14 @@
       "properties": {
         "kind": { "const": "confirm" },
         "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "NoneCondition": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
       }
     },
     "Shape": {

@@ -7,6 +7,7 @@ import type {
   Plan, ContainerScope, ComponentValidation,
   ValidationRule, ValueProducer,
 } from "../types";
+import { isEvaluable } from "../types";
 import type { ExecContext } from "../types";
 import { resolveElement } from "../resolution/resolver";
 import { evaluateCondition } from "../conditions/conditions";
@@ -43,7 +44,7 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
     container = resolveElement(plan, containerKey);
   } catch (e) {
     if (!isResolutionError(e)) throw e;
-    if ((containerScope.validationRules?.length ?? 0) > 0) {
+    if (containerScope.validationRules.length > 0) {
       log.warn("validate: form container missing, blocking", { containerId });
       return false;
     }
@@ -55,7 +56,7 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
 
   clearContainerErrors(containerScope, plan, containerId, summaryEl);
 
-  if (!containerScope.validationRules || containerScope.validationRules.length === 0) {
+  if (containerScope.validationRules.length === 0) {
     return true;
   }
 
@@ -131,7 +132,7 @@ function placeServerError(
  */
 export function revalidateField(plan: Plan, containerKey: string, componentKey: string): void {
   const containerComp = plan.components[containerKey];
-  if (!containerComp?.container?.validationRules) return;
+  if (!containerComp?.container) return;
 
   const cv = containerComp.container.validationRules.find(r => r.component === componentKey);
   if (!cv) return;
@@ -265,7 +266,7 @@ function evaluateRulesForField(
 
 /** Check if a rule's condition is met. Returns false if condition skips this rule. */
 function isRuleActive(rule: ValidationRule, plan: Plan, ctx?: ExecContext): boolean {
-  if (!rule.when) return true;
+  if (rule.when.kind === "none") return true;
   try {
     return evaluateCondition(rule.when, plan, ctx);
   } catch (e) {
@@ -276,7 +277,7 @@ function isRuleActive(rule: ValidationRule, plan: Plan, ctx?: ExecContext): bool
 
 /** Pre-resolve otherValue if present — keeps rule-engine pure (no DOM). */
 function resolveOtherValue(rule: ValidationRule, plan: Plan): unknown {
-  if (!rule.otherValue) return undefined;
+  if (!isEvaluable(rule.otherValue)) return undefined;
   try {
     return evaluateValue(rule.otherValue, plan);
   } catch (e) {
@@ -311,7 +312,7 @@ function isResolutionError(e: unknown): boolean {
 function allRulesConditionallySkipped(rules: ValidationRule[], plan: Plan, ctx?: ExecContext): boolean {
   if (rules.length === 0) return true;
   for (const rule of rules) {
-    if (!rule.when) return false;
+    if (rule.when.kind === "none") return false;
     try {
       const result = evaluateCondition(rule.when, plan, ctx);
       if (result) return false;
@@ -329,11 +330,9 @@ function clearContainerErrors(
   containerId: string,
   summaryEl: HTMLElement | null,
 ): void {
-  if (containerScope.validationRules) {
-    for (const cv of containerScope.validationRules) {
-      const comp = plan.components[cv.component];
-      if (comp) clearInline(containerId, comp.id);
-    }
+  for (const cv of containerScope.validationRules) {
+    const comp = plan.components[cv.component];
+    if (comp) clearInline(containerId, comp.id);
   }
   if (summaryEl) {
     clearSummary(summaryEl);
@@ -344,7 +343,7 @@ function clearContainerErrors(
 function findComponentKeyByName(containerScope: ContainerScope, name: string): string | undefined {
   // Plan-driven: each ComponentValidation carries serverFieldName set at C# build time.
   // No heuristics — the plan declares the mapping.
-  return containerScope.validationRules?.find(
+  return containerScope.validationRules.find(
     cv => cv.serverFieldName === name || cv.component === name
   )?.component;
 }

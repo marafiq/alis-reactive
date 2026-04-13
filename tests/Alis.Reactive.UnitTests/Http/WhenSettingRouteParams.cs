@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text.Json;
 using Alis.Reactive.Builders.Conditions;
 
@@ -129,7 +130,7 @@ public class WhenSettingRouteParams : PlanTestBase
     // ── Absence + composition ────────────────────────────
 
     [Test]
-    public void plan_without_route_params_omits_field()
+    public void plan_without_route_params_emits_empty_object()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
@@ -140,7 +141,14 @@ public class WhenSettingRouteParams : PlanTestBase
 
         var planJson = plan.RenderFormatted();
         AssertSchemaValid(planJson);
-        Assert.That(planJson, Does.Not.Contain("\"routeParams\""));
+
+        using var doc = JsonDocument.Parse(planJson);
+        var request = doc.RootElement.GetProperty("behaviors")[0]
+            .GetProperty("reaction").GetProperty("request");
+        var routeParams = request.GetProperty("routeParams");
+        Assert.That(routeParams.ValueKind, Is.EqualTo(JsonValueKind.Object));
+        Assert.That(routeParams.EnumerateObject().Any(), Is.False,
+            "RouteParams should be present as an empty object");
     }
 
     [Test]

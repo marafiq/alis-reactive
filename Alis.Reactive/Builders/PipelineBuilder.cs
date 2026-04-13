@@ -241,7 +241,7 @@ namespace Alis.Reactive.Builders
         {
             var hasPendingCommands = Steps.Count > 0;
             _segments.Add(_parallelBuilder.BuildReaction(
-                hasPendingCommands ? new List<Reaction>(Steps) : null));
+                hasPendingCommands ? new List<Reaction>(Steps) : new List<Reaction>()));
             Steps.Clear();
             _parallelBuilder = null;
         }
@@ -292,7 +292,7 @@ namespace Alis.Reactive.Builders
 
         private Reaction BuildSingleReaction()
         {
-            var pendingCommands = Steps.Count > 0 ? Steps : null;
+            var pendingCommands = Steps.Count > 0 ? Steps : new List<Reaction>();
             return _mode switch
             {
                 PipelineMode.Parallel => _parallelBuilder!.BuildReaction(pendingCommands),

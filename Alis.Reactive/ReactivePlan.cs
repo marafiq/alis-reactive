@@ -130,15 +130,13 @@ namespace Alis.Reactive
             }
         }
 
-        private void CollectValidationFromReactions(List<Reaction>? reactions)
+        private void CollectValidationFromReactions(IReadOnlyList<Reaction> reactions)
         {
-            if (reactions == null) return;
             foreach (var r in reactions) CollectValidationFromReaction(r);
         }
 
-        private void CollectValidationFromResponseHandlers(List<ResponseHandler>? handlers)
+        private void CollectValidationFromResponseHandlers(IReadOnlyList<ResponseHandler> handlers)
         {
-            if (handlers == null) return;
             foreach (var h in handlers)
             {
                 if (h.Reaction != null) CollectValidationFromReaction(h.Reaction);
@@ -204,7 +202,7 @@ namespace Alis.Reactive
         private static void MergeValidationRules(
             ContainerScope container, List<ComponentValidation> incoming)
         {
-            if (container.ValidationRules == null)
+            if (container.ValidationRules.Count == 0)
             {
                 container.ValidationRules = incoming;
                 return;
@@ -248,7 +246,7 @@ namespace Alis.Reactive
             if (extracted.When != null)
                 rule.When = ToCondition(extracted.When);
 
-            if (extracted.Shape != null && !extracted.Shape.IsNone)
+            if (!extracted.Shape.IsNone)
                 rule.Shape = extracted.Shape;
 
             return rule;
@@ -297,7 +295,7 @@ namespace Alis.Reactive
             }
             else
             {
-                right = null;
+                right = ValueProducer.None;
             }
 
             return Condition.Compare(left, cmp.Op, right, conditionShape);
@@ -308,14 +306,12 @@ namespace Alis.Reactive
     {
         private static readonly JsonSerializerOptions Compact = new JsonSerializerOptions
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
 
         private static readonly JsonSerializerOptions Formatted = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             WriteIndented = true
         };
 

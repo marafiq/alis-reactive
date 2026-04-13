@@ -3,6 +3,7 @@
 // Condition is a discriminated union: compare, all, any, not, confirm.
 
 import type { Condition, CompareCondition, Plan, ValueProducer } from "../types";
+import { isEvaluable } from "../types";
 import type { ExecContext } from "../types";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
@@ -38,6 +39,8 @@ export function evaluateCondition(condition: Condition, plan: Plan, ctx?: ExecCo
     case "confirm":
       log.warn("ConfirmCondition in sync context — denying (callers should use async path)");
       return false;
+    case "none":
+      return true;
     default:
       assertNever(condition, "condition kind");
   }
@@ -65,6 +68,8 @@ export async function evaluateConditionAsync(condition: Condition, plan: Plan, c
       if (!confirmFn) throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
       return confirmFn(condition.message);
     }
+    case "none":
+      return true;
     default:
       assertNever(condition, "condition kind");
   }
@@ -109,11 +114,12 @@ function resolveRight(
   evalValue: (p: ValueProducer, plan: Plan, ctx?: ExecContext) => unknown,
   plan: Plan, ctx?: ExecContext,
 ): unknown {
-  const right = cond.right ? evalValue(cond.right, plan, ctx) : undefined;
+  if (!isEvaluable(cond.right)) return undefined;
+  const right = evalValue(cond.right, plan, ctx);
   if (Array.isArray(right) && (cond.op === "in" || cond.op === "not-in" || cond.op === "between")) {
     return right.map(item => applyShape(item, cond.shape));
   }
-  return cond.right ? applyShape(right, cond.shape) : undefined;
+  return applyShape(right, cond.shape);
 }
 
 /** Evaluate binary operators that require both left and right operands. */
@@ -151,7 +157,7 @@ function evaluateBinaryOp(cond: CompareCondition, shapedLeft: unknown, shapedRig
 }
 
 function evaluateArrayContains(cond: CompareCondition, shapedLeft: unknown, shapedRight: unknown): boolean {
-  const items = cond.itemShape && Array.isArray(shapedLeft)
+  const items = cond.itemShape.kind !== "none" && Array.isArray(shapedLeft)
     ? (shapedLeft as unknown[]).map(item => applyShape(item, cond.itemShape))
     : shapedLeft;
   return Array.isArray(items) && items.includes(shapedRight);

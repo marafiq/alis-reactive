@@ -17,9 +17,9 @@ export interface Plan {
 // ── JsType ────────────────────────────────────────────────────
 
 export interface JsType {
-  properties?: Record<string, Property>;
-  methods?: Record<string, Method>;
-  events?: Record<string, Event>;
+  properties: Record<string, Property>;
+  methods: Record<string, Method>;
+  events: Record<string, Event>;
 }
 
 export interface Property {
@@ -30,8 +30,8 @@ export interface Property {
 
 export interface Method {
   path: Path;
-  args?: Shape[];
-  returns?: Shape;
+  args: Shape[];
+  returns: Shape;
 }
 
 export interface Event {
@@ -55,7 +55,7 @@ export interface Component {
 
 export interface ContainerScope {
   components: string[];
-  validationRules?: ComponentValidation[];
+  validationRules: ComponentValidation[];
 }
 
 export interface ComponentValidation {
@@ -77,10 +77,10 @@ export type ValidationRuleName =
 export interface ValidationRule {
   name: ValidationRuleName;
   message: string;
-  constraint?: ValueProducer;
-  otherValue?: ValueProducer;
-  when?: Condition;
-  shape?: Shape;
+  constraint: ValueProducer;
+  otherValue: ValueProducer;
+  when: Condition;
+  shape: Shape;
 }
 
 // ── Source ─────────────────────────────────────────────────────
@@ -185,7 +185,7 @@ export interface BranchReaction {
 }
 
 export interface BranchCase {
-  when?: Condition;
+  when: Condition;
   reaction: Reaction;
 }
 
@@ -200,7 +200,7 @@ export interface CallReaction {
   kind: "call";
   on: Source;
   method: string;
-  args?: ValueProducer[];
+  args: ValueProducer[];
 }
 
 export interface RequestReaction {
@@ -211,7 +211,7 @@ export interface RequestReaction {
 export interface DispatchReaction {
   kind: "dispatch";
   event: string;
-  data?: ValueProducer;
+  data: ValueProducer;
   payloadType?: string;
 }
 
@@ -233,14 +233,14 @@ export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 export interface Request {
   method: HttpMethod;
   url: string;
-  headers?: Record<string, ValueProducer>;
-  routeParams?: Record<string, ValueProducer>;
+  headers: Record<string, ValueProducer>;
+  routeParams: Record<string, ValueProducer>;
   container?: string;
   input?: RequestInput;
-  before?: Reaction[];
-  success?: ResponseHandler[];
-  error?: ResponseHandler[];
-  complete?: Reaction[];
+  before: Reaction[];
+  success: ResponseHandler[];
+  error: ResponseHandler[];
+  complete: Reaction[];
   next?: Request;
 }
 
@@ -272,49 +272,61 @@ export interface ResponseHandler {
   reaction: Reaction;
 }
 
-// ── ValueProducer (discriminated union — 4 kinds) ─────────────
+// ── ValueProducer (discriminated union — 5 kinds) ─────────────
 
 export type ValueProducer =
   | LiteralProducer
   | ReadProducer
   | ObjectProducer
-  | ArrayProducer;
+  | ArrayProducer
+  | NoneProducer;
 
 export interface LiteralProducer {
   kind: "literal";
   value: string | number | boolean | null;
-  shape?: Shape;
+  shape: Shape;
 }
 
 export interface ReadProducer {
   kind: "read";
   from: Source;
   member: string;
-  path?: Path;
-  shape?: Shape;
-  args?: ValueProducer[];
+  path: Path;
+  shape: Shape;
+  args: ValueProducer[];
 }
 
 export interface ObjectProducer {
   kind: "object";
   fields: Record<string, ValueProducer>;
-  shape?: Shape;
+  shape: Shape;
 }
 
 export interface ArrayProducer {
   kind: "array";
   items: ValueProducer[];
-  shape?: Shape;
+  shape: Shape;
 }
 
-// ── Condition (discriminated union — 5 kinds) ─────────────────
+export interface NoneProducer {
+  kind: "none";
+}
+
+export type EvaluableProducer = Exclude<ValueProducer, NoneProducer>;
+
+export function isEvaluable(p: ValueProducer): p is EvaluableProducer {
+  return p.kind !== "none";
+}
+
+// ── Condition (discriminated union — 6 kinds) ─────────────────
 
 export type Condition =
   | CompareCondition
   | AllCondition
   | AnyCondition
   | NotCondition
-  | ConfirmCondition;
+  | ConfirmCondition
+  | NoneCondition;
 
 export type CompareOp =
   | "eq" | "neq" | "gt" | "gte" | "lt" | "lte"
@@ -328,9 +340,9 @@ export interface CompareCondition {
   kind: "compare";
   left: ValueProducer;
   op: CompareOp;
-  right?: ValueProducer;
-  shape?: Shape;
-  itemShape?: Shape;
+  right: ValueProducer;
+  shape: Shape;
+  itemShape: Shape;
 }
 
 export interface AllCondition {
@@ -351,6 +363,16 @@ export interface NotCondition {
 export interface ConfirmCondition {
   kind: "confirm";
   message: string;
+}
+
+export interface NoneCondition {
+  kind: "none";
+}
+
+export type EvaluableCondition = Exclude<Condition, NoneCondition>;
+
+export function isActiveCondition(c: Condition): c is EvaluableCondition {
+  return c.kind !== "none";
 }
 
 // ── Shape (discriminated union — 9 kinds) ─────────────────────

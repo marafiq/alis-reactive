@@ -19,7 +19,7 @@ interface ResolvedFetch {
 }
 
 function buildFetch(req: Request, gatherResult: GatherResult, plan: Plan, ctx?: ExecContext): ResolvedFetch {
-  let url = req.routeParams
+  let url = Object.keys(req.routeParams).length > 0
     ? resolveRouteParams(req.url, req.routeParams, plan, ctx)
     : req.url;
   const init: RequestInit = { method: req.method };
@@ -40,12 +40,14 @@ function buildFetch(req: Request, gatherResult: GatherResult, plan: Plan, ctx?: 
 
   // Evaluate and set custom headers from plan ValueProducers.
   // Applied AFTER Content-Type — user headers can override if needed.
-  if (req.headers) {
+  const headerEntries = Object.entries(req.headers);
+  if (headerEntries.length > 0) {
     const existing = (init.headers as Record<string, string>) ?? {};
-    for (const [name, producer] of Object.entries(req.headers)) {
+    for (const [name, producer] of headerEntries) {
       const value = evaluateValue(producer, plan, ctx);
       if (value != null) {
-        const wire = formatForWire(value, producer.shape);
+        const shape = "shape" in producer ? producer.shape : { kind: "none" as const };
+        const wire = formatForWire(value, shape);
         existing[name] = String(wire);
       }
     }
@@ -68,10 +70,8 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     }
 
     // 2. Before reactions
-    if (req.before) {
-      for (const r of req.before) {
-        await executeReaction(r, plan, ctx);
-      }
+    for (const r of req.before) {
+      await executeReaction(r, plan, ctx);
     }
 
     // 3. Gather -> freeze
@@ -116,10 +116,8 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
 }
 
 async function runComplete(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
-  if (req.complete) {
-    for (const r of req.complete) {
-      await executeReaction(r, plan, ctx);
-    }
+  for (const r of req.complete) {
+    await executeReaction(r, plan, ctx);
   }
 }
 
@@ -132,12 +130,12 @@ async function readResponseBody(response: Response): Promise<unknown> {
 }
 
 export async function routeHandlers(
-  handlers: ResponseHandler[] | undefined,
+  handlers: ResponseHandler[],
   status: number,
   plan: Plan,
   ctx?: ExecContext,
 ): Promise<void> {
-  if (!handlers || handlers.length === 0) return;
+  if (handlers.length === 0) return;
 
   // First pass: exact status match
   for (const h of handlers) {

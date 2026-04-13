@@ -30,6 +30,9 @@ export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecCon
     case "array":
       return producer.items.map(i => evaluateValue(i, plan, ctx));
 
+    case "none":
+      throw new Error("[alis] NoneProducer must not be evaluated — this is a pipeline bug");
+
     default:
       assertNever(producer, "value producer kind");
   }
@@ -56,17 +59,17 @@ function readFromTypedSource(
 ): unknown {
   const jsType = getJsTypeForSource(plan, producer.from);
 
-  const prop = jsType.properties?.[producer.member];
+  const prop = jsType.properties[producer.member];
   if (prop) {
     const raw = resolverReadProperty(root, prop);
-    return raw == null ? raw : applyShape(raw, producer.shape ?? prop.shape);
+    return raw == null ? raw : applyShape(raw, producer.shape.kind !== "none" ? producer.shape : prop.shape);
   }
 
-  const method = jsType.methods?.[producer.member];
+  const method = jsType.methods[producer.member];
   if (method) {
-    const evaluatedArgs = producer.args ? producer.args.map(a => evaluateValue(a, plan, ctx)) : [];
+    const evaluatedArgs = producer.args.map(a => evaluateValue(a, plan, ctx));
     const raw = callMethod(root, method, evaluatedArgs);
-    return raw == null ? raw : applyShape(raw, producer.shape ?? method.returns);
+    return raw == null ? raw : applyShape(raw, producer.shape.kind !== "none" ? producer.shape : method.returns);
   }
 
   const sourceName = producer.from.kind === "component"
@@ -87,7 +90,7 @@ function readFromUrl(
 function readFromPayload(
   producer: Extract<ValueProducer, { kind: "read" }>, root: unknown,
 ): unknown {
-  if (producer.path) {
+  if (producer.path.length > 0) {
     const walked = walkPath(root as any, producer.path);
     return walked == null ? walked : applyShape(walked, producer.shape);
   }

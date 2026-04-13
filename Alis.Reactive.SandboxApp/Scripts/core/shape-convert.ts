@@ -20,9 +20,7 @@ function err<T>(error: string): ConvertResult<T> { return { ok: false, error }; 
  * Apply a Shape to a raw value. This is the ONE entry point for Shape conversion.
  * Every module calls this — conditions, validation, gather, execution.
  */
-export function applyShape(value: unknown, shape?: Shape): unknown {
-  if (!shape) return value;
-
+export function applyShape(value: unknown, shape: Shape): unknown {
   switch (shape.kind) {
     case "string":   return applyScalar(value, toString);
     case "number":   return applyScalar(value, toNumber);

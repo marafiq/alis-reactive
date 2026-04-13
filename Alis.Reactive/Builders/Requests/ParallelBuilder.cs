@@ -43,7 +43,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var requestReactions = _branches.Select(r => Reaction.Request(r)).ToList();
 
-            var hasPreFetchCommands = preFetch != null && preFetch.Count > 0;
+            var hasPreFetchCommands = preFetch.Count > 0;
             if (hasPreFetchCommands)
                 requestReactions.InsertRange(0, preFetch);
 

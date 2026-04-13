@@ -29,6 +29,37 @@
         <None Include="build\AlisReactive.targets" Pack="true" PackagePath="build\" />
     </ItemGroup>
 
+    <!--
+        Build sandbox bundles fresh from source, then sync to packaged assets,
+        before Pack runs. This guarantees `dotnet pack` always ships the latest
+        JS/CSS regardless of when wwwroot was last built. Without rebuilding,
+        a stale wwwroot/ bundle (left over from an older Scripts/ state) would
+        be silently shipped — Codex flagged this exact scenario.
+
+        Requires Node.js + npm dependencies installed (the framework already
+        requires both for development). If npm is missing, the Exec task fails
+        with a clear error.
+
+        Copy is unconditional so deliberate or accidental modification of
+        assets/ cannot survive a pack.
+    -->
+    <Target Name="SyncPackagedAssetsBeforePack" BeforeTargets="GenerateNuspec">
+        <Message Importance="high" Text="SyncPackagedAssetsBeforePack: rebuilding sandbox JS/CSS bundles from source..." />
+        <Exec Command="npm run build:all"
+              WorkingDirectory="$(MSBuildThisFileDirectory).."
+              ConsoleToMSBuild="true"
+              IgnoreExitCode="false" />
+        <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\js\alis-reactive.js')"
+               Text="Sandbox JS bundle missing after 'npm run build:all'. Verify Node.js and npm dependencies are installed (run 'npm ci' from the repo root)." />
+        <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\css\design-system.css')"
+               Text="Sandbox CSS bundle missing after 'npm run build:all'. Verify Node.js and npm dependencies are installed (run 'npm ci' from the repo root)." />
+        <Copy SourceFiles="$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\js\alis-reactive.js"
+              DestinationFiles="$(MSBuildThisFileDirectory)assets\js\alis-reactive.js" />
+        <Copy SourceFiles="$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\css\design-system.css"
+              DestinationFiles="$(MSBuildThisFileDirectory)assets\css\design-system.css" />
+        <Message Importance="high" Text="SyncPackagedAssetsBeforePack: packaged assets synced from fresh sandbox build." />
+    </Target>
+
     <!-- Bundle Roslyn analyzers so consumers get compile-time DSL checks (ALIS001-ALIS008) -->
     <ItemGroup>
         <None Include="..\Alis.Reactive.Analyzers\bin\$(Configuration)\netstandard2.0\Alis.Reactive.Analyzers.dll"

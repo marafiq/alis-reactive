@@ -42,8 +42,8 @@ function serializeValue(value: unknown, name: string): string {
 
 /** Transport strategies for emitting name/value pairs into GET, FormData, or JSON. */
 interface TransportStrategy {
-  emitScalar(name: string, value: unknown, shape?: Shape): void;
-  emitArray(name: string, items: unknown[], itemShape?: Shape): void;
+  emitScalar(name: string, value: unknown, shape: Shape): void;
+  emitArray(name: string, items: unknown[], itemShape: Shape): void;
 }
 
 function createGetTransport(urlParams: string[]): TransportStrategy {
@@ -89,7 +89,7 @@ function createJsonTransport(body: Record<string, unknown>): TransportStrategy {
     },
     emitArray: (name, items, itemShape) => {
       if (hasFiles(items)) throw new Error("[alis] File objects require transport: form-data");
-      const wireItems = itemShape
+      const wireItems = itemShape.kind !== "none"
         ? items.map(v => formatForWire(v, itemShape))
         : items;
       setNested(body, name, wireItems);
@@ -105,14 +105,14 @@ function selectTransport(
   return createJsonTransport(body);
 }
 
-function emitValue(name: string, raw: unknown, shape: Shape | undefined, transport: TransportStrategy): void {
+function emitValue(name: string, raw: unknown, shape: Shape, transport: TransportStrategy): void {
   if (typeof FileList !== "undefined" && raw instanceof FileList) {
     transport.emitArray(name, Array.from(raw), shape);
     log.trace("file", { name, count: raw.length });
     return;
   }
   if (Array.isArray(raw)) {
-    const itemShape = shape?.kind === "array" ? shape.item : undefined;
+    const itemShape = shape.kind === "array" ? shape.item : { kind: "none" as const };
     transport.emitArray(name, raw, itemShape);
   } else {
     transport.emitScalar(name, raw, shape);
@@ -153,10 +153,10 @@ function resolveValueInput(
 
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
     for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
-      emitValue(key, val, undefined, transport);
+      emitValue(key, val, { kind: "none" }, transport);
     }
   } else {
-    emitValue("value", value, undefined, transport);
+    emitValue("value", value, { kind: "none" }, transport);
   }
 
   return { urlParams, body: formData ?? body };
@@ -190,7 +190,8 @@ function gatherExplicitFields(
       gatheredComponents.add(field.value.from.component);
     }
     const raw = evaluateValue(field.value, plan, ctx);
-    emitValue(field.key, raw, field.value.shape, transport);
+    const shape = "shape" in field.value ? field.value.shape : { kind: "none" as const };
+    emitValue(field.key, raw, shape, transport);
   }
   return gatheredComponents;
 }
@@ -199,11 +200,11 @@ function gatherExplicitFields(
 function emitStaticValues(
   gatherInput: GatherInput, transport: TransportStrategy, plan: Plan, ctx?: ExecContext,
 ): void {
-  if (!gatherInput.statics) return;
+  if (!gatherInput.statics || gatherInput.statics.kind === "none") return;
   const staticValues = evaluateValue(gatherInput.statics, plan, ctx);
   if (typeof staticValues !== "object" || staticValues === null || Array.isArray(staticValues)) return;
   for (const [key, val] of Object.entries(staticValues as Record<string, unknown>)) {
-    emitValue(key, val, undefined, transport);
+    emitValue(key, val, { kind: "none" }, transport);
   }
 }
 
@@ -220,7 +221,8 @@ function gatherDynamicComponents(
     if (!comp.valueMember || !comp.bindingPath) continue;
     if (!document.getElementById(comp.id)) continue;
     const jsType = plan.types[comp.type];
-    const prop = jsType?.properties?.[comp.valueMember];
+    if (!jsType) continue;
+    const prop = jsType.properties[comp.valueMember];
     if (!prop) continue;
     const root = resolveComponent(plan, compKey);
     const raw = readProperty(root, prop);

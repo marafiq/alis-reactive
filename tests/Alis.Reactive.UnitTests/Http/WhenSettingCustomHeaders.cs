@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text.Json;
 using Alis.Reactive.Builders.Conditions;
 
@@ -61,7 +62,7 @@ public class WhenSettingCustomHeaders : PlanTestBase
     }
 
     [Test]
-    public void plan_without_headers_omits_headers_field()
+    public void plan_without_headers_emits_empty_headers_object()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
@@ -73,7 +74,13 @@ public class WhenSettingCustomHeaders : PlanTestBase
         var planJson = plan.RenderFormatted();
         AssertSchemaValid(planJson);
 
-        Assert.That(planJson, Does.Not.Contain("\"headers\""));
+        using var doc = JsonDocument.Parse(planJson);
+        var request = doc.RootElement.GetProperty("behaviors")[0]
+            .GetProperty("reaction").GetProperty("request");
+        var headers = request.GetProperty("headers");
+        Assert.That(headers.ValueKind, Is.EqualTo(JsonValueKind.Object));
+        Assert.That(headers.EnumerateObject().Any(), Is.False,
+            "Headers should be present as an empty object");
     }
 
     [Test]

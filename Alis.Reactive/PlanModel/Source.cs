@@ -36,6 +36,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the payload scope: event (trigger payload), success or error (HTTP response), request (outgoing body), dispatch (custom event data), or local (view model).</summary>
         public string Scope { get; }
         /// <summary>Gets the optional payload type tag, or <see langword="null"/> when untyped.</summary>
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public string Type { get; }
 
         internal PayloadSource(string scope, string type = null)

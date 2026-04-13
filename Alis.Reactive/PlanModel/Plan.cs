@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -6,6 +7,7 @@ namespace Alis.Reactive.PlanModel
     {
         public int Version => 3;
         public string PlanId { get; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? PartId { get; internal set; }
 
         // Mutable backing fields — accessed by PlanBuildContext during construction

@@ -25,6 +25,7 @@ namespace Alis.Reactive.PlanModel
     {
         public string Kind => "document-event";
         public string Event { get; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public string? PayloadType { get; }
 
         internal DocumentEventTrigger(string eventName, string? payloadType)
@@ -51,7 +52,9 @@ namespace Alis.Reactive.PlanModel
     {
         public string Kind => "server-push";
         public string Url { get; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public string? Event { get; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public string? PayloadType { get; }
 
         internal ServerPushTrigger(string url, string? eventName, string? payloadType)
@@ -67,6 +70,7 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "signalr";
         public string HubUrl { get; }
         public string Method { get; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public string? PayloadType { get; }
 
         internal SignalRTrigger(string hubUrl, string method, string? payloadType)

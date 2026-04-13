@@ -1,0 +1,71 @@
+name: Verify packaged assets
+
+# Fails the build if `Alis.Reactive/assets/{js,css}` are stale relative to
+# the sandbox sources. The NuGet package ships from `Alis.Reactive/assets/`,
+# so any drift means consumers get an old runtime that does not match the
+# server-side plan model. Catches the failure mode where a developer modifies
+# `Alis.Reactive.SandboxApp/Scripts/` without committing the rebuilt bundle.
+#
+# Runs on every push and pull request — the existing nuget-publish.yml only
+# runs on push to main/release branches, which is too late.
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'Alis.Reactive.SandboxApp/Scripts/**'
+      - 'Alis.Reactive.SandboxApp/Styles/**'
+      - 'Alis.Reactive/assets/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/verify-packaged-assets.yml'
+  pull_request:
+    paths:
+      - 'Alis.Reactive.SandboxApp/Scripts/**'
+      - 'Alis.Reactive.SandboxApp/Styles/**'
+      - 'Alis.Reactive/assets/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/verify-packaged-assets.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build sandbox JS + CSS bundles
+        run: npm run build:all
+
+      - name: Verify Alis.Reactive/assets/ matches sandbox build output
+        run: |
+          set -e
+          mkdir -p /tmp/expected/js /tmp/expected/css
+          cp Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js /tmp/expected/js/
+          cp Alis.Reactive.SandboxApp/wwwroot/css/design-system.css /tmp/expected/css/
+
+          if ! cmp -s /tmp/expected/js/alis-reactive.js Alis.Reactive/assets/js/alis-reactive.js; then
+            echo "::error::Alis.Reactive/assets/js/alis-reactive.js is stale relative to sandbox build output."
+            echo "::error::This means the NuGet package would ship an outdated JS runtime that does not match the C# plan model."
+            echo "::error::Fix: run 'npm run build:all && cp Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js Alis.Reactive/assets/js/' and commit the result."
+            diff <(head -c 200 /tmp/expected/js/alis-reactive.js) <(head -c 200 Alis.Reactive/assets/js/alis-reactive.js) || true
+            exit 1
+          fi
+
+          if ! cmp -s /tmp/expected/css/design-system.css Alis.Reactive/assets/css/design-system.css; then
+            echo "::error::Alis.Reactive/assets/css/design-system.css is stale relative to sandbox build output."
+            echo "::error::This means the NuGet package would ship an outdated CSS that does not match the sandbox styling."
+            echo "::error::Fix: run 'npm run build:all && cp Alis.Reactive.SandboxApp/wwwroot/css/design-system.css Alis.Reactive/assets/css/' and commit the result."
+            exit 1
+          fi
+
+          echo "Packaged assets are in sync with sandbox build output."
