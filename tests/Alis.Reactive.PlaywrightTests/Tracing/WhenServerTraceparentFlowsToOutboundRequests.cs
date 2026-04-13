@@ -34,15 +34,14 @@ public class WhenServerTraceparentFlowsToOutboundRequests : PlaywrightTestBase
     [Test]
     public async Task outbound_save_request_carries_a_valid_w3c_traceparent_header()
     {
-        await NavigateTo(Path);
+        await NavigateToAndWaitForBoot(Path);
 
-        // Click Save and capture the outbound POST request.
+        // Click Save and capture the outbound POST request. Use the exact
+        // component id (seen in the boot-time trigger.wire events) instead
+        // of a text-match locator — the page has multiple buttons whose
+        // text contains "Save".
         var request = await Page.RunAndWaitForRequestAsync(
-            async () =>
-            {
-                var save = Page.Locator("button:has-text('Save')").First;
-                await save.ClickAsync();
-            },
+            async () => await Page.Locator("#save-btn").ClickAsync(),
             "**/Sandbox/HttpPipeline/Http/Save");
 
         var headers = request.Headers;
@@ -62,7 +61,7 @@ public class WhenServerTraceparentFlowsToOutboundRequests : PlaywrightTestBase
     [Test]
     public async Task plan_element_carries_traceparent_matching_the_server_activity()
     {
-        await NavigateTo(Path);
+        await NavigateToAndWaitForBoot(Path);
 
         // Read plan JSON straight from the DOM; it must carry a traceparent
         // property the server produced during the render of this page.
@@ -84,7 +83,7 @@ public class WhenServerTraceparentFlowsToOutboundRequests : PlaywrightTestBase
     [Test]
     public async Task outbound_request_traceparent_trace_id_matches_plan_traceparent_trace_id()
     {
-        await NavigateTo(Path);
+        await NavigateToAndWaitForBoot(Path);
 
         // Extract the plan-level traceparent first.
         var planJson = await Page.EvaluateAsync<string>(
@@ -96,11 +95,7 @@ public class WhenServerTraceparentFlowsToOutboundRequests : PlaywrightTestBase
 
         // Trigger an outbound request and read its traceparent header.
         var request = await Page.RunAndWaitForRequestAsync(
-            async () =>
-            {
-                var save = Page.Locator("button:has-text('Save')").First;
-                await save.ClickAsync();
-            },
+            async () => await Page.Locator("#save-btn").ClickAsync(),
             "**/Sandbox/HttpPipeline/Http/Save");
 
         var headers = request.Headers;
