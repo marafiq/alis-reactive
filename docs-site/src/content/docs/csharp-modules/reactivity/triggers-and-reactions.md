@@ -100,15 +100,23 @@ Html.On(plan, t => t.CustomEvent<ResidentCreatedPayload>("resident-created", (pa
 
 > **How typed payloads work:** `SetText(payload, x => x.Name)` does not read `payload.Name` at render time. The expression `x => x.Name` is converted to the dot-path `"evt.name"` and embedded in the JSON plan. At runtime, when the event fires, the JS runtime resolves `evt.name` from the actual event data. The `payload` parameter is a compile-time proxy — it exists only for IntelliSense and type checking. The payload type must have a parameterless constructor (`new()` constraint).
 
-Dispatching with data:
+Dispatching with data — two variants:
 
 ```csharp
+// Literal payload: data known at build time
 pipeline.Dispatch("resident-created", new ResidentCreatedPayload
 {
     Name = "Jane Doe",
     Facility = "Sunrise Manor"
 });
+
+// Source-backed payload: fields resolved from live components at runtime
+pipeline.DispatchWith<ResidentCreatedPayload>("resident-created", d => d
+    .Set(x => x.Name, pipeline.Component<NativeTextBox>(m => m.Name).Value())
+    .Set(x => x.Facility, "Sunrise Manor"));
 ```
+
+Use `Dispatch` when the payload is a compile-time constant. Use `DispatchWith` when fields come from live component values, URL params, plugin reads, or need to mix sources with literals.
 
 ## .Reactive() — component events
 

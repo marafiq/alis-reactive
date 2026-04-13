@@ -55,16 +55,27 @@ ToPath<T>(prefix, expression)
 ToPath<T>(prefix, expression)
 ToPropertyName<T>(expression)
 ToResponsePath<T>(expression)
+ToResponsePath<T>()
 ```
 
 ### IAppLevelComponent
 
 Marker for app-level components with a well-known element ID.
 
+```csharp
+// Properties
+DefaultId { get; }  // Gets the default DOM element ID for this app-level component.
+```
+
 ### IComponent
 
 Base interface for all reactive components (Fusion SF, Native DOM).
             Every component declares its vendor ("native" or "fusion") as an instance property.
+
+```csharp
+// Properties
+Vendor { get; }  // Gets the vendor identifier for component resolution.
+```
 
 ### IdGenerator
 
@@ -99,6 +110,7 @@ PlanId { get; }  // Gets the unique plan identifier, derived from the model type
 ```
 
 ```csharp
+RegisterPlugin()
 Render()
 RenderFormatted()
 WalkRequestReactions()
@@ -131,23 +143,240 @@ Read<T>(expression)
 Typed event reference for component .Reactive() extensions.
             Holds the JS event name and provides compile-time type safety for event args.
 
+```csharp
+// Properties
+Args { get; }  // Gets the typed event arguments instance.
+JsEvent { get; }  // Gets the JavaScript event name.
+```
+
 ---
 
 ## Builders
+
+### DispatchPayloadBuilder<T>
+
+Composes a custom-event dispatch payload from live sources and literals.
+            Each field is set via a typed expression on `TPayload`,
+            matching the shape that `PipelineBuilder{<T>`
+            listeners consume.
+
+```csharp
+ExpandNestedPaths()
+Set(field, value)
+Set(field, value)
+Set(field, value)
+Set<T>(field, source)
+```
+
+### ElementBuilder<T>
+
+Builds DOM mutations on a target element: text, HTML, CSS classes, and visibility.
+
+```csharp
+AddClass(className)
+Hide()
+RemoveClass(className)
+SetHtml(html)
+SetHtml<T>(source, path)
+SetHtml<T>(source)
+SetText(text)
+SetText<T>(source, path)
+SetText<T>(source, path)
+SetText<T>(source)
+Show()
+ToggleClass(className)
+```
 
 ### IReactionEmitter
 
 Narrow interface for emitting reactions into a pipeline.
             Used by vendor-specific extensions (Fusion, Native) and ComponentRef.
 
+```csharp
+// Properties
+BuildContext { get; }  // Gets the plan build context for component registration.
+```
+
+```csharp
+AddStep()
+```
+
+### PipelineBuilder<T>
+
+Builds the sequence of commands that execute when a trigger fires: element mutations,
+            event dispatches, HTTP calls, component interactions, and conditional logic.
+
+```csharp
+// Properties
+Alis#Reactive#Builders#IReactionEmitter#BuildContext { get; }  // 
+```
+
+```csharp
+Alis#Reactive#Builders#IReactionEmitter#AddStep()
+Component<T>(expr)
+Component<T>(expr)
+Component<T>(refId)
+Component<T>()
+Confirm(message)
+Delete(url)
+Dispatch(eventName)
+Dispatch<T>(eventName, payload)
+DispatchWith<T>(eventName, configure)
+Element(elementId)
+FromUrl(paramName)
+FromUrl<T>(paramName)
+Get(url)
+Into(elementId)
+Parallel()
+Plugin(pluginName, member)
+Plugin<T>(pluginName, member)
+Post(url)
+Post()
+Put()
+ValidationErrors(formId)
+When<T>()
+When<T>()
+When<T>()
+```
+
+### PluginCallBuilder<T>
+
+Builds a void plugin method call with optional arguments.
+            Call `Fire` to emit the CallReaction into the pipeline.
+
+```csharp
+Arg()
+Arg()
+Arg()
+Arg()
+Arg<T>()
+Arg<T>()
+Arg<T>()
+Fire()
+```
+
+### PluginReadBuilder<T>
+
+Builds a plugin method read with optional arguments.
+            Implicitly converts to `TypedPluginSource<T>` — no explicit Build() call needed.
+
+```csharp
+Arg()
+Arg()
+Arg()
+Arg()
+Arg<T>()
+Arg<T>()
+Arg<T>()
+op_Implicit()
+```
+
+### PluginTypeBuilder
+
+Configures a plugin's JsType members during plan construction.
+            Used by `plan.RegisterPlugin("name", p => p.Method<string>("getToken"))`.
+
+```csharp
+Method<T>()
+Void()
+```
+
+### TriggerBuilder<T>
+
+Wires browser triggers to reactive workflows.
+
+```csharp
+CustomEvent(eventName, pipeline)
+CustomEvent<T>(eventName, pipeline)
+DomReady(pipeline)
+ServerPush(url, pipeline)
+ServerPush(url, eventType, pipeline)
+ServerPush<T>(url, eventType, pipeline)
+SignalR(hubUrl, methodName, pipeline)
+SignalR<T>(hubUrl, methodName, pipeline)
+```
+
 ---
 
 ## Builders — Conditions
+
+### BranchBuilder<T>
+
+Chains ElseIf and Else cases after a Then branch.
+
+```csharp
+Else(pipeline)
+ElseIf<T>()
+ElseIf<T>()
+ElseIf<T>()
+```
+
+### ConditionSourceBuilder<T>
+
+Provides typed comparison operators for a value source in a condition.
+
+```csharp
+ArrayContains()
+Between()
+Contains()
+EndsWith()
+Eq()
+Eq()
+Falsy()
+Gt()
+Gt()
+Gte()
+Gte()
+In()
+IsEmpty()
+IsNull()
+Lt()
+Lt()
+Lte()
+Lte()
+Matches()
+MinLength()
+NotEmpty()
+NotEq()
+NotEq()
+NotIn()
+NotNull()
+StartsWith()
+Truthy()
+```
+
+### ConditionStart<T>
+
+Entry point for building standalone condition expressions used in nested And/Or calls.
+
+```csharp
+Confirm(message)
+When<T>()
+When<T>()
+When<T>()
+```
 
 ### EventArgSource<T>
 
 A typed source that reads from the event payload.
             Delegates to `PayloadTypedSource<T>` with event scope.
+
+### GuardBuilder<T>
+
+Composes conditions with And/Or/Not and branches with Then/ElseIf/Else.
+
+```csharp
+And()
+And<T>()
+And<T>()
+And<T>()
+Not()
+Or()
+Or<T>()
+Or<T>()
+Or<T>()
+Then(pipeline)
+```
 
 ### PayloadTypedSource<T>
 
@@ -158,6 +387,11 @@ A typed source that reads from any payload scope (event, success, error, dispatc
 
 A typed source that reads the current value of a component in the browser.
             Returned by each component's Value() extension method.
+
+### TypedPluginSource<T>
+
+A typed source that reads a method return value from a registered plugin.
+            Returned by `PipelineBuilder.Plugin<T>()` via implicit conversion from `PluginReadBuilder<T>`.
 
 ### TypedSource<T>
 
@@ -176,13 +410,101 @@ ToComponentSource()
 ToValueProducer()
 ```
 
+### TypedUrlSource<T>
+
+A typed source that reads a URL query parameter from the browser's current location.
+            Returned by `PipelineBuilder.FromUrl()` and `PipelineBuilder.FromUrl<T>()`.
+            Plugs into all TypedSource<T> consumers: conditions, guards, branches, element ops, gather, headers, route params.
+
 ---
 
 ## Builders — Requests
 
+### GatherBuilder<T>
+
+Builds the HTTP request payload by gathering values from components, static data, event args, plugins, headers, route params, and URL query params.
+
+```csharp
+// Properties
+IsIncludeAll { get; }  // Returns true if IncludeAll() was called.             Used at build time to expand to all registered components.
+```
+
+```csharp
+FromEvent<T>(args, path, param)
+FromUrl()
+FromUrl()
+FromUrl<T>()
+FromUrl<T>()
+Header()
+Header<T>()
+Header<T>()
+Include()
+IncludeAll()
+Plugin<T>()
+RequireScalarShape<T>()
+RouteParam()
+RouteParam()
+RouteParam()
+RouteParam<T>()
+RouteParam<T>()
+Static(param, value)
+```
+
 ### GatherExtensions
 
-Vendor-agnostic gather extensions for any `IComponent` + `IInputComponent`.
+Vendor-agnostic gather extensions for including component values in HTTP requests.
+
+```csharp
+Include<T>()
+Include<T>()
+Include<T>()
+Include<T>()
+```
+
+### HttpRequestBuilder<T>
+
+Builds an HTTP request with optional gather, validation, response handling, and chaining.
+
+```csharp
+AsFormData()
+AsJson()
+AttachResponseLifecycle()
+BuildStaticAndEventFields()
+Delete(url)
+ExpandIncludeAllComponents()
+Finally(pipeline)
+Gather(gather)
+Get(url)
+Post(url)
+Put(url)
+ResolveRequestPayload()
+Response(response)
+Validate<T>(formId)
+ValidateRouteParamAlignment()
+WhileLoading(pipeline)
+```
+
+### ParallelBuilder<T>
+
+Builds a set of HTTP requests that execute concurrently.
+
+```csharp
+OnAllSettled()
+```
+
+### ResponseBuilder<T>
+
+Builds response handlers for HTTP success, error, and chained requests.
+
+```csharp
+Chained(request)
+OnError(pipeline)
+OnError(statusCode, pipeline)
+OnError<T>(pipeline)
+OnError<T>(statusCode, pipeline)
+OnSuccess(pipeline)
+OnSuccess<T>(pipeline)
+```
 
 ---
 
@@ -242,6 +564,83 @@ Writes closing HTML tags when disposed. Pure BCL.
 
 ## PlanModel
 
+### AllCondition
+
+Logical AND: all child conditions must be true.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"all"`.
+Terms { get; }  // Gets the child conditions that must all be true.
+```
+
+### AnyCondition
+
+Logical OR: at least one child condition must be true.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"any"`.
+Terms { get; }  // Gets the child conditions where at least one must be true.
+```
+
+### ArrayProducer
+
+A composite value built from ordered item expressions.
+
+```csharp
+// Properties
+Items { get; }  // Gets the ordered item expressions.
+Kind { get; }  // Gets the kind. Always `"array"`.
+Shape { get; }  // Gets the expected type shape, or `null` when not specified.
+```
+
+### BranchCase
+
+Pairs an optional guard condition with a reaction to execute.
+
+```csharp
+// Properties
+Reaction { get; }  // Gets the reaction to execute when the condition is met.
+When { get; }  // Gets the guard condition, or `null` for the default (else) case.
+```
+
+### BranchReaction
+
+Evaluates conditions and executes the first matching case.
+
+```csharp
+// Properties
+Cases { get; }  // Gets the ordered cases to evaluate.
+Kind { get; }  // Gets the kind. Always `"branch"`.
+```
+
+### CallReaction
+
+Calls a method on a component or DOM element.
+
+```csharp
+// Properties
+Args { get; }  // Gets the method arguments, or `null` when the method takes no arguments.
+Kind { get; }  // Gets the kind. Always `"call"`.
+Method { get; }  // Gets the method name to call.
+On { get; }  // Gets the target source to call the method on.
+```
+
+### CompareCondition
+
+Compares two values using a relational operator.
+
+```csharp
+// Properties
+ItemShape { get; }  // Gets the element type shape used by collection operators such as `contains`, or `null` for non-collection comparisons.
+Kind { get; }  // Gets the kind. Always `"compare"`.
+Left { get; }  // Gets the left-hand operand.
+Op { get; }  // Gets the comparison operator (eq, neq, gt, gte, lt, lte, truthy, empty, contains, startsWith, endsWith).
+Right { get; }  // Gets the right-hand operand, or `null` for unary operators.
+Shape { get; }  // Gets the expected type shape for comparison, or `null` when inferred.
+```
+
 ### CompareOp
 
 String constants for all compare-condition operators.
@@ -250,15 +649,158 @@ String constants for all compare-condition operators.
             The `Shape)` parameter type stays `string`
             (serializes directly) but all internal callers use these constants.
 
+### ComponentSource
+
+Identifies a registered UI component as the value source.
+
+```csharp
+// Properties
+Component { get; }  // Gets the registered component name.
+Kind { get; }  // Gets the kind. Always `"component"`.
+```
+
+### ComponentValidation
+
+Validation rules for a single component within a container scope.
+            The Value producer reads the component's current value via the shared evaluateValue path.
+
+```csharp
+// Properties
+Component { get; }  // Component ID — used for DOM error display and serverFieldName mapping.
+Value { get; }  // How to read this component's value for validation. Evaluated via evaluateValue().
+```
+
+### Condition
+
+Base class for conditional predicates evaluated when the plan executes. Not constructed in application code.
+
+### ConfirmCondition
+
+Prompts the user for confirmation before the reaction proceeds.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"confirm"`.
+Message { get; }  // Gets the confirmation message shown to the user.
+```
+
+### DispatchReaction
+
+Dispatches a custom browser event.
+
+```csharp
+// Properties
+Data { get; }  // Gets the optional event payload, or `null` for no data.
+Event { get; }  // Gets the event name to dispatch.
+Kind { get; }  // Gets the kind. Always `"dispatch"`.
+PayloadType { get; }  // Gets the optional payload type tag, or `null` when untyped.
+```
+
 ### EventField
 
 A value read from the triggering event's payload.
             Replaces the "$event:" magic-string prefix.
 
+### GatherField
+
+Maps an HTTP parameter name to a value expression evaluated at request time.
+
+```csharp
+// Properties
+Key { get; }  // HTTP parameter name (from model binding path or explicit override).
+Value { get; }  // How to read the value. Carries source, member, and shape.
+```
+
+### InjectReaction
+
+Injects a value into a named component.
+
+```csharp
+// Properties
+Component { get; }  // Gets the target component name.
+Kind { get; }  // Gets the kind. Always `"inject"`.
+Value { get; }  // Gets the value to inject.
+```
+
+### LiteralProducer
+
+A constant value embedded in the plan.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"literal"`.
+Shape { get; }  // Gets the expected type shape, or `null` when not specified.
+Value { get; }  // Gets the constant value embedded in the plan.
+```
+
+### NotCondition
+
+Logical NOT: inverts a single child condition.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"not"`.
+Term { get; }  // Gets the condition to invert.
+```
+
+### ObjectProducer
+
+A composite value built from named field expressions.
+
+```csharp
+// Properties
+Fields { get; }  // Gets the named fields and their value expressions.
+Kind { get; }  // Gets the kind. Always `"object"`.
+Shape { get; }  // Gets the expected type shape, or `null` when not specified.
+WritableFields { get; }  // Gets the underlying mutable dictionary for building nested structures.
+```
+
+### ParallelReaction
+
+Executes a list of reactions concurrently.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"parallel"`.
+OnSettled { get; }  // Gets the reaction to execute after all steps settle, or `null` if none.
+Steps { get; }  // Gets the reactions to execute concurrently.
+```
+
+### Path
+
+An ordered sequence of segments for navigating nested properties on a value.
+
+```csharp
+// Properties
+Segments { get; }  // Gets the ordered path segments.
+```
+
 ### PathJsonConverter
 
 Serializes Path as a bare JSON array of PathSegments.
             Schema expects: [{ "kind": "property", "name": "value" }]
+
+### PathSegment
+
+One step in a property navigation path: a property name or array index.
+
+```csharp
+// Properties
+Index { get; }  // Gets the array index for index segments, or `null` for property segments.
+Kind { get; }  // Gets the segment kind (property or index).
+Name { get; }  // Gets the property name for property segments, or `null` for index segments.
+```
+
+### PayloadSource
+
+Reads from the event or response payload of the current trigger.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"payload"`.
+Scope { get; }  // Gets the payload scope: event (trigger payload), success or error (HTTP response), request (outgoing body), dispatch (custom event data), or local (view model).
+Type { get; }  // Gets the optional payload type tag, or `null` when untyped.
+```
 
 ### PlanBuildContext
 
@@ -272,27 +814,196 @@ EnsureElement()
 EnsureEvent()
 EnsureInputComponent()
 EnsureMethod()
+EnsurePluginMethod()
 EnsureProperty()
 GetRegisteredComponents()
 RegisterInputComponents()
+RegisterPlugin()
 TryFindRegistrationById()
+WireComponentEvent()
+```
+
+### PluginSource
+
+Reads a value from a named plugin object registered by the application.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"plugin"`.
+Name { get; }  // Gets the plugin registry name.
+```
+
+### Reaction
+
+Base class for all executable actions in a reactive plan. Not constructed in application code.
+
+### ReadProducer
+
+A value read from a live source when the plan executes in the browser.
+
+```csharp
+// Properties
+Args { get; }  // Gets optional method arguments, or `null` for property reads.
+From { get; }  // Gets the value source: `ComponentSource`, `PluginSource`,             `UrlSource`, or `PayloadSource`.
+Kind { get; }  // Gets the kind. Always `"read"`.
+Member { get; }  // Gets the property or method name to read on the source.
+Path { get; }  // Gets the nested property path, or `null` for direct reads.
+Shape { get; }  // Gets the expected type shape, or `null` when not specified.
+```
+
+### Request
+
+An HTTP request definition in the reactive plan.
+
+```csharp
+// Properties
+Before { get; }  // Gets reactions to execute before the request is sent, or `null` if none.
+Complete { get; }  // Gets reactions to execute after the request completes regardless of outcome, or `null` if none.
+Container { get; }  // Gets the DOM element ID where validation errors are displayed, or `null` when validation is not configured for this request.
+Error { get; }  // Gets the error response handlers, or `null` if none.
+Headers { get; }  // Gets the custom HTTP headers, or `null` if none. Each value is evaluated at request time.
+Input { get; }  // Gets the request body strategy, or `null` for bodiless requests.
+Method { get; }  // Gets the HTTP method (GET, POST, PUT, DELETE, PATCH).
+Next { get; }  // Gets the chained follow-up request, or `null` if none.
+RouteParams { get; }  // Gets the URL template parameters, or `null` if none. Each value is evaluated and URI-encoded before replacing placeholders in the URL.
+Success { get; }  // Gets the success response handlers, or `null` if none.
+Url { get; }  // Gets the request URL, which may contain template placeholders like `{id}`.
+```
+
+### RequestInput
+
+Base class for request body strategies. Not constructed in application code.
+
+### RequestReaction
+
+Sends an HTTP request as defined by the enclosed `Request`.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"request"`.
+Request { get; }  // Gets the HTTP request definition.
+```
+
+### ResponseHandler
+
+Maps an optional HTTP status code to a reaction.
+
+```csharp
+// Properties
+Reaction { get; }  // Gets the reaction to execute when the status matches.
+Status { get; }  // Gets the HTTP status code to match, or `null` to match any status.
+```
+
+### SequenceReaction
+
+Executes a list of reactions in declaration order.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"sequence"`.
+Steps { get; }  // Gets the ordered reactions to execute.
+```
+
+### SetReaction
+
+Sets a property value on a component or DOM element.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"set"`.
+On { get; }  // Gets the target source to set the property on.
+Property { get; }  // Gets the property name to set.
+Value { get; }  // Gets the value to assign.
 ```
 
 ### Shape
 
-The type contract the plan expresses. Declares what a value IS and enables
-            Shape-to-Shape conversion. One shared type used everywhere: JsType properties,
-            ValueProducer reads, conditions, validation rules, gather.
+Declares the expected type for a value in the plan (string, number, date, array, object, etc.).
+            Used across value expressions, conditions, and validation to ensure type consistency.
+
+```csharp
+// Properties
+Additional { get; }  // Gets whether the object shape accepts properties beyond those listed in `Fields`. When true, the value may contain extra keys not declared in the shape.
+Fields { get; }  // Gets the named field shapes for object shapes, or `null` for non-object shapes.
+Inner { get; }  // Gets the wrapped shape for nullable shapes, or `null` for non-nullable shapes.
+IsScalar { get; }  // Returns true if this shape represents a value that can be meaningfully serialized             to a single string. Suitable for HTTP headers, route params, and query strings.             Scalars: string, number, boolean, date. Nullable wrapping a scalar is also scalar.             Non-scalars: array, object, raw, any, none.
+Item { get; }  // Gets the element shape for array shapes, or `null` for non-array shapes.
+Kind { get; }  // Gets the shape kind (string, number, boolean, date, array, object, nullable, raw, any, or none).
+```
+
+```csharp
+Equals(other)
+Equals()
+GetHashCode()
+op_Equality()
+op_Inequality()
+```
 
 ### ShapeCompat
 
 Picks the most specific compatible shape from two registrations.
             Returns null if incompatible (true conflict).
 
+### ShowValidationErrorsReaction
+
+Displays accumulated validation errors in the target container.
+
+```csharp
+// Properties
+Container { get; }  // Gets the element ID of the validation error container.
+Kind { get; }  // Gets the kind. Always `"show-validation-errors"`.
+```
+
+### Source
+
+Base class for value source identifiers in a reactive plan. Not constructed in application code.
+
 ### StaticField
 
 A literal key/value pair included in a gather request.
             Replaces the "$static:" magic-string prefix.
+
+### UrlSource
+
+Reads a value from the browser's current URL query string.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"url"`.
+```
+
+### ValueInput
+
+Sends a single evaluated value as the request body.
+
+```csharp
+// Properties
+Kind { get; }  // Gets the kind. Always `"value"`.
+Transport { get; }  // Gets the transport format (json or form).
+Value { get; }  // Gets the value expression to send as the body.
+```
+
+### ValueProducer
+
+Base class for all value nodes in a reactive plan. Not constructed in application code.
+
+```csharp
+LiteralRaw()
+ReadUrl()
+```
+
+---
+
+## Serialization
+
+### WriteOnlyPolymorphicConverter<T>
+
+Serializes polymorphic types by writing the concrete type properties. Read is not supported.
+
+```csharp
+Read()
+Write()
+```
 
 ---
 
@@ -762,6 +1473,91 @@ Wires browser events from a `FusionDateTimePicker` into the reactive plan.
 Reactive<T>(builder, plan, eventSelector, pipeline)
 ```
 
+### FusionDialog
+
+FusionDialog — non-input display component wrapping Syncfusion EJ2 Dialog.
+            Modal or non-modal popup for forms, confirmations, and detail views.
+            Has events and methods but no form value (no ValueMember, no IInputComponent).
+
+### FusionDialogBeforeCloseArgs
+
+Payload for FusionDialog.BeforeClose (SF "beforeClose" event).
+            Fires before the dialog closes.
+
+```csharp
+// Properties
+Cancel { get; }  // Set to true to prevent the dialog from closing.
+IsInteracted { get; }  // True when the user closed the dialog via X button or overlay click.
+```
+
+### FusionDialogBeforeOpenArgs
+
+Payload for FusionDialog.BeforeOpen (SF "beforeOpen" event).
+            Fires before the dialog opens. Set cancel to true to prevent opening.
+
+```csharp
+// Properties
+Cancel { get; }  // Set to true to prevent the dialog from opening.
+```
+
+### FusionDialogBuilder<T>
+
+Wraps SF DialogBuilder.Render() output + carries plan and elementId
+            for .Reactive() chaining. Non-input component — no ComponentsMap registration.
+
+### FusionDialogClosedArgs
+
+Payload for FusionDialog.Closed (SF "close" event).
+            Notification only — fires after the dialog is hidden.
+
+### FusionDialogEvents
+
+Events available on FusionDialog.
+            Singleton instance — used with .Reactive() event selector lambda.
+
+```csharp
+// Properties
+BeforeClose { get; }  // Fires before the dialog closes (SF "beforeClose" event).
+BeforeOpen { get; }  // Fires before the dialog opens (SF "beforeOpen" event).
+Closed { get; }  // Fires after the dialog is hidden (SF "close" event).
+Opened { get; }  // Fires after the dialog is visible (SF "open" event).
+OverlayClick { get; }  // Fires when the modal overlay is clicked (SF "overlayClick" event).
+```
+
+### FusionDialogExtensions
+
+Mutation extensions for `FusionDialog` in a reactive pipeline.
+
+```csharp
+Hide<T>()
+RefreshPosition<T>()
+Show<T>()
+```
+
+### FusionDialogHtmlExtensions
+
+Factory extension for creating FusionDialogBuilder.
+            Non-input component — NO InputField wrapper, NO ComponentsMap registration.
+
+```csharp
+FusionDialog<T>()
+```
+
+### FusionDialogOpenedArgs
+
+Payload for FusionDialog.Opened (SF "open" event).
+            Notification only — fires after the dialog is visible.
+
+### FusionDialogOverlayClickArgs
+
+Payload for FusionDialog.OverlayClick (SF "overlayClick" event).
+            Fires when the modal overlay background is clicked.
+            Notification only — typically used to close the dialog.
+
+### FusionDialogReactiveExtensions
+
+Wires browser events from a `FusionDialog` into the reactive plan.
+
 ### FusionDropDownList
 
 A FusionDropDownList for selecting a single value from a list.
@@ -885,6 +1681,92 @@ Event payload delivered when files are selected in a `FusionFileUpload`.
 // Properties
 FilesCount { get; }  // Gets or sets the number of files selected.
 IsInteracted { get; }  // Gets or sets whether the selection was triggered by user interaction.
+```
+
+### FusionGrid
+
+FusionGrid — non-input data grid component with server-side custom binding.
+            Supports sort, page, and filter via the DataStateChange event.
+
+### FusionGridAction
+
+Action details from the dataStateChange event.
+            Contains requestType plus context-specific parameters.
+
+```csharp
+// Properties
+ColumnName { get; }  // Gets or sets the column name being sorted (sorting actions only).
+CurrentPage { get; }  // Gets or sets the current page number.
+Direction { get; }  // Gets or sets the sort direction (sorting actions only).
+PageSize { get; }  // Gets or sets the page size.
+PreviousPage { get; }  // Gets or sets the previous page number.
+RequestType { get; }  // Gets or sets the request type (e.g. "sorting", "paging").
+```
+
+### FusionGridBuilder<T>
+
+Wraps SF GridBuilder.Render() output and carries plan and elementId
+            for `.Reactive()` chaining. Non-input component.
+
+### FusionGridDataStateChangeArgs
+
+Event args for the SF Grid "dataStateChange" event.
+            Fires when the Grid needs data: on init, sort, page, or filter.
+
+```csharp
+// Properties
+Action { get; }  // Action details: requestType, columnName, direction, currentPage.
+Skip { get; }  // Paging offset (0-based). Always present.
+Sorted { get; }  // Active sort columns. Empty when unsorted. Supports multi-sort.
+Take { get; }  // Page size. Always present.
+```
+
+### FusionGridEvents
+
+Typed event descriptors for the `FusionGrid` component.
+
+```csharp
+// Properties
+DataStateChange { get; }  // Fires when the grid needs data (sort, page, filter).             SF "dataStateChange" event in custom binding mode.
+```
+
+### FusionGridExtensions
+
+Typed mutations for `FusionGrid` in a reactive pipeline.
+
+```csharp
+Refresh<T>()
+SetDataSource<T>(self, source, path)
+SetDataSource<T>(self, source)
+SetDataSource<T>(self, source, path)
+```
+
+### FusionGridHtmlExtensions
+
+Factory extension for creating a `FusionGridBuilder<T>`.
+            Non-input component: no InputField wrapper, no ComponentsMap registration.
+
+```csharp
+FusionGrid<T>(html, plan, elementId, build)
+```
+
+### FusionGridReactiveExtensions
+
+Wires browser events from a `FusionGrid` into the reactive plan.
+
+```csharp
+Reactive<T>(builder, eventSelector, pipeline)
+```
+
+### FusionGridSortColumn
+
+One sort column in the grid's sorted state.
+            SF uses lowercase direction: "ascending" / "descending".
+
+```csharp
+// Properties
+Direction { get; }  // Sort direction: "ascending" or "descending" (lowercase).
+Name { get; }  // Field name (e.g., "name", "age").
 ```
 
 ### FusionInputMask
@@ -1206,6 +2088,199 @@ Wires browser events from a `FusionRichTextEditor` into the reactive plan.
 Reactive<T>(builder, plan, eventSelector, pipeline)
 ```
 
+### FusionSchedule
+
+FusionSchedule — non-input display component wrapping Syncfusion EJ2 Schedule.
+            Calendar/scheduler for shift management, appointments, and event planning.
+            Supports multiple views (Day, Week, Month, Agenda, Timeline), resource grouping,
+            drag-and-drop, and server-driven data loading.
+            Has events and methods but no form value (no ValueMember, no IInputComponent).
+
+### FusionScheduleActionBeginArgs
+
+Payload for FusionSchedule.ActionBegin (SF "actionBegin" event).
+            Fires before every scheduler action. Set cancel to prevent the action.
+            requestType: "eventCreate", "eventChange", "eventRemove", "dateNavigate", "viewNavigate".
+
+```csharp
+// Properties
+Cancel { get; }  // Set to true to cancel the action.
+RequestType { get; }  // The type of action being performed.
+```
+
+### FusionScheduleActionCompleteArgs
+
+Payload for FusionSchedule.ActionComplete (SF "actionComplete" event).
+            Fires after a scheduler action completes successfully.
+
+```csharp
+// Properties
+RequestType { get; }  // The type of action that completed.
+```
+
+### FusionScheduleBuilder<T>
+
+Wraps SF ScheduleBuilder.Render() output + carries plan and elementId
+            for .Reactive() chaining. Non-input component — no ComponentsMap registration.
+
+### FusionScheduleCellClickArgs
+
+Payload for FusionSchedule.CellClicked (SF "cellClick" event).
+            Fires when a time cell is clicked. Contains the time slot and resource group.
+
+```csharp
+// Properties
+EndTime { get; }  // End time of the clicked cell slot.
+GroupIndex { get; }  // Zero-based index of the resource group (e.g., which shift).
+IsAllDay { get; }  // True if the all-day row was clicked.
+StartTime { get; }  // Start time of the clicked cell slot.
+```
+
+### FusionScheduleDataBoundArgs
+
+Payload for FusionSchedule.DataBound (SF "dataBound" event).
+            Fires after data is loaded and rendered. Notification only.
+            Use to hide loaders or update counts after server data loads.
+
+### FusionScheduleEventClickArgs
+
+Payload for FusionSchedule.EventClicked (SF "eventClick" event).
+            Fires when an appointment/event is clicked.
+
+```csharp
+// Properties
+Cancel { get; }  // Set to true to prevent the default quick-info popup.
+```
+
+### FusionScheduleEventData
+
+Event data nested inside eventRendered args. Contains the schedule event's
+            domain fields for use in conditional styling (e.g., red for unassigned).
+
+### FusionScheduleEventRenderedArgs
+
+Payload for FusionSchedule.EventRendered (SF "eventRendered" event).
+            Fires before each event/appointment renders on the UI.
+            Use to apply custom styling (e.g., unassigned shifts in red).
+            Set cancel to true to prevent the event from rendering.
+
+```csharp
+// Properties
+Cancel { get; }  // Set to true to prevent this event from rendering.
+Data { get; }  // The event data being rendered. Use in conditions for conditional styling.
+Type { get; }  // The render type: "event" for normal events.
+```
+
+### FusionScheduleEvents
+
+Events available on FusionSchedule.
+            Singleton instance — used with .Reactive() event selector lambda.
+
+```csharp
+// Properties
+ActionBegin { get; }  // Fires before a scheduler action begins (SF "actionBegin" event).             requestType: "eventCreate", "eventChange", "eventRemove", "dateNavigate", "viewNavigate".
+ActionComplete { get; }  // Fires after a scheduler action completes (SF "actionComplete" event).             Contains addedRecords, changedRecords, deletedRecords.
+CellClicked { get; }  // Fires when a time cell is clicked (SF "cellClick" event).             Payload: startTime, endTime, groupIndex, isAllDay.
+DataBound { get; }  // Fires after data is loaded and rendered (SF "dataBound" event).
+EventClicked { get; }  // Fires when an event/appointment is clicked (SF "eventClick" event).
+EventRendered { get; }  // Fires before each event renders (SF "eventRendered" event).             Used for custom styling (e.g., unassigned shifts in red). Cancelable.
+Navigating { get; }  // Fires before date or view navigation (SF "navigating" event).             action: "date" or "view". Cancelable.
+PopupClose { get; }  // Fires when a popup closes (SF "popupClose" event).
+PopupOpen { get; }  // Fires before a popup opens (SF "popupOpen" event).             type: "QuickInfo", "Editor", "DeleteAlert". Cancelable.
+```
+
+### FusionScheduleExtensions
+
+Mutation extensions for `FusionSchedule` in a reactive pipeline.
+
+```csharp
+AddEvent<T>()
+CloseEditor<T>()
+CurrentView<T>()
+DeleteEvent<T>()
+OpenEditor<T>()
+Print<T>()
+RefreshEvents<T>()
+SaveEvent<T>()
+ScrollTo<T>()
+SelectedDate<T>()
+SetDataSource<T>()
+SetDataSource<T>()
+```
+
+### FusionScheduleHtmlExtensions
+
+Factory extension for creating FusionScheduleBuilder.
+            Non-input component — NO InputField wrapper, NO ComponentsMap registration.
+
+```csharp
+FusionSchedule<T>()
+```
+
+### FusionScheduleNavigatingArgs
+
+Payload for FusionSchedule.Navigating (SF "navigating" event).
+            Fires before date or view navigation. Set cancel to prevent.
+            action: "date" for arrow navigation, "view" for Day/Week/Month tab switch.
+
+```csharp
+// Properties
+Action { get; }  // The navigation action: "date" or "view".
+Cancel { get; }  // Set to true to cancel the navigation.
+CurrentDate { get; }  // The date being navigated TO (ISO string from SF).
+CurrentView { get; }  // The view being navigated TO: "Day", "Week", "WorkWeek", "Month", "Agenda".             Present on view switch (action="view"). Empty on date navigation.
+PreviousDate { get; }  // The date being navigated FROM (ISO string from SF).
+PreviousView { get; }  // The view being navigated FROM.             Present on view switch (action="view"). Empty on date navigation.
+ViewIndex { get; }  // Zero-based index of the target view in the views array.             Present on view switch (action="view").
+```
+
+### FusionSchedulePopupCloseArgs
+
+Payload for FusionSchedule.PopupClose (SF "popupClose" event).
+            Fires when a popup closes.
+
+```csharp
+// Properties
+Type { get; }  // The popup type that closed: "QuickInfo", "Editor", or "DeleteAlert".
+```
+
+### FusionSchedulePopupData
+
+Event data nested inside popupOpen args. Contains the schedule event being
+            acted on. Use with FromEvent to pass the event ID to server endpoints.
+
+```csharp
+// Properties
+Id { get; }  // The event ID.
+Subject { get; }  // The event subject/title.
+```
+
+### FusionSchedulePopupOpenArgs
+
+Payload for FusionSchedule.PopupOpen (SF "popupOpen" event).
+            Fires before any popup opens. Set cancel to prevent.
+            type: "QuickInfo" (click tooltip), "Editor" (full edit modal), "DeleteAlert" (confirmation).
+
+```csharp
+// Properties
+Cancel { get; }  // Set to true to prevent the popup from opening.
+Data { get; }  // The event data associated with this popup (id, subject, startTime, etc.).
+Type { get; }  // The popup type: "QuickInfo", "Editor", or "DeleteAlert".
+```
+
+### FusionSchedulePopupOpenArgsExtensions
+
+Extensions for `FusionSchedulePopupOpenArgs` — cancel SF popup to use custom UI.
+            Same pattern as `FusionAutoCompleteFilteringArgs`.PreventDefault.
+
+```csharp
+PreventDefault()
+```
+
+### FusionScheduleReactiveExtensions
+
+Wires browser events from a `FusionSchedule` into the reactive plan.
+
 ### FusionSwitch
 
 A FusionSwitch for toggling a boolean on/off.
@@ -1383,43 +2458,176 @@ Wires browser events from a `FusionTimePicker` into the reactive plan.
 Reactive<T>(builder, plan, eventSelector, pipeline)
 ```
 
-### TestWidgetSyncFusion
+### FusionTooltip
 
-Test widget for architecture verification — fusion vendor.
-            Phantom type — proves vendor resolves root via ej2_instances[0],
-            and valueMember walks from that root.
+FusionTooltip — non-input display component wrapping Syncfusion EJ2 Tooltip.
+            Shows contextual information on hover, click, or programmatic trigger.
+            Has events and methods but no form value (no ValueMember, no IInputComponent).
 
-```csharp
-// Properties
-ValueMember { get; }  // 
-```
+### FusionTooltipBeforeCloseArgs
 
-### TestWidgetSyncFusionBuilder<T>
-
-Renders a <div data-test-widget> element that auto-mounts as a TestWidget
-             with ej2_instances pattern. Not model-bound — for standalone test widgets.
-            
-             Usage:
-               @Html.TestWidget("my-widget")
-                   .InitialValue("hello")
-                   .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
+Payload for FusionTooltip.BeforeClose (SF "beforeClose" event).
+            Fires before the tooltip closes. Set cancel to true to prevent closing.
 
 ```csharp
 // Properties
-ElementId { get; }  // The element ID — used by .Reactive() to wire events.
+Cancel { get; }  // Set to true to prevent the tooltip from closing.
 ```
 
+### FusionTooltipBeforeOpenArgs
+
+Payload for FusionTooltip.BeforeOpen (SF "beforeOpen" event).
+            Fires before the tooltip opens. Set cancel to true to prevent opening.
+
 ```csharp
-CssClass()
-InitialValue()
+// Properties
+Cancel { get; }  // Set to true to prevent the tooltip from opening.
 ```
 
-### TestWidgetSyncFusionHtmlExtensions
+### FusionTooltipBeforeRenderArgs
 
-Factory extension for creating TestWidgetSyncFusionBuilder.
+Payload for FusionTooltip.BeforeRender (SF "beforeRender" event).
+            Fires before tooltip content renders. Used for dynamic content injection.
+            Set cancel to true to prevent rendering.
 
 ```csharp
-TestWidget<T>()
+// Properties
+Cancel { get; }  // Set to true to prevent the tooltip from rendering.
+```
+
+### FusionTooltipBuilder<T>
+
+Wraps SF TooltipBuilder.Render() output + carries plan and elementId
+            for .Reactive() chaining. Non-input component — no ComponentsMap registration.
+
+### FusionTooltipClosedArgs
+
+Payload for FusionTooltip.Closed (SF "close" event).
+            Fires after the tooltip is hidden. Notification only — no actionable fields.
+
+### FusionTooltipEvents
+
+Events available on FusionTooltip.
+            Singleton instance — used with .Reactive() event selector lambda:
+              .Reactive(evt => evt.BeforeOpen, (args, p) => { ... })
+
+```csharp
+// Properties
+BeforeClose { get; }  // Fires before the tooltip closes (SF "beforeClose" event). Set cancel to prevent closing.
+BeforeOpen { get; }  // Fires before the tooltip opens (SF "beforeOpen" event). Set cancel to prevent opening.
+BeforeRender { get; }  // Fires before tooltip content renders (SF "beforeRender" event). Used for dynamic content.
+Closed { get; }  // Fires after the tooltip is hidden (SF "close" event).
+Opened { get; }  // Fires after the tooltip is visible (SF "open" event).
+```
+
+### FusionTooltipExtensions
+
+Mutation extensions for `FusionTooltip` in a reactive pipeline.
+
+```csharp
+Close<T>()
+Open<T>()
+Refresh<T>()
+```
+
+### FusionTooltipHtmlExtensions
+
+Factory extension for creating FusionTooltipBuilder.
+            Non-input component — NO InputField wrapper, NO ComponentsMap registration.
+
+```csharp
+FusionTooltip<T>()
+```
+
+### FusionTooltipOpenedArgs
+
+Payload for FusionTooltip.Opened (SF "open" event).
+            Fires after the tooltip becomes visible. Notification only — no actionable fields.
+
+### FusionTooltipReactiveExtensions
+
+Wires browser events from a `FusionTooltip` into the reactive plan.
+
+---
+
+## Fusion — Templates
+
+### FusionConditionalBuilder<T>
+
+Builder for conditional content inside When/ShowIf blocks
+
+```csharp
+Badge()
+Badge<T>()
+Button()
+Div()
+EventButton<T>()
+Icon()
+Img<T>()
+Raw()
+Render()
+Span()
+Span<T>()
+```
+
+### FusionTemplate
+
+Factory for creating typed Syncfusion template builders.
+
+```csharp
+Create<T>()
+```
+
+### FusionTemplateBuilder<T>
+
+Builds a div element with nested content for Syncfusion templates.
+            Use `Create<T>` to create instances.
+
+```csharp
+Attr()
+Badge()
+Badge<T>()
+Button()
+ButtonFor<T>()
+Class()
+Div()
+EventButton<T>()
+Icon()
+Id()
+Img<T>()
+Link<T>()
+Raw()
+Render()
+ShowIf()
+Span()
+Span<T>()
+Text()
+Text<T>()
+ToString()
+When()
+```
+
+### FusionTemplateExpression
+
+Converts C# expressions to Syncfusion template syntax.
+            m => m.PropertyName → ${PropertyName}
+            m => m.Address.City → ${Address.City}
+            m => m.Status == "Active" → Status === 'Active'
+
+```csharp
+ToBinding<T>()
+ToCondition<T>()
+ToPropertyPath<T>()
+```
+
+### TemplateElements
+
+Shared HTML element rendering for Syncfusion template builders.
+            Each method produces a single HTML element string using SF template binding syntax.
+
+```csharp
+Button()
+EventButton()
 ```
 
 ---
@@ -2067,68 +3275,6 @@ A single radio or checkbox option with a value, display text, and optional descr
 Description { get; }  // Gets the optional secondary description shown below the display text.
 Text { get; }  // Gets the display text shown next to the radio button or checkbox.
 Value { get; }  // Gets the option value submitted in the form.
-```
-
-### TestWidgetNative
-
-Test widget for architecture verification — native vendor.
-            Phantom type — proves the same valueMember works for both vendors.
-
-```csharp
-// Properties
-ValueMember { get; }  // 
-```
-
-### TestWidgetNativeBuilder<T>
-
-Renders an <input type="text"> element for architecture verification.
-             Not model-bound — for standalone native test inputs.
-            
-             Usage:
-               @(Html.TestWidgetNative<TModel>("my-input")
-                   .InitialValue("hello")
-                   .CssClass("rounded-md border"))
-
-```csharp
-// Properties
-ElementId { get; }  // The element ID — used by .Reactive() to wire events.
-```
-
-```csharp
-CssClass()
-InitialValue()
-ReadOnly()
-```
-
-### TestWidgetNativeChangeArgs
-
-Payload for TestWidgetNative.Changed (DOM "change" event).
-            Properties are typed markers for expression-based source binding:
-              p.Element("result").SetText(args, x => x.Value)
-            ExpressionPathHelper resolves x => x.Value to "evt.value".
-
-```csharp
-// Properties
-Value { get; }  // The input's value after the change.
-```
-
-### TestWidgetNativeEvents
-
-Events available on TestWidgetNative.
-            Singleton instance — used with .Reactive() event selector lambda:
-              .Reactive(plan, evt => evt.Changed, (args, p) => { ... })
-
-```csharp
-// Properties
-Changed { get; }  // Fires when the user changes the input value (DOM "change" event).
-```
-
-### TestWidgetNativeHtmlExtensions
-
-Factory extension for creating TestWidgetNativeBuilder.
-
-```csharp
-TestWidgetNative<T>()
 ```
 
 ---

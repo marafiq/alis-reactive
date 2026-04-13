@@ -280,7 +280,11 @@ Fire a named event that other triggers are listening for. This is how dom-ready 
 ```
 pipeline.Dispatch("event-name")                      fire a named event
 pipeline.Dispatch<TPayload>("name", new TPayload { ... })
-                                                     fire with typed data
+                                                     fire with literal data
+pipeline.DispatchWith<TPayload>("name", d => d
+    .Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Value())
+    .Set(x => x.Status, "active"))                   fire with source-backed data
+                                                     (live component values + literals)
 ```
 
 #### Conditions
