@@ -1,6 +1,6 @@
-# Tracing v2 — Plan-Driven, Encapsulated, Event-Only API
+# Structured Tracing — Plan-Driven, Encapsulated, Event-Only API
 
-> **For the next session:** This plan replaces the abandoned first attempt on branch `tracing-module-otel-standard-as-first-class-citizen-in-ts-runtime` (PR #107). Do **not** merge that branch. Read its lessons below, then start fresh from `release/1.0.0-preview1`.
+> **For the next session:** This plan supersedes the abandoned exploration on branch `tracing-module-otel-standard-as-first-class-citizen-in-ts-runtime` (PR #107). That branch is kept as a learning artifact — do not merge it. Start fresh from `release/1.0.0-preview1` as `feature/structured-tracing`.
 
 **Goal:** A tracing module where the runtime is a dumb visitor of the plan, tracing is a cross-cutting observer of that same walk, and the developer writes only `tracer("scope").info("event.name", { data })` — no Span, no lifecycle, no ctx threading, no flush.
 
@@ -98,7 +98,7 @@ I claimed "ready to ship" multiple times based on passing Playwright tests. Ever
 
 ---
 
-## The v2 Design
+## The Design
 
 ### Core principle
 
@@ -449,14 +449,14 @@ export interface ExecContext {
 
 Revert any changes to this interface from the abandoned branch.
 
-### Event name conventions (unchanged from v1)
+### Event name conventions
 
 - Dotted, noun-first: `boot.start`, `http.request.send`, `reaction.fail`
 - Base verb form, no past tense: `.fail` not `.failed`, `.connect` not `.connected`
 - Compound adjective states acceptable: `not-found`
 - Event names documented in a migration map for grep-ability
 
-### ConsoleSink rendering rules (lessons from v1)
+### ConsoleSink rendering rules
 
 ```typescript
 // Scripts/tracing/sink.ts
@@ -472,7 +472,7 @@ export class ConsoleSink {
 
     // Inline data JSON for greppability (Playwright + log aggregators)
     // AND human readability. Do NOT also pass as separate arg — causes
-    // DevTools to print each log twice (lesson from v1 browser verification).
+    // DevTools to print each log twice (lesson from browser verification on abandoned branch).
     const dataStr = event.data ? " " + JSON.stringify(event.data) : "";
     const args: unknown[] = [tag + dataStr, ...styles];
     if (event.error) args.push(event.error);  // error passed separately for DevTools stack trace expansion
@@ -536,8 +536,8 @@ Page.Console += (_, msg) =>
 - [ ] **Create a fresh worktree** from `release/1.0.0-preview1` (not from the abandoned branch)
   ```bash
   git fetch origin release/1.0.0-preview1
-  git worktree add .worktrees/tracing-v2 -b feature/tracing-v2 origin/release/1.0.0-preview1
-  cd .worktrees/tracing-v2
+  git worktree add .worktrees/structured-tracing -b feature/structured-tracing origin/release/1.0.0-preview1
+  cd .worktrees/structured-tracing
   ```
 - [ ] **Mark build artifacts skip-worktree immediately** to prevent the dotnet build target from dirtying the tree
   ```bash
@@ -558,14 +558,14 @@ Page.Console += (_, msg) =>
 **Files:**
 - Create `Scripts/tracing/types.ts` (public types only — no `Span`, no `SpanData`, no `TraceRoot`)
 - Create `Scripts/tracing/context.ts` (parseTraceparent, formatTraceparent, resolveLevel, isValidLevel, generateTraceId, generateSpanId)
-- Create `Scripts/tracing/breadcrumbs.ts` (unchanged ring buffer from v1)
+- Create `Scripts/tracing/breadcrumbs.ts` (ring buffer — reuse the implementation from the abandoned branch verbatim)
 - Create `Scripts/__tests__/tracing/types.test.ts`, `context.test.ts`, `breadcrumbs.test.ts`
 
 **Key:** `types.ts` must NOT export `Span`, `SpanData`, `TraceRoot`, or anything span-related. Only `Level`, `LEVELS`, `SEVERITY`, `TraceEvent`, `Breadcrumb`, `TraceSink`, `TraceConfig`, `ScopedTracer`.
 
 **Verify:** `npm run typecheck` clean, ~20 vitest pass, commit.
 
-### Task 2 — Interactions module (the heart of v2)
+### Task 2 — Interactions module (the heart of the design)
 
 **Files:**
 - Create `Scripts/tracing/interactions.ts` (run, currentTraceparent, setRootFromTraceparent, getCurrentTraceId, getCurrentSpanId, resetForTests)
@@ -663,11 +663,11 @@ One commit per file or grouped by responsibility, your choice. For each:
 
 **Modify:** `Scripts/types/plan.ts` — add optional `traceparent?: string` and `traceLevel?: string` to `Plan` interface.
 
-**Do NOT** modify `Scripts/types/context.ts`. `ExecContext.span` does not exist in v2.
+**Do NOT** modify `Scripts/types/context.ts`. `ExecContext.span` does not exist in this design.
 
 ### Task 8 — Update vitest coverage
 
-Delete any v1 tests that asserted on `Span`, `SpanData`, `NOOP_SPAN`, `ActiveSpan`, `ContextOnlySpan`, `TraceRoot`, `withSpan`, `span.end()`. Replace with the interactions-focused tests from Task 2-3.
+Do not bring over any tests from the abandoned branch that asserted on `Span`, `SpanData`, `NOOP_SPAN`, `ActiveSpan`, `ContextOnlySpan`, `TraceRoot`, `withSpan`, `span.end()` — none of those primitives exist here. Interactions-focused tests from Task 2-3 are the full coverage.
 
 **Verify:** `npm test` — all pass, commit.
 
@@ -698,10 +698,10 @@ Delete any v1 tests that asserted on `Span`, `SpanData`, `NOOP_SPAN`, `ActiveSpa
   ```
 - [ ] Run with file output and streaming check:
   ```bash
-  dotnet test tests/Alis.Reactive.PlaywrightTests --nologo --logger "console;verbosity=detailed" > /tmp/pw-v2.log 2>&1 &
+  dotnet test tests/Alis.Reactive.PlaywrightTests --nologo --logger "console;verbosity=detailed" > /tmp/pw-run.log 2>&1 &
   ```
-- [ ] Monitor progress via `wc -l /tmp/pw-v2.log; grep -cE "^  Passed " /tmp/pw-v2.log; grep -cE "^  Failed " /tmp/pw-v2.log`
-- [ ] Update PlaywrightTestBase to strip `%c` markers (lesson from v1)
+- [ ] Monitor progress via `wc -l /tmp/pw-run.log; grep -cE "^  Passed " /tmp/pw-run.log; grep -cE "^  Failed " /tmp/pw-run.log`
+- [ ] Update PlaywrightTestBase to strip `%c` markers (see lesson 3)
 - [ ] Update any trace format assertions in test files to match new event names (migration map Appendix A). Most asserts still work because they match substrings (`[alis:execute]`, `reaction.dispatch`, etc.)
 - [ ] Final: all 825 tests pass
 
@@ -744,7 +744,7 @@ Key patterns:
 
 ---
 
-## Appendix B — What does NOT change from v1
+## Appendix B — What stays the same from the abandoned branch
 
 - Research findings on OTel bundle cost (still: don't import OTel SDK)
 - W3C traceparent wire format
@@ -757,10 +757,10 @@ Key patterns:
 
 ---
 
-## Appendix C — What DOES change from v1
+## Appendix C — What changes from the abandoned branch
 
-| v1 | v2 |
-|----|----|
+| Abandoned branch | This plan |
+|------------------|-----------|
 | `Span` is a public interface | Does not exist in public API |
 | `getRootSpan(), NOOP_SPAN, TraceRoot, SpanData` exported | Not exported; span primitives don't exist at all |
 | `ctx.span` is an ExecContext field | ExecContext unchanged — no span field |
@@ -777,6 +777,6 @@ Key patterns:
 
 ## Closing
 
-The v1 branch taught us that **OTel-style span APIs in consumer code are a trap in a runtime where the framework already knows every interaction boundary**. The plan is the source of truth. Tracing observes the walk of the plan. Dev writes events and nothing else. Four files go from 80 lines of boilerplate to 4 lines of plain wiring.
+The abandoned branch taught us that **OTel-style span APIs in consumer code are a trap in a runtime where the framework already knows every interaction boundary**. The plan is the source of truth. Tracing observes the walk of the plan. Dev writes events and nothing else. Four files go from 80 lines of boilerplate to 4 lines of plain wiring.
 
-Read the 9 lessons at the top before you write any code. Open the browser before you claim done. Submit every phase to Codex xhigh. This plan is a lot smaller than the v1 plan because the design is smaller.
+Read the 9 lessons at the top before you write any code. Open the browser before you claim done. Submit every phase to Codex xhigh. This plan is smaller than the abandoned branch's plan because the design is smaller.
