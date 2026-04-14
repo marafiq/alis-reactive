@@ -1372,7 +1372,7 @@ sequenceDiagram
             end
 
             alt element not inside form container
-                orch->>orch: log.trace("field outside form, skipping")
+                orch->>orch: log.trace("field.out-of-scope", {component, containerId})
                 Note over orch: continue
             end
 
@@ -1440,7 +1440,7 @@ sequenceDiagram
     orch->>orch: extractErrors(data)
     Note over orch: Expects ProblemDetails: {errors: Record}
     alt data is not ProblemDetails shape
-        orch->>orch: log.warn("not ProblemDetails shape, ignoring")
+        orch->>orch: log.warn("server-errors.wrong-shape")
         orch-->>Caller: return
     end
 
@@ -1458,7 +1458,7 @@ sequenceDiagram
     opt summaryHasErrors AND summaryEl
         orch->>errDisp: showSummaryDiv(summaryEl)
     end
-    orch->>orch: log.debug("showServerErrors", {formId, fieldCount})
+    orch->>orch: log.debug("server-errors.shown", {id, fieldCount})
 </div>
 
 <h3>allRulesConditionallySkipped()</h3>
@@ -1979,7 +1979,7 @@ sequenceDiagram
     root->>confirm: init()
     confirm->>DOM: getElementById("alisConfirmDialog")
     alt element not found
-        confirm->>confirm: log.warn("confirm element not found")
+        confirm->>confirm: log.warn("element.not-found", {id})
         confirm-->>root: return
     end
 
@@ -2273,9 +2273,11 @@ sequenceDiagram
 
 <h3>trace.ts</h3>
 <p class="path">Scripts/core/trace.ts</p>
-<p>Deterministic single-string trace output. Levels: off(0), error(1), warn(2), info(3), debug(4), trace(5).
-Format: <code>[alis:scope] msg {"key":"val"}</code>. Uses <code>console.error</code> for error,
-<code>console.warn</code> for warn, <code>console.log</code> for everything else.</p>
+<p>Deterministic structured trace output. Levels: off(0), error(1), warn(2), info(3), debug(4), trace(5).
+Text form: <code>[alis:scope] msg {"key":"val"}</code> — the JSON payload is embedded in the message so
+console-text scrapers and log aggregators can substring-match on payload keys. The live <code>data</code>
+object is also passed as a second argument so DevTools renders it as an expandable tree. Routing:
+<code>console.error</code> for error, <code>console.warn</code> for warn, <code>console.log</code> for everything else.</p>
 <div class="mermaid">
 sequenceDiagram
     participant Caller
@@ -2288,18 +2290,18 @@ sequenceDiagram
     Caller->>trace: setLevel("debug")
     Note over trace: active = LEVELS["debug"] = 4
 
-    Caller->>trace: logger.info("booted", {entries: 3})
-    trace->>trace: emit(LEVELS.info=3, "[alis:boot]", "booted", {entries:3})
+    Caller->>trace: logger.info("booted", {planId: "p1"})
+    trace->>trace: emit(LEVELS.info=3, "[alis:boot]", "booted", {planId:"p1"})
     alt level > active
         Note over trace: No-op (filtered out)
     else level <= active
-        Note over trace: line = '[alis:boot] booted {"entries":3}'
+        Note over trace: line = '[alis:boot] booted {"planId":"p1"}'
         alt level <= LEVELS.error
-            trace->>Console: console.error(line)
+            trace->>Console: console.error(line, data)
         else level <= LEVELS.warn
-            trace->>Console: console.warn(line)
+            trace->>Console: console.warn(line, data)
         else
-            trace->>Console: console.log(line)
+            trace->>Console: console.log(line, data)
         end
     end
 </div>
