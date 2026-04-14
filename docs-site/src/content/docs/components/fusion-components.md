@@ -796,6 +796,151 @@ Html.On(plan, t => t.DomReady(p =>
 
 ---
 
+## FusionSchedule
+
+A calendar-style schedule for booking senior-living resources such as staff shift rosters, activity calendars, and medical appointments. Non-input component: it fires many action and navigation events and exposes mutation methods for data loading and CRUD, but is not bound to a single model property, so there is no `InputField` wrapper.
+
+| Property | Value |
+|----------|-------|
+| ReadExpr | `(not input-bound)` |
+| Events | `CellClicked`, `EventClicked`, `ActionBegin`, `ActionComplete`, `Navigating`, `PopupOpen`, `PopupClose`, `DataBound`, `EventRendered` |
+| Typed Source | `(not input-bound)` |
+
+### How do I render a schedule?
+
+Call `Html.FusionSchedule(plan, "shift-schedule", b => ...)` and configure the view set, resource groups, event field mappings, work hours, and QuickInfo templates inside the builder callback. The element ID you pass as the second argument is what you use later to target the schedule from the pipeline. Load the initial data from the server in a `DomReady` trigger with `SetDataSource`.
+
+```csharp
+Html.On(plan, t => t.DomReady(p =>
+{
+    p.Get("/api/schedule/assignments?selectedFacilityId=mystery-manor")
+     .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
+     {
+         s.Component<FusionSchedule>("shift-schedule")
+             .SetDataSource(json, j => j.Assignments);
+         s.Element("status").SetText("Schedule loaded");
+         s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+     }));
+}));
+```
+
+```csharp
+@(Html.FusionSchedule(plan, "shift-schedule", b =>
+    {
+        b.Width("100%"); b.Height("100%"); b.CurrentView(View.Week); b.SelectedDate(DateTime.Today);
+        b.Views(new List<ScheduleView>
+        {
+            new ScheduleView { Option = View.Day },
+            new ScheduleView { Option = View.Week },
+            new ScheduleView { Option = View.WorkWeek },
+            new ScheduleView { Option = View.Month },
+            new ScheduleView { Option = View.Agenda },
+        });
+        b.Group(new ScheduleGroup { Resources = new string[] { "Shifts" } });
+        b.Resources(new List<ScheduleResource>
+        {
+            new ScheduleResource
+            {
+                Field = "shiftId", Title = "Shift", Name = "Shifts",
+                DataSource = FakeScheduleData.Shifts,
+                TextField = "text", IdField = "id", ColorField = "color"
+            }
+        });
+        b.EventSettings(new ScheduleEventSettings
+        {
+            EnableTooltip = true,
+            Fields = new ScheduleField
+            {
+                Id = "id",
+                Subject = new ScheduleFieldOptions { Name = "subject" },
+                StartTime = new ScheduleFieldOptions { Name = "startTime" },
+                EndTime = new ScheduleFieldOptions { Name = "endTime" },
+                Description = new ScheduleFieldOptions { Name = "description" },
+                IsAllDay = new ScheduleFieldOptions { Name = "isAllDay" },
+            },
+        });
+        b.QuickInfoTemplates(new ScheduleQuickInfoTemplates
+        {
+            Content = quickInfoContent,
+            Footer = quickInfoFooter,
+        });
+        b.WorkHours(new ScheduleWorkHours { Highlight = true, Start = "06:00", End = "22:00" });
+        b.StartHour("05:00"); b.EndHour("23:00");
+        b.TimeScale(new ScheduleTimeScale { Enable = true, Interval = 60, SlotCount = 1 });
+        b.ShowHeaderBar(true); b.ShowTimeIndicator(true); b.AllowDragAndDrop(true);
+    }))
+```
+
+### How do I react when a user clicks an empty cell?
+
+Chain `.Reactive(evt => evt.CellClicked, ...)` onto the schedule. The event args expose `StartTime`, `EndTime`, `GroupIndex`, and `IsAllDay` -- pass them through `FromEvent` into a GET that loads a new-assignment form partial, then open a dialog to host it.
+
+```csharp
+.Reactive(evt => evt.CellClicked, (args, p) =>
+{
+    // Trace: show which cell was clicked
+    p.Element("event-trace").SetText(args, x => x.StartTime);
+    p.Element("event-shift").SetText(args, x => x.GroupIndex);
+
+    // Load new assignment form into dialog via Into(), then show
+    p.Get("/Sandbox/Components/Schedule/NewAssignmentForm")
+     .Gather(g => g
+         .FromEvent(args, x => x.StartTime, "startTime")
+         .FromEvent(args, x => x.EndTime, "endTime")
+         .FromEvent(args, x => x.GroupIndex, "shiftId")
+         .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId))
+     .Response(r => r.OnSuccess(s => s.Into("new-assignment-content")));
+    p.Component<FusionDialog>("new-assignment-dialog").Show();
+})
+```
+
+### How do I persist changes back to the server?
+
+Chain `.Reactive(evt => evt.ActionComplete, ...)` onto the schedule. Syncfusion fires `ActionComplete` after it finishes a CRUD action internally (drag, resize, editor save). Guard on `RequestType == "eventChanged"` so you only reload after a real change, then GET a fresh slice and push it back into the component with `SetDataSource`.
+
+```csharp
+.Reactive(evt => evt.ActionComplete, (args, p) =>
+{
+    // After SF finishes a CRUD action -- reload fresh data from server
+    p.When(args, x => x.RequestType).Eq("eventChanged")
+     .Then(t =>
+     {
+         t.Element("status").SetText("Saved -- reloading...");
+         t.Get("/api/schedule/assignments")
+          .Gather(g => g
+              .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
+              .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
+              .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
+          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
+          {
+              s.Component<FusionSchedule>("shift-schedule")
+                  .SetDataSource(json, j => j.Assignments);
+              s.Element("status").SetText("Refreshed after save");
+              s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+          }));
+     });
+})
+```
+
+### Mutation extensions
+
+| Extension | Description |
+|-----------|-------------|
+| `CurrentView()` | Reads the active view (`Day`, `Week`, `WorkWeek`, `Month`, `Agenda`) for conditions or gather |
+| `SelectedDate()` | Reads the currently selected date for conditions or gather |
+| `SetDataSource(ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)` | Replaces the schedule event data from an HTTP response body with a path selector |
+| `SetDataSource(ResponseBody<TResponse> source)` | Replaces the schedule event data with the entire HTTP response body |
+| `AddEvent(ValueProducer data)` | Adds one or more events to the schedule |
+| `SaveEvent(ValueProducer data)` | Updates an existing event |
+| `DeleteEvent(ValueProducer eventId)` | Deletes an event by ID |
+| `OpenEditor(ValueProducer data, string action = "Add")` | Opens the built-in event editor programmatically |
+| `CloseEditor()` | Closes the event editor |
+| `RefreshEvents()` | Re-renders all events |
+| `Print()` | Prints the current schedule view |
+| `ScrollTo(string hour)` | Scrolls to a specific time in the schedule |
+
+---
+
 ## FusionTab
 
 A tab strip for separating related content into browsable panels -- residents, staff, facilities, and reports inside a single facility management page. Non-input component: it fires selection events and exposes mutation methods but is not bound to a model property, so there is no `InputField` wrapper.
