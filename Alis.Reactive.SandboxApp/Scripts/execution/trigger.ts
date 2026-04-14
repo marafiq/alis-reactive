@@ -49,7 +49,6 @@ export function wireBehavior(
       const source = `document-event:${trigger.event}`;
       log.debug("document-event.listening", { event: trigger.event });
       document.addEventListener(trigger.event, (e: Event) => {
-        log.trace("document-event.fired", { event: trigger.event });
         const ctx: ExecContext = { event: (e as CustomEvent).detail ?? e };
         runReaction(reaction, plan, ctx, source);
       }, opts);
@@ -71,7 +70,6 @@ export function wireBehavior(
       log.debug("component-event.listening", { component: trigger.component, event: trigger.event, channel });
 
       wireEvent(plan, trigger.component, channel, (eventData) => {
-        log.trace("component-event.fired", { component: trigger.component, event: trigger.event });
         const ctx: ExecContext = { event: eventData };
         runReaction(reaction, plan, ctx, source);
       }, opts);
