@@ -260,6 +260,46 @@ No `public` constructors on plan model classes. All plan model class constructor
 APIs and factory methods (`Html.On`, `Html.InputField`, `p.Get`, `p.When`) — never through
 constructors.
 
+#### Locked 1.0 Public Surface (P2 audit)
+
+P2 audited every `public` type in the four library projects. The locked surface is
+**351 public types**, organized by category. Each category has a default (KEEP or DEMOTE);
+exceptions are listed below. Any future PR that adds a public type in a library project
+must either fit a KEEP category or justify a new entry against the rule.
+
+| Category | Project / Pattern | Approx count | Locked default | Rationale |
+|---|---|---|---:|---|
+| Builder fluent-chain types | `Alis.Reactive/Builders/**/*Builder.cs` (incl. `TriggerBuilder`, `PipelineBuilder`, `ElementBuilder`, `HttpRequestBuilder`, `GatherBuilder`, `ResponseBuilder`, `ParallelBuilder`, `ConditionStart`, `ConditionSourceBuilder`, `BranchBuilder`, `GuardBuilder`, `DispatchPayloadBuilder`, `PluginCallBuilder`, `PluginReadBuilder`, `PluginTypeBuilder`, `TypedSource<>`, `TypedComponentSource<>`, `TypedUrlSource<>`, `TypedPluginSource<>`, `EventArgSource<>`, `PayloadTypedSource<>`) | ~30 | **KEEP public** (sealed) | Returned to consumer code by `Html.On`, `Trigger().DomReady(p => ...)`, `p.Get/Post/Put/Delete`, `p.When`, etc. Constructors are `internal` — consumers obtain instances through factories only. |
+| Plan model abstract bases | `Alis.Reactive/PlanModel/Shape.cs` (`Shape`), `ValueProducer.cs` (`ValueProducer`), `Reaction.cs` (`Reaction`), `Condition.cs` (`Condition`), `Source.cs` (`Source`), `Request.cs` (`Request`, `RequestInput`, `ResponseHandler`), `StartsWhen.cs` (`StartsWhen`), `JsType.cs` (`JsType`, `JsEvent`), `Path.cs` (`Path`, `PathSegment`) | 13 | **KEEP public abstract** | Required for STJ polymorphic serialization via `[JsonConverter(typeof(WriteOnlyPolymorphicConverter<T>))]`. Constructors are `private protected`. External consumers cannot derive (no friend-assembly cross-derivation through `private protected`). |
+| Plan model concrete subclasses (legacy public-sealed) | `LiteralProducer`, `ReadProducer`, `ObjectProducer`, `ArrayProducer`, `NoneProducer` (in `ValueProducer.cs`); `CompareCondition`, `AllCondition`, `AnyCondition`, `NotCondition`, `ConfirmCondition`, `NoneCondition` (in `Condition.cs`); `SequenceReaction`, `ParallelReaction`, `BranchReaction`, `BranchCase`, `SetReaction`, `CallReaction`, `RequestReaction`, `DispatchReaction`, `InjectReaction`, `ShowValidationErrorsReaction` (in `Reaction.cs`); `ComponentSource`, `PayloadSource`, `PluginSource`, `UrlSource` (in `Source.cs`); `ValueInput` (in `Request.cs`) | ~25 | **KEEP public sealed** (legacy) | Existing convention — `public sealed` since pre-1.0. P1a (`Shape` subclasses → `internal sealed`) and P1b (`NoOpReaction` → `internal sealed`) set the new precedent for newly added subclasses. Converting all existing legacy subclasses is a separate slice (would touch ~25 types and force the audit of every consumer that pattern-matches on them). Locked as-is for 1.0. |
+| Plan model concrete subclasses (P1a/P1b new precedent) | `ScalarShape`, `OpaqueShape`, `NoneShape`, `ArrayShape`, `NullableShape`, `ObjectShape`, `NoOpReaction` | 7 | **KEEP internal sealed** | New precedent set by P1a/P1b. Internal subclasses cannot be pattern-matched by external consumers — discipline says the framework owns shape/reaction semantics end-to-end. |
+| DSL entry points / view-facing root types | `Alis.Reactive/Html.cs` and `Alis.Reactive/*.cs` root files (`ReactivePlan<TModel>`, `ReactivePlanConfig`, `ResponseBody<T>`, `ComponentRef<TComponent,TModel>`, `IComponent`, `IdGenerator`, `TypedEvent<TArgs>`, `InputBoundField<>`, `InputFieldOptions`) | ~10 | **KEEP public** | Top-level consumer DSL — referenced from views, controllers, `Program.cs`, and component HtmlExtensions. |
+| Native components | `Alis.Reactive.Native/Components/**` (HtmlExtensions, Extensions, Args types per slice — 7-file vertical slice × ~10 components) | 71 | **KEEP all public** | Consumer DSL for `.cshtml` views. Each component has `Html.NativeXxx(...)` HtmlExtensions, fluent `Extensions` (`.OnChange`, `.OnBlur`, etc.), and event args types. Removing any breaks consumer view code. |
+| Fusion components | `Alis.Reactive.Fusion/Components/**` (HtmlExtensions, Extensions, Args, Methods per Syncfusion component × ~30 components) | 166 | **KEEP all public** | Same as Native — consumer DSL. |
+| Native AppLevel + Templates | `Alis.Reactive.Native/AppLevel/**` (Confirm, Toast singletons), `Alis.Reactive.Native/Extensions/**` | ~10 | **KEEP all public** | Consumer DSL singletons. |
+| Fusion AppLevel + Templates | `Alis.Reactive.Fusion/AppLevel/**`, `Alis.Reactive.Fusion/Templates/**` | ~9 | **KEEP all public** | Consumer DSL singletons + typed templates for SF components. |
+| DesignSystem | `Alis.Reactive/DesignSystem/**` (`TokenMap`, `CssUtils`, `GridCss`, `CardCss`, `ContainerCss`, `DividerCss`, `KvCss`, `TextCss`, `VStackCss`, `HStackCss`, `HeadingCss`, etc.) | ~17 | **KEEP all public** | Used directly in `.cshtml` views for layout and CSS token resolution. |
+| Validation cluster | `Alis.Reactive/Validation/*.cs` (`ValidationField`, `ValidationRule`, `IValidationExtractor`, `FieldCondition` + 4 subclasses) | 8 | **KEEP all public** | Exposed via `ReactivePlanConfig.UseValidationExtractor(IValidationExtractor extractor)` — called from consumer `Program.cs` to register the FluentValidation integration. The whole transitive surface (return types, parameter types, property types) must stay public. |
+| FluentValidator integration | `Alis.Reactive.FluentValidator/*.cs` (`FluentValidationAdapter`, `ReactiveValidator`, `FieldConditionBuilder`, validators, `IClientConditionSource`) | 11 | **KEEP all public** | Consumer-extensible validator base class and adapter. Consumers extend `ReactiveValidator<TModel>` to define validation rules. |
+| Schema serialization helper | `Alis.Reactive/Serialization/WriteOnlyPolymorphicConverter<T>` | 1 | **DEMOTE → internal** (P2) | Used only inside `Alis.Reactive` as a `[JsonConverter]` attribute argument. No consumer reference. Demoted in P2. |
+| Internal helpers (P2 demotions) | `ComponentRegistration`, `PlanBuildContext`, `ExpressionPathHelper`, `WriteOnlyPolymorphicConverter<T>` | 4 | **DEMOTE → internal** | Internal builder/registration plumbing with zero consumer references (verified by grep against `Alis.Reactive.SandboxApp` + `examples/`). |
+| `IReactionEmitter` interface tightening | `Alis.Reactive/Builders/IReactionEmitter.cs` | 1 | **KEEP public, REMOVE `BuildContext` property** | The interface stays public (used as a parameter type on Fusion event handler extensions like `args.OnFiltering(pipeline)`). Its `BuildContext` property had zero callers — removing it lets `PlanBuildContext` become internal. |
+
+**P2 outcome:**
+
+- 4 types demoted from public to internal (`ComponentRegistration`, `PlanBuildContext`, `ExpressionPathHelper`, `WriteOnlyPolymorphicConverter<T>`)
+- 1 interface property removed (`IReactionEmitter.BuildContext`) — zero callers, was the cascade-blocker for `PlanBuildContext`
+- Total public surface: **351 types** locked for 1.0 (down from 355 pre-P2)
+
+**Process gate:** any future PR adding a `public` class/interface/struct/enum to `Alis.Reactive` / `Alis.Reactive.Native` / `Alis.Reactive.Fusion` / `Alis.Reactive.FluentValidator` must either:
+
+1. Fit one of the KEEP categories above (with the natural file location), OR
+2. Add a new entry to the locked table with a written rationale (requires user approval and a documented "is there a consumer reference?" grep).
+
+Reviewers MUST check the locked table before approving any PR that adds a new public type
+in a library project. The `no-public-in-libraries` hookify rule blocks accidental `public`
+declarations at edit time as a tripwire, but the locked table is the authoritative gate.
+
 ### 8. Root Cause, Not Patch
 
 Trace the full code path. Identify the exact line. Understand WHY before changing WHAT.

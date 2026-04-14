@@ -19,7 +19,7 @@ namespace Alis.Reactive
     /// (method calls, arithmetic) throw <see cref="InvalidOperationException"/>.
     /// </para>
     /// </remarks>
-    public static class ExpressionPathHelper
+    internal static class ExpressionPathHelper
     {
         /// <summary>
         /// Converts an expression to a prefixed camelCase dot-path.

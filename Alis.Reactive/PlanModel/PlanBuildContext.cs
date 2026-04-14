@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlanModel
     /// Replaces the old PlanAuthoringContext triple-indirection (contracts/objects/bindings).
     /// Each component gets its own JsType. Members are added on-demand as builders reference them.
     /// </summary>
-    public sealed class PlanBuildContext
+    internal sealed class PlanBuildContext
     {
         private readonly Plan _plan;
         private readonly Dictionary<string, ComponentRegistration> _components;

@@ -38,9 +38,6 @@ namespace Alis.Reactive.Builders
         /// <inheritdoc />
         void IReactionEmitter.AddStep(Reaction step) => Steps.Add(step);
 
-        /// <inheritdoc />
-        PlanBuildContext IReactionEmitter.BuildContext => Context;
-
         /// <summary>Dispatches a custom browser event by name.</summary>
         /// <param name="eventName">The event name. Listeners registered with <c>t.CustomEvent("name", ...)</c> will fire.</param>
         /// <returns>This builder for chaining.</returns>

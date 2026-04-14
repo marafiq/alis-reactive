@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace Alis.Reactive.Serialization
 {
     /// <summary>Serializes polymorphic types by writing the concrete type properties. Read is not supported.</summary>
-    public class WriteOnlyPolymorphicConverter<T> : JsonConverter<T>
+    internal class WriteOnlyPolymorphicConverter<T> : JsonConverter<T>
     {
         /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
