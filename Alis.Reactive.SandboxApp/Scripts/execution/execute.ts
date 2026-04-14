@@ -267,7 +267,9 @@ function executeInject(reaction: InjectReaction, plan: Plan, ctx?: ExecContext):
   const value = evaluateValue(reaction.value, plan, ctx);
   if (typeof value === "string") {
     injectHtml(container, value);
+    log.trace("inject.applied", { component: reaction.component, size: value.length });
   } else {
+    log.error("inject.wrong-type", { component: reaction.component, type: typeof value });
     throw new Error(`[alis] inject expects string HTML, got ${typeof value}`);
   }
 }
@@ -284,8 +286,10 @@ function executeShowValidationErrors(
   // When called inside an error handler, ctx.response carries the server's
   // ProblemDetails body. Route to showServerErrors instead of client-side validation.
   if (ctx?.response && typeof ctx.response === "object") {
+    log.debug("show-validation", { container: reaction.container, mode: "server" });
     showServerErrors(plan, reaction.container, ctx.response);
   } else {
+    log.debug("show-validation", { container: reaction.container, mode: "client" });
     validateContainer(plan, reaction.container, ctx);
   }
 }

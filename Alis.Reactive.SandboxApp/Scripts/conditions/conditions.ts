@@ -65,8 +65,13 @@ export async function evaluateConditionAsync(condition: Condition, plan: Plan, c
       return !(await evaluateConditionAsync(condition.term, plan, ctx));
     case "confirm": {
       const confirmFn = (window as any).alis?.confirm;
-      if (!confirmFn) throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
-      return confirmFn(condition.message);
+      if (!confirmFn) {
+        log.error("confirm.dialog-missing");
+        throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
+      }
+      const accepted = await confirmFn(condition.message);
+      log.debug("confirm.result", { accepted, message: condition.message });
+      return accepted;
     }
     case "none":
       return true;
