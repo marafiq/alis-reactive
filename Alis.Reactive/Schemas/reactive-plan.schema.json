@@ -650,14 +650,13 @@
     },
     "ObjectShape": {
       "type": "object",
-      "required": ["kind"],
+      "required": ["kind", "fields"],
       "properties": {
         "kind": { "const": "object" },
         "fields": {
           "type": "object",
           "additionalProperties": { "$ref": "#/$defs/Shape" }
-        },
-        "additional": { "type": "boolean" }
+        }
       }
     },
     "NullableShape": {

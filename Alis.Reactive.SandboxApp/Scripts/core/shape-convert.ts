@@ -49,7 +49,7 @@ function applyScalar<T>(value: unknown, convert: (v: unknown) => ConvertResult<T
 function applyArrayShape(value: unknown, shape: Extract<Shape, { kind: "array" }>): unknown {
   const r = toArray(value);
   if (!r.ok) return value;
-  return shape.item ? r.value.map(v => applyShape(v, shape.item)) : r.value;
+  return r.value.map(v => applyShape(v, shape.item));
 }
 
 /**
@@ -78,7 +78,7 @@ export function convertByShape(value: unknown, shape: Shape): ConvertResult<unkn
 function convertArrayShape(value: unknown, shape: Extract<Shape, { kind: "array" }>): ConvertResult<unknown> {
   const r = toArray(value);
   if (!r.ok) return r;
-  return shape.item ? ok(r.value.map(v => applyShape(v, shape.item))) : r;
+  return ok(r.value.map(v => applyShape(v, shape.item)));
 }
 
 // ── Conversion functions ──────────────────────────────────

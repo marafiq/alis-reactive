@@ -375,7 +375,7 @@ export function isActiveCondition(c: Condition): c is EvaluableCondition {
   return c.kind !== "none";
 }
 
-// ── Shape (discriminated union — 9 kinds) ─────────────────────
+// ── Shape (discriminated union — 10 kinds) ────────────────────
 
 export type Shape =
   | StringShape
@@ -416,8 +416,7 @@ export interface ArrayShape {
 
 export interface ObjectShape {
   kind: "object";
-  fields?: Record<string, Shape>;
-  additional?: boolean;
+  fields: Record<string, Shape>;
 }
 
 export interface NullableShape {

@@ -76,8 +76,8 @@ namespace Alis.Reactive.PlanModel
             if (a == Shape.Any || a == Shape.None) return b;
             if (b == Shape.Any || b == Shape.None) return a;
             // Nullable wrapping: Date ↔ Nullable(Date) → keep Nullable(Date)
-            if (a.Kind == "nullable" && a.Inner == b) return a;
-            if (b.Kind == "nullable" && b.Inner == a) return b;
+            if (a is NullableShape an && an.Inner.Equals(b)) return a;
+            if (b is NullableShape bn && bn.Inner.Equals(a)) return b;
             return null; // incompatible
         }
     }
