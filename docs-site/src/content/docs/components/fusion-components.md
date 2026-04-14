@@ -651,12 +651,7 @@ Pass `AccordionItem` instances to `.Items(...)` inside the builder callback. Eac
         new AccordionItem { Header = "Facility Overview", Content = "<p>Sunrise Senior Living provides assisted living, memory care, and independent living communities across 30 states.</p>" },
         new AccordionItem { Header = "Care Levels", Content = "<p>Level 1: Independent Living. Level 2: Assisted Living. Level 3: Memory Care. Level 4: Skilled Nursing.</p>" },
         new AccordionItem { Header = "Contact Information", Content = "<p>Main Office: (555) 123-4567. Emergency: (555) 987-6543. Admissions: admissions@sunrise.example.com</p>" }
-    }))
-    .Reactive(evt => evt.Expanded, (args, p) =>
-    {
-        p.Element("expanded-index").SetText(args, x => x.Index);
-        p.Element("expanded-state").SetText(args, x => x.IsExpanded);
-    }))
+    })))
 ```
 
 The whole expression returns `IHtmlContent`, so it is wrapped in `@(...)` rather than `@{ ... }`. The `Items(...)` call accepts any `List<AccordionItem>` you build in code -- you can compose it from partial views, database lookups, or inline literals.
@@ -669,12 +664,15 @@ The `Expanded` event args expose `Index` (zero-based) and `IsExpanded` (true whe
 @(Html.FusionAccordion(plan, "demo-accordion", b => b
     .Items(new List<AccordionItem>
     {
-        new AccordionItem { Header = "Facility Overview", Content = "<p>Overview</p>" },
-        new AccordionItem { Header = "Care Levels", Content = "<p>Care Levels</p>" },
-        new AccordionItem { Header = "Contact Information", Content = "<p>Contact</p>" }
+        new AccordionItem { Header = "Facility Overview", Content = "<p>Sunrise Senior Living provides assisted living, memory care, and independent living communities across 30 states.</p>" },
+        new AccordionItem { Header = "Care Levels", Content = "<p>Level 1: Independent Living. Level 2: Assisted Living. Level 3: Memory Care. Level 4: Skilled Nursing.</p>" },
+        new AccordionItem { Header = "Contact Information", Content = "<p>Main Office: (555) 123-4567. Emergency: (555) 987-6543. Admissions: admissions@sunrise.example.com</p>" }
     }))
     .Reactive(evt => evt.Expanded, (args, p) =>
     {
+        p.Element("expanded-index").SetText(args, x => x.Index);
+        p.Element("expanded-state").SetText(args, x => x.IsExpanded);
+
         p.When(args, x => x.IsExpanded).Truthy()
             .Then(t => t.Element("condition-result").SetText("Panel expanded"))
             .Else(e => e.Element("condition-result").SetText("Panel collapsed"));
