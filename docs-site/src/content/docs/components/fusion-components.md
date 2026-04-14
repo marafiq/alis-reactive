@@ -690,6 +690,81 @@ You can combine conditions with `.And(args, x => x.Index).Eq(0)` to react only w
 
 ---
 
+## FusionTab
+
+A tab strip for separating related content into browsable panels -- residents, staff, facilities, and reports inside a single facility management page. Non-input component: it fires selection events and exposes mutation methods but is not bound to a model property, so there is no `InputField` wrapper.
+
+| Property | Value |
+|----------|-------|
+| ReadExpr | `(not input-bound)` |
+| Events | `Selected` |
+| Typed Source | `(not input-bound)` |
+
+### How do I render a tab strip with multiple panels?
+
+Pass `TabItem` instances to `.Items(...)` inside the builder callback. Each item has a `Header` (with `Text`) and a `Content` string (raw HTML). The element ID you pass as the second argument is what you use later to target the tab from the pipeline.
+
+```csharp
+@(Html.FusionTab(plan, "demo-tab", b => b
+    .Items(new List<TabItem>
+    {
+        new TabItem { Header = new TabHeader { Text = "Residents" },
+            Content = "<div class='p-4'><p class='text-sm'>Resident management content. Lists all residents in the facility with care level assignments.</p></div>" },
+        new TabItem { Header = new TabHeader { Text = "Staff" },
+            Content = "<div class='p-4'><p class='text-sm'>Staff scheduling and assignments. View shift rotations and caregiver-to-resident ratios.</p></div>" },
+        new TabItem { Header = new TabHeader { Text = "Facilities" },
+            Content = "<div class='p-4'><p class='text-sm'>Facility details and room availability. Manage wings, rooms, and occupancy tracking.</p></div>" },
+        new TabItem { Header = new TabHeader { Text = "Reports" },
+            Content = "<div class='p-4'><p class='text-sm'>Monthly compliance and care reports. Track medication schedules, incident reports, and audit logs.</p></div>" }
+    })))
+```
+
+The whole expression returns `IHtmlContent`, so it is wrapped in `@(...)` rather than `@{ ... }`. `TabItem` and `TabHeader` come from `Syncfusion.EJ2.Navigations`, so the view needs `@using Syncfusion.EJ2.Navigations` alongside the reactive namespaces.
+
+### How do I react to a tab selection?
+
+The `Selected` event args expose `SelectedIndex` (zero-based), `PreviousIndex` (the tab the user was on), and `IsSwiped` (true when the selection came from a touch swipe). Use `p.When(args, x => x.SelectedIndex).Eq(n)` to branch per tab -- chain `ElseIf` for each remaining panel and close with `Else`.
+
+```csharp
+@(Html.FusionTab(plan, "demo-tab", b => b
+    .Items(new List<TabItem>
+    {
+        new TabItem { Header = new TabHeader { Text = "Residents" },
+            Content = "<div class='p-4'><p class='text-sm'>Resident management content. Lists all residents in the facility with care level assignments.</p></div>" },
+        new TabItem { Header = new TabHeader { Text = "Staff" },
+            Content = "<div class='p-4'><p class='text-sm'>Staff scheduling and assignments. View shift rotations and caregiver-to-resident ratios.</p></div>" },
+        new TabItem { Header = new TabHeader { Text = "Facilities" },
+            Content = "<div class='p-4'><p class='text-sm'>Facility details and room availability. Manage wings, rooms, and occupancy tracking.</p></div>" },
+        new TabItem { Header = new TabHeader { Text = "Reports" },
+            Content = "<div class='p-4'><p class='text-sm'>Monthly compliance and care reports. Track medication schedules, incident reports, and audit logs.</p></div>" }
+    }))
+    .Reactive(evt => evt.Selected, (args, p) =>
+    {
+        p.Element("selected-index").SetText(args, x => x.SelectedIndex);
+        p.Element("previous-index").SetText(args, x => x.PreviousIndex);
+        p.Element("is-swiped").SetText(args, x => x.IsSwiped);
+        p.When(args, x => x.SelectedIndex).Eq(0)
+            .Then(t => t.Element("condition-result").SetText("Residents tab active"))
+            .ElseIf(args, x => x.SelectedIndex).Eq(1)
+            .Then(t => t.Element("condition-result").SetText("Staff tab active"))
+            .ElseIf(args, x => x.SelectedIndex).Eq(2)
+            .Then(t => t.Element("condition-result").SetText("Facilities tab active"))
+            .Else(e => e.Element("condition-result").SetText("Reports tab active"));
+    }))
+```
+
+Each branch can do more than `SetText` -- drop a `Get(...)` call with `Response(r => r.OnSuccess(s => s.Into("lazy-tab-content")))` inside a `Then` to lazy-load each panel's content from a partial view only when the user opens the tab.
+
+### Mutation extensions
+
+| Extension | Description |
+|-----------|-------------|
+| `Select(int index)` | Selects a tab by index |
+| `HideTab(int index, bool isHidden = true)` | Shows or hides a tab by index |
+| `SetSelectedItem(int index)` | Sets the selected tab index via the `selectedItem` property |
+
+---
+
 ## App-Level Fusion Components
 
 App-level Fusion components are singletons rendered once in the layout. Referenced from any pipeline without a model expression.
