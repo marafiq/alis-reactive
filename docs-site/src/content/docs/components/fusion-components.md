@@ -876,22 +876,66 @@ Html.On(plan, t => t.DomReady(p =>
 Chain `.Reactive(evt => evt.CellClicked, ...)` onto the schedule. The event args expose `StartTime`, `EndTime`, `GroupIndex`, and `IsAllDay` -- pass them through `FromEvent` into a GET that loads a new-assignment form partial, then open a dialog to host it.
 
 ```csharp
-.Reactive(evt => evt.CellClicked, (args, p) =>
-{
-    // Trace: show which cell was clicked
-    p.Element("event-trace").SetText(args, x => x.StartTime);
-    p.Element("event-shift").SetText(args, x => x.GroupIndex);
+@(Html.FusionSchedule(plan, "shift-schedule", b =>
+    {
+        b.Width("100%"); b.Height("100%"); b.CurrentView(View.Week); b.SelectedDate(DateTime.Today);
+        b.Views(new List<ScheduleView>
+        {
+            new ScheduleView { Option = View.Day },
+            new ScheduleView { Option = View.Week },
+            new ScheduleView { Option = View.WorkWeek },
+            new ScheduleView { Option = View.Month },
+            new ScheduleView { Option = View.Agenda },
+        });
+        b.Group(new ScheduleGroup { Resources = new string[] { "Shifts" } });
+        b.Resources(new List<ScheduleResource>
+        {
+            new ScheduleResource
+            {
+                Field = "shiftId", Title = "Shift", Name = "Shifts",
+                DataSource = FakeScheduleData.Shifts,
+                TextField = "text", IdField = "id", ColorField = "color"
+            }
+        });
+        b.EventSettings(new ScheduleEventSettings
+        {
+            EnableTooltip = true,
+            Fields = new ScheduleField
+            {
+                Id = "id",
+                Subject = new ScheduleFieldOptions { Name = "subject" },
+                StartTime = new ScheduleFieldOptions { Name = "startTime" },
+                EndTime = new ScheduleFieldOptions { Name = "endTime" },
+                Description = new ScheduleFieldOptions { Name = "description" },
+                IsAllDay = new ScheduleFieldOptions { Name = "isAllDay" },
+            },
+        });
+        b.QuickInfoTemplates(new ScheduleQuickInfoTemplates
+        {
+            Content = quickInfoContent,
+            Footer = quickInfoFooter,
+        });
+        b.WorkHours(new ScheduleWorkHours { Highlight = true, Start = "06:00", End = "22:00" });
+        b.StartHour("05:00"); b.EndHour("23:00");
+        b.TimeScale(new ScheduleTimeScale { Enable = true, Interval = 60, SlotCount = 1 });
+        b.ShowHeaderBar(true); b.ShowTimeIndicator(true); b.AllowDragAndDrop(true);
+    })
+    .Reactive(evt => evt.CellClicked, (args, p) =>
+    {
+        // Trace: show which cell was clicked
+        p.Element("event-trace").SetText(args, x => x.StartTime);
+        p.Element("event-shift").SetText(args, x => x.GroupIndex);
 
-    // Load new assignment form into dialog via Into(), then show
-    p.Get("/Sandbox/Components/Schedule/NewAssignmentForm")
-     .Gather(g => g
-         .FromEvent(args, x => x.StartTime, "startTime")
-         .FromEvent(args, x => x.EndTime, "endTime")
-         .FromEvent(args, x => x.GroupIndex, "shiftId")
-         .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId))
-     .Response(r => r.OnSuccess(s => s.Into("new-assignment-content")));
-    p.Component<FusionDialog>("new-assignment-dialog").Show();
-})
+        // Load new assignment form into dialog via Into(), then show
+        p.Get("/Sandbox/Components/Schedule/NewAssignmentForm")
+         .Gather(g => g
+             .FromEvent(args, x => x.StartTime, "startTime")
+             .FromEvent(args, x => x.EndTime, "endTime")
+             .FromEvent(args, x => x.GroupIndex, "shiftId")
+             .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId))
+         .Response(r => r.OnSuccess(s => s.Into("new-assignment-content")));
+        p.Component<FusionDialog>("new-assignment-dialog").Show();
+    }))
 ```
 
 ### How do I persist changes back to the server?
@@ -899,27 +943,71 @@ Chain `.Reactive(evt => evt.CellClicked, ...)` onto the schedule. The event args
 Chain `.Reactive(evt => evt.ActionComplete, ...)` onto the schedule. Syncfusion fires `ActionComplete` after it finishes a CRUD action internally (drag, resize, editor save). Guard on `RequestType == "eventChanged"` so you only reload after a real change, then GET a fresh slice and push it back into the component with `SetDataSource`.
 
 ```csharp
-.Reactive(evt => evt.ActionComplete, (args, p) =>
-{
-    // After SF finishes a CRUD action -- reload fresh data from server
-    p.When(args, x => x.RequestType).Eq("eventChanged")
-     .Then(t =>
-     {
-         t.Element("status").SetText("Saved -- reloading...");
-         t.Get("/api/schedule/assignments")
-          .Gather(g => g
-              .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-              .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
-              .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
-          .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
-          {
-              s.Component<FusionSchedule>("shift-schedule")
-                  .SetDataSource(json, j => j.Assignments);
-              s.Element("status").SetText("Refreshed after save");
-              s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
-          }));
-     });
-})
+@(Html.FusionSchedule(plan, "shift-schedule", b =>
+    {
+        b.Width("100%"); b.Height("100%"); b.CurrentView(View.Week); b.SelectedDate(DateTime.Today);
+        b.Views(new List<ScheduleView>
+        {
+            new ScheduleView { Option = View.Day },
+            new ScheduleView { Option = View.Week },
+            new ScheduleView { Option = View.WorkWeek },
+            new ScheduleView { Option = View.Month },
+            new ScheduleView { Option = View.Agenda },
+        });
+        b.Group(new ScheduleGroup { Resources = new string[] { "Shifts" } });
+        b.Resources(new List<ScheduleResource>
+        {
+            new ScheduleResource
+            {
+                Field = "shiftId", Title = "Shift", Name = "Shifts",
+                DataSource = FakeScheduleData.Shifts,
+                TextField = "text", IdField = "id", ColorField = "color"
+            }
+        });
+        b.EventSettings(new ScheduleEventSettings
+        {
+            EnableTooltip = true,
+            Fields = new ScheduleField
+            {
+                Id = "id",
+                Subject = new ScheduleFieldOptions { Name = "subject" },
+                StartTime = new ScheduleFieldOptions { Name = "startTime" },
+                EndTime = new ScheduleFieldOptions { Name = "endTime" },
+                Description = new ScheduleFieldOptions { Name = "description" },
+                IsAllDay = new ScheduleFieldOptions { Name = "isAllDay" },
+            },
+        });
+        b.QuickInfoTemplates(new ScheduleQuickInfoTemplates
+        {
+            Content = quickInfoContent,
+            Footer = quickInfoFooter,
+        });
+        b.WorkHours(new ScheduleWorkHours { Highlight = true, Start = "06:00", End = "22:00" });
+        b.StartHour("05:00"); b.EndHour("23:00");
+        b.TimeScale(new ScheduleTimeScale { Enable = true, Interval = 60, SlotCount = 1 });
+        b.ShowHeaderBar(true); b.ShowTimeIndicator(true); b.AllowDragAndDrop(true);
+    })
+    .Reactive(evt => evt.ActionComplete, (args, p) =>
+    {
+        // After SF finishes a CRUD action — reload fresh data from server
+        p.When(args, x => x.RequestType).Eq("eventChanged")
+         .Then(t =>
+         {
+             t.Element("status").SetText("Saved — reloading...");
+             t.Get("/api/schedule/assignments")
+              .Gather(g => g
+                  .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
+                  .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
+                  .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
+              .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
+              {
+                  s.Component<FusionSchedule>("shift-schedule")
+                      .SetDataSource(json, j => j.Assignments);
+                  s.Element("status").SetText("Refreshed after save");
+                  s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+              }));
+         });
+    }))
 ```
 
 ### Mutation extensions
