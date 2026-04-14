@@ -202,6 +202,51 @@ during a refactor is the failure pattern from `feedback_null_escape_hatch_blindn
 removing tech debt, if the count of null markers on ANY surface goes UP, stop and audit each
 new marker for sentinel-replaceability before committing.
 
+#### Locked Nullable Properties (1.0 commitment)
+
+P1 (sentinel cleanup) audited every nullable property in `Alis.Reactive/PlanModel/` after the
+P1a Shape DU and P1b NoOpReaction refactors. The 19 properties below are LOCKED as
+genuinely nullable for 1.0. Each entry has a written rationale explaining why a sentinel would
+collide with semantics. Any future PR that adds a nullable plan model property must either fit
+this table (with a matching rationale) or convert to a sentinel before merge.
+
+The discipline is: nullable means "genuinely absent as a domain concept." Wherever empty-string,
+zero, empty-collection, or a `Xxx.None` singleton would carry a different meaning than absence,
+the property stays nullable. Wherever the sentinel is structurally indistinguishable from absence,
+the property gets the sentinel.
+
+| File:Line | Property | Type | Locked rationale |
+|---|---|---|---|
+| `Plan.cs:11` | `Plan.PartId` | `string?` | Only set for partial plans. Empty string would be a distinct partial ID ("the empty-named partial"). |
+| `Component.cs:13` | `Component.BindingPath` | `string?` (internal) | Display components have no model binding. Empty string would mean "binding to root" (`m => m`), which is structurally different from "no binding at all." |
+| `Component.cs:20` | `Component.ValueMember` | `string?` (internal) | Display components have no value-bearing member. The empty string is not a valid JS property name. |
+| `Component.cs:23` | `Component.Container` | `ContainerScope?` | Components outside any form have no container scope. An empty `ContainerScope` (zero components, zero rules) is structurally different from "the component is not inside a form" — the runtime treats container-scoped vs unscoped components differently. |
+| `Component.cs:62` | `ComponentValidation.ServerFieldName` | `string?` (internal) | Optional override for the server-side field name. Default behavior (when null) is to use the component ID. Empty string would override to literal `""` which is meaningfully different. |
+| `Request.cs:16` | `Request.Container` | `string?` | Requests not scoped to a form have no container. Empty string would be a distinct (broken) container ID. |
+| `Request.cs:19` | `Request.Input` | `RequestInput?` | GET/DELETE requests have no body. A `NoBodyInput` sentinel was considered but rejected: GET requests genuinely send no `Content-Type`/`Content-Length`, and a sentinel would force a wire-format decision (`{}` vs `null` vs `{"kind":"none"}`) that has no semantic match in HTTP. |
+| `Request.cs:30` | `Request.Next` | `Request?` | Recursive request chaining — null = end of chain. A sentinel `NoNextRequest` would itself need a `.Next`, creating infinite recursion. The chain MUST terminate at null. |
+| `Request.cs:65` | `GatherInput.Statics` | `ValueProducer?` (internal) | Optional static fields appended to the gather body. `ValueProducer.None` would technically work, but `Statics` is internal-only and the runtime distinguishes "no static section" from "empty static section" for performance. |
+| `Request.cs:151` | `ResponseHandler.Status` | `int?` | HTTP status filter — null = match any status. `0` is technically a valid HTTP status (used for "no response received" / network errors), so 0 ≠ absent. |
+| `StartsWhen.cs:29` | `DocumentEventTrigger.PayloadType` | `string?` | Untyped DOM event — null = match any payload. Empty string would mean "match payloadType=='" which is a different filter than "match any payload type." |
+| `StartsWhen.cs:56` | `ServerPushTrigger.Event` | `string?` | Server push without event filter — null = match any event from this URL. Empty string would match an event named literally `""`. |
+| `StartsWhen.cs:58` | `ServerPushTrigger.PayloadType` | `string?` | Same rationale as `DocumentEventTrigger.PayloadType`. |
+| `StartsWhen.cs:74` | `SignalRTrigger.PayloadType` | `string?` | Same rationale as `DocumentEventTrigger.PayloadType`. |
+| `Reaction.cs:177` | `DispatchReaction.PayloadType` | `string?` | Untyped dispatch event — null = no payload type tag. Empty string would create a distinct event filter key. |
+| `JsType.cs:117` | `JsEvent.PayloadType` | `string?` | Untyped component event registration. Same rationale as the trigger PayloadType properties. |
+| `Source.cs:40` | `PayloadSource.Type` | `string` (pre-NRT, JsonIgnore-WhenWritingNull) | Untyped payload source. The pre-NRT declaration style is a P2 cleanup target, but the nullability itself is locked. |
+| `Path.cs:35` | `PathSegment.Name` | `string` (pre-NRT, JsonIgnore-WhenWritingNull) | Discriminated pair with `Index` — exactly one is set. `PathSegment.Property("x")` sets `Name`, `PathSegment.AtIndex(3)` sets `Index`. A sentinel would require splitting `PathSegment` into `NamedSegment` / `IndexSegment` subclasses (a separate slice — viable but out of P1 scope). |
+| `Path.cs:39` | `PathSegment.Index` | `int?` | Discriminated pair with `Name`. See above. |
+
+**Properties NOT in this table are forbidden to be nullable.** If a future change introduces a
+nullable plan model property that is not on this list, the change is wrong and must either:
+
+1. Add the property to this table with a matching rationale (requires user approval and a
+   documented sentinel-considered-and-rejected analysis), OR
+2. Convert the property to a sentinel (`Xxx.None`, empty collection, empty string, etc.).
+
+The locked table is the single authoritative gate. Reviewers MUST check the table before
+approving any PR that adds or modifies a nullable plan model property.
+
 ### 6. Plan-Driven IDs — No DOM Scanning
 
 `IdGenerator` generates every element ID from the model expression at C# render time.
