@@ -101,6 +101,71 @@ p.Get("/api/physicians?dept=", g => g.Include(m => m.Department))
 
 ---
 
+## FusionColorPicker
+
+A color picker for facility branding -- theme color, accent color, and other palette choices. Bound to a `string?` property that holds a hex value (e.g. `"#e11d48ff"`).
+
+| Property | Value |
+|----------|-------|
+| ReadExpr | `"value"` |
+| Events | `Changed` |
+| Typed Source | `TypedComponentSource<string>` |
+
+### How do I render a color picker?
+
+```csharp
+Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))
+    .FusionColorPicker(b => b
+        .Reactive(plan, evt => evt.Changed, (args, p) =>
+        {
+            p.Element("change-value").SetText(args, x => x.Value);
+        }));
+```
+
+### How do I set its value?
+
+```csharp
+p.Component<FusionColorPicker>(m => m.ThemeColor).SetValue("#e11d48");
+```
+
+### How do I react to a color change?
+
+```csharp
+.Reactive(plan, evt => evt.Changed, (args, p) =>
+{
+    p.Element("change-value").SetText(args, x => x.Value);
+    p.When(args, x => x.Value).Eq("#e11d48ff")
+        .Then(t => t.Element("args-condition").SetText("rose selected"))
+        .Else(e => e.Element("args-condition").SetText("other color"));
+})
+```
+
+### How do I read the current color in a condition?
+
+```csharp
+var comp = p.Component<FusionColorPicker>(m => m.AccentColor);
+p.When(comp.Value()).IsEmpty()
+    .Then(t => t.Element("component-read-result").SetText("no accent color set"))
+    .Else(e => e.Element("component-read-result").SetText("accent color is set"));
+```
+
+### How do I open the popup from a button?
+
+```csharp
+p.Component<FusionColorPicker>(m => m.AccentColor).Toggle();
+```
+
+### Mutation extensions
+
+| Extension | Description |
+|-----------|-------------|
+| `SetValue(string?)` | Sets the color value as a hex string (e.g. `"#ff0000"`), or `null` to clear |
+| `Toggle()` | Toggles the ColorPicker popup open or closed |
+| `Disable(bool)` | Sets the disabled state of the ColorPicker |
+| `Value()` | Reads the current hex color value as a typed source for conditions and gather |
+
+---
+
 ## FusionNumericTextBox
 
 A numeric input with spin buttons, formatting, and min/max constraints.
