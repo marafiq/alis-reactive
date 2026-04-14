@@ -8,9 +8,6 @@ import type { Plan, Component } from "../types";
 import { resolveElement, wireEvent } from "../resolution/resolver";
 import { clearInline } from "./error-display";
 import { revalidateField } from "./orchestrator";
-import { scope } from "../core/trace";
-
-const log = scope("live-clear");
 
 /** Set of componentDomIds already wired — prevents double-wiring on partial reload. */
 const wiredFields = new Set<string>();

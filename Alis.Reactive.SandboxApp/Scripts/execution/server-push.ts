@@ -42,7 +42,7 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
   const wired: WiredBehavior[] = [];
 
   es.onopen = () => {
-    log.debug("connection.opened", { url });
+    log.debug("connected", { url });
     removeRetryIndicators(url);
   };
 

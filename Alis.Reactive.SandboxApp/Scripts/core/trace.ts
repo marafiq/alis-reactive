@@ -34,6 +34,19 @@ function emit(level: number, tag: string, msg: string, data?: unknown): void {
   const out = level <= LEVELS.error ? console.error
             : level <= LEVELS.warn  ? console.warn
             : console.log;
-  if (data !== undefined) out(`${tag} ${msg}`, data);
+  // Dual form: JSON embedded in the message (so console-text scrapers and
+  // log aggregators can substring-match on payload keys) AND the live object
+  // as a second arg (so DevTools renders it as an expandable tree).
+  if (data !== undefined) out(`${tag} ${msg} ${safeStringify(data)}`, data);
   else                    out(`${tag} ${msg}`);
+}
+
+function safeStringify(data: unknown): string {
+  try {
+    return JSON.stringify(data);
+  } catch {
+    // Circular reference or BigInt — fall back to a marker so text scrapers
+    // still see SOMETHING while DevTools handles the live object gracefully.
+    return "[unserializable]";
+  }
 }

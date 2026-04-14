@@ -28,13 +28,13 @@ const log = scope("validation");
 export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecContext): boolean {
   const containerComp = plan.components[containerKey];
   if (!containerComp) {
-    log.warn("container.not-found", { containerKey });
+    log.warn("container.not-found", { id: containerKey });
     return false;
   }
 
   const containerScope = containerComp.container;
   if (!containerScope) {
-    log.warn("container.no-scope", { containerKey });
+    log.warn("container.no-scope", { id: containerComp.id });
     return true;
   }
 
@@ -45,7 +45,7 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
   } catch (e) {
     if (!isResolutionError(e)) throw e;
     if (containerScope.validationRules.length > 0) {
-      log.warn("form.missing", { containerId });
+      log.warn("form.missing", { id: containerId });
       return false;
     }
     return true;
@@ -72,7 +72,7 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
 
   if (summaryHasErrors && summaryEl) showSummaryDiv(summaryEl);
 
-  log.debug("validated", { containerId, valid });
+  log.debug("validated", { id: containerId, valid });
   return valid;
 }
 
@@ -98,7 +98,7 @@ export function showServerErrors(plan: Plan, containerKey: string, data: unknown
   }
 
   if (summaryHasErrors && summaryEl) showSummaryDiv(summaryEl);
-  log.debug("server-errors.shown", { containerId, fieldCount: Object.keys(errors).length });
+  log.debug("server-errors.shown", { id: containerId, fieldCount: Object.keys(errors).length });
 }
 
 /** Place a single server error on its component or into the summary. Returns true if any summary errors added. */

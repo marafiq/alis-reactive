@@ -26,7 +26,7 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
       await connection.start();
-      log.info("connection.opened", { hubUrl });
+      log.info("connected", { hubUrl });
       return;
     } catch (err) {
       const delay = delays[attempt] ?? 30000;

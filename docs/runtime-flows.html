@@ -439,7 +439,7 @@ sequenceDiagram
                 Note over execute: Skip this branch
             end
         end
-        execute->>execute: log.trace("no-branch-taken")
+        execute->>execute: log.trace("branch.no-match", {caseCount})
 
     else reaction.kind == "http"
         execute->>execute: log.debug("http", {url})
@@ -492,7 +492,7 @@ sequenceDiagram
                 end
             end
         end
-        execute->>execute: log.trace("no-branch-taken")
+        execute->>execute: log.trace("branch.no-match", {caseCount})
 
     else reaction.kind == "http"
         execute->>execute: log.debug("http", {url})
@@ -1001,7 +1001,7 @@ sequenceDiagram
         pipeline->>validation: validate(req.validation)
         validation-->>pipeline: boolean
         alt validation fails
-            pipeline->>pipeline: log.debug("validation failed, aborting request")
+            pipeline->>pipeline: log.debug("validation.aborted", {containerKey, url})
             pipeline-->>pipeline: return false
         else
             pipeline-->>pipeline: return true
@@ -1334,7 +1334,7 @@ sequenceDiagram
     orch->>DOM: document.getElementById(desc.formId)
     alt container not found
         alt desc.fields.length > 0
-            orch->>orch: log.warn("form container missing, blocking")
+            orch->>orch: log.warn("form.missing", {id})
             orch-->>Caller: false
         else no fields
             orch-->>Caller: true
