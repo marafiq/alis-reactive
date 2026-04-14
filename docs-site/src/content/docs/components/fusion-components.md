@@ -690,6 +690,112 @@ You can combine conditions with `.And(args, x => x.Index).Eq(0)` to react only w
 
 ---
 
+## FusionGrid
+
+A data grid for displaying tabular records such as residents, care incidents, or medication schedules, with server-side sort, paging, and filter. Non-input component: it fires a data-state event and exposes mutation methods but is not bound to a single model property, so there is no `InputField` wrapper.
+
+| Property | Value |
+|----------|-------|
+| ReadExpr | `(not input-bound)` |
+| Events | `DataStateChange` |
+| Typed Source | `(not input-bound)` |
+
+### How do I render a grid with columns?
+
+Pass `GridColumn` instances to `.Columns(...)` inside the builder callback. Each column has a `Field` (matching a property on the row type), a `HeaderText`, and a `Width`. The element ID you pass as the second argument is what you use later to target the grid from the pipeline.
+
+```csharp
+@(Html.FusionGrid(plan, "residents-grid", b => b
+    .AllowSorting(true)
+    .AllowPaging(true)
+    .PageSettings(new GridPageSettings { PageSize = 10 })
+    .Columns(new List<GridColumn>
+    {
+        new GridColumn { Field = "name", HeaderText = "Name", Width = "180" },
+        new GridColumn { Field = "age", HeaderText = "Age", Width = "80" },
+        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
+        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "100" },
+    })))
+```
+
+Column definitions come from `FusionGridBuilder` and accept any `List<GridColumn>` you build in code. When you need compile-time safety on cell templates, use `FusionTemplateExpression` to bind a template to a typed member of the row model.
+
+### How do I wire server-side pagination?
+
+Attach `.Reactive(evt => evt.DataStateChange, ...)` to the grid. The event args expose `Skip`, `Take`, `Sorted`, and a nested `Action` describing what triggered the request (sort, page, filter, or refresh). Gather those values with `FromEvent` and POST them to your data endpoint, then push the response back into the grid.
+
+```csharp
+@(Html.FusionGrid(plan, "residents-grid", b => b
+    .AllowSorting(true)
+    .AllowPaging(true)
+    .PageSettings(new GridPageSettings { PageSize = 10 })
+    .Columns(new List<GridColumn>
+    {
+        new GridColumn { Field = "name", HeaderText = "Name", Width = "180" },
+        new GridColumn { Field = "age", HeaderText = "Age", Width = "80" },
+        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
+        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "100" },
+    }))
+    .Reactive(evt => evt.DataStateChange, (args, p) =>
+    {
+        p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
+            .Then(t =>
+            {
+                t.Element("evt-skip").SetText(args, x => x.Skip);
+                t.Element("evt-take").SetText(args, x => x.Take);
+                t.Element("evt-action-type").SetText(args, x => x.Action.RequestType);
+                t.Element("evt-action-column").SetText(args, x => x.Action.ColumnName);
+                t.Element("evt-action-direction").SetText(args, x => x.Action.Direction);
+                t.Element("evt-action-page").SetText(args, x => x.Action.CurrentPage);
+                t.Post("/Sandbox/Components/Grid/Data")
+                 .Gather(g => g
+                     .FromEvent(args, x => x.Skip, "skip")
+                     .FromEvent(args, x => x.Take, "take")
+                     .FromEvent(args, x => x.Sorted, "sorted")
+                     .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
+                 .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
+                 {
+                     s.Component<FusionGrid>("residents-grid")
+                         .SetDataSource(json);
+                     s.Element("action-status").SetText("data refreshed");
+                 }));
+            });
+    }))
+```
+
+The `.When(...).NotEq(FusionGridAction.Refresh)` guard skips the round-trip when the grid is refreshing itself after an in-place update, so you do not re-POST on every `SetDataSource` call.
+
+### How do I reload the grid from an HTTP response?
+
+Use `s.Component<FusionGrid>("residents-grid").SetDataSource(json)` inside an `OnSuccess` handler. The `json` parameter is the typed `ResponseBody<T>` -- passing it without a path replaces the grid's data source with the entire response, which is the shape Syncfusion expects for custom binding (`{ result, count }`).
+
+```csharp
+Html.On(plan, t => t.DomReady(p =>
+{
+    p.Post("/Sandbox/Components/Grid/Data")
+     .Gather(g => g
+         .Static("skip", 0)
+         .Static("take", 10))
+     .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
+     {
+         s.Component<FusionGrid>("residents-grid")
+             .SetDataSource(json);
+         s.Element("load-status").SetText("initial data loaded");
+     }));
+}));
+```
+
+### Mutation extensions
+
+| Extension | Description |
+|-----------|-------------|
+| `SetDataSource(ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)` | Replaces the grid data source with items selected from an HTTP response body |
+| `SetDataSource(ResponseBody<TResponse> source)` | Replaces the grid data source with the entire HTTP response body (custom binding `{ result, count }`) |
+| `SetDataSource(TSource source, Expression<Func<TSource, object?>> path)` | Replaces the grid data source with items selected from an event payload |
+| `Refresh()` | Triggers a grid refresh to re-render with the current data source |
+
+---
+
 ## FusionTab
 
 A tab strip for separating related content into browsable panels -- residents, staff, facilities, and reports inside a single facility management page. Non-input component: it fires selection events and exposes mutation methods but is not bound to a model property, so there is no `InputField` wrapper.
