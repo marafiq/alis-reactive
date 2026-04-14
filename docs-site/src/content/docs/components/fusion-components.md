@@ -115,29 +115,21 @@ A color picker for facility branding -- theme color, accent color, and other pal
 
 ```csharp
 Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))
-    .FusionColorPicker(b => b
-        .Reactive(plan, evt => evt.Changed, (args, p) =>
-        {
-            p.Element("change-value").SetText(args, x => x.Value);
-        }));
-```
-
-### How do I set its value?
-
-```csharp
-p.Component<FusionColorPicker>(m => m.ThemeColor).SetValue("#e11d48");
+    .FusionColorPicker(b => b);
 ```
 
 ### How do I react to a color change?
 
 ```csharp
-.Reactive(plan, evt => evt.Changed, (args, p) =>
-{
-    p.Element("change-value").SetText(args, x => x.Value);
-    p.When(args, x => x.Value).Eq("#e11d48ff")
-        .Then(t => t.Element("args-condition").SetText("rose selected"))
-        .Else(e => e.Element("args-condition").SetText("other color"));
-})
+Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))
+    .FusionColorPicker(b => b
+        .Reactive(plan, evt => evt.Changed, (args, p) =>
+        {
+            p.Element("change-value").SetText(args, x => x.Value);
+            p.When(args, x => x.Value).Eq("#e11d48ff")
+                .Then(t => t.Element("args-condition").SetText("rose selected"))
+                .Else(e => e.Element("args-condition").SetText("other color"));
+        }));
 ```
 
 ### How do I read the current color in a condition?
@@ -147,12 +139,6 @@ var comp = p.Component<FusionColorPicker>(m => m.AccentColor);
 p.When(comp.Value()).IsEmpty()
     .Then(t => t.Element("component-read-result").SetText("no accent color set"))
     .Else(e => e.Element("component-read-result").SetText("accent color is set"));
-```
-
-### How do I open the popup from a button?
-
-```csharp
-p.Component<FusionColorPicker>(m => m.AccentColor).Toggle();
 ```
 
 ### Mutation extensions
