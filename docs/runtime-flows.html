@@ -2277,7 +2277,8 @@ sequenceDiagram
 Text form: <code>[alis:scope] msg {"key":"val"}</code> — the JSON payload is embedded in the message so
 console-text scrapers and log aggregators can substring-match on payload keys. The live <code>data</code>
 object is also passed as a second argument so DevTools renders it as an expandable tree. Routing:
-<code>console.error</code> for error, <code>console.warn</code> for warn, <code>console.log</code> for everything else.</p>
+<code>console.error</code> for error, <code>console.warn</code> for warn, <code>console.info</code> for info,
+<code>console.log</code> for debug and trace.</p>
 <div class="mermaid">
 sequenceDiagram
     participant Caller
@@ -2300,6 +2301,8 @@ sequenceDiagram
             trace->>Console: console.error(line, data)
         else level <= LEVELS.warn
             trace->>Console: console.warn(line, data)
+        else level <= LEVELS.info
+            trace->>Console: console.info(line, data)
         else
             trace->>Console: console.log(line, data)
         end
