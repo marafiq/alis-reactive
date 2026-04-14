@@ -13,6 +13,9 @@ namespace Alis.Reactive.PlanModel
     {
         private protected Reaction() { }
 
+        /// <summary>The "do nothing" sentinel reaction. Used as the default for optional reaction slots.</summary>
+        internal static readonly Reaction NoOp = new NoOpReaction();
+
         internal static Reaction Sequence(params Reaction[] steps) =>
             new SequenceReaction(new List<Reaction>(steps));
 
@@ -70,14 +73,13 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "parallel";
         /// <summary>Gets the reactions to execute concurrently.</summary>
         public IReadOnlyList<Reaction> Steps { get; }
-        /// <summary>Gets the reaction to execute after all steps settle, or <see langword="null"/> if none.</summary>
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public Reaction? OnSettled { get; }
+        /// <summary>Gets the reaction to execute after all steps settle. Defaults to <see cref="Reaction.NoOp"/> when no on-settled reaction is supplied.</summary>
+        public Reaction OnSettled { get; }
 
         internal ParallelReaction(List<Reaction> steps, Reaction? onSettled)
         {
             Steps = steps ?? throw new ArgumentNullException(nameof(steps));
-            OnSettled = onSettled;
+            OnSettled = onSettled ?? NoOp;
         }
     }
 
@@ -211,5 +213,14 @@ namespace Alis.Reactive.PlanModel
         {
             Container = container ?? throw new ArgumentNullException(nameof(container));
         }
+    }
+
+    /// <summary>The "do nothing" sentinel reaction. Used as the default value for optional reaction slots so the wire format always carries an explicit reaction.</summary>
+    internal sealed class NoOpReaction : Reaction
+    {
+        /// <summary>Gets the kind. Always <c>"noop"</c>.</summary>
+        public string Kind => "noop";
+
+        internal NoOpReaction() { }
     }
 }

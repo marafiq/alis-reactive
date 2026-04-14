@@ -21,7 +21,7 @@ function walkReaction(reaction: Reaction, visitor: RequestVisitor): void {
       break;
     case "parallel":
       for (const step of reaction.steps) walkReaction(step, visitor);
-      if (reaction.onSettled) walkReaction(reaction.onSettled, visitor);
+      walkReaction(reaction.onSettled, visitor);
       break;
     case "branch":
       for (const c of reaction.cases) walkReaction(c.reaction, visitor);
@@ -34,6 +34,7 @@ function walkReaction(reaction: Reaction, visitor: RequestVisitor): void {
     case "dispatch":
     case "inject":
     case "show-validation-errors":
+    case "noop":
       // Leaf reactions — no nested requests to walk
       break;
     default:

@@ -166,7 +166,8 @@ export type Reaction =
   | RequestReaction
   | DispatchReaction
   | InjectReaction
-  | ShowValidationErrorsReaction;
+  | ShowValidationErrorsReaction
+  | NoOpReaction;
 
 export interface SequenceReaction {
   kind: "sequence";
@@ -176,7 +177,11 @@ export interface SequenceReaction {
 export interface ParallelReaction {
   kind: "parallel";
   steps: Reaction[];
-  onSettled?: Reaction;
+  onSettled: Reaction;
+}
+
+export interface NoOpReaction {
+  kind: "noop";
 }
 
 export interface BranchReaction {

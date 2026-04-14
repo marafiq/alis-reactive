@@ -98,6 +98,7 @@ function resolveSingleRequest(
     case "dispatch":
     case "inject":
     case "show-validation-errors":
+    case "noop":
       return;
     default:
       assertNever(reaction, "reaction kind in NativeActionLink");

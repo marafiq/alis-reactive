@@ -105,7 +105,7 @@ namespace Alis.Reactive
                     break;
                 case ParallelReaction par:
                     foreach (var step in par.Steps) CollectValidationFromReaction(step);
-                    if (par.OnSettled != null) CollectValidationFromReaction(par.OnSettled);
+                    CollectValidationFromReaction(par.OnSettled);
                     break;
                 case BranchReaction br:
                     foreach (var c in br.Cases) CollectValidationFromReaction(c.Reaction);

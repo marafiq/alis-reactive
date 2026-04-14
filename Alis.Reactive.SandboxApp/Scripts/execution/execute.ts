@@ -78,6 +78,10 @@ export function executeReaction(
       executeShowValidationErrors(reaction, p, ctx);
       return;
 
+    case "noop":
+      // Sentinel: do nothing.
+      return;
+
     // ── Mixed kinds: void or Promise ─────────────────────
     case "sequence":
       return executeSequence(reaction, p, ctx);
@@ -188,10 +192,9 @@ async function executeParallel(
   for (const r of results) {
     if (r.status === "rejected") log.error("parallel.step-failed", { error: String(r.reason) });
   }
-  if (reaction.onSettled) {
-    const r = executeReaction(reaction.onSettled, plan, ctx);
-    if (r instanceof Promise) await r;
-  }
+  // onSettled is always present (defaults to NoOpReaction sentinel which executes as a no-op).
+  const r = executeReaction(reaction.onSettled, plan, ctx);
+  if (r instanceof Promise) await r;
 }
 
 // ── Set reaction ───────────────────────────────────────────

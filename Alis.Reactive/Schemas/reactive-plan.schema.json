@@ -258,8 +258,16 @@
         { "$ref": "#/$defs/RequestReaction" },
         { "$ref": "#/$defs/DispatchReaction" },
         { "$ref": "#/$defs/InjectReaction" },
-        { "$ref": "#/$defs/ShowValidationErrorsReaction" }
+        { "$ref": "#/$defs/ShowValidationErrorsReaction" },
+        { "$ref": "#/$defs/NoOpReaction" }
       ]
+    },
+    "NoOpReaction": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": { "const": "noop" }
+      }
     },
     "SequenceReaction": {
       "type": "object",
@@ -274,7 +282,7 @@
     },
     "ParallelReaction": {
       "type": "object",
-      "required": ["kind", "steps"],
+      "required": ["kind", "steps", "onSettled"],
       "properties": {
         "kind": { "const": "parallel" },
         "steps": {
