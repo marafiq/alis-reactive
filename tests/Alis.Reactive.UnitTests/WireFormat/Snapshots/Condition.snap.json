@@ -1,0 +1,212 @@
+[
+  {
+    "kind": "compare",
+    "left": {
+      "kind": "read",
+      "from": {
+        "kind": "component",
+        "component": "c1"
+      },
+      "member": "value",
+      "path": [],
+      "shape": {
+        "kind": "none"
+      },
+      "args": []
+    },
+    "op": "eq",
+    "right": {
+      "kind": "literal",
+      "value": "hello",
+      "shape": {
+        "kind": "string"
+      }
+    },
+    "shape": {
+      "kind": "none"
+    },
+    "itemShape": {
+      "kind": "none"
+    }
+  },
+  {
+    "kind": "compare",
+    "left": {
+      "kind": "read",
+      "from": {
+        "kind": "component",
+        "component": "c1"
+      },
+      "member": "value",
+      "path": [],
+      "shape": {
+        "kind": "none"
+      },
+      "args": []
+    },
+    "op": "truthy",
+    "right": {
+      "kind": "none"
+    },
+    "shape": {
+      "kind": "none"
+    },
+    "itemShape": {
+      "kind": "none"
+    }
+  },
+  {
+    "kind": "all",
+    "terms": [
+      {
+        "kind": "compare",
+        "left": {
+          "kind": "read",
+          "from": {
+            "kind": "component",
+            "component": "c1"
+          },
+          "member": "value",
+          "path": [],
+          "shape": {
+            "kind": "none"
+          },
+          "args": []
+        },
+        "op": "truthy",
+        "right": {
+          "kind": "none"
+        },
+        "shape": {
+          "kind": "none"
+        },
+        "itemShape": {
+          "kind": "none"
+        }
+      },
+      {
+        "kind": "compare",
+        "left": {
+          "kind": "read",
+          "from": {
+            "kind": "component",
+            "component": "c1"
+          },
+          "member": "value",
+          "path": [],
+          "shape": {
+            "kind": "none"
+          },
+          "args": []
+        },
+        "op": "eq",
+        "right": {
+          "kind": "literal",
+          "value": 1,
+          "shape": {
+            "kind": "number"
+          }
+        },
+        "shape": {
+          "kind": "none"
+        },
+        "itemShape": {
+          "kind": "none"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "any",
+    "terms": [
+      {
+        "kind": "compare",
+        "left": {
+          "kind": "read",
+          "from": {
+            "kind": "component",
+            "component": "c1"
+          },
+          "member": "value",
+          "path": [],
+          "shape": {
+            "kind": "none"
+          },
+          "args": []
+        },
+        "op": "truthy",
+        "right": {
+          "kind": "none"
+        },
+        "shape": {
+          "kind": "none"
+        },
+        "itemShape": {
+          "kind": "none"
+        }
+      },
+      {
+        "kind": "compare",
+        "left": {
+          "kind": "read",
+          "from": {
+            "kind": "component",
+            "component": "c1"
+          },
+          "member": "value",
+          "path": [],
+          "shape": {
+            "kind": "none"
+          },
+          "args": []
+        },
+        "op": "falsy",
+        "right": {
+          "kind": "none"
+        },
+        "shape": {
+          "kind": "none"
+        },
+        "itemShape": {
+          "kind": "none"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "not",
+    "term": {
+      "kind": "compare",
+      "left": {
+        "kind": "read",
+        "from": {
+          "kind": "component",
+          "component": "c1"
+        },
+        "member": "value",
+        "path": [],
+        "shape": {
+          "kind": "none"
+        },
+        "args": []
+      },
+      "op": "truthy",
+      "right": {
+        "kind": "none"
+      },
+      "shape": {
+        "kind": "none"
+      },
+      "itemShape": {
+        "kind": "none"
+      }
+    }
+  },
+  {
+    "kind": "confirm",
+    "message": "Are you sure?"
+  },
+  {
+    "kind": "none"
+  }
+]

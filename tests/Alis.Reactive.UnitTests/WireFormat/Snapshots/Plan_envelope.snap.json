@@ -1,0 +1,58 @@
+{
+  "version": 3,
+  "planId": "<stable>",
+  "types": {
+    "native.element.test-id": {
+      "properties": {
+        "text": {
+          "path": [
+            {
+              "kind": "property",
+              "name": "textContent"
+            }
+          ],
+          "shape": {
+            "kind": "string"
+          },
+          "access": "write"
+        }
+      },
+      "methods": {},
+      "events": {}
+    }
+  },
+  "components": {
+    "test-id": {
+      "id": "test-id",
+      "vendor": "native",
+      "type": "native.element.test-id"
+    }
+  },
+  "behaviors": [
+    {
+      "startsWhen": {
+        "kind": "page-ready"
+      },
+      "reaction": {
+        "kind": "sequence",
+        "steps": [
+          {
+            "kind": "set",
+            "on": {
+              "kind": "component",
+              "component": "test-id"
+            },
+            "property": "text",
+            "value": {
+              "kind": "literal",
+              "value": "hello",
+              "shape": {
+                "kind": "string"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

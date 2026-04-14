@@ -1,0 +1,40 @@
+[
+  {
+    "kind": "page-ready"
+  },
+  {
+    "kind": "document-event",
+    "event": "custom-event"
+  },
+  {
+    "kind": "document-event",
+    "event": "typed-event",
+    "payloadType": "MyPayloadType"
+  },
+  {
+    "kind": "component-event",
+    "component": "comp1",
+    "event": "change"
+  },
+  {
+    "kind": "server-push",
+    "url": "/api/sse"
+  },
+  {
+    "kind": "server-push",
+    "url": "/api/sse",
+    "event": "filtered-event",
+    "payloadType": "MyPayloadType"
+  },
+  {
+    "kind": "signalr",
+    "hubUrl": "/hub",
+    "method": "OnUpdate"
+  },
+  {
+    "kind": "signalr",
+    "hubUrl": "/hub",
+    "method": "OnUpdateTyped",
+    "payloadType": "MyPayloadType"
+  }
+]

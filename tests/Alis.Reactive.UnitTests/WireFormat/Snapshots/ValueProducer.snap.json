@@ -1,0 +1,82 @@
+[
+  {
+    "kind": "literal",
+    "value": "hello",
+    "shape": {
+      "kind": "string"
+    }
+  },
+  {
+    "kind": "literal",
+    "value": 42,
+    "shape": {
+      "kind": "number"
+    }
+  },
+  {
+    "kind": "literal",
+    "value": true,
+    "shape": {
+      "kind": "boolean"
+    }
+  },
+  {
+    "kind": "literal",
+    "value": null,
+    "shape": {
+      "kind": "none"
+    }
+  },
+  {
+    "kind": "read",
+    "from": {
+      "kind": "url"
+    },
+    "member": "tab",
+    "path": [],
+    "shape": {
+      "kind": "none"
+    },
+    "args": []
+  },
+  {
+    "kind": "object",
+    "fields": {
+      "name": {
+        "kind": "literal",
+        "value": "Alice",
+        "shape": {
+          "kind": "string"
+        }
+      }
+    },
+    "shape": {
+      "kind": "none"
+    }
+  },
+  {
+    "kind": "array",
+    "items": [
+      {
+        "kind": "literal",
+        "value": 1,
+        "shape": {
+          "kind": "number"
+        }
+      },
+      {
+        "kind": "literal",
+        "value": 2,
+        "shape": {
+          "kind": "number"
+        }
+      }
+    ],
+    "shape": {
+      "kind": "none"
+    }
+  },
+  {
+    "kind": "none"
+  }
+]

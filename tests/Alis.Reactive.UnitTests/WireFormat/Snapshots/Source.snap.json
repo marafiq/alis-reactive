@@ -1,0 +1,42 @@
+[
+  {
+    "kind": "component",
+    "component": "comp1"
+  },
+  {
+    "kind": "payload",
+    "scope": "event"
+  },
+  {
+    "kind": "payload",
+    "scope": "event",
+    "type": "MyPayloadType"
+  },
+  {
+    "kind": "payload",
+    "scope": "success"
+  },
+  {
+    "kind": "payload",
+    "scope": "error"
+  },
+  {
+    "kind": "payload",
+    "scope": "request"
+  },
+  {
+    "kind": "payload",
+    "scope": "dispatch"
+  },
+  {
+    "kind": "payload",
+    "scope": "local"
+  },
+  {
+    "kind": "url"
+  },
+  {
+    "kind": "plugin",
+    "name": "myPlugin"
+  }
+]

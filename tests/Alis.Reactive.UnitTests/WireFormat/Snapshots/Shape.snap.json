@@ -1,0 +1,46 @@
+[
+  {
+    "kind": "string"
+  },
+  {
+    "kind": "number"
+  },
+  {
+    "kind": "boolean"
+  },
+  {
+    "kind": "date"
+  },
+  {
+    "kind": "raw"
+  },
+  {
+    "kind": "any"
+  },
+  {
+    "kind": "none"
+  },
+  {
+    "kind": "array",
+    "item": {
+      "kind": "string"
+    }
+  },
+  {
+    "kind": "nullable",
+    "inner": {
+      "kind": "number"
+    }
+  },
+  {
+    "kind": "object",
+    "fields": {
+      "name": {
+        "kind": "string"
+      },
+      "count": {
+        "kind": "number"
+      }
+    }
+  }
+]

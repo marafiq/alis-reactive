@@ -1,0 +1,109 @@
+[
+  {
+    "kind": "sequence",
+    "steps": [
+      {
+        "kind": "show-validation-errors",
+        "container": "c1"
+      }
+    ]
+  },
+  {
+    "kind": "parallel",
+    "steps": [
+      {
+        "kind": "show-validation-errors",
+        "container": "c1"
+      }
+    ],
+    "onSettled": {
+      "kind": "noop"
+    }
+  },
+  {
+    "kind": "parallel",
+    "steps": [
+      {
+        "kind": "show-validation-errors",
+        "container": "c1"
+      }
+    ],
+    "onSettled": {
+      "kind": "show-validation-errors",
+      "container": "c1"
+    }
+  },
+  {
+    "kind": "branch",
+    "cases": [
+      {
+        "when": {
+          "kind": "none"
+        },
+        "reaction": {
+          "kind": "show-validation-errors",
+          "container": "c1"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "set",
+    "on": {
+      "kind": "url"
+    },
+    "property": "value",
+    "value": {
+      "kind": "literal",
+      "value": "x",
+      "shape": {
+        "kind": "string"
+      }
+    }
+  },
+  {
+    "kind": "call",
+    "on": {
+      "kind": "url"
+    },
+    "method": "method",
+    "args": []
+  },
+  {
+    "kind": "dispatch",
+    "event": "event-name",
+    "data": {
+      "kind": "none"
+    }
+  },
+  {
+    "kind": "dispatch",
+    "event": "typed-event",
+    "data": {
+      "kind": "literal",
+      "value": "payload",
+      "shape": {
+        "kind": "string"
+      }
+    },
+    "payloadType": "MyPayloadType"
+  },
+  {
+    "kind": "inject",
+    "component": "comp1",
+    "value": {
+      "kind": "literal",
+      "value": "html",
+      "shape": {
+        "kind": "string"
+      }
+    }
+  },
+  {
+    "kind": "show-validation-errors",
+    "container": "container1"
+  },
+  {
+    "kind": "noop"
+  }
+]
