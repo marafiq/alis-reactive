@@ -33,6 +33,7 @@ function emit(level: number, tag: string, msg: string, data?: unknown): void {
   if (level > active) return;
   const out = level <= LEVELS.error ? console.error
             : level <= LEVELS.warn  ? console.warn
+            : level <= LEVELS.info  ? console.info
             : console.log;
   // Dual form: JSON embedded in the message (so console-text scrapers and
   // log aggregators can substring-match on payload keys) AND the live object

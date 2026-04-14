@@ -68,8 +68,8 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
     .withAutomaticReconnect()
     .configureLogging({
       log: (level: signalR.LogLevel, message: string) => {
-        if (level >= signalR.LogLevel.Warning) log.warn("lib.warn", { message });
-        else if (level >= signalR.LogLevel.Information) log.debug("lib.info", { message });
+        if (level >= signalR.LogLevel.Warning) log.debug("lib.forwarded", { level: "warn", message });
+        else if (level >= signalR.LogLevel.Information) log.debug("lib.forwarded", { level: "info", message });
       }
     })
     .build();
