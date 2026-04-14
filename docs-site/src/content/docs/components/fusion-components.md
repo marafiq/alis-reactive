@@ -630,6 +630,68 @@ Html.InputField(plan, m => m.Documents, o => o.Label("Supporting Documents"))
 
 ---
 
+## FusionAccordion
+
+A collapsible panel container for grouping related content -- facility overviews, care level breakdowns, resident profile sections, or contact information. Non-input component: it has events and methods but is not bound to a model property, so there is no `InputField` wrapper.
+
+| Property | Value |
+|----------|-------|
+| ReadExpr | `(not input-bound)` |
+| Events | `Expanded` |
+| Typed Source | `(not input-bound)` |
+
+### How do I render an accordion with multiple panels?
+
+Pass `AccordionItem` instances to `.Items(...)` inside the builder callback. Each item has a `Header` and a `Content` string (raw HTML). The element ID you pass as the second argument is what you use later to target the accordion from the pipeline.
+
+```csharp
+@(Html.FusionAccordion(plan, "demo-accordion", b => b
+    .Items(new List<AccordionItem>
+    {
+        new AccordionItem { Header = "Facility Overview", Content = "<p>Sunrise Senior Living provides assisted living, memory care, and independent living communities across 30 states.</p>" },
+        new AccordionItem { Header = "Care Levels", Content = "<p>Level 1: Independent Living. Level 2: Assisted Living. Level 3: Memory Care. Level 4: Skilled Nursing.</p>" },
+        new AccordionItem { Header = "Contact Information", Content = "<p>Main Office: (555) 123-4567. Emergency: (555) 987-6543. Admissions: admissions@sunrise.example.com</p>" }
+    }))
+    .Reactive(evt => evt.Expanded, (args, p) =>
+    {
+        p.Element("expanded-index").SetText(args, x => x.Index);
+        p.Element("expanded-state").SetText(args, x => x.IsExpanded);
+    }))
+```
+
+The whole expression returns `IHtmlContent`, so it is wrapped in `@(...)` rather than `@{ ... }`. The `Items(...)` call accepts any `List<AccordionItem>` you build in code -- you can compose it from partial views, database lookups, or inline literals.
+
+### How do I react to a panel expanding?
+
+The `Expanded` event args expose `Index` (zero-based) and `IsExpanded` (true when opening, false when collapsing). Use `p.When(args, x => x.IsExpanded).Truthy()` to branch based on whether the panel just opened or closed.
+
+```csharp
+@(Html.FusionAccordion(plan, "demo-accordion", b => b
+    .Items(new List<AccordionItem>
+    {
+        new AccordionItem { Header = "Facility Overview", Content = "<p>Overview</p>" },
+        new AccordionItem { Header = "Care Levels", Content = "<p>Care Levels</p>" },
+        new AccordionItem { Header = "Contact Information", Content = "<p>Contact</p>" }
+    }))
+    .Reactive(evt => evt.Expanded, (args, p) =>
+    {
+        p.When(args, x => x.IsExpanded).Truthy()
+            .Then(t => t.Element("condition-result").SetText("Panel expanded"))
+            .Else(e => e.Element("condition-result").SetText("Panel collapsed"));
+    }))
+```
+
+You can combine conditions with `.And(args, x => x.Index).Eq(0)` to react only when a specific panel opens -- useful for lazy-loading each panel's content via an HTTP `Get` inside the `Then` branch.
+
+### Mutation extensions
+
+| Extension | Description |
+|-----------|-------------|
+| `ExpandItem(bool isExpand, int index)` | Expands or collapses a panel by index |
+| `EnableItem(int index, bool isEnable = true)` | Enables or disables a panel by index |
+
+---
+
 ## App-Level Fusion Components
 
 App-level Fusion components are singletons rendered once in the layout. Referenced from any pipeline without a model expression.
