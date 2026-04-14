@@ -114,14 +114,16 @@ A color picker for facility branding -- theme color, accent color, and other pal
 ### How do I render a color picker?
 
 ```csharp
-Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))
-    .FusionColorPicker(b => b);
+@{ Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))
+    .FusionColorPicker(b => b); }
 ```
+
+The `b` builder exposes `.Reactive(plan, evt => evt.Changed, ...)` for wiring the Changed event -- see the next question for the full pattern.
 
 ### How do I react to a color change?
 
 ```csharp
-Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))
+@{ Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))
     .FusionColorPicker(b => b
         .Reactive(plan, evt => evt.Changed, (args, p) =>
         {
@@ -129,16 +131,20 @@ Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))
             p.When(args, x => x.Value).Eq("#e11d48ff")
                 .Then(t => t.Element("args-condition").SetText("rose selected"))
                 .Else(e => e.Element("args-condition").SetText("other color"));
-        }));
+        })); }
 ```
 
 ### How do I read the current color in a condition?
 
 ```csharp
-var comp = p.Component<FusionColorPicker>(m => m.AccentColor);
-p.When(comp.Value()).IsEmpty()
-    .Then(t => t.Element("component-read-result").SetText("no accent color set"))
-    .Else(e => e.Element("component-read-result").SetText("accent color is set"));
+@(Html.NativeButton("check-accent-btn", "Check Accent Color")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        var comp = p.Component<FusionColorPicker>(m => m.AccentColor);
+        p.When(comp.Value()).IsEmpty()
+            .Then(t => t.Element("component-read-result").SetText("no accent color set"))
+            .Else(e => e.Element("component-read-result").SetText("accent color is set"));
+    }))
 ```
 
 ### Mutation extensions
