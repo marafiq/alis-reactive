@@ -31,8 +31,23 @@ export function scope(name: string): Logger {
 
 function emit(level: number, tag: string, msg: string, data?: unknown): void {
   if (level > active) return;
-  const line = data !== undefined ? `${tag} ${msg} ${JSON.stringify(data)}` : `${tag} ${msg}`;
-  if (level <= LEVELS.error) console.error(line);
-  else if (level <= LEVELS.warn) console.warn(line);
-  else console.log(line);
+  const out = level <= LEVELS.error ? console.error
+            : level <= LEVELS.warn  ? console.warn
+            : level <= LEVELS.info  ? console.info
+            : console.log;
+  // Dual form: JSON embedded in the message (so console-text scrapers and
+  // log aggregators can substring-match on payload keys) AND the live object
+  // as a second arg (so DevTools renders it as an expandable tree).
+  if (data !== undefined) out(`${tag} ${msg} ${safeStringify(data)}`, data);
+  else                    out(`${tag} ${msg}`);
+}
+
+function safeStringify(data: unknown): string {
+  try {
+    return JSON.stringify(data);
+  } catch {
+    // Circular reference or BigInt — fall back to a marker so text scrapers
+    // still see SOMETHING while DevTools handles the live object gracefully.
+    return "[unserializable]";
+  }
 }

@@ -26,7 +26,7 @@ const sources = new Map<string, ManagedSource>();
 
 function retrySSE(url: string, behaviors: readonly WiredBehavior[]): void {
   removeRetryIndicators(url);
-  log.info("manual retry", { url });
+  log.info("retry.manual", { url });
 
   for (const b of behaviors) {
     wireServerPush(b.trigger, b.reaction, b.plan);
@@ -51,14 +51,14 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
     if (managed?.stopping) return;
 
     if (es.readyState === EventSource.CLOSED) {
-      log.error("connection closed permanently", { url });
+      log.error("connection.closed-permanent", { url });
       sources.delete(url);
       if (managed && managed.targetIds.size > 0) {
         const wiredBehaviors = managed.wired;
         showRetryIndicators(url, managed.targetIds, () => retrySSE(url, wiredBehaviors));
       }
     } else {
-      log.warn("connection error (reconnecting)", { url });
+      log.warn("connection.reconnecting", { url });
     }
   };
 
@@ -70,11 +70,11 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
       managed.stopping = true;
       es.close();
       sources.delete(url);
-      log.debug("closed", { url });
+      log.debug("connection.closed", { url });
     });
   }
 
-  log.debug("created", { url });
+  log.debug("source.created", { url });
   return managed;
 }
 
@@ -90,14 +90,14 @@ export function wireServerPush(
 
   const handler = (e: MessageEvent) => {
     const evt: Record<string, unknown> = JSON.parse(e.data);
-    log.debug("message", { url: trigger.url, event: trigger.event });
+    log.debug("message.received", { url: trigger.url, event: trigger.event });
     const result = executeReaction(reaction, plan, { event: evt });
     if (result instanceof Promise) {
-      result.catch(err => log.error("reaction failed", { error: String(err) }));
+      result.catch(err => log.error("reaction.failed", { url: trigger.url, event: trigger.event, error: String(err) }));
     }
   };
 
   const eventName = trigger.event ?? "message";
   managed.es.addEventListener(eventName, handler as EventListener);
-  log.debug("listening", { url: trigger.url, event: eventName });
+  log.debug("event.listening", { url: trigger.url, event: eventName });
 }

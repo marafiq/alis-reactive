@@ -10,19 +10,19 @@ const log = scope("trigger");
 
 /**
  * Execute a reaction and handle errors for both sync and async paths.
- * The callback is synchronous. For pure sync reactions (set, call, branch
- * with compare conditions), execution completes before this returns —
- * in the same tick as the SF event callback. SF checks args.cancel AFTER
- * this returns, so the mutation is visible.
+ * `source` identifies the originating trigger so failure logs point at
+ * which wiring broke. Execution is synchronous for pure sync reactions
+ * (set, call, branch with compare conditions) — required so SF event
+ * mutations like args.cancel are visible when SF checks them after return.
  */
-function runReaction(reaction: Reaction, plan: Plan, ctx: ExecContext): void {
+function runReaction(reaction: Reaction, plan: Plan, ctx: ExecContext, source: string): void {
   try {
     const result = executeReaction(reaction, plan, ctx);
     if (result instanceof Promise) {
-      result.catch(err => log.error("reaction failed", { error: String(err) }));
+      result.catch(err => log.error("reaction.failed", { source, sync: false, error: String(err) }));
     }
   } catch (err) {
-    log.error("reaction failed (sync)", { error: String(err) });
+    log.error("reaction.failed", { source, sync: true, error: String(err) });
   }
 }
 
@@ -38,34 +38,40 @@ export function wireBehavior(
     case "page-ready":
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {
-          runReaction(reaction, plan, {});
+          runReaction(reaction, plan, {}, "page-ready");
         }, opts);
       } else {
-        runReaction(reaction, plan, {});
+        runReaction(reaction, plan, {}, "page-ready");
       }
       break;
 
-    case "document-event":
-      log.debug("document-event: listening", { event: trigger.event });
+    case "document-event": {
+      const source = `document-event:${trigger.event}`;
+      log.debug("document-event.listening", { event: trigger.event });
       document.addEventListener(trigger.event, (e: Event) => {
         const ctx: ExecContext = { event: (e as CustomEvent).detail ?? e };
-        runReaction(reaction, plan, ctx);
+        runReaction(reaction, plan, ctx, source);
       }, opts);
       break;
+    }
 
     case "component-event": {
       const comp = plan.components[trigger.component];
-      if (!comp) throw new Error(`[alis] trigger component not found: ${trigger.component}`);
+      if (!comp) {
+        log.error("trigger.component-not-found", { component: trigger.component, event: trigger.event });
+        throw new Error(`[alis] trigger component not found: ${trigger.component}`);
+      }
 
       const jsType = getJsType(plan, trigger.component);
       const eventDef = jsType.events[trigger.event];
       const channel = eventDef?.channel ?? trigger.event;
+      const source = `component-event:${trigger.component}:${trigger.event}`;
 
-      log.debug("component-event", { component: trigger.component, event: trigger.event, channel });
+      log.debug("component-event.listening", { component: trigger.component, event: trigger.event, channel });
 
       wireEvent(plan, trigger.component, channel, (eventData) => {
         const ctx: ExecContext = { event: eventData };
-        runReaction(reaction, plan, ctx);
+        runReaction(reaction, plan, ctx, source);
       }, opts);
       break;
     }

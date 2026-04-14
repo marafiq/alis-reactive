@@ -30,12 +30,12 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
       return;
     } catch (err) {
       const delay = delays[attempt] ?? 30000;
-      log.warn("start failed, retrying", { hubUrl, attempt: attempt + 1, delay, error: String(err) });
+      log.warn("start.retry", { hubUrl, attempt: attempt + 1, delay, error: String(err) });
       await new Promise(r => setTimeout(r, delay));
     }
   }
 
-  log.error("start failed after all retries", { hubUrl, attempts: maxAttempts });
+  log.error("start.failed", { hubUrl, attempts: maxAttempts });
   const managed = hubs.get(hubUrl);
   if (managed) showRetryIndicators(hubUrl, managed.targetIds, () => retryConnection(hubUrl));
 }
@@ -43,18 +43,18 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
 function retryConnection(hubUrl: string): void {
   const managed = hubs.get(hubUrl);
   if (!managed) {
-    log.warn("retry requested but no connection found", { hubUrl });
+    log.warn("retry.no-connection", { hubUrl });
     removeRetryIndicators(hubUrl);
     return;
   }
 
   const { connection } = managed;
   if (connection.state !== signalR.HubConnectionState.Disconnected) {
-    log.debug("retry skipped — not disconnected", { hubUrl, state: connection.state });
+    log.debug("retry.skipped", { hubUrl, state: connection.state });
     return;
   }
 
-  log.info("manual retry", { hubUrl });
+  log.info("retry.manual", { hubUrl });
   removeRetryIndicators(hubUrl);
   managed.startPromise = startWithRetry(connection, hubUrl);
 }
@@ -68,8 +68,8 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
     .withAutomaticReconnect()
     .configureLogging({
       log: (level: signalR.LogLevel, message: string) => {
-        if (level >= signalR.LogLevel.Warning) log.warn("lib", { message });
-        else if (level >= signalR.LogLevel.Information) log.debug("lib", { message });
+        if (level >= signalR.LogLevel.Warning) log.debug("lib.forwarded", { level: "warn", message });
+        else if (level >= signalR.LogLevel.Information) log.debug("lib.forwarded", { level: "info", message });
       }
     })
     .build();
@@ -77,20 +77,20 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
   const targetIds = new Set<string>();
 
   connection.onreconnecting(err => {
-    log.warn("reconnecting", { hubUrl, error: err ? String(err) : undefined });
+    log.warn("connection.reconnecting", { hubUrl, error: err ? String(err) : undefined });
   });
 
   connection.onreconnected(connectionId => {
-    log.info("reconnected", { hubUrl, connectionId });
+    log.info("connection.reconnected", { hubUrl, connectionId });
     removeRetryIndicators(hubUrl);
   });
 
   connection.onclose(err => {
     if (managed!.stopping) {
-      log.debug("stopped", { hubUrl });
+      log.debug("connection.stopped", { hubUrl });
       hubs.delete(hubUrl);
     } else {
-      log.warn("disconnected", { hubUrl, error: err ? String(err) : undefined });
+      log.warn("connection.disconnected", { hubUrl, error: err ? String(err) : undefined });
       showRetryIndicators(hubUrl, targetIds, () => retryConnection(hubUrl));
     }
   });
@@ -128,12 +128,12 @@ export function wireSignalR(
     }
 
     const evt = args[0] as Record<string, unknown>;
-    log.debug("method", { hubUrl: trigger.hubUrl, method: trigger.method });
+    log.debug("method.received", { hubUrl: trigger.hubUrl, method: trigger.method });
     const result = executeReaction(reaction, plan, { event: evt });
     if (result instanceof Promise) {
-      result.catch(err => log.error("reaction failed", { error: String(err) }));
+      result.catch(err => log.error("reaction.failed", { hubUrl: trigger.hubUrl, method: trigger.method, error: String(err) }));
     }
   });
 
-  log.debug("listening", { hubUrl: trigger.hubUrl, method: trigger.method });
+  log.debug("method.listening", { hubUrl: trigger.hubUrl, method: trigger.method });
 }

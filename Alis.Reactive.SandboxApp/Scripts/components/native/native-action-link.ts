@@ -40,10 +40,10 @@ function handleClick(event: MouseEvent): void {
 
   const payload = decodePayload(anchor);
   bindHrefToSingleRequest(payload.reaction, anchor.getAttribute("href") ?? anchor.href);
-  log.debug("activate", { id: anchor.id, href: anchor.href });
+  log.debug("activated", { id: anchor.id, href: anchor.href });
   const result = executeReaction(payload.reaction, payload.plan);
   if (result instanceof Promise) {
-    result.catch(err => log.error("reaction failed", { error: String(err) }));
+    result.catch(err => log.error("reaction.failed", { id: anchor.id, error: String(err) }));
   }
 }
 

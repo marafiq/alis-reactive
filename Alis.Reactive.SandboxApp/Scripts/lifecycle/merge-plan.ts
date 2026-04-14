@@ -79,7 +79,7 @@ export class PlanRegistry {
     for (const [key, type] of Object.entries(incoming.types)) {
       const owner = this.keyOwners.get(`t:${key}`);
       if (owner && owner !== partId && partId) {
-        log.error("cross-source type collision", { key, owner, incoming: partId });
+        log.error("merge.type-collision", { key, owner, incoming: partId });
         continue;
       }
       target.types[key] = type;
@@ -92,7 +92,7 @@ export class PlanRegistry {
     for (const [key, comp] of Object.entries(incoming.components)) {
       const owner = this.keyOwners.get(`c:${key}`);
       if (owner && owner !== partId && partId) {
-        log.error("cross-source component collision", { key, owner, incoming: partId });
+        log.error("merge.component-collision", { key, owner, incoming: partId });
         continue;
       }
       deepMergeValidationRules(target.components[key], comp);

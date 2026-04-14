@@ -145,7 +145,7 @@ function executeBranch(
       return executeReaction(c.reaction, plan, ctx);
     }
   }
-  log.trace("no-branch-taken");
+  log.trace("branch.no-match", { caseCount: reaction.cases.length });
 }
 
 function hasConfirm(condition: Condition): boolean {
@@ -169,7 +169,7 @@ async function executeBranchAsync(
       return;
     }
   }
-  log.trace("no-branch-taken");
+  log.trace("branch.no-match", { caseCount: reaction.cases.length });
 }
 
 // ── Parallel executor ─────────────────────────────────────
@@ -186,7 +186,7 @@ async function executeParallel(
     })
   );
   for (const r of results) {
-    if (r.status === "rejected") log.error("parallel step failed", { error: String(r.reason) });
+    if (r.status === "rejected") log.error("parallel.step-failed", { error: String(r.reason) });
   }
   if (reaction.onSettled) {
     const r = executeReaction(reaction.onSettled, plan, ctx);
@@ -267,7 +267,9 @@ function executeInject(reaction: InjectReaction, plan: Plan, ctx?: ExecContext):
   const value = evaluateValue(reaction.value, plan, ctx);
   if (typeof value === "string") {
     injectHtml(container, value);
+    log.trace("inject.applied", { component: reaction.component, size: value.length });
   } else {
+    log.error("inject.wrong-type", { component: reaction.component, type: typeof value });
     throw new Error(`[alis] inject expects string HTML, got ${typeof value}`);
   }
 }
@@ -284,8 +286,10 @@ function executeShowValidationErrors(
   // When called inside an error handler, ctx.response carries the server's
   // ProblemDetails body. Route to showServerErrors instead of client-side validation.
   if (ctx?.response && typeof ctx.response === "object") {
+    log.debug("show-validation.server", { id: reaction.container });
     showServerErrors(plan, reaction.container, ctx.response);
   } else {
+    log.debug("show-validation.client", { id: reaction.container });
     validateContainer(plan, reaction.container, ctx);
   }
 }

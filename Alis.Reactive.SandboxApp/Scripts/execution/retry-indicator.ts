@@ -19,7 +19,7 @@ export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry
     // See module header comment for rationale.
     const el = document.getElementById(id);
     if (!el) {
-      log.warn("target not found", { key, id });
+      log.warn("target.not-found", { key, id });
       continue;
     }
 
@@ -43,14 +43,14 @@ export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry
   }
 
   if (anchored.size > 0) {
-    log.info("shown", { key, placed: anchored.size });
+    log.info("indicators.shown", { key, placed: anchored.size });
   } else if (targetIds.size > 0) {
-    log.error("no indicators placed — all targets missing", { key, targets: [...targetIds] });
+    log.error("indicators.all-targets-missing", { key, targets: [...targetIds] });
   }
 }
 
 export function removeRetryIndicators(key: string): void {
   const icons = document.querySelectorAll(`[${RETRY_ATTR}="${key}"]`);
   icons.forEach(icon => icon.remove());
-  if (icons.length > 0) log.debug("removed", { key });
+  if (icons.length > 0) log.debug("indicators.removed", { key, count: icons.length });
 }

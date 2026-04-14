@@ -64,7 +64,7 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     if (req.container) {
       const valid = validateContainer(plan, req.container, ctx);
       if (!valid) {
-        log.debug("validation failed, aborting request");
+        log.debug("validation.aborted", { id: req.container, url: req.url });
         return;
       }
     }
@@ -82,10 +82,17 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     const requestPayload = gatherResult.body instanceof FormData ? {} : gatherResult.body;
     ctx = { ...ctx, request: requestPayload };
 
-    log.debug("fetch", { method: req.method, url: resolved.url });
+    log.debug("fetch.send", { method: req.method, url: resolved.url });
 
     // 4. Fetch
+    const start = performance.now();
     const response = await fetch(resolved.url, resolved.init);
+    log.debug("fetch.response", {
+      method: req.method,
+      url: resolved.url,
+      status: response.status,
+      ms: Math.round(performance.now() - start),
+    });
 
     // 5. Route response
     const body = await readResponseBody(response);
@@ -100,7 +107,7 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     }
   } catch (err) {
     const status = err instanceof TypeError ? 0 : -1;
-    log.error(status === 0 ? "network error" : "client error", { url: req.url, error: String(err) });
+    log.error(status === 0 ? "fetch.network-error" : "fetch.client-error", { method: req.method, url: req.url, error: String(err) });
     await routeHandlers(req.error, status, plan, ctx);
     await runComplete(req, plan, ctx);
     return; // no chained on error
@@ -152,4 +159,7 @@ export async function routeHandlers(
       return;
     }
   }
+
+  // No handler matched — silent miss unless traced.
+  log.warn("response.unhandled", { status, handlerCount: handlers.length });
 }
