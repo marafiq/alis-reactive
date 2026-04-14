@@ -64,7 +64,7 @@ export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext
     if (req.container) {
       const valid = validateContainer(plan, req.container, ctx);
       if (!valid) {
-        log.debug("validation.aborted", { containerKey: req.container, url: req.url });
+        log.debug("validation.aborted", { id: req.container, url: req.url });
         return;
       }
     }

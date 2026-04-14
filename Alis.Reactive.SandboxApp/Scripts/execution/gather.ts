@@ -117,7 +117,6 @@ function emitValue(name: string, raw: unknown, shape: Shape, transport: Transpor
   } else {
     transport.emitScalar(name, raw, shape);
   }
-  log.trace("value.emitted", { name, value: raw });
 }
 
 /**

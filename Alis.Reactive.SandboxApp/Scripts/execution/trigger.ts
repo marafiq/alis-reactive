@@ -19,10 +19,10 @@ function runReaction(reaction: Reaction, plan: Plan, ctx: ExecContext, source: s
   try {
     const result = executeReaction(reaction, plan, ctx);
     if (result instanceof Promise) {
-      result.catch(err => log.error("reaction.failed-async", { source, error: String(err) }));
+      result.catch(err => log.error("reaction.failed", { source, sync: false, error: String(err) }));
     }
   } catch (err) {
-    log.error("reaction.failed-sync", { source, error: String(err) });
+    log.error("reaction.failed", { source, sync: true, error: String(err) });
   }
 }
 

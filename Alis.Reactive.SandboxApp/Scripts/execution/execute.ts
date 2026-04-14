@@ -286,10 +286,10 @@ function executeShowValidationErrors(
   // When called inside an error handler, ctx.response carries the server's
   // ProblemDetails body. Route to showServerErrors instead of client-side validation.
   if (ctx?.response && typeof ctx.response === "object") {
-    log.debug("show-validation", { container: reaction.container, mode: "server" });
+    log.debug("show-validation.server", { id: reaction.container });
     showServerErrors(plan, reaction.container, ctx.response);
   } else {
-    log.debug("show-validation", { container: reaction.container, mode: "client" });
+    log.debug("show-validation.client", { id: reaction.container });
     validateContainer(plan, reaction.container, ctx);
   }
 }
