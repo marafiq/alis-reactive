@@ -12,13 +12,11 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Scenario 2 — Conditional Show/Hide</native-heading>
-        <native-text color="Secondary">
-            Fields show/hide based on condition source values. Validation rules may or may not align
-            with visibility — hidden fields with unconditional rules show errors in summary.
-        </native-text>
-    </div>
+    <native-heading level="H1">Scenario 2 — Conditional Show/Hide</native-heading>
+    <native-text color="Secondary">
+        Fields show/hide based on condition source values. Validation rules may or may not align
+        with visibility — hidden fields with unconditional rules show errors in summary.
+    </native-text>
 
     <form id="resident-form" class="rounded-lg border border-border bg-white p-6 shadow-sm space-y-4">
         <h2 class="text-base font-semibold mb-2">Basic Information</h2>
@@ -53,6 +51,7 @@
                            .Then(t => t.Element("physician-section").Hide())
                            .Else(e => e.Element("physician-section").Show());
                    })); }
+        </native-grid>
 
         <h2 class="text-base font-semibold mb-2 mt-6">Veteran Status</h2>
 
@@ -130,7 +129,7 @@
 
         <h2 class="text-base font-semibold mb-2 mt-6">Address</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <native-grid cols="C2" gap="Base">
             @{ Html.InputField(plan, m => m.Address.Street, o => o.Required().Label("Street"))
                .NativeTextBox(b => b
                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
@@ -145,7 +144,7 @@
                .NativeTextBox(b => b
                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
                    .Placeholder("12345")); }
-        </div>
+        </native-grid>
 
         <native-hstack gap="Base" class="mt-6">
             @(Html.NativeButton("submit-btn", "Submit Admission")
@@ -164,7 +163,6 @@
 
             <p id="result" class="text-sm text-text-muted"></p>
         </native-hstack>
-        </native-grid>
     </form>
 </native-vstack>
 
