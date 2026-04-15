@@ -29,7 +29,7 @@
     {
         <native-card><native-card-body>
             <native-heading level="H3">Cognitive Assessment</native-heading>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <native-grid cols="C2" gap="Base" class="mb-4">
                 @{ Html.InputField(plan, m => m.CognitiveScore, o => o.Label("Cognitive Score (MMSE)"))
                     .FusionNumericTextBox(b => b.Min(0).Max(30).Step(1)
                         .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -48,13 +48,13 @@
                             .Then(t => t.Element("wander-details").Show())
                             .Else(e => e.Element("wander-details").Hide());
                     })); }
-            </div>
+            </native-grid>
             <p class="font-mono text-sm">Status: <span id="cog-status" class="text-text-muted">&mdash;</span></p>
             <div id="wander-details" @(Model.Wanders ? "" : "hidden")>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <native-grid cols="C2" gap="Base" class="mt-4">
                     @{ Html.InputField(plan, m => m.WanderFrequency, o => o.Label("Wander Frequency"))
                         .FusionDropDownList(b => b.DataSource(new[] { "Rarely", "Occasionally", "Frequently" }).Placeholder("Select frequency")); }
-                </div>
+                </native-grid>
             </div>
         </native-card-body></native-card>
     }
@@ -63,7 +63,7 @@
     {
         <native-card><native-card-body>
             <native-heading level="H3">Cardiac Assessment</native-heading>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <native-grid cols="C2" gap="Base" class="mb-4">
                 @{ Html.InputField(plan, m => m.SystolicBP, o => o.Label("Systolic BP (mmHg)"))
                     .FusionNumericTextBox(b => b.Min(0).Max(300).Step(1)); }
                 @{ Html.InputField(plan, m => m.HasPacemaker, o => o.Label("Has Pacemaker"))
@@ -73,14 +73,14 @@
                             .Then(t => t.Element("pacemaker-details").Show())
                             .Else(e => e.Element("pacemaker-details").Hide());
                     })); }
-            </div>
+            </native-grid>
             <div id="pacemaker-details" @(Model.HasPacemaker ? "" : "hidden")>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <native-grid cols="C2" gap="Base">
                     @{ Html.InputField(plan, m => m.PacemakerModel, o => o.Label("Pacemaker Model"))
                         .NativeTextBox(b => b.Placeholder("e.g. Medtronic Azure")); }
                     @{ Html.InputField(plan, m => m.LastDeviceCheck, o => o.Label("Last Device Check"))
                         .FusionDatePicker(b => b.Placeholder("Select date")); }
-                </div>
+                </native-grid>
             </div>
         </native-card-body></native-card>
     }
@@ -89,13 +89,13 @@
     {
         <native-card><native-card-body>
             <native-heading level="H3">Diabetes Management</native-heading>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <native-grid cols="C2" gap="Base" class="mb-4">
                 @{ Html.InputField(plan, m => m.DiabetesType, o => o.Label("Diabetes Type"))
                     .FusionDropDownList(b => b.DataSource(new[] { "Type 1", "Type 2" }).Placeholder("Select type")); }
                 @{ Html.InputField(plan, m => m.A1cLevel, o => o.Label("A1C Level (%)"))
                     .FusionNumericTextBox(b => b.Min(0).Max(20).Step(0.1)); }
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            </native-grid>
+            <native-grid cols="C2" gap="Base" class="mb-4">
                 @{ Html.InputField(plan, m => m.InsulinDependent, o => o.Label("Insulin Dependent"))
                     .FusionSwitch(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
@@ -103,12 +103,12 @@
                             .Then(t => t.Element("insulin-details").Show())
                             .Else(e => e.Element("insulin-details").Hide());
                     })); }
-            </div>
+            </native-grid>
             <div id="insulin-details" @(Model.InsulinDependent ? "" : "hidden")>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <native-grid cols="C2" gap="Base">
                     @{ Html.InputField(plan, m => m.InsulinSchedule, o => o.Label("Insulin Schedule"))
                         .FusionDropDownList(b => b.DataSource(new[] { "Once daily", "Twice daily", "Before meals", "Sliding scale" }).Placeholder("Select schedule")); }
-                </div>
+                </native-grid>
             </div>
         </native-card-body></native-card>
     }
@@ -118,7 +118,7 @@
         <p class="text-sm text-text-secondary">No specialized assessment required for @Model.PrimaryDiagnosis.</p>
     }
 
-    <div class="flex justify-between mt-6">
+    <native-hstack gap="None" justify="Between" class="mt-6">
         @(Html.NativeButton("prev-2", "\u2190 Back: Demographics")
             .CssClass("rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -149,7 +149,7 @@
                             .Static("step", 3))
                         .Response(r2 => r2.OnSuccess(s2 => s2.Into("step-container")))));
             }))
-    </div>
+    </native-hstack>
 </native-card-body></native-card>
 
 @Html.EJS().ScriptManager()
