@@ -24,13 +24,11 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Playground Syntax</native-heading>
-        <native-text color="Secondary">
-            Exercises Html.InputField() wrapping, .Reactive() on both Fusion and Native builders,
-            and cross-vendor pipelines via a single custom event.
-        </native-text>
-    </div>
+    <native-heading level="H1">Playground Syntax</native-heading>
+    <native-text color="Secondary">
+        Exercises Html.InputField() wrapping, .Reactive() on both Fusion and Native builders,
+        and cross-vendor pipelines via a single custom event.
+    </native-text>
 
     <!-- Section 1: Fusion .Reactive() inside Html.InputField() -->
     <native-card>
@@ -48,10 +46,10 @@
                        p.Element("amount-echo").SetText("Amount changed");
                    })); }
         </native-grid>
-        <div class="mt-3 text-xs font-mono flex justify-between">
+        <native-hstack gap="None" justify="Between" class="mt-3 text-xs font-mono">
             <span class="text-text-secondary">Echo</span>
             <span id="amount-echo">&mdash;</span>
-        </div>
+        </native-hstack>
     </native-card-body>
     </native-card>
 
@@ -75,10 +73,10 @@
                    .Items(categoryItems)
                    .Placeholder("-- Select Category --")); }
         </native-grid>
-        <div class="mt-3 text-xs font-mono flex justify-between">
+        <native-hstack gap="None" justify="Between" class="mt-3 text-xs font-mono">
             <span class="text-text-secondary">Echo</span>
             <span id="status-echo">&mdash;</span>
-        </div>
+        </native-hstack>
     </native-card-body>
     </native-card>
 
