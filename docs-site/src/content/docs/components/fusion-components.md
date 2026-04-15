@@ -701,6 +701,73 @@ You can combine conditions with `.And(args, x => x.Index).Eq(0)` to react only w
 
 ---
 
+## FusionDialog
+
+A modal dialog for confirmations, forms, and detail views -- confirming a resident discharge, capturing a care incident, or showing medication details. Non-input component: it has events and methods but is not bound to a model property, so there is no `InputField` wrapper.
+
+| Property | Value |
+|----------|-------|
+| ReadExpr | `(not input-bound)` |
+| Events | `BeforeOpen`, `Opened`, `BeforeClose`, `Closed`, `OverlayClick` |
+| Typed Source | `(not input-bound)` |
+
+### How do I render a dialog?
+
+Pass the element ID as the second argument and configure the dialog inside the builder callback. Start hidden with `b.Visible(false)`, then call `Show()` from a button to open it. Chain `.Reactive(...)` callbacks for the events you care about -- here `Opened` and `Closed` update a status element.
+
+```csharp
+@(Html.FusionDialog(plan, "discharge-dialog", b =>
+{
+    b.Header("Confirm Discharge");
+    b.Content("<p>Are you sure you want to discharge this resident? This action cannot be undone.</p>");
+    b.IsModal(true);
+    b.Width("420px");
+    b.ShowCloseIcon(true);
+    b.CloseOnEscape(true);
+    b.Visible(false);
+})
+.Reactive(evt => evt.Opened, (_, p) =>
+{
+    p.Element("dialog-opened").SetText("opened");
+})
+.Reactive(evt => evt.Closed, (_, p) =>
+{
+    p.Element("dialog-closed").SetText("closed");
+}))
+```
+
+### How do I show and hide it from a button?
+
+Resolve the dialog through the pipeline with `p.Component<FusionDialog>("discharge-dialog")` and call the `Show()` or `Hide()` extension. The same ID you passed to `Html.FusionDialog(...)` is the handle you use from any reactive callback.
+
+```csharp
+@(Html.NativeButton("open-dialog-btn", "Confirm Discharge")
+    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+    .Reactive(plan, evt => evt.Click, (_, p) =>
+    {
+        p.Component<FusionDialog>("discharge-dialog").Show();
+    }))
+```
+
+```csharp
+@(Html.NativeButton("close-dialog-btn", "Cancel Discharge")
+    .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
+    .Reactive(plan, evt => evt.Click, (_, p) =>
+    {
+        p.Component<FusionDialog>("discharge-dialog").Hide();
+    }))
+```
+
+### Mutation extensions
+
+| Extension | Description |
+|-----------|-------------|
+| `Show()` | Shows the dialog |
+| `Hide()` | Hides the dialog |
+| `RefreshPosition()` | Refreshes the dialog position and dimensions |
+
+---
+
 ## FusionGrid
 
 A data grid for displaying tabular records such as residents, care incidents, or medication schedules, with server-side sort, paging, and filter. Non-input component: it fires a data-state event and exposes mutation methods but is not bound to a single model property, so there is no `InputField` wrapper.
