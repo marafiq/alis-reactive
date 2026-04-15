@@ -19,7 +19,7 @@
     <header class="border-b border-border bg-white">
         <native-container>
             <div class="flex items-center h-16 gap-8">
-                <a asp-controller="Home" asp-action="Index"
+                <a asp-area="Sandbox" asp-controller="SandboxHome" asp-action="Index"
                    class="flex items-center gap-2.5 shrink-0 group">
                     <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7A2E3B] to-[#9B4A57] flex items-center justify-center">
                         <span class="text-white font-bold text-sm">A</span>
@@ -28,29 +28,6 @@
                         Alis.Reactive
                     </span>
                 </a>
-                <nav class="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-                    <a href="@Url.Action("Index", "Home")"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Home</a>
-                    <a href="@Url.Action("Index", "SandboxHome", new { area = "Sandbox" })"
-                       class="px-3 py-1.5 rounded-md text-sm font-semibold text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Sandbox</a>
-
-                    <span class="w-px h-5 bg-border mx-1"></span>
-
-                    <a href="@Url.Action("Index", "CoreBehaviors", new { area = "Sandbox" })"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Core</a>
-                    <a href="@Url.Action("Index", "ConditionsHome", new { area = "Sandbox" })"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Conditions</a>
-                    <a href="@Url.Action("Index", "HttpPipeline", new { area = "Sandbox" })"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">HTTP</a>
-                    <a href="@Url.Action("Index", "ValidationHome", new { area = "Sandbox" })"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Validation</a>
-                    <a href="@Url.Action("Index", "Components", new { area = "Sandbox" })"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Components</a>
-                    <a href="@Url.Action("Index", "ArrayManager", new { area = "Sandbox" })"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">Plugins</a>
-                    <a href="@Url.Action("Index", "AllModulesTogether", new { area = "Sandbox" })"
-                       class="px-3 py-1.5 rounded-md text-sm font-medium text-text-secondary hover:text-[#7A2E3B] hover:bg-[#7A2E3B]/5 transition-all whitespace-nowrap">All Modules</a>
-                </nav>
             </div>
         </native-container>
     </header>
