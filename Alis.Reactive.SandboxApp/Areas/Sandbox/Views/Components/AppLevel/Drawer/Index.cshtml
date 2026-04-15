@@ -10,13 +10,11 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Drawer</native-heading>
-        <native-text color="Secondary">
-            Plan-driven slide-out drawer: set size, title, load content via partial, open — all via C# DSL.
-            Escape key and close button handled by drawer.ts.
-        </native-text>
-    </div>
+    <native-heading level="H1">Drawer</native-heading>
+    <native-text color="Secondary">
+        Plan-driven slide-out drawer: set size, title, load content via partial, open — all via C# DSL.
+        Escape key and close button handled by drawer.ts.
+    </native-text>
 
     <!-- Size Variants -->
     <native-card><native-card-body>
@@ -25,7 +23,7 @@
             Three width primitives: Small (28rem), Medium (36rem), Large (48rem).
             On mobile (&lt;640px) all sizes become full width. Content loaded via server partials.
         </native-text>
-        <div class="flex flex-wrap gap-3">
+        <native-hstack gap="Sm" wrap="true">
             @(Html.NativeButton("btn-open-sm", "Small — Resident Details")
                 .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -58,7 +56,7 @@
                      .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
                     p.Component<NativeDrawer>().Open();
                 }))
-        </div>
+        </native-hstack>
     </native-card-body></native-card>
 
     <!-- Close Drawer -->
