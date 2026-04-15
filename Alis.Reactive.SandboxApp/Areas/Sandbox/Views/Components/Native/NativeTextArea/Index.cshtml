@@ -21,14 +21,12 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">NativeTextArea — Full API</native-heading>
-        <native-text color="Secondary">
-            Exercises NativeTextArea vertical slice: property writes (SetValue),
-            property reads (Value), events (Changed), typed conditions (When), and reactive wiring.
-            Senior living domain: care notes and incident descriptions.
-        </native-text>
-    </div>
+    <native-heading level="H1">NativeTextArea — Full API</native-heading>
+    <native-text color="Secondary">
+        Exercises NativeTextArea vertical slice: property writes (SetValue),
+        property reads (Value), events (Changed), typed conditions (When), and reactive wiring.
+        Senior living domain: care notes and incident descriptions.
+    </native-text>
 
     <!-- Section 1: Property Write -->
     <native-card><native-card-body>
@@ -49,9 +47,7 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, reads the care notes component value and echoes it.
         </p>
-        <div class="font-mono text-sm">
-            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 3: Event + Event-Args Condition -->
@@ -82,9 +78,7 @@
                             e.Element("incident-status").RemoveClass("text-red-600");
                         });
                 })); }
-        <div class="font-mono text-sm mt-2">
-            <p>Status: <span id="incident-status" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm mt-2">Status: <span id="incident-status" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 4: Component-Read Condition -->
@@ -103,9 +97,7 @@
                     .Then(t => t.Element("notes-warning").SetText("notes required"))
                     .Else(e => e.Element("notes-warning").SetText("notes recorded"));
             }))
-        <div class="font-mono text-sm mt-2">
-            <p>Warning: <span id="notes-warning" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm mt-2">Warning: <span id="notes-warning" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Plan JSON -->
