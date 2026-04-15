@@ -781,7 +781,7 @@ The `.When(...).NotEq(FusionGridAction.Refresh)` guard skips the round-trip when
 Use `s.Component<FusionGrid>("residents-grid").SetDataSource(json)` inside an `OnSuccess` handler. The `json` parameter is the typed `ResponseBody<T>` -- passing it without a path replaces the grid's data source with the entire response, which is the shape Syncfusion expects for custom binding (`{ result, count }`).
 
 ```csharp
-Html.On(plan, t => t.DomReady(p =>
+@{ Html.On(plan, t => t.DomReady(p =>
 {
     p.Post("/Sandbox/Components/Grid/Data")
      .Gather(g => g
@@ -793,7 +793,7 @@ Html.On(plan, t => t.DomReady(p =>
              .SetDataSource(json);
          s.Element("load-status").SetText("initial data loaded");
      }));
-}));
+})); }
 ```
 
 ### Mutation extensions
@@ -822,7 +822,7 @@ A calendar-style schedule for booking senior-living resources such as staff shif
 Call `Html.FusionSchedule(plan, "shift-schedule", b => ...)` and configure the view set, resource groups, event field mappings, work hours, and QuickInfo templates inside the builder callback. The element ID you pass as the second argument is what you use later to target the schedule from the pipeline. Load the initial data from the server in a `DomReady` trigger with `SetDataSource`.
 
 ```csharp
-Html.On(plan, t => t.DomReady(p =>
+@{ Html.On(plan, t => t.DomReady(p =>
 {
     p.Get("/api/schedule/assignments?selectedFacilityId=mystery-manor")
      .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
@@ -832,7 +832,7 @@ Html.On(plan, t => t.DomReady(p =>
          s.Element("status").SetText("Schedule loaded");
          s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
      }));
-}));
+})); }
 ```
 
 ```csharp
