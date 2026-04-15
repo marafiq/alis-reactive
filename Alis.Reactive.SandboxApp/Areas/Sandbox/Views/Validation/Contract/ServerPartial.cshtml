@@ -12,18 +12,16 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Scenario 3a — Server-Rendered Partials</native-heading>
-        <native-text color="Secondary">
-            Parent view renders basic fields. Address and Emergency partials rendered server-side
-            via PartialAsync. Same TModel, merged plans. Each partial has own reactive behavior.
-        </native-text>
-    </div>
+    <native-heading level="H1">Scenario 3a — Server-Rendered Partials</native-heading>
+    <native-text color="Secondary">
+        Parent view renders basic fields. Address and Emergency partials rendered server-side
+        via PartialAsync. Same TModel, merged plans. Each partial has own reactive behavior.
+    </native-text>
 
     <form id="resident-form" class="rounded-lg border border-border bg-white p-6 shadow-sm space-y-4">
         <h2 class="text-base font-semibold mb-2">Basic Information (Parent)</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <native-grid cols="C2" gap="Base">
             @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
                .NativeTextBox(b => b
                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
@@ -53,7 +51,7 @@
                .NativeTextBox(b => b
                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
                    .Placeholder("V12345")); }
-        </div>
+        </native-grid>
 
         <h2 class="text-base font-semibold mb-2 mt-6">Address (Server Partial)</h2>
         @await Html.PartialAsync("~/Areas/Sandbox/Views/Validation/Contract/_AddressPartial.cshtml", Model)
@@ -61,7 +59,7 @@
         <h2 class="text-base font-semibold mb-2 mt-6">Emergency Contact (Server Partial)</h2>
         @await Html.PartialAsync("~/Areas/Sandbox/Views/Validation/Contract/_EmergencyPartial.cshtml", Model)
 
-        <div class="mt-6 flex items-center gap-4">
+        <native-hstack gap="Base" class="mt-6">
             @(Html.NativeButton("submit-btn", "Submit Admission")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -77,7 +75,7 @@
                 }))
 
             <p id="result" class="text-sm text-text-muted"></p>
-        </div>
+        </native-hstack>
     </form>
 </native-vstack>
 
