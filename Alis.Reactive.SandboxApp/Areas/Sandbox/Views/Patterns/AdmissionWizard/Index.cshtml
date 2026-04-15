@@ -19,12 +19,10 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Admission Wizard (Server-Side)</native-heading>
-        <native-text color="Secondary">
-            Single page. Each step loads from server via Into(). Edit scenario: server loads from draft.
-        </native-text>
-    </div>
+    <native-heading level="H1">Admission Wizard (Server-Side)</native-heading>
+    <native-text color="Secondary">
+        Single page. Each step loads from server via Into(). Edit scenario: server loads from draft.
+    </native-text>
 
     @await Html.PartialAsync("~/Areas/Sandbox/Views/Patterns/AdmissionWizard/_StepIndicator.cshtml")
 
