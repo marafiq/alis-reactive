@@ -30,34 +30,34 @@
             <native-grid cols="C3" gap="Base" class="mt-3">
                 @if (!string.IsNullOrEmpty(Model.RiskTier))
                 {
-                    <div>
+                    <native-vstack gap="None">
                         <p class="text-xs text-text-muted uppercase tracking-wider">Risk Tier</p>
                         <p class="text-sm font-semibold">@Model.RiskTier</p>
-                    </div>
+                    </native-vstack>
                 }
                 @if (!string.IsNullOrEmpty(Model.CareUnit))
                 {
-                    <div>
+                    <native-vstack gap="None">
                         <p class="text-xs text-text-muted uppercase tracking-wider">Care Unit</p>
                         <p class="text-sm font-semibold">@Model.CareUnit</p>
-                    </div>
+                    </native-vstack>
                 }
                 @if (!string.IsNullOrEmpty(Model.MonitoringLevel))
                 {
-                    <div>
+                    <native-vstack gap="None">
                         <p class="text-xs text-text-muted uppercase tracking-wider">Monitoring Level</p>
                         <p class="text-sm font-semibold">@Model.MonitoringLevel</p>
-                    </div>
+                    </native-vstack>
                 }
             </native-grid>
         </native-card-body></native-card>
     }
 
-    <div class="mt-3 text-sm">
+    <native-vstack gap="None" class="mt-3 text-sm">
         <p>Step 1: <strong class="@(Model.Step1Saved ? "text-emerald-600" : "text-red-600")">@(Model.Step1Saved ? "Saved" : "Not saved")</strong></p>
         <p>Step 2: <strong class="@(Model.Step2Saved ? "text-emerald-600" : "text-red-600")">@(Model.Step2Saved ? "Saved" : "Not saved")</strong></p>
         <p>Step 3: <strong class="@(Model.Step3Saved ? "text-emerald-600" : "text-red-600")">@(Model.Step3Saved ? "Saved" : "Not saved")</strong></p>
-    </div>
+    </native-vstack>
 
     <div id="submit-result" hidden class="rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm text-emerald-700 mt-4"></div>
 
