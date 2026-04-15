@@ -14,24 +14,18 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Reactive Conditions</native-heading>
-        <native-text color="Secondary">
-            Conditions inside <code class="bg-slate-100 px-1 rounded">.Reactive()</code>
-            — each control is rendered once, its <code class="bg-slate-100 px-1 rounded">.Reactive()</code>
-            pipeline uses conditions to mutate other controls cross-vendor.
-        </native-text>
-    </div>
+    <native-heading level="H1">Reactive Conditions</native-heading>
+    <native-text color="Secondary">
+        Conditions inside <code class="bg-slate-100 px-1 rounded">.Reactive()</code>
+        — each control is rendered once, its <code class="bg-slate-100 px-1 rounded">.Reactive()</code>
+        pipeline uses conditions to mutate other controls cross-vendor.
+    </native-text>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         All form fields rendered once — each with its own .Reactive()
-         ═══════════════════════════════════════════════════════════ -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">Form — Each control has its own .Reactive() pipeline</native-heading>
 
-        <!-- Row 1: Status (native) + Amount (fusion) -->
-        <div class="grid grid-cols-2 gap-4 mb-4">
+        <native-grid cols="C2" gap="Base" class="mb-4">
 
             <!-- ── Status: Native dropdown with ElseIf branches ──
                  "active"   → Amount=100, City="seattle", show success
@@ -106,7 +100,7 @@
                                else_.Element("amount-tier").RemoveClass("text-sky-600");
                            });
                    })); }
-        </div>
+        </native-grid>
 
         <!-- Row 2: Address fields (nested) -->
         <div id="address-section" class="grid grid-cols-3 gap-4 mb-4">
@@ -159,21 +153,20 @@
                    .Min(10000).Max(99999).Step(1)); }
         </div>
 
-        <!-- Echo panel -->
-        <div class="border-t border-border pt-3 space-y-2 text-xs font-mono">
-            <div class="flex justify-between">
+        <native-vstack gap="Sm" class="border-t border-border pt-3 text-xs font-mono">
+            <native-hstack gap="None" justify="Between">
                 <span class="text-text-secondary">Status result</span>
                 <span id="status-result">&mdash;</span>
-            </div>
-            <div class="flex justify-between">
+            </native-hstack>
+            <native-hstack gap="None" justify="Between">
                 <span class="text-text-secondary">Amount tier</span>
                 <span id="amount-tier">&mdash;</span>
-            </div>
-            <div class="flex justify-between">
+            </native-hstack>
+            <native-hstack gap="None" justify="Between">
                 <span class="text-text-secondary">City auto-fill</span>
                 <span id="city-auto">Select a city</span>
-            </div>
-        </div>
+            </native-hstack>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
