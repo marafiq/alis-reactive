@@ -111,16 +111,9 @@ A color picker for facility branding -- theme color, accent color, and other pal
 | Events | `Changed` |
 | Typed Source | `TypedComponentSource<string>` |
 
-### How do I render a color picker?
+### How do I render a color picker and react to changes?
 
-```csharp
-@{ Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))
-    .FusionColorPicker(b => { }); }
-```
-
-The `b` builder exposes `.Reactive(plan, evt => evt.Changed, ...)` for wiring the Changed event -- see the next question for the full pattern.
-
-### How do I react to a color change?
+Start the chain with `Html.InputField(plan, m => m.ThemeColor)`, then call `.FusionColorPicker(b => b.Reactive(plan, evt => evt.Changed, ...))`. The `Changed` handler receives typed event args (`args.Value` is the newly picked hex) and a pipeline builder for wiring conditions, component reads, and element mutations -- all in one place.
 
 ```csharp
 @{ Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))

@@ -177,12 +177,12 @@ Open `http://localhost:5220/Sandbox/Components/Fusion/ColorPicker`. Exercise eac
 
 - [ ] **Step 1.3: Choose the code snippets**
 
-From `Index.cshtml`, pick exactly 3 snippets:
-1. Render snippet — the `Html.InputField(...).FusionColorPicker(b => b ... )` block.
-2. Event snippet — the `Reactive(plan, evt => evt.Changed, ...)` block showing a `When` + `Then`/`Else`.
-3. Read-as-source snippet — the block that does `var comp = p.Component<FusionColorPicker>(...); p.When(comp.Value())`.
+From `Index.cshtml`, pick 2 or 3 snippets depending on what the sandbox naturally exercises. The canonical set is:
+1. Render + event snippet — the `Html.InputField(...).FusionColorPicker(b => b.Reactive(plan, evt => evt.Changed, ...))` block showing a `When` + `Then`/`Else`. This is the SINGLE authoritative render pattern; merging "render" and "react to change" into one Q/A avoids a thin bare-builder Q1 that has no precedent in the sandbox.
+2. Read-as-source snippet — the block that does `var comp = p.Component<FusionColorPicker>(...); p.When(comp.Value())`.
+3. (Optional) any additional snippet only if the sandbox genuinely demonstrates something the first two do not cover.
 
-Copy them verbatim. Strip only unrelated `native-card` / HTML wrapper markup — keep all C#.
+Copy them verbatim. Strip only unrelated `native-card` / HTML wrapper markup — keep all C#. A separate pure-render snippet with an empty `b => { }` callback is NOT required and should not be invented for docs pedagogy if the sandbox only exercises the empty builder in a throwaway section — prefer the rich Reactive form as the first docs block.
 
 - [ ] **Step 1.4: Find the insertion anchor in `fusion-components.md`**
 
