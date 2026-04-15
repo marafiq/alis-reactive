@@ -11,13 +11,11 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Care Level Cascade — Condition-Gated Component Mutations</native-heading>
-        <native-text color="Secondary">
-            Realistic nurse workflow: selecting a care level auto-populates related fields.
-            Conditions mutate OTHER components — not just element text.
-        </native-text>
-    </div>
+    <native-heading level="H1">Care Level Cascade — Condition-Gated Component Mutations</native-heading>
+    <native-text color="Secondary">
+        Realistic nurse workflow: selecting a care level auto-populates related fields.
+        Conditions mutate OTHER components — not just element text.
+    </native-text>
 
     <!-- Section 1: Condition → Component.SetValue() on another dropdown -->
     <native-card><native-card-body>
@@ -27,7 +25,7 @@
             Memory Care → "Enhanced Monitoring", Skilled Nursing → "Full Clinical",
             anything else → cleared. Commands before/after always run.
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
                 .FusionDropDownList(b => b
                     .DataSource(careLevels)
@@ -63,11 +61,11 @@
                 .FusionDropDownList(b => b
                     .DataSource(protocols)
                     .Placeholder("Auto-assigned")); }
-        </div>
-        <div class="font-mono text-sm space-y-1">
+        </native-grid>
+        <native-vstack gap="Xs" class="font-mono text-sm">
             <p>Current level: <span id="s1-current-level" class="text-text-muted">&mdash;</span></p>
             <p>Action status: <span id="s1-action-status" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body></native-card>
 
     <!-- Section 2: Condition → SetChecked on Switch (cross-component type) -->
@@ -79,10 +77,10 @@
             anything else → not required (unchecked).
             Proves conditions can mutate across component types (dropdown reads → switch writes).
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.RequiresEscort, o => o.Label("Requires Escort"))
                 .FusionSwitch(b => { }); }
-        </div>
+        </native-grid>
         <div class="mt-3">
             @(Html.NativeButton("s2-apply-btn", "Apply Escort Policy")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -110,11 +108,11 @@
                     p.Element("s2-policy-status").SetText("policy-applied");
                 }))
         </div>
-        <div class="font-mono text-sm mt-3 space-y-1">
+        <native-vstack gap="Xs" class="font-mono text-sm mt-3">
             <p>Checking: <span id="s2-checking" class="text-text-muted">&mdash;</span></p>
             <p>Result: <span id="s2-result" class="text-text-muted">&mdash;</span></p>
             <p>Policy status: <span id="s2-policy-status" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body></native-card>
 
     <!-- Plan JSON -->
