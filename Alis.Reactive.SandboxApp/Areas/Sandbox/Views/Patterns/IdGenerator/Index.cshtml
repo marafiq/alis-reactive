@@ -115,26 +115,26 @@
     <section>
         <h2 class="text-sm font-semibold mb-2">3. Generated IDs</h2>
         <div id="id-inspection" class="grid grid-cols-1 gap-2 text-xs font-mono">
-            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+            <native-hstack gap="None" justify="Between" class="bg-slate-50 rounded px-3 py-2">
                 <span class="text-text-secondary">IdGenerator prefix</span>
                 <span class="text-emerald-700" id="id-prefix">@(IdGenerator.TypeScope(typeof(IdGeneratorModel)))</span>
-            </div>
-            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+            </native-hstack>
+            <native-hstack gap="None" justify="Between" class="bg-slate-50 rounded px-3 py-2">
                 <span class="text-text-secondary">m => m.Amount</span>
                 <span class="text-emerald-700">@(IdGenerator.For<IdGeneratorModel>(m => m.Amount))</span>
-            </div>
-            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+            </native-hstack>
+            <native-hstack gap="None" justify="Between" class="bg-slate-50 rounded px-3 py-2">
                 <span class="text-text-secondary">m => m.Status</span>
                 <span class="text-emerald-700">@(IdGenerator.For<IdGeneratorModel>(m => m.Status))</span>
-            </div>
-            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+            </native-hstack>
+            <native-hstack gap="None" justify="Between" class="bg-slate-50 rounded px-3 py-2">
                 <span class="text-text-secondary">m => m.Address.City</span>
                 <span class="text-emerald-700">@(IdGenerator.For<IdGeneratorModel>(m => m.Address!.City))</span>
-            </div>
-            <div class="flex justify-between bg-slate-50 rounded px-3 py-2">
+            </native-hstack>
+            <native-hstack gap="None" justify="Between" class="bg-slate-50 rounded px-3 py-2">
                 <span class="text-text-secondary">m => m.Address.PostalCode</span>
                 <span class="text-emerald-700">@(IdGenerator.For<IdGeneratorModel>(m => m.Address!.PostalCode))</span>
-            </div>
+            </native-hstack>
         </div>
     </section>
 </native-vstack>
