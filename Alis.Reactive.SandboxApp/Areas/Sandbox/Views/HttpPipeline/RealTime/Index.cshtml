@@ -59,14 +59,10 @@
             </native-text>
             <native-divider />
             <native-grid cols="C2" gap="Sm">
-                <div>
-                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Message</dt>
-                    <dd id="alert-message" class="mt-1 text-sm text-text-primary">—</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Level</dt>
-                    <dd id="alert-level" class="mt-1 text-sm text-text-primary">—</dd>
-                </div>
+                <native-vstack gap="None"><dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Message</dt>
+                    <dd id="alert-message" class="mt-1 text-sm text-text-primary">—</dd></native-vstack>
+                <native-vstack gap="None"><dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Level</dt>
+                    <dd id="alert-level" class="mt-1 text-sm text-text-primary">—</dd></native-vstack>
             </native-grid>
         </native-card-body>
     </native-card>
@@ -83,18 +79,12 @@
             </native-text>
             <native-divider />
             <native-grid cols="C3" gap="Sm">
-                <div>
-                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Count</dt>
-                    <dd id="notif-count" class="mt-1 text-2xl font-semibold text-text-primary">—</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Message</dt>
-                    <dd id="notif-message" class="mt-1 text-sm text-text-primary">—</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Priority</dt>
-                    <dd id="notif-priority" class="mt-1 text-sm text-text-primary">—</dd>
-                </div>
+                <native-vstack gap="None"><dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Count</dt>
+                    <dd id="notif-count" class="mt-1 text-2xl font-semibold text-text-primary">—</dd></native-vstack>
+                <native-vstack gap="None"><dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Message</dt>
+                    <dd id="notif-message" class="mt-1 text-sm text-text-primary">—</dd></native-vstack>
+                <native-vstack gap="None"><dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Priority</dt>
+                    <dd id="notif-priority" class="mt-1 text-sm text-text-primary">—</dd></native-vstack>
             </native-grid>
             <native-divider />
             <native-hstack gap="Sm">
@@ -125,18 +115,12 @@
             </native-text>
             <native-divider />
             <native-grid cols="C3" gap="Sm">
-                <div>
-                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Resident</dt>
-                    <dd id="resident-name" class="mt-1 text-sm font-semibold text-text-primary">—</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Status</dt>
-                    <dd id="resident-status" class="mt-1 text-sm text-text-primary">—</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Care Level</dt>
-                    <dd id="resident-care-level" class="mt-1 text-sm text-text-primary">—</dd>
-                </div>
+                <native-vstack gap="None"><dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Resident</dt>
+                    <dd id="resident-name" class="mt-1 text-sm font-semibold text-text-primary">—</dd></native-vstack>
+                <native-vstack gap="None"><dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Status</dt>
+                    <dd id="resident-status" class="mt-1 text-sm text-text-primary">—</dd></native-vstack>
+                <native-vstack gap="None"><dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Care Level</dt>
+                    <dd id="resident-care-level" class="mt-1 text-sm text-text-primary">—</dd></native-vstack>
             </native-grid>
             <native-divider />
             <native-hstack gap="Sm">
