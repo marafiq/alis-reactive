@@ -148,18 +148,6 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Build JS + CSS bundles
-        run: npm run build:all
-
-      - name: Copy assets into Alis.Reactive package source
-        run: |
-          mkdir -p Alis.Reactive/assets/js Alis.Reactive/assets/css
-          cp Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js Alis.Reactive/assets/js/
-          cp Alis.Reactive.SandboxApp/wwwroot/css/design-system.css Alis.Reactive/assets/css/
-
-      - name: Build all C# projects
-        run: dotnet build --configuration Release
-
       - name: Determine version suffix
         id: version
         run: |
@@ -171,22 +159,8 @@ jobs:
             echo "is_preview=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Pack NuGet packages
-        run: |
-          PACK_ARGS="--configuration Release --no-build --output ./nupkgs"
-          if [ -n "${{ steps.version.outputs.suffix }}" ]; then
-            PACK_ARGS="$PACK_ARGS --version-suffix ${{ steps.version.outputs.suffix }}"
-          fi
-
-          dotnet pack Alis.Reactive/Alis.Reactive.csproj $PACK_ARGS
-          dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj $PACK_ARGS
-          dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj $PACK_ARGS
-          dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj $PACK_ARGS
-          dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj $PACK_ARGS
-          dotnet pack Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj $PACK_ARGS
-
-      - name: Log package versions
-        run: ls -1 ./nupkgs/
+      - name: Build bundles, stage assets, and pack NuGet packages
+        run: ./scripts/pack-nuget.sh "${{ steps.version.outputs.suffix }}"
 
       - name: Upload NuGet artifacts
         uses: actions/upload-artifact@v4
