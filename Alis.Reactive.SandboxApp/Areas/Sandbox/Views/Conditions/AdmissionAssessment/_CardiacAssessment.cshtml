@@ -15,8 +15,7 @@
         Pacemaker details appear when the pacemaker switch is enabled.
     </p>
 
-    <!-- Row 1: Systolic BP + Has Pacemaker -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+    <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.SystolicBP, o => o.Label("Systolic BP (mmHg)"))
             .FusionNumericTextBox(b => b
                 .Min(0).Max(300).Step(1)
@@ -55,24 +54,22 @@
                         .Then(t => t.Element("pacemaker-details").Show())
                         .Else(e => e.Element("pacemaker-details").Hide());
                 })); }
-    </div>
+    </native-grid>
 
-    <!-- Status echoes -->
-    <div class="font-mono text-sm space-y-1 mb-4">
+    <native-vstack gap="Xs" class="font-mono text-sm mb-4">
         <p>BP: <span id="bp-echo" class="text-text-muted">&mdash;</span></p>
         <p><span id="hypertension-spinner" hidden class="text-accent">Sending alert...</span></p>
         <div id="hypertension-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
-    </div>
+    </native-vstack>
 
-    <!-- Pacemaker details (conditionally visible) -->
     <div id="pacemaker-details" hidden>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.PacemakerModel, o => o.Label("Pacemaker Model"))
                 .NativeTextBox(b => b.Placeholder("e.g. Medtronic Azure")); }
 
             @{ Html.InputField(plan, m => m.LastDeviceCheck, o => o.Label("Last Device Check"))
                 .FusionDatePicker(b => b.Placeholder("Select date")); }
-        </div>
+        </native-grid>
     </div>
 
 </native-card-body></native-card>

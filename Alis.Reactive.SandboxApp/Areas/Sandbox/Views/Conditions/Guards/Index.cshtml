@@ -225,301 +225,301 @@
     <native-card><native-card-body>
         <native-heading level="H2">int — ElseIf Grade Ladder</native-heading>
         <p class="text-xs text-text-secondary mb-3">Score &ge; 90 &rarr; A &bull; &ge; 80 &rarr; B &bull; else &rarr; F</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-score-95", "95", "set-score", new ScorePayload { Score = 95 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-score-85", "85", "set-score", new ScorePayload { Score = 85 }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
             @DispatchButton("btn-score-40", "40", "set-score", new ScorePayload { Score = 40 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="grid grid-cols-2 gap-4 text-xs font-mono">
-            <div class="flex justify-between"><span class="text-text-secondary">Score</span><span id="score-display">&mdash;</span></div>
-            <div class="flex justify-between"><span class="text-text-secondary">Grade</span><span id="grade">&mdash;</span></div>
-        </div>
+        </native-hstack>
+        <native-grid cols="C2" gap="Base" class="text-xs font-mono">
+            <native-hstack gap="None" justify="Between"><span class="text-text-secondary">Score</span><span id="score-display">&mdash;</span></native-hstack>
+            <native-hstack gap="None" justify="Between"><span class="text-text-secondary">Grade</span><span id="grade">&mdash;</span></native-hstack>
+        </native-grid>
     </native-card-body></native-card>
 
     <!-- Section 2: long -->
     <native-card><native-card-body>
         <native-heading level="H2">long — Balance Threshold</native-heading>
         <p class="text-xs text-text-secondary mb-3">Balance &gt; 1,000,000 &rarr; "High Value" &bull; else &rarr; "Standard"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-long-high", "5,000,000", "check-long", new LongPayload { Balance = 5_000_000L }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-long-low", "500", "check-long", new LongPayload { Balance = 500L }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="long-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="long-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 3: double -->
     <native-card><native-card-body>
         <native-heading level="H2">double — Temperature Check</native-heading>
         <p class="text-xs text-text-secondary mb-3">Temp &gt; 98.6 &rarr; "Fever" &bull; else &rarr; "Normal"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-double-high", "101.3", "check-double", new DoublePayload { Temperature = 101.3 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
             @DispatchButton("btn-double-low", "97.2", "check-double", new DoublePayload { Temperature = 97.2 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="double-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="double-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 4: bool -->
     <native-card><native-card-body>
         <native-heading level="H2">bool — Truthy / Falsy</native-heading>
         <p class="text-xs text-text-secondary mb-3">IsActive truthy &rarr; "Online" &bull; else &rarr; "Offline"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-bool-true", "true", "check-bool", new BoolPayload { IsActive = true }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-bool-false", "false", "check-bool", new BoolPayload { IsActive = false }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="bool-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="bool-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 5: string -->
     <native-card><native-card-body>
         <native-heading level="H2">string — Equality</native-heading>
         <p class="text-xs text-text-secondary mb-3">Name == "Alice" &rarr; "Welcome Alice!" &bull; else &rarr; "Hello Stranger"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-string-match", "Alice", "check-string", new RolePayload { Role = "Alice" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-string-miss", "Bob", "check-string", new RolePayload { Role = "Bob" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="string-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="string-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 6: DateTime -->
     <native-card><native-card-body>
         <native-heading level="H2">DateTime — Deadline Comparison</native-heading>
         <p class="text-xs text-text-secondary mb-3">Deadline &gt; 2026-06-01 &rarr; "On Time" &bull; else &rarr; "Overdue"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-date-future", "2026-07-15", "check-date", new DatePayload { Deadline = new DateTime(2026, 7, 15) }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-date-past", "2026-01-15", "check-date", new DatePayload { Deadline = new DateTime(2026, 1, 15) }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="date-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="date-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 7: int? (nullable) -->
     <native-card><native-card-body>
         <native-heading level="H2">int? — Nullable IsNull</native-heading>
         <p class="text-xs text-text-secondary mb-3">NullableScore is null &rarr; "No Score" &bull; else &rarr; "Has Score"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-nullable-null", "null", "check-nullable", new NullablePayload { NullableScore = null }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
             @DispatchButton("btn-nullable-value", "42", "check-nullable", new NullablePayload { NullableScore = 42 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="nullable-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="nullable-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 8: AND composition (int + string) -->
     <native-card><native-card-body>
         <native-heading level="H2">AND — Mixed Types (int + string)</native-heading>
         <p class="text-xs text-text-secondary mb-3">Score &ge; 90 <strong>AND</strong> Status == "active"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-and-pass", "95 + active", "check-and", new ScorePayload { Score = 95, Status = "active" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-and-fail", "95 + inactive", "check-and", new ScorePayload { Score = 95, Status = "inactive" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="and-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="and-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 9: OR composition (string) -->
     <native-card><native-card-body>
         <native-heading level="H2">OR — String Alternatives</native-heading>
         <p class="text-xs text-text-secondary mb-3">Role == "admin" <strong>OR</strong> "superuser"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-or-admin", "admin", "check-or", new RolePayload { Role = "admin" }, "px-3 py-1.5 rounded bg-indigo-600 text-white text-xs font-medium")
             @DispatchButton("btn-or-super", "superuser", "check-or", new RolePayload { Role = "superuser" }, "px-3 py-1.5 rounded bg-violet-600 text-white text-xs font-medium")
             @DispatchButton("btn-or-viewer", "viewer", "check-or", new RolePayload { Role = "viewer" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="or-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="or-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 10: Nested payload condition -->
     <native-card><native-card-body>
         <native-heading level="H2">Nested Payload — Deep Dot-Path Guard</native-heading>
         <p class="text-xs text-text-secondary mb-3">Address.City == "Seattle" &rarr; "Found Seattle" &bull; else &rarr; "Other City"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-nested-seattle", "Seattle", "check-nested", new NestedPayload { Address = new AddressInfo { City = "Seattle", Zip = "98101" }, Id = 1 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-nested-portland", "Portland", "check-nested", new NestedPayload { Address = new AddressInfo { City = "Portland", Zip = "97201" }, Id = 2 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="nested-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="nested-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 11: Null nested object -->
     <native-card><native-card-body>
         <native-heading level="H2">Null Nested Object — IsNull Guard</native-heading>
         <p class="text-xs text-text-secondary mb-3">Address is null &rarr; "No Address" &bull; else &rarr; "Has Address"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-nested-null", "null address", "check-nested-null", new NestedPayload { Address = null, Id = 1 }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
             @DispatchButton("btn-nested-present", "has address", "check-nested-null", new NestedPayload { Address = new AddressInfo { City = "NYC" }, Id = 2 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-nested-missing", "missing key", "check-nested-null", new NestedPayload { Id = 3 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="nested-null-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="nested-null-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 12: Mixed nested + flat AND -->
     <native-card><native-card-body>
         <native-heading level="H2">Mixed AND — Flat + Nested in Compound</native-heading>
         <p class="text-xs text-text-secondary mb-3">Id &ge; 1 <strong>AND</strong> Address.City not-null &rarr; "Valid" &bull; else &rarr; "Invalid"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-nested-and-pass", "id=5 + city", "check-nested-and", new NestedPayload { Id = 5, Address = new AddressInfo { City = "NYC" } }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-nested-and-null", "id=5 + null addr", "check-nested-and", new NestedPayload { Id = 5, Address = null }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
             @DispatchButton("btn-nested-and-missing", "id=5 + missing", "check-nested-and", new NestedPayload { Id = 5 }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="nested-and-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="nested-and-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 13: Null leaf in comparison -->
     <native-card><native-card-body>
         <native-heading level="H2">Null Leaf — Comparison Doesn't Crash</native-heading>
         <p class="text-xs text-text-secondary mb-3">Address.City == "Seattle" when city is null &rarr; else branch (no crash)</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-null-leaf-null", "city=null", "check-null-leaf", new NestedPayload { Address = new AddressInfo { City = null }, Id = 1 }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
             @DispatchButton("btn-null-leaf-match", "city=Seattle", "check-null-leaf", new NestedPayload { Address = new AddressInfo { City = "Seattle" }, Id = 2 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-null-leaf-obj-null", "address=null", "check-null-leaf", new NestedPayload { Address = null, Id = 3 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
             @DispatchButton("btn-null-leaf-missing", "address missing", "check-null-leaf", new NestedPayload { Id = 99 }, "px-3 py-1.5 rounded bg-slate-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="null-leaf-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="null-leaf-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 14: In membership -->
     <native-card><native-card-body>
         <native-heading level="H2">In — Membership</native-heading>
         <p class="text-xs text-text-secondary mb-3">Category in ["A","B","C"] &rarr; "In Group" &bull; else &rarr; "Not In Group"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-in-match", "B", "check-in", new MembershipPayload { Category = "B", Priority = 1 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-in-miss", "Z", "check-in", new MembershipPayload { Category = "Z", Priority = 1 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="in-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="in-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 15: NotIn membership -->
     <native-card><native-card-body>
         <native-heading level="H2">NotIn — Exclusion</native-heading>
         <p class="text-xs text-text-secondary mb-3">Category not-in ["X","Y"] &rarr; "Allowed" &bull; else &rarr; "Blocked"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-notin-pass", "A", "check-notin", new MembershipPayload { Category = "A", Priority = 1 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-notin-fail", "X", "check-notin", new MembershipPayload { Category = "X", Priority = 1 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="notin-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="notin-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 16: Between range -->
     <native-card><native-card-body>
         <native-heading level="H2">Between — Range Check</native-heading>
         <p class="text-xs text-text-secondary mb-3">Age between [18, 65] &rarr; "Working Age" &bull; else &rarr; "Outside Range"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-between-in", "30", "check-between", new RangePayload { Age = 30 }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-between-low", "10", "check-between", new RangePayload { Age = 10 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
             @DispatchButton("btn-between-high", "80", "check-between", new RangePayload { Age = 80 }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="between-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="between-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 17: Contains text -->
     <native-card><native-card-body>
         <native-heading level="H2">Contains — Text Search</native-heading>
         <p class="text-xs text-text-secondary mb-3">Name contains "admin" &rarr; "Has admin" &bull; else &rarr; "No admin"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-contains-yes", "superadmin", "check-contains", new TextPayload { Name = "superadmin", Email = "" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-contains-no", "viewer", "check-contains", new TextPayload { Name = "viewer", Email = "" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="contains-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="contains-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 18: StartsWith text -->
     <native-card><native-card-body>
         <native-heading level="H2">StartsWith — Text Prefix</native-heading>
         <p class="text-xs text-text-secondary mb-3">Email starts-with "admin&#64;" &rarr; "Admin email" &bull; else &rarr; "Other email"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-startswith-yes", "admin@corp.com", "check-startswith", new TextPayload { Name = "", Email = "admin@corp.com" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-startswith-no", "user@corp.com", "check-startswith", new TextPayload { Name = "", Email = "user@corp.com" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="startswith-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="startswith-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 19: Matches regex -->
     <native-card><native-card-body>
         <native-heading level="H2">Matches — Regex Pattern</native-heading>
         <p class="text-xs text-text-secondary mb-3">Email matches ^[a-z]+&#64;[a-z]+\.[a-z]+$ &rarr; "Valid" &bull; else &rarr; "Invalid"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-matches-yes", "test@corp.com", "check-matches", new TextPayload { Name = "", Email = "test@corp.com" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-matches-no", "BAD@123.com", "check-matches", new TextPayload { Name = "", Email = "BAD@123.com" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="matches-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="matches-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 20: MinLength text -->
     <native-card><native-card-body>
         <native-heading level="H2">MinLength — Text Length Check</native-heading>
         <p class="text-xs text-text-secondary mb-3">Name min-length 3 &rarr; "Long enough" &bull; else &rarr; "Too short"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-minlength-yes", "Alice", "check-minlength", new TextPayload { Name = "Alice", Email = "" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-minlength-no", "Al", "check-minlength", new TextPayload { Name = "Al", Email = "" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="minlength-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="minlength-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 21: IsEmpty presence -->
     <native-card><native-card-body>
         <native-heading level="H2">IsEmpty — Presence Check</native-heading>
         <p class="text-xs text-text-secondary mb-3">Name is-empty &rarr; "Empty" &bull; else &rarr; "Has value"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-isempty-empty", "\"\"", "check-isempty", new TextPayload { Name = "", Email = "" }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
             @DispatchButton("btn-isempty-null", "null", "check-isempty", new TextPayload { Name = null!, Email = "" }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
             @DispatchButton("btn-isempty-value", "Alice", "check-isempty", new TextPayload { Name = "Alice", Email = "" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="isempty-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="isempty-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 22: NOT (inverted condition) -->
     <native-card><native-card-body>
         <native-heading level="H2">NOT — Invert Guard</native-heading>
         <p class="text-xs text-text-secondary mb-3">NOT(Role == "admin") &rarr; "Not admin" &bull; else &rarr; "Is admin"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-not-user", "user", "check-not", new RolePayload { Role = "user" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-not-admin", "admin", "check-not", new RolePayload { Role = "admin" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="not-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="not-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 23: Confirm dialog (async halt) -->
     <native-card><native-card-body>
         <native-heading level="H2">Confirm — Async Halt Dialog</native-heading>
         <p class="text-xs text-text-secondary mb-3">Shows confirm dialog &rarr; OK = "Confirmed" &bull; Cancel = "Cancelled"</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-confirm", "Trigger Confirm", "check-confirm", new ScorePayload { Score = 1, Status = "" }, "px-3 py-1.5 rounded bg-indigo-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="confirm-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="confirm-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 24: Single-command condition via When/Then -->
     <native-card><native-card-body>
         <native-heading level="H2">Single-Command Condition — When/Then</native-heading>
         <p class="text-xs text-text-secondary mb-3">Unconditional command runs first &bull; guarded command executes when Score &ge; 90</p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-single-command-condition-high", "95", "check-single-command-condition", new ScorePayload { Score = 95, Status = "" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-single-command-condition-low", "50", "check-single-command-condition", new ScorePayload { Score = 50, Status = "" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="grid grid-cols-2 gap-4 text-xs font-mono">
-            <div class="flex justify-between"><span class="text-text-secondary">Always</span><span id="single-command-condition-result">&mdash;</span></div>
-            <div class="flex justify-between"><span class="text-text-secondary">Bonus</span><span id="single-command-condition-bonus">&mdash;</span></div>
-        </div>
+        </native-hstack>
+        <native-grid cols="C2" gap="Base" class="text-xs font-mono">
+            <native-hstack gap="None" justify="Between"><span class="text-text-secondary">Always</span><span id="single-command-condition-result">&mdash;</span></native-hstack>
+            <native-hstack gap="None" justify="Between"><span class="text-text-secondary">Bonus</span><span id="single-command-condition-bonus">&mdash;</span></native-hstack>
+        </native-grid>
     </native-card-body></native-card>
 
     <!-- Section 25: Direct And syntax -->
     <native-card><native-card-body>
         <native-heading level="H2">Direct And — Simplified Syntax</native-heading>
         <p class="text-xs text-text-secondary mb-3">Score &ge; 90 <strong>.And(args, x =&gt; x.Status).Eq("active")</strong></p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-direct-and-pass", "95 + active", "check-direct-and", new ScorePayload { Score = 95, Status = "active" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-direct-and-fail", "95 + inactive", "check-direct-and", new ScorePayload { Score = 95, Status = "inactive" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
             @DispatchButton("btn-direct-and-score-low", "70 + active", "check-direct-and", new ScorePayload { Score = 70, Status = "active" }, "px-3 py-1.5 rounded bg-slate-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="direct-and-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="direct-and-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Section 26: Direct Or syntax -->
     <native-card><native-card-body>
         <native-heading level="H2">Direct Or — Simplified Syntax</native-heading>
         <p class="text-xs text-text-secondary mb-3">Role == "admin" <strong>.Or(args, x =&gt; x.Role).Eq("superuser")</strong></p>
-        <div class="flex gap-2 mb-4">
+        <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-direct-or-admin", "admin", "check-direct-or", new RolePayload { Role = "admin" }, "px-3 py-1.5 rounded bg-indigo-600 text-white text-xs font-medium")
             @DispatchButton("btn-direct-or-super", "superuser", "check-direct-or", new RolePayload { Role = "superuser" }, "px-3 py-1.5 rounded bg-violet-600 text-white text-xs font-medium")
             @DispatchButton("btn-direct-or-viewer", "viewer", "check-direct-or", new RolePayload { Role = "viewer" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
-        </div>
-        <div class="text-xs font-mono flex justify-between"><span class="text-text-secondary">Result</span><span id="direct-or-result">&mdash;</span></div>
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="direct-or-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Plan JSON -->

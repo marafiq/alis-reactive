@@ -26,13 +26,11 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">FusionAccordion — Full API</native-heading>
-        <native-text color="Secondary">
-            Non-input container component. Exercises events (expanded), methods (expandItem, enableItem),
-            and typed conditions on event args. Senior living domain: facility information sections.
-        </native-text>
-    </div>
+    <native-heading level="H1">FusionAccordion — Full API</native-heading>
+    <native-text color="Secondary">
+        Non-input container component. Exercises events (expanded), methods (expandItem, enableItem),
+        and typed conditions on event args. Senior living domain: facility information sections.
+    </native-text>
 
     <!-- Section 1: Method Call (ExpandItem on DomReady) -->
     <native-card><native-card-body>
@@ -40,9 +38,7 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, <code>ExpandItem(true, 1)</code> expands the second panel programmatically.
         </p>
-        <div class="font-mono text-sm mt-2">
-            <p>ExpandItem result: <span id="expand-result" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm mt-2">ExpandItem result: <span id="expand-result" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 2: The Accordion Component -->
@@ -70,10 +66,10 @@
                     .Else(e => e.Element("condition-result").SetText("Panel collapsed"));
             }))
 
-        <div class="font-mono text-sm mt-4 space-y-1">
+        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
             <p>Last expanded index: <span id="expanded-index" class="text-text-muted">&mdash;</span></p>
             <p>Is expanded: <span id="expanded-state" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body></native-card>
 
     <!-- Section 3: Condition (When/Then/Else on event args) -->
@@ -83,9 +79,7 @@
             <code>When(args, x =&gt; x.IsExpanded).Truthy()</code> shows "Panel expanded" or "Panel collapsed"
             based on the expanded event args.
         </p>
-        <div class="font-mono text-sm mt-2">
-            <p>Condition result: <span id="condition-result" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm mt-2">Condition result: <span id="condition-result" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 4: Method Call (EnableItem via button) -->
@@ -103,9 +97,7 @@
                 p.Dispatch("disable-panel");
             }))
 
-        <div class="font-mono text-sm mt-2">
-            <p>EnableItem result: <span id="enable-result" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm mt-2">EnableItem result: <span id="enable-result" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 5: Lazy-Load Content on Expand (HTTP + Into) -->
@@ -160,9 +152,7 @@
                         })));
             }))
 
-        <div class="font-mono text-sm mt-4">
-            <p>Load status: <span id="lazy-load-status" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm mt-4">Load status: <span id="lazy-load-status" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Plan JSON — always last -->

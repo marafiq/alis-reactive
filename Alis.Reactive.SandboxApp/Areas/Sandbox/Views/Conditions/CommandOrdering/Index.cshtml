@@ -26,10 +26,10 @@
     }));
 }
 
-<div class="p-6 space-y-4">
+<native-vstack gap="Base" class="p-6">
     <h1 class="text-xl font-bold text-text">Command Ordering Around Conditions</h1>
 
-    <div class="flex gap-2">
+    <native-hstack gap="Sm">
         @(Html.NativeButton("btn-high", "Trigger with level=high")
             .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -39,11 +39,9 @@
             .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
                 p.Dispatch("ordering-test", new CommandOrderingPayload { Level = "low" })))
-    </div>
+    </native-hstack>
 
-    <div class="font-mono text-sm text-text-muted">
-        <p>Proof element: <span id="proof">&mdash;</span></p>
-    </div>
-</div>
+    <p class="font-mono text-sm text-text-muted">Proof element: <span id="proof">&mdash;</span></p>
+</native-vstack>
 
 @Html.RenderPlan(plan)

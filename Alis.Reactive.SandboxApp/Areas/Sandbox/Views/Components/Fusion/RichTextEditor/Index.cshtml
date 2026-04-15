@@ -18,14 +18,12 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">FusionRichTextEditor — Full API</native-heading>
-        <native-text color="Secondary">
-            Exercises all supported FusionRichTextEditor API: property writes, property reads,
-            events with typed conditions, and component-read conditions.
-            Senior living domain: care plan documentation, discharge summaries.
-        </native-text>
-    </div>
+    <native-heading level="H1">FusionRichTextEditor — Full API</native-heading>
+    <native-text color="Secondary">
+        Exercises all supported FusionRichTextEditor API: property writes, property reads,
+        events with typed conditions, and component-read conditions.
+        Senior living domain: care plan documentation, discharge summaries.
+    </native-text>
 
     <!-- Section 1: Property Write (SetValue) -->
     <native-card><native-card-body>
@@ -33,7 +31,7 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, sets care plan to initial HTML content via structured prop on the Syncfusion ej2 instance.
         </p>
-        <div class="grid grid-cols-1 gap-4">
+        <native-grid cols="C1" gap="Base">
             @{ Html.InputField(plan, m => m.CarePlan, o => o.Label("Care Plan"))
                 .FusionRichTextEditor(b => b
                     .Placeholder("Enter care plan notes...")
@@ -55,7 +53,7 @@
                                 else_.Element("selected-indicator").Hide();
                             });
                     })); }
-        </div>
+        </native-grid>
     </native-card-body></native-card>
 
     <!-- Section 2: Property Read — Echo Value -->
@@ -64,9 +62,7 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, reads the care plan component's <code>value</code> property and displays it in a text element.
         </p>
-        <div class="font-mono text-sm">
-            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 3: Events — Changed with typed condition -->
@@ -76,11 +72,11 @@
             The care plan field wires a Changed event. Change shows the new value.
             <code>When(args, x =&gt; x.Value).NotEmpty()</code> tests typed event-args condition.
         </p>
-        <div class="font-mono text-sm space-y-1">
+        <native-vstack gap="Xs" class="font-mono text-sm">
             <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
             <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
             <p>On file: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body></native-card>
 
     <!-- Section 4: Component-Read Condition -->
@@ -90,7 +86,7 @@
             Button reads care plan via <code>When(comp.Value()).IsEmpty()</code>
             and shows a warning or confirmation.
         </p>
-        <div class="mt-3">
+        <native-hstack gap="None" class="mt-3">
             @(Html.NativeButton("check-careplan-btn", "Check Care Plan")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -100,10 +96,8 @@
                         .Then(t => t.Element("careplan-warning").SetText("care plan is required"))
                         .Else(e => e.Element("careplan-warning").SetText("care plan set"));
                 }))
-        </div>
-        <div class="font-mono text-sm mt-2">
-            <p>Warning: <span id="careplan-warning" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-hstack>
+        <p class="font-mono text-sm mt-2">Warning: <span id="careplan-warning" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Plan JSON -->

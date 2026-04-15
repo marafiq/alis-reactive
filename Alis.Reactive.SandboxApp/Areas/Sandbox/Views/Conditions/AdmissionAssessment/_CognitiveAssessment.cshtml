@@ -15,8 +15,7 @@
         Wandering behavior triggers elopement alerts when frequent.
     </p>
 
-    <!-- Row 1: Cognitive Score + Wanders -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+    <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.CognitiveScore, o => o.Label("Cognitive Score (MMSE)"))
             .FusionNumericTextBox(b => b
                 .Min(0).Max(30).Step(1)
@@ -55,18 +54,16 @@
                         .Then(t => t.Element("wander-details").Show())
                         .Else(e => e.Element("wander-details").Hide());
                 })); }
-    </div>
+    </native-grid>
 
-    <!-- Status echoes -->
-    <div class="font-mono text-sm space-y-1 mb-4">
+    <native-vstack gap="Xs" class="font-mono text-sm mb-4">
         <p>Score: <span id="score-echo" class="text-text-muted">&mdash;</span></p>
         <p>Status: <span id="cognitive-status" class="text-text-muted">&mdash;</span></p>
         <p>Scored: <span id="cognitive-scored" class="text-text-muted">&mdash;</span></p>
-    </div>
+    </native-vstack>
 
-    <!-- Wander details (conditionally visible) -->
     <div id="wander-details" hidden>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.WanderFrequency, o => o.Label("Wander Frequency"))
                 .FusionDropDownList(b => b
                     .DataSource(new[] { "Rarely", "Occasionally", "Frequently" })
@@ -93,12 +90,12 @@
                                 e.Element("elopement-result").Hide();
                             });
                     })); }
-        </div>
+        </native-grid>
 
-        <div class="font-mono text-sm space-y-1">
+        <native-vstack gap="Xs" class="font-mono text-sm">
             <p><span id="elopement-spinner" hidden class="text-accent">Sending alert...</span></p>
             <div id="elopement-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
-        </div>
+        </native-vstack>
     </div>
 
 </native-card-body></native-card>

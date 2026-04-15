@@ -24,14 +24,12 @@
     }));
 }
 
-<div class="space-y-8">
-    <div>
-        <h1 class="text-2xl font-bold tracking-tight">FusionGrid &mdash; Server-Side Sort, Paging &amp; Filter</h1>
-        <p class="text-sm text-text-secondary">
-            200 residents in server memory. Grid shows 10 per page with server-side sort + paging.
-            External Min Age filter sends the full state (skip, take, sorted, minAge) on every action.
-        </p>
-    </div>
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionGrid &mdash; Server-Side Sort, Paging &amp; Filter</native-heading>
+    <native-text color="Secondary">
+        200 residents in server memory. Grid shows 10 per page with server-side sort + paging.
+        External Min Age filter sends the full state (skip, take, sorted, minAge) on every action.
+    </native-text>
 
     <!-- Section 1: Grid + Sort + Paging + External Filter -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
@@ -43,7 +41,7 @@
 
         <!-- External Filter Panel -->
         <div class="mb-4 p-4 rounded-md bg-slate-50 border border-border/50">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+            <native-grid cols="C3" gap="Base">
                 @{ Html.InputField(plan, m => m.MinAge, o => o.Label("Min Age Filter"))
                     .FusionNumericTextBox(b => b
                         .Format("n0")
@@ -64,7 +62,7 @@
                                  s.Element("filter-status").SetText("filtered");
                              }));
                         })); }
-            </div>
+            </native-grid>
         </div>
 
         @(Html.FusionGrid(plan, "residents-grid", b => b
@@ -104,7 +102,7 @@
                     });
             }))
 
-        <div class="font-mono text-sm mt-4 space-y-1">
+        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
             <p>Load status: <span id="load-status" class="text-text-muted">&mdash;</span></p>
             <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
             <p>Action status: <span id="action-status" class="text-text-muted">&mdash;</span></p>
@@ -114,7 +112,7 @@
             <p>Event action.columnName: <span id="evt-action-column" class="text-text-muted">&mdash;</span></p>
             <p>Event action.direction: <span id="evt-action-direction" class="text-text-muted">&mdash;</span></p>
             <p>Event action.currentPage: <span id="evt-action-page" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </section>
 
     <!-- Plan JSON -->
@@ -122,6 +120,6 @@
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
     </section>
-</div>
+</native-vstack>
 
 @Html.RenderPlan(plan)

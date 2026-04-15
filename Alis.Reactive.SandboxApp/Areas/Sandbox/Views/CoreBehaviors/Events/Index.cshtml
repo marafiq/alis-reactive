@@ -43,23 +43,20 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Events &amp; Dispatch</native-heading>
-        <native-text color="Secondary">
-            Three-hop event chain: dom-ready dispatches "test" &rarr; "test-received" &rarr; "final" with payload.
-            Open DevTools console to see trace output.
-        </native-text>
-    </div>
+    <native-heading level="H1">Events &amp; Dispatch</native-heading>
+    <native-text color="Secondary">
+        Three-hop event chain: dom-ready dispatches "test" &rarr; "test-received" &rarr; "final" with payload.
+        Open DevTools console to see trace output.
+    </native-text>
 
-    <!-- Chain Status — all driven by plan, zero manual JS -->
     <native-card><native-card-body>
         <native-heading level="H2">Event Chain Status</native-heading>
-        <div class="space-y-2 font-mono text-sm">
+        <native-vstack gap="Sm" class="font-mono text-sm">
             <p id="step-1" class="text-text-muted">Step 1: waiting for dom-ready...</p>
             <p id="step-2" class="text-text-muted">Step 2: waiting for "test" event...</p>
             <p id="step-3" class="text-text-muted">Step 3: waiting for "test-received" event...</p>
             <p id="chain-status" class="text-text-muted mt-4">Chain not started</p>
-        </div>
+        </native-vstack>
     </native-card-body></native-card>
 
     <!-- Plan JSON -->

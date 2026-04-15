@@ -11,14 +11,12 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">FusionFileUpload — Full API</native-heading>
-        <native-text color="Secondary">
-            Exercises FusionFileUpload vertical slice: Syncfusion Uploader in form mode
-            (no auto-upload). Files travel via FormData POST — they cannot travel via JSON.
-            Senior living domain: resident document uploads (medical records, photos, consent forms).
-        </native-text>
-    </div>
+    <native-heading level="H1">FusionFileUpload — Full API</native-heading>
+    <native-text color="Secondary">
+        Exercises FusionFileUpload vertical slice: Syncfusion Uploader in form mode
+        (no auto-upload). Files travel via FormData POST — they cannot travel via JSON.
+        Senior living domain: resident document uploads (medical records, photos, consent forms).
+    </native-text>
 
     <!-- Section 1: Form with TextBox + FileUpload -->
     <native-card><native-card-body>
@@ -65,12 +63,12 @@
                     .OnError(400, e => { e.ValidationErrors("upload-form"); })
                  );
             }))
-        <div id="echo-result" class="mt-4 space-y-1 font-mono text-sm text-text-muted">
+        <native-vstack gap="Xs" id="echo-result" class="mt-4 font-mono text-sm text-text-muted">
             <p>Resident Name: <span id="echo-name">&mdash;</span></p>
             <p>File Count: <span id="echo-count">&mdash;</span></p>
             <p>File Names: <span id="echo-files">&mdash;</span></p>
             <p>File Sizes: <span id="echo-sizes">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body></native-card>
 
     <!-- Plan JSON -->

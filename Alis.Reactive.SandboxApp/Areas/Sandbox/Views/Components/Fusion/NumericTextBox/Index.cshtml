@@ -37,13 +37,11 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">FusionNumericTextBox — Full API</native-heading>
-        <native-text color="Secondary">
-            Exercises all supported FusionNumericTextBox API: property writes, method calls,
-            property reads, events, conditions, and gather.
-        </native-text>
-    </div>
+    <native-heading level="H1">FusionNumericTextBox — Full API</native-heading>
+    <native-text color="Secondary">
+        Exercises all supported FusionNumericTextBox API: property writes, method calls,
+        property reads, events, conditions, and gather.
+    </native-text>
 
     <!-- Section 1: Property Write (SetValue + SetMin) -->
     <native-card><native-card-body>
@@ -51,11 +49,11 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, sets value=42 and min=0 via structured prop on the Syncfusion ej2 instance.
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <native-grid cols="C2" gap="Base">
             @{ Html.InputField(plan, m => m.Amount, o => o.Label("Amount (SF NumericTextBox)"))
                 .FusionNumericTextBox(b => b
                     .Min(-100).Max(99999).Step(1)); }
-        </div>
+        </native-grid>
     </native-card-body></native-card>
 
     <!-- Section 2: Property Read — Echo Value -->
@@ -64,9 +62,7 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, reads the Amount component's <code>value</code> property and displays it in a text element.
         </p>
-        <div class="font-mono text-sm">
-            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 3: Method Calls (Increment / Decrement) -->
@@ -76,7 +72,7 @@
             Buttons invoke <code>el.increment()</code> and <code>el.decrement()</code> on the Syncfusion instance.
             After each call, the <code>change</code> event fires and updates the echo.
         </p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("increment-btn", "Increment")
                 .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -89,10 +85,8 @@
                 {
                     p.Component<FusionNumericTextBox>(m => m.Amount).Decrement();
                 }))
-        </div>
-        <div class="font-mono text-sm">
-            <p>Method result: <span id="method-result" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-hstack>
+        <p class="font-mono text-sm">Method result: <span id="method-result" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 4: Events — Changed, Focus, Blur -->
@@ -102,7 +96,7 @@
             The Temperature field wires all three events. Change shows the new value,
             Focus/Blur show focus state.
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.Temperature, o => o.Label("Temperature (SF NumericTextBox)"))
                 .FusionNumericTextBox(b => b
                     .Min(-50).Max(150).Step(1)
@@ -141,13 +135,13 @@
                     {
                         p.Element("focus-state").SetText("blurred");
                     })); }
-        </div>
-        <div class="font-mono text-sm space-y-1">
+        </native-grid>
+        <native-vstack gap="Xs" class="font-mono text-sm">
             <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
             <p>Focus state: <span id="focus-state" class="text-text-muted">&mdash;</span></p>
             <p>Positive: <span id="positive-indicator" hidden class="text-emerald-600">&mdash;</span></p>
             <p>High temp: <span id="high-temp-warning" hidden class="text-rose-600">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body></native-card>
 
     <!-- Section 5: Condition — Positive Indicator -->
@@ -174,9 +168,7 @@
             {
                 p.Dispatch("do-gather");
             }))
-        <div class="font-mono text-sm">
-            <p>Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
-        </div>
+        <p class="font-mono text-sm">Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
     </native-card-body></native-card>
 
     <!-- Section 7: Increment/Decrement Tracking -->
@@ -186,7 +178,7 @@
             A standalone quantity field with its own change event.
             Increment and decrement buttons update the value and the echo tracks changes.
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.Quantity, o => o.Label("Quantity (SF NumericTextBox)"))
                 .FusionNumericTextBox(b => b
                     .Min(0).Max(100).Step(1).Value(1)
@@ -195,8 +187,8 @@
                         p.Element("method-result").SetText(args, x => x.Value);
                         p.Element("qty-echo").SetText(args, x => x.Value);
                     })); }
-        </div>
-        <div class="flex gap-2 mb-3">
+        </native-grid>
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("qty-inc-btn", "Qty +1")
                 .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -209,10 +201,8 @@
                 {
                     p.Component<FusionNumericTextBox>(m => m.Quantity).Decrement();
                 }))
-        </div>
-        <div class="font-mono text-sm">
-            <p>Quantity echo: <span id="qty-echo" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-hstack>
+        <p class="font-mono text-sm">Quantity echo: <span id="qty-echo" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Plan JSON -->

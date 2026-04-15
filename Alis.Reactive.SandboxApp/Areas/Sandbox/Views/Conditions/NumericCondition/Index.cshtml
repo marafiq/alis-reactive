@@ -21,13 +21,11 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Numeric Conditions — Vital Signs</native-heading>
-        <native-text color="Secondary">
-            Conditions with FusionNumericTextBox: simple Gt, ElseIf ladder, AND compound,
-            and cross-component source-vs-source comparison. Senior living domain: vital sign thresholds.
-        </native-text>
-    </div>
+    <native-heading level="H1">Numeric Conditions — Vital Signs</native-heading>
+    <native-text color="Secondary">
+        Conditions with FusionNumericTextBox: simple Gt, ElseIf ladder, AND compound,
+        and cross-component source-vs-source comparison. Senior living domain: vital sign thresholds.
+    </native-text>
 
     <!-- Section 1: Simple Gt condition -->
     <native-card><native-card-body>
@@ -36,7 +34,7 @@
             Enter a heart rate. Values above 100 show a tachycardia warning.
             Uses <code>When(comp.Value()).Gt(100m)</code> as a component-read condition.
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.HeartRate, o => o.Label("Heart Rate (bpm)"))
                 .FusionNumericTextBox(b => b
                     .Min(0).Max(300).Step(1)
@@ -65,10 +63,8 @@
                             .Then(t => t.Element("hr-zone").SetText("Normal"))
                             .Else(e => e.Element("hr-zone").SetText("Low"));
                     })); }
-        </div>
-        <div class="font-mono text-sm">
-            <p>Warning: <span id="tachycardia-warning" hidden class="text-rose-600">&mdash;</span></p>
-        </div>
+        </native-grid>
+        <p class="font-mono text-sm">Warning: <span id="tachycardia-warning" hidden class="text-rose-600">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 2: ElseIf grade ladder -->
@@ -79,9 +75,7 @@
             <code>Gte(120) → "Critical" / Gte(100) → "High" / Gte(60) → "Normal" / Else → "Low"</code>.
             Uses component-read source with ElseIf chaining.
         </p>
-        <div class="font-mono text-sm">
-            <p>Zone: <span id="hr-zone" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm">Zone: <span id="hr-zone" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 3: AND compound condition -->
@@ -92,7 +86,7 @@
             <code>When(comp.Value()).Gte(60m).And(comp.Value()).Lte(120m)</code> shows "Normal range".
             Outside that range shows "Out of range".
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.BloodPressure, o => o.Label("Systolic BP (mmHg)"))
                 .FusionNumericTextBox(b => b
                     .Min(0).Max(300).Step(1)
@@ -110,10 +104,8 @@
                                 else_.Element("bp-range").SetText("Out of range");
                             });
                     })); }
-        </div>
-        <div class="font-mono text-sm">
-            <p>Range: <span id="bp-range" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-grid>
+        <p class="font-mono text-sm">Range: <span id="bp-range" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 4: Cross-component source-vs-source -->
@@ -124,12 +116,12 @@
             <code>When(heartRate.Value()).Gte(threshold.Value())</code>.
             Button-triggered so both components are read at click time.
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.ThresholdValue, o => o.Label("Threshold (bpm)"))
                 .FusionNumericTextBox(b => b
                     .Min(0).Max(300).Step(1)); }
-        </div>
-        <div class="mt-3">
+        </native-grid>
+        <native-hstack gap="None" class="mt-3">
             @(Html.NativeButton("check-threshold-btn", "Check Against Threshold")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -140,10 +132,8 @@
                         .Then(t => t.Element("threshold-result").SetText("Above threshold"))
                         .Else(e => e.Element("threshold-result").SetText("Below threshold"));
                 }))
-        </div>
-        <div class="font-mono text-sm mt-2">
-            <p>Result: <span id="threshold-result" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-hstack>
+        <p class="font-mono text-sm mt-2">Result: <span id="threshold-result" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Plan JSON -->
