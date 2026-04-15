@@ -370,11 +370,11 @@
     </div>
 </section>
 
-<!-- App Level -->
+<!-- Overlays -->
 <section class="mb-10">
     <div class="flex items-center gap-3 mb-4">
         <span class="w-1 h-6 rounded-full bg-[#D4A053]"></span>
-        <h2 class="text-lg font-semibold text-text-primary">App Level</h2>
+        <h2 class="text-lg font-semibold text-text-primary">Overlays</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <a asp-area="Sandbox" asp-controller="Drawer" asp-action="Index"
@@ -387,6 +387,32 @@
             </div>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                 Click to open a slide-out drawer panel, see partial HTML loaded into it via Into()
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="Dialog" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+            <div class="flex items-start justify-between">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                    Dialog
+                </h3>
+                <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            </div>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Open a modal dialog with Show/Hide, see BeforeOpen through Closed events drive the event log
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="Tooltip" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+            <div class="flex items-start justify-between">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+                    Tooltip
+                </h3>
+                <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            </div>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                Hover a target element to surface a tooltip, programmatic Open/Close via the pipeline
             </p>
         </a>
     </div>
