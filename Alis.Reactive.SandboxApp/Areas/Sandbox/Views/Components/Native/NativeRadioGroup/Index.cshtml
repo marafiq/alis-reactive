@@ -10,13 +10,11 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">NativeRadioGroup</native-heading>
-        <native-text color="Secondary">
-            Radio button group: text-only variation, text + description variation,
-            form submission (JSON POST), and FluentValidation integration.
-        </native-text>
-    </div>
+    <native-heading level="H1">NativeRadioGroup</native-heading>
+    <native-text color="Secondary">
+        Radio button group: text-only variation, text + description variation,
+        form submission (JSON POST), and FluentValidation integration.
+    </native-text>
 
     <!-- Section 1: Text-Only Variation -->
     <native-card><native-card-body>
@@ -36,9 +34,7 @@
                     p.Element("meal-echo").SetText(args, a => a.Value);
                 })); }
 
-        <div class="font-mono text-sm">
-            <p>Selected: <span id="meal-echo" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm">Selected: <span id="meal-echo" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 2: Text + Description Variation -->
@@ -71,9 +67,7 @@
                         });
                 })); }
 
-        <div class="font-mono text-sm">
-            <p>Notice: <span id="care-notice" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm">Notice: <span id="care-notice" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 3: Form with Validation -->
@@ -91,7 +85,7 @@
             @{ Html.InputField(plan, m => m.RoomType, o => o.Required().Label("Room Type"))
                 .NativeRadioGroup(b => b.Items(roomTypeItems)); }
 
-            <div class="flex items-center gap-4">
+            <native-hstack gap="Base">
                 @(Html.NativeButton("submit-btn", "Submit Preferences")
                     .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -107,7 +101,7 @@
                     }))
 
                 <p id="result" class="text-sm text-text-muted"></p>
-            </div>
+            </native-hstack>
         </form>
     </native-card-body></native-card>
 
@@ -127,9 +121,7 @@
                     .Then(t => t.Element("care-confirmation").SetText("care level confirmed"))
                     .Else(e => e.Element("care-confirmation").SetText("care level is required"));
             }))
-        <div class="font-mono text-sm">
-            <p>Status: <span id="care-confirmation" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm">Status: <span id="care-confirmation" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Plan JSON -->
