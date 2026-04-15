@@ -12,13 +12,11 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">NativeCheckList</native-heading>
-        <native-text color="Secondary">
-            Checkbox list: text + description variation, text-only variation,
-            form submission (JSON POST), component value condition, and model binding proof.
-        </native-text>
-    </div>
+    <native-heading level="H1">NativeCheckList</native-heading>
+    <native-text color="Secondary">
+        Checkbox list: text + description variation, text-only variation,
+        form submission (JSON POST), component value condition, and model binding proof.
+    </native-text>
 
     <!-- Section 1: Text + Description -->
     <native-card><native-card-body>
@@ -35,9 +33,7 @@
                     p.Element("allergy-echo").SetText(args, a => a.Value);
                 })); }
 
-        <div class="font-mono text-sm">
-            <p>Selected: <span id="allergy-echo" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm">Selected: <span id="allergy-echo" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 2: Text-Only -->
@@ -66,7 +62,7 @@
             @{ Html.InputField(plan, m => m.DietaryNeeds, o => o.Required().Label("Dietary Needs"))
                 .NativeCheckList(b => b.Items(dietaryItems)); }
 
-            <div class="flex items-center gap-4">
+            <native-hstack gap="Base">
                 @(Html.NativeButton("submit-btn", "Submit Preferences")
                     .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -82,7 +78,7 @@
                     }))
 
                 <p id="result" class="text-sm text-text-muted"></p>
-            </div>
+            </native-hstack>
         </form>
     </native-card-body></native-card>
 
@@ -102,9 +98,7 @@
                     .Then(t => t.Element("allergy-confirmation").SetText("allergies recorded"))
                     .Else(e => e.Element("allergy-confirmation").SetText("no allergies selected"));
             }))
-        <div class="font-mono text-sm">
-            <p>Status: <span id="allergy-confirmation" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm">Status: <span id="allergy-confirmation" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
     <!-- Section 5: Model Binding Proof -->
