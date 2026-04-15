@@ -1163,6 +1163,72 @@ Each branch can do more than `SetText` -- drop a `Get(...)` call with `Response(
 
 ---
 
+## FusionTooltip
+
+A hover tooltip for surfacing contextual hints such as care-level differences on a resident card, severity legends on an incident grid, or medication schedule details on a timeline. Non-input component: it has events and methods but is not bound to a model property, so there is no `InputField` wrapper.
+
+| Property | Value |
+|----------|-------|
+| ReadExpr | `(not input-bound)` |
+| Events | `BeforeRender`, `BeforeOpen`, `Opened`, `BeforeClose`, `Closed` |
+| Typed Source | `(not input-bound)` |
+
+### How do I attach a tooltip to an element?
+
+Point the tooltip at the DOM element it describes with `b.Target("#care-level-target")` and pick a trigger with `b.OpensOn("Hover")`. The `Position` argument uses Syncfusion's strongly-typed `Position` enum, so write it fully qualified. Chain `.Reactive(...)` callbacks for the lifecycle events you care about -- here `Opened` and `Closed` update a status element.
+
+```csharp
+@(Html.FusionTooltip(plan, "care-level-tooltip", b =>
+{
+    b.Target("#care-level-target");
+    b.Content("24/7 staff, secure environment, assistance with activities of daily living.");
+    b.Position(Syncfusion.EJ2.Popups.Position.TopCenter);
+    b.OpensOn("Hover");
+    b.Width("260px");
+    b.ShowTipPointer(true);
+})
+.Reactive(evt => evt.Opened, (_, p) =>
+{
+    p.Element("tooltip-opened").SetText("opened");
+})
+.Reactive(evt => evt.Closed, (_, p) =>
+{
+    p.Element("tooltip-closed").SetText("closed");
+}))
+```
+
+### How do I open or close it from a button?
+
+Resolve the tooltip through the pipeline with `p.Component<FusionTooltip>("care-level-tooltip")` and call the `Open()` or `Close()` extension. The same ID you passed to `Html.FusionTooltip(...)` is the handle you use from any reactive callback.
+
+```csharp
+@(Html.NativeButton("open-tooltip-btn", "Open Tooltip")
+    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+    .Reactive(plan, evt => evt.Click, (_, p) =>
+    {
+        p.Component<FusionTooltip>("care-level-tooltip").Open();
+    }))
+```
+
+```csharp
+@(Html.NativeButton("close-tooltip-btn", "Close Tooltip")
+    .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
+    .Reactive(plan, evt => evt.Click, (_, p) =>
+    {
+        p.Component<FusionTooltip>("care-level-tooltip").Close();
+    }))
+```
+
+### Mutation extensions
+
+| Extension | Description |
+|-----------|-------------|
+| `Open()` | Opens the tooltip programmatically on the target element |
+| `Close()` | Closes the tooltip |
+| `Refresh()` | Refreshes the tooltip position and content |
+
+---
+
 ## App-Level Fusion Components
 
 App-level Fusion components are singletons rendered once in the layout. Referenced from any pipeline without a model expression.
