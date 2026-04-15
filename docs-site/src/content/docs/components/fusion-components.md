@@ -884,69 +884,9 @@ A calendar-style schedule for booking senior-living resources such as staff shif
 | Events | `CellClicked`, `EventClicked`, `ActionBegin`, `ActionComplete`, `Navigating`, `PopupOpen`, `PopupClose`, `DataBound`, `EventRendered` |
 | Typed Source | `(not input-bound)` |
 
-### How do I render a schedule?
+### How do I render a schedule and wire its events?
 
-Call `Html.FusionSchedule(plan, "shift-schedule", b => ...)` and configure the view set, resource groups, event field mappings, work hours, and QuickInfo templates inside the builder callback. The element ID you pass as the second argument is what you use later to target the schedule from the pipeline. Load the initial data from the server in a `DomReady` trigger with `SetDataSource`.
-
-```csharp
-@{ Html.On(plan, t => t.DomReady(p =>
-{
-    p.Get("/api/schedule/assignments?selectedFacilityId=mystery-manor")
-     .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
-     {
-         s.Component<FusionSchedule>("shift-schedule")
-             .SetDataSource(json, j => j.Assignments);
-         s.Element("status").SetText("Schedule loaded");
-         s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
-     }));
-})); }
-```
-
-```csharp
-@(Html.FusionSchedule(plan, "shift-schedule", b =>
-    {
-        b.Width("100%"); b.Height("100%"); b.CurrentView(View.Week); b.SelectedDate(DateTime.Today);
-        b.Views(new List<ScheduleView>
-        {
-            new ScheduleView { Option = View.Day },
-            new ScheduleView { Option = View.Week },
-            new ScheduleView { Option = View.WorkWeek },
-            new ScheduleView { Option = View.Month },
-            new ScheduleView { Option = View.Agenda },
-        });
-        b.Group(new ScheduleGroup { Resources = new string[] { "Shifts" } });
-        b.Resources(new List<ScheduleResource>
-        {
-            new ScheduleResource
-            {
-                Field = "shiftId", Title = "Shift", Name = "Shifts",
-                DataSource = FakeScheduleData.Shifts,
-                TextField = "text", IdField = "id", ColorField = "color"
-            }
-        });
-        b.EventSettings(new ScheduleEventSettings
-        {
-            EnableTooltip = true,
-            Fields = new ScheduleField
-            {
-                Id = "id",
-                Subject = new ScheduleFieldOptions { Name = "subject" },
-                StartTime = new ScheduleFieldOptions { Name = "startTime" },
-                EndTime = new ScheduleFieldOptions { Name = "endTime" },
-                Description = new ScheduleFieldOptions { Name = "description" },
-                IsAllDay = new ScheduleFieldOptions { Name = "isAllDay" },
-            },
-        });
-        b.WorkHours(new ScheduleWorkHours { Highlight = true, Start = "06:00", End = "22:00" });
-        b.StartHour("05:00"); b.EndHour("23:00");
-        b.TimeScale(new ScheduleTimeScale { Enable = true, Interval = 60, SlotCount = 1 });
-        b.ShowHeaderBar(true); b.ShowTimeIndicator(true); b.AllowDragAndDrop(true);
-    }))
-```
-
-### How do I react when a user clicks an empty cell?
-
-Chain `.Reactive(evt => evt.CellClicked, ...)` onto the schedule. The event args expose `StartTime`, `EndTime`, `GroupIndex`, and `IsAllDay` -- pass them through `FromEvent` into a GET that loads a new-assignment form partial, then open a dialog to host it.
+Call `Html.FusionSchedule(plan, "shift-schedule", b => ...)` and configure the view set, resource groups, event field mappings, work hours, and QuickInfo templates inside the builder callback. The element ID you pass as the second argument is what you use later to target the schedule from the pipeline. Chain `.Reactive(evt => evt.CellClicked, ...)` to handle empty-cell clicks (pass `StartTime`, `EndTime`, and `GroupIndex` through `FromEvent` into a GET that loads a new-assignment form partial, then show a dialog to host it), and chain `.Reactive(evt => evt.ActionComplete, ...)` guarded on `RequestType == "eventChanged"` to reload fresh data after Syncfusion finishes a CRUD operation internally (drag, resize, editor save).
 
 ```csharp
 @(Html.FusionSchedule(plan, "shift-schedule", b =>
@@ -1003,52 +943,6 @@ Chain `.Reactive(evt => evt.CellClicked, ...)` onto the schedule. The event args
              .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId))
          .Response(r => r.OnSuccess(s => s.Into("new-assignment-content")));
         p.Component<FusionDialog>("new-assignment-dialog").Show();
-    }))
-```
-
-### How do I persist changes back to the server?
-
-Chain `.Reactive(evt => evt.ActionComplete, ...)` onto the schedule. Syncfusion fires `ActionComplete` after it finishes a CRUD action internally (drag, resize, editor save). Guard on `RequestType == "eventChanged"` so you only reload after a real change, then GET a fresh slice and push it back into the component with `SetDataSource`.
-
-```csharp
-@(Html.FusionSchedule(plan, "shift-schedule", b =>
-    {
-        b.Width("100%"); b.Height("100%"); b.CurrentView(View.Week); b.SelectedDate(DateTime.Today);
-        b.Views(new List<ScheduleView>
-        {
-            new ScheduleView { Option = View.Day },
-            new ScheduleView { Option = View.Week },
-            new ScheduleView { Option = View.WorkWeek },
-            new ScheduleView { Option = View.Month },
-            new ScheduleView { Option = View.Agenda },
-        });
-        b.Group(new ScheduleGroup { Resources = new string[] { "Shifts" } });
-        b.Resources(new List<ScheduleResource>
-        {
-            new ScheduleResource
-            {
-                Field = "shiftId", Title = "Shift", Name = "Shifts",
-                DataSource = FakeScheduleData.Shifts,
-                TextField = "text", IdField = "id", ColorField = "color"
-            }
-        });
-        b.EventSettings(new ScheduleEventSettings
-        {
-            EnableTooltip = true,
-            Fields = new ScheduleField
-            {
-                Id = "id",
-                Subject = new ScheduleFieldOptions { Name = "subject" },
-                StartTime = new ScheduleFieldOptions { Name = "startTime" },
-                EndTime = new ScheduleFieldOptions { Name = "endTime" },
-                Description = new ScheduleFieldOptions { Name = "description" },
-                IsAllDay = new ScheduleFieldOptions { Name = "isAllDay" },
-            },
-        });
-        b.WorkHours(new ScheduleWorkHours { Highlight = true, Start = "06:00", End = "22:00" });
-        b.StartHour("05:00"); b.EndHour("23:00");
-        b.TimeScale(new ScheduleTimeScale { Enable = true, Interval = 60, SlotCount = 1 });
-        b.ShowHeaderBar(true); b.ShowTimeIndicator(true); b.AllowDragAndDrop(true);
     })
     .Reactive(evt => evt.ActionComplete, (args, p) =>
     {
@@ -1074,6 +968,24 @@ Chain `.Reactive(evt => evt.ActionComplete, ...)` onto the schedule. Syncfusion 
 ```
 
 The sandbox view also wires `PopupOpen` (to cancel Syncfusion's built-in QuickInfo popup with `args.PreventDefault(t)`), `ActionBegin`, `Navigating`, `EventClicked`, `PopupClose`, `DataBound`, and `EventRendered` -- see `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Schedule/Index.cshtml` for the full event surface.
+
+### How do I load initial data after DOM ready?
+
+Fetch the initial slice in a `DomReady` trigger and push it into the schedule with `SetDataSource`. The schedule never holds the full dataset -- the server filters by facility, view, and date range on each request.
+
+```csharp
+@{ Html.On(plan, t => t.DomReady(p =>
+{
+    p.Get("/api/schedule/assignments?selectedFacilityId=mystery-manor")
+     .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
+     {
+         s.Component<FusionSchedule>("shift-schedule")
+             .SetDataSource(json, j => j.Assignments);
+         s.Element("status").SetText("Schedule loaded");
+         s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
+     }));
+})); }
+```
 
 ### Mutation extensions
 
