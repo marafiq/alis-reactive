@@ -34,7 +34,7 @@
     // (Section 7 plan wiring is inline below via .Reactive on the component)
 }
 
-<div class="space-y-8">
+<native-vstack gap="Lg">
     <div>
         <h1 class="text-2xl font-bold tracking-tight">FusionAutoComplete — Full API</h1>
         <p class="mt-2 text-text-secondary">
@@ -49,7 +49,7 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, sets value="Dr. Smith" via structured prop on the Syncfusion ej2 instance.
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <native-grid cols="C2" gap="Base">
             @{ Html.InputField(plan, m => m.Physician, o => o.Label("Physician (SF AutoComplete)"))
                 .FusionAutoComplete(b => b
                     .DataSource(physicians)
@@ -73,8 +73,8 @@
                                 else_.Element("selected-indicator").Hide();
                             });
                     })); }
-        </div>
-        <div class="flex gap-2 mt-4">
+        </native-grid>
+        <native-hstack gap="Sm" class="mt-4">
             @(Html.NativeButton("show-popup-btn", "Show Popup")
                 .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -87,10 +87,8 @@
                 {
                     p.Component<FusionAutoComplete>(m => m.Physician).HidePopup();
                 }))
-        </div>
-        <div class="font-mono text-sm mt-4">
-            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-hstack>
+        <p class="font-mono text-sm mt-4">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
     </section>
 
     <!-- Section 2: Events — Changed -->
@@ -99,11 +97,11 @@
         <p class="text-sm text-text-secondary mb-4">
             The Physician field wires the Changed event. Change shows the new value.
         </p>
-        <div class="font-mono text-sm space-y-1">
+        <native-vstack gap="Xs" class="font-mono text-sm">
             <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
             <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
             <p>Selected: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </section>
 
     <!-- Section 5: Conditions — Typed Event-Args + Component-Read -->
@@ -129,9 +127,7 @@
             {
                 p.Dispatch("do-gather");
             }))
-        <div class="font-mono text-sm">
-            <p>Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
-        </div>
+        <p class="font-mono text-sm">Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
     </section>
 
     <!-- Section 7: Filtering Event — Server-Filtered Medications -->
@@ -141,7 +137,7 @@
             Type to search medications. The Filtering event fires on each keystroke (debounced 500ms),
             sends the typed text to the server via HTTP GET, and updates the dropdown DataSource from the response.
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <native-grid cols="C2" gap="Base">
             @{ Html.InputField(plan, m => m.MedicationType, o => o.Label("Medication (Server-Filtered)"))
                 .FusionAutoComplete(b => b
                     .Fields<MedicationTypeItem>(t => t.Text, v => v.Value)
@@ -162,10 +158,10 @@
                                 s.Element("filter-status").SetText("results loaded");
                             }));
                     })); }
-        </div>
-        <div class="font-mono text-sm mt-2 space-y-1">
+        </native-grid>
+        <native-vstack gap="Xs" class="font-mono text-sm mt-2">
             <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </section>
 
     <!-- Plan JSON -->
@@ -173,6 +169,6 @@
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
     </section>
-</div>
+</native-vstack>
 
 @Html.RenderPlan(plan)
