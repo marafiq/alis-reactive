@@ -7,6 +7,9 @@ import astroD2 from 'astro-d2';
 export default defineConfig({
 	site: 'https://marafiq.github.io',
 	base: '/alis-reactive',
+	redirects: {
+		'/components/fusion-components': '/alis-reactive/components/fusion',
+	},
 	integrations: [
 		starlight({
 			title: 'Alis.Reactive',
