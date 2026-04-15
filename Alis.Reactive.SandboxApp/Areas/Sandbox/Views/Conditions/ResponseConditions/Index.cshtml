@@ -143,18 +143,18 @@
     <native-card-body>
         <native-heading level="H2">1. When on success response body</native-heading>
         <p class="text-sm text-text-secondary mb-3">POST Approve &rarr; <code>When(json, r =&gt; r.Status).Eq("approved")</code>. Badge shows only for approved.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s1-btn-approve", "Approve")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s1-when-approved")))
             @(Html.NativeButton("s1-btn-deny", "Deny")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s1-when-denied")))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Result: <span id="s1-result">&mdash;</span></p>
             <p id="s1-badge" hidden class="text-green-600 font-semibold">Approved Badge</p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -163,7 +163,7 @@
     <native-card-body>
         <native-heading level="H2">2. ElseIf chain on response body</native-heading>
         <p class="text-sm text-text-secondary mb-3">Three endpoints: approved &rarr; green, pending &rarr; yellow, denied &rarr; red.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s2-btn-approve", "Approve")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s2-elseif-approve")))
@@ -173,10 +173,10 @@
             @(Html.NativeButton("s2-btn-deny", "Deny")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s2-elseif-deny")))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Label: <span id="s2-label">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -185,17 +185,17 @@
     <native-card-body>
         <native-heading level="H2">3. And composition on response body</native-heading>
         <p class="text-sm text-text-secondary mb-3"><code>When(status == approved).And(count &gt; 0)</code>. Approve has count=5, Deny has count=0.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s3-btn-approve", "Approve (count=5)")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s3-and-approve")))
             @(Html.NativeButton("s3-btn-deny", "Deny (count=0)")
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s3-and-deny")))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Result: <span id="s3-result">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -204,14 +204,14 @@
     <native-card-body>
         <native-heading level="H2">4. OnError catch-all</native-heading>
         <p class="text-sm text-text-secondary mb-3">POST Fail (422) &rarr; <code>OnError(p =&gt; ...)</code> catch-all handler fires.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s4-btn-fail", "Trigger 422")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s4-error-catchall")))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Result: <span id="s4-result">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -220,14 +220,14 @@
     <native-card-body>
         <native-heading level="H2">5. OnError typed with conditions</native-heading>
         <p class="text-sm text-text-secondary mb-3">POST Fail (422) &rarr; <code>OnError&lt;ErrorDetailResponse&gt;((err, e) =&gt; e.When(err, x =&gt; x.Code).Eq(422))</code>.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s5-btn-fail", "Trigger 422")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch("s5-error-typed")))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Result: <span id="s5-result">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 </native-vstack>

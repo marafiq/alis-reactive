@@ -89,20 +89,17 @@
     }));
 }
 
-<div class="space-y-6">
-    <div>
-        <h1 class="text-2xl font-bold tracking-tight">Point-in-Time Schedule</h1>
-        <p class="text-sm text-text-secondary">
-            Senior living shift schedule. Double-click an assignment to edit via SF's built-in editor.
-            Change facility to load different data. Navigate weeks to see different assignments.
-        </p>
-    </div>
+<native-vstack gap="Base">
+    <native-heading level="H1">Point-in-Time Schedule</native-heading>
+    <native-text color="Secondary">
+        Senior living shift schedule. Double-click an assignment to edit via SF's built-in editor.
+        Change facility to load different data. Navigate weeks to see different assignments.
+    </native-text>
 
     <!-- Filter Bar -->
     <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
-        <div class="flex items-center gap-6 flex-wrap">
-            <div class="flex items-center gap-2">
-                @{ Html.InputField(plan, m => m.SelectedFacilityId, o => o.Label("Facility"))
+        <native-hstack gap="Lg" wrap="true">
+            @{ Html.InputField(plan, m => m.SelectedFacilityId, o => o.Label("Facility"))
                     .FusionDropDownList(b => b
                         .Placeholder("Select facility")
                         .DataSource(FakeScheduleData.Facilities)
@@ -124,21 +121,20 @@
                                  s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
                              }));
                         })); }
-            </div>
-            <div class="flex items-center gap-3 ml-auto text-sm">
+            <native-hstack gap="Sm" class="ml-auto text-sm">
                 <span class="text-text-secondary">Unassigned:</span>
                 <span id="unassigned-count" class="font-bold text-red-600">--</span>
                 <span class="mx-1 text-border">|</span>
                 <span class="text-text-secondary">Status:</span>
                 <span id="status" class="font-medium text-text-muted">Loading...</span>
-            </div>
+            </native-hstack>
             @(Html.NativeButton("print-btn", "Print Schedule")
                 .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionSchedule>("shift-schedule").Print();
                 }))
-        </div>
+        </native-hstack>
     </section>
 
     <!-- Schedule -->
@@ -321,10 +317,10 @@
     <!-- Event Trace -->
     <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
         <h3 class="text-sm font-semibold mb-2">Event Trace</h3>
-        <div class="font-mono text-xs space-y-1">
+        <native-vstack gap="Xs" class="font-mono text-xs">
             <p>Last cell click: <span id="event-trace" class="text-text-muted">--</span></p>
             <p>Shift group: <span id="event-shift" class="text-text-muted">--</span></p>
-        </div>
+        </native-vstack>
     </section>
 
     <!-- Plan JSON -->
@@ -332,7 +328,7 @@
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code>@Html.Raw(plan.RenderFormatted())</code></pre>
     </section>
-</div>
+</native-vstack>
 
 @Html.RenderPlan(plan)
 

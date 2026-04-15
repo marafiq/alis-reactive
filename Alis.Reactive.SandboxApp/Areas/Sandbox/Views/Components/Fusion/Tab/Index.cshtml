@@ -61,14 +61,12 @@
     };
 }
 
-<div class="space-y-8">
-    <div>
-        <h1 class="text-2xl font-bold tracking-tight">FusionTab — Full API</h1>
-        <p class="text-sm text-text-secondary">
-            Exercises FusionTab API: property writes (SetSelectedItem), method calls (Select, HideTab),
-            and events (Selected) with typed conditions. Senior living domain: facility management tabs.
-        </p>
-    </div>
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionTab — Full API</native-heading>
+    <native-text color="Secondary">
+        Exercises FusionTab API: property writes (SetSelectedItem), method calls (Select, HideTab),
+        and events (Selected) with typed conditions. Senior living domain: facility management tabs.
+    </native-text>
 
     <!-- Section 1: Property Write (SetSelectedItem) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
@@ -76,9 +74,7 @@
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, <code>SetSelectedItem(1)</code> switches to the "Staff" tab (index 1).
         </p>
-        <div class="font-mono text-sm mt-4">
-            <p>SetSelectedItem result: <span id="set-selected-result" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm mt-4">SetSelectedItem result: <span id="set-selected-result" class="text-text-muted">&mdash;</span></p>
     </section>
 
     <!-- Section 2: Tab Component -->
@@ -104,12 +100,12 @@
                     .Else(e => e.Element("condition-result").SetText("Reports tab active"));
             }))
 
-        <div class="font-mono text-sm mt-4 space-y-1">
+        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
             <p>selectedIndex: <span id="selected-index" class="text-text-muted">&mdash;</span></p>
             <p>previousIndex: <span id="previous-index" class="text-text-muted">&mdash;</span></p>
             <p>isSwiped: <span id="is-swiped" class="text-text-muted">&mdash;</span></p>
             <p>Condition: <span id="condition-result" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </section>
 
     <!-- Section 3: Method Call (Select) -->
@@ -124,9 +120,7 @@
             {
                 p.Dispatch("do-select-tab");
             }))
-        <div class="font-mono text-sm mt-4">
-            <p>Method result: <span id="method-result" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm mt-4">Method result: <span id="method-result" class="text-text-muted">&mdash;</span></p>
     </section>
 
     <!-- Section 4: Method Call (HideTab / ShowTab) -->
@@ -147,9 +141,7 @@
             {
                 p.Dispatch("do-show-tab");
             }))
-        <div class="font-mono text-sm mt-4">
-            <p>Hide/Show result: <span id="hide-result" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm mt-4">Hide/Show result: <span id="hide-result" class="text-text-muted">&mdash;</span></p>
     </section>
 
     <!-- Section 5: Lazy-Load Tab Content via HTTP + Into -->
@@ -206,9 +198,7 @@
             <div class="p-4 text-sm text-text-muted">Click a tab to load content via HTTP</div>
         </div>
 
-        <div class="font-mono text-sm mt-4">
-            <p>Load status: <span id="lazy-load-status" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm mt-4">Load status: <span id="lazy-load-status" class="text-text-muted">&mdash;</span></p>
     </section>
 
     <!-- Plan JSON -->
@@ -216,6 +206,6 @@
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
         <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
     </section>
-</div>
+</native-vstack>
 
 @Html.RenderPlan(plan)

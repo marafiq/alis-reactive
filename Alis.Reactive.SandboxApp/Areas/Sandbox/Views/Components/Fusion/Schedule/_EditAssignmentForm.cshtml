@@ -13,14 +13,14 @@
     }).ToList();
 }
 
-<div class="p-4 space-y-4">
+<native-vstack gap="Base" class="p-4">
     <h3 class="text-lg font-semibold">Edit Shift Assignment</h3>
     <p class="text-sm text-text-secondary">Assignment #@Model.AssignmentId</p>
 
     <form id="assignment-form" class="space-y-3">
     @Html.HiddenFieldFor(plan, m => m.AssignmentId)
 
-    <div class="space-y-3">
+    <native-vstack gap="Sm">
         @{ Html.InputField(plan, m => m.StaffId, o => o.Required().Label("Staff Member"))
             .FusionDropDownList(b => b
                 .Placeholder("Select staff member")
@@ -29,9 +29,9 @@
 
         @{ Html.InputField(plan, m => m.Notes, o => o.Label("Care Notes"))
             .NativeTextArea(b => b.Rows(3).Placeholder("Care instructions, special requirements...")); }
-    </div>
+    </native-vstack>
 
-    <div class="flex gap-3 pt-2">
+    <native-hstack gap="Sm" class="pt-2">
         @(Html.NativeButton("btn-save-assignment", "Save Assignment")
             .CssClass("px-4 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -57,11 +57,11 @@
             {
                 p.Component<NativeDrawer>().Close();
             }))
-    </div>
+    </native-hstack>
 
     <p id="edit-status" class="text-sm text-text-muted"></p>
     </form>
-</div>
+</native-vstack>
 
 @Html.EJS().ScriptManager()
 @Html.RenderPlan(plan)

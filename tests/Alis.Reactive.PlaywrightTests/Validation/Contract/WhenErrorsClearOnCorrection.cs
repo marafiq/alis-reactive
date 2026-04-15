@@ -11,7 +11,7 @@ namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 [TestFixture]
 public class WhenErrorsClearOnCorrection : PlaywrightTestBase
 {
-    private const string Path = "/Sandbox/AllModulesTogether/ComponentGather";
+    private const string Path = "/Sandbox/Patterns/ComponentGather";
     private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ComponentGatherModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-json-btn");

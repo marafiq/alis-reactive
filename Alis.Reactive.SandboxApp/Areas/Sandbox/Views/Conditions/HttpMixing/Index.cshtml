@@ -173,7 +173,7 @@
     <native-card-body>
         <native-heading level="H2">1. Condition after HTTP</native-heading>
         <p class="text-sm text-text-secondary mb-3">POST saves, then outer condition checks active flag.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s1-btn-active", "Save (active=true)")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -182,11 +182,11 @@
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Dispatch("s1-save-then-check", new HttpMixingPayload { Active = false })))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Saved: <span id="s1-status">&mdash;</span></p>
             <p id="s1-badge" hidden class="text-green-600 font-semibold">Active Badge</p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -195,7 +195,7 @@
     <native-card-body>
         <native-heading level="H2">2. HTTP between two conditions</native-heading>
         <p class="text-sm text-text-secondary mb-3">Condition &rarr; POST audit &rarr; Condition. All three segments execute independently.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s2-btn-active-with-count", "active=true, count=5")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -204,12 +204,12 @@
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Dispatch("s2-condition-http-condition", new HttpMixingPayload { Active = false, Count = 0 })))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Active status: <span id="s2-active-status">&mdash;</span></p>
             <p>Audit: <span id="s2-audit-result">&mdash;</span></p>
             <p id="s2-count-badge" hidden class="text-blue-600 font-semibold">Count Badge</p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -218,7 +218,7 @@
     <native-card-body>
         <native-heading level="H2">3. Full interleaving</native-heading>
         <p class="text-sm text-text-secondary mb-3">Commands &rarr; Condition &rarr; Commands &rarr; HTTP &rarr; Condition &rarr; Commands.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s3-btn-all-true", "active=true, count=3")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -227,15 +227,15 @@
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Dispatch("s3-full-interleave", new HttpMixingPayload { Active = false, Count = 0 })))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Header: <span id="s3-header">&mdash;</span></p>
             <p id="s3-pre-badge" hidden class="text-green-600 font-semibold">Pre-HTTP Badge</p>
             <p>Loading: <span id="s3-loading">&mdash;</span></p>
             <p>HTTP result: <span id="s3-http-result">&mdash;</span></p>
             <p id="s3-count" hidden class="text-blue-600 font-semibold">Count Visible</p>
             <p>Footer: <span id="s3-footer">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -244,7 +244,7 @@
     <native-card-body>
         <native-heading level="H2">4. Condition inside OnSuccess</native-heading>
         <p class="text-sm text-text-secondary mb-3">POST &rarr; OnSuccess { SetText + When(active) + SetText }. Inner condition within response handler.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s4-btn-active", "active=true")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -253,14 +253,14 @@
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Dispatch("s4-condition-inside-success", new HttpMixingPayload { Active = false })))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Pre: <span id="s4-pre">&mdash;</span></p>
             <p>Status: <span id="s4-status">&mdash;</span></p>
             <p id="s4-inner-badge" hidden class="text-green-600 font-semibold">Inner Active Badge</p>
             <p>Timestamp: <span id="s4-timestamp">&mdash;</span></p>
             <p>Footer: <span id="s4-footer">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -269,7 +269,7 @@
     <native-card-body>
         <native-heading level="H2">5. ElseIf inside OnSuccess + outer condition</native-heading>
         <p class="text-sm text-text-secondary mb-3">POST classify &rarr; OnSuccess { ElseIf tier ladder } &rarr; outer When(active).</p>
-        <div class="flex flex-wrap gap-2 mb-3">
+        <native-hstack gap="Sm" wrap="true" class="mb-3">
             @(Html.NativeButton("s5-btn-enterprise", "count=200, active=true")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -286,12 +286,12 @@
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Dispatch("s5-elseif-inside-success", new HttpMixingPayload { Count = 3, Active = false })))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Server tier: <span id="s5-server-tier">&mdash;</span></p>
             <p>Client tier: <span id="s5-client-tier">&mdash;</span></p>
             <p id="s5-trial-badge" class="text-amber-600 font-semibold">Trial Badge</p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -300,7 +300,7 @@
     <native-card-body>
         <native-heading level="H2">6. Multiple conditions after HTTP</native-heading>
         <p class="text-sm text-text-secondary mb-3">POST &rarr; When(active) &rarr; When(category=="premium") &rarr; SetText.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s6-btn-active-premium", "active, premium")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -313,13 +313,13 @@
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Dispatch("s6-multi-conditions-after-http", new HttpMixingPayload { Active = false, Category = "premium" })))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Saved: <span id="s6-saved">&mdash;</span></p>
             <p id="s6-active-badge" hidden class="text-green-600 font-semibold">Active Badge</p>
             <p id="s6-premium-label" hidden class="text-purple-600 font-semibold">Premium</p>
             <p>Footer: <span id="s6-footer">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -328,7 +328,7 @@
     <native-card-body>
         <native-heading level="H2">7. Condition inside OnError handler</native-heading>
         <p class="text-sm text-text-secondary mb-3">POST fails &rarr; OnError(400) { When(category=="required") &rarr; specific error message }.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s7-btn-required", "category=required")
                 .CssClass("rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -337,11 +337,11 @@
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Dispatch("s7-condition-in-error", new HttpMixingPayload { Category = "format" })))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Status: <span id="s7-status">&mdash;</span></p>
             <p>Error: <span id="s7-error-msg">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -350,7 +350,7 @@
     <native-card-body>
         <native-heading level="H2">8. And guard inside OnSuccess</native-heading>
         <p class="text-sm text-text-secondary mb-3">POST &rarr; OnSuccess { When(active).And(count &gt; 5) &rarr; Show/Hide }.</p>
-        <div class="flex gap-2 mb-3">
+        <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s8-btn-qualified", "active=true, count=10")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -363,11 +363,11 @@
                 .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Dispatch("s8-and-guard-inside-success", new HttpMixingPayload { Active = false, Count = 10 })))
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Saved: <span id="s8-saved">&mdash;</span></p>
             <p id="s8-qualified" hidden class="text-green-600 font-semibold">Qualified!</p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -378,7 +378,7 @@
             Type a resident name, blur the field, and the real component <code>.Reactive()</code> path will run:
             pre-command &rarr; POST echo &rarr; outer <code>When/Then/Else</code> &rarr; tail command.
         </p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+        <native-grid cols="C2" gap="Base" class="mb-3">
             @{
                 Html.InputField(plan, m => m.ReactiveResidentName, o => o.Label("Resident Name"))
                     .NativeTextBox(b => b
@@ -398,13 +398,13 @@
                             p.Element("s9-tail").SetText("complete");
                         }));
             }
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-grid>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Pre: <span id="s9-pre">&mdash;</span></p>
             <p>HTTP result: <span id="s9-http-result">&mdash;</span></p>
             <p id="s9-badge" hidden class="text-green-600 font-semibold">VIP Badge</p>
             <p>Tail: <span id="s9-tail">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -415,7 +415,7 @@
             Type a follow-up label and blur. The component change posts to the server, then
             <code>OnSuccess</code> runs shared commands around an inner <code>When/Then/Else</code>.
         </p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+        <native-grid cols="C2" gap="Base" class="mb-3">
             @{
                 Html.InputField(plan, m => m.ReactiveFollowUpName, o => o.Label("Follow-up Label"))
                     .NativeTextBox(b => b
@@ -435,13 +435,13 @@
                              }));
                         }));
             }
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-grid>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Pre: <span id="s10-pre">&mdash;</span></p>
             <p>HTTP result: <span id="s10-http-result">&mdash;</span></p>
             <p>Classification: <span id="s10-classification">&mdash;</span></p>
             <p>Tail: <span id="s10-tail">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -452,7 +452,7 @@
             Type an error category and blur. The component change triggers a failing POST, then
             <code>OnError(400)</code> evaluates the supported condition DSL inside the response handler.
         </p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+        <native-grid cols="C2" gap="Base" class="mb-3">
             @{
                 Html.InputField(plan, m => m.ReactiveErrorCategory, o => o.Label("Error Category"))
                     .NativeTextBox(b => b
@@ -473,13 +473,13 @@
                                  }));
                         }));
             }
-        </div>
-        <div class="space-y-1 font-mono text-sm text-text-muted">
+        </native-grid>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
             <p>Pre: <span id="s11-pre">&mdash;</span></p>
             <p>Status: <span id="s11-status">&mdash;</span></p>
             <p>Error: <span id="s11-error-msg">&mdash;</span></p>
             <p>Tail: <span id="s11-tail">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 </native-vstack>

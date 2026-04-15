@@ -39,17 +39,15 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Issue #86 &mdash; Source-Backed Dispatch</native-heading>
-        <native-text color="Secondary">
-            Type a name and city, click Dispatch. The listener shows the live values
-            (source-backed) plus a literal status — including nested Address.City.
-        </native-text>
-    </div>
+    <native-heading level="H1">Issue #86 &mdash; Source-Backed Dispatch</native-heading>
+    <native-text color="Secondary">
+        Type a name and city, click Dispatch. The listener shows the live values
+        (source-backed) plus a literal status — including nested Address.City.
+    </native-text>
 
     <native-card><native-card-body>
         <native-heading level="H2">Input</native-heading>
-        <div class="space-y-3">
+        <native-vstack gap="Sm">
             <div id="@IdGenerator.For<DispatchSourceModel>(m => m.Name)-field"></div>
             <div id="@IdGenerator.For<DispatchSourceModel>(m => m.Address.City)-field"></div>
             @(Html.NativeButton("dispatch-btn", "Dispatch Transfer")
@@ -58,17 +56,17 @@
                 {
                     p.Dispatch("do-transfer");
                 }))
-        </div>
+        </native-vstack>
     </native-card-body></native-card>
 
     <native-card><native-card-body>
         <native-heading level="H2">Listener Output</native-heading>
-        <div class="space-y-2 font-mono text-sm">
+        <native-vstack gap="Sm" class="font-mono text-sm">
             <p>Name (source): <span id="received-name" class="text-text-muted">—</span></p>
             <p>Status (literal): <span id="received-status-value" class="text-text-muted">—</span></p>
             <p>City (nested source): <span id="received-city" class="text-text-muted">—</span></p>
             <p id="received-result" class="text-text-muted">Waiting for dispatch...</p>
-        </div>
+        </native-vstack>
     </native-card-body></native-card>
 </native-vstack>
 

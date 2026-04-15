@@ -13,18 +13,16 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Scenario 3b — AJAX-Loaded Partials</native-heading>
-        <native-text color="Secondary">
-            Address fields load dynamically when "Custom Address" is selected.
-            Before loading: unenriched validation fields. After loading: inline validation.
-        </native-text>
-    </div>
+    <native-heading level="H1">Scenario 3b — AJAX-Loaded Partials</native-heading>
+    <native-text color="Secondary">
+        Address fields load dynamically when "Custom Address" is selected.
+        Before loading: unenriched validation fields. After loading: inline validation.
+    </native-text>
 
     <form id="resident-form" class="rounded-lg border border-border bg-white p-6 shadow-sm space-y-4">
         <h2 class="text-base font-semibold mb-2">Basic Information (Parent)</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <native-grid cols="C2" gap="Base">
             @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
                .NativeTextBox(b => b
                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
@@ -39,7 +37,7 @@
                .NativeTextBox(b => b
                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
                    .Placeholder("Confirm email")); }
-        </div>
+        </native-grid>
 
         <h2 class="text-base font-semibold mb-2 mt-6">Address Type</h2>
 
@@ -60,7 +58,7 @@
 
         <div id="address-container" class="mt-4"></div>
 
-        <div class="mt-6 flex items-center gap-4">
+        <native-hstack gap="Base" class="mt-6">
             @(Html.NativeButton("submit-btn", "Submit Admission")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -76,7 +74,7 @@
                 }))
 
             <p id="result" class="text-sm text-text-muted"></p>
-        </div>
+        </native-hstack>
     </form>
 </native-vstack>
 

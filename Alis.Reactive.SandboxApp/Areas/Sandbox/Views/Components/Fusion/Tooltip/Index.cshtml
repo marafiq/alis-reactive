@@ -1,0 +1,120 @@
+@model TooltipModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "FusionTooltip";
+
+    var plan = Html.ReactivePlan<TooltipModel>();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionTooltip — Full API</native-heading>
+    <native-text color="Secondary">
+        Non-input display component. Exercises Open / Close methods and BeforeRender, BeforeOpen,
+        Opened, BeforeClose, Closed events. Senior living domain: describing care-level differences on hover.
+    </native-text>
+
+    <!-- Section 1: Target element -->
+    <native-card><native-card-body>
+        <native-heading level="H2">1. Tooltip Target</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Hover the care level below to open the tooltip attached via <code>Target("#care-level-target")</code>.
+        </p>
+
+        <p id="care-level-target" class="inline-block rounded-md border border-border bg-surface-muted px-3 py-2 text-sm font-medium">
+            Memory Care
+        </p>
+    </native-card-body></native-card>
+
+    <!-- Section 2: The Tooltip Component -->
+    <native-card><native-card-body>
+        <native-heading level="H2">2. Tooltip Component</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Opens on hover. The reactive wiring updates the event log when each lifecycle event fires.
+        </p>
+
+        @(Html.FusionTooltip(plan, "care-level-tooltip", b =>
+        {
+            b.Target("#care-level-target");
+            b.Content("24/7 staff, secure environment, assistance with activities of daily living.");
+            b.Position(Syncfusion.EJ2.Popups.Position.TopCenter);
+            b.OpensOn("Hover");
+            b.Width("260px");
+            b.ShowTipPointer(true);
+        })
+        .Reactive(evt => evt.BeforeRender, (_, p) =>
+        {
+            p.Element("tooltip-before-render").SetText("beforeRender fired");
+        })
+        .Reactive(evt => evt.BeforeOpen, (_, p) =>
+        {
+            p.Element("tooltip-before-open").SetText("beforeOpen fired");
+        })
+        .Reactive(evt => evt.Opened, (_, p) =>
+        {
+            p.Element("tooltip-opened").SetText("opened");
+        })
+        .Reactive(evt => evt.BeforeClose, (_, p) =>
+        {
+            p.Element("tooltip-before-close").SetText("beforeClose fired");
+        })
+        .Reactive(evt => evt.Closed, (_, p) =>
+        {
+            p.Element("tooltip-closed").SetText("closed");
+        }))
+    </native-card-body></native-card>
+
+    <!-- Section 3: Open programmatically -->
+    <native-card><native-card-body>
+        <native-heading level="H2">3. Open the Tooltip (Open method)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Calls <code>Component&lt;FusionTooltip&gt;("care-level-tooltip").Open()</code>.
+        </p>
+
+        @(Html.NativeButton("open-tooltip-btn", "Open Tooltip")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                p.Component<FusionTooltip>("care-level-tooltip").Open();
+            }))
+    </native-card-body></native-card>
+
+    <!-- Section 4: Close programmatically -->
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Close the Tooltip (Close method)</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Calls <code>Component&lt;FusionTooltip&gt;("care-level-tooltip").Close()</code>.
+        </p>
+
+        @(Html.NativeButton("close-tooltip-btn", "Close Tooltip")
+            .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                p.Component<FusionTooltip>("care-level-tooltip").Close();
+            }))
+    </native-card-body></native-card>
+
+    <!-- Section 5: Event Log -->
+    <native-card><native-card-body>
+        <native-heading level="H2">5. Event Log</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Each lifecycle event updates its own status line as the tooltip opens and closes.
+        </p>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>BeforeRender: <span id="tooltip-before-render" class="text-text-muted">&mdash;</span></p>
+            <p>BeforeOpen:   <span id="tooltip-before-open" class="text-text-muted">&mdash;</span></p>
+            <p>Opened:       <span id="tooltip-opened" class="text-text-muted">&mdash;</span></p>
+            <p>BeforeClose:  <span id="tooltip-before-close" class="text-text-muted">&mdash;</span></p>
+            <p>Closed:       <span id="tooltip-closed" class="text-text-muted">&mdash;</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON — always last -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -16,16 +16,16 @@
         .FirstOrDefault(s => s.Id == Model.ShiftId)?.Text ?? "Unknown Shift";
 }
 
-<div class="p-4 space-y-4">
+<native-vstack gap="Base" class="p-4">
     @{
         DateTimeOffset.TryParse(Model.StartTime, out var startDto);
         DateTimeOffset.TryParse(Model.EndTime, out var endDto);
     }
-    <div class="text-sm text-text-secondary space-y-1">
+    <native-vstack gap="Xs" class="text-sm text-text-secondary">
         <p><span class="font-medium">Shift:</span> @shiftName</p>
         <p><span class="font-medium">Start:</span> @startDto.LocalDateTime.ToString("MMM d, yyyy h:mm tt")</p>
         <p><span class="font-medium">End:</span> @endDto.LocalDateTime.ToString("MMM d, yyyy h:mm tt")</p>
-    </div>
+    </native-vstack>
 
     <form id="new-assignment-form" class="space-y-3">
         @Html.HiddenFieldFor(plan, m => m.StartTime)
@@ -33,7 +33,7 @@
         @Html.HiddenFieldFor(plan, m => m.ShiftId)
         @Html.HiddenFieldFor(plan, m => m.FacilityId)
 
-        <div class="space-y-3">
+        <native-vstack gap="Sm">
             @{ Html.InputField(plan, m => m.StaffId, o => o.Required().Label("Staff Member"))
                 .FusionDropDownList(b => b
                     .Placeholder("Select staff member")
@@ -42,9 +42,9 @@
 
             @{ Html.InputField(plan, m => m.Notes, o => o.Label("Care Notes"))
                 .NativeTextArea(b => b.Rows(3).Placeholder("Care instructions, special requirements...")); }
-        </div>
+        </native-vstack>
 
-        <div class="flex gap-3 pt-2">
+        <native-hstack gap="Sm" class="pt-2">
             @(Html.NativeButton("btn-create-assignment", "Create Assignment")
                 .CssClass("px-4 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent/90")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -72,11 +72,11 @@
                 {
                     p.Component<FusionDialog>("new-assignment-dialog").Hide();
                 }))
-        </div>
+        </native-hstack>
 
         <p id="new-assignment-status" class="text-sm text-text-muted"></p>
     </form>
-</div>
+</native-vstack>
 
 @Html.EJS().ScriptManager()
 @Html.RenderPlan(plan)

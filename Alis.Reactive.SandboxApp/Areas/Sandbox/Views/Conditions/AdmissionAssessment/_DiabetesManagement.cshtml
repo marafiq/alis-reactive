@@ -15,8 +15,7 @@
         Insulin-dependent residents require schedule details.
     </p>
 
-    <!-- Row 1: Diabetes Type + A1C Level -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+    <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.DiabetesType, o => o.Label("Diabetes Type"))
             .FusionDropDownList(b => b
                 .DataSource(new[] { "Type 1", "Type 2" })
@@ -50,10 +49,9 @@
                             e.Element("uncontrolled-result").Show();
                         });
                 })); }
-    </div>
+    </native-grid>
 
-    <!-- Row 2: Insulin Dependent -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+    <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.InsulinDependent, o => o.Label("Insulin Dependent"))
             .FusionSwitch(b => b
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
@@ -63,23 +61,21 @@
                         .Then(t => t.Element("insulin-details").Show())
                         .Else(e => e.Element("insulin-details").Hide());
                 })); }
-    </div>
+    </native-grid>
 
-    <!-- Status echoes -->
-    <div class="font-mono text-sm space-y-1 mb-4">
+    <native-vstack gap="Xs" class="font-mono text-sm mb-4">
         <p>A1C: <span id="a1c-echo" class="text-text-muted">&mdash;</span></p>
         <p><span id="uncontrolled-spinner" hidden class="text-accent">Sending alert...</span></p>
         <div id="uncontrolled-result" hidden class="rounded-md bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-700"></div>
-    </div>
+    </native-vstack>
 
-    <!-- Insulin details (conditionally visible) -->
     <div id="insulin-details" hidden>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.InsulinSchedule, o => o.Label("Insulin Schedule"))
                 .FusionDropDownList(b => b
                     .DataSource(new[] { "Once daily", "Twice daily", "Before meals", "Sliding scale" })
                     .Placeholder("Select schedule")); }
-        </div>
+        </native-grid>
     </div>
 
 </native-card-body></native-card>

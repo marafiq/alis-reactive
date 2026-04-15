@@ -117,24 +117,22 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Array Plugin</native-heading>
-        <native-text color="Secondary">
-            Native JS array methods exposed to the DSL via plugin. Proves all 4 method patterns.
-        </native-text>
-    </div>
+    <native-heading level="H1">Array Plugin</native-heading>
+    <native-text color="Secondary">
+        Native JS array methods exposed to the DSL via plugin. Proves all 4 method patterns.
+    </native-text>
 
     <native-card>
     <native-card-body>
         <native-heading level="H2">DomReady: Array Operations on Server Data</native-heading>
-        <div id="arr-results" class="space-y-2 font-mono text-sm text-text-muted">
+        <native-vstack gap="Sm" id="arr-results" class="font-mono text-sm text-text-muted">
             <p>Total: <span id="arr-total">—</span></p>
             <p>First Name: <span id="arr-first-name">—</span></p>
             <p>Active Count: <span id="arr-active-count">—</span></p>
             <p>Total Age: <span id="arr-total-age">—</span></p>
             <p id="arr-has-critical" hidden class="text-red-600">Critical residents found!</p>
             <p id="arr-no-critical" hidden class="text-green-600">No critical residents ✓</p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -143,10 +141,10 @@
         <native-heading level="H2">HTTP: Plugin Values in Gather + Header</native-heading>
         @(Html.NativeButton("arr-send-btn", "Send to Server")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
-        <div id="arr-echo-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+        <native-vstack gap="Sm" id="arr-echo-result" class="mt-3 font-mono text-sm text-text-muted">
             <p>Count: <span id="arr-echo-count">—</span></p>
             <p>Header: <span id="arr-echo-header">—</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -156,12 +154,12 @@
         <native-heading level="H2">Button: Filter Active — All 5 Methods + Conditions</native-heading>
         @(Html.NativeButton("arr-filter-btn", "Filter Active & Inspect")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
-        <div id="arr-f-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
+        <native-vstack gap="Sm" id="arr-f-result" class="mt-3 font-mono text-sm text-text-muted">
             <p>Active Count: <span id="arr-f-count">—</span></p>
             <p>Active Age Sum: <span id="arr-f-age-sum">—</span></p>
             <p>First Active Name: <span id="arr-f-first">—</span></p>
             <p>Some Active: <span id="arr-f-some">—</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 

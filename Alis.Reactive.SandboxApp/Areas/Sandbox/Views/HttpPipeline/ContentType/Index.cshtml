@@ -56,13 +56,11 @@
 }
 
 <native-vstack gap="Lg">
-    <div>
-        <native-heading level="H1">Content-Type Aware Success Handlers</native-heading>
-        <native-text color="Secondary">
-            JSON responses use <code>OnSuccess&lt;T&gt;</code> with typed path walking via <code>ResponseBody&lt;T&gt;</code>.
-            HTML partials use <code>Into</code> with <code>ej.base.append</code>.
-        </native-text>
-    </div>
+    <native-heading level="H1">Content-Type Aware Success Handlers</native-heading>
+    <native-text color="Secondary">
+        JSON responses use <code>OnSuccess&lt;T&gt;</code> with typed path walking via <code>ResponseBody&lt;T&gt;</code>.
+        HTML partials use <code>Into</code> with <code>ej.base.append</code>.
+    </native-text>
 
     <!-- Section 1: Flat JSON Response -->
     <native-card>
@@ -78,11 +76,11 @@
             {
                 p.Dispatch("fetch-flat");
             }))
-        <div class="font-mono text-sm space-y-1">
+        <native-vstack gap="Xs" class="font-mono text-sm">
             <p id="flat-spinner" hidden class="text-amber-600">Loading...</p>
             <p>Message: <span id="flat-message" class="text-text-muted">&mdash;</span></p>
             <p>Count: <span id="flat-count" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -100,12 +98,12 @@
             {
                 p.Dispatch("fetch-nested");
             }))
-        <div class="font-mono text-sm space-y-1">
+        <native-vstack gap="Xs" class="font-mono text-sm">
             <p id="nested-spinner" hidden class="text-amber-600">Loading...</p>
             <p>Name: <span id="nested-name" class="text-text-muted">&mdash;</span></p>
             <p>Email: <span id="nested-email" class="text-text-muted">&mdash;</span></p>
             <p>Total: <span id="nested-total" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </native-card-body>
     </native-card>
 
@@ -124,9 +122,7 @@
             {
                 p.Dispatch("fetch-partial");
             }))
-        <div class="font-mono text-sm">
-            <p id="partial-spinner" hidden class="text-amber-600">Loading partial...</p>
-        </div>
+        <p id="partial-spinner" hidden class="font-mono text-sm text-amber-600">Loading partial...</p>
         <div id="partial-container" class="mt-3 rounded-md border border-dashed border-border p-4">
             <p class="text-text-muted text-sm">Partial not loaded yet</p>
         </div>
