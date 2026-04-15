@@ -21,12 +21,19 @@
         <Content Include="Schemas\**\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
-    <!-- Ship JS/CSS as NuGet content files with a configurable output path -->
+    <!-- Ship JS/CSS as NuGet content files with a configurable output path.
+         PackagePath uses explicit file paths (not folder paths with trailing slashes)
+         so the packed entries never contain an empty path segment. A trailing
+         backslash like PackagePath="buildTransitive\" produced ZIP entries such as
+         buildTransitive//AlisReactive.targets which are normalized on macOS/Linux
+         during NuGet extraction but are NOT normalized on Windows — leaving the
+         targets file at a location that does not match NuGet's auto-import
+         convention, so consumers silently get no assets in wwwroot. -->
     <ItemGroup>
-        <None Include="assets\js\alis-reactive.js" Pack="true" PackagePath="buildTransitive\assets\js\" />
-        <None Include="assets\css\design-system.css" Pack="true" PackagePath="buildTransitive\assets\css\" />
-        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="buildTransitive\" />
-        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="build\" />
+        <None Include="assets\js\alis-reactive.js" Pack="true" PackagePath="buildTransitive\assets\js\alis-reactive.js" />
+        <None Include="assets\css\design-system.css" Pack="true" PackagePath="buildTransitive\assets\css\design-system.css" />
+        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.targets" />
+        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="build\AlisReactive.targets" />
     </ItemGroup>
 
     <!--
