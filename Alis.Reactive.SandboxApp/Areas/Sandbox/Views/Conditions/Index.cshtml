@@ -13,7 +13,7 @@
             <span class="w-1 h-6 rounded-full bg-[#7A2E3B]"></span>
             <native-heading level="H2">Syntax &amp; Routing</native-heading>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <native-grid cols="C2" gap="Base">
             <a asp-area="Sandbox" asp-controller="Guards" asp-action="Index"
                class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
                 <native-hstack justify="Between" align="Start">
@@ -78,7 +78,7 @@
                     Branch on HTTP response status codes — approve, deny, pending, fail — with status-driven DOM updates.
                 </p>
             </a>
-        </div>
+        </native-grid>
     </section>
 
     <section>
@@ -86,7 +86,7 @@
             <span class="w-1 h-6 rounded-full bg-[#D4A053]"></span>
             <native-heading level="H2">Component Reactions</native-heading>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <native-grid cols="C3" gap="Base">
             <a asp-area="Sandbox" asp-controller="NumericCondition" asp-action="Index"
                class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
                 <native-hstack justify="Between" align="Start">
@@ -125,7 +125,7 @@
                     Cross-component value reactions driven by care-level selection, component updates, and membership-based branching.
                 </p>
             </a>
-        </div>
+        </native-grid>
     </section>
 
     <section>
@@ -133,7 +133,7 @@
             <span class="w-1 h-6 rounded-full bg-[#2563EB]"></span>
             <native-heading level="H2">Workflow Slices</native-heading>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <native-grid cols="C2" gap="Base">
             <a asp-area="Sandbox" asp-controller="AdmissionAssessment" asp-action="Index"
                class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
                 <native-hstack justify="Between" align="Start">
@@ -159,6 +159,6 @@
                     Verify that pipeline commands fire in declaration order even when interleaved with conditions, HTTP calls, and dispatch events.
                 </p>
             </a>
-        </div>
+        </native-grid>
     </section>
 </native-vstack>
