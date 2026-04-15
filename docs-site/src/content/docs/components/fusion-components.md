@@ -1041,9 +1041,9 @@ A tab strip for separating related content into browsable panels -- residents, s
 
 Pass `TabItem` instances to `.Items(...)` inside the builder callback. Each item has a `Header` (with `Text`) and a `Content` string (raw HTML). The element ID you pass as the second argument is what you use later to target the tab from the pipeline.
 
-```csharp
-@(Html.FusionTab(plan, "demo-tab", b => b
-    .Items(new List<TabItem>
+```cshtml
+@{
+    var tabItems = new List<TabItem>
     {
         new TabItem { Header = new TabHeader { Text = "Residents" },
             Content = "<div class='p-4'><p class='text-sm'>Resident management content. Lists all residents in the facility with care level assignments.</p></div>" },
@@ -1053,10 +1053,14 @@ Pass `TabItem` instances to `.Items(...)` inside the builder callback. Each item
             Content = "<div class='p-4'><p class='text-sm'>Facility details and room availability. Manage wings, rooms, and occupancy tracking.</p></div>" },
         new TabItem { Header = new TabHeader { Text = "Reports" },
             Content = "<div class='p-4'><p class='text-sm'>Monthly compliance and care reports. Track medication schedules, incident reports, and audit logs.</p></div>" }
-    })))
+    };
+}
+
+@(Html.FusionTab(plan, "demo-tab", b => b
+    .Items(tabItems)))
 ```
 
-The whole expression returns `IHtmlContent`, so it is wrapped in `@(...)` rather than `@{ ... }`. `TabItem` and `TabHeader` come from `Syncfusion.EJ2.Navigations`, so the view needs `@using Syncfusion.EJ2.Navigations` alongside the reactive namespaces.
+The `@{ var tabItems = ...; }` block declares the list as a Razor-level local; the `@(Html.FusionTab(...))` expression then renders the component. `TabItem` and `TabHeader` come from `Syncfusion.EJ2.Navigations`, so the view needs `@using Syncfusion.EJ2.Navigations` alongside the reactive namespaces.
 
 ### How do I react to a tab selection?
 
@@ -1064,17 +1068,7 @@ The `Selected` event args expose `SelectedIndex` (zero-based), `PreviousIndex` (
 
 ```csharp
 @(Html.FusionTab(plan, "demo-tab", b => b
-    .Items(new List<TabItem>
-    {
-        new TabItem { Header = new TabHeader { Text = "Residents" },
-            Content = "<div class='p-4'><p class='text-sm'>Resident management content. Lists all residents in the facility with care level assignments.</p></div>" },
-        new TabItem { Header = new TabHeader { Text = "Staff" },
-            Content = "<div class='p-4'><p class='text-sm'>Staff scheduling and assignments. View shift rotations and caregiver-to-resident ratios.</p></div>" },
-        new TabItem { Header = new TabHeader { Text = "Facilities" },
-            Content = "<div class='p-4'><p class='text-sm'>Facility details and room availability. Manage wings, rooms, and occupancy tracking.</p></div>" },
-        new TabItem { Header = new TabHeader { Text = "Reports" },
-            Content = "<div class='p-4'><p class='text-sm'>Monthly compliance and care reports. Track medication schedules, incident reports, and audit logs.</p></div>" }
-    }))
+    .Items(tabItems))
     .Reactive(evt => evt.Selected, (args, p) =>
     {
         p.Element("selected-index").SetText(args, x => x.SelectedIndex);
