@@ -27,15 +27,13 @@
     }));
 }
 
-<div class="space-y-8">
-    <div>
-        <h1 class="text-2xl font-bold tracking-tight">Cascading DropDownList</h1>
-        <p class="mt-2 text-text-secondary">
-            Demonstrates cascading dropdowns: Country selection triggers HTTP GET to load cities.
-            Uses SetDataSource + DataBind to update the child dropdown with response data.
-            Senior living domain: facility location selection.
-        </p>
-    </div>
+<native-vstack gap="Lg">
+    <native-heading level="H1">Cascading DropDownList</native-heading>
+    <native-text color="Secondary">
+        Demonstrates cascading dropdowns: Country selection triggers HTTP GET to load cities.
+        Uses SetDataSource + DataBind to update the child dropdown with response data.
+        Senior living domain: facility location selection.
+    </native-text>
 
     <!-- Section 1: Parent Dropdown (Country) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
@@ -85,11 +83,11 @@
                     p.Element("selected-city").SetText(args, x => x.Value);
                     p.Element("selected-city").RemoveClass("text-text-muted");
                 })); }
-        <div class="font-mono text-sm mt-2 space-y-1">
+        <native-vstack gap="Xs" class="font-mono text-sm mt-2">
             <p>Cascade status: <span id="cascade-status" class="text-text-muted">&mdash;</span></p>
             <p>City count: <span id="city-count" class="text-text-muted">&mdash;</span></p>
             <p>Selected city: <span id="selected-city" class="text-text-muted">&mdash;</span></p>
-        </div>
+        </native-vstack>
     </section>
 
     <!-- Section 3: Submit Both -->
@@ -104,9 +102,7 @@
             {
                 p.Dispatch("do-save");
             }))
-        <div class="font-mono text-sm mt-2">
-            <p>Result: <span id="save-result" class="text-text-muted">&mdash;</span></p>
-        </div>
+        <p class="font-mono text-sm mt-2">Result: <span id="save-result" class="text-text-muted">&mdash;</span></p>
     </section>
 
     <!-- Plan JSON -->
@@ -114,6 +110,6 @@
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
     </section>
-</div>
+</native-vstack>
 
 @Html.RenderPlan(plan)
