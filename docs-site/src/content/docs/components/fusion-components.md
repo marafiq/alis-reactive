@@ -115,7 +115,7 @@ A color picker for facility branding -- theme color, accent color, and other pal
 
 ```csharp
 @{ Html.InputField(plan, m => m.ThemeColor, o => o.Label("Theme Color"))
-    .FusionColorPicker(b => b); }
+    .FusionColorPicker(b => { }); }
 ```
 
 The `b` builder exposes `.Reactive(plan, evt => evt.Changed, ...)` for wiring the Changed event -- see the next question for the full pattern.
@@ -131,6 +131,17 @@ The `b` builder exposes `.Reactive(plan, evt => evt.Changed, ...)` for wiring th
             p.When(args, x => x.Value).Eq("#e11d48ff")
                 .Then(t => t.Element("args-condition").SetText("rose selected"))
                 .Else(e => e.Element("args-condition").SetText("other color"));
+            var comp = p.Component<FusionColorPicker>(m => m.ThemeColor);
+            p.When(comp.Value()).NotEmpty()
+                .Then(then =>
+                {
+                    then.Element("selected-indicator").Show();
+                    then.Element("selected-indicator").SetText("color active");
+                })
+                .Else(else_ =>
+                {
+                    else_.Element("selected-indicator").Hide();
+                });
         })); }
 ```
 
