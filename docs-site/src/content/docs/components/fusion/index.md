@@ -15,35 +15,35 @@ Each component has its own page. Pick the one you need.
 
 Bind a model property to a Syncfusion input. Rendered through `Html.InputField(plan, m => m.X).FusionX(b => ...)`.
 
-- [AutoComplete](/alis-reactive/components/fusion/auto-complete/) -- text input with server-side filtering
-- [DropDownList](/alis-reactive/components/fusion/dropdown-list/) -- single-select with search and cascade
-- [MultiSelect](/alis-reactive/components/fusion/multi-select/) -- multi-select with `string[]` value
-- [MultiColumnComboBox](/alis-reactive/components/fusion/multi-column-combobox/) -- combo with multi-column dropdown
-- [NumericTextBox](/alis-reactive/components/fusion/numeric-textbox/) -- numeric with spin buttons
-- [DatePicker](/alis-reactive/components/fusion/date-picker/) -- date only
-- [DateTimePicker](/alis-reactive/components/fusion/date-time-picker/) -- date and time
-- [TimePicker](/alis-reactive/components/fusion/time-picker/) -- time only
-- [DateRangePicker](/alis-reactive/components/fusion/date-range-picker/) -- start and end dates
-- [ColorPicker](/alis-reactive/components/fusion/color-picker/) -- hex color input
-- [Switch](/alis-reactive/components/fusion/switch/) -- toggle
-- [InputMask](/alis-reactive/components/fusion/input-mask/) -- format-enforced text input
-- [RichTextEditor](/alis-reactive/components/fusion/rich-text-editor/) -- WYSIWYG editor
-- [FileUpload](/alis-reactive/components/fusion/file-upload/) -- multi-file picker
+- [AutoComplete](./auto-complete/) -- text input with server-side filtering
+- [DropDownList](./dropdown-list/) -- single-select with search and cascade
+- [MultiSelect](./multi-select/) -- multi-select with `string[]` value
+- [MultiColumnComboBox](./multi-column-combobox/) -- combo with multi-column dropdown
+- [NumericTextBox](./numeric-textbox/) -- numeric with spin buttons
+- [DatePicker](./date-picker/) -- date only
+- [DateTimePicker](./date-time-picker/) -- date and time
+- [TimePicker](./time-picker/) -- time only
+- [DateRangePicker](./date-range-picker/) -- start and end dates
+- [ColorPicker](./color-picker/) -- hex color input
+- [Switch](./switch/) -- toggle
+- [InputMask](./input-mask/) -- format-enforced text input
+- [RichTextEditor](./rich-text-editor/) -- WYSIWYG editor
+- [FileUpload](./file-upload/) -- multi-file picker
 
 ## Surfaces and containers
 
 Components that organize content on the page. Rendered directly; no `InputField` wrapper.
 
-- [Accordion](/alis-reactive/components/fusion/accordion/) -- collapsible panels
-- [Tab](/alis-reactive/components/fusion/tab/) -- tab strip with per-panel content
-- [Grid](/alis-reactive/components/fusion/grid/) -- data grid with server-side sort, page, filter
-- [Schedule](/alis-reactive/components/fusion/schedule/) -- calendar, resource planning, CRUD
-- [Dialog](/alis-reactive/components/fusion/dialog/) -- modal popup for confirmations and forms
-- [Tooltip](/alis-reactive/components/fusion/tooltip/) -- hover hint on a target element
+- [Accordion](./accordion/) -- collapsible panels
+- [Tab](./tab/) -- tab strip with per-panel content
+- [Grid](./grid/) -- data grid with server-side sort, page, filter
+- [Schedule](./schedule/) -- calendar, resource planning, CRUD
+- [Dialog](./dialog/) -- modal popup for confirmations and forms
+- [Tooltip](./tooltip/) -- hover hint on a target element
 
 ## App-level singletons
 
 Rendered once in the layout. Called from any plan without a model expression.
 
-- [Toast](/alis-reactive/components/fusion/toast/) -- transient notifications (success, warn, danger, info)
-- [Confirm](/alis-reactive/components/fusion/confirm/) -- confirmation dialog
+- [Toast](./toast/) -- transient notifications (success, warn, danger, info)
+- [Confirm](./confirm/) -- confirmation dialog

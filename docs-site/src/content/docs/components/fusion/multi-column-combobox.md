@@ -9,7 +9,7 @@ A combo box that shows multiple columns inside its dropdown. Use it when picking
 
 **Model type:** `string` &nbsp; **ReadExpr:** `"value"` &nbsp; **Events:** `Changed`
 
-Shares the same data-source + cascade vocabulary as [DropDownList](/alis-reactive/components/fusion/dropdown-list/) -- the difference is purely visual (multi-column layout in the popup).
+Shares the same data-source + cascade vocabulary as [DropDownList](./dropdown-list/) -- the difference is purely visual (multi-column layout in the popup).
 
 ## Reference
 
