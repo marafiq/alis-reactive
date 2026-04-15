@@ -100,7 +100,7 @@
                 Each button enters the same branch chain. The winning branch dispatches a different event, and only the routed listener updates the visible result.
             </p>
 
-            <div class="flex flex-wrap gap-2 mb-4">
+            <native-hstack gap="Sm" wrap="true" class="mb-4">
                 @(Html.NativeButton("btn-escalation-isolation", "Isolation Review")
                     .CssClass("px-3 py-1.5 rounded bg-rose-700 text-white text-xs font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -136,30 +136,30 @@
                             ManualOverride = false
                         });
                     }))
-            </div>
+            </native-hstack>
 
-            <div class="space-y-2 text-xs font-mono">
-                <div class="flex justify-between">
+            <native-vstack gap="Sm" class="text-xs font-mono">
+                <native-hstack gap="None" justify="Between">
                     <span class="text-text-secondary">Shared precheck</span>
                     <span id="trigger-precheck">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
+                </native-hstack>
+                <native-hstack gap="None" justify="Between">
                     <span class="text-text-secondary">Audit</span>
                     <span id="trigger-audit">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
+                </native-hstack>
+                <native-hstack gap="None" justify="Between">
                     <span class="text-text-secondary">Result</span>
                     <span id="trigger-result">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
+                </native-hstack>
+                <native-hstack gap="None" justify="Between">
                     <span class="text-text-secondary">Badge</span>
                     <span id="trigger-badge" hidden>&mdash;</span>
-                </div>
-                <div class="flex justify-between">
+                </native-hstack>
+                <native-hstack gap="None" justify="Between">
                     <span class="text-text-secondary">Summary</span>
                     <span id="trigger-summary">&mdash;</span>
-                </div>
-            </div>
+                </native-hstack>
+            </native-vstack>
         </native-card-body>
     </native-card>
 
@@ -170,7 +170,7 @@
                 Changing any input re-runs the same branch chain from component sources. The routed event determines the visible outcome.
             </p>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            <native-grid cols="C3" gap="Base" class="mb-4">
                 @{ Html.InputField(plan, m => m.AssessmentScore, o => o.Label("Assessment Score"))
                     .FusionNumericTextBox(b => b
                         .Min(0).Max(100).Step(1)
@@ -217,7 +217,7 @@
                         {
                             p.Dispatch("refresh-component-routing");
                         })); }
-            </div>
+            </native-grid>
 
             @{
                 Html.On(plan, t => t.CustomEvent("refresh-component-routing", p =>
@@ -248,28 +248,28 @@
                 }));
             }
 
-            <div class="space-y-2 text-xs font-mono">
-                <div class="flex justify-between">
+            <native-vstack gap="Sm" class="text-xs font-mono">
+                <native-hstack gap="None" justify="Between">
                     <span class="text-text-secondary">Shared precheck</span>
                     <span id="component-precheck">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
+                </native-hstack>
+                <native-hstack gap="None" justify="Between">
                     <span class="text-text-secondary">Audit</span>
                     <span id="component-audit">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
+                </native-hstack>
+                <native-hstack gap="None" justify="Between">
                     <span class="text-text-secondary">Result</span>
                     <span id="component-result">&mdash;</span>
-                </div>
-                <div class="flex justify-between">
+                </native-hstack>
+                <native-hstack gap="None" justify="Between">
                     <span class="text-text-secondary">Badge</span>
                     <span id="component-badge" hidden>&mdash;</span>
-                </div>
-                <div class="flex justify-between">
+                </native-hstack>
+                <native-hstack gap="None" justify="Between">
                     <span class="text-text-secondary">Summary</span>
                     <span id="component-summary">&mdash;</span>
-                </div>
-            </div>
+                </native-hstack>
+            </native-vstack>
         </native-card-body>
     </native-card>
 
