@@ -870,11 +870,6 @@ Html.On(plan, t => t.DomReady(p =>
                 IsAllDay = new ScheduleFieldOptions { Name = "isAllDay" },
             },
         });
-        b.QuickInfoTemplates(new ScheduleQuickInfoTemplates
-        {
-            Content = quickInfoContent,
-            Footer = quickInfoFooter,
-        });
         b.WorkHours(new ScheduleWorkHours { Highlight = true, Start = "06:00", End = "22:00" });
         b.StartHour("05:00"); b.EndHour("23:00");
         b.TimeScale(new ScheduleTimeScale { Enable = true, Interval = 60, SlotCount = 1 });
@@ -920,11 +915,6 @@ Chain `.Reactive(evt => evt.CellClicked, ...)` onto the schedule. The event args
                 Description = new ScheduleFieldOptions { Name = "description" },
                 IsAllDay = new ScheduleFieldOptions { Name = "isAllDay" },
             },
-        });
-        b.QuickInfoTemplates(new ScheduleQuickInfoTemplates
-        {
-            Content = quickInfoContent,
-            Footer = quickInfoFooter,
         });
         b.WorkHours(new ScheduleWorkHours { Highlight = true, Start = "06:00", End = "22:00" });
         b.StartHour("05:00"); b.EndHour("23:00");
@@ -988,11 +978,6 @@ Chain `.Reactive(evt => evt.ActionComplete, ...)` onto the schedule. Syncfusion 
                 IsAllDay = new ScheduleFieldOptions { Name = "isAllDay" },
             },
         });
-        b.QuickInfoTemplates(new ScheduleQuickInfoTemplates
-        {
-            Content = quickInfoContent,
-            Footer = quickInfoFooter,
-        });
         b.WorkHours(new ScheduleWorkHours { Highlight = true, Start = "06:00", End = "22:00" });
         b.StartHour("05:00"); b.EndHour("23:00");
         b.TimeScale(new ScheduleTimeScale { Enable = true, Interval = 60, SlotCount = 1 });
@@ -1020,6 +1005,8 @@ Chain `.Reactive(evt => evt.ActionComplete, ...)` onto the schedule. Syncfusion 
          });
     }))
 ```
+
+The sandbox view also wires `PopupOpen` (to cancel Syncfusion's built-in QuickInfo popup with `args.PreventDefault(t)`), `ActionBegin`, `Navigating`, `EventClicked`, `PopupClose`, `DataBound`, and `EventRendered` -- see `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Schedule/Index.cshtml` for the full event surface.
 
 ### Mutation extensions
 
