@@ -28,12 +28,22 @@
          buildTransitive//AlisReactive.targets which are normalized on macOS/Linux
          during NuGet extraction but are NOT normalized on Windows — leaving the
          targets file at a location that does not match NuGet's auto-import
-         convention, so consumers silently get no assets in wwwroot. -->
+         convention, so consumers silently get no assets in wwwroot.
+
+         Assets AND targets are packed under BOTH build\ and buildTransitive\.
+         - build\          : required by net48 projects using packages.config
+                             (classic NuGet only auto-imports build\*.targets and
+                             resolves $(MSBuildThisFileDirectory)assets\* relative
+                             to that folder).
+         - buildTransitive\: required so PackageReference consumers flow the
+                             targets + assets through transitive dependencies. -->
     <ItemGroup>
+        <None Include="assets\js\alis-reactive.js" Pack="true" PackagePath="build\assets\js\alis-reactive.js" />
+        <None Include="assets\css\design-system.css" Pack="true" PackagePath="build\assets\css\design-system.css" />
         <None Include="assets\js\alis-reactive.js" Pack="true" PackagePath="buildTransitive\assets\js\alis-reactive.js" />
         <None Include="assets\css\design-system.css" Pack="true" PackagePath="buildTransitive\assets\css\design-system.css" />
-        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.targets" />
         <None Include="build\AlisReactive.targets" Pack="true" PackagePath="build\AlisReactive.targets" />
+        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.targets" />
     </ItemGroup>
 
     <!--

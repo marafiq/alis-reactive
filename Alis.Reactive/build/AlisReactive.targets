@@ -3,32 +3,54 @@
   <!--
     Alis.Reactive static assets (JS + CSS) — versioned filenames.
 
-    Defaults (auto-detected by framework):
-      net10.0+  JS  → wwwroot/scripts/alis-reactive.{version}.js
-                CSS → wwwroot/css/design-system.{version}.css
-      net48     JS  → Scripts/alis-reactive.{version}.js
-                CSS → Content/css/design-system.{version}.css
+    Defaults (auto-detected from $(TargetFrameworkIdentifier)):
+      .NETFramework (classic ASP.NET MVC or SDK-style net48):
+                JS  → Content\alisreactive\alis-reactive.{version}.js
+                CSS → Content\alisreactive\design-system.{version}.css
+      .NETCoreApp (net10.0+):
+                JS  → wwwroot\scripts\alis-reactive.{version}.js
+                CSS → wwwroot\css\design-system.{version}.css
+
+    $(TargetFrameworkIdentifier) is the robust signal — it is set to
+    '.NETFramework' for BOTH classic csproj files (via
+    TargetFrameworkVersion=v4.x) and SDK-style csproj files targeting
+    net4x. A bare $(TargetFramework) check misses classic projects
+    because they do not set that property at all.
+
+    For .NET Framework both JS and CSS live together under
+    Content\alisreactive\ so Web Optimization bundles, View references,
+    and deploy rules only need to track one folder. The folder sits
+    inside Content\ so it is published by default by WebApplication
+    targets (classic projects treat Scripts\ and Content\ as content
+    roots; a custom sibling folder would need extra csproj wiring).
 
     Override in your csproj:
       <PropertyGroup>
-        <AlisReactiveJsPath>my/custom/js</AlisReactiveJsPath>
-        <AlisReactiveCssPath>my/custom/css</AlisReactiveCssPath>
+        <AlisReactiveJsPath>my\custom\js</AlisReactiveJsPath>
+        <AlisReactiveCssPath>my\custom\css</AlisReactiveCssPath>
       </PropertyGroup>
   -->
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
-    <AlisReactiveJsPath Condition="'$(AlisReactiveJsPath)' == ''">Scripts</AlisReactiveJsPath>
-    <AlisReactiveCssPath Condition="'$(AlisReactiveCssPath)' == ''">Content\css</AlisReactiveCssPath>
+  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <AlisReactiveJsPath Condition="'$(AlisReactiveJsPath)' == ''">Content\alisreactive</AlisReactiveJsPath>
+    <AlisReactiveCssPath Condition="'$(AlisReactiveCssPath)' == ''">Content\alisreactive</AlisReactiveCssPath>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' != 'net48'">
+  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
     <AlisReactiveJsPath Condition="'$(AlisReactiveJsPath)' == ''">wwwroot\scripts</AlisReactiveJsPath>
     <AlisReactiveCssPath Condition="'$(AlisReactiveCssPath)' == ''">wwwroot\css</AlisReactiveCssPath>
   </PropertyGroup>
 
+  <!--
+    $(MSBuildThisFileDirectory) is the build\ folder inside the extracted
+    NuGet package. Its parent is '{PackageId}.{Version}', e.g.
+    'AlisReactive.1.0.0-preview.17'. Strip the 'AlisReactive.' prefix
+    (13 chars) to keep only the version for use in output filenames.
+  -->
   <PropertyGroup>
     <AlisReactivePkgDir>$(MSBuildThisFileDirectory)</AlisReactivePkgDir>
-    <AlisReactiveVersion Condition="'$(AlisReactiveVersion)' == ''">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(AlisReactivePkgDir.TrimEnd('\/'))))))</AlisReactiveVersion>
+    <AlisReactivePkgFolderName>$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(AlisReactivePkgDir.TrimEnd('\/'))))))</AlisReactivePkgFolderName>
+    <AlisReactiveVersion Condition="'$(AlisReactiveVersion)' == ''">$(AlisReactivePkgFolderName.Substring(13))</AlisReactiveVersion>
   </PropertyGroup>
 
   <Target Name="CopyAlisReactiveAssets" AfterTargets="Build">
