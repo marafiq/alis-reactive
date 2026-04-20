@@ -3,18 +3,19 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
-/// MonthlyRate card: SF <c>validationRules</c> (min=1) block the commit when user enters 0.
-/// The <c>validating</c> event fires; the card's handler calls <c>SetErrorMessage</c>;
-/// SF keeps the editor open and renders the custom text in the native <c>.e-editable-error</c> slot.
-/// Zero POSTs should fire.
+/// MonthlyRate card: FluentValidator (<c>GreaterThan(0m)</c>) blocks the commit via the framework's
+/// <c>HttpRequestBuilder.Validate&lt;T&gt;(formId)</c> path. No SF <c>validationRules</c> duplication.
+/// Consistent UX with every other card: editor closes on user save; POST is aborted client-side;
+/// error renders in the framework's validation slot beneath the editor. Zero POSTs fire.
 /// </summary>
 [TestFixture]
 public class WhenInPlaceEditorQuickEditBlocksOnValidationRule : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionInPlaceEditor";
+    private const string RateEditorId = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_MonthlyRateQuickEdit__Value";
 
     [Test]
-    public async Task entering_zero_keeps_editor_open_with_custom_error_and_no_post()
+    public async Task entering_zero_aborts_post_via_fluent_validation()
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#card-monthly-rate .e-editable-value-wrapper");
 
@@ -33,16 +34,11 @@ public class WhenInPlaceEditorQuickEditBlocksOnValidationRule : PlaywrightTestBa
         await inner.PressAsync("Enter");
 
         await Page.WaitForTimeoutAsync(2800);
+        Assert.That(postFired, Is.False, "FluentValidator must abort the POST when Value violates GreaterThan(0).");
 
-        Assert.That(postFired, Is.False, "No POST should fire while SF validation blocks the commit");
-
-        var errorSlot = Page.Locator("#card-monthly-rate .e-editable-error").First;
-        await Expect(errorSlot).ToContainTextAsync("Monthly rate must be at least $1.", new() { Timeout = 3000 });
-
-        // Editor remains open: action buttons + inner input still rendered
-        await Expect(Page.Locator("#card-monthly-rate .e-editable-action-buttons").First)
-            .ToBeVisibleAsync(new() { Timeout = 3000 });
-
-        AssertNoConsoleErrors();
+        // Error renders in the framework's per-field validation slot — {elementId}_error — next to
+        // the label, below the (now-closed) editor. This is the same slot every other card uses.
+        var errorSlot = Page.Locator($"#{RateEditorId}_error");
+        await Expect(errorSlot).Not.ToBeEmptyAsync(new() { Timeout = 3000 });
     }
 }

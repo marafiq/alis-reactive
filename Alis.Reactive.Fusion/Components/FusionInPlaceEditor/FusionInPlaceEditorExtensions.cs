@@ -78,8 +78,11 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Reads the current committed value for use in conditions or gather.</summary>
         /// <remarks>
-        /// Reads Syncfusion's outer <c>value</c> property. Values surface as string via
-        /// <see cref="Shape.String"/>, matching the other Fusion inputs.
+        /// Reads Syncfusion's outer <c>value</c> property using the shape registered at render time
+        /// by <see cref="FusionInPlaceEditorHtmlExtensions"/> (i.e. <c>Shape.FromClrType(typeof(TProp))</c>).
+        /// A <c>DateTime?</c>-bound editor reads as date, a <c>decimal</c>-bound editor reads as number,
+        /// a <c>string</c>-bound editor reads as string — no hardcoded <see cref="Shape.String"/> that
+        /// would conflict with the registered shape and fail <c>EnsureProperty</c> at plan-build time.
         /// </remarks>
         /// <returns>A typed source representing the editor's current committed value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
@@ -87,7 +90,14 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor);
-            self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.String, "read");
+
+            // Honor the shape the HtmlExtensions registered. EnsureProperty would otherwise throw on
+            // a shape mismatch when the component was registered with a non-string shape (Date, Number).
+            var shape = self.Pipeline.Context.TryFindRegistrationById(self.TargetId, out var reg) && reg != null
+                ? reg.Shape
+                : Shape.String;
+
+            self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, shape, "read");
             return new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ValueMember);
         }
 

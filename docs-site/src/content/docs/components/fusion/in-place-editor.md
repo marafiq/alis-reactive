@@ -49,22 +49,32 @@ The standalone quick-edit model carries both the edited value and any identity f
     .Include<NativeHiddenField, DobEdit>(m => m.ResidentId))
 ```
 
-## How do I keep the editor open with an inline error?
+## How does validation work?
 
-Configure Syncfusion's `ValidationRules` and hook `Validating` to set a custom error message. `SetErrorMessage` writes `args.errorMessage`, which Syncfusion renders in its native `.e-editable-error` slot below the inner editor. `PreventDefault` is not needed separately — when `errorMessage` is set, SF holds the editor open.
+Validation is the framework's single path: define rules **once** in a `FluentValidator<T>`, call `.Validate<TValidator>(formId)` on the `HttpRequestBuilder`, and the framework:
+
+- runs the extracted client-side rules before the POST (aborting if invalid),
+- renders errors in the per-field validation slot (`{elementId}_error`),
+- routes server-side 400 responses through the same slot via `e.ValidationErrors(formId)`.
 
 ```csharp
-var rules = new Dictionary<string, object> {
-    ["value"] = new Dictionary<string, object> { ["required"] = true, ["min"] = 1 }
-};
-
-b.Name("value")                // rules key must match name (both lowercase after SF's camelCase)
- .ValidationRules(rules)
- .Reactive(plan, evt => evt.Validating, (args, p) =>
- {
-     args.SetErrorMessage(p, "Monthly rate must be at least $1.");
- });
+b.Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
+{
+    p.Post(url)
+     .Gather(g => g
+        .Include<FusionInPlaceEditor, M>(m => m.Value)
+        .Include<NativeHiddenField, M>(m => m.ResidentId))
+     .Validate<MonthlyRateQuickEditValidator>("card-monthly-rate")
+     .Response(r => r
+        .OnSuccess<Ok>((json, s) => s.Element("display").SetText(json, x => x.Display))
+        .OnError(400, e => e.ValidationErrors("card-monthly-rate"))
+        .OnError<CommitError>((err, e) => e.Element("error").SetText(err, x => x.Message)));
+});
 ```
+
+Do **not** configure Syncfusion's `ValidationRules` dictionary in parallel. That duplicates the validator declaration (one in the view, one in the `FluentValidator<T>`) and creates two independent enforcement paths that can drift out of sync. The framework's single-source-of-truth rule applies: one validator, one plan, one enforcement path.
+
+The `Validating` event and `PreventDefault` / `SetErrorMessage` extensions remain on the API for advanced scenarios where a consumer legitimately needs to observe SF's internal validation (e.g. third-party validation rules SF ships natively that have no FluentValidator counterpart). They are not part of the recommended commit flow.
 
 ## How do I react to user cancel?
 
