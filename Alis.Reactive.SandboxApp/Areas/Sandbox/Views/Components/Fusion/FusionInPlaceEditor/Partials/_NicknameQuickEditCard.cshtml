@@ -1,0 +1,46 @@
+@model NicknameQuickEdit
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@{
+    var plan = Html.ReactivePlan<NicknameQuickEdit>();
+    var updateUrl = Url.Action("UpdateNickname", "FusionInPlaceEditor", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve FusionInPlaceEditor.UpdateNickname.");
+}
+
+<section id="card-nickname-error" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Nickname — ActionSuccess + server 500 via Response.OnError + hidden-field identity</h3>
+    <p class="text-xs text-text-secondary mb-2">Enter <code>boom</code> and commit to trigger a 500 response. Payload carries ResidentId too.</p>
+
+    @Html.HiddenFieldFor(plan, m => m.ResidentId)
+
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Nickname"))
+        .FusionInPlaceEditor(b => b
+            .Type(SfInPlace.InputType.Text)
+            .Mode(SfInPlace.RenderMode.Inline)
+            .EditableOn(SfInPlace.EditableType.Click)
+            .Model(new { placeholder = "type boom to force 500" })
+            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
+            {
+                p.Post(updateUrl)
+                 .Gather(g => g
+                     .Include<FusionInPlaceEditor, NicknameQuickEdit>(m => m.Value)
+                     .Include<NativeHiddenField, NicknameQuickEdit>(m => m.ResidentId))
+                 .Validate<NicknameQuickEditValidator>("card-nickname-error")
+                 .Response(r => r
+                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                    {
+                        s.Element("card-nickname-display").SetText(json, x => x.DisplayValue);
+                    })
+                    .OnError<InPlaceEditorCommitError>((err, e) =>
+                    {
+                        e.Element("card-nickname-error-message").SetText(err, x => x.Message);
+                    }));
+            })); }
+
+    <p class="text-sm mt-3">Display: <span id="card-nickname-display" class="font-mono text-text-muted">unchanged</span></p>
+    <p class="text-sm">Error: <span id="card-nickname-error-message" class="text-red-600"></span></p>
+</section>
+
+@Html.RenderPlan(plan)

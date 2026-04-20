@@ -1,0 +1,57 @@
+@model MonthlyRateQuickEdit
+@using System.Collections.Generic
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@{
+    var plan = Html.ReactivePlan<MonthlyRateQuickEdit>();
+    var updateUrl = Url.Action("UpdateMonthlyRate", "FusionInPlaceEditor", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve FusionInPlaceEditor.UpdateMonthlyRate.");
+
+    var rules = new Dictionary<string, object>
+    {
+        ["value"] = new Dictionary<string, object> { ["required"] = true, ["min"] = 1 }
+    };
+}
+
+<section id="card-monthly-rate" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Monthly Rate — SF validationRules + SetErrorMessage + hidden-field identity</h3>
+    <p class="text-xs text-text-secondary mb-2">Enter 0 or negative to see SF's inline error keep the editor open. On valid, ActionSuccess fires and POST commits with ResidentId.</p>
+
+    @Html.HiddenFieldFor(plan, m => m.ResidentId)
+
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Monthly Rate"))
+        .FusionInPlaceEditor(b => b
+            .Name("value")
+            .Type(SfInPlace.InputType.Numeric)
+            .Mode(SfInPlace.RenderMode.Inline)
+            .EditableOn(SfInPlace.EditableType.Click)
+            .Model(new { format = "C0", min = 0, max = 25000, step = 50 })
+            .ValidationRules(rules)
+            .Reactive(plan, evt => evt.Validating, (args, p) =>
+            {
+                args.SetErrorMessage(p, "Monthly rate must be at least $1.");
+            })
+            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
+            {
+                p.Post(updateUrl)
+                 .Gather(g => g
+                     .Include<FusionInPlaceEditor, MonthlyRateQuickEdit>(m => m.Value)
+                     .Include<NativeHiddenField, MonthlyRateQuickEdit>(m => m.ResidentId))
+                 .Response(r => r
+                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                    {
+                        s.Element("card-monthly-rate-display").SetText(json, x => x.DisplayValue);
+                    })
+                    .OnError<InPlaceEditorCommitError>((err, e) =>
+                    {
+                        e.Element("card-monthly-rate-error").SetText(err, x => x.Message);
+                    }));
+            })); }
+
+    <p class="text-sm mt-3">Display: <span id="card-monthly-rate-display" class="font-mono text-text-muted">unchanged</span></p>
+    <p class="text-sm">Server error: <span id="card-monthly-rate-error" class="text-red-600"></span></p>
+</section>
+
+@Html.RenderPlan(plan)

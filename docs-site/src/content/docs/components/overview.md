@@ -65,6 +65,7 @@ Syncfusion EJ2 components. Vendor is `"fusion"` -- the runtime reads via `el.ej2
 | `FusionInputMask` | MaskedTextBox | `"value"` | `string` | `SetValue`, `FocusIn` |
 | `FusionRichTextEditor` | RichTextEditor | `"value"` | `string` | `SetValue`, `FocusIn` |
 | `FusionFileUpload` | Uploader | `"filesData"` | -- | read-only, no `SetValue` |
+| `FusionInPlaceEditor` | InPlaceEditor | `"value"` | `string` | `SetValue`, `Enable`, `Disable`, `Save`, `Focus`, `Validate` |
 
 All Fusion input components fire `Changed`. Some also fire `Filtering` (AutoComplete, MultiSelect), `Focus`/`Blur` (NumericTextBox, DropDownList), or `Selected` (FileUpload).
 

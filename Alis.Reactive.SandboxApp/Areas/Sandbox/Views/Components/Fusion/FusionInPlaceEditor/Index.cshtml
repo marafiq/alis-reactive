@@ -1,0 +1,118 @@
+@model ResidentProfile
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@{
+    ViewData["Title"] = "InPlaceEditor";
+
+    var plan = Html.ReactivePlan<ResidentProfile>();
+    var careLevels = (List<InPlaceEditorCareLevelOption>)ViewBag.CareLevels;
+    var allergies  = (List<AllergyOption>)ViewBag.Allergies;
+
+    var updateProfileUrl = Url.Action("UpdateProfile", "FusionInPlaceEditor", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve InPlaceEditor.UpdateProfile.");
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionInPlaceEditor — Full API</native-heading>
+    <native-text color="Secondary">
+        Two use cases: a mixed form with InPlaceEditor fields alongside other Fusion inputs,
+        and standalone quick-edit cards where each partial view owns its own <code>ReactivePlan&lt;TStandalone&gt;</code>.
+    </native-text>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         §A — Use Case A: Mixed form. InPlaceEditor participates in Gather + Validate
+         alongside FusionTextBox, FusionDropDownList, FusionDatePicker, FusionNumericTextBox.
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <section id="resident-form" class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">§A · Mixed form (one plan, one submit)</h2>
+
+        <native-grid cols="C2" gap="Base" class="mb-4">
+            @{ Html.InputField(plan, m => m.Name, o => o.Label("Resident Name"))
+                .NativeTextBox(b => b.Placeholder("e.g. Eleanor Vance")); }
+
+            @{ Html.InputField(plan, m => m.CareLevelId, o => o.Label("Care Level"))
+                .FusionDropDownList(b => b
+                    .DataSource(careLevels)
+                    .Fields<InPlaceEditorCareLevelOption>(t => t.Label, v => v.Id)
+                    .Placeholder("Choose a care level")); }
+
+            @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Label("Admission Date"))
+                .FusionDatePicker(b => b.Format("yyyy-MM-dd")); }
+
+            @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Label("Monthly Rate"))
+                .FusionNumericTextBox(b => b.Min(0).Max(25000).Step(50).Format("C0")); }
+        </native-grid>
+
+        <h3 class="text-sm font-semibold mt-4 mb-2">In-place fields (click the pencil to edit)</h3>
+        <native-grid cols="C3" gap="Base" class="mb-4">
+            @{ Html.InputField(plan, m => m.Nickname, o => o.Label("Nickname"))
+                .FusionInPlaceEditor(b => b
+                    .Type(SfInPlace.InputType.Text)
+                    .Mode(SfInPlace.RenderMode.Inline)
+                    .EditableOn(SfInPlace.EditableType.Click)); }
+
+            @{ Html.InputField(plan, m => m.DateOfBirth, o => o.Label("Date of Birth"))
+                .FusionInPlaceEditor(b => b
+                    .Type(SfInPlace.InputType.Date)
+                    .Mode(SfInPlace.RenderMode.Inline)
+                    .EditableOn(SfInPlace.EditableType.Click)); }
+
+            @{ Html.InputField(plan, m => m.Allergies, o => o.Label("Allergies"))
+                .FusionInPlaceEditor(b => b
+                    .Type(SfInPlace.InputType.DropDownList)
+                    .Mode(SfInPlace.RenderMode.Inline)
+                    .EditableOn(SfInPlace.EditableType.Click)
+                    .Model(new {
+                        dataSource = allergies,
+                        fields = new { text = "name", value = "code" }
+                    })); }
+        </native-grid>
+
+        <native-hstack gap="None" justify="Start">
+            @(Html.NativeButton("submit-profile", "Save Profile")
+                .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post(updateProfileUrl)
+                     .Gather(g => g.IncludeAll())
+                     .Validate<ResidentProfileValidator>("resident-form")
+                     .Response(r => r
+                        .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                        {
+                            s.Element("profile-status").SetText("Saved");
+                        })
+                        .OnError(400, e => e.ValidationErrors("resident-form"))
+                        .OnError(e => e.Element("profile-status").SetText("Failed")));
+                }))
+        </native-hstack>
+
+        <p class="text-sm mt-3">Status: <span id="profile-status" class="font-mono text-text-muted">not saved</span></p>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         §B — Use Case B: Standalone quick-edit cards. Each partial owns its own plan.
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <native-heading level="H2" class="mt-8">§B · Standalone quick-edit cards</native-heading>
+    <native-text color="Secondary">
+        Each card below is a partial with its own <code>ReactivePlan&lt;TStandalone&gt;</code>
+        and its own FluentValidator. Hijacks the built-in SF commit via
+        <code>actionBegin → PreventDefault</code>, then runs the reactive HTTP pipeline.
+    </native-text>
+
+    @{ var residentId = ViewBag.ResidentId as string ?? "resident-42"; }
+    @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_DobQuickEditCard.cshtml",         new DateOfBirthQuickEdit { ResidentId = residentId, Value = Model.DateOfBirth })
+    @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_CareLevelQuickEditCard.cshtml",   new CareLevelQuickEdit   { ResidentId = residentId, Value = Model.CareLevelId })
+    @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_MonthlyRateQuickEditCard.cshtml", new MonthlyRateQuickEdit { ResidentId = residentId, Value = Model.MonthlyRate })
+    @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_NicknameQuickEditCard.cshtml",    new NicknameQuickEdit    { ResidentId = residentId, Value = Model.Nickname })
+    @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_CancelDemoQuickEditCard.cshtml",  new CancelDemoQuickEdit  { ResidentId = residentId, Value = Model.Nickname })
+
+    <!-- Plan JSON (main-view §A plan only) -->
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <h2 class="text-base font-semibold mb-4">Main-view plan JSON (§A)</h2>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,22 @@
+namespace Alis.Reactive.Fusion.Components
+{
+    /// <summary>Event payload delivered when the inner editor's value changes.</summary>
+    /// <remarks>
+    /// Fires on inner-editor value changes during the edit, including user-initiated changes before
+    /// commit. For a commit hook use <c>ActionSuccess</c>.
+    /// </remarks>
+    public class FusionInPlaceEditorChangeArgs
+    {
+        /// <summary>The current value of the inner integrated component (surfaced as string).</summary>
+        public string? Value { get; set; }
+
+        /// <summary>The previous value of the inner integrated component.</summary>
+        public string? PreviousValue { get; set; }
+
+        /// <summary>The SF event name.</summary>
+        public string? Name { get; set; }
+
+        /// <summary>Creates a new instance. Framework-internal: instances are created by the event descriptor.</summary>
+        public FusionInPlaceEditorChangeArgs() { }
+    }
+}
