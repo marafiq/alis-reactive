@@ -1,0 +1,46 @@
+@model LastAdmissionQuickEdit
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@{
+    var plan = Html.ReactivePlan<LastAdmissionQuickEdit>();
+    var updateUrl = Url.Action("UpdateLastAdmission", "FusionInPlaceEditor", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve FusionInPlaceEditor.UpdateLastAdmission.");
+}
+
+<section id="card-last-admission" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Last Admission — DateTimePicker inner type (date + time)</h3>
+    <p class="text-xs text-text-secondary mb-2">Value is <code>DateTime</code> including a time component. Proves the Date shape registration flows through with time precision preserved.</p>
+
+    @Html.HiddenFieldFor(plan, m => m.ResidentId)
+
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Last Admission"))
+        .FusionInPlaceEditor(b => b
+            .Type(SfInPlace.InputType.DateTime)
+            .Mode(SfInPlace.RenderMode.Inline)
+            .EditableOn(SfInPlace.EditableType.Click)
+            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
+            {
+                p.Post(updateUrl)
+                 .Gather(g => g
+                     .Include<FusionInPlaceEditor, LastAdmissionQuickEdit>(m => m.Value)
+                     .Include<NativeHiddenField, LastAdmissionQuickEdit>(m => m.ResidentId))
+                 .Validate<LastAdmissionQuickEditValidator>("card-last-admission")
+                 .Response(r => r
+                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                    {
+                        s.Element("card-last-admission-display").SetText(json, x => x.DisplayValue);
+                    })
+                    .OnError(400, e => e.ValidationErrors("card-last-admission"))
+                    .OnError<InPlaceEditorCommitError>((err, e) =>
+                    {
+                        e.Element("card-last-admission-error").SetText(err, x => x.Message);
+                    }));
+            })); }
+
+    <p class="text-sm mt-3">Display: <span id="card-last-admission-display" class="font-mono text-text-muted">unchanged</span></p>
+    <p class="text-sm">Error: <span id="card-last-admission-error" class="text-red-600"></span></p>
+</section>
+
+@Html.RenderPlan(plan)

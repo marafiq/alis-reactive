@@ -122,5 +122,47 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 Saved = true
             });
         }
+
+        [HttpPost("UpdateAllergies")]
+        public IActionResult UpdateAllergies([FromBody] AllergiesQuickEdit body)
+        {
+            if (body?.Value == null || body.Value.Length == 0)
+                return BadRequest(new InPlaceEditorCommitError { Message = "Select at least one allergy." });
+            if (string.IsNullOrWhiteSpace(body.ResidentId))
+                return BadRequest(new InPlaceEditorCommitError { Message = "ResidentId missing from commit payload." });
+            return Ok(new InPlaceEditorUpdateResponse
+            {
+                DisplayValue = $"{string.Join(", ", body.Value)} (resident={body.ResidentId})",
+                Saved = true
+            });
+        }
+
+        [HttpPost("UpdateLastAdmission")]
+        public IActionResult UpdateLastAdmission([FromBody] LastAdmissionQuickEdit body)
+        {
+            if (body?.Value == null)
+                return BadRequest(new InPlaceEditorCommitError { Message = "Admission timestamp required." });
+            if (string.IsNullOrWhiteSpace(body.ResidentId))
+                return BadRequest(new InPlaceEditorCommitError { Message = "ResidentId missing from commit payload." });
+            return Ok(new InPlaceEditorUpdateResponse
+            {
+                DisplayValue = $"{body.Value.Value:yyyy-MM-dd HH:mm} (resident={body.ResidentId})",
+                Saved = true
+            });
+        }
+
+        [HttpPost("UpdateMedicalRecordNumber")]
+        public IActionResult UpdateMedicalRecordNumber([FromBody] MedicalRecordNumberQuickEdit body)
+        {
+            if (string.IsNullOrWhiteSpace(body?.Value))
+                return BadRequest(new InPlaceEditorCommitError { Message = "Medical record number required." });
+            if (string.IsNullOrWhiteSpace(body.ResidentId))
+                return BadRequest(new InPlaceEditorCommitError { Message = "ResidentId missing from commit payload." });
+            return Ok(new InPlaceEditorUpdateResponse
+            {
+                DisplayValue = $"{body.Value} (resident={body.ResidentId})",
+                Saved = true
+            });
+        }
     }
 }

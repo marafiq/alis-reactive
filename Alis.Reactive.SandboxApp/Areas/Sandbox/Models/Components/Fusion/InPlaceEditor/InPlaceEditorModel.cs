@@ -48,6 +48,27 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? Value { get; set; }
     }
 
+    public class AllergiesQuickEdit
+    {
+        // MultiSelect inner type — value is an array of allergy codes.
+        public string? ResidentId { get; set; }
+        public string[]? Value { get; set; }
+    }
+
+    public class LastAdmissionQuickEdit
+    {
+        // DateTimePicker inner type — value is date + time.
+        public string? ResidentId { get; set; }
+        public DateTime? Value { get; set; }
+    }
+
+    public class MedicalRecordNumberQuickEdit
+    {
+        // Mask inner type — format-constrained string (e.g. MRN pattern).
+        public string? ResidentId { get; set; }
+        public string? Value { get; set; }
+    }
+
     // --- Lookup DTOs (shared by §A and §B) ---
 
     public class InPlaceEditorCareLevelOption

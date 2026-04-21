@@ -48,4 +48,30 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.Value).NotEmpty().MaximumLength(50);
         }
     }
+
+    public class AllergiesQuickEditValidator : AbstractValidator<AllergiesQuickEdit>
+    {
+        public AllergiesQuickEditValidator()
+        {
+            // At least one allergy selected (MultiSelect returns string[]).
+            RuleFor(x => x.Value).NotNull();
+        }
+    }
+
+    public class LastAdmissionQuickEditValidator : AbstractValidator<LastAdmissionQuickEdit>
+    {
+        public LastAdmissionQuickEditValidator()
+        {
+            RuleFor(x => x.Value).NotNull().LessThanOrEqualTo(DateTime.UtcNow);
+        }
+    }
+
+    public class MedicalRecordNumberQuickEditValidator : AbstractValidator<MedicalRecordNumberQuickEdit>
+    {
+        public MedicalRecordNumberQuickEditValidator()
+        {
+            // MRN format: 3 letters + "-" + 4 digits (e.g. "MRN-1234").
+            RuleFor(x => x.Value).NotEmpty().Matches(@"^[A-Z]{3}-\d{4}$");
+        }
+    }
 }
