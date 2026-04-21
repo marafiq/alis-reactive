@@ -1,3 +1,4 @@
+using System;
 using Alis.Reactive;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Fusion.Components;
@@ -12,6 +13,8 @@ public class WhenReadingFusionInPlaceEditorValue : FusionTestBase
     public void Value_returns_typed_component_source_of_string()
     {
         var plan = CreatePlan();
+        RegisterStringInPlaceEditor(plan, "PhoneNumber", "Alis_Reactive_Fusion_UnitTests_FusionTestModel__PhoneNumber");
+
         Trigger(plan).DomReady(p =>
         {
             var source = p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).Value();
@@ -23,6 +26,8 @@ public class WhenReadingFusionInPlaceEditorValue : FusionTestBase
     public void Value_read_is_reflected_in_rendered_plan()
     {
         var plan = CreatePlan();
+        RegisterStringInPlaceEditor(plan, "PhoneNumber", "Alis_Reactive_Fusion_UnitTests_FusionTestModel__PhoneNumber");
+
         Trigger(plan).DomReady(p =>
         {
             var comp = p.Component<FusionInPlaceEditor>(m => m.PhoneNumber);
@@ -82,5 +87,35 @@ public class WhenReadingFusionInPlaceEditorValue : FusionTestBase
                 Assert.That(source, Is.TypeOf<TypedComponentSource<string>>());
             });
         });
+    }
+
+    // Regression: PR #117 codex P2 flagged `?? Shape.String` fallback as a Rule 3 violation.
+    // When a plan calls .Value() before the editor has been registered via HtmlExtensions,
+    // we must throw with context instead of inventing a shape.
+    [Test]
+    public void Value_throws_when_editor_is_not_registered()
+    {
+        var plan = CreatePlan();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).Value();
+            });
+        });
+
+        Assert.That(ex!.Message, Does.Contain("FusionInPlaceEditor"));
+        Assert.That(ex.Message, Does.Contain("not registered"));
+        Assert.That(ex.Message, Does.Contain("Html.InputField"));
+    }
+
+    private static void RegisterStringInPlaceEditor(ReactivePlan<FusionTestModel> plan, string bindingPath, string elementId)
+    {
+        var component = new FusionInPlaceEditor();
+        var registration = new ComponentRegistration(
+            elementId, component.Vendor, bindingPath, component.ValueMember,
+            "inplace-editor", Shape.String);
+        plan.AddToComponentsMap(bindingPath, registration);
     }
 }

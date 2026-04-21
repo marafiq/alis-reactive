@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.PlanModel;
@@ -81,23 +82,30 @@ namespace Alis.Reactive.Fusion.Components
         /// Reads Syncfusion's outer <c>value</c> property using the shape registered at render time
         /// by <see cref="FusionInPlaceEditorHtmlExtensions"/> (i.e. <c>Shape.FromClrType(typeof(TProp))</c>).
         /// A <c>DateTime?</c>-bound editor reads as date, a <c>decimal</c>-bound editor reads as number,
-        /// a <c>string</c>-bound editor reads as string — no hardcoded <see cref="Shape.String"/> that
-        /// would conflict with the registered shape and fail <c>EnsureProperty</c> at plan-build time.
+        /// a <c>string</c>-bound editor reads as string. The component must be registered via
+        /// <c>Html.InputField(plan, m => m.X).FusionInPlaceEditor(...)</c> before this read is built
+        /// into the plan — no hardcoded shape, no fallback.
         /// </remarks>
         /// <returns>A typed source representing the editor's current committed value.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when no <c>FusionInPlaceEditor</c> registration exists for <paramref name="self"/>'s
+        /// target id. Call <c>Html.InputField(plan, m =&gt; m.X).FusionInPlaceEditor(...)</c> first.
+        /// </exception>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
         {
             self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor);
 
-            // Honor the shape the HtmlExtensions registered. EnsureProperty would otherwise throw on
-            // a shape mismatch when the component was registered with a non-string shape (Date, Number).
-            var shape = self.Pipeline.Context.TryFindRegistrationById(self.TargetId, out var reg) && reg != null
-                ? reg.Shape
-                : Shape.String;
+            if (!self.Pipeline.Context.TryFindRegistrationById(self.TargetId, out var reg) || reg == null)
+            {
+                throw new InvalidOperationException(
+                    $"FusionInPlaceEditor '{self.TargetId}' is not registered. " +
+                    "Render the editor with Html.InputField(plan, m => m.X).FusionInPlaceEditor(...) " +
+                    "before reading .Value() in a pipeline — the registered shape drives the typed read.");
+            }
 
-            self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, shape, "read");
+            self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, reg.Shape, "read");
             return new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ValueMember);
         }
 
