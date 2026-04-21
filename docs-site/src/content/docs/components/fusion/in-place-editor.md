@@ -93,7 +93,6 @@ b.Reactive(plan, evt => evt.CancelClick, (args, p) =>
 | `Enable()` / `Disable()` | Toggles edit-mode entry (calls SF `disable(bool)`) |
 | `Save()` | Programmatic commit (fires `ActionSuccess`, not `SubmitClick`) |
 | `Focus()` | Focuses the inner editor input |
-| `Validate()` | Triggers validation on-demand without committing |
 
 ### Reads
 

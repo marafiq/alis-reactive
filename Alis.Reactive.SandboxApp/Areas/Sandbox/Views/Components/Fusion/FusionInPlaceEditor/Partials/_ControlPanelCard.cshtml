@@ -63,11 +63,6 @@
             .CssClass("rounded-md bg-indigo-600 px-3 py-1 text-xs text-white")
             .Reactive(plan, evt => evt.Click, (args, p) =>
                 p.Component<FusionInPlaceEditor>(m => m.Value).Save()))
-
-        @(Html.NativeButton("ctrl-btn-validate", "Validate()")
-            .CssClass("rounded-md bg-slate-600 px-3 py-1 text-xs text-white")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-                p.Component<FusionInPlaceEditor>(m => m.Value).Validate()))
     </div>
 
     <p class="text-sm mt-4">Current Value() read: <span id="control-echo" class="font-mono text-text-muted"></span></p>

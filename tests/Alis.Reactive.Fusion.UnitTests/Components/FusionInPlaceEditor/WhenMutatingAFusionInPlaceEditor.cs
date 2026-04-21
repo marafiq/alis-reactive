@@ -93,17 +93,4 @@ public class WhenMutatingAFusionInPlaceEditor : FusionTestBase
         Assert.That(json, Does.Contain("\"setFocus\""));
     }
 
-    [Test]
-    public void Validate_produces_call_reaction_to_validate()
-    {
-        var plan = CreatePlan();
-        Trigger(plan).DomReady(p =>
-            p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).Validate());
-
-        var json = plan.RenderFormatted();
-        AssertSchemaValid(json);
-
-        Assert.That(json, Does.Contain("\"call\""));
-        Assert.That(json, Does.Contain("\"validate\""));
-    }
 }

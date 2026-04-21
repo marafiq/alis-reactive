@@ -67,17 +67,6 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall("setFocus");
 
-        /// <summary>Triggers on-demand validation against the configured validationRules.</summary>
-        /// <remarks>
-        /// Calls Syncfusion's <c>validate()</c> method. Fires the <c>validating</c> event without firing
-        /// <c>actionBegin</c>. Only meaningful when the builder configures <c>validationRules</c>.
-        /// </remarks>
-        /// <returns>The component reference for method chaining.</returns>
-        public static ComponentRef<FusionInPlaceEditor, TModel> Validate<TModel>(
-            this ComponentRef<FusionInPlaceEditor, TModel> self)
-            where TModel : class
-            => self.EmitCall("validate");
-
         /// <summary>Reads the current committed value for use in conditions or gather.</summary>
         /// <remarks>
         /// Reads Syncfusion's outer <c>value</c> property using the shape registered at render time
