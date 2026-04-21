@@ -37,8 +37,23 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public MonthlyRateQuickEditValidator()
         {
+            // Client-extractable rules — shape the client adapter recognizes (GreaterThan + LessThanOrEqualTo)
+            // and runs before POST.
             RuleFor(x => x.Value).GreaterThan(0m).LessThanOrEqualTo(25000m);
+
+            // Server-only rule — Must() becomes a PredicateValidator which the FluentValidationAdapter
+            // does not extract, so the client never sees it. Simulates "is this rate already in use by
+            // another resident?" style DB-gated invariants. Enter 7777 in the browser to trigger it:
+            // client will let the POST through, the server will reject with the framework-standard
+            // { errors: { Value: [...] } } shape, and .OnError(400, e => e.ValidationErrors(formId))
+            // renders the message in the per-field slot.
+            RuleFor(x => x.Value)
+                .Must(rate => !IsAlreadyAssignedToAnotherResident(rate))
+                .WithMessage("Monthly rate is already assigned to another resident (server-only check).");
         }
+
+        // Pretend this reaches a database. In production this would be a repository call.
+        private static bool IsAlreadyAssignedToAnotherResident(decimal rate) => rate == 7777m;
     }
 
     public class NicknameQuickEditValidator : AbstractValidator<NicknameQuickEdit>

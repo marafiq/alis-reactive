@@ -41,4 +41,36 @@ public class WhenInPlaceEditorQuickEditBlocksOnValidationRule : PlaywrightTestBa
         var errorSlot = Page.Locator($"#{RateEditorId}_error");
         await Expect(errorSlot).Not.ToBeEmptyAsync(new() { Timeout = 3000 });
     }
+
+    // Server-only Must() rule: client extracts GreaterThan/LessThanOrEqualTo but not Must, so
+    // a value that trips only the simulated "already assigned" DB check passes the client
+    // adapter, reaches the server, and the server returns { errors: { Value: [msg] } }. The
+    // framework's .OnError(400, e => e.ValidationErrors(formId)) writes it into the same
+    // per-field slot that client-side rule failures use — identical UX, no card-specific glue.
+    [Test]
+    public async Task entering_server_only_duplicate_rate_surfaces_server_400_in_same_field_slot()
+    {
+        await NavigateToAndWaitForVisibleSignal(Path, "#card-monthly-rate .e-editable-value-wrapper");
+
+        await Page.Locator("#card-monthly-rate .e-editable-value-wrapper").First.ClickAsync();
+        var inner = Page.Locator("#card-monthly-rate input.e-control").First;
+        await Expect(inner).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await inner.FillAsync("7777");
+
+        var requestTask = Page.WaitForRequestAsync(req =>
+            req.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateMonthlyRate")
+            && req.Method == "POST",
+            new() { Timeout = 10000 });
+
+        await inner.PressAsync("Enter");
+
+        // POST fires: client-extractable rules passed; server rejects via the Must() rule.
+        var request = await requestTask;
+        Assert.That(request.PostData ?? "", Does.Contain("7777"),
+            "Client-extractable rules must pass so the commit reaches the server.");
+
+        // Server's framework-standard { errors: { Value: [msg] } } renders in the per-field slot.
+        var errorSlot = Page.Locator($"#{RateEditorId}_error");
+        await Expect(errorSlot).ToContainTextAsync("server-only check", new() { Timeout = 5000 });
+    }
 }

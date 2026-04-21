@@ -10,11 +10,14 @@
 }
 
 <section id="card-monthly-rate" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
-    <h3 class="text-sm font-semibold mb-3">Quick-edit: Monthly Rate — FluentValidation gate + hidden-field identity</h3>
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Monthly Rate — FluentValidation both sides</h3>
     <p class="text-xs text-text-secondary mb-2">
-        Validation is the single FluentValidator only — no SF <code>validationRules</code> duplication.
-        On invalid, <code>HttpRequestBuilder.Validate&lt;T&gt;(formId)</code> aborts the POST and renders the error
-        in the framework's validation slot (same UX for client-rule, framework-rule, and server-400 errors).
+        One <code>MonthlyRateQuickEditValidator</code> drives both sides. Client extracts the
+        <code>GreaterThan/LessThanOrEqualTo</code> rules and blocks the POST on invalid input.
+        A <code>Must()</code> rule that simulates a DB lookup is not extractable by the adapter and runs
+        server-only: enter <strong>7777</strong> to watch the client pass, the server reject with
+        <code>{ errors: { Value: [...] } }</code>, and <code>.OnError(400, e => e.ValidationErrors(formId))</code>
+        render the message into the per-field validation slot.
     </p>
 
     @Html.HiddenFieldFor(plan, m => m.ResidentId)
