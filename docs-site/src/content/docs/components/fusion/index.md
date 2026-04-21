@@ -29,6 +29,7 @@ Bind a model property to a Syncfusion input. Rendered through `Html.InputField(p
 - [InputMask](./input-mask/) -- format-enforced text input
 - [RichTextEditor](./rich-text-editor/) -- WYSIWYG editor
 - [FileUpload](./file-upload/) -- multi-file picker
+- [InPlaceEditor](./in-place-editor/) -- click-to-edit a single field that wraps another inner input; commits via reactive pipeline
 
 ## Surfaces and containers
 

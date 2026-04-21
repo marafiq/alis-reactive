@@ -1,0 +1,50 @@
+@model CareLevelQuickEdit
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@{
+    var plan = Html.ReactivePlan<CareLevelQuickEdit>();
+    var updateUrl = Url.Action("UpdateCareLevel", "FusionInPlaceEditor", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve FusionInPlaceEditor.UpdateCareLevel.");
+    var careLevels = (List<InPlaceEditorCareLevelOption>)ViewBag.CareLevels;
+}
+
+<section id="card-care-level" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Care Level — ActionSuccess + DropDown inner + hidden-field identity</h3>
+
+    @Html.HiddenFieldFor(plan, m => m.ResidentId)
+
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Care Level"))
+        .FusionInPlaceEditor(b => b
+            .Type(SfInPlace.InputType.DropDownList)
+            .Mode(SfInPlace.RenderMode.Inline)
+            .EditableOn(SfInPlace.EditableType.Click)
+            .Model(new {
+                dataSource = careLevels,
+                fields = new { text = "label", value = "id" },
+                placeholder = "Choose a care level"
+            })
+            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
+            {
+                p.Post(updateUrl)
+                 .Gather(g => g
+                     .Include<FusionInPlaceEditor, CareLevelQuickEdit>(m => m.Value)
+                     .Include<NativeHiddenField, CareLevelQuickEdit>(m => m.ResidentId))
+                 .Validate<CareLevelQuickEditValidator>("card-care-level")
+                 .Response(r => r
+                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                    {
+                        s.Element("card-care-level-display").SetText(json, x => x.DisplayValue);
+                    })
+                    .OnError<InPlaceEditorCommitError>((err, e) =>
+                    {
+                        e.Element("card-care-level-error").SetText(err, x => x.Message);
+                    }));
+            })); }
+
+    <p class="text-sm mt-3">Display: <span id="card-care-level-display" class="font-mono text-text-muted">unchanged</span></p>
+    <p class="text-sm">Error: <span id="card-care-level-error" class="text-red-600"></span></p>
+</section>
+
+@Html.RenderPlan(plan)

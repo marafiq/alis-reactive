@@ -1,0 +1,72 @@
+@model InPlaceEditorControlPanelModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@{
+    var plan = Html.ReactivePlan<InPlaceEditorControlPanelModel>();
+}
+
+<section id="card-control-panel" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Control panel — mutations + Value() read</h3>
+    <p class="text-xs text-text-secondary mb-3">
+        Every mutation extension and the <code>Value()</code> read exercised against a single Text editor.
+        Click a button to invoke the mutation. Typing into the editor then clicking outside updates the echo
+        via the Value()-driven DomReady pipeline; the greeting element toggles when the value equals <code>"Hello"</code>.
+    </p>
+
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Free text"))
+        .FusionInPlaceEditor(b => b
+            .Type(SfInPlace.InputType.Text)
+            .Mode(SfInPlace.RenderMode.Inline)
+            .EditableOn(SfInPlace.EditableType.Click)); }
+
+    @{
+        // DomReady runs AFTER the InputField has registered the editor; Value() now reads the registered shape.
+        Html.On(plan, t => t.DomReady(p =>
+        {
+            var comp = p.Component<FusionInPlaceEditor>(m => m.Value);
+            p.Element("control-echo").SetText(comp.Value());
+            p.When(comp.Value()).Eq("Hello")
+                .Then(then => then.Element("control-greeting").Show())
+                .Else(e => e.Element("control-greeting").Hide());
+        }));
+    }
+
+    <div class="flex flex-wrap gap-2 mt-3">
+        @(Html.NativeButton("ctrl-btn-set-hello", "SetValue(\"Hello\")")
+            .CssClass("rounded-md bg-accent/80 px-3 py-1 text-xs text-white")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Component<FusionInPlaceEditor>(m => m.Value).SetValue("Hello")))
+
+        @(Html.NativeButton("ctrl-btn-set-null", "SetValue(null)")
+            .CssClass("rounded-md bg-accent/80 px-3 py-1 text-xs text-white")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Component<FusionInPlaceEditor>(m => m.Value).SetValue(null)))
+
+        @(Html.NativeButton("ctrl-btn-enable", "Enable()")
+            .CssClass("rounded-md bg-emerald-600 px-3 py-1 text-xs text-white")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Component<FusionInPlaceEditor>(m => m.Value).Enable()))
+
+        @(Html.NativeButton("ctrl-btn-disable", "Disable()")
+            .CssClass("rounded-md bg-amber-600 px-3 py-1 text-xs text-white")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Component<FusionInPlaceEditor>(m => m.Value).Disable()))
+
+        @(Html.NativeButton("ctrl-btn-focus", "Focus()")
+            .CssClass("rounded-md bg-sky-600 px-3 py-1 text-xs text-white")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Component<FusionInPlaceEditor>(m => m.Value).Focus()))
+
+        @(Html.NativeButton("ctrl-btn-save", "Save()")
+            .CssClass("rounded-md bg-indigo-600 px-3 py-1 text-xs text-white")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Component<FusionInPlaceEditor>(m => m.Value).Save()))
+    </div>
+
+    <p class="text-sm mt-4">Current Value() read: <span id="control-echo" class="font-mono text-text-muted"></span></p>
+    <p class="text-sm"><span id="control-greeting" class="text-emerald-600 font-semibold">Value is exactly "Hello", condition matched</span></p>
+</section>
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,11 @@
+/* Visual commit signal for FusionInPlaceEditor cards.
+   The slice's p.Component<FusionInPlaceEditor>(m => m.X).AddClass("alis-editor-saved")
+   on ActionSuccess toggles this class; .RemoveClass(...) on BeginEdit removes it.
+   SF preserves the outer wrapper's classList across its edit/close cycles, so a pseudo
+   element anchored to the collapsed-value span is enough to render the check. */
+.alis-editor-saved .e-editable-value::after {
+    content: " ✓";
+    color: #059669;
+    font-weight: 700;
+    padding-left: 4px;
+}

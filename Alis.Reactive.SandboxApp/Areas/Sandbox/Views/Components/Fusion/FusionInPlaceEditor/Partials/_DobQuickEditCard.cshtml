@@ -1,0 +1,55 @@
+@model DateOfBirthQuickEdit
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@{
+    var plan = Html.ReactivePlan<DateOfBirthQuickEdit>();
+    var updateUrl = Url.Action("UpdateDateOfBirth", "FusionInPlaceEditor", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve FusionInPlaceEditor.UpdateDateOfBirth.");
+}
+
+<section id="card-dob" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Date of Birth — ActionSuccess commit + hidden-field identity</h3>
+    <p class="text-xs text-text-secondary mb-2">
+        Payload carries the edited <code>Value</code> AND the <code>ResidentId</code> (from a NativeHiddenField).
+        Server echoes both so you can verify the identity was sent.
+    </p>
+
+    @Html.HiddenFieldFor(plan, m => m.ResidentId)
+
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Date of Birth"))
+        .FusionInPlaceEditor(b => b
+            .Type(SfInPlace.InputType.Date)
+            .Mode(SfInPlace.RenderMode.Inline)
+            .EditableOn(SfInPlace.EditableType.Click)
+            .Reactive(plan, evt => evt.BeginEdit, (args, p) =>
+            {
+                // Clear the saved-indicator the moment the user starts editing again.
+                p.Component<FusionInPlaceEditor>(m => m.Value).RemoveClass("alis-editor-saved");
+            })
+            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
+            {
+                p.Post(updateUrl)
+                 .Gather(g => g
+                     .Include<FusionInPlaceEditor, DateOfBirthQuickEdit>(m => m.Value)
+                     .Include<NativeHiddenField, DateOfBirthQuickEdit>(m => m.ResidentId))
+                 .Validate<DateOfBirthQuickEditValidator>("card-dob")
+                 .Response(r => r
+                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                    {
+                        s.Element("card-dob-display").SetText(json, x => x.DisplayValue);
+                        // Flip the saved-indicator once the server confirms the commit.
+                        s.Component<FusionInPlaceEditor>(m => m.Value).AddClass("alis-editor-saved");
+                    })
+                    .OnError<InPlaceEditorCommitError>((err, e) =>
+                    {
+                        e.Element("card-dob-error").SetText(err, x => x.Message);
+                    }));
+            })); }
+
+    <p class="text-sm mt-3">Display: <span id="card-dob-display" class="font-mono text-text-muted">unchanged</span></p>
+    <p class="text-sm">Error: <span id="card-dob-error" class="text-red-600"></span></p>
+</section>
+
+@Html.RenderPlan(plan)

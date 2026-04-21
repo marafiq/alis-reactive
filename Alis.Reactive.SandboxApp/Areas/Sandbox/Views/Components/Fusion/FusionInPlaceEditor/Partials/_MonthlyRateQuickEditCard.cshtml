@@ -1,0 +1,59 @@
+@model MonthlyRateQuickEdit
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@{
+    var plan = Html.ReactivePlan<MonthlyRateQuickEdit>();
+    var updateUrl = Url.Action("UpdateMonthlyRate", "FusionInPlaceEditor", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve FusionInPlaceEditor.UpdateMonthlyRate.");
+}
+
+<section id="card-monthly-rate" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Monthly Rate — FluentValidation both sides</h3>
+    <p class="text-xs text-text-secondary mb-2">
+        One <code>MonthlyRateQuickEditValidator</code> drives both sides. Client extracts the
+        <code>GreaterThan/LessThanOrEqualTo</code> rules and blocks the POST on invalid input.
+        A <code>Must()</code> rule that simulates a DB lookup is not extractable by the adapter and runs
+        server-only: enter <strong>7777</strong> to watch the client pass, the server reject with
+        <code>{ errors: { Value: [...] } }</code>, and <code>.OnError(400, e => e.ValidationErrors(formId))</code>
+        render the message into the per-field validation slot.
+    </p>
+
+    @Html.HiddenFieldFor(plan, m => m.ResidentId)
+
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Monthly Rate"))
+        .FusionInPlaceEditor(b => b
+            .Type(SfInPlace.InputType.Numeric)
+            .Mode(SfInPlace.RenderMode.Inline)
+            .EditableOn(SfInPlace.EditableType.Click)
+            .Model(new { format = "C0", min = 0, max = 25000, step = 50 })
+            .Reactive(plan, evt => evt.BeginEdit, (args, p) =>
+            {
+                p.Component<FusionInPlaceEditor>(m => m.Value).RemoveClass("alis-editor-saved");
+            })
+            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
+            {
+                p.Post(updateUrl)
+                 .Gather(g => g
+                     .Include<FusionInPlaceEditor, MonthlyRateQuickEdit>(m => m.Value)
+                     .Include<NativeHiddenField, MonthlyRateQuickEdit>(m => m.ResidentId))
+                 .Validate<MonthlyRateQuickEditValidator>("card-monthly-rate")
+                 .Response(r => r
+                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                    {
+                        s.Element("card-monthly-rate-display").SetText(json, x => x.DisplayValue);
+                        s.Component<FusionInPlaceEditor>(m => m.Value).AddClass("alis-editor-saved");
+                    })
+                    .OnError(400, e => e.ValidationErrors("card-monthly-rate"))
+                    .OnError<InPlaceEditorCommitError>((err, e) =>
+                    {
+                        e.Element("card-monthly-rate-error").SetText(err, x => x.Message);
+                    }));
+            })); }
+
+    <p class="text-sm mt-3">Display: <span id="card-monthly-rate-display" class="font-mono text-text-muted">unchanged</span></p>
+    <p class="text-sm">Other error: <span id="card-monthly-rate-error" class="text-red-600"></span></p>
+</section>
+
+@Html.RenderPlan(plan)

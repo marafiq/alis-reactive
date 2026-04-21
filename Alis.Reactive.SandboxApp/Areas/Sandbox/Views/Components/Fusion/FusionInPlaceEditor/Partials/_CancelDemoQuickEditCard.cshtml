@@ -1,0 +1,29 @@
+@model CancelDemoQuickEdit
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@{
+    var plan = Html.ReactivePlan<CancelDemoQuickEdit>();
+}
+
+<section id="card-cancel" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Cancel — CancelClick event side effect (no commit)</h3>
+    <p class="text-xs text-text-secondary mb-2">Click the pencil, type anything, click Cancel (×). No HTTP. Standalone model still carries ResidentId for consistency with other cards.</p>
+
+    @Html.HiddenFieldFor(plan, m => m.ResidentId)
+
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Nickname"))
+        .FusionInPlaceEditor(b => b
+            .Type(SfInPlace.InputType.Text)
+            .Mode(SfInPlace.RenderMode.Inline)
+            .EditableOn(SfInPlace.EditableType.Click)
+            .Reactive(plan, evt => evt.CancelClick, (args, p) =>
+            {
+                p.Element("card-cancel-status").SetText("User cancelled the edit");
+            })); }
+
+    <p class="text-sm mt-3">Status: <span id="card-cancel-status" class="font-mono text-text-muted">(no cancel yet)</span></p>
+</section>
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,60 @@
+@model AllergiesQuickEdit
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@{
+    var plan = Html.ReactivePlan<AllergiesQuickEdit>();
+    var updateUrl = Url.Action("UpdateAllergies", "FusionInPlaceEditor", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve FusionInPlaceEditor.UpdateAllergies.");
+
+    var allergies = new[]
+    {
+        new { code = "peanuts",    name = "Peanuts" },
+        new { code = "penicillin", name = "Penicillin" },
+        new { code = "shellfish",  name = "Shellfish" },
+        new { code = "latex",      name = "Latex" },
+        new { code = "gluten",     name = "Gluten" }
+    };
+}
+
+<section id="card-allergies" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Allergies — MultiSelect inner type (Shape.Array(String))</h3>
+    <p class="text-xs text-text-secondary mb-2">Value is <code>string[]</code>. Proves array-shape registration flows through <code>Value&lt;TModel&gt;()</code> and the commit payload.</p>
+
+    @Html.HiddenFieldFor(plan, m => m.ResidentId)
+
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Allergies"))
+        .FusionInPlaceEditor(b => b
+            .Type(SfInPlace.InputType.MultiSelect)
+            .Mode(SfInPlace.RenderMode.Inline)
+            .EditableOn(SfInPlace.EditableType.Click)
+            .Model(new {
+                dataSource = allergies,
+                fields = new { text = "name", value = "code" },
+                placeholder = "Select allergies"
+            })
+            .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
+            {
+                p.Post(updateUrl)
+                 .Gather(g => g
+                     .Include<FusionInPlaceEditor, AllergiesQuickEdit>(m => m.Value)
+                     .Include<NativeHiddenField, AllergiesQuickEdit>(m => m.ResidentId))
+                 .Validate<AllergiesQuickEditValidator>("card-allergies")
+                 .Response(r => r
+                    .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
+                    {
+                        s.Element("card-allergies-display").SetText(json, x => x.DisplayValue);
+                    })
+                    .OnError(400, e => e.ValidationErrors("card-allergies"))
+                    .OnError<InPlaceEditorCommitError>((err, e) =>
+                    {
+                        e.Element("card-allergies-error").SetText(err, x => x.Message);
+                    }));
+            })); }
+
+    <p class="text-sm mt-3">Display: <span id="card-allergies-display" class="font-mono text-text-muted">unchanged</span></p>
+    <p class="text-sm">Error: <span id="card-allergies-error" class="text-red-600"></span></p>
+</section>
+
+@Html.RenderPlan(plan)

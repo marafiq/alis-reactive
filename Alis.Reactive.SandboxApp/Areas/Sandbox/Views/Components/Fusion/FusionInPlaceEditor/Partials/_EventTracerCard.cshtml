@@ -1,0 +1,94 @@
+@model InPlaceEditorEventTracerModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using SfInPlace = Syncfusion.EJ2.InPlaceEditor
+@{
+    var plan = Html.ReactivePlan<InPlaceEditorEventTracerModel>();
+}
+
+<section id="card-event-tracer" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Event tracer — every onboarded lifecycle event, surfaced live</h3>
+    <p class="text-xs text-text-secondary mb-3">
+        Each <code>FusionInPlaceEditor</code> event exposed by the slice is wired once on the builder and
+        writes its typed args-prop into a dedicated trace cell. <code>PreventDefault</code> on
+        <code>BeginEdit</code> blocks edit-mode entry when the current stored value equals <code>"lock"</code>.
+    </p>
+
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Type anything; try \"lock\" to block BeginEdit"))
+        .FusionInPlaceEditor(b =>
+        {
+            b.Type(SfInPlace.InputType.Text)
+             .Mode(SfInPlace.RenderMode.Inline)
+             .EditableOn(SfInPlace.EditableType.Click);
+
+            // PreventDefault on BeginEdit when the currently-stored value equals "lock".
+            b.Reactive(plan, evt => evt.BeginEdit, (args, p) =>
+            {
+                p.Element("trace-begin").SetText(args, x => x.Mode);
+                p.When(p.Component<FusionInPlaceEditor>(m => m.Value).Value()).Eq("lock")
+                    .Then(then => args.PreventDefault(then));
+            });
+
+            // Change event — reads args.Value and surfaces it live.
+            b.Reactive(plan, evt => evt.Changed, (args, p) =>
+            {
+                p.Element("trace-change").SetText(args, x => x.Value);
+            });
+
+            // EndEdit — reads args.Action ("submit" / "cancel" / "outside").
+            b.Reactive(plan, evt => evt.EndEdit, (args, p) =>
+            {
+                p.Element("trace-endedit").SetText(args, x => x.Action);
+            });
+
+            // ActionBegin — PreventDefault extension proven here too.
+            b.Reactive(plan, evt => evt.ActionBegin, (args, p) =>
+            {
+                p.Element("trace-actionbegin").SetText("fired");
+            });
+
+            // ActionSuccess — reads args.Value.
+            b.Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
+            {
+                p.Element("trace-actionsuccess").SetText(args, x => x.Value);
+            });
+
+            // SubmitClick — args.Name only.
+            b.Reactive(plan, evt => evt.SubmitClick, (args, p) =>
+            {
+                p.Element("trace-submitclick").SetText(args, x => x.Name);
+            });
+
+            // CancelClick — args.Name only.
+            b.Reactive(plan, evt => evt.CancelClick, (args, p) =>
+            {
+                p.Element("trace-cancelclick").SetText(args, x => x.Name);
+            });
+        }); }
+
+    <dl class="mt-4 grid grid-cols-2 gap-2 text-xs font-mono">
+        <dt class="text-text-secondary">BeginEdit args.Mode</dt>
+        <dd><span id="trace-begin" class="text-text-muted"></span></dd>
+
+        <dt class="text-text-secondary">Change args.Value</dt>
+        <dd><span id="trace-change" class="text-text-muted"></span></dd>
+
+        <dt class="text-text-secondary">EndEdit args.Action</dt>
+        <dd><span id="trace-endedit" class="text-text-muted"></span></dd>
+
+        <dt class="text-text-secondary">ActionBegin</dt>
+        <dd><span id="trace-actionbegin" class="text-text-muted"></span></dd>
+
+        <dt class="text-text-secondary">ActionSuccess args.Value</dt>
+        <dd><span id="trace-actionsuccess" class="text-text-muted"></span></dd>
+
+        <dt class="text-text-secondary">SubmitClick args.Name</dt>
+        <dd><span id="trace-submitclick" class="text-text-muted"></span></dd>
+
+        <dt class="text-text-secondary">CancelClick args.Name</dt>
+        <dd><span id="trace-cancelclick" class="text-text-muted"></span></dd>
+    </dl>
+</section>
+
+@Html.RenderPlan(plan)
