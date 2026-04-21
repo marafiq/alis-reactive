@@ -28,6 +28,10 @@
             .Mode(SfInPlace.RenderMode.Inline)
             .EditableOn(SfInPlace.EditableType.Click)
             .Model(new { format = "C0", min = 0, max = 25000, step = 50 })
+            .Reactive(plan, evt => evt.BeginEdit, (args, p) =>
+            {
+                p.Component<FusionInPlaceEditor>(m => m.Value).RemoveClass("alis-editor-saved");
+            })
             .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
             {
                 p.Post(updateUrl)
@@ -39,6 +43,7 @@
                     .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
                     {
                         s.Element("card-monthly-rate-display").SetText(json, x => x.DisplayValue);
+                        s.Component<FusionInPlaceEditor>(m => m.Value).AddClass("alis-editor-saved");
                     })
                     .OnError(400, e => e.ValidationErrors("card-monthly-rate"))
                     .OnError<InPlaceEditorCommitError>((err, e) =>

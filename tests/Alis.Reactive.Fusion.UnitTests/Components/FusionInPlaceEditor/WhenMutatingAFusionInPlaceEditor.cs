@@ -93,4 +93,41 @@ public class WhenMutatingAFusionInPlaceEditor : FusionTestBase
         Assert.That(json, Does.Contain("\"setFocus\""));
     }
 
+    [Test]
+    public void AddClass_produces_call_reaction_to_classList_add()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).DomReady(p =>
+            p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).AddClass("alis-editor-saved"));
+
+        var json = plan.RenderFormatted();
+        AssertSchemaValid(json);
+
+        Assert.That(json, Does.Contain("\"call\""));
+        Assert.That(json, Does.Contain("\"classAdd\""));
+        // Path walks through ej.element (SF wraps the DOM element there) then classList.add.
+        Assert.That(json, Does.Contain("\"element\""));
+        Assert.That(json, Does.Contain("\"classList\""));
+        Assert.That(json, Does.Contain("\"add\""));
+        Assert.That(json, Does.Contain("alis-editor-saved"));
+    }
+
+    [Test]
+    public void RemoveClass_produces_call_reaction_to_classList_remove()
+    {
+        var plan = CreatePlan();
+        Trigger(plan).DomReady(p =>
+            p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).RemoveClass("alis-editor-saved"));
+
+        var json = plan.RenderFormatted();
+        AssertSchemaValid(json);
+
+        Assert.That(json, Does.Contain("\"call\""));
+        Assert.That(json, Does.Contain("\"classRemove\""));
+        Assert.That(json, Does.Contain("\"element\""));
+        Assert.That(json, Does.Contain("\"classList\""));
+        Assert.That(json, Does.Contain("\"remove\""));
+        Assert.That(json, Does.Contain("alis-editor-saved"));
+    }
+
 }

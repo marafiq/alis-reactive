@@ -67,6 +67,46 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall("setFocus");
 
+        /// <summary>Adds a CSS class to the editor's outer wrapper.</summary>
+        /// <remarks>
+        /// Emits a call on Syncfusion's <c>element.classList.add</c>. The Fusion vendor resolver
+        /// returns the ej2 instance, so the path reaches through <c>ej.element</c> (SF's reference
+        /// back to the editor's outer DOM element). The class persists across SF's edit/close
+        /// cycles; typical use is a visual commit signal (e.g. a CSS <c>::after</c> check mark)
+        /// wired on <c>ActionSuccess</c> and removed on <c>BeginEdit</c>.
+        /// </remarks>
+        /// <param name="self">The component reference for the target editor.</param>
+        /// <param name="className">The class name to add.</param>
+        /// <returns>The component reference for method chaining.</returns>
+        public static ComponentRef<FusionInPlaceEditor, TModel> AddClass<TModel>(
+            this ComponentRef<FusionInPlaceEditor, TModel> self, string className)
+            where TModel : class
+        {
+            var key = self.Pipeline.Context.EnsureComponent(self.TargetId, self.Vendor);
+            self.Pipeline.Context.EnsureMethod(key, "classAdd", "element.classList.add");
+            self.Pipeline.Steps.Add(Reaction.Call(
+                ComponentSource.Of(key), "classAdd",
+                new List<ValueProducer> { ValueProducer.Literal(className) }));
+            return self;
+        }
+
+        /// <summary>Removes a CSS class from the editor's outer wrapper.</summary>
+        /// <remarks>Emits a call on Syncfusion's <c>element.classList.remove</c>.</remarks>
+        /// <param name="self">The component reference for the target editor.</param>
+        /// <param name="className">The class name to remove.</param>
+        /// <returns>The component reference for method chaining.</returns>
+        public static ComponentRef<FusionInPlaceEditor, TModel> RemoveClass<TModel>(
+            this ComponentRef<FusionInPlaceEditor, TModel> self, string className)
+            where TModel : class
+        {
+            var key = self.Pipeline.Context.EnsureComponent(self.TargetId, self.Vendor);
+            self.Pipeline.Context.EnsureMethod(key, "classRemove", "element.classList.remove");
+            self.Pipeline.Steps.Add(Reaction.Call(
+                ComponentSource.Of(key), "classRemove",
+                new List<ValueProducer> { ValueProducer.Literal(className) }));
+            return self;
+        }
+
         /// <summary>Reads the current committed value for use in conditions or gather.</summary>
         /// <remarks>
         /// Reads Syncfusion's outer <c>value</c> property using the shape registered at render time
