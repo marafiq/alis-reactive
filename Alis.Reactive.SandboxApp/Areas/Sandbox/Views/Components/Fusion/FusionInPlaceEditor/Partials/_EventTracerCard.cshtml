@@ -8,15 +8,11 @@
 }
 
 <section id="card-event-tracer" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
-    <h3 class="text-sm font-semibold mb-3">Quick-edit: Event tracer — 7 lifecycle events surfaced live</h3>
+    <h3 class="text-sm font-semibold mb-3">Quick-edit: Event tracer — every onboarded lifecycle event, surfaced live</h3>
     <p class="text-xs text-text-secondary mb-3">
-        Every <code>FusionInPlaceEditor</code> event the slice exposes is wired once on the builder; each one
+        Each <code>FusionInPlaceEditor</code> event exposed by the slice is wired once on the builder and
         writes its typed args-prop into a dedicated trace cell. <code>PreventDefault</code> on
-        <code>BeginEdit</code> blocks edit-mode entry when the current value equals <code>"lock"</code>.
-        <strong>Validating + SetErrorMessage</strong> and <strong>ActionFailure</strong> are
-        unit-test-only: Validating requires Syncfusion's <code>ValidationRules</code> (which crashes inside
-        <code>SO.getErrorElement</code> when rendered outside an MVC form scaffold); ActionFailure requires
-        SF's <code>UrlAdaptor</code> commit path, which this slice deliberately does not use.
+        <code>BeginEdit</code> blocks edit-mode entry when the current stored value equals <code>"lock"</code>.
     </p>
 
     @{ Html.InputField(plan, m => m.Value, o => o.Label("Type anything; try \"lock\" to block BeginEdit"))

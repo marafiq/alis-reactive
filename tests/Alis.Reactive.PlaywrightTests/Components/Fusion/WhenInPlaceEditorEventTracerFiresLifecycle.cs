@@ -3,16 +3,8 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
-/// Event tracer card: proves the 7 lifecycle events that fire without Syncfusion's UrlAdaptor
-/// or ValidationRules surface their typed args-props into dedicated trace cells.
-///
-/// Out of scope for the sandbox demo (covered by unit tests only):
-/// <list type="bullet">
-///   <item><c>ActionFailure</c> requires SF's UrlAdaptor commit path, which this slice does not use.</item>
-///   <item><c>Validating</c> + <c>SetErrorMessage</c> / <c>PreventDefault</c> require SF's
-///   <c>ValidationRules</c>; SF's internal <c>getErrorElement</c> assumes an MVC form scaffold
-///   and throws when rendered inside our <c>InputField</c> wrapper.</item>
-/// </list>
+/// Event tracer card: proves every onboarded lifecycle event surfaces its typed args-props
+/// into a dedicated trace cell end-to-end in the browser.
 /// </summary>
 [TestFixture]
 public class WhenInPlaceEditorEventTracerFiresLifecycle : PlaywrightTestBase

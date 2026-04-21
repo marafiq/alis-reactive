@@ -33,11 +33,6 @@ namespace Alis.Reactive.Fusion.Components
             new TypedEvent<FusionInPlaceEditorChangeArgs>(
                 "change", new FusionInPlaceEditorChangeArgs());
 
-        /// <summary>Fires during validation (SF "validating" event). Only fires when builder configures <c>validationRules</c>.</summary>
-        public TypedEvent<FusionInPlaceEditorValidatingArgs> Validating =>
-            new TypedEvent<FusionInPlaceEditorValidatingArgs>(
-                "validating", new FusionInPlaceEditorValidatingArgs());
-
         /// <summary>Fires before the submit step (SF "actionBegin" event). Rarely hooked; set <c>cancel = true</c> via <c>PreventDefault</c> to block.</summary>
         public TypedEvent<FusionInPlaceEditorActionBeginArgs> ActionBegin =>
             new TypedEvent<FusionInPlaceEditorActionBeginArgs>(
@@ -47,11 +42,6 @@ namespace Alis.Reactive.Fusion.Components
         public TypedEvent<FusionInPlaceEditorActionSuccessArgs> ActionSuccess =>
             new TypedEvent<FusionInPlaceEditorActionSuccessArgs>(
                 "actionSuccess", new FusionInPlaceEditorActionSuccessArgs());
-
-        /// <summary>Fires after a failed SF-initiated commit (SF "actionFailure"). Only meaningful if the builder configures a URL; otherwise this path is unused.</summary>
-        public TypedEvent<FusionInPlaceEditorActionFailureArgs> ActionFailure =>
-            new TypedEvent<FusionInPlaceEditorActionFailureArgs>(
-                "actionFailure", new FusionInPlaceEditorActionFailureArgs());
 
         /// <summary>Fires on a user save click or Enter key (SF "submitClick"). Fires even when validation blocks the commit; use <see cref="ActionSuccess"/> for post-commit side effects.</summary>
         public TypedEvent<FusionInPlaceEditorSubmitClickArgs> SubmitClick =>

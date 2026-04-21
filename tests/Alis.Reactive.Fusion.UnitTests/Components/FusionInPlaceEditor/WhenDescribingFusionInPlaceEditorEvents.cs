@@ -36,14 +36,6 @@ public class WhenDescribingFusionInPlaceEditorEvents
     }
 
     [Test]
-    public void Validating_descriptor_maps_to_sf_event_name()
-    {
-        var d = FusionInPlaceEditorEvents.Instance.Validating;
-        Assert.That(d.JsEvent, Is.EqualTo("validating"));
-        Assert.That(d.Args, Is.TypeOf<FusionInPlaceEditorValidatingArgs>());
-    }
-
-    [Test]
     public void ActionBegin_descriptor_maps_to_sf_event_name()
     {
         var d = FusionInPlaceEditorEvents.Instance.ActionBegin;
@@ -57,14 +49,6 @@ public class WhenDescribingFusionInPlaceEditorEvents
         var d = FusionInPlaceEditorEvents.Instance.ActionSuccess;
         Assert.That(d.JsEvent, Is.EqualTo("actionSuccess"));
         Assert.That(d.Args, Is.TypeOf<FusionInPlaceEditorActionSuccessArgs>());
-    }
-
-    [Test]
-    public void ActionFailure_descriptor_maps_to_sf_event_name()
-    {
-        var d = FusionInPlaceEditorEvents.Instance.ActionFailure;
-        Assert.That(d.JsEvent, Is.EqualTo("actionFailure"));
-        Assert.That(d.Args, Is.TypeOf<FusionInPlaceEditorActionFailureArgs>());
     }
 
     [Test]
@@ -119,18 +103,6 @@ public class WhenDescribingFusionInPlaceEditorEvents
     }
 
     [Test]
-    public void Validating_args_has_expected_defaults()
-    {
-        var args = new FusionInPlaceEditorValidatingArgs();
-        Assert.Multiple(() =>
-        {
-            Assert.That(args.Data, Is.Null);
-            Assert.That(args.Cancel, Is.False);
-            Assert.That(args.ErrorMessage, Is.Null);
-        });
-    }
-
-    [Test]
     public void ActionBegin_args_has_expected_defaults()
     {
         var args = new FusionInPlaceEditorActionBeginArgs();
@@ -152,14 +124,4 @@ public class WhenDescribingFusionInPlaceEditorEvents
         });
     }
 
-    [Test]
-    public void ActionFailure_args_has_expected_defaults()
-    {
-        var args = new FusionInPlaceEditorActionFailureArgs();
-        Assert.Multiple(() =>
-        {
-            Assert.That(args.Value, Is.Null);
-            Assert.That(args.Data, Is.Null);
-        });
-    }
 }

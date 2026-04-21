@@ -74,8 +74,6 @@ b.Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
 
 Do **not** configure Syncfusion's `ValidationRules` dictionary in parallel. That duplicates the validator declaration (one in the view, one in the `FluentValidator<T>`) and creates two independent enforcement paths that can drift out of sync. The framework's single-source-of-truth rule applies: one validator, one plan, one enforcement path.
 
-The `Validating` event and `PreventDefault` / `SetErrorMessage` extensions remain on the API for advanced scenarios where a consumer legitimately needs to observe SF's internal validation (e.g. third-party validation rules SF ships natively that have no FluentValidator counterpart). They are not part of the recommended commit flow.
-
 ## How do I react to user cancel?
 
 ```csharp
@@ -110,10 +108,8 @@ b.Reactive(plan, evt => evt.CancelClick, (args, p) =>
 | `BeginEdit` | User opens the editor | `cancel`, `cancelFocus`, `mode` |
 | `Change` | Inner value changes while editing | `value`, `previousValue` |
 | `EndEdit` | Editor leaves edit mode | `cancel`, `action` (`"submit"` or `"cancel"`) |
-| `Validating` | Pre-commit validation (only with `ValidationRules` set) | `errorMessage`, `cancel`, `data` |
 | `ActionBegin` | Before SF's submit lifecycle | `cancel`, `data` (`{ name, primaryKey, value }`) |
-| `ActionSuccess` | After successful commit — **use as your reactive commit hook** | `value`, `data` |
-| `ActionFailure` | After SF-initiated commit fails | `value`, `data` |
+| `ActionSuccess` | After successful commit &mdash; **use as your reactive commit hook** | `value`, `data` |
 | `SubmitClick` | User clicked Save or pressed Enter | `name` only; fires even when validation blocked the commit |
 | `CancelClick` | User clicked Cancel | `name` only |
 
@@ -121,5 +117,4 @@ b.Reactive(plan, evt => evt.CancelClick, (args, p) =>
 
 | Extension | On which args | Purpose |
 |---|---|---|
-| `PreventDefault(pipeline)` | `BeginEditArgs`, `EndEditArgs`, `ActionBeginArgs`, `ValidatingArgs` | Sets `args.cancel = true` so SF honors the block |
-| `SetErrorMessage(pipeline, string)` | `ValidatingArgs` | Writes `args.errorMessage` so SF renders it in the native inline slot |
+| `PreventDefault(pipeline)` | `BeginEditArgs`, `EndEditArgs`, `ActionBeginArgs` | Sets `args.cancel = true` so SF honors the block |
