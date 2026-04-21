@@ -45,7 +45,7 @@ namespace Alis.Reactive.Fusion.Components
             }
             catch
             {
-                // No initial model value — editor starts empty.
+                // No initial model value; editor starts empty.
             }
 
             var builder = setup.Helper.EJS().InPlaceEditor(setup.ElementId)

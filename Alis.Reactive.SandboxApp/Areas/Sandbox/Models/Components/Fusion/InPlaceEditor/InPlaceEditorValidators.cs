@@ -70,8 +70,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public MedicalRecordNumberQuickEditValidator()
         {
-            // MRN format: 3 letters + "-" + 4 digits (e.g. "MRN-1234").
-            RuleFor(x => x.Value).NotEmpty().Matches(@"^[A-Z]{3}-\d{4}$");
+            // Syncfusion Mask exposes `value` with mask literals stripped — the dash is
+            // display-only. Domain value is 3 letters + 4 digits (e.g. "MRN1234"),
+            // rendered as "MRN-1234" through the LLL-0000 mask.
+            RuleFor(x => x.Value).NotEmpty().Matches(@"^[A-Z]{3}\d{4}$");
         }
     }
 }

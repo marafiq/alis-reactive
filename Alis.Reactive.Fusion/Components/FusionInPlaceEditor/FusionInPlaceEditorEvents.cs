@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <c>.Reactive(plan, evt =&gt; evt.ActionSuccess, (args, p) =&gt; { … })</c>.
     /// <para>
     /// Commit flow (<c>url</c> not set): <c>beginEdit → change → endEdit → actionBegin → actionSuccess → submitClick</c>.
-    /// Hook <see cref="ActionSuccess"/> for the commit POST — it only fires after validation passes.
+    /// Hook <see cref="ActionSuccess"/> for the commit POST: it only fires after validation passes.
     /// <see cref="SubmitClick"/> fires on every user save intent including blocked saves and is not a commit-success signal.
     /// </para>
     /// </remarks>

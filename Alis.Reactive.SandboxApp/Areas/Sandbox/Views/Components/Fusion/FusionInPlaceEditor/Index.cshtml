@@ -109,7 +109,9 @@
     @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_CancelDemoQuickEditCard.cshtml",  new CancelDemoQuickEdit  { ResidentId = residentId, Value = Model.Nickname })
     @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_AllergiesQuickEditCard.cshtml",     new AllergiesQuickEdit     { ResidentId = residentId, Value = new[] { "penicillin" } })
     @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_LastAdmissionQuickEditCard.cshtml", new LastAdmissionQuickEdit { ResidentId = residentId, Value = Model.AdmissionDate })
-    @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_MedicalRecordNumberQuickEditCard.cshtml", new MedicalRecordNumberQuickEdit { ResidentId = residentId, Value = "MRN-1234" })
+    @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_MedicalRecordNumberQuickEditCard.cshtml", new MedicalRecordNumberQuickEdit { ResidentId = residentId, Value = "MRN1234" })
+    @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_ControlPanelCard.cshtml", new InPlaceEditorControlPanelModel { Value = "Hello" })
+    @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_EventTracerCard.cshtml", new InPlaceEditorEventTracerModel { Value = "" })
 
     <!-- Plan JSON (main-view §A plan only) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">

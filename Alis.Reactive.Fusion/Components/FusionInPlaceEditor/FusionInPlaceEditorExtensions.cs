@@ -21,12 +21,13 @@ namespace Alis.Reactive.Fusion.Components
         /// Writes to Syncfusion's <c>value</c> property. Updates the displayed text immediately
         /// without firing <c>change</c>.
         /// </remarks>
+        /// <param name="self">The component reference for the target editor.</param>
         /// <param name="value">The value to commit, or <see langword="null"/> to clear.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionInPlaceEditor, TModel> SetValue<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string? value)
             where TModel : class
-            => self.EmitSet("value", ValueProducer.Literal(value));
+            => self.EmitSet("value", value != null ? ValueProducer.Literal(value) : ValueProducer.Null());
 
         /// <summary>Enables the editor, restoring edit-mode entry.</summary>
         /// <remarks>
@@ -84,7 +85,7 @@ namespace Alis.Reactive.Fusion.Components
         /// A <c>DateTime?</c>-bound editor reads as date, a <c>decimal</c>-bound editor reads as number,
         /// a <c>string</c>-bound editor reads as string. The component must be registered via
         /// <c>Html.InputField(plan, m => m.X).FusionInPlaceEditor(...)</c> before this read is built
-        /// into the plan — no hardcoded shape, no fallback.
+        /// into the plan: no hardcoded shape, no fallback.
         /// </remarks>
         /// <returns>A typed source representing the editor's current committed value.</returns>
         /// <exception cref="InvalidOperationException">
@@ -102,7 +103,7 @@ namespace Alis.Reactive.Fusion.Components
                 throw new InvalidOperationException(
                     $"FusionInPlaceEditor '{self.TargetId}' is not registered. " +
                     "Render the editor with Html.InputField(plan, m => m.X).FusionInPlaceEditor(...) " +
-                    "before reading .Value() in a pipeline — the registered shape drives the typed read.");
+                    "before reading .Value() in a pipeline; the registered shape drives the typed read.");
             }
 
             self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, reg.Shape, "read");

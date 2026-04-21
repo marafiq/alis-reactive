@@ -94,12 +94,35 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         [HttpPost("UpdateMonthlyRate")]
-        public IActionResult UpdateMonthlyRate([FromBody] MonthlyRateQuickEdit body)
+        public IActionResult UpdateMonthlyRate([FromBody] MonthlyRateQuickEdit? body)
         {
-            if (body == null || body.Value <= 0)
-                return BadRequest(new InPlaceEditorCommitError { Message = "Monthly rate must be positive." });
-            if (string.IsNullOrWhiteSpace(body.ResidentId))
-                return BadRequest(new InPlaceEditorCommitError { Message = "ResidentId missing from commit payload." });
+            if (body == null)
+                return BadRequest(new { errors = new Dictionary<string, string[]> { ["Value"] = new[] { "Request body is required." } } });
+
+            // Same FluentValidator used client-side. Server runs it; on failure returns the framework's standard
+            // { errors: { fieldName: [msg] } } shape so .OnError(400, e => e.ValidationErrors(formId)) on the
+            // client writes each message into its per-field validation slot. No custom rules, no SF channel.
+            var result = new MonthlyRateQuickEditValidator().Validate(body);
+            if (!result.IsValid)
+            {
+                var errors = new Dictionary<string, string[]>();
+                foreach (var failure in result.Errors)
+                {
+                    if (errors.TryGetValue(failure.PropertyName, out var existing))
+                    {
+                        var extended = new string[existing.Length + 1];
+                        existing.CopyTo(extended, 0);
+                        extended[existing.Length] = failure.ErrorMessage;
+                        errors[failure.PropertyName] = extended;
+                    }
+                    else
+                    {
+                        errors[failure.PropertyName] = new[] { failure.ErrorMessage };
+                    }
+                }
+                return BadRequest(new { errors });
+            }
+
             return Ok(new InPlaceEditorUpdateResponse
             {
                 DisplayValue = $"{body.Value:C} (resident={body.ResidentId})",

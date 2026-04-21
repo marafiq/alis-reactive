@@ -3,7 +3,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>Event payload delivered after a successful commit of a <see cref="FusionInPlaceEditor"/>.</summary>
     /// <remarks>
     /// Primary hook for the reactive commit pipeline. Fires only after validation passes. Editor is still
-    /// open and display text is still stale when this fires — SF closes the editor immediately after.
+    /// open and display text is still stale when this fires; SF closes the editor immediately after.
     /// </remarks>
     public class FusionInPlaceEditorActionSuccessArgs
     {

@@ -69,6 +69,20 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? Value { get; set; }
     }
 
+    // --- API-surface coverage cards (demo-only; no commit endpoint) ---
+
+    public class InPlaceEditorControlPanelModel
+    {
+        // Demo: Text inner, proves SetValue/Enable/Disable/Save/Focus/Validate mutations and the Value() read.
+        public string? Value { get; set; }
+    }
+
+    public class InPlaceEditorEventTracerModel
+    {
+        // Demo: Text inner with SF ValidationRules so Validating fires alongside the lifecycle events.
+        public string? Value { get; set; }
+    }
+
     // --- Lookup DTOs (shared by §A and §B) ---
 
     public class InPlaceEditorCareLevelOption

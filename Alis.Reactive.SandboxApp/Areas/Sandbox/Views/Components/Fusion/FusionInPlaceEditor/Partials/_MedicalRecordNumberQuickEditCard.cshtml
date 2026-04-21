@@ -11,7 +11,7 @@
 
 <section id="card-mrn" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
     <h3 class="text-sm font-semibold mb-3">Quick-edit: MRN — Mask inner type (format-constrained string)</h3>
-    <p class="text-xs text-text-secondary mb-2">Mask <code>LLL-0000</code> enforces 3 letters + dash + 4 digits. Value is still <code>string</code>; FluentValidator regex proves format on commit.</p>
+    <p class="text-xs text-text-secondary mb-2">Mask <code>LLL-0000</code> is a display formatter — Syncfusion stores the raw 7 characters (<code>MRN1234</code>) in the outer <code>value</code> and renders them as <code>MRN-1234</code> through the mask. FluentValidator regex <code>^[A-Z]{3}\d{4}$</code> proves the raw format on commit.</p>
 
     @Html.HiddenFieldFor(plan, m => m.ResidentId)
 
