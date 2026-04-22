@@ -35,6 +35,7 @@ TestResults/
 # packed into the NuGet by Alis.Reactive.csproj — never copied into
 # sandbox wwwroot. Sandbox-only bundles live in SandboxApp/wwwroot/.
 Alis.Reactive.Assets/dist/
+Alis.Reactive.Fusion/dist/
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
 Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
 
@@ -51,3 +52,4 @@ docs-site/public/downloads/resident-intake.zip
 # diffs and orphaned files when the AlisReactive version bumps.
 examples/resident-intake/wwwroot/scripts/alis-reactive.*.js
 examples/resident-intake/wwwroot/css/design-system.*.css
+examples/resident-intake/wwwroot/css/syncfusion.*.css

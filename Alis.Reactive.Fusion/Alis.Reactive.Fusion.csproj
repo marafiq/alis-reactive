@@ -32,4 +32,22 @@
       <InternalsVisibleTo Include="Alis.Reactive.Fusion.UnitTests" />
     </ItemGroup>
 
+    <!-- Ship Syncfusion EJ2 CSS (built by vite.fusion.config.ts from
+         @syncfusion/ej2/tailwind3.css + our syncfusion.overrides.css) as a
+         NuGet content file. Structure mirrors AlisReactive.csproj: packed
+         under BOTH build\ and buildTransitive\ so packages.config consumers
+         and PackageReference transitive flows both pick up the asset and the
+         Copy target that lands it in the consumer's wwwroot. -->
+    <ItemGroup>
+        <None Include="dist\css\syncfusion.dev.css" Pack="true" PackagePath="build\assets\css\syncfusion.css" />
+        <None Include="dist\css\syncfusion.dev.css" Pack="true" PackagePath="buildTransitive\assets\css\syncfusion.css" />
+        <None Include="build\AlisReactive.Fusion.targets" Pack="true" PackagePath="build\AlisReactive.Fusion.targets" />
+        <None Include="build\AlisReactive.Fusion.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.Fusion.targets" />
+    </ItemGroup>
+
+    <Target Name="VerifyFusionBundleExistsBeforePack" BeforeTargets="GenerateNuspec">
+        <Error Condition="!Exists('$(MSBuildThisFileDirectory)dist\css\syncfusion.dev.css')"
+               Text="syncfusion.dev.css bundle not found. Run 'npm run build:all' from the repo root before packing." />
+    </Target>
+
 </Project>

@@ -41,25 +41,36 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Sandbox eats its own dog food as an Alis.Reactive consumer: serve the
-// framework runtime bundles (alis-reactive.js, design-system.css) straight
-// from the sibling Alis.Reactive.Assets/dist produced by `npm run build:all`.
-// Same path in dev and CI — no copy into sandbox wwwroot required, so
-// `git status` stays clean after a local build.
+// framework runtime bundles straight from the sibling project dist/ trees
+// produced by `npm run build:all`. Same path in dev and CI — no copy into
+// sandbox wwwroot required, so `git status` stays clean after a local build.
 //
-// Fail fast if the dist folder is missing (Rule 5). The sandbox is a dev-only
+//   Alis.Reactive.Assets/dist/   — core:   alis-reactive.dev.js, design-system.dev.css
+//   Alis.Reactive.Fusion/dist/   — Fusion: syncfusion.dev.css
+//
+// Fail fast if either dist folder is missing (Rule 5). The sandbox is a dev-only
 // harness — there is no environment where it should boot without bundles.
 // Silently skipping would leave it serving 404 on the runtime bundle with
 // no log signal, a trap for first-run devs who haven't run the JS build yet.
 var frameworkAssetsDir = Path.GetFullPath(Path.Combine(
     app.Environment.ContentRootPath, "..", "Alis.Reactive.Assets", "dist"));
+var fusionAssetsDir = Path.GetFullPath(Path.Combine(
+    app.Environment.ContentRootPath, "..", "Alis.Reactive.Fusion", "dist"));
 if (!Directory.Exists(frameworkAssetsDir))
 {
     throw new InvalidOperationException(
         $"Framework asset bundles not found at '{frameworkAssetsDir}'. " +
         "Run 'npm run build:all' from the repo root before starting the sandbox.");
 }
+if (!Directory.Exists(fusionAssetsDir))
+{
+    throw new InvalidOperationException(
+        $"Fusion asset bundles not found at '{fusionAssetsDir}'. " +
+        "Run 'npm run build:all' from the repo root before starting the sandbox.");
+}
 var composite = new CompositeFileProvider(
     new PhysicalFileProvider(frameworkAssetsDir),
+    new PhysicalFileProvider(fusionAssetsDir),
     app.Environment.WebRootFileProvider);
 app.Environment.WebRootFileProvider = composite;
 
