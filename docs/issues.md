@@ -18,7 +18,7 @@ methods should return `ElementBuilder<TModel>` for fluent element-level chaining
 the current pattern (exit to pipeline after each mutation) is intentional.
 
 ### 2. conditions.ts — silent fall-through when itemShape set on non-array
-**File:** `Alis.Reactive.SandboxApp/Scripts/conditions/conditions.ts:122-127`
+**File:** `Alis.Reactive.Assets/Scripts/conditions/conditions.ts:122-127`
 
 In the `array-contains` case, when `cond.itemShape` is present but the source resolves to a
 scalar (not an array), the ternary falls through to `items = shapedLeft`. Then
@@ -26,7 +26,7 @@ scalar (not an array), the ternary falls through to `items = shapedLeft`. Then
 No error is thrown. Violates Rule 7 (Fail Fast — Fallbacks Are Exceptions) in CLAUDE.md.
 
 ### 3. resolver.ts — unknown vendor error missing element ID
-**File:** `Alis.Reactive.SandboxApp/Scripts/resolution/resolver.ts:72`
+**File:** `Alis.Reactive.Assets/Scripts/resolution/resolver.ts:72`
 
 The `resolveVendorRoot` function's default branch throws `[alis] unknown vendor: "${_}"` but
 does not include `el.id` (available in scope via the `el: HTMLElement` parameter). In a form

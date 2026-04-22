@@ -27,7 +27,7 @@ Tracked as GitHub issues or in `docs/issues.md`:
 
 | Item | Location | GH Issue |
 |------|----------|----------|
-| SonarQube CRITICALs: evaluateCompare (19-case switch) + ruleFails (20-case switch) | `Alis.Reactive.SandboxApp/Scripts/conditions/conditions.ts`, `Scripts/validation/rule-engine.ts` | #54 |
+| SonarQube CRITICALs: evaluateCompare (19-case switch) + ruleFails (20-case switch) | `Alis.Reactive.Assets/Scripts/conditions/conditions.ts`, `Scripts/validation/rule-engine.ts` | #54 |
 | Invalid trace level enables all logging (unsafe `as TraceLevel` cast) | `Scripts/root.ts:29` | #73 |
 | HTTP Finally stage (prevents permanent WhileLoading spinners) | Feature request | #88 |
 | FlushSegment bundles commands across condition boundaries | `Alis.Reactive/Builders/PipelineBuilder.cs:184` | #90 |
