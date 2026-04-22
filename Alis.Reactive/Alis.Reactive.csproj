@@ -21,60 +21,41 @@
         <Content Include="Schemas\**\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
-    <!-- Ship JS/CSS as NuGet content files with a configurable output path.
-         PackagePath uses explicit file paths (not folder paths with trailing slashes)
-         so the packed entries never contain an empty path segment. A trailing
-         backslash like PackagePath="buildTransitive\" produced ZIP entries such as
-         buildTransitive//AlisReactive.targets which are normalized on macOS/Linux
-         during NuGet extraction but are NOT normalized on Windows — leaving the
-         targets file at a location that does not match NuGet's auto-import
-         convention, so consumers silently get no assets in wwwroot.
-
-         Assets AND targets are packed under BOTH build\ and buildTransitive\.
-         - build\          : required by net48 projects using packages.config
-                             (classic NuGet only auto-imports build\*.targets and
-                             resolves $(MSBuildThisFileDirectory)assets\* relative
-                             to that folder).
-         - buildTransitive\: required so PackageReference consumers flow the
-                             targets + assets through transitive dependencies. -->
+    <!-- Ship JS/CSS (built by npm in the sibling Alis.Reactive.Assets project)
+         as NuGet content files. Assets and the targets file are packed under
+         BOTH build\ and buildTransitive\:
+           build\          : required by packages.config consumers (net48 classic).
+                             Classic NuGet auto-imports build\*.targets and resolves
+                             $(MSBuildThisFileDirectory)assets\* relative to it.
+           buildTransitive\: required so PackageReference consumers flow the targets
+                             + assets through transitive dependencies.
+         PackagePath uses explicit file paths (no trailing separator) — a trailing
+         backslash produces ZIP entries with an empty segment that macOS/Linux
+         normalize on extraction but Windows does not. -->
     <ItemGroup>
-        <None Include="assets\js\alis-reactive.js" Pack="true" PackagePath="build\assets\js\alis-reactive.js" />
-        <None Include="assets\css\design-system.css" Pack="true" PackagePath="build\assets\css\design-system.css" />
-        <None Include="assets\js\alis-reactive.js" Pack="true" PackagePath="buildTransitive\assets\js\alis-reactive.js" />
-        <None Include="assets\css\design-system.css" Pack="true" PackagePath="buildTransitive\assets\css\design-system.css" />
+        <!-- npm emits bundles under dist\ with a literal "dev" version token so
+             the sandbox serves them at the same URL pattern a net10 consumer
+             uses (~/scripts/alis-reactive.{version}.js). PackagePath here
+             strips the "dev" token so the NuGet ships the unversioned name;
+             AlisReactive.targets then writes the consumer's real version on
+             copy-to-wwwroot. Identical surface end-to-end. -->
+        <None Include="..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="build\assets\js\alis-reactive.js" />
+        <None Include="..\Alis.Reactive.Assets\dist\css\design-system.dev.css"      Pack="true" PackagePath="build\assets\css\design-system.css" />
+        <None Include="..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="buildTransitive\assets\js\alis-reactive.js" />
+        <None Include="..\Alis.Reactive.Assets\dist\css\design-system.dev.css"      Pack="true" PackagePath="buildTransitive\assets\css\design-system.css" />
         <None Include="build\AlisReactive.targets" Pack="true" PackagePath="build\AlisReactive.targets" />
         <None Include="build\AlisReactive.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.targets" />
     </ItemGroup>
 
-    <!--
-        Build sandbox bundles fresh from source, then sync to packaged assets,
-        before Pack runs. This guarantees `dotnet pack` always ships the latest
-        JS/CSS regardless of when wwwroot was last built. Without rebuilding,
-        a stale wwwroot/ bundle (left over from an older Scripts/ state) would
-        be silently shipped — Codex flagged this exact scenario.
-
-        Requires Node.js + npm dependencies installed (the framework already
-        requires both for development). If npm is missing, the Exec task fails
-        with a clear error.
-
-        Copy is unconditional so deliberate or accidental modification of
-        assets/ cannot survive a pack.
-    -->
-    <Target Name="SyncPackagedAssetsBeforePack" BeforeTargets="GenerateNuspec">
-        <Message Importance="high" Text="SyncPackagedAssetsBeforePack: rebuilding sandbox JS/CSS bundles from source..." />
-        <Exec Command="npm run build:all"
-              WorkingDirectory="$(MSBuildThisFileDirectory).."
-              ConsoleToMSBuild="true"
-              IgnoreExitCode="false" />
-        <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\js\alis-reactive.js')"
-               Text="Sandbox JS bundle missing after 'npm run build:all'. Verify Node.js and npm dependencies are installed (run 'npm ci' from the repo root)." />
-        <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\css\design-system.css')"
-               Text="Sandbox CSS bundle missing after 'npm run build:all'. Verify Node.js and npm dependencies are installed (run 'npm ci' from the repo root)." />
-        <Copy SourceFiles="$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\js\alis-reactive.js"
-              DestinationFiles="$(MSBuildThisFileDirectory)assets\js\alis-reactive.js" />
-        <Copy SourceFiles="$(MSBuildThisFileDirectory)..\Alis.Reactive.SandboxApp\wwwroot\css\design-system.css"
-              DestinationFiles="$(MSBuildThisFileDirectory)assets\css\design-system.css" />
-        <Message Importance="high" Text="SyncPackagedAssetsBeforePack: packaged assets synced from fresh sandbox build." />
+    <!-- Verify JS/CSS bundles exist before Pack. The bundles are produced by
+         'npm run build:all' from the repo root. Pack does NOT invoke npm;
+         consumers do not need Node.js for `dotnet pack`. CI orchestrates
+         npm + dotnet as separate steps. -->
+    <Target Name="VerifyBundlesExistBeforePack" BeforeTargets="GenerateNuspec">
+        <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js')"
+               Text="alis-reactive.dev.js bundle not found. Run 'npm run build:all' from the repo root before packing." />
+        <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.Assets\dist\css\design-system.dev.css')"
+               Text="design-system.dev.css bundle not found. Run 'npm run build:all' from the repo root before packing." />
     </Target>
 
     <!-- Bundle Roslyn analyzers so consumers get compile-time DSL checks (ALIS001-ALIS008) -->

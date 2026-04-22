@@ -1,12 +1,9 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 
-/* ── Source scanning ── */
-@source "../Views/**/*.cshtml";
-@source "../Areas/**/*.cshtml";
-@source "../Areas/**/*.cs";
-@source "../Controllers/**/*.cs";
-@source "../Models/**/*.cs";
+/* ── Source scanning — framework C# only ──
+   Consumers scan their own views via their own tailwind config;
+   this file compiles classes emitted from framework C# code only. */
 @source "../../Alis.Reactive/DesignSystem/**/*.cs";
 @source "../../Alis.Reactive.NativeTagHelpers/**/*.cs";
 @source "../../Alis.Reactive.Native/**/*.cs";

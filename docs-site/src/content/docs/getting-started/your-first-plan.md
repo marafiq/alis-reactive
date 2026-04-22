@@ -26,11 +26,17 @@ ReactivePlanConfig.UseValidationExtractor(
     new FluentValidationAdapter(type => (IValidator?)Activator.CreateInstance(type)));
 ```
 
-In `_Layout.cshtml`, load the runtime (once, for all pages):
+In `_Layout.cshtml`, load the runtime (once, for all pages). `AlisReactive.targets`
+in the NuGet package copies the bundle into your `wwwroot/scripts/` with your
+package version baked in — reference it with the same version:
 
 ```html
-<script type="module" src="~/js/alis-reactive.js" asp-append-version="true"></script>
+<link rel="stylesheet" href="~/css/design-system.@Version.css" asp-append-version="true"/>
+<script src="~/scripts/alis-reactive.@Version.js" asp-append-version="true"></script>
 ```
+
+Replace `@Version` with your installed AlisReactive package version
+(e.g. `1.0.0`). The bundle is a classic IIFE script — do not add `type="module"`.
 
 ## Step 1: The Model
 

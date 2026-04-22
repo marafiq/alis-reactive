@@ -1,6 +1,7 @@
 using Alis.Reactive;
 using Alis.Reactive.FluentValidator;
 using Alis.Reactive.SandboxApp.Hubs;
+using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -38,6 +39,22 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Sandbox eats its own dog food as an Alis.Reactive consumer: serve the
+// framework runtime bundles (alis-reactive.js, design-system.css) straight
+// from the sibling Alis.Reactive.Assets/dist produced by `npm run build:all`.
+// Same path in dev and CI — no copy into sandbox wwwroot required, so
+// `git status` stays clean after a local build.
+var frameworkAssetsDir = Path.GetFullPath(Path.Combine(
+    app.Environment.ContentRootPath, "..", "Alis.Reactive.Assets", "dist"));
+if (Directory.Exists(frameworkAssetsDir))
+{
+    var composite = new CompositeFileProvider(
+        new PhysicalFileProvider(frameworkAssetsDir),
+        app.Environment.WebRootFileProvider);
+    app.Environment.WebRootFileProvider = composite;
+}
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();

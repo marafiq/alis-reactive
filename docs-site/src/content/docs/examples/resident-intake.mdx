@@ -818,7 +818,7 @@ public class IntakeController : Controller
     <link rel="stylesheet"
           href="https://cdn.syncfusion.com/ej2/32.2.8/tailwind3.css"/>
     <link rel="stylesheet"
-          href="~/css/design-system.css" asp-append-version="true"/>
+          href="~/css/design-system.@Version.css" asp-append-version="true"/>
 </head>
 <body class="alis-root h-full">
 <div class="min-h-full flex flex-col">
@@ -850,8 +850,8 @@ public class IntakeController : Controller
 @Html.FusionConfirmDialog()
 @Html.NativeLoader()
 @Html.NativeDrawer()
-<script type="module"
-        src="~/js/alis-reactive.js" asp-append-version="true"></script>
+<script src="~/scripts/alis-reactive.@Version.js"
+        asp-append-version="true"></script>
 </body>
 </html>
 ```
@@ -876,6 +876,6 @@ dotnet run
 
 The ZIP includes:
 - Framework DLLs in `lib/` (Alis.Reactive, Native, Fusion, FluentValidator, NativeTagHelpers)
-- Runtime JS bundle in `wwwroot/js/alis-reactive.js`
-- Design system CSS in `wwwroot/css/design-system.css`
+- Runtime JS bundle in `wwwroot/scripts/alis-reactive.{version}.js`
+- Design system CSS in `wwwroot/css/design-system.{version}.css`
 - Complete source: Model, Validator, Controller, Views (including dynamic partials)

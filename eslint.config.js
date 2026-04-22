@@ -10,6 +10,7 @@ export default tseslint.config(
       "**/bin/",
       "**/obj/",
       "**/__experiments__/",
+      "Alis.Reactive.Assets/dist/",
     ],
   },
 
@@ -19,13 +20,11 @@ export default tseslint.config(
   // TypeScript: recommended (type-aware off for now — keep it fast)
   ...tseslint.configs.recommended,
 
-  // Project-specific overrides for source files
+  // Framework TS (Alis.Reactive.Assets)
   {
-    files: ["Alis.Reactive.SandboxApp/Scripts/**/*.ts"],
+    files: ["Alis.Reactive.Assets/Scripts/**/*.ts"],
     ignores: [
-      "Alis.Reactive.SandboxApp/Scripts/core/coerce.ts",         // coerce.ts IS the implementation
-      "Alis.Reactive.SandboxApp/Scripts/components/lab/**",       // lab test components are exempt
-      "Alis.Reactive.SandboxApp/Scripts/__tests__/**",            // test files are exempt
+      "Alis.Reactive.Assets/Scripts/__tests__/**", // test files relaxed below
     ],
     rules: {
       // -- Bug catchers (errors) --
@@ -45,7 +44,6 @@ export default tseslint.config(
       // -- Coerce module enforcement --
       // Ban raw String() on value paths. Use toString() from core/coerce instead.
       // Allowed: String(err) for error logging (matched by the err/error variable name).
-      // coerce.ts itself is excluded via ignores above.
       "no-restricted-syntax": [
         "error",
         {
@@ -56,9 +54,30 @@ export default tseslint.config(
     },
   },
 
+  // Sandbox-only TS (sandbox-plugins.ts) — same base rules but smaller surface
+  {
+    files: ["Alis.Reactive.SandboxApp/Scripts/**/*.ts"],
+    ignores: [
+      "Alis.Reactive.SandboxApp/Scripts/__tests__/**",
+    ],
+    rules: {
+      "no-fallthrough": "error",
+      "no-var": "error",
+      "eqeqeq": ["error", "always", { null: "ignore" }],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
+  },
+
   // Test files: relax some rules
   {
-    files: ["Alis.Reactive.SandboxApp/Scripts/__tests__/**/*.ts"],
+    files: [
+      "Alis.Reactive.Assets/Scripts/__tests__/**/*.ts",
+      "Alis.Reactive.SandboxApp/Scripts/__tests__/**/*.ts",
+    ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
     },

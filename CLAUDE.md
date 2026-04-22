@@ -7,7 +7,12 @@ plan does not describe. C# never executes browser behavior. TypeScript never inv
 information the plan does not carry.
 
 Throughout this document, "the runtime" means the TypeScript code in
-`Alis.Reactive.SandboxApp/Scripts/` that executes plans in the browser.
+`Alis.Reactive.Assets/Scripts/` that executes plans in the browser. It is
+bundled by esbuild into `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js`
+(IIFE), shipped inside the AlisReactive NuGet, and copied into the consumer's
+`wwwroot/scripts/` (net10) or `Content/alisreactive/` (net48) by the shipped
+`AlisReactive.targets` file with the consumer's package version baked into
+the filename.
 
 ## Architecture — 5 Layers, 4 Boundaries
 
@@ -94,19 +99,54 @@ JSON — it does not re-validate. If the JSON is malformed, `JSON.parse` throws 
 
 ## Build & Run
 
+Every npm and dotnet command below runs from the repo root.
+
+### First time (clone)
+
 ```bash
-npm run build:all                # JS bundles + CSS
-dotnet build                     # All C# projects
-npm run build:api-docs           # API reference from XML docs
+npm ci                          # JS deps
+npm run build:all               # initial framework + sandbox bundles
+dotnet build                    # all C# projects (Debug)
+```
 
-npm run watch                    # esbuild watch
-npm run watch:css                # Tailwind watch
-lsof -ti:5220 | xargs kill -9 2>/dev/null; dotnet run --project Alis.Reactive.SandboxApp
+### Daily dev loop — 3 terminals
 
-npm run typecheck                # TS type checking
-npm run lint                     # ESLint
+```bash
+# Terminal 1 — framework JS (~200ms per edit; esbuild --watch=forever)
+npm run watch
 
-npm test                                                     # TS vitest (configured, no tests on this branch)
+# Terminal 2 — framework CSS (~3-5s per edit)
+npm run watch:css
+
+# Terminal 3 — Razor + C# hot reload
+lsof -ti:5220 | xargs kill -9 2>/dev/null
+dotnet watch --project Alis.Reactive.SandboxApp
+# → http://localhost:5220
+```
+
+Framework TS/CSS changes require **only a browser refresh** — no `dotnet build`,
+no sandbox restart. `Alis.Reactive.SandboxApp/Program.cs` wires a
+`CompositeFileProvider` that serves `Alis.Reactive.Assets/dist/` directly;
+`asp-append-version="true"` computes a fresh content hash every request so the
+browser never caches stale bytes.
+
+Sandbox-specific bundles (edited rarely):
+
+```bash
+npm run watch:sandbox-plugins   # SandboxApp/Scripts/sandbox-plugins.ts → wwwroot/js/
+npm run watch:sandbox-css       # SandboxApp/Styles/sandbox.css → wwwroot/css/
+```
+
+### One-shot build + verify + test
+
+```bash
+npm run build:all               # framework (dist/) + sandbox (wwwroot/) bundles
+dotnet build                    # all C# projects
+
+npm run typecheck               # both tsconfigs (framework + sandbox)
+npm run lint                    # eslint
+npm test                        # vitest
+
 dotnet test tests/Alis.Reactive.UnitTests                    # Core + schema
 dotnet test tests/Alis.Reactive.Native.UnitTests             # Native
 dotnet test tests/Alis.Reactive.Fusion.UnitTests             # Fusion
@@ -114,14 +154,37 @@ dotnet test tests/Alis.Reactive.FluentValidator.UnitTests    # Validation
 dotnet test tests/Alis.Reactive.Analyzers.Tests              # Analyzers
 dotnet test tests/Alis.Reactive.DesignSystem.Tests           # Design system
 dotnet test tests/Alis.Reactive.NativeTagHelpers.Tests       # Tag helpers
+
+lsof -ti:5220 | xargs kill -9 2>/dev/null
 dotnet test tests/Alis.Reactive.PlaywrightTests \
   --logger "trx;LogFileName=playwright-results.trx" \
   --results-directory TestResults
-./scripts/sonar-analyze.sh                                   # SonarQube (Docker)
 ```
 
-After TS/CSS changes: `npm run build:all && dotnet build`, restart SandboxApp.
-All tests pass before every commit. TS tests go in `Alis.Reactive.SandboxApp/Scripts/__tests__/`
+### Pack the NuGet (delivery smoke)
+
+```bash
+npm run build:all                                           # required: pack does NOT invoke npm
+dotnet build --configuration Release
+dotnet pack Alis.Reactive/Alis.Reactive.csproj \
+    --configuration Release --no-build \
+    --output ./nupkgs -p:Version=<your-version>
+```
+
+`VerifyBundlesExistBeforePack` errors with a clear message if the bundles
+are missing. `dotnet pack` never requires Node.js.
+
+### Before any commit
+
+```bash
+git status                      # MUST be clean after build — any dist/ or wwwroot/ noise is a bug
+npm run build:api-docs          # regenerate API reference from XML docs (if touched)
+```
+
+Tracked wwwroot files are hand-written only (`disable-sf-animations.js`);
+every bundler output path is gitignored.
+
+All tests pass before every commit. TS tests go in `Alis.Reactive.Assets/Scripts/__tests__/`
 with `.test.ts` suffix.
 
 ## Tech Stack
@@ -169,10 +232,10 @@ No inline `<script>` blocks — `root.ts` handles discovery and boot automatical
 2. Polymorphic registration — `WriteOnlyPolymorphicConverter` delegates to concrete type
 3. Builder method — PipelineBuilder, ElementBuilder, or TriggerBuilder
 4. JSON schema — failing `AssertSchemaValid()` test drives the update
-5. TS types — new interface in `Alis.Reactive.SandboxApp/Scripts/types/`, discriminated union with `kind`
+5. TS types — new interface in `Alis.Reactive.Assets/Scripts/types/`, discriminated union with `kind`
 6. Runtime handler — new switch case + `assertNever`
 7. C# unit test — `AssertSchemaValid()` validates rendered JSON against schema
-8. TS unit test — `Alis.Reactive.SandboxApp/Scripts/__tests__/*.test.ts`, runtime behavior via `boot()`
+8. TS unit test — `Alis.Reactive.Assets/Scripts/__tests__/*.test.ts`, runtime behavior via `boot()`
 9. Playwright test — browser behavior with sandbox view
 10. Sandbox view — demonstrate the primitive
 

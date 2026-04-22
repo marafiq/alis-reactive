@@ -74,7 +74,7 @@ MyApp/
 │   ├── Home/
 │   │   └── Index.cshtml                     ← landing page
 │   └── Shared/
-│       └── _Layout.cshtml                   ← loads runtime: <script type="module" src="~/js/alis-reactive.js">
+│       └── _Layout.cshtml                   ← loads runtime: <script src="~/scripts/alis-reactive.{version}.js">
 ├── Features/
 │   └── Residents/
 │       ├── Controllers/
@@ -87,10 +87,10 @@ MyApp/
 │               ├── Index.cshtml             ← Html.ReactivePlan<ResidentModel>(), Html.InputField, .Reactive()
 │               └── _AddressPartial.cshtml   ← Html.ResolvePlan<ResidentModel>() (merges into parent plan)
 └── wwwroot/
-    ├── js/
-    │   └── alis-reactive.js                 ← framework runtime (you don't edit this)
+    ├── scripts/
+    │   └── alis-reactive.{version}.js       ← framework runtime (copied from NuGet by AlisReactive.targets)
     └── css/
-        └── design-system.css                ← design tokens and component styles
+        └── design-system.{version}.css      ← design tokens + component styles (same source)
 ```
 
 The view still has `@model` at the top and HTML in the body. But instead of a `<script>` block at the bottom, you write fluent C# in the code block and call `@Html.RenderPlan(plan)` — which produces a structured JSON plan that a runtime executes.

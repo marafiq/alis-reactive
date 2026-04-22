@@ -7,14 +7,15 @@ on:
     branches: [main, 'release/*']
     paths:
       - 'Alis.Reactive/**'
+      - 'Alis.Reactive.Assets/**'
       - 'Alis.Reactive.Native/**'
       - 'Alis.Reactive.Fusion/**'
       - 'Alis.Reactive.FluentValidator/**'
       - 'Alis.Reactive.NativeTagHelpers/**'
       - 'Alis.Reactive.Analyzers/**'
-      - 'Alis.Reactive.SandboxApp/Scripts/**'
-      - 'Alis.Reactive.SandboxApp/Styles/**'
       - 'Directory.Build.props'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/nuget-publish.yml'
   workflow_dispatch:
 
@@ -150,12 +151,6 @@ jobs:
 
       - name: Build JS + CSS bundles
         run: npm run build:all
-
-      - name: Copy assets into Alis.Reactive package source
-        run: |
-          mkdir -p Alis.Reactive/assets/js Alis.Reactive/assets/css
-          cp Alis.Reactive.SandboxApp/wwwroot/js/alis-reactive.js Alis.Reactive/assets/js/
-          cp Alis.Reactive.SandboxApp/wwwroot/css/design-system.css Alis.Reactive/assets/css/
 
       - name: Build all C# projects
         run: dotnet build --configuration Release

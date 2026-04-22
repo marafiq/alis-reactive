@@ -42,15 +42,20 @@
   </PropertyGroup>
 
   <!--
-    $(MSBuildThisFileDirectory) is the build\ folder inside the extracted
-    NuGet package. Its parent is '{PackageId}.{Version}', e.g.
-    'AlisReactive.1.0.0-preview.17'. Strip the 'AlisReactive.' prefix
-    (13 chars) to keep only the version for use in output filenames.
+    $(MSBuildThisFileDirectory) is the build\ (or buildTransitive\) folder
+    inside the extracted NuGet package. The parent folder is either:
+      - '{PackageId}.{Version}' (packages.config extraction, e.g.
+        'AlisReactive.1.0.0-preview.17'), or
+      - '{Version}' (PackageReference global-packages extraction, e.g.
+        '1.0.0-preview.17' — parent of that is the lowercase PackageId).
+    Strip the 'AlisReactive.' prefix (13 chars) if present; otherwise use
+    the folder name as-is. Works for both layouts without detection.
   -->
   <PropertyGroup>
     <AlisReactivePkgDir>$(MSBuildThisFileDirectory)</AlisReactivePkgDir>
     <AlisReactivePkgFolderName>$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(AlisReactivePkgDir.TrimEnd('\/'))))))</AlisReactivePkgFolderName>
-    <AlisReactiveVersion Condition="'$(AlisReactiveVersion)' == ''">$(AlisReactivePkgFolderName.Substring(13))</AlisReactiveVersion>
+    <AlisReactiveVersion Condition="'$(AlisReactiveVersion)' == '' and $(AlisReactivePkgFolderName.StartsWith('AlisReactive.'))">$(AlisReactivePkgFolderName.Substring(13))</AlisReactiveVersion>
+    <AlisReactiveVersion Condition="'$(AlisReactiveVersion)' == ''">$(AlisReactivePkgFolderName)</AlisReactiveVersion>
   </PropertyGroup>
 
   <Target Name="CopyAlisReactiveAssets" AfterTargets="Build">

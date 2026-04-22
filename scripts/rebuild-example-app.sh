@@ -49,10 +49,10 @@ else
 fi
 
 echo "=== Step 3: Copy JS + CSS bundles ==="
-SANDBOX_WWWROOT="$REPO_ROOT/Alis.Reactive.SandboxApp/wwwroot"
+ASSETS_DIST="$REPO_ROOT/Alis.Reactive.Assets/dist"
 mkdir -p "$EXAMPLE_DIR/wwwroot/js" "$EXAMPLE_DIR/wwwroot/css"
-cp "$SANDBOX_WWWROOT/js/alis-reactive.js" "$EXAMPLE_DIR/wwwroot/js/"
-cp "$SANDBOX_WWWROOT/css/design-system.css" "$EXAMPLE_DIR/wwwroot/css/"
+cp "$ASSETS_DIST/js/alis-reactive.js" "$EXAMPLE_DIR/wwwroot/js/"
+cp "$ASSETS_DIST/css/design-system.css" "$EXAMPLE_DIR/wwwroot/css/"
 
 echo "=== Step 4: Verify example app compiles ==="
 dotnet build "$EXAMPLE_DIR/ResidentIntake.csproj" --nologo -v q
