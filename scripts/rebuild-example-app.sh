@@ -55,10 +55,14 @@ echo "=== Step 3: Copy JS + CSS bundles ==="
 # match the pinned version in examples/resident-intake/Views/Shared/_Layout.cshtml
 # (~/scripts/alis-reactive.{version}.js, ~/css/design-system.{version}.css).
 ASSETS_DIST="$REPO_ROOT/Alis.Reactive.Assets/dist"
-EXAMPLE_BUNDLE_VERSION=$(grep -oE "alis-reactive\.[0-9][^.\"]*\.[^.\"]*\.[^.\"]*\.js" "$EXAMPLE_DIR/Views/Shared/_Layout.cshtml" \
-    | head -1 | sed -E 's|alis-reactive\.(.*)\.js|\1|')
+# Match alis-reactive.<version>.js where <version> is any run of characters
+# that isn't a quote (the HTML attribute boundary). Handles 1.0.0,
+# 1.0.0-preview.2, 2.0.0-beta.1.build-42, and future version shapes.
+EXAMPLE_BUNDLE_VERSION=$(sed -nE 's|.*alis-reactive\.([^"]+)\.js.*|\1|p' \
+    "$EXAMPLE_DIR/Views/Shared/_Layout.cshtml" | head -1)
 if [ -z "$EXAMPLE_BUNDLE_VERSION" ]; then
-    echo "ERROR: could not parse bundle version from example Layout." >&2
+    echo "ERROR: could not parse bundle version from $EXAMPLE_DIR/Views/Shared/_Layout.cshtml" >&2
+    echo "       expected a <script src=\"~/scripts/alis-reactive.<version>.js\" ...> tag." >&2
     exit 1
 fi
 echo "  example pins version: $EXAMPLE_BUNDLE_VERSION"
