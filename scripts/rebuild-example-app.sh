@@ -49,10 +49,23 @@ else
 fi
 
 echo "=== Step 3: Copy JS + CSS bundles ==="
+# npm writes the framework bundles under Alis.Reactive.Assets/dist/ with a "dev"
+# version token so the sandbox can serve them at the same /scripts/ URL pattern
+# a real consumer uses. For the downloadable example, rename them on copy to
+# match the pinned version in examples/resident-intake/Views/Shared/_Layout.cshtml
+# (~/scripts/alis-reactive.{version}.js, ~/css/design-system.{version}.css).
 ASSETS_DIST="$REPO_ROOT/Alis.Reactive.Assets/dist"
-mkdir -p "$EXAMPLE_DIR/wwwroot/js" "$EXAMPLE_DIR/wwwroot/css"
-cp "$ASSETS_DIST/js/alis-reactive.js" "$EXAMPLE_DIR/wwwroot/js/"
-cp "$ASSETS_DIST/css/design-system.css" "$EXAMPLE_DIR/wwwroot/css/"
+EXAMPLE_BUNDLE_VERSION=$(grep -oE "alis-reactive\.[0-9][^.\"]*\.[^.\"]*\.[^.\"]*\.js" "$EXAMPLE_DIR/Views/Shared/_Layout.cshtml" \
+    | head -1 | sed -E 's|alis-reactive\.(.*)\.js|\1|')
+if [ -z "$EXAMPLE_BUNDLE_VERSION" ]; then
+    echo "ERROR: could not parse bundle version from example Layout." >&2
+    exit 1
+fi
+echo "  example pins version: $EXAMPLE_BUNDLE_VERSION"
+
+mkdir -p "$EXAMPLE_DIR/wwwroot/scripts" "$EXAMPLE_DIR/wwwroot/css"
+cp "$ASSETS_DIST/scripts/alis-reactive.dev.js"  "$EXAMPLE_DIR/wwwroot/scripts/alis-reactive.${EXAMPLE_BUNDLE_VERSION}.js"
+cp "$ASSETS_DIST/css/design-system.dev.css"     "$EXAMPLE_DIR/wwwroot/css/design-system.${EXAMPLE_BUNDLE_VERSION}.css"
 
 echo "=== Step 4: Verify example app compiles ==="
 dotnet build "$EXAMPLE_DIR/ResidentIntake.csproj" --nologo -v q
