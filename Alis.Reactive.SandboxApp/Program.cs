@@ -46,9 +46,10 @@ app.UseHttpsRedirection();
 // Same path in dev and CI — no copy into sandbox wwwroot required, so
 // `git status` stays clean after a local build.
 //
-// Fail fast in Development if the dist folder is missing (Rule 5). Silently
-// skipping would leave the sandbox serving 404 on the runtime bundle with
-// no log signal — a trap for first-run devs who haven't run the JS build yet.
+// Fail fast if the dist folder is missing (Rule 5). The sandbox is a dev-only
+// harness — there is no environment where it should boot without bundles.
+// Silently skipping would leave it serving 404 on the runtime bundle with
+// no log signal, a trap for first-run devs who haven't run the JS build yet.
 var frameworkAssetsDir = Path.GetFullPath(Path.Combine(
     app.Environment.ContentRootPath, "..", "Alis.Reactive.Assets", "dist"));
 if (!Directory.Exists(frameworkAssetsDir))

@@ -36,3 +36,10 @@ TestResults/
 Alis.Reactive.Assets/dist/
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
 Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
+
+# The downloadable example zip is regenerated fresh on every docs deploy
+# (see .github/workflows/deploy-docs.yml — runs rebuild-example-app.sh
+# before `npm run build`). Tracking the zip would only serve a stale copy
+# until someone manually rebuilds and commits; CI is the source of truth.
+# Local dev regenerates on demand by running scripts/rebuild-example-app.sh.
+docs-site/public/downloads/resident-intake.zip
