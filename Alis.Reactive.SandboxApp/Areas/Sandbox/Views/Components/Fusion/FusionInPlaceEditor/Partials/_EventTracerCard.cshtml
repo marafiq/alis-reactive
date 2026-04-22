@@ -26,7 +26,7 @@
             b.Reactive(plan, evt => evt.BeginEdit, (args, p) =>
             {
                 p.Element("trace-begin").SetText(args, x => x.Mode);
-                p.When(p.Component<FusionInPlaceEditor>(m => m.Value).Value()).Eq("lock")
+                p.When(p.Component<FusionInPlaceEditor>(m => m.Value).Value<string>()).Eq("lock")
                     .Then(then => args.PreventDefault(then));
             });
 

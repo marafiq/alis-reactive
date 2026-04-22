@@ -222,8 +222,8 @@ namespace Alis.Reactive.Builders.Requests
             foreach (var sf in _gatherBuilder.StaticFields)
                 fields[sf.Key] = ValueProducer.LiteralRaw(sf.Value, Shape.FromClrType(sf.Value?.GetType()));
             foreach (var ef in _gatherBuilder.EventFields)
-                fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath);
-            return ValueProducer.Object(fields);
+                fields[ef.Key] = ValueProducer.Read(PayloadSource.Event(), ef.EventPath, shape: ef.Shape);
+            return ValueProducer.Object(fields, shape: Shape.OpenObject());
         }
 
         /// <summary>

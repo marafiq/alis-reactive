@@ -3,7 +3,7 @@
 // Uses Shape for ALL type-aware comparisons via convertByShape from shape-convert.
 // otherValue (for peer comparisons) is pre-resolved by the orchestrator.
 
-import { convertByShape, applyShape, toString } from "../core/shape-convert";
+import { convertByShape, applyShape, shapeEquals, toString } from "../core/shape-convert";
 import type { ValidationRule, Shape } from "../types";
 
 function compareValues(a: unknown, b: unknown, shape: Shape): number {
@@ -52,15 +52,13 @@ function failsRangeRule(rule: ValidationRule, value: unknown, empty: boolean): b
   return cmpLo <= 0 || cmpHi >= 0;
 }
 
-/** Shape-aware equality — applies shape to both sides and uses strict equality. */
+/** Shape-aware equality — applies shape to both sides then delegates to shapeEquals. */
 function shapeEqual(a: unknown, b: unknown, shape: Shape): boolean {
-  if (shape.kind !== "none") {
-    const ca = applyShape(a, shape);
-    const cb = applyShape(b, shape);
-    return ca === cb;
+  if (shape.kind === "none") {
+    const sa = toString(a); const sb = toString(b);
+    return (sa.ok ? sa.value : "") === (sb.ok ? sb.value : "");
   }
-  const sa = toString(a); const sb = toString(b);
-  return (sa.ok ? sa.value : "") === (sb.ok ? sb.value : "");
+  return shapeEquals(applyShape(a, shape), applyShape(b, shape), shape);
 }
 
 function failsEqualityRule(

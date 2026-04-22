@@ -71,12 +71,14 @@ public sealed class DateTimePickerLocator
         await Input.PressSequentiallyAsync(dateTimeText, new() { Delay = 30 });
     }
 
-    /// <summary>Click, select all, and delete.</summary>
+    /// <summary>
+    /// Clear via Playwright's native ClearAsync — EJ2 restores the keyboard
+    /// Meta+A+Backspace+Tab sequence on blur.
+    /// </summary>
     public async Task Clear()
     {
         await Input.ClickWhenStableAsync(_page);
-        await Input.PressAsync("Meta+a");
-        await Input.PressAsync("Backspace");
+        await Input.ClearAsync();
     }
 
     /// <summary>Click the input to focus it.</summary>

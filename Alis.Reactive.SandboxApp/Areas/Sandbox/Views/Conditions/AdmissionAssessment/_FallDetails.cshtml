@@ -20,7 +20,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var sw = p.Component<FusionSwitch>(m => m.CausedInjury);
-                    p.When(sw.Value()).Truthy()
+                    p.When(sw.Value<bool>()).Truthy()
                         .Then(t => t.Element("injury-details").Show())
                         .Else(e => e.Element("injury-details").Hide());
                 })); }
@@ -35,7 +35,7 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         var inj = p.Component<FusionDropDownList>(m => m.InjuryType);
-                        p.When(inj.Value()).Eq("Head Injury")
+                        p.When(inj.Value<string>()).Eq("Head Injury")
                             .Then(then =>
                             {
                                 then.Element("neuro-spinner").Show();

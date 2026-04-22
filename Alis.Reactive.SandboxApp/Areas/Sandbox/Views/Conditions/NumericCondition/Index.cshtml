@@ -7,10 +7,10 @@
 
     var plan = Html.ReactivePlan<NumericConditionModel>();
 
-    // ── Section 1: Simple condition — When(comp.Value()).Gt(100m) ──
+    // ── Section 1: Simple condition — When(comp.Value<decimal>()).Gt(100m) ──
     // HeartRate change → Gt(100) shows tachycardia warning, Else hides it
 
-    // ── Section 2: ElseIf grade ladder — comp.Value() ranges ──
+    // ── Section 2: ElseIf grade ladder — comp.Value<decimal>() ranges ──
     // HeartRate change → Gte(120) "Critical" / Gte(100) "High" / Gte(60) "Normal" / Else "Low"
 
     // ── Section 3: AND compound — Gt(60) AND Lt(100) → "Normal range" ──
@@ -32,7 +32,7 @@
         <native-heading level="H2">1. Simple Condition — Gt(100)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Enter a heart rate. Values above 100 show a tachycardia warning.
-            Uses <code>When(comp.Value()).Gt(100m)</code> as a component-read condition.
+            Uses <code>When(comp.Value<decimal>()).Gt(100m)</code> as a component-read condition.
         </p>
         <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.HeartRate, o => o.Label("Heart Rate (bpm)"))
@@ -43,7 +43,7 @@
                         var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
                         // Simple condition: Gt(100) → tachycardia warning
-                        p.When(comp.Value()).Gt(100m)
+                        p.When(comp.Value<decimal>()).Gt(100m)
                             .Then(then =>
                             {
                                 then.Element("tachycardia-warning").Show();
@@ -55,11 +55,11 @@
                             });
 
                         // ElseIf ladder: heart rate zones
-                        p.When(comp.Value()).Gte(120m)
+                        p.When(comp.Value<decimal>()).Gte(120m)
                             .Then(t => t.Element("hr-zone").SetText("Critical"))
-                            .ElseIf(comp.Value()).Gte(100m)
+                            .ElseIf(comp.Value<decimal>()).Gte(100m)
                             .Then(t => t.Element("hr-zone").SetText("High"))
-                            .ElseIf(comp.Value()).Gte(60m)
+                            .ElseIf(comp.Value<decimal>()).Gte(60m)
                             .Then(t => t.Element("hr-zone").SetText("Normal"))
                             .Else(e => e.Element("hr-zone").SetText("Low"));
                     })); }
@@ -83,7 +83,7 @@
         <native-heading level="H2">3. AND Compound — Normal Range</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Blood pressure field uses a compound condition:
-            <code>When(comp.Value()).Gte(60m).And(comp.Value()).Lte(120m)</code> shows "Normal range".
+            <code>When(comp.Value<decimal>()).Gte(60m).And(comp.Value<decimal>()).Lte(120m)</code> shows "Normal range".
             Outside that range shows "Out of range".
         </p>
         <native-grid cols="C2" gap="Base" class="mb-4">
@@ -93,8 +93,8 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         var comp = p.Component<FusionNumericTextBox>(m => m.BloodPressure);
-                        p.When(comp.Value()).Gte(60m)
-                            .And(comp.Value()).Lte(120m)
+                        p.When(comp.Value<decimal>()).Gte(60m)
+                            .And(comp.Value<decimal>()).Lte(120m)
                             .Then(then =>
                             {
                                 then.Element("bp-range").SetText("Normal range");
@@ -113,7 +113,7 @@
         <native-heading level="H2">4. Cross-Component — Value vs Threshold</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             Compares heart rate against a configurable threshold using source-vs-source:
-            <code>When(heartRate.Value()).Gte(threshold.Value())</code>.
+            <code>When(heartRate.Value()).Gte(threshold.Value<decimal>())</code>.
             Button-triggered so both components are read at click time.
         </p>
         <native-grid cols="C2" gap="Base" class="mb-4">
@@ -128,7 +128,7 @@
                 {
                     var hr = p.Component<FusionNumericTextBox>(m => m.HeartRate);
                     var threshold = p.Component<FusionNumericTextBox>(m => m.ThresholdValue);
-                    p.When(hr.Value()).Gte(threshold.Value())
+                    p.When(hr.Value<decimal>()).Gte(threshold.Value<decimal>())
                         .Then(t => t.Element("threshold-result").SetText("Above threshold"))
                         .Else(e => e.Element("threshold-result").SetText("Below threshold"));
                 }))

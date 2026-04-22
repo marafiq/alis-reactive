@@ -16,18 +16,10 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionInPlaceEditor Component = new FusionInPlaceEditor();
 
-        /// <summary>Sets the committed value.</summary>
-        /// <remarks>
-        /// Writes to Syncfusion's <c>value</c> property. Updates the displayed text immediately
-        /// without firing <c>change</c>.
-        /// </remarks>
-        /// <param name="self">The component reference for the target editor.</param>
-        /// <param name="value">The value to commit, or <see langword="null"/> to clear.</param>
-        /// <returns>The component reference for method chaining.</returns>
-        public static ComponentRef<FusionInPlaceEditor, TModel> SetValue<TModel>(
-            this ComponentRef<FusionInPlaceEditor, TModel> self, string? value)
-            where TModel : class
-            => self.EmitSet("value", value != null ? ValueProducer.Literal(value) : ValueProducer.Null());
+        // SetValue&lt;TProp&gt;(TProp value) is provided by the ComponentRef base class.
+        // Vendor-specific write overloads (TypedComponentSource source, ResponseBody source+path,
+        // event payload source+path) remain on the vendor's Extensions class because their
+        // signatures need TResponse/TSource type parameters alongside TProp.
 
         /// <summary>Enables the editor, restoring edit-mode entry.</summary>
         /// <remarks>
@@ -107,37 +99,9 @@ namespace Alis.Reactive.Fusion.Components
             return self;
         }
 
-        /// <summary>Reads the current committed value for use in conditions or gather.</summary>
-        /// <remarks>
-        /// Reads Syncfusion's outer <c>value</c> property using the shape registered at render time
-        /// by <see cref="FusionInPlaceEditorHtmlExtensions"/> (i.e. <c>Shape.FromClrType(typeof(TProp))</c>).
-        /// A <c>DateTime?</c>-bound editor reads as date, a <c>decimal</c>-bound editor reads as number,
-        /// a <c>string</c>-bound editor reads as string. The component must be registered via
-        /// <c>Html.InputField(plan, m => m.X).FusionInPlaceEditor(...)</c> before this read is built
-        /// into the plan: no hardcoded shape, no fallback.
-        /// </remarks>
-        /// <returns>A typed source representing the editor's current committed value.</returns>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when no <c>FusionInPlaceEditor</c> registration exists for <paramref name="self"/>'s
-        /// target id. Call <c>Html.InputField(plan, m =&gt; m.X).FusionInPlaceEditor(...)</c> first.
-        /// </exception>
-        public static TypedComponentSource<string> Value<TModel>(
-            this ComponentRef<FusionInPlaceEditor, TModel> self)
-            where TModel : class
-        {
-            self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor);
-
-            if (!self.Pipeline.Context.TryFindRegistrationById(self.TargetId, out var reg) || reg == null)
-            {
-                throw new InvalidOperationException(
-                    $"FusionInPlaceEditor '{self.TargetId}' is not registered. " +
-                    "Render the editor with Html.InputField(plan, m => m.X).FusionInPlaceEditor(...) " +
-                    "before reading .Value() in a pipeline; the registered shape drives the typed read.");
-            }
-
-            self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, reg.Shape, "read");
-            return new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ValueMember);
-        }
+        // Value&lt;TProp&gt;() is provided by the ComponentRef base class — see ComponentRef.cs.
+        // FusionInPlaceEditor is IInputComponent, so the base method reads ValueMember="value"
+        // and cross-checks TProp against the registered model property shape.
 
     }
 }

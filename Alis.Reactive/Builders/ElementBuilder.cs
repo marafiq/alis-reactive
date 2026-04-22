@@ -71,34 +71,40 @@ namespace Alis.Reactive.Builders
             return _pipeline;
         }
 
-        /// <summary>Sets the text content from an event payload property.</summary>
+        /// <summary>Sets the text content from an event payload property. TProp is inferred from
+        /// the lambda; <c>Shape.FromClrType(typeof(TProp))</c> is carried into the plan JSON.</summary>
         /// <typeparam name="TSource">The event payload type.</typeparam>
+        /// <typeparam name="TProp">The read property's CLR type (inferred from the lambda).</typeparam>
         /// <param name="source">The event payload instance.</param>
         /// <param name="path">Expression selecting the property to display.</param>
         /// <returns>The pipeline builder for chaining.</returns>
-        public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object>> path)
+        public PipelineBuilder<TModel> SetText<TSource, TProp>(TSource source, Expression<Func<TSource, TProp>> path)
         {
             _pipeline.Context.EnsureProperty(_componentKey, "text", "textContent", Shape.String, "write");
             var eventPath = ExpressionPathHelper.ToEventPath(path);
+            var shape = Shape.FromClrType(typeof(TProp));
             _pipeline.Steps.Add(Reaction.Set(
                 ComponentSource.Of(_componentKey), "text",
-                ValueProducer.Read(PayloadSource.Event(), eventPath)));
+                ValueProducer.Read(PayloadSource.Event(), eventPath, shape: shape)));
             return _pipeline;
         }
 
-        /// <summary>Sets the text content from an HTTP response body property.</summary>
+        /// <summary>Sets the text content from an HTTP response body property. TProp is inferred from
+        /// the lambda; <c>Shape.FromClrType(typeof(TProp))</c> is carried into the plan JSON.</summary>
         /// <typeparam name="TResponse">The response body type.</typeparam>
+        /// <typeparam name="TProp">The read property's CLR type (inferred from the lambda).</typeparam>
         /// <param name="source">The response body instance from <c>OnSuccess</c> or <c>OnError</c>.</param>
         /// <param name="path">Expression selecting the property to display.</param>
         /// <returns>The pipeline builder for chaining.</returns>
-        public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, object>> path)
+        public PipelineBuilder<TModel> SetText<TResponse, TProp>(ResponseBody<TResponse> source, Expression<Func<TResponse, TProp>> path)
             where TResponse : class
         {
             _pipeline.Context.EnsureProperty(_componentKey, "text", "textContent", Shape.String, "write");
             var responsePath = ExpressionPathHelper.ToResponsePath(path);
+            var shape = Shape.FromClrType(typeof(TProp));
             _pipeline.Steps.Add(Reaction.Set(
                 ComponentSource.Of(_componentKey), "text",
-                ValueProducer.Read(source.Scope, responsePath)));
+                ValueProducer.Read(source.Scope, responsePath, shape: shape)));
             return _pipeline;
         }
 
@@ -126,18 +132,21 @@ namespace Alis.Reactive.Builders
             return _pipeline;
         }
 
-        /// <summary>Sets the inner HTML from an event payload property.</summary>
+        /// <summary>Sets the inner HTML from an event payload property. TProp is inferred from
+        /// the lambda; <c>Shape.FromClrType(typeof(TProp))</c> is carried into the plan JSON.</summary>
         /// <typeparam name="TSource">The event payload type.</typeparam>
+        /// <typeparam name="TProp">The read property's CLR type (inferred from the lambda).</typeparam>
         /// <param name="source">The event payload instance.</param>
         /// <param name="path">Expression selecting the property containing HTML.</param>
         /// <returns>The pipeline builder for chaining.</returns>
-        public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object>> path)
+        public PipelineBuilder<TModel> SetHtml<TSource, TProp>(TSource source, Expression<Func<TSource, TProp>> path)
         {
             _pipeline.Context.EnsureProperty(_componentKey, "html", "innerHTML", Shape.String, "write");
             var eventPath = ExpressionPathHelper.ToEventPath(path);
+            var shape = Shape.FromClrType(typeof(TProp));
             _pipeline.Steps.Add(Reaction.Set(
                 ComponentSource.Of(_componentKey), "html",
-                ValueProducer.Read(PayloadSource.Event(), eventPath)));
+                ValueProducer.Read(PayloadSource.Event(), eventPath, shape: shape)));
             return _pipeline;
         }
 

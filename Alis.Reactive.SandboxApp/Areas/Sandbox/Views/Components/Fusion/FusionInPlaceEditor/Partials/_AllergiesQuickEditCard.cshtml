@@ -36,6 +36,7 @@
             })
             .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
             {
+                p.Component<FusionInPlaceEditor>(m => m.Value).Value<string[]?>();
                 p.Post(updateUrl)
                  .Gather(g => g
                      .Include<FusionInPlaceEditor, AllergiesQuickEdit>(m => m.Value)

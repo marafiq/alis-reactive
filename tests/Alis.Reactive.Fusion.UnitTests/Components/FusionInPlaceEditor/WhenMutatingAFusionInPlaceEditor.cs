@@ -26,7 +26,7 @@ public class WhenMutatingAFusionInPlaceEditor : FusionTestBase
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
-            p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).SetValue(null));
+            p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).SetValue<string>((string)null!));
 
         var json = plan.RenderFormatted();
         AssertSchemaValid(json);

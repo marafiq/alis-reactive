@@ -15,7 +15,7 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Value<string[]>());
     }));
 
     // ── Section 6: Filtering event with HTTP — Server-filtered Supplies ──
@@ -61,7 +61,7 @@
                     {
                         p.Element("change-value").SetText(args, x => x.Value);
                         var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
-                        p.When(comp.Value()).NotNull()
+                        p.When(comp.Value<string[]>()).NotNull()
                             .Then(then =>
                             {
                                 then.Element("selected-indicator").Show();

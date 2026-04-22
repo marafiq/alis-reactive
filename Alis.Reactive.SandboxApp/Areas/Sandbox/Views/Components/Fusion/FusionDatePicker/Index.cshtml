@@ -11,9 +11,9 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<FusionDatePicker>(m => m.AdmissionDate).SetValue(new DateTime(2026, 6, 15));
+        p.Component<FusionDatePicker>(m => m.AdmissionDate).SetValue<DateTime?>(new DateTime(2026, 6, 15));
         var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Value<DateTime?>());
     }));
 }
 
@@ -42,7 +42,7 @@
                             .Then(t => t.Element("args-condition").SetText("date selected"))
                             .Else(e => e.Element("args-condition").SetText("no date"));
                         var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
-                        p.When(comp.Value()).NotNull()
+                        p.When(comp.Value<DateTime?>()).NotNull()
                             .Then(then =>
                             {
                                 then.Element("selected-indicator").Show();
@@ -83,7 +83,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition (Discharge Date)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads discharge date via <code>When(comp.Value()).IsEmpty()</code>
+            Button reads discharge date via <code>When(comp.Value<System.DateTime>()).IsEmpty()</code>
             and shows a warning or confirmation.
         </p>
         @{ Html.InputField(plan, m => m.DischargeDate, o => o.Label("Discharge Date"))
@@ -95,7 +95,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var comp = p.Component<FusionDatePicker>(m => m.DischargeDate);
-                    p.When(comp.Value()).IsEmpty()
+                    p.When(comp.Value<DateTime?>()).IsNull()
                         .Then(t => t.Element("discharge-warning").SetText("discharge date is required"))
                         .Else(e => e.Element("discharge-warning").SetText("discharge date set"));
                 }))

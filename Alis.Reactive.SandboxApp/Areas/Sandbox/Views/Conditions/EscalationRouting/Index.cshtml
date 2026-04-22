@@ -181,15 +181,15 @@
                             var careTrack = p.Component<FusionDropDownList>(m => m.CareTrack);
 
                             p.Element("component-precheck").SetText("Escalation evaluated");
-                            p.When(assessment.Value()).Gte(85m)
-                                .And(cs => cs.When(supervisorOverride.Value()).Truthy()
-                                    .Or(careTrack.Value()).Eq("memory"))
+                            p.When(assessment.Value<decimal>()).Gte(85m)
+                                .And(cs => cs.When(supervisorOverride.Value<bool>()).Truthy()
+                                    .Or(careTrack.Value<string>()).Eq("memory"))
                                 .Then(then =>
                                 {
                                     then.Dispatch("component-route-isolation");
                                 })
-                                .ElseIf(assessment.Value()).Gte(60m)
-                                .And(cs => cs.When(supervisorOverride.Value()).Truthy().Not())
+                                .ElseIf(assessment.Value<decimal>()).Gte(60m)
+                                .And(cs => cs.When(supervisorOverride.Value<bool>()).Truthy().Not())
                                 .Then(then =>
                                 {
                                     then.Dispatch("component-route-monitor");
@@ -227,15 +227,15 @@
                     var careTrack = p.Component<FusionDropDownList>(m => m.CareTrack);
 
                     p.Element("component-precheck").SetText("Escalation evaluated");
-                    p.When(assessment.Value()).Gte(85m)
-                        .And(cs => cs.When(supervisorOverride.Value()).Truthy()
-                            .Or(careTrack.Value()).Eq("memory"))
+                    p.When(assessment.Value<decimal>()).Gte(85m)
+                        .And(cs => cs.When(supervisorOverride.Value<bool>()).Truthy()
+                            .Or(careTrack.Value<string>()).Eq("memory"))
                         .Then(then =>
                         {
                             then.Dispatch("component-route-isolation");
                         })
-                        .ElseIf(assessment.Value()).Gte(60m)
-                        .And(cs => cs.When(supervisorOverride.Value()).Truthy().Not())
+                        .ElseIf(assessment.Value<decimal>()).Gte(60m)
+                        .And(cs => cs.When(supervisorOverride.Value<bool>()).Truthy().Not())
                         .Then(then =>
                         {
                             then.Dispatch("component-route-monitor");

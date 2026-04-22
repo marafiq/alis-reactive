@@ -35,15 +35,15 @@
                         var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
                         // BEFORE condition — always: show current selection
-                        p.Element("s1-current-level").SetText(careLevel.Value());
+                        p.Element("s1-current-level").SetText(careLevel.Value<string>());
 
                         // Condition → mutate another component
-                        p.When(careLevel.Value()).Eq("Memory Care")
+                        p.When(careLevel.Value<string>()).Eq("Memory Care")
                             .Then(then =>
                             {
                                 then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Enhanced Monitoring");
                             })
-                            .ElseIf(careLevel.Value()).Eq("Skilled Nursing")
+                            .ElseIf(careLevel.Value<string>()).Eq("Skilled Nursing")
                             .Then(then =>
                             {
                                 then.Component<FusionDropDownList>(m => m.Protocol).SetValue("Full Clinical");
@@ -89,10 +89,10 @@
                     var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
                     // BEFORE: show what we're checking
-                    p.Element("s2-checking").SetText(careLevel.Value());
+                    p.Element("s2-checking").SetText(careLevel.Value<string>());
 
                     // Condition → mutate switch
-                    p.When(careLevel.Value()).In("Memory Care", "Skilled Nursing")
+                    p.When(careLevel.Value<string>()).In("Memory Care", "Skilled Nursing")
                         .Then(then =>
                         {
                             then.Component<FusionSwitch>(m => m.RequiresEscort).SetChecked(true);

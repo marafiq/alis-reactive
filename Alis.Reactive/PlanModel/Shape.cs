@@ -189,5 +189,52 @@ namespace Alis.Reactive.PlanModel
         public static bool operator ==(Shape left, Shape right) => Equals(left, right);
         /// <summary>Returns <see langword="true"/> if the shapes are not structurally equal.</summary>
         public static bool operator !=(Shape left, Shape right) => !Equals(left, right);
+
+        /// <summary>
+        /// Returns true if a value of shape <paramref name="other"/> can be safely assigned
+        /// to a target of this shape. Identity and nullable-widening: a T value satisfies
+        /// a Nullable(T) target (non-null is a subset of nullable). Array shapes recurse
+        /// on their element types. All other cases require strict equality.
+        /// </summary>
+        /// <remarks>
+        /// Used by typed accessor cross-checks so that callers can pass a non-null concrete
+        /// value into a nullable-registered field without writing explicit
+        /// <c>.SetValue&lt;DateTime?&gt;(new DateTime(...))</c> ceremony.
+        /// </remarks>
+        internal bool Accepts(Shape other)
+        {
+            if (other is null) return false;
+            if (Equals(other)) return true;
+            // Nullable(T) accepts T — passing a non-null value into a nullable-typed slot is always safe.
+            if (Kind == "nullable" && Inner != null && Inner.Accepts(other)) return true;
+            // Symmetric widening: a Nullable(T) value where the runtime can't produce null
+            // can be written into a T-typed slot in a .Value<TProp>() read context.
+            if (other.Kind == "nullable" && other.Inner != null && Accepts(other.Inner)) return true;
+            // Array widening: Shape.ArrayOf(T) accepts ArrayOf(T') when T.Accepts(T').
+            if (Kind == "array" && other.Kind == "array" && Item != null && other.Item != null
+                && Item.Accepts(other.Item)) return true;
+            return false;
+        }
+
+        /// <summary>Human-readable description of the shape — used by typed-accessor error messages.</summary>
+        public override string ToString()
+        {
+            switch (Kind)
+            {
+                case "array":
+                    return Item != null ? $"Array({Item})" : "Array";
+                case "nullable":
+                    return Inner != null ? $"Nullable({Inner})" : "Nullable";
+                case "object":
+                    if (Fields != null && Fields.Count > 0)
+                    {
+                        var inner = string.Join(", ", System.Linq.Enumerable.Select(Fields, kv => kv.Key + ":" + kv.Value));
+                        return Additional ? $"Object({{{inner}, ...}})" : $"Object({{{inner}}})";
+                    }
+                    return Additional ? "Object({...})" : "Object";
+                default:
+                    return char.ToUpperInvariant(Kind[0]) + Kind.Substring(1);
+            }
+        }
     }
 }

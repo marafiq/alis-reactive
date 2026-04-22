@@ -33,7 +33,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var comp = p.Component<FusionDropDownList>(m => m.FallHistory);
-                    p.When(comp.Value()).In("1-2 falls", "3+ falls")
+                    p.When(comp.Value<string>()).In("1-2 falls", "3+ falls")
                         .Then(t => t.Element("fall-details").Show())
                         .Else(e => e.Element("fall-details").Hide());
                 })); }
@@ -56,7 +56,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var comp = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
-                    p.When(comp.Value()).Truthy()
+                    p.When(comp.Value<bool>()).Truthy()
                         .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Enhanced"))
                         .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Standard"));
                 })); }
@@ -65,7 +65,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var comp = p.Component<FusionSwitch>(m => m.TakesPainMedication);
-                    p.When(comp.Value()).Truthy()
+                    p.When(comp.Value<bool>()).Truthy()
                         .Then(t => t.Element("pain-section").Show())
                         .Else(e => e.Element("pain-section").Hide());
                 })); }
@@ -78,7 +78,7 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         var sw = p.Component<FusionSwitch>(m => m.CausedInjury);
-                        p.When(sw.Value()).Truthy()
+                        p.When(sw.Value<bool>()).Truthy()
                             .Then(t => t.Element("injury-details").Show())
                             .Else(e => e.Element("injury-details").Hide());
                     })); }

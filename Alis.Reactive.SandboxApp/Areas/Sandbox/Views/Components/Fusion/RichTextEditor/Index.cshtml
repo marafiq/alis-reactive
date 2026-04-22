@@ -13,7 +13,7 @@
     {
         p.Component<FusionRichTextEditor>(m => m.CarePlan).SetValue("<p>Resident requires daily medication review and weekly physical therapy sessions.</p>");
         var comp = p.Component<FusionRichTextEditor>(m => m.CarePlan);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Value<string>());
     }));
 }
 
@@ -42,7 +42,7 @@
                             .Then(t => t.Element("args-condition").SetText("content entered"))
                             .Else(e => e.Element("args-condition").SetText("no content"));
                         var comp = p.Component<FusionRichTextEditor>(m => m.CarePlan);
-                        p.When(comp.Value()).NotEmpty()
+                        p.When(comp.Value<string>()).NotEmpty()
                             .Then(then =>
                             {
                                 then.Element("selected-indicator").Show();
@@ -83,7 +83,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads care plan via <code>When(comp.Value()).IsEmpty()</code>
+            Button reads care plan via <code>When(comp.Value<string>()).IsEmpty()</code>
             and shows a warning or confirmation.
         </p>
         <native-hstack gap="None" class="mt-3">
@@ -92,7 +92,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var comp = p.Component<FusionRichTextEditor>(m => m.CarePlan);
-                    p.When(comp.Value()).IsEmpty()
+                    p.When(comp.Value<string>()).IsEmpty()
                         .Then(t => t.Element("careplan-warning").SetText("care plan is required"))
                         .Else(e => e.Element("careplan-warning").SetText("care plan set"));
                 }))

@@ -13,7 +13,7 @@
     {
         p.Component<FusionSwitch>(m => m.ReceiveNotifications).SetChecked(false);
         var comp = p.Component<FusionSwitch>(m => m.EmailAlerts);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Value<bool>());
     }));
 }
 
@@ -42,7 +42,7 @@
                             .Then(t => t.Element("args-condition").SetText("notifications enabled"))
                             .Else(e => e.Element("args-condition").SetText("notifications disabled"));
                         var comp = p.Component<FusionSwitch>(m => m.ReceiveNotifications);
-                        p.When(comp.Value()).Truthy()
+                        p.When(comp.Value<bool>()).Truthy()
                             .Then(then =>
                             {
                                 then.Element("selected-indicator").Show();
@@ -85,7 +85,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads SMS alerts switch via <code>When(comp.Value()).Truthy()</code>
+            Button reads SMS alerts switch via <code>When(comp.Value<bool>()).Truthy()</code>
             and shows a confirmation or warning.
         </p>
         @{ Html.InputField(plan, m => m.SmsAlerts, o => o.Label("SMS Alerts"))
@@ -96,7 +96,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var comp = p.Component<FusionSwitch>(m => m.SmsAlerts);
-                    p.When(comp.Value()).Truthy()
+                    p.When(comp.Value<bool>()).Truthy()
                         .Then(t => t.Element("sms-warning").SetText("SMS alerts are enabled"))
                         .Else(e => e.Element("sms-warning").SetText("SMS alerts are disabled"));
                 }))

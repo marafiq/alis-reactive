@@ -22,15 +22,15 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
-                    p.Element("score-echo").SetText(comp.Value());
+                    p.Element("score-echo").SetText(comp.Value<decimal>());
 
-                    p.When(comp.Value()).Lt(15m)
+                    p.When(comp.Value<decimal>()).Lt(15m)
                         .Then(t =>
                         {
                             t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Memory Care");
                             t.Element("cognitive-status").SetText("Severe Impairment — Memory Care");
                         })
-                        .ElseIf(comp.Value()).Lt(25m)
+                        .ElseIf(comp.Value<decimal>()).Lt(25m)
                         .Then(t =>
                         {
                             t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Assisted Living with Memory Support");
@@ -50,7 +50,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var sw = p.Component<FusionSwitch>(m => m.Wanders);
-                    p.When(sw.Value()).Truthy()
+                    p.When(sw.Value<bool>()).Truthy()
                         .Then(t => t.Element("wander-details").Show())
                         .Else(e => e.Element("wander-details").Hide());
                 })); }
@@ -71,7 +71,7 @@
                     .Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
                         var freq = p.Component<FusionDropDownList>(m => m.WanderFrequency);
-                        p.When(freq.Value()).Eq("Frequently")
+                        p.When(freq.Value<string>()).Eq("Frequently")
                             .Then(then =>
                             {
                                 then.Element("elopement-spinner").Show();

@@ -63,12 +63,15 @@ public sealed class AutoCompleteLocator
         await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 15000 });
     }
 
-    /// <summary>Select all text and delete — the way a user clears a field.</summary>
+    /// <summary>
+    /// Clear the input the way a user does. Uses Playwright's native ClearAsync
+    /// because the keyboard dance (Meta+A, Backspace, Tab) gets reverted by EJ2
+    /// on blur — verified in the live browser.
+    /// </summary>
     public async Task Clear()
     {
         await Input.ClickWhenStableAsync(_page);
-        await Input.PressAsync("Meta+a");
-        await Input.PressAsync("Backspace");
+        await Input.ClearAsync();
     }
 
     /// <summary>Click a suggestion in the popup by its visible text.</summary>

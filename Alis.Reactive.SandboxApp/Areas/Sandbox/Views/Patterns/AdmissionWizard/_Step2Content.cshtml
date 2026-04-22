@@ -35,16 +35,16 @@
                         .Reactive(plan, evt => evt.Changed, (args, p) =>
                         {
                             var comp = p.Component<FusionNumericTextBox>(m => m.CognitiveScore);
-                            p.When(comp.Value()).Lt(15m)
+                            p.When(comp.Value<decimal>()).Lt(15m)
                                 .Then(t => { t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Memory Care"); t.Element("cog-status").SetText("Severe — Memory Care"); })
-                                .ElseIf(comp.Value()).Lt(25m)
+                                .ElseIf(comp.Value<decimal>()).Lt(25m)
                                 .Then(t => { t.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Assisted Living + Memory"); t.Element("cog-status").SetText("Moderate — Assisted Living"); })
                                 .Else(e => { e.Component<NativeHiddenField>(m => m.CareUnit).SetValue("Standard"); e.Element("cog-status").SetText("Mild/Normal"); });
                         })); }
                 @{ Html.InputField(plan, m => m.Wanders, o => o.Label("Wanders"))
                     .FusionSwitch(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
-                        p.When(p.Component<FusionSwitch>(m => m.Wanders).Value()).Truthy()
+                        p.When(p.Component<FusionSwitch>(m => m.Wanders).Value<bool>()).Truthy()
                             .Then(t => t.Element("wander-details").Show())
                             .Else(e => e.Element("wander-details").Hide());
                     })); }
@@ -69,7 +69,7 @@
                 @{ Html.InputField(plan, m => m.HasPacemaker, o => o.Label("Has Pacemaker"))
                     .FusionSwitch(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
-                        p.When(p.Component<FusionSwitch>(m => m.HasPacemaker).Value()).Truthy()
+                        p.When(p.Component<FusionSwitch>(m => m.HasPacemaker).Value<bool>()).Truthy()
                             .Then(t => t.Element("pacemaker-details").Show())
                             .Else(e => e.Element("pacemaker-details").Hide());
                     })); }
@@ -99,7 +99,7 @@
                 @{ Html.InputField(plan, m => m.InsulinDependent, o => o.Label("Insulin Dependent"))
                     .FusionSwitch(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
                     {
-                        p.When(p.Component<FusionSwitch>(m => m.InsulinDependent).Value()).Truthy()
+                        p.When(p.Component<FusionSwitch>(m => m.InsulinDependent).Value<bool>()).Truthy()
                             .Then(t => t.Element("insulin-details").Show())
                             .Else(e => e.Element("insulin-details").Hide());
                     })); }

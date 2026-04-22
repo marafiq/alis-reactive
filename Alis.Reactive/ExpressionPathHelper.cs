@@ -122,6 +122,35 @@ namespace Alis.Reactive
         }
 
         /// <summary>
+        /// Extracts the CLR type of the final member in a property-access chain, unwrapping
+        /// any <c>Convert</c> boxing that C# inserts when the expression's return type is
+        /// <c>object</c> (e.g. <c>Expression&lt;Func&lt;T, object&gt;&gt;</c>).
+        /// </summary>
+        /// <remarks>
+        /// For <c>m =&gt; m.DateOfBirth</c> where <c>DateOfBirth</c> is <c>DateTime?</c>, returns
+        /// <c>typeof(DateTime?)</c>. Returns null for non-simple-member expressions (method calls,
+        /// computed values, etc.) — the caller's cross-check then falls through to other
+        /// resolution paths (registration lookup, throw).
+        /// </remarks>
+        /// <param name="expression">The lambda expression whose body is a property-access chain.</param>
+        /// <returns>The CLR type of the leaf member, or null if not a simple member access.</returns>
+        public static Type? ExtractMemberClrType(LambdaExpression expression)
+        {
+            if (expression == null) return null;
+            var expr = expression.Body;
+
+            // Unwrap Convert (boxing of value types when return type is object)
+            if (expr is UnaryExpression unary && unary.NodeType == ExpressionType.Convert)
+                expr = unary.Operand;
+
+            // The leaf member's Type is the actual CLR type we want.
+            if (expr is MemberExpression member)
+                return member.Type;
+
+            return null;
+        }
+
+        /// <summary>
         /// Extracts the model binding path from a model expression.
         /// </summary>
         /// <remarks>

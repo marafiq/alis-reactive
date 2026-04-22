@@ -45,6 +45,29 @@ function applyScalar<T>(value: unknown, convert: (v: unknown) => ConvertResult<T
   return r.ok ? r.value : value;
 }
 
+/**
+ * Shape-aware value equality. Required because shape-applied domain values
+ * are not all === comparable: Date objects with the same instant are distinct
+ * references, so ===/!==/Array.includes silently misreport equality. Ordering
+ * operators (>,>=,<,<=) are unaffected — JS calls valueOf on Date, so epoch-ms
+ * comparison falls out naturally. Recurses on nullable/array compositions.
+ */
+export function shapeEquals(a: unknown, b: unknown, shape: Shape): boolean {
+  if (a == null || b == null) return a === b;
+  switch (shape.kind) {
+    case "date":
+      return a instanceof Date && b instanceof Date && a.getTime() === b.getTime();
+    case "nullable":
+      return shapeEquals(a, b, shape.inner);
+    case "array":
+      return Array.isArray(a) && Array.isArray(b)
+        && a.length === b.length
+        && a.every((v, i) => shapeEquals(v, b[i], shape.item));
+    default:
+      return a === b;
+  }
+}
+
 /** Apply array shape — convert to array, then recursively apply item shape. */
 function applyArrayShape(value: unknown, shape: Extract<Shape, { kind: "array" }>): unknown {
   const r = toArray(value);
@@ -114,17 +137,21 @@ export function toBoolean(value: unknown): ConvertResult<boolean> {
   return err(`toBoolean: received object — cannot convert`);
 }
 
-export function toDate(value: unknown): ConvertResult<number> {
-  if (value == null) return ok(NaN);
-  if (value instanceof Date) return ok(value.getTime());
-  if (typeof value === "number") return ok(value);
+export function toDate(value: unknown): ConvertResult<Date> {
+  if (value == null) return err(`toDate: null is not a date`);
+  if (value instanceof Date) return ok(value);
+  if (typeof value === "number") {
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? err(`toDate: NaN number`) : ok(d);
+  }
   if (typeof value === "string") {
     // Date-only "YYYY-MM-DD" — parse as LOCAL midnight, not UTC
     if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
       const [y, m, d] = value.split("-").map(Number);
-      return ok(new Date(y, m - 1, d).getTime());
+      return ok(new Date(y, m - 1, d));
     }
-    return ok(new Date(value).getTime());
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? err(`toDate: unparseable string "${value}"`) : ok(d);
   }
   return err(`toDate: received ${typeof value} — not a date or timestamp`);
 }

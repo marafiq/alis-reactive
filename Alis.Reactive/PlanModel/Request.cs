@@ -135,11 +135,13 @@ namespace Alis.Reactive.PlanModel
     {
         public string Key { get; }
         public string EventPath { get; }
+        public Shape Shape { get; }
 
-        internal EventField(string key, string eventPath)
+        internal EventField(string key, string eventPath, Shape shape)
         {
             Key = key;
             EventPath = eventPath;
+            Shape = shape ?? Shape.None;
         }
     }
 

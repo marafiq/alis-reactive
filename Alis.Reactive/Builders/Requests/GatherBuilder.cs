@@ -65,7 +65,8 @@ namespace Alis.Reactive.Builders.Requests
             string param)
         {
             var eventPath = ExpressionPathHelper.ToEventPath(path);
-            EventFields.Add(new EventField(param, eventPath));
+            var shape = Shape.FromClrType(typeof(TProp));
+            EventFields.Add(new EventField(param, eventPath, shape));
             return this;
         }
 

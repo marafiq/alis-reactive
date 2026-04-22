@@ -1,55 +1,22 @@
-using System;
-using System.Globalization;
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.PlanModel;
-
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed mutations and value reading for <see cref="FusionTimePicker"/> in a reactive pipeline.
+    /// Typed mutations for <see cref="FusionTimePicker"/> beyond Value/SetValue.
+    /// Typed Value&lt;TProp&gt;() and SetValue&lt;TProp&gt;(...) are provided by the
+    /// <see cref="InputComponentRef{TComponent, TModel}"/> base class.
     /// </summary>
-    /// <remarks>
-    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
-    /// <c>p.Component&lt;FusionTimePicker&gt;(m =&gt; m.CheckInTime).SetValue(new DateTime(1, 1, 1, 14, 30, 0))</c>.
-    /// </remarks>
     public static class FusionTimePickerExtensions
     {
-        private static readonly FusionTimePicker Component = new FusionTimePicker();
-
-        /// <summary>Sets the selected time.</summary>
-        /// <param name="value">The time to set (only the time portion is used).</param>
-        /// <returns>The component reference for method chaining.</returns>
-        public static ComponentRef<FusionTimePicker, TModel> SetValue<TModel>(
-            this ComponentRef<FusionTimePicker, TModel> self, DateTime value)
-            where TModel : class
-        {
-            return self.EmitSet("value",
-                ValueProducer.Literal(value.ToString("HH:mm", CultureInfo.InvariantCulture)));
-        }
-
         /// <summary>Moves focus into the time picker.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTimePicker, TModel> FocusIn<TModel>(
             this ComponentRef<FusionTimePicker, TModel> self)
             where TModel : class
             => self.EmitCall("focusIn");
 
         /// <summary>Removes focus from the time picker.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTimePicker, TModel> FocusOut<TModel>(
             this ComponentRef<FusionTimePicker, TModel> self)
             where TModel : class
             => self.EmitCall("focusOut");
-
-        /// <summary>Reads the current time value for use in conditions or gather.</summary>
-        /// <remarks>
-        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
-        /// <c>p.When(p.Component&lt;FusionTimePicker&gt;(m =&gt; m.CheckInTime).Value()).NotNull().Then(p =&gt; { ... })</c>.
-        /// </remarks>
-        /// <returns>A typed source representing the time picker's current value.</returns>
-        public static TypedComponentSource<DateTime> Value<TModel>(
-            this ComponentRef<FusionTimePicker, TModel> self)
-            where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.Date, "read"); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, Component.ValueMember); }
     }
 }

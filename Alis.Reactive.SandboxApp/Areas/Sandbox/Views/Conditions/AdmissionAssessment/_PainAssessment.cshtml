@@ -21,9 +21,9 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.PainLevel);
-                    p.Element("pain-echo").SetText(comp.Value());
+                    p.Element("pain-echo").SetText(comp.Value<decimal>());
 
-                    p.When(comp.Value()).Gt(7m)
+                    p.When(comp.Value<decimal>()).Gt(7m)
                         .Then(then =>
                         {
                             then.Element("pain-spinner").Show();

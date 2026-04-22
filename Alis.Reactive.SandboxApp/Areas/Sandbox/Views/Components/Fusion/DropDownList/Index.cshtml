@@ -14,7 +14,7 @@
     {
         p.Component<FusionDropDownList>(m => m.Category).SetValue("Books");
         var comp = p.Component<FusionDropDownList>(m => m.Category);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Value<string>());
     }));
 
     // ── Section 5: Gather — POST with Include ──
@@ -56,7 +56,7 @@
                             .Then(t => t.Element("args-condition").SetText("electronics selected"))
                             .Else(e => e.Element("args-condition").SetText("other category"));
                         var comp = p.Component<FusionDropDownList>(m => m.Category);
-                        p.When(comp.Value()).NotNull()
+                        p.When(comp.Value<string>()).NotNull()
                             .Then(then =>
                             {
                                 then.Element("selected-indicator").Show();
@@ -114,7 +114,7 @@
         <p class="text-sm text-text-secondary mb-4">
             Two condition types are exercised:
             <code>When(args, x =&gt; x.Value).Eq("Electronics")</code> (typed event-args condition)
-            and <code>When(comp.Value()).NotNull()</code> (component-read condition).
+            and <code>When(comp.Value<string>()).NotNull()</code> (component-read condition).
         </p>
     </section>
 

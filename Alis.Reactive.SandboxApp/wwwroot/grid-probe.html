@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EJ2 Grid — Runtime Shape Probe</title>
+<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.2.8/tailwind3.css">
+<script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+<style>
+  body { font-family: system-ui, sans-serif; padding: 20px; background: #f8f9fa; }
+  h1 { margin-top: 0; }
+  .probe-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .probe-card h2 { margin-top: 0; font-size: 1rem; color: #334155; }
+  pre { background: #0f172a; color: #86efac; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 12px; line-height: 1.5; max-height: 300px; }
+  .state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .pill-event { background: #dbeafe; color: #1e40af; }
+  .pill-instance { background: #fee2e2; color: #991b1b; }
+  button { margin-right: 8px; padding: 4px 10px; border-radius: 6px; border: 1px solid #cbd5e1; cursor: pointer; background: #fff; }
+  button:hover { background: #f1f5f9; }
+</style>
+</head>
+<body>
+<h1>EJ2 Grid — Runtime Shape Probe</h1>
+<p>
+  Dumps the actual vendor shape at each action so we can onboard against ground truth,
+  not docs. <span class="pill pill-event">EVENT</span> = what
+  <code>dataStateChange.args</code> carries.
+  <span class="pill pill-instance">INSTANCE</span> = what
+  <code>grid.sortSettings.columns</code> / <code>pageSettings</code> / etc. hold on the instance.
+</p>
+
+<div class="probe-card">
+  <h2>Grid</h2>
+  <div id="grid"></div>
+  <div style="margin-top:12px">
+    <button id="sort-age-asc">Sort Age Ascending</button>
+    <button id="sort-age-desc">Sort Age Descending</button>
+    <button id="sort-name-asc">Then Name Ascending (multi-sort)</button>
+    <button id="clear-sort">Clear Sort</button>
+    <button id="page-2">Go to Page 2</button>
+    <button id="page-3">Go to Page 3</button>
+    <button id="search-mem">Search "mem"</button>
+    <button id="search-clear">Clear Search</button>
+    <button id="filter-age-gt80">Filter Age &gt; 80</button>
+    <button id="filter-clear">Clear Filters</button>
+    <button id="dump-now">Dump State Now</button>
+  </div>
+</div>
+
+<div class="state-grid">
+  <div class="probe-card">
+    <h2><span class="pill pill-event">EVENT</span> Last <code>dataStateChange</code> args</h2>
+    <pre id="last-event">(no event yet)</pre>
+  </div>
+  <div class="probe-card">
+    <h2><span class="pill pill-instance">INSTANCE</span> Current <code>grid</code> settings</h2>
+    <pre id="grid-state">(click any action)</pre>
+  </div>
+</div>
+
+<div class="probe-card">
+  <h2>Action log (chronological)</h2>
+  <pre id="log" style="max-height: 400px"></pre>
+</div>
+
+<script>
+(() => {
+  const residents = [];
+  const firstNames = ['Alice','Bob','Carol','David','Eve','Frank','Grace','Henry','Irene','Jack','Karen','Leo','Maria','Nathan','Olivia','Paul'];
+  const lastNames = ['Smith','Johnson','Davis','Wilson','Brown','Lee','Taylor','Anderson','White','Harris','Clark','Lewis','Walker','Young'];
+  const careLevels = ['Independent','Assisted','Memory Care','Skilled Nursing'];
+  const wings = ['East','West','North','South'];
+  let seed = 42;
+  const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  for (let i = 0; i < 100; i++) {
+    residents.push({
+      name: firstNames[Math.floor(rand()*firstNames.length)] + ' ' + lastNames[Math.floor(rand()*lastNames.length)],
+      age: 65 + Math.floor(rand() * 34),
+      careLevel: careLevels[Math.floor(rand()*careLevels.length)],
+      wing: wings[Math.floor(rand()*wings.length)],
+    });
+  }
+
+  const logEl = document.getElementById('log');
+  const logLines = [];
+  const log = (label, payload) => {
+    const line = `[${new Date().toISOString().slice(11, 23)}] ${label}\n${JSON.stringify(payload, null, 2)}\n`;
+    logLines.push(line);
+    logEl.textContent = logLines.slice(-20).join('\n');
+    console.log(label, payload);
+  };
+
+  const dumpInstance = () => {
+    const snap = {
+      'sortSettings.columns':    grid.sortSettings   && grid.sortSettings.columns,
+      'pageSettings.currentPage': grid.pageSettings  && grid.pageSettings.currentPage,
+      'pageSettings.pageSize':    grid.pageSettings  && grid.pageSettings.pageSize,
+      'pageSettings.totalRecordsCount': grid.pageSettings && grid.pageSettings.totalRecordsCount,
+      'searchSettings.key':       grid.searchSettings && grid.searchSettings.key,
+      'filterSettings.columns':   grid.filterSettings && grid.filterSettings.columns,
+      'groupSettings.columns':    grid.groupSettings  && grid.groupSettings.columns,
+      'currentViewData.length':   (grid.currentViewData || []).length,
+    };
+    document.getElementById('grid-state').textContent = JSON.stringify(snap, null, 2);
+    return snap;
+  };
+
+  // Custom binding — dataStateChange only fires when dataSource is {result,count}
+  // (not a plain array). Mirrors the real sandbox pattern.
+  const applyState = (state) => {
+    let rows = [...residents];
+    // External filter: greaterThan age (from action)
+    if (state.where && state.where[0] && state.where[0].predicates) {
+      for (const p of state.where[0].predicates) {
+        if (p.field === 'age' && p.operator === 'greaterthan') rows = rows.filter(r => r.age > p.value);
+        if (p.field === 'age' && p.operator === 'lessthan')    rows = rows.filter(r => r.age < p.value);
+      }
+    }
+    // Search
+    if (state.search && state.search[0] && state.search[0].key) {
+      const k = state.search[0].key.toLowerCase();
+      rows = rows.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(k)));
+    }
+    // Sort
+    if (state.sorted && state.sorted.length) {
+      rows.sort((a, b) => {
+        for (const s of state.sorted) {
+          const av = a[s.name], bv = b[s.name];
+          if (av === bv) continue;
+          const dir = s.direction === 'descending' ? -1 : 1;
+          return (av > bv ? 1 : -1) * dir;
+        }
+        return 0;
+      });
+    }
+    const count = rows.length;
+    const skip = state.skip || 0;
+    const take = state.take || 10;
+    return { result: rows.slice(skip, skip + take), count };
+  };
+
+  const safe = (o) => { try { return JSON.parse(JSON.stringify(o, (k, v) => (k === 'parentObj' || k === 'properties' || k === 'changedProperties' || k === 'childChangedProperties' || k === 'isDestroyed' || k === 'isProtectedOnChange' || k === 'grid' || k === 'observers') ? undefined : v)); } catch (e) { return { _err: e.message, keys: Object.keys(o || {}) }; } };
+  window.__safe = safe;
+
+  const grid = new ej.grids.Grid({
+    dataSource: applyState({ skip: 0, take: 10 }),
+    allowSorting: true,
+    allowPaging: true,
+    allowFiltering: true,
+    filterSettings: { type: 'Menu' },
+    pageSettings: { pageSize: 10 },
+    toolbar: ['Search'],
+    columns: [
+      { field: 'name', headerText: 'Name', width: 180 },
+      { field: 'age', headerText: 'Age', width: 80, type: 'number' },
+      { field: 'careLevel', headerText: 'Care Level', width: 150 },
+      { field: 'wing', headerText: 'Wing', width: 100 },
+    ],
+    dataStateChange: (args) => {
+      const evt = safe(args);
+      document.getElementById('last-event').textContent = JSON.stringify(evt, null, 2);
+      log('dataStateChange EVENT args', evt);
+      grid.dataSource = applyState(args);
+      setTimeout(() => log('INSTANCE after event', dumpInstance()), 50);
+    },
+    dataBound: () => dumpInstance(),
+  });
+  grid.appendTo('#grid');
+  window.grid = grid;
+
+  document.getElementById('sort-age-asc').onclick   = () => grid.sortColumn('age', 'Ascending');
+  document.getElementById('sort-age-desc').onclick  = () => grid.sortColumn('age', 'Descending');
+  document.getElementById('sort-name-asc').onclick  = () => grid.sortColumn('name', 'Ascending', true);
+  document.getElementById('clear-sort').onclick     = () => grid.clearSorting();
+  document.getElementById('page-2').onclick         = () => grid.goToPage(2);
+  document.getElementById('page-3').onclick         = () => grid.goToPage(3);
+  document.getElementById('search-mem').onclick     = () => grid.search('mem');
+  document.getElementById('search-clear').onclick   = () => grid.search('');
+  document.getElementById('filter-age-gt80').onclick = () => grid.filterByColumn('age', 'greaterthan', 80);
+  document.getElementById('filter-clear').onclick   = () => grid.clearFiltering();
+  document.getElementById('dump-now').onclick       = () => log('manual-dump', dumpInstance());
+})();
+</script>
+</body>
+</html>

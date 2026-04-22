@@ -7,7 +7,7 @@ import { isEvaluable } from "../types";
 import type { ExecContext } from "../types";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
-import { applyShape, toString } from "../core/shape-convert";
+import { applyShape, shapeEquals, toString } from "../core/shape-convert";
 
 const log = scope("conditions");
 
@@ -124,23 +124,32 @@ function resolveRight(
   if (Array.isArray(right) && (cond.op === "in" || cond.op === "not-in" || cond.op === "between")) {
     return right.map(item => applyShape(item, cond.shape));
   }
+  // array-contains: left is the array, right is the scalar needle. Apply the
+  // element shape (cond.itemShape) to the needle — applying cond.shape (the
+  // array shape) would wrap the scalar into a single-element array via toArray,
+  // and the downstream element-wise compare would never match.
+  if (cond.op === "array-contains") {
+    return applyShape(right, cond.itemShape);
+  }
   return applyShape(right, cond.shape);
 }
 
 /** Evaluate binary operators that require both left and right operands. */
 function evaluateBinaryOp(cond: CompareCondition, shapedLeft: unknown, shapedRight: unknown): boolean {
   switch (cond.op) {
-    case "eq":  return shapedLeft === shapedRight;
-    case "neq": return shapedLeft !== shapedRight;
+    case "eq":  return shapeEquals(shapedLeft, shapedRight, cond.shape);
+    case "neq": return !shapeEquals(shapedLeft, shapedRight, cond.shape);
     case "gt":  return (shapedLeft as number) > (shapedRight as number);
     case "gte": return (shapedLeft as number) >= (shapedRight as number);
     case "lt":  return (shapedLeft as number) < (shapedRight as number);
     case "lte": return (shapedLeft as number) <= (shapedRight as number);
 
     case "in":
-      return Array.isArray(shapedRight) && shapedRight.includes(shapedLeft);
+      return Array.isArray(shapedRight)
+        && shapedRight.some(v => shapeEquals(v, shapedLeft, cond.shape));
     case "not-in":
-      return !Array.isArray(shapedRight) || !shapedRight.includes(shapedLeft);
+      return !Array.isArray(shapedRight)
+        || !shapedRight.some(v => shapeEquals(v, shapedLeft, cond.shape));
 
     case "between":
       return Array.isArray(shapedRight)
@@ -162,10 +171,10 @@ function evaluateBinaryOp(cond: CompareCondition, shapedLeft: unknown, shapedRig
 }
 
 function evaluateArrayContains(cond: CompareCondition, shapedLeft: unknown, shapedRight: unknown): boolean {
-  const items = cond.itemShape.kind !== "none" && Array.isArray(shapedLeft)
-    ? (shapedLeft as unknown[]).map(item => applyShape(item, cond.itemShape))
-    : shapedLeft;
-  return Array.isArray(items) && items.includes(shapedRight);
+  if (!Array.isArray(shapedLeft)) return false;
+  if (cond.itemShape.kind === "none") return shapedLeft.includes(shapedRight);
+  const items = (shapedLeft as unknown[]).map(item => applyShape(item, cond.itemShape));
+  return items.some(v => shapeEquals(v, shapedRight, cond.itemShape));
 }
 
 function stringOp(left: unknown, right: unknown, fn: (s: string, o: string) => boolean): boolean {

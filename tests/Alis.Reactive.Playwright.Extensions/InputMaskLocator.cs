@@ -45,12 +45,15 @@ public sealed class InputMaskLocator
         await Input.FillAsync(value);
     }
 
-    /// <summary>Click, select all, and delete.</summary>
+    /// <summary>
+    /// Clear via Playwright's native ClearAsync. EJ2 InputMask treats Meta+A+Backspace
+    /// as selecting over the mask template and discards the keystroke, so the
+    /// vendor .value is restored on blur — verified in live browser.
+    /// </summary>
     public async Task Clear()
     {
         await Input.ClickAsync();
-        await Input.PressAsync("Meta+a");
-        await Input.PressAsync("Backspace");
+        await Input.ClearAsync();
     }
 
     /// <summary>Click the input to focus it.</summary>

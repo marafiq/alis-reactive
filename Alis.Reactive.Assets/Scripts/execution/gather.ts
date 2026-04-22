@@ -195,15 +195,24 @@ function gatherExplicitFields(
   return gatheredComponents;
 }
 
-/** Emit static/event values merged alongside component fields. */
+/**
+ * Emit static/event values merged alongside component fields.
+ *
+ * Iterates at the ValueProducer level (not on the evaluated plain object) so each
+ * field's own shape is preserved through to emitValue. Flattening via evaluateValue
+ * first would lose per-field shape and force every static/event field to ship as
+ * Shape.None — correct for strings by coincidence, silently wrong for dates
+ * (epoch-ms instead of ISO) and other typed values.
+ */
 function emitStaticValues(
   gatherInput: GatherInput, transport: TransportStrategy, plan: Plan, ctx?: ExecContext,
 ): void {
   if (!gatherInput.statics || gatherInput.statics.kind === "none") return;
-  const staticValues = evaluateValue(gatherInput.statics, plan, ctx);
-  if (typeof staticValues !== "object" || staticValues === null || Array.isArray(staticValues)) return;
-  for (const [key, val] of Object.entries(staticValues as Record<string, unknown>)) {
-    emitValue(key, val, { kind: "none" }, transport);
+  if (gatherInput.statics.kind !== "object") return;
+  for (const [key, fieldProducer] of Object.entries(gatherInput.statics.fields)) {
+    const raw = evaluateValue(fieldProducer, plan, ctx);
+    const shape = "shape" in fieldProducer ? fieldProducer.shape : { kind: "none" as const };
+    emitValue(key, raw, shape, transport);
   }
 }
 

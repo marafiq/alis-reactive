@@ -1,58 +1,16 @@
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.PlanModel;
-
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Pipeline extensions for <see cref="NativeDropDown"/>: set selected value, focus, and read.
+    /// Pipeline extensions for <see cref="NativeDropDown"/>: focus-in.
+    /// Typed Value&lt;TProp&gt;() and SetValue&lt;TProp&gt;(value) are provided by the
+    /// <see cref="InputComponentRef{TComponent, TModel}"/> base class.
     /// </summary>
-    /// <remarks>
-    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via
-    /// <see cref="Builders.PipelineBuilder{TModel}.Component{TComponent}(System.Linq.Expressions.Expression{System.Func{TModel, object}})"/>:
-    /// <code>p.Component&lt;NativeDropDown&gt;(m =&gt; m.Status).SetValue("active")</code>
-    /// </remarks>
     public static class NativeDropDownExtensions
     {
-        private static readonly NativeDropDown _component = new NativeDropDown();
-
-        /// <summary>
-        /// Sets the selected option value in the browser.
-        /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <param name="self">The dropdown component reference.</param>
-        /// <param name="value">The option value to select.</param>
-        /// <returns>The component reference for method chaining.</returns>
-        public static ComponentRef<NativeDropDown, TModel> SetValue<TModel>(
-            this ComponentRef<NativeDropDown, TModel> self, string value)
-            where TModel : class
-        {
-            return self.EmitSet("value", ValueProducer.Literal(value));
-        }
-
-        /// <summary>
-        /// Moves keyboard focus into the dropdown.
-        /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <returns>The component reference for method chaining.</returns>
+        /// <summary>Moves keyboard focus into the dropdown.</summary>
         public static ComponentRef<NativeDropDown, TModel> FocusIn<TModel>(
             this ComponentRef<NativeDropDown, TModel> self)
             where TModel : class
-        {
-            return self.EmitCall("focus");
-        }
-
-        /// <summary>
-        /// Reads the currently selected value for use in conditions or gather.
-        /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <returns>A typed source representing the dropdown's selected value.</returns>
-        public static TypedComponentSource<string> Value<TModel>(
-            this ComponentRef<NativeDropDown, TModel> self)
-            where TModel : class
-        {
-            self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor);
-            self.Pipeline.Context.EnsureProperty(self.TargetId, _component.ValueMember, _component.ValueMember, Shape.String, "read");
-            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ValueMember);
-        }
+            => self.EmitCall("focus");
     }
 }

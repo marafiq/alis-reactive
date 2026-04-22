@@ -1,0 +1,461 @@
+@model ConditionCoverageModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Condition Coverage";
+
+    var plan = Html.ReactivePlan<ConditionCoverageModel>();
+    var careLevels = new[] { "Standard", "Assisted", "Memory Care", "Skilled Nursing" };
+    var allergyOptions = new[] { "Penicillin", "Latex", "Peanuts", "Sulfa", "Shellfish" };
+
+    // Seed initial values so button clicks have deterministic state.
+    // Dosage stays null to exercise is-null on a nullable numeric binding.
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Component<FusionDropDownList>(m => m.CareLevel).SetValue<string>("Standard");
+        p.Component<FusionNumericTextBox>(m => m.HeartRate).SetValue<decimal>(72m);
+        p.Component<FusionSwitch>(m => m.AcceptedTerms).SetValue<bool>(false);
+        p.Component<FusionDatePicker>(m => m.AdmissionDate).SetValue<System.DateTime?>(new System.DateTime(2025, 6, 15));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Condition Coverage — Component-Read Conditions</native-heading>
+    <native-text color="Secondary">
+        Each button reads its target component via <code>comp.Value&lt;T&gt;()</code> and
+        evaluates ONE condition operator. No event-args conditions, no conditions inside
+        Changed handlers — this slice proves the component-read path end-to-end for every
+        operator × shape pair.
+    </native-text>
+
+    <!-- ═══════════════════════════════════════════════════════════════ STRING ═══════════════════════════════════════════════════════════════ -->
+
+    <native-card><native-card-body>
+        <native-heading level="H2">1. String — Eq / Neq (FusionDropDownList)</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
+                .FusionDropDownList(b => b.DataSource(careLevels)); }
+        </native-grid>
+        <native-hstack gap="Sm" class="mt-3">
+            @(Html.NativeButton("btn-str-eq", "Eq \"Memory Care\"")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionDropDownList>(m => m.CareLevel);
+                    p.When(comp.Value<string>()).Eq("Memory Care")
+                        .Then(t => t.Element("r-str-eq").SetText("match"))
+                        .Else(e => e.Element("r-str-eq").SetText("no match"));
+                }))
+            @(Html.NativeButton("btn-str-neq", "Neq \"Standard\"")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionDropDownList>(m => m.CareLevel);
+                    p.When(comp.Value<string>()).NotEq("Standard")
+                        .Then(t => t.Element("r-str-neq").SetText("different"))
+                        .Else(e => e.Element("r-str-neq").SetText("same"));
+                }))
+        </native-hstack>
+        <p class="font-mono text-xs mt-2">
+            eq: <span id="r-str-eq" class="text-text-muted">—</span> |
+            neq: <span id="r-str-neq" class="text-text-muted">—</span>
+        </p>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">2. String — Contains / StartsWith / EndsWith / Matches (NativeTextBox)</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Label("Resident Name"))
+                .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
+        </native-grid>
+        <native-hstack gap="Sm" class="mt-3">
+            @(Html.NativeButton("btn-str-contains", "Contains \"Doe\"")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<NativeTextBox>(m => m.ResidentName);
+                    p.When(comp.Value<string>()).Contains("Doe")
+                        .Then(t => t.Element("r-str-contains").SetText("yes"))
+                        .Else(e => e.Element("r-str-contains").SetText("no"));
+                }))
+            @(Html.NativeButton("btn-str-starts", "StartsWith \"Jane\"")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<NativeTextBox>(m => m.ResidentName);
+                    p.When(comp.Value<string>()).StartsWith("Jane")
+                        .Then(t => t.Element("r-str-starts").SetText("yes"))
+                        .Else(e => e.Element("r-str-starts").SetText("no"));
+                }))
+            @(Html.NativeButton("btn-str-ends", "EndsWith \"Doe\"")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<NativeTextBox>(m => m.ResidentName);
+                    p.When(comp.Value<string>()).EndsWith("Doe")
+                        .Then(t => t.Element("r-str-ends").SetText("yes"))
+                        .Else(e => e.Element("r-str-ends").SetText("no"));
+                }))
+            @(Html.NativeButton("btn-str-matches", "Matches \"^[A-Z].*\"")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<NativeTextBox>(m => m.ResidentName);
+                    p.When(comp.Value<string>()).Matches("^[A-Z].*")
+                        .Then(t => t.Element("r-str-matches").SetText("yes"))
+                        .Else(e => e.Element("r-str-matches").SetText("no"));
+                }))
+        </native-hstack>
+        <p class="font-mono text-xs mt-2">
+            contains: <span id="r-str-contains" class="text-text-muted">—</span> |
+            starts: <span id="r-str-starts" class="text-text-muted">—</span> |
+            ends: <span id="r-str-ends" class="text-text-muted">—</span> |
+            matches: <span id="r-str-matches" class="text-text-muted">—</span>
+        </p>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">3. String — MinLength / IsEmpty / NotEmpty (NativeTextArea)</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.Notes, o => o.Label("Notes"))
+                .NativeTextArea(b => b.Rows(3)); }
+        </native-grid>
+        <native-hstack gap="Sm" class="mt-3">
+            @(Html.NativeButton("btn-str-minlen", "MinLength 10")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<NativeTextArea>(m => m.Notes);
+                    p.When(comp.Value<string>()).MinLength(10)
+                        .Then(t => t.Element("r-str-minlen").SetText("long enough"))
+                        .Else(e => e.Element("r-str-minlen").SetText("too short"));
+                }))
+            @(Html.NativeButton("btn-str-isempty", "IsEmpty")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<NativeTextArea>(m => m.Notes);
+                    p.When(comp.Value<string>()).IsEmpty()
+                        .Then(t => t.Element("r-str-isempty").SetText("empty"))
+                        .Else(e => e.Element("r-str-isempty").SetText("filled"));
+                }))
+            @(Html.NativeButton("btn-str-notempty", "NotEmpty")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<NativeTextArea>(m => m.Notes);
+                    p.When(comp.Value<string>()).NotEmpty()
+                        .Then(t => t.Element("r-str-notempty").SetText("filled"))
+                        .Else(e => e.Element("r-str-notempty").SetText("empty"));
+                }))
+        </native-hstack>
+        <p class="font-mono text-xs mt-2">
+            min-length: <span id="r-str-minlen" class="text-text-muted">—</span> |
+            is-empty: <span id="r-str-isempty" class="text-text-muted">—</span> |
+            not-empty: <span id="r-str-notempty" class="text-text-muted">—</span>
+        </p>
+    </native-card-body></native-card>
+
+    <!-- ═══════════════════════════════════════════════════════════════ NUMBER ═══════════════════════════════════════════════════════════════ -->
+
+    <native-card><native-card-body>
+        <native-heading level="H2">4. Number — Gt / Gte / Lt / Lte / Between / In (FusionNumericTextBox)</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.HeartRate, o => o.Label("Heart Rate"))
+                .FusionNumericTextBox(b => b.Min(0).Max(300).Step(1)); }
+        </native-grid>
+        <native-hstack gap="Sm" class="mt-3">
+            @(Html.NativeButton("btn-num-gt", "Gt(60)")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
+                    p.When(comp.Value<decimal>()).Gt(60m)
+                        .Then(t => t.Element("r-num-gt").SetText("above"))
+                        .Else(e => e.Element("r-num-gt").SetText("not above"));
+                }))
+            @(Html.NativeButton("btn-num-gte", "Gte(72)")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
+                    p.When(comp.Value<decimal>()).Gte(72m)
+                        .Then(t => t.Element("r-num-gte").SetText("at/above"))
+                        .Else(e => e.Element("r-num-gte").SetText("below"));
+                }))
+            @(Html.NativeButton("btn-num-lt", "Lt(200)")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
+                    p.When(comp.Value<decimal>()).Lt(200m)
+                        .Then(t => t.Element("r-num-lt").SetText("under"))
+                        .Else(e => e.Element("r-num-lt").SetText("not under"));
+                }))
+            @(Html.NativeButton("btn-num-lte", "Lte(72)")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
+                    p.When(comp.Value<decimal>()).Lte(72m)
+                        .Then(t => t.Element("r-num-lte").SetText("at/below"))
+                        .Else(e => e.Element("r-num-lte").SetText("above"));
+                }))
+            @(Html.NativeButton("btn-num-between", "Between(60,100)")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
+                    p.When(comp.Value<decimal>()).Between(60m, 100m)
+                        .Then(t => t.Element("r-num-between").SetText("normal"))
+                        .Else(e => e.Element("r-num-between").SetText("abnormal"));
+                }))
+            @(Html.NativeButton("btn-num-in", "In(60,72,90)")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
+                    p.When(comp.Value<decimal>()).In(60m, 72m, 90m)
+                        .Then(t => t.Element("r-num-in").SetText("known"))
+                        .Else(e => e.Element("r-num-in").SetText("other"));
+                }))
+        </native-hstack>
+        <p class="font-mono text-xs mt-2">
+            gt: <span id="r-num-gt" class="text-text-muted">—</span> |
+            gte: <span id="r-num-gte" class="text-text-muted">—</span> |
+            lt: <span id="r-num-lt" class="text-text-muted">—</span> |
+            lte: <span id="r-num-lte" class="text-text-muted">—</span> |
+            between: <span id="r-num-between" class="text-text-muted">—</span> |
+            in: <span id="r-num-in" class="text-text-muted">—</span>
+        </p>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">5. Nullable(Number) — IsNull / NotNull (FusionNumericTextBox bound to decimal?)</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.Dosage, o => o.Label("Dosage (mg)"))
+                .FusionNumericTextBox(b => b.Min(0).Max(500).Step(0.5)); }
+        </native-grid>
+        <native-hstack gap="Sm" class="mt-3">
+            @(Html.NativeButton("btn-num-isnull", "IsNull")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.Dosage);
+                    p.When(comp.Value<decimal?>()).IsNull()
+                        .Then(t => t.Element("r-num-isnull").SetText("unset"))
+                        .Else(e => e.Element("r-num-isnull").SetText("set"));
+                }))
+            @(Html.NativeButton("btn-num-notnull", "NotNull")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionNumericTextBox>(m => m.Dosage);
+                    p.When(comp.Value<decimal?>()).NotNull()
+                        .Then(t => t.Element("r-num-notnull").SetText("set"))
+                        .Else(e => e.Element("r-num-notnull").SetText("unset"));
+                }))
+        </native-hstack>
+        <p class="font-mono text-xs mt-2">
+            is-null: <span id="r-num-isnull" class="text-text-muted">—</span> |
+            not-null: <span id="r-num-notnull" class="text-text-muted">—</span>
+        </p>
+    </native-card-body></native-card>
+
+    <!-- ═══════════════════════════════════════════════════════════════ BOOLEAN ═══════════════════════════════════════════════════════════════ -->
+
+    <native-card><native-card-body>
+        <native-heading level="H2">6. Boolean — Truthy / Falsy / Eq (FusionSwitch)</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.AcceptedTerms, o => o.Label("Accepted Terms"))
+                .FusionSwitch(b => { }); }
+        </native-grid>
+        <native-hstack gap="Sm" class="mt-3">
+            @(Html.NativeButton("btn-bool-truthy", "Truthy")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionSwitch>(m => m.AcceptedTerms);
+                    p.When(comp.Value<bool>()).Truthy()
+                        .Then(t => t.Element("r-bool-truthy").SetText("yes"))
+                        .Else(e => e.Element("r-bool-truthy").SetText("no"));
+                }))
+            @(Html.NativeButton("btn-bool-falsy", "Falsy")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionSwitch>(m => m.AcceptedTerms);
+                    p.When(comp.Value<bool>()).Falsy()
+                        .Then(t => t.Element("r-bool-falsy").SetText("yes"))
+                        .Else(e => e.Element("r-bool-falsy").SetText("no"));
+                }))
+            @(Html.NativeButton("btn-bool-eq", "Eq(true)")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionSwitch>(m => m.AcceptedTerms);
+                    p.When(comp.Value<bool>()).Eq(true)
+                        .Then(t => t.Element("r-bool-eq").SetText("accepted"))
+                        .Else(e => e.Element("r-bool-eq").SetText("not accepted"));
+                }))
+        </native-hstack>
+        <p class="font-mono text-xs mt-2">
+            truthy: <span id="r-bool-truthy" class="text-text-muted">—</span> |
+            falsy: <span id="r-bool-falsy" class="text-text-muted">—</span> |
+            eq: <span id="r-bool-eq" class="text-text-muted">—</span>
+        </p>
+    </native-card-body></native-card>
+
+    <!-- ═══════════════════════════════════════════════════════════════ DATE ═══════════════════════════════════════════════════════════════ -->
+
+    <native-card><native-card-body>
+        <native-heading level="H2">7. Nullable(Date) — Eq / Gt / Lt / Between / IsNull / NotNull (FusionDatePicker)</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.AdmissionDate, o => o.Label("Admission Date"))
+                .FusionDatePicker(b => b.Placeholder("Select date")); }
+        </native-grid>
+        <native-hstack gap="Sm" class="mt-3 flex-wrap">
+            @(Html.NativeButton("btn-date-eq", "Eq(2025-06-15)")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
+                    p.When(comp.Value<System.DateTime?>()).Eq(new System.DateTime(2025, 6, 15))
+                        .Then(t => t.Element("r-date-eq").SetText("match"))
+                        .Else(e => e.Element("r-date-eq").SetText("no match"));
+                }))
+            @(Html.NativeButton("btn-date-gt", "Gt(2020-01-01)")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
+                    p.When(comp.Value<System.DateTime?>()).Gt(new System.DateTime(2020, 1, 1))
+                        .Then(t => t.Element("r-date-gt").SetText("modern"))
+                        .Else(e => e.Element("r-date-gt").SetText("old"));
+                }))
+            @(Html.NativeButton("btn-date-lt", "Lt(2030-01-01)")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
+                    p.When(comp.Value<System.DateTime?>()).Lt(new System.DateTime(2030, 1, 1))
+                        .Then(t => t.Element("r-date-lt").SetText("past/present"))
+                        .Else(e => e.Element("r-date-lt").SetText("future"));
+                }))
+            @(Html.NativeButton("btn-date-between", "Between(2020..2030)")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
+                    p.When(comp.Value<System.DateTime?>())
+                        .Between(new System.DateTime(2020, 1, 1), new System.DateTime(2030, 1, 1))
+                        .Then(t => t.Element("r-date-between").SetText("in range"))
+                        .Else(e => e.Element("r-date-between").SetText("out of range"));
+                }))
+            @(Html.NativeButton("btn-date-isnull", "IsNull")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
+                    p.When(comp.Value<System.DateTime?>()).IsNull()
+                        .Then(t => t.Element("r-date-isnull").SetText("missing"))
+                        .Else(e => e.Element("r-date-isnull").SetText("set"));
+                }))
+            @(Html.NativeButton("btn-date-notnull", "NotNull")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionDatePicker>(m => m.AdmissionDate);
+                    p.When(comp.Value<System.DateTime?>()).NotNull()
+                        .Then(t => t.Element("r-date-notnull").SetText("set"))
+                        .Else(e => e.Element("r-date-notnull").SetText("missing"));
+                }))
+        </native-hstack>
+        <p class="font-mono text-xs mt-2">
+            eq: <span id="r-date-eq" class="text-text-muted">—</span> |
+            gt: <span id="r-date-gt" class="text-text-muted">—</span> |
+            lt: <span id="r-date-lt" class="text-text-muted">—</span> |
+            between: <span id="r-date-between" class="text-text-muted">—</span> |
+            is-null: <span id="r-date-isnull" class="text-text-muted">—</span> |
+            not-null: <span id="r-date-notnull" class="text-text-muted">—</span>
+        </p>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">8. Date cross-component — Admission &lt; Discharge</native-heading>
+        <p class="text-sm text-text-secondary mb-2">Two DatePickers compared to each other via component-read on both sides.</p>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.DischargeDate, o => o.Label("Discharge Date"))
+                .FusionDatePicker(b => b.Placeholder("Select date")); }
+        </native-grid>
+        <native-hstack gap="Sm" class="mt-3">
+            @(Html.NativeButton("btn-date-cross", "Admission < Discharge?")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var admission = p.Component<FusionDatePicker>(m => m.AdmissionDate);
+                    var discharge = p.Component<FusionDatePicker>(m => m.DischargeDate);
+                    p.When(admission.Value<System.DateTime?>())
+                        .Lt(discharge.Value<System.DateTime?>())
+                        .Then(t => t.Element("r-date-cross").SetText("valid order"))
+                        .Else(e => e.Element("r-date-cross").SetText("invalid order"));
+                }))
+        </native-hstack>
+        <p class="font-mono text-xs mt-2">
+            cross: <span id="r-date-cross" class="text-text-muted">—</span>
+        </p>
+    </native-card-body></native-card>
+
+    <!-- ═══════════════════════════════════════════════════════════════ ARRAY ═══════════════════════════════════════════════════════════════ -->
+
+    <native-card><native-card-body>
+        <native-heading level="H2">9. Array(String) — IsEmpty / NotEmpty / ArrayContains (FusionMultiSelect)</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.Allergies, o => o.Label("Known Allergies"))
+                .FusionMultiSelect(b => b.DataSource(allergyOptions).Placeholder("Select allergies")); }
+        </native-grid>
+        <native-hstack gap="Sm" class="mt-3">
+            @(Html.NativeButton("btn-arr-isempty", "IsEmpty")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
+                    p.When(comp.Value<string[]>()).IsEmpty()
+                        .Then(t => t.Element("r-arr-isempty").SetText("none"))
+                        .Else(e => e.Element("r-arr-isempty").SetText("some"));
+                }))
+            @(Html.NativeButton("btn-arr-notempty", "NotEmpty")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
+                    p.When(comp.Value<string[]>()).NotEmpty()
+                        .Then(t => t.Element("r-arr-notempty").SetText("some"))
+                        .Else(e => e.Element("r-arr-notempty").SetText("none"));
+                }))
+            @(Html.NativeButton("btn-arr-contains", "ArrayContains \"Penicillin\"")
+                .CssClass("rounded-md bg-accent px-3 py-1 text-xs text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var comp = p.Component<FusionMultiSelect>(m => m.Allergies);
+                    p.When(comp.Value<string[]>()).ArrayContains("Penicillin")
+                        .Then(t => t.Element("r-arr-contains").SetText("allergic"))
+                        .Else(e => e.Element("r-arr-contains").SetText("safe"));
+                }))
+        </native-hstack>
+        <p class="font-mono text-xs mt-2">
+            is-empty: <span id="r-arr-isempty" class="text-text-muted">—</span> |
+            not-empty: <span id="r-arr-notempty" class="text-text-muted">—</span> |
+            array-contains: <span id="r-arr-contains" class="text-text-muted">—</span>
+        </p>
+    </native-card-body></native-card>
+
+    <!-- Plan JSON -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

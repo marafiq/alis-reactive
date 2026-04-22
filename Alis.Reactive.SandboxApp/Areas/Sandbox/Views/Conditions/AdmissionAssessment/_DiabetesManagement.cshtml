@@ -27,9 +27,9 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.A1cLevel);
-                    p.Element("a1c-echo").SetText(comp.Value());
+                    p.Element("a1c-echo").SetText(comp.Value<decimal>());
 
-                    p.When(comp.Value()).Gt(9m)
+                    p.When(comp.Value<decimal>()).Gt(9m)
                         .Then(then =>
                         {
                             then.Element("uncontrolled-spinner").Show();
@@ -57,7 +57,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var sw = p.Component<FusionSwitch>(m => m.InsulinDependent);
-                    p.When(sw.Value()).Truthy()
+                    p.When(sw.Value<bool>()).Truthy()
                         .Then(t => t.Element("insulin-details").Show())
                         .Else(e => e.Element("insulin-details").Hide());
                 })); }

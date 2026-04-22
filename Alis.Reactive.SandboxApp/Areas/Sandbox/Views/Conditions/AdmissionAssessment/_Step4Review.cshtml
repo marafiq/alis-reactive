@@ -32,7 +32,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var contact = p.Component<NativeTextBox>(m => m.EmergencyContact);
-                    p.When(contact.Value()).IsEmpty()
+                    p.When(contact.Value<string>()).IsEmpty()
                         .Then(t => t.Element("contact-warning").Show())
                         .Else(e => e.Element("contact-warning").Hide());
                 })); }

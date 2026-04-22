@@ -13,7 +13,7 @@
     {
         p.Component<FusionDateTimePicker>(m => m.MedicationTime).SetValue(new DateTime(2026, 6, 15, 14, 30, 0));
         var comp = p.Component<FusionDateTimePicker>(m => m.MedicationTime);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Value<System.DateTime>());
     }));
 }
 
@@ -42,7 +42,7 @@
                             .Then(t => t.Element("args-condition").SetText("time selected"))
                             .Else(e => e.Element("args-condition").SetText("no time"));
                         var comp = p.Component<FusionDateTimePicker>(m => m.MedicationTime);
-                        p.When(comp.Value()).NotNull()
+                        p.When(comp.Value<System.DateTime>()).NotNull()
                             .Then(then =>
                             {
                                 then.Element("selected-indicator").Show();
@@ -83,7 +83,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads medication time via <code>When(comp.Value()).IsEmpty()</code>
+            Button reads medication time via <code>When(comp.Value<System.DateTime>()).IsEmpty()</code>
             and shows a warning or confirmation.
         </p>
         <native-hstack gap="None" class="mt-3">
@@ -92,7 +92,7 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     var comp = p.Component<FusionDateTimePicker>(m => m.MedicationTime);
-                    p.When(comp.Value()).IsEmpty()
+                    p.When(comp.Value<System.DateTime>()).IsEmpty()
                         .Then(t => t.Element("medication-warning").SetText("medication time is required"))
                         .Else(e => e.Element("medication-warning").SetText("medication time set"));
                 }))

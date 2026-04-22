@@ -13,7 +13,7 @@ public class WhenMutatingAFusionFileUpload : FusionTestBase
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
-            var source = p.Component<FusionFileUpload>(m => m.Documents).Value();
+            var source = p.Component<FusionFileUpload>(m => m.Documents).Value<string>();
             Assert.That(source, Is.TypeOf<TypedComponentSource<string>>());
         });
     }

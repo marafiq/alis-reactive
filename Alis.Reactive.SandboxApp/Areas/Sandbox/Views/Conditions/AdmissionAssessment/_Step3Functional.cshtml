@@ -45,7 +45,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var hist = p.Component<FusionDropDownList>(m => m.FallHistory);
-                    p.When(hist.Value()).In("1-2 falls", "3+ falls")
+                    p.When(hist.Value<string>()).In("1-2 falls", "3+ falls")
                         .Then(t => t.Element("fall-details").Show())
                         .Else(e => e.Element("fall-details").Hide());
                 })); }
@@ -63,7 +63,7 @@
                 var fallRisk = p.Component<FusionNumericTextBox>(m => m.FallRiskScore);
                 var age = p.Component<FusionNumericTextBox>(m => m.Age);
 
-                p.When(fallRisk.Value()).Gte(7m).And(age.Value()).Gte(80m)
+                p.When(fallRisk.Value<decimal>()).Gte(7m).And(age.Value<decimal>()).Gte(80m)
                     .Then(t =>
                     {
                         t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Continuous");
@@ -89,11 +89,11 @@
                 {
                     var aid = p.Component<FusionDropDownList>(m => m.MobilityAid);
 
-                    p.When(aid.Value()).In("Walker", "Wheelchair")
+                    p.When(aid.Value<string>()).In("Walker", "Wheelchair")
                         .Then(t => t.Element("escort-indicator").Show())
                         .Else(e => e.Element("escort-indicator").Hide());
 
-                    p.When(aid.Value()).Eq("Wheelchair")
+                    p.When(aid.Value<string>()).Eq("Wheelchair")
                         .Then(then =>
                         {
                             then.Element("room-spinner").Show();
@@ -115,7 +115,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var meds = p.Component<FusionNumericTextBox>(m => m.MedicationCount);
-                    p.When(meds.Value()).Gt(10m)
+                    p.When(meds.Value<decimal>()).Gt(10m)
                         .Then(t => t.Element("polypharmacy-warning").Show())
                         .Else(e => e.Element("polypharmacy-warning").Hide());
                 })); }
@@ -140,7 +140,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var bt = p.Component<FusionSwitch>(m => m.TakesBloodThinners);
-                    p.When(bt.Value()).Truthy()
+                    p.When(bt.Value<bool>()).Truthy()
                         .Then(t => t.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Enhanced"))
                         .Else(e => e.Component<NativeHiddenField>(m => m.MonitoringLevel).SetValue("Standard"));
                 })); }
@@ -150,7 +150,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var pm = p.Component<FusionSwitch>(m => m.TakesPainMedication);
-                    p.When(pm.Value()).Truthy()
+                    p.When(pm.Value<bool>()).Truthy()
                         .Then(t => t.Element("pain-section").Show())
                         .Else(e => e.Element("pain-section").Hide());
                 })); }

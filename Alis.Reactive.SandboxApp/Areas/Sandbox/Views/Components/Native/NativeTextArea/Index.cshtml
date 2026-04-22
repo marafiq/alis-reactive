@@ -16,7 +16,7 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<NativeTextArea>(m => m.CareNotes);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Value<string>());
     }));
 }
 
@@ -85,7 +85,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads care notes via <code>When(comp.Value()).IsEmpty()</code>
+            Button reads care notes via <code>When(comp.Value<string>()).IsEmpty()</code>
             and shows a warning or confirmation.
         </p>
         @(Html.NativeButton("check-notes-btn", "Check Care Notes")
@@ -93,7 +93,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeTextArea>(m => m.CareNotes);
-                p.When(comp.Value()).IsEmpty()
+                p.When(comp.Value<string>()).IsEmpty()
                     .Then(t => t.Element("notes-warning").SetText("notes required"))
                     .Else(e => e.Element("notes-warning").SetText("notes recorded"));
             }))

@@ -109,7 +109,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <native-text color="Secondary">
-            Button reads care level via <code>When(comp.Value()).NotEmpty()</code>.
+            Button reads care level via <code>When(comp.Value<string>()).NotEmpty()</code>.
         </native-text>
 
         @(Html.NativeButton("check-care-btn", "Check Care Level")
@@ -117,7 +117,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeRadioGroup>(m => m.CareLevel);
-                p.When(comp.Value()).NotEmpty()
+                p.When(comp.Value<string>()).NotEmpty()
                     .Then(t => t.Element("care-confirmation").SetText("care level confirmed"))
                     .Else(e => e.Element("care-confirmation").SetText("care level is required"));
             }))

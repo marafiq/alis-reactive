@@ -19,7 +19,7 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<NativeDropDown>(m => m.CareLevel);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Value<string>());
     }));
 }
 
@@ -88,7 +88,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads care level via <code>When(comp.Value()).NotEmpty()</code>
+            Button reads care level via <code>When(comp.Value<string>()).NotEmpty()</code>
             and shows a confirmation or warning.
         </p>
         @(Html.NativeButton("check-care-btn", "Check Care Level")
@@ -96,7 +96,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeDropDown>(m => m.CareLevel);
-                p.When(comp.Value()).NotEmpty()
+                p.When(comp.Value<string>()).NotEmpty()
                     .Then(t => t.Element("care-confirmation").SetText("care level confirmed"))
                     .Else(e => e.Element("care-confirmation").SetText("care level is required"));
             }))

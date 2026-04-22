@@ -16,7 +16,7 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<NativeCheckBox>(m => m.AllowsVisitors);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Value<bool>());
     }));
 }
 
@@ -86,7 +86,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads medication checkbox via <code>When(comp.Value()).Truthy()</code>
+            Button reads medication checkbox via <code>When(comp.Value<bool>()).Truthy()</code>
             and shows a confirmation or warning.
         </p>
         @(Html.NativeButton("check-medication-btn", "Check Medication Status")
@@ -94,7 +94,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeCheckBox>(m => m.ReceivesMedication);
-                p.When(comp.Value()).Truthy()
+                p.When(comp.Value<bool>()).Truthy()
                     .Then(t => t.Element("medication-warning").SetText("resident receives medication"))
                     .Else(e => e.Element("medication-warning").SetText("no medication on record"));
             }))

@@ -21,9 +21,9 @@
     Html.On(plan, t => t.CustomEvent("do-transfer", p =>
     {
         p.DispatchWith<DispatchSourceModel>("transfer", d => d
-            .Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Value())
+            .Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Value<string>())
             .Set(x => x.Status, "active")
-            .Set(x => x.Address.City, p.Component<NativeTextBox>(m => m.Address.City).Value())
+            .Set(x => x.Address.City, p.Component<NativeTextBox>(m => m.Address.City).Value<string>())
         );
     }));
 

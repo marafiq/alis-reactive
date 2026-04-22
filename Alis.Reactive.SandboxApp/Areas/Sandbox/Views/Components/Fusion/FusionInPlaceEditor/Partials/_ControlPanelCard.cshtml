@@ -26,8 +26,8 @@
         Html.On(plan, t => t.DomReady(p =>
         {
             var comp = p.Component<FusionInPlaceEditor>(m => m.Value);
-            p.Element("control-echo").SetText(comp.Value());
-            p.When(comp.Value()).Eq("Hello")
+            p.Element("control-echo").SetText(comp.Value<string>());
+            p.When(comp.Value<string>()).Eq("Hello")
                 .Then(then => then.Element("control-greeting").Show())
                 .Else(e => e.Element("control-greeting").Hide());
         }));
@@ -42,7 +42,7 @@
         @(Html.NativeButton("ctrl-btn-set-null", "SetValue(null)")
             .CssClass("rounded-md bg-accent/80 px-3 py-1 text-xs text-white")
             .Reactive(plan, evt => evt.Click, (args, p) =>
-                p.Component<FusionInPlaceEditor>(m => m.Value).SetValue(null)))
+                p.Component<FusionInPlaceEditor>(m => m.Value).SetValue<string>((string)null!)))
 
         @(Html.NativeButton("ctrl-btn-enable", "Enable()")
             .CssClass("rounded-md bg-emerald-600 px-3 py-1 text-xs text-white")

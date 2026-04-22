@@ -52,12 +52,15 @@ public sealed class RichTextEditorLocator
         await _page.Keyboard.TypeAsync(text);
     }
 
-    /// <summary>Select all content and delete it.</summary>
+    /// <summary>
+    /// Clear the editor. Playwright's FillAsync on the contenteditable surface
+    /// replaces the DOM content and fires the change events EJ2 listens for —
+    /// the keyboard Meta+A+Backspace dance leaves the prior HTML on blur.
+    /// </summary>
     public async Task Clear()
     {
         await Focus();
-        await _page.Keyboard.PressAsync("Meta+a");
-        await _page.Keyboard.PressAsync("Backspace");
+        await Editor.FillAsync("");
     }
 
     /// <summary>Press Tab to leave the editor.</summary>

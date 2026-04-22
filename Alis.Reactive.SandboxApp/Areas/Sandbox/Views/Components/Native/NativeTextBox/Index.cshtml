@@ -16,7 +16,7 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<NativeTextBox>(m => m.ResidentName);
-        p.Element("value-echo").SetText(comp.Value());
+        p.Element("value-echo").SetText(comp.Value<string>());
     }));
 }
 
@@ -83,7 +83,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
-            Button reads resident name via <code>When(comp.Value()).IsEmpty()</code>
+            Button reads resident name via <code>When(comp.Value<string>()).IsEmpty()</code>
             and shows a warning or confirmation.
         </p>
         @(Html.NativeButton("check-name-btn", "Check Resident Name")
@@ -91,7 +91,7 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 var comp = p.Component<NativeTextBox>(m => m.ResidentName);
-                p.When(comp.Value()).IsEmpty()
+                p.When(comp.Value<string>()).IsEmpty()
                     .Then(t => t.Element("name-warning").SetText("name is required"))
                     .Else(e => e.Element("name-warning").SetText("name set"));
             }))

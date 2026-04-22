@@ -22,9 +22,9 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.SystolicBP);
-                    p.Element("bp-echo").SetText(comp.Value());
+                    p.Element("bp-echo").SetText(comp.Value<decimal>());
 
-                    p.When(comp.Value()).Gt(140m)
+                    p.When(comp.Value<decimal>()).Gt(140m)
                         .Then(then =>
                         {
                             then.Element("hypertension-spinner").Show();
@@ -50,7 +50,7 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var pm = p.Component<FusionSwitch>(m => m.HasPacemaker);
-                    p.When(pm.Value()).Truthy()
+                    p.When(pm.Value<bool>()).Truthy()
                         .Then(t => t.Element("pacemaker-details").Show())
                         .Else(e => e.Element("pacemaker-details").Hide());
                 })); }

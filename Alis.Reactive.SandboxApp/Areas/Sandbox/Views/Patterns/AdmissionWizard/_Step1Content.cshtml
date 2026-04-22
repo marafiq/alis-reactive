@@ -29,9 +29,9 @@
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
                     var ageComp = p.Component<FusionNumericTextBox>(m => m.Age);
-                    p.When(ageComp.Value()).Gte(85m)
+                    p.When(ageComp.Value<decimal>()).Gte(85m)
                         .Then(t => { t.Component<FusionDropDownList>(m => m.RiskTier).SetValue("High"); t.Element("risk-badge").SetText("High Risk"); t.Element("risk-badge").Show(); })
-                        .ElseIf(ageComp.Value()).Gte(65m)
+                        .ElseIf(ageComp.Value<decimal>()).Gte(65m)
                         .Then(t => { t.Component<FusionDropDownList>(m => m.RiskTier).SetValue("Standard"); t.Element("risk-badge").SetText("Standard Risk"); t.Element("risk-badge").Show(); })
                         .Else(e => { e.Component<FusionDropDownList>(m => m.RiskTier).SetValue("Low"); e.Element("risk-badge").SetText("Low Risk"); e.Element("risk-badge").Show(); });
                 })); }
@@ -58,7 +58,7 @@
             .FusionSwitch(b => b.Reactive(plan, evt => evt.Changed, (args, p) =>
             {
                 var sw = p.Component<FusionSwitch>(m => m.IsVeteran);
-                p.When(sw.Value()).Truthy()
+                p.When(sw.Value<bool>()).Truthy()
                     .Then(t => t.Element("veteran-section").Show())
                     .Else(e => e.Element("veteran-section").Hide());
             })); }

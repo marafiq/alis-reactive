@@ -5,61 +5,35 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed value reading for <see cref="FusionDateRangePicker"/> in a reactive pipeline.
+    /// Vendor-declared named reads for <see cref="FusionDateRangePicker"/>.
+    /// Typed Value&lt;TProp&gt;() (reads the bound range as an array) is provided by the
+    /// <see cref="InputComponentRef{TComponent, TModel}"/> base class with cross-check
+    /// against the registration shape. <see cref="StartDate{TModel}"/> and
+    /// <see cref="EndDate{TModel}"/> read the vendor-declared startDate/endDate
+    /// properties which are always <see cref="Shape.Date"/> regardless of binding.
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
-    /// <c>p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).Value()</c>.
-    /// </para>
-    /// <para>
-    /// <see cref="StartDate{TModel}"/> and <see cref="EndDate{TModel}"/> read individual
-    /// dates for use in conditions. <see cref="Value{TModel}"/> reads both dates as an array.
-    /// </para>
-    /// <para>
-    /// No <c>SetValue()</c> is provided. The date range is set by user interaction only.
-    /// </para>
-    /// </remarks>
     public static class FusionDateRangePickerExtensions
     {
         private static readonly FusionDateRangePicker Component = new FusionDateRangePicker();
 
         /// <summary>Reads the start date for use in conditions or gather.</summary>
-        /// <remarks>
-        /// Pass to a <c>When()</c> condition guard:
-        /// <c>p.When(p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).StartDate()).NotNull().Then(p =&gt; { ... })</c>.
-        /// </remarks>
-        /// <returns>A typed source representing the range's start date.</returns>
         public static TypedComponentSource<DateTime> StartDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, "startDate", "startDate", Shape.Date, "read"); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "startDate"); }
+        {
+            self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor);
+            self.Pipeline.Context.EnsureProperty(self.TargetId, "startDate", "startDate", Shape.Date, "read");
+            return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "startDate");
+        }
 
         /// <summary>Reads the end date for use in conditions or gather.</summary>
-        /// <remarks>
-        /// Pass to a <c>When()</c> condition guard:
-        /// <c>p.When(p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).EndDate()).NotNull().Then(p =&gt; { ... })</c>.
-        /// </remarks>
-        /// <returns>A typed source representing the range's end date.</returns>
         public static TypedComponentSource<DateTime> EndDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, "endDate", "endDate", Shape.Date, "read"); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "endDate"); }
-
-        /// <summary>Reads both dates as an array for use in conditions or gather.</summary>
-        /// <remarks>
-        /// <para>
-        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations.
-        /// </para>
-        /// <para>
-        /// Use <see cref="StartDate{TModel}"/> or <see cref="EndDate{TModel}"/>
-        /// when you need individual date access in conditions.
-        /// </para>
-        /// </remarks>
-        /// <returns>A typed source representing the full date range (start and end).</returns>
-        public static TypedComponentSource<DateTime[]> Value<TModel>(
-            this ComponentRef<FusionDateRangePicker, TModel> self)
-            where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.ArrayOf(Shape.Date), "read"); return new TypedComponentSource<DateTime[]>(self.TargetId, Component.Vendor, Component.ValueMember); }
+        {
+            self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor);
+            self.Pipeline.Context.EnsureProperty(self.TargetId, "endDate", "endDate", Shape.Date, "read");
+            return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "endDate");
+        }
     }
 }

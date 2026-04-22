@@ -51,10 +51,10 @@
                         var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
                         // BEFORE condition — always executes
-                        p.Element("s1-last-reading").SetText(comp.Value());
+                        p.Element("s1-last-reading").SetText(comp.Value<decimal>());
 
                         // Condition: Gt(140) → POST alert, Else → text only
-                        p.When(comp.Value()).Gt(140m)
+                        p.When(comp.Value<decimal>()).Gt(140m)
                             .Then(then =>
                             {
                                 then.Post(alertUrl,
@@ -98,7 +98,7 @@
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
-                    p.When(comp.Value()).Gte(180m)
+                    p.When(comp.Value<decimal>()).Gte(180m)
                         .Then(then =>
                         {
                             then.Post(criticalUrl,
@@ -109,7 +109,7 @@
                                     s.Element("s2-tier-level").SetText(json, x => x.Level);
                                 }));
                         })
-                        .ElseIf(comp.Value()).Gte(140m)
+                        .ElseIf(comp.Value<decimal>()).Gte(140m)
                         .Then(then =>
                         {
                             then.Post(warningUrl,
@@ -150,10 +150,10 @@
 
                     // BEFORE condition — always
                     p.Element("s3-before").SetText("before-ran");
-                    p.Element("s3-reading").SetText(comp.Value());
+                    p.Element("s3-reading").SetText(comp.Value<decimal>());
 
                     // Condition: Gt(140) → POST, Else → text
-                    p.When(comp.Value()).Gt(140m)
+                    p.When(comp.Value<decimal>()).Gt(140m)
                         .Then(then =>
                         {
                             then.Post(alertUrl,

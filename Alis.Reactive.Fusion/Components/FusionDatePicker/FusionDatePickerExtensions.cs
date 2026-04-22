@@ -16,16 +16,7 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionDatePicker Component = new FusionDatePicker();
 
-        /// <summary>Sets the selected date.</summary>
-        /// <param name="value">The date to set.</param>
-        /// <returns>The component reference for method chaining.</returns>
-        public static ComponentRef<FusionDatePicker, TModel> SetValue<TModel>(
-            this ComponentRef<FusionDatePicker, TModel> self, DateTime value)
-            where TModel : class
-        {
-            return self.EmitSet("value",
-                ValueProducer.Literal(value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)));
-        }
+        // SetValue&lt;TProp&gt;(TProp value) is provided by the ComponentRef base class.
 
         /// <summary>Moves focus into the date picker.</summary>
         /// <returns>The component reference for method chaining.</returns>
@@ -41,15 +32,6 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall("focusOut");
 
-        /// <summary>Reads the current date value for use in conditions or gather.</summary>
-        /// <remarks>
-        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
-        /// <c>p.When(p.Component&lt;FusionDatePicker&gt;(m =&gt; m.BirthDate).Value()).NotNull().Then(p =&gt; { ... })</c>.
-        /// </remarks>
-        /// <returns>A typed source representing the date picker's current value.</returns>
-        public static TypedComponentSource<DateTime> Value<TModel>(
-            this ComponentRef<FusionDatePicker, TModel> self)
-            where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.Date, "read"); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, Component.ValueMember); }
+        // Value&lt;TProp&gt;() is provided by the ComponentRef base class.
     }
 }

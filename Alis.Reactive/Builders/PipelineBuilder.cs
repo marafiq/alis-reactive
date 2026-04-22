@@ -92,30 +92,42 @@ namespace Alis.Reactive.Builders
             return new ElementBuilder<TModel>(this, elementId);
         }
 
-        /// <summary>References a component bound to a model expression for method calls and property mutations.</summary>
-        /// <typeparam name="TComponent">The component type.</typeparam>
+        /// <summary>References an input component bound to a model expression for typed Value/SetValue accessors, method calls, and property mutations.</summary>
+        /// <remarks>
+        /// Constrained to <see cref="IInputComponent"/>: expression-based factory presumes a model-property binding.
+        /// Returns <see cref="InputComponentRef{TComponent, TModel}"/> which exposes <c>Value&lt;TProp&gt;()</c>
+        /// and <c>SetValue&lt;TProp&gt;(TProp)</c>. For non-input components (buttons, toasts), use the ID-based
+        /// factory <c>Component&lt;T&gt;(refId)</c> instead.
+        /// </remarks>
+        /// <typeparam name="TComponent">The input component type.</typeparam>
         /// <param name="expr">The model expression that identifies the component.</param>
-        /// <returns>A typed component reference.</returns>
-        public ComponentRef<TComponent, TModel> Component<TComponent>(
+        /// <returns>A typed input component reference.</returns>
+        public InputComponentRef<TComponent, TModel> Component<TComponent>(
             Expression<Func<TModel, object>> expr)
-            where TComponent : IComponent, new()
+            where TComponent : IInputComponent, new()
         {
             var elementId = IdGenerator.For<TModel>(expr);
-            return new ComponentRef<TComponent, TModel>(elementId, this);
+            var exprClrType = ExpressionPathHelper.ExtractMemberClrType(expr);
+            return new InputComponentRef<TComponent, TModel>(elementId, this, exprClrType);
         }
 
-        /// <summary>References a component bound to a different model (cross-partial scenarios).</summary>
-        /// <typeparam name="TComponent">The component type.</typeparam>
+        /// <summary>References an input component bound to a different model (cross-partial / wizard scenarios).</summary>
+        /// <remarks>
+        /// Same as the same-model overload but allows the expression to reference a model type other than the pipeline's TModel.
+        /// Returns <see cref="InputComponentRef{TComponent, TModel}"/>.
+        /// </remarks>
+        /// <typeparam name="TComponent">The input component type.</typeparam>
         /// <typeparam name="TOtherModel">The other view model type.</typeparam>
         /// <param name="expr">The model expression on the other model.</param>
-        /// <returns>A typed component reference.</returns>
-        public ComponentRef<TComponent, TModel> Component<TComponent, TOtherModel>(
+        /// <returns>A typed input component reference.</returns>
+        public InputComponentRef<TComponent, TModel> Component<TComponent, TOtherModel>(
             Expression<Func<TOtherModel, object>> expr)
-            where TComponent : IComponent, new()
+            where TComponent : IInputComponent, new()
             where TOtherModel : class
         {
             var elementId = IdGenerator.For<TOtherModel>(expr);
-            return new ComponentRef<TComponent, TModel>(elementId, this);
+            var exprClrType = ExpressionPathHelper.ExtractMemberClrType(expr);
+            return new InputComponentRef<TComponent, TModel>(elementId, this, exprClrType);
         }
 
         /// <summary>References a component by explicit ID.</summary>

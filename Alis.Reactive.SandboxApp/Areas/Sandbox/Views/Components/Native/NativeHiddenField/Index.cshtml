@@ -10,9 +10,9 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Element("resident-id-echo").SetText(
-            p.Component<NativeHiddenField>(m => m.ResidentId).Value());
+            p.Component<NativeHiddenField>(m => m.ResidentId).Value<string>());
         p.Element("form-token-echo").SetText(
-            p.Component<NativeHiddenField>(m => m.FormToken).Value());
+            p.Component<NativeHiddenField>(m => m.FormToken).Value<string>());
     }));
 }
 
@@ -47,7 +47,7 @@
         <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
             On DomReady, reads hidden field values into echo spans using
-            <code>Component&lt;NativeHiddenField&gt;(m =&gt; m.ResidentId).Value()</code>.
+            <code>Component&lt;NativeHiddenField&gt;(m =&gt; m.ResidentId).Value<string>()</code>.
         </p>
         <native-vstack gap="Xs" class="font-mono text-sm">
             <p>Resident ID: <span id="resident-id-echo" class="text-text-muted">&mdash;</span></p>
