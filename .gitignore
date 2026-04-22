@@ -44,3 +44,10 @@ Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
 # until someone manually rebuilds and commits; CI is the source of truth.
 # Local dev regenerates on demand by running scripts/rebuild-example-app.sh.
 docs-site/public/downloads/resident-intake.zip
+
+# AlisReactive NuGet copies versioned bundles into consumer wwwroot after every
+# build (see Alis.Reactive/build/AlisReactive.targets CopyAlisReactiveAssets).
+# Source of truth is the NuGet package; tracked copies only produce phantom
+# diffs and orphaned files when the AlisReactive version bumps.
+examples/resident-intake/wwwroot/scripts/alis-reactive.*.js
+examples/resident-intake/wwwroot/css/design-system.*.css
