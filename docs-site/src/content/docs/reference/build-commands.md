@@ -11,39 +11,44 @@ All commands run from the repository root.
 
 ## How do I build the JS runtime?
 
-The runtime is bundled as a single ESM module via esbuild. Entry point: `Scripts/root.ts`.
+The runtime is bundled as a single IIFE via esbuild. Entry point: `Alis.Reactive.Assets/Scripts/root.ts`.
 
 ```bash
-npm run build            # Bundle -> wwwroot/js/alis-reactive.js
+npm run build            # Bundle -> Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js
 ```
+
+The sandbox serves this file at `/scripts/alis-reactive.dev.js` — the same URL
+shape a net10 NuGet consumer sees (with their package version in place of `dev`).
 
 ## How do I build the CSS?
 
 Tailwind v4, compiled via `@tailwindcss/cli`:
 
 ```bash
-npm run build:css        # Compile -> wwwroot/css/design-system.css
+npm run build:css        # Compile -> Alis.Reactive.Assets/dist/css/design-system.dev.css
 ```
 
 ## How do I build everything?
 
 ```bash
-npm run build:all        # JS runtime + test-widget + CSS
+npm run build:all        # framework JS + framework CSS + sandbox-plugins + sandbox.css
 ```
 
-This runs `build`, `build:test-widget`, and `build:css` in sequence.
+This runs `build`, `build:css`, `build:sandbox-plugins`, and `build:sandbox-css` in sequence.
 
 ## How do I watch for changes?
 
 ```bash
-npm run watch            # Rebuild JS on file change
-npm run watch:css        # Rebuild CSS on file change
+npm run watch                  # Rebuild framework JS on file change
+npm run watch:css              # Rebuild framework CSS on file change
+npm run watch:sandbox-plugins  # Rebuild sandbox-plugins on change
+npm run watch:sandbox-css      # Rebuild sandbox.css on change
 ```
 
 ## How do I typecheck?
 
 ```bash
-npm run typecheck        # tsc --noEmit against Scripts/tsconfig.json
+npm run typecheck        # tsc against both tsconfigs (framework + sandbox)
 ```
 
 ## How do I lint?
@@ -111,7 +116,12 @@ All must pass before every commit. No exceptions.
 dotnet run --project Alis.Reactive.SandboxApp
 ```
 
-Starts Kestrel on `http://localhost:5220`. The app serves bundled JS and CSS from `wwwroot/`.
+Starts Kestrel on `http://localhost:5220`. The sandbox serves framework bundles
+(`/scripts/alis-reactive.dev.js`, `/css/design-system.dev.css`) directly from
+`Alis.Reactive.Assets/dist/` via a `CompositeFileProvider` configured in
+`Alis.Reactive.SandboxApp/Program.cs` — no copy into sandbox `wwwroot/` required.
+Sandbox-specific bundles (`sandbox-plugins.js`, `sandbox.css`) live in the
+standard `wwwroot/`.
 
 ---
 
@@ -125,7 +135,10 @@ After making changes, follow this order. Each step depends on the one before it.
 npm run build:all
 ```
 
-Regenerates JS and CSS in `wwwroot/`. The ASP.NET `asp-append-version="true"` tag helper computes a SHA256 hash, so browsers always get the latest build.
+Regenerates framework bundles in `Alis.Reactive.Assets/dist/` and sandbox-specific
+bundles in `Alis.Reactive.SandboxApp/wwwroot/`. The ASP.NET `asp-append-version="true"`
+tag helper computes a SHA256 hash from each served file, so browsers always
+get the latest build without cache collisions.
 
 ### 2. Run TypeScript tests
 

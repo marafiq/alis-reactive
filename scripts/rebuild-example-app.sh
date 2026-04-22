@@ -1,13 +1,25 @@
 #!/usr/bin/env bash
-# rebuild-example-app.sh — Rebuilds example app DLLs, JS/CSS assets, and packages the zip.
+# rebuild-example-app.sh — Regenerates the downloadable resident-intake zip.
 # Run from repo root: ./scripts/rebuild-example-app.sh
 #
 # What it does:
-#   1. Builds all 5 Alis.Reactive framework DLLs (Release)
-#   2. Copies fresh DLLs into examples/resident-intake/lib/
-#   3. Copies fresh JS + CSS bundles into examples/resident-intake/wwwroot/
-#   4. Verifies the example app compiles against the new DLLs
-#   5. Packages examples/resident-intake/ into docs-site/public/downloads/resident-intake.zip
+#   1. `dotnet build examples/resident-intake/ResidentIntake.csproj`
+#      NuGet restore pulls the versions pinned in the csproj
+#      (e.g. AlisReactive 1.0.0-preview.2). On Build, the restored
+#      AlisReactive.targets copies the NuGet's own bundles into
+#      examples/resident-intake/wwwroot/ — the same code path every
+#      real consumer uses. This is the authoritative source for the
+#      JS + CSS shipped inside the zip. See docs-site/public/downloads/
+#      for the resulting file.
+#   2. Package the example directory into resident-intake.zip, excluding
+#      local build artefacts.
+#
+# Bumping the example to a new published preview:
+#   - Update PackageReference versions in examples/resident-intake/ResidentIntake.csproj
+#   - Update the ~/scripts/alis-reactive.<version>.js and
+#     ~/css/design-system.<version>.css references in examples/resident-intake/Views/Shared/_Layout.cshtml
+#   - Re-run this script — the zip will reflect the new pinned version
+#     exactly as consumers of that NuGet would see it.
 
 set -euo pipefail
 
@@ -16,65 +28,37 @@ EXAMPLE_DIR="$REPO_ROOT/examples/resident-intake"
 DOWNLOADS_DIR="$REPO_ROOT/docs-site/public/downloads"
 ZIP_FILE="$DOWNLOADS_DIR/resident-intake.zip"
 
-echo "=== Step 1: Build framework DLLs (Release) ==="
-dotnet build "$REPO_ROOT/Alis.Reactive/Alis.Reactive.csproj" -c Release --nologo -v q
-dotnet build "$REPO_ROOT/Alis.Reactive.Native/Alis.Reactive.Native.csproj" -c Release --nologo -v q
-dotnet build "$REPO_ROOT/Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" -c Release --nologo -v q
-dotnet build "$REPO_ROOT/Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj" -c Release --nologo -v q
-
-echo "=== Step 2: Copy DLLs to example app lib/ ==="
-mkdir -p "$EXAMPLE_DIR/lib"
-
-# Find Release output directories
-CORE_OUT="$REPO_ROOT/Alis.Reactive/bin/Release/net10.0"
-NATIVE_OUT="$REPO_ROOT/Alis.Reactive.Native/bin/Release/net10.0"
-FUSION_OUT="$REPO_ROOT/Alis.Reactive.Fusion/bin/Release/net10.0"
-VALIDATOR_OUT="$REPO_ROOT/Alis.Reactive.FluentValidator/bin/Release/net10.0"
-
-cp "$CORE_OUT/Alis.Reactive.dll" "$EXAMPLE_DIR/lib/"
-cp "$NATIVE_OUT/Alis.Reactive.Native.dll" "$EXAMPLE_DIR/lib/"
-cp "$FUSION_OUT/Alis.Reactive.Fusion.dll" "$EXAMPLE_DIR/lib/"
-cp "$VALIDATOR_OUT/Alis.Reactive.FluentValidator.dll" "$EXAMPLE_DIR/lib/"
-
-# NativeTagHelpers is part of Alis.Reactive.Native output
-if [ -f "$NATIVE_OUT/Alis.Reactive.NativeTagHelpers.dll" ]; then
-  cp "$NATIVE_OUT/Alis.Reactive.NativeTagHelpers.dll" "$EXAMPLE_DIR/lib/"
-else
-  # May be in a separate project — check common locations
-  TAGHELPERSPROJECT="$REPO_ROOT/Alis.Reactive.NativeTagHelpers"
-  if [ -d "$TAGHELPERSPROJECT" ]; then
-    dotnet build "$TAGHELPERSPROJECT/Alis.Reactive.NativeTagHelpers.csproj" -c Release --nologo -v q
-    cp "$TAGHELPERSPROJECT/bin/Release/net10.0/Alis.Reactive.NativeTagHelpers.dll" "$EXAMPLE_DIR/lib/"
-  fi
-fi
-
-echo "=== Step 3: Copy JS + CSS bundles ==="
-SANDBOX_WWWROOT="$REPO_ROOT/Alis.Reactive.SandboxApp/wwwroot"
-mkdir -p "$EXAMPLE_DIR/wwwroot/js" "$EXAMPLE_DIR/wwwroot/css"
-cp "$SANDBOX_WWWROOT/js/alis-reactive.js" "$EXAMPLE_DIR/wwwroot/js/"
-cp "$SANDBOX_WWWROOT/css/design-system.css" "$EXAMPLE_DIR/wwwroot/css/"
-
-echo "=== Step 4: Verify example app compiles ==="
+echo "=== Step 1: Restore + build example (NuGet drives the version) ==="
 dotnet build "$EXAMPLE_DIR/ResidentIntake.csproj" --nologo -v q
 if [ $? -ne 0 ]; then
-  echo "ERROR: Example app failed to compile with updated DLLs."
-  exit 1
+    echo "ERROR: example failed to compile. Fix build errors before re-running." >&2
+    exit 1
 fi
-echo "Example app compiles successfully."
 
-echo "=== Step 5: Package zip ==="
+# Verify AlisReactive.targets produced the versioned bundles in wwwroot.
+# If missing, either the pinned NuGet version is broken or AlisReactive.targets
+# itself has regressed — either way, do not ship a broken zip.
+JS_BUNDLE=$(ls "$EXAMPLE_DIR/wwwroot/scripts/alis-reactive."*.js 2>/dev/null | head -1)
+CSS_BUNDLE=$(ls "$EXAMPLE_DIR/wwwroot/css/design-system."*.css 2>/dev/null | head -1)
+if [ -z "$JS_BUNDLE" ] || [ -z "$CSS_BUNDLE" ]; then
+    echo "ERROR: AlisReactive.targets did not populate wwwroot with the expected bundles." >&2
+    echo "       Expected: wwwroot/scripts/alis-reactive.<version>.js + wwwroot/css/design-system.<version>.css" >&2
+    exit 1
+fi
+echo "  bundled JS:  $(basename "$JS_BUNDLE")"
+echo "  bundled CSS: $(basename "$CSS_BUNDLE")"
+
+echo "=== Step 2: Package zip ==="
 mkdir -p "$DOWNLOADS_DIR"
-# Remove old zip
 rm -f "$ZIP_FILE"
-# Create zip from example directory (excludes build artifacts)
 cd "$EXAMPLE_DIR"
 zip -r "$ZIP_FILE" . \
-  -x "bin/*" "obj/*" ".DS_Store" "*.user" \
-  > /dev/null
+    -x "bin/*" "obj/*" "lib/*" ".DS_Store" "*.user" \
+    > /dev/null
 cd "$REPO_ROOT"
 
 ZIP_SIZE=$(du -h "$ZIP_FILE" | cut -f1)
 echo "=== Done ==="
-echo "  DLLs:  $(ls -1 "$EXAMPLE_DIR/lib/"*.dll | wc -l | tr -d ' ') files updated"
 echo "  Zip:   $ZIP_FILE ($ZIP_SIZE)"
-echo "  Ready for commit."
+echo "  Contains: Model, Validator, Controller, Views, Razor _Layout, pinned PackageReferences,"
+echo "            and NuGet-restored alis-reactive.<version>.js + design-system.<version>.css."
