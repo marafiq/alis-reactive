@@ -45,15 +45,22 @@ app.UseHttpsRedirection();
 // from the sibling Alis.Reactive.Assets/dist produced by `npm run build:all`.
 // Same path in dev and CI — no copy into sandbox wwwroot required, so
 // `git status` stays clean after a local build.
+//
+// Fail fast in Development if the dist folder is missing (Rule 5). Silently
+// skipping would leave the sandbox serving 404 on the runtime bundle with
+// no log signal — a trap for first-run devs who haven't run the JS build yet.
 var frameworkAssetsDir = Path.GetFullPath(Path.Combine(
     app.Environment.ContentRootPath, "..", "Alis.Reactive.Assets", "dist"));
-if (Directory.Exists(frameworkAssetsDir))
+if (!Directory.Exists(frameworkAssetsDir))
 {
-    var composite = new CompositeFileProvider(
-        new PhysicalFileProvider(frameworkAssetsDir),
-        app.Environment.WebRootFileProvider);
-    app.Environment.WebRootFileProvider = composite;
+    throw new InvalidOperationException(
+        $"Framework asset bundles not found at '{frameworkAssetsDir}'. " +
+        "Run 'npm run build:all' from the repo root before starting the sandbox.");
 }
+var composite = new CompositeFileProvider(
+    new PhysicalFileProvider(frameworkAssetsDir),
+    app.Environment.WebRootFileProvider);
+app.Environment.WebRootFileProvider = composite;
 
 app.UseStaticFiles();
 app.UseRouting();
