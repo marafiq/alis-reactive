@@ -28,13 +28,13 @@
   <!--
     Mirrors the version-derivation in AlisReactive.targets:
       - packages.config layout: '{PackageId}.{Version}' folder, strip the
-        'AlisReactive.Fusion.' prefix (21 chars).
+        'AlisReactive.Fusion.' prefix (20 chars).
       - PackageReference layout: '{Version}' folder, use as-is.
   -->
   <PropertyGroup>
     <AlisReactiveFusionPkgDir>$(MSBuildThisFileDirectory)</AlisReactiveFusionPkgDir>
     <AlisReactiveFusionPkgFolderName>$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(AlisReactiveFusionPkgDir.TrimEnd('\/'))))))</AlisReactiveFusionPkgFolderName>
-    <AlisReactiveFusionVersion Condition="'$(AlisReactiveFusionVersion)' == '' and $(AlisReactiveFusionPkgFolderName.StartsWith('AlisReactive.Fusion.'))">$(AlisReactiveFusionPkgFolderName.Substring(21))</AlisReactiveFusionVersion>
+    <AlisReactiveFusionVersion Condition="'$(AlisReactiveFusionVersion)' == '' and $(AlisReactiveFusionPkgFolderName.StartsWith('AlisReactive.Fusion.'))">$(AlisReactiveFusionPkgFolderName.Substring(20))</AlisReactiveFusionVersion>
     <AlisReactiveFusionVersion Condition="'$(AlisReactiveFusionVersion)' == ''">$(AlisReactiveFusionPkgFolderName)</AlisReactiveFusionVersion>
   </PropertyGroup>
 
