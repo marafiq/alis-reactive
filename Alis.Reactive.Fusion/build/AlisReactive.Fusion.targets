@@ -1,0 +1,49 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+    AlisReactive.Fusion static assets (Syncfusion EJ2 CSS) — versioned filenames.
+
+    Defaults (auto-detected from $(TargetFrameworkIdentifier)):
+      .NETFramework: CSS → Content\alisreactive\syncfusion.{version}.css
+      .NETCoreApp:   CSS → wwwroot\css\syncfusion.{version}.css
+
+    Shares the same destination convention as AlisReactive.targets — consumers
+    that reference both packages get their bundles side-by-side under one
+    folder per framework flavor.
+
+    Override in your csproj:
+      <PropertyGroup>
+        <AlisReactiveFusionCssPath>my\custom\css</AlisReactiveFusionCssPath>
+      </PropertyGroup>
+  -->
+
+  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <AlisReactiveFusionCssPath Condition="'$(AlisReactiveFusionCssPath)' == ''">Content\alisreactive</AlisReactiveFusionCssPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
+    <AlisReactiveFusionCssPath Condition="'$(AlisReactiveFusionCssPath)' == ''">wwwroot\css</AlisReactiveFusionCssPath>
+  </PropertyGroup>
+
+  <!--
+    Mirrors the version-derivation in AlisReactive.targets:
+      - packages.config layout: '{PackageId}.{Version}' folder, strip the
+        'AlisReactive.Fusion.' prefix (20 chars).
+      - PackageReference layout: '{Version}' folder, use as-is.
+  -->
+  <PropertyGroup>
+    <AlisReactiveFusionPkgDir>$(MSBuildThisFileDirectory)</AlisReactiveFusionPkgDir>
+    <AlisReactiveFusionPkgFolderName>$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(AlisReactiveFusionPkgDir.TrimEnd('\/'))))))</AlisReactiveFusionPkgFolderName>
+    <AlisReactiveFusionVersion Condition="'$(AlisReactiveFusionVersion)' == '' and $(AlisReactiveFusionPkgFolderName.StartsWith('AlisReactive.Fusion.'))">$(AlisReactiveFusionPkgFolderName.Substring(20))</AlisReactiveFusionVersion>
+    <AlisReactiveFusionVersion Condition="'$(AlisReactiveFusionVersion)' == ''">$(AlisReactiveFusionPkgFolderName)</AlisReactiveFusionVersion>
+  </PropertyGroup>
+
+  <Target Name="CopyAlisReactiveFusionAssets" AfterTargets="Build">
+    <MakeDir Directories="$(AlisReactiveFusionCssPath)" Condition="!Exists('$(AlisReactiveFusionCssPath)')" />
+
+    <Copy SourceFiles="$(AlisReactiveFusionPkgDir)assets\css\syncfusion.css"
+          DestinationFiles="$(AlisReactiveFusionCssPath)\syncfusion.$(AlisReactiveFusionVersion).css"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

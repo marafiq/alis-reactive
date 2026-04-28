@@ -40,13 +40,17 @@ fi
 # itself has regressed — either way, do not ship a broken zip.
 JS_BUNDLE=$(ls "$EXAMPLE_DIR/wwwroot/scripts/alis-reactive."*.js 2>/dev/null | head -1)
 CSS_BUNDLE=$(ls "$EXAMPLE_DIR/wwwroot/css/design-system."*.css 2>/dev/null | head -1)
-if [ -z "$JS_BUNDLE" ] || [ -z "$CSS_BUNDLE" ]; then
-    echo "ERROR: AlisReactive.targets did not populate wwwroot with the expected bundles." >&2
-    echo "       Expected: wwwroot/scripts/alis-reactive.<version>.js + wwwroot/css/design-system.<version>.css" >&2
+FUSION_CSS_BUNDLE=$(ls "$EXAMPLE_DIR/wwwroot/css/syncfusion."*.css 2>/dev/null | head -1)
+if [ -z "$JS_BUNDLE" ] || [ -z "$CSS_BUNDLE" ] || [ -z "$FUSION_CSS_BUNDLE" ]; then
+    echo "ERROR: AlisReactive targets did not populate wwwroot with all expected bundles." >&2
+    echo "       Expected: wwwroot/scripts/alis-reactive.<version>.js" >&2
+    echo "                 wwwroot/css/design-system.<version>.css" >&2
+    echo "                 wwwroot/css/syncfusion.<version>.css" >&2
     exit 1
 fi
-echo "  bundled JS:  $(basename "$JS_BUNDLE")"
-echo "  bundled CSS: $(basename "$CSS_BUNDLE")"
+echo "  bundled JS:         $(basename "$JS_BUNDLE")"
+echo "  bundled CSS:        $(basename "$CSS_BUNDLE")"
+echo "  bundled Fusion CSS: $(basename "$FUSION_CSS_BUNDLE")"
 
 echo "=== Step 2: Package zip ==="
 mkdir -p "$DOWNLOADS_DIR"
