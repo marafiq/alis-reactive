@@ -24,26 +24,9 @@ The browser runtime is a dumb executor for that contract. There is no legacy pla
 
 ## Build & Verify
 
-```bash
-npm run build:all
-dotnet build /Users/muhammadadnanrafiq/Documents/alis-reactive-framework-1-0/.codex-worktrees/schema-capability-design/Alis.Reactive.slnx -nologo -t:Rebuild
-npm run typecheck
-npm test
-
-dotnet test tests/Alis.Reactive.UnitTests/Alis.Reactive.UnitTests.csproj -nologo
-dotnet test tests/Alis.Reactive.Native.UnitTests/Alis.Reactive.Native.UnitTests.csproj -nologo
-dotnet test tests/Alis.Reactive.Fusion.UnitTests/Alis.Reactive.Fusion.UnitTests.csproj -nologo
-dotnet test tests/Alis.Reactive.FluentValidator.UnitTests/Alis.Reactive.FluentValidator.UnitTests.csproj -nologo
-dotnet test tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj -nologo --logger "console;verbosity=detailed"
-```
-
-### Playwright Run Rules
-
-1. **Kill ALL sandbox/dotnet processes** before running Playwright. Lingering processes cause port conflicts, timeouts, and false failures.
-2. **Always use** `--logger "console;verbosity=detailed"` — never run without it. Non-verbose mode hides which tests failed.
-3. **Never pipe through grep/tail/filters** — the full output must be visible so every Passed/Failed test name and error message is captured.
-4. **Run directly** — do not use `&` backgrounding with pipes. Use Bash `run_in_background` if needed, but the command itself must write full output to the output file.
-5. **Rebuild JS bundle** (`npm run build`) before running — the bundle must match the current TS source.
+Canonical build, run, test, and pack commands: see
+[Build & Run in the root CLAUDE.md](../CLAUDE.md#build--run). Run every
+command from the repo root.
 
 ## Mental Model
 

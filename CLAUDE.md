@@ -99,54 +99,87 @@ JSON — it does not re-validate. If the JSON is malformed, `JSON.parse` throws 
 
 ## Build & Run
 
-Every npm and dotnet command below runs from the repo root.
+Canonical build, run, and test reference. Every command runs from the repo
+root. A fresh clone has no `node_modules` and no bundles — start with First run.
 
-### First time (clone)
+### First run (fresh clone)
 
 ```bash
-npm ci                          # JS deps
-npm run build:all               # initial framework + sandbox bundles
-dotnet build                    # all C# projects (Debug)
+npm ci                                          # JS deps, from package-lock.json
+npm run build:all                               # build the JS/CSS bundles
+dotnet run --project Alis.Reactive.SandboxApp    # → http://localhost:5220
 ```
+
+Order is strict — `build:all` must finish before the sandbox starts.
+`SandboxApp/Program.cs` serves the bundles directly and throws on startup if the
+`Alis.Reactive.Assets/dist/` or `Alis.Reactive.Fusion/dist/` folder is missing.
 
 ### Daily dev loop — 3 terminals
 
 ```bash
-# Terminal 1 — framework JS (~200ms per edit; esbuild --watch=forever)
-npm run watch
-
-# Terminal 2 — framework CSS (~3-5s per edit)
-npm run watch:css
-
-# Terminal 3 — Razor + C# hot reload
-lsof -ti:5220 | xargs kill -9 2>/dev/null
-dotnet watch --project Alis.Reactive.SandboxApp
-# → http://localhost:5220
+npm run watch                                    # framework JS → dist/ on every .ts edit
+npm run watch:css                                # framework CSS → dist/ on every .css edit
+dotnet watch --project Alis.Reactive.SandboxApp  # Razor + C# hot reload
 ```
 
-Framework TS/CSS changes require **only a browser refresh** — no `dotnet build`,
-no sandbox restart. `Alis.Reactive.SandboxApp/Program.cs` wires a
-`CompositeFileProvider` that serves `Alis.Reactive.Assets/dist/` directly;
-`asp-append-version="true"` computes a fresh content hash every request so the
-browser never caches stale bytes.
+Framework TS/CSS edits need **only a browser refresh** — no `dotnet build`, no
+sandbox restart. `Program.cs` wires a `CompositeFileProvider` over the bundle
+output; `asp-append-version` re-hashes each file per request so the browser
+never serves stale bytes. Sandbox-only bundles have their own watchers
+(`watch:sandbox-plugins`, `watch:sandbox-css`) — edited rarely.
 
-Sandbox-specific bundles (edited rarely):
+### The bundles — `npm run build:all` runs 5 steps
+
+Every output path is gitignored; `git status` stays clean after a build.
+
+| npm script | Output | Used by |
+|------------|--------|---------|
+| `build` | `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` | sandbox, NuGet |
+| `build:css` | `Alis.Reactive.Assets/dist/css/design-system.dev.css` | sandbox, NuGet |
+| `build:fusion-css` | `Alis.Reactive.Fusion/dist/css/syncfusion.dev.css` | sandbox, `AlisReactive.Fusion` NuGet |
+| `build:sandbox-plugins` | `Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js` | sandbox only |
+| `build:sandbox-css` | `Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css` | sandbox only |
+
+The bundles reach three places:
+
+- **Sandbox** — `Program.cs` serves `Alis.Reactive.Assets/dist/` and
+  `Alis.Reactive.Fusion/dist/` via `CompositeFileProvider`. No copy into `wwwroot/`.
+- **NuGet** — `Alis.Reactive.csproj` packs the core `dist/` bundles into the
+  `AlisReactive` package; `Alis.Reactive.Fusion.csproj` packs `syncfusion.dev.css`
+  into `AlisReactive.Fusion` the same way. `dotnet pack` never runs npm; the
+  `VerifyBundlesExistBeforePack` / `VerifyFusionBundleExistsBeforePack` targets
+  fail fast if a bundle is missing.
+- **Example app** (`examples/resident-intake/`) — consumes the *published*
+  NuGet; `AlisReactive.targets` copies the bundles into its `wwwroot/` on build.
+  Not driven by local `npm`. Rebuild via `scripts/rebuild-example-app.sh`.
+
+### Static checks
 
 ```bash
-npm run watch:sandbox-plugins   # SandboxApp/Scripts/sandbox-plugins.ts → wwwroot/js/
-npm run watch:sandbox-css       # SandboxApp/Styles/sandbox.css → wwwroot/css/
+npm run typecheck                                # both tsconfigs (framework + sandbox)
+npm run lint
 ```
 
-### One-shot build + verify + test
+### Run the tests
+
+Three layers. **All must pass before every push.**
+
+**TypeScript runtime — vitest:**
 
 ```bash
-npm run build:all               # framework (dist/) + sandbox (wwwroot/) bundles
-dotnet build                    # all C# projects
+npm test
+```
 
-npm run typecheck               # both tsconfigs (framework + sandbox)
-npm run lint                    # eslint
-npm test                        # vitest
+Runs the vitest suite (jsdom). `vitest.config.ts` looks for `*.test.ts` under
+`Alis.Reactive.Assets/Scripts/__tests__/` and `Alis.Reactive.SandboxApp/Scripts/__tests__/`.
+A branch with no such files (this branch has none) makes vitest print
+`No test files found` and exit non-zero — that is the empty-suite signal, not a
+failure in your code.
 
+**C# unit tests — fast, no server needed:**
+
+```bash
+dotnet build
 dotnet test tests/Alis.Reactive.UnitTests                    # Core + schema
 dotnet test tests/Alis.Reactive.Native.UnitTests             # Native
 dotnet test tests/Alis.Reactive.Fusion.UnitTests             # Fusion
@@ -154,38 +187,88 @@ dotnet test tests/Alis.Reactive.FluentValidator.UnitTests    # Validation
 dotnet test tests/Alis.Reactive.Analyzers.Tests              # Analyzers
 dotnet test tests/Alis.Reactive.DesignSystem.Tests           # Design system
 dotnet test tests/Alis.Reactive.NativeTagHelpers.Tests       # Tag helpers
-
-lsof -ti:5220 | xargs kill -9 2>/dev/null
-dotnet test tests/Alis.Reactive.PlaywrightTests \
-  --logger "trx;LogFileName=playwright-results.trx" \
-  --results-directory TestResults
 ```
 
-### Pack the NuGet (delivery smoke)
+**Playwright — browser, end-to-end:**
 
 ```bash
-npm run build:all                                           # required: pack does NOT invoke npm
+dotnet build                                                 # pre-build so the fixture's sandbox starts fast
+dotnet test tests/Alis.Reactive.PlaywrightTests --logger "console;verbosity=detailed"
+```
+
+The fixture starts and stops its **own** sandbox on a random free port — do not
+pre-start the sandbox, and port 5220 does **not** need to be free for Playwright.
+The `console;verbosity=detailed` logger prints every test as `Passed`/`Failed` and
+ends with a `Total / Passed / Failed` summary, so a run always reports exactly
+what failed. (`dotnet test` is cross-platform; no `.trx` file needed.)
+
+First run only — build the test project, then install the browser (the
+`playwright.ps1` script is a build output, so the build must come first):
+
+```bash
+dotnet build tests/Alis.Reactive.PlaywrightTests
+pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+```
+
+Re-run only the tests that failed — confirms a real failure vs. a load flake:
+
+```bash
+dotnet test tests/Alis.Reactive.PlaywrightTests --filter "Name=test_one|Name=test_two"
+```
+
+A Playwright test that fails with a `TimeoutException` but passes on an isolated
+re-run is a machine-load flake, not a product bug.
+
+### Sandbox processes — kill stale, run fresh
+
+Testing against a stale app is the top time-waster. Two failure modes:
+
+**1. Stale process.** A leftover `dotnet run` keeps listening on 5220. The next
+`dotnet run` cannot bind the port and crashes with `address already in use` — but
+`localhost:5220` still answers, served by the **old** process, so you debug
+against stale code. Stop the sandbox with `Ctrl+C` in its own terminal. To find
+and kill a stray one:
+
+```bash
+# macOS / Linux
+lsof -ti:5220 | xargs kill -9         # by port
+pkill -f Alis.Reactive.SandboxApp     # by name
+```
+
+```bat
+REM Windows
+for /f "tokens=5" %p in ('netstat -ano ^| findstr :5220') do taskkill /F /PID %p
+taskkill /F /IM Alis.Reactive.SandboxApp.exe
+```
+
+Playwright cleans up its own server; this applies only to a manually-run sandbox.
+
+**2. Stale bundle.** Editing `.ts`/`.css` without rebuilding leaves the sandbox
+serving old bytes. Rebuild with `npm run build:all`, or leave `npm run watch` /
+`watch:css` running — `CompositeFileProvider` serves the new `dist/` output on the
+next request and `asp-append-version` re-hashes the URL, so a browser refresh
+always gets current bytes. No sandbox restart needed for TS/CSS changes; C#/Razor
+changes need `dotnet watch` or a rebuild.
+
+### Pack the NuGet
+
+```bash
+npm run build:all                                # required — pack does NOT invoke npm
 dotnet build --configuration Release
 dotnet pack Alis.Reactive/Alis.Reactive.csproj \
-    --configuration Release --no-build \
-    --output ./nupkgs -p:Version=<your-version>
+    --configuration Release --no-build --output ./nupkgs -p:Version=<version>
 ```
 
-`VerifyBundlesExistBeforePack` errors with a clear message if the bundles
-are missing. `dotnet pack` never requires Node.js.
+### Before every push
 
-### Before any commit
-
-```bash
-git status                      # MUST be clean after build — any dist/ or wwwroot/ noise is a bug
-npm run build:api-docs          # regenerate API reference from XML docs (if touched)
-```
-
-Tracked wwwroot files are hand-written only (`disable-sf-animations.js`);
-every bundler output path is gitignored.
-
-All tests pass before every commit. TS tests go in `Alis.Reactive.Assets/Scripts/__tests__/`
-with `.test.ts` suffix.
+1. **All tests pass** — vitest, all seven C# unit projects, and Playwright (see
+   Run the tests above). No exceptions.
+2. **`git status` is clean** after a build. Every bundler output path is
+   gitignored; tracked `wwwroot/` files are hand-written only
+   (`disable-sf-animations.js`). A `dist/` or `wwwroot/` bundle showing in
+   `git status` means the build wrote to a tracked path — that is a bug, do not
+   `git add` it.
+3. Regenerate API docs with `npm run build:api-docs` if XML docs changed.
 
 ## Tech Stack
 
