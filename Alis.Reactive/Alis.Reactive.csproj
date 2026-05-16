@@ -21,41 +21,34 @@
         <Content Include="Schemas\**\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
-    <!-- Ship JS/CSS (built by npm in the sibling Alis.Reactive.Assets project)
-         as NuGet content files. Assets and the targets file are packed under
+    <!-- Ship the runtime JS bundle (built by npm in the sibling
+         Alis.Reactive.Assets tree). The design-system CSS is shipped separately
+         by the AlisReactive.DesignSystem package. The asset is packed under
          BOTH build\ and buildTransitive\:
            build\          : required by packages.config consumers (net48 classic).
-                             Classic NuGet auto-imports build\*.targets and resolves
-                             $(MSBuildThisFileDirectory)assets\* relative to it.
-           buildTransitive\: required so PackageReference consumers flow the targets
-                             + assets through transitive dependencies.
-         PackagePath uses explicit file paths (no trailing separator) — a trailing
-         backslash produces ZIP entries with an empty segment that macOS/Linux
-         normalize on extraction but Windows does not. -->
+           buildTransitive\: required so PackageReference consumers flow the
+                             targets + assets through transitive dependencies.
+         The copy mechanism is the shared build\AlisReactiveAssets.targets,
+         packed under this package's id name so NuGet auto-imports it. -->
     <ItemGroup>
-        <!-- npm emits bundles under dist\ with a literal "dev" version token so
-             the sandbox serves them at the same URL pattern a net10 consumer
-             uses (~/scripts/alis-reactive.{version}.js). PackagePath here
-             strips the "dev" token so the NuGet ships the unversioned name;
-             AlisReactive.targets then writes the consumer's real version on
-             copy-to-wwwroot. Identical surface end-to-end. -->
+        <!-- npm emits the bundle under dist\ with a literal "dev" version token so
+             the sandbox serves it at the same URL pattern a net10 consumer uses
+             (~/scripts/alis-reactive.{version}.js). PackagePath strips the "dev"
+             token so the NuGet ships the unversioned name; the shared targets
+             then writes the consumer's real version on copy-to-wwwroot. -->
         <None Include="..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="build\assets\js\alis-reactive.js" />
-        <None Include="..\Alis.Reactive.Assets\dist\css\design-system.dev.css"      Pack="true" PackagePath="build\assets\css\design-system.css" />
         <None Include="..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="buildTransitive\assets\js\alis-reactive.js" />
-        <None Include="..\Alis.Reactive.Assets\dist\css\design-system.dev.css"      Pack="true" PackagePath="buildTransitive\assets\css\design-system.css" />
-        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="build\AlisReactive.targets" />
-        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.targets" />
+        <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="build\AlisReactive.targets" />
+        <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.targets" />
     </ItemGroup>
 
-    <!-- Verify JS/CSS bundles exist before Pack. The bundles are produced by
+    <!-- Verify the JS bundle exists before Pack. The bundle is produced by
          'npm run build:all' from the repo root. Pack does NOT invoke npm;
          consumers do not need Node.js for `dotnet pack`. CI orchestrates
          npm + dotnet as separate steps. -->
     <Target Name="VerifyBundlesExistBeforePack" BeforeTargets="GenerateNuspec">
         <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js')"
                Text="alis-reactive.dev.js bundle not found. Run 'npm run build:all' from the repo root before packing." />
-        <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.Assets\dist\css\design-system.dev.css')"
-               Text="design-system.dev.css bundle not found. Run 'npm run build:all' from the repo root before packing." />
     </Target>
 
     <!-- Bundle Roslyn analyzers so consumers get compile-time DSL checks (ALIS001-ALIS008) -->

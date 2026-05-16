@@ -1,0 +1,30 @@
+/* Alis.Reactive brand — the single source of truth for brand color and type.
+
+   Consumed by the design-system stylesheet (Styles/app.css), the Syncfusion
+   theme overrides (Alis.Reactive.Fusion/Styles/syncfusion.entry.css), and the
+   sandbox stylesheet. Each of those imports this file, so every bundle carries
+   the brand independently — change a value here to rebrand every surface,
+   native and Syncfusion alike.
+
+   Primary shades are declared as RGB triplets: one declaration feeds both
+   Tailwind's rgb() utilities and Syncfusion's rgba(var(), alpha) slots, which
+   require the bare triplet form. */
+:root {
+  /* Primary ramp */
+  --alis-brand-primary-rgb:       122, 46, 59;
+  --alis-brand-primary-light-rgb: 155, 74, 87;
+  --alis-brand-primary-dark-rgb:   94, 31, 44;
+  --alis-brand-primary:         rgb(var(--alis-brand-primary-rgb));
+  --alis-brand-primary-light:   rgb(var(--alis-brand-primary-light-rgb));
+  --alis-brand-primary-dark:    rgb(var(--alis-brand-primary-dark-rgb));
+  --alis-brand-primary-lighter: #F5E4E7;
+  --alis-brand-primary-darker:  #3D1420;
+
+  /* Accent ramp */
+  --alis-brand-accent:        #D4A053;
+  --alis-brand-accent-light:  #E0B975;
+  --alis-brand-accent-dark:   #B8873C;
+
+  /* Type */
+  --alis-brand-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}

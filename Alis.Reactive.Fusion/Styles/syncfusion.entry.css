@@ -1,8 +1,10 @@
 /* Fusion (Syncfusion EJ2) stylesheet entry.
    Compiled by vite.fusion.config.ts → Alis.Reactive.Fusion/dist/css/syncfusion.dev.css.
 
-   Reads tokens such as --color-* declared at :root by the core design-system.dev.css.
-   Consumers load design-system.dev.css alongside this file. */
+   Imports the design-system brand tokens (brand.css) so the Syncfusion theme
+   honors the same brand as the native components. brand.css is bundled into
+   this stylesheet, so syncfusion.dev.css carries the brand independently. */
 
+@import "../../Alis.Reactive.DesignSystem/Styles/brand.css";
 @import "@syncfusion/ej2/tailwind3.css";
 @import "./syncfusion.overrides.css";

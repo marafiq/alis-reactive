@@ -17,7 +17,7 @@
     "lint": "eslint Alis.Reactive.Assets/Scripts/ Alis.Reactive.SandboxApp/Scripts/",
     "lint:fix": "eslint Alis.Reactive.Assets/Scripts/ Alis.Reactive.SandboxApp/Scripts/ --fix",
     "build:api-docs": "dotnet run --project tools/ApiDocGenerator",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
   "devDependencies": {

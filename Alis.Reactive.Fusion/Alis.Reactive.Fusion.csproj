@@ -26,6 +26,10 @@
     <ItemGroup>
       <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
       <ProjectReference Include="..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />
+      <!-- Fusion components emit design-system classes and the Syncfusion theme
+           consumes design-system brand tokens: the design system is a real
+           dependency, and this flows its CSS package to Fusion consumers. -->
+      <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -34,15 +38,15 @@
 
     <!-- Ship Syncfusion EJ2 CSS (built by vite.fusion.config.ts from
          @syncfusion/ej2/tailwind3.css + our syncfusion.overrides.css) as a
-         NuGet content file. Structure mirrors AlisReactive.csproj: packed
-         under BOTH build\ and buildTransitive\ so packages.config consumers
-         and PackageReference transitive flows both pick up the asset and the
-         Copy target that lands it in the consumer's wwwroot. -->
+         NuGet content file. Packed under BOTH build\ and buildTransitive\ so
+         packages.config consumers and PackageReference transitive flows both
+         pick up the asset. The copy mechanism is the shared
+         build\AlisReactiveAssets.targets, packed under this package's id name. -->
     <ItemGroup>
         <None Include="dist\css\syncfusion.dev.css" Pack="true" PackagePath="build\assets\css\syncfusion.css" />
         <None Include="dist\css\syncfusion.dev.css" Pack="true" PackagePath="buildTransitive\assets\css\syncfusion.css" />
-        <None Include="build\AlisReactive.Fusion.targets" Pack="true" PackagePath="build\AlisReactive.Fusion.targets" />
-        <None Include="build\AlisReactive.Fusion.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.Fusion.targets" />
+        <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="build\AlisReactive.Fusion.targets" />
+        <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.Fusion.targets" />
     </ItemGroup>
 
     <Target Name="VerifyFusionBundleExistsBeforePack" BeforeTargets="GenerateNuspec">

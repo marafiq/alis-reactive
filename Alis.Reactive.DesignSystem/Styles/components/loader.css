@@ -30,7 +30,7 @@
   width: 2.5rem;
   height: 2.5rem;
   border: 3px solid var(--color-border, #e5e7eb);
-  border-top-color: var(--color-primary, #7A2E3B);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: alis-loader-spin 0.7s linear infinite;
 }

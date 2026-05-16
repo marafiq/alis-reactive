@@ -112,7 +112,8 @@ dotnet run --project Alis.Reactive.SandboxApp    # → http://localhost:5220
 
 Order is strict — `build:all` must finish before the sandbox starts.
 `SandboxApp/Program.cs` serves the bundles directly and throws on startup if the
-`Alis.Reactive.Assets/dist/` or `Alis.Reactive.Fusion/dist/` folder is missing.
+`Alis.Reactive.Assets/dist/`, `Alis.Reactive.DesignSystem/dist/`, or
+`Alis.Reactive.Fusion/dist/` folder is missing.
 
 ### Daily dev loop — 3 terminals
 
@@ -134,21 +135,25 @@ Every output path is gitignored; `git status` stays clean after a build.
 
 | npm script | Output | Used by |
 |------------|--------|---------|
-| `build` | `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` | sandbox, NuGet |
-| `build:css` | `Alis.Reactive.Assets/dist/css/design-system.dev.css` | sandbox, NuGet |
+| `build` | `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` | sandbox, `AlisReactive` NuGet |
+| `build:css` | `Alis.Reactive.DesignSystem/dist/css/design-system.dev.css` | sandbox, `AlisReactive.DesignSystem` NuGet |
 | `build:fusion-css` | `Alis.Reactive.Fusion/dist/css/syncfusion.dev.css` | sandbox, `AlisReactive.Fusion` NuGet |
 | `build:sandbox-plugins` | `Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js` | sandbox only |
 | `build:sandbox-css` | `Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css` | sandbox only |
 
 The bundles reach three places:
 
-- **Sandbox** — `Program.cs` serves `Alis.Reactive.Assets/dist/` and
-  `Alis.Reactive.Fusion/dist/` via `CompositeFileProvider`. No copy into `wwwroot/`.
-- **NuGet** — `Alis.Reactive.csproj` packs the core `dist/` bundles into the
-  `AlisReactive` package; `Alis.Reactive.Fusion.csproj` packs `syncfusion.dev.css`
-  into `AlisReactive.Fusion` the same way. `dotnet pack` never runs npm; the
-  `VerifyBundlesExistBeforePack` / `VerifyFusionBundleExistsBeforePack` targets
-  fail fast if a bundle is missing.
+- **Sandbox** — `Program.cs` serves `Alis.Reactive.Assets/dist/`,
+  `Alis.Reactive.DesignSystem/dist/`, and `Alis.Reactive.Fusion/dist/` via
+  `CompositeFileProvider`. No copy into `wwwroot/`.
+- **NuGet** — each package ships its own bundle: `Alis.Reactive.csproj` packs the
+  runtime JS into `AlisReactive`, `Alis.Reactive.DesignSystem.csproj` packs
+  `design-system.dev.css` into `AlisReactive.DesignSystem`, and
+  `Alis.Reactive.Fusion.csproj` packs `syncfusion.dev.css` into `AlisReactive.Fusion`.
+  The copy-to-`wwwroot` mechanism is one shared `build/AlisReactiveAssets.targets`,
+  packed into each. `dotnet pack` never runs npm; the `VerifyBundlesExistBeforePack`
+  / `VerifyDesignSystemBundleExistsBeforePack` / `VerifyFusionBundleExistsBeforePack`
+  targets fail fast if a bundle is missing.
 - **Example app** (`examples/resident-intake/`) — consumes the *published*
   NuGet; `AlisReactive.targets` copies the bundles into its `wwwroot/` on build.
   Not driven by local `npm`. Rebuild via `scripts/rebuild-example-app.sh`.

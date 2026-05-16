@@ -1,6 +1,7 @@
 using Alis.Reactive.DesignSystem.Tokens;
 using Alis.Reactive.NativeTagHelpers.Grid;
 using Alis.Reactive.NativeTagHelpers.Tests.Infrastructure;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using NUnit.Framework;
 
 namespace Alis.Reactive.NativeTagHelpers.Tests;
@@ -36,5 +37,18 @@ public class WhenRenderingGrid : TagHelperTestBase
         var classAttr = output.Attributes["class"]?.Value?.ToString();
         Assert.That(classAttr, Does.Contain("grid-cols-3"));
         Assert.That(classAttr, Does.Not.Contain("sm:"));
+    }
+
+    [Test]
+    public void Grid_renders_with_start_and_end_tag()
+    {
+        var tagHelper = new NativeGridTagHelper();
+        var context = CreateContext("native-grid");
+        var output = CreateOutput("native-grid");
+        output.TagMode = TagMode.SelfClosing;
+
+        tagHelper.Process(context, output);
+
+        Assert.That(output.TagMode, Is.EqualTo(TagMode.StartTagAndEndTag));
     }
 }

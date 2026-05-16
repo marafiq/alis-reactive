@@ -49,18 +49,18 @@ Most tokens are **hex**:
 ```
 
 A few are **raw RGB triplets** (no `rgb()` wrapper). These are consumed inside `rgba()` calls so
-Syncfusion can apply an alpha channel: `color: rgba(var(--color-sf-primary), 0.5)`.
+Syncfusion can apply an alpha channel: `color: rgba(var(--color-sf-black), 0.5)`.
 
 ```
---color-sf-primary: 122, 46, 59;     correct — wrapped by SF internally
 --color-sf-black:   0, 0, 0;
 --color-sf-white:   255, 255, 255;
 ```
 
 **Rule of thumb**: if Syncfusion wraps the token in `rgba(var(--<name>))`, use the raw triplet
-format. Otherwise use hex. Confirmed tokens that require the triplet format:
-`--color-sf-primary`, `--color-sf-black`, `--color-sf-white`. Every other high-leverage token is
-hex.
+format. Otherwise use hex. `--color-sf-primary` is **not** a triplet despite the alpha-channel
+naming: the tailwind3 theme uses it directly as a color (`color: var(--color-sf-primary)`, 300+
+times) and ships a hex default, so it takes a hex/`rgb()` color. Every other high-leverage token
+is hex.
 
 Mixing formats silently fails — a hex value inside `rgba(...)` is an invalid CSS color and the
 browser drops the rule.
@@ -73,7 +73,7 @@ These cover the majority of brand customization. Full defaults are populated in
 ### Brand
 | Token | Default (Tailwind3 indigo) |
 |---|---|
-| `--color-sf-primary` | `79, 70, 229` (triplet) |
+| `--color-sf-primary` | `#4f46e5` (hex color) |
 | `--color-sf-primary-text-color` | `#fff` |
 | `--color-sf-primary-light` | `#818cf8` |
 | `--color-sf-primary-lighter` | `#e0e7ff` |

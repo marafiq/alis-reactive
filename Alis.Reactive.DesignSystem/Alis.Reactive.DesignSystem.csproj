@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net48;net10.0</TargetFrameworks>
+    <LangVersion>8</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>Alis.Reactive.DesignSystem</RootNamespace>
+    <AssemblyName>Alis.Reactive.DesignSystem</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>AlisReactive.DesignSystem</PackageId>
+    <IsPackable>true</IsPackable>
+    <PackageDescription>Design system for Alis.Reactive — brand tokens, layout primitives, and the design-system stylesheet. Consumed by the component packages independently of the reactive core.</PackageDescription>
+    <PackageTags>reactive;design-system;css;tokens</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Ship the design-system CSS bundle (built by 'npm run build:all' via
+       vite.config.ts into dist\css\design-system.dev.css). Packed under build\
+       and buildTransitive\; the copy mechanism is the shared
+       build\AlisReactiveAssets.targets, packed under this package's id name so
+       NuGet auto-imports it into the consumer build. -->
+  <ItemGroup>
+    <None Include="dist\css\design-system.dev.css" Pack="true" PackagePath="build\assets\css\design-system.css" />
+    <None Include="dist\css\design-system.dev.css" Pack="true" PackagePath="buildTransitive\assets\css\design-system.css" />
+    <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="build\AlisReactive.DesignSystem.targets" />
+    <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.DesignSystem.targets" />
+  </ItemGroup>
+
+  <!-- Verify the CSS bundle exists before Pack. Produced by 'npm run build:all'
+       from the repo root. Pack does NOT invoke npm. -->
+  <Target Name="VerifyDesignSystemBundleExistsBeforePack" BeforeTargets="GenerateNuspec">
+    <Error Condition="!Exists('$(MSBuildThisFileDirectory)dist\css\design-system.dev.css')"
+           Text="design-system.dev.css bundle not found. Run 'npm run build:all' from the repo root before packing." />
+  </Target>
+
+</Project>

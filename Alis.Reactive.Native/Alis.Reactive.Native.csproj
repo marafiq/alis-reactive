@@ -23,6 +23,9 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
+        <!-- Native components emit design-system classes; this flows the
+             design-system CSS package to Native consumers. -->
+        <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
     </ItemGroup>
 
     <ItemGroup>

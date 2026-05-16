@@ -1,5 +1,6 @@
 using Alis.Reactive.NativeTagHelpers.Container;
 using Alis.Reactive.NativeTagHelpers.Tests.Infrastructure;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using NUnit.Framework;
 
 namespace Alis.Reactive.NativeTagHelpers.Tests;
@@ -33,5 +34,18 @@ public class WhenRenderingContainer : TagHelperTestBase
 
         var classAttr = output.Attributes["class"]?.Value?.ToString();
         Assert.That(classAttr, Does.Contain("py-8"));
+    }
+
+    [Test]
+    public void Container_renders_with_start_and_end_tag()
+    {
+        var tagHelper = new NativeContainerTagHelper();
+        var context = CreateContext("native-container");
+        var output = CreateOutput("native-container");
+        output.TagMode = TagMode.SelfClosing;
+
+        tagHelper.Process(context, output);
+
+        Assert.That(output.TagMode, Is.EqualTo(TagMode.StartTagAndEndTag));
     }
 }

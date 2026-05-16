@@ -4,7 +4,7 @@
 /* ── Source scanning — framework C# only ──
    Consumers scan their own views via their own tailwind config;
    this file compiles classes emitted from framework C# code only. */
-@source "../../Alis.Reactive/DesignSystem/**/*.cs";
+@source "../../Alis.Reactive.DesignSystem/**/*.cs";
 @source "../../Alis.Reactive.NativeTagHelpers/**/*.cs";
 @source "../../Alis.Reactive.Native/**/*.cs";
 @source "../../Alis.Reactive.Fusion/**/*.cs";
@@ -24,15 +24,18 @@
 @source inline("border-l-4");
 @source inline("rounded-2xl ring-1");
 
+/* ── Brand — single source of truth, see brand.css ── */
+@import "./brand.css";
+
 /* ── Theme tokens — registered as Tailwind utilities ── */
 @theme {
-  /* Brand */
-  --color-primary: #7A2E3B;
-  --color-primary-light: #9B4A57;
-  --color-primary-dark: #5E1F2C;
-  --color-accent: #D4A053;
-  --color-accent-light: #E0B975;
-  --color-accent-dark: #B8873C;
+  /* Brand — sourced from brand.css */
+  --color-primary: var(--alis-brand-primary);
+  --color-primary-light: var(--alis-brand-primary-light);
+  --color-primary-dark: var(--alis-brand-primary-dark);
+  --color-accent: var(--alis-brand-accent);
+  --color-accent-light: var(--alis-brand-accent-light);
+  --color-accent-dark: var(--alis-brand-accent-dark);
 
   /* Surfaces */
   --color-surface: #F8FAFC;
@@ -63,7 +66,7 @@
   --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
 
   /* Typography */
-  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: var(--alis-brand-font);
   --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 }
 

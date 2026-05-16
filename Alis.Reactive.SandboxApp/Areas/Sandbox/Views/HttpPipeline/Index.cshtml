@@ -7,12 +7,12 @@
 
 <native-grid cols="C3" gap="Base">
     <a asp-area="Sandbox" asp-controller="Http" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
                 Http
             </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
             Click buttons to fire GET/POST requests with gather payloads, watch chained sequential requests cascade, and see parallel requests resolve concurrently
@@ -20,12 +20,12 @@
     </a>
 
     <a asp-area="Sandbox" asp-controller="ContentType" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
                 Content Type
             </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
             Compare JSON responses (parsed into DOM mutations) vs HTML responses (injected via Into()), see how the runtime handles each content type
@@ -33,12 +33,12 @@
     </a>
 
     <a asp-area="Sandbox" asp-controller="RealTime" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
                 Real Time
             </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
             Watch Server-Sent Events stream data in real time, see live DOM updates as events arrive, observe retry behavior on disconnection

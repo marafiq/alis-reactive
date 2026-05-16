@@ -41,38 +41,37 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Sandbox eats its own dog food as an Alis.Reactive consumer: serve the
-// framework runtime bundles straight from the sibling project dist/ trees
-// produced by `npm run build:all`. Same path in dev and CI — no copy into
-// sandbox wwwroot required, so `git status` stays clean after a local build.
+// framework bundles straight from the sibling project dist/ trees produced by
+// `npm run build:all`. Same path in dev and CI — no copy into sandbox wwwroot
+// required, so `git status` stays clean after a local build.
 //
-//   Alis.Reactive.Assets/dist/   — core:   alis-reactive.dev.js, design-system.dev.css
-//   Alis.Reactive.Fusion/dist/   — Fusion: syncfusion.dev.css
+//   Alis.Reactive.Assets/dist/        — runtime JS:    alis-reactive.dev.js
+//   Alis.Reactive.DesignSystem/dist/  — design system: design-system.dev.css
+//   Alis.Reactive.Fusion/dist/        — Fusion:        syncfusion.dev.css
 //
-// Fail fast if either dist folder is missing (Rule 5). The sandbox is a dev-only
+// Fail fast if any dist folder is missing (Rule 5). The sandbox is a dev-only
 // harness — there is no environment where it should boot without bundles.
-// Silently skipping would leave it serving 404 on the runtime bundle with
-// no log signal, a trap for first-run devs who haven't run the JS build yet.
-var frameworkAssetsDir = Path.GetFullPath(Path.Combine(
-    app.Environment.ContentRootPath, "..", "Alis.Reactive.Assets", "dist"));
-var fusionAssetsDir = Path.GetFullPath(Path.Combine(
-    app.Environment.ContentRootPath, "..", "Alis.Reactive.Fusion", "dist"));
-if (!Directory.Exists(frameworkAssetsDir))
+// Silently skipping would leave it serving 404 on a bundle with no log signal,
+// a trap for first-run devs who haven't run the JS/CSS build yet.
+var assetDistDirs = new[]
 {
-    throw new InvalidOperationException(
-        $"Framework asset bundles not found at '{frameworkAssetsDir}'. " +
-        "Run 'npm run build:all' from the repo root before starting the sandbox.");
-}
-if (!Directory.Exists(fusionAssetsDir))
+    Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "Alis.Reactive.Assets", "dist")),
+    Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "Alis.Reactive.DesignSystem", "dist")),
+    Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "Alis.Reactive.Fusion", "dist")),
+};
+var assetProviders = new List<IFileProvider>();
+foreach (var assetDistDir in assetDistDirs)
 {
-    throw new InvalidOperationException(
-        $"Fusion asset bundles not found at '{fusionAssetsDir}'. " +
-        "Run 'npm run build:all' from the repo root before starting the sandbox.");
+    if (!Directory.Exists(assetDistDir))
+    {
+        throw new InvalidOperationException(
+            $"Asset bundles not found at '{assetDistDir}'. " +
+            "Run 'npm run build:all' from the repo root before starting the sandbox.");
+    }
+    assetProviders.Add(new PhysicalFileProvider(assetDistDir));
 }
-var composite = new CompositeFileProvider(
-    new PhysicalFileProvider(frameworkAssetsDir),
-    new PhysicalFileProvider(fusionAssetsDir),
-    app.Environment.WebRootFileProvider);
-app.Environment.WebRootFileProvider = composite;
+assetProviders.Add(app.Environment.WebRootFileProvider);
+app.Environment.WebRootFileProvider = new CompositeFileProvider(assetProviders);
 
 app.UseStaticFiles();
 app.UseRouting();

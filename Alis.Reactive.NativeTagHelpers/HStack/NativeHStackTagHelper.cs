@@ -1,20 +1,47 @@
+using Alis.Reactive.DesignSystem.Layout;
 using Alis.Reactive.DesignSystem.Tokens;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Alis.Reactive.NativeTagHelpers.HStack;
 
+/// <summary>
+/// Renders a <c>native-hstack</c> element as a horizontal flex row that lays its
+/// children out side by side.
+/// </summary>
 [HtmlTargetElement("native-hstack")]
 public class NativeHStackTagHelper : TagHelper
 {
+    /// <summary>
+    /// Gets or sets the spacing between children. Defaults to <see cref="SpacingScale.Base"/>.
+    /// </summary>
     public SpacingScale Gap { get; set; } = SpacingScale.Base;
+
+    /// <summary>
+    /// Gets or sets how children align on the cross axis. Defaults to <see cref="AlignItems.Center"/>.
+    /// </summary>
     public AlignItems Align { get; set; } = AlignItems.Center;
+
+    /// <summary>
+    /// Gets or sets how children are distributed along the row. Defaults to <see cref="JustifyContent.Start"/>.
+    /// </summary>
     public JustifyContent Justify { get; set; } = JustifyContent.Start;
+
+    /// <summary>
+    /// Gets or sets whether children wrap onto multiple lines when they overflow the row.
+    /// </summary>
     public bool Wrap { get; set; }
+
+    /// <summary>
+    /// Gets or sets extra CSS classes appended to the row's design-system classes.
+    /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }
 
+    /// <inheritdoc/>
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        HStackRenderer.Render(output, Gap, Align, Justify, Wrap, CssClass);
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("class", HStackCss.Classes(Gap, Align, Justify, Wrap, CssClass));
     }
 }

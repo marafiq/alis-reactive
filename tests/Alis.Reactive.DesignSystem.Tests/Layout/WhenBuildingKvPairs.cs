@@ -24,6 +24,18 @@ public class WhenBuildingKvPairs
     }
 
     [Test]
+    public void Stacked_wrapper_is_empty_without_css_class()
+    {
+        Assert.That(KvCss.StackedWrapperClasses(), Is.EqualTo(""));
+    }
+
+    [Test]
+    public void Stacked_wrapper_merges_css_class()
+    {
+        Assert.That(KvCss.StackedWrapperClasses("mb-4"), Is.EqualTo("mb-4"));
+    }
+
+    [Test]
     public void Inline_wrapper_has_flex_layout()
     {
         var classes = KvCss.InlineWrapperClasses();

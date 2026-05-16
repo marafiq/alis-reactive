@@ -30,11 +30,14 @@ TestResults/
 .scannerwork/
 
 # Built JS/CSS bundles — produced by `npm run build:all`.
-# Framework bundles live in Alis.Reactive.Assets/dist/ and are served to
-# the sandbox via a CompositeFileProvider in SandboxApp/Program.cs and
-# packed into the NuGet by Alis.Reactive.csproj — never copied into
-# sandbox wwwroot. Sandbox-only bundles live in SandboxApp/wwwroot/.
+# The runtime JS lives in Alis.Reactive.Assets/dist/, the design-system CSS in
+# Alis.Reactive.DesignSystem/dist/, and the Syncfusion CSS in
+# Alis.Reactive.Fusion/dist/. All are served to the sandbox via a
+# CompositeFileProvider in SandboxApp/Program.cs and packed into their
+# respective NuGets — never copied into sandbox wwwroot. Sandbox-only bundles
+# live in SandboxApp/wwwroot/.
 Alis.Reactive.Assets/dist/
+Alis.Reactive.DesignSystem/dist/
 Alis.Reactive.Fusion/dist/
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
 Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css

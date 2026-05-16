@@ -10,25 +10,26 @@
 
 :root {
   /* ── Brand primary ─────────────────────────────────────────────────
-     --color-sf-primary is consumed by SF as rgba(var(--color-sf-primary), α),
-     so this one MUST be a raw R, G, B triplet. All other tokens below are
-     hex. Default: rgba(79, 70, 229) (Tailwind3 indigo). */
-  --color-sf-primary:              122, 46, 59;   /* #7A2E3B — brand */
+     Sourced from brand.css (imported by syncfusion.entry.css). The Syncfusion
+     tailwind3 theme uses --color-sf-primary directly as a color value (e.g.
+     `color: var(--color-sf-primary)`), matching its own hex default, so this
+     takes the rgb()-resolved brand color — not the raw triplet. */
+  --color-sf-primary:              var(--alis-brand-primary);
   --color-sf-primary-text-color:   #fff;
-  --color-sf-primary-light:        #9b4a57;       /* default: #818cf8 */
-  --color-sf-primary-lighter:      #f5e4e7;       /* default: #e0e7ff */
-  --color-sf-primary-dark:         #5e1f2c;       /* default: #4338ca */
-  --color-sf-primary-darker:       #3d1420;       /* default: #3730a3 */
+  --color-sf-primary-light:        var(--alis-brand-primary-light);
+  --color-sf-primary-lighter:      var(--alis-brand-primary-lighter);
+  --color-sf-primary-dark:         var(--alis-brand-primary-dark);
+  --color-sf-primary-darker:       var(--alis-brand-primary-darker);
 
   /* ── Primary button (SF treats as distinct from brand above) ─────── */
-  --color-sf-primary-bg-color:              #7a2e3b;   /* default: #4f46e5 */
-  --color-sf-primary-bg-color-hover:        #5e1f2c;   /* default: #4338ca */
-  --color-sf-primary-bg-color-pressed:      #3d1420;   /* default: #3730a3 */
-  --color-sf-primary-bg-color-focus:        #5e1f2c;   /* default: #4338ca */
-  --color-sf-primary-bg-color-disabled:     #d8b5bc;   /* default: #a5b4fc */
-  --color-sf-primary-border-color:          #7a2e3b;   /* default: #4f46e5 */
-  --color-sf-primary-border-color-hover:    #5e1f2c;
-  --color-sf-primary-border-color-pressed:  #3d1420;
+  --color-sf-primary-bg-color:              var(--alis-brand-primary);
+  --color-sf-primary-bg-color-hover:        var(--alis-brand-primary-dark);
+  --color-sf-primary-bg-color-pressed:      var(--alis-brand-primary-darker);
+  --color-sf-primary-bg-color-focus:        var(--alis-brand-primary-dark);
+  --color-sf-primary-bg-color-disabled:     #d8b5bc;   /* desaturated brand tint */
+  --color-sf-primary-border-color:          var(--alis-brand-primary);
+  --color-sf-primary-border-color-hover:    var(--alis-brand-primary-dark);
+  --color-sf-primary-border-color-pressed:  var(--alis-brand-primary-darker);
   --color-sf-primary-text:                  #fff;
 
   /* ── Status colors ────────────────────────────────────────────────── */
@@ -96,10 +97,10 @@
   --color-sf-overlay-bg-color:     rgba(107, 114, 128, .75);
 
   /* ── Typography & geometry ───────────────────────────────────────── */
-  --e-font-name:    'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --e-font-name:    var(--alis-brand-font);
   --e-radius:       1rem;
   --e-border:       1rem;
 
-  /* ── Framework font token (used by the .e-control rule below) ───── */
-  --font-sf: 'Inter', system-ui, sans-serif;
+  /* ── Framework font token ──────────────────────────────────────────── */
+  --font-sf: var(--alis-brand-font);
 }
