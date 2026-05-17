@@ -31,10 +31,8 @@ namespace Alis.Reactive
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
-        private static readonly JsonSerializerOptions FormattedOptions = new JsonSerializerOptions
+        private static readonly JsonSerializerOptions FormattedOptions = new JsonSerializerOptions(CompactOptions)
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             WriteIndented = true
         };
 
