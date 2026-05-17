@@ -36,8 +36,8 @@
              (~/scripts/alis-reactive.{version}.js). PackagePath strips the "dev"
              token so the NuGet ships the unversioned name; the shared targets
              then writes the consumer's real version on copy-to-wwwroot. -->
-        <None Include="..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="build\assets\js\alis-reactive.js" />
-        <None Include="..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="buildTransitive\assets\js\alis-reactive.js" />
+        <None Include="$(AlisAssetsDist)\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="build\assets\js\alis-reactive.js" />
+        <None Include="$(AlisAssetsDist)\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="buildTransitive\assets\js\alis-reactive.js" />
         <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="build\AlisReactive.targets" />
         <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.targets" />
     </ItemGroup>
@@ -47,7 +47,7 @@
          consumers do not need Node.js for `dotnet pack`. CI orchestrates
          npm + dotnet as separate steps. -->
     <Target Name="VerifyBundlesExistBeforePack" BeforeTargets="GenerateNuspec">
-        <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js')"
+        <Error Condition="!Exists('$(AlisAssetsDist)\scripts\alis-reactive.dev.js')"
                Text="alis-reactive.dev.js bundle not found. Run 'npm run build:all' from the repo root before packing." />
     </Target>
 

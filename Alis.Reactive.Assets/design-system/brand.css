@@ -1,7 +1,7 @@
 /* Alis.Reactive brand — the single source of truth for brand color and type.
 
-   Consumed by the design-system stylesheet (Styles/app.css), the Syncfusion
-   theme overrides (Alis.Reactive.Fusion/Styles/syncfusion.entry.css), and the
+   Consumed by the design-system stylesheet (app.css), the Syncfusion theme
+   overrides (../fusion/syncfusion.entry.css), and the
    sandbox stylesheet. Each of those imports this file, so every bundle carries
    the brand independently — change a value here to rebrand every surface,
    native and Syncfusion alike.

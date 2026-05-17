@@ -1,0 +1,32 @@
+{
+  "name": "alis-reactive-assets",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Framework browser assets — the TypeScript runtime, the design-system CSS, and the Syncfusion CSS. Built by esbuild/vite; shipped by the C# NuGet packages.",
+  "scripts": {
+    "build": "npm run build:runtime && npm run build:design-system && npm run build:fusion",
+    "build:runtime": "node esbuild.config.mjs",
+    "build:design-system": "vite build --config vite.design-system.config.ts",
+    "build:fusion": "vite build --config vite.fusion.config.ts",
+    "watch:runtime": "node esbuild.config.mjs --watch",
+    "watch:design-system": "vite build --config vite.design-system.config.ts --watch",
+    "watch:fusion": "vite build --config vite.fusion.config.ts --watch",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@syncfusion/ej2": "^32.2.8",
+    "@tailwindcss/vite": "^4.2.4",
+    "esbuild": "^0.28.0",
+    "jsdom": "^27.0.1",
+    "tailwindcss": "^4.2.1",
+    "vite": "^8.0.9",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@microsoft/signalr": "^10.0.0",
+    "@tailwindcss/forms": "^0.5.11"
+  }
+}

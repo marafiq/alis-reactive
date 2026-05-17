@@ -9,6 +9,7 @@ on:
       - 'Alis.Reactive/**'
       - 'Alis.Reactive.Assets/**'
       - 'Alis.Reactive.Native/**'
+      - 'Alis.Reactive.DesignSystem/**'
       - 'Alis.Reactive.Fusion/**'
       - 'Alis.Reactive.FluentValidator/**'
       - 'Alis.Reactive.NativeTagHelpers/**'
@@ -46,6 +47,13 @@ jobs:
       - name: Build JS + CSS bundles
         run: npm run build:all
 
+      - name: Verify TypeScript — typecheck + unit tests
+        run: |
+          npm run typecheck
+          npm test
+        # 'npm run lint' is intentionally NOT run here yet: the runtime has 10
+        # pre-existing eslint errors. Add it once those are cleared.
+
       - name: Build all C# projects
         run: dotnet build --configuration Release
 
@@ -55,6 +63,8 @@ jobs:
           dotnet test tests/Alis.Reactive.Native.UnitTests --configuration Release --no-build
           dotnet test tests/Alis.Reactive.Fusion.UnitTests --configuration Release --no-build
           dotnet test tests/Alis.Reactive.FluentValidator.UnitTests --configuration Release --no-build
+          dotnet test tests/Alis.Reactive.DesignSystem.Tests --configuration Release --no-build
+          dotnet test tests/Alis.Reactive.NativeTagHelpers.Tests --configuration Release --no-build
           dotnet test tests/Alis.Reactive.Analyzers.Tests --configuration Release --no-build
 
   playwright:
@@ -174,6 +184,7 @@ jobs:
           fi
 
           dotnet pack Alis.Reactive/Alis.Reactive.csproj $PACK_ARGS
+          dotnet pack Alis.Reactive.DesignSystem/Alis.Reactive.DesignSystem.csproj $PACK_ARGS
           dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj $PACK_ARGS
           dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj $PACK_ARGS
           dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj $PACK_ARGS

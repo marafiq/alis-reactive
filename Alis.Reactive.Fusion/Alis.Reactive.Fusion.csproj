@@ -43,14 +43,14 @@
          pick up the asset. The copy mechanism is the shared
          build\AlisReactiveAssets.targets, packed under this package's id name. -->
     <ItemGroup>
-        <None Include="dist\css\syncfusion.dev.css" Pack="true" PackagePath="build\assets\css\syncfusion.css" />
-        <None Include="dist\css\syncfusion.dev.css" Pack="true" PackagePath="buildTransitive\assets\css\syncfusion.css" />
+        <None Include="$(AlisAssetsDist)\css\syncfusion.dev.css" Pack="true" PackagePath="build\assets\css\syncfusion.css" />
+        <None Include="$(AlisAssetsDist)\css\syncfusion.dev.css" Pack="true" PackagePath="buildTransitive\assets\css\syncfusion.css" />
         <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="build\AlisReactive.Fusion.targets" />
         <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.Fusion.targets" />
     </ItemGroup>
 
     <Target Name="VerifyFusionBundleExistsBeforePack" BeforeTargets="GenerateNuspec">
-        <Error Condition="!Exists('$(MSBuildThisFileDirectory)dist\css\syncfusion.dev.css')"
+        <Error Condition="!Exists('$(AlisAssetsDist)\css\syncfusion.dev.css')"
                Text="syncfusion.dev.css bundle not found. Run 'npm run build:all' from the repo root before packing." />
     </Target>
 

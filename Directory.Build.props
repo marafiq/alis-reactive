@@ -11,6 +11,15 @@
     <PackageProjectUrl>https://github.com/marafiq/alis-reactive</PackageProjectUrl>
     <Copyright>Copyright (c) Alis Solutions 2026</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!-- CS1591: missing XML comment on a public member. Suppressed solution-wide so
+         GenerateDocumentationFile still emits the XML doc file without flooding the
+         build/IDE with warnings for undocumented members. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- Single handoff point between the npm build and dotnet pack: npm builds
+         the framework browser bundles into Alis.Reactive.Assets/dist/; the
+         asset-bearing packages (AlisReactive, .DesignSystem, .Fusion) pack
+         their bundle from here. One definition, three consumers. -->
+    <AlisAssetsDist>$(MSBuildThisFileDirectory)Alis.Reactive.Assets\dist</AlisAssetsDist>
   </PropertyGroup>
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
     <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="/" />

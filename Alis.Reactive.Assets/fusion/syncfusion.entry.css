@@ -5,6 +5,6 @@
    honors the same brand as the native components. brand.css is bundled into
    this stylesheet, so syncfusion.dev.css carries the brand independently. */
 
-@import "../../Alis.Reactive.DesignSystem/Styles/brand.css";
+@import "../design-system/brand.css";
 @import "@syncfusion/ej2/tailwind3.css";
 @import "./syncfusion.overrides.css";

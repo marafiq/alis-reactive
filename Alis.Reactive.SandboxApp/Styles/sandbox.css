@@ -7,7 +7,7 @@
 @plugin "@tailwindcss/forms";
 
 /* Brand tokens — single source of truth, shared with the framework. */
-@import "../../Alis.Reactive.DesignSystem/Styles/brand.css";
+@import "../../Alis.Reactive.Assets/design-system/brand.css";
 
 /* Theme tokens live in the framework design-system.css; redeclare the
    ones tailwind needs to resolve utility classes compiled here. */

@@ -1,40 +1,32 @@
 {
   "private": true,
   "type": "module",
+  "workspaces": [
+    "Alis.Reactive.Assets",
+    "Alis.Reactive.SandboxApp"
+  ],
   "scripts": {
-    "build": "esbuild Alis.Reactive.Assets/Scripts/root.ts --bundle --outfile=Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js --format=iife --global-name=__alisReactive --minify",
-    "build:css": "vite build --config vite.config.ts",
-    "build:fusion-css": "vite build --config vite.fusion.config.ts",
-    "build:sandbox-plugins": "esbuild Alis.Reactive.SandboxApp/Scripts/sandbox-plugins.ts --bundle --format=iife --outfile=Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js",
-    "build:sandbox-css": "vite build --config vite.sandbox.config.ts",
-    "build:all": "npm run build && npm run build:css && npm run build:fusion-css && npm run build:sandbox-plugins && npm run build:sandbox-css",
-    "watch": "esbuild Alis.Reactive.Assets/Scripts/root.ts --bundle --outfile=Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js --format=iife --global-name=__alisReactive --watch=forever",
-    "watch:css": "vite build --config vite.config.ts --watch",
-    "watch:fusion-css": "vite build --config vite.fusion.config.ts --watch",
-    "watch:sandbox-plugins": "esbuild Alis.Reactive.SandboxApp/Scripts/sandbox-plugins.ts --bundle --format=iife --outfile=Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js --watch=forever",
-    "watch:sandbox-css": "vite build --config vite.sandbox.config.ts --watch",
-    "typecheck": "tsc --project Alis.Reactive.Assets/Scripts/tsconfig.json --noEmit && tsc --project Alis.Reactive.SandboxApp/Scripts/tsconfig.json --noEmit",
-    "lint": "eslint Alis.Reactive.Assets/Scripts/ Alis.Reactive.SandboxApp/Scripts/",
-    "lint:fix": "eslint Alis.Reactive.Assets/Scripts/ Alis.Reactive.SandboxApp/Scripts/ --fix",
-    "build:api-docs": "dotnet run --project tools/ApiDocGenerator",
-    "test": "vitest run --passWithNoTests",
-    "test:watch": "vitest"
+    "build:all": "npm run build -w Alis.Reactive.Assets && npm run build -w Alis.Reactive.SandboxApp",
+    "build:runtime": "npm run build:runtime -w Alis.Reactive.Assets",
+    "build:design-system": "npm run build:design-system -w Alis.Reactive.Assets",
+    "build:fusion": "npm run build:fusion -w Alis.Reactive.Assets",
+    "build:sandbox": "npm run build -w Alis.Reactive.SandboxApp",
+    "watch:runtime": "npm run watch:runtime -w Alis.Reactive.Assets",
+    "watch:design-system": "npm run watch:design-system -w Alis.Reactive.Assets",
+    "watch:fusion": "npm run watch:fusion -w Alis.Reactive.Assets",
+    "watch:sandbox-plugins": "npm run watch:plugins -w Alis.Reactive.SandboxApp",
+    "watch:sandbox-css": "npm run watch:css -w Alis.Reactive.SandboxApp",
+    "typecheck": "npm run typecheck -w Alis.Reactive.Assets && npm run typecheck -w Alis.Reactive.SandboxApp",
+    "lint": "eslint Alis.Reactive.Assets/runtime/ Alis.Reactive.SandboxApp/Scripts/",
+    "lint:fix": "eslint Alis.Reactive.Assets/runtime/ Alis.Reactive.SandboxApp/Scripts/ --fix",
+    "test": "npm run test -w Alis.Reactive.Assets && npm run test -w Alis.Reactive.SandboxApp",
+    "test:watch": "npm run test:watch -w Alis.Reactive.Assets",
+    "build:api-docs": "dotnet run --project tools/ApiDocGenerator"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
-    "@syncfusion/ej2": "^32.2.8",
-    "@tailwindcss/vite": "^4.2.4",
-    "esbuild": "^0.28.0",
     "eslint": "^9.39.4",
-    "jsdom": "^27.0.1",
-    "tailwindcss": "^4.2.1",
     "typescript": "^5.8.0",
-    "typescript-eslint": "^8.57.1",
-    "vite": "^8.0.9",
-    "vitest": "^3.2.4"
-  },
-  "dependencies": {
-    "@microsoft/signalr": "^10.0.0",
-    "@tailwindcss/forms": "^0.5.11"
+    "typescript-eslint": "^8.57.1"
   }
 }
