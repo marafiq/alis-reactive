@@ -96,17 +96,12 @@ namespace Alis.Reactive
         {
             if (_componentsMap.TryGetValue(bindingPath, out var existing))
             {
-                if (existing.ComponentId == entry.ComponentId
-                    && existing.Vendor == entry.Vendor
-                    && existing.ReadExpr == entry.ReadExpr
-                    && existing.ComponentType == entry.ComponentType
-                    && existing.CoerceAs == entry.CoerceAs)
+                if (existing.IsSameRegistrationAs(entry))
                     return;
 
                 throw new InvalidOperationException(
                     $"Duplicate component registration for binding path '{bindingPath}': " +
-                    $"existing [{existing.ComponentId}, {existing.Vendor}, {existing.ReadExpr}, {existing.ComponentType}, {existing.CoerceAs}] vs " +
-                    $"new [{entry.ComponentId}, {entry.Vendor}, {entry.ReadExpr}, {entry.ComponentType}, {entry.CoerceAs}]. " +
+                    $"existing {existing} vs new {entry}. " +
                     "Each binding path must map to exactly one component.");
             }
 

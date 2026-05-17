@@ -42,5 +42,33 @@ namespace Alis.Reactive
             ComponentType = componentType;
             CoerceAs = coerceAs;
         }
+
+        /// <summary>
+        /// Returns whether <paramref name="other"/> registers the identical component.
+        /// </summary>
+        /// <remarks>
+        /// Compares <see cref="ComponentId"/>, <see cref="Vendor"/>, <see cref="ReadExpr"/>,
+        /// <see cref="ComponentType"/>, and <see cref="CoerceAs"/>. <see cref="BindingPath"/> is
+        /// excluded because callers compare registrations already keyed by the same binding
+        /// path, so it is equal by construction.
+        /// </remarks>
+        internal bool IsSameRegistrationAs(ComponentRegistration other)
+        {
+            return ComponentId == other.ComponentId
+                && Vendor == other.Vendor
+                && ReadExpr == other.ReadExpr
+                && ComponentType == other.ComponentType
+                && CoerceAs == other.CoerceAs;
+        }
+
+        /// <summary>
+        /// Returns the registration's identifying fields as a bracketed list for
+        /// diagnostics, e.g. <c>[name-input, native, value, textbox, string]</c>.
+        /// </summary>
+        /// <returns>The component id, vendor, read expression, component type, and coercion.</returns>
+        public override string ToString()
+        {
+            return $"[{ComponentId}, {Vendor}, {ReadExpr}, {ComponentType}, {CoerceAs}]";
+        }
     }
 }
