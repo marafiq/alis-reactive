@@ -137,20 +137,13 @@ namespace Alis.Reactive
             }, options);
         }
 
-        // Flatten ComponentRegistration to anonymous objects for JSON serialization
+        // Project each registration to its plan-JSON shape, keyed by binding path.
         private Dictionary<string, object> SerializeComponentsMap()
         {
             var result = new Dictionary<string, object>();
             foreach (var kvp in _componentsMap)
             {
-                result[kvp.Key] = new
-                {
-                    id = kvp.Value.ComponentId,
-                    vendor = kvp.Value.Vendor,
-                    readExpr = kvp.Value.ReadExpr,
-                    componentType = kvp.Value.ComponentType,
-                    coerceAs = kvp.Value.CoerceAs
-                };
+                result[kvp.Key] = kvp.Value.ToSerializableShape();
             }
             return result;
         }

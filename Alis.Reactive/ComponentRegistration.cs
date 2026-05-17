@@ -70,5 +70,26 @@ namespace Alis.Reactive
         {
             return $"[{ComponentId}, {Vendor}, {ReadExpr}, {ComponentType}, {CoerceAs}]";
         }
+
+        /// <summary>
+        /// Projects the registration to the shape embedded in the plan JSON:
+        /// <c>{ id, vendor, readExpr, componentType, coerceAs }</c>.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="BindingPath"/> is omitted because it is the key under which the
+        /// registration is stored in the plan's components map.
+        /// </remarks>
+        /// <returns>An object carrying the registration's serialized fields.</returns>
+        internal object ToSerializableShape()
+        {
+            return new
+            {
+                id = ComponentId,
+                vendor = Vendor,
+                readExpr = ReadExpr,
+                componentType = ComponentType,
+                coerceAs = CoerceAs
+            };
+        }
     }
 }
