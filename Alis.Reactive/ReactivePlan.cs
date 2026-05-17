@@ -123,22 +123,17 @@ namespace Alis.Reactive
         /// Resolves validation rules and component enrichment before rendering.
         /// </remarks>
         /// <returns>The rendered plan string consumed by the browser.</returns>
-        public string Render()
-        {
-            ResolveAll();
-            return JsonSerializer.Serialize(new
-            {
-                planId = PlanId,
-                components = SerializeComponentsMap(),
-                entries = _entries
-            }, CompactOptions);
-        }
+        public string Render() => SerializePlan(CompactOptions);
 
         /// <summary>
         /// Renders the plan with indentation for debugging and test snapshots.
         /// </summary>
         /// <returns>The rendered plan string with indentation for readability.</returns>
-        public string RenderFormatted()
+        public string RenderFormatted() => SerializePlan(FormattedOptions);
+
+        // Resolves pending validation/enrichment, then serializes the plan payload.
+        // The payload shape { planId, components, entries } is the framework's JSON contract.
+        private string SerializePlan(JsonSerializerOptions options)
         {
             ResolveAll();
             return JsonSerializer.Serialize(new
@@ -146,7 +141,7 @@ namespace Alis.Reactive
                 planId = PlanId,
                 components = SerializeComponentsMap(),
                 entries = _entries
-            }, FormattedOptions);
+            }, options);
         }
 
         // Flatten ComponentRegistration to anonymous objects for JSON serialization
