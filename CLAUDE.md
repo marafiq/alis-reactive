@@ -7,7 +7,7 @@ plan does not describe. C# never executes browser behavior. TypeScript never inv
 information the plan does not carry.
 
 Throughout this document, "the runtime" means the TypeScript code in
-`Alis.Reactive.Assets/Scripts/` that executes plans in the browser. It is
+`Alis.Reactive.Assets/runtime/` that executes plans in the browser. It is
 bundled by esbuild into `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js`
 (IIFE), shipped inside the AlisReactive NuGet, and copied into the consumer's
 `wwwroot/scripts/` (net10) or `Content/alisreactive/` (net48) by the shipped
@@ -112,43 +112,50 @@ dotnet run --project Alis.Reactive.SandboxApp    # → http://localhost:5220
 
 Order is strict — `build:all` must finish before the sandbox starts.
 `SandboxApp/Program.cs` serves the bundles directly and throws on startup if the
-`Alis.Reactive.Assets/dist/` or `Alis.Reactive.Fusion/dist/` folder is missing.
+`Alis.Reactive.Assets/dist/` folder is missing.
 
 ### Daily dev loop — 3 terminals
 
 ```bash
-npm run watch                                    # framework JS → dist/ on every .ts edit
-npm run watch:css                                # framework CSS → dist/ on every .css edit
+npm run watch:runtime                            # framework JS → dist/ on every .ts edit
+npm run watch:design-system                      # framework CSS → dist/ on every .css edit
 dotnet watch --project Alis.Reactive.SandboxApp  # Razor + C# hot reload
 ```
 
 Framework TS/CSS edits need **only a browser refresh** — no `dotnet build`, no
 sandbox restart. `Program.cs` wires a `CompositeFileProvider` over the bundle
 output; `asp-append-version` re-hashes each file per request so the browser
-never serves stale bytes. Sandbox-only bundles have their own watchers
-(`watch:sandbox-plugins`, `watch:sandbox-css`) — edited rarely.
+never serves stale bytes. The Fusion CSS watcher is `watch:fusion`; sandbox-only
+bundles have their own watchers (`watch:sandbox-plugins`, `watch:sandbox-css`).
 
-### The bundles — `npm run build:all` runs 5 steps
+### The bundles — `npm run build:all`
 
-Every output path is gitignored; `git status` stays clean after a build.
+`build:all` builds the two npm workspaces in order: `Alis.Reactive.Assets` (the
+framework browser assets — runtime, design system, Fusion) then
+`Alis.Reactive.SandboxApp` (sandbox-only assets). Every output path is
+gitignored; `git status` stays clean after a build.
 
-| npm script | Output | Used by |
-|------------|--------|---------|
-| `build` | `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` | sandbox, NuGet |
-| `build:css` | `Alis.Reactive.Assets/dist/css/design-system.dev.css` | sandbox, NuGet |
-| `build:fusion-css` | `Alis.Reactive.Fusion/dist/css/syncfusion.dev.css` | sandbox, `AlisReactive.Fusion` NuGet |
-| `build:sandbox-plugins` | `Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js` | sandbox only |
-| `build:sandbox-css` | `Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css` | sandbox only |
+| npm script (root) | Output | Used by |
+|-------------------|--------|---------|
+| `build:runtime` | `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` | sandbox, `AlisReactive` NuGet |
+| `build:design-system` | `Alis.Reactive.Assets/dist/css/design-system.dev.css` | sandbox, `AlisReactive.DesignSystem` NuGet |
+| `build:fusion` | `Alis.Reactive.Assets/dist/css/syncfusion.dev.css` | sandbox, `AlisReactive.Fusion` NuGet |
+| `build:sandbox` | `Alis.Reactive.SandboxApp/wwwroot/{js,css}/` | sandbox only |
 
-The bundles reach three places:
+All three framework bundles build into one tree — `Alis.Reactive.Assets/dist/`.
+They reach three places:
 
-- **Sandbox** — `Program.cs` serves `Alis.Reactive.Assets/dist/` and
-  `Alis.Reactive.Fusion/dist/` via `CompositeFileProvider`. No copy into `wwwroot/`.
-- **NuGet** — `Alis.Reactive.csproj` packs the core `dist/` bundles into the
-  `AlisReactive` package; `Alis.Reactive.Fusion.csproj` packs `syncfusion.dev.css`
-  into `AlisReactive.Fusion` the same way. `dotnet pack` never runs npm; the
-  `VerifyBundlesExistBeforePack` / `VerifyFusionBundleExistsBeforePack` targets
-  fail fast if a bundle is missing.
+- **Sandbox** — `Program.cs` serves `Alis.Reactive.Assets/dist/` via a single
+  `CompositeFileProvider`. No copy into `wwwroot/`.
+- **NuGet** — each package ships its own bundle: `Alis.Reactive.csproj` packs the
+  runtime JS into `AlisReactive`, `Alis.Reactive.DesignSystem.csproj` packs
+  `design-system.dev.css` into `AlisReactive.DesignSystem`, and
+  `Alis.Reactive.Fusion.csproj` packs `syncfusion.dev.css` into `AlisReactive.Fusion`
+  — all from `$(AlisAssetsDist)`, defined once in `Directory.Build.props`.
+  The copy-to-`wwwroot` mechanism is one shared `build/AlisReactiveAssets.targets`,
+  packed into each. `dotnet pack` never runs npm; the `VerifyBundlesExistBeforePack`
+  / `VerifyDesignSystemBundleExistsBeforePack` / `VerifyFusionBundleExistsBeforePack`
+  targets fail fast if a bundle is missing.
 - **Example app** (`examples/resident-intake/`) — consumes the *published*
   NuGet; `AlisReactive.targets` copies the bundles into its `wwwroot/` on build.
   Not driven by local `npm`. Rebuild via `scripts/rebuild-example-app.sh`.
@@ -170,8 +177,9 @@ Three layers. **All must pass before every push.**
 npm test
 ```
 
-Runs the vitest suite (jsdom). `vitest.config.ts` looks for `*.test.ts` under
-`Alis.Reactive.Assets/Scripts/__tests__/` and `Alis.Reactive.SandboxApp/Scripts/__tests__/`.
+Runs vitest (jsdom) across both npm workspaces. Each workspace has its own
+`vitest.config.ts` — `Alis.Reactive.Assets` scans `runtime/__tests__/`,
+`Alis.Reactive.SandboxApp` scans `Scripts/__tests__/`.
 A branch with no such files (this branch has none) makes vitest print
 `No test files found` and exit non-zero — that is the empty-suite signal, not a
 failure in your code.
@@ -244,8 +252,8 @@ taskkill /F /IM Alis.Reactive.SandboxApp.exe
 Playwright cleans up its own server; this applies only to a manually-run sandbox.
 
 **2. Stale bundle.** Editing `.ts`/`.css` without rebuilding leaves the sandbox
-serving old bytes. Rebuild with `npm run build:all`, or leave `npm run watch` /
-`watch:css` running — `CompositeFileProvider` serves the new `dist/` output on the
+serving old bytes. Rebuild with `npm run build:all`, or leave `npm run watch:runtime` /
+`watch:design-system` running — `CompositeFileProvider` serves the new `dist/` output on the
 next request and `asp-append-version` re-hashes the URL, so a browser refresh
 always gets current bytes. No sandbox restart needed for TS/CSS changes; C#/Razor
 changes need `dotnet watch` or a rebuild.
@@ -315,10 +323,10 @@ No inline `<script>` blocks — `root.ts` handles discovery and boot automatical
 2. Polymorphic registration — `WriteOnlyPolymorphicConverter` delegates to concrete type
 3. Builder method — PipelineBuilder, ElementBuilder, or TriggerBuilder
 4. JSON schema — failing `AssertSchemaValid()` test drives the update
-5. TS types — new interface in `Alis.Reactive.Assets/Scripts/types/`, discriminated union with `kind`
+5. TS types — new interface in `Alis.Reactive.Assets/runtime/types/`, discriminated union with `kind`
 6. Runtime handler — new switch case + `assertNever`
 7. C# unit test — `AssertSchemaValid()` validates rendered JSON against schema
-8. TS unit test — `Alis.Reactive.Assets/Scripts/__tests__/*.test.ts`, runtime behavior via `boot()`
+8. TS unit test — `Alis.Reactive.Assets/runtime/__tests__/*.test.ts`, runtime behavior via `boot()`
 9. Playwright test — browser behavior with sandbox view
 10. Sandbox view — demonstrate the primitive
 

@@ -11,6 +11,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../Alis.Reactive/Alis.Reactive.csproj" />
+    <ProjectReference Include="../../Alis.Reactive.DesignSystem/Alis.Reactive.DesignSystem.csproj" />
   </ItemGroup>
 </Project>

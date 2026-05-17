@@ -33,15 +33,14 @@ public class WhenRenderingValidationSummary : TagHelperTestBase
     }
 
     [Test]
-    public void Uses_empty_string_when_plan_id_is_null()
+    public void Throws_when_plan_id_is_missing()
     {
         var tagHelper = new NativeValidationSummaryTagHelper();
         var context = CreateContext("native-validation-summary");
         var output = CreateOutput("native-validation-summary");
 
-        tagHelper.Process(context, output);
-
-        Assert.That(output.Attributes["data-reactive-validation-summary"]?.Value?.ToString(), Is.EqualTo(""));
+        Assert.That(() => tagHelper.Process(context, output),
+            Throws.TypeOf<InvalidOperationException>());
     }
 
     [Test]
@@ -55,18 +54,6 @@ public class WhenRenderingValidationSummary : TagHelperTestBase
 
         Assert.That(output.Attributes["id"]?.Value?.ToString(),
             Is.EqualTo("My_App_Models_ResidentModel_validation_summary"));
-    }
-
-    [Test]
-    public void Omits_id_when_plan_id_is_null()
-    {
-        var tagHelper = new NativeValidationSummaryTagHelper();
-        var context = CreateContext("native-validation-summary");
-        var output = CreateOutput("native-validation-summary");
-
-        tagHelper.Process(context, output);
-
-        Assert.That(output.Attributes.ContainsName("id"), Is.False);
     }
 
     [Test]

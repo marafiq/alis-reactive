@@ -104,6 +104,8 @@
   <Project Path="Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />
   <Project Path="Alis.Reactive.Native/Alis.Reactive.Native.csproj" />
   <Project Path="Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj" />
+  <Project Path="Alis.Reactive.Assets/Alis.Reactive.Assets.csproj" />
+  <Project Path="Alis.Reactive.DesignSystem/Alis.Reactive.DesignSystem.csproj" />
   <Project Path="Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj" />
   <Project Path="Alis.Reactive/Alis.Reactive.csproj" />
   <Project Path="Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" />
@@ -113,5 +115,11 @@
   </Folder>
   <Folder Name="/examples/">
     <Project Path="examples/resident-intake/ResidentIntake.csproj" />
+  </Folder>
+  <Folder Name="/build/">
+    <File Path="package.json" />
+    <File Path="eslint.config.js" />
+    <File Path="Directory.Build.props" />
+    <File Path="build/AlisReactiveAssets.targets" />
   </Folder>
 </Solution>

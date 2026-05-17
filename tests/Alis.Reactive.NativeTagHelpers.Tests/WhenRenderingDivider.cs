@@ -78,4 +78,18 @@ public class WhenRenderingDivider : TagHelperTestBase
         Assert.That(classAttr, Does.Contain("my-8"));
         Assert.That(classAttr, Does.Contain("relative"));
     }
+
+    [Test]
+    public void Labeled_divider_html_encodes_the_label()
+    {
+        var tagHelper = new NativeDividerTagHelper { Label = "<script>alert('x')</script>" };
+        var context = CreateContext("native-divider");
+        var output = CreateOutput("native-divider");
+
+        tagHelper.Process(context, output);
+
+        var html = output.Content.GetContent();
+        Assert.That(html, Does.Contain("&lt;script&gt;"));
+        Assert.That(html, Does.Not.Contain("<script>"));
+    }
 }

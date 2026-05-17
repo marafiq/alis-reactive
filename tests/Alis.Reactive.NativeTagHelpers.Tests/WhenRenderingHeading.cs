@@ -1,6 +1,7 @@
 using Alis.Reactive.DesignSystem.Tokens;
 using Alis.Reactive.NativeTagHelpers.Heading;
 using Alis.Reactive.NativeTagHelpers.Tests.Infrastructure;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using NUnit.Framework;
 
 namespace Alis.Reactive.NativeTagHelpers.Tests;
@@ -69,5 +70,32 @@ public class WhenRenderingHeading : TagHelperTestBase
 
         var classAttr = output.Attributes["class"]?.Value?.ToString();
         Assert.That(classAttr, Does.Contain("mb-3"));
+    }
+
+    [Test]
+    public void Heading_html_encodes_the_overline()
+    {
+        var tagHelper = new NativeHeadingTagHelper { Overline = "<script>alert('x')</script>" };
+        var context = CreateContext("native-heading");
+        var output = CreateOutput("native-heading");
+
+        tagHelper.Process(context, output);
+
+        var preElement = output.PreElement.GetContent();
+        Assert.That(preElement, Does.Contain("&lt;script&gt;"));
+        Assert.That(preElement, Does.Not.Contain("<script>"));
+    }
+
+    [Test]
+    public void Heading_renders_with_start_and_end_tag()
+    {
+        var tagHelper = new NativeHeadingTagHelper { Level = HeadingLevel.H2 };
+        var context = CreateContext("native-heading");
+        var output = CreateOutput("native-heading");
+        output.TagMode = TagMode.SelfClosing;
+
+        tagHelper.Process(context, output);
+
+        Assert.That(output.TagMode, Is.EqualTo(TagMode.StartTagAndEndTag));
     }
 }

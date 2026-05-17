@@ -2,17 +2,45 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Alis.Reactive.NativeTagHelpers.ValidationSummary;
 
+/// <summary>
+/// Renders a <c>native-validation-summary</c> element: a hidden container that displays
+/// the validation errors for a plan once they occur.
+/// </summary>
 [HtmlTargetElement("native-validation-summary")]
 public class NativeValidationSummaryTagHelper : TagHelper
 {
+    /// <summary>
+    /// Gets or sets the id of the plan whose validation errors this summary displays.
+    /// This attribute is required: the tag helper throws when it is missing or empty.
+    /// </summary>
     [HtmlAttributeName("plan-id")]
-    public string? PlanId { get; set; }
+    public string PlanId { get; set; } = "";
 
+    /// <summary>
+    /// Gets or sets extra CSS classes appended to the summary element.
+    /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }
 
+    /// <inheritdoc/>
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        ValidationSummaryRenderer.Render(output, PlanId, CssClass);
+        if (string.IsNullOrWhiteSpace(PlanId))
+            throw new InvalidOperationException(
+                "The native-validation-summary tag helper requires a plan-id attribute. " +
+                "Set plan-id to the id of the plan whose validation errors this summary should display.");
+
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-reactive-validation-summary", PlanId);
+        output.Attributes.SetAttribute("id", ToSummaryId(PlanId));
+        output.Attributes.SetAttribute("hidden", "");
+
+        if (!string.IsNullOrWhiteSpace(CssClass))
+            output.Attributes.SetAttribute("class", CssClass);
     }
+
+    // Predictable element id for the summary: dots and plus signs become underscores.
+    private static string ToSummaryId(string planId) =>
+        planId.Replace('.', '_').Replace('+', '_') + "_validation_summary";
 }

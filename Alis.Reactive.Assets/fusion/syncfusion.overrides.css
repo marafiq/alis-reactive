@@ -1,0 +1,106 @@
+/* ── Syncfusion Tailwind3 theme overrides ──
+   Companion to @import "@syncfusion/ej2/tailwind3.css" in syncfusion.entry.css.
+   See TOKENS.md for the full reference and value-format conventions (hex vs
+   raw RGB triplet).
+
+   Tokens set to their Tailwind3 defaults are scaffolded here so every
+   high-leverage customization point is visible in one place. Edit values
+   below to rebrand; remove lines you want to keep at SF defaults (it changes
+   nothing, but shrinks the cascade footprint). */
+
+:root {
+  /* ── Brand primary ─────────────────────────────────────────────────
+     Sourced from brand.css (imported by syncfusion.entry.css). The Syncfusion
+     tailwind3 theme uses --color-sf-primary directly as a color value (e.g.
+     `color: var(--color-sf-primary)`), matching its own hex default, so this
+     takes the rgb()-resolved brand color — not the raw triplet. */
+  --color-sf-primary:              var(--alis-brand-primary);
+  --color-sf-primary-text-color:   #fff;
+  --color-sf-primary-light:        var(--alis-brand-primary-light);
+  --color-sf-primary-lighter:      var(--alis-brand-primary-lighter);
+  --color-sf-primary-dark:         var(--alis-brand-primary-dark);
+  --color-sf-primary-darker:       var(--alis-brand-primary-darker);
+
+  /* ── Primary button (SF treats as distinct from brand above) ─────── */
+  --color-sf-primary-bg-color:              var(--alis-brand-primary);
+  --color-sf-primary-bg-color-hover:        var(--alis-brand-primary-dark);
+  --color-sf-primary-bg-color-pressed:      var(--alis-brand-primary-darker);
+  --color-sf-primary-bg-color-focus:        var(--alis-brand-primary-dark);
+  --color-sf-primary-bg-color-disabled:     #d8b5bc;   /* desaturated brand tint */
+  --color-sf-primary-border-color:          var(--alis-brand-primary);
+  --color-sf-primary-border-color-hover:    var(--alis-brand-primary-dark);
+  --color-sf-primary-border-color-pressed:  var(--alis-brand-primary-darker);
+  --color-sf-primary-text:                  #fff;
+
+  /* ── Status colors ────────────────────────────────────────────────── */
+  --color-sf-success:          #15803d;
+  --color-sf-success-light:    #dcfce7;
+  --color-sf-success-lighter:  #f0fdf4;
+  --color-sf-success-dark:     #166534;
+  --color-sf-info:             #0e7490;
+  --color-sf-info-light:       #cffafe;
+  --color-sf-info-lighter:     #ecfeff;
+  --color-sf-info-dark:        #155e75;
+  --color-sf-warning:          #c2410c;
+  --color-sf-warning-light:    #ffedd5;
+  --color-sf-warning-lighter:  #fff7fd;
+  --color-sf-warning-dark:     #9a3412;
+  --color-sf-danger:           #dc2626;
+  --color-sf-danger-light:     #fee2e2;
+  --color-sf-danger-lighter:   #fef2f2;
+  --color-sf-danger-dark:      #b91c1c;
+
+  /* ── Content surfaces (5 shades, light → dark) ───────────────────── */
+  --color-sf-content-bg-color:           rgba(255, 255, 255);
+  --color-sf-content-bg-color-alt1:      #f9fafb;
+  --color-sf-content-bg-color-alt2:      #f3f4f6;
+  --color-sf-content-bg-color-alt3:      #e5e7eb;
+  --color-sf-content-bg-color-alt4:      #9ca3af;
+  --color-sf-content-bg-color-alt5:      #6b7280;
+  --color-sf-content-bg-color-hover:     #f9fafb;
+  --color-sf-content-bg-color-pressed:   #f3f4f6;
+  --color-sf-content-bg-color-focus:     #f9fafb;
+  --color-sf-content-bg-color-selected:  #e5e7eb;
+  --color-sf-content-bg-color-disabled:  #ffffff;
+
+  /* ── Content text (4 hierarchy levels) ───────────────────────────── */
+  --color-sf-content-text-color:           #111827;
+  --color-sf-content-text-color-alt1:      #374151;
+  --color-sf-content-text-color-alt2:      #4b5563;
+  --color-sf-content-text-color-alt3:      #6b7280;
+  --color-sf-content-text-color-alt4:      #9ca3af;
+  --color-sf-content-text-color-hover:     #111827;
+  --color-sf-content-text-color-pressed:   #111827;
+  --color-sf-content-text-color-focus:     #111827;
+  --color-sf-content-text-color-selected:  #111827;
+  --color-sf-content-text-color-disabled:  #9ca3af;
+  --color-sf-placeholder-text-color:       #6b7280;
+
+  /* ── Borders ─────────────────────────────────────────────────────── */
+  --color-sf-border-light:     #e5e7eb;
+  --color-sf-border:           #d1d5db;
+  --color-sf-border-dark:      #9ca3af;
+  --color-sf-border-hover:     #d1d5db;
+  --color-sf-border-pressed:   #9ca3af;
+  --color-sf-border-focus:     #d1d5db;
+  --color-sf-border-selected:  #9ca3af;
+  --color-sf-border-dragged:   #e5e7eb;
+  --color-sf-border-disabled:  #e5e7eb;
+  --color-sf-border-warning:   #c2410c;
+  --color-sf-border-error:     #dc2626;
+  --color-sf-border-success:   #15803d;
+
+  /* ── Input and flyout surfaces ────────────────────────────────────── */
+  --color-sf-text-input-bg-color:  #ffffff;
+  --color-sf-flyout-bg-color:      #ffffff;
+  --color-sf-flyout-border:        #e5e7eb;
+  --color-sf-overlay-bg-color:     rgba(107, 114, 128, .75);
+
+  /* ── Typography & geometry ───────────────────────────────────────── */
+  --e-font-name:    var(--alis-brand-font);
+  --e-radius:       1rem;
+  --e-border:       1rem;
+
+  /* ── Framework font token ──────────────────────────────────────────── */
+  --font-sf: var(--alis-brand-font);
+}

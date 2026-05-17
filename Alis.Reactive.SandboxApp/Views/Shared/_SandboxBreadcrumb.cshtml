@@ -33,7 +33,7 @@
 
         <nav class="mb-6 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
             <a href="@sandboxUrl"
-               class="inline-flex items-center gap-1 text-text-secondary hover:text-[#7A2E3B] transition-colors">
+               class="inline-flex items-center gap-1 text-text-secondary hover:text-primary transition-colors">
                 <span>&larr;</span> Sandbox
             </a>
 
@@ -42,7 +42,7 @@
                 var concernUrl = Url.Action("Index", concern.Controller, new { area = "Sandbox" });
                 <span class="text-text-muted">/</span>
                 <a href="@concernUrl"
-                   class="text-text-secondary hover:text-[#7A2E3B] transition-colors">
+                   class="text-text-secondary hover:text-primary transition-colors">
                     @concern.Display
                 </a>
             }

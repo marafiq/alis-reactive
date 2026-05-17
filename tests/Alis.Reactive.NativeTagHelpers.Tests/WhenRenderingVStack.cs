@@ -1,6 +1,7 @@
 using Alis.Reactive.DesignSystem.Tokens;
 using Alis.Reactive.NativeTagHelpers.VStack;
 using Alis.Reactive.NativeTagHelpers.Tests.Infrastructure;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using NUnit.Framework;
 
 namespace Alis.Reactive.NativeTagHelpers.Tests;
@@ -34,5 +35,18 @@ public class WhenRenderingVStack : TagHelperTestBase
 
         var classAttr = output.Attributes["class"]?.Value?.ToString();
         Assert.That(classAttr, Does.Contain("divide-y"));
+    }
+
+    [Test]
+    public void VStack_renders_with_start_and_end_tag()
+    {
+        var tagHelper = new NativeVStackTagHelper();
+        var context = CreateContext("native-vstack");
+        var output = CreateOutput("native-vstack");
+        output.TagMode = TagMode.SelfClosing;
+
+        tagHelper.Process(context, output);
+
+        Assert.That(output.TagMode, Is.EqualTo(TagMode.StartTagAndEndTag));
     }
 }

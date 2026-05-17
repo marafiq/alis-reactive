@@ -29,4 +29,16 @@ public class WhenMergingClasses
     {
         Assert.That(CssUtils.MergeClasses("flex", "  mt-2  "), Is.EqualTo("flex mt-2"));
     }
+
+    [Test]
+    public void Returns_trimmed_user_class_when_generated_is_empty()
+    {
+        Assert.That(CssUtils.MergeClasses("", "  mt-2  "), Is.EqualTo("mt-2"));
+    }
+
+    [Test]
+    public void Returns_empty_when_both_generated_and_user_class_are_empty()
+    {
+        Assert.That(CssUtils.MergeClasses("", null), Is.EqualTo(""));
+    }
 }
