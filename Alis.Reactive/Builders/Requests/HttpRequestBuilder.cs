@@ -143,7 +143,7 @@ namespace Alis.Reactive.Builders.Requests
 
         internal RequestDescriptor BuildRequestDescriptor()
         {
-            var desc = new RequestDescriptor(
+            return new RequestDescriptor(
                 _verb,
                 _url,
                 _gather,
@@ -152,12 +152,8 @@ namespace Alis.Reactive.Builders.Requests
                 _response?.SuccessHandlers.Count > 0 ? _response.SuccessHandlers : null,
                 _response?.ErrorHandlers.Count > 0 ? _response.ErrorHandlers : null,
                 _response?.ChainedRequest,
-                _validation);
-
-            if (_validatorType != null)
-                desc.AttachValidator(_validatorType);
-
-            return desc;
+                _validation,
+                _validatorType);
         }
     }
 }

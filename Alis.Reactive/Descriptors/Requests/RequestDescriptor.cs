@@ -37,12 +37,7 @@ namespace Alis.Reactive.Descriptors.Requests
         public ValidationDescriptor? Validation { get; private set; }
 
         [JsonIgnore]
-        internal Type? ValidatorType { get; private set; }
-
-        internal void AttachValidator(Type validatorType)
-        {
-            ValidatorType = validatorType;
-        }
+        internal Type? ValidatorType { get; }
 
         internal void EnrichValidation(ValidationDescriptor resolved)
         {
@@ -62,7 +57,8 @@ namespace Alis.Reactive.Descriptors.Requests
             List<StatusHandler>? onSuccess = null,
             List<StatusHandler>? onError = null,
             RequestDescriptor? chained = null,
-            ValidationDescriptor? validation = null)
+            ValidationDescriptor? validation = null,
+            Type? validatorType = null)
         {
             Verb = verb;
             Url = url;
@@ -73,6 +69,7 @@ namespace Alis.Reactive.Descriptors.Requests
             OnError = onError;
             Chained = chained;
             Validation = validation;
+            ValidatorType = validatorType;
         }
     }
 }
