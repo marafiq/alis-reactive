@@ -4,22 +4,54 @@ using System.Collections.Generic;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Manages JsType and Component registration during plan construction.
-    /// Replaces the old PlanAuthoringContext triple-indirection (contracts/objects/bindings).
+    /// Accumulates JsType, Component, and Behavior registrations during plan construction,
+    /// then snapshots them into an immutable <see cref="PlanModel.Plan"/> via <see cref="BuildPlan"/>.
     /// Each component gets its own JsType. Members are added on-demand as builders reference them.
     /// </summary>
     public sealed class PlanBuildContext
     {
-        private readonly Plan _plan;
-        private readonly Dictionary<string, ComponentRegistration> _components;
+        private readonly string _planId;
+        private readonly string? _partId;
+        private readonly Dictionary<string, JsType> _types = new Dictionary<string, JsType>();
+        private readonly Dictionary<string, Component> _components = new Dictionary<string, Component>();
+        private readonly List<Behavior> _behaviors = new List<Behavior>();
+        private readonly Dictionary<string, ComponentRegistration> _registrations;
+        private readonly HashSet<string> _registeredPlugins = new HashSet<string>();
+        private readonly List<(Request Request, Type ValidatorType)> _validationJobs =
+            new List<(Request, Type)>();
 
-        internal PlanBuildContext(Plan plan, Dictionary<string, ComponentRegistration> components)
+        internal PlanBuildContext(
+            string planId, string? partId, Dictionary<string, ComponentRegistration> registrations)
         {
-            _plan = plan;
-            _components = components;
+            _planId = planId;
+            _partId = partId;
+            _registrations = registrations;
         }
 
-        internal Plan Plan => _plan;
+        /// <summary>Snapshots the accumulated state into an immutable plan document.</summary>
+        internal Plan BuildPlan() =>
+            new Plan(
+                _planId,
+                _partId,
+                new Dictionary<string, JsType>(_types),
+                new Dictionary<string, Component>(_components),
+                new List<Behavior>(_behaviors));
+
+        /// <summary>Behaviors collected so far — a read-only view for mid-build inspection.</summary>
+        internal IReadOnlyList<Behavior> Behaviors => _behaviors;
+
+        /// <summary>Gets a component already registered in the plan.</summary>
+        internal Component GetComponent(string key) => _components[key];
+
+        /// <summary>Replaces a registered component (used when enriching it with a container scope).</summary>
+        internal void SetComponent(string key, Component component) => _components[key] = component;
+
+        /// <summary>Records that a request must run validation before it is sent, with its validator type.</summary>
+        internal void RegisterValidationJob(Request request, Type validatorType) =>
+            _validationJobs.Add((request, validatorType));
+
+        /// <summary>Requests that declared a validator at build time, each paired with its validator type.</summary>
+        internal IReadOnlyList<(Request Request, Type ValidatorType)> ValidationJobs => _validationJobs;
 
         /// <summary>
         /// Ensures a DOM element is registered as a native component with a JsType.
@@ -28,14 +60,14 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal string EnsureElement(string elementId)
         {
-            if (_plan.MutableComponents.ContainsKey(elementId))
+            if (_components.ContainsKey(elementId))
                 return elementId;
 
             var typeKey = "native.element." + elementId;
-            if (!_plan.MutableTypes.ContainsKey(typeKey))
-                _plan.MutableTypes[typeKey] = new JsType();
+            if (!_types.ContainsKey(typeKey))
+                _types[typeKey] = new JsType();
 
-            _plan.MutableComponents[elementId] = Component.Create(elementId, "native", typeKey);
+            _components[elementId] = Component.Create(elementId, "native", typeKey);
             return elementId;
         }
 
@@ -46,35 +78,28 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal string EnsureComponent(string componentId, string vendor)
         {
-            var key = componentId;
-
-            if (_plan.MutableComponents.TryGetValue(key, out var existing))
+            if (_components.TryGetValue(componentId, out var existing))
             {
                 ValidateVendor(existing, componentId, vendor);
-                EnrichExistingComponent(existing, key, componentId);
-                return key;
+                EnrichExistingComponent(existing, componentId);
+                return componentId;
             }
 
             var typeKey = vendor + "." + componentId;
-            var reg = FindRegistration(key, componentId);
+            var reg = FindRegistration(componentId);
 
             if (reg != null)
             {
-                _plan.MutableTypes[typeKey] = CreateEnrichedType(reg.ValueMember, reg.Shape);
+                _types[typeKey] = CreateEnrichedType(reg.ValueMember, reg.Shape);
             }
-            else if (!_plan.MutableTypes.ContainsKey(typeKey))
+            else if (!_types.ContainsKey(typeKey))
             {
-                _plan.MutableTypes[typeKey] = new JsType();
+                _types[typeKey] = new JsType();
             }
 
-            var comp = Component.Create(componentId, vendor, typeKey);
-            if (reg != null)
-            {
-                comp.BindingPath = reg.BindingPath;
-                comp.ValueMember = reg.ValueMember;
-            }
-            _plan.MutableComponents[key] = comp;
-            return key;
+            _components[componentId] = Component.Create(
+                componentId, vendor, typeKey, reg?.BindingPath, reg?.ValueMember);
+            return componentId;
         }
 
         private static void ValidateVendor(Component existing, string componentId, string vendor)
@@ -85,36 +110,34 @@ namespace Alis.Reactive.PlanModel
                     $"but re-referenced as '{vendor}'. A component cannot change vendor.");
         }
 
-        private void EnrichExistingComponent(Component existing, string key, string componentId)
+        private void EnrichExistingComponent(Component existing, string componentId)
         {
-            var reg = FindRegistration(key, componentId);
+            var reg = FindRegistration(componentId);
             if (reg == null) return;
 
-            if (existing.BindingPath == null)
-                existing.BindingPath = reg.BindingPath;
-            if (existing.ValueMember == null)
-                existing.ValueMember = reg.ValueMember;
-
-            var jsType = _plan.MutableTypes[existing.Type];
+            var jsType = _types[existing.Type];
+            _components[componentId] = existing.WithBindingIfAbsent(reg.BindingPath, reg.ValueMember);
             EnrichTypeIfNeeded(jsType, reg.ValueMember, reg.Shape);
         }
 
         /// <summary>
-        /// Searches the components map for a registration whose ComponentId matches.
+        /// Searches the registration map for a registration whose ComponentId matches.
         /// The map is keyed by binding path, but componentId is the generated HTML id.
         /// </summary>
         internal bool TryFindRegistrationById(string componentId, out ComponentRegistration? registration)
         {
-            registration = FindRegistration(componentId, componentId);
+            registration = FindRegistration(componentId);
             return registration != null;
         }
 
-        private ComponentRegistration? FindRegistration(string key, string componentId)
+        private ComponentRegistration? FindRegistration(string componentId)
         {
-            if (_components.TryGetValue(key, out var reg))
+            if (_registrations.TryGetValue(componentId, out var reg))
                 return reg;
 
-            foreach (var kvp in _components)
+            // _registrations is a live map the caller keeps populating after this context
+            // is constructed, so resolve by ComponentId against its current contents.
+            foreach (var kvp in _registrations)
             {
                 if (kvp.Value.ComponentId == componentId)
                     return kvp.Value;
@@ -129,27 +152,19 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal string EnsureInputComponent(string componentId, string vendor, string valueMember, Shape shape, string? bindingPath = null)
         {
-            var key = componentId;
-
-            if (_plan.MutableComponents.TryGetValue(key, out var existing))
+            if (_components.TryGetValue(componentId, out var existing))
             {
-                if (bindingPath != null && existing.BindingPath == null)
-                    existing.BindingPath = bindingPath;
-                if (existing.ValueMember == null)
-                    existing.ValueMember = valueMember;
-
-                EnrichTypeIfNeeded(_plan.MutableTypes[existing.Type], valueMember, shape);
-                return key;
+                EnrichTypeIfNeeded(_types[existing.Type], valueMember, shape);
+                _components[componentId] = existing.WithBindingIfAbsent(bindingPath, valueMember);
+                return componentId;
             }
 
             var typeKey = vendor + "." + componentId;
-            _plan.MutableTypes[typeKey] = CreateEnrichedType(valueMember, shape);
+            _types[typeKey] = CreateEnrichedType(valueMember, shape);
 
-            var comp = Component.Create(componentId, vendor, typeKey);
-            comp.BindingPath = bindingPath;
-            comp.ValueMember = valueMember;
-            _plan.MutableComponents[key] = comp;
-            return key;
+            _components[componentId] = Component.Create(
+                componentId, vendor, typeKey, bindingPath, valueMember);
+            return componentId;
         }
 
         /// <summary>
@@ -181,16 +196,14 @@ namespace Alis.Reactive.PlanModel
             jsType.WithEvent(eventName, channel, payloadType);
         }
 
-        private readonly HashSet<string> _registeredPlugins = new HashSet<string>();
-
         /// <summary>Registers a plugin's JsType. Throws on duplicate registration.</summary>
         internal void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder> configure)
         {
             if (!_registeredPlugins.Add(pluginName))
                 throw new InvalidOperationException($"Plugin '{pluginName}' is already registered.");
-            var typeKey = "plugin." + pluginName;
-            _plan.MutableTypes[typeKey] = new JsType();
-            configure(new Builders.PluginTypeBuilder(_plan, typeKey));
+            var jsType = new JsType();
+            _types["plugin." + pluginName] = jsType;
+            configure(new Builders.PluginTypeBuilder(jsType));
         }
 
         /// <summary>Ensures a plugin method exists in the plan's JsType registry.
@@ -202,44 +215,43 @@ namespace Alis.Reactive.PlanModel
             if (string.IsNullOrWhiteSpace(member))
                 throw new System.ArgumentException("Method name required.", nameof(member));
             var typeKey = "plugin." + pluginName;
-            if (!_plan.MutableTypes.ContainsKey(typeKey))
+            if (!_types.ContainsKey(typeKey))
                 throw new System.InvalidOperationException(
                     $"Plugin '{pluginName}' is not registered. Call plan.RegisterPlugin(\"{pluginName}\", ...) first.");
-            _plan.MutableTypes[typeKey].WithMethod(member, Path.Parse(member), returns: returns);
+            _types[typeKey].WithMethod(member, Path.Parse(member), returns: returns);
         }
 
         private JsType GetJsType(string componentKey)
         {
-            var component = _plan.MutableComponents[componentKey];
-            return _plan.MutableTypes[component.Type];
+            var component = _components[componentKey];
+            return _types[component.Type];
         }
 
         private static JsType CreateEnrichedType(string valueMember, Shape shape)
         {
-            var jsType = new JsType()
-                .WithProperty(valueMember, Path.Parse(valueMember), shape, "read");
-            // Always register "value" as an alias so parent validators can read any
-            // input component uniformly via member:"value" — even checkbox ("checked")
-            // or switch ("checked"). The alias points to the same path with the same shape.
-            if (valueMember != "value")
-                jsType.WithProperty("value", Path.Parse(valueMember), shape, "read");
+            var jsType = new JsType();
+            EnrichTypeIfNeeded(jsType, valueMember, shape);
             return jsType;
         }
 
         private static void EnrichTypeIfNeeded(JsType jsType, string valueMember, Shape shape)
         {
-            jsType.WithProperty(valueMember, Path.Parse(valueMember), shape, "read");
+            var valuePath = Path.Parse(valueMember);
+            jsType.WithProperty(valueMember, valuePath, shape, "read");
+            // Always register "value" as an alias so parent validators can read any
+            // input component uniformly via member:"value" — even checkbox ("checked")
+            // or switch ("checked"). The alias points to the same path with the same shape.
             if (valueMember != "value")
-                jsType.WithProperty("value", Path.Parse(valueMember), shape, "read");
+                jsType.WithProperty("value", valuePath, shape, "read");
         }
 
         /// <summary>
-        /// Registers all input components from the ReactivePlan's ComponentsMap into the Plan.
+        /// Registers all input components from the ReactivePlan's ComponentsMap into the plan.
         /// Called during Render().
         /// </summary>
         internal void RegisterInputComponents()
         {
-            foreach (var kvp in _components)
+            foreach (var kvp in _registrations)
             {
                 var reg = kvp.Value;
                 EnsureInputComponent(reg.ComponentId, reg.Vendor, reg.ValueMember, reg.Shape, kvp.Key);
@@ -249,7 +261,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>
         /// Returns all registered input components for IncludeAll expansion at build time.
         /// </summary>
-        internal IReadOnlyDictionary<string, ComponentRegistration> GetRegisteredComponents() => _components;
+        internal IReadOnlyDictionary<string, ComponentRegistration> GetRegisteredComponents() => _registrations;
 
         /// <summary>
         /// Wires a component event to a set of reactive behaviors.
@@ -265,15 +277,21 @@ namespace Alis.Reactive.PlanModel
 
         internal void AddBehavior(Behavior behavior)
         {
-            // Auto-register JsEvent for component-event triggers so the plan
-            // carries event metadata. Covers all 26 Reactive extensions.
-            if (behavior.StartsWhen is ComponentEventTrigger cet
-                && _plan.MutableComponents.ContainsKey(cet.Component))
+            RegisterEventMetadataForTrigger(behavior.StartsWhen);
+            _behaviors.Add(behavior);
+        }
+
+        /// <summary>
+        /// A component-event trigger needs its <see cref="JsEvent"/> in the plan so the
+        /// runtime carries the event metadata. Covers all 26 Reactive extensions.
+        /// </summary>
+        private void RegisterEventMetadataForTrigger(StartsWhen trigger)
+        {
+            if (trigger is ComponentEventTrigger cet
+                && _components.ContainsKey(cet.Component))
             {
                 EnsureEvent(cet.Component, cet.Event, cet.Event);
             }
-
-            _plan.MutableBehaviors.Add(behavior);
         }
     }
 }

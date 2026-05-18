@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -23,24 +22,24 @@ namespace Alis.Reactive.PlanModel
         {
             if (item == null || item == None)
                 throw new ArgumentException("Array item shape is required.", nameof(item));
-            return new Shape("array") { Item = item };
+            return new Shape("array", item: item);
         }
 
         internal static Shape ObjectOf(Dictionary<string, Shape> fields)
         {
-            return new Shape("object") { Fields = new ReadOnlyDictionary<string, Shape>(fields) };
+            return new Shape("object", fields: new ReadOnlyDictionary<string, Shape>(fields));
         }
 
         internal static Shape OpenObject()
         {
-            return new Shape("object") { Additional = true };
+            return new Shape("object", additional: true);
         }
 
         internal static Shape Nullable(Shape inner)
         {
             if (inner == null || inner == None)
                 throw new ArgumentException("Nullable inner shape is required.", nameof(inner));
-            return new Shape("nullable") { Inner = inner };
+            return new Shape("nullable", inner: inner);
         }
 
         internal static Shape FromClrType(Type type)
@@ -86,9 +85,9 @@ namespace Alis.Reactive.PlanModel
 #endif
                ;
 
-        private static Type GetCollectionElementType(Type type)
+        private static Type? GetCollectionElementType(Type type)
         {
-            if (type.IsArray) return type.GetElementType()!;
+            if (type.IsArray) return type.GetElementType();
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
                 return type.GetGenericArguments()[0];
             return null;
@@ -98,16 +97,16 @@ namespace Alis.Reactive.PlanModel
         public string Kind { get; }
         /// <summary>Gets the element shape for array shapes, or <see langword="null"/> for non-array shapes.</summary>
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public Shape Item { get; private set; }
+        public Shape? Item { get; }
         /// <summary>Gets the wrapped shape for nullable shapes, or <see langword="null"/> for non-nullable shapes.</summary>
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public Shape Inner { get; private set; }
+        public Shape? Inner { get; }
         /// <summary>Gets the named field shapes for object shapes, or <see langword="null"/> for non-object shapes.</summary>
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public IReadOnlyDictionary<string, Shape> Fields { get; private set; }
+        public IReadOnlyDictionary<string, Shape>? Fields { get; }
         /// <summary>Gets whether the object shape accepts properties beyond those listed in <see cref="Fields"/>. When <see langword="true"/>, the value may contain extra keys not declared in the shape. Default <see langword="false"/> means the shape is closed.</summary>
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
-        public bool Additional { get; private set; }
+        public bool Additional { get; }
 
         internal bool IsNone => Kind == "none";
 
@@ -136,15 +135,20 @@ namespace Alis.Reactive.PlanModel
             }
         }
 
-        private Shape(string kind)
+        private Shape(string kind, Shape? item = null, Shape? inner = null,
+            IReadOnlyDictionary<string, Shape>? fields = null, bool additional = false)
         {
             Kind = kind;
+            Item = item;
+            Inner = inner;
+            Fields = fields;
+            Additional = additional;
         }
 
         /// <summary>Determines whether two <see cref="Shape"/> instances represent the same type contract.</summary>
         /// <param name="other">The shape to compare with.</param>
         /// <returns><see langword="true"/> if the shapes are structurally equal.</returns>
-        public bool Equals(Shape other)
+        public bool Equals(Shape? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -164,7 +168,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => Equals(obj as Shape);
+        public override bool Equals(object? obj) => Equals(obj as Shape);
 
         /// <inheritdoc/>
         public override int GetHashCode()
@@ -176,8 +180,8 @@ namespace Alis.Reactive.PlanModel
             {
                 int hash = 17;
                 hash = hash * 31 + (Kind != null ? Kind.GetHashCode() : 0);
-                hash = hash * 31 + (Item != null ? Item.GetHashCode() : 0);
-                hash = hash * 31 + (Inner != null ? Inner.GetHashCode() : 0);
+                hash = hash * 31 + (Item is null ? 0 : Item.GetHashCode());
+                hash = hash * 31 + (Inner is null ? 0 : Inner.GetHashCode());
                 hash = hash * 31 + (Fields?.Count ?? 0);
                 hash = hash * 31 + Additional.GetHashCode();
                 return hash;
@@ -186,8 +190,8 @@ namespace Alis.Reactive.PlanModel
         }
 
         /// <summary>Returns <see langword="true"/> if both shapes are structurally equal.</summary>
-        public static bool operator ==(Shape left, Shape right) => Equals(left, right);
+        public static bool operator ==(Shape? left, Shape? right) => Equals(left, right);
         /// <summary>Returns <see langword="true"/> if the shapes are not structurally equal.</summary>
-        public static bool operator !=(Shape left, Shape right) => !Equals(left, right);
+        public static bool operator !=(Shape? left, Shape? right) => !Equals(left, right);
     }
 }

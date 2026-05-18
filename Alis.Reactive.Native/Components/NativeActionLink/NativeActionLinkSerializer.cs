@@ -19,10 +19,14 @@ namespace Alis.Reactive.Native.Components
             Action<PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var plan = Plan.Create("action-link", null);
-            var context = new PlanBuildContext(plan, new Dictionary<string, ComponentRegistration>());
+            var context = new PlanBuildContext(
+                "action-link", null, new Dictionary<string, ComponentRegistration>());
             var pb = new PipelineBuilder<TModel>(context);
             pipeline(pb);
+
+            if (context.ValidationJobs.Count > 0)
+                throw new InvalidOperationException(
+                    "NativeActionLink does not support validation.");
 
             var reaction = pb.BuildReaction();
             var state = new RequestProjectionState();
@@ -36,7 +40,7 @@ namespace Alis.Reactive.Native.Components
             // Carry the full plan context so the runtime can resolve
             // all component references in the reaction tree.
             var payloadJson = JsonSerializer.Serialize(
-                new NativeActionLinkPayload(plan, projectedReaction),
+                new NativeActionLinkPayload(context.BuildPlan(), projectedReaction),
                 CompactOptions);
 
             return new NativeActionLinkContract(payloadJson);
@@ -80,16 +84,11 @@ namespace Alis.Reactive.Native.Components
                 throw new InvalidOperationException(
                     "NativeActionLink does not support chained requests.");
 
-            if (request.ValidatorType != null)
-                throw new InvalidOperationException(
-                    "NativeActionLink does not support validation.");
-
-            var projected = new Request(request.Method, string.Empty);
-            projected.Input = request.Input;
-            projected.Before = request.Before;
-            projected.Success = request.Success;
-            projected.Error = request.Error;
-            return projected;
+            return new Request(request.Method, string.Empty,
+                input: request.Input,
+                before: request.Before,
+                success: request.Success,
+                error: request.Error);
         }
 
         private sealed class RequestProjectionState

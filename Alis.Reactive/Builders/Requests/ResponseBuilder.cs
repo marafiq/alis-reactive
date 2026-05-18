@@ -67,7 +67,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
-            var handler = new ResponseHandler(pb.BuildReaction()) { Status = statusCode };
+            var handler = new ResponseHandler(pb.BuildReaction(), statusCode);
             ErrorHandlers.Add(handler);
             return this;
         }
@@ -97,7 +97,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(new ResponseBody<TError>(PayloadSource.Error()), pb);
-            var handler = new ResponseHandler(pb.BuildReaction()) { Status = statusCode };
+            var handler = new ResponseHandler(pb.BuildReaction(), statusCode);
             ErrorHandlers.Add(handler);
             return this;
         }

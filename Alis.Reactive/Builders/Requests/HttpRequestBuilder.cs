@@ -130,35 +130,42 @@ namespace Alis.Reactive.Builders.Requests
 
         internal Request BuildRequest()
         {
-            var request = new Request(_verb, _url);
+            var input = _gatherBuilder != null ? ResolveRequestPayload() : null;
 
-            if (_gatherBuilder != null)
-                ResolveRequestPayload(request);
+            var before = _whileLoading != null && _whileLoading.Count > 0 ? _whileLoading : null;
+            var complete = _finally != null && _finally.Count > 0 ? _finally : null;
 
-            if (_container != null)
-                request.Container = _container;
-
-            var hasWhileLoadingCommands = _whileLoading != null && _whileLoading.Count > 0;
-            if (hasWhileLoadingCommands)
-                request.Before = _whileLoading;
-
-            var hasFinallyCommands = _finally != null && _finally.Count > 0;
-            if (hasFinallyCommands)
-                request.Complete = _finally;
-
+            IReadOnlyList<ResponseHandler>? success = null;
+            IReadOnlyList<ResponseHandler>? error = null;
+            Request? next = null;
             if (_response != null)
-                AttachResponseLifecycle(request);
-
-            if (_validatorType != null)
-                request.ValidatorType = _validatorType;
+            {
+                if (_response.SuccessHandlers.Count > 0) success = _response.SuccessHandlers;
+                if (_response.ErrorHandlers.Count > 0) error = _response.ErrorHandlers;
+                next = _response.ChainedRequest;
+            }
 
             var hasHeaders = _gatherBuilder != null && _gatherBuilder.HeaderFields.Count > 0;
-            if (hasHeaders)
-                request.Headers = new Dictionary<string, ValueProducer>(_gatherBuilder.HeaderFields);
+            var headers = hasHeaders
+                ? new Dictionary<string, ValueProducer>(_gatherBuilder.HeaderFields)
+                : null;
 
             var hasRouteParams = _gatherBuilder != null && _gatherBuilder.RouteParamFields.Count > 0;
-            if (hasRouteParams)
-                ValidateRouteParamAlignment(request);
+            var routeParams = hasRouteParams ? ResolveRouteParams() : null;
+
+            var request = new Request(_verb, _url,
+                container: _container,
+                input: input,
+                before: before,
+                success: success,
+                error: error,
+                complete: complete,
+                next: next,
+                headers: headers,
+                routeParams: routeParams);
+
+            if (_validatorType != null)
+                _context.RegisterValidationJob(request, _validatorType);
 
             return request;
         }
@@ -167,7 +174,7 @@ namespace Alis.Reactive.Builders.Requests
         /// Resolves the request payload from gathered component fields, static values,
         /// and event-sourced values. IncludeAll expands to every registered input component.
         /// </summary>
-        private void ResolveRequestPayload(Request request)
+        private RequestInput? ResolveRequestPayload()
         {
             if (_gatherBuilder.IsIncludeAll)
                 ExpandIncludeAllComponents();
@@ -176,15 +183,15 @@ namespace Alis.Reactive.Builders.Requests
             if (hasComponentFields)
             {
                 var statics = BuildStaticAndEventFields();
-                var gatherInput = new GatherInput(_gatherBuilder.Fields, _transport, statics);
-                if (_gatherBuilder.IsIncludeAll) gatherInput.IncludeAll = true;
-                request.Input = gatherInput;
-                return;
+                return new GatherInput(
+                    _gatherBuilder.Fields, _transport, statics, _gatherBuilder.IsIncludeAll);
             }
 
             var hasStaticOrEventFieldsOnly = _gatherBuilder.StaticFields.Count > 0 || _gatherBuilder.EventFields.Count > 0;
             if (hasStaticOrEventFieldsOnly)
-                request.Input = new ValueInput(BuildStaticAndEventFields(), _transport);
+                return new ValueInput(BuildStaticAndEventFields(), _transport);
+
+            return null;
         }
 
         /// <summary>
@@ -227,26 +234,11 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Wires success handlers, error handlers, and chained request onto the request.
-        /// Each is independently optional — a request may have success without error, or
-        /// a chained next without any handlers.
-        /// </summary>
-        private void AttachResponseLifecycle(Request request)
-        {
-            if (_response.SuccessHandlers.Count > 0)
-                request.Success = _response.SuccessHandlers;
-            if (_response.ErrorHandlers.Count > 0)
-                request.Error = _response.ErrorHandlers;
-            if (_response.ChainedRequest != null)
-                request.Next = _response.ChainedRequest;
-        }
-
-        /// <summary>
         /// Validates bidirectional alignment between URL template placeholders and RouteParam
-        /// declarations. Every RouteParam must match a {placeholder} in the URL, and every
-        /// {placeholder} in the URL must have a corresponding RouteParam.
+        /// declarations, then returns the resolved route parameters. Every RouteParam must match
+        /// a {placeholder} in the URL, and every {placeholder} must have a matching RouteParam.
         /// </summary>
-        private void ValidateRouteParamAlignment(Request request)
+        private IReadOnlyDictionary<string, ValueProducer> ResolveRouteParams()
         {
             var placeholderRe = new System.Text.RegularExpressions.Regex(@"\{(\w+)\}");
 
@@ -267,7 +259,7 @@ namespace Alis.Reactive.Builders.Requests
                         $"but no matching .RouteParam(\"{placeholder}\", ...) was provided.");
             }
 
-            request.RouteParams = new Dictionary<string, ValueProducer>(_gatherBuilder.RouteParamFields);
+            return new Dictionary<string, ValueProducer>(_gatherBuilder.RouteParamFields);
         }
     }
 }

@@ -45,11 +45,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static Reaction ShowValidationErrors(string container) =>
             new ShowValidationErrorsReaction(container);
-
-        internal static Reaction SequenceOrSingle(List<Reaction> reactions)
-        {
-            return Sequence(reactions);
-        }
     }
 
     /// <summary>Executes a list of reactions in declaration order.</summary>

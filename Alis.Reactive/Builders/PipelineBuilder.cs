@@ -229,9 +229,8 @@ namespace Alis.Reactive.Builders
         private void FlushHttpRequest()
         {
             var request = _httpBuilder.BuildRequest();
-            var hasWhileLoadingCommands = Steps.Count > 0;
-            if (hasWhileLoadingCommands)
-                request.Before = new List<Reaction>(Steps);
+            if (Steps.Count > 0)
+                request = request.WithBefore(new List<Reaction>(Steps));
             _segments.Add(Reaction.Request(request));
             Steps.Clear();
             _httpBuilder = null;

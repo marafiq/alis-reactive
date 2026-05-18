@@ -22,8 +22,7 @@ namespace Alis.Reactive
         internal ReactivePlan(bool isPartial = false)
         {
             IsPartial = isPartial;
-            var plan = Plan.Create(PlanId, isPartial ? PlanId : null);
-            _context = new PlanBuildContext(plan, _componentsMap);
+            _context = new PlanBuildContext(PlanId, isPartial ? PlanId : null, _componentsMap);
         }
 
         /// <summary>Gets the unique plan identifier, derived from the model type's full name.</summary>
@@ -67,14 +66,14 @@ namespace Alis.Reactive
         public string Render()
         {
             ResolveAll();
-            return ReactivePlanSerializer.Serialize(_context.Plan);
+            return ReactivePlanSerializer.Serialize(_context.BuildPlan());
         }
 
         /// <summary>Registers all components and resolves validation, then serializes the plan as indented JSON for debugging.</summary>
         public string RenderFormatted()
         {
             ResolveAll();
-            return ReactivePlanSerializer.SerializeFormatted(_context.Plan);
+            return ReactivePlanSerializer.SerializeFormatted(_context.BuildPlan());
         }
 
         private void ResolveAll()
@@ -85,95 +84,35 @@ namespace Alis.Reactive
 
         private void ResolveValidation()
         {
-            // Walk all behaviors to find RequestReaction nodes with a ValidatorType.
-            foreach (var behavior in _context.Plan.Behaviors)
+            // Every request that declared a validator registered a job at build time.
+            foreach (var job in _context.ValidationJobs)
             {
-                CollectValidationFromReaction(behavior.Reaction);
+                ResolveRequestValidation(job.Request, job.ValidatorType);
             }
         }
 
-        private void CollectValidationFromReaction(Reaction reaction)
+        private void ResolveRequestValidation(Request request, Type validatorType)
         {
-            switch (reaction)
-            {
-                case RequestReaction rr:
-                    ResolveRequestValidation(rr.Request);
-                    WalkRequestReactions(rr.Request);
-                    break;
-                case SequenceReaction seq:
-                    foreach (var step in seq.Steps) CollectValidationFromReaction(step);
-                    break;
-                case ParallelReaction par:
-                    foreach (var step in par.Steps) CollectValidationFromReaction(step);
-                    if (par.OnSettled != null) CollectValidationFromReaction(par.OnSettled);
-                    break;
-                case BranchReaction br:
-                    foreach (var c in br.Cases) CollectValidationFromReaction(c.Reaction);
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Walks all nested reactions inside a Request (Before, Success, Error, Complete, Next).
-        /// </summary>
-        private void WalkRequestReactions(Request request)
-        {
-            CollectValidationFromReactions(request.Before);
-            CollectValidationFromResponseHandlers(request.Success);
-            CollectValidationFromResponseHandlers(request.Error);
-            CollectValidationFromReactions(request.Complete);
-
-            if (request.Next != null)
-            {
-                ResolveRequestValidation(request.Next);
-                WalkRequestReactions(request.Next);
-            }
-        }
-
-        private void CollectValidationFromReactions(IReadOnlyList<Reaction> reactions)
-        {
-            foreach (var r in reactions) CollectValidationFromReaction(r);
-        }
-
-        private void CollectValidationFromResponseHandlers(IReadOnlyList<ResponseHandler> handlers)
-        {
-            foreach (var h in handlers)
-            {
-                if (h.Reaction != null) CollectValidationFromReaction(h.Reaction);
-            }
-        }
-
-        private void ResolveRequestValidation(Request request)
-        {
-            if (request.ValidatorType == null)
-                return;
-
             var extractor = ReactivePlanConfig.Extractor
                 ?? throw new InvalidOperationException(
-                    $"Request at '{request.Url}' specifies ValidatorType '{request.ValidatorType.Name}' " +
+                    $"Request at '{request.Url}' specifies validator '{validatorType.Name}' " +
                     "but no IValidationExtractor is registered. " +
                     "Call ReactivePlanConfig.UseValidationExtractor() at app startup.");
 
             var container = request.Container
                 ?? throw new InvalidOperationException(
-                    $"Request at '{request.Url}' specifies ValidatorType '{request.ValidatorType.Name}' " +
+                    $"Request at '{request.Url}' specifies validator '{validatorType.Name}' " +
                     "but no Container (formId) is set. Call .Validate<T>(formId) to specify the form.");
 
-            var extractedFields = extractor.ExtractRules(request.ValidatorType, container);
+            var extractedFields = extractor.ExtractRules(validatorType, container);
 
             var componentValidations = new List<ComponentValidation>();
             foreach (var field in extractedFields)
             {
-                var isLocallyRegistered = _componentsMap.TryGetValue(field.FieldName, out var reg);
-                if (isLocallyRegistered)
-                {
-                    field.FieldId = reg.ComponentId;
-                    field.Shape = reg.Shape;
-                }
-                else
-                {
-                    field.FieldId = IdGenerator.For(typeof(TModel), field.FieldName);
-                }
+                var (componentId, registration) = ResolveFieldComponent(field.FieldName);
+                field.FieldId = componentId;
+                if (registration != null)
+                    field.Shape = registration.Shape;
 
                 var canonicalValueMember = "value";
                 var fieldValue = ValueProducer.Read(
@@ -184,72 +123,52 @@ namespace Alis.Reactive
                     field.FieldId, fieldValue, planRules, field.FieldName));
             }
 
-            var containerAlreadyExists = _context.Plan.MutableComponents.TryGetValue(container, out var comp);
-            if (containerAlreadyExists)
-            {
-                comp.Container ??= ContainerScope.Of();
-                MergeValidationRules(comp.Container, componentValidations);
-            }
-            else
-            {
-                _context.EnsureElement(container);
-                var formComp = _context.Plan.MutableComponents[container];
-                formComp.Container = ContainerScope.Of();
-                MergeValidationRules(formComp.Container, componentValidations);
-            }
-        }
+            // EnsureElement is idempotent — it returns the existing component when the
+            // container id is already registered, or creates a native element when not.
+            _context.EnsureElement(container);
+            var comp = _context.GetComponent(container);
 
-        private static void MergeValidationRules(
-            ContainerScope container, List<ComponentValidation> incoming)
-        {
-            if (container.ValidationRules.Count == 0)
-            {
-                container.ValidationRules = incoming;
-                return;
-            }
-            // Merge by component key — incoming rules for the same component replace,
-            // new components are appended. This handles the case where two requests
-            // in the same plan both validate the same container.
-            var existing = container.ValidationRules.ToDictionary(cv => cv.Component);
-            foreach (var cv in incoming)
-                existing[cv.Component] = cv;
-            container.ValidationRules = existing.Values.ToList();
+            var scope = (comp.Container ?? ContainerScope.Of())
+                .WithValidationRulesMerged(componentValidations);
+            _context.SetComponent(container, comp.WithContainer(scope));
         }
 
         private PlanModel.ValidationRule ToPlanValidationRule(
             Validation.ValidationRule extracted, ValidationField field)
         {
-            var rule = new PlanModel.ValidationRule(extracted.Rule, extracted.Message);
+            var constraint = extracted.Constraint != null
+                ? ValueProducer.LiteralRaw(extracted.Constraint, extracted.Shape)
+                : null;
 
-            if (extracted.Constraint != null)
-                rule.Constraint = ValueProducer.LiteralRaw(extracted.Constraint, extracted.Shape);
+            var otherValue = extracted.Field != null
+                ? ResolveOtherValue(extracted.Field)
+                : null;
 
-            if (extracted.Field != null)
-            {
-                string otherComponentId;
-                Shape otherShape = null;
+            var when = extracted.When != null ? ToCondition(extracted.When) : null;
+            var shape = !extracted.Shape.IsNone ? extracted.Shape : null;
 
-                if (_componentsMap.TryGetValue(extracted.Field, out var otherReg))
-                {
-                    otherComponentId = otherReg.ComponentId;
-                    otherShape = otherReg.Shape;
-                }
-                else
-                {
-                    otherComponentId = IdGenerator.For(typeof(TModel), extracted.Field);
-                }
+            return new PlanModel.ValidationRule(
+                extracted.Rule, extracted.Message, constraint, otherValue, when, shape);
+        }
 
-                rule.OtherValue = ValueProducer.Read(
-                    ComponentSource.Of(otherComponentId), "value", shape: otherShape);
-            }
+        private ValueProducer ResolveOtherValue(string field)
+        {
+            var (componentId, registration) = ResolveFieldComponent(field);
+            return ValueProducer.Read(
+                ComponentSource.Of(componentId), "value", shape: registration?.Shape);
+        }
 
-            if (extracted.When != null)
-                rule.When = ToCondition(extracted.When);
+        /// <summary>
+        /// Resolves a model field name to its component id and registration. A field
+        /// registered locally returns its <see cref="ComponentRegistration"/>; a field owned
+        /// by a partial falls back to a generated id with no registration.
+        /// </summary>
+        private (string ComponentId, ComponentRegistration? Registration) ResolveFieldComponent(string fieldName)
+        {
+            if (_componentsMap.TryGetValue(fieldName, out var registration))
+                return (registration.ComponentId, registration);
 
-            if (!extracted.Shape.IsNone)
-                rule.Shape = extracted.Shape;
-
-            return rule;
+            return (IdGenerator.For(typeof(TModel), fieldName), null);
         }
 
         private Condition ToCondition(FieldCondition fc) => fc switch
@@ -263,24 +182,15 @@ namespace Alis.Reactive
 
         private Condition ResolveCompare(FieldCompare cmp)
         {
-            // Build a read from the condition's field component.
-            // Try local map first; fall back to IdGenerator for partial-owned fields.
-            string fieldComponentId;
-            ComponentRegistration fieldReg = null;
-            if (_componentsMap.TryGetValue(cmp.Field, out fieldReg))
-            {
-                fieldComponentId = fieldReg.ComponentId;
-            }
-            else
-            {
-                fieldComponentId = IdGenerator.For(typeof(TModel), cmp.Field);
-            }
+            // Build a read from the condition's field component. ResolveFieldComponent
+            // tries the local map first, then falls back to IdGenerator for partial-owned fields.
+            var (fieldComponentId, fieldRegistration) = ResolveFieldComponent(cmp.Field);
 
             var left = ValueProducer.Read(
                 ComponentSource.Of(fieldComponentId),
                 "value");
 
-            var conditionShape = fieldReg?.Shape;
+            var conditionShape = fieldRegistration?.Shape;
             ValueProducer right;
             if (cmp.Value is object[] arr)
             {

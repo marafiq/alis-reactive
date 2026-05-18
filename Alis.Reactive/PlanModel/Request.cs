@@ -13,40 +13,56 @@ namespace Alis.Reactive.PlanModel
         public string Url { get; }
         /// <summary>Gets the DOM element ID where validation errors are displayed, or <see langword="null"/> when validation is not configured for this request.</summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Container { get; internal set; }
+        public string? Container { get; }
         /// <summary>Gets the request body strategy, or <see langword="null"/> for bodiless requests.</summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public RequestInput? Input { get; internal set; }
+        public RequestInput? Input { get; }
         /// <summary>Gets reactions to execute before the request is sent.</summary>
-        public IReadOnlyList<Reaction> Before { get; internal set; } = System.Array.Empty<Reaction>();
+        public IReadOnlyList<Reaction> Before { get; }
         /// <summary>Gets the success response handlers.</summary>
-        public IReadOnlyList<ResponseHandler> Success { get; internal set; } = System.Array.Empty<ResponseHandler>();
+        public IReadOnlyList<ResponseHandler> Success { get; }
         /// <summary>Gets the error response handlers.</summary>
-        public IReadOnlyList<ResponseHandler> Error { get; internal set; } = System.Array.Empty<ResponseHandler>();
+        public IReadOnlyList<ResponseHandler> Error { get; }
         /// <summary>Gets reactions to execute after the request completes regardless of outcome.</summary>
-        public IReadOnlyList<Reaction> Complete { get; internal set; } = System.Array.Empty<Reaction>();
+        public IReadOnlyList<Reaction> Complete { get; }
         /// <summary>Gets the chained follow-up request, or <see langword="null"/> if none.</summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Request? Next { get; internal set; }
+        public Request? Next { get; }
         /// <summary>Gets the custom HTTP headers. Each value is evaluated at request time.</summary>
-        public IReadOnlyDictionary<string, ValueProducer> Headers { get; internal set; } = new Dictionary<string, ValueProducer>();
+        public IReadOnlyDictionary<string, ValueProducer> Headers { get; }
         /// <summary>Gets the URL template parameters. Each value is evaluated and URI-encoded before replacing placeholders in the URL.</summary>
-        public IReadOnlyDictionary<string, ValueProducer> RouteParams { get; internal set; } = new Dictionary<string, ValueProducer>();
+        public IReadOnlyDictionary<string, ValueProducer> RouteParams { get; }
 
-        internal Request(string method, string url)
+        internal Request(
+            string method,
+            string url,
+            string? container = null,
+            RequestInput? input = null,
+            IReadOnlyList<Reaction>? before = null,
+            IReadOnlyList<ResponseHandler>? success = null,
+            IReadOnlyList<ResponseHandler>? error = null,
+            IReadOnlyList<Reaction>? complete = null,
+            Request? next = null,
+            IReadOnlyDictionary<string, ValueProducer>? headers = null,
+            IReadOnlyDictionary<string, ValueProducer>? routeParams = null)
         {
             Method = method ?? throw new System.ArgumentNullException(nameof(method));
             Url = url ?? throw new System.ArgumentNullException(nameof(url));
+            Container = container;
+            Input = input;
+            Before = before ?? System.Array.Empty<Reaction>();
+            Success = success ?? System.Array.Empty<ResponseHandler>();
+            Error = error ?? System.Array.Empty<ResponseHandler>();
+            Complete = complete ?? System.Array.Empty<Reaction>();
+            Next = next;
+            Headers = headers ?? new Dictionary<string, ValueProducer>();
+            RouteParams = routeParams ?? new Dictionary<string, ValueProducer>();
         }
 
-        internal static Request Get(string url) => new Request("GET", url);
-        internal static Request Post(string url) => new Request("POST", url);
-        internal static Request Put(string url) => new Request("PUT", url);
-        internal static Request Delete(string url) => new Request("DELETE", url);
-        internal static Request Patch(string url) => new Request("PATCH", url);
-
-        [JsonIgnore]
-        internal System.Type ValidatorType { get; set; }
+        /// <summary>Returns a copy of this request with <see cref="Before"/> replaced.</summary>
+        internal Request WithBefore(IReadOnlyList<Reaction> before) =>
+            new Request(Method, Url, Container, Input, before, Success, Error,
+                Complete, Next, Headers, RouteParams);
     }
 
     /// <summary>Base class for request body strategies. Not constructed in application code.</summary>
@@ -66,13 +82,15 @@ namespace Alis.Reactive.PlanModel
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
         [System.Text.Json.Serialization.JsonInclude]
-        internal bool IncludeAll { get; set; }
+        internal bool IncludeAll { get; }
 
-        internal GatherInput(List<GatherField> components, string transport, ValueProducer? statics = null)
+        internal GatherInput(List<GatherField> components, string transport,
+            ValueProducer? statics = null, bool includeAll = false)
         {
             Components = components;
             Transport = transport;
             Statics = statics;
+            IncludeAll = includeAll;
         }
     }
 
@@ -148,13 +166,14 @@ namespace Alis.Reactive.PlanModel
     {
         /// <summary>Gets the HTTP status code to match, or <see langword="null"/> to match any status.</summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? Status { get; internal set; }
+        public int? Status { get; }
         /// <summary>Gets the reaction to execute when the status matches.</summary>
         public Reaction Reaction { get; }
 
-        internal ResponseHandler(Reaction reaction)
+        internal ResponseHandler(Reaction reaction, int? status = null)
         {
-            Reaction = reaction;
+            Reaction = reaction ?? throw new System.ArgumentNullException(nameof(reaction));
+            Status = status;
         }
     }
 }
