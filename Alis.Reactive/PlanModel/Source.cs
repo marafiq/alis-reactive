@@ -37,19 +37,19 @@ namespace Alis.Reactive.PlanModel
         public string Scope { get; }
         /// <summary>Gets the optional payload type tag, or <see langword="null"/> when untyped.</summary>
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public string Type { get; }
+        public string? Type { get; }
 
-        internal PayloadSource(string scope, string type = null)
+        internal PayloadSource(string scope, string? type = null)
         {
             Scope = scope ?? throw new ArgumentNullException(nameof(scope));
             Type = type;
         }
 
-        internal static PayloadSource Event(string type = null) => new PayloadSource("event", type);
-        internal static PayloadSource Success(string type = null) => new PayloadSource("success", type);
-        internal static PayloadSource Error(string type = null) => new PayloadSource("error", type);
-        internal static PayloadSource Request(string type = null) => new PayloadSource("request", type);
-        internal static PayloadSource Dispatch(string type = null) => new PayloadSource("dispatch", type);
+        internal static PayloadSource Event(string? type = null) => new PayloadSource("event", type);
+        internal static PayloadSource Success(string? type = null) => new PayloadSource("success", type);
+        internal static PayloadSource Error(string? type = null) => new PayloadSource("error", type);
+        internal static PayloadSource Request(string? type = null) => new PayloadSource("request", type);
+        internal static PayloadSource Dispatch(string? type = null) => new PayloadSource("dispatch", type);
         internal static PayloadSource Local() => new PayloadSource("local");
     }
 

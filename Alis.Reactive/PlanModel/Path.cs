@@ -32,13 +32,13 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>Gets the property name for property segments, or <see langword="null"/> for index segments.</summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string Name { get; }
+        public string? Name { get; }
 
         /// <summary>Gets the array index for index segments, or <see langword="null"/> for property segments.</summary>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? Index { get; }
 
-        private PathSegment(string kind, string name, int? index)
+        private PathSegment(string kind, string? name, int? index)
         {
             Kind = kind;
             Name = name;
