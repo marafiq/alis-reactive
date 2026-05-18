@@ -17,8 +17,7 @@ namespace Alis.Reactive.PlanModel
         private readonly List<Behavior> _behaviors = new List<Behavior>();
         private readonly Dictionary<string, ComponentRegistration> _registrations;
         private readonly HashSet<string> _registeredPlugins = new HashSet<string>();
-        private readonly List<(Request Request, Type ValidatorType)> _validationJobs =
-            new List<(Request, Type)>();
+        private readonly List<ValidationJob> _validationJobs = new List<ValidationJob>();
 
         internal PlanBuildContext(
             string planId, string? partId, Dictionary<string, ComponentRegistration> registrations)
@@ -46,12 +45,12 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Replaces a registered component (used when enriching it with a container scope).</summary>
         internal void SetComponent(string key, Component component) => _components[key] = component;
 
-        /// <summary>Records that a request must run validation before it is sent, with its validator type.</summary>
+        /// <summary>Records that a request declared a validator, to be resolved during Render().</summary>
         internal void RegisterValidationJob(Request request, Type validatorType) =>
-            _validationJobs.Add((request, validatorType));
+            _validationJobs.Add(new ValidationJob(request.Url, request.Container, validatorType));
 
-        /// <summary>Requests that declared a validator at build time, each paired with its validator type.</summary>
-        internal IReadOnlyList<(Request Request, Type ValidatorType)> ValidationJobs => _validationJobs;
+        /// <summary>The validation jobs declared during plan construction.</summary>
+        internal IReadOnlyList<ValidationJob> ValidationJobs => _validationJobs;
 
         /// <summary>
         /// Ensures a DOM element is registered as a native component with a JsType.

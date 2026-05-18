@@ -87,24 +87,24 @@ namespace Alis.Reactive
             // Every request that declared a validator registered a job at build time.
             foreach (var job in _context.ValidationJobs)
             {
-                ResolveRequestValidation(job.Request, job.ValidatorType);
+                ResolveValidationJob(job);
             }
         }
 
-        private void ResolveRequestValidation(Request request, Type validatorType)
+        private void ResolveValidationJob(ValidationJob job)
         {
             var extractor = ReactivePlanConfig.Extractor
                 ?? throw new InvalidOperationException(
-                    $"Request at '{request.Url}' specifies validator '{validatorType.Name}' " +
+                    $"Request at '{job.RequestUrl}' specifies validator '{job.ValidatorType.Name}' " +
                     "but no IValidationExtractor is registered. " +
                     "Call ReactivePlanConfig.UseValidationExtractor() at app startup.");
 
-            var container = request.Container
+            var container = job.Container
                 ?? throw new InvalidOperationException(
-                    $"Request at '{request.Url}' specifies validator '{validatorType.Name}' " +
+                    $"Request at '{job.RequestUrl}' specifies validator '{job.ValidatorType.Name}' " +
                     "but no Container (formId) is set. Call .Validate<T>(formId) to specify the form.");
 
-            var extractedFields = extractor.ExtractRules(validatorType, container);
+            var extractedFields = extractor.ExtractRules(job.ValidatorType, container);
 
             var componentValidations = new List<ComponentValidation>();
             foreach (var field in extractedFields)
