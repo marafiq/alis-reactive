@@ -208,7 +208,7 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>Ensures a plugin method exists in the plan's JsType registry.
         /// Auto-creates the JsType on first use. Methods only.</summary>
-        internal void EnsurePluginMethod(string pluginName, string member, Shape returns = null)
+        internal void EnsurePluginMethod(string pluginName, string member, Shape? returns = null)
         {
             if (string.IsNullOrWhiteSpace(pluginName))
                 throw new System.ArgumentException("Plugin name required.", nameof(pluginName));

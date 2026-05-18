@@ -21,7 +21,7 @@ namespace Alis.Reactive.PlanModel
                 // Keep the more specific shape: typed shape wins over Any/None/Nullable wrapper.
                 // Compatible pairs: Date ↔ Nullable(Date), String ↔ Nullable(String), etc.
                 var keepShape = ShapeCompat.Resolve(existing.Shape, shape);
-                if (keepShape == null)
+                if (keepShape is null)
                     throw new System.InvalidOperationException(
                         $"Property '{name}' registered with shape '{existing.Shape.Kind}' " +
                         $"but re-registered with conflicting shape '{shape.Kind}'.");
@@ -69,7 +69,7 @@ namespace Alis.Reactive.PlanModel
     /// </summary>
     internal static class ShapeCompat
     {
-        internal static Shape Resolve(Shape a, Shape b)
+        internal static Shape? Resolve(Shape a, Shape b)
         {
             if (a == b) return a;
             // Any/None are wildcards — the other wins
@@ -102,7 +102,7 @@ namespace Alis.Reactive.PlanModel
         public System.Collections.Generic.IReadOnlyList<Shape> Args { get; }
         public Shape Returns { get; }
 
-        internal JsMethod(Path path, List<Shape> args = null, Shape returns = null)
+        internal JsMethod(Path path, List<Shape>? args = null, Shape? returns = null)
         {
             Path = path;
             Args = args != null && args.Count > 0 ? args : (System.Collections.Generic.IReadOnlyList<Shape>)System.Array.Empty<Shape>();
