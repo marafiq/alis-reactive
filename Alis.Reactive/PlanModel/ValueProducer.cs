@@ -46,21 +46,21 @@ namespace Alis.Reactive.PlanModel
         /// System.Text.Json handles serialization at Render time.
         /// No reflection. No type inspection. The serializer does the work.
         /// </summary>
-        internal static ValueProducer LiteralRaw(object value, Shape shape) =>
+        internal static ValueProducer LiteralRaw(object? value, Shape? shape) =>
             new LiteralProducer(value, shape);
 
         /// <summary>Creates a ReadProducer that reads a URL query parameter by name.
         /// Default shape is String because URL params are inherently strings.</summary>
-        internal static ValueProducer ReadUrl(string paramName, Shape shape = null) =>
+        internal static ValueProducer ReadUrl(string paramName, Shape? shape = null) =>
             Read(UrlSource.Instance, paramName, shape: shape ?? Shape.String);
 
-        internal static ValueProducer Read(Source from, string member, Path path = null, Shape shape = null, List<ValueProducer> args = null) =>
+        internal static ValueProducer Read(Source from, string member, Path? path = null, Shape? shape = null, List<ValueProducer>? args = null) =>
             new ReadProducer(from, member, path, shape, args);
 
-        internal static ValueProducer Object(Dictionary<string, ValueProducer> fields, Shape shape = null) =>
+        internal static ValueProducer Object(Dictionary<string, ValueProducer> fields, Shape? shape = null) =>
             new ObjectProducer(fields, shape);
 
-        internal static ValueProducer Array(List<ValueProducer> items, Shape shape = null) =>
+        internal static ValueProducer Array(List<ValueProducer> items, Shape? shape = null) =>
             new ArrayProducer(items, shape);
     }
 
@@ -74,11 +74,11 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "literal";
         /// <summary>Gets the constant value embedded in the plan.</summary>
         [JsonInclude]
-        public object Value { get; }
+        public object? Value { get; }
         /// <summary>Gets the expected type shape. Defaults to <see cref="PlanModel.Shape.None"/> when not specified.</summary>
         public Shape Shape { get; }
 
-        internal LiteralProducer(object value, Shape shape)
+        internal LiteralProducer(object? value, Shape? shape)
         {
             Value = value;
             Shape = shape ?? Shape.None;
@@ -107,7 +107,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets method arguments. Empty when the read targets a property.</summary>
         public IReadOnlyList<ValueProducer> Args { get; }
 
-        internal ReadProducer(Source from, string member, Path path = null, Shape shape = null, List<ValueProducer> args = null)
+        internal ReadProducer(Source from, string member, Path? path = null, Shape? shape = null, List<ValueProducer>? args = null)
         {
             From = from ?? throw new ArgumentNullException(nameof(from));
             Member = member ?? throw new ArgumentNullException(nameof(member));
@@ -129,7 +129,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
         public Shape Shape { get; }
 
-        internal ObjectProducer(Dictionary<string, ValueProducer> fields, Shape shape = null)
+        internal ObjectProducer(Dictionary<string, ValueProducer> fields, Shape? shape = null)
         {
             Fields = fields ?? throw new ArgumentNullException(nameof(fields));
             Shape = shape ?? Shape.None;
@@ -149,7 +149,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
         public Shape Shape { get; }
 
-        internal ArrayProducer(List<ValueProducer> items, Shape shape = null)
+        internal ArrayProducer(List<ValueProducer> items, Shape? shape = null)
         {
             Items = items ?? throw new ArgumentNullException(nameof(items));
             Shape = shape ?? Shape.None;

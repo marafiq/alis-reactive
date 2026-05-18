@@ -13,7 +13,7 @@ namespace Alis.Reactive.PlanModel
     {
         private protected Condition() { }
 
-        internal static Condition Compare(ValueProducer left, string op, ValueProducer right = null, Shape shape = null, Shape itemShape = null) =>
+        internal static Condition Compare(ValueProducer left, string op, ValueProducer? right = null, Shape? shape = null, Shape? itemShape = null) =>
             new CompareCondition(left, op, right, shape, itemShape);
 
         internal static Condition All(params Condition[] terms) =>
@@ -49,7 +49,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the element type shape used by collection operators such as <c>contains</c>. <see cref="PlanModel.Shape.None"/> for non-collection comparisons.</summary>
         public Shape ItemShape { get; }
 
-        internal CompareCondition(ValueProducer left, string op, ValueProducer right = null, Shape shape = null, Shape itemShape = null)
+        internal CompareCondition(ValueProducer left, string op, ValueProducer? right = null, Shape? shape = null, Shape? itemShape = null)
         {
             Left = left ?? throw new ArgumentNullException(nameof(left));
             Op = op ?? throw new ArgumentNullException(nameof(op));
