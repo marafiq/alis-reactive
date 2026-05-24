@@ -235,7 +235,7 @@ optional — they are the framework's architectural invariants.
 - Shape MUST flow through every ValueProducer creation path via Shape.FromClrType.
 - String-destination values (headers, route params) require Shape.IsScalar guard.
 - Null literal strings must throw ArgumentNullException at build time.
-- Every builder overload gets its own unit test with AssertSchemaValid.
+- Every builder overload gets behavior coverage that proves the emitted plan intent.
 - Sandbox sections must have exact element IDs, button names, DSL code.
 - vitest required for new TS runtime functions.
 - Fail-fast: throws, not warnings + fallbacks (CLAUDE.md Rule 3).

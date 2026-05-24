@@ -15,10 +15,6 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Content Include="Schemas\**\*.json" CopyToOutputDirectory="PreserveNewest" />
-    </ItemGroup>
-
     <!-- Ship the runtime JS bundle (built by npm in the sibling
          Alis.Reactive.Assets tree). The design-system CSS is shipped separately
          by the AlisReactive.DesignSystem package. The asset is packed under
