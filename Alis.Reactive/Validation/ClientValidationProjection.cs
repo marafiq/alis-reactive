@@ -63,7 +63,7 @@ namespace Alis.Reactive.Validation
             if (fields == null) throw new ArgumentNullException(nameof(fields));
             if (skippedRules == null) throw new ArgumentNullException(nameof(skippedRules));
 
-            Fields = Snapshot(fields, nameof(fields));
+            Fields = SnapshotFields(fields);
             SkippedRules = Snapshot(skippedRules, nameof(skippedRules));
         }
 
@@ -81,6 +81,22 @@ namespace Alis.Reactive.Validation
                     throw new ArgumentException("Client validation projection items must not be null.", parameterName);
 
                 snapshot.Add(item);
+            }
+
+            return snapshot;
+        }
+
+        private static IReadOnlyList<ClientValidationField> SnapshotFields(IReadOnlyList<ClientValidationField> fields)
+        {
+            if (fields == null) throw new ArgumentNullException(nameof(fields));
+
+            var snapshot = new List<ClientValidationField>(fields.Count);
+            foreach (var field in fields)
+            {
+                if (field == null)
+                    throw new ArgumentException("Client validation projection items must not be null.", nameof(fields));
+
+                snapshot.Add(field.Snapshot());
             }
 
             return snapshot;

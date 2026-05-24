@@ -22,7 +22,8 @@ namespace Alis.Reactive
     internal sealed class ClientValidationProjectionBinder
     {
         private readonly PlanBuildContext _context;
-        private readonly ValidationProjectionBindingScope _bindings;
+        private readonly IReadOnlyDictionary<string, ComponentRegistration> _registeredInputs;
+        private readonly Type _modelType;
 
         internal ClientValidationProjectionBinder(
             PlanBuildContext context,
@@ -30,7 +31,8 @@ namespace Alis.Reactive
             Type modelType)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _bindings = ValidationProjectionBindingScope.For(registeredInputs, modelType);
+            _registeredInputs = registeredInputs ?? throw new ArgumentNullException(nameof(registeredInputs));
+            _modelType = modelType ?? throw new ArgumentNullException(nameof(modelType));
         }
 
         /// <summary>Binds every validation projection job declared during plan construction.</summary>
@@ -46,9 +48,10 @@ namespace Alis.Reactive
             var container = job.Container;
 
             var projection = source.Project(ClientValidationProjectionRequest.For(job.ValidatorType, container));
+            var bindings = ValidationProjectionBindingScope.For(_registeredInputs, _modelType, projection.Fields);
 
             var componentValidations = projection.Fields
-                .Select(field => _bindings.Bind(field).ToComponentValidation())
+                .Select(field => bindings.Bind(field).ToComponentValidation())
                 .ToList();
 
             // EnsureElement is idempotent — it returns the existing component when the

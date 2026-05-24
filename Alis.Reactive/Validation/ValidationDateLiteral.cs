@@ -1,7 +1,7 @@
 using System;
 using Alis.Reactive.PlanModel;
 
-namespace Alis.Reactive.FluentValidator
+namespace Alis.Reactive.Validation
 {
     internal static class ValidationDateLiteral
     {

@@ -43,7 +43,23 @@ Validate<TValidator>(containerId)
 Field binding has two deterministic paths:
 
 - Registered input fields use the rendered component id, value member, and shape from `ComponentRegistration`.
-- Deferred fields resolve model shape from the root model and use the deterministic component id a partial will render later.
+- Deferred fields use the projection's declared field shape when the source supplies one, otherwise they resolve model shape from the root model. In both cases they use the deterministic component id a partial will render later.
+
+## Core Projection Registry
+
+`ClientValidationProjectionRegistry` is the core-owned projection source for
+deterministic browser validation rules that are authored directly, without
+FluentValidation inspection. It keys projections by the validation source type
+named by `Validate<TValidator>()`, but public authoring selects fields through
+typed expressions and `ClientValidationFieldToken<TModel, TValue>`, not field
+name strings.
+
+Registry-authored fields carry their projected shape into render-time binding.
+That lets deferred partial fields bind through the same deterministic component
+id policy without reflecting over the model just to rediscover the field type.
+Peer fields and condition fields are also entered into the projection so their
+component value contracts can be resolved by the same binding path as ordinary
+rules.
 
 ## FluentValidation Adapter
 
@@ -100,6 +116,7 @@ components.
 | --- | --- |
 | Request gate | `RequestValidation`, `ValidationJob`, `RequestValidationTarget` |
 | Projection contract | `IClientValidationProjectionSource`, `ClientValidationProjectionRequest`, `ClientValidationProjection` |
+| Core projection source | `ClientValidationProjectionRegistry`, `ClientValidationProjectionBuilder<TModel>`, `ClientValidationFieldToken<TModel, TValue>` |
 | Projection binding | `ClientValidationProjectionBinder`, `ValidationProjectionBindingScope`, `ValidationFieldBinding` |
 | Plan payload | `ComponentValidation`, `ValidationRuleExecution`, `ValidationRuleOperand`, `ValidationRuleActivation` |
 | Runtime execution | `validateContainer`, `showServerErrors`, `RuntimeValidationActivation`, `RuntimeValidationPeerOperand`, `rule-engine.ts` |

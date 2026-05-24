@@ -25,7 +25,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void SetUp()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseClientValidationProjectionSource(new StubExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new EmptyProjectionSource());
     }
 
     [TearDown]
@@ -50,7 +50,7 @@ public class WhenEnrichingValidationAtRenderTime
              .Response(r => r.OnSuccess(s => s.Dispatch("saved")));
         });
 
-        // Enrichment happens during Render() — but since the StubExtractor returns empty,
+        // Enrichment happens during Render() — but since the EmptyProjectionSource returns empty,
         // the plan won't have validation fields. This test verifies the code path compiles
         // and runs without errors.
         var json = plan.Render();
@@ -61,7 +61,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Validation_rules_render_explicit_execution_contract()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseClientValidationProjectionSource(new SingleRuleExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new SingleRuleProjectionSource());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
         RegisterTextInput(plan, "Name", "name-input");
@@ -93,7 +93,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Deferred_validation_fields_keep_the_model_field_shape_for_partials()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseClientValidationProjectionSource(new DeferredDateFieldExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new DeferredDateFieldProjectionSource());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
 
@@ -119,7 +119,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Registered_validation_fields_read_the_component_value_contract()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseClientValidationProjectionSource(new BooleanRuleExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new BooleanRuleProjectionSource());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
         RegisterInput(plan, "ReceiveNotifications", "notify-input", "checked", Alis.Reactive.PlanModel.Shape.Boolean);
@@ -145,7 +145,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Registered_validation_conditions_read_the_component_value_contract()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseClientValidationProjectionSource(new ConditionalRuleExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new ConditionalRuleProjectionSource());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
         RegisterInput(plan, "Email", "email-input", "value", Alis.Reactive.PlanModel.Shape.String);
@@ -174,7 +174,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Registered_validation_peer_fields_read_the_component_value_contract()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseClientValidationProjectionSource(new PeerRuleExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new PeerRuleProjectionSource());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
         RegisterInput(plan, "Email", "email-input", "value", Alis.Reactive.PlanModel.Shape.String);
@@ -203,7 +203,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Deferred_validation_field_must_exist_on_the_model()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseClientValidationProjectionSource(new UnknownFieldExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new UnknownFieldProjectionSource());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
 
@@ -254,13 +254,13 @@ public class WhenEnrichingValidationAtRenderTime
                 shape));
     }
 
-    private class StubExtractor : IClientValidationProjectionSource
+    private class EmptyProjectionSource : IClientValidationProjectionSource
     {
         public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
             ClientValidationProjection.ForFields(request, new List<ClientValidationField>());
     }
 
-    private class SingleRuleExtractor : IClientValidationProjectionSource
+    private class SingleRuleProjectionSource : IClientValidationProjectionSource
     {
         public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
             ClientValidationProjection.ForFields(
@@ -279,7 +279,7 @@ public class WhenEnrichingValidationAtRenderTime
                 });
     }
 
-    private class DeferredDateFieldExtractor : IClientValidationProjectionSource
+    private class DeferredDateFieldProjectionSource : IClientValidationProjectionSource
     {
         public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
             ClientValidationProjection.ForFields(
@@ -290,7 +290,7 @@ public class WhenEnrichingValidationAtRenderTime
                 });
     }
 
-    private class BooleanRuleExtractor : IClientValidationProjectionSource
+    private class BooleanRuleProjectionSource : IClientValidationProjectionSource
     {
         public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
             ClientValidationProjection.ForFields(
@@ -301,7 +301,7 @@ public class WhenEnrichingValidationAtRenderTime
                 });
     }
 
-    private class UnknownFieldExtractor : IClientValidationProjectionSource
+    private class UnknownFieldProjectionSource : IClientValidationProjectionSource
     {
         public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
             ClientValidationProjection.ForFields(
@@ -312,7 +312,7 @@ public class WhenEnrichingValidationAtRenderTime
                 });
     }
 
-    private class ConditionalRuleExtractor : IClientValidationProjectionSource
+    private class ConditionalRuleProjectionSource : IClientValidationProjectionSource
     {
         public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
             ClientValidationProjection.ForFields(
@@ -335,7 +335,7 @@ public class WhenEnrichingValidationAtRenderTime
                 });
     }
 
-    private class PeerRuleExtractor : IClientValidationProjectionSource
+    private class PeerRuleProjectionSource : IClientValidationProjectionSource
     {
         public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
             ClientValidationProjection.ForFields(

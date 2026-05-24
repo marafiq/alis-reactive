@@ -292,6 +292,8 @@ Domain terms:
 
 - `ClientValidationProjectionRequest`
 - `ClientValidationProjection`
+- `ClientValidationProjectionRegistry`
+- `ClientValidationFieldToken`
 - `ClientValidationField`
 - `ValidationRule`
 - `FieldCondition`
@@ -301,7 +303,7 @@ Domain terms:
 
 Runtime behavior:
 
-FluentValidation always remains server validation. The framework extracts only
+FluentValidation always remains server validation. The framework projects only
 client-side projectable rules. `ReactiveValidator` gives explicit client
 condition intent while still applying the server predicate. Server-only
 FluentValidation conditions are skipped for client projection, not lost on the
@@ -311,8 +313,10 @@ Design consequence:
 
 Validation is a projection/binding problem, not a reflection trick. Client rules
 should be explicit, named, and bound to registered component value contracts at
-render. Peer-field comparisons and conditional activation must resolve through
-the same value producer and condition language as `.Reactive`.
+render. Core registry projections carry typed field tokens and field shapes;
+FluentValidation remains one adapter into the same projection contract. Peer-field
+comparisons and conditional activation must resolve through the same value
+producer and condition language as `.Reactive`.
 
 ## Browser Object Contracts
 

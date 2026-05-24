@@ -19,15 +19,16 @@ namespace Alis.Reactive
 
         internal static ValidationProjectionBindingScope For(
             IReadOnlyDictionary<string, ComponentRegistration> registeredInputs,
-            Type modelType) =>
-            new ValidationProjectionBindingScope(new ValidationFieldBindingCatalog(registeredInputs, modelType));
+            Type modelType,
+            IReadOnlyList<ClientValidationField> projectedFields) =>
+            new ValidationProjectionBindingScope(new ValidationFieldBindingCatalog(registeredInputs, modelType, projectedFields));
 
         internal BoundClientValidationField Bind(ClientValidationField field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
             return BoundClientValidationField.From(
                 field,
-                _fieldBindings.Resolve(field.FieldPath),
+                _fieldBindings.Resolve(field),
                 _ruleBinding);
         }
     }
@@ -71,14 +72,27 @@ namespace Alis.Reactive
     internal sealed class ValidationFieldBindingCatalog
     {
         private readonly IReadOnlyDictionary<string, ComponentRegistration> _registeredInputs;
+        private readonly IReadOnlyDictionary<string, ClientValidationField> _projectedFields;
         private readonly Type _modelType;
 
         internal ValidationFieldBindingCatalog(
             IReadOnlyDictionary<string, ComponentRegistration> registeredInputs,
-            Type modelType)
+            Type modelType,
+            IReadOnlyList<ClientValidationField> projectedFields)
         {
             _registeredInputs = registeredInputs ?? throw new ArgumentNullException(nameof(registeredInputs));
             _modelType = modelType ?? throw new ArgumentNullException(nameof(modelType));
+            _projectedFields = ProjectedValidationFieldCatalog.From(projectedFields);
+        }
+
+        internal ValidationFieldBinding Resolve(ClientValidationField field)
+        {
+            if (field == null) throw new ArgumentNullException(nameof(field));
+
+            if (_registeredInputs.TryGetValue(field.FieldName, out var registration))
+                return ValidationFieldBinding.Registered(registration);
+
+            return ValidationFieldBinding.Deferred(field.ToDeferredField(_modelType));
         }
 
         internal ValidationFieldBinding Resolve(ValidationFieldPath fieldPath)
@@ -88,8 +102,29 @@ namespace Alis.Reactive
             if (_registeredInputs.TryGetValue(fieldPath.Value, out var registration))
                 return ValidationFieldBinding.Registered(registration);
 
-            var deferredField = DeferredModelBoundClientValidationField.For(_modelType, fieldPath);
+            var deferredField = _projectedFields.TryGetValue(fieldPath.Value, out var field)
+                ? field.ToDeferredField(_modelType)
+                : DeferredModelBoundClientValidationField.FromModel(_modelType, fieldPath);
             return ValidationFieldBinding.Deferred(deferredField);
+        }
+    }
+
+    internal static class ProjectedValidationFieldCatalog
+    {
+        internal static IReadOnlyDictionary<string, ClientValidationField> From(IReadOnlyList<ClientValidationField> fields)
+        {
+            if (fields == null) throw new ArgumentNullException(nameof(fields));
+
+            var catalog = new Dictionary<string, ClientValidationField>(StringComparer.Ordinal);
+            foreach (var field in fields)
+            {
+                if (field == null)
+                    throw new ArgumentException("Projected validation field must not be null.", nameof(fields));
+
+                catalog[field.FieldName] = field;
+            }
+
+            return catalog;
         }
     }
 
@@ -148,15 +183,27 @@ namespace Alis.Reactive
 
         internal InputValueContract ValueContract => InputValueContract.ForCanonicalValue(Shape);
 
-        internal static DeferredModelBoundClientValidationField For(Type modelType, ValidationFieldPath fieldPath)
+        internal static DeferredModelBoundClientValidationField FromModel(Type modelType, ValidationFieldPath fieldPath)
         {
             if (modelType == null) throw new ArgumentNullException(nameof(modelType));
             if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
 
             var modelField = ValidationModelField.Resolve(modelType, fieldPath);
+            return FromProjectedShape(modelType, fieldPath, modelField.Shape);
+        }
+
+        internal static DeferredModelBoundClientValidationField FromProjectedShape(
+            Type modelType,
+            ValidationFieldPath fieldPath,
+            Shape shape)
+        {
+            if (modelType == null) throw new ArgumentNullException(nameof(modelType));
+            if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
+            if (shape == null) throw new ArgumentNullException(nameof(shape));
+
             return new DeferredModelBoundClientValidationField(
                 Alis.Reactive.PlanModel.ComponentId.Of(IdGenerator.For(modelType, fieldPath.Value)),
-                modelField.Shape);
+                shape);
         }
     }
 
