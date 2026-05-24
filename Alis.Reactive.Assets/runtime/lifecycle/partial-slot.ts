@@ -44,7 +44,7 @@ export class PartialSlotContribution {
   ) {}
 }
 
-interface TrackedPartialPlanSnapshot {
+interface AppliedSlotContributionSnapshot {
   readonly partId: PartId;
   readonly planId: PlanId;
   readonly abort: AbortController;
@@ -55,11 +55,11 @@ interface TrackedPartialPlanSnapshot {
   readonly validationRuleContributions: ValidationRuleContribution[];
 }
 
-export class TrackedPartialPlan {
-  private constructor(private readonly snapshot: TrackedPartialPlanSnapshot) {}
+export class AppliedSlotContribution {
+  private constructor(private readonly snapshot: AppliedSlotContributionSnapshot) {}
 
-  static capture(source: PartialPlanContributionSource, incoming: Plan): TrackedPartialPlan {
-    return new TrackedPartialPlan({
+  static capture(source: PartialPlanContributionSource, incoming: Plan): AppliedSlotContribution {
+    return new AppliedSlotContribution({
       partId: source.partId,
       planId: incoming.planId,
       abort: source.abortController,
@@ -99,20 +99,20 @@ export class TrackedPartialPlan {
     return this.snapshot.validationRuleContributions;
   }
 
-  abortWiredBehaviors(): void {
+  revokeBehaviorSubscriptions(): void {
     this.snapshot.abort.abort();
   }
 }
 
 export class PartialSlotRegistry {
-  private readonly slots = new Map<PartId, TrackedPartialSlot>();
+  private readonly slots = new Map<PartId, AppliedPartialSlot>();
 
-  contributions(partId: PartId): TrackedPartialPlan[] {
+  contributions(partId: PartId): AppliedSlotContribution[] {
     return this.slots.get(partId)?.contributions() ?? [];
   }
 
-  track(source: PartialPlanContributionSource, incoming: Plan): void {
-    this.slotFor(source.partId).track(TrackedPartialPlan.capture(source, incoming));
+  recordApplied(source: PartialPlanContributionSource, incoming: Plan): void {
+    this.slotFor(source.partId).record(AppliedSlotContribution.capture(source, incoming));
   }
 
   clear(partId: PartId): void {
@@ -120,14 +120,14 @@ export class PartialSlotRegistry {
   }
 
   reset(): void {
-    for (const slot of this.slots.values()) slot.abortWiredBehaviors();
+    for (const slot of this.slots.values()) slot.revokeBehaviorSubscriptions();
     this.slots.clear();
   }
 
-  private slotFor(partId: PartId): TrackedPartialSlot {
+  private slotFor(partId: PartId): AppliedPartialSlot {
     let slot = this.slots.get(partId);
     if (slot === undefined) {
-      slot = new TrackedPartialSlot();
+      slot = new AppliedPartialSlot();
       this.slots.set(partId, slot);
     }
 
@@ -135,18 +135,18 @@ export class PartialSlotRegistry {
   }
 }
 
-class TrackedPartialSlot {
-  private readonly trackedContributions: TrackedPartialPlan[] = [];
+class AppliedPartialSlot {
+  private readonly appliedContributions: AppliedSlotContribution[] = [];
 
-  track(contribution: TrackedPartialPlan): void {
-    this.trackedContributions.push(contribution);
+  record(contribution: AppliedSlotContribution): void {
+    this.appliedContributions.push(contribution);
   }
 
-  contributions(): TrackedPartialPlan[] {
-    return [...this.trackedContributions];
+  contributions(): AppliedSlotContribution[] {
+    return [...this.appliedContributions];
   }
 
-  abortWiredBehaviors(): void {
-    for (const contribution of this.trackedContributions) contribution.abortWiredBehaviors();
+  revokeBehaviorSubscriptions(): void {
+    for (const contribution of this.appliedContributions) contribution.revokeBehaviorSubscriptions();
   }
 }

@@ -1,22 +1,20 @@
 // merge-plan.ts — Plan registry and partial contribution lifecycle orchestration.
 
 import type { Plan, Behavior } from "../types";
-import { unwireField } from "../validation/live-clear";
 import {
   ComponentContribution,
   ComponentOwnershipLedger,
-  ComponentValidationRules,
   LayoutObjectReferenceLedger,
-  unionSets,
 } from "./component-contribution";
 import { BrowserObjectContractLedger, mergeJsTypes } from "./object-contract-fragment";
+import { AppliedSlotContributionRemoval } from "./applied-slot-contribution-removal";
 import {
   planContributionSourceFrom,
   type PartId,
   type PlanContributionSource,
   type PlanId,
 } from "./plan-contribution-source";
-import { PartialSlotLoad, PartialSlotRegistry, type TrackedPartialPlan } from "./partial-slot";
+import { PartialSlotLoad, PartialSlotRegistry } from "./partial-slot";
 
 type WireBehaviors = (behaviors: Behavior[], plan: Plan, signal?: AbortSignal) => void;
 type WireContainerValidation = (plan: Plan, signal?: AbortSignal) => void;
@@ -123,6 +121,13 @@ export class PlanRegistry {
   private readonly componentOwnership = new ComponentOwnershipLedger();
   private readonly layoutObjects = new LayoutObjectReferenceLedger();
   private readonly typeOwnership = new BrowserObjectContractLedger();
+  private readonly contributionRemoval = new AppliedSlotContributionRemoval(
+    this.plans,
+    this.rootPlanIds,
+    this.componentOwnership,
+    this.layoutObjects,
+    this.typeOwnership,
+  );
 
   register(plan: Plan): void {
     this.plans.set(plan.planId, plan);
@@ -183,7 +188,7 @@ export class PlanRegistry {
 
     for (const contribution of contributions) {
       affectedPlanIds.add(contribution.planId);
-      this.removeContribution(contribution);
+      this.contributionRemoval.remove(contribution);
     }
 
     this.slots.clear(partId);
@@ -245,110 +250,10 @@ export class PlanRegistry {
     }
   }
 
-  private removeContribution(source: TrackedPartialPlan): void {
-    const plan = this.plans.get(source.planId);
-    if (plan === undefined) {
-      source.abortWiredBehaviors();
-      return;
-    }
-
-    source.abortWiredBehaviors();
-    this.removeSourceBehaviors(plan, source);
-    const removedLayoutObjectKeys = this.removeSourceLayoutObjects(plan, source);
-    const removedComponentKeys = this.removeSourceComponents(plan, source);
-    this.removeSourceValidationRules(plan, source);
-    this.pruneOrphanedValidationRules(
-      plan,
-      source,
-      unionSets(removedComponentKeys, removedLayoutObjectKeys));
-    this.removeSourceTypes(plan, source);
-
-    if (this.canPruneMergedPlan(source.planId, plan)) {
-      this.plans.delete(source.planId);
-    }
-  }
-
-  private removeSourceBehaviors(plan: Plan, source: TrackedPartialPlan): void {
-    for (const behavior of source.behaviors) {
-      const idx = plan.behaviors.indexOf(behavior);
-      if (idx >= 0) plan.behaviors.splice(idx, 1);
-    }
-  }
-
-  private removeSourceLayoutObjects(plan: Plan, source: TrackedPartialPlan): Set<string> {
-    const removed = new Set<string>();
-    for (const key of source.layoutObjectKeys) {
-      const release = this.layoutObjects.release(source.planId, key, source.partId);
-      if (!release.shouldRemoveMaterializedObject) continue;
-
-      const component = plan.components[key];
-      if (component) unwireField(component.id);
-      delete plan.components[key];
-      this.componentOwnership.release(source.planId, key);
-      removed.add(key);
-    }
-
-    return removed;
-  }
-
-  private removeSourceComponents(plan: Plan, source: TrackedPartialPlan): Set<string> {
-    const removed = new Set<string>();
-    for (const key of source.componentKeys) {
-      if (!this.componentOwnership.isOwnedBy(source.planId, key, source.partId)) continue;
-      const comp = plan.components[key];
-      if (comp) unwireField(comp.id);
-      delete plan.components[key];
-      this.componentOwnership.release(source.planId, key);
-      removed.add(key);
-    }
-    return removed;
-  }
-
-  private pruneOrphanedValidationRules(
-    plan: Plan,
-    source: TrackedPartialPlan,
-    removedKeys: Set<string>,
-  ): void {
-    if (removedKeys.size === 0) return;
-    for (const [compKey, comp] of Object.entries(plan.components)) {
-      const validationRules = ComponentValidationRules.from(comp);
-      if (validationRules === undefined) continue;
-      if (!this.componentOwnership.isOwnedBy(source.planId, compKey, source.partId)) continue;
-      validationRules.removeRulesForComponents(removedKeys);
-    }
-  }
-
-  private removeSourceTypes(plan: Plan, source: TrackedPartialPlan): void {
-    for (const key of source.typeKeys) {
-      const remainingContract = this.typeOwnership.releasePartial(source.planId, key, source.partId);
-      if (remainingContract === undefined) {
-        delete plan.types[key];
-        continue;
-      }
-
-      plan.types[key] = remainingContract.toJsType();
-    }
-  }
-
-  private removeSourceValidationRules(plan: Plan, source: TrackedPartialPlan): void {
-    for (const contribution of source.validationRuleContributions) {
-      contribution.removeFrom(plan);
-    }
-  }
-
-  private canPruneMergedPlan(planId: PlanId, plan: Plan): boolean {
-    const planWasNotBootedAsRoot = !this.rootPlanIds.has(planId);
-    const planHasNoBehaviors = plan.behaviors.length === 0;
-    const planHasNoComponents = Object.keys(plan.components).length === 0;
-    const planHasNoTypes = Object.keys(plan.types).length === 0;
-
-    return planWasNotBootedAsRoot && planHasNoBehaviors && planHasNoComponents && planHasNoTypes;
-  }
-
   private trackMergedContribution(source: PlanContributionSource, incoming: Plan): void {
     if (source.kind === "root") return;
 
-    this.slots.track(source, incoming);
+    this.slots.recordApplied(source, incoming);
   }
 
   private claimRootKeys(plan: Plan): void {
