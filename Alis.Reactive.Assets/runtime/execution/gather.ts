@@ -200,8 +200,8 @@ class GatherRequestInputResolver extends RequestInputResolver {
     gatherExplicitFields(this.input, output.transport, runtime, claims);
     emitStaticValues(this.input, output.transport, runtime, claims);
 
-    RuntimeComponentGatherExpansion
-      .from(this.input, claims)
+    RuntimeRegisteredInputSelection
+      .from(this.input.selection, claims)
       .emitInto(runtime, output.transport);
 
     return output.toResult();
@@ -501,32 +501,44 @@ class ComponentReadGatherField extends ExplicitGatherComponentRead {
   }
 }
 
-abstract class RuntimeComponentGatherExpansion {
-  static from(gatherInput: GatherInput, claims: GatherPayloadClaims): RuntimeComponentGatherExpansion {
-    const allRuntimeComponentsWereRequested = gatherInput.selection.kind === "all-registered-inputs";
-    if (!allRuntimeComponentsWereRequested) return ExplicitGatherFieldsOnly.instance;
-
-    return new DynamicGatherComponentExpansion(claims);
+abstract class RuntimeRegisteredInputSelection {
+  static from(
+    selection: GatherInput["selection"],
+    claims: GatherPayloadClaims,
+  ): RuntimeRegisteredInputSelection {
+    switch (selection.kind) {
+      case "explicit":
+        return PlanDeclaredGatherFieldsOnly.instance;
+      case "all-registered-inputs":
+        return new AllRegisteredInputsRuntimeSelection(claims);
+      default:
+        return assertNever(selection, "gather selection");
+    }
   }
 
   abstract emitInto(runtime: GatherRuntime, transport: TransportStrategy): void;
 }
 
-class ExplicitGatherFieldsOnly extends RuntimeComponentGatherExpansion {
-  static readonly instance = new ExplicitGatherFieldsOnly();
+class PlanDeclaredGatherFieldsOnly extends RuntimeRegisteredInputSelection {
+  static readonly instance = new PlanDeclaredGatherFieldsOnly();
 
   emitInto(): void {
     return;
   }
 }
 
-class DynamicGatherComponentExpansion extends RuntimeComponentGatherExpansion {
+class AllRegisteredInputsRuntimeSelection extends RuntimeRegisteredInputSelection {
   constructor(private readonly claims: GatherPayloadClaims) {
     super();
   }
 
   emitInto(runtime: GatherRuntime, transport: TransportStrategy): void {
-    emitDynamicGatherComponents(runtime, this.claims, transport);
+    for (const component of runtime.runtimePlan.components.entries()) {
+      const runtimeField = RuntimeRegisteredInputGatherField.tryFrom(component, this.claims);
+      if (runtimeField === undefined) continue;
+
+      runtimeField.emitInto(transport);
+    }
   }
 }
 
@@ -622,34 +634,37 @@ class JsonArrayBodyValue {
   }
 }
 
-/**
- * IncludeAll: gather dynamically-merged components from partial plan injection.
- * The C# builder expands all KNOWN components at build time. This loop catches
- * components added AFTER build time via partial plan merge.
- */
-function emitDynamicGatherComponents(
-  runtime: GatherRuntime,
-  claims: GatherPayloadClaims,
-  transport: TransportStrategy,
-): void {
-  for (const component of runtime.runtimePlan.components.entries()) {
-    const componentAlreadyGathered = claims.hasComponent(component.key);
-    if (componentAlreadyGathered) continue;
+class RuntimeRegisteredInputGatherField {
+  private constructor(
+    private readonly component: RuntimeComponent,
+    private readonly contract: RegisteredInputGatherContract,
+  ) {}
 
-    const valueBinding = ComponentGatherBinding.tryFrom(component.definition);
-    if (valueBinding === undefined) continue;
+  static tryFrom(
+    component: RuntimeComponent,
+    claims: GatherPayloadClaims,
+  ): RuntimeRegisteredInputGatherField | undefined {
+    const componentAlreadyGatheredAtBuildTime = claims.hasComponent(component.key);
+    if (componentAlreadyGatheredAtBuildTime) return undefined;
 
-    const componentElementWasMounted = ComponentMountState.isMounted(component);
-    if (!componentElementWasMounted) continue;
+    const contract = RegisteredInputGatherContract.tryFrom(component.definition);
+    if (contract === undefined) return undefined;
 
-    const payloadSlotWasReserved = claims.tryClaimRuntimePayloadKey(valueBinding.bindingPath);
-    if (!payloadSlotWasReserved) continue;
+    const registeredInputIsMounted = component.tryElement() !== undefined;
+    if (!registeredInputIsMounted) return undefined;
 
-    const object = component.object();
-    const runtimeValue = object.read(valueBinding.valueMember);
+    const payloadSlotWasReserved = claims.tryClaimRuntimePayloadKey(contract.bindingPath);
+    if (!payloadSlotWasReserved) return undefined;
+
+    return new RuntimeRegisteredInputGatherField(component, contract);
+  }
+
+  emitInto(transport: TransportStrategy): void {
+    const object = this.component.object();
+    const runtimeValue = object.read(this.contract.valueMember);
 
     emitValue(
-      valueBinding.bindingPath,
+      this.contract.bindingPath,
       runtimeValue.usingDeclaredShape(),
       RuntimeShape.from(runtimeValue.shape),
       transport,
@@ -657,23 +672,17 @@ function emitDynamicGatherComponents(
   }
 }
 
-class ComponentGatherBinding {
+class RegisteredInputGatherContract {
   private constructor(
     readonly valueMember: string,
     readonly bindingPath: string,
   ) {}
 
-  static tryFrom(component: Component): ComponentGatherBinding | undefined {
+  static tryFrom(component: Component): RegisteredInputGatherContract | undefined {
     const binding = component.binding;
     if (binding.kind === "none") return undefined;
 
-    return new ComponentGatherBinding(binding.valueMember, binding.bindingPath);
-  }
-}
-
-class ComponentMountState {
-  static isMounted(component: RuntimeComponent): boolean {
-    return component.tryElement() !== undefined;
+    return new RegisteredInputGatherContract(binding.valueMember, binding.bindingPath);
   }
 }
 
