@@ -142,9 +142,10 @@ describe("boot plan composition", () => {
     const componentId = "resident-name";
     const typeKey = "native.component.resident-name";
     const conflictingDefinition = registeredInputComponent(componentId, typeKey);
-    if (conflictingDefinition.binding.kind !== "registered-input") return;
+    expect(conflictingDefinition.binding.kind).toBe("registered-input");
+    const conflictingBinding = expectRegisteredInputBinding(conflictingDefinition);
     conflictingDefinition.binding = {
-      ...conflictingDefinition.binding,
+      ...conflictingBinding,
       bindingPath: "Clinical.ResidentName",
     };
 
@@ -289,15 +290,14 @@ describe("boot plan composition", () => {
     ]);
 
     const container = composed[0].components["resident-form"].container;
-    expect(container.kind).toBe("validation-container");
-    if (container.kind !== "validation-container") return;
+    const validationScope = expectValidationContainer(container);
 
-    expect(container.validationRules.map(rule => rule.component)).toEqual([
+    expect(validationScope.validationRules.map(rule => rule.component)).toEqual([
       "first-name",
       "zip-code",
       "city",
     ]);
-    expect(container.validationRules.find(rule => rule.component === "zip-code")?.rules[0]?.message)
+    expect(validationScope.validationRules.find(rule => rule.component === "zip-code")?.rules[0]?.message)
       .toBe("new zip required");
   });
 
@@ -351,3 +351,23 @@ describe("boot plan composition", () => {
     ])).toThrow('partial plan contribution "address-slot" cannot declare component "resident-form"');
   });
 });
+
+function expectRegisteredInputBinding(component: Component): Extract<Component["binding"], { kind: "registered-input" }> {
+  expect(component.binding.kind).toBe("registered-input");
+  if (component.binding.kind !== "registered-input") {
+    throw new Error(`Expected component "${component.id}" to have registered input binding`);
+  }
+
+  return component.binding;
+}
+
+function expectValidationContainer(
+  container: Component["container"],
+): Extract<Component["container"], { kind: "validation-container" }> {
+  expect(container.kind).toBe("validation-container");
+  if (container.kind !== "validation-container") {
+    throw new Error(`Expected validation-container scope, received "${container.kind}"`);
+  }
+
+  return container;
+}

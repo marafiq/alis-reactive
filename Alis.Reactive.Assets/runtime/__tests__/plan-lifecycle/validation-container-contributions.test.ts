@@ -44,15 +44,14 @@ describe("validation container contributions", () => {
     );
 
     const container = merged.components["resident-form"].container;
-    expect(container.kind).toBe("validation-container");
-    if (container.kind !== "validation-container") return;
+    const validationScope = expectValidationContainer(container);
 
-    expect(container.validationRules.map(rule => rule.component)).toEqual([
+    expect(validationScope.validationRules.map(rule => rule.component)).toEqual([
       "first-name",
       "zip-code",
       "city",
     ]);
-    expect(container.validationRules.find(rule => rule.component === "zip-code")?.rules[0]?.message)
+    expect(validationScope.validationRules.find(rule => rule.component === "zip-code")?.rules[0]?.message)
       .toBe("new zip required");
   });
 
@@ -142,3 +141,14 @@ describe("validation container contributions", () => {
     expect(validationComponents(registry.get(planId)!, "resident-form")).toEqual(["first-name"]);
   });
 });
+
+function expectValidationContainer(
+  container: Component["container"],
+): Extract<Component["container"], { kind: "validation-container" }> {
+  expect(container.kind).toBe("validation-container");
+  if (container.kind !== "validation-container") {
+    throw new Error(`Expected validation-container scope, received "${container.kind}"`);
+  }
+
+  return container;
+}

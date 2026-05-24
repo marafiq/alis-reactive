@@ -7,6 +7,7 @@ import { wireSignalR } from "./signalr";
 import { assertNever } from "../core/assert-never";
 import { scope } from "../core/trace";
 import { ExecutionContext } from "../domain/execution-context";
+import { ComponentEventContract } from "../domain/component-event-contract";
 
 const log = scope("trigger");
 
@@ -57,19 +58,18 @@ export function wireBehavior(
     }
 
     case "component-event": {
-      const component = RuntimePlan.from(plan).components.find(trigger.component);
-      if (!component) {
-        log.error("trigger.component-not-found", { component: trigger.component, event: trigger.event });
-        throw new Error(`[alis] trigger component not found: ${trigger.component}`);
-      }
+      const component = RuntimePlan.from(plan).components.requireComponent(trigger.component);
+      const eventContract = ComponentEventContract.declaredBy(component, trigger.event);
 
-      const eventDef = component.jsType().events[trigger.event];
-      const channel = ComponentEventChannel.from(trigger.event, eventDef?.channel).value;
       const source = `component-event:${trigger.component}:${trigger.event}`;
 
-      log.debug("component-event.listening", { component: trigger.component, event: trigger.event, channel });
+      log.debug("component-event.listening", {
+        component: trigger.component,
+        event: eventContract.eventName,
+        channel: eventContract.channel,
+      });
 
-      wireEvent(plan, trigger.component, channel, (eventData) => {
+      wireEvent(plan, trigger.component, eventContract.channel, (eventData) => {
         const context = ExecutionContext.event(eventData);
         runReaction(reaction, plan, context, source);
       }, opts);
@@ -104,15 +104,5 @@ class DocumentEventPayload {
     if (eventCarriesDetail) return detail;
 
     return event;
-  }
-}
-
-class ComponentEventChannel {
-  private constructor(readonly value: string) {}
-
-  static from(eventName: string, declaredChannel: string | undefined): ComponentEventChannel {
-    if (declaredChannel === undefined) return new ComponentEventChannel(eventName);
-
-    return new ComponentEventChannel(declaredChannel);
   }
 }
