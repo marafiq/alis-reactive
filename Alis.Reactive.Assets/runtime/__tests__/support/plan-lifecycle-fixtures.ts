@@ -162,7 +162,9 @@ export function mergeHooks() {
 
 export function validationComponents(plan: Plan, componentKey: string): string[] {
   const container = plan.components[componentKey]?.container;
-  if (container?.kind !== "validation-container") return [];
+  if (container?.kind !== "validation-container") {
+    throw new Error(`Expected component "${componentKey}" to be a validation container`);
+  }
 
   return container.validationRules.map(rule => rule.component);
 }

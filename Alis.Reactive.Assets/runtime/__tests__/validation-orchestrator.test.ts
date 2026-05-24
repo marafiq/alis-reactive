@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { PlanRegistry } from "../lifecycle/merge-plan";
 import { showServerErrors, validateContainer } from "../validation/orchestrator";
 import type { Component, ComponentValidation, JsType, Plan, Shape } from "../types";
 
@@ -173,6 +174,38 @@ describe("validation orchestrator server errors", () => {
       .toBe("Notification choice is required");
   });
 
+  it("routes server errors for unloaded partial fields to the summary", () => {
+    renderValidationDom();
+    const registry = new PlanRegistry();
+    const runtimePlan = plan([
+      requiredRule("zip-code-field", "Address.ZipCode", "zip-code-field"),
+    ], {});
+
+    registry.register(runtimePlan);
+    registry.loadPartialSlot("address-slot", [
+      {
+        version: 3,
+        planId: runtimePlan.planId,
+        scope: { kind: "partial", partId: "server-address-plan" },
+        types: {},
+        components: {
+          "zip-code-field": nativeComponent("zip-code-input"),
+        },
+        behaviors: [],
+      },
+    ], silentLifecycleHooks);
+    registry.unloadPartialSlot("address-slot");
+
+    showServerErrors(runtimePlan, "resident-form", {
+      errors: { "Address.ZipCode": ["Zip code is required"] },
+    });
+
+    const summary = document.getElementById("Runtime_ValidationServerErrors_validation_summary");
+    expect(summary?.hasAttribute("hidden")).toBe(false);
+    expect(document.querySelector("[data-valmsg-summary-for='Address.ZipCode']")?.textContent)
+      .toBe("Zip code is required");
+  });
+
   it("routes server errors for known fields to summary when the component element is not mounted", () => {
     renderValidationDom();
     const runtimePlan = plan([
@@ -229,3 +262,8 @@ describe("validation orchestrator server errors", () => {
       .toThrow("[alis] component not found: missing-component");
   });
 });
+
+const silentLifecycleHooks = {
+  wireBehaviors: () => undefined,
+  wireContainerValidation: () => undefined,
+};
