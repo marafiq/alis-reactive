@@ -16,12 +16,21 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionTabExtensions
     {
+        private static readonly ComponentMethod SelectMethod =
+            ComponentMethod.Named("select").WithArgs<int>();
+
+        private static readonly ComponentMethod HideTabMethod =
+            ComponentMethod.Named("hideTab").WithArgs<int, bool>();
+
+        private static readonly ComponentProperty<int> SelectedItemProperty =
+            ComponentProperty<int>.Named("selectedItem");
+
         /// <summary>
         /// Selects a tab by index: ej2.select(index).
         /// </summary>
         public static ComponentRef<FusionTab, TModel> Select<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index) where TModel : class
-            => self.EmitCall("select", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(index) });
+            => self.EmitCall(SelectMethod, new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(index) });
 
         /// <summary>
         /// Shows or hides a tab by index: ej2.hideTab(index, isHidden).
@@ -29,13 +38,13 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionTab, TModel> HideTab<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index, bool isHidden = true)
             where TModel : class
-            => self.EmitCall("hideTab", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(index), ValueProducer.Literal(isHidden) });
+            => self.EmitCall(HideTabMethod, new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(index), ValueProducer.Literal(isHidden) });
 
         /// <summary>
         /// Sets the selected tab index via property: ej2.selectedItem = index.
         /// </summary>
         public static ComponentRef<FusionTab, TModel> SetSelectedItem<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index) where TModel : class
-            => self.EmitSet("selectedItem", ValueProducer.Literal(index));
+            => self.EmitSet(SelectedItemProperty, ValueProducer.Literal(index));
     }
 }

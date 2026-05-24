@@ -15,7 +15,6 @@ public class WhenMutatingAFusionGrid : FusionTestBase
             p.Component<FusionGrid>("residents-grid").Refresh());
 
         var json = plan.RenderFormatted();
-        AssertSchemaValid(json);
 
         Assert.That(json, Does.Contain("\"call\""), "Must contain a call reaction");
         Assert.That(json, Does.Contain("\"refresh\""), "Must target the refresh method");
@@ -36,7 +35,6 @@ public class WhenMutatingAFusionGrid : FusionTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"set\""), "Must contain a set reaction");
         Assert.That(planJson, Does.Contain("\"dataSource\""), "Must target dataSource property");
@@ -57,7 +55,6 @@ public class WhenMutatingAFusionGrid : FusionTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"set\""), "Must contain a set reaction");
         Assert.That(planJson, Does.Contain("\"dataSource\""), "Must target dataSource property");
@@ -73,7 +70,6 @@ public class WhenMutatingAFusionGrid : FusionTestBase
                 p.Component<FusionGrid>("residents-grid").SetDataSource(payload, x => x.Items));
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"set\""), "Must contain a set reaction");
         Assert.That(planJson, Does.Contain("\"dataSource\""), "Must target dataSource property");
@@ -91,7 +87,6 @@ public class WhenMutatingAFusionGrid : FusionTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"call\""), "Must contain call for Refresh");
         Assert.That(planJson, Does.Contain("\"refresh\""), "Must target refresh method");

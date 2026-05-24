@@ -15,6 +15,18 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionInPlaceEditorExtensions
     {
         private static readonly FusionInPlaceEditor Component = new FusionInPlaceEditor();
+        private static readonly ComponentProperty<string> ValueProperty =
+            ComponentProperty<string>.Named("value");
+        private static readonly ComponentMethod DisableMethod =
+            ComponentMethod.Named("disable").WithArgs<bool>();
+        private static readonly ComponentMethod SaveMethod =
+            ComponentMethod.Named("save");
+        private static readonly ComponentMethod FocusMethod =
+            ComponentMethod.Named("setFocus");
+        private static readonly ComponentMethod ClassAddMethod =
+            ComponentMethod.Mapped("classAdd", "element.classList.add").WithArgs<string>();
+        private static readonly ComponentMethod ClassRemoveMethod =
+            ComponentMethod.Mapped("classRemove", "element.classList.remove").WithArgs<string>();
 
         /// <summary>Sets the committed value.</summary>
         /// <remarks>
@@ -27,7 +39,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> SetValue<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string? value)
             where TModel : class
-            => self.EmitSet("value", value != null ? ValueProducer.Literal(value) : ValueProducer.Null());
+            => self.EmitSet(ValueProperty, value != null ? ValueProducer.Literal(value) : ValueProducer.Null());
 
         /// <summary>Enables the editor, restoring edit-mode entry.</summary>
         /// <remarks>
@@ -38,7 +50,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> Enable<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
-            => self.EmitCall("disable", new List<ValueProducer> { ValueProducer.Literal(false) });
+            => self.EmitCall(DisableMethod, new List<ValueProducer> { ValueProducer.Literal(false) });
 
         /// <summary>Disables the editor, blocking edit-mode entry.</summary>
         /// <remarks>Calls Syncfusion's <c>disable(true)</c> method. Applies the <c>.e-disable</c> CSS class.</remarks>
@@ -46,7 +58,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> Disable<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
-            => self.EmitCall("disable", new List<ValueProducer> { ValueProducer.Literal(true) });
+            => self.EmitCall(DisableMethod, new List<ValueProducer> { ValueProducer.Literal(true) });
 
         /// <summary>Programmatically commits the current edit.</summary>
         /// <remarks>
@@ -57,7 +69,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> Save<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
-            => self.EmitCall("save");
+            => self.EmitCall(SaveMethod);
 
         /// <summary>Moves focus into the inner editor input.</summary>
         /// <remarks>Calls Syncfusion's <c>setFocus()</c> method.</remarks>
@@ -65,7 +77,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> Focus<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
-            => self.EmitCall("setFocus");
+            => self.EmitCall(FocusMethod);
 
         /// <summary>Adds a CSS class to the editor's outer wrapper.</summary>
         /// <remarks>
@@ -81,14 +93,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> AddClass<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string className)
             where TModel : class
-        {
-            var key = self.Pipeline.Context.EnsureComponent(self.TargetId, self.Vendor);
-            self.Pipeline.Context.EnsureMethod(key, "classAdd", "element.classList.add");
-            self.Pipeline.Steps.Add(Reaction.Call(
-                ComponentSource.Of(key), "classAdd",
-                new List<ValueProducer> { ValueProducer.Literal(className) }));
-            return self;
-        }
+            => self.EmitCall(ClassAddMethod, new List<ValueProducer> { ValueProducer.Literal(className) });
 
         /// <summary>Removes a CSS class from the editor's outer wrapper.</summary>
         /// <remarks>Emits a call on Syncfusion's <c>element.classList.remove</c>.</remarks>
@@ -98,14 +103,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> RemoveClass<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string className)
             where TModel : class
-        {
-            var key = self.Pipeline.Context.EnsureComponent(self.TargetId, self.Vendor);
-            self.Pipeline.Context.EnsureMethod(key, "classRemove", "element.classList.remove");
-            self.Pipeline.Steps.Add(Reaction.Call(
-                ComponentSource.Of(key), "classRemove",
-                new List<ValueProducer> { ValueProducer.Literal(className) }));
-            return self;
-        }
+            => self.EmitCall(ClassRemoveMethod, new List<ValueProducer> { ValueProducer.Literal(className) });
 
         /// <summary>Reads the current committed value for use in conditions or gather.</summary>
         /// <remarks>
@@ -127,16 +125,11 @@ namespace Alis.Reactive.Fusion.Components
         {
             self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor);
 
-            if (!self.Pipeline.Context.TryFindRegistrationById(self.TargetId, out var reg) || reg == null)
-            {
-                throw new InvalidOperationException(
-                    $"FusionInPlaceEditor '{self.TargetId}' is not registered. " +
-                    "Render the editor with Html.InputField(plan, m => m.X).FusionInPlaceEditor(...) " +
-                    "before reading .Value() in a pipeline; the registered shape drives the typed read.");
-            }
+            var registration = self.Pipeline.Context.FindRegistrationById(self.TargetId);
+            var registeredShape = registration.RequireShape(
+                ComponentRegistrationRequirement.ForFusionInPlaceEditorValueRead(self.TargetId));
 
-            self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, reg.Shape, "read");
-            return new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ValueMember);
+            return self.Read(ValueProperty.WithShape(registeredShape));
         }
 
     }

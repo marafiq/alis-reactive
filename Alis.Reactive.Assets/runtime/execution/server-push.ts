@@ -2,9 +2,10 @@
 // Uses ServerPushTrigger from the plan schema.
 
 import type { ServerPushTrigger, Reaction, Plan } from "../types";
-import { executeReaction } from "./execute";
+import { executeReaction, ReactionCompletion } from "./execute";
 import { showRetryIndicators, removeRetryIndicators } from "./retry-indicator";
 import { scope } from "../core/trace";
+import { ExecutionContext } from "../domain/execution-context";
 
 const log = scope("server-push");
 
@@ -48,12 +49,14 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
 
   es.onerror = () => {
     const managed = sources.get(url);
-    if (managed?.stopping) return;
+    const connectionIsStopping = managed !== undefined && managed.stopping;
+    if (connectionIsStopping) return;
 
     if (es.readyState === EventSource.CLOSED) {
       log.error("connection.closed-permanent", { url });
       sources.delete(url);
-      if (managed && managed.targetIds.size > 0) {
+      const retryCanBeShown = managed !== undefined && managed.targetIds.size > 0;
+      if (retryCanBeShown) {
         const wiredBehaviors = managed.wired;
         showRetryIndicators(url, managed.targetIds, () => retrySSE(url, wiredBehaviors));
       }
@@ -85,19 +88,29 @@ export function wireServerPush(
   signal?: AbortSignal,
 ): void {
   const managed = getOrCreate(trigger.url, signal);
+  const eventName = ServerPushEventName.from(trigger).value;
 
   managed.wired.push({ trigger, reaction, plan });
 
   const handler = (e: MessageEvent) => {
     const evt: Record<string, unknown> = JSON.parse(e.data);
-    log.debug("message.received", { url: trigger.url, event: trigger.event });
-    const result = executeReaction(reaction, plan, { event: evt });
-    if (result instanceof Promise) {
-      result.catch(err => log.error("reaction.failed", { url: trigger.url, event: trigger.event, error: String(err) }));
-    }
+    log.debug("message.received", { url: trigger.url, event: eventName });
+    ReactionCompletion
+      .from(executeReaction(reaction, plan, ExecutionContext.event(evt).raw))
+      .catchAsync(err => log.error("reaction.failed", { url: trigger.url, event: eventName, error: String(err) }));
   };
 
-  const eventName = trigger.event ?? "message";
   managed.es.addEventListener(eventName, handler as EventListener);
   log.debug("event.listening", { url: trigger.url, event: eventName });
+}
+
+class ServerPushEventName {
+  private constructor(readonly value: string) {}
+
+  static from(trigger: ServerPushTrigger): ServerPushEventName {
+    const filter = trigger.eventFilter;
+    if (filter.kind === "any") return new ServerPushEventName("message");
+
+    return new ServerPushEventName(filter.event);
+  }
 }

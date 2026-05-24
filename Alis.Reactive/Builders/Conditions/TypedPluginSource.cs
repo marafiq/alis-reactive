@@ -9,18 +9,37 @@ namespace Alis.Reactive.Builders.Conditions
     /// </summary>
     public sealed class TypedPluginSource<TProp> : TypedSource<TProp>
     {
-        private readonly string _pluginName;
-        private readonly string _member;
+        private readonly PluginOperationId _operation;
         private readonly List<ValueProducer> _args;
 
-        internal TypedPluginSource(string pluginName, string member, List<ValueProducer> args = null)
+        internal TypedPluginSource(PluginOperationId operation, List<ValueProducer> args)
         {
-            _pluginName = pluginName;
-            _member = member;
-            _args = args;
+            _operation = operation ?? throw new System.ArgumentNullException(nameof(operation));
+            _args = args ?? throw new System.ArgumentNullException(nameof(args));
         }
 
         internal override ValueProducer ToValueProducer() =>
-            ValueProducer.Read(PluginSource.Of(_pluginName), _member, shape: Shape, args: _args);
+            ValueProducer.Invoke(
+                PluginSource.Of(_operation.PluginNameValue),
+                _operation.PlanMethodNameValue,
+                Shape,
+                _args);
+    }
+
+    /// <summary>A typed source that reads a property from a registered plugin object.</summary>
+    public sealed class TypedPluginPropertySource<TProp> : TypedSource<TProp>
+    {
+        private readonly PluginPropertyId _property;
+
+        internal TypedPluginPropertySource(PluginPropertyId property)
+        {
+            _property = property ?? throw new System.ArgumentNullException(nameof(property));
+        }
+
+        internal override ValueProducer ToValueProducer() =>
+            ValueProducer.Read(
+                PluginSource.Of(_property.PluginNameValue),
+                _property.PlanMemberNameValue,
+                Shape);
     }
 }

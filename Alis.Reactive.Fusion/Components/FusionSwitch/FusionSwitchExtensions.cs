@@ -14,6 +14,9 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionSwitch Component = new FusionSwitch();
 
+        private static readonly ComponentProperty<bool> ValueProperty =
+            ComponentProperty<bool>.Named(Component.ValueMember);
+
         /// <summary>Sets the checked state of the switch.</summary>
         /// <param name="isChecked"><see langword="true"/> to check, <see langword="false"/> to uncheck.</param>
         /// <returns>The component reference for method chaining.</returns>
@@ -21,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionSwitch, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.EmitSet("checked", ValueProducer.Literal(isChecked));
+            return self.EmitSet(ValueProperty, ValueProducer.Literal(isChecked));
         }
 
         /// <summary>Reads the current checked state for use in conditions or gather.</summary>
@@ -33,6 +36,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<bool> Value<TModel>(
             this ComponentRef<FusionSwitch, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.Boolean, "read"); return new TypedComponentSource<bool>(self.TargetId, Component.Vendor, Component.ValueMember); }
+            => self.Read(ValueProperty);
     }
 }

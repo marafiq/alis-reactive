@@ -23,6 +23,11 @@
         p.Void("track");
     });
 
+    plan.RegisterPlugin("slugify", p =>
+    {
+        p.Function<string, string>();
+    });
+
     // DomReady: GET residents → use array plugin on response
     Html.On(plan, t => t.DomReady(p =>
         p.Get("/Sandbox/Plugins/ArrayManager/Residents")
@@ -54,6 +59,9 @@
              s.When(someSrc).Truthy()
               .Then(then => then.Element("arr-has-critical").Show())
               .Else(els => els.Element("arr-no-critical").Show());
+
+             TypedPluginSource<string> slugSrc = p.Plugin<string>("slugify").Arg("John Doe");
+             s.Element("arr-root-slug").SetText(slugSrc);
 
              s.Element("arr-results").AddClass("text-green-600");
          }))));
@@ -130,6 +138,7 @@
             <p>First Name: <span id="arr-first-name">—</span></p>
             <p>Active Count: <span id="arr-active-count">—</span></p>
             <p>Total Age: <span id="arr-total-age">—</span></p>
+            <p>Root Function: <span id="arr-root-slug">—</span></p>
             <p id="arr-has-critical" hidden class="text-red-600">Critical residents found!</p>
             <p id="arr-no-critical" hidden class="text-green-600">No critical residents ✓</p>
         </native-vstack>

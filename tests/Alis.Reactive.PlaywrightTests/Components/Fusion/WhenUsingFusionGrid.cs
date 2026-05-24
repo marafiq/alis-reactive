@@ -40,8 +40,8 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
         await NavigateAndWaitForInitialLoad();
 
         var gridRows = Page.Locator("#residents-grid .e-row");
-        var count = await gridRows.CountAsync();
-        Assert.That(count, Is.EqualTo(10), "Grid should display exactly 10 rows (pageSize)");
+        await Expect(gridRows)
+            .ToHaveCountAsync(10, new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 

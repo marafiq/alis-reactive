@@ -13,7 +13,11 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeCheckBoxExtensions
     {
-        private static readonly NativeCheckBox _component = new NativeCheckBox();
+        private static readonly ComponentProperty<bool> CheckedProperty =
+            ComponentProperty<bool>.Named("checked");
+
+        private static readonly ComponentMethod FocusMethod =
+            ComponentMethod.Named("focus");
 
         /// <summary>
         /// Sets the checkbox checked state in the browser.
@@ -26,7 +30,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.EmitSet("checked", ValueProducer.Literal(isChecked));
+            return self.EmitSet(CheckedProperty, ValueProducer.Literal(isChecked));
         }
 
         /// <summary>
@@ -38,7 +42,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
-            return self.EmitCall("focus");
+            return self.EmitCall(FocusMethod);
         }
 
         /// <summary>
@@ -50,9 +54,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
         {
-            self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor);
-            self.Pipeline.Context.EnsureProperty(self.TargetId, _component.ValueMember, _component.ValueMember, Shape.Boolean, "read");
-            return new TypedComponentSource<bool>(self.TargetId, _component.Vendor, _component.ValueMember);
+            return self.Read(CheckedProperty);
         }
     }
 }

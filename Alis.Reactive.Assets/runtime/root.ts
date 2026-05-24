@@ -12,32 +12,65 @@ import type { Plan } from "./types";
 import type { TraceLevel } from "./core/trace";
 import { registerPlugin } from "./core/plugin-registry";
 
-// Drain passive plugin queue — plugins push here from separate bundles before framework loads
-const pendingPlugins = (window as any).__alisPlugins as Array<{ name: string; instance: unknown }> | undefined;
-if (pendingPlugins) {
-  for (const entry of pendingPlugins) registerPlugin(entry.name, entry.instance);
-  delete (window as any).__alisPlugins;
+interface PendingBrowserPlugin {
+  readonly name: string;
+  readonly instance: unknown;
 }
 
-initConfirm();
-initNativeActionLinks();
+interface PluginQueueWindow extends Window {
+  __alisPlugins?: PendingBrowserPlugin[];
+}
 
-const planEls = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
-const plans: Plan[] = [];
+startRuntimeWhenDocumentIsReady();
 
-for (const el of planEls) {
-  const traceLevel = el.dataset.trace as TraceLevel | undefined;
-  if (traceLevel) trace.setLevel(traceLevel);
+function startRuntimeWhenDocumentIsReady(): void {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startRuntime, { once: true });
+    return;
+  }
 
-  try {
-    const text = el.textContent?.trim();
-    if (!text) throw new Error("[alis] empty plan element");
-    plans.push(JSON.parse(text));
-  } catch (e) {
-    throw new Error(`[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(e as Error).message}`);
+  startRuntime();
+}
+
+function startRuntime(): void {
+  drainPluginQueue();
+
+  initConfirm();
+  initNativeActionLinks();
+
+  for (const plan of composeInitialPlans(discoverPlans())) {
+    boot(plan);
   }
 }
 
-for (const plan of composeInitialPlans(plans)) {
-  boot(plan);
+function drainPluginQueue(): void {
+  // Plugins push here from separate bundles before the framework starts.
+  const pluginQueue = window as PluginQueueWindow;
+  const pendingPlugins = pluginQueue.__alisPlugins;
+  if (pendingPlugins === undefined) return;
+
+  for (const entry of pendingPlugins) {
+    registerPlugin(entry.name, entry.instance);
+  }
+  delete pluginQueue.__alisPlugins;
+}
+
+function discoverPlans(): Plan[] {
+  const planEls = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
+  const plans: Plan[] = [];
+
+  for (const el of planEls) {
+    const traceLevel = el.dataset.trace as TraceLevel | undefined;
+    if (traceLevel) trace.setLevel(traceLevel);
+
+    try {
+      const text = el.textContent?.trim();
+      if (!text) throw new Error("[alis] empty plan element");
+      plans.push(JSON.parse(text));
+    } catch (e) {
+      throw new Error(`[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(e as Error).message}`);
+    }
+  }
+
+  return plans;
 }

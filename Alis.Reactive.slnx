@@ -112,6 +112,7 @@
   <Project Path="Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj" />
   <Folder Name="/tools/">
     <Project Path="tools/ApiDocGenerator/ApiDocGenerator.csproj" />
+    <Project Path="tools/PlanTypeGenerator/PlanTypeGenerator.csproj" />
   </Folder>
   <Folder Name="/examples/">
     <Project Path="examples/resident-intake/ResidentIntake.csproj" />

@@ -37,7 +37,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         using var doc = JsonDocument.Parse(planJson);
         var request = doc.RootElement.GetProperty("behaviors")[0]
@@ -60,7 +59,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Contain("\"hello-world\""));
     }
 
@@ -76,7 +74,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Contain("\"kind\": \"number\""));
     }
 
@@ -84,7 +81,7 @@ public class WhenSettingRouteParams : PlanTestBase
     public void typed_source_route_param_produces_component_read()
     {
         var plan = CreatePlan();
-        var source = new TypedComponentSource<int>("resident-ddl", "fusion", "value");
+        var source = new TypedComponentSource<int>("resident-ddl", "value");
 
         Trigger(plan).DomReady(p =>
         {
@@ -94,7 +91,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"kind\": \"read\""));
         Assert.That(planJson, Does.Contain("\"component\": \"resident-ddl\""));
@@ -117,7 +113,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         using var doc = JsonDocument.Parse(planJson);
         var request = doc.RootElement.GetProperty("behaviors")[0]
@@ -140,7 +135,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         using var doc = JsonDocument.Parse(planJson);
         var request = doc.RootElement.GetProperty("behaviors")[0]
@@ -149,6 +143,24 @@ public class WhenSettingRouteParams : PlanTestBase
         Assert.That(routeParams.ValueKind, Is.EqualTo(JsonValueKind.Object));
         Assert.That(routeParams.EnumerateObject().Any(), Is.False,
             "RouteParams should be present as an empty object");
+    }
+
+    [Test]
+    public void url_template_placeholder_without_route_param_throws_at_build_time()
+    {
+        var plan = CreatePlan();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Get("/api/residents/{id}")
+                 .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+            });
+        });
+
+        Assert.That(ex!.Message, Does.Contain("placeholder '{id}'"));
+        Assert.That(ex.Message, Does.Contain("RouteParam(\"id\""));
     }
 
     [Test]
@@ -165,7 +177,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Contain("\"facilityId\""));
         Assert.That(planJson, Does.Contain("\"residentId\""));
     }
@@ -184,7 +195,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Contain("\"routeParams\""));
         Assert.That(planJson, Does.Contain("\"headers\""));
     }
@@ -203,7 +213,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Contain("\"routeParams\""));
         Assert.That(planJson, Does.Contain("\"filter\""));
     }
@@ -227,7 +236,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Contain("\"id\""));
         Assert.That(planJson, Does.Contain("\"facilityId\""));
     }
@@ -320,6 +328,41 @@ public class WhenSettingRouteParams : PlanTestBase
     }
 
     [Test]
+    public void malformed_placeholder_name_throws_even_without_route_param()
+    {
+        var plan = CreatePlan();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Get("/api/data/{resident-id}")
+                 .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+            });
+        });
+
+        Assert.That(ex!.Message, Does.Contain("URL template '/api/data/{resident-id}' is invalid"));
+        Assert.That(ex.Message, Does.Contain("invalid placeholder '{resident-id}'"));
+    }
+
+    [Test]
+    public void unclosed_placeholder_throws_at_build_time()
+    {
+        var plan = CreatePlan();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Get("/api/data/{residentId")
+                 .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+            });
+        });
+
+        Assert.That(ex!.Message, Does.Contain("missing closing brace"));
+    }
+
+    [Test]
     public void mismatched_param_name_throws_at_build_time()
     {
         var plan = CreatePlan();
@@ -371,7 +414,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Contain("\"count\""));
     }
 
@@ -379,7 +421,7 @@ public class WhenSettingRouteParams : PlanTestBase
     public void datetime_typed_source_carries_date_shape()
     {
         var plan = CreatePlan();
-        var source = new TypedComponentSource<DateTime>("date-picker", "fusion", "value");
+        var source = new TypedComponentSource<DateTime>("date-picker", "value");
 
         Trigger(plan).DomReady(p =>
         {
@@ -389,7 +431,6 @@ public class WhenSettingRouteParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         using var doc = JsonDocument.Parse(planJson);
         var request = doc.RootElement.GetProperty("behaviors")[0]

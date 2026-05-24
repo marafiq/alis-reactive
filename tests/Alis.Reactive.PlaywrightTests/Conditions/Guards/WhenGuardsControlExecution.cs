@@ -577,11 +577,11 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     public async Task missing_key_in_payload_evaluates_as_null()
     {
         // Dispatch with {id:3} (no address key at all) → When(address).IsNull() should be true
-        // Proves walk.ts returns undefined for missing keys, and IsNull treats undefined as null
+        // Proves structured payload path resolution returns undefined for missing keys, and IsNull treats undefined as null
         await NavigateAndBoot();
         var result = Page.Locator("#nested-null-result");
 
-        // Missing key → walk returns undefined → IsNull treats as null → "No Address"
+        // Missing key → path read returns undefined → IsNull treats as null → "No Address"
         await Page.Locator("#btn-nested-missing").ClickAsync();
         await Expect(result).ToHaveTextAsync("No Address");
 
@@ -728,12 +728,12 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     [Test]
     public async Task null_leaf_with_missing_address_key_takes_else_no_crash()
     {
-        // Dispatch check-null-leaf with NO address key at all → walk returns undefined
+        // Dispatch check-null-leaf with NO address key at all → path read returns undefined
         // → coerced to "" → != "Seattle" → else branch, no crash
         await NavigateAndBoot();
         var result = Page.Locator("#null-leaf-result");
 
-        // address key entirely missing → walk.ts returns undefined → else
+        // address key entirely missing → path read returns undefined → else
         await Page.Locator("#btn-null-leaf-missing").ClickAsync();
         await Expect(result).ToHaveTextAsync("Not Seattle");
 

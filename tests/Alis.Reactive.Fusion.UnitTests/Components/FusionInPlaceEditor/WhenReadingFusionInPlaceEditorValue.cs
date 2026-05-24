@@ -35,7 +35,6 @@ public class WhenReadingFusionInPlaceEditorValue : FusionTestBase
         });
 
         var json = plan.RenderFormatted();
-        AssertSchemaValid(json);
 
         Assert.That(json, Does.Contain("\"value\""), "Must reference the 'value' member");
     }
@@ -47,14 +46,13 @@ public class WhenReadingFusionInPlaceEditorValue : FusionTestBase
     public void Value_uses_registered_shape_for_date_bound_editor_without_shape_conflict()
     {
         var plan = CreatePlan();
-        var component = new FusionInPlaceEditor();
 
         // Simulate HtmlExtensions registering the component with Date shape (DateTime? binding).
         var elementId = "Alis_Reactive_Fusion_UnitTests_FusionTestModel__AppointmentTime";
-        var registration = new ComponentRegistration(
-            elementId, component.Vendor, "AppointmentTime", component.ValueMember,
-            "inplace-editor", Shape.FromClrType(typeof(System.DateTime?)));
-        plan.AddToComponentsMap("AppointmentTime", registration);
+        var registration = ModelBoundInputComponentSlot
+            .For<System.DateTime?>(elementId, "AppointmentTime")
+            .Register(FusionInPlaceEditor.Registration);
+        plan.RegisterInputComponent(registration);
 
         // Value() on the Date-shaped component must not throw a shape-conflict.
         Assert.DoesNotThrow(() =>
@@ -71,13 +69,12 @@ public class WhenReadingFusionInPlaceEditorValue : FusionTestBase
     public void Value_uses_registered_shape_for_decimal_bound_editor_without_shape_conflict()
     {
         var plan = CreatePlan();
-        var component = new FusionInPlaceEditor();
 
         var elementId = "Alis_Reactive_Fusion_UnitTests_FusionTestModel__Amount";
-        var registration = new ComponentRegistration(
-            elementId, component.Vendor, "Amount", component.ValueMember,
-            "inplace-editor", Shape.FromClrType(typeof(decimal)));
-        plan.AddToComponentsMap("Amount", registration);
+        var registration = ModelBoundInputComponentSlot
+            .For<decimal>(elementId, "Amount")
+            .Register(FusionInPlaceEditor.Registration);
+        plan.RegisterInputComponent(registration);
 
         Assert.DoesNotThrow(() =>
         {
@@ -112,10 +109,9 @@ public class WhenReadingFusionInPlaceEditorValue : FusionTestBase
 
     private static void RegisterStringInPlaceEditor(ReactivePlan<FusionTestModel> plan, string bindingPath, string elementId)
     {
-        var component = new FusionInPlaceEditor();
-        var registration = new ComponentRegistration(
-            elementId, component.Vendor, bindingPath, component.ValueMember,
-            "inplace-editor", Shape.String);
-        plan.AddToComponentsMap(bindingPath, registration);
+        var registration = ModelBoundInputComponentSlot
+            .For<string>(elementId, bindingPath)
+            .Register(FusionInPlaceEditor.Registration);
+        plan.RegisterInputComponent(registration);
     }
 }

@@ -12,6 +12,15 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionDialogExtensions
     {
+        private static readonly ComponentMethod ShowMethod =
+            ComponentMethod.Named("show");
+
+        private static readonly ComponentMethod HideMethod =
+            ComponentMethod.Named("hide");
+
+        private static readonly ComponentMethod RefreshPositionMethod =
+            ComponentMethod.Named("refreshPosition");
+
         /// <summary>
         /// Shows the dialog.
         /// Runtime: ej2.show()
@@ -19,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionDialog, TModel> Show<TModel>(
             this ComponentRef<FusionDialog, TModel> self)
             where TModel : class
-            => self.EmitCall("show", new System.Collections.Generic.List<ValueProducer>());
+            => self.EmitCall(ShowMethod);
 
         /// <summary>
         /// Hides the dialog.
@@ -28,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionDialog, TModel> Hide<TModel>(
             this ComponentRef<FusionDialog, TModel> self)
             where TModel : class
-            => self.EmitCall("hide", new System.Collections.Generic.List<ValueProducer>());
+            => self.EmitCall(HideMethod);
 
         /// <summary>
         /// Refreshes the dialog position and dimensions.
@@ -37,6 +46,6 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionDialog, TModel> RefreshPosition<TModel>(
             this ComponentRef<FusionDialog, TModel> self)
             where TModel : class
-            => self.EmitCall("refreshPosition", new System.Collections.Generic.List<ValueProducer>());
+            => self.EmitCall(RefreshPositionMethod);
     }
 }

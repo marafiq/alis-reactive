@@ -1,4 +1,5 @@
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Builders.Requests;
 
 namespace Alis.Reactive.Builders.Conditions
 {
@@ -14,9 +15,7 @@ namespace Alis.Reactive.Builders.Conditions
 
         internal TypedUrlSource(string paramName)
         {
-            if (string.IsNullOrWhiteSpace(paramName))
-                throw new System.ArgumentException(
-                    "URL param name must not be null or whitespace.", nameof(paramName));
+            var urlParam = UrlParameterName.Of(paramName);
             // URL params are single strings from URLSearchParams.get().
             // Reject non-scalar types — arrays, objects, complex types are not supported.
             var shape = Shape.FromClrType(typeof(TProp));
@@ -24,7 +23,7 @@ namespace Alis.Reactive.Builders.Conditions
                 throw new System.InvalidOperationException(
                     $"FromUrl<{typeof(TProp).Name}>(\"{paramName}\") is not supported. " +
                     "URL query parameters are single strings — use scalar types (string, int, bool, DateTime).");
-            _paramName = paramName;
+            _paramName = urlParam.Value;
         }
 
         internal override ValueProducer ToValueProducer() =>

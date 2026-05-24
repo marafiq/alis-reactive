@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
@@ -14,14 +13,14 @@ namespace Alis.Reactive.Builders.Requests
     public class ResponseBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
-        internal List<ResponseHandler> SuccessHandlers { get; } = new List<ResponseHandler>();
-        internal List<ResponseHandler> ErrorHandlers { get; } = new List<ResponseHandler>();
-        internal Request ChainedRequest { get; private set; }
+        private readonly ResponseDraft _draft = new ResponseDraft();
 
         internal ResponseBuilder(PlanBuildContext context)
         {
             _context = context;
         }
+
+        internal ResponseDraft Draft => _draft;
 
         /// <summary>Handles a successful HTTP response.</summary>
         /// <param name="pipeline">Builds the commands to execute on success.</param>
@@ -30,7 +29,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
-            SuccessHandlers.Add(new ResponseHandler(pb.BuildReaction()));
+            _draft.HandleSuccess(pb.BuildReaction());
             return this;
         }
 
@@ -43,8 +42,10 @@ namespace Alis.Reactive.Builders.Requests
             where TResponse : class
         {
             var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(new ResponseBody<TResponse>(PayloadSource.Success()), pb);
-            SuccessHandlers.Add(new ResponseHandler(pb.BuildReaction()));
+            pipeline(
+                new ResponseBody<TResponse>(PayloadSource.Success(PayloadContract.ForPayload(typeof(TResponse)))),
+                pb);
+            _draft.HandleSuccess(pb.BuildReaction());
             return this;
         }
 
@@ -55,7 +56,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
-            ErrorHandlers.Add(new ResponseHandler(pb.BuildReaction()));
+            _draft.HandleError(pb.BuildReaction());
             return this;
         }
 
@@ -67,8 +68,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
-            var handler = new ResponseHandler(pb.BuildReaction(), statusCode);
-            ErrorHandlers.Add(handler);
+            _draft.HandleError(statusCode, pb.BuildReaction());
             return this;
         }
 
@@ -81,8 +81,10 @@ namespace Alis.Reactive.Builders.Requests
             where TError : class
         {
             var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(new ResponseBody<TError>(PayloadSource.Error()), pb);
-            ErrorHandlers.Add(new ResponseHandler(pb.BuildReaction()));
+            pipeline(
+                new ResponseBody<TError>(PayloadSource.Error(PayloadContract.ForPayload(typeof(TError)))),
+                pb);
+            _draft.HandleError(pb.BuildReaction());
             return this;
         }
 
@@ -96,9 +98,10 @@ namespace Alis.Reactive.Builders.Requests
             where TError : class
         {
             var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(new ResponseBody<TError>(PayloadSource.Error()), pb);
-            var handler = new ResponseHandler(pb.BuildReaction(), statusCode);
-            ErrorHandlers.Add(handler);
+            pipeline(
+                new ResponseBody<TError>(PayloadSource.Error(PayloadContract.ForPayload(typeof(TError)))),
+                pb);
+            _draft.HandleError(statusCode, pb.BuildReaction());
             return this;
         }
 
@@ -109,7 +112,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var chainedBuilder = new HttpRequestBuilder<TModel>(_context);
             request(chainedBuilder);
-            ChainedRequest = chainedBuilder.BuildRequest();
+            _draft.ContinueWith(chainedBuilder.BuildRequest());
             return this;
         }
     }

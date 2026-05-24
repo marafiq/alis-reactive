@@ -43,10 +43,8 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             var descriptor = eventSelector(NativeTextBoxEvents.Instance);
-            var pb = new PipelineBuilder<TModel>(plan.Context);
-            pipeline(descriptor.Args, pb);
 
-            plan.Context.WireComponentEvent(builder.ElementId, "native", descriptor.JsEvent, pb.BuildReactions());
+            ComponentEventOnboarding.Wire(plan, builder.ElementId, "native", descriptor, pipeline);
 
             return builder;
         }

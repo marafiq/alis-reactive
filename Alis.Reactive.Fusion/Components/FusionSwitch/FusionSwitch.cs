@@ -9,6 +9,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionSwitch : FusionComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new FusionSwitch(), "switch");
+
         /// <inheritdoc />
         public string ValueMember => "checked";
     }

@@ -19,15 +19,14 @@ public class WhenRegisteringAFusionInPlaceEditor : FusionTestBase
     public void Registration_for_string_property_has_string_shape()
     {
         var plan = CreatePlan();
-        var component = new FusionInPlaceEditor();
-        var registration = new ComponentRegistration(
-            "phoneNumber", component.Vendor, "PhoneNumber", component.ValueMember,
-            "inplace-editor", Shape.FromClrType(typeof(string)));
+        var registration = ModelBoundInputComponentSlot
+            .For<string>("phoneNumber", "PhoneNumber")
+            .Register(FusionInPlaceEditor.Registration);
 
-        plan.AddToComponentsMap("PhoneNumber", registration);
+        plan.RegisterInputComponent(registration);
 
-        Assert.That(plan.ComponentsMap, Contains.Key("PhoneNumber"));
-        var reg = plan.ComponentsMap["PhoneNumber"];
+        Assert.That(plan.RegisteredInputComponents, Contains.Key("PhoneNumber"));
+        var reg = plan.RegisteredInputComponents["PhoneNumber"];
         Assert.That(reg.Vendor, Is.EqualTo("fusion"));
         Assert.That(reg.ValueMember, Is.EqualTo("value"));
         Assert.That(reg.ComponentType, Is.EqualTo("inplace-editor"));
@@ -39,14 +38,13 @@ public class WhenRegisteringAFusionInPlaceEditor : FusionTestBase
     public void Registration_for_decimal_property_has_number_shape()
     {
         var plan = CreatePlan();
-        var component = new FusionInPlaceEditor();
-        var registration = new ComponentRegistration(
-            "amount", component.Vendor, "Amount", component.ValueMember,
-            "inplace-editor", Shape.FromClrType(typeof(decimal)));
+        var registration = ModelBoundInputComponentSlot
+            .For<decimal>("amount", "Amount")
+            .Register(FusionInPlaceEditor.Registration);
 
-        plan.AddToComponentsMap("Amount", registration);
+        plan.RegisterInputComponent(registration);
 
-        var reg = plan.ComponentsMap["Amount"];
+        var reg = plan.RegisteredInputComponents["Amount"];
         Assert.That(reg.ComponentType, Is.EqualTo("inplace-editor"));
         Assert.That(reg.Shape.Kind, Is.EqualTo(Shape.Number.Kind));
     }
@@ -55,32 +53,29 @@ public class WhenRegisteringAFusionInPlaceEditor : FusionTestBase
     public void Registration_for_nullable_datetime_property_has_nullable_date_shape()
     {
         var plan = CreatePlan();
-        var component = new FusionInPlaceEditor();
-        var registration = new ComponentRegistration(
-            "appointmentTime", component.Vendor, "AppointmentTime", component.ValueMember,
-            "inplace-editor", Shape.FromClrType(typeof(DateTime?)));
+        var registration = ModelBoundInputComponentSlot
+            .For<DateTime?>("appointmentTime", "AppointmentTime")
+            .Register(FusionInPlaceEditor.Registration);
 
-        plan.AddToComponentsMap("AppointmentTime", registration);
+        plan.RegisterInputComponent(registration);
 
-        var reg = plan.ComponentsMap["AppointmentTime"];
+        var reg = plan.RegisteredInputComponents["AppointmentTime"];
         Assert.That(reg.ComponentType, Is.EqualTo("inplace-editor"));
         Assert.That(reg.Shape.Kind, Is.EqualTo("nullable"));
-        Assert.That(reg.Shape.Inner, Is.Not.Null);
-        Assert.That(reg.Shape.Inner!.Kind, Is.EqualTo(Shape.Date.Kind));
+        Assert.That(reg.Shape.IsNullableOf(Shape.Date), Is.True);
     }
 
     [Test]
     public void Registration_for_non_nullable_datetime_property_has_date_shape()
     {
         var plan = CreatePlan();
-        var component = new FusionInPlaceEditor();
-        var registration = new ComponentRegistration(
-            "appointmentTime", component.Vendor, "AppointmentTime", component.ValueMember,
-            "inplace-editor", Shape.FromClrType(typeof(DateTime)));
+        var registration = ModelBoundInputComponentSlot
+            .For<DateTime>("appointmentTime", "AppointmentTime")
+            .Register(FusionInPlaceEditor.Registration);
 
-        plan.AddToComponentsMap("AppointmentTime", registration);
+        plan.RegisterInputComponent(registration);
 
-        var reg = plan.ComponentsMap["AppointmentTime"];
+        var reg = plan.RegisteredInputComponents["AppointmentTime"];
         Assert.That(reg.ComponentType, Is.EqualTo("inplace-editor"));
         Assert.That(reg.Shape.Kind, Is.EqualTo(Shape.Date.Kind));
     }

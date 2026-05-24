@@ -21,9 +21,10 @@ namespace Alis.Reactive.Builders.Requests
             where TModel : class
         {
             var component = new TComponent();
-            var elementId = IdGenerator.For<TModel>(expr);
-            var propertyName = ExpressionPathHelper.ToPropertyName(expr);
-            self.Include(elementId, component.Vendor, propertyName, component.ValueMember);
+            var elementId = IdGenerator.For<TModel, object>(expr);
+            var propertyName = ExpressionPathHelper.ToPropertyName<TModel, object>(expr);
+            var shape = Shape.FromClrType(ExpressionPathHelper.ToPropertyType(expr));
+            self.Include(elementId, component.Vendor, propertyName, component.ValueMember, shape);
             return self;
         }
 
@@ -40,7 +41,10 @@ namespace Alis.Reactive.Builders.Requests
             where TModel : class
         {
             var component = new TComponent();
-            var valueMember = component is IInputComponent input ? input.ValueMember : name;
+            var valueMember = name;
+            if (component is IInputComponent input)
+                valueMember = input.ValueMember;
+
             self.Include(refId, component.Vendor, name, valueMember);
             return self;
         }
@@ -56,7 +60,7 @@ namespace Alis.Reactive.Builders.Requests
             TypedComponentSource<TProp> source)
             where TModel : class
         {
-            self.Include(source.ComponentId, source.Vendor, source.ReadMember, source.ReadMember);
+            self.Include(source, source.ReadMember);
             return self;
         }
 
@@ -70,7 +74,7 @@ namespace Alis.Reactive.Builders.Requests
             string paramName)
             where TModel : class
         {
-            self.Include(source.ComponentId, source.Vendor, paramName, source.ReadMember);
+            self.Include(source, paramName);
             return self;
         }
     }

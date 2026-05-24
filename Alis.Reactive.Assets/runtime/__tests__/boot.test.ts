@@ -1,0 +1,56 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { initNativeActionLinks } from "../components/native/native-action-link";
+import { registerPlugin, resolvePlugin } from "../core/plugin-registry";
+import { executeReaction } from "../execution/execute";
+import { boot, resetBootStateForTests } from "../lifecycle/boot";
+import type { Plan } from "../types";
+
+function emptyPlan(planId: string): Plan {
+  return {
+    version: 3,
+    planId,
+    scope: { kind: "root" },
+    types: {},
+    components: {},
+    behaviors: [],
+  };
+}
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  resetBootStateForTests();
+  document.body.innerHTML = "";
+});
+
+describe("runtime boot state", () => {
+  it("resets browser runtime singletons so native action links initialize on the next boot", () => {
+    const addEventListener = vi.spyOn(document, "addEventListener");
+
+    initNativeActionLinks();
+    resetBootStateForTests();
+    initNativeActionLinks();
+
+    const documentClickRegistrations = addEventListener.mock.calls.filter(
+      ([eventName]) => eventName === "click",
+    );
+
+    expect(documentClickRegistrations).toHaveLength(2);
+  });
+
+  it("clears the active execution plan during boot reset", () => {
+    boot(emptyPlan("Runtime.ActivePlanReset"));
+
+    resetBootStateForTests();
+
+    expect(() => executeReaction({ kind: "sequence", steps: [] }))
+      .toThrow("[alis] no active plan");
+  });
+
+  it("clears browser plugin instances during boot reset", () => {
+    registerPlugin("slugify", (value: string): string => value.toLowerCase());
+
+    resetBootStateForTests();
+
+    expect(() => resolvePlugin("slugify")).toThrow("plugin not found");
+  });
+});

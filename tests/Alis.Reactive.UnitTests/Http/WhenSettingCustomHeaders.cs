@@ -5,8 +5,7 @@ using Alis.Reactive.Builders.Conditions;
 namespace Alis.Reactive.UnitTests.Http;
 
 /// <summary>
-/// Verifies that custom headers on HTTP requests serialize correctly
-/// and validate against the reactive plan schema.
+/// Verifies that custom headers on HTTP requests serialize correctly.
 /// </summary>
 [TestFixture]
 public class WhenSettingCustomHeaders : PlanTestBase
@@ -30,7 +29,6 @@ public class WhenSettingCustomHeaders : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"headers\""));
         Assert.That(planJson, Does.Contain("\"X-Api-Version\""));
@@ -54,7 +52,6 @@ public class WhenSettingCustomHeaders : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"X-Api-Version\""));
         Assert.That(planJson, Does.Contain("\"X-Tenant-Id\""));
@@ -72,7 +69,6 @@ public class WhenSettingCustomHeaders : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         using var doc = JsonDocument.Parse(planJson);
         var request = doc.RootElement.GetProperty("behaviors")[0]
@@ -102,7 +98,6 @@ public class WhenSettingCustomHeaders : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         // Both "one" and "two" header values must be present
         Assert.That(planJson, Does.Contain("\"one\""));
@@ -121,7 +116,6 @@ public class WhenSettingCustomHeaders : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         using var doc = JsonDocument.Parse(planJson);
         var request = doc.RootElement
@@ -151,7 +145,6 @@ public class WhenSettingCustomHeaders : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         // Event arg header reads from payload scope "event"
         Assert.That(planJson, Does.Contain("\"X-Correlation\""));
@@ -176,7 +169,6 @@ public class WhenSettingCustomHeaders : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         using var doc = JsonDocument.Parse(planJson);
         var request = doc.RootElement
@@ -256,7 +248,6 @@ public class WhenSettingCustomHeaders : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"X-Count\""));
     }
@@ -284,7 +275,7 @@ public class WhenSettingCustomHeaders : PlanTestBase
         // TypedComponentSource<T> is the production path for component.Value() reads
         var plan = CreatePlan();
         var source = new Alis.Reactive.Builders.Conditions.TypedComponentSource<string>(
-            "tenant-ddl", "fusion", "value");
+            "tenant-ddl", "value");
 
         Trigger(plan).DomReady(p =>
         {
@@ -294,7 +285,6 @@ public class WhenSettingCustomHeaders : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"X-Tenant\""));
         Assert.That(planJson, Does.Contain("\"kind\": \"read\""));

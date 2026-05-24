@@ -1,10 +1,5 @@
-#if NET48
-using System.Web;
-using System.Web.Mvc;
-#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-#endif
 
 namespace Alis.Reactive.Native.Extensions
 {
@@ -35,11 +30,7 @@ namespace Alis.Reactive.Native.Extensions
         /// </remarks>
         /// <typeparam name="TModel">The view model type, providing compile-time expression paths.</typeparam>
         /// <returns>A new plan instance scoped to this view.</returns>
-#if NET48
-        public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
-#else
         public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
-#endif
             where TModel : class
         {
             return new ReactivePlan<TModel>();
@@ -62,14 +53,10 @@ namespace Alis.Reactive.Native.Extensions
         /// </remarks>
         /// <typeparam name="TModel">The view model type must match the view's model.</typeparam>
         /// <returns>A plan instance that merges into the view's plan in the browser.</returns>
-#if NET48
-        public static ReactivePlan<TModel> ResolvePlan<TModel>(this HtmlHelper<TModel> html)
-#else
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
-#endif
             where TModel : class
         {
-            return new ReactivePlan<TModel>(isPartial: true);
+            return new ReactivePlan<TModel>(ReactivePlanScope.PartialContribution);
         }
 
         /// <summary>
@@ -84,22 +71,6 @@ namespace Alis.Reactive.Native.Extensions
         /// <param name="html">The Razor HTML helper.</param>
         /// <param name="plan">The plan to render.</param>
         /// <returns>HTML content that activates the plan when the page loads.</returns>
-#if NET48
-        public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html,
-            ReactivePlan<TModel> plan) where TModel : class
-        {
-            var json = plan.Render();
-            var elementId = plan.PlanId.Replace('.', '-').Replace('+', '-');
-            var script = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
-
-            if (plan.IsPartial)
-                return new MvcHtmlString(script);
-
-            var planId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
-            return new MvcHtmlString(script +
-                $"<div data-reactive-validation-summary=\"{planId}\" hidden></div>");
-        }
-#else
         public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan) where TModel : class
         {
@@ -112,13 +83,13 @@ namespace Alis.Reactive.Native.Extensions
             // hidden fields, unenriched fields (partial not yet loaded), or server
             // errors with no matching error span. Only views emit it — partials
             // rely on the view's summary div only if the partials are not rendered yet.
-            if (plan.IsPartial)
+            var planRendersValidationSummary = plan.RendersValidationSummary;
+            if (!planRendersValidationSummary)
                 return new HtmlString(script);
 
             var planId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
             return new HtmlString(script +
                 $"<div data-reactive-validation-summary=\"{planId}\" hidden></div>");
         }
-#endif
     }
 }

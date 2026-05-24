@@ -12,7 +12,7 @@ public class WhenExtractingLengthRules
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("maxLength"));
-        Assert.That(desc[0].Rules[0].Constraint, Is.EqualTo(100));
+        Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(100));
     }
 
     [Test]
@@ -22,7 +22,7 @@ public class WhenExtractingLengthRules
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("minLength"));
-        Assert.That(desc[0].Rules[0].Constraint, Is.EqualTo(3));
+        Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(3));
     }
 
     [Test]

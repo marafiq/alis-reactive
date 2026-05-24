@@ -16,6 +16,15 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionTimePicker Component = new FusionTimePicker();
 
+        private static readonly ComponentProperty<DateTime> ValueProperty =
+            ComponentProperty<DateTime>.Named(Component.ValueMember);
+
+        private static readonly ComponentMethod FocusInMethod =
+            ComponentMethod.Named("focusIn");
+
+        private static readonly ComponentMethod FocusOutMethod =
+            ComponentMethod.Named("focusOut");
+
         /// <summary>Sets the selected time.</summary>
         /// <param name="value">The time to set (only the time portion is used).</param>
         /// <returns>The component reference for method chaining.</returns>
@@ -23,8 +32,8 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionTimePicker, TModel> self, DateTime value)
             where TModel : class
         {
-            return self.EmitSet("value",
-                ValueProducer.Literal(value.ToString("HH:mm", CultureInfo.InvariantCulture)));
+            return self.EmitSet(ValueProperty,
+                ValueProducer.LiteralRaw(value.ToString("HH:mm", CultureInfo.InvariantCulture), Shape.Date));
         }
 
         /// <summary>Moves focus into the time picker.</summary>
@@ -32,14 +41,14 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionTimePicker, TModel> FocusIn<TModel>(
             this ComponentRef<FusionTimePicker, TModel> self)
             where TModel : class
-            => self.EmitCall("focusIn");
+            => self.EmitCall(FocusInMethod);
 
         /// <summary>Removes focus from the time picker.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTimePicker, TModel> FocusOut<TModel>(
             this ComponentRef<FusionTimePicker, TModel> self)
             where TModel : class
-            => self.EmitCall("focusOut");
+            => self.EmitCall(FocusOutMethod);
 
         /// <summary>Reads the current time value for use in conditions or gather.</summary>
         /// <remarks>
@@ -50,6 +59,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<DateTime> Value<TModel>(
             this ComponentRef<FusionTimePicker, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.Date, "read"); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, Component.ValueMember); }
+            => self.Read(ValueProperty);
     }
 }

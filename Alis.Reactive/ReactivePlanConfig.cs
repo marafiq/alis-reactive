@@ -1,4 +1,5 @@
 using System;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive
@@ -13,8 +14,10 @@ namespace Alis.Reactive
     /// </remarks>
     public static class ReactivePlanConfig
     {
-        /// <summary>Gets the registered validation extractor, or <see langword="null"/> if none is registered.</summary>
-        internal static IValidationExtractor? Extractor { get; private set; }
+        private static ValidationExtractorRegistration _validationExtractor =
+            ValidationExtractorRegistration.Missing;
+
+        internal static ValidationExtractorRegistration ValidationExtractor => _validationExtractor;
 
         /// <summary>
         /// Registers the validation extractor that converts FluentValidation rules to
@@ -28,14 +31,62 @@ namespace Alis.Reactive
         /// <exception cref="InvalidOperationException">Thrown if an extractor is already registered.</exception>
         public static void UseValidationExtractor(IValidationExtractor extractor)
         {
-            if (Extractor != null)
-                throw new InvalidOperationException(
-                    "Validation extractor is already registered. " +
-                    "UseValidationExtractor must be called exactly once at app startup.");
-            Extractor = extractor;
+            _validationExtractor = _validationExtractor.Register(extractor);
         }
 
         /// <summary>Test-only: resets static state so UseValidationExtractor can be called again.</summary>
-        internal static void Reset() => Extractor = null;
+        internal static void Reset() => _validationExtractor = ValidationExtractorRegistration.Missing;
+    }
+
+    internal abstract class ValidationExtractorRegistration
+    {
+        internal static ValidationExtractorRegistration Missing { get; } =
+            new MissingValidationExtractorRegistration();
+
+        internal abstract ValidationExtractorRegistration Register(IValidationExtractor extractor);
+
+        internal abstract IValidationExtractor RequireFor(ValidationJob job);
+    }
+
+    internal sealed class MissingValidationExtractorRegistration : ValidationExtractorRegistration
+    {
+        internal override ValidationExtractorRegistration Register(IValidationExtractor extractor)
+        {
+            if (extractor == null) throw new ArgumentNullException(nameof(extractor));
+            return new RegisteredValidationExtractor(extractor);
+        }
+
+        internal override IValidationExtractor RequireFor(ValidationJob job)
+        {
+            if (job == null) throw new ArgumentNullException(nameof(job));
+            throw new InvalidOperationException(
+                $"Request at '{job.RequestUrl}' specifies validator '{job.ValidatorType.Name}' " +
+                "but no IValidationExtractor is registered. " +
+                "Call ReactivePlanConfig.UseValidationExtractor() at app startup.");
+        }
+    }
+
+    internal sealed class RegisteredValidationExtractor : ValidationExtractorRegistration
+    {
+        private readonly IValidationExtractor _extractor;
+
+        internal RegisteredValidationExtractor(IValidationExtractor extractor)
+        {
+            _extractor = extractor ?? throw new ArgumentNullException(nameof(extractor));
+        }
+
+        internal override ValidationExtractorRegistration Register(IValidationExtractor extractor)
+        {
+            if (extractor == null) throw new ArgumentNullException(nameof(extractor));
+            throw new InvalidOperationException(
+                "Validation extractor is already registered. " +
+                "UseValidationExtractor must be called exactly once at app startup.");
+        }
+
+        internal override IValidationExtractor RequireFor(ValidationJob job)
+        {
+            if (job == null) throw new ArgumentNullException(nameof(job));
+            return _extractor;
+        }
     }
 }

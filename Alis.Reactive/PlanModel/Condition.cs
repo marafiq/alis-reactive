@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Serialization;
 
@@ -13,77 +14,279 @@ namespace Alis.Reactive.PlanModel
     {
         private protected Condition() { }
 
-        internal static Condition Compare(ValueProducer left, string op, ValueProducer? right = null, Shape? shape = null, Shape? itemShape = null) =>
-            new CompareCondition(left, op, right, shape, itemShape);
+        internal static Condition Compare(string op, ComparisonOperands operands) =>
+            new CompareCondition(CompareOperator.From(op), operands);
+
+        internal static Condition Compare(CompareOperator op, ComparisonOperands operands) =>
+            new CompareCondition(op, operands);
 
         internal static Condition All(params Condition[] terms) =>
-            new AllCondition(new List<Condition>(terms));
+            new AllCondition(ConditionTerms.From("all", terms));
 
         internal static Condition Any(params Condition[] terms) =>
-            new AnyCondition(new List<Condition>(terms));
+            new AnyCondition(ConditionTerms.From("any", terms));
 
         internal static Condition Not(Condition term) =>
             new NotCondition(term);
 
         internal static Condition Confirm(string message) =>
             new ConfirmCondition(message);
+    }
 
-        internal static readonly Condition None = new NoneCondition();
+    internal sealed class ConditionTerms
+    {
+        private readonly IReadOnlyList<Condition> _items;
 
-        internal bool IsNone => this is NoneCondition;
+        private ConditionTerms(IReadOnlyList<Condition> items)
+        {
+            _items = items ?? throw new ArgumentNullException(nameof(items));
+        }
+
+        internal IReadOnlyList<Condition> Items => _items;
+
+        internal static ConditionTerms From(string composition, IEnumerable<Condition> terms)
+        {
+            if (composition == null) throw new ArgumentNullException(nameof(composition));
+            if (terms == null) throw new ArgumentNullException(nameof(terms));
+
+            var items = new List<Condition>();
+            foreach (var term in terms)
+            {
+                if (term == null) throw new ArgumentException("Condition term must not be null.", nameof(terms));
+                items.Add(term);
+            }
+
+            if (items.Count == 0)
+                throw new ArgumentException(
+                    $"Composite condition '{composition}' requires at least one term.",
+                    nameof(terms));
+
+            return new ConditionTerms(items);
+        }
     }
 
     /// <summary>Compares two values using a relational operator.</summary>
+    [JsonConverter(typeof(CompareConditionJsonConverter))]
     public sealed class CompareCondition : Condition
     {
+        private readonly CompareOperator _op;
+        private readonly ComparisonOperands _operands;
+
         /// <summary>Gets the kind. Always <c>"compare"</c>.</summary>
         public string Kind => "compare";
         /// <summary>Gets the left-hand operand.</summary>
-        public ValueProducer Left { get; }
+        public ValueProducer Left => _operands.Left;
         /// <summary>Gets the comparison operator (eq, neq, gt, gte, lt, lte, truthy, empty, contains, startsWith, endsWith).</summary>
-        public string Op { get; }
-        /// <summary>Gets the right-hand operand. <see cref="ValueProducer.None"/> for unary operators.</summary>
-        public ValueProducer Right { get; }
+        public string Op => _op.Value;
         /// <summary>Gets the expected type shape for comparison. <see cref="PlanModel.Shape.None"/> when not specified.</summary>
-        public Shape Shape { get; }
+        public Shape Shape => _operands.ShapeForJson;
         /// <summary>Gets the element type shape used by collection operators such as <c>contains</c>. <see cref="PlanModel.Shape.None"/> for non-collection comparisons.</summary>
-        public Shape ItemShape { get; }
+        public Shape ItemShape => _operands.ItemShapeForJson;
 
-        internal CompareCondition(ValueProducer left, string op, ValueProducer? right = null, Shape? shape = null, Shape? itemShape = null)
+        internal ComparisonRightOperand RightOperand => _operands.Right;
+
+        internal CompareCondition(CompareOperator op, ComparisonOperands operands)
+        {
+            _op = op ?? throw new ArgumentNullException(nameof(op));
+            _operands = operands ?? throw new ArgumentNullException(nameof(operands));
+        }
+    }
+
+    internal sealed class CompareConditionJsonConverter : JsonConverter<CompareCondition>
+    {
+        public override void Write(Utf8JsonWriter writer, CompareCondition value, JsonSerializerOptions options)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            writer.WriteStartObject();
+            writer.WriteString("kind", value.Kind);
+            WriteProperty(writer, options, "left", value.Left);
+            writer.WriteString("op", value.Op);
+            WriteProperty(writer, options, "right", value.RightOperand);
+            WriteProperty(writer, options, "shape", value.Shape);
+            WriteProperty(writer, options, "itemShape", value.ItemShape);
+            writer.WriteEndObject();
+        }
+
+        public override CompareCondition Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options) =>
+            throw new NotSupportedException("Plan types are write-only.");
+
+        private static void WriteProperty<T>(
+            Utf8JsonWriter writer,
+            JsonSerializerOptions options,
+            string name,
+            T value)
+        {
+            writer.WritePropertyName(name);
+            JsonSerializer.Serialize(writer, value, options);
+        }
+    }
+
+    internal sealed class ComparisonOperands
+    {
+        private readonly ComparisonRightOperand _right;
+        private readonly ComparisonShapeProfile _shape;
+
+        private ComparisonOperands(
+            ValueProducer left,
+            ComparisonRightOperand right,
+            ComparisonShapeProfile shape)
         {
             Left = left ?? throw new ArgumentNullException(nameof(left));
-            Op = op ?? throw new ArgumentNullException(nameof(op));
-            Right = right ?? ValueProducer.None;
-            Shape = shape ?? Shape.None;
-            ItemShape = itemShape ?? Shape.None;
+            _right = right ?? throw new ArgumentNullException(nameof(right));
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
+
+        internal ValueProducer Left { get; }
+        internal ComparisonRightOperand Right => _right;
+        internal Shape ShapeForJson => _shape.OperandShape;
+        internal Shape ItemShapeForJson => _shape.ItemShape;
+
+        internal static ComparisonOperands Unary(ValueProducer left, Shape shape) =>
+            new ComparisonOperands(
+                left,
+                ComparisonRightOperand.Absent,
+                ComparisonShapeProfile.Scalar(shape));
+
+        internal static ComparisonOperands Binary(ValueProducer left, ValueProducer right, Shape shape) =>
+            new ComparisonOperands(
+                left,
+                ComparisonRightOperand.Present(right),
+                ComparisonShapeProfile.Scalar(shape));
+
+        internal static ComparisonOperands CollectionItem(
+            ValueProducer left,
+            ValueProducer right,
+            Shape collectionShape,
+            Shape itemShape) =>
+            new ComparisonOperands(
+                left,
+                ComparisonRightOperand.Present(right),
+                ComparisonShapeProfile.Collection(collectionShape, itemShape));
+    }
+
+    [JsonConverter(typeof(ComparisonRightOperandJsonConverter))]
+    internal abstract class ComparisonRightOperand
+    {
+        internal static ComparisonRightOperand Absent { get; } =
+            new AbsentComparisonRightOperand();
+
+        internal static ComparisonRightOperand Present(ValueProducer value) =>
+            new PresentComparisonRightOperand(value);
+
+        public abstract string Kind { get; }
+
+        internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
+    }
+
+    internal sealed class PresentComparisonRightOperand : ComparisonRightOperand
+    {
+        private readonly ValueProducer _value;
+
+        internal PresentComparisonRightOperand(ValueProducer value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        internal ValueProducer Value => _value;
+
+        public override string Kind => "value";
+
+        internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
+            ComparisonRightOperandJsonConverter.WriteProperty(writer, options, "value", _value);
+    }
+
+    internal sealed class AbsentComparisonRightOperand : ComparisonRightOperand
+    {
+        public override string Kind => "none";
+
+        internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
+        {
+        }
+    }
+
+    internal sealed class ComparisonRightOperandJsonConverter : JsonConverter<ComparisonRightOperand>
+    {
+        public override void Write(
+            Utf8JsonWriter writer,
+            ComparisonRightOperand value,
+            JsonSerializerOptions options)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            writer.WriteStartObject();
+            writer.WriteString("kind", value.Kind);
+            value.WritePayload(writer, options);
+            writer.WriteEndObject();
+        }
+
+        public override ComparisonRightOperand Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options) =>
+            throw new NotSupportedException("Plan types are write-only.");
+
+        internal static void WriteProperty<T>(
+            Utf8JsonWriter writer,
+            JsonSerializerOptions options,
+            string name,
+            T value)
+        {
+            writer.WritePropertyName(name);
+            JsonSerializer.Serialize(writer, value, options);
+        }
+    }
+
+    internal sealed class ComparisonShapeProfile
+    {
+        private ComparisonShapeProfile(Shape operandShape, Shape itemShape)
+        {
+            OperandShape = operandShape ?? throw new ArgumentNullException(nameof(operandShape));
+            ItemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
+        }
+
+        internal Shape OperandShape { get; }
+        internal Shape ItemShape { get; }
+
+        internal static ComparisonShapeProfile Scalar(Shape shape) =>
+            new ComparisonShapeProfile(shape, Shape.None);
+
+        internal static ComparisonShapeProfile Collection(Shape collectionShape, Shape itemShape) =>
+            new ComparisonShapeProfile(collectionShape, itemShape);
     }
 
     /// <summary>Logical AND: all child conditions must be true.</summary>
     public sealed class AllCondition : Condition
     {
+        private readonly ConditionTerms _terms;
+
         /// <summary>Gets the kind. Always <c>"all"</c>.</summary>
         public string Kind => "all";
         /// <summary>Gets the child conditions that must all be true.</summary>
-        public IReadOnlyList<Condition> Terms { get; }
+        public IReadOnlyList<Condition> Terms => _terms.Items;
 
-        internal AllCondition(List<Condition> terms)
+        internal AllCondition(ConditionTerms terms)
         {
-            Terms = terms ?? throw new ArgumentNullException(nameof(terms));
+            _terms = terms ?? throw new ArgumentNullException(nameof(terms));
         }
     }
 
     /// <summary>Logical OR: at least one child condition must be true.</summary>
     public sealed class AnyCondition : Condition
     {
+        private readonly ConditionTerms _terms;
+
         /// <summary>Gets the kind. Always <c>"any"</c>.</summary>
         public string Kind => "any";
         /// <summary>Gets the child conditions where at least one must be true.</summary>
-        public IReadOnlyList<Condition> Terms { get; }
+        public IReadOnlyList<Condition> Terms => _terms.Items;
 
-        internal AnyCondition(List<Condition> terms)
+        internal AnyCondition(ConditionTerms terms)
         {
-            Terms = terms ?? throw new ArgumentNullException(nameof(terms));
+            _terms = terms ?? throw new ArgumentNullException(nameof(terms));
         }
     }
 
@@ -115,12 +318,4 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>Sentinel for "no guard specified." Evaluates to true (no restriction). Not constructed in application code.</summary>
-    public sealed class NoneCondition : Condition
-    {
-        /// <summary>Gets the kind. Always <c>"none"</c>.</summary>
-        public string Kind => "none";
-
-        internal NoneCondition() { }
-    }
 }

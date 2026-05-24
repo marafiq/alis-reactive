@@ -4,35 +4,129 @@
 // No parallel read path — same concept as pipeline and gather.
 
 import type {
-  Plan, ContainerScope, ComponentValidation,
+  Plan, ValidationContainerComponent, ComponentValidation,
   ValidationRule, ValueProducer,
+  Condition,
+  ValidationRuleActivation as PlanValidationRuleActivation,
+  ValidationRuleOperand as PlanValidationRuleOperand,
 } from "../types";
-import { isEvaluable } from "../types";
 import type { ExecContext } from "../types";
-import { resolveElement } from "../resolution/resolver";
+import { RuntimePlan, RuntimeResolutionError, type RuntimeComponent } from "../domain/runtime-plan";
 import { evaluateCondition } from "../conditions/conditions";
 import { evaluateValue } from "../core/evaluate";
 import { scope } from "../core/trace";
 import { toString } from "../core/shape-convert";
-import { ruleFails } from "./rule-engine";
+import type { ResolvedPeerValue } from "./rule-engine";
+import { noPeerValue, peerValue, ruleFails } from "./rule-engine";
 import {
   showInline, clearInline,
   addToSummary, removeSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
   showServerErrorInline,
 } from "./error-display";
+import { ExecutionContext } from "../domain/execution-context";
+import { ObjectRecord } from "../domain/object-record";
+import { assertNever } from "../core/assert-never";
 
 const log = scope("validation");
+
+abstract class ValidationSummary {
+  static forPlan(planId: string): ValidationSummary {
+    const element = findSummaryElement(planId);
+    if (element === null) return MissingValidationSummary.instance;
+
+    return new RenderedValidationSummary(element);
+  }
+
+  abstract add(componentKey: string, message: string): boolean;
+
+  abstract remove(componentKey: string): void;
+
+  abstract hasEntry(componentKey: string): boolean;
+
+  abstract showWhen(hasErrors: boolean): void;
+
+  abstract clearAndHide(): void;
+}
+
+class RenderedValidationSummary extends ValidationSummary {
+  constructor(private readonly element: HTMLElement) {
+    super();
+  }
+
+  add(componentKey: string, message: string): boolean {
+    addToSummary(this.element, componentKey, message);
+    return true;
+  }
+
+  remove(componentKey: string): void {
+    removeSummaryEntry(this.element, componentKey);
+  }
+
+  hasEntry(componentKey: string): boolean {
+    return this.element.querySelector(`[data-valmsg-summary-for="${componentKey}"]`) !== null;
+  }
+
+  showWhen(hasErrors: boolean): void {
+    if (hasErrors) showSummaryDiv(this.element);
+  }
+
+  clearAndHide(): void {
+    clearSummary(this.element);
+    hideSummaryDiv(this.element);
+  }
+}
+
+class MissingValidationSummary extends ValidationSummary {
+  static readonly instance = new MissingValidationSummary();
+
+  add(): boolean {
+    return false;
+  }
+
+  remove(): void {
+    return;
+  }
+
+  hasEntry(): boolean {
+    return false;
+  }
+
+  showWhen(): void {
+    return;
+  }
+
+  clearAndHide(): void {
+    return;
+  }
+}
+
+interface ValidationSurface {
+  readonly plan: Plan;
+  readonly runtime: RuntimePlan;
+  readonly containerId: string;
+  readonly containerScope: ValidationContainerComponent;
+  readonly summary: ValidationSummary;
+  readonly context: ExecutionContext;
+}
+
+interface FieldEvaluation {
+  readonly componentValidation: ComponentValidation;
+  readonly componentDomId: string;
+  readonly value: unknown;
+  readonly hidden: boolean;
+}
 
 // -- Public API --
 
 export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecContext): boolean {
-  const containerComp = plan.components[containerKey];
+  const runtime = RuntimePlan.from(plan);
+  const containerComp = runtime.components.find(containerKey);
   if (!containerComp) {
     log.warn("container.not-found", { id: containerKey });
     return false;
   }
 
-  const containerScope = containerComp.container;
+  const containerScope = containerComp.containerScope;
   if (!containerScope) {
     log.warn("container.no-scope", { id: containerComp.id });
     return true;
@@ -41,7 +135,7 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
   const containerId = containerComp.id;
   let container: HTMLElement;
   try {
-    container = resolveElement(plan, containerKey);
+    container = containerComp.element();
   } catch (e) {
     if (!isResolutionError(e)) throw e;
     if (containerScope.validationRules.length > 0) {
@@ -51,10 +145,17 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
     return true;
   }
 
-  const planId = plan.planId;
-  const summaryEl = findSummaryElement(planId);
+  const summary = ValidationSummary.forPlan(plan.planId);
+  const surface: ValidationSurface = {
+    plan,
+    runtime,
+    containerId,
+    containerScope,
+    summary,
+    context: ExecutionContext.from(ctx),
+  };
 
-  clearContainerErrors(containerScope, plan, containerId, summaryEl);
+  clearContainerErrors(surface);
 
   if (containerScope.validationRules.length === 0) {
     return true;
@@ -64,66 +165,105 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
   let summaryHasErrors = false;
 
   for (const cv of containerScope.validationRules) {
-    if (!evaluateComponentRules(cv, plan, containerId, container, summaryEl, ctx)) {
+    if (!evaluateComponentRules(cv, surface, container)) {
       valid = false;
-      summaryHasErrors = summaryHasErrors || hasSummaryEntry(summaryEl, cv.component);
+      summaryHasErrors = summaryHasErrors || surface.summary.hasEntry(cv.component);
     }
   }
 
-  if (summaryHasErrors && summaryEl) showSummaryDiv(summaryEl);
+  surface.summary.showWhen(summaryHasErrors);
 
   log.debug("validated", { id: containerId, valid });
   return valid;
 }
 
 export function showServerErrors(plan: Plan, containerKey: string, data: unknown): void {
-  const containerComp = plan.components[containerKey];
-  if (!containerComp?.container) return;
+  const runtime = RuntimePlan.from(plan);
+  const containerComp = runtime.components.find(containerKey);
+  const containerScope = containerComp?.containerScope;
+  if (!containerComp || !containerScope) return;
 
   const containerId = containerComp.id;
-  const containerScope = containerComp.container;
-  const planId = plan.planId;
-  const summaryEl = findSummaryElement(planId);
+  const summary = ValidationSummary.forPlan(plan.planId);
+  const surface: ValidationSurface = {
+    plan,
+    runtime,
+    containerId,
+    containerScope,
+    summary,
+    context: ExecutionContext.absent(),
+  };
 
-  clearContainerErrors(containerScope, plan, containerId, summaryEl);
+  clearContainerErrors(surface);
 
-  const errors = extractErrors(data);
-  if (!errors) return;
+  const errors = ServerValidationErrors.from(data);
+  if (errors.wrongShape) log.warn("server-errors.wrong-shape");
+  if (!errors.found) return;
 
   let summaryHasErrors = false;
 
-  for (const [name, msgs] of Object.entries(errors)) {
-    const addedToSummary = placeServerError(name, msgs, containerScope, containerId, summaryEl, plan);
+  for (const error of errors.fields) {
+    const addedToSummary = placeServerError(error, surface);
     if (addedToSummary) summaryHasErrors = true;
   }
 
-  if (summaryHasErrors && summaryEl) showSummaryDiv(summaryEl);
-  log.debug("server-errors.shown", { id: containerId, fieldCount: Object.keys(errors).length });
+  surface.summary.showWhen(summaryHasErrors);
+  log.debug("server-errors.shown", { id: containerId, fieldCount: errors.fields.length });
 }
 
 /** Place a single server error on its component or into the summary. Returns true if any summary errors added. */
 function placeServerError(
-  name: string, msgs: unknown, containerScope: ContainerScope,
-  containerId: string, summaryEl: HTMLElement | null, plan: Plan,
+  error: ServerValidationError,
+  surface: ValidationSurface,
 ): boolean {
-  const msgResult = toString(msgs);
-  const msg = Array.isArray(msgs) ? msgs.join(", ") : msgResult.ok ? msgResult.value : "";
+  const msg = ServerValidationErrorMessage.from(error.messages);
+  return ServerErrorPlacementTarget
+    .for(error.name, surface)
+    .place(msg, surface);
+}
 
-  const compKey = findComponentKeyByName(containerScope, name);
-  if (compKey) {
-    const comp = plan.components[compKey];
-    if (comp) {
-      showServerErrorInline(containerId, compKey, msg, plan, containerScope);
-    }
-    // compKey exists but component missing from plan — silently skip (not a summary item)
+abstract class ServerErrorPlacementTarget {
+  static for(serverFieldName: string, surface: ValidationSurface): ServerErrorPlacementTarget {
+    const validation = findComponentValidationByName(surface, serverFieldName);
+    if (validation === undefined) return new SummaryServerErrorTarget(serverFieldName);
+
+    const component = surface.runtime.components.find(validation.component);
+    if (component === undefined) return new SummaryServerErrorTarget(serverFieldName);
+
+    const element = component.tryElement();
+    if (element === undefined) return new SummaryServerErrorTarget(serverFieldName);
+
+    const inlineMessageSlotCanRender = canRenderInlineValidationMessage(component.id);
+    if (!inlineMessageSlotCanRender) return new SummaryServerErrorTarget(serverFieldName);
+
+    return new InlineServerErrorTarget(component.id, element);
+  }
+
+  abstract place(message: string, surface: ValidationSurface): boolean;
+}
+
+class InlineServerErrorTarget extends ServerErrorPlacementTarget {
+  constructor(
+    private readonly componentDomId: string,
+    private readonly element: HTMLElement,
+  ) {
+    super();
+  }
+
+  place(message: string): boolean {
+    showServerErrorInline(this.componentDomId, message, this.element);
     return false;
   }
-  // No component found by name — route to summary
-  if (summaryEl) {
-    addToSummary(summaryEl, name, msg);
-    return true;
+}
+
+class SummaryServerErrorTarget extends ServerErrorPlacementTarget {
+  constructor(private readonly serverFieldName: string) {
+    super();
   }
-  return false;
+
+  place(message: string, surface: ValidationSurface): boolean {
+    return surface.summary.add(this.serverFieldName, message);
+  }
 }
 
 /**
@@ -131,96 +271,127 @@ function placeServerError(
  * Called on blur/change by live-clear to give immediate field-level feedback.
  */
 export function revalidateField(plan: Plan, containerKey: string, componentKey: string): void {
-  const containerComp = plan.components[containerKey];
-  if (!containerComp?.container) return;
+  const runtime = RuntimePlan.from(plan);
+  const containerComp = runtime.components.find(containerKey);
+  const containerScope = containerComp?.containerScope;
+  if (!containerComp || !containerScope) return;
 
-  const cv = containerComp.container.validationRules.find(r => r.component === componentKey);
+  const cv = containerScope.validationRules.find(r => r.component === componentKey);
   if (!cv) return;
 
   const containerId = containerComp.id;
 
   // Clear existing error for this field
-  const comp = plan.components[componentKey];
-  if (comp) clearInline(containerId, comp.id);
+  const comp = runtime.components.find(componentKey);
+  if (comp) clearInline(comp.id);
 
   // Find the container element
   let container: HTMLElement;
   try {
-    container = resolveElement(plan, containerKey);
+    container = containerComp.element();
   } catch (e) {
     if (!isResolutionError(e)) throw e;
     return;
   }
 
-  const summaryEl = findSummaryElement(plan.planId);
+  const summary = ValidationSummary.forPlan(plan.planId);
+  const surface: ValidationSurface = {
+    plan,
+    runtime,
+    containerId,
+    containerScope,
+    summary,
+    context: ExecutionContext.absent(),
+  };
 
-  evaluateComponentRules(cv, plan, containerId, container, summaryEl);
+  evaluateComponentRules(cv, surface, container);
 }
 
 export function clearContainerValidation(plan: Plan, containerKey: string): void {
-  const containerComp = plan.components[containerKey];
-  if (!containerComp?.container) return;
+  const runtime = RuntimePlan.from(plan);
+  const containerComp = runtime.components.find(containerKey);
+  const containerScope = containerComp?.containerScope;
+  if (!containerComp || !containerScope) return;
 
   const containerId = containerComp.id;
-  const summaryEl = findSummaryElement(plan.planId);
-  clearContainerErrors(containerComp.container, plan, containerId, summaryEl);
+  const summary = ValidationSummary.forPlan(plan.planId);
+  clearContainerErrors({
+    plan,
+    runtime,
+    containerId,
+    containerScope,
+    summary,
+    context: ExecutionContext.absent(),
+  });
 }
 
 // -- Per-component evaluation --
 
 function evaluateComponentRules(
   cv: ComponentValidation,
-  plan: Plan,
-  containerId: string,
+  surface: ValidationSurface,
   container: HTMLElement,
-  summaryEl: HTMLElement | null,
-  ctx?: ExecContext,
 ): boolean {
-  const comp = plan.components[cv.component];
-  if (!comp) return handleMissingComponent(cv, plan, summaryEl, ctx);
+  const comp = surface.runtime.components.find(cv.component);
+  if (!comp) return handleMissingComponent(cv, surface);
 
-  const resolved = resolveFieldElement(plan, cv, summaryEl, ctx);
+  const resolved = resolveFieldElement(comp, cv, surface);
   if (resolved.done) return resolved.result;
 
-  if (!container.contains(resolved.el)) {
-    log.trace("field.out-of-scope", { component: cv.component, containerId });
+  if (!container.contains(resolved.element)) {
+    log.trace("field.out-of-scope", { component: cv.component, containerId: surface.containerId });
     return true;
   }
 
   const hidden = isErrorSpanHidden(comp.id);
-  const value = readValueSafe(cv.value, plan);
+  const value = evaluateValue(cv.value, surface.plan);
+  const field: FieldEvaluation = {
+    componentValidation: cv,
+    componentDomId: comp.id,
+    value,
+    hidden,
+  };
 
-  return evaluateRulesForField(cv, plan, containerId, comp.id, value, hidden, summaryEl, ctx);
+  return evaluateRulesForField(field, surface);
 }
 
 /** When the component is not found in the plan, check if all rules are conditionally skipped. */
 function handleMissingComponent(
-  cv: ComponentValidation, plan: Plan, summaryEl: HTMLElement | null, ctx?: ExecContext,
+  cv: ComponentValidation,
+  surface: ValidationSurface,
 ): boolean {
   log.trace("component.not-found", { component: cv.component });
-  if (allRulesConditionallySkipped(cv.rules, plan, ctx)) return true;
-  if (cv.rules.length > 0 && summaryEl) {
-    addToSummary(summaryEl, cv.component, cv.rules[0].message);
+  if (allRulesConditionallySkipped(cv.rules, surface)) return true;
+  const message = firstRuleMessage(cv);
+  if (message !== undefined) {
+    surface.summary.add(cv.component, message);
   }
   return false;
 }
 
-type FieldResolution = { done: false; el: HTMLElement } | { done: true; result: boolean };
+type FieldResolution = { done: false; element: HTMLElement } | { done: true; result: boolean };
 
 /** Resolve the field element. On resolution error, returns early result (true if all skipped, false otherwise). */
 function resolveFieldElement(
-  plan: Plan, cv: ComponentValidation, summaryEl: HTMLElement | null, ctx?: ExecContext,
+  component: RuntimeComponent,
+  cv: ComponentValidation,
+  surface: ValidationSurface,
 ): FieldResolution {
   try {
-    return { done: false, el: resolveElement(plan, cv.component) };
+    return { done: false, element: component.element() };
   } catch (e) {
     if (!isResolutionError(e)) throw e;
-    if (allRulesConditionallySkipped(cv.rules, plan, ctx)) return { done: true, result: true };
-    if (cv.rules.length > 0 && summaryEl) {
-      addToSummary(summaryEl, cv.component, cv.rules[0].message);
+    if (allRulesConditionallySkipped(cv.rules, surface)) return { done: true, result: true };
+    const message = firstRuleMessage(cv);
+    if (message !== undefined) {
+      surface.summary.add(cv.component, message);
     }
     return { done: true, result: false };
   }
+}
+
+function firstRuleMessage(cv: ComponentValidation): string | undefined {
+  return cv.rules[0]?.message;
 }
 
 /**
@@ -229,145 +400,259 @@ function resolveFieldElement(
  * getElementById is correct here — error spans are not registered in plan.components.
  */
 function isErrorSpanHidden(compId: string): boolean {
-  const errorSpan = document.getElementById(compId + "_error");
-  return errorSpan?.parentElement ? isHidden(errorSpan.parentElement) : true;
+  return !canRenderInlineValidationMessage(compId);
 }
 
-/**
- * Read value via the shared evaluateValue — same concept as pipeline and gather.
- * Component may not be resolved yet (partial not merged) — suppress resolution errors only.
- */
-function readValueSafe(valueProducer: ValueProducer, plan: Plan): unknown {
-  try {
-    return evaluateValue(valueProducer, plan);
-  } catch (e) {
-    if (isResolutionError(e)) return undefined;
-    throw e;
-  }
+function canRenderInlineValidationMessage(compId: string): boolean {
+  const errorSpan = document.getElementById(compId + "_error");
+  const parent = errorSpan?.parentElement;
+  const messageSlotWasNotRendered = parent === null || parent === undefined;
+  if (messageSlotWasNotRendered) return false;
+
+  return !isHidden(parent);
 }
 
 /** Evaluate each rule against the field value. Returns false on first failure. */
 function evaluateRulesForField(
-  cv: ComponentValidation, plan: Plan, containerId: string, compId: string,
-  value: unknown, hidden: boolean, summaryEl: HTMLElement | null, ctx?: ExecContext,
+  field: FieldEvaluation,
+  surface: ValidationSurface,
 ): boolean {
-  for (const rule of cv.rules) {
-    if (!isRuleActive(rule, plan, ctx)) continue;
+  for (const rule of field.componentValidation.rules) {
+    const runtimeRule = RuntimeValidationRule.from(rule);
+    if (!runtimeRule.isActive(surface)) continue;
 
-    const otherValue = resolveOtherValue(rule, plan);
+    const otherValue = runtimeRule.resolvePeerValue(surface.plan);
 
-    if (ruleFails(rule, value, otherValue)) {
-      reportRuleFailure(cv.component, rule, value, containerId, compId, hidden, summaryEl);
+    if (ruleFails({ rule, value: field.value, peerValue: otherValue })) {
+      reportRuleFailure(field, rule, surface);
       return false;
     }
   }
   return true;
 }
 
-/** Check if a rule's condition is met. Returns false if condition skips this rule. */
-function isRuleActive(rule: ValidationRule, plan: Plan, ctx?: ExecContext): boolean {
-  if (rule.when.kind === "none") return true;
-  try {
-    return evaluateCondition(rule.when, plan, ctx);
-  } catch (e) {
-    if (isResolutionError(e)) return false;
-    throw e;
-  }
-}
-
-/** Pre-resolve otherValue if present — keeps rule-engine pure (no DOM). */
-function resolveOtherValue(rule: ValidationRule, plan: Plan): unknown {
-  if (!isEvaluable(rule.otherValue)) return undefined;
-  try {
-    return evaluateValue(rule.otherValue, plan);
-  } catch (e) {
-    if (isResolutionError(e)) return undefined;
-    throw e;
-  }
-}
-
 /** Show the error inline or in the summary depending on visibility. */
 function reportRuleFailure(
-  component: string, rule: ValidationRule, value: unknown,
-  containerId: string, compId: string, hidden: boolean, summaryEl: HTMLElement | null,
+  field: FieldEvaluation,
+  rule: ValidationRule,
+  surface: ValidationSurface,
 ): void {
-  log.trace("rule.failed", { component, rule: rule.name, value, message: rule.message });
-  if (hidden) {
-    if (summaryEl) addToSummary(summaryEl, component, rule.message);
+  const component = field.componentValidation.component;
+  log.trace("rule.failed", { component, rule: rule.name, value: field.value, message: rule.message });
+  if (field.hidden) {
+    surface.summary.add(component, rule.message);
   } else {
-    showInline(containerId, compId, rule.message);
-    if (summaryEl) removeSummaryEntry(summaryEl, component);
+    showInline(field.componentDomId, rule.message);
+    surface.summary.remove(component);
   }
 }
 
 /** Only suppress errors from component/element resolution — not contract bugs. */
 function isResolutionError(e: unknown): boolean {
-  if (!(e instanceof Error)) return false;
-  const msg = e.message;
-  return msg.includes("component not found") || msg.includes("element not found");
+  return RuntimeResolutionError.is(e);
 }
 
 // -- Helpers --
 
-function allRulesConditionallySkipped(rules: ValidationRule[], plan: Plan, ctx?: ExecContext): boolean {
+function allRulesConditionallySkipped(rules: ValidationRule[], surface: ValidationSurface): boolean {
   if (rules.length === 0) return true;
   for (const rule of rules) {
-    if (rule.when.kind === "none") return false;
-    try {
-      const result = evaluateCondition(rule.when, plan, ctx);
-      if (result) return false;
-    } catch (e) {
-      if (isResolutionError(e)) continue;
-      throw e;
-    }
+    if (!RuntimeValidationRule.from(rule).isConditionallySkipped(surface)) return false;
   }
   return true;
 }
 
-function clearContainerErrors(
-  containerScope: ContainerScope,
-  plan: Plan,
-  containerId: string,
-  summaryEl: HTMLElement | null,
-): void {
-  for (const cv of containerScope.validationRules) {
-    const comp = plan.components[cv.component];
-    if (comp) clearInline(containerId, comp.id);
+class RuntimeValidationRule {
+  private constructor(private readonly rule: ValidationRule) {}
+
+  static from(rule: ValidationRule): RuntimeValidationRule {
+    return new RuntimeValidationRule(rule);
   }
-  if (summaryEl) {
-    clearSummary(summaryEl);
-    hideSummaryDiv(summaryEl);
+
+  isActive(surface: ValidationSurface): boolean {
+    return ValidationActivation.from(this.rule.execution.activation).isActive(surface);
+  }
+
+  isConditionallySkipped(surface: ValidationSurface): boolean {
+    return ValidationActivation.from(this.rule.execution.activation).isSkipped(surface);
+  }
+
+  resolvePeerValue(plan: Plan): ResolvedPeerValue {
+    return ValidationPeerOperand.from(this.rule.execution.otherValue).resolve(plan);
   }
 }
 
-function findComponentKeyByName(containerScope: ContainerScope, name: string): string | undefined {
+abstract class ValidationActivation {
+  static from(activation: PlanValidationRuleActivation): ValidationActivation {
+    switch (activation.kind) {
+      case "always": return AlwaysValidationActivation.instance;
+      case "when": return new ConditionalValidationActivation(activation.condition);
+      default: return assertNever(activation, "validation rule activation");
+    }
+  }
+
+  abstract isActive(surface: ValidationSurface): boolean;
+
+  abstract isSkipped(surface: ValidationSurface): boolean;
+}
+
+class AlwaysValidationActivation extends ValidationActivation {
+  static readonly instance = new AlwaysValidationActivation();
+
+  isActive(): boolean {
+    return true;
+  }
+
+  isSkipped(): boolean {
+    return false;
+  }
+}
+
+class ConditionalValidationActivation extends ValidationActivation {
+  constructor(private readonly condition: Condition) {
+    super();
+  }
+
+  isActive(surface: ValidationSurface): boolean {
+    try {
+      return evaluateCondition(this.condition, surface.plan, surface.context.raw);
+    } catch (e) {
+      if (isResolutionError(e)) return false;
+      throw e;
+    }
+  }
+
+  isSkipped(surface: ValidationSurface): boolean {
+    try {
+      return !evaluateCondition(this.condition, surface.plan, surface.context.raw);
+    } catch (e) {
+      if (isResolutionError(e)) return true;
+      throw e;
+    }
+  }
+}
+
+abstract class ValidationPeerOperand {
+  static from(operand: PlanValidationRuleOperand): ValidationPeerOperand {
+    switch (operand.kind) {
+      case "none": return MissingValidationPeerOperand.instance;
+      case "value": return new PresentValidationPeerOperand(operand.value);
+      default: return assertNever(operand, "validation peer operand");
+    }
+  }
+
+  abstract resolve(plan: Plan): ResolvedPeerValue;
+}
+
+class MissingValidationPeerOperand extends ValidationPeerOperand {
+  static readonly instance = new MissingValidationPeerOperand();
+
+  resolve(): ResolvedPeerValue {
+    return noPeerValue();
+  }
+}
+
+class PresentValidationPeerOperand extends ValidationPeerOperand {
+  constructor(private readonly value: ValueProducer) {
+    super();
+  }
+
+  resolve(plan: Plan): ResolvedPeerValue {
+    try {
+      return peerValue(evaluateValue(this.value, plan));
+    } catch (e) {
+      if (isResolutionError(e)) return noPeerValue();
+      throw e;
+    }
+  }
+}
+
+function clearContainerErrors(
+  surface: ValidationSurface,
+): void {
+  for (const cv of surface.containerScope.validationRules) {
+    const comp = surface.runtime.components.find(cv.component);
+    if (comp) clearInline(comp.id);
+  }
+  surface.summary.clearAndHide();
+}
+
+function findComponentValidationByName(surface: ValidationSurface, name: string): ComponentValidation | undefined {
   // Plan-driven: each ComponentValidation carries serverFieldName set at C# build time.
   // No heuristics — the plan declares the mapping.
-  return containerScope.validationRules.find(
-    cv => cv.serverFieldName === name || cv.component === name
-  )?.component;
+  return surface.containerScope.validationRules.find(cv => matchesServerErrorName(cv, name));
 }
 
-function hasSummaryEntry(summaryEl: HTMLElement | null, componentKey: string): boolean {
-  if (!summaryEl) return false;
-  return summaryEl.querySelector(`[data-valmsg-summary-for="${componentKey}"]`) !== null;
+function matchesServerErrorName(componentValidation: ComponentValidation, serverFieldName: string): boolean {
+  return componentValidation.serverFieldName === serverFieldName;
 }
 
 function isHidden(el: HTMLElement): boolean {
   let node: HTMLElement | null = el;
   while (node) {
-    if (node.hasAttribute("hidden") || node.style?.display === "none") return true;
+    const nodeIsHidden = node.hasAttribute("hidden") || node.style?.display === "none";
+    if (nodeIsHidden) return true;
     node = node.parentElement;
   }
   return false;
 }
 
-function extractErrors(data: unknown): Record<string, unknown> | null {
-  if (!data || typeof data !== "object") return null;
-  const obj = data as Record<string, unknown>;
-  if ("errors" in obj && typeof obj.errors === "object" && obj.errors !== null) {
-    return obj.errors as Record<string, unknown>;
+interface ServerValidationError {
+  readonly name: string;
+  readonly messages: unknown;
+}
+
+class ServerValidationErrors {
+  private constructor(
+    readonly fields: ServerValidationError[],
+    private readonly payloadShape: ServerValidationPayloadShape,
+  ) {}
+
+  static from(data: unknown): ServerValidationErrors {
+    const payload = ObjectRecord.tryFrom(data);
+    if (payload === undefined) return ServerValidationErrors.notPresent();
+
+    const errors = ObjectRecord.tryFrom(payload.get("errors"));
+    if (errors === undefined) return ServerValidationErrors.wrongShape();
+
+    return ServerValidationErrors.withFields(
+      errors.entries().map(([name, messages]) => ({ name, messages })),
+    );
   }
-  log.warn("server-errors.wrong-shape");
-  return null;
+
+  private static notPresent(): ServerValidationErrors {
+    return new ServerValidationErrors([], "not-validation-payload");
+  }
+
+  private static wrongShape(): ServerValidationErrors {
+    return new ServerValidationErrors([], "wrong-shape");
+  }
+
+  private static withFields(fields: ServerValidationError[]): ServerValidationErrors {
+    return new ServerValidationErrors(fields, "field-errors");
+  }
+
+  get wrongShape(): boolean {
+    return this.payloadShape === "wrong-shape";
+  }
+
+  get found(): boolean {
+    return this.fields.length > 0;
+  }
+}
+
+type ServerValidationPayloadShape =
+  | "not-validation-payload"
+  | "wrong-shape"
+  | "field-errors";
+
+class ServerValidationErrorMessage {
+  static from(messages: unknown): string {
+    if (Array.isArray(messages)) return messages.join(", ");
+
+    const message = toString(messages);
+    if (message.ok) return message.value;
+
+    return "";
+  }
 }

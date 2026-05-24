@@ -14,7 +14,7 @@ public class WhenExtractingRangeRule
         var rule = desc[0].Rules[0];
         Assert.That(rule.Rule, Is.EqualTo("range"));
 
-        var constraint = rule.Constraint as object[];
+        var constraint = rule.ConstraintValue() as object[];
         Assert.That(constraint, Is.Not.Null);
         Assert.That(constraint!, Has.Length.EqualTo(2));
         Assert.That(constraint[0], Is.EqualTo(0));

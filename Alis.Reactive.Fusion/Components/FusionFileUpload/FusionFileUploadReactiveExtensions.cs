@@ -42,15 +42,13 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var descriptor = eventSelector(FusionFileUploadEvents.Instance);
-            var pb = new PipelineBuilder<TModel>(plan.Context);
-            pipeline(descriptor.Args, pb);
 
             // Uploader uses Uploader(id) — id is set via the constructor, stored in model.Id.
             // name is set via HtmlAttributes.
             var componentId = builder.model.Id;
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
 
-            plan.Context.WireComponentEvent(componentId, Component.Vendor, descriptor.JsEvent, pb.BuildReactions());
+            ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, descriptor, pipeline);
 
             return builder;
         }

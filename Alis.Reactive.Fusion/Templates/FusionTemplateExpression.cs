@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq.Expressions;
 
 namespace Alis.Reactive.Fusion.Templates
@@ -107,7 +108,7 @@ namespace Alis.Reactive.Fusion.Templates
             return ConvertConstant(value);
         }
 
-        private static string ConvertConstant(object value)
+        private static string ConvertConstant(object? value)
         {
             if (value == null) return "null";
 
@@ -115,13 +116,7 @@ namespace Alis.Reactive.Fusion.Templates
             {
                 string s => $"'{s}'",
                 bool b => b ? "true" : "false",
-                int _ => value.ToString(),
-                long _ => value.ToString(),
-                short _ => value.ToString(),
-                byte _ => value.ToString(),
-                float _ => value.ToString(),
-                double _ => value.ToString(),
-                decimal _ => value.ToString(),
+                IFormattable number => number.ToString(null, CultureInfo.InvariantCulture),
                 _ => $"'{value}'"
             };
         }

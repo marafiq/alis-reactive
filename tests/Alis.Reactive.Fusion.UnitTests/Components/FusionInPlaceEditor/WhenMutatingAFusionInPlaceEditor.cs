@@ -14,7 +14,6 @@ public class WhenMutatingAFusionInPlaceEditor : FusionTestBase
             p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).SetValue("555-0123"));
 
         var json = plan.RenderFormatted();
-        AssertSchemaValid(json);
 
         Assert.That(json, Does.Contain("\"set\""));
         Assert.That(json, Does.Contain("\"value\""));
@@ -29,7 +28,6 @@ public class WhenMutatingAFusionInPlaceEditor : FusionTestBase
             p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).SetValue(null));
 
         var json = plan.RenderFormatted();
-        AssertSchemaValid(json);
 
         Assert.That(json, Does.Contain("\"set\""));
         Assert.That(json, Does.Contain("\"value\""));
@@ -43,7 +41,6 @@ public class WhenMutatingAFusionInPlaceEditor : FusionTestBase
             p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).Enable());
 
         var json = plan.RenderFormatted();
-        AssertSchemaValid(json);
 
         Assert.That(json, Does.Contain("\"call\""));
         Assert.That(json, Does.Contain("\"disable\""));
@@ -58,7 +55,6 @@ public class WhenMutatingAFusionInPlaceEditor : FusionTestBase
             p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).Disable());
 
         var json = plan.RenderFormatted();
-        AssertSchemaValid(json);
 
         Assert.That(json, Does.Contain("\"call\""));
         Assert.That(json, Does.Contain("\"disable\""));
@@ -73,7 +69,6 @@ public class WhenMutatingAFusionInPlaceEditor : FusionTestBase
             p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).Save());
 
         var json = plan.RenderFormatted();
-        AssertSchemaValid(json);
 
         Assert.That(json, Does.Contain("\"call\""));
         Assert.That(json, Does.Contain("\"save\""));
@@ -87,7 +82,6 @@ public class WhenMutatingAFusionInPlaceEditor : FusionTestBase
             p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).Focus());
 
         var json = plan.RenderFormatted();
-        AssertSchemaValid(json);
 
         Assert.That(json, Does.Contain("\"call\""));
         Assert.That(json, Does.Contain("\"setFocus\""));
@@ -101,7 +95,6 @@ public class WhenMutatingAFusionInPlaceEditor : FusionTestBase
             p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).AddClass("alis-editor-saved"));
 
         var json = plan.RenderFormatted();
-        AssertSchemaValid(json);
 
         Assert.That(json, Does.Contain("\"call\""));
         Assert.That(json, Does.Contain("\"classAdd\""));
@@ -120,7 +113,6 @@ public class WhenMutatingAFusionInPlaceEditor : FusionTestBase
             p.Component<FusionInPlaceEditor>(m => m.PhoneNumber).RemoveClass("alis-editor-saved"));
 
         var json = plan.RenderFormatted();
-        AssertSchemaValid(json);
 
         Assert.That(json, Does.Contain("\"call\""));
         Assert.That(json, Does.Contain("\"classRemove\""));

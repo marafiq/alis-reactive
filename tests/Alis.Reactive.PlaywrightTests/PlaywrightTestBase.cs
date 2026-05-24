@@ -6,17 +6,14 @@ namespace Alis.Reactive.PlaywrightTests;
 public abstract class PlaywrightTestBase : PageTest
 {
     protected string BaseUrl => WebServerFixture.BaseUrl;
-    private const string ReactiveBootedExpression = "() => document.documentElement.dataset.alisBooted === 'true'";
-    private static readonly string[] TransientBootRecoveryMarkers =
-    [
-        "ERR_NETWORK_CHANGED",
-        "net::ERR_NETWORK_CHANGED",
-        "ERR_NETWORK_IO_SUSPENDED",
-        "ReferenceError: ej is not defined",
-        "ReferenceError: ejs is not defined",
-        "Cannot read properties of undefined (reading 'popups')"
-    ];
-    private static readonly string[] IgnoredConsoleErrorMarkers =
+    private const int BootPollIntervalMs = 50;
+    private const int ReactiveBootTimeoutMs = 60000;
+    private const int NavigationTimeoutBootRecoveryMs = 1000;
+    private const string ReactiveBootedTrace = "[alis:boot] booted";
+    private const string ReactiveBootedMarkerSelector = "html[data-alis-booted='true']";
+    private const string ReactiveBootedBrowserPredicate =
+        "() => document.documentElement.dataset.alisBooted === 'true' || window.__alisReactiveBoot?.booted === true";
+    private static readonly string[] IgnoredBrowserNavigationErrors =
     [
         "ERR_NETWORK_CHANGED",
         "net::ERR_NETWORK_CHANGED",
@@ -33,6 +30,7 @@ public abstract class PlaywrightTestBase : PageTest
         ClearConsoleState();
         Page.SetDefaultTimeout(60000);
         Page.SetDefaultNavigationTimeout(60000);
+        await RouteExternalFontsToLocalFallback();
 
         Page.Console += (_, msg) =>
         {
@@ -62,6 +60,20 @@ public abstract class PlaywrightTestBase : PageTest
             Snapshots = true,
             Sources = false
         });
+    }
+
+    private async Task RouteExternalFontsToLocalFallback()
+    {
+        await Context.RouteAsync("https://fonts.googleapis.com/**", async route =>
+            await route.FulfillAsync(new()
+            {
+                Status = 200,
+                ContentType = "text/css",
+                Body = ""
+            }));
+
+        await Context.RouteAsync("https://fonts.gstatic.com/**", async route =>
+            await route.FulfillAsync(new() { Status = 204 }));
     }
 
     [TearDown]
@@ -103,11 +115,22 @@ public abstract class PlaywrightTestBase : PageTest
 
     protected async Task NavigateTo(string path)
     {
-        await Page.GotoAsync($"{BaseUrl}{path}", new()
+        try
         {
-            WaitUntil = WaitUntilState.Commit,
-            Timeout = 60000
-        });
+            await Page.GotoAsync($"{BaseUrl}{path}", new()
+            {
+                WaitUntil = WaitUntilState.DOMContentLoaded,
+                Timeout = 60000
+            });
+        }
+        catch (TimeoutException)
+        {
+            if (!await PageReachedReactiveBootAfterNavigationTimeout())
+                throw;
+
+            TestContext.Out.WriteLine(
+                "Navigation timed out after reactive boot was observed; continuing with reactive boot as readiness.");
+        }
     }
 
     protected async Task NavigateToAndWaitForTextSignal(
@@ -142,13 +165,13 @@ public abstract class PlaywrightTestBase : PageTest
 
     protected void AssertNoConsoleErrors()
     {
-        var unexpected = FilterUnexpectedConsoleErrors();
+        var unexpected = SnapshotUnexpectedConsoleErrors();
         Assert.That(unexpected, Is.Empty, "Expected no console errors");
     }
 
     protected void AssertNoConsoleErrorsExcept(params string[] allowedPatterns)
     {
-        var unexpected = FilterUnexpectedConsoleErrors()
+        var unexpected = SnapshotUnexpectedConsoleErrors()
             .Where(e => !allowedPatterns.Any(p => e.Contains(p)))
             .ToList();
         Assert.That(unexpected, Is.Empty, "Expected no unexpected console errors");
@@ -189,9 +212,8 @@ public abstract class PlaywrightTestBase : PageTest
 
     protected async Task ClickWhenStable(ILocator locator, int timeoutMs = 60000)
     {
-        await locator.ScrollIntoViewIfNeededAsync();
-        await Expect(locator).ToBeVisibleAsync();
-        await Expect(locator).ToBeEnabledAsync();
+        await Expect(locator).ToBeVisibleAsync(new() { Timeout = timeoutMs });
+        await Expect(locator).ToBeEnabledAsync(new() { Timeout = timeoutMs });
 
         try
         {
@@ -201,18 +223,8 @@ public abstract class PlaywrightTestBase : PageTest
         {
             TestContext.Out.WriteLine(
                 $"ClickWhenStable retrying after timeout for locator '{locator}': {ex.Message}");
-            await locator.ScrollIntoViewIfNeededAsync();
             await Page.WaitForTimeoutAsync(250);
             await locator.ClickAsync(new() { Timeout = timeoutMs });
-        }
-    }
-
-    private bool HasTransientBootFailure()
-    {
-        lock (_consoleLock)
-        {
-            return _consoleMessages.Any(m => TransientBootRecoveryMarkers.Any(m.Contains))
-                   || _consoleErrors.Any(m => TransientBootRecoveryMarkers.Any(m.Contains));
         }
     }
 
@@ -240,12 +252,10 @@ public abstract class PlaywrightTestBase : PageTest
         }
     }
 
-    private List<string> FilterUnexpectedConsoleErrors()
-    {
-        return SnapshotConsoleErrors()
-            .Where(e => !IgnoredConsoleErrorMarkers.Any(e.Contains))
+    private List<string> SnapshotUnexpectedConsoleErrors() =>
+        SnapshotConsoleErrors()
+            .Where(error => !IgnoredBrowserNavigationErrors.Any(error.Contains))
             .ToList();
-    }
 
     private void ClearConsoleState()
     {
@@ -256,33 +266,68 @@ public abstract class PlaywrightTestBase : PageTest
         }
     }
 
-    private async Task<bool> TryRecoverFromTransientBootFailure()
+    private async Task WaitForReactiveBoot(int timeoutMs)
     {
-        if (!HasTransientBootFailure())
-            return false;
+        var bootTimeoutMs = Math.Max(timeoutMs, ReactiveBootTimeoutMs);
+        if (ConsoleContains(ReactiveBootedTrace))
+            return;
 
-        WriteConsoleMessages("=== Browser Console Output Before Boot Retry ===", SnapshotConsoleMessages());
-        ClearConsoleState();
-        await Page.ReloadAsync(new()
-        {
-            WaitUntil = WaitUntilState.Commit,
-            Timeout = 60000
-        });
-        return true;
+        if (await BrowserReportsReactiveBoot(bootTimeoutMs))
+            return;
+
+        if (ConsoleContains(ReactiveBootedTrace) || await PageHasReactiveBootMarker())
+            return;
+
+        WriteConsoleMessages(
+            "=== Browser Console Output While Waiting For Boot ===",
+            SnapshotConsoleMessages());
+        throw new TimeoutException($"Timed out waiting {bootTimeoutMs}ms for reactive boot.");
     }
 
-    private async Task WaitForReactiveBoot(int timeoutMs)
+    private async Task<bool> BrowserReportsReactiveBoot(int timeoutMs)
     {
         try
         {
-            await Page.WaitForFunctionAsync(ReactiveBootedExpression, null, new() { Timeout = timeoutMs });
+            await Page.WaitForFunctionAsync(
+                ReactiveBootedBrowserPredicate,
+                null,
+                new() { Timeout = timeoutMs, PollingInterval = BootPollIntervalMs });
+            return true;
         }
         catch (TimeoutException)
         {
-            if (!await TryRecoverFromTransientBootFailure())
-                throw;
+            return false;
+        }
+        catch (PlaywrightException ex) when (BrowserContextChangedWhileWaiting(ex))
+        {
+            return false;
+        }
+    }
 
-            await Page.WaitForFunctionAsync(ReactiveBootedExpression, null, new() { Timeout = timeoutMs });
+    private async Task<bool> PageReachedReactiveBootAfterNavigationTimeout()
+    {
+        if (ConsoleContains(ReactiveBootedTrace))
+            return true;
+
+        if (await PageHasReactiveBootMarker())
+            return true;
+
+        return await BrowserReportsReactiveBoot(NavigationTimeoutBootRecoveryMs);
+    }
+
+    private static bool BrowserContextChangedWhileWaiting(PlaywrightException ex) =>
+        ex.Message.Contains("Execution context was destroyed", StringComparison.OrdinalIgnoreCase)
+        || ex.Message.Contains("Target page, context or browser has been closed", StringComparison.OrdinalIgnoreCase);
+
+    private async Task<bool> PageHasReactiveBootMarker()
+    {
+        try
+        {
+            return await Page.Locator(ReactiveBootedMarkerSelector).CountAsync() > 0;
+        }
+        catch (PlaywrightException)
+        {
+            return false;
         }
     }
 

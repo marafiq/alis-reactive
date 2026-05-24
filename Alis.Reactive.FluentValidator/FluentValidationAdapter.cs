@@ -15,10 +15,11 @@ namespace Alis.Reactive.FluentValidator
     /// <summary>
     /// Extracts client-side validation rules from FluentValidation validators.
     /// Unconditional rules are extracted for client-side use.
-    /// Conditional rules (.When()/.Unless()) are skipped (server-side only).
+    /// Conditional rules (.When()/.Unless()) are skipped for client projection unless
+    /// paired with a ReactiveValidator WhenField() guard.
     /// ReactiveValidator WhenField() conditions are included with a When guard.
     /// </summary>
-    public sealed class FluentValidationAdapter : IValidationExtractor
+    public sealed partial class FluentValidationAdapter : IValidationExtractor
     {
         private readonly Func<Type, IValidator?> _factory;
 
@@ -29,143 +30,63 @@ namespace Alis.Reactive.FluentValidator
                 "IValidator instances (e.g. from your DI container).", nameof(factory));
         }
 
-        /// <summary>
-        /// Extract client rules from the given validator type for a form.
-        /// Returns an empty list if no extractable rules are found.
-        /// Fields carry only fieldName + rules. Runtime enriches component info from plan.components.
-        /// </summary>
-        public List<ValidationField> ExtractRules(Type validatorType, string formId)
+        public ValidationExtractionReport Extract(ValidationExtractionRequest request)
         {
-            var validator = _factory(validatorType);
-            if (validator == null) return new List<ValidationField>();
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
-            // Intermediate: property path → ordered list of (ruleType, message, constraint)
-            var fieldRules = new Dictionary<string, List<ExtractedRule>>();
+            var validator = ResolveRootValidator(request.ValidatorType);
 
-            // Read client conditions if validator extends ReactiveValidator<T>
-            IReadOnlyDictionary<IValidationRule, FieldCondition>? clientConditions = null;
-            if (validator is IClientConditionSource source)
-            {
-                clientConditions = source.ClientConditions;
-            }
+            var extractedForm = new ExtractedValidationContract();
+            var clientConditions = ClientConditionCatalog.From(validator);
+            var rootFrame = ValidatorExtractionFrame.Root(
+                ValidationFieldPath.Empty,
+                extractedForm,
+                _factory,
+                clientConditions);
 
-            ExtractFromValidator(validator, "", fieldRules, _factory, clientConditions);
+            ExtractFromValidator(validator, rootFrame);
 
-            // Ensure cross-property peer fields are present in the extracted form contract for value reads.
-            var peerFields = fieldRules
-                .SelectMany(kvp => kvp.Value)
-                .Where(er => !string.IsNullOrEmpty(er.Field) && !fieldRules.ContainsKey(er.Field!))
-                .Select(er => er.Field!)
-                .ToHashSet();
-            foreach (var peerField in peerFields)
-                fieldRules[peerField] = new List<ExtractedRule>();
-
-            // Build fields
-            var fields = new List<ValidationField>();
-            foreach (var kvp in fieldRules)
-            {
-                var propertyPath = kvp.Key;
-                var rules = new List<ValidationRule>();
-                foreach (var er in kvp.Value)
-                {
-                    rules.Add(new ValidationRule(er.Rule, er.Message, er.Constraint, er.When, er.Field, er.Shape));
-                }
-                fields.Add(new ValidationField(propertyPath, rules));
-            }
-
-            return fields;
+            extractedForm.EnsurePeerFields();
+            return extractedForm.ToReport(request.ValidationContainer);
         }
 
-        private static void ExtractFromValidator(
-            IValidator validator,
-            string prefix,
-            Dictionary<string, List<ExtractedRule>> fieldRules,
-            Func<Type, IValidator?> factory,
-            IReadOnlyDictionary<IValidationRule, FieldCondition>? clientConditions = null,
-            FieldCondition? parentCondition = null)
+        private IValidator ResolveRootValidator(Type validatorType)
+        {
+            if (validatorType == null) throw new ArgumentNullException(nameof(validatorType));
+            return ResolveValidator(
+                _factory,
+                validatorType,
+                "validator",
+                "Ensure it is registered in the validator factory passed to FluentValidationAdapter.");
+        }
+
+        private static void ExtractFromValidator(IValidator validator, ValidatorExtractionFrame frame)
         {
             if (!(validator is IEnumerable<IValidationRule> rules)) return;
 
             foreach (var rule in rules)
             {
-                var (ruleCondition, skip) = TryResolveCondition(rule, prefix, fieldRules, clientConditions);
-                if (skip) continue;
-
-                if (string.IsNullOrEmpty(rule.PropertyName))
-                {
-                    ProcessIncludeRule(rule, prefix, fieldRules, factory, ruleCondition ?? parentCondition);
-                    continue;
-                }
-
-                var fullPath = string.IsNullOrEmpty(prefix)
-                    ? rule.PropertyName
-                    : prefix + "." + rule.PropertyName;
-
-                ProcessComponents(rule, fullPath, rule.PropertyName, prefix, fieldRules, factory, ruleCondition, parentCondition);
+                RuleExtractionScope
+                    .For(rule, frame)
+                    .Extract(rule, frame);
             }
         }
 
         /// <summary>
-        /// Checks if a rule has a client-side WhenField() condition. Returns the condition
-        /// and whether the rule should be skipped (server-only .When()).
+        /// Resolves whether a FluentValidation rule can be extracted for the browser.
+        /// Server-only conditions become a no-op extraction scope.
         /// </summary>
-        private static (FieldCondition? condition, bool skip) TryResolveCondition(
+        private static RuleExtractionScope ResolveRuleExtractionScope(
             IValidationRule rule,
-            string prefix,
-            Dictionary<string, List<ExtractedRule>> fieldRules,
-            IReadOnlyDictionary<IValidationRule, FieldCondition>? clientConditions)
+            ValidatorExtractionFrame frame)
         {
-            if (!rule.HasCondition && !rule.HasAsyncCondition)
-                return (null, false);
+            var ruleHasServerCondition = rule.HasCondition || rule.HasAsyncCondition;
+            if (!ruleHasServerCondition)
+                return RuleExtractionScope.Unconditional;
 
-            if (clientConditions == null || !clientConditions.TryGetValue(rule, out var cc))
-                return (null, true); // Server-only .When() — skip
-
-            // Apply prefix to all field references in the condition tree
-            // and ensure peer fields exist in fieldRules.
-            var resolved = ApplyPrefix(cc, prefix, fieldRules);
-            return (resolved, false);
-        }
-
-        /// <summary>
-        /// Recursively applies a prefix to all FieldCompare.Field values in the tree
-        /// and ensures each referenced field is present in fieldRules.
-        /// </summary>
-        private static FieldCondition ApplyPrefix(
-            FieldCondition fc, string prefix,
-            Dictionary<string, List<ExtractedRule>> fieldRules)
-        {
-            switch (fc)
-            {
-                case FieldCompare cmp:
-                {
-                    var fullField = string.IsNullOrEmpty(prefix)
-                        ? cmp.Field
-                        : prefix + "." + cmp.Field;
-                    if (!fieldRules.ContainsKey(fullField))
-                        fieldRules[fullField] = new List<ExtractedRule>();
-                    return FieldCondition.Compare(fullField, cmp.Op, cmp.Value);
-                }
-                case FieldAll all:
-                {
-                    var terms = new FieldCondition[all.Terms.Count];
-                    for (int i = 0; i < all.Terms.Count; i++)
-                        terms[i] = ApplyPrefix(all.Terms[i], prefix, fieldRules);
-                    return FieldCondition.All(terms);
-                }
-                case FieldAny any:
-                {
-                    var terms = new FieldCondition[any.Terms.Count];
-                    for (int i = 0; i < any.Terms.Count; i++)
-                        terms[i] = ApplyPrefix(any.Terms[i], prefix, fieldRules);
-                    return FieldCondition.Any(terms);
-                }
-                case FieldNot not:
-                    return FieldCondition.Not(ApplyPrefix(not.Term, prefix, fieldRules));
-                default:
-                    throw new InvalidOperationException(
-                        $"Unknown FieldCondition type: {fc.GetType().Name}");
-            }
+            return frame.ClientConditions
+                .Find(rule)
+                .ToRuleExtractionScope(frame);
         }
 
         /// <summary>
@@ -173,18 +94,14 @@ namespace Alis.Reactive.FluentValidator
         /// </summary>
         private static void ProcessIncludeRule(
             IValidationRule rule,
-            string prefix,
-            Dictionary<string, List<ExtractedRule>> fieldRules,
-            Func<Type, IValidator?> factory,
-            FieldCondition? parentCondition = null)
+            ValidatorExtractionFrame frame)
         {
             foreach (IRuleComponent component in rule.Components)
             {
                 if (component.Validator is IChildValidatorAdaptor adaptor)
                 {
-                    var nested = ResolveNestedValidator(factory, adaptor.ValidatorType);
-                    var nestedConditions = (nested as IClientConditionSource)?.ClientConditions;
-                    ExtractFromValidator(nested, prefix, fieldRules, factory, nestedConditions, parentCondition);
+                    var nested = ResolveNestedValidator(frame.Factory, adaptor.ValidatorType);
+                    ExtractFromValidator(nested, frame.ForNestedValidator(nested));
                 }
             }
         }
@@ -194,262 +111,895 @@ namespace Alis.Reactive.FluentValidator
         /// </summary>
         private static void ProcessComponents(
             IValidationRule rule,
-            string fullPath,
-            string propertyName,
-            string prefix,
-            Dictionary<string, List<ExtractedRule>> fieldRules,
-            Func<Type, IValidator?> factory,
-            FieldCondition? ruleCondition,
-            FieldCondition? parentCondition)
+            ValidationRuleTarget target,
+            ValidatorExtractionFrame frame,
+            ValidationRuleCondition ruleCondition)
         {
+            if (target == null) throw new ArgumentNullException(nameof(target));
+
             foreach (IRuleComponent component in rule.Components)
             {
-                if (component.HasCondition || component.HasAsyncCondition) continue;
-
-                if (component.Validator is IChildValidatorAdaptor adaptor)
+                var componentHasComponentCondition = component.HasCondition || component.HasAsyncCondition;
+                if (componentHasComponentCondition)
                 {
-                    var nested = ResolveNestedValidator(factory, adaptor.ValidatorType);
-                    var nestedConditions = (nested as IClientConditionSource)?.ClientConditions;
-                    ExtractFromValidator(nested, fullPath, fieldRules, factory, nestedConditions, ruleCondition);
+                    frame.ExtractedForm.AddSkippedClientRule(SkippedClientRuleFor(
+                        target.FullPath,
+                        component.Validator,
+                        ClientRuleExtractionSkipReason.RuleComponentCondition));
                     continue;
                 }
 
-                // Compose parent + rule conditions: if both exist, both must be true (All).
-                FieldCondition? effectiveCondition;
-                if (ruleCondition != null && parentCondition != null)
-                    effectiveCondition = FieldCondition.All(parentCondition, ruleCondition);
-                else
-                    effectiveCondition = ruleCondition ?? parentCondition;
-                var extracted = MapComponent(component, propertyName, prefix, effectiveCondition);
+                if (component.Validator is IChildValidatorAdaptor adaptor)
+                {
+                    var nested = ResolveNestedValidator(frame.Factory, adaptor.ValidatorType);
+                    ExtractFromValidator(nested, frame.ForNestedValidator(nested, target.FullPath, ruleCondition));
+                    continue;
+                }
+
+                var effectiveCondition = frame.ParentCondition.Combine(ruleCondition);
+                var extracted = MapComponent(
+                    RuleComponentMapping.For(
+                    component,
+                    target,
+                    effectiveCondition),
+                    frame.ExtractedForm);
                 if (extracted.Count > 0)
                 {
-                    if (!fieldRules.TryGetValue(fullPath, out var list))
-                    {
-                        list = new List<ExtractedRule>();
-                        fieldRules[fullPath] = list;
-                    }
-                    list.AddRange(extracted);
+                    frame.ExtractedForm.AddRules(target.FullPath, extracted);
                 }
             }
         }
 
         private static IValidator ResolveNestedValidator(Func<Type, IValidator?> factory, Type validatorType)
         {
-            IValidator? nested;
+            return ResolveValidator(
+                factory,
+                validatorType,
+                "nested validator",
+                "Ensure it is registered in the validator factory.");
+        }
+
+        private static IValidator ResolveValidator(
+            Func<Type, IValidator?> factory,
+            Type validatorType,
+            string validatorRole,
+            string fixGuidance)
+        {
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
+            if (validatorType == null) throw new ArgumentNullException(nameof(validatorType));
+            if (validatorRole == null) throw new ArgumentNullException(nameof(validatorRole));
+            if (fixGuidance == null) throw new ArgumentNullException(nameof(fixGuidance));
+
+            IValidator? validator;
             try
             {
-                nested = factory(validatorType);
+                validator = factory(validatorType);
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException(
-                    $"Failed to create nested validator '{validatorType.Name}'. " +
-                    $"Ensure it is registered in the validator factory.", ex);
+                    $"Failed to create {validatorRole} '{validatorType.Name}'. " +
+                    fixGuidance, ex);
             }
 
-            if (nested == null)
+            if (validator == null)
             {
                 throw new InvalidOperationException(
-                    $"Validator factory returned null for nested validator '{validatorType.Name}'. " +
-                    $"Ensure it is registered in the validator factory.");
+                    $"Validator factory returned null for {validatorRole} '{validatorType.Name}'. " +
+                    fixGuidance);
             }
 
-            return nested;
+            return validator;
         }
 
         private static List<ExtractedRule> MapComponent(
-            IRuleComponent component, string propertyName, string prefix, FieldCondition? ruleCondition = null)
+            RuleComponentMapping mapping,
+            ExtractedValidationContract extractedForm)
         {
+            if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+            if (extractedForm == null) throw new ArgumentNullException(nameof(extractedForm));
+
             var result = new List<ExtractedRule>();
-            var validator = component.Validator;
-            var displayName = Humanize(propertyName);
-            // GetUnformattedErrorMessage() returns FV's template (e.g. "'{PropertyName}' must not be empty.")
-            // even when no .WithMessage() was set. Only treat it as a custom message if it does NOT
-            // contain FV placeholder tokens like {PropertyName}.
-            var rawMsg = component.GetUnformattedErrorMessage();
-            var customMsg = !string.IsNullOrEmpty(rawMsg) && !rawMsg.Contains('{')
-                ? rawMsg
-                : null;
+            var validator = mapping.Validator;
+            var displayName = mapping.DisplayName;
+
+            if (ClientValidationRuleProjectionCatalog.TryFind(mapping.Component, out var explicitClientRule))
+            {
+                result.Add(new ExtractedRule(
+                    explicitClientRule.Name,
+                    mapping.Message.OrDefault(explicitClientRule.MessageFor(displayName).Value),
+                    explicitClientRule.DetailsFor(mapping.RuleCondition)));
+                return result;
+            }
 
             switch (validator)
             {
                 case INotEmptyValidator _:
                 case INotNullValidator _:
                     result.Add(new ExtractedRule(
-                        "required",
-                        customMsg ?? $"'{displayName}' is required.",
-                        null, ruleCondition));
+                        ValidationRuleName.Required,
+                        mapping.Message.OrDefault($"'{displayName}' is required."),
+                        ValidationRuleDetails.NoOperand(mapping.RuleCondition)));
                     break;
 
                 case IEmptyValidator _:
                     result.Add(new ExtractedRule(
-                        "empty",
-                        customMsg ?? $"'{displayName}' must be empty.",
-                        null, ruleCondition));
+                        ValidationRuleName.Empty,
+                        mapping.Message.OrDefault($"'{displayName}' must be empty."),
+                        ValidationRuleDetails.NoOperand(mapping.RuleCondition)));
                     break;
 
                 case ILengthValidator lv:
-                    MapLengthValidator(lv, displayName, customMsg, ruleCondition, result);
+                    MapLengthValidator(lv, mapping, result);
                     break;
 
                 case IEmailValidator _:
                     result.Add(new ExtractedRule(
-                        "email",
-                        customMsg ?? $"'{displayName}' must be a valid email address.",
-                        null, ruleCondition));
+                        ValidationRuleName.Email,
+                        mapping.Message.OrDefault($"'{displayName}' must be a valid email address."),
+                        ValidationRuleDetails.NoOperand(mapping.RuleCondition)));
                     break;
 
                 case IRegularExpressionValidator rv:
-                    if (!string.IsNullOrEmpty(rv.Expression))
+                    if (string.IsNullOrEmpty(rv.Expression))
+                    {
+                        extractedForm.AddSkippedClientRule(SkippedClientRuleFor(
+                            mapping.Target.FullPath,
+                            validator,
+                            ClientRuleExtractionSkipReason.MissingRegexExpression));
+                    }
+                    else
                     {
                         result.Add(new ExtractedRule(
-                            "regex",
-                            customMsg ?? $"'{displayName}' format is invalid.",
-                            rv.Expression, ruleCondition));
+                            ValidationRuleName.Regex,
+                            mapping.Message.OrDefault($"'{displayName}' format is invalid."),
+                            ValidationRuleDetails.WithConstraint(rv.Expression, mapping.RuleCondition, Shape.None)));
                     }
                     break;
 
                 case FluentValidation.Validators.ICreditCardValidator _:
                     result.Add(new ExtractedRule(
-                        "creditCard",
-                        customMsg ?? $"'{displayName}' must be a valid credit card number.",
-                        null, ruleCondition));
+                        ValidationRuleName.CreditCard,
+                        mapping.Message.OrDefault($"'{displayName}' must be a valid credit card number."),
+                        ValidationRuleDetails.NoOperand(mapping.RuleCondition)));
                     break;
 
                 case IExclusiveBetweenValidator ebv:
-                    result.Add(MapRangeValidator("exclusiveRange", ebv.From, ebv.To,
-                        customMsg ?? $"'{displayName}' must be between {ebv.From} and {ebv.To} (exclusive).",
-                        ruleCondition));
+                {
+                    var defaultMessage = mapping.Message.OrDefault(
+                        $"'{displayName}' must be between {ebv.From} and {ebv.To} (exclusive).");
+                    MapRangeValidator(
+                        ValidationRuleName.ExclusiveRange,
+                        ebv.From,
+                        ebv.To,
+                        defaultMessage,
+                        mapping.RuleCondition).AddTo(result, mapping, extractedForm);
                     break;
+                }
 
                 case IBetweenValidator bv:
-                    result.Add(MapRangeValidator("range", bv.From, bv.To,
-                        customMsg ?? $"'{displayName}' must be between {bv.From} and {bv.To}.",
-                        ruleCondition));
+                {
+                    var defaultMessage = mapping.Message.OrDefault(
+                        $"'{displayName}' must be between {bv.From} and {bv.To}.");
+                    MapRangeValidator(
+                        ValidationRuleName.Range,
+                        bv.From,
+                        bv.To,
+                        defaultMessage,
+                        mapping.RuleCondition).AddTo(result, mapping, extractedForm);
                     break;
+                }
 
                 case IComparisonValidator cv:
                 {
-                    var comparisonRule = MapComparisonValidator(cv, propertyName, prefix, displayName, customMsg, ruleCondition);
-                    result.Add(comparisonRule);
+                    MapComparisonValidator(cv, mapping).AddTo(result, mapping, extractedForm);
                     break;
                 }
+
+                default:
+                    extractedForm.AddSkippedClientRule(SkippedClientRuleFor(
+                        mapping.Target.FullPath,
+                        validator,
+                        ClientRuleExtractionSkipReason.UnsupportedValidator));
+                    break;
             }
 
             return result;
         }
 
         private static void MapLengthValidator(
-            ILengthValidator lv, string displayName, string? customMsg,
-            FieldCondition? ruleCondition, List<ExtractedRule> result)
+            ILengthValidator lv,
+            RuleComponentMapping mapping,
+            List<ExtractedRule> result)
         {
+            if (lv == null) throw new ArgumentNullException(nameof(lv));
+            if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+            if (result == null) throw new ArgumentNullException(nameof(result));
+
+            var displayName = mapping.DisplayName;
             if (lv.Min > 0)
             {
                 result.Add(new ExtractedRule(
-                    "minLength",
-                    customMsg ?? $"'{displayName}' must be at least {lv.Min} characters.",
-                    lv.Min, ruleCondition));
+                    ValidationRuleName.MinLength,
+                    mapping.Message.OrDefault($"'{displayName}' must be at least {lv.Min} characters."),
+                    ValidationRuleDetails.WithConstraint(lv.Min, mapping.RuleCondition, Shape.None)));
             }
             if (lv.Max > 0)
             {
                 result.Add(new ExtractedRule(
-                    "maxLength",
-                    customMsg ?? $"'{displayName}' must be at most {lv.Max} characters.",
-                    lv.Max, ruleCondition));
+                    ValidationRuleName.MaxLength,
+                    mapping.Message.OrDefault($"'{displayName}' must be at most {lv.Max} characters."),
+                    ValidationRuleDetails.WithConstraint(lv.Max, mapping.RuleCondition, Shape.None)));
             }
         }
 
-        private static ExtractedRule MapRangeValidator(
-            string ruleType, object? from, object? to,
-            string message, FieldCondition? ruleCondition)
+        private static ClientRuleProjection MapRangeValidator(
+            ValidationRuleName ruleName,
+            object? lowerBound,
+            object? upperBound,
+            ValidationMessage message,
+            ValidationRuleCondition ruleCondition)
         {
-            var shape = Shape.FromClrType(from?.GetType());
-            var isDate = shape == Shape.Date;
-            var serializedFrom = isDate && from != null ? SerializeDateConstraint(from) : from;
-            var serializedTo = isDate && to != null ? SerializeDateConstraint(to) : to;
-            return new ExtractedRule(ruleType, message,
-                new object[] { serializedFrom!, serializedTo! }, ruleCondition, field: null, shape: shape);
+            if (ruleName == null) throw new ArgumentNullException(nameof(ruleName));
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            if (ruleCondition == null) throw new ArgumentNullException(nameof(ruleCondition));
+
+            return RangeEndpointValues
+                .From(lowerBound, upperBound)
+                .BuildRule(ruleName, message, ruleCondition);
         }
 
-        private static ExtractedRule MapComparisonValidator(
-            IComparisonValidator cv, string propertyName, string prefix, string displayName,
-            string? customMsg, FieldCondition? ruleCondition)
+        private static ClientRuleProjection MapComparisonValidator(
+            IComparisonValidator cv,
+            RuleComponentMapping mapping)
         {
-            var (field, constraint, propertyType) = ResolveComparisonOperands(cv);
-            var isNestedPeerField = field != null && !string.IsNullOrEmpty(prefix);
-            if (isNestedPeerField)
-                field = prefix + "." + field;
+            if (cv == null) throw new ArgumentNullException(nameof(cv));
+            if (mapping == null) throw new ArgumentNullException(nameof(mapping));
 
-            var shape = Shape.FromClrType(propertyType);
-            var isDateConstraint = shape == Shape.Date && constraint != null;
-            if (isDateConstraint)
-                constraint = SerializeDateConstraint(constraint);
-
-            var (ruleType, defaultMsg) = cv.Comparison switch
-            {
-                Comparison.Equal => ("equalTo",
-                    ComparisonMessage(displayName, field, constraint, "must match", "must equal")),
-                Comparison.NotEqual when field != null => ("notEqualTo",
-                    $"'{displayName}' must not match '{Humanize(field)}'."),
-                Comparison.NotEqual => ("notEqual",
-                    $"'{displayName}' must not equal '{constraint}'."),
-                Comparison.GreaterThanOrEqual => ("min",
-                    ComparisonMessage(displayName, field, constraint, "must be at least", "must be at least")),
-                Comparison.LessThanOrEqual => ("max",
-                    ComparisonMessage(displayName, field, constraint, "must be at most", "must be at most")),
-                Comparison.GreaterThan => ("gt",
-                    ComparisonMessage(displayName, field, constraint, "must be greater than", "must be greater than")),
-                Comparison.LessThan => ("lt",
-                    ComparisonMessage(displayName, field, constraint, "must be less than", "must be less than")),
-                _ => throw new InvalidOperationException(
-                    $"Unknown Comparison type '{cv.Comparison}' on property '{propertyName}'. " +
-                    $"This FluentValidation comparison is not supported for client-side extraction.")
-            };
-
-            return new ExtractedRule(ruleType, customMsg ?? defaultMsg, constraint, ruleCondition, field, shape);
+            return ComparisonRuleOperands
+                .From(cv, mapping.Target)
+                .PrefixedBy(mapping.SameObjectPeerPrefix)
+                .BuildRule(cv.Comparison, mapping);
         }
 
-        private static string ComparisonMessage(
-            string displayName, string? field, object? constraint,
-            string fieldVerb, string constraintVerb)
-            => field != null
-                ? $"'{displayName}' {fieldVerb} '{Humanize(field)}'."
-                : $"'{displayName}' {constraintVerb} {constraint}.";
-
-        private static (string? field, object? constraint, Type? propertyType) ResolveComparisonOperands(
-            IComparisonValidator cv)
+        private sealed class ValidationRuleTarget
         {
-            if (cv.MemberToCompare != null)
+            private ValidationRuleTarget(
+                string propertyName,
+                ValidationFieldPath fullPath,
+                System.Reflection.MemberInfo? ruleMember)
             {
-                var field = cv.MemberToCompare.Name;
-                Type? propertyType = cv.MemberToCompare switch
+                PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
+                FullPath = fullPath ?? throw new ArgumentNullException(nameof(fullPath));
+                DisplayName = Humanize(propertyName);
+                PeerScope = ValidationPeerFieldScope.ForRuleMember(ruleMember);
+            }
+
+            internal string PropertyName { get; }
+            internal ValidationFieldPath FullPath { get; }
+            internal ValidationFieldPath SameObjectPeerPrefix => FullPath.Parent();
+            internal string DisplayName { get; }
+            private ValidationPeerFieldScope PeerScope { get; }
+
+            internal ValidationPeerFieldProjection ClassifyPeerMember(System.Reflection.MemberInfo member)
+            {
+                if (member == null) throw new ArgumentNullException(nameof(member));
+                return PeerScope.Classify(member);
+            }
+
+            internal static ValidationRuleTarget From(
+                ValidationFieldPath prefix,
+                IValidationRule rule)
+            {
+                if (prefix == null) throw new ArgumentNullException(nameof(prefix));
+                if (rule == null) throw new ArgumentNullException(nameof(rule));
+
+                return From(prefix, rule.PropertyName, rule.Member);
+            }
+
+            private static ValidationRuleTarget From(
+                ValidationFieldPath prefix,
+                string propertyName,
+                System.Reflection.MemberInfo? ruleMember)
+            {
+                if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
+
+                return new ValidationRuleTarget(
+                    propertyName,
+                    prefix.Append(propertyName),
+                    ruleMember);
+            }
+        }
+
+        private sealed class ValidationPeerFieldScope
+        {
+            private readonly Type? _ownerType;
+
+            private ValidationPeerFieldScope(Type? ownerType)
+            {
+                _ownerType = ownerType;
+            }
+
+            internal static ValidationPeerFieldScope ForRuleMember(System.Reflection.MemberInfo? ruleMember) =>
+                new ValidationPeerFieldScope(ruleMember?.DeclaringType);
+
+            internal ValidationPeerFieldProjection Classify(System.Reflection.MemberInfo peerMember)
+            {
+                if (peerMember == null) throw new ArgumentNullException(nameof(peerMember));
+                if (_ownerType == null)
+                    return ValidationPeerFieldProjection.SkipClientProjection(ClientRuleExtractionSkipReason.UnknownPeerFieldScope);
+
+                var peerOwnerType = peerMember.DeclaringType;
+                if (peerOwnerType == null)
+                    return ValidationPeerFieldProjection.SkipClientProjection(ClientRuleExtractionSkipReason.UnknownPeerFieldScope);
+
+                var sameObjectPeer = peerOwnerType.IsAssignableFrom(_ownerType);
+                if (sameObjectPeer) return ValidationPeerFieldProjection.SameObjectPeer;
+
+                return ValidationPeerFieldProjection.SkipClientProjection(ClientRuleExtractionSkipReason.CrossObjectPeerComparison);
+            }
+        }
+
+        private abstract class ValidationPeerFieldProjection
+        {
+            internal static ValidationPeerFieldProjection SameObjectPeer { get; } =
+                new SameObjectPeerFieldProjection();
+
+            internal static ValidationPeerFieldProjection SkipClientProjection(ClientRuleExtractionSkipReason reason) =>
+                new SkippedPeerFieldProjection(reason);
+
+            internal abstract ComparisonRuleOperands ToOperands(System.Reflection.MemberInfo member);
+        }
+
+        private sealed class SameObjectPeerFieldProjection : ValidationPeerFieldProjection
+        {
+            internal override ComparisonRuleOperands ToOperands(System.Reflection.MemberInfo member)
+            {
+                if (member == null) throw new ArgumentNullException(nameof(member));
+
+                return ComparisonPeerShape
+                    .From(member)
+                    .ToOperands(ValidationFieldPath.Of(member.Name));
+            }
+        }
+
+        private sealed class SkippedPeerFieldProjection : ValidationPeerFieldProjection
+        {
+            private readonly ClientRuleExtractionSkipReason _reason;
+
+            internal SkippedPeerFieldProjection(ClientRuleExtractionSkipReason reason)
+            {
+                _reason = reason;
+            }
+
+            internal override ComparisonRuleOperands ToOperands(System.Reflection.MemberInfo member)
+            {
+                if (member == null) throw new ArgumentNullException(nameof(member));
+                return new SkippedComparisonRuleOperands(_reason);
+            }
+        }
+
+        private sealed class RuleComponentMapping
+        {
+            private readonly ValidationRuleTarget _target;
+
+            private RuleComponentMapping(
+                IRuleComponent component,
+                ValidationRuleTarget target,
+                ValidationRuleCondition ruleCondition)
+            {
+                Component = component ?? throw new ArgumentNullException(nameof(component));
+                _target = target ?? throw new ArgumentNullException(nameof(target));
+                RuleCondition = ruleCondition ?? throw new ArgumentNullException(nameof(ruleCondition));
+                Message = RuleMessage.From(component);
+            }
+
+            internal IRuleComponent Component { get; }
+            internal ValidationRuleTarget Target => _target;
+            internal string PropertyName => _target.PropertyName;
+            internal ValidationFieldPath SameObjectPeerPrefix => _target.SameObjectPeerPrefix;
+            internal ValidationRuleCondition RuleCondition { get; }
+            internal string DisplayName => _target.DisplayName;
+            internal RuleMessage Message { get; }
+            internal IPropertyValidator Validator => Component.Validator;
+
+            internal static RuleComponentMapping For(
+                IRuleComponent component,
+                ValidationRuleTarget target,
+                ValidationRuleCondition ruleCondition) =>
+                new RuleComponentMapping(component, target, ruleCondition);
+        }
+
+        private abstract class RuleMessage
+        {
+            private protected RuleMessage() { }
+
+            internal static RuleMessage From(IRuleComponent component)
+            {
+                if (component == null) throw new ArgumentNullException(nameof(component));
+
+                // GetUnformattedErrorMessage() returns FV's template even when no
+                // .WithMessage() was set. Template placeholders mean "use our default".
+                var rawMessage = component.GetUnformattedErrorMessage();
+                var messageIsCustomText = !string.IsNullOrEmpty(rawMessage) && !rawMessage.Contains('{');
+                if (messageIsCustomText)
+                    return new CustomRuleMessage(rawMessage);
+
+                return DefaultRuleMessage.Instance;
+            }
+
+            internal abstract ValidationMessage OrDefault(string defaultMessage);
+
+            private sealed class DefaultRuleMessage : RuleMessage
+            {
+                internal static DefaultRuleMessage Instance { get; } = new DefaultRuleMessage();
+
+                private DefaultRuleMessage() { }
+
+                internal override ValidationMessage OrDefault(string defaultMessage)
                 {
-                    System.Reflection.PropertyInfo pi => pi.PropertyType,
-                    System.Reflection.FieldInfo fi => fi.FieldType,
-                    _ => null
-                };
-                return (field, null, propertyType);
+                    if (defaultMessage == null) throw new ArgumentNullException(nameof(defaultMessage));
+                    return ValidationMessage.Of(defaultMessage);
+                }
             }
 
-            return (null, cv.ValueToCompare, cv.ValueToCompare?.GetType());
+            private sealed class CustomRuleMessage : RuleMessage
+            {
+                private readonly string _message;
+
+                internal CustomRuleMessage(string message)
+                {
+                    _message = message ?? throw new ArgumentNullException(nameof(message));
+                }
+
+                internal override ValidationMessage OrDefault(string defaultMessage)
+                {
+                    if (defaultMessage == null) throw new ArgumentNullException(nameof(defaultMessage));
+                    return ValidationMessage.Of(_message);
+                }
+            }
+        }
+
+        private abstract class RangeEndpointValues
+        {
+            private protected RangeEndpointValues() { }
+
+            internal static RangeEndpointValues From(object? lowerBound, object? upperBound)
+            {
+                if (lowerBound == null || upperBound == null)
+                    return MissingRangeEndpointValues.Instance;
+
+                return new CompleteRangeEndpointValues(lowerBound, upperBound);
+            }
+
+            internal abstract ClientRuleProjection BuildRule(
+                ValidationRuleName ruleName,
+                ValidationMessage message,
+                ValidationRuleCondition ruleCondition);
+        }
+
+        private sealed class MissingRangeEndpointValues : RangeEndpointValues
+        {
+            internal static MissingRangeEndpointValues Instance { get; } =
+                new MissingRangeEndpointValues();
+
+            private MissingRangeEndpointValues() { }
+
+            internal override ClientRuleProjection BuildRule(
+                ValidationRuleName ruleName,
+                ValidationMessage message,
+                ValidationRuleCondition ruleCondition)
+            {
+                if (ruleName == null) throw new ArgumentNullException(nameof(ruleName));
+                if (message == null) throw new ArgumentNullException(nameof(message));
+                if (ruleCondition == null) throw new ArgumentNullException(nameof(ruleCondition));
+                return ClientRuleProjection.SkipClientProjection(ClientRuleExtractionSkipReason.MissingRangeEndpoint);
+            }
+        }
+
+        private sealed class CompleteRangeEndpointValues : RangeEndpointValues
+        {
+            internal CompleteRangeEndpointValues(object lowerBound, object upperBound)
+            {
+                LowerBound = lowerBound ?? throw new ArgumentNullException(nameof(lowerBound));
+                UpperBound = upperBound ?? throw new ArgumentNullException(nameof(upperBound));
+            }
+
+            internal object LowerBound { get; }
+            internal object UpperBound { get; }
+
+            internal ValidationRangeBounds ToValidationRangeBounds()
+            {
+                var shape = Shape.FromClrType(LowerBound.GetType());
+                var lowerBound = SerializeEndpoint(LowerBound, shape);
+                var upperBound = SerializeEndpoint(UpperBound, shape);
+                return ValidationRangeBounds.Between(lowerBound, upperBound, shape);
+            }
+
+            internal override ClientRuleProjection BuildRule(
+                ValidationRuleName ruleName,
+                ValidationMessage message,
+                ValidationRuleCondition ruleCondition)
+            {
+                if (ruleName == null) throw new ArgumentNullException(nameof(ruleName));
+                if (message == null) throw new ArgumentNullException(nameof(message));
+                if (ruleCondition == null) throw new ArgumentNullException(nameof(ruleCondition));
+
+                var bounds = ToValidationRangeBounds();
+                return ClientRuleProjection.Project(new ExtractedRule(
+                    ruleName,
+                    message,
+                    ValidationRuleDetails.WithConstraint(
+                        ValidationConstraint.InclusiveRange(bounds),
+                        ruleCondition,
+                        bounds.Shape)));
+            }
+
+            private static object SerializeEndpoint(object endpoint, Shape shape)
+            {
+                if (endpoint == null) throw new ArgumentNullException(nameof(endpoint));
+                if (shape == null) throw new ArgumentNullException(nameof(shape));
+
+                var endpointUsesDateShape = shape == Shape.Date;
+                if (endpointUsesDateShape)
+                    return SerializeDateConstraint(endpoint);
+
+                return endpoint;
+            }
+        }
+
+        private abstract class ComparisonRuleOperands
+        {
+            private protected ComparisonRuleOperands() { }
+
+            internal abstract ComparisonRuleOperands PrefixedBy(ValidationFieldPath prefix);
+
+            internal abstract ClientRuleProjection BuildRule(
+                Comparison comparison,
+                RuleComponentMapping mapping);
+
+            internal static ComparisonRuleOperands From(
+                IComparisonValidator validator,
+                ValidationRuleTarget target)
+            {
+                if (validator == null) throw new ArgumentNullException(nameof(validator));
+                if (target == null) throw new ArgumentNullException(nameof(target));
+
+                var peerMember = validator.MemberToCompare;
+                if (peerMember == null)
+                    return Literal(validator.ValueToCompare);
+
+                return ComparisonPeerField.ToOperands(peerMember, target);
+            }
+
+            private static ComparisonRuleOperands Literal(object? value) =>
+                new LiteralComparisonRuleOperands(value);
+        }
+
+        private abstract class ExtractableComparisonRuleOperands : ComparisonRuleOperands
+        {
+            internal abstract ValidationRuleName NotEqualRule { get; }
+
+            internal abstract ValidationRuleDetails DetailsFor(ValidationRuleCondition condition);
+
+            internal abstract string Message(
+                string displayName,
+                string fieldVerb,
+                string constraintVerb);
+
+            internal abstract string NotEqualMessage(string displayName);
+
+            internal override ClientRuleProjection BuildRule(
+                Comparison comparison,
+                RuleComponentMapping mapping)
+            {
+                if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+
+                var displayName = mapping.DisplayName;
+                return comparison switch
+                {
+                    Comparison.Equal => ClientRule(
+                        ValidationRuleName.EqualTo,
+                        Message(displayName, "must match", "must equal"),
+                        mapping),
+                    Comparison.NotEqual => ClientRule(
+                        NotEqualRule,
+                        NotEqualMessage(displayName),
+                        mapping),
+                    Comparison.GreaterThanOrEqual => ClientRule(
+                        ValidationRuleName.Min,
+                        Message(displayName, "must be at least", "must be at least"),
+                        mapping),
+                    Comparison.LessThanOrEqual => ClientRule(
+                        ValidationRuleName.Max,
+                        Message(displayName, "must be at most", "must be at most"),
+                        mapping),
+                    Comparison.GreaterThan => ClientRule(
+                        ValidationRuleName.Gt,
+                        Message(displayName, "must be greater than", "must be greater than"),
+                        mapping),
+                    Comparison.LessThan => ClientRule(
+                        ValidationRuleName.Lt,
+                        Message(displayName, "must be less than", "must be less than"),
+                        mapping),
+                    _ => ClientRuleProjection.SkipClientProjection(ClientRuleExtractionSkipReason.UnsupportedComparisonOperator)
+                };
+            }
+
+            private ClientRuleProjection ClientRule(
+                ValidationRuleName ruleName,
+                string defaultMessage,
+                RuleComponentMapping mapping)
+            {
+                return ClientRuleProjection.Project(new ExtractedRule(
+                    ruleName,
+                    mapping.Message.OrDefault(defaultMessage),
+                    DetailsFor(mapping.RuleCondition)));
+            }
+        }
+
+        private sealed class SkippedComparisonRuleOperands : ComparisonRuleOperands
+        {
+            private readonly ClientRuleExtractionSkipReason _reason;
+
+            internal SkippedComparisonRuleOperands(ClientRuleExtractionSkipReason reason)
+            {
+                _reason = reason;
+            }
+
+            internal override ComparisonRuleOperands PrefixedBy(ValidationFieldPath prefix)
+            {
+                if (prefix == null) throw new ArgumentNullException(nameof(prefix));
+                return this;
+            }
+
+            internal override ClientRuleProjection BuildRule(
+                Comparison comparison,
+                RuleComponentMapping mapping)
+            {
+                if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+                return ClientRuleProjection.SkipClientProjection(_reason);
+            }
+        }
+
+        private sealed class ComparisonPeerField
+        {
+            private ComparisonPeerField(ValidationFieldPath path, Shape shape)
+            {
+                Path = path ?? throw new ArgumentNullException(nameof(path));
+                Shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            }
+
+            internal ValidationFieldPath Path { get; }
+            internal Shape Shape { get; }
+
+            internal static ComparisonPeerField Of(ValidationFieldPath path, Shape shape) =>
+                new ComparisonPeerField(path, shape);
+
+            internal static ComparisonRuleOperands ToOperands(
+                System.Reflection.MemberInfo member,
+                ValidationRuleTarget target)
+            {
+                if (member == null) throw new ArgumentNullException(nameof(member));
+                if (target == null) throw new ArgumentNullException(nameof(target));
+                return target.ClassifyPeerMember(member).ToOperands(member);
+            }
+
+            internal ComparisonPeerField PrefixedBy(ValidationFieldPath prefix)
+            {
+                if (prefix == null) throw new ArgumentNullException(nameof(prefix));
+                return new ComparisonPeerField(prefix.Append(Path), Shape);
+            }
+        }
+
+        private abstract class ComparisonPeerShape
+        {
+            private protected ComparisonPeerShape() { }
+
+            internal static ComparisonPeerShape From(System.Reflection.MemberInfo member)
+            {
+                if (member == null) throw new ArgumentNullException(nameof(member));
+
+                Shape shape;
+                if (member is System.Reflection.PropertyInfo property)
+                    shape = Shape.FromClrType(property.PropertyType);
+                else if (member is System.Reflection.FieldInfo field)
+                    shape = Shape.FromClrType(field.FieldType);
+                else
+                    return UnsupportedComparisonPeerShape.Instance;
+
+                if (shape.IsAny)
+                    return UnsupportedComparisonPeerShape.Instance;
+
+                return new DeclaredComparisonPeerShape(shape);
+            }
+
+            internal abstract ComparisonRuleOperands ToOperands(ValidationFieldPath path);
+        }
+
+        private sealed class UnsupportedComparisonPeerShape : ComparisonPeerShape
+        {
+            internal static UnsupportedComparisonPeerShape Instance { get; } =
+                new UnsupportedComparisonPeerShape();
+
+            private UnsupportedComparisonPeerShape() { }
+
+            internal override ComparisonRuleOperands ToOperands(ValidationFieldPath path)
+            {
+                if (path == null) throw new ArgumentNullException(nameof(path));
+                return new SkippedComparisonRuleOperands(ClientRuleExtractionSkipReason.UnsupportedPeerShape);
+            }
+        }
+
+        private sealed class DeclaredComparisonPeerShape : ComparisonPeerShape
+        {
+            private readonly Shape _shape;
+
+            internal DeclaredComparisonPeerShape(Shape shape)
+            {
+                _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            }
+
+            internal override ComparisonRuleOperands ToOperands(ValidationFieldPath path)
+            {
+                if (path == null) throw new ArgumentNullException(nameof(path));
+                return PeerComparisonRuleOperands.For(ComparisonPeerField.Of(path, _shape));
+            }
+        }
+
+        private sealed class PeerComparisonRuleOperands : ExtractableComparisonRuleOperands
+        {
+            private readonly ComparisonPeerField _field;
+
+            private PeerComparisonRuleOperands(ComparisonPeerField field)
+            {
+                _field = field ?? throw new ArgumentNullException(nameof(field));
+            }
+
+            internal static PeerComparisonRuleOperands For(ComparisonPeerField field) =>
+                new PeerComparisonRuleOperands(field);
+
+            internal override ValidationRuleName NotEqualRule => ValidationRuleName.NotEqualTo;
+
+            internal override ComparisonRuleOperands PrefixedBy(ValidationFieldPath prefix)
+            {
+                if (prefix == null) throw new ArgumentNullException(nameof(prefix));
+                return For(_field.PrefixedBy(prefix));
+            }
+
+            internal override ValidationRuleDetails DetailsFor(ValidationRuleCondition condition)
+            {
+                if (condition == null) throw new ArgumentNullException(nameof(condition));
+                return ValidationRuleDetails.WithPeerField(_field.Path, condition, _field.Shape);
+            }
+
+            internal override string Message(
+                string displayName,
+                string fieldVerb,
+                string constraintVerb)
+            {
+                if (displayName == null) throw new ArgumentNullException(nameof(displayName));
+                if (fieldVerb == null) throw new ArgumentNullException(nameof(fieldVerb));
+                return $"'{displayName}' {fieldVerb} '{Humanize(_field.Path)}'.";
+            }
+
+            internal override string NotEqualMessage(string displayName)
+            {
+                if (displayName == null) throw new ArgumentNullException(nameof(displayName));
+                return $"'{displayName}' must not match '{Humanize(_field.Path)}'.";
+            }
+        }
+
+        private sealed class LiteralComparisonRuleOperands : ExtractableComparisonRuleOperands
+        {
+            private readonly object? _constraint;
+            private readonly Shape _shape;
+
+            internal LiteralComparisonRuleOperands(object? value)
+            {
+                var literal = ComparisonLiteralConstraint.From(value);
+                _constraint = literal.Value;
+                _shape = literal.Shape;
+            }
+
+            internal override ValidationRuleName NotEqualRule => ValidationRuleName.NotEqual;
+
+            internal override ComparisonRuleOperands PrefixedBy(ValidationFieldPath prefix)
+            {
+                if (prefix == null) throw new ArgumentNullException(nameof(prefix));
+                return this;
+            }
+
+            internal override ValidationRuleDetails DetailsFor(ValidationRuleCondition condition)
+            {
+                if (condition == null) throw new ArgumentNullException(nameof(condition));
+                return ValidationRuleDetails.WithConstraint(_constraint, condition, _shape);
+            }
+
+            internal override string Message(
+                string displayName,
+                string fieldVerb,
+                string constraintVerb)
+            {
+                if (displayName == null) throw new ArgumentNullException(nameof(displayName));
+                if (constraintVerb == null) throw new ArgumentNullException(nameof(constraintVerb));
+                return $"'{displayName}' {constraintVerb} {_constraint}.";
+            }
+
+            internal override string NotEqualMessage(string displayName)
+            {
+                if (displayName == null) throw new ArgumentNullException(nameof(displayName));
+                return $"'{displayName}' must not equal '{_constraint}'.";
+            }
+        }
+
+        private sealed class ComparisonLiteralConstraint
+        {
+            private ComparisonLiteralConstraint(object? value, Shape shape)
+            {
+                Value = value;
+                Shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            }
+
+            internal object? Value { get; }
+            internal Shape Shape { get; }
+
+            internal static ComparisonLiteralConstraint From(object? value)
+            {
+                if (value == null)
+                    return new ComparisonLiteralConstraint(null, Shape.None);
+
+                var shape = Shape.FromClrType(value.GetType());
+                var serialized = SerializeForPlan(value, shape);
+                return new ComparisonLiteralConstraint(serialized, shape);
+            }
+
+            private static object SerializeForPlan(object value, Shape shape)
+            {
+                var shouldSerializeDateLiteral = shape == Shape.Date;
+                if (shouldSerializeDateLiteral)
+                    return SerializeDateConstraint(value);
+
+                return value;
+            }
         }
 
         private static object SerializeDateConstraint(object value)
         {
-            if (value is DateTime dt)
-                return dt.TimeOfDay == TimeSpan.Zero
-                    ? dt.ToString("yyyy-MM-dd")
-                    : dt.ToString("s");
-            if (value is DateTimeOffset dto)
-                return dto.TimeOfDay == TimeSpan.Zero
-                    ? dto.ToString("yyyy-MM-dd")
-                    : dto.ToString("s");
-#if NET6_0_OR_GREATER
-            if (value is DateOnly d)
-                return d.ToString("yyyy-MM-dd");
-#endif
-            return value;
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            return ValidationDateLiteral.From(value, Shape.Date);
         }
+
+        private static SkippedClientRuleExtraction SkippedClientRuleFor(
+            ValidationFieldPath fieldPath,
+            IPropertyValidator validator,
+            ClientRuleExtractionSkipReason reason)
+        {
+            if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
+            if (validator == null) throw new ArgumentNullException(nameof(validator));
+
+            return SkippedClientRuleExtraction.For(fieldPath, validator.Name, reason);
+        }
+
+        private static SkippedClientRuleExtraction SkippedClientRuleFor(
+            ValidationFieldPath fieldPath,
+            IValidationRule rule,
+            ClientRuleExtractionSkipReason reason)
+        {
+            if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
+            if (rule == null) throw new ArgumentNullException(nameof(rule));
+
+            var validatorName = string.Join(
+                ", ",
+                rule.Components.Select(component => component.Validator.Name));
+            var noComponentNamesWereAvailable = string.IsNullOrWhiteSpace(validatorName);
+            if (noComponentNamesWereAvailable)
+                validatorName = rule.GetType().Name;
+
+            return SkippedClientRuleExtraction.For(fieldPath, validatorName, reason);
+        }
+
+        private static string Humanize(ValidationFieldPath fieldPath) => Humanize(fieldPath.Value);
 
         private static string Humanize(string propertyName)
         {
@@ -457,32 +1007,13 @@ namespace Alis.Reactive.FluentValidator
             var result = new StringBuilder();
             foreach (var c in propertyName)
             {
-                if (char.IsUpper(c) && result.Length > 0)
+                var shouldInsertWordBoundary = char.IsUpper(c) && result.Length > 0;
+                if (shouldInsertWordBoundary)
                     result.Append(' ');
                 result.Append(result.Length == 0 ? char.ToUpper(c) : c);
             }
             return result.ToString();
         }
 
-        private sealed class ExtractedRule
-        {
-            public string Rule { get; }
-            public string Message { get; }
-            public object? Constraint { get; }
-            public string? Field { get; }
-            public Shape Shape { get; }
-            public FieldCondition? When { get; }
-
-            public ExtractedRule(string rule, string message, object? constraint,
-                FieldCondition? when = null, string? field = null, Shape? shape = null)
-            {
-                Rule = rule;
-                Message = message;
-                Constraint = constraint;
-                When = when;
-                Field = field;
-                Shape = shape ?? Shape.None;
-            }
-        }
     }
 }

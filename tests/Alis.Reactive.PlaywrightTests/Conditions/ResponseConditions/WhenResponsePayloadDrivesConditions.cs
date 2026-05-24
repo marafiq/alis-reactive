@@ -46,13 +46,13 @@ public class WhenResponsePayloadDrivesConditions : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#s1-btn-approve").ClickAsync();
+        await ClickWhenStable(Page.Locator("#s1-btn-approve"));
         await Expect(Page.Locator("#s1-badge")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        await Page.Locator("#s1-btn-deny").ClickAsync();
+        await ClickWhenStable(Page.Locator("#s1-btn-deny"));
         await Expect(Page.Locator("#s1-badge")).ToBeHiddenAsync(new() { Timeout = 5000 });
 
-        await Page.Locator("#s1-btn-approve").ClickAsync();
+        await ClickWhenStable(Page.Locator("#s1-btn-approve"));
         await Expect(Page.Locator("#s1-badge")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();

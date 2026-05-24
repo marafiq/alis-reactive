@@ -1,10 +1,21 @@
 # Alis.Reactive Framework
 
 C# fluent builders express reactive browser intent. `Html.RenderPlan(plan)` serializes that
-intent to JSON validated against `Alis.Reactive/Schemas/reactive-plan.schema.json` (61
-definitions). The TypeScript runtime executes plan instructions without adding behavior the
-plan does not describe. C# never executes browser behavior. TypeScript never invents
-information the plan does not carry.
+intent as plan JSON from the rich C# domain model. Generated TypeScript plan
+types mirror that domain model, and the TypeScript runtime executes plan
+instructions without adding behavior the plan does not describe. C# never
+executes browser behavior. TypeScript never invents information the plan does
+not carry.
+
+Core architecture rule: DSL -> Rich Plan Domain -> Generated Rich TS Contract ->
+Runtime Executioner. Defensive runtime design is a smell when the PlanModel can
+make invalid behavior unrepresentable; runtime checks belong at external
+corruption, lifecycle, and integration-drift boundaries.
+
+Active rich-model vocabulary lives in `docs/reactive-plan-domain-language.md`.
+Keep that glossary aligned with code changes; it is a navigation aid for the
+DDD refactor, while C# plan types plus generated TypeScript types remain the
+contract source.
 
 Throughout this document, "the runtime" means the TypeScript code in
 `Alis.Reactive.Assets/runtime/` that executes plans in the browser. It is
@@ -14,37 +25,33 @@ bundled by esbuild into `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js`
 `AlisReactive.targets` file with the consumer's package version baked into
 the filename.
 
-## Architecture — 5 Layers, 4 Boundaries
+## Architecture — 4 Layers, 3 Boundaries
 
-Each boundary is guarded by a test harness. A failing test is the only reason to cross one.
+Each boundary is guarded by behavior evidence. Tests are production code: they
+should protect DSL behavior and domain language, not mirror implementation
+indirection.
 
 ```
-Layer 1  C# Domain Model + Builders
-         Quality: DDD value objects, internal constructors, C# 8.0, SOLID
-         Harness: AssertSchemaValid() — 70 calls across Core, Fusion, Native test bases
+Layer 1  Frozen Public DSL in cshtml
+         Quality: typed authoring, compile-time component/member APIs, no string magic except plugin compatibility
+         Harness: developer-facing unit tests and Playwright slices that use the DSL
          ↓
-         BOUNDARY: failing AssertSchemaValid() drives schema update
+         BOUNDARY: DSL intent must be representable without server-side browser execution
          ↓
-Layer 2  JSON Schema (Alis.Reactive/Schemas/reactive-plan.schema.json)
-         Quality: additionalProperties: false on every object, 61 $defs
-         Harness: AssertSchemaValid() in PlanTestBase, FusionTestBase, NativeTestBase
+Layer 2  Rich C# Plan Domain
+         Quality: value objects, invariants, reaction graph, object contracts, lifecycle vocabulary
+         Harness: domain behavior tests
          ↓
-         BOUNDARY: schema change → failing vitest drives TS type update
+         BOUNDARY: generated TS plan contract
          ↓
-Layer 3  TypeScript Types + Runtime
-         Quality: discriminated unions match schema, fail-fast, no fallbacks
-         Harness: npm run typecheck (vitest configured but no tests on this branch yet)
+Layer 3  Generated TypeScript Plan Types + Runtime Domain
+         Quality: generated discriminated unions, immediate/async execution lanes, no fallback behavior
+         Harness: npm run typecheck and focused runtime behavior tests
          ↓
-         BOUNDARY: browser first, then Playwright — eyes before automation
+         BOUNDARY: browser-visible behavior
          ↓
-Layer 4  Browser Verification
-         Quality: real interactions, visible outcomes, no page.evaluate()
-         Harness: Playwright BDD (5 rules), 69 test fixtures
-         ↓
-         BOUNDARY: working sandbox example before writing docs
-         ↓
-Layer 5  Documentation + Skills
-         Quality: dev-facing language, verified code examples, no internals vocabulary
+Layer 4  Browser Verification + Documentation
+         Quality: real interactions, visible outcomes, no page.evaluate(), glossary aligned with code
          Harness: sandbox-verified examples
 ```
 
@@ -94,8 +101,10 @@ concrete type via `JsonSerializer.Serialize(writer, value, value.GetType(), opti
 concrete plan model class carries its own `kind` property (e.g., `public string Kind => "set"`)
 which becomes the discriminator in the JSON, matched by TypeScript discriminated unions.
 
-Schema validation happens in C# tests via `AssertSchemaValid()`. The runtime trusts the
-JSON — it does not re-validate. If the JSON is malformed, `JSON.parse` throws at boot time.
+Generated TypeScript types come from the C# plan domain via `PlanTypeGenerator`.
+The runtime trusts framework-produced plan JSON as domain output. If external or
+corrupted JSON reaches the browser, runtime failures should expose the domain
+drift with context rather than become normal control flow.
 
 ## Build & Run
 
@@ -188,7 +197,7 @@ failure in your code.
 
 ```bash
 dotnet build
-dotnet test tests/Alis.Reactive.UnitTests                    # Core + schema
+dotnet test tests/Alis.Reactive.UnitTests                    # Core plan domain
 dotnet test tests/Alis.Reactive.Native.UnitTests             # Native
 dotnet test tests/Alis.Reactive.Fusion.UnitTests             # Fusion
 dotnet test tests/Alis.Reactive.FluentValidator.UnitTests    # Validation
@@ -287,7 +296,6 @@ dotnet pack Alis.Reactive/Alis.Reactive.csproj \
 | Components | Syncfusion EJ2 32.x (Fusion) + Native HTML. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
 | Validation | FluentValidation 12.x, extracted to client rules via `FluentValidationAdapter` |
 | Tests | NUnit 4.3-4.5, Vitest 3.x + jsdom (configured, no tests yet), Playwright 1.52 |
-| Schema | JSON Schema with 61 `$defs`, validated by `JsonSchema.Net` |
 
 ## Skills
 
@@ -322,13 +330,12 @@ No inline `<script>` blocks — `root.ts` handles discovery and boot automatical
 1. C# plan model class — sealed class, `internal` constructor
 2. Polymorphic registration — `WriteOnlyPolymorphicConverter` delegates to concrete type
 3. Builder method — PipelineBuilder, ElementBuilder, or TriggerBuilder
-4. JSON schema — failing `AssertSchemaValid()` test drives the update
-5. TS types — new interface in `Alis.Reactive.Assets/runtime/types/`, discriminated union with `kind`
-6. Runtime handler — new switch case + `assertNever`
-7. C# unit test — `AssertSchemaValid()` validates rendered JSON against schema
-8. TS unit test — `Alis.Reactive.Assets/runtime/__tests__/*.test.ts`, runtime behavior via `boot()`
-9. Playwright test — browser behavior with sandbox view
-10. Sandbox view — demonstrate the primitive
+4. Generated TS plan contract — `PlanTypeGenerator` output stays aligned with C#
+5. Runtime handler — new switch case + `assertNever`
+6. C# domain behavior test — prove DSL intent becomes the right plan model
+7. TS runtime behavior test — `Alis.Reactive.Assets/runtime/__tests__/*.test.ts`
+8. Playwright test — browser behavior with sandbox view
+9. Sandbox view — demonstrate the primitive
 
 ### 3. Vertical Slices — Duplication Over Abstraction
 

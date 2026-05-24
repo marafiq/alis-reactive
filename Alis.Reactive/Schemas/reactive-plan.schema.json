@@ -4,11 +4,11 @@
   "title": "Reactive Plan",
   "description": "The runtime plan produced by the domain model and executed by the browser runtime.",
   "type": "object",
-  "required": ["version", "planId", "types", "components", "behaviors"],
+  "required": ["version", "planId", "scope", "types", "components", "behaviors"],
   "properties": {
     "version": { "const": 3 },
     "planId": { "type": "string", "minLength": 1 },
-    "partId": { "type": "string", "minLength": 1 },
+    "scope": { "$ref": "#/$defs/PlanScope" },
     "types": {
       "type": "object",
       "additionalProperties": { "$ref": "#/$defs/JsType" }
@@ -23,6 +23,28 @@
     }
   },
   "$defs": {
+    "PlanScope": {
+      "oneOf": [
+        { "$ref": "#/$defs/RootPlanScope" },
+        { "$ref": "#/$defs/PartialPlanScope" }
+      ]
+    },
+    "RootPlanScope": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "root" }
+      }
+    },
+    "PartialPlanScope": {
+      "type": "object",
+      "required": ["kind", "partId"],
+      "properties": {
+        "kind": { "const": "partial" },
+        "partId": { "type": "string", "minLength": 1 }
+      }
+    },
     "JsType": {
       "type": "object",
       "required": ["properties", "methods", "events"],
@@ -55,27 +77,71 @@
     },
     "Method": {
       "type": "object",
-      "required": ["path", "args", "returns"],
+      "required": ["path", "arguments", "returns"],
       "properties": {
         "path": { "$ref": "#/$defs/Path" },
-        "args": {
+        "arguments": { "$ref": "#/$defs/MethodArgumentContract" },
+        "returns": { "$ref": "#/$defs/Shape" }
+      }
+    },
+    "MethodArgumentContract": {
+      "oneOf": [
+        { "$ref": "#/$defs/OpenMethodArgumentContract" },
+        { "$ref": "#/$defs/ExactMethodArgumentContract" }
+      ]
+    },
+    "OpenMethodArgumentContract": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": { "const": "open" }
+      }
+    },
+    "ExactMethodArgumentContract": {
+      "type": "object",
+      "required": ["kind", "shapes"],
+      "properties": {
+        "kind": { "const": "exact" },
+        "shapes": {
           "type": "array",
           "items": { "$ref": "#/$defs/Shape" }
-        },
-        "returns": { "$ref": "#/$defs/Shape" }
+        }
       }
     },
     "Event": {
       "type": "object",
-      "required": ["channel"],
+      "required": ["channel", "payloadType"],
       "properties": {
         "channel": { "type": "string", "minLength": 1 },
-        "payloadType": { "type": "string", "minLength": 1 }
+        "payloadType": { "$ref": "#/$defs/PayloadContract" }
+      }
+    },
+    "PayloadContract": {
+      "oneOf": [
+        { "$ref": "#/$defs/UntypedPayloadContract" },
+        { "$ref": "#/$defs/TypedPayloadContract" }
+      ]
+    },
+    "UntypedPayloadContract": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "untyped" }
+      }
+    },
+    "TypedPayloadContract": {
+      "type": "object",
+      "required": ["kind", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "typed" },
+        "type": { "type": "string", "minLength": 1 }
       }
     },
     "Component": {
       "type": "object",
-      "required": ["id", "vendor", "type"],
+      "required": ["id", "vendor", "type", "binding", "container"],
       "additionalProperties": false,
       "properties": {
         "id": { "type": "string", "minLength": 1 },
@@ -84,15 +150,53 @@
           "enum": ["native", "fusion"]
         },
         "type": { "type": "string", "minLength": 1 },
-        "bindingPath": { "type": "string" },
-        "valueMember": { "type": "string" },
-        "container": { "$ref": "#/$defs/ContainerScope" }
+        "binding": { "$ref": "#/$defs/ComponentBinding" },
+        "container": { "$ref": "#/$defs/ComponentContainer" }
       }
     },
-    "ContainerScope": {
+    "ComponentBinding": {
+      "oneOf": [
+        { "$ref": "#/$defs/UnboundComponentBinding" },
+        { "$ref": "#/$defs/RegisteredInputBinding" }
+      ]
+    },
+    "UnboundComponentBinding": {
       "type": "object",
-      "required": ["components", "validationRules"],
+      "required": ["kind"],
+      "additionalProperties": false,
       "properties": {
+        "kind": { "const": "none" }
+      }
+    },
+    "RegisteredInputBinding": {
+      "type": "object",
+      "required": ["kind", "bindingPath", "valueMember"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "registered-input" },
+        "bindingPath": { "type": "string", "minLength": 1 },
+        "valueMember": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ComponentContainer": {
+      "oneOf": [
+        { "$ref": "#/$defs/UnscopedComponentContainer" },
+        { "$ref": "#/$defs/ValidationContainerComponent" }
+      ]
+    },
+    "UnscopedComponentContainer": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
+      }
+    },
+    "ValidationContainerComponent": {
+      "type": "object",
+      "required": ["kind", "components", "validationRules"],
+      "properties": {
+        "kind": { "const": "validation-container" },
         "components": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 }
@@ -118,7 +222,7 @@
     },
     "ValidationRule": {
       "type": "object",
-      "required": ["name", "message", "constraint", "otherValue", "when", "shape"],
+      "required": ["name", "message", "execution"],
       "properties": {
         "name": {
           "type": "string",
@@ -133,10 +237,63 @@
           ]
         },
         "message": { "type": "string", "minLength": 1 },
-        "constraint": { "$ref": "#/$defs/ValueProducer" },
-        "otherValue": { "$ref": "#/$defs/ValueProducer" },
-        "when": { "$ref": "#/$defs/Condition" },
-        "shape": { "$ref": "#/$defs/Shape" }
+        "execution": { "$ref": "#/$defs/ValidationRuleExecution" }
+      }
+    },
+    "ValidationRuleExecution": {
+      "type": "object",
+      "required": ["constraint", "otherValue", "activation", "comparisonShape"],
+      "properties": {
+        "constraint": { "$ref": "#/$defs/ValidationRuleOperand" },
+        "otherValue": { "$ref": "#/$defs/ValidationRuleOperand" },
+        "activation": { "$ref": "#/$defs/ValidationRuleActivation" },
+        "comparisonShape": { "$ref": "#/$defs/Shape" }
+      }
+    },
+    "ValidationRuleOperand": {
+      "oneOf": [
+        { "$ref": "#/$defs/NoValidationRuleOperand" },
+        { "$ref": "#/$defs/ValueValidationRuleOperand" }
+      ]
+    },
+    "NoValidationRuleOperand": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
+      }
+    },
+    "ValueValidationRuleOperand": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "value" },
+        "value": { "$ref": "#/$defs/ValueProducer" }
+      }
+    },
+    "ValidationRuleActivation": {
+      "oneOf": [
+        { "$ref": "#/$defs/AlwaysValidationRuleActivation" },
+        { "$ref": "#/$defs/ConditionalValidationRuleActivation" }
+      ]
+    },
+    "AlwaysValidationRuleActivation": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "always" }
+      }
+    },
+    "ConditionalValidationRuleActivation": {
+      "type": "object",
+      "required": ["kind", "condition"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "when" },
+        "condition": { "$ref": "#/$defs/Condition" }
       }
     },
     "Source": {
@@ -158,7 +315,7 @@
     },
     "PayloadSource": {
       "type": "object",
-      "required": ["kind", "scope"],
+      "required": ["kind", "scope", "type"],
       "additionalProperties": false,
       "properties": {
         "kind": { "const": "payload" },
@@ -166,7 +323,7 @@
           "type": "string",
           "enum": ["event", "success", "error", "request", "dispatch", "local"]
         },
-        "type": { "type": "string", "minLength": 1 }
+        "type": { "$ref": "#/$defs/PayloadContract" }
       }
     },
     "UrlSource": {
@@ -212,11 +369,11 @@
     },
     "DocumentEventTrigger": {
       "type": "object",
-      "required": ["kind", "event"],
+      "required": ["kind", "event", "payloadType"],
       "properties": {
         "kind": { "const": "document-event" },
         "event": { "type": "string", "minLength": 1 },
-        "payloadType": { "type": "string", "minLength": 1 }
+        "payloadType": { "$ref": "#/$defs/PayloadContract" }
       }
     },
     "ComponentEventTrigger": {
@@ -230,22 +387,46 @@
     },
     "ServerPushTrigger": {
       "type": "object",
-      "required": ["kind", "url"],
+      "required": ["kind", "url", "eventFilter"],
       "properties": {
         "kind": { "const": "server-push" },
         "url": { "type": "string", "minLength": 1 },
+        "eventFilter": { "$ref": "#/$defs/ServerPushEventFilter" }
+      }
+    },
+    "ServerPushEventFilter": {
+      "oneOf": [
+        { "$ref": "#/$defs/AnyServerPushEventFilter" },
+        { "$ref": "#/$defs/NamedServerPushEventFilter" }
+      ]
+    },
+    "AnyServerPushEventFilter": {
+      "type": "object",
+      "required": ["kind", "payloadType"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "any" },
+        "payloadType": { "$ref": "#/$defs/PayloadContract" }
+      }
+    },
+    "NamedServerPushEventFilter": {
+      "type": "object",
+      "required": ["kind", "event", "payloadType"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "named" },
         "event": { "type": "string", "minLength": 1 },
-        "payloadType": { "type": "string", "minLength": 1 }
+        "payloadType": { "$ref": "#/$defs/PayloadContract" }
       }
     },
     "SignalRTrigger": {
       "type": "object",
-      "required": ["kind", "hubUrl", "method"],
+      "required": ["kind", "hubUrl", "method", "payloadType"],
       "properties": {
         "kind": { "const": "signalr" },
         "hubUrl": { "type": "string", "minLength": 1 },
         "method": { "type": "string", "minLength": 1 },
-        "payloadType": { "type": "string", "minLength": 1 }
+        "payloadType": { "$ref": "#/$defs/PayloadContract" }
       }
     },
     "Reaction": {
@@ -274,14 +455,36 @@
     },
     "ParallelReaction": {
       "type": "object",
-      "required": ["kind", "steps"],
+      "required": ["kind", "steps", "completion"],
       "properties": {
         "kind": { "const": "parallel" },
         "steps": {
           "type": "array",
           "items": { "$ref": "#/$defs/Reaction" }
         },
-        "onSettled": { "$ref": "#/$defs/Reaction" }
+        "completion": { "$ref": "#/$defs/ParallelCompletion" }
+      }
+    },
+    "ParallelCompletion": {
+      "oneOf": [
+        { "$ref": "#/$defs/NoParallelCompletion" },
+        { "$ref": "#/$defs/SettledParallelCompletion" }
+      ]
+    },
+    "NoParallelCompletion": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
+      }
+    },
+    "SettledParallelCompletion": {
+      "type": "object",
+      "required": ["kind", "reaction"],
+      "properties": {
+        "kind": { "const": "on-settled" },
+        "reaction": { "$ref": "#/$defs/Reaction" }
       }
     },
     "BranchReaction": {
@@ -297,10 +500,31 @@
     },
     "BranchCase": {
       "type": "object",
-      "required": ["when", "reaction"],
+      "required": ["guard", "reaction"],
       "properties": {
-        "when": { "$ref": "#/$defs/Condition" },
+        "guard": { "$ref": "#/$defs/BranchGuard" },
         "reaction": { "$ref": "#/$defs/Reaction" }
+      }
+    },
+    "BranchGuard": {
+      "oneOf": [
+        { "$ref": "#/$defs/DefaultBranchGuard" },
+        { "$ref": "#/$defs/ConditionalBranchGuard" }
+      ]
+    },
+    "DefaultBranchGuard": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": { "const": "default" }
+      }
+    },
+    "ConditionalBranchGuard": {
+      "type": "object",
+      "required": ["kind", "condition"],
+      "properties": {
+        "kind": { "const": "when" },
+        "condition": { "$ref": "#/$defs/Condition" }
       }
     },
     "SetReaction": {
@@ -336,12 +560,35 @@
     },
     "DispatchReaction": {
       "type": "object",
-      "required": ["kind", "event", "data"],
+      "required": ["kind", "event", "payload"],
       "properties": {
         "kind": { "const": "dispatch" },
         "event": { "type": "string", "minLength": 1 },
+        "payload": { "$ref": "#/$defs/DispatchPayload" }
+      }
+    },
+    "DispatchPayload": {
+      "oneOf": [
+        { "$ref": "#/$defs/NoDispatchPayload" },
+        { "$ref": "#/$defs/PresentDispatchPayload" }
+      ]
+    },
+    "NoDispatchPayload": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
+      }
+    },
+    "PresentDispatchPayload": {
+      "type": "object",
+      "required": ["kind", "data", "payloadType"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "value" },
         "data": { "$ref": "#/$defs/ValueProducer" },
-        "payloadType": { "type": "string", "minLength": 1 }
+        "payloadType": { "$ref": "#/$defs/PayloadContract" }
       }
     },
     "InjectReaction": {
@@ -363,7 +610,7 @@
     },
     "Request": {
       "type": "object",
-      "required": ["method", "url", "before", "success", "error", "complete", "headers", "routeParams"],
+      "required": ["method", "url", "before", "success", "error", "complete", "headers", "routeParams", "validation", "input", "chain"],
       "properties": {
         "method": {
           "type": "string",
@@ -379,7 +626,7 @@
           "propertyNames": { "pattern": "^[a-zA-Z0-9_]+$" },
           "additionalProperties": { "$ref": "#/$defs/ValueProducer" }
         },
-        "container": { "type": "string", "minLength": 1 },
+        "validation": { "$ref": "#/$defs/RequestValidationTarget" },
         "input": { "$ref": "#/$defs/RequestInput" },
         "before": {
           "type": "array",
@@ -397,18 +644,71 @@
           "type": "array",
           "items": { "$ref": "#/$defs/Reaction" }
         },
+        "chain": { "$ref": "#/$defs/RequestChain" }
+      }
+    },
+    "RequestValidationTarget": {
+      "oneOf": [
+        { "$ref": "#/$defs/NoRequestValidationTarget" },
+        { "$ref": "#/$defs/ContainerRequestValidationTarget" }
+      ]
+    },
+    "NoRequestValidationTarget": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
+      }
+    },
+    "ContainerRequestValidationTarget": {
+      "type": "object",
+      "required": ["kind", "container"],
+      "properties": {
+        "kind": { "const": "container" },
+        "container": { "type": "string", "minLength": 1 }
+      }
+    },
+    "RequestChain": {
+      "oneOf": [
+        { "$ref": "#/$defs/TerminalRequestChain" },
+        { "$ref": "#/$defs/FollowUpRequestChain" }
+      ]
+    },
+    "TerminalRequestChain": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "terminal" }
+      }
+    },
+    "FollowUpRequestChain": {
+      "type": "object",
+      "required": ["kind", "next"],
+      "properties": {
+        "kind": { "const": "follow-up" },
         "next": { "$ref": "#/$defs/Request" }
       }
     },
     "RequestInput": {
       "oneOf": [
+        { "$ref": "#/$defs/NoRequestInput" },
         { "$ref": "#/$defs/GatherInput" },
         { "$ref": "#/$defs/ValueInput" }
       ]
     },
+    "NoRequestInput": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
+      }
+    },
     "GatherInput": {
       "type": "object",
-      "required": ["kind", "components", "transport"],
+      "required": ["kind", "components", "transport", "statics", "selection"],
       "properties": {
         "kind": { "const": "gather" },
         "components": {
@@ -419,8 +719,53 @@
           "type": "string",
           "enum": ["query", "json", "form-data"]
         },
-        "statics": { "$ref": "#/$defs/ValueProducer" },
-        "includeAll": { "type": "boolean" }
+        "statics": { "$ref": "#/$defs/GatherStatics" },
+        "selection": { "$ref": "#/$defs/GatherSelection" }
+      }
+    },
+    "GatherStatics": {
+      "oneOf": [
+        { "$ref": "#/$defs/NoGatherStatics" },
+        { "$ref": "#/$defs/StaticGatherValue" }
+      ]
+    },
+    "NoGatherStatics": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
+      }
+    },
+    "StaticGatherValue": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "value" },
+        "value": { "$ref": "#/$defs/ValueProducer" }
+      }
+    },
+    "GatherSelection": {
+      "oneOf": [
+        { "$ref": "#/$defs/ExplicitGatherSelection" },
+        { "$ref": "#/$defs/AllRegisteredInputsGatherSelection" }
+      ]
+    },
+    "ExplicitGatherSelection": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "explicit" }
+      }
+    },
+    "AllRegisteredInputsGatherSelection": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "all-registered-inputs" }
       }
     },
     "ValueInput": {
@@ -445,10 +790,32 @@
     },
     "ResponseHandler": {
       "type": "object",
-      "required": ["reaction"],
+      "required": ["match", "reaction"],
       "properties": {
-        "status": { "type": "integer" },
+        "match": { "$ref": "#/$defs/ResponseStatusMatch" },
         "reaction": { "$ref": "#/$defs/Reaction" }
+      }
+    },
+    "ResponseStatusMatch": {
+      "oneOf": [
+        { "$ref": "#/$defs/AnyResponseStatusMatch" },
+        { "$ref": "#/$defs/ExactResponseStatusMatch" }
+      ]
+    },
+    "AnyResponseStatusMatch": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "any" }
+      }
+    },
+    "ExactResponseStatusMatch": {
+      "type": "object",
+      "required": ["kind", "status"],
+      "properties": {
+        "kind": { "const": "status" },
+        "status": { "type": "integer" }
       }
     },
     "ValueProducer": {
@@ -456,8 +823,7 @@
         { "$ref": "#/$defs/LiteralProducer" },
         { "$ref": "#/$defs/ReadProducer" },
         { "$ref": "#/$defs/ObjectProducer" },
-        { "$ref": "#/$defs/ArrayProducer" },
-        { "$ref": "#/$defs/NoneProducer" }
+        { "$ref": "#/$defs/ArrayProducer" }
       ]
     },
     "LiteralProducer": {
@@ -478,13 +844,35 @@
     },
     "ReadProducer": {
       "type": "object",
-      "required": ["kind", "from", "member", "path", "shape", "args"],
+      "required": ["kind", "from", "member", "path", "shape", "access"],
       "properties": {
         "kind": { "const": "read" },
         "from": { "$ref": "#/$defs/Source" },
         "member": { "type": "string", "minLength": 1 },
         "path": { "$ref": "#/$defs/Path" },
         "shape": { "$ref": "#/$defs/Shape" },
+        "access": { "$ref": "#/$defs/ValueReadAccess" }
+      }
+    },
+    "ValueReadAccess": {
+      "oneOf": [
+        { "$ref": "#/$defs/PropertyValueReadAccess" },
+        { "$ref": "#/$defs/MethodValueReadAccess" }
+      ]
+    },
+    "PropertyValueReadAccess": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "property" }
+      }
+    },
+    "MethodValueReadAccess": {
+      "type": "object",
+      "required": ["kind", "args"],
+      "properties": {
+        "kind": { "const": "method" },
         "args": {
           "type": "array",
           "items": { "$ref": "#/$defs/ValueProducer" }
@@ -515,22 +903,13 @@
         "shape": { "$ref": "#/$defs/Shape" }
       }
     },
-    "NoneProducer": {
-      "type": "object",
-      "required": ["kind"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "none" }
-      }
-    },
     "Condition": {
       "oneOf": [
         { "$ref": "#/$defs/CompareCondition" },
         { "$ref": "#/$defs/AllCondition" },
         { "$ref": "#/$defs/AnyCondition" },
         { "$ref": "#/$defs/NotCondition" },
-        { "$ref": "#/$defs/ConfirmCondition" },
-        { "$ref": "#/$defs/NoneCondition" }
+        { "$ref": "#/$defs/ConfirmCondition" }
       ]
     },
     "CompareCondition": {
@@ -550,9 +929,32 @@
             "contains", "starts-with", "ends-with", "matches", "min-length"
           ]
         },
-        "right": { "$ref": "#/$defs/ValueProducer" },
+        "right": { "$ref": "#/$defs/ComparisonRightOperand" },
         "shape": { "$ref": "#/$defs/Shape" },
         "itemShape": { "$ref": "#/$defs/Shape" }
+      }
+    },
+    "ComparisonRightOperand": {
+      "oneOf": [
+        { "$ref": "#/$defs/NoComparisonRightOperand" },
+        { "$ref": "#/$defs/PresentComparisonRightOperand" }
+      ]
+    },
+    "NoComparisonRightOperand": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "none" }
+      }
+    },
+    "PresentComparisonRightOperand": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "value" },
+        "value": { "$ref": "#/$defs/ValueProducer" }
       }
     },
     "AllCondition": {
@@ -591,14 +993,6 @@
       "properties": {
         "kind": { "const": "confirm" },
         "message": { "type": "string", "minLength": 1 }
-      }
-    },
-    "NoneCondition": {
-      "type": "object",
-      "required": ["kind"],
-      "additionalProperties": false,
-      "properties": {
-        "kind": { "const": "none" }
       }
     },
     "Shape": {
@@ -650,7 +1044,7 @@
     },
     "ObjectShape": {
       "type": "object",
-      "required": ["kind"],
+      "required": ["kind", "fields", "additional"],
       "properties": {
         "kind": { "const": "object" },
         "fields": {

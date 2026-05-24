@@ -1,0 +1,198 @@
+import type { JsType, MemberAccess, Method, MethodArgumentContract, Property } from "../types";
+import { assertNever } from "../core/assert-never";
+import { RuntimePath } from "./runtime-path";
+import { RuntimeValue } from "./runtime-value";
+import { RuntimeShape } from "./runtime-shape";
+
+type ExactMethodArgumentContract = Extract<MethodArgumentContract, { kind: "exact" }>;
+
+export class RuntimeObject {
+  constructor(
+    readonly label: string,
+    readonly root: unknown,
+    readonly jsType: JsType,
+  ) {}
+
+  read(member: string): RuntimeValue {
+    return this.requireProperty(member).read(this.root);
+  }
+
+  set(member: string, value: unknown): void {
+    const property = this.requireProperty(member);
+    property.write(this.root, value);
+  }
+
+  call(member: string, args: unknown[]): RuntimeValue {
+    const method = this.requireMethod(member);
+    const invocation = RuntimeMethodInvocation.from(this.label, member, method);
+    const raw = invocation.call(this.root, args);
+    return RuntimeValue.declared(raw, method.returns);
+  }
+
+  requireProperty(member: string): RuntimeProperty {
+    const property = this.tryProperty(member);
+    const propertyWasDeclared = property !== undefined;
+    if (!propertyWasDeclared) throw new Error(`[alis] property "${member}" not found on ${this.label}`);
+    return property;
+  }
+
+  requireMethod(member: string): Method {
+    const method = this.tryMethod(member);
+    const methodWasDeclared = method !== undefined;
+    if (!methodWasDeclared) throw new Error(`[alis] method "${member}" not found on ${this.label}`);
+    return method;
+  }
+
+  private tryProperty(member: string): RuntimeProperty | undefined {
+    const property = this.jsType.properties[member];
+    if (property === undefined) return undefined;
+
+    return RuntimeProperty.from(this.label, member, property);
+  }
+
+  private tryMethod(member: string): Method | undefined {
+    return this.jsType.methods[member];
+  }
+}
+
+class RuntimeProperty {
+  private constructor(
+    private readonly label: string,
+    private readonly property: Property,
+    private readonly access: RuntimePropertyAccess,
+  ) {}
+
+  static from(objectLabel: string, member: string, property: Property): RuntimeProperty {
+    const label = `${objectLabel}.${member}`;
+    return new RuntimeProperty(label, property, RuntimePropertyAccess.from(label, property.access));
+  }
+
+  read(root: unknown): RuntimeValue {
+    this.access.requireReadable(this.label);
+    const raw = RuntimePath.from(this.property.path).readDeclared(root, this.label);
+    return RuntimeValue.declared(raw, this.property.shape);
+  }
+
+  write(root: unknown, value: unknown): void {
+    this.access.requireWritable(this.label);
+    const shaped = RuntimeValue.declared(value, this.property.shape).usingDeclaredShape();
+    RuntimePath.from(this.property.path).assign(root, shaped, this.label);
+  }
+}
+
+abstract class RuntimePropertyAccess {
+  static from(label: string, access: MemberAccess): RuntimePropertyAccess {
+    switch (access) {
+      case "read":
+        return ReadOnlyRuntimePropertyAccess.instance;
+      case "write":
+        return WriteOnlyRuntimePropertyAccess.instance;
+      case "readwrite":
+        return ReadWriteRuntimePropertyAccess.instance;
+      default:
+        assertNever(access, `property access for ${label}`);
+    }
+  }
+
+  abstract requireReadable(label: string): void;
+
+  abstract requireWritable(label: string): void;
+}
+
+class ReadOnlyRuntimePropertyAccess extends RuntimePropertyAccess {
+  static readonly instance = new ReadOnlyRuntimePropertyAccess();
+
+  requireReadable(_label: string): void {
+  }
+
+  requireWritable(label: string): void {
+    throw new Error(`[alis] property ${label} is not writable`);
+  }
+}
+
+class WriteOnlyRuntimePropertyAccess extends RuntimePropertyAccess {
+  static readonly instance = new WriteOnlyRuntimePropertyAccess();
+
+  requireReadable(label: string): void {
+    throw new Error(`[alis] property ${label} is not readable`);
+  }
+
+  requireWritable(_label: string): void {
+  }
+}
+
+class ReadWriteRuntimePropertyAccess extends RuntimePropertyAccess {
+  static readonly instance = new ReadWriteRuntimePropertyAccess();
+
+  requireReadable(_label: string): void {
+  }
+
+  requireWritable(_label: string): void {
+  }
+}
+
+class RuntimeMethodInvocation {
+  private constructor(
+    private readonly label: string,
+    private readonly method: Method,
+    private readonly argumentsContract: RuntimeMethodArguments,
+  ) {}
+
+  static from(objectLabel: string, member: string, method: Method): RuntimeMethodInvocation {
+    return new RuntimeMethodInvocation(
+      `${objectLabel}.${member}`,
+      method,
+      RuntimeMethodArguments.from(method.arguments),
+    );
+  }
+
+  call(root: unknown, args: unknown[]): unknown {
+    const preparedArgs = this.argumentsContract.prepare(this.label, args);
+    return RuntimePath.from(this.method.path).call(root, preparedArgs, this.label);
+  }
+}
+
+abstract class RuntimeMethodArguments {
+  static from(contract: MethodArgumentContract): RuntimeMethodArguments {
+    switch (contract.kind) {
+      case "open":
+        return OpenRuntimeMethodArguments.instance;
+      case "exact":
+        return new ExactRuntimeMethodArguments(contract.shapes);
+      default:
+        assertNever(contract, "method argument contract");
+    }
+  }
+
+  abstract prepare(label: string, args: unknown[]): unknown[];
+}
+
+class OpenRuntimeMethodArguments extends RuntimeMethodArguments {
+  static readonly instance = new OpenRuntimeMethodArguments();
+
+  prepare(_label: string, args: unknown[]): unknown[] {
+    return args;
+  }
+}
+
+class ExactRuntimeMethodArguments extends RuntimeMethodArguments {
+  constructor(private readonly shapes: ExactMethodArgumentContract["shapes"]) {
+    super();
+  }
+
+  prepare(label: string, args: unknown[]): unknown[] {
+    const argumentCountMatchesContract = args.length === this.shapes.length;
+    if (!argumentCountMatchesContract) {
+      throw new Error(`[alis] method "${label}" expects ${this.shapes.length} argument(s) but received ${args.length}`);
+    }
+
+    return args.map((arg, index) => RuntimeShape.from(this.shapeAt(index, label)).apply(arg));
+  }
+
+  private shapeAt(index: number, label: string) {
+    const shape = this.shapes[index];
+    if (shape !== undefined) return shape;
+
+    throw new Error(`[alis] method "${label}" argument ${index} has no declared shape`);
+  }
+}

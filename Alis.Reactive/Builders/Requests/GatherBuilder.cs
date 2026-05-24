@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.PlanModel;
@@ -16,29 +15,20 @@ namespace Alis.Reactive.Builders.Requests
     public class GatherBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
-        internal List<GatherField> Fields { get; } = new List<GatherField>();
-        internal List<StaticField> StaticFields { get; } = new List<StaticField>();
-        internal List<EventField> EventFields { get; } = new List<EventField>();
-        internal Dictionary<string, ValueProducer> HeaderFields { get; } = new Dictionary<string, ValueProducer>();
-        internal Dictionary<string, ValueProducer> RouteParamFields { get; } = new Dictionary<string, ValueProducer>();
-        private bool _includeAll;
+        private readonly GatherDraft _draft = new GatherDraft();
 
         internal GatherBuilder(PlanBuildContext context)
         {
             _context = context;
         }
 
-        internal GatherBuilder<TModel> AddField(GatherField field)
-        {
-            Fields.Add(field);
-            return this;
-        }
+        internal GatherDraft Draft => _draft;
 
         /// <summary>Includes all registered input component values in the request payload.</summary>
         /// <returns>This builder for chaining.</returns>
         public GatherBuilder<TModel> IncludeAll()
         {
-            _includeAll = true;
+            _draft.IncludeAllRegisteredInputs();
             return this;
         }
 
@@ -48,7 +38,10 @@ namespace Alis.Reactive.Builders.Requests
         /// <returns>This builder for chaining.</returns>
         public GatherBuilder<TModel> Static(string param, object value)
         {
-            StaticFields.Add(new StaticField(param, value));
+            var payloadKey = HttpPayloadKey.Of(param);
+            _draft.AddSupplementalField(
+                payloadKey,
+                ValueProducer.LiteralFromValue(value));
             return this;
         }
 
@@ -64,58 +57,45 @@ namespace Alis.Reactive.Builders.Requests
             Expression<Func<TArgs, TProp>> path,
             string param)
         {
+            var payloadKey = HttpPayloadKey.Of(param);
             var eventPath = ExpressionPathHelper.ToEventPath(path);
-            EventFields.Add(new EventField(param, eventPath));
+            var shape = Shape.FromClrType(typeof(TProp));
+            _draft.AddSupplementalField(
+                payloadKey,
+                ValueProducer.ReadPayload(PayloadSource.Event(), eventPath, shape));
             return this;
         }
 
         /// <summary>Adds a literal string header to the HTTP request. Value must not be null — use a typed source overload for dynamic/nullable values.</summary>
         public GatherBuilder<TModel> Header(string name, string value)
         {
-            ValidateHeaderName(name);
+            var header = HeaderName.Of(name);
             if (value == null)
                 throw new System.ArgumentNullException(nameof(value),
                     $"Header '{name}' value must not be null. Literal headers require a concrete value. " +
                     "Use the TypedSource<T> or event-arg overload for dynamic/nullable values.");
-            HeaderFields[name] = ValueProducer.Literal(value);
+            _draft.AddHeader(header, ValueProducer.Literal(value));
             return this;
         }
 
         /// <summary>Adds a header from a typed source. HTTP headers are scalar — arrays and objects are rejected at build time.</summary>
         public GatherBuilder<TModel> Header<TProp>(string name, TypedSource<TProp> source)
         {
-            ValidateHeaderName(name);
+            var header = HeaderName.Of(name);
             if (source == null) throw new System.ArgumentNullException(nameof(source));
-            RequireScalarShape<TProp>(name, "header");
-            HeaderFields[name] = source.ToValueProducer();
+            RequestScalarSlot.Header(header).RequireShape<TProp>();
+            _draft.AddHeader(header, source.ToValueProducer());
             return this;
         }
 
         /// <summary>Adds a header from an event arg expression. HTTP headers are scalar — arrays and objects are rejected at build time.</summary>
         public GatherBuilder<TModel> Header<TArgs, TProp>(string name, TArgs args, Expression<Func<TArgs, TProp>> path)
         {
-            ValidateHeaderName(name);
-            RequireScalarShape<TProp>(name, "header");
+            var header = HeaderName.Of(name);
+            var shape = RequestScalarSlot.Header(header).RequireShape<TProp>();
             var eventPath = ExpressionPathHelper.ToEventPath(path);
-            var shape = Shape.FromClrType(typeof(TProp));
-            HeaderFields[name] = ValueProducer.Read(PayloadSource.Event(), eventPath, shape: shape);
+            _draft.AddHeader(header, ValueProducer.ReadPayload(PayloadSource.Event(), eventPath, shape));
             return this;
-        }
-
-        /// <summary>Rejects non-scalar shapes for string-destination values (headers, route params).</summary>
-        internal static void RequireScalarShape<TProp>(string paramName, string context)
-        {
-            var shape = Shape.FromClrType(typeof(TProp));
-            if (!shape.IsScalar)
-                throw new System.InvalidOperationException(
-                    $"{context} '{paramName}' requires a scalar type, but got shape '{shape.Kind}'. " +
-                    "Use string, int, bool, DateTime, or their nullable variants.");
-        }
-
-        private static void ValidateHeaderName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new System.ArgumentException("Header name must not be null or whitespace.", nameof(name));
         }
 
         // ── Route Params ─────────────────────────────────────
@@ -123,38 +103,38 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>Adds a route param from a static int.</summary>
         public GatherBuilder<TModel> RouteParam(string paramName, int value)
         {
-            ValidateRouteParamName(paramName);
-            RouteParamFields[paramName] = ValueProducer.Literal(value);
+            var routeParam = _draft.RegisterRouteParameter(paramName);
+            _draft.AddRouteParameter(routeParam, ValueProducer.Literal(value));
             return this;
         }
 
         /// <summary>Adds a route param from a static string. Value must not be null.</summary>
         public GatherBuilder<TModel> RouteParam(string paramName, string value)
         {
-            ValidateRouteParamName(paramName);
+            var routeParam = _draft.RegisterRouteParameter(paramName);
             if (value == null)
                 throw new System.ArgumentNullException(nameof(value),
                     $"Route param '{paramName}' value must not be null. Literal route params require a concrete value. " +
                     "Use the TypedSource<T> or event-arg overload for dynamic/nullable values.");
-            RouteParamFields[paramName] = ValueProducer.Literal(value);
+            _draft.AddRouteParameter(routeParam, ValueProducer.Literal(value));
             return this;
         }
 
         /// <summary>Adds a route param from a static long.</summary>
         public GatherBuilder<TModel> RouteParam(string paramName, long value)
         {
-            ValidateRouteParamName(paramName);
-            RouteParamFields[paramName] = ValueProducer.Literal(value);
+            var routeParam = _draft.RegisterRouteParameter(paramName);
+            _draft.AddRouteParameter(routeParam, ValueProducer.Literal(value));
             return this;
         }
 
         /// <summary>Adds a route param from a typed source. Route params are scalar — arrays and objects are rejected at build time.</summary>
         public GatherBuilder<TModel> RouteParam<TProp>(string paramName, TypedSource<TProp> source)
         {
-            ValidateRouteParamName(paramName);
+            var routeParam = _draft.RegisterRouteParameter(paramName);
             if (source == null) throw new System.ArgumentNullException(nameof(source));
-            RequireScalarShape<TProp>(paramName, "route param");
-            RouteParamFields[paramName] = source.ToValueProducer();
+            RequestScalarSlot.RouteParameter(routeParam).RequireShape<TProp>();
+            _draft.AddRouteParameter(routeParam, source.ToValueProducer());
             return this;
         }
 
@@ -162,31 +142,11 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> RouteParam<TArgs, TProp>(
             string paramName, TArgs args, Expression<Func<TArgs, TProp>> path)
         {
-            ValidateRouteParamName(paramName);
-            RequireScalarShape<TProp>(paramName, "route param");
+            var routeParam = _draft.RegisterRouteParameter(paramName);
+            var shape = RequestScalarSlot.RouteParameter(routeParam).RequireShape<TProp>();
             var eventPath = ExpressionPathHelper.ToEventPath(path);
-            var shape = Shape.FromClrType(typeof(TProp));
-            RouteParamFields[paramName] = ValueProducer.Read(PayloadSource.Event(), eventPath, shape: shape);
+            _draft.AddRouteParameter(routeParam, ValueProducer.ReadPayload(PayloadSource.Event(), eventPath, shape));
             return this;
-        }
-
-
-        private void ValidateRouteParamName(string paramName)
-        {
-            if (string.IsNullOrWhiteSpace(paramName))
-                throw new System.ArgumentException("Route param name must not be null or whitespace.", nameof(paramName));
-
-            var hasInvalidCharacters = !GatherValidation.IsValidRouteParamName(paramName);
-            if (hasInvalidCharacters)
-                throw new System.ArgumentException(
-                    $"Route param name '{paramName}' contains invalid characters. " +
-                    "Names must match [a-zA-Z0-9_] (ASCII only) to align with the runtime {{placeholder}} regex.",
-                    nameof(paramName));
-
-            var isDuplicate = RouteParamFields.ContainsKey(paramName);
-            if (isDuplicate)
-                throw new System.InvalidOperationException(
-                    $"Route param '{paramName}' is already defined. Each route param can only be set once.");
         }
 
         // ── URL Query Params ──────────────────────────────────
@@ -197,11 +157,9 @@ namespace Alis.Reactive.Builders.Requests
         /// </summary>
         public GatherBuilder<TModel> FromUrl(string paramName)
         {
-            if (string.IsNullOrWhiteSpace(paramName))
-                throw new System.ArgumentException(
-                    "URL param name must not be null or whitespace.", nameof(paramName));
-            var value = ValueProducer.ReadUrl(paramName);
-            Fields.Add(GatherField.Of(paramName, value));
+            var urlParam = UrlParameterName.Of(paramName);
+            var value = ValueProducer.ReadUrl(urlParam.Value);
+            _draft.AddPayloadField(GatherField.Of(urlParam.Value, value));
             return this;
         }
 
@@ -210,14 +168,10 @@ namespace Alis.Reactive.Builders.Requests
         /// </summary>
         public GatherBuilder<TModel> FromUrl(string paramName, string asParam)
         {
-            if (string.IsNullOrWhiteSpace(paramName))
-                throw new System.ArgumentException(
-                    "URL param name must not be null or whitespace.", nameof(paramName));
-            if (string.IsNullOrWhiteSpace(asParam))
-                throw new System.ArgumentException(
-                    "HTTP parameter name must not be null or whitespace.", nameof(asParam));
-            var value = ValueProducer.ReadUrl(paramName);
-            Fields.Add(GatherField.Of(asParam, value));
+            var urlParam = UrlParameterName.Of(paramName);
+            var payloadKey = HttpPayloadKey.Of(asParam);
+            var value = ValueProducer.ReadUrl(urlParam.Value);
+            _draft.AddPayloadField(GatherField.Of(payloadKey.Value, value));
             return this;
         }
 
@@ -226,13 +180,10 @@ namespace Alis.Reactive.Builders.Requests
         /// </summary>
         public GatherBuilder<TModel> FromUrl<T>(string paramName)
         {
-            if (string.IsNullOrWhiteSpace(paramName))
-                throw new System.ArgumentException(
-                    "URL param name must not be null or whitespace.", nameof(paramName));
-            RequireScalarShape<T>(paramName, "URL param");
-            var shape = Shape.FromClrType(typeof(T));
-            var value = ValueProducer.ReadUrl(paramName, shape);
-            Fields.Add(GatherField.Of(paramName, value));
+            var urlParam = UrlParameterName.Of(paramName);
+            var shape = RequestScalarSlot.UrlQueryParameter(urlParam).RequireShape<T>();
+            var value = ValueProducer.ReadUrl(urlParam.Value, shape);
+            _draft.AddPayloadField(GatherField.Of(urlParam.Value, value));
             return this;
         }
 
@@ -241,16 +192,11 @@ namespace Alis.Reactive.Builders.Requests
         /// </summary>
         public GatherBuilder<TModel> FromUrl<T>(string paramName, string asParam)
         {
-            if (string.IsNullOrWhiteSpace(paramName))
-                throw new System.ArgumentException(
-                    "URL param name must not be null or whitespace.", nameof(paramName));
-            if (string.IsNullOrWhiteSpace(asParam))
-                throw new System.ArgumentException(
-                    "HTTP parameter name must not be null or whitespace.", nameof(asParam));
-            RequireScalarShape<T>(paramName, "URL param");
-            var shape = Shape.FromClrType(typeof(T));
-            var value = ValueProducer.ReadUrl(paramName, shape);
-            Fields.Add(GatherField.Of(asParam, value));
+            var urlParam = UrlParameterName.Of(paramName);
+            var payloadKey = HttpPayloadKey.Of(asParam);
+            var shape = RequestScalarSlot.UrlQueryParameter(urlParam).RequireShape<T>();
+            var value = ValueProducer.ReadUrl(urlParam.Value, shape);
+            _draft.AddPayloadField(GatherField.Of(payloadKey.Value, value));
             return this;
         }
 
@@ -260,9 +206,8 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> Plugin<T>(Conditions.TypedPluginSource<T> source, string paramName)
         {
             if (source == null) throw new System.ArgumentNullException(nameof(source));
-            if (string.IsNullOrWhiteSpace(paramName))
-                throw new System.ArgumentException("HTTP param name required.", nameof(paramName));
-            Fields.Add(GatherField.Of(paramName, source.ToValueProducer()));
+            var payloadKey = HttpPayloadKey.Of(paramName);
+            _draft.AddPayloadField(GatherField.Of(payloadKey.Value, source.ToValueProducer()));
             return this;
         }
 
@@ -272,27 +217,56 @@ namespace Alis.Reactive.Builders.Requests
         /// </summary>
         public GatherBuilder<TModel> Include(string componentId, string vendor, string propertyName, string valueMember)
         {
-            var isAlreadyRegistered = _context.TryFindRegistrationById(componentId, out var reg);
-            var resolvedShape = isAlreadyRegistered ? reg.Shape : Shape.Any;
-            _context.EnsureInputComponent(componentId, vendor, valueMember, resolvedShape, propertyName);
-            var componentValue = ValueProducer.Read(ComponentSource.Of(componentId), valueMember, shape: resolvedShape);
-            Fields.Add(GatherField.Of(propertyName, componentValue));
+            var registration = _context.FindRegistrationById(componentId);
+            var valueContract = registration.RequireValueContract(
+                ComponentRegistrationRequirement.ForGatherValueRead(componentId, valueMember));
+            return Include(componentId, vendor, propertyName, valueContract);
+        }
+
+        internal GatherBuilder<TModel> Include(
+            string componentId,
+            string vendor,
+            string propertyName,
+            string valueMember,
+            Shape shape)
+        {
+            if (shape == null) throw new System.ArgumentNullException(nameof(shape));
+            return Include(
+                componentId,
+                vendor,
+                propertyName,
+                InputValueContract.For(valueMember, shape));
+        }
+
+        private GatherBuilder<TModel> Include(
+            string componentId,
+            string vendor,
+            string propertyName,
+            InputValueContract valueContract)
+        {
+            if (valueContract == null) throw new System.ArgumentNullException(nameof(valueContract));
+            var componentIdentity = RegisteredComponentIdentity.For(componentId, vendor);
+            var planBindingPath = BindingPath.Of(propertyName);
+            var payloadKey = HttpPayloadKey.Of(propertyName);
+            var gatheredValue = GatheredComponentValue.For(
+                componentIdentity,
+                planBindingPath,
+                payloadKey,
+                valueContract);
+            _context.EnsureInputComponent(gatheredValue.PlanBinding);
+            _draft.AddPayloadField(gatheredValue.Field);
             return this;
         }
 
-        /// <summary>
-        /// Returns true if IncludeAll() was called.
-        /// Used at build time to expand to all registered components.
-        /// </summary>
-        internal bool IsIncludeAll => _includeAll;
+        internal GatherBuilder<TModel> Include<TProp>(
+            TypedComponentSource<TProp> source,
+            string paramName)
+        {
+            if (source == null) throw new System.ArgumentNullException(nameof(source));
+            var payloadKey = HttpPayloadKey.Of(paramName);
+            _draft.AddPayloadField(GatherField.Of(payloadKey.Value, source.ToValueProducer()));
+            return this;
+        }
     }
 
-    internal static class GatherValidation
-    {
-        private static readonly System.Text.RegularExpressions.Regex RouteParamNamePattern =
-            new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9_]+$",
-                System.Text.RegularExpressions.RegexOptions.Compiled);
-
-        internal static bool IsValidRouteParamName(string name) => RouteParamNamePattern.IsMatch(name);
-    }
 }

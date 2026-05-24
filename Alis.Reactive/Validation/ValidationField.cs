@@ -1,25 +1,25 @@
+using System;
 using System.Collections.Generic;
-using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// Describes a single field's validation rules within a form.
-    /// Enriched at render time from ComponentsMap.
+    /// Enriched at render time from registered input component contracts.
     /// </summary>
     public sealed class ValidationField
     {
-        public string FieldName { get; }
-        public List<ValidationRule> Rules { get; }
-        public string FieldId { get; internal set; }
-        public string Vendor { get; internal set; }
-        public string ValueMember { get; internal set; }
-        public Shape Shape { get; internal set; }
+        private readonly ValidationFieldPath _fieldName;
 
-        internal ValidationField(string fieldName, List<ValidationRule> rules)
+        public string FieldName => _fieldName.Value;
+        public List<ValidationRule> Rules { get; }
+
+        internal ValidationField(ValidationFieldPath fieldName, List<ValidationRule> rules)
         {
-            FieldName = fieldName;
-            Rules = rules;
+            _fieldName = fieldName ?? throw new ArgumentNullException(nameof(fieldName));
+            Rules = ExtractedValidationRules.From(rules).ToPublicList();
         }
+
+        internal ValidationFieldPath FieldPath => _fieldName;
     }
 }

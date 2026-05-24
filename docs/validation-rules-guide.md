@@ -264,7 +264,7 @@ public class ResidentConditionalValidator : ReactiveValidator<ResidentModel>
 
 **What happens when the user clicks "Save":**
 1. Runtime reads ALL validation rules from the plan
-2. For each field: reads the component value via `resolveRoot` + `walk(readExpr)`
+2. For each field: reads the component value through the shared value-evaluation/runtime-object path
 3. Evaluates each rule (skips conditional rules whose condition is false)
 4. If any rule fails: shows error inline next to the field (or in summary if hidden)
 5. If all pass: sends the HTTP POST

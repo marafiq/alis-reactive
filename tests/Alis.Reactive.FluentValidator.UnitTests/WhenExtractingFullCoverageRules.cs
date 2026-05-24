@@ -14,8 +14,8 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "Name").Rules.First(r => r.Rule == "required");
-        Assert.That(rule.Constraint, Is.Null);
-        Assert.That(rule.Field, Is.Null);
+        Assert.That(rule.ConstraintValue(), Is.Null);
+        Assert.That(rule.PeerFieldName(), Is.Null);
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.None));
     }
 
@@ -26,7 +26,7 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "Nickname").Rules.First(r => r.Rule == "empty");
-        Assert.That(rule.Constraint, Is.Null);
+        Assert.That(rule.ConstraintValue(), Is.Null);
     }
 
     // ── minLength / maxLength ────────────────────────────────
@@ -36,7 +36,7 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "Name").Rules.First(r => r.Rule == "minLength");
-        Assert.That(rule.Constraint, Is.EqualTo(3));
+        Assert.That(rule.ConstraintValue(), Is.EqualTo(3));
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "Name").Rules.First(r => r.Rule == "maxLength");
-        Assert.That(rule.Constraint, Is.EqualTo(100));
+        Assert.That(rule.ConstraintValue(), Is.EqualTo(100));
     }
 
     // ── email ────────────────────────────────────────────────
@@ -54,7 +54,7 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "Email").Rules.First(r => r.Rule == "email");
-        Assert.That(rule.Constraint, Is.Null);
+        Assert.That(rule.ConstraintValue(), Is.Null);
     }
 
     // ── regex ────────────────────────────────────────────────
@@ -64,7 +64,7 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "Phone").Rules.First(r => r.Rule == "regex");
-        Assert.That(rule.Constraint, Is.EqualTo(@"^\d{3}-\d{3}-\d{4}$"));
+        Assert.That(rule.ConstraintValue(), Is.EqualTo(@"^\d{3}-\d{3}-\d{4}$"));
     }
 
     // ── creditCard ───────────────────────────────────────────
@@ -74,7 +74,7 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "CreditCardNumber").Rules.First(r => r.Rule == "creditCard");
-        Assert.That(rule.Constraint, Is.Null);
+        Assert.That(rule.ConstraintValue(), Is.Null);
     }
 
     // ── range (inclusive) with shape ───────────────────────
@@ -84,7 +84,7 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "Age").Rules.First(r => r.Rule == "range");
-        var constraint = rule.Constraint as object[];
+        var constraint = rule.ConstraintValue() as object[];
         Assert.That(constraint, Is.Not.Null);
         Assert.That(constraint![0], Is.EqualTo(0));
         Assert.That(constraint[1], Is.EqualTo(120));
@@ -98,7 +98,7 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "Score").Rules.First(r => r.Rule == "exclusiveRange");
-        var constraint = rule.Constraint as object[];
+        var constraint = rule.ConstraintValue() as object[];
         Assert.That(constraint, Is.Not.Null);
         Assert.That(constraint![0], Is.EqualTo(0m));
         Assert.That(constraint[1], Is.EqualTo(100m));
@@ -112,9 +112,9 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "Salary").Rules.First(r => r.Rule == "min");
-        Assert.That(rule.Constraint, Is.EqualTo(0m));
+        Assert.That(rule.ConstraintValue(), Is.EqualTo(0m));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
-        Assert.That(rule.Field, Is.Null);
+        Assert.That(rule.PeerFieldName(), Is.Null);
     }
 
     [Test]
@@ -122,7 +122,7 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "Salary").Rules.First(r => r.Rule == "max");
-        Assert.That(rule.Constraint, Is.EqualTo(500000m));
+        Assert.That(rule.ConstraintValue(), Is.EqualTo(500000m));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
 
@@ -133,7 +133,7 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "MonthlyRate").Rules.First(r => r.Rule == "gt");
-        Assert.That(rule.Constraint, Is.EqualTo(0m));
+        Assert.That(rule.ConstraintValue(), Is.EqualTo(0m));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
 
@@ -142,7 +142,7 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "MonthlyRate").Rules.First(r => r.Rule == "lt");
-        Assert.That(rule.Constraint, Is.EqualTo(1000000m));
+        Assert.That(rule.ConstraintValue(), Is.EqualTo(1000000m));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
 
@@ -153,8 +153,8 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "ConfirmEmail").Rules.First(r => r.Rule == "equalTo");
-        Assert.That(rule.Field, Is.EqualTo("Email"));
-        Assert.That(rule.Constraint, Is.Null);
+        Assert.That(rule.PeerFieldName(), Is.EqualTo("Email"));
+        Assert.That(rule.ConstraintValue(), Is.Null);
     }
 
     // ── notEqualTo (cross-property via field) ────────────────
@@ -164,8 +164,8 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "AlternateEmail").Rules.First(r => r.Rule == "notEqualTo");
-        Assert.That(rule.Field, Is.EqualTo("Email"));
-        Assert.That(rule.Constraint, Is.Null);
+        Assert.That(rule.PeerFieldName(), Is.EqualTo("Email"));
+        Assert.That(rule.ConstraintValue(), Is.Null);
     }
 
     // ── notEqual (fixed value) ───────────────────────────────
@@ -175,8 +175,8 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "Status").Rules.First(r => r.Rule == "notEqual");
-        Assert.That(rule.Constraint, Is.EqualTo("deleted"));
-        Assert.That(rule.Field, Is.Null);
+        Assert.That(rule.ConstraintValue(), Is.EqualTo("deleted"));
+        Assert.That(rule.PeerFieldName(), Is.Null);
     }
 
     // ── min with shape: "date" ────────────────────────────
@@ -186,9 +186,9 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "AdmissionDate").Rules.First(r => r.Rule == "min");
-        Assert.That(rule.Constraint, Is.EqualTo("2020-01-01"));
+        Assert.That(rule.ConstraintValue(), Is.EqualTo("2020-01-01"));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Date));
-        Assert.That(rule.Field, Is.Null);
+        Assert.That(rule.PeerFieldName(), Is.Null);
     }
 
     // ── gt cross-property with shape: "date" ─────────────
@@ -198,8 +198,8 @@ public class WhenExtractingFullCoverageRules
     {
         var desc = _adapter.ExtractRules(typeof(FullCoverageValidator), "testForm")!;
         var rule = desc.First(f => f.FieldName == "DischargeDate").Rules.First(r => r.Rule == "gt");
-        Assert.That(rule.Field, Is.EqualTo("AdmissionDate"));
-        Assert.That(rule.Constraint, Is.Null);
+        Assert.That(rule.PeerFieldName(), Is.EqualTo("AdmissionDate"));
+        Assert.That(rule.ConstraintValue(), Is.Null);
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Date));
     }
 
@@ -244,8 +244,8 @@ public class WhenExtractingFullCoverageRules
         {
             foreach (var rule in field.Rules)
             {
-                Assert.That(rule.When, Is.Not.Null, $"Rule '{rule.Rule}' on '{field.FieldName}' missing condition");
-                var ruleWhen = (FieldCompare)rule.When!;
+                Assert.That(rule.Condition(), Is.Not.Null, $"Rule '{rule.Rule}' on '{field.FieldName}' missing condition");
+                var ruleWhen = (FieldCompare)rule.Condition()!;
                 Assert.That(ruleWhen.Field, Is.EqualTo("IsEmployed"), $"Rule '{rule.Rule}' on '{field.FieldName}' wrong condition field");
                 Assert.That(ruleWhen.Op, Is.EqualTo("truthy"), $"Rule '{rule.Rule}' on '{field.FieldName}' wrong condition op");
             }
@@ -263,9 +263,9 @@ public class WhenExtractingFullCoverageRules
                     $"'{uField.FieldName}'[{i}] rule type mismatch");
                 Assert.That(cField.Rules[i].Shape, Is.EqualTo(uField.Rules[i].Shape),
                     $"'{uField.FieldName}'[{i}] shape mismatch");
-                Assert.That(cField.Rules[i].Field, Is.EqualTo(uField.Rules[i].Field),
+                Assert.That(cField.Rules[i].PeerFieldName(), Is.EqualTo(uField.Rules[i].PeerFieldName()),
                     $"'{uField.FieldName}'[{i}] field mismatch");
-                Assert.That(cField.Rules[i].Constraint?.ToString(), Is.EqualTo(uField.Rules[i].Constraint?.ToString()),
+                Assert.That(cField.Rules[i].ConstraintValue()?.ToString(), Is.EqualTo(uField.Rules[i].ConstraintValue()?.ToString()),
                     $"'{uField.FieldName}'[{i}] constraint mismatch");
             }
         }

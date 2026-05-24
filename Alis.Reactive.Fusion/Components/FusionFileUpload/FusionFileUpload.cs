@@ -9,6 +9,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new FusionFileUpload(), "fileupload");
+
         /// <inheritdoc />
         public string ValueMember => "filesData";
     }

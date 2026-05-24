@@ -12,7 +12,7 @@ public class WhenExtractingComparisonRules
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("min"));
-        Assert.That(desc[0].Rules[0].Constraint, Is.EqualTo(0m));
+        Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(0m));
         Assert.That(desc[0].Rules[0].Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
 
@@ -23,7 +23,7 @@ public class WhenExtractingComparisonRules
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("max"));
-        Assert.That(desc[0].Rules[0].Constraint, Is.EqualTo(500000m));
+        Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(500000m));
         Assert.That(desc[0].Rules[0].Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
 
@@ -35,7 +35,7 @@ public class WhenExtractingComparisonRules
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules.Count, Is.EqualTo(1));
         Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("gt"));
-        Assert.That(desc[0].Rules[0].Constraint, Is.EqualTo(0m));
+        Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(0m));
         Assert.That(desc[0].Rules[0].Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
 
@@ -47,7 +47,7 @@ public class WhenExtractingComparisonRules
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules.Count, Is.EqualTo(1));
         Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("lt"));
-        Assert.That(desc[0].Rules[0].Constraint, Is.EqualTo(1000000m));
+        Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(1000000m));
         Assert.That(desc[0].Rules[0].Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
 }

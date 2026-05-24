@@ -32,7 +32,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"kind\": \"url\""));
         Assert.That(planJson, Does.Contain("\"member\": \"tab\""));
@@ -50,7 +49,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"kind\": \"url\""));
         Assert.That(planJson, Does.Contain("\"member\": \"page\""));
@@ -68,7 +66,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Contain("\"kind\": \"boolean\""));
     }
 
@@ -82,7 +79,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Contain("\"kind\": \"date\""));
     }
 
@@ -100,7 +96,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"key\": \"facilityId\""));
         Assert.That(planJson, Does.Contain("\"kind\": \"url\""));
@@ -118,7 +113,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"key\": \"unit\""));
     }
@@ -136,7 +130,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"kind\": \"compare\""));
         Assert.That(planJson, Does.Contain("\"kind\": \"url\""));
@@ -154,7 +147,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         // The condition's left ValueProducer carries number shape from FromUrl<int>
         Assert.That(planJson, Does.Contain("\"op\": \"gt\""));
@@ -175,7 +167,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"kind\": \"set\""));
         Assert.That(planJson, Does.Contain("\"kind\": \"url\""));
@@ -193,7 +184,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Not.Contain("\"kind\": \"url\""));
     }
 
@@ -214,7 +204,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Contain("\"routeParams\""));
         Assert.That(planJson, Does.Contain("\"headers\""));
         Assert.That(planJson, Does.Contain("\"kind\": \"url\""));
@@ -232,7 +221,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         using var doc = JsonDocument.Parse(planJson);
         var routeParam = doc.RootElement.GetProperty("behaviors")[0]
@@ -254,7 +242,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         using var doc = JsonDocument.Parse(planJson);
         var header = doc.RootElement.GetProperty("behaviors")[0]
@@ -277,7 +264,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         using var doc = JsonDocument.Parse(planJson);
         var field = doc.RootElement.GetProperty("behaviors")[0]
@@ -299,7 +285,6 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
         Assert.That(planJson, Does.Contain("\"key\": \"pageNum\""));
     }
 

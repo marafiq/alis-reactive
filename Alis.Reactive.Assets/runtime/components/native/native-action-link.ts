@@ -4,7 +4,7 @@
 import { executeReaction } from "../../execution/execute";
 import { scope } from "../../core/trace";
 import type { Reaction, Plan, Request } from "../../types";
-import { assertNever } from "../../core/assert-never";
+import { RuntimeReactionTree } from "../../domain/reaction-tree";
 
 const log = scope("native-action-link");
 const SELECTOR = "a[data-reactive-link]";
@@ -61,55 +61,37 @@ function decodePayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
 }
 
 function bindHrefToSingleRequest(reaction: Reaction, href: string): void {
-  const state = { count: 0, request: undefined as Request | undefined };
-  resolveSingleRequest(reaction, state);
-
-  if (state.count !== 1 || !state.request) {
-    throw new Error("NativeActionLink requires exactly one request.");
-  }
-
-  state.request.url = href;
+  NativeActionLinkRequestTarget.from(reaction).bindHref(href);
 }
 
-function resolveSingleRequest(
-  reaction: Reaction,
-  state: { count: number; request?: Request },
-): void {
-  switch (reaction.kind) {
-    case "sequence":
-      for (const step of reaction.steps) resolveSingleRequest(step, state);
-      return;
-    case "parallel":
-      for (const step of reaction.steps) resolveSingleRequest(step, state);
-      return;
-    case "branch":
-      for (const c of reaction.cases) resolveSingleRequest(c.reaction, state);
-      return;
-    case "request":
-      state.count++;
-      if (state.count > 1) {
-        throw new Error("NativeActionLink supports exactly one request.");
-      }
-      assertRequestSupported(reaction.request);
-      state.request = reaction.request;
-      return;
-    case "set":
-    case "call":
-    case "dispatch":
-    case "inject":
-    case "show-validation-errors":
-      return;
-    default:
-      assertNever(reaction, "reaction kind in NativeActionLink");
-  }
-}
+class NativeActionLinkRequestTarget {
+  private constructor(private readonly request: Request) {}
 
-function assertRequestSupported(request: Request): void {
-  if (request.next) {
-    throw new Error("NativeActionLink does not support chained requests.");
+  static from(reaction: Reaction): NativeActionLinkRequestTarget {
+    const requests = RuntimeReactionTree.from(reaction).declaredRequests();
+    const request = requests[0];
+    if (requests.length !== 1 || request === undefined) {
+      throw new Error("NativeActionLink requires exactly one request.");
+    }
+
+    return new NativeActionLinkRequestTarget(request).assertSupported();
   }
 
-  if (request.container) {
-    throw new Error("NativeActionLink does not support validation.");
+  bindHref(href: string): void {
+    this.request.url = href;
+  }
+
+  private assertSupported(): NativeActionLinkRequestTarget {
+    const requestUsesChaining = this.request.chain.kind === "follow-up";
+    if (requestUsesChaining) {
+      throw new Error("NativeActionLink does not support chained requests.");
+    }
+
+    const requestRunsClientValidation = this.request.validation.kind === "container";
+    if (requestRunsClientValidation) {
+      throw new Error("NativeActionLink does not support validation.");
+    }
+
+    return this;
   }
 }

@@ -6,7 +6,7 @@ namespace Alis.Reactive.UnitTests.ValidationEnrichment;
 /// <summary>
 /// Overview #3 — Component registration enforcement.
 /// InputBoundFieldBase.Render() must throw if the component was not registered
-/// via AddToComponentsMap. Silent skips in validation and gather are forbidden.
+/// via the shared input component onboarding contract. Silent skips in validation and gather are forbidden.
 ///
 /// These tests use the internal InputBoundFieldBase constructor because the public
 /// DSL (Html.InputField) requires ASP.NET IHtmlHelper, which lives in
@@ -22,9 +22,16 @@ public class WhenEnforcingComponentRegistration
         System.Linq.Expressions.Expression<System.Func<EnrichmentTestModel, string?>> expr,
         string bindingPath)
     {
+        var field = BoundInputField<EnrichmentTestModel, string>.Create(
+            plan,
+            expr!,
+            new InputFieldOptions(),
+            ModelBoundInputComponentSlot.For<EnrichmentTestModel, string>(expr!, bindingPath));
+
         return new InputBoundFieldBase<object, EnrichmentTestModel, string>(
-            new object(), plan, expr!, new InputFieldOptions(),
-            bindingPath, bindingPath, writer);
+            new object(),
+            field,
+            writer);
     }
 
     [Test]
@@ -39,7 +46,7 @@ public class WhenEnforcingComponentRegistration
 
         Assert.That(ex!.Message, Does.Contain("Name"),
             "Error must name the specific binding path that failed");
-        Assert.That(ex.Message, Does.Contain("AddToComponentsMap"),
+        Assert.That(ex.Message, Does.Contain("RegisterInputComponent"),
             "Error must tell the developer how to fix it");
     }
 
@@ -49,8 +56,11 @@ public class WhenEnforcingComponentRegistration
         var plan = new ReactivePlan<EnrichmentTestModel>();
         var writer = new StringWriter();
 
-        plan.AddToComponentsMap("Email", new ComponentRegistration(
-            "Email", "native", "Email", "value", "textbox", Alis.Reactive.PlanModel.Shape.String));
+        plan.RegisterInputComponent(ComponentRegistration.RegisteredInput(
+                Alis.Reactive.RegisteredComponentIdentity.For("Email", "native"),
+                Alis.Reactive.RegisteredComponentBinding.For("Email", "value"),
+                Alis.Reactive.PlanModel.ComponentKind.Of("textbox"),
+                Alis.Reactive.PlanModel.Shape.String));
 
         var setup = CreateSetup(plan, writer, x => x.Email, "Email");
         setup.Options.Label("Email Address");
@@ -74,8 +84,11 @@ public class WhenEnforcingComponentRegistration
         var writer = new StringWriter();
 
         // Register Name but not Email
-        plan.AddToComponentsMap("Name", new ComponentRegistration(
-            "Name", "native", "Name", "value", "textbox", Alis.Reactive.PlanModel.Shape.String));
+        plan.RegisterInputComponent(ComponentRegistration.RegisteredInput(
+                Alis.Reactive.RegisteredComponentIdentity.For("Name", "native"),
+                Alis.Reactive.RegisteredComponentBinding.For("Name", "value"),
+                Alis.Reactive.PlanModel.ComponentKind.Of("textbox"),
+                Alis.Reactive.PlanModel.Shape.String));
 
         var nameSetup = CreateSetup(plan, writer, x => x.Name, "Name");
         Assert.DoesNotThrow(() =>

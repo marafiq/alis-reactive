@@ -7,7 +7,7 @@
   "scripts": {
     "build": "npm run build:plugins && npm run build:css",
     "build:plugins": "node esbuild.config.mjs",
-    "build:css": "vite build --config vite.config.ts",
+    "build:css": "node build-css.mjs",
     "watch:plugins": "node esbuild.config.mjs --watch",
     "watch:css": "vite build --config vite.config.ts --watch",
     "typecheck": "tsc --project Scripts/tsconfig.json --noEmit",

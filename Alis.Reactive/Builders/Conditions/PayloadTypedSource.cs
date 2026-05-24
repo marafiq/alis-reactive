@@ -21,8 +21,8 @@ namespace Alis.Reactive.Builders.Conditions
 
         internal override ValueProducer ToValueProducer()
         {
-            var member = ExpressionPathHelper.ToEventPath(_expression);
-            return ValueProducer.Read(_source, member, shape: Shape);
+            var payloadPath = ExpressionPathHelper.ToEventPath(_expression);
+            return ValueProducer.ReadPayload(_source, payloadPath, Shape);
         }
     }
 }

@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net48;net10.0</TargetFrameworks>
-        <LangVersion>8</LangVersion>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>AlisReactive.Fusion</PackageId>
@@ -11,21 +10,13 @@
         <PackageTags>reactive;aspnetcore;syncfusion;ej2;components</PackageTags>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <ItemGroup>
       <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="32.2.8" />
       <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-      <PackageReference Include="Syncfusion.EJ2.MVC5" Version="32.2.8" />
-      <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
-      <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-      <Reference Include="System.Web" />
-    </ItemGroup>
-
     <ItemGroup>
       <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
-      <ProjectReference Include="..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />
       <!-- Fusion components emit design-system classes and the Syncfusion theme
            consumes design-system brand tokens: the design system is a real
            dependency, and this flows its CSS package to Fusion consumers. -->
@@ -39,7 +30,7 @@
     <!-- Ship Syncfusion EJ2 CSS (built by vite.fusion.config.ts from
          @syncfusion/ej2/tailwind3.css + our syncfusion.overrides.css) as a
          NuGet content file. Packed under BOTH build\ and buildTransitive\ so
-         packages.config consumers and PackageReference transitive flows both
+         direct PackageReference consumers and transitive PackageReference flows both
          pick up the asset. The copy mechanism is the shared
          build\AlisReactiveAssets.targets, packed under this package's id name. -->
     <ItemGroup>

@@ -7,13 +7,14 @@ namespace Alis.Reactive.Native.Components
 {
     public static class NativeHiddenFieldExtensions
     {
-        private static readonly NativeHiddenField _component = new NativeHiddenField();
+        private static readonly ComponentProperty<string> ValueProperty =
+            ComponentProperty<string>.Named("value");
 
         public static ComponentRef<NativeHiddenField, TModel> SetValue<TModel>(
             this ComponentRef<NativeHiddenField, TModel> self, string value)
             where TModel : class
         {
-            return self.EmitSet("value", ValueProducer.Literal(value));
+            return self.EmitSet(ValueProperty, ValueProducer.Literal(value));
         }
 
         // -- Property Write (component source -- cross-plan value binding) --
@@ -22,7 +23,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeHiddenField, TModel> self, TypedComponentSource<string> source)
             where TModel : class
         {
-            return self.EmitSet("value", source.ToValueProducer());
+            return self.EmitSet(ValueProperty, source.ToValueProducer());
         }
 
         // -- Property Write (response body) --
@@ -34,16 +35,14 @@ namespace Alis.Reactive.Native.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.EmitSet("value", ValueProducer.Read(source.Scope, "body", Path.Parse(sourcePath)));
+            return self.EmitSet(ValueProperty, ValueProducer.Read(source.Scope, "body", Path.Parse(sourcePath)));
         }
 
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeHiddenField, TModel> self)
             where TModel : class
         {
-            self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor);
-            self.Pipeline.Context.EnsureProperty(self.TargetId, _component.ValueMember, _component.ValueMember, Shape.String, "read");
-            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ValueMember);
+            return self.Read(ValueProperty);
         }
     }
 }

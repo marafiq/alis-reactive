@@ -13,7 +13,11 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeDropDownExtensions
     {
-        private static readonly NativeDropDown _component = new NativeDropDown();
+        private static readonly ComponentProperty<string> ValueProperty =
+            ComponentProperty<string>.Named("value");
+
+        private static readonly ComponentMethod FocusMethod =
+            ComponentMethod.Named("focus");
 
         /// <summary>
         /// Sets the selected option value in the browser.
@@ -26,7 +30,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeDropDown, TModel> self, string value)
             where TModel : class
         {
-            return self.EmitSet("value", ValueProducer.Literal(value));
+            return self.EmitSet(ValueProperty, ValueProducer.Literal(value));
         }
 
         /// <summary>
@@ -38,7 +42,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeDropDown, TModel> self)
             where TModel : class
         {
-            return self.EmitCall("focus");
+            return self.EmitCall(FocusMethod);
         }
 
         /// <summary>
@@ -50,9 +54,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeDropDown, TModel> self)
             where TModel : class
         {
-            self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor);
-            self.Pipeline.Context.EnsureProperty(self.TargetId, _component.ValueMember, _component.ValueMember, Shape.String, "read");
-            return new TypedComponentSource<string>(self.TargetId, _component.Vendor, _component.ValueMember);
+            return self.Read(ValueProperty);
         }
     }
 }

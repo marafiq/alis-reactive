@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.Builders.Requests;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders
@@ -18,17 +17,9 @@ namespace Alis.Reactive.Builders
     /// <typeparam name="TModel">The view model type.</typeparam>
     public partial class PipelineBuilder<TModel> : IReactionEmitter where TModel : class
     {
-        private enum PipelineMode { Sequential, Http, Parallel, Conditional }
-
-        internal List<Reaction> Steps { get; } = new List<Reaction>();
-        internal List<BranchCase> ConditionalBranches { get; private set; }
         internal PlanBuildContext Context { get; }
 
-        private HttpRequestBuilder<TModel> _httpBuilder;
-        private ParallelBuilder<TModel> _parallelBuilder;
-        private PipelineMode _mode = PipelineMode.Sequential;
-        private List<Reaction> _segments;
-        private int _preConditionBoundary;
+        private readonly PipelineDraft<TModel> _draft = new PipelineDraft<TModel>();
 
         internal PipelineBuilder(PlanBuildContext context)
         {
@@ -36,17 +27,22 @@ namespace Alis.Reactive.Builders
         }
 
         /// <inheritdoc />
-        void IReactionEmitter.AddStep(Reaction step) => Steps.Add(step);
+        void IReactionEmitter.AddStep(Reaction step) => AddStep(step);
 
         /// <inheritdoc />
         PlanBuildContext IReactionEmitter.BuildContext => Context;
+
+        internal void AddStep(Reaction step)
+        {
+            _draft.AddCommand(step);
+        }
 
         /// <summary>Dispatches a custom browser event by name.</summary>
         /// <param name="eventName">The event name. Listeners registered with <c>t.CustomEvent("name", ...)</c> will fire.</param>
         /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {
-            Steps.Add(Reaction.Dispatch(eventName));
+            AddStep(Reaction.Dispatch(eventName));
             return this;
         }
 
@@ -57,7 +53,10 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
-            Steps.Add(Reaction.Dispatch(eventName, ValueProducer.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload)))));
+            AddStep(Reaction.Dispatch(
+                eventName,
+                ValueProducer.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload))),
+                PayloadContract.ForPayload(typeof(TPayload))));
             return this;
         }
 
@@ -80,7 +79,10 @@ namespace Alis.Reactive.Builders
         {
             var builder = new DispatchPayloadBuilder<TPayload, TModel>();
             configure(builder);
-            Steps.Add(Reaction.Dispatch(eventName, builder.Build()));
+            AddStep(Reaction.Dispatch(
+                eventName,
+                builder.Build(),
+                PayloadContract.ForPayload(typeof(TPayload))));
             return this;
         }
 
@@ -100,7 +102,7 @@ namespace Alis.Reactive.Builders
             Expression<Func<TModel, object>> expr)
             where TComponent : IComponent, new()
         {
-            var elementId = IdGenerator.For<TModel>(expr);
+            var elementId = IdGenerator.For<TModel, object>(expr);
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
@@ -114,7 +116,7 @@ namespace Alis.Reactive.Builders
             where TComponent : IComponent, new()
             where TOtherModel : class
         {
-            var elementId = IdGenerator.For<TOtherModel>(expr);
+            var elementId = IdGenerator.For<TOtherModel, object>(expr);
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
@@ -128,14 +130,16 @@ namespace Alis.Reactive.Builders
             return new ComponentRef<TComponent, TModel>(refId, this);
         }
 
-        /// <summary>References an app-level component (e.g. Toast, Confirm) by its default ID.</summary>
-        /// <typeparam name="TComponent">The app-level component type.</typeparam>
+        /// <summary>References a layout-owned app component (e.g. Toast, Confirm) by its default ID.</summary>
+        /// <typeparam name="TComponent">The layout-owned app component type.</typeparam>
         /// <returns>A typed component reference.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>()
             where TComponent : IAppLevelComponent, new()
         {
             var comp = new TComponent();
-            return new ComponentRef<TComponent, TModel>(comp.DefaultId, this);
+            return new ComponentRef<TComponent, TModel>(
+                ComponentObjectTarget.ForLayout<TComponent>(comp.DefaultId),
+                this);
         }
 
         /// <summary>Reads a URL query parameter as a string for use in conditions or as a value source.</summary>
@@ -162,8 +166,58 @@ namespace Alis.Reactive.Builders
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
             if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
-            Context.EnsurePluginMethod(pluginName, member, returns: PlanModel.Shape.FromClrType(typeof(T)));
-            return new PluginReadBuilder<T, TModel>(pluginName, member);
+            var operation = PluginOperationId.Of(pluginName, member);
+            var signature = Context.EnsurePluginMethod(PluginMethodRequirement.Function(
+                operation,
+                PlanModel.Shape.FromClrType(typeof(T))));
+            return new PluginReadBuilder<T, TModel>(
+                operation,
+                signature.Arguments);
+        }
+
+        /// <summary>Reads a value by calling the registered plugin root function.</summary>
+        /// <param name="pluginName">The registered plugin name.</param>
+        public PluginReadBuilder<T, TModel> Plugin<T>(string pluginName)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+            var operation = PluginOperationId.Root(pluginName);
+            var signature = Context.EnsurePluginMethod(PluginMethodRequirement.Function(
+                operation,
+                PlanModel.Shape.FromClrType(typeof(T))));
+            return new PluginReadBuilder<T, TModel>(
+                operation,
+                signature.Arguments);
+        }
+
+        /// <summary>Reads a property value from a registered plugin object.</summary>
+        /// <param name="pluginName">The registered plugin name.</param>
+        /// <param name="member">The property name on the plugin object.</param>
+        public Conditions.TypedPluginPropertySource<T> PluginProperty<T>(string pluginName, string member)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+            if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
+
+            var property = PluginPropertyId.Of(pluginName, member);
+            Context.EnsurePluginProperty(PluginPropertyRequirement.Read(property, PlanModel.Shape.FromClrType(typeof(T))));
+            return new Conditions.TypedPluginPropertySource<T>(property);
+        }
+
+        /// <summary>Reads a value from a declared plugin function.</summary>
+        /// <param name="function">The plugin function descriptor registered with the plan.</param>
+        public PluginReadBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
+        {
+            if (function == null) throw new System.ArgumentNullException(nameof(function));
+            Context.EnsurePluginMethod(PluginMethodRequirement.Function(function));
+            return new PluginReadBuilder<T, TModel>(function);
+        }
+
+        /// <summary>Reads a value from a declared plugin property.</summary>
+        /// <param name="property">The plugin property descriptor registered with the plan.</param>
+        public Conditions.TypedPluginPropertySource<T> Plugin<T>(PluginProperty<T> property)
+        {
+            if (property == null) throw new System.ArgumentNullException(nameof(property));
+            Context.EnsurePluginProperty(PluginPropertyRequirement.Read(property));
+            return new Conditions.TypedPluginPropertySource<T>(property.PropertyId);
         }
 
         /// <summary>Calls a plugin method that does not return a value. Chain <c>.Arg()</c> then <c>.Fire()</c>.</summary>
@@ -174,8 +228,34 @@ namespace Alis.Reactive.Builders
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
             if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
-            Context.EnsurePluginMethod(pluginName, member);
-            return new PluginCallBuilder<TModel>(pluginName, member, this);
+            var operation = PluginOperationId.Of(pluginName, member);
+            var signature = Context.EnsurePluginMethod(PluginMethodRequirement.Command(operation));
+            return new PluginCallBuilder<TModel>(
+                operation,
+                this,
+                signature.Arguments);
+        }
+
+        /// <summary>Calls the registered plugin root function as a command. Chain <c>.Arg()</c> then <c>.Fire()</c>.</summary>
+        /// <param name="pluginName">The registered plugin name.</param>
+        public PluginCallBuilder<TModel> Plugin(string pluginName)
+        {
+            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
+            var operation = PluginOperationId.Root(pluginName);
+            var signature = Context.EnsurePluginMethod(PluginMethodRequirement.Command(operation));
+            return new PluginCallBuilder<TModel>(
+                operation,
+                this,
+                signature.Arguments);
+        }
+
+        /// <summary>Calls a declared plugin command. Chain <c>.Arg()</c> then <c>.Fire()</c>.</summary>
+        /// <param name="command">The plugin command descriptor registered with the plan.</param>
+        public PluginCallBuilder<TModel> Plugin(PluginCommand command)
+        {
+            if (command == null) throw new System.ArgumentNullException(nameof(command));
+            Context.EnsurePluginMethod(PluginMethodRequirement.Command(command));
+            return new PluginCallBuilder<TModel>(command, this);
         }
 
         /// <summary>Displays accumulated validation errors in the specified container.</summary>
@@ -183,7 +263,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
-            Steps.Add(Reaction.ShowValidationErrors(formId));
+            AddStep(Reaction.ShowValidationErrors(formId));
             return this;
         }
 
@@ -195,164 +275,28 @@ namespace Alis.Reactive.Builders
         {
             Context.EnsureElement(elementId);
             var responseBody = ValueProducer.Read(PayloadSource.Success(), "responseBody");
-            Steps.Add(Reaction.Inject(elementId, responseBody));
+            AddStep(Reaction.Inject(elementId, responseBody));
             return this;
         }
 
         internal void SetConditionalBranches(List<BranchCase> branches)
         {
-            _preConditionBoundary = Steps.Count;
-            ConditionalBranches = branches;
+            _draft.SetConditionalBranches(branches);
         }
 
         internal void FlushSegment()
         {
-            _segments ??= new List<Reaction>();
-
-            if (_mode == PipelineMode.Http && _httpBuilder != null)
-                FlushHttpRequest();
-            else if (_mode == PipelineMode.Parallel && _parallelBuilder != null)
-                FlushParallelRequest();
-            else
-                FlushCommandsAroundCondition();
-
-            var hasUnflushedBranch = ConditionalBranches != null && ConditionalBranches.Count > 0;
-            if (hasUnflushedBranch)
-            {
-                _segments.Add(Reaction.Branch(ConditionalBranches));
-                ConditionalBranches = null;
-            }
-
-            _mode = PipelineMode.Sequential;
-        }
-
-        private void FlushHttpRequest()
-        {
-            var request = _httpBuilder.BuildRequest();
-            if (Steps.Count > 0)
-                request = request.WithBefore(new List<Reaction>(Steps));
-            _segments.Add(Reaction.Request(request));
-            Steps.Clear();
-            _httpBuilder = null;
-        }
-
-        private void FlushParallelRequest()
-        {
-            var hasPendingCommands = Steps.Count > 0;
-            _segments.Add(_parallelBuilder.BuildReaction(
-                hasPendingCommands ? new List<Reaction>(Steps) : new List<Reaction>()));
-            Steps.Clear();
-            _parallelBuilder = null;
-        }
-
-        private void FlushCommandsAroundCondition()
-        {
-            var hasPreConditionCommands = _preConditionBoundary > 0;
-            var hasPostConditionCommands = Steps.Count > _preConditionBoundary;
-            var hasPendingBranch = ConditionalBranches != null && ConditionalBranches.Count > 0;
-
-            if (hasPreConditionCommands)
-                _segments.Add(Reaction.Sequence(
-                    new List<Reaction>(Steps.GetRange(0, _preConditionBoundary))));
-
-            if (hasPendingBranch)
-            {
-                _segments.Add(Reaction.Branch(ConditionalBranches));
-                ConditionalBranches = null;
-            }
-
-            if (hasPostConditionCommands)
-                _segments.Add(Reaction.Sequence(
-                    new List<Reaction>(Steps.GetRange(
-                        _preConditionBoundary, Steps.Count - _preConditionBoundary))));
-
-            Steps.Clear();
-            _preConditionBoundary = 0;
+            _draft.FlushSegment();
         }
 
         internal Reaction BuildReaction()
         {
-            var reactions = BuildReactions();
-            if (reactions.Count > 1)
-                throw new InvalidOperationException(
-                    $"BuildReaction() requires exactly one reaction segment but found {reactions.Count}.");
-            return reactions[0];
+            return _draft.BuildReaction();
         }
 
         internal List<Reaction> BuildReactions()
         {
-            var isSingleSegmentPipeline = _segments == null || _segments.Count == 0;
-            if (isSingleSegmentPipeline)
-                return new List<Reaction> { BuildSingleReaction() };
-
-            FlushSegment();
-            return _segments;
-        }
-
-        private Reaction BuildSingleReaction()
-        {
-            var pendingCommands = Steps.Count > 0 ? Steps : new List<Reaction>();
-            return _mode switch
-            {
-                PipelineMode.Parallel => _parallelBuilder!.BuildReaction(pendingCommands),
-                PipelineMode.Http => BuildHttpReaction(),
-                PipelineMode.Conditional => BuildConditionalReaction(),
-                _ => Reaction.Sequence(Steps),
-            };
-        }
-
-        private Reaction BuildConditionalReaction()
-        {
-            var branch = Reaction.Branch(ConditionalBranches ?? new List<BranchCase>());
-            if (Steps.Count == 0)
-                return branch;
-
-            var hasPreConditionCommands = _preConditionBoundary > 0;
-            var hasPostConditionCommands = Steps.Count > _preConditionBoundary;
-
-            var reactions = new List<Reaction>();
-
-            if (hasPreConditionCommands)
-                reactions.Add(Reaction.Sequence(
-                    new List<Reaction>(Steps.GetRange(0, _preConditionBoundary))));
-
-            reactions.Add(branch);
-
-            if (hasPostConditionCommands)
-                reactions.Add(Reaction.Sequence(
-                    new List<Reaction>(Steps.GetRange(
-                        _preConditionBoundary, Steps.Count - _preConditionBoundary))));
-
-            return Reaction.Sequence(reactions);
-        }
-
-        private Reaction BuildHttpReaction()
-        {
-            var request = _httpBuilder!.BuildRequest();
-            var requestReaction = Reaction.Request(request);
-            if (Steps.Count > 0)
-            {
-                var all = new List<Reaction>(Steps) { requestReaction };
-                return Reaction.Sequence(all);
-            }
-            return requestReaction;
-        }
-
-        internal void SetHttpMode(HttpRequestBuilder<TModel> builder)
-        {
-            _mode = PipelineMode.Http;
-            _httpBuilder = builder;
-        }
-
-        internal void SetParallelMode(ParallelBuilder<TModel> builder)
-        {
-            _mode = PipelineMode.Parallel;
-            _parallelBuilder = builder;
-        }
-
-        internal void SetConditionalMode()
-        {
-            _mode = PipelineMode.Conditional;
+            return _draft.BuildReactions();
         }
     }
 }

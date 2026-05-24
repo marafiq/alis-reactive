@@ -1,4 +1,5 @@
 using Alis.Reactive.Validation;
+using FluentValidation;
 
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
@@ -14,7 +15,7 @@ public class WhenExtractingComposedConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldsAndValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
-        var when = jobTitle.Rules[0].When;
+        var when = jobTitle.Rules[0].Condition();
 
         Assert.That(when, Is.InstanceOf<FieldAll>());
         var all = (FieldAll)when!;
@@ -27,7 +28,7 @@ public class WhenExtractingComposedConditions
         var right = (FieldCompare)all.Terms[1];
         Assert.That(right.Field, Is.EqualTo("Age"));
         Assert.That(right.Op, Is.EqualTo("gte"));
-        Assert.That(right.Value, Is.EqualTo(18));
+        Assert.That(right.OperandValue(), Is.EqualTo(18));
     }
 
     [Test]
@@ -47,7 +48,7 @@ public class WhenExtractingComposedConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldsOrValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
-        var when = notes.Rules[0].When;
+        var when = notes.Rules[0].Condition();
 
         Assert.That(when, Is.InstanceOf<FieldAny>());
         var any = (FieldAny)when!;
@@ -56,12 +57,12 @@ public class WhenExtractingComposedConditions
         var left = (FieldCompare)any.Terms[0];
         Assert.That(left.Field, Is.EqualTo("CareLevel"));
         Assert.That(left.Op, Is.EqualTo("eq"));
-        Assert.That(left.Value, Is.EqualTo("memory-care"));
+        Assert.That(left.OperandValue(), Is.EqualTo("memory-care"));
 
         var right = (FieldCompare)any.Terms[1];
         Assert.That(right.Field, Is.EqualTo("CareLevel"));
         Assert.That(right.Op, Is.EqualTo("eq"));
-        Assert.That(right.Value, Is.EqualTo("skilled-nursing"));
+        Assert.That(right.OperandValue(), Is.EqualTo("skilled-nursing"));
     }
 
     // ── Not composition ────────────────────────────────────────────────────
@@ -71,7 +72,7 @@ public class WhenExtractingComposedConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldsNotValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
-        var when = notes.Rules[0].When;
+        var when = notes.Rules[0].Condition();
 
         Assert.That(when, Is.InstanceOf<FieldNot>());
         var not = (FieldNot)when!;
@@ -89,7 +90,7 @@ public class WhenExtractingComposedConditions
         // Validator: (employed AND salary > 50k) OR (age >= 65)
         var fields = _adapter.ExtractRules(typeof(WhenFieldsComplexValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
-        var when = email.Rules[0].When;
+        var when = email.Rules[0].Condition();
 
         // Top level: Any (OR)
         Assert.That(when, Is.InstanceOf<FieldAny>());
@@ -108,13 +109,13 @@ public class WhenExtractingComposedConditions
         var salary = (FieldCompare)and.Terms[1];
         Assert.That(salary.Field, Is.EqualTo("Salary"));
         Assert.That(salary.Op, Is.EqualTo("gt"));
-        Assert.That(salary.Value, Is.EqualTo(50000m));
+        Assert.That(salary.OperandValue(), Is.EqualTo(50000m));
 
         // Right branch: age >= 65
         var age = (FieldCompare)or.Terms[1];
         Assert.That(age.Field, Is.EqualTo("Age"));
         Assert.That(age.Op, Is.EqualTo("gte"));
-        Assert.That(age.Value, Is.EqualTo(65));
+        Assert.That(age.OperandValue(), Is.EqualTo(65));
     }
 
     [Test]
@@ -178,6 +179,37 @@ public class WhenExtractingComposedConditions
     }
 
     [Test]
+    public void WhenFields_And_server_predicate_short_circuits_when_left_side_fails()
+    {
+        var validator = new ShortCircuitAndValidator();
+
+        var result = validator.Validate(new ShortCircuitModel
+        {
+            Gate = false,
+            Target = "",
+            Nested = null
+        });
+
+        Assert.That(result.IsValid, Is.True);
+    }
+
+    [Test]
+    public void WhenFields_Or_server_predicate_short_circuits_when_left_side_passes()
+    {
+        var validator = new ShortCircuitOrValidator();
+
+        var result = validator.Validate(new ShortCircuitModel
+        {
+            Gate = true,
+            Target = "",
+            Nested = null
+        });
+
+        Assert.That(result.IsValid, Is.False);
+        Assert.That(result.Errors[0].PropertyName, Is.EqualTo(nameof(ShortCircuitModel.Target)));
+    }
+
+    [Test]
     public void WhenFields_Not_server_predicate_inverts_condition()
     {
         var validator = new WhenFieldsNotValidator();
@@ -189,5 +221,40 @@ public class WhenExtractingComposedConditions
         // IsEmployed = false → NOT truthy = true → rules apply
         var result2 = validator.Validate(new TestModel { IsEmployed = false, Notes = "" });
         Assert.That(result2.IsValid, Is.False, "NOT(falsy) = true = rules apply, empty Notes invalid");
+    }
+
+}
+
+public sealed class ShortCircuitModel
+{
+    public bool Gate { get; set; }
+    public string Target { get; set; } = "";
+    public ShortCircuitNested? Nested { get; set; }
+}
+
+public sealed class ShortCircuitNested
+{
+    public string Code { get; set; } = "";
+}
+
+public sealed class ShortCircuitAndValidator : ReactiveValidator<ShortCircuitModel>
+{
+    public ShortCircuitAndValidator()
+    {
+        WhenFields(
+            c => c.Field(x => x.Gate).Truthy()
+                  .And(c.Field(x => x.Nested!.Code).Eq("active")),
+            () => RuleFor(x => x.Target).NotEmpty());
+    }
+}
+
+public sealed class ShortCircuitOrValidator : ReactiveValidator<ShortCircuitModel>
+{
+    public ShortCircuitOrValidator()
+    {
+        WhenFields(
+            c => c.Field(x => x.Gate).Truthy()
+                  .Or(c.Field(x => x.Nested!.Code).Eq("active")),
+            () => RuleFor(x => x.Target).NotEmpty());
     }
 }

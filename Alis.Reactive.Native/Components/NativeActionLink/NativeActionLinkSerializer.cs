@@ -19,8 +19,9 @@ namespace Alis.Reactive.Native.Components
             Action<PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
+            var planIdentity = PlanIdentity.Root(PlanId.Of("action-link"));
             var context = new PlanBuildContext(
-                "action-link", null, new Dictionary<string, ComponentRegistration>());
+                planIdentity, new ComponentRegistrationCatalog());
             var pb = new PipelineBuilder<TModel>(context);
             pipeline(pb);
 
@@ -56,7 +57,7 @@ namespace Alis.Reactive.Native.Components
                 case BranchReaction conditional:
                     var projectedCases = new List<BranchCase>();
                     foreach (var c in conditional.Cases)
-                        projectedCases.Add(new BranchCase(c.When, ProjectReaction(c.Reaction, href, state)));
+                        projectedCases.Add(c.WithReaction(ProjectReaction(c.Reaction, href, state)));
                     return Reaction.Branch(projectedCases);
 
                 case RequestReaction http:
@@ -80,15 +81,29 @@ namespace Alis.Reactive.Native.Components
 
         private static Request ProjectRequest(Request request)
         {
-            if (request.Next != null)
+            var requestHasFollowUp = request.Chain is FollowUpRequestChain;
+            if (requestHasFollowUp)
                 throw new InvalidOperationException(
                     "NativeActionLink does not support chained requests.");
 
-            return new Request(request.Method, string.Empty,
-                input: request.Input,
-                before: request.Before,
-                success: request.Success,
-                error: request.Error);
+            var lifecycle = RequestLifecycle.Create(
+                RequestReactionStages
+                    .From(
+                        request.Before,
+                        request.Success,
+                        request.Error,
+                        request.Complete)
+                    .WithoutCompletionStage(),
+                RequestChain.Terminal);
+
+            return Request.Create(
+                RequestEndpoint.To(HttpMethodName.From(request.Method), RequestUrl.Of(string.Empty)),
+                request.Payload,
+                lifecycle,
+                RequestParameters.From(
+                    new Dictionary<string, ValueProducer>(),
+                    new Dictionary<string, ValueProducer>()),
+                RequestValidationTarget.None);
         }
 
         private sealed class RequestProjectionState

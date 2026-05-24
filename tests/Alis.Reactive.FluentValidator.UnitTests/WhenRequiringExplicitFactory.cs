@@ -20,4 +20,16 @@ public class WhenRequiringExplicitFactory
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].FieldName, Is.EqualTo("Name"));
     }
+
+    [Test]
+    public void Root_validator_factory_null_throws()
+    {
+        var adapter = new FluentValidationAdapter(_ => null);
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            adapter.ExtractRules(typeof(RequiredValidator), "testForm"));
+
+        Assert.That(ex!.Message, Does.Contain("RequiredValidator"));
+        Assert.That(ex.Message, Does.Contain("validator factory"));
+    }
 }

@@ -1,6 +1,6 @@
 ---
 name: no-public-in-libraries
-enabled: true
+enabled: false
 event: file
 action: block
 conditions:

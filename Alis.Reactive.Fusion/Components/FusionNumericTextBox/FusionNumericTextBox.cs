@@ -9,6 +9,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new FusionNumericTextBox(), "numerictextbox");
+
         /// <inheritdoc />
         public string ValueMember => "value";
     }

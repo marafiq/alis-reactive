@@ -1,50 +1,75 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
+    internal sealed class ShapeJsonConverter : JsonConverter<Shape>
+    {
+        public override void Write(Utf8JsonWriter writer, Shape value, JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("kind", value.Kind);
+            value.WriteContractDetails(writer, options);
+            writer.WriteEndObject();
+        }
+
+        public override Shape Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+            throw new NotSupportedException("Plan types are write-only.");
+    }
+
     /// <summary>
     /// Declares the expected type for a value in the plan (string, number, date, array, object, etc.).
     /// Used across value expressions, conditions, and validation to ensure type consistency.
     /// </summary>
+    [JsonConverter(typeof(ShapeJsonConverter))]
     public sealed class Shape : IEquatable<Shape>
     {
-        internal static readonly Shape String = new Shape("string");
-        internal static readonly Shape Number = new Shape("number");
-        internal static readonly Shape Boolean = new Shape("boolean");
-        internal static readonly Shape Date = new Shape("date");
-        internal static readonly Shape Raw = new Shape("raw");
-        internal static readonly Shape Any = new Shape("any");
-        internal static readonly Shape None = new Shape("none");
+        internal static readonly Shape String = Scalar("string");
+        internal static readonly Shape Number = Scalar("number");
+        internal static readonly Shape Boolean = Scalar("boolean");
+        internal static readonly Shape Date = Scalar("date");
+        internal static readonly Shape Raw = Scalar("raw");
+        internal static readonly Shape Any = Scalar("any");
+        internal static readonly Shape None = Scalar("none");
 
         internal static Shape ArrayOf(Shape item)
         {
-            if (item == null || item == None)
+            if (item is null)
                 throw new ArgumentException("Array item shape is required.", nameof(item));
-            return new Shape("array", item: item);
+            if (item.IsNone)
+                throw new ArgumentException("Array item shape is required.", nameof(item));
+            return new Shape("array", ShapeStructure.Array(item));
         }
 
         internal static Shape ObjectOf(Dictionary<string, Shape> fields)
         {
-            return new Shape("object", fields: new ReadOnlyDictionary<string, Shape>(fields));
+            if (fields is null)
+                throw new ArgumentNullException(nameof(fields));
+            return new Shape("object", ShapeStructure.Object(new ReadOnlyDictionary<string, Shape>(fields)));
         }
 
         internal static Shape OpenObject()
         {
-            return new Shape("object", additional: true);
+            return new Shape("object", ShapeStructure.OpenObject);
         }
 
         internal static Shape Nullable(Shape inner)
         {
-            if (inner == null || inner == None)
+            if (inner is null)
                 throw new ArgumentException("Nullable inner shape is required.", nameof(inner));
-            return new Shape("nullable", inner: inner);
+            if (inner.IsNone)
+                throw new ArgumentException("Nullable inner shape is required.", nameof(inner));
+            return new Shape("nullable", ShapeStructure.Nullable(inner));
         }
 
         internal static Shape FromClrType(Type type)
         {
-            if (type == null) return Any;
+            if (type == null) throw new ArgumentNullException(nameof(type));
 
             var underlying = System.Nullable.GetUnderlyingType(type);
             if (underlying != null)
@@ -57,12 +82,23 @@ namespace Alis.Reactive.PlanModel
             if (IsStringSerializedType(type)) return String;
             if (type.IsEnum) return String;
 
-            var elementType = GetCollectionElementType(type);
-            if (elementType != null)
-                return ArrayOf(FromClrType(elementType));
+            var collection = CollectionElementShape.FromClrType(type);
+            if (collection.IsKnown)
+                return collection.ToArrayShape();
 
             return Any;
         }
+
+        internal static Shape FromUnknownClrType(Type? type)
+        {
+            if (type == null)
+                return Any;
+
+            return FromClrType(type);
+        }
+
+        internal static Shape FromValue(object? value) =>
+            value == null ? None : FromClrType(value.GetType());
 
         private static bool IsDateType(Type type)
             => type == typeof(DateTime) || type == typeof(DateTimeOffset)
@@ -85,30 +121,17 @@ namespace Alis.Reactive.PlanModel
 #endif
                ;
 
-        private static Type? GetCollectionElementType(Type type)
-        {
-            if (type.IsArray) return type.GetElementType();
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
-                return type.GetGenericArguments()[0];
-            return null;
-        }
-
         /// <summary>Gets the shape kind (string, number, boolean, date, array, object, nullable, raw, any, or none).</summary>
         public string Kind { get; }
-        /// <summary>Gets the element shape for array shapes, or <see langword="null"/> for non-array shapes.</summary>
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public Shape? Item { get; }
-        /// <summary>Gets the wrapped shape for nullable shapes, or <see langword="null"/> for non-nullable shapes.</summary>
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public Shape? Inner { get; }
-        /// <summary>Gets the named field shapes for object shapes, or <see langword="null"/> for non-object shapes.</summary>
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public IReadOnlyDictionary<string, Shape>? Fields { get; }
-        /// <summary>Gets whether the object shape accepts properties beyond those listed in <see cref="Fields"/>. When <see langword="true"/>, the value may contain extra keys not declared in the shape. Default <see langword="false"/> means the shape is closed.</summary>
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
-        public bool Additional { get; }
 
         internal bool IsNone => Kind == "none";
+        internal bool IsAny => Kind == "any";
+
+        internal bool TryGetArrayItemShape(out Shape itemShape) =>
+            _structure.TryGetArrayItemShape(out itemShape);
+
+        internal bool TryGetObjectContract(out ShapeObjectContract contract) =>
+            _structure.TryGetObjectContract(out contract);
 
         /// <summary>
         /// Returns true if this shape represents a value that can be meaningfully serialized
@@ -127,23 +150,49 @@ namespace Alis.Reactive.PlanModel
                     case "boolean":
                     case "date":
                         return true;
-                    case "nullable":
-                        return Inner?.IsScalar == true;
                     default:
-                        return false;
+                        return _structure.IsScalar;
                 }
             }
         }
 
-        private Shape(string kind, Shape? item = null, Shape? inner = null,
-            IReadOnlyDictionary<string, Shape>? fields = null, bool additional = false)
+        private readonly ShapeStructure _structure;
+
+        private Shape(string kind, ShapeStructure structure)
         {
             Kind = kind;
-            Item = item;
-            Inner = inner;
-            Fields = fields;
-            Additional = additional;
+            _structure = structure ?? throw new ArgumentNullException(nameof(structure));
         }
+
+        private static Shape Scalar(string kind) => new Shape(kind, ShapeStructure.None);
+
+        internal bool IsNullableOf(Shape inner)
+        {
+            if (inner is null)
+                throw new ArgumentNullException(nameof(inner));
+
+            return _structure.IsNullableWrapping(inner);
+        }
+
+        internal bool TryGetNullableInnerShape(out Shape inner) =>
+            _structure.TryGetNullableInnerShape(out inner);
+
+        internal string DescribeContract()
+        {
+            if (TryGetArrayItemShape(out var itemShape))
+                return "array<" + itemShape.DescribeContract() + ">";
+
+            if (TryGetNullableInnerShape(out var innerShape))
+                return "nullable<" + innerShape.DescribeContract() + ">";
+
+            if (TryGetObjectContract(out var objectContract))
+                return objectContract.Describe();
+
+            return Kind;
+        }
+
+        internal void WriteContractDetails(Utf8JsonWriter writer, JsonSerializerOptions options) =>
+            _structure.WriteContractDetails(writer, options);
 
         /// <summary>Determines whether two <see cref="Shape"/> instances represent the same type contract.</summary>
         /// <param name="other">The shape to compare with.</param>
@@ -153,18 +202,7 @@ namespace Alis.Reactive.PlanModel
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             if (Kind != other.Kind) return false;
-            if (!Equals(Item, other.Item)) return false;
-            if (!Equals(Inner, other.Inner)) return false;
-            if (Additional != other.Additional) return false;
-            if (Fields == null && other.Fields == null) return true;
-            if (Fields == null || other.Fields == null) return false;
-            if (Fields.Count != other.Fields.Count) return false;
-            foreach (var kvp in Fields)
-            {
-                if (!other.Fields.TryGetValue(kvp.Key, out var otherShape) || !kvp.Value.Equals(otherShape))
-                    return false;
-            }
-            return true;
+            return _structure.HasSameContract(other._structure);
         }
 
         /// <inheritdoc/>
@@ -174,16 +212,13 @@ namespace Alis.Reactive.PlanModel
         public override int GetHashCode()
         {
 #if NET6_0_OR_GREATER
-            return HashCode.Combine(Kind, Item, Inner, Fields?.Count ?? 0, Additional);
+            return HashCode.Combine(Kind, _structure.GetContractHashCode());
 #else
             unchecked
             {
                 int hash = 17;
-                hash = hash * 31 + (Kind != null ? Kind.GetHashCode() : 0);
-                hash = hash * 31 + (Item is null ? 0 : Item.GetHashCode());
-                hash = hash * 31 + (Inner is null ? 0 : Inner.GetHashCode());
-                hash = hash * 31 + (Fields?.Count ?? 0);
-                hash = hash * 31 + Additional.GetHashCode();
+                hash = hash * 31 + Kind.GetHashCode();
+                hash = hash * 31 + _structure.GetContractHashCode();
                 return hash;
             }
 #endif
@@ -193,5 +228,345 @@ namespace Alis.Reactive.PlanModel
         public static bool operator ==(Shape? left, Shape? right) => Equals(left, right);
         /// <summary>Returns <see langword="true"/> if the shapes are not structurally equal.</summary>
         public static bool operator !=(Shape? left, Shape? right) => !Equals(left, right);
+    }
+
+    internal sealed class CollectionElementShape
+    {
+        private readonly Shape _itemShape;
+        private readonly bool _isKnown;
+
+        private CollectionElementShape(Shape itemShape, bool isKnown)
+        {
+            _itemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
+            _isKnown = isKnown;
+        }
+
+        internal bool IsKnown => _isKnown;
+
+        internal Shape ItemShapeOrNone => _isKnown ? _itemShape : Shape.None;
+
+        internal Shape ToArrayShape()
+        {
+            if (!_isKnown)
+                throw new InvalidOperationException("Collection element shape is not known.");
+
+            return Shape.ArrayOf(_itemShape);
+        }
+
+        internal static CollectionElementShape FromClrType(Type type)
+        {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+
+            if (type == typeof(string)) return None;
+            if (type.IsArray)
+            {
+                var arrayElementType = type.GetElementType();
+                if (arrayElementType == null) return None;
+                return FromElementType(arrayElementType);
+            }
+            if (IsDictionaryLike(type)) return None;
+            if (TryGetElementTypeFromSupportedGeneric(type, out var directElementType))
+                return FromElementType(directElementType);
+
+            var candidates = type.GetInterfaces()
+                .Where(IsSupportedGenericCollection)
+                .Select(item => item.GetGenericArguments()[0])
+                .Distinct()
+                .ToArray();
+
+            return candidates.Length == 1
+                ? FromElementType(candidates[0])
+                : None;
+        }
+
+        private static CollectionElementShape Known(Shape itemShape) =>
+            new CollectionElementShape(itemShape, true);
+
+        private static CollectionElementShape None { get; } =
+            new CollectionElementShape(Shape.None, false);
+
+        private static CollectionElementShape FromElementType(Type elementType) =>
+            Known(Shape.FromClrType(elementType));
+
+        private static bool TryGetElementTypeFromSupportedGeneric(Type type, out Type elementType)
+        {
+            if (type.IsGenericType && IsSupportedGenericCollection(type))
+            {
+                elementType = type.GetGenericArguments()[0];
+                return true;
+            }
+
+            elementType = typeof(object);
+            return false;
+        }
+
+        private static bool IsSupportedGenericCollection(Type type)
+        {
+            if (!type.IsGenericType) return false;
+
+            var definition = type.GetGenericTypeDefinition();
+            return definition == typeof(IEnumerable<>)
+                   || definition == typeof(IReadOnlyCollection<>)
+                   || definition == typeof(IReadOnlyList<>)
+                   || definition == typeof(ICollection<>)
+                   || definition == typeof(IList<>)
+                   || definition == typeof(List<>)
+                   || definition == typeof(HashSet<>)
+                   || definition == typeof(ISet<>);
+        }
+
+        private static bool IsDictionaryLike(Type type)
+        {
+            if (type.IsGenericType && IsDictionaryDefinition(type.GetGenericTypeDefinition()))
+                return true;
+
+            return type.GetInterfaces()
+                .Any(item => item.IsGenericType && IsDictionaryDefinition(item.GetGenericTypeDefinition()));
+        }
+
+        private static bool IsDictionaryDefinition(Type definition) =>
+            definition == typeof(Dictionary<,>)
+            || definition == typeof(IDictionary<,>)
+            || definition == typeof(IReadOnlyDictionary<,>);
+    }
+
+    internal abstract class ShapeStructure
+    {
+        internal static ShapeStructure None { get; } =
+            new EmptyShapeStructure();
+
+        internal static ShapeStructure OpenObject { get; } =
+            new OpenObjectShapeStructure();
+
+        internal virtual bool IsScalar => false;
+
+        internal virtual bool HasSameContract(ShapeStructure other) =>
+            other.GetType() == GetType();
+
+        internal virtual int GetContractHashCode() => GetType().GetHashCode();
+
+        internal virtual bool IsNullableWrapping(Shape inner) => false;
+
+        internal virtual bool TryGetArrayItemShape(out Shape itemShape)
+        {
+            itemShape = Shape.None;
+            return false;
+        }
+
+        internal virtual bool TryGetObjectContract(out ShapeObjectContract contract)
+        {
+            contract = ShapeObjectContract.None;
+            return false;
+        }
+
+        internal virtual bool TryGetNullableInnerShape(out Shape inner)
+        {
+            inner = Shape.None;
+            return false;
+        }
+
+        internal virtual void WriteContractDetails(Utf8JsonWriter writer, JsonSerializerOptions options)
+        {
+        }
+
+        internal static ShapeStructure Array(Shape item) => new ArrayShapeStructure(item);
+
+        internal static ShapeStructure Nullable(Shape inner) => new NullableShapeStructure(inner);
+
+        internal static ShapeStructure Object(IReadOnlyDictionary<string, Shape> fields) =>
+            new ObjectShapeStructure(fields);
+
+        private sealed class EmptyShapeStructure : ShapeStructure
+        {
+        }
+
+        private sealed class OpenObjectShapeStructure : ShapeStructure
+        {
+            internal override bool TryGetObjectContract(out ShapeObjectContract contract)
+            {
+                contract = ShapeObjectContract.Open;
+                return true;
+            }
+
+            internal override void WriteContractDetails(Utf8JsonWriter writer, JsonSerializerOptions options) =>
+                ShapeObjectContract.Open.WriteTo(writer, options);
+        }
+
+        private sealed class ArrayShapeStructure : ShapeStructure
+        {
+            private readonly Shape _item;
+
+            internal ArrayShapeStructure(Shape item)
+            {
+                _item = item ?? throw new ArgumentNullException(nameof(item));
+            }
+
+            internal override bool HasSameContract(ShapeStructure other) =>
+                other is ArrayShapeStructure array && _item.Equals(array._item);
+
+            internal override int GetContractHashCode() => _item.GetHashCode();
+
+            internal override bool TryGetArrayItemShape(out Shape itemShape)
+            {
+                itemShape = _item;
+                return true;
+            }
+
+            internal override void WriteContractDetails(Utf8JsonWriter writer, JsonSerializerOptions options)
+            {
+                writer.WritePropertyName("item");
+                JsonSerializer.Serialize(writer, _item, options);
+            }
+        }
+
+        private sealed class NullableShapeStructure : ShapeStructure
+        {
+            private readonly Shape _inner;
+
+            internal NullableShapeStructure(Shape inner)
+            {
+                _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+            }
+
+            internal override bool IsScalar => _inner.IsScalar;
+
+            internal override bool HasSameContract(ShapeStructure other) =>
+                other is NullableShapeStructure nullable && _inner.Equals(nullable._inner);
+
+            internal override int GetContractHashCode() => _inner.GetHashCode();
+
+            internal override bool IsNullableWrapping(Shape inner) => _inner.Equals(inner);
+
+            internal override bool TryGetNullableInnerShape(out Shape inner)
+            {
+                inner = _inner;
+                return true;
+            }
+
+            internal override void WriteContractDetails(Utf8JsonWriter writer, JsonSerializerOptions options)
+            {
+                writer.WritePropertyName("inner");
+                JsonSerializer.Serialize(writer, _inner, options);
+            }
+        }
+
+        private sealed class ObjectShapeStructure : ShapeStructure
+        {
+            private readonly IReadOnlyDictionary<string, Shape> _fields;
+
+            internal ObjectShapeStructure(IReadOnlyDictionary<string, Shape> fields)
+            {
+                _fields = fields ?? throw new ArgumentNullException(nameof(fields));
+            }
+
+            internal override bool HasSameContract(ShapeStructure other)
+            {
+                var obj = other as ObjectShapeStructure;
+                if (obj == null) return false;
+                if (_fields.Count != obj._fields.Count) return false;
+
+                foreach (var field in _fields)
+                {
+                    var otherHasField = obj._fields.TryGetValue(field.Key, out var otherShape);
+                    if (!otherHasField) return false;
+                    if (!field.Value.Equals(otherShape)) return false;
+                }
+
+                return true;
+            }
+
+            internal override int GetContractHashCode()
+            {
+                unchecked
+                {
+                    var hash = GetType().GetHashCode();
+                    foreach (var field in _fields)
+                    {
+                        hash = (hash * 397) ^ field.Key.GetHashCode();
+                        hash = (hash * 397) ^ field.Value.GetHashCode();
+                    }
+
+                    return hash;
+                }
+            }
+
+            internal override bool TryGetObjectContract(out ShapeObjectContract contract)
+            {
+                contract = ShapeObjectContract.Closed(_fields);
+                return true;
+            }
+
+            internal override void WriteContractDetails(Utf8JsonWriter writer, JsonSerializerOptions options) =>
+                ShapeObjectContract.Closed(_fields).WriteTo(writer, options);
+        }
+    }
+
+    internal sealed class ShapeObjectContract
+    {
+        private static readonly IReadOnlyDictionary<string, Shape> NoDeclaredFields =
+            new ReadOnlyDictionary<string, Shape>(new Dictionary<string, Shape>());
+
+        internal static readonly ShapeObjectContract Open =
+            new ShapeObjectContract(NoDeclaredFields, additional: true);
+
+        internal static readonly ShapeObjectContract None =
+            new ShapeObjectContract(NoDeclaredFields, additional: false);
+
+        private readonly IReadOnlyDictionary<string, Shape> _fields;
+        private readonly bool _additional;
+
+        private ShapeObjectContract(IReadOnlyDictionary<string, Shape> fields, bool additional)
+        {
+            _fields = fields ?? throw new ArgumentNullException(nameof(fields));
+            _additional = additional;
+        }
+
+        internal IReadOnlyDictionary<string, Shape> Fields => _fields;
+
+        internal bool AllowsAdditionalFields => _additional;
+
+        internal static ShapeObjectContract Closed(IReadOnlyDictionary<string, Shape> fields) =>
+            new ShapeObjectContract(fields, additional: false);
+
+        internal string Describe()
+        {
+            if (_fields.Count == 0)
+                return _additional ? "object<open>" : "object{}";
+
+            var description = new StringBuilder();
+            description.Append("object{");
+            var first = true;
+            foreach (var field in _fields)
+            {
+                if (!first) description.Append(", ");
+                description.Append(field.Key);
+                description.Append(":");
+                description.Append(field.Value.DescribeContract());
+                first = false;
+            }
+
+            if (_additional)
+            {
+                if (!first) description.Append(", ");
+                description.Append("...");
+            }
+
+            description.Append("}");
+            return description.ToString();
+        }
+
+        internal void WriteTo(Utf8JsonWriter writer, JsonSerializerOptions options)
+        {
+            writer.WritePropertyName("fields");
+            writer.WriteStartObject();
+            foreach (var field in _fields)
+            {
+                writer.WritePropertyName(field.Key);
+                JsonSerializer.Serialize(writer, field.Value, options);
+            }
+            writer.WriteEndObject();
+
+            writer.WriteBoolean("additional", _additional);
+        }
     }
 }

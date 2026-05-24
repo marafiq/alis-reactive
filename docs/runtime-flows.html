@@ -311,7 +311,7 @@ sequenceDiagram
     participant trigger as trigger.ts
     participant execute as execute.ts
     participant component as component.ts
-    participant walk as walk.ts
+    participant path as RuntimePath
     participant DOM
 
     Caller->>trigger: wireTrigger(trigger, reaction, components, signal)
@@ -347,8 +347,8 @@ sequenceDiagram
         Note over DOM: When component event fires:
         alt trigger.vendor == "native"
             alt trigger.readExpr exists
-                DOM->>walk: walk(el, readExpr)
-                walk-->>DOM: value
+                DOM->>path: RuntimePath.read(el, read path)
+                path-->>DOM: value
                 Note over DOM: detail = {[readExpr]: value, event: e}
             else no readExpr
                 Note over DOM: detail = {event: e}
@@ -875,13 +875,13 @@ sequenceDiagram
 <h2>8. resolver.ts &mdash; BindSource Resolution</h2>
 <p class="path">Scripts/resolution/resolver.ts</p>
 <p>Unified entry point for resolving <code>BindSource</code> values. Dispatches by source kind:
-<code>event</code> (walk execution context) or <code>component</code> (read from DOM). Re-exports <code>coerce</code> from <code>core/coerce.ts</code>.</p>
+<code>event</code> (read execution context through structured paths) or <code>component</code> (read from DOM). Re-exports <code>coerce</code> from <code>core/coerce.ts</code>.</p>
 
 <div class="mermaid">
 sequenceDiagram
     participant Caller
     participant resolver as resolver.ts
-    participant walk as walk.ts
+    participant path as RuntimePath
     participant component as component.ts
     participant coerce as core/coerce.ts
 
@@ -892,8 +892,8 @@ sequenceDiagram
         alt ctx is undefined
             resolver-->>Caller: undefined
         else
-            resolver->>walk: walk(ctx, source.path)
-            walk-->>resolver: result
+            resolver->>path: RuntimePath.read(ctx, source.path)
+            path-->>resolver: result
             resolver->>resolver: log.trace("resolve", {path, value})
             resolver-->>Caller: result
         end
@@ -963,7 +963,7 @@ sequenceDiagram
 sequenceDiagram
     participant Caller
     participant component as component.ts
-    participant walk as walk.ts
+    participant path as RuntimePath
     participant DOM
 
     Caller->>component: evalRead(id, vendor, readExpr)
@@ -973,8 +973,8 @@ sequenceDiagram
     end
     component->>component: resolveRoot(el, vendor)
     component-->>component: root
-    component->>walk: walk(root, readExpr)
-    walk-->>component: value
+    component->>path: RuntimePath.read(root, read path)
+    path-->>component: value
     component-->>Caller: value
 </div>
 </section>
@@ -1318,7 +1318,7 @@ sequenceDiagram
     participant orch as orchestrator.ts
     participant errDisp as error-display.ts
     participant component as component.ts
-    participant walk as walk.ts
+    participant path as RuntimePath
     participant ruleEngine as rule-engine.ts
     participant condition as condition.ts
     participant DOM
@@ -1380,12 +1380,12 @@ sequenceDiagram
             Note over orch: hidden = errorSpan?.parentElement<br/>? isHidden(errorSpan.parentElement) : true
             orch->>component: resolveRoot(el, field.vendor)
             component-->>orch: root
-            orch->>walk: walk(root, field.readExpr)
-            walk-->>orch: value
+            orch->>path: RuntimePath.read(root, field path)
+            path-->>orch: value
 
             loop Each rule in field.rules
-                opt rule.when exists
-                    orch->>condition: evalCondition(rule.when, condReader)
+                opt rule.execution.activation.kind == "when"
+                    orch->>condition: evalCondition(rule.execution.activation.condition, condReader)
                     alt result == false
                         Note over orch: continue (skip rule)
                     else result == null (unresolvable)
@@ -1472,10 +1472,10 @@ sequenceDiagram
         orch-->>orch: true (no rules = nothing to block)
     end
     loop Each rule
-        alt rule has no .when (unconditional)
+        alt rule.execution.activation.kind == "always"
             orch-->>orch: false (must block)
         else
-            orch->>condition: evalCondition(rule.when, condReader)
+            orch->>condition: evalCondition(rule.execution.activation.condition, condReader)
             alt result !== false (true or null)
                 orch-->>orch: false (must block)
             end
@@ -1507,7 +1507,7 @@ sequenceDiagram
 sequenceDiagram
     participant orch as orchestrator.ts
     participant component as component.ts
-    participant walk as walk.ts
+    participant path as RuntimePath
     participant DOM
 
     Note over orch: readConditionSource(fieldName)
@@ -1521,8 +1521,8 @@ sequenceDiagram
     end
     orch->>component: resolveRoot(el, field.vendor)
     component-->>orch: root
-    orch->>walk: walk(root, field.readExpr)
-    walk-->>orch: val
+    orch->>path: RuntimePath.read(root, field path)
+    path-->>orch: val
     Note over orch: Normalize: null/undefined/false -> ""
     orch-->>orch: String(val) or ""
 </div>
@@ -1532,7 +1532,7 @@ sequenceDiagram
 sequenceDiagram
     participant orch as orchestrator.ts
     participant component as component.ts
-    participant walk as walk.ts
+    participant path as RuntimePath
     participant DOM
 
     Note over orch: readPeer(fieldName)
@@ -1546,8 +1546,8 @@ sequenceDiagram
     end
     orch->>component: resolveRoot(el, field.vendor)
     component-->>orch: root
-    orch->>walk: walk(root, field.readExpr)
-    walk-->>orch: val
+    orch->>path: RuntimePath.read(root, field path)
+    path-->>orch: val
     orch-->>orch: String(val ?? "")
 </div>
 </section>
@@ -2251,24 +2251,23 @@ sequenceDiagram
     end
 </div>
 
-<h3>walk.ts</h3>
-<p class="path">Scripts/core/walk.ts</p>
+<h3>RuntimePath</h3>
+<p class="path">runtime/domain/runtime-path.ts</p>
 <p>Pure utility. Zero side effects, zero DOM, zero vendor knowledge.
-Walks a dot-notation path on any object.</p>
+Reads, writes, or calls a structured plan path on any object.</p>
 <div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant walk as walk.ts
+    participant path as RuntimePath
 
-    Caller->>walk: walk(root, "evt.address.city")
-    walk->>walk: parts = path.split(".")
-    loop Each part: ["evt", "address", "city"]
+    Caller->>path: RuntimePath.from([{property:"address"}, {property:"city"}]).read(root)
+    loop Each structured path segment
         alt current == null
-            walk-->>Caller: undefined (null safety)
+            path-->>Caller: undefined (null safety)
         end
-        walk->>walk: current = current[part]
+        path->>path: current = current[segment key]
     end
-    walk-->>Caller: final value (or undefined)
+    path-->>Caller: final value (or undefined)
 </div>
 
 <h3>trace.ts</h3>

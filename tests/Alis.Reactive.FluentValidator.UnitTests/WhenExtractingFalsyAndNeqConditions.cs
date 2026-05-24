@@ -17,11 +17,11 @@ public class WhenExtractingFalsyAndNeqConditions
         Assert.That(jobTitle.Rules, Has.Count.EqualTo(1));
         Assert.That(jobTitle.Rules[0].Rule, Is.EqualTo("required"));
         Assert.That(jobTitle.Rules[0].Message, Is.EqualTo("Explain why not employed"));
-        Assert.That(jobTitle.Rules[0].When, Is.Not.Null);
-        var when = (FieldCompare)jobTitle.Rules[0].When!;
+        Assert.That(jobTitle.Rules[0].Condition(), Is.Not.Null);
+        var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
         Assert.That(when.Field, Is.EqualTo("IsEmployed"));
         Assert.That(when.Op, Is.EqualTo("falsy"));
-        Assert.That(when.Value, Is.Null);
+        Assert.That(when.Operand, Is.InstanceOf<NoFieldComparisonOperand>());
     }
 
     [Test]
@@ -32,11 +32,11 @@ public class WhenExtractingFalsyAndNeqConditions
         Assert.That(desc, Is.Not.Null);
         var email = desc.First(f => f.FieldName == "Email");
         Assert.That(email.Rules[0].Rule, Is.EqualTo("required"));
-        Assert.That(email.Rules[0].When, Is.Not.Null);
-        var neqWhen = (FieldCompare)email.Rules[0].When!;
+        Assert.That(email.Rules[0].Condition(), Is.Not.Null);
+        var neqWhen = (FieldCompare)email.Rules[0].Condition()!;
         Assert.That(neqWhen.Field, Is.EqualTo("Name"));
         Assert.That(neqWhen.Op, Is.EqualTo("neq"));
-        Assert.That(neqWhen.Value, Is.EqualTo("Independent"));
+        Assert.That(neqWhen.OperandValue(), Is.EqualTo("Independent"));
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class WhenExtractingFalsyAndNeqConditions
         Assert.That(desc, Is.Not.Null);
         var name = desc.First(f => f.FieldName == "Name");
         Assert.That(name.Rules[0].Rule, Is.EqualTo("required"));
-        Assert.That(name.Rules[0].When, Is.Null);
+        Assert.That(name.Rules[0].Condition(), Is.Null);
     }
 
     [Test]

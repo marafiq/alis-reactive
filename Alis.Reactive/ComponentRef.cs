@@ -13,46 +13,71 @@ namespace Alis.Reactive
         where TComponent : IComponent, new()
         where TModel : class
     {
+        private readonly ComponentObjectTarget _target;
 
-        internal string TargetId { get; }
+        internal string TargetId => _target.IdForJson;
         internal PipelineBuilder<TModel> Pipeline { get; }
 
         internal ComponentRef(string targetId, PipelineBuilder<TModel> pipeline)
+            : this(ComponentObjectTarget.For<TComponent>(targetId), pipeline)
         {
-            TargetId = targetId;
-            Pipeline = pipeline;
         }
 
-        /// <summary>
-        /// Emits a Set reaction on this component.
-        /// Called by vendor extension methods.
-        /// Uses the component's actual vendor (not hardcoded "native").
-        /// </summary>
-        internal ComponentRef<TComponent, TModel> EmitSet(
-            string property, ValueProducer value)
+        internal ComponentRef(ComponentObjectTarget target, PipelineBuilder<TModel> pipeline)
         {
-            var componentKey = Pipeline.Context.EnsureComponent(TargetId, Vendor);
-            Pipeline.Context.EnsureProperty(componentKey, property, property, Shape.Any, "write");
-            Pipeline.Steps.Add(Reaction.Set(
-                ComponentSource.Of(componentKey), property, value));
+            _target = target ?? throw new System.ArgumentNullException(nameof(target));
+            Pipeline = pipeline ?? throw new System.ArgumentNullException(nameof(pipeline));
+        }
+
+        internal ComponentRef<TComponent, TModel> EmitSet<TValue>(
+            ComponentProperty<TValue> property, ValueProducer value)
+        {
+            if (property == null) throw new System.ArgumentNullException(nameof(property));
+            var componentKey = _target.EnsureIn(Pipeline.Context);
+            Pipeline.Context.EnsureProperty(
+                componentKey,
+                property.ContractFor(MemberAccess.Write));
+            Pipeline.AddStep(Reaction.Set(
+                ComponentSource.Of(componentKey), property.Member, value));
             return this;
         }
 
-        /// <summary>
-        /// Emits a Call reaction on this component.
-        /// Called by vendor extension methods.
-        /// Uses the component's actual vendor (not hardcoded "native").
-        /// </summary>
+        internal ComponentRef<TComponent, TModel> EmitCall(ComponentMethod method) =>
+            EmitCall(method, CallArguments.None);
+
         internal ComponentRef<TComponent, TModel> EmitCall(
-            string method, System.Collections.Generic.List<ValueProducer>? args = null)
+            ComponentMethod method,
+            System.Collections.Generic.List<ValueProducer> args) =>
+            EmitCall(method, CallArguments.Of(args));
+
+        private ComponentRef<TComponent, TModel> EmitCall(
+            ComponentMethod method,
+            CallArguments args)
         {
-            var componentKey = Pipeline.Context.EnsureComponent(TargetId, Vendor);
-            Pipeline.Context.EnsureMethod(componentKey, method, method);
-            Pipeline.Steps.Add(Reaction.Call(
-                ComponentSource.Of(componentKey), method, args));
+            if (method == null) throw new System.ArgumentNullException(nameof(method));
+            if (args == null) throw new System.ArgumentNullException(nameof(args));
+            var componentKey = _target.EnsureIn(Pipeline.Context);
+            Pipeline.Context.EnsureMethod(
+                componentKey,
+                method.ContractReturning(Shape.None));
+            var source = ComponentSource.Of(componentKey);
+            Pipeline.AddStep(Reaction.Call(source, method.Member, args));
             return this;
         }
 
-        internal string Vendor => new TComponent().Vendor;
+        internal Builders.Conditions.TypedComponentSource<TValue> Read<TValue>(
+            ComponentProperty<TValue> property)
+        {
+            if (property == null) throw new System.ArgumentNullException(nameof(property));
+            var componentKey = _target.EnsureIn(Pipeline.Context);
+            Pipeline.Context.EnsureProperty(
+                componentKey,
+                property.ContractFor(MemberAccess.Read));
+            return new Builders.Conditions.TypedComponentSource<TValue>(
+                componentKey.Value,
+                property.Member);
+        }
+
+        internal string Vendor => _target.Vendor.Value;
     }
 }

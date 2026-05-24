@@ -1,173 +1,108 @@
 # Validation Architecture
 
-> Code-first documentation of the validation system. Describes how it works, not how it should work.
+This document describes the current validation design. Keep it aligned with
+`docs/reactive-plan-domain-language.md`.
 
-## Overview
+## Boundary
 
-Validation is request-chained: `Validate<TValidator>(formId)` or `Validate(descriptor)` attaches a validation descriptor to an HTTP request. Before the request fires, the runtime runs `validate(desc)`. If it returns `false`, the request is aborted. Server errors are displayed via the `validation-errors` command in `OnError` handlers.
+FluentValidation remains the server authority. Alis Reactive extracts only the
+deterministic client-side projection that can be represented in the Reactive
+Plan and executed in the browser runtime.
 
-**Key design:** Two-phase enrichment (C# at render + runtime at boot/merge) so partial-owned fields can be enriched when their partial loads.
-
----
+Unsupported browser projections are not guessed. They are recorded in
+`ValidationExtractionReport.SkippedClientRules` with a reason, while the server
+rule still runs normally on postback or HTTP submit.
 
 ## Data Flow
 
-```
-C# Authoring                          C# Render                         Runtime
-────────────────────────────────────────────────────────────────────────────────────
-Validate<TValidator>(formId)    →    ResolveAll()                    →   pipeline.ts
-  placeholder descriptor               ExtractRules() (throws if null)     passesValidation()
-  AttachValidator(type)                EnrichValidation                   wireLiveClearing()
-                                       EnrichFieldsFromComponents         validate()
-                                       StampPlanId
-
-Validate(descriptor)            →    ResolveAll()                    →   (same)
-  explicit descriptor                  EnrichFieldsFromComponents
-  no ValidatorType                     StampPlanId
+```text
+Validate<TValidator>(containerId)
+  -> RequestValidation registers a ValidationJob
+  -> ReactivePlan.Render() calls ResolveAll()
+  -> input component registrations are materialized into the plan
+  -> ClientValidationProjectionBinder binds queued validation jobs
+  -> Component.container.validationRules carries browser validation intent
+  -> HTTP runtime validates the container before dispatch
 ```
 
----
+## C# Plan Side
 
-## C# Side
+`ConfiguredRequestValidation.Register(...)` records a `ValidationJob` containing:
 
-### Entry Points
+- request URL, used for diagnostics;
+- validation container id;
+- validator type to project.
 
-| Method | Creates | File |
-|--------|---------|------|
-| `Validate<TValidator>(formId)` | `_validation = new ValidationDescriptor(formId, [])`, `_validatorType = typeof(TValidator)` | `HttpRequestBuilder.cs:93-98` |
-| `Validate(ValidationDescriptor)` | Uses provided descriptor | `HttpRequestBuilder.cs:82-86` |
+`ClientValidationProjectionBinder` then:
 
-### ResolveAll (ReactivePlan.cs:95-116)
+1. Requires a registered `IValidationExtractor`.
+2. Calls `Extract(ValidationExtractionRequest.For(validatorType, container))`.
+3. Binds each `ClientValidationField` through `ValidationProjectionBindingScope`.
+4. Merges the resulting `ComponentValidation` rules onto the validation-container component.
 
-```
-if (extractor != null)
-  ValidationResolver.Resolve(_entries, extractor, _componentsMap)
-else if (HasValidatorTypes)
-  throw "no validation extractor registered"
-else if (_componentsMap.Count > 0)
-  ValidationResolver.EnrichFromComponents(_entries, _componentsMap)
-always: StampPlanId(_entries, PlanId)
-```
+Field binding has two deterministic paths:
 
-### ValidationResolver.ResolveRequest (ValidationResolver.cs:81-104)
+- Registered input fields use the rendered component id, value member, and shape from `ComponentRegistration`.
+- Deferred fields resolve model shape from the root model and use the deterministic component id a partial will render later.
 
-1. **Extract:** If `ValidatorType` and `Validation` set → `extractor.ExtractRules()` → if null, throw; else `EnrichValidation(extracted)`.
-2. **Enrich:** If `Validation` and `componentsMap` set → `EnrichFieldsFromComponents(req.Validation, componentsMap)`.
-3. **Recurse:** If `Chained` → `ResolveRequest(req.Chained, ...)`.
+## FluentValidation Adapter
 
-### EnrichFieldsFromComponents (ValidationResolver.cs:138-151)
+`FluentValidationAdapter` translates supported FluentValidation validators into
+client projection primitives. Custom validators can opt in through
+`ProjectToClient(...)`, which attaches an explicit browser rule projection to the
+FluentValidation rule component.
 
-Maps `field.FieldName` → `componentsMap[fieldName]`:
-- Found → set `field.FieldId`, `field.Vendor`, `field.ReadExpr`
-- Not found → leave null (field stays unenriched)
+Conditions are projected only when the validator supplies a matching symbolic
+client guard through the ReactiveValidator `WhenField*` language. Server-only
+conditions are skipped for the browser projection instead of being inferred from
+FluentValidation internals.
 
-### FluentValidationAdapter.ExtractRules
+Nested `WhenField*` scopes project as one active client condition. A single
+scope keeps its guard directly; multiple active scopes are composed with `all`
+in the same outer-to-inner order the server predicates use.
 
-Returns `null` when:
-- `_factory(validatorType)` returns null
-- `fields.Count == 0` (no extractable rules, e.g. `EmptyValidator`)
-
----
+If a rule is declared under both a `WhenField*` guard and a server-only
+FluentValidation `When`/`Unless` scope, the browser projection is skipped. The
+client guard would be only a partial activation, so the adapter records a
+skipped client projection instead of guessing the missing predicate.
 
 ## Runtime Side
 
-### Boot & Merge
+`RequestValidationGate` runs before HTTP dispatch. If a request has
+`validation.kind === "container"`, it calls:
 
-- **Boot:** `enrichEntries(plan.entries, plan.components)` enriches validation fields from `plan.components`.
-- **Merge:** When a partial loads, `applyMergedPlan` runs `enrichEntries` again. Previously unenriched fields (e.g. from a partial that hadn't loaded) can now be enriched.
-
-### Pre-Request Gate (pipeline.ts:10-18)
-
-```typescript
-function passesValidation(req): boolean {
-  if (!req.validation) return true;
-  wireLiveClearing(req.validation);
-  if (!validate(req.validation)) return false;
-  return true;
-}
+```ts
+validateContainer(plan, validation.container, context)
 ```
 
-### validate() Orchestrator (validation/orchestrator.ts)
+`validateContainer` resolves the validation container from `RuntimePlan`, clears
+current errors, evaluates each `ComponentValidation`, and routes failures to
+inline spans or the plan-level summary.
 
-**Initialization:** Clear inline + summary, find summary element by `planId`.
+Server validation errors are displayed separately through
+`showServerErrors(plan, container, data)`. Runtime maps server errors by
+`serverFieldName`; component keys are not fallback field names.
 
-**Form container missing:**
-- `fields.length > 0` → return false (block)
-- `fields.length === 0` → return true (nothing to validate)
+## Partial Lifecycle
 
-**Per-field loop:**
-- **Unenriched** (no fieldId/vendor/readExpr): If `allRulesConditionallySkipped` → skip. Else → add first rule to summary, block.
-- **Enriched but element missing:** Same logic (component removed or partial unloaded).
-- **Field outside form:** Skip (trace only).
-- **Enriched + element present:** Read value via `resolveRoot` + `walk`, evaluate rules with conditions, route errors to inline or summary.
+Partial load can contribute validation rules to a root-owned validation
+container. Partial unload removes only the exact rule objects contributed by
+that partial slot. It must not delete root validation rules or layout-owned app
+components.
 
-**allRulesConditionallySkipped:** Returns true only if every rule has `when` and `evalCondition` returns `false` for all. Otherwise block.
+## Key Types
 
-### Server Errors (validation-errors command)
+| Area | Types |
+| --- | --- |
+| Request gate | `RequestValidation`, `ValidationJob`, `RequestValidationTarget` |
+| Extraction contract | `IValidationExtractor`, `ValidationExtractionRequest`, `ValidationExtractionReport` |
+| Projection binding | `ClientValidationProjectionBinder`, `ValidationProjectionBindingScope`, `ValidationFieldBinding` |
+| Plan payload | `ComponentValidation`, `ValidationRuleExecution`, `ValidationRuleOperand`, `ValidationRuleActivation` |
+| Runtime execution | `validateContainer`, `showServerErrors`, `RuntimeValidationActivation`, `RuntimeValidationPeerOperand`, `rule-engine.ts` |
 
-- Throws if `ctx.validationDesc` is missing. Use `.Validate<TValidator>(formId)` on the request to attach one.
-- `showServerErrors(desc, ctx.responseBody)` — `extractErrors` accepts only ProblemDetails `{ errors: Record<string, string[]> }`; otherwise returns null and logs.
+## Design Rules
 
-### Live Clear (validation/live-clear.ts)
-
-One-time wiring on form container: `input` and `change` events. Walks up from event target to find the field wrapper's `[data-valmsg-for]` span, looks up field by name, clears inline error. Vendor-agnostic: works for native inputs and Fusion inner elements.
-
----
-
-## Module Responsibilities
-
-| Module | Responsibility |
-|--------|----------------|
-| `orchestrator.ts` | Fail-closed validation, routing inline vs summary |
-| `rule-engine.ts` | Pure rule evaluation (required, minLength, equalTo, etc.) |
-| `condition.ts` | Pure condition evaluation (truthy, falsy, eq, neq) |
-| `error-display.ts` | DOM manipulation (inline spans, summary div) |
-| `live-clear.ts` | One-time input/change wiring on form container |
-| `enrichment.ts` | Enrich validation fields from `plan.components` |
-
----
-
-## Rule Types (rule-engine.ts)
-
-| Rule | Fail-closed behavior |
-|------|----------------------|
-| required, minLength, maxLength, email, regex, url, min, max, range | Standard checks |
-| equalTo | `peerReader.readPeer() === undefined` → block |
-| atLeastOne | Array length check |
-| unknown | `return true` (block) |
-| regex (broken) | `catch` → block |
-
----
-
-## Condition Operators (condition.ts)
-
-| Op | Returns |
-|----|---------|
-| truthy | `!empty` |
-| falsy | `empty` |
-| eq | `empty ? false : str === String(cond.value)` |
-| neq | `empty ? false : str !== String(cond.value)` |
-| source undefined | `null` (caller blocks) |
-
-**Design:** For eq/neq, empty source returns false ("not yet determined") — rule is skipped. Tests: `when-evaluating-pure-rules.test.ts`.
-
----
-
-## Design Decisions
-
-1. **Two-phase enrichment** — C# enriches from ComponentsMap; runtime enriches from plan.components. Partials can add components after boot; merge re-enriches.
-2. **Unenriched fields** — Block unless all rules conditionally skipped. Supports partial-owned fields that load later.
-3. **Extraction null** — Throws at render time when `Validate<TValidator>` is used but `ExtractRules` returns null.
-4. **ProblemDetails only** — Server errors must be `{ errors }` shape.
-5. **planId scoping** — Summary div: `[data-alis-validation-summary="${planId}"]`. `findSummaryElement(undefined)` returns null (refuse to guess).
-
----
-
-## Key Files
-
-| Layer | File |
-|-------|------|
-| C# | `HttpRequestBuilder.cs`, `ValidationResolver.cs`, `FluentValidationAdapter.cs`, `ReactivePlan.cs` |
-| Runtime | `pipeline.ts`, `validation/orchestrator.ts`, `validation/rule-engine.ts`, `validation/condition.ts`, `validation/error-display.ts`, `validation/live-clear.ts`, `enrichment.ts` |
-| Commands | `commands.ts` (validation-errors), `http.ts` (threads validationDesc to error handlers) |
-
+- Do not call client projection “server rule extraction.”
+- Do not use null as behavior; `none`, missing component, and literal `null` are distinct cases.
+- Do not infer custom FluentValidation behavior from implementation details; require `ProjectToClient(...)`.
+- Do not create a separate validation read path in runtime; validation reads component values through the same declared object/member contract as gather and reactions.

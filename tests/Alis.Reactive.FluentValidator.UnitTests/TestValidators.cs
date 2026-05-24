@@ -262,6 +262,33 @@ public class ReactiveEqConditionValidator : ReactiveValidator<TestModel>
     }
 }
 
+public class DirectNestedWhenFieldValidator : ReactiveValidator<TestModel>
+{
+    public DirectNestedWhenFieldValidator()
+    {
+        WhenFieldNotEmpty(x => x.Address!.City, () =>
+        {
+            RuleFor(x => x.JobTitle).NotEmpty();
+        });
+    }
+}
+
+public class NestedReactiveConditionValidator : ReactiveValidator<TestModel>
+{
+    public NestedReactiveConditionValidator()
+    {
+        WhenField(x => x.IsEmployed, () =>
+        {
+            WhenField(x => x.CareLevel, "memory-care", () =>
+            {
+                RuleFor(x => x.Notes).NotEmpty();
+            });
+
+            RuleFor(x => x.JobTitle).NotEmpty();
+        });
+    }
+}
+
 public class ReactiveMixedValidator : ReactiveValidator<TestModel>
 {
     public ReactiveMixedValidator()
@@ -273,8 +300,53 @@ public class ReactiveMixedValidator : ReactiveValidator<TestModel>
         {
             RuleFor(x => x.JobTitle).NotEmpty();
         });
-        // Server-only via .When() — should be skipped by adapter
+        // .When() without a client guard should be skipped by client projection.
         RuleFor(x => x.Salary).GreaterThanOrEqualTo(0m).When(x => x.Age > 18);
+    }
+}
+
+public class ServerOnlyWhenWrapsClientGuardValidator : ReactiveValidator<TestModel>
+{
+    public ServerOnlyWhenWrapsClientGuardValidator()
+    {
+        When(x => x.Age >= 18, () =>
+        {
+            WhenField(x => x.IsEmployed, () =>
+            {
+                RuleFor(x => x.JobTitle).NotEmpty();
+            });
+        });
+    }
+}
+
+public class ClientGuardWrapsServerOnlyWhenValidator : ReactiveValidator<TestModel>
+{
+    public ClientGuardWrapsServerOnlyWhenValidator()
+    {
+        WhenField(x => x.IsEmployed, () =>
+        {
+            When(x => x.Age >= 18, () =>
+            {
+                RuleFor(x => x.JobTitle).NotEmpty();
+            });
+        });
+    }
+}
+
+public class ServerOnlyOtherwiseWrapsClientGuardValidator : ReactiveValidator<TestModel>
+{
+    public ServerOnlyOtherwiseWrapsClientGuardValidator()
+    {
+        When(x => x.Age >= 18, () =>
+        {
+            RuleFor(x => x.Name).NotEmpty();
+        }).Otherwise(() =>
+        {
+            WhenField(x => x.IsEmployed, () =>
+            {
+                RuleFor(x => x.JobTitle).NotEmpty();
+            });
+        });
     }
 }
 
@@ -391,6 +463,15 @@ public class EqualToWithCustomMessageValidator : AbstractValidator<TestModel>
     }
 }
 
+public class LiteralNullComparisonValidator : AbstractValidator<TestModel>
+{
+    public LiteralNullComparisonValidator()
+    {
+        RuleFor(x => x.MiddleName).Equal((string?)null);
+        RuleFor(x => x.JobTitle).NotEqual((string?)null);
+    }
+}
+
 // --- Broken nested validator (for fail-fast test) ---
 
 public class BrokenNestedValidator : AbstractValidator<TestModel>
@@ -401,7 +482,7 @@ public class BrokenNestedValidator : AbstractValidator<TestModel>
     }
 }
 
-// --- DateTime condition validators (WhenField<DateTime> → Unix ms) ---
+// --- DateTime condition validators (WhenField<DateTime> date-shaped literals) ---
 
 public class DateTimeConditionValidator : ReactiveValidator<FullCoverageModel>
 {
@@ -673,6 +754,17 @@ public class WhenFieldMinLengthValidator : ReactiveValidator<TestModel>
         WhenFieldMinLength(x => x.Notes, 10, () =>
         {
             RuleFor(x => x.Email).NotEmpty().WithMessage("Email required when notes are substantial");
+        });
+    }
+}
+
+public class NegativeWhenFieldMinLengthValidator : ReactiveValidator<TestModel>
+{
+    public NegativeWhenFieldMinLengthValidator()
+    {
+        WhenFieldMinLength(x => x.Notes, -1, () =>
+        {
+            RuleFor(x => x.Email).NotEmpty();
         });
     }
 }

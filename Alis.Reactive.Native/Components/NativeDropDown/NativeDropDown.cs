@@ -10,6 +10,9 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeDropDown : NativeComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new NativeDropDown(), "dropdown");
+
         /// <inheritdoc />
         public string ValueMember => "value";
     }

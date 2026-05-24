@@ -35,16 +35,8 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>
         /// Element shape for array types (e.g., Shape.String for string[]).
         /// </summary>
-        internal Shape ElementShape
-        {
-            get
-            {
-                var propType = typeof(TProp);
-                if (propType.IsArray) return Shape.FromClrType(propType.GetElementType());
-                if (propType.IsGenericType) return Shape.FromClrType(propType.GetGenericArguments()[0]);
-                return Shape.None;
-            }
-        }
+        internal Shape ElementShape =>
+            CollectionElementShape.FromClrType(typeof(TProp)).ItemShapeOrNone;
     }
 
     /// <summary>
@@ -57,7 +49,9 @@ namespace Alis.Reactive.Builders.Conditions
 
         internal EventArgSource(Expression<Func<TPayload, TProp>> expression)
         {
-            _inner = new PayloadTypedSource<TPayload, TProp>(PayloadSource.Event(), expression);
+            _inner = new PayloadTypedSource<TPayload, TProp>(
+                PayloadSource.Event(PayloadContract.ForPayload(typeof(TPayload))),
+                expression);
         }
 
         internal override ValueProducer ToValueProducer() => _inner.ToValueProducer();

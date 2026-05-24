@@ -12,7 +12,7 @@ public class WhenExtractingEmailRule
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("email"));
-        Assert.That(desc[0].Rules[0].Constraint, Is.Null);
+        Assert.That(desc[0].Rules[0].ConstraintValue(), Is.Null);
     }
 
     [Test]

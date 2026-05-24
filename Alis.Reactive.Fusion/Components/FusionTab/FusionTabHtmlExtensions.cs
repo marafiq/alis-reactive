@@ -1,9 +1,5 @@
 using System;
-#if NET48
-using System.Web.Mvc;
-#else
 using Microsoft.AspNetCore.Mvc.Rendering;
-#endif
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Navigations;
 
@@ -11,7 +7,7 @@ namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
     /// Factory extension for creating FusionTab (non-input component).
-    /// No InputField wrapper. No ComponentsMap registration.
+    /// No InputField wrapper. No input component registration.
     /// Uses explicit string elementId (not model-expression-derived).
     /// </summary>
     public static class FusionTabHtmlExtensions
@@ -21,17 +17,13 @@ namespace Alis.Reactive.Fusion.Components
         /// Non-input component: renders directly, no label/validation wrapper.
         /// </summary>
         public static FusionTabBuilder<TModel> FusionTab<TModel>(
-#if NET48
-            this HtmlHelper<TModel> html,
-#else
             this IHtmlHelper<TModel> html,
-#endif
             ReactivePlan<TModel> plan,
             string elementId,
             Action<TabBuilder> build)
             where TModel : class
         {
-            // NO ComponentsMap registration — Tab is NOT an input component
+            // NO input component registration — Tab is NOT an input component
 
             var builder = html.EJS().Tab(elementId);
             build(builder);

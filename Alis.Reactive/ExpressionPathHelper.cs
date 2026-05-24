@@ -98,9 +98,7 @@ namespace Alis.Reactive
         {
             var members = new List<string>();
 
-            // Unwrap Convert (boxing of value types)
-            if (expr is UnaryExpression unary && unary.NodeType == ExpressionType.Convert)
-                expr = unary.Operand;
+            expr = UnwrapConvert(expr);
 
             while (expr is MemberExpression member)
             {
@@ -133,6 +131,21 @@ namespace Alis.Reactive
         /// <param name="expression">The model property expression.</param>
         /// <returns>A dot-separated binding path like <c>"Address.City"</c>.</returns>
         public static string ToPropertyName<TModel>(Expression<Func<TModel, object?>> expression)
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return string.Join(".", members.ConvertAll(PascalRestore));
+        }
+
+        internal static Type ToPropertyType(LambdaExpression expression)
+        {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            return UnwrapConvert(expression.Body).Type;
+        }
+
+        /// <summary>
+        /// Extracts the model binding path from a typed model expression, preserving type safety for value types.
+        /// </summary>
+        public static string ToPropertyName<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return string.Join(".", members.ConvertAll(PascalRestore));
@@ -178,6 +191,18 @@ namespace Alis.Reactive
         {
             if (string.IsNullOrEmpty(name)) return name;
             return char.ToLowerInvariant(name[0]) + name.Substring(1);
+        }
+
+        private static Expression UnwrapConvert(Expression expr)
+        {
+            while (expr is UnaryExpression unary &&
+                   (unary.NodeType == ExpressionType.Convert ||
+                    unary.NodeType == ExpressionType.ConvertChecked))
+            {
+                expr = unary.Operand;
+            }
+
+            return expr;
         }
     }
 }

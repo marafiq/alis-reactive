@@ -16,6 +16,12 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionAccordionExtensions
     {
+        private static readonly ComponentMethod ExpandItemMethod =
+            ComponentMethod.Named("expandItem").WithArgs<bool, int>();
+
+        private static readonly ComponentMethod EnableItemMethod =
+            ComponentMethod.Named("enableItem").WithArgs<int, bool>();
+
         /// <summary>
         /// Expands or collapses a panel by index.
         /// Runtime: ej2.expandItem(isExpand, index)
@@ -23,7 +29,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAccordion, TModel> ExpandItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, bool isExpand, int index)
             where TModel : class
-            => self.EmitCall("expandItem", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(isExpand), ValueProducer.Literal(index) });
+            => self.EmitCall(ExpandItemMethod, new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(isExpand), ValueProducer.Literal(index) });
 
         /// <summary>
         /// Enables or disables a panel by index.
@@ -32,6 +38,6 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAccordion, TModel> EnableItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, int index, bool isEnable = true)
             where TModel : class
-            => self.EmitCall("enableItem", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(index), ValueProducer.Literal(isEnable) });
+            => self.EmitCall(EnableItemMethod, new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(index), ValueProducer.Literal(isEnable) });
     }
 }

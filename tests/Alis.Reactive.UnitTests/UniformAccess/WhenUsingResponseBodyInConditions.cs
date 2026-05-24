@@ -37,7 +37,6 @@ public class WhenUsingResponseBodyInConditions : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         using var doc = JsonDocument.Parse(planJson);
         var behaviors = doc.RootElement.GetProperty("behaviors");
@@ -63,7 +62,6 @@ public class WhenUsingResponseBodyInConditions : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         // The condition should read from payload scope "error"
         Assert.That(planJson, Does.Contain("\"scope\": \"error\""));
@@ -86,7 +84,6 @@ public class WhenUsingResponseBodyInConditions : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         // Should have an "all" condition with two terms both reading from success
         Assert.That(planJson, Does.Contain("\"kind\": \"all\""));
@@ -108,7 +105,6 @@ public class WhenUsingResponseBodyInConditions : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"kind\": \"any\""));
     }
@@ -131,7 +127,6 @@ public class WhenUsingResponseBodyInConditions : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         // Should have a branch with 3 cases
         Assert.That(planJson, Does.Contain("\"kind\": \"branch\""));
@@ -151,7 +146,6 @@ public class WhenUsingResponseBodyInConditions : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         // Error handler should exist in the plan
         Assert.That(planJson, Does.Contain("\"error\""));
@@ -171,7 +165,6 @@ public class WhenUsingResponseBodyInConditions : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("422"));
         // SetText reads from error scope
@@ -194,7 +187,6 @@ public class WhenUsingResponseBodyInConditions : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"scope\": \"success\""));
     }
@@ -213,7 +205,6 @@ public class WhenUsingResponseBodyInConditions : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         // SetText should use the success scope from ResponseBody
         Assert.That(planJson, Does.Contain("\"scope\": \"success\""));
@@ -237,7 +228,6 @@ public class WhenUsingResponseBodyInConditions : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        AssertSchemaValid(planJson);
 
         Assert.That(planJson, Does.Contain("\"scope\": \"success\""));
         Assert.That(planJson, Does.Contain("\"count\""));

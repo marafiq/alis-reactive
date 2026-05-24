@@ -10,6 +10,9 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeTextBox : NativeComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new NativeTextBox(), "textbox");
+
         /// <inheritdoc />
         public string ValueMember => "value";
     }

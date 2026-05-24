@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Conditions
     public sealed class BranchBuilder<TModel> where TModel : class
     {
         private readonly List<BranchCase> _cases;
-        private bool _elseCalled;
+        private BranchChainState _chainState = BranchChainState.Open;
 
         internal PipelineBuilder<TModel> Pipeline { get; }
 
@@ -30,8 +30,7 @@ namespace Alis.Reactive.Builders.Conditions
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
-            if (_elseCalled)
-                throw new InvalidOperationException("Cannot add ElseIf after Else.");
+            _chainState.EnsureElseIfCanBeAdded();
 
             var source = new EventArgSource<TPayload, TProp>(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
@@ -43,8 +42,7 @@ namespace Alis.Reactive.Builders.Conditions
             Expression<Func<TPayload, TProp>> path)
             where TPayload : class
         {
-            if (_elseCalled)
-                throw new InvalidOperationException("Cannot add ElseIf after Else.");
+            _chainState.EnsureElseIfCanBeAdded();
 
             var source = responseBody.Read(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
@@ -53,8 +51,7 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>Adds an ElseIf branch from a typed source.</summary>
         public ConditionSourceBuilder<TModel, TProp> ElseIf<TProp>(TypedSource<TProp> source)
         {
-            if (_elseCalled)
-                throw new InvalidOperationException("Cannot add ElseIf after Else.");
+            _chainState.EnsureElseIfCanBeAdded();
 
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
@@ -63,20 +60,66 @@ namespace Alis.Reactive.Builders.Conditions
         /// <param name="pipeline">Builds the commands for the default case.</param>
         public void Else(Action<PipelineBuilder<TModel>> pipeline)
         {
-            if (_elseCalled)
-                throw new InvalidOperationException("Else already called.");
+            _chainState.EnsureDefaultCanBeAdded();
 
             var pb = new PipelineBuilder<TModel>(Pipeline.Context);
             pipeline(pb);
             _cases.Add(BranchCase.Default(pb.BuildReaction()));
-            _elseCalled = true;
+            _chainState = BranchChainState.ClosedAfterDefault;
         }
 
         internal void AddBranch(BranchCase branchCase)
         {
-            if (_elseCalled)
-                throw new InvalidOperationException("Cannot add branches after Else.");
+            _chainState.EnsureBranchCanBeAdded();
             _cases.Add(branchCase);
+        }
+    }
+
+    internal abstract class BranchChainState
+    {
+        internal static BranchChainState Open { get; } =
+            new OpenBranchChainState();
+
+        internal static BranchChainState ClosedAfterDefault { get; } =
+            new BranchChainClosedAfterDefault();
+
+        internal abstract void EnsureElseIfCanBeAdded();
+
+        internal abstract void EnsureDefaultCanBeAdded();
+
+        internal abstract void EnsureBranchCanBeAdded();
+    }
+
+    internal sealed class OpenBranchChainState : BranchChainState
+    {
+        internal override void EnsureElseIfCanBeAdded()
+        {
+        }
+
+        internal override void EnsureDefaultCanBeAdded()
+        {
+        }
+
+        internal override void EnsureBranchCanBeAdded()
+        {
+        }
+    }
+
+    internal sealed class BranchChainClosedAfterDefault : BranchChainState
+    {
+        internal override void EnsureElseIfCanBeAdded()
+        {
+            throw new InvalidOperationException("Cannot add ElseIf after Else.");
+        }
+
+        internal override void EnsureDefaultCanBeAdded()
+        {
+            throw new InvalidOperationException("Else already called.");
+        }
+
+        internal override void EnsureBranchCanBeAdded()
+        {
+            throw new InvalidOperationException("Cannot add branches after Else.");
         }
     }
 }

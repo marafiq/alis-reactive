@@ -3,7 +3,7 @@
    sandbox markup but not emitted by framework C#. Loaded alongside the
    framework-shipped design-system.css — not a replacement for it. */
 
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 @plugin "@tailwindcss/forms";
 
 /* Brand tokens — single source of truth, shared with the framework. */

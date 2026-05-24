@@ -1,10 +1,6 @@
 using System;
 using Alis.Reactive.Builders;
-#if NET48
-using System.Web.Mvc;
-#else
 using Microsoft.AspNetCore.Mvc.Rendering;
-#endif
 
 namespace Alis.Reactive.Native.Extensions
 {
@@ -50,11 +46,7 @@ namespace Alis.Reactive.Native.Extensions
         /// Configures one or more triggers via the fluent <see cref="TriggerBuilder{TModel}"/> API.
         /// Triggers can be chained: <c>t.DomReady(...).CustomEvent(...).SignalR(...).ServerPush(...)</c>.
         /// </param>
-#if NET48
-        public static void On<TModel>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan,
-#else
         public static void On<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan,
-#endif
             Action<TriggerBuilder<TModel>> trigger) where TModel : class
         {
             var builder = new TriggerBuilder<TModel>(plan, plan.Context);

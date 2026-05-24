@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Serialization;
 
@@ -14,31 +15,43 @@ namespace Alis.Reactive.PlanModel
         private protected Reaction() { }
 
         internal static Reaction Sequence(params Reaction[] steps) =>
-            new SequenceReaction(new List<Reaction>(steps));
+            new SequenceReaction(ReactionSteps.From(steps));
 
         internal static Reaction Sequence(List<Reaction> steps) =>
-            new SequenceReaction(steps);
+            new SequenceReaction(ReactionSteps.From(steps));
 
-        internal static Reaction Parallel(List<Reaction> steps, Reaction? onSettled = null) =>
-            new ParallelReaction(steps, onSettled);
+        internal static Reaction Parallel(List<Reaction> steps, ParallelCompletion completion) =>
+            new ParallelReaction(ReactionSteps.From(steps), completion);
 
         internal static Reaction Branch(params BranchCase[] cases) =>
-            new BranchReaction(new List<BranchCase>(cases));
+            new BranchReaction(BranchCases.From(cases));
 
         internal static Reaction Branch(List<BranchCase> cases) =>
-            new BranchReaction(cases);
+            new BranchReaction(BranchCases.From(cases));
 
         internal static Reaction Set(Source on, string property, ValueProducer value) =>
             new SetReaction(on, property, value);
 
-        internal static Reaction Call(Source on, string method, List<ValueProducer>? args = null) =>
+        internal static Reaction Call(Source on, string method) =>
+            new CallReaction(on, method, CallArguments.None);
+
+        internal static Reaction Call(Source on, string method, List<ValueProducer> args) =>
+            new CallReaction(on, method, CallArguments.Of(args));
+
+        internal static Reaction Call(Source on, string method, CallArguments args) =>
             new CallReaction(on, method, args);
 
         internal static Reaction Request(Request request) =>
             new RequestReaction(request);
 
-        internal static Reaction Dispatch(string eventName, ValueProducer? data = null, string? payloadType = null) =>
-            new DispatchReaction(eventName, data, payloadType);
+        internal static Reaction Dispatch(string eventName) =>
+            new DispatchReaction(eventName, DispatchPayload.None);
+
+        internal static Reaction Dispatch(string eventName, ValueProducer data) =>
+            new DispatchReaction(eventName, DispatchPayload.Untyped(data));
+
+        internal static Reaction Dispatch(string eventName, ValueProducer data, PayloadContract payloadType) =>
+            new DispatchReaction(eventName, DispatchPayload.Typed(data, payloadType));
 
         internal static Reaction Inject(string component, ValueProducer value) =>
             new InjectReaction(component, value);
@@ -50,77 +63,330 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Executes a list of reactions in declaration order.</summary>
     public sealed class SequenceReaction : Reaction
     {
+        private readonly ReactionSteps _steps;
+
         /// <summary>Gets the kind. Always <c>"sequence"</c>.</summary>
         public string Kind => "sequence";
         /// <summary>Gets the ordered reactions to execute.</summary>
-        public IReadOnlyList<Reaction> Steps { get; }
+        public IReadOnlyList<Reaction> Steps => _steps.ForJson;
 
-        internal SequenceReaction(List<Reaction> steps) { Steps = steps ?? throw new ArgumentNullException(nameof(steps)); }
+        internal SequenceReaction(ReactionSteps steps)
+        {
+            _steps = steps ?? throw new ArgumentNullException(nameof(steps));
+        }
     }
 
     /// <summary>Executes a list of reactions concurrently.</summary>
     public sealed class ParallelReaction : Reaction
     {
+        private readonly ReactionSteps _steps;
+        private readonly ParallelCompletion _completion;
+
         /// <summary>Gets the kind. Always <c>"parallel"</c>.</summary>
         public string Kind => "parallel";
         /// <summary>Gets the reactions to execute concurrently.</summary>
-        public IReadOnlyList<Reaction> Steps { get; }
-        /// <summary>Gets the reaction to execute after all steps settle, or <see langword="null"/> if none.</summary>
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public Reaction? OnSettled { get; }
+        public IReadOnlyList<Reaction> Steps => _steps.ForJson;
+        /// <summary>Gets the completion behavior to run after all steps settle.</summary>
+        public ParallelCompletion Completion => _completion;
 
-        internal ParallelReaction(List<Reaction> steps, Reaction? onSettled)
+        internal ParallelReaction(ReactionSteps steps, ParallelCompletion completion)
         {
-            Steps = steps ?? throw new ArgumentNullException(nameof(steps));
-            OnSettled = onSettled;
+            _steps = steps ?? throw new ArgumentNullException(nameof(steps));
+            _completion = completion ?? throw new ArgumentNullException(nameof(completion));
         }
+    }
+
+    internal sealed class ReactionSteps
+    {
+        private readonly IReadOnlyList<Reaction> _items;
+
+        private ReactionSteps(IReadOnlyList<Reaction> items)
+        {
+            _items = items ?? throw new ArgumentNullException(nameof(items));
+        }
+
+        internal IReadOnlyList<Reaction> ForJson => _items;
+
+        internal static ReactionSteps Empty { get; } =
+            new ReactionSteps(Array.Empty<Reaction>());
+
+        internal static ReactionSteps From(IEnumerable<Reaction> steps)
+        {
+            if (steps == null) throw new ArgumentNullException(nameof(steps));
+
+            var snapshot = new List<Reaction>();
+            foreach (var step in steps)
+            {
+                if (step == null)
+                    throw new ArgumentException("Reaction step must not be null.", nameof(steps));
+
+                snapshot.Add(step);
+            }
+
+            var hasNoSteps = snapshot.Count == 0;
+            if (hasNoSteps) return Empty;
+            return new ReactionSteps(snapshot);
+        }
+    }
+
+    /// <summary>Base class for parallel completion behavior. Not constructed in application code.</summary>
+    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ParallelCompletion>))]
+    public abstract class ParallelCompletion
+    {
+        private protected ParallelCompletion() { }
+
+        internal static ParallelCompletion None { get; } = new NoParallelCompletion();
+
+        /// <summary>Gets the completion kind.</summary>
+        public abstract string Kind { get; }
+
+        internal static ParallelCompletion OnSettled(Reaction reaction)
+        {
+            if (reaction == null) throw new ArgumentNullException(nameof(reaction));
+            return new SettledParallelCompletion(reaction);
+        }
+    }
+
+    /// <summary>Represents a parallel reaction with no completion reaction.</summary>
+    public sealed class NoParallelCompletion : ParallelCompletion
+    {
+        /// <summary>Gets the kind. Always <c>"none"</c>.</summary>
+        public override string Kind => "none";
+    }
+
+    /// <summary>Runs a reaction after every parallel branch has settled.</summary>
+    public sealed class SettledParallelCompletion : ParallelCompletion
+    {
+        private readonly Reaction _reaction;
+
+        internal SettledParallelCompletion(Reaction reaction)
+        {
+            _reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));
+        }
+
+        /// <summary>Gets the kind. Always <c>"on-settled"</c>.</summary>
+        public override string Kind => "on-settled";
+
+        /// <summary>Gets the reaction to run after all branches settle.</summary>
+        public Reaction Reaction => _reaction;
     }
 
     /// <summary>Evaluates conditions and executes the first matching case.</summary>
     public sealed class BranchReaction : Reaction
     {
+        private readonly BranchCases _cases;
+
         /// <summary>Gets the kind. Always <c>"branch"</c>.</summary>
         public string Kind => "branch";
         /// <summary>Gets the ordered cases to evaluate.</summary>
-        public IReadOnlyList<BranchCase> Cases { get; }
+        public IReadOnlyList<BranchCase> Cases => _cases.ForJson;
 
-        internal BranchReaction(List<BranchCase> cases) { Cases = cases ?? throw new ArgumentNullException(nameof(cases)); }
+        internal BranchReaction(BranchCases cases)
+        {
+            _cases = cases ?? throw new ArgumentNullException(nameof(cases));
+        }
     }
 
-    /// <summary>Pairs a guard condition with a reaction to execute. Use <see cref="Condition.None"/> for the default (else) case.</summary>
+    internal sealed class BranchCases
+    {
+        private readonly IReadOnlyList<BranchCase> _items;
+
+        private BranchCases(IReadOnlyList<BranchCase> items)
+        {
+            _items = items ?? throw new ArgumentNullException(nameof(items));
+        }
+
+        internal IReadOnlyList<BranchCase> ForJson => _items;
+
+        internal static BranchCases From(IEnumerable<BranchCase> cases)
+        {
+            if (cases == null) throw new ArgumentNullException(nameof(cases));
+
+            var snapshot = new List<BranchCase>();
+            foreach (var branchCase in cases)
+            {
+                if (branchCase == null)
+                    throw new ArgumentException("Branch case must not be null.", nameof(cases));
+
+                snapshot.Add(branchCase);
+            }
+
+            var hasNoCases = snapshot.Count == 0;
+            if (hasNoCases)
+                throw new InvalidOperationException(
+                    "Branch reaction requires at least one branch case.");
+
+            EnsureDefaultCaseIsUniqueAndLast(snapshot);
+            return new BranchCases(snapshot);
+        }
+
+        private static void EnsureDefaultCaseIsUniqueAndLast(IReadOnlyList<BranchCase> cases)
+        {
+            var defaultCaseIndex = -1;
+            for (var i = 0; i < cases.Count; i++)
+            {
+                var branchCase = cases[i];
+                var caseIsDefault = branchCase.GuardForJson.Kind == "default";
+                if (!caseIsDefault) continue;
+
+                if (defaultCaseIndex >= 0)
+                    throw new InvalidOperationException(
+                        "Branch reaction can have only one default branch case.");
+
+                defaultCaseIndex = i;
+            }
+
+            var defaultCaseWasDeclared = defaultCaseIndex >= 0;
+            var defaultCaseIsLast = defaultCaseIndex == cases.Count - 1;
+            if (defaultCaseWasDeclared && !defaultCaseIsLast)
+                throw new InvalidOperationException(
+                    "Branch reaction default branch case must be last.");
+        }
+    }
+
+    /// <summary>Pairs an explicit guard with a reaction to execute. A default guard is the else case.</summary>
+    [JsonConverter(typeof(BranchCaseJsonConverter))]
     public sealed class BranchCase
     {
-        /// <summary>Gets the guard condition. <see cref="Condition.None"/> means the default (else) case — always matches.</summary>
-        public Condition When { get; }
+        private readonly BranchGuard _guard;
+
         /// <summary>Gets the reaction to execute when the condition is met.</summary>
         public Reaction Reaction { get; }
 
-        internal BranchCase(Condition when, Reaction reaction)
+        internal BranchGuard GuardForJson => _guard;
+
+        private BranchCase(BranchGuard guard, Reaction reaction)
         {
-            When = when ?? Condition.None;
+            _guard = guard ?? throw new ArgumentNullException(nameof(guard));
             Reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));
         }
 
-        internal static BranchCase Of(Condition when, Reaction reaction) => new BranchCase(when, reaction);
-        internal static BranchCase Default(Reaction reaction) => new BranchCase(Condition.None, reaction);
+        internal static BranchCase Of(Condition when, Reaction reaction) =>
+            new BranchCase(BranchGuard.When(when), reaction);
+
+        internal static BranchCase Default(Reaction reaction) =>
+            new BranchCase(BranchGuard.Else, reaction);
+
+        internal BranchCase WithReaction(Reaction reaction) =>
+            new BranchCase(_guard, reaction);
+    }
+
+    internal sealed class BranchCaseJsonConverter : JsonConverter<BranchCase>
+    {
+        public override void Write(Utf8JsonWriter writer, BranchCase value, JsonSerializerOptions options)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            writer.WriteStartObject();
+            WriteProperty(writer, options, "guard", value.GuardForJson);
+            WriteProperty(writer, options, "reaction", value.Reaction);
+            writer.WriteEndObject();
+        }
+
+        public override BranchCase Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options) =>
+            throw new NotSupportedException("Plan types are write-only.");
+
+        private static void WriteProperty<T>(
+            Utf8JsonWriter writer,
+            JsonSerializerOptions options,
+            string name,
+            T value)
+        {
+            writer.WritePropertyName(name);
+            JsonSerializer.Serialize(writer, value, options);
+        }
+    }
+
+    [JsonConverter(typeof(BranchGuardJsonConverter))]
+    internal abstract class BranchGuard
+    {
+        private protected BranchGuard() { }
+
+        internal static BranchGuard Else { get; } =
+            new DefaultBranchGuard();
+
+        public abstract string Kind { get; }
+        internal abstract void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options);
+
+        internal static BranchGuard When(Condition condition) =>
+            new ConditionalBranchGuard(condition);
+
+        private sealed class DefaultBranchGuard : BranchGuard
+        {
+            public override string Kind => "default";
+
+            internal override void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options)
+            {
+            }
+        }
+
+        private sealed class ConditionalBranchGuard : BranchGuard
+        {
+            private readonly Condition _condition;
+
+            internal ConditionalBranchGuard(Condition condition)
+            {
+                _condition = condition ?? throw new ArgumentNullException(nameof(condition));
+            }
+
+            public override string Kind => "when";
+            public Condition Condition => _condition;
+
+            internal override void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
+                BranchGuardJsonConverter.WriteProperty(writer, options, "condition", _condition);
+        }
+    }
+
+    internal sealed class BranchGuardJsonConverter : JsonConverter<BranchGuard>
+    {
+        public override void Write(Utf8JsonWriter writer, BranchGuard value, JsonSerializerOptions options)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            writer.WriteStartObject();
+            writer.WriteString("kind", value.Kind);
+            value.WriteGuardPayload(writer, options);
+            writer.WriteEndObject();
+        }
+
+        public override BranchGuard Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options) =>
+            throw new NotSupportedException("Plan types are write-only.");
+
+        internal static void WriteProperty<T>(
+            Utf8JsonWriter writer,
+            JsonSerializerOptions options,
+            string name,
+            T value)
+        {
+            writer.WritePropertyName(name);
+            JsonSerializer.Serialize(writer, value, options);
+        }
     }
 
     /// <summary>Sets a property value on a component or DOM element.</summary>
     public sealed class SetReaction : Reaction
     {
+        private readonly MemberName _property;
+
         /// <summary>Gets the kind. Always <c>"set"</c>.</summary>
         public string Kind => "set";
         /// <summary>Gets the target source to set the property on.</summary>
         public Source On { get; }
         /// <summary>Gets the property name to set.</summary>
-        public string Property { get; }
+        public string Property => _property.Value;
         /// <summary>Gets the value to assign.</summary>
         public ValueProducer Value { get; }
 
         internal SetReaction(Source on, string property, ValueProducer value)
         {
             On = on ?? throw new ArgumentNullException(nameof(on));
-            Property = property ?? throw new ArgumentNullException(nameof(property));
+            _property = MemberName.Of(property);
             Value = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
@@ -128,20 +394,56 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Calls a method on a component or DOM element.</summary>
     public sealed class CallReaction : Reaction
     {
+        private readonly MemberName _method;
+        private readonly CallArguments _args;
+
         /// <summary>Gets the kind. Always <c>"call"</c>.</summary>
         public string Kind => "call";
         /// <summary>Gets the target source to call the method on.</summary>
         public Source On { get; }
         /// <summary>Gets the method name to call.</summary>
-        public string Method { get; }
+        public string Method => _method.Value;
         /// <summary>Gets the method arguments. Empty when the method takes no arguments.</summary>
-        public IReadOnlyList<ValueProducer> Args { get; }
+        public IReadOnlyList<ValueProducer> Args => _args.ItemsForJson;
 
-        internal CallReaction(Source on, string method, List<ValueProducer>? args)
+        internal CallReaction(Source on, string method, CallArguments args)
         {
             On = on ?? throw new ArgumentNullException(nameof(on));
-            Method = method ?? throw new ArgumentNullException(nameof(method));
-            Args = args != null && args.Count > 0 ? args : (IReadOnlyList<ValueProducer>)System.Array.Empty<ValueProducer>();
+            _method = MemberName.Of(method);
+            _args = args ?? throw new ArgumentNullException(nameof(args));
+        }
+    }
+
+    internal sealed class CallArguments
+    {
+        private readonly IReadOnlyList<ValueProducer> _items;
+
+        private CallArguments(IReadOnlyList<ValueProducer> items)
+        {
+            _items = items ?? throw new ArgumentNullException(nameof(items));
+        }
+
+        internal static CallArguments None { get; } =
+            new CallArguments(System.Array.Empty<ValueProducer>());
+
+        internal IReadOnlyList<ValueProducer> ItemsForJson => _items;
+
+        internal static CallArguments Of(IReadOnlyList<ValueProducer> items)
+        {
+            if (items == null) throw new ArgumentNullException(nameof(items));
+            if (items.Count == 0)
+                return None;
+
+            var snapshot = new List<ValueProducer>();
+            foreach (var item in items)
+            {
+                if (item == null)
+                    throw new ArgumentException("Call argument must not be null.", nameof(items));
+
+                snapshot.Add(item);
+            }
+
+            return new CallArguments(snapshot);
         }
     }
 
@@ -157,39 +459,148 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Dispatches a custom browser event.</summary>
+    [JsonConverter(typeof(DispatchReactionJsonConverter))]
     public sealed class DispatchReaction : Reaction
     {
+        private readonly EventName _event;
+        private readonly DispatchPayload _payload;
+
         /// <summary>Gets the kind. Always <c>"dispatch"</c>.</summary>
         public string Kind => "dispatch";
         /// <summary>Gets the event name to dispatch.</summary>
-        public string Event { get; }
-        /// <summary>Gets the event payload. <see cref="ValueProducer.None"/> when no data is provided.</summary>
-        public ValueProducer Data { get; }
-        /// <summary>Gets the optional payload type tag, or <see langword="null"/> when untyped.</summary>
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        public string? PayloadType { get; }
+        public string Event => _event.Value;
 
-        internal DispatchReaction(string eventName, ValueProducer? data, string? payloadType)
+        internal DispatchPayload PayloadForJson => _payload;
+
+        internal DispatchReaction(string eventName, DispatchPayload payload)
         {
-            Event = eventName ?? throw new ArgumentNullException(nameof(eventName));
-            Data = data ?? ValueProducer.None;
-            PayloadType = payloadType;
+            _event = EventName.Of(eventName);
+            _payload = payload ?? throw new ArgumentNullException(nameof(payload));
+        }
+    }
+
+    internal sealed class DispatchReactionJsonConverter : JsonConverter<DispatchReaction>
+    {
+        public override void Write(Utf8JsonWriter writer, DispatchReaction value, JsonSerializerOptions options)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            writer.WriteStartObject();
+            writer.WriteString("kind", value.Kind);
+            writer.WriteString("event", value.Event);
+            WriteProperty(writer, options, "payload", value.PayloadForJson);
+            writer.WriteEndObject();
+        }
+
+        public override DispatchReaction Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options) =>
+            throw new NotSupportedException("Plan types are write-only.");
+
+        private static void WriteProperty<T>(
+            Utf8JsonWriter writer,
+            JsonSerializerOptions options,
+            string name,
+            T value)
+        {
+            writer.WritePropertyName(name);
+            JsonSerializer.Serialize(writer, value, options);
+        }
+    }
+
+    [JsonConverter(typeof(DispatchPayloadJsonConverter))]
+    internal abstract class DispatchPayload
+    {
+        private protected DispatchPayload() { }
+
+        internal static DispatchPayload None { get; } =
+            new NoDispatchPayload();
+
+        public abstract string Kind { get; }
+
+        internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
+
+        internal static DispatchPayload Untyped(ValueProducer data) =>
+            new PresentDispatchPayload(data, PayloadContract.Untyped);
+
+        internal static DispatchPayload Typed(ValueProducer data, PayloadContract payloadType) =>
+            new PresentDispatchPayload(data, payloadType);
+    }
+
+    internal sealed class NoDispatchPayload : DispatchPayload
+    {
+        public override string Kind => "none";
+
+        internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
+        {
+        }
+    }
+
+    internal sealed class PresentDispatchPayload : DispatchPayload
+    {
+        private readonly ValueProducer _data;
+        private readonly PayloadContract _payloadType;
+
+        internal PresentDispatchPayload(ValueProducer data, PayloadContract payloadType)
+        {
+            _data = data ?? throw new ArgumentNullException(nameof(data));
+            _payloadType = payloadType ?? throw new ArgumentNullException(nameof(payloadType));
+        }
+
+        public override string Kind => "value";
+
+        internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
+        {
+            DispatchPayloadJsonConverter.WriteProperty(writer, options, "data", _data);
+            DispatchPayloadJsonConverter.WriteProperty(writer, options, "payloadType", _payloadType);
+        }
+    }
+
+    internal sealed class DispatchPayloadJsonConverter : JsonConverter<DispatchPayload>
+    {
+        public override void Write(Utf8JsonWriter writer, DispatchPayload value, JsonSerializerOptions options)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            writer.WriteStartObject();
+            writer.WriteString("kind", value.Kind);
+            value.WritePayload(writer, options);
+            writer.WriteEndObject();
+        }
+
+        public override DispatchPayload Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options) =>
+            throw new NotSupportedException("Plan types are write-only.");
+
+        internal static void WriteProperty<T>(
+            Utf8JsonWriter writer,
+            JsonSerializerOptions options,
+            string name,
+            T value)
+        {
+            writer.WritePropertyName(name);
+            JsonSerializer.Serialize(writer, value, options);
         }
     }
 
     /// <summary>Injects a value into a named component.</summary>
     public sealed class InjectReaction : Reaction
     {
+        private readonly ComponentKey _component;
+
         /// <summary>Gets the kind. Always <c>"inject"</c>.</summary>
         public string Kind => "inject";
         /// <summary>Gets the target component name.</summary>
-        public string Component { get; }
+        public string Component => _component.Value;
         /// <summary>Gets the value to inject.</summary>
         public ValueProducer Value { get; }
 
         internal InjectReaction(string component, ValueProducer value)
         {
-            Component = component ?? throw new ArgumentNullException(nameof(component));
+            _component = ComponentKey.Of(component);
             Value = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
@@ -197,14 +608,16 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Displays accumulated validation errors in the target container.</summary>
     public sealed class ShowValidationErrorsReaction : Reaction
     {
+        private readonly ComponentId _container;
+
         /// <summary>Gets the kind. Always <c>"show-validation-errors"</c>.</summary>
         public string Kind => "show-validation-errors";
         /// <summary>Gets the element ID of the validation error container.</summary>
-        public string Container { get; }
+        public string Container => _container.Value;
 
         internal ShowValidationErrorsReaction(string container)
         {
-            Container = container ?? throw new ArgumentNullException(nameof(container));
+            _container = ComponentId.Of(container);
         }
     }
 }

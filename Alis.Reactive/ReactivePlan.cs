@@ -11,22 +11,35 @@ namespace Alis.Reactive
     /// </summary>
     public sealed class ReactivePlan<TModel> where TModel : class
     {
-        private readonly Dictionary<string, ComponentRegistration> _componentsMap =
-            new Dictionary<string, ComponentRegistration>();
+        private readonly ComponentRegistrationCatalog _registeredInputComponents =
+            new ComponentRegistrationCatalog();
 
+        private readonly PlanId _planId = Alis.Reactive.PlanModel.PlanId.ForModel(typeof(TModel));
         private readonly PlanBuildContext _context;
 
-        internal ReactivePlan(bool isPartial = false)
+        private readonly ReactivePlanScope _scope;
+
+        internal ReactivePlan()
+            : this(ReactivePlanScope.RootView)
         {
-            IsPartial = isPartial;
-            _context = new PlanBuildContext(PlanId, isPartial ? PlanId : null, _componentsMap);
+        }
+
+        internal ReactivePlan(ReactivePlanScope scope)
+        {
+            if (scope == null) throw new ArgumentNullException(nameof(scope));
+
+            _scope = scope;
+            var planIdentity = _scope.CreateIdentity(_planId);
+            _context = new PlanBuildContext(planIdentity, _registeredInputComponents);
         }
 
         /// <summary>Gets the unique plan identifier, derived from the model type's full name.</summary>
-        public string PlanId { get; } = typeof(TModel).FullName!;
+        public string PlanId => _planId.Value;
         /// <summary>Gets whether this plan represents a partial view that merges into a parent plan.</summary>
-        public bool IsPartial { get; }
-        internal IReadOnlyDictionary<string, ComponentRegistration> ComponentsMap => _componentsMap;
+        public bool IsPartial => _scope.IsPartial;
+        internal bool RendersValidationSummary => _scope.RendersValidationSummary;
+        internal IReadOnlyDictionary<string, ComponentRegistration> RegisteredInputComponents =>
+            _registeredInputComponents.Snapshot();
         internal PlanBuildContext Context => _context;
 
         /// <summary>Registers a plugin's type metadata in the plan. Must be called before any p.Plugin() reference.</summary>
@@ -36,28 +49,35 @@ namespace Alis.Reactive
                 throw new ArgumentException("Plugin name required.", nameof(pluginName));
             if (configure == null)
                 throw new ArgumentNullException(nameof(configure));
-            _context.RegisterPlugin(pluginName, configure);
+            var builder = new Builders.PluginTypeBuilder(pluginName);
+            configure(builder);
+            _context.RegisterPlugin(builder.Build());
         }
 
-        internal void AddToComponentsMap(string bindingPath, ComponentRegistration entry)
+        /// <summary>Registers a typed browser plugin contract in the plan.</summary>
+        public void RegisterPlugin(ReactivePlugin plugin)
         {
-            if (_componentsMap.TryGetValue(bindingPath, out var existing))
-            {
-                if (existing.ComponentId == entry.ComponentId
-                    && existing.Vendor == entry.Vendor
-                    && existing.ValueMember == entry.ValueMember
-                    && existing.ComponentType == entry.ComponentType
-                    && existing.Shape == entry.Shape)
-                    return;
-
-                throw new InvalidOperationException(
-                    $"Duplicate component registration for binding path '{bindingPath}': " +
-                    $"existing [{existing.ComponentId}, {existing.Vendor}, {existing.ValueMember}, {existing.ComponentType}, {existing.Shape.Kind}] vs " +
-                    $"new [{entry.ComponentId}, {entry.Vendor}, {entry.ValueMember}, {entry.ComponentType}, {entry.Shape.Kind}].");
-            }
-
-            _componentsMap[bindingPath] = entry;
+            if (plugin == null) throw new ArgumentNullException(nameof(plugin));
+            _context.RegisterPlugin(plugin.ToContract());
         }
+
+        /// <summary>Creates and registers a typed browser plugin contract in the plan.</summary>
+        public TPlugin RegisterPlugin<TPlugin>()
+            where TPlugin : ReactivePlugin, new()
+        {
+            var plugin = new TPlugin();
+            RegisterPlugin(plugin);
+            return plugin;
+        }
+
+        internal void RegisterInputComponent(ComponentRegistration registration)
+        {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            _registeredInputComponents.Add(registration.RegisteredBindingPath, registration);
+        }
+
+        internal bool HasRegisteredInputComponent(BindingPath bindingPath) =>
+            _registeredInputComponents.Contains(bindingPath);
 
         /// <summary>Registers all components and resolves validation, then serializes the plan as compact JSON.</summary>
         public string Render()
@@ -76,7 +96,52 @@ namespace Alis.Reactive
         private void ResolveAll()
         {
             _context.RegisterInputComponents();
-            new ValidationResolver(_context, _componentsMap, typeof(TModel)).Resolve();
+            new ClientValidationProjectionBinder(
+                    _context,
+                    _registeredInputComponents.Snapshot(),
+                    typeof(TModel))
+                .BindQueuedJobs();
+        }
+    }
+
+    internal abstract class ReactivePlanScope
+    {
+        internal static ReactivePlanScope RootView { get; } =
+            new RootViewPlanScope();
+
+        internal static ReactivePlanScope PartialContribution { get; } =
+            new PartialContributionPlanScope();
+
+        internal abstract bool IsPartial { get; }
+
+        internal abstract bool RendersValidationSummary { get; }
+
+        internal abstract PlanIdentity CreateIdentity(PlanId planId);
+    }
+
+    internal sealed class RootViewPlanScope : ReactivePlanScope
+    {
+        internal override bool IsPartial => false;
+
+        internal override bool RendersValidationSummary => true;
+
+        internal override PlanIdentity CreateIdentity(PlanId planId)
+        {
+            if (planId == null) throw new ArgumentNullException(nameof(planId));
+            return PlanIdentity.Root(planId);
+        }
+    }
+
+    internal sealed class PartialContributionPlanScope : ReactivePlanScope
+    {
+        internal override bool IsPartial => true;
+
+        internal override bool RendersValidationSummary => false;
+
+        internal override PlanIdentity CreateIdentity(PlanId planId)
+        {
+            if (planId == null) throw new ArgumentNullException(nameof(planId));
+            return PlanIdentity.Partial(planId);
         }
     }
 

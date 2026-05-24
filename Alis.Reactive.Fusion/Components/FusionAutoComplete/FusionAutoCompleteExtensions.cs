@@ -16,13 +16,40 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionAutoComplete Component = new FusionAutoComplete();
 
+        private static readonly ComponentProperty<string> ValueProperty =
+            ComponentProperty<string>.Named(Component.ValueMember);
+
+        private static readonly ComponentProperty<string> TextProperty =
+            ComponentProperty<string>.Named("text");
+
+        private static readonly ComponentProperty<object> DataSourceProperty =
+            ComponentProperty<object>.Named("dataSource");
+
+        private static readonly ComponentProperty<bool> EnabledProperty =
+            ComponentProperty<bool>.Named("enabled");
+
+        private static readonly ComponentMethod DataBindMethod =
+            ComponentMethod.Named("dataBind");
+
+        private static readonly ComponentMethod FocusInMethod =
+            ComponentMethod.Named("focusIn");
+
+        private static readonly ComponentMethod FocusOutMethod =
+            ComponentMethod.Named("focusOut");
+
+        private static readonly ComponentMethod ShowPopupMethod =
+            ComponentMethod.Named("showPopup");
+
+        private static readonly ComponentMethod HidePopupMethod =
+            ComponentMethod.Named("hidePopup");
+
         /// <summary>Sets the selected value.</summary>
         /// <param name="value">The value to select, or <see langword="null"/> to clear.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionAutoComplete, TModel> SetValue<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self, string? value)
             where TModel : class
-            => self.EmitSet("value", ValueProducer.Literal(value));
+            => self.EmitSet(ValueProperty, ValueProducer.LiteralRaw(value, Shape.String));
 
         /// <summary>Sets the displayed text without changing the underlying value.</summary>
         /// <param name="text">The text to display.</param>
@@ -30,7 +57,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> SetText<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self, string text)
             where TModel : class
-            => self.EmitSet("text", ValueProducer.Literal(text));
+            => self.EmitSet(TextProperty, ValueProducer.Literal(text));
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
@@ -44,7 +71,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.EmitSet("dataSource", ValueProducer.Read(PayloadSource.Event(), sourcePath));
+            return self.EmitSet(DataSourceProperty, ValueProducer.Read(PayloadSource.Event(), sourcePath));
         }
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
@@ -60,7 +87,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.EmitSet("dataSource", ValueProducer.Read(source.Scope, sourcePath));
+            return self.EmitSet(DataSourceProperty, ValueProducer.Read(source.Scope, sourcePath));
         }
 
         /// <summary>
@@ -74,35 +101,35 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> DataBind<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.EmitCall("dataBind");
+            => self.EmitCall(DataBindMethod);
 
         /// <summary>Moves focus into the autocomplete input.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionAutoComplete, TModel> FocusIn<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.EmitCall("focusIn");
+            => self.EmitCall(FocusInMethod);
 
         /// <summary>Removes focus from the autocomplete input.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionAutoComplete, TModel> FocusOut<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.EmitCall("focusOut");
+            => self.EmitCall(FocusOutMethod);
 
         /// <summary>Opens the suggestion popup.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionAutoComplete, TModel> ShowPopup<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.EmitCall("showPopup");
+            => self.EmitCall(ShowPopupMethod);
 
         /// <summary>Closes the suggestion popup.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionAutoComplete, TModel> HidePopup<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.EmitCall("hidePopup");
+            => self.EmitCall(HidePopupMethod);
 
         // NOTE: showSpinner/hideSpinner have no visible effect on SF AutoComplete.
         // refresh() causes focus loss mid-typing, not usable during filtering.
@@ -113,14 +140,14 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAutoComplete, TModel> Enable<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.EmitSet("enabled", ValueProducer.Literal(true));
+            => self.EmitSet(EnabledProperty, ValueProducer.Literal(true));
 
         /// <summary>Disables the autocomplete input, preventing user interaction.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionAutoComplete, TModel> Disable<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            => self.EmitSet("enabled", ValueProducer.Literal(false));
+            => self.EmitSet(EnabledProperty, ValueProducer.Literal(false));
 
         /// <summary>Reads the current selected value for use in conditions or gather.</summary>
         /// <remarks>
@@ -131,6 +158,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.String, "read"); return new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ValueMember); }
+            => self.Read(ValueProperty);
     }
 }

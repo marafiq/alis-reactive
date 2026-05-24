@@ -64,6 +64,23 @@ app.Environment.WebRootFileProvider = new CompositeFileProvider(
     new PhysicalFileProvider(assetDistDir),
     app.Environment.WebRootFileProvider);
 
+// Playwright boot must not depend on CDN availability. Syncfusion's ASP.NET
+// helpers emit scripts that require the global `ej/ejs` object before the
+// reactive runtime boots, so serve the npm package from the local workspace.
+var syncfusionPackageDir = Path.GetFullPath(
+    Path.Combine(app.Environment.ContentRootPath, "..", "node_modules", "@syncfusion", "ej2"));
+if (!Directory.Exists(syncfusionPackageDir))
+{
+    throw new InvalidOperationException(
+        $"Syncfusion browser assets not found at '{syncfusionPackageDir}'. " +
+        "Run 'npm install' from the repo root before starting the sandbox.");
+}
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(syncfusionPackageDir),
+    RequestPath = "/vendor/syncfusion"
+});
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();

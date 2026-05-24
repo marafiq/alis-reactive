@@ -4,263 +4,114 @@ using System.Collections.Generic;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Accumulates JsType, Component, and Behavior registrations during plan construction,
-    /// then snapshots them into an immutable <see cref="PlanModel.Plan"/> via <see cref="BuildPlan"/>.
-    /// Each component gets its own JsType. Members are added on-demand as builders reference them.
+    /// Construction boundary used by the public DSL builders.
+    /// It delegates domain decisions to the plan draft aggregates and only exposes the
+    /// narrow mutation verbs the DSL needs while authoring a plan.
     /// </summary>
     public sealed class PlanBuildContext
     {
-        private readonly string _planId;
-        private readonly string? _partId;
-        private readonly Dictionary<string, JsType> _types = new Dictionary<string, JsType>();
-        private readonly Dictionary<string, Component> _components = new Dictionary<string, Component>();
-        private readonly List<Behavior> _behaviors = new List<Behavior>();
-        private readonly Dictionary<string, ComponentRegistration> _registrations;
-        private readonly HashSet<string> _registeredPlugins = new HashSet<string>();
-        private readonly List<ValidationJob> _validationJobs = new List<ValidationJob>();
+        private readonly PlanIdentity _identity;
+        private readonly JsTypeCatalog _types;
+        private readonly ComponentCatalog _components;
+        private readonly BehaviorGraph _behaviors;
+        private readonly ValidationWorkQueue _validationJobs = new ValidationWorkQueue();
 
         internal PlanBuildContext(
-            string planId, string? partId, Dictionary<string, ComponentRegistration> registrations)
+            PlanIdentity identity,
+            ComponentRegistrationCatalog registrations)
         {
-            _planId = planId;
-            _partId = partId;
-            _registrations = registrations;
+            _identity = identity ?? throw new ArgumentNullException(nameof(identity));
+            _types = new JsTypeCatalog();
+            _components = new ComponentCatalog(_types, registrations);
+            _behaviors = new BehaviorGraph(_components);
         }
 
-        /// <summary>Snapshots the accumulated state into an immutable plan document.</summary>
+        /// <summary>Snapshots the accumulated draft into the serialized plan document.</summary>
         internal Plan BuildPlan() =>
             new Plan(
-                _planId,
-                _partId,
-                new Dictionary<string, JsType>(_types),
-                new Dictionary<string, Component>(_components),
-                new List<Behavior>(_behaviors));
+                _identity,
+                PlanTypes.From(_types.Snapshot()),
+                PlanComponents.From(_components.Snapshot()),
+                PlanBehaviors.From(_behaviors.Snapshot()));
 
         /// <summary>Behaviors collected so far — a read-only view for mid-build inspection.</summary>
-        internal IReadOnlyList<Behavior> Behaviors => _behaviors;
+        internal IReadOnlyList<Behavior> Behaviors => _behaviors.Behaviors;
 
         /// <summary>Gets a component already registered in the plan.</summary>
-        internal Component GetComponent(string key) => _components[key];
+        internal Component GetComponent(ComponentKey key) => _components.Get(key);
 
-        /// <summary>Replaces a registered component (used when enriching it with a container scope).</summary>
-        internal void SetComponent(string key, Component component) => _components[key] = component;
+        /// <summary>Replaces a registered component, used when validation enriches a container scope.</summary>
+        internal void SetComponent(ComponentKey key, Component component) => _components.Set(key, component);
 
         /// <summary>Records that a request declared a validator, to be resolved during Render().</summary>
-        internal void RegisterValidationJob(Request request, Type validatorType) =>
-            _validationJobs.Add(new ValidationJob(request.Url, request.Container, validatorType));
+        internal void RegisterValidationJob(Request request, ComponentId container, Type validatorType) =>
+            _validationJobs.Enqueue(request, container, validatorType);
 
         /// <summary>The validation jobs declared during plan construction.</summary>
-        internal IReadOnlyList<ValidationJob> ValidationJobs => _validationJobs;
+        internal IReadOnlyList<ValidationJob> ValidationJobs => _validationJobs.Jobs;
 
         /// <summary>
         /// Ensures a DOM element is registered as a native component with a JsType.
-        /// Only used by <see cref="Builders.ElementBuilder{TModel}"/> for plain DOM elements.
-        /// Returns the component key for use in Source references.
+        /// Returns the component key for use in source references.
         /// </summary>
-        internal string EnsureElement(string elementId)
-        {
-            if (_components.ContainsKey(elementId))
-                return elementId;
-
-            var typeKey = "native.element." + elementId;
-            if (!_types.ContainsKey(typeKey))
-                _types[typeKey] = new JsType();
-
-            _components[elementId] = Component.Create(elementId, "native", typeKey);
-            return elementId;
-        }
+        internal ComponentKey EnsureElement(string elementId) => _components.EnsureElement(elementId);
 
         /// <summary>
-        /// Ensures a component is registered with the correct vendor.
-        /// Used by <see cref="ComponentRef{TComponent,TModel}"/> which knows
-        /// its vendor from the <see cref="IComponent"/> instance.
+        /// Ensures a component is registered with its vendor, type metadata, and any known input binding.
         /// </summary>
-        internal string EnsureComponent(string componentId, string vendor)
-        {
-            if (_components.TryGetValue(componentId, out var existing))
-            {
-                ValidateVendor(existing, componentId, vendor);
-                EnrichExistingComponent(existing, componentId);
-                return componentId;
-            }
+        internal ComponentKey EnsureComponent(string componentId, string vendor) =>
+            EnsureComponent(componentId, vendor, ComponentContributionIntent.ObjectTarget);
 
-            var typeKey = vendor + "." + componentId;
-            var reg = FindRegistration(componentId);
-
-            if (reg != null)
-            {
-                _types[typeKey] = CreateEnrichedType(reg.ValueMember, reg.Shape);
-            }
-            else if (!_types.ContainsKey(typeKey))
-            {
-                _types[typeKey] = new JsType();
-            }
-
-            _components[componentId] = Component.Create(
-                componentId, vendor, typeKey, reg?.BindingPath, reg?.ValueMember);
-            return componentId;
-        }
-
-        private static void ValidateVendor(Component existing, string componentId, string vendor)
-        {
-            if (existing.Vendor != vendor)
-                throw new InvalidOperationException(
-                    $"Component '{componentId}' registered as vendor '{existing.Vendor}' " +
-                    $"but re-referenced as '{vendor}'. A component cannot change vendor.");
-        }
-
-        private void EnrichExistingComponent(Component existing, string componentId)
-        {
-            var reg = FindRegistration(componentId);
-            if (reg == null) return;
-
-            var jsType = _types[existing.Type];
-            _components[componentId] = existing.WithBindingIfAbsent(reg.BindingPath, reg.ValueMember);
-            EnrichTypeIfNeeded(jsType, reg.ValueMember, reg.Shape);
-        }
+        /// <summary>
+        /// Ensures a component is registered with the contribution intent that caused the reference.
+        /// </summary>
+        internal ComponentKey EnsureComponent(
+            string componentId,
+            string vendor,
+            ComponentContributionIntent contribution) =>
+            _components.EnsureComponent(componentId, vendor, contribution);
 
         /// <summary>
         /// Searches the registration map for a registration whose ComponentId matches.
-        /// The map is keyed by binding path, but componentId is the generated HTML id.
         /// </summary>
-        internal bool TryFindRegistrationById(string componentId, out ComponentRegistration? registration)
-        {
-            registration = FindRegistration(componentId);
-            return registration != null;
-        }
-
-        private ComponentRegistration? FindRegistration(string componentId)
-        {
-            if (_registrations.TryGetValue(componentId, out var reg))
-                return reg;
-
-            // _registrations is a live map the caller keeps populating after this context
-            // is constructed, so resolve by ComponentId against its current contents.
-            foreach (var kvp in _registrations)
-            {
-                if (kvp.Value.ComponentId == componentId)
-                    return kvp.Value;
-            }
-
-            return null;
-        }
+        internal ComponentRegistrationMatch FindRegistrationById(string componentId) =>
+            _components.FindRegistrationById(componentId);
 
         /// <summary>
-        /// Ensures a registered input component exists in the plan with its JsType.
-        /// Returns the component key.
+        /// Ensures a registered input component exists in the plan with readable value metadata.
         /// </summary>
-        internal string EnsureInputComponent(string componentId, string vendor, string valueMember, Shape shape, string? bindingPath = null)
-        {
-            if (_components.TryGetValue(componentId, out var existing))
-            {
-                EnrichTypeIfNeeded(_types[existing.Type], valueMember, shape);
-                _components[componentId] = existing.WithBindingIfAbsent(bindingPath, valueMember);
-                return componentId;
-            }
+        internal ComponentKey EnsureInputComponent(InputComponentPlanBinding binding) =>
+            _components.EnsureInputComponent(binding);
 
-            var typeKey = vendor + "." + componentId;
-            _types[typeKey] = CreateEnrichedType(valueMember, shape);
+        /// <summary>Ensures a property member exists on a component's JsType.</summary>
+        internal void EnsureProperty(ComponentKey componentKey, JsPropertyContract contract) =>
+            _components.EnsureProperty(componentKey, contract);
 
-            _components[componentId] = Component.Create(
-                componentId, vendor, typeKey, bindingPath, valueMember);
-            return componentId;
-        }
+        /// <summary>Ensures a method member exists on a component's JsType.</summary>
+        internal JsMethod EnsureMethod(ComponentKey componentKey, JsMethodContract contract) =>
+            _components.EnsureMethod(componentKey, contract);
+
+        /// <summary>Registers a plugin contract. Throws on duplicate registration.</summary>
+        internal void RegisterPlugin(PluginContract contract) =>
+            _types.RegisterPlugin(contract);
+
+        /// <summary>Ensures a plugin method exists in the plan's JsType registry.</summary>
+        internal MethodSignature EnsurePluginMethod(PluginMethodRequirement requirement) =>
+            _types.EnsurePluginMethod(requirement);
+
+        /// <summary>Ensures a plugin property exists in the plan's JsType registry.</summary>
+        internal void EnsurePluginProperty(PluginPropertyRequirement requirement) =>
+            _types.EnsurePluginProperty(requirement);
 
         /// <summary>
-        /// Ensures a property member exists on a component's JsType.
-        /// Used by ElementBuilder when setting text/html/hidden.
-        /// </summary>
-        internal void EnsureProperty(string componentKey, string memberName, string pathExpr, Shape shape, string access)
-        {
-            var jsType = GetJsType(componentKey);
-            jsType.WithProperty(memberName, Path.Parse(pathExpr), shape, access);
-        }
-
-        /// <summary>
-        /// Ensures a method member exists on a component's JsType.
-        /// Used by ElementBuilder for classList.add/remove/toggle, setAttribute, removeAttribute.
-        /// </summary>
-        internal void EnsureMethod(string componentKey, string memberName, string pathExpr, List<Shape>? args = null, Shape? returns = null)
-        {
-            var jsType = GetJsType(componentKey);
-            jsType.WithMethod(memberName, Path.Parse(pathExpr), args, returns);
-        }
-
-        /// <summary>
-        /// Ensures an event exists on a component's JsType.
-        /// </summary>
-        internal void EnsureEvent(string componentKey, string eventName, string channel, string? payloadType = null)
-        {
-            var jsType = GetJsType(componentKey);
-            jsType.WithEvent(eventName, channel, payloadType);
-        }
-
-        /// <summary>Registers a plugin's JsType. Throws on duplicate registration.</summary>
-        internal void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder> configure)
-        {
-            if (!_registeredPlugins.Add(pluginName))
-                throw new InvalidOperationException($"Plugin '{pluginName}' is already registered.");
-            var jsType = new JsType();
-            _types["plugin." + pluginName] = jsType;
-            configure(new Builders.PluginTypeBuilder(jsType));
-        }
-
-        /// <summary>Ensures a plugin method exists in the plan's JsType registry.
-        /// Auto-creates the JsType on first use. Methods only.</summary>
-        internal void EnsurePluginMethod(string pluginName, string member, Shape? returns = null)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName))
-                throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-            if (string.IsNullOrWhiteSpace(member))
-                throw new System.ArgumentException("Method name required.", nameof(member));
-            var typeKey = "plugin." + pluginName;
-            if (!_types.ContainsKey(typeKey))
-                throw new System.InvalidOperationException(
-                    $"Plugin '{pluginName}' is not registered. Call plan.RegisterPlugin(\"{pluginName}\", ...) first.");
-            _types[typeKey].WithMethod(member, Path.Parse(member), returns: returns);
-        }
-
-        private JsType GetJsType(string componentKey)
-        {
-            var component = _components[componentKey];
-            return _types[component.Type];
-        }
-
-        private static JsType CreateEnrichedType(string valueMember, Shape shape)
-        {
-            var jsType = new JsType();
-            EnrichTypeIfNeeded(jsType, valueMember, shape);
-            return jsType;
-        }
-
-        private static void EnrichTypeIfNeeded(JsType jsType, string valueMember, Shape shape)
-        {
-            var valuePath = Path.Parse(valueMember);
-            jsType.WithProperty(valueMember, valuePath, shape, "read");
-            // Always register "value" as an alias so parent validators can read any
-            // input component uniformly via member:"value" — even checkbox ("checked")
-            // or switch ("checked"). The alias points to the same path with the same shape.
-            if (valueMember != "value")
-                jsType.WithProperty("value", valuePath, shape, "read");
-        }
-
-        /// <summary>
-        /// Registers all input components from the ReactivePlan's ComponentsMap into the plan.
+        /// Registers all input components from the ReactivePlan's input component onboarding catalog into the plan.
         /// Called during Render().
         /// </summary>
-        internal void RegisterInputComponents()
-        {
-            foreach (var kvp in _registrations)
-            {
-                var reg = kvp.Value;
-                EnsureInputComponent(reg.ComponentId, reg.Vendor, reg.ValueMember, reg.Shape, kvp.Key);
-            }
-        }
+        internal void RegisterInputComponents() => _components.RegisterInputComponents();
 
-        /// <summary>
-        /// Returns all registered input components for IncludeAll expansion at build time.
-        /// </summary>
-        internal IReadOnlyDictionary<string, ComponentRegistration> GetRegisteredComponents() => _registrations;
+        /// <summary>Returns all registered input components for IncludeAll expansion at build time.</summary>
+        internal IReadOnlyDictionary<string, ComponentRegistration> GetRegisteredComponents() =>
+            _components.RegisteredInputs;
 
         /// <summary>
         /// Wires a component event to a set of reactive behaviors.
@@ -274,23 +125,6 @@ namespace Alis.Reactive.PlanModel
                 AddBehavior(Behavior.On(trigger, reaction));
         }
 
-        internal void AddBehavior(Behavior behavior)
-        {
-            RegisterEventMetadataForTrigger(behavior.StartsWhen);
-            _behaviors.Add(behavior);
-        }
-
-        /// <summary>
-        /// A component-event trigger needs its <see cref="JsEvent"/> in the plan so the
-        /// runtime carries the event metadata. Covers all 26 Reactive extensions.
-        /// </summary>
-        private void RegisterEventMetadataForTrigger(StartsWhen trigger)
-        {
-            if (trigger is ComponentEventTrigger cet
-                && _components.ContainsKey(cet.Component))
-            {
-                EnsureEvent(cet.Component, cet.Event, cet.Event);
-            }
-        }
+        internal void AddBehavior(Behavior behavior) => _behaviors.Add(behavior);
     }
 }

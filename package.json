@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "build:all": "npm run build -w Alis.Reactive.Assets && npm run build -w Alis.Reactive.SandboxApp",
+    "generate:plan-types": "npm run generate:plan-types -w Alis.Reactive.Assets",
     "build:runtime": "npm run build:runtime -w Alis.Reactive.Assets",
     "build:design-system": "npm run build:design-system -w Alis.Reactive.Assets",
     "build:fusion": "npm run build:fusion -w Alis.Reactive.Assets",

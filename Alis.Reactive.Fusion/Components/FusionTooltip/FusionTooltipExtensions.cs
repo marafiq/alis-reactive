@@ -12,6 +12,15 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionTooltipExtensions
     {
+        private static readonly ComponentMethod OpenMethod =
+            ComponentMethod.Named("open");
+
+        private static readonly ComponentMethod CloseMethod =
+            ComponentMethod.Named("close");
+
+        private static readonly ComponentMethod RefreshMethod =
+            ComponentMethod.Named("refresh");
+
         /// <summary>
         /// Opens the tooltip programmatically on the target element.
         /// Runtime: ej2.open(targetElement)
@@ -19,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionTooltip, TModel> Open<TModel>(
             this ComponentRef<FusionTooltip, TModel> self)
             where TModel : class
-            => self.EmitCall("open", new System.Collections.Generic.List<ValueProducer>());
+            => self.EmitCall(OpenMethod);
 
         /// <summary>
         /// Closes the tooltip.
@@ -28,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionTooltip, TModel> Close<TModel>(
             this ComponentRef<FusionTooltip, TModel> self)
             where TModel : class
-            => self.EmitCall("close", new System.Collections.Generic.List<ValueProducer>());
+            => self.EmitCall(CloseMethod);
 
         /// <summary>
         /// Refreshes the tooltip position and content.
@@ -37,6 +46,6 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionTooltip, TModel> Refresh<TModel>(
             this ComponentRef<FusionTooltip, TModel> self)
             where TModel : class
-            => self.EmitCall("refresh", new System.Collections.Generic.List<ValueProducer>());
+            => self.EmitCall(RefreshMethod);
     }
 }

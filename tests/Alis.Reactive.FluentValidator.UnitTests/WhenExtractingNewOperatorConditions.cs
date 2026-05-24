@@ -1,3 +1,4 @@
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator.UnitTests;
@@ -14,11 +15,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldGtValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
-        var when = (FieldCompare)jobTitle.Rules[0].When!;
+        var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Age"));
         Assert.That(when.Op, Is.EqualTo("gt"));
-        Assert.That(when.Value, Is.EqualTo(18));
+        Assert.That(when.OperandValue(), Is.EqualTo(18));
     }
 
     [Test]
@@ -26,11 +27,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldGteValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
-        var when = (FieldCompare)email.Rules[0].When!;
+        var when = (FieldCompare)email.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Salary"));
         Assert.That(when.Op, Is.EqualTo("gte"));
-        Assert.That(when.Value, Is.EqualTo(50000m));
+        Assert.That(when.OperandValue(), Is.EqualTo(50000m));
     }
 
     [Test]
@@ -38,11 +39,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldLtValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
-        var when = (FieldCompare)name.Rules[0].When!;
+        var when = (FieldCompare)name.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Age"));
         Assert.That(when.Op, Is.EqualTo("lt"));
-        Assert.That(when.Value, Is.EqualTo(18));
+        Assert.That(when.OperandValue(), Is.EqualTo(18));
     }
 
     [Test]
@@ -50,11 +51,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldLteValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
-        var when = (FieldCompare)notes.Rules[0].When!;
+        var when = (FieldCompare)notes.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Salary"));
         Assert.That(when.Op, Is.EqualTo("lte"));
-        Assert.That(when.Value, Is.EqualTo(0m));
+        Assert.That(when.OperandValue(), Is.EqualTo(0m));
     }
 
     // ── Presence operators ─────────────────────────────────────────────────
@@ -64,11 +65,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldNullValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
-        var when = (FieldCompare)notes.Rules[0].When!;
+        var when = (FieldCompare)notes.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("MiddleName"));
         Assert.That(when.Op, Is.EqualTo("is-null"));
-        Assert.That(when.Value, Is.Null);
+        Assert.That(when.Operand, Is.InstanceOf<NoFieldComparisonOperand>());
     }
 
     [Test]
@@ -76,11 +77,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldNotNullValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
-        var when = (FieldCompare)name.Rules[0].When!;
+        var when = (FieldCompare)name.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("MiddleName"));
         Assert.That(when.Op, Is.EqualTo("not-null"));
-        Assert.That(when.Value, Is.Null);
+        Assert.That(when.Operand, Is.InstanceOf<NoFieldComparisonOperand>());
     }
 
     [Test]
@@ -88,11 +89,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldEmptyValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
-        var when = (FieldCompare)phone.Rules[0].When!;
+        var when = (FieldCompare)phone.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Email"));
         Assert.That(when.Op, Is.EqualTo("is-empty"));
-        Assert.That(when.Value, Is.Null);
+        Assert.That(when.Operand, Is.InstanceOf<NoFieldComparisonOperand>());
     }
 
     [Test]
@@ -100,11 +101,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldNotEmptyValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
-        var when = (FieldCompare)name.Rules[0].When!;
+        var when = (FieldCompare)name.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Notes"));
         Assert.That(when.Op, Is.EqualTo("not-empty"));
-        Assert.That(when.Value, Is.Null);
+        Assert.That(when.Operand, Is.InstanceOf<NoFieldComparisonOperand>());
     }
 
     // ── Membership operators ───────────────────────────────────────────────
@@ -114,12 +115,12 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldInValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
-        var when = (FieldCompare)notes.Rules[0].When!;
+        var when = (FieldCompare)notes.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("CareLevel"));
         Assert.That(when.Op, Is.EqualTo("in"));
-        Assert.That(when.Value, Is.InstanceOf<object[]>());
-        var values = (object[])when.Value!;
+        Assert.That(when.OperandValue(), Is.InstanceOf<object[]>());
+        var values = (object[])when.OperandValue()!;
         Assert.That(values, Is.EqualTo(new object[] { "memory-care", "skilled-nursing" }));
     }
 
@@ -128,12 +129,12 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldNotInValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
-        var when = (FieldCompare)phone.Rules[0].When!;
+        var when = (FieldCompare)phone.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("CareLevel"));
         Assert.That(when.Op, Is.EqualTo("not-in"));
-        Assert.That(when.Value, Is.InstanceOf<object[]>());
-        var values = (object[])when.Value!;
+        Assert.That(when.OperandValue(), Is.InstanceOf<object[]>());
+        var values = (object[])when.OperandValue()!;
         Assert.That(values, Is.EqualTo(new object[] { "independent", "assisted" }));
     }
 
@@ -142,14 +143,30 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldBetweenValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
-        var when = (FieldCompare)jobTitle.Rules[0].When!;
+        var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Age"));
         Assert.That(when.Op, Is.EqualTo("between"));
-        Assert.That(when.Value, Is.InstanceOf<object[]>());
-        var range = (object[])when.Value!;
+        Assert.That(when.OperandValue(), Is.InstanceOf<object[]>());
+        var range = (object[])when.OperandValue()!;
         Assert.That(range[0], Is.EqualTo(18));
         Assert.That(range[1], Is.EqualTo(65));
+
+        var planCondition = ResolveWithNumberShape(when);
+        AssertRightArrayOperandShape(planCondition, Shape.ArrayOf(Shape.Number));
+    }
+
+    [Test]
+    public void WhenFieldBetween_keeps_array_operand_shape_when_field_shape_is_unspecified()
+    {
+        var fields = _adapter.ExtractRules(typeof(WhenFieldBetweenValidator), "form");
+        var jobTitle = fields.First(f => f.FieldName == "JobTitle");
+        var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
+
+        var planCondition = ResolveWithShape(when, Shape.None);
+
+        Assert.That(planCondition.Shape, Is.EqualTo(Shape.None));
+        AssertRightArrayOperandShape(planCondition, Shape.ArrayOf(Shape.Any));
     }
 
     // ── Text operators ─────────────────────────────────────────────────────
@@ -159,11 +176,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldContainsValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
-        var when = (FieldCompare)phone.Rules[0].When!;
+        var when = (FieldCompare)phone.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Notes"));
         Assert.That(when.Op, Is.EqualTo("contains"));
-        Assert.That(when.Value, Is.EqualTo("urgent"));
+        Assert.That(when.OperandValue(), Is.EqualTo("urgent"));
     }
 
     [Test]
@@ -171,11 +188,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldStartsWithValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
-        var when = (FieldCompare)email.Rules[0].When!;
+        var when = (FieldCompare)email.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Name"));
         Assert.That(when.Op, Is.EqualTo("starts-with"));
-        Assert.That(when.Value, Is.EqualTo("Dr."));
+        Assert.That(when.OperandValue(), Is.EqualTo("Dr."));
     }
 
     [Test]
@@ -183,11 +200,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldEndsWithValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
-        var when = (FieldCompare)jobTitle.Rules[0].When!;
+        var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Email"));
         Assert.That(when.Op, Is.EqualTo("ends-with"));
-        Assert.That(when.Value, Is.EqualTo("@hospital.org"));
+        Assert.That(when.OperandValue(), Is.EqualTo("@hospital.org"));
     }
 
     // ── Condition source fields included ───────────────────────────────────
@@ -231,11 +248,11 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldMatchesValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
-        var when = (FieldCompare)name.Rules[0].When!;
+        var when = (FieldCompare)name.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Phone"));
         Assert.That(when.Op, Is.EqualTo("matches"));
-        Assert.That(when.Value, Is.EqualTo(@"^\d{3}-"));
+        Assert.That(when.OperandValue(), Is.EqualTo(@"^\d{3}-"));
     }
 
     [Test]
@@ -243,11 +260,21 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldMinLengthValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
-        var when = (FieldCompare)email.Rules[0].When!;
+        var when = (FieldCompare)email.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Notes"));
         Assert.That(when.Op, Is.EqualTo("min-length"));
-        Assert.That(when.Value, Is.EqualTo(10));
+        Assert.That(when.OperandValue(), Is.EqualTo(10));
+    }
+
+    [Test]
+    public void WhenFieldMinLength_rejects_negative_lengths_before_extraction()
+    {
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new NegativeWhenFieldMinLengthValidator());
+
+        Assert.That(exception!.ParamName, Is.EqualTo("minLength"));
+        Assert.That(exception.Message, Does.Contain("zero or greater"));
     }
 
     [Test]
@@ -255,10 +282,51 @@ public class WhenExtractingNewOperatorConditions
     {
         var fields = _adapter.ExtractRules(typeof(WhenFieldArrayContainsValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
-        var when = (FieldCompare)phone.Rules[0].When!;
+        var when = (FieldCompare)phone.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Tags"));
         Assert.That(when.Op, Is.EqualTo("array-contains"));
-        Assert.That(when.Value, Is.EqualTo("urgent"));
+        Assert.That(when.OperandValue(), Is.EqualTo("urgent"));
+
+        var planCondition = ResolveWithArrayShape(when);
+        Assert.That(planCondition.Shape, Is.EqualTo(Shape.ArrayOf(Shape.String)));
+        Assert.That(planCondition.ItemShape, Is.EqualTo(Shape.String));
+    }
+
+    private static CompareCondition ResolveWithArrayShape(FieldCompare when)
+    {
+        var arrayShape = Shape.ArrayOf(Shape.String);
+        var binding = new FieldConditionPlanBinding(_ =>
+            FieldComparisonTarget.ForComponentValue(
+                ValueProducer.LiteralRaw(new[] { "routine", "urgent" }, arrayShape),
+                arrayShape));
+
+        return (CompareCondition)when.ToPlanCondition(binding);
+    }
+
+    private static CompareCondition ResolveWithNumberShape(FieldCompare when)
+    {
+        return ResolveWithShape(when, Shape.Number);
+    }
+
+    private static CompareCondition ResolveWithShape(FieldCompare when, Shape shape)
+    {
+        var binding = new FieldConditionPlanBinding(_ =>
+            FieldComparisonTarget.ForComponentValue(
+                ValueProducer.LiteralRaw(42, shape),
+                shape));
+
+        return (CompareCondition)when.ToPlanCondition(binding);
+    }
+
+    private static void AssertRightArrayOperandShape(CompareCondition condition, Shape expected)
+    {
+        Assert.That(condition.RightOperand, Is.InstanceOf<PresentComparisonRightOperand>());
+
+        var right = (PresentComparisonRightOperand)condition.RightOperand;
+        Assert.That(right.Value, Is.InstanceOf<ArrayProducer>());
+
+        var array = (ArrayProducer)right.Value;
+        Assert.That(array.Shape, Is.EqualTo(expected));
     }
 }

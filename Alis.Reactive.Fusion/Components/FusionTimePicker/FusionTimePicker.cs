@@ -9,6 +9,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionTimePicker : FusionComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new FusionTimePicker(), "timepicker");
+
         /// <inheritdoc />
         public string ValueMember => "value";
     }

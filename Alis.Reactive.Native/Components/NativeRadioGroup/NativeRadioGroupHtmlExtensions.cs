@@ -1,5 +1,4 @@
 using System;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
@@ -10,8 +9,6 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeRadioGroupHtmlExtensions
     {
-        private static readonly NativeRadioGroup _component = new NativeRadioGroup();
-
         /// <summary>
         /// Creates a <see cref="NativeRadioGroupBuilder{TModel,TProp}"/> inside the field wrapper,
         /// registers the component in the plan, and renders the radio group.
@@ -25,11 +22,13 @@ namespace Alis.Reactive.Native.Components
             Action<NativeRadioGroupBuilder<TModel, TProp>> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ValueMember, "radiogroup",
-                Shape.FromClrType(typeof(TProp))));
+            var registration = global::Alis.Reactive.Native.Components.NativeRadioGroup.Registration;
+            setup.RegisterInputComponent(registration);
 
-            var builder = new NativeRadioGroupBuilder<TModel, TProp>(setup.Helper, setup.Expression);
+            var builder = new NativeRadioGroupBuilder<TModel, TProp>(
+                setup.Helper,
+                setup.Expression,
+                setup.RenderTarget);
             build(builder);
             setup.Render(builder);
         }

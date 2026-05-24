@@ -2,7 +2,17 @@
 // Extracts any <script data-reactive-plan> elements and merges them.
 
 import type { Plan } from "../types";
-import { mergePlan } from "../lifecycle/boot";
+import { loadPartialSlot, mergePlan, unloadPartialSlot } from "../lifecycle/boot";
+
+interface SyncfusionBase {
+  append(nodes: ChildNode[], target: HTMLElement, shouldClone?: boolean): void;
+}
+
+interface SyncfusionGlobal {
+  readonly ej?: {
+    readonly base?: SyncfusionBase;
+  };
+}
 
 /**
  * Inject HTML into a container, using ej.base.append when available (SF component init).
@@ -23,18 +33,24 @@ export function injectHtml(container: HTMLElement, html: string): void {
   }
 
   container.innerHTML = "";
-  const ej = (globalThis as any).ej;
+  const ej = (globalThis as SyncfusionGlobal).ej;
   if (ej?.base?.append) {
     ej.base.append(Array.from(temp.childNodes), container, true);
   } else {
     container.append(...Array.from(temp.childNodes));
   }
 
-  // Merge extracted plans into booted plans (partId = container ID for dedup on reload)
-  for (const plan of plans) {
-    if (container.id) {
-      plan.partId = container.id;
+  const containerIdentifiesPartialSlot = container.id.length > 0;
+  if (containerIdentifiesPartialSlot) {
+    if (plans.length === 0) {
+      unloadPartialSlot(container.id);
+    } else {
+      loadPartialSlot(container.id, plans);
     }
+    return;
+  }
+
+  for (const plan of plans) {
     mergePlan(plan);
   }
 }

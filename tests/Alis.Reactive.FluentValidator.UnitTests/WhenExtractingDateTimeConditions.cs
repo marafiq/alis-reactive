@@ -3,9 +3,8 @@ using Alis.Reactive.Validation;
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 /// <summary>
-/// WhenField<DateTime> and WhenFieldNot<DateTime> serialize condition values as Unix ms
-/// (DateTimeOffset.ToUnixTimeMilliseconds) so that TS domConditionReader can produce
-/// matching Unix ms strings via Date.getTime() for eq/neq comparison.
+/// WhenField<DateTime> and WhenFieldNot<DateTime> serialize condition values
+/// using the same date-shaped plan literals as validation constraints.
 /// </summary>
 [TestFixture]
 public class WhenExtractingDateTimeConditions
@@ -13,46 +12,40 @@ public class WhenExtractingDateTimeConditions
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
-    public void WhenField_DateTime_eq_serializes_value_as_unix_ms()
+    public void WhenField_DateTime_eq_serializes_value_as_date_literal()
     {
         var desc = _adapter.ExtractRules(typeof(DateTimeConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var nameField = desc.First(f => f.FieldName == "Name");
         Assert.That(nameField.Rules, Has.Count.EqualTo(1));
-        Assert.That(nameField.Rules[0].When, Is.Not.Null);
-        var when = (FieldCompare)nameField.Rules[0].When!;
+        Assert.That(nameField.Rules[0].Condition(), Is.Not.Null);
+        var when = (FieldCompare)nameField.Rules[0].Condition()!;
         Assert.That(when.Field, Is.EqualTo("AdmissionDate"));
         Assert.That(when.Op, Is.EqualTo("eq"));
 
-        // Value must be Unix ms (long), NOT an ISO string
-        var condValue = when.Value;
-        Assert.That(condValue, Is.TypeOf<long>(),
-            "DateTime condition value must be serialized as Unix ms (long)");
-
-        // Verify the actual timestamp: 2026-07-01T00:00:00Z
-        var expected = new DateTimeOffset(2026, 7, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds();
-        Assert.That(condValue, Is.EqualTo(expected));
+        var condValue = when.OperandValue();
+        Assert.That(condValue, Is.TypeOf<string>(),
+            "DateTime condition value must use the date-shaped plan literal format");
+        Assert.That(condValue, Is.EqualTo("2026-07-01"));
     }
 
     [Test]
-    public void WhenFieldNot_DateTime_neq_serializes_value_as_unix_ms()
+    public void WhenFieldNot_DateTime_neq_serializes_value_as_date_literal()
     {
         var desc = _adapter.ExtractRules(typeof(DateTimeNeqConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var scoreField = desc.First(f => f.FieldName == "Score");
-        Assert.That(scoreField.Rules[0].When, Is.Not.Null);
-        var neqWhen = (FieldCompare)scoreField.Rules[0].When!;
+        Assert.That(scoreField.Rules[0].Condition(), Is.Not.Null);
+        var neqWhen = (FieldCompare)scoreField.Rules[0].Condition()!;
         Assert.That(neqWhen.Field, Is.EqualTo("AdmissionDate"));
         Assert.That(neqWhen.Op, Is.EqualTo("neq"));
 
-        var condValue = neqWhen.Value;
-        Assert.That(condValue, Is.TypeOf<long>(),
-            "DateTime condition value must be serialized as Unix ms (long)");
-
-        var expected = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds();
-        Assert.That(condValue, Is.EqualTo(expected));
+        var condValue = neqWhen.OperandValue();
+        Assert.That(condValue, Is.TypeOf<string>(),
+            "DateTime condition value must use the date-shaped plan literal format");
+        Assert.That(condValue, Is.EqualTo("2026-01-01"));
     }
 
     [Test]
@@ -63,10 +56,10 @@ public class WhenExtractingDateTimeConditions
 
         Assert.That(desc, Is.Not.Null);
         var emailField = desc.First(f => f.FieldName == "Email");
-        var condition = emailField.Rules[0].When;
+        var condition = emailField.Rules[0].Condition();
         Assert.That(condition, Is.Not.Null);
         var strWhen = (FieldCompare)condition!;
-        Assert.That(strWhen.Value, Is.EqualTo("Independent"),
+        Assert.That(strWhen.OperandValue(), Is.EqualTo("Independent"),
             "String condition values must remain as strings, not converted to Unix ms");
     }
 }

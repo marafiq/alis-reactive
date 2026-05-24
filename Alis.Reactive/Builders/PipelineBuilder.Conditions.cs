@@ -13,7 +13,7 @@ namespace Alis.Reactive.Builders
             Expression<Func<TPayload, TProp>> path)
         {
             FlushPendingConditionIfNeeded();
-            SetMode(PipelineMode.Conditional);
+            _draft.BeginConditional();
 
             var source = new EventArgSource<TPayload, TProp>(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
@@ -26,7 +26,7 @@ namespace Alis.Reactive.Builders
             where TPayload : class
         {
             FlushPendingConditionIfNeeded();
-            SetMode(PipelineMode.Conditional);
+            _draft.BeginConditional();
 
             var source = responseBody.Read(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
@@ -36,7 +36,7 @@ namespace Alis.Reactive.Builders
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
             FlushPendingConditionIfNeeded();
-            SetMode(PipelineMode.Conditional);
+            _draft.BeginConditional();
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
@@ -45,15 +45,14 @@ namespace Alis.Reactive.Builders
         public GuardBuilder<TModel> Confirm(string message)
         {
             FlushPendingConditionIfNeeded();
-            SetMode(PipelineMode.Conditional);
+            _draft.BeginConditional();
 
             return new GuardBuilder<TModel>(Condition.Confirm(message), this);
         }
 
         private void FlushPendingConditionIfNeeded()
         {
-            var hasPendingCondition = ConditionalBranches != null && ConditionalBranches.Count > 0;
-            if (hasPendingCondition)
+            if (_draft.HasPendingCondition)
                 FlushSegment();
         }
     }

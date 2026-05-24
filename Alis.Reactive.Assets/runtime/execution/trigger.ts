@@ -1,10 +1,12 @@
-import type { Plan, Reaction, StartsWhen, ExecContext } from "../types";
-import { resolveComponent, getJsType, wireEvent } from "../resolution/resolver";
-import { executeReaction } from "./execute";
+import type { Plan, Reaction, StartsWhen } from "../types";
+import { wireEvent } from "../resolution/resolver";
+import { RuntimePlan } from "../domain/runtime-plan";
+import { executeReaction, ReactionCompletion } from "./execute";
 import { wireServerPush } from "./server-push";
 import { wireSignalR } from "./signalr";
 import { assertNever } from "../core/assert-never";
 import { scope } from "../core/trace";
+import { ExecutionContext } from "../domain/execution-context";
 
 const log = scope("trigger");
 
@@ -15,12 +17,11 @@ const log = scope("trigger");
  * (set, call, branch with compare conditions) — required so SF event
  * mutations like args.cancel are visible when SF checks them after return.
  */
-function runReaction(reaction: Reaction, plan: Plan, ctx: ExecContext, source: string): void {
+function runReaction(reaction: Reaction, plan: Plan, context: ExecutionContext, source: string): void {
   try {
-    const result = executeReaction(reaction, plan, ctx);
-    if (result instanceof Promise) {
-      result.catch(err => log.error("reaction.failed", { source, sync: false, error: String(err) }));
-    }
+    ReactionCompletion
+      .from(executeReaction(reaction, plan, context.raw))
+      .catchAsync(err => log.error("reaction.failed", { source, sync: false, error: String(err) }));
   } catch (err) {
     log.error("reaction.failed", { source, sync: true, error: String(err) });
   }
@@ -32,16 +33,16 @@ export function wireBehavior(
   plan: Plan,
   signal?: AbortSignal
 ): void {
-  const opts: AddEventListenerOptions | undefined = signal ? { signal } : undefined;
+  const opts = ListenerOptions.from(signal);
 
   switch (trigger.kind) {
     case "page-ready":
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {
-          runReaction(reaction, plan, {}, "page-ready");
+          runReaction(reaction, plan, ExecutionContext.empty(), "page-ready");
         }, opts);
       } else {
-        runReaction(reaction, plan, {}, "page-ready");
+        runReaction(reaction, plan, ExecutionContext.empty(), "page-ready");
       }
       break;
 
@@ -49,29 +50,28 @@ export function wireBehavior(
       const source = `document-event:${trigger.event}`;
       log.debug("document-event.listening", { event: trigger.event });
       document.addEventListener(trigger.event, (e: Event) => {
-        const ctx: ExecContext = { event: (e as CustomEvent).detail ?? e };
-        runReaction(reaction, plan, ctx, source);
+        const context = ExecutionContext.event(DocumentEventPayload.from(e));
+        runReaction(reaction, plan, context, source);
       }, opts);
       break;
     }
 
     case "component-event": {
-      const comp = plan.components[trigger.component];
-      if (!comp) {
+      const component = RuntimePlan.from(plan).components.find(trigger.component);
+      if (!component) {
         log.error("trigger.component-not-found", { component: trigger.component, event: trigger.event });
         throw new Error(`[alis] trigger component not found: ${trigger.component}`);
       }
 
-      const jsType = getJsType(plan, trigger.component);
-      const eventDef = jsType.events[trigger.event];
-      const channel = eventDef?.channel ?? trigger.event;
+      const eventDef = component.jsType().events[trigger.event];
+      const channel = ComponentEventChannel.from(trigger.event, eventDef?.channel).value;
       const source = `component-event:${trigger.component}:${trigger.event}`;
 
       log.debug("component-event.listening", { component: trigger.component, event: trigger.event, channel });
 
       wireEvent(plan, trigger.component, channel, (eventData) => {
-        const ctx: ExecContext = { event: eventData };
-        runReaction(reaction, plan, ctx, source);
+        const context = ExecutionContext.event(eventData);
+        runReaction(reaction, plan, context, source);
       }, opts);
       break;
     }
@@ -86,5 +86,33 @@ export function wireBehavior(
 
     default:
       assertNever(trigger, "trigger kind");
+  }
+}
+
+class ListenerOptions {
+  static from(signal: AbortSignal | undefined): AddEventListenerOptions | undefined {
+    if (signal === undefined) return undefined;
+
+    return { signal };
+  }
+}
+
+class DocumentEventPayload {
+  static from(event: Event): unknown {
+    const detail = (event as CustomEvent).detail;
+    const eventCarriesDetail = detail !== null && detail !== undefined;
+    if (eventCarriesDetail) return detail;
+
+    return event;
+  }
+}
+
+class ComponentEventChannel {
+  private constructor(readonly value: string) {}
+
+  static from(eventName: string, declaredChannel: string | undefined): ComponentEventChannel {
+    if (declaredChannel === undefined) return new ComponentEventChannel(eventName);
+
+    return new ComponentEventChannel(declaredChannel);
   }
 }

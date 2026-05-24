@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPackable>false</IsPackable>
+        <RepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\'))</RepositoryRoot>
+        <BuildReactiveBrowserAssets Condition="'$(BuildReactiveBrowserAssets)' == ''">true</BuildReactiveBrowserAssets>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,5 +20,40 @@
         <ProjectReference Include="../Alis.Reactive.Playwright.Extensions/Alis.Reactive.Playwright.Extensions.csproj" />
         <ProjectReference Include="../../Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)package.json" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)package-lock.json" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive.Assets\package.json" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive.Assets\*.mjs" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive.Assets\*.config.ts" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive.Assets\runtime\**\*.*" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive.Assets\design-system\**\*.*" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive.Assets\fusion\**\*.*" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive\PlanModel\**\*.cs" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)tools\PlanTypeGenerator\**\*.*" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive.SandboxApp\package.json" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive.SandboxApp\*.mjs" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive.SandboxApp\*.config.ts" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive.SandboxApp\Scripts\**\*.*" />
+        <ReactiveBrowserAssetInput Include="$(RepositoryRoot)Alis.Reactive.SandboxApp\Styles\**\*.*" />
+        <ReactiveBrowserAssetOutput Include="$(RepositoryRoot)Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js" />
+        <ReactiveBrowserAssetOutput Include="$(RepositoryRoot)Alis.Reactive.Assets\dist\css\design-system.dev.css" />
+        <ReactiveBrowserAssetOutput Include="$(RepositoryRoot)Alis.Reactive.Assets\dist\css\syncfusion.dev.css" />
+        <ReactiveBrowserAssetOutput Include="$(RepositoryRoot)Alis.Reactive.SandboxApp\wwwroot\css\sandbox.css" />
+        <ReactiveBrowserAssetOutput Include="$(RepositoryRoot)Alis.Reactive.SandboxApp\wwwroot\js\sandbox-plugins.js" />
+    </ItemGroup>
+
+    <Target Name="BuildReactiveBrowserAssetsForPlaywright"
+            BeforeTargets="VSTest"
+            Condition="'$(BuildReactiveBrowserAssets)' == 'true'"
+            Inputs="@(ReactiveBrowserAssetInput)"
+            Outputs="@(ReactiveBrowserAssetOutput)">
+        <Message Importance="high" Text="Building reactive browser assets for Playwright sandbox." />
+        <Exec
+            WorkingDirectory="$(RepositoryRoot)"
+            Command="npm run build:all"
+            EnvironmentVariables="MSBUILDDISABLENODEREUSE=1" />
+    </Target>
 
 </Project>

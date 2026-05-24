@@ -14,20 +14,29 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionColorPicker Component = new FusionColorPicker();
 
+        private static readonly ComponentProperty<string> ValueProperty =
+            ComponentProperty<string>.Named(Component.ValueMember);
+
+        private static readonly ComponentProperty<bool> DisabledProperty =
+            ComponentProperty<bool>.Named("disabled");
+
+        private static readonly ComponentMethod ToggleMethod =
+            ComponentMethod.Named("toggle");
+
         /// <summary>Sets the color value (hex string, e.g. "#ff0000").</summary>
         /// <param name="value">The hex color string to set, or <see langword="null"/> to clear.</param>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionColorPicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, string? value)
             where TModel : class
-            => self.EmitSet("value", ValueProducer.Literal(value));
+            => self.EmitSet(ValueProperty, ValueProducer.LiteralRaw(value, Shape.String));
 
         /// <summary>Toggles the ColorPicker popup open/closed.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionColorPicker, TModel> Toggle<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self)
             where TModel : class
-            => self.EmitCall("toggle");
+            => self.EmitCall(ToggleMethod);
 
         /// <summary>Sets the disabled state of the ColorPicker.</summary>
         /// <param name="disabled"><see langword="true"/> to disable, <see langword="false"/> to enable.</param>
@@ -35,7 +44,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionColorPicker, TModel> Disable<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, bool disabled = true)
             where TModel : class
-            => self.EmitSet("disabled", ValueProducer.Literal(disabled));
+            => self.EmitSet(DisabledProperty, ValueProducer.Literal(disabled));
 
         /// <summary>Reads the current color value for use in conditions or gather.</summary>
         /// <remarks>
@@ -46,6 +55,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.String, "read"); return new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ValueMember); }
+            => self.Read(ValueProperty);
     }
 }

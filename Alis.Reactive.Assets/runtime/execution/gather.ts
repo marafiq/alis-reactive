@@ -2,13 +2,16 @@
 // Every field carries a ValueProducer — evaluated via evaluateValue().
 // No parallel read path. Shape flows from plan → transport for wire formatting.
 
-import type { Plan, GatherInput, RequestInput, Transport, Shape } from "../types";
+import type { Plan, Component, GatherField, GatherInput, GatherStatics, HttpMethod, ObjectProducer, RequestInput, Transport, ValueProducer } from "../types";
 import type { ExecContext } from "../types";
-import { resolveComponent, readProperty } from "../resolution/resolver";
-import { applyShape, toString } from "../core/shape-convert";
+import { assertNever } from "../core/assert-never";
+import { toString } from "../core/shape-convert";
 import { scope } from "../core/trace";
 import { evaluateValue } from "../core/evaluate";
-import { formatForWire } from "../core/wire-format";
+import { RuntimePlan, type RuntimeComponent } from "../domain/runtime-plan";
+import { PlainObjectRecord } from "../domain/object-record";
+import { RuntimeShape } from "../domain/runtime-shape";
+import { HttpRequestMethod } from "../domain/http-request-method";
 
 const log = scope("gather");
 
@@ -17,47 +20,89 @@ export interface GatherResult {
   body: Record<string, unknown> | FormData;
 }
 
-/** Extracts a File from a value — handles raw File objects and wrapper objects with .rawFile. */
-function toFile(item: unknown): File | null {
-  if (item instanceof File) return item;
-  if (item != null && typeof item === "object" && "rawFile" in item && (item as any).rawFile instanceof File)
-    return (item as any).rawFile;
-  return null;
-}
-
-/** Returns true if any item in the array is or wraps a File. */
-function hasFiles(items: unknown[]): boolean {
-  return items.some(item => toFile(item) != null);
-}
-
-/** Unwrap toString Result — returns empty string on Err and logs a warning. */
-function serializeValue(value: unknown, name: string): string {
-  const result = toString(value);
-  if (!result.ok) {
-    log.warn("serialize.failed", { name, error: result.error });
-    return "";
-  }
-  return result.value;
-}
-
 /** Transport strategies for emitting name/value pairs into GET, FormData, or JSON. */
 interface TransportStrategy {
-  emitScalar(name: string, value: unknown, shape: Shape): void;
-  emitArray(name: string, items: unknown[], itemShape: Shape): void;
+  emitScalar(name: string, value: unknown, shape: RuntimeShape): void;
+  emitArray(name: string, items: unknown[], itemShape: RuntimeShape): void;
+}
+
+interface GatherRuntime {
+  readonly method: HttpMethod;
+  readonly plan: Plan;
+  readonly runtimePlan: RuntimePlan;
+  readonly ctx: ExecContext;
+}
+
+class GatherOutput {
+  private constructor(
+    private readonly urlParams: string[],
+    private readonly body: GatherRequestBody,
+    readonly transport: TransportStrategy,
+  ) {}
+
+  static empty(): GatherResult {
+    return { urlParams: [], body: {} };
+  }
+
+  static for(requestTransport: Transport, method: HttpMethod): GatherOutput {
+    const urlParams: string[] = [];
+    const requestMethod = HttpRequestMethod.from(method);
+    if (requestMethod.sendsInputInQueryString()) {
+      return new GatherOutput(urlParams, GatherRequestBody.empty(), createGetTransport(urlParams));
+    }
+
+    if (requestTransport === "form-data") {
+      const formData = new FormData();
+      return new GatherOutput(urlParams, new MultipartGatherBody(formData), createFormDataTransport(formData));
+    }
+
+    const body = new JsonGatherBody({});
+    return new GatherOutput(urlParams, body, createJsonTransport(body.record));
+  }
+
+  toResult(): GatherResult {
+    return { urlParams: this.urlParams, body: this.body.value() };
+  }
+}
+
+abstract class GatherRequestBody {
+  static empty(): GatherRequestBody {
+    return new JsonGatherBody({});
+  }
+
+  abstract value(): Record<string, unknown> | FormData;
+}
+
+class JsonGatherBody extends GatherRequestBody {
+  constructor(readonly record: Record<string, unknown>) {
+    super();
+  }
+
+  value(): Record<string, unknown> {
+    return this.record;
+  }
+}
+
+class MultipartGatherBody extends GatherRequestBody {
+  constructor(private readonly formData: FormData) {
+    super();
+  }
+
+  value(): FormData {
+    return this.formData;
+  }
 }
 
 function createGetTransport(urlParams: string[]): TransportStrategy {
   return {
     emitScalar: (name, value, shape) => {
-      const wire = formatForWire(value, shape);
-      urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(wire, name))}`);
+      const wire = shape.formatForWire(value);
+      urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(GatherScalarWireValue.from(wire, name))}`);
     },
     emitArray: (name, items, itemShape) => {
-      if (hasFiles(items)) throw new Error("[alis] File objects cannot be sent via GET");
-      for (const item of items) {
-        const wire = formatForWire(item, itemShape);
-        urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(serializeValue(wire, name))}`);
-      }
+      const gatheredItems = GatheredArrayItems.from(items);
+      if (gatheredItems.containsFile) throw new Error("[alis] File objects cannot be sent via GET");
+      gatheredItems.emitToQueryString(name, itemShape, urlParams);
     },
   };
 }
@@ -65,18 +110,11 @@ function createGetTransport(urlParams: string[]): TransportStrategy {
 function createFormDataTransport(formData: FormData): TransportStrategy {
   return {
     emitScalar: (name, value, shape) => {
-      const wire = formatForWire(value, shape);
-      formData.append(name, serializeValue(wire, name));
+      const wire = shape.formatForWire(value);
+      formData.append(name, GatherScalarWireValue.from(wire, name));
     },
     emitArray: (name, items, itemShape) => {
-      for (const item of items) {
-        const file = toFile(item);
-        if (file) formData.append(name, file, file.name);
-        else {
-          const wire = formatForWire(item, itemShape);
-          formData.append(name, serializeValue(wire, name));
-        }
-      }
+      GatheredArrayItems.from(items).appendToFormData(name, itemShape, formData);
     },
   };
 }
@@ -84,126 +122,503 @@ function createFormDataTransport(formData: FormData): TransportStrategy {
 function createJsonTransport(body: Record<string, unknown>): TransportStrategy {
   return {
     emitScalar: (name, value, shape) => {
-      const wire = formatForWire(value, shape);
-      setNested(body, name, wire === "" ? null : wire);
+      const wire = shape.formatForWire(value);
+      JsonBodyPath.from(name).assign(body, JsonBodyValue.fromWire(wire));
     },
     emitArray: (name, items, itemShape) => {
-      if (hasFiles(items)) throw new Error("[alis] File objects require transport: form-data");
-      const wireItems = itemShape.kind !== "none"
-        ? items.map(v => formatForWire(v, itemShape))
-        : items;
-      setNested(body, name, wireItems);
+      const gatheredItems = GatheredArrayItems.from(items);
+      if (gatheredItems.containsFile) throw new Error("[alis] File objects require transport: form-data");
+      const wireItems = gatheredItems.toJsonValue(itemShape);
+      JsonBodyPath.from(name).assign(body, wireItems);
     },
   };
 }
 
-function selectTransport(
-  transport: Transport, method: string, urlParams: string[], formData: FormData | null, body: Record<string, unknown>,
-): TransportStrategy {
-  if (method === "GET") return createGetTransport(urlParams);
-  if (transport === "form-data" && formData) return createFormDataTransport(formData);
-  return createJsonTransport(body);
-}
-
-function emitValue(name: string, raw: unknown, shape: Shape, transport: TransportStrategy): void {
-  if (typeof FileList !== "undefined" && raw instanceof FileList) {
-    transport.emitArray(name, Array.from(raw), shape);
-    log.trace("file.emitted", { name, count: raw.length });
-    return;
-  }
-  if (Array.isArray(raw)) {
-    const itemShape = shape.kind === "array" ? shape.item : { kind: "none" as const };
-    transport.emitArray(name, raw, itemShape);
-  } else {
-    transport.emitScalar(name, raw, shape);
-  }
+function emitValue(name: string, raw: unknown, shape: RuntimeShape, transport: TransportStrategy): void {
+  GatheredValue.from(name, raw, shape).emitInto(transport);
 }
 
 /**
  * Resolve gather input into GatherResult (urlParams + body/FormData).
  */
 export function resolveGather(
-  input: RequestInput | undefined,
-  method: string,
+  input: RequestInput,
+  method: HttpMethod,
   plan: Plan,
-  ctx?: ExecContext,
+  ctx: ExecContext,
 ): GatherResult {
-  const urlParams: string[] = [];
-  const body: Record<string, unknown> = {};
-
-  if (!input) return { urlParams, body };
-
-  if (input.kind === "value") {
-    return resolveValueInput(input, method, urlParams, body, plan, ctx);
-  }
-
-  return resolveGatherInput(input as GatherInput, method, urlParams, body, plan, ctx);
+  const runtime = { method, plan, runtimePlan: RuntimePlan.from(plan), ctx };
+  return RequestInputResolver.from(input).resolve(runtime);
 }
 
-/** ValueInput — evaluate the value producer directly and emit as object fields or single value. */
-function resolveValueInput(
-  input: Extract<RequestInput, { kind: "value" }>,
-  method: string, urlParams: string[], body: Record<string, unknown>,
-  plan: Plan, ctx?: ExecContext,
-): GatherResult {
-  const value = evaluateValue(input.value, plan, ctx);
-  const formData = input.transport === "form-data" ? new FormData() : null;
-  const transport = selectTransport(input.transport, method, urlParams, formData, body);
-
-  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
-      emitValue(key, val, { kind: "none" }, transport);
+abstract class RequestInputResolver {
+  static from(input: RequestInput): RequestInputResolver {
+    switch (input.kind) {
+      case "none":
+        return EmptyRequestInputResolver.instance;
+      case "value":
+        return new ValueRequestInputResolver(input);
+      case "gather":
+        return new GatherRequestInputResolver(input);
+      default:
+        return assertNever(input, "request input");
     }
-  } else {
-    emitValue("value", value, { kind: "none" }, transport);
   }
 
-  return { urlParams, body: formData ?? body };
+  abstract resolve(runtime: GatherRuntime): GatherResult;
 }
 
-/** GatherInput — each field carries a ValueProducer. Handles components, statics, and includeAll. */
-function resolveGatherInput(
-  gatherInput: GatherInput, method: string, urlParams: string[], body: Record<string, unknown>,
-  plan: Plan, ctx?: ExecContext,
-): GatherResult {
-  const formData = gatherInput.transport === "form-data" ? new FormData() : null;
-  const transport = selectTransport(gatherInput.transport, method, urlParams, formData, body);
+class EmptyRequestInputResolver extends RequestInputResolver {
+  static readonly instance = new EmptyRequestInputResolver();
 
-  const gatheredComponents = gatherExplicitFields(gatherInput, transport, plan, ctx);
-  emitStaticValues(gatherInput, transport, plan, ctx);
+  resolve(): GatherResult {
+    return GatherOutput.empty();
+  }
+}
 
-  if (gatherInput.includeAll) {
-    gatherDynamicComponents(plan, gatheredComponents, transport);
+class ValueRequestInputResolver extends RequestInputResolver {
+  constructor(private readonly input: Extract<RequestInput, { kind: "value" }>) {
+    super();
   }
 
-  return { urlParams, body: formData ?? body };
+  resolve(runtime: GatherRuntime): GatherResult {
+    const output = GatherOutput.for(this.input.transport, runtime.method);
+    DeclaredObjectValueFields.from(this.input.value).emitInto(output.transport, runtime);
+    return output.toResult();
+  }
 }
 
-/** Gather explicit component fields — each carries a ValueProducer with shape. Returns tracked component keys. */
+class GatherRequestInputResolver extends RequestInputResolver {
+  constructor(private readonly input: GatherInput) {
+    super();
+  }
+
+  resolve(runtime: GatherRuntime): GatherResult {
+    const output = GatherOutput.for(this.input.transport, runtime.method);
+
+    const claims = GatherPayloadClaims.empty();
+    gatherExplicitFields(this.input, output.transport, runtime, claims);
+    emitStaticValues(this.input, output.transport, runtime, claims);
+
+    RuntimeComponentGatherExpansion
+      .from(this.input, claims)
+      .emitInto(runtime, output.transport);
+
+    return output.toResult();
+  }
+}
+
+/** Gather explicit request fields, tracking both their payload keys and any component reads. */
 function gatherExplicitFields(
-  gatherInput: GatherInput, transport: TransportStrategy, plan: Plan, ctx?: ExecContext,
-): Set<string> {
-  const gatheredComponents = new Set<string>();
+  gatherInput: GatherInput,
+  transport: TransportStrategy,
+  runtime: GatherRuntime,
+  claims: GatherPayloadClaims,
+): void {
   for (const field of gatherInput.components) {
-    if (field.value.kind === "read" && field.value.from.kind === "component") {
-      gatheredComponents.add(field.value.from.component);
-    }
-    const raw = evaluateValue(field.value, plan, ctx);
-    const shape = "shape" in field.value ? field.value.shape : { kind: "none" as const };
-    emitValue(field.key, raw, shape, transport);
+    ExplicitGatherField.from(field).emitInto(transport, runtime, claims);
   }
-  return gatheredComponents;
 }
 
 /** Emit static/event values merged alongside component fields. */
 function emitStaticValues(
-  gatherInput: GatherInput, transport: TransportStrategy, plan: Plan, ctx?: ExecContext,
+  gatherInput: GatherInput,
+  transport: TransportStrategy,
+  runtime: GatherRuntime,
+  claims: GatherPayloadClaims,
 ): void {
-  if (!gatherInput.statics || gatherInput.statics.kind === "none") return;
-  const staticValues = evaluateValue(gatherInput.statics, plan, ctx);
-  if (typeof staticValues !== "object" || staticValues === null || Array.isArray(staticValues)) return;
-  for (const [key, val] of Object.entries(staticValues as Record<string, unknown>)) {
-    emitValue(key, val, { kind: "none" }, transport);
+  StaticGatherValues.from(gatherInput.statics).emitInto(transport, runtime, claims);
+}
+
+class GatheredValue {
+  private constructor(
+    private readonly name: string,
+    private readonly raw: unknown,
+    private readonly shape: RuntimeShape,
+  ) {}
+
+  static from(name: string, raw: unknown, shape: RuntimeShape): GatheredValue {
+    return new GatheredValue(name, raw, shape);
+  }
+
+  emitInto(transport: TransportStrategy): void {
+    const fileList = BrowserFileList.tryFrom(this.raw);
+    const rawValueIsBrowserFileList = fileList !== undefined;
+    if (rawValueIsBrowserFileList) {
+      transport.emitArray(this.name, fileList.files(), this.shape);
+      log.trace("file.emitted", { name: this.name, count: fileList.count });
+      return;
+    }
+
+    const arrayValue = GatheredArrayValue.tryFrom(this.raw, this.shape);
+    const rawValueIsArray = arrayValue !== undefined;
+    if (rawValueIsArray) {
+      transport.emitArray(this.name, arrayValue.items, arrayValue.itemShape);
+      return;
+    }
+
+    transport.emitScalar(this.name, this.raw, this.shape);
+  }
+}
+
+class BrowserFileList {
+  private constructor(
+    private readonly value: FileList,
+    readonly count: number,
+  ) {}
+
+  static tryFrom(raw: unknown): BrowserFileList | undefined {
+    const browserExposesFileList = typeof FileList !== "undefined";
+    if (!browserExposesFileList) return undefined;
+
+    const rawIsFileList = raw instanceof FileList;
+    if (!rawIsFileList) return undefined;
+
+    return new BrowserFileList(raw, raw.length);
+  }
+
+  files(): File[] {
+    return Array.from(this.value);
+  }
+}
+
+class GatheredArrayValue {
+  private constructor(
+    readonly items: unknown[],
+    readonly itemShape: RuntimeShape,
+  ) {}
+
+  static tryFrom(raw: unknown, shape: RuntimeShape): GatheredArrayValue | undefined {
+    const rawIsArray = Array.isArray(raw);
+    if (!rawIsArray) return undefined;
+
+    return new GatheredArrayValue(raw, shape.item());
+  }
+}
+
+class GatheredArrayItems {
+  private constructor(private readonly items: GatheredArrayItem[]) {}
+
+  static from(items: unknown[]): GatheredArrayItems {
+    return new GatheredArrayItems(items.map(item => GatheredArrayItem.from(item)));
+  }
+
+  get containsFile(): boolean {
+    return this.items.some(item => item.containsFile);
+  }
+
+  emitToQueryString(name: string, itemShape: RuntimeShape, urlParams: string[]): void {
+    for (const item of this.items) {
+      item.emitToQueryString(name, itemShape, urlParams);
+    }
+  }
+
+  appendToFormData(name: string, itemShape: RuntimeShape, formData: FormData): void {
+    for (const item of this.items) {
+      item.appendToFormData(name, itemShape, formData);
+    }
+  }
+
+  toJsonValue(itemShape: RuntimeShape): unknown[] {
+    return JsonArrayBodyValue.fromItems(
+      this.items.map(item => item.rawValue),
+      itemShape
+    );
+  }
+}
+
+abstract class GatheredArrayItem {
+  static from(item: unknown): GatheredArrayItem {
+    const itemIsBrowserFile = item instanceof File;
+    if (itemIsBrowserFile) return new UploadedFileArrayItem(item);
+
+    const wrapper = PlainObjectRecord.tryFrom(item);
+    const itemCanWrapBrowserFile = wrapper !== undefined;
+    if (itemCanWrapBrowserFile) {
+      const rawFile = wrapper.get("rawFile");
+      const itemWrapsBrowserFile = rawFile instanceof File;
+      if (itemWrapsBrowserFile) return new UploadedFileArrayItem(rawFile);
+    }
+
+    return new SerializableArrayItem(item);
+  }
+
+  abstract get containsFile(): boolean;
+  abstract get rawValue(): unknown;
+  abstract appendToFormData(name: string, itemShape: RuntimeShape, formData: FormData): void;
+
+  emitToQueryString(name: string, itemShape: RuntimeShape, urlParams: string[]): void {
+    const wire = itemShape.formatForWire(this.rawValue);
+    urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(GatherScalarWireValue.from(wire, name))}`);
+  }
+}
+
+class UploadedFileArrayItem extends GatheredArrayItem {
+  constructor(private readonly file: File) {
+    super();
+  }
+
+  get containsFile(): boolean {
+    return true;
+  }
+
+  get rawValue(): unknown {
+    return this.file;
+  }
+
+  appendToFormData(name: string, _itemShape: RuntimeShape, formData: FormData): void {
+    formData.append(name, this.file, this.file.name);
+  }
+}
+
+class SerializableArrayItem extends GatheredArrayItem {
+  constructor(private readonly value: unknown) {
+    super();
+  }
+
+  get containsFile(): boolean {
+    return false;
+  }
+
+  get rawValue(): unknown {
+    return this.value;
+  }
+
+  appendToFormData(name: string, itemShape: RuntimeShape, formData: FormData): void {
+    const wire = itemShape.formatForWire(this.value);
+    formData.append(name, GatherScalarWireValue.from(wire, name));
+  }
+}
+
+class GatherScalarWireValue {
+  static from(value: unknown, name: string): string {
+    const result = toString(value);
+    if (result.ok) return result.value;
+
+    throw new Error(`[alis] gather value "${name}" cannot be serialized as a scalar: ${result.error}`);
+  }
+}
+
+class ExplicitGatherField {
+  private constructor(private readonly field: GatherField) {}
+
+  static from(field: GatherField): ExplicitGatherField {
+    return new ExplicitGatherField(field);
+  }
+
+  emitInto(
+    transport: TransportStrategy,
+    runtime: GatherRuntime,
+    claims: GatherPayloadClaims,
+  ): void {
+    claims.recordDeclaredField(this.field);
+
+    const raw = evaluateValue(this.field.value, runtime.plan, runtime.ctx);
+    const shape = RuntimeShape.declaredBy(this.field.value);
+    emitValue(this.field.key, raw, shape, transport);
+  }
+}
+
+class GatherPayloadClaims {
+  private constructor(
+    private readonly payloadSlots: GatherPayloadSlots,
+    private readonly componentKeys: Set<string>,
+  ) {}
+
+  static empty(): GatherPayloadClaims {
+    return new GatherPayloadClaims(GatherPayloadSlots.empty(), new Set<string>());
+  }
+
+  recordDeclaredField(field: GatherField): void {
+    this.claimPayloadKey(field.key);
+    ExplicitGatherComponentRead.from(field.value).recordIn(this.componentKeys);
+  }
+
+  claimPayloadKey(payloadKey: string): void {
+    this.payloadSlots.claimDeclared(payloadKey);
+  }
+
+  tryClaimRuntimePayloadKey(payloadKey: string): boolean {
+    return this.payloadSlots.tryClaim(payloadKey);
+  }
+
+  hasComponent(componentKey: string): boolean {
+    return this.componentKeys.has(componentKey);
+  }
+}
+
+class GatherPayloadSlots {
+  private constructor(private readonly claimedPaths: JsonBodyPath[]) {}
+
+  static empty(): GatherPayloadSlots {
+    return new GatherPayloadSlots([]);
+  }
+
+  claimDeclared(payloadKey: string): void {
+    this.claimedPaths.push(JsonBodyPath.from(payloadKey));
+  }
+
+  tryClaim(payloadKey: string): boolean {
+    const incoming = JsonBodyPath.from(payloadKey);
+    const payloadPathAlreadyClaimed = this.claimedPaths.some(path => path.overlaps(incoming));
+    if (payloadPathAlreadyClaimed) return false;
+
+    this.claimedPaths.push(incoming);
+    return true;
+  }
+}
+
+abstract class ExplicitGatherComponentRead {
+  static from(producer: ValueProducer): ExplicitGatherComponentRead {
+    const producerReadsRuntimeValue = producer.kind === "read";
+    if (!producerReadsRuntimeValue) return NoExplicitGatherComponentRead.instance;
+
+    const source = producer.from;
+    const producerReadsComponent = source.kind === "component";
+    if (!producerReadsComponent) return NoExplicitGatherComponentRead.instance;
+
+    return new ComponentReadGatherField(source.component);
+  }
+
+  abstract recordIn(gatheredComponents: Set<string>): void;
+}
+
+class NoExplicitGatherComponentRead extends ExplicitGatherComponentRead {
+  static readonly instance = new NoExplicitGatherComponentRead();
+
+  recordIn(): void {
+    return;
+  }
+}
+
+class ComponentReadGatherField extends ExplicitGatherComponentRead {
+  constructor(private readonly componentKey: string) {
+    super();
+  }
+
+  recordIn(gatheredComponents: Set<string>): void {
+    gatheredComponents.add(this.componentKey);
+  }
+}
+
+abstract class RuntimeComponentGatherExpansion {
+  static from(gatherInput: GatherInput, claims: GatherPayloadClaims): RuntimeComponentGatherExpansion {
+    const allRuntimeComponentsWereRequested = gatherInput.selection.kind === "all-registered-inputs";
+    if (!allRuntimeComponentsWereRequested) return ExplicitGatherFieldsOnly.instance;
+
+    return new DynamicGatherComponentExpansion(claims);
+  }
+
+  abstract emitInto(runtime: GatherRuntime, transport: TransportStrategy): void;
+}
+
+class ExplicitGatherFieldsOnly extends RuntimeComponentGatherExpansion {
+  static readonly instance = new ExplicitGatherFieldsOnly();
+
+  emitInto(): void {
+    return;
+  }
+}
+
+class DynamicGatherComponentExpansion extends RuntimeComponentGatherExpansion {
+  constructor(private readonly claims: GatherPayloadClaims) {
+    super();
+  }
+
+  emitInto(runtime: GatherRuntime, transport: TransportStrategy): void {
+    emitDynamicGatherComponents(runtime, this.claims, transport);
+  }
+}
+
+abstract class StaticGatherValues {
+  static from(statics: GatherStatics): StaticGatherValues {
+    switch (statics.kind) {
+      case "none":
+        return NoStaticGatherValues.instance;
+      case "value":
+        return new DeclaredStaticGatherValues(statics.value);
+      default:
+        return assertNever(statics, "gather statics");
+    }
+  }
+
+  abstract emitInto(
+    transport: TransportStrategy,
+    runtime: GatherRuntime,
+    claims: GatherPayloadClaims,
+  ): void;
+}
+
+class NoStaticGatherValues extends StaticGatherValues {
+  static readonly instance = new NoStaticGatherValues();
+
+  emitInto(): void {
+    return;
+  }
+}
+
+class DeclaredStaticGatherValues extends StaticGatherValues {
+  constructor(private readonly producer: ObjectProducer) {
+    super();
+  }
+
+  emitInto(
+    transport: TransportStrategy,
+    runtime: GatherRuntime,
+    claims: GatherPayloadClaims,
+  ): void {
+    DeclaredObjectValueFields.from(this.producer).emitIntoGather(transport, runtime, claims);
+  }
+}
+
+class DeclaredObjectValueFields {
+  private constructor(private readonly fields: Record<string, ValueProducer>) {
+  }
+
+  static from(producer: ObjectProducer): DeclaredObjectValueFields {
+    return new DeclaredObjectValueFields(producer.fields);
+  }
+
+  emitInto(transport: TransportStrategy, runtime: GatherRuntime): void {
+    this.emitEach((key, producer) => {
+      const value = evaluateValue(producer, runtime.plan, runtime.ctx);
+      emitValue(key, value, RuntimeShape.declaredBy(producer), transport);
+    });
+  }
+
+  emitIntoGather(
+    transport: TransportStrategy,
+    runtime: GatherRuntime,
+    claims: GatherPayloadClaims,
+  ): void {
+    this.emitEach((key, producer) => {
+      claims.claimPayloadKey(key);
+      const value = evaluateValue(producer, runtime.plan, runtime.ctx);
+      emitValue(key, value, RuntimeShape.declaredBy(producer), transport);
+    });
+  }
+
+  private emitEach(emit: (key: string, producer: ValueProducer) => void): void {
+    for (const [key, producer] of Object.entries(this.fields)) {
+      emit(key, producer);
+    }
+  }
+}
+
+class JsonBodyValue {
+  static fromWire(wireValue: unknown): unknown {
+    const emptyTextRepresentsClearedField = wireValue === "";
+    if (emptyTextRepresentsClearedField) return null;
+
+    return wireValue;
+  }
+}
+
+class JsonArrayBodyValue {
+  static fromItems(items: unknown[], itemShape: RuntimeShape): unknown[] {
+    if (!itemShape.isDeclared) return items;
+
+    return items.map(item => itemShape.formatForWire(item));
   }
 }
 
@@ -212,37 +627,184 @@ function emitStaticValues(
  * The C# builder expands all KNOWN components at build time. This loop catches
  * components added AFTER build time via partial plan merge.
  */
-function gatherDynamicComponents(
-  plan: Plan, gatheredComponents: Set<string>, transport: TransportStrategy,
+function emitDynamicGatherComponents(
+  runtime: GatherRuntime,
+  claims: GatherPayloadClaims,
+  transport: TransportStrategy,
 ): void {
-  for (const [compKey, comp] of Object.entries(plan.components)) {
-    if (gatheredComponents.has(compKey)) continue;
-    if (!comp.valueMember || !comp.bindingPath) continue;
-    if (!document.getElementById(comp.id)) continue;
-    const jsType = plan.types[comp.type];
-    if (!jsType) continue;
-    const prop = jsType.properties[comp.valueMember];
-    if (!prop) continue;
-    const root = resolveComponent(plan, compKey);
-    const raw = readProperty(root, prop);
-    const value = applyShape(raw, prop.shape);
-    emitValue(comp.bindingPath, value, prop.shape, transport);
+  for (const component of runtime.runtimePlan.components.entries()) {
+    const componentAlreadyGathered = claims.hasComponent(component.key);
+    if (componentAlreadyGathered) continue;
+
+    const valueBinding = ComponentGatherBinding.tryFrom(component.definition);
+    if (valueBinding === undefined) continue;
+
+    const componentElementWasMounted = ComponentMountState.isMounted(component);
+    if (!componentElementWasMounted) continue;
+
+    const payloadSlotWasReserved = claims.tryClaimRuntimePayloadKey(valueBinding.bindingPath);
+    if (!payloadSlotWasReserved) continue;
+
+    const object = component.object();
+    const runtimeValue = object.read(valueBinding.valueMember);
+
+    emitValue(
+      valueBinding.bindingPath,
+      runtimeValue.usingDeclaredShape(),
+      RuntimeShape.from(runtimeValue.shape),
+      transport,
+    );
   }
 }
 
-function setNested(obj: Record<string, unknown>, key: string, value: unknown): void {
-  const parts = key.split(".");
-  if (parts.length === 1) {
-    obj[key] = value;
-    return;
+class ComponentGatherBinding {
+  private constructor(
+    readonly valueMember: string,
+    readonly bindingPath: string,
+  ) {}
+
+  static tryFrom(component: Component): ComponentGatherBinding | undefined {
+    const binding = component.binding;
+    if (binding.kind === "none") return undefined;
+
+    return new ComponentGatherBinding(binding.valueMember, binding.bindingPath);
   }
-  let cur = obj;
-  for (let i = 0; i < parts.length - 1; i++) {
-    const p = parts[i];
-    if (!(p in cur) || typeof cur[p] !== "object" || cur[p] === null) {
-      cur[p] = {};
+}
+
+class ComponentMountState {
+  static isMounted(component: RuntimeComponent): boolean {
+    return component.tryElement() !== undefined;
+  }
+}
+
+class JsonBodyPath {
+  private constructor(
+    private readonly key: string,
+    private readonly parts: [string, ...string[]],
+  ) {}
+
+  static from(key: string): JsonBodyPath {
+    const parts = key.split(".");
+    const keyContainsEmptySegment = parts.some(part => part.length === 0);
+    if (keyContainsEmptySegment) {
+      throw new Error(`[alis] gather key "${key}" contains an empty path segment`);
     }
-    cur = cur[p] as Record<string, unknown>;
+
+    return new JsonBodyPath(key, parts as [string, ...string[]]);
   }
-  cur[parts[parts.length - 1]] = value;
+
+  assign(body: Record<string, unknown>, value: unknown): void {
+    const pathTargetsRootField = this.parts.length === 1;
+    if (pathTargetsRootField) {
+      JsonBodyLeaf.from(body, this.rootPart(), this.key).assign(value);
+      return;
+    }
+
+    const parent = this.parentObject(body);
+    JsonBodyLeaf.from(parent, this.lastPart(), this.key).assign(value);
+  }
+
+  overlaps(other: JsonBodyPath): boolean {
+    return this.isPrefixOf(other) || other.isPrefixOf(this);
+  }
+
+  private isPrefixOf(other: JsonBodyPath): boolean {
+    if (this.parts.length > other.parts.length) return false;
+
+    return this.parts.every((part, index) => part === other.parts[index]);
+  }
+
+  private parentObject(body: Record<string, unknown>): Record<string, unknown> {
+    let current = body;
+    const parentPath = this.parts.slice(0, -1);
+    const walkedPath: string[] = [];
+
+    for (const segment of parentPath) {
+      walkedPath.push(segment);
+      current = JsonBodySlot.from(current, segment, this.key, walkedPath.join(".")).ensureObject();
+    }
+
+    return current;
+  }
+
+  private rootPart(): string {
+    return this.parts[0];
+  }
+
+  private lastPart(): string {
+    const part = this.parts[this.parts.length - 1];
+    if (part === undefined) {
+      throw new Error("[alis] gather path is empty");
+    }
+
+    return part;
+  }
+}
+
+class JsonBodySlot {
+  private constructor(
+    private readonly parent: Record<string, unknown>,
+    private readonly segment: string,
+    private readonly ownerKey: string,
+    private readonly segmentPath: string,
+  ) {}
+
+  static from(
+    parent: Record<string, unknown>,
+    segment: string,
+    ownerKey: string,
+    segmentPath: string,
+  ): JsonBodySlot {
+    return new JsonBodySlot(parent, segment, ownerKey, segmentPath);
+  }
+
+  ensureObject(): Record<string, unknown> {
+    const value = this.parent[this.segment];
+    const segmentHasNoValue = !(this.segment in this.parent);
+    if (segmentHasNoValue) {
+      this.parent[this.segment] = {};
+      return this.parent[this.segment] as Record<string, unknown>;
+    }
+
+    const nestedObject = PlainObjectRecord.tryFrom(value);
+    if (nestedObject !== undefined) return nestedObject.raw;
+
+    throw new Error(
+      `[alis] gather key "${this.ownerKey}" conflicts at "${this.segmentPath}": ` +
+      "an existing scalar value cannot hold nested fields. " +
+      `Use either "${this.segmentPath}" or "${this.segmentPath}.*" fields, not both.`
+    );
+  }
+}
+
+class JsonBodyLeaf {
+  private constructor(
+    private readonly parent: Record<string, unknown>,
+    private readonly segment: string,
+    private readonly ownerKey: string,
+  ) {}
+
+  static from(parent: Record<string, unknown>, segment: string, ownerKey: string): JsonBodyLeaf {
+    return new JsonBodyLeaf(parent, segment, ownerKey);
+  }
+
+  assign(value: unknown): void {
+    const existingValue = this.parent[this.segment];
+    const segmentHasValue = this.segment in this.parent;
+    const existingValueIsNestedObject = PlainObjectRecord.tryFrom(existingValue) !== undefined;
+    const incomingValueIsNestedObject = PlainObjectRecord.tryFrom(value) !== undefined;
+    const assignmentWouldReplaceNestedFields =
+      segmentHasValue
+      && existingValueIsNestedObject
+      && !incomingValueIsNestedObject;
+    if (assignmentWouldReplaceNestedFields) {
+      throw new Error(
+        `[alis] gather key "${this.ownerKey}" conflicts at "${this.segment}": ` +
+        "nested fields were already assigned under this key. " +
+        `Use either "${this.segment}" or "${this.segment}.*" fields, not both.`
+      );
+    }
+
+    this.parent[this.segment] = value;
+  }
 }

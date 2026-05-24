@@ -1,69 +1,202 @@
 // Live Validation — Per-field event wiring for interactive validation
-// V3: reads from ContainerScope on plan.components[containerKey].container.
-// Uses SHARED resolver for vendor root resolution.
+// Reads container scope through RuntimePlan so component lookup and DOM resolution
+// stay on the same deterministic path as execution/gather.
 // On blur/change: re-validates the single field (not just clears).
 // On input: clears only (typing should not show errors mid-keystroke).
 
-import type { Plan, Component } from "../types";
-import { resolveElement, wireEvent } from "../resolution/resolver";
+import type { Plan } from "../types";
+import {
+  RuntimeComponentReadinessError,
+  RuntimePlan,
+  RuntimeResolutionError,
+  type RuntimeComponent,
+} from "../domain/runtime-plan";
+import { wireEvent } from "../resolution/resolver";
 import { clearInline } from "./error-display";
 import { revalidateField } from "./orchestrator";
 
-/** Set of componentDomIds already wired — prevents double-wiring on partial reload. */
-const wiredFields = new Set<string>();
+interface LiveFieldWire {
+  readonly plan: Plan;
+  readonly containerKey: string;
+  readonly component: RuntimeComponent;
+  readonly signal: AbortSignal | undefined;
+}
+
+interface LiveFieldEvents {
+  readonly clear: () => void;
+  readonly revalidate: () => void;
+  readonly listenerOptions: AddEventListenerOptions | undefined;
+}
 
 /**
  * Wire live validation for all components in a container scope.
  * containerKey identifies the component that holds the ContainerScope.
  */
-export function wireLiveValidation(plan: Plan, containerKey: string): void {
-  const containerComp = plan.components[containerKey];
-  if (!containerComp?.container) return;
-
-  const containerId = containerComp.id;
-  const containerScope = containerComp.container;
+export function wireLiveValidation(plan: Plan, containerKey: string, signal?: AbortSignal): void {
+  const runtime = RuntimePlan.from(plan);
+  const containerComp = runtime.components.find(containerKey);
+  const containerScope = containerComp?.containerScope;
+  if (!containerComp || !containerScope) return;
 
   for (const cv of containerScope.validationRules) {
-    const comp = plan.components[cv.component];
+    const comp = runtime.components.find(cv.component);
     if (!comp) continue;
-    wireField(plan, containerId, containerKey, cv.component, comp);
+    wireField({ plan, containerKey, component: comp, signal });
   }
 }
 
-function wireField(plan: Plan, containerId: string, containerKey: string, componentKey: string, comp: Component): void {
-  if (wiredFields.has(comp.id)) return;
+function wireField(field: LiveFieldWire): void {
+  if (field.signal?.aborted === true) return;
 
-  let el: HTMLElement;
-  try {
-    el = resolveElement(plan, componentKey);
-  } catch {
-    return; // Element not in DOM yet — will be wired on merge
+  const el = resolveFieldElement(field.component);
+  if (el === undefined) return;
+
+  const events = liveFieldEventsFor(field);
+
+  const domEventsWereAdded = wireFieldDomEvents(field, el, events);
+  const changeEventWasAdded = wireComponentChangeEvent(field, events);
+
+  if (domEventsWereAdded || changeEventWasAdded) {
+    LiveFieldWireFootprint
+      .for(field.component.id, {
+        domEvents: domEventsWereAdded,
+        componentChangeEvent: changeEventWasAdded,
+      })
+      .forgetOnAbort(field.signal, wiredFields);
   }
+}
 
-  wiredFields.add(comp.id);
+function liveFieldEventsFor(field: LiveFieldWire): LiveFieldEvents {
+  return {
+    clear: () => clearInline(field.component.id),
+    revalidate: () => revalidateField(field.plan, field.containerKey, field.component.key),
+    listenerOptions: listenerOptionsFor(field.signal),
+  };
+}
 
-  const clearHandler = () => clearInline(containerId, comp.id);
-  const revalidateHandler = () => revalidateField(plan, containerKey, componentKey);
+function resolveFieldElement(component: RuntimeComponent): HTMLElement | undefined {
+  try {
+    return component.element();
+  } catch (e) {
+    if (RuntimeResolutionError.is(e)) return undefined;
+    throw e;
+  }
+}
 
-  // DOM events (input, blur) fire on the underlying element for ALL vendors.
-  // The SF element is a standard <input> — it receives native DOM events.
-  el.addEventListener("input", clearHandler);
-  el.addEventListener("blur", revalidateHandler);
+function wireFieldDomEvents(
+  field: LiveFieldWire,
+  el: HTMLElement,
+  events: LiveFieldEvents,
+): boolean {
+  if (wiredFields.hasDomEvents(field.component.id)) return false;
+
+  // DOM events are best-effort field events; vendor semantic change is tracked separately.
+  el.addEventListener("input", events.clear, events.listenerOptions);
+  el.addEventListener("blur", events.revalidate, events.listenerOptions);
+  wiredFields.rememberDomEvents(field.component.id);
+  return true;
+}
+
+function wireComponentChangeEvent(
+  field: LiveFieldWire,
+  events: LiveFieldEvents,
+): boolean {
+  if (wiredFields.hasComponentChangeEvent(field.component.id)) return false;
 
   // Semantic "change" goes through the vendor's event system (DOM or modelObserver).
   try {
-    wireEvent(plan, componentKey, "change", () => revalidateHandler());
-  } catch {
-    // Component not yet initialized — skip, will be wired on merge
+    wireEvent(field.plan, field.component.key, "change", () => events.revalidate(), events.listenerOptions);
+  } catch (e) {
+    if (componentChangeEventCanBeDeferred(e)) return false;
+    throw e;
   }
+
+  wiredFields.rememberComponentChangeEvent(field.component.id);
+  return true;
+}
+
+function componentChangeEventCanBeDeferred(error: unknown): boolean {
+  return RuntimeResolutionError.is(error) || RuntimeComponentReadinessError.is(error);
 }
 
 /** Remove a field's wired status so it can be re-wired after partial reload. */
 export function unwireField(domId: string): void {
-  wiredFields.delete(domId);
+  wiredFields.forget(domId);
 }
 
 /** Reset for tests — clears the wired set so tests start clean. */
 export function resetLiveClearForTests(): void {
   wiredFields.clear();
+}
+
+function listenerOptionsFor(signal: AbortSignal | undefined): AddEventListenerOptions | undefined {
+  if (signal === undefined) return undefined;
+
+  return { signal };
+}
+
+class LiveValidationWireRegistry {
+  private readonly domEventFields = new Set<string>();
+  private readonly componentChangeEventFields = new Set<string>();
+
+  hasDomEvents(componentDomId: string): boolean {
+    return this.domEventFields.has(componentDomId);
+  }
+
+  rememberDomEvents(componentDomId: string): void {
+    this.domEventFields.add(componentDomId);
+  }
+
+  hasComponentChangeEvent(componentDomId: string): boolean {
+    return this.componentChangeEventFields.has(componentDomId);
+  }
+
+  rememberComponentChangeEvent(componentDomId: string): void {
+    this.componentChangeEventFields.add(componentDomId);
+  }
+
+  forgetDomEvents(componentDomId: string): void {
+    this.domEventFields.delete(componentDomId);
+  }
+
+  forgetComponentChangeEvent(componentDomId: string): void {
+    this.componentChangeEventFields.delete(componentDomId);
+  }
+
+  forget(componentDomId: string): void {
+    this.domEventFields.delete(componentDomId);
+    this.componentChangeEventFields.delete(componentDomId);
+  }
+
+  clear(): void {
+    this.domEventFields.clear();
+    this.componentChangeEventFields.clear();
+  }
+}
+
+const wiredFields = new LiveValidationWireRegistry();
+
+interface LiveFieldWireKinds {
+  readonly domEvents: boolean;
+  readonly componentChangeEvent: boolean;
+}
+
+class LiveFieldWireFootprint {
+  private constructor(
+    private readonly componentDomId: string,
+    private readonly kinds: LiveFieldWireKinds,
+  ) {}
+
+  static for(componentDomId: string, kinds: LiveFieldWireKinds): LiveFieldWireFootprint {
+    return new LiveFieldWireFootprint(componentDomId, kinds);
+  }
+
+  forgetOnAbort(signal: AbortSignal | undefined, registry: LiveValidationWireRegistry): void {
+    signal?.addEventListener("abort", () => this.forgetFrom(registry), { once: true });
+  }
+
+  private forgetFrom(registry: LiveValidationWireRegistry): void {
+    if (this.kinds.domEvents) registry.forgetDomEvents(this.componentDomId);
+    if (this.kinds.componentChangeEvent) registry.forgetComponentChangeEvent(this.componentDomId);
+  }
 }

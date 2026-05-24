@@ -9,6 +9,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionMultiColumnComboBox : FusionComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new FusionMultiColumnComboBox(), "multicolumncombobox");
+
         /// <inheritdoc />
         public string ValueMember => "value";
     }

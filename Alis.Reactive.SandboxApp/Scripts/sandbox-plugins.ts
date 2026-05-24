@@ -1,20 +1,53 @@
 // sandbox-plugins.ts — Plugin instances for sandbox testing.
 // Bundled separately. Loaded before alis-reactive.js.
 
-((window as any).__alisPlugins ??= []).push({
+interface BrowserPluginEntry {
+  readonly name: string;
+  readonly instance: Record<string, unknown> | ((...args: unknown[]) => unknown);
+}
+
+interface PluginQueueWindow extends Window {
+  __alisPlugins?: BrowserPluginEntry[];
+}
+
+type LengthBearingValue = ArrayLike<unknown> | string | undefined;
+type PluginRecord = Record<string, unknown>;
+type PluginRecordList = readonly PluginRecord[] | undefined;
+
+const pluginHost = window as PluginQueueWindow;
+const registeredPlugins = pluginHost.__alisPlugins ??= [];
+
+const readField = (item: PluginRecord, key: string): unknown => item[key];
+
+const fieldMatches = (item: PluginRecord, key: string, expected: unknown): boolean =>
+  readField(item, key) === expected;
+
+registeredPlugins.push({
   name: "array",
   instance: {
-    count:  (arr: any[]) => arr?.length ?? 0,
-    pluck:  (arr: any[], index: number, key: string) => arr?.[index]?.[key],
-    filter: (arr: any[], key: string, val: any) => arr?.filter((i: any) => i[key] === val) ?? [],
-    sum:    (arr: any[], key: string) => arr?.reduce((s: number, i: any) => s + (Number(i[key]) || 0), 0) ?? 0,
-    some:   (arr: any[], key: string, val: any) => arr?.some((i: any) => i[key] === val) ?? false,
+    count:  (items: LengthBearingValue) => items?.length ?? 0,
+    pluck:  (items: PluginRecordList, index: number, key: string) => items?.[index]?.[key],
+    filter: (items: PluginRecordList, key: string, expected: unknown) =>
+      items?.filter(item => fieldMatches(item, key, expected)) ?? [],
+    sum:    (items: PluginRecordList, key: string) =>
+      items?.reduce((total, item) => total + (Number(readField(item, key)) || 0), 0) ?? 0,
+    some:   (items: PluginRecordList, key: string, expected: unknown) =>
+      items?.some(item => fieldMatches(item, key, expected)) ?? false,
   }
 });
 
-((window as any).__alisPlugins ??= []).push({
+registeredPlugins.push({
   name: "analytics",
   instance: {
-    track: (event: string) => { /* sandbox no-op */ },
+    track: (_event: string) => { /* sandbox no-op */ },
   }
+});
+
+registeredPlugins.push({
+  name: "slugify",
+  instance: (value: unknown) =>
+    String(value ?? "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-"),
 });

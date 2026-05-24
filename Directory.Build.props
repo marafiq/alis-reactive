@@ -11,10 +11,10 @@
     <PackageProjectUrl>https://github.com/marafiq/alis-reactive</PackageProjectUrl>
     <Copyright>Copyright (c) Alis Solutions 2026</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <!-- CS1591: missing XML comment on a public member. Suppressed solution-wide so
-         GenerateDocumentationFile still emits the XML doc file without flooding the
-         build/IDE with warnings for undocumented members. -->
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <LangVersion>14.0</LangVersion>
+    <!-- XML documentation warnings are suppressed solution-wide so
+         GenerateDocumentationFile still emits XML docs without flooding normal builds. -->
+    <NoWarn>$(NoWarn);CS0419;CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1591;CS1711;CS1712</NoWarn>
     <!-- Single handoff point between the npm build and dotnet pack: npm builds
          the framework browser bundles into Alis.Reactive.Assets/dist/; the
          asset-bearing packages (AlisReactive, .DesignSystem, .Fusion) pack

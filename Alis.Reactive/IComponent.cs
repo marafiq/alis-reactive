@@ -1,38 +1,31 @@
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Base interface for all reactive components (Fusion SF, Native DOM).
-    /// Every component declares its vendor ("native" or "fusion") as an instance property.
+    /// Marker interface for a browser component object that can be referenced in a reactive plan.
     /// </summary>
-    /// <summary>Marker interface for reactive components that can be referenced in the pipeline.</summary>
     public interface IComponent
     {
-        /// <summary>Gets the vendor identifier for component resolution.</summary>
         /// <summary>Gets the vendor identifier for component resolution.</summary>
         string Vendor { get; }
     }
 
     /// <summary>
-    /// Interface for input components — provides the member name for reading the component's value.
-    /// Used by gather and validation extensions.
+    /// Marker interface for model-bound input components that expose a readable value member.
     /// </summary>
     public interface IInputComponent : IComponent
     {
         /// <summary>
-        /// The member name on the JS object for reading the component's value.
-        /// Examples: "value", "checked"
+        /// Gets the member name on the JavaScript component object that gather and validation read.
         /// </summary>
         string ValueMember { get; }
     }
 
     /// <summary>
-    /// Marker for app-level components with a well-known element ID.
+    /// Marker interface for layout-owned app components with a well-known component id.
     /// </summary>
-    /// <summary>Marker interface for app-level singleton components (Toast, Confirm) with a default DOM ID.</summary>
     public interface IAppLevelComponent : IComponent
     {
-        /// <summary>Gets the default DOM element ID for this app-level component.</summary>
-        /// <summary>Gets the default DOM element ID for this app-level component.</summary>
+        /// <summary>Gets the default DOM element ID for this layout-owned component.</summary>
         string DefaultId { get; }
     }
 }

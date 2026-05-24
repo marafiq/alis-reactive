@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net48;net10.0</TargetFrameworks>
-    <LangVersion>8</LangVersion>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <RootNamespace>Alis.Reactive.DesignSystem</RootNamespace>
@@ -13,10 +12,6 @@
     <PackageDescription>Design system for Alis.Reactive — brand tokens, layout primitives, and the design-system stylesheet. Consumed by the component packages independently of the reactive core.</PackageDescription>
     <PackageTags>reactive;design-system;css;tokens</PackageTags>
   </PropertyGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-  </ItemGroup>
 
   <!-- Ship the design-system CSS bundle (built by 'npm run build:all' via
        vite.config.ts into dist\css\design-system.dev.css). Packed under build\

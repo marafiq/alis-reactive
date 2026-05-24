@@ -10,13 +10,11 @@ namespace Alis.Reactive.Builders.Conditions
     public sealed class TypedComponentSource<TProp> : TypedSource<TProp>
     {
         private readonly string _componentId;
-        private readonly string _vendor;
         private readonly string _valueMember;
 
-        internal TypedComponentSource(string componentId, string vendor, string valueMember)
+        internal TypedComponentSource(string componentId, string valueMember)
         {
             _componentId = componentId;
-            _vendor = vendor;
             _valueMember = valueMember;
         }
 
@@ -27,7 +25,6 @@ namespace Alis.Reactive.Builders.Conditions
             PlanModel.ComponentSource.Of(_componentId);
 
         internal string ComponentId => _componentId;
-        internal string Vendor => _vendor;
         internal override string ReadMember => _valueMember;
     }
 }

@@ -17,17 +17,18 @@ namespace Alis.Reactive.PlanModel
         /// <summary>The declaring request's URL. Used only for error context.</summary>
         public string RequestUrl { get; }
 
-        /// <summary>The form element id whose components this validator covers, or
-        /// <see langword="null"/> when the declaring request set no container.</summary>
-        public string? Container { get; }
+        private readonly ComponentId _container;
+
+        /// <summary>The form element id whose components this validator covers.</summary>
+        public string Container => _container.Value;
 
         /// <summary>The FluentValidation validator type whose rules are extracted.</summary>
         public Type ValidatorType { get; }
 
-        internal ValidationJob(string requestUrl, string? container, Type validatorType)
+        internal ValidationJob(string requestUrl, ComponentId container, Type validatorType)
         {
             RequestUrl = requestUrl ?? throw new ArgumentNullException(nameof(requestUrl));
-            Container = container;
+            _container = container ?? throw new ArgumentNullException(nameof(container));
             ValidatorType = validatorType ?? throw new ArgumentNullException(nameof(validatorType));
         }
     }

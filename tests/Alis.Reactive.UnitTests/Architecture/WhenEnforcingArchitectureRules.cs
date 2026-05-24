@@ -58,9 +58,11 @@ public class WhenEnforcingArchitectureRules
 
     private class DummyExtractor : Validation.IValidationExtractor
     {
-        public List<Validation.ValidationField> ExtractRules(Type validatorType, string formId)
+        public Validation.ValidationExtractionReport Extract(Validation.ValidationExtractionRequest request)
         {
-            return new List<Validation.ValidationField>();
+            return Validation.ValidationExtractionReport.ForClientFields(
+                request,
+                new List<Validation.ValidationField>());
         }
     }
 }
