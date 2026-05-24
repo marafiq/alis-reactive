@@ -514,21 +514,11 @@ class ConditionalValidationActivation extends ValidationActivation {
   }
 
   isActive(surface: ValidationSurface): boolean {
-    try {
-      return evaluateCondition(this.condition, surface.plan, surface.context.raw);
-    } catch (e) {
-      if (isResolutionError(e)) return false;
-      throw e;
-    }
+    return evaluateCondition(this.condition, surface.plan, surface.context.raw);
   }
 
   isSkipped(surface: ValidationSurface): boolean {
-    try {
-      return !evaluateCondition(this.condition, surface.plan, surface.context.raw);
-    } catch (e) {
-      if (isResolutionError(e)) return true;
-      throw e;
-    }
+    return !evaluateCondition(this.condition, surface.plan, surface.context.raw);
   }
 }
 
@@ -558,12 +548,7 @@ class PresentValidationPeerOperand extends ValidationPeerOperand {
   }
 
   resolve(plan: Plan): ResolvedPeerValue {
-    try {
-      return peerValue(evaluateValue(this.value, plan));
-    } catch (e) {
-      if (isResolutionError(e)) return noPeerValue();
-      throw e;
-    }
+    return peerValue(evaluateValue(this.value, plan));
   }
 }
 

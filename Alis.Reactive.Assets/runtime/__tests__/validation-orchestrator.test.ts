@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { PlanRegistry } from "../lifecycle/merge-plan";
 import { showServerErrors, validateContainer } from "../validation/orchestrator";
-import type { Component, ComponentValidation, JsType, Plan, Shape } from "../types";
+import type { Component, ComponentValidation, JsType, Plan, Shape, ValueProducer } from "../types";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };
@@ -12,7 +12,13 @@ afterEach(() => {
 
 function nativeInputType(): JsType {
   return {
-    properties: {},
+    properties: {
+      value: {
+        path: [{ kind: "property", name: "value" }],
+        shape: stringShape,
+        access: "readwrite",
+      },
+    },
     methods: {},
     events: {},
   };
@@ -72,6 +78,78 @@ function requiredRule(
         },
       },
     ],
+  };
+}
+
+function conditionalRuleWithMissingActivationSource(): ComponentValidation {
+  return {
+    component: "resident-name-field",
+    serverFieldName: "Name",
+    value: readComponentValue("resident-name-field"),
+    rules: [
+      {
+        name: "required",
+        message: "Name is required",
+        execution: {
+          constraint: { kind: "none" },
+          otherValue: { kind: "none" },
+          activation: {
+            kind: "when",
+            condition: {
+              kind: "compare",
+              left: readComponentValue("missing-activation-source"),
+              op: "eq",
+              right: { kind: "value", value: literal("yes") },
+              shape: stringShape,
+              itemShape: noneShape,
+            },
+          },
+          comparisonShape: noneShape,
+        },
+      },
+    ],
+  };
+}
+
+function peerRuleWithMissingPeerSource(): ComponentValidation {
+  return {
+    component: "resident-name-field",
+    serverFieldName: "Name",
+    value: readComponentValue("resident-name-field"),
+    rules: [
+      {
+        name: "equalTo",
+        message: "Name must match",
+        execution: {
+          constraint: { kind: "none" },
+          otherValue: {
+            kind: "value",
+            value: readComponentValue("missing-peer-source"),
+          },
+          activation: { kind: "always" },
+          comparisonShape: stringShape,
+        },
+      },
+    ],
+  };
+}
+
+function readComponentValue(component: string): ValueProducer {
+  return {
+    kind: "read",
+    from: { kind: "component", component },
+    member: "value",
+    path: [],
+    shape: stringShape,
+    access: { kind: "property" },
+  };
+}
+
+function literal(value: string): ValueProducer {
+  return {
+    kind: "literal",
+    value,
+    shape: stringShape,
   };
 }
 
@@ -251,7 +329,9 @@ describe("validation orchestrator server errors", () => {
     expect(document.querySelector("[data-valmsg-summary-for='Name']")?.textContent)
       .toBe("Name is required");
   });
+});
 
+describe("validation orchestrator client rules", () => {
   it("does not hide a miswired validation value producer behind missing field behavior", () => {
     renderValidationDom();
     const runtimePlan = plan([
@@ -260,6 +340,26 @@ describe("validation orchestrator server errors", () => {
 
     expect(() => validateContainer(runtimePlan, "resident-form"))
       .toThrow("[alis] component not found: missing-component");
+  });
+
+  it("does not hide a miswired activation dependency behind conditional skip behavior", () => {
+    renderValidationDom();
+    const runtimePlan = plan([
+      conditionalRuleWithMissingActivationSource(),
+    ]);
+
+    expect(() => validateContainer(runtimePlan, "resident-form"))
+      .toThrow("[alis] component not found: missing-activation-source");
+  });
+
+  it("does not hide a miswired peer dependency behind an absent peer value", () => {
+    renderValidationDom();
+    const runtimePlan = plan([
+      peerRuleWithMissingPeerSource(),
+    ]);
+
+    expect(() => validateContainer(runtimePlan, "resident-form"))
+      .toThrow("[alis] component not found: missing-peer-source");
   });
 });
 
