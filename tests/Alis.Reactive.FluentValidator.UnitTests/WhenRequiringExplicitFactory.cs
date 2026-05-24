@@ -15,7 +15,7 @@ public class WhenRequiringExplicitFactory
         var adapter = new FluentValidationAdapter(type =>
             Activator.CreateInstance(type) as FluentValidation.IValidator);
 
-        var desc = adapter.ExtractRules(typeof(RequiredValidator), "testForm");
+        var desc = adapter.ProjectRules(typeof(RequiredValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].FieldName, Is.EqualTo("Name"));
@@ -27,7 +27,7 @@ public class WhenRequiringExplicitFactory
         var adapter = new FluentValidationAdapter(_ => null);
 
         var ex = Assert.Throws<InvalidOperationException>(() =>
-            adapter.ExtractRules(typeof(RequiredValidator), "testForm"));
+            adapter.ProjectRules(typeof(RequiredValidator), "testForm"));
 
         Assert.That(ex!.Message, Does.Contain("RequiredValidator"));
         Assert.That(ex.Message, Does.Contain("validator factory"));

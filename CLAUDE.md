@@ -21,9 +21,8 @@ Throughout this document, "the runtime" means the TypeScript code in
 `Alis.Reactive.Assets/runtime/` that executes plans in the browser. It is
 bundled by esbuild into `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js`
 (IIFE), shipped inside the AlisReactive NuGet, and copied into the consumer's
-`wwwroot/scripts/` (net10) or `Content/alisreactive/` (net48) by the shipped
-`AlisReactive.targets` file with the consumer's package version baked into
-the filename.
+`wwwroot/scripts/` by the shipped `AlisReactive.targets` file with the
+consumer's package version baked into the filename.
 
 ## Architecture — 4 Layers, 3 Boundaries
 
@@ -291,10 +290,10 @@ dotnet pack Alis.Reactive/Alis.Reactive.csproj \
 
 | Layer | Technology |
 |-------|-----------|
-| C# | .NET 10. **C# 8.0 enforced** in 4 library projects (Core, Fusion, Native, FluentValidator). Analyzers uses `latest`. Apps and tests use `latest`. |
+| C# | .NET 10, C# 14. Use modern C# where it improves the domain model without weakening the DSL contract. |
 | TS | TypeScript 5.8, esbuild ESM, Tailwind CSS v4 |
 | Components | Syncfusion EJ2 32.x (Fusion) + Native HTML. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
-| Validation | FluentValidation 12.x, extracted to client rules via `FluentValidationAdapter` |
+| Validation | FluentValidation 12.x remains server authority; `FluentValidationAdapter` projects deterministic client validation rules |
 | Tests | NUnit 4.3-4.5, Vitest 3.x + jsdom (configured, no tests yet), Playwright 1.52 |
 
 ## Skills
@@ -309,7 +308,7 @@ dotnet pack Alis.Reactive/Alis.Reactive.csproj \
 | `validation-rules` | FluentValidation rules, Validate, ValidationErrors, WhenField |
 | `onboard-fusion-component` | Adding Syncfusion components, 7-file vertical slice |
 | `solid-ts-audit` | SOLID analysis of TypeScript runtime modules |
-| `modern-csharp` | C# patterns (needs rewrite — currently promotes C# 12+, repo uses C# 8.0) |
+| `modern-csharp` | C# 14 patterns that clarify the rich plan domain model |
 | `bdd-testing` | Playwright BDD tests, 5 rules, 7-behavior contract, blind reviewer |
 
 10 hookify rules in `.claude/hookify.*.local.md` enforce quality gates automatically:

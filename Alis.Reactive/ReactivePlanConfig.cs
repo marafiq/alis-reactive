@@ -8,85 +8,84 @@ namespace Alis.Reactive
     /// One-time startup configuration for the reactive framework.
     /// </summary>
     /// <remarks>
-    /// Call <see cref="UseValidationExtractor"/> in <c>Program.cs</c> or <c>Startup.cs</c>
-    /// to enable client-side validation extraction from FluentValidation validators.
+    /// Call <see cref="UseClientValidationProjectionSource"/> in <c>Program.cs</c> or <c>Startup.cs</c>
+    /// to enable client-side validation projection from validators or generated model metadata.
     /// Without this call, views that use <c>Validate&lt;TValidator&gt;()</c> will throw at render time.
     /// </remarks>
     public static class ReactivePlanConfig
     {
-        private static ValidationExtractorRegistration _validationExtractor =
-            ValidationExtractorRegistration.Missing;
+        private static ClientValidationProjectionSourceRegistration _projectionSource =
+            ClientValidationProjectionSourceRegistration.Missing;
 
-        internal static ValidationExtractorRegistration ValidationExtractor => _validationExtractor;
+        internal static ClientValidationProjectionSourceRegistration ClientValidationProjectionSource => _projectionSource;
 
         /// <summary>
-        /// Registers the validation extractor that converts FluentValidation rules to
-        /// client-side validation rules.
+        /// Registers the source that projects deterministic browser validation rules.
         /// </summary>
         /// <remarks>
         /// Must be called exactly once at app startup. Calling it a second time throws
-        /// to prevent accidental double-registration that would silently replace the extractor.
+        /// to prevent accidental double-registration that would silently replace the projection source.
         /// </remarks>
-        /// <param name="extractor">The extractor implementation (typically from <c>Alis.Reactive.FluentValidator</c>).</param>
-        /// <exception cref="InvalidOperationException">Thrown if an extractor is already registered.</exception>
-        public static void UseValidationExtractor(IValidationExtractor extractor)
+        /// <param name="source">The projection source implementation (typically from <c>Alis.Reactive.FluentValidator</c>).</param>
+        /// <exception cref="InvalidOperationException">Thrown if a projection source is already registered.</exception>
+        public static void UseClientValidationProjectionSource(IClientValidationProjectionSource source)
         {
-            _validationExtractor = _validationExtractor.Register(extractor);
+            _projectionSource = _projectionSource.Register(source);
         }
 
-        /// <summary>Test-only: resets static state so UseValidationExtractor can be called again.</summary>
-        internal static void Reset() => _validationExtractor = ValidationExtractorRegistration.Missing;
+        /// <summary>Test-only: resets static state so UseClientValidationProjectionSource can be called again.</summary>
+        internal static void Reset() => _projectionSource = ClientValidationProjectionSourceRegistration.Missing;
     }
 
-    internal abstract class ValidationExtractorRegistration
+    internal abstract class ClientValidationProjectionSourceRegistration
     {
-        internal static ValidationExtractorRegistration Missing { get; } =
-            new MissingValidationExtractorRegistration();
+        internal static ClientValidationProjectionSourceRegistration Missing { get; } =
+            new MissingClientValidationProjectionSourceRegistration();
 
-        internal abstract ValidationExtractorRegistration Register(IValidationExtractor extractor);
+        internal abstract ClientValidationProjectionSourceRegistration Register(IClientValidationProjectionSource source);
 
-        internal abstract IValidationExtractor RequireFor(ValidationJob job);
+        internal abstract IClientValidationProjectionSource RequireFor(ValidationJob job);
     }
 
-    internal sealed class MissingValidationExtractorRegistration : ValidationExtractorRegistration
+    internal sealed class MissingClientValidationProjectionSourceRegistration : ClientValidationProjectionSourceRegistration
     {
-        internal override ValidationExtractorRegistration Register(IValidationExtractor extractor)
+        internal override ClientValidationProjectionSourceRegistration Register(IClientValidationProjectionSource source)
         {
-            if (extractor == null) throw new ArgumentNullException(nameof(extractor));
-            return new RegisteredValidationExtractor(extractor);
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            return new RegisteredClientValidationProjectionSource(source);
         }
 
-        internal override IValidationExtractor RequireFor(ValidationJob job)
+        internal override IClientValidationProjectionSource RequireFor(ValidationJob job)
         {
             if (job == null) throw new ArgumentNullException(nameof(job));
             throw new InvalidOperationException(
                 $"Request at '{job.RequestUrl}' specifies validator '{job.ValidatorType.Name}' " +
-                "but no IValidationExtractor is registered. " +
-                "Call ReactivePlanConfig.UseValidationExtractor() at app startup.");
+                "but no IClientValidationProjectionSource is registered. " +
+                "Call ReactivePlanConfig.UseClientValidationProjectionSource() at app startup.");
         }
     }
 
-    internal sealed class RegisteredValidationExtractor : ValidationExtractorRegistration
+    internal sealed class RegisteredClientValidationProjectionSource : ClientValidationProjectionSourceRegistration
     {
-        private readonly IValidationExtractor _extractor;
+        private readonly IClientValidationProjectionSource _source;
 
-        internal RegisteredValidationExtractor(IValidationExtractor extractor)
+        internal RegisteredClientValidationProjectionSource(IClientValidationProjectionSource source)
         {
-            _extractor = extractor ?? throw new ArgumentNullException(nameof(extractor));
+            _source = source ?? throw new ArgumentNullException(nameof(source));
         }
 
-        internal override ValidationExtractorRegistration Register(IValidationExtractor extractor)
+        internal override ClientValidationProjectionSourceRegistration Register(IClientValidationProjectionSource source)
         {
-            if (extractor == null) throw new ArgumentNullException(nameof(extractor));
+            if (source == null) throw new ArgumentNullException(nameof(source));
             throw new InvalidOperationException(
-                "Validation extractor is already registered. " +
-                "UseValidationExtractor must be called exactly once at app startup.");
+                "Client validation projection source is already registered. " +
+                "UseClientValidationProjectionSource must be called exactly once at app startup.");
         }
 
-        internal override IValidationExtractor RequireFor(ValidationJob job)
+        internal override IClientValidationProjectionSource RequireFor(ValidationJob job)
         {
             if (job == null) throw new ArgumentNullException(nameof(job));
-            return _extractor;
+            return _source;
         }
     }
 }

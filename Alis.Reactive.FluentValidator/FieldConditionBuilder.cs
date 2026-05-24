@@ -27,11 +27,11 @@ namespace Alis.Reactive.FluentValidator
     /// </summary>
     public sealed class FieldStart<T, TProp> where T : class
     {
-        private readonly SelectedValidationField<T, TProp> _field;
+        private readonly SelectedClientValidationField<T, TProp> _field;
 
         internal FieldStart(Expression<Func<T, TProp>> field)
         {
-            _field = SelectedValidationField<T, TProp>.From(field);
+            _field = SelectedClientValidationField<T, TProp>.From(field);
         }
 
         // ── Equality ───────────────────────────────────────────────────────

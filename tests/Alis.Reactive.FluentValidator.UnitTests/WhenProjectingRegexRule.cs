@@ -1,14 +1,14 @@
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
-public class WhenExtractingRegexRule
+public class WhenProjectingRegexRule
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
     public void Matches_produces_regex_rule_with_pattern_constraint()
     {
-        var desc = _adapter.ExtractRules(typeof(RegexValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(RegexValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("regex"));

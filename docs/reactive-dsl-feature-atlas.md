@@ -290,9 +290,9 @@ Source:
 
 Domain terms:
 
-- `ValidationExtractionRequest`
-- `ValidationExtractionReport`
-- `ValidationField`
+- `ClientValidationProjectionRequest`
+- `ClientValidationProjection`
+- `ClientValidationField`
 - `ValidationRule`
 - `FieldCondition`
 - `ValidationRuleActivation`
@@ -463,7 +463,7 @@ The next closed surfaces should be chosen by blast radius and domain clarity:
    lane boundary.
 3. Partial contribution lifecycle: stable artifact ID, merge, unmerge, owned
    definitions, references, validation and listener removal.
-4. Validation projection/binding: client rule extraction, field conditions,
+4. Validation projection/binding: client rule projection, field conditions,
    peer fields, skipped server-only conditions.
 5. Gather/request: payload claims, scalar slots, route/header/url binding,
    chained/parallel lifecycle.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Alis.Reactive.Validation
 {
-    /// <summary>Rendered validation boundary that owns extracted validation output.</summary>
+    /// <summary>Rendered validation boundary that owns projected browser validation output.</summary>
     public sealed class ValidationContainerId : IEquatable<ValidationContainerId>
     {
         private ValidationContainerId(string value)
@@ -18,7 +18,7 @@ namespace Alis.Reactive.Validation
             if (string.IsNullOrWhiteSpace(value))
             {
                 throw new ArgumentException(
-                    "A validation container id is required so extracted rules can be attached to the rendered validation boundary.",
+                    "A validation container id is required so projected browser rules can be attached to the rendered validation boundary.",
                     nameof(value));
             }
 
@@ -35,10 +35,10 @@ namespace Alis.Reactive.Validation
         public override string ToString() => Value;
     }
 
-    /// <summary>Request passed from plan resolution to a validation integration.</summary>
-    public sealed class ValidationExtractionRequest
+    /// <summary>Request passed from plan resolution to a client validation projection source.</summary>
+    public sealed class ClientValidationProjectionRequest
     {
-        private ValidationExtractionRequest(Type validatorType, ValidationContainerId validationContainer)
+        private ClientValidationProjectionRequest(Type validatorType, ValidationContainerId validationContainer)
         {
             ValidatorType = validatorType ?? throw new ArgumentNullException(nameof(validatorType));
             ValidationContainer = validationContainer ?? throw new ArgumentNullException(nameof(validationContainer));
@@ -47,29 +47,29 @@ namespace Alis.Reactive.Validation
         public Type ValidatorType { get; }
         public ValidationContainerId ValidationContainer { get; }
 
-        public static ValidationExtractionRequest For(Type validatorType, string validationContainerId) =>
-            new ValidationExtractionRequest(validatorType, ValidationContainerId.Of(validationContainerId));
+        public static ClientValidationProjectionRequest For(Type validatorType, string validationContainerId) =>
+            new ClientValidationProjectionRequest(validatorType, ValidationContainerId.Of(validationContainerId));
     }
 
-    /// <summary>Complete extraction outcome split by projected browser fields and skipped browser projections.</summary>
-    public sealed class ValidationExtractionReport
+    /// <summary>Complete client validation projection split by projected fields and skipped browser rules.</summary>
+    public sealed class ClientValidationProjection
     {
-        public ValidationExtractionReport(
+        public ClientValidationProjection(
             ValidationContainerId validationContainer,
-            IReadOnlyList<ValidationField> clientFields,
-            IReadOnlyList<SkippedClientRuleExtraction> skippedClientRules)
+            IReadOnlyList<ClientValidationField> fields,
+            IReadOnlyList<SkippedClientRuleProjection> skippedRules)
         {
             ValidationContainer = validationContainer ?? throw new ArgumentNullException(nameof(validationContainer));
-            if (clientFields == null) throw new ArgumentNullException(nameof(clientFields));
-            if (skippedClientRules == null) throw new ArgumentNullException(nameof(skippedClientRules));
+            if (fields == null) throw new ArgumentNullException(nameof(fields));
+            if (skippedRules == null) throw new ArgumentNullException(nameof(skippedRules));
 
-            ClientFields = Snapshot(clientFields, nameof(clientFields));
-            SkippedClientRules = Snapshot(skippedClientRules, nameof(skippedClientRules));
+            Fields = Snapshot(fields, nameof(fields));
+            SkippedRules = Snapshot(skippedRules, nameof(skippedRules));
         }
 
         public ValidationContainerId ValidationContainer { get; }
-        public IReadOnlyList<ValidationField> ClientFields { get; }
-        public IReadOnlyList<SkippedClientRuleExtraction> SkippedClientRules { get; }
+        public IReadOnlyList<ClientValidationField> Fields { get; }
+        public IReadOnlyList<SkippedClientRuleProjection> SkippedRules { get; }
 
         private static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items, string parameterName)
             where T : class
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Validation
             foreach (var item in items)
             {
                 if (item == null)
-                    throw new ArgumentException("Validation extraction report items must not be null.", parameterName);
+                    throw new ArgumentException("Client validation projection items must not be null.", parameterName);
 
                 snapshot.Add(item);
             }
@@ -86,25 +86,25 @@ namespace Alis.Reactive.Validation
             return snapshot;
         }
 
-        public static ValidationExtractionReport ForClientFields(
-            ValidationExtractionRequest request,
-            IReadOnlyList<ValidationField> clientFields)
+        public static ClientValidationProjection ForFields(
+            ClientValidationProjectionRequest request,
+            IReadOnlyList<ClientValidationField> fields)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            return new ValidationExtractionReport(
+            return new ClientValidationProjection(
                 request.ValidationContainer,
-                clientFields,
-                Array.Empty<SkippedClientRuleExtraction>());
+                fields,
+                Array.Empty<SkippedClientRuleProjection>());
         }
     }
 
     /// <summary>Rule intentionally omitted from the browser projection because no deterministic client rule was proven.</summary>
-    public sealed class SkippedClientRuleExtraction
+    public sealed class SkippedClientRuleProjection
     {
-        private SkippedClientRuleExtraction(
+        private SkippedClientRuleProjection(
             ValidationFieldPath fieldPath,
             string validatorName,
-            ClientRuleExtractionSkipReason reason)
+            ClientRuleProjectionSkipReason reason)
         {
             if (string.IsNullOrWhiteSpace(validatorName))
             {
@@ -120,25 +120,25 @@ namespace Alis.Reactive.Validation
 
         public string FieldName => FieldPath.Value;
         public string ValidatorName { get; }
-        public ClientRuleExtractionSkipReason Reason { get; }
+        public ClientRuleProjectionSkipReason Reason { get; }
 
         internal ValidationFieldPath FieldPath { get; }
 
-        public static SkippedClientRuleExtraction ForField(
+        public static SkippedClientRuleProjection ForField(
             string fieldName,
             string validatorName,
-            ClientRuleExtractionSkipReason reason) =>
-            new SkippedClientRuleExtraction(ValidationFieldPath.Of(fieldName), validatorName, reason);
+            ClientRuleProjectionSkipReason reason) =>
+            new SkippedClientRuleProjection(ValidationFieldPath.Of(fieldName), validatorName, reason);
 
-        internal static SkippedClientRuleExtraction For(
+        internal static SkippedClientRuleProjection For(
             ValidationFieldPath fieldPath,
             string validatorName,
-            ClientRuleExtractionSkipReason reason) =>
-            new SkippedClientRuleExtraction(fieldPath, validatorName, reason);
+            ClientRuleProjectionSkipReason reason) =>
+            new SkippedClientRuleProjection(fieldPath, validatorName, reason);
     }
 
     /// <summary>Why a validation rule was not projected into browser validation.</summary>
-    public enum ClientRuleExtractionSkipReason
+    public enum ClientRuleProjectionSkipReason
     {
         FluentValidationConditionWithoutClientGuard,
         RuleComponentCondition,

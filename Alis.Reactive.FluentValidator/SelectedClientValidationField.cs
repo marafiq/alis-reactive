@@ -5,12 +5,12 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
 {
-    internal sealed class SelectedValidationField<TModel, TValue>
+    internal sealed class SelectedClientValidationField<TModel, TValue>
         where TModel : class
     {
         private readonly Func<TModel, TValue> _readValue;
 
-        private SelectedValidationField(
+        private SelectedClientValidationField(
             ValidationFieldPath path,
             Func<TModel, TValue> readValue)
         {
@@ -20,11 +20,11 @@ namespace Alis.Reactive.FluentValidator
 
         private ValidationFieldPath Path { get; }
 
-        internal static SelectedValidationField<TModel, TValue> From(
+        internal static SelectedClientValidationField<TModel, TValue> From(
             Expression<Func<TModel, TValue>> expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            return new SelectedValidationField<TModel, TValue>(
+            return new SelectedClientValidationField<TModel, TValue>(
                 PathFrom(expression),
                 expression.Compile());
         }

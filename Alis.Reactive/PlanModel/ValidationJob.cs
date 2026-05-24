@@ -22,7 +22,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>The form element id whose components this validator covers.</summary>
         public string Container => _container.Value;
 
-        /// <summary>The FluentValidation validator type whose rules are extracted.</summary>
+        /// <summary>The FluentValidation validator type whose rules are projected.</summary>
         public Type ValidatorType { get; }
 
         internal ValidationJob(string requestUrl, ComponentId container, Type validatorType)

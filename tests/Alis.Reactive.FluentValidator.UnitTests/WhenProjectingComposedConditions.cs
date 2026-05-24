@@ -4,16 +4,16 @@ using FluentValidation;
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
-public class WhenExtractingComposedConditions
+public class WhenProjectingComposedConditions
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     // ── And composition ────────────────────────────────────────────────────
 
     [Test]
-    public void WhenFields_And_extracts_FieldAll_with_two_terms()
+    public void WhenFields_And_projects_FieldAll_with_two_terms()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldsAndValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldsAndValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
         var when = jobTitle.Rules[0].Condition();
 
@@ -34,7 +34,7 @@ public class WhenExtractingComposedConditions
     [Test]
     public void WhenFields_And_includes_all_source_fields()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldsAndValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldsAndValidator), "form");
         var fieldNames = fields.Select(f => f.FieldName).ToList();
 
         Assert.That(fieldNames, Does.Contain("IsEmployed"));
@@ -44,9 +44,9 @@ public class WhenExtractingComposedConditions
     // ── Or composition ─────────────────────────────────────────────────────
 
     [Test]
-    public void WhenFields_Or_extracts_FieldAny_with_two_terms()
+    public void WhenFields_Or_projects_FieldAny_with_two_terms()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldsOrValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldsOrValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
         var when = notes.Rules[0].Condition();
 
@@ -68,9 +68,9 @@ public class WhenExtractingComposedConditions
     // ── Not composition ────────────────────────────────────────────────────
 
     [Test]
-    public void WhenFields_Not_extracts_FieldNot_wrapping_inner()
+    public void WhenFields_Not_projects_FieldNot_wrapping_inner()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldsNotValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldsNotValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
         var when = notes.Rules[0].Condition();
 
@@ -85,10 +85,10 @@ public class WhenExtractingComposedConditions
     // ── Complex composition ────────────────────────────────────────────────
 
     [Test]
-    public void WhenFields_complex_extracts_nested_tree()
+    public void WhenFields_complex_projects_nested_tree()
     {
         // Validator: (employed AND salary > 50k) OR (age >= 65)
-        var fields = _adapter.ExtractRules(typeof(WhenFieldsComplexValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldsComplexValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
         var when = email.Rules[0].Condition();
 
@@ -121,7 +121,7 @@ public class WhenExtractingComposedConditions
     [Test]
     public void WhenFields_complex_includes_all_source_fields()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldsComplexValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldsComplexValidator), "form");
         var fieldNames = fields.Select(f => f.FieldName).ToList();
 
         Assert.That(fieldNames, Does.Contain("IsEmployed"));

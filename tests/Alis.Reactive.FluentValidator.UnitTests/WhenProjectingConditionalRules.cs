@@ -3,14 +3,14 @@ using Alis.Reactive.Validation;
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
-public class WhenExtractingConditionalRules
+public class WhenProjectingConditionalRules
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
     public void Conditional_rules_with_When_are_skipped()
     {
-        var desc = _adapter.ExtractRules(typeof(ConditionalValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ConditionalValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         // Only Name should appear (JobTitle has .When() so it's skipped)
@@ -21,7 +21,7 @@ public class WhenExtractingConditionalRules
     [Test]
     public void ReactiveValidator_WhenField_merges_conditional_rules()
     {
-        var desc = _adapter.ExtractRules(typeof(ConditionalProviderValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ConditionalProviderValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc.Select(f => f.FieldName).ToList();
@@ -40,14 +40,14 @@ public class WhenExtractingConditionalRules
     [Test]
     public void Server_only_When_wrapping_WhenField_skips_client_projection()
     {
-        var report = _adapter.ExtractReport(typeof(ServerOnlyWhenWrapsClientGuardValidator), "testForm");
+        var report = _adapter.ProjectValidation(typeof(ServerOnlyWhenWrapsClientGuardValidator), "testForm");
 
-        Assert.That(report.ClientFields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
-        Assert.That(report.SkippedClientRules, Has.Count.EqualTo(1));
-        Assert.That(report.SkippedClientRules[0].FieldName, Is.EqualTo("JobTitle"));
+        Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
+        Assert.That(report.SkippedRules, Has.Count.EqualTo(1));
+        Assert.That(report.SkippedRules[0].FieldName, Is.EqualTo("JobTitle"));
         Assert.That(
-            report.SkippedClientRules[0].Reason,
-            Is.EqualTo(ClientRuleExtractionSkipReason.FluentValidationConditionWithoutClientGuard));
+            report.SkippedRules[0].Reason,
+            Is.EqualTo(ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard));
 
         var validator = new ServerOnlyWhenWrapsClientGuardValidator();
         var result = validator.Validate(new TestModel
@@ -62,25 +62,25 @@ public class WhenExtractingConditionalRules
     [Test]
     public void WhenField_wrapping_server_only_When_skips_client_projection()
     {
-        var report = _adapter.ExtractReport(typeof(ClientGuardWrapsServerOnlyWhenValidator), "testForm");
+        var report = _adapter.ProjectValidation(typeof(ClientGuardWrapsServerOnlyWhenValidator), "testForm");
 
-        Assert.That(report.ClientFields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
-        Assert.That(report.SkippedClientRules, Has.Count.EqualTo(1));
-        Assert.That(report.SkippedClientRules[0].FieldName, Is.EqualTo("JobTitle"));
+        Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
+        Assert.That(report.SkippedRules, Has.Count.EqualTo(1));
+        Assert.That(report.SkippedRules[0].FieldName, Is.EqualTo("JobTitle"));
         Assert.That(
-            report.SkippedClientRules[0].Reason,
-            Is.EqualTo(ClientRuleExtractionSkipReason.FluentValidationConditionWithoutClientGuard));
+            report.SkippedRules[0].Reason,
+            Is.EqualTo(ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard));
     }
 
     [Test]
     public void Server_only_Otherwise_wrapping_WhenField_skips_client_projection()
     {
-        var report = _adapter.ExtractReport(typeof(ServerOnlyOtherwiseWrapsClientGuardValidator), "testForm");
+        var report = _adapter.ProjectValidation(typeof(ServerOnlyOtherwiseWrapsClientGuardValidator), "testForm");
 
-        Assert.That(report.ClientFields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
-        var jobTitleSkip = report.SkippedClientRules.Single(rule => rule.FieldName == "JobTitle");
+        Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
+        var jobTitleSkip = report.SkippedRules.Single(rule => rule.FieldName == "JobTitle");
         Assert.That(
             jobTitleSkip.Reason,
-            Is.EqualTo(ClientRuleExtractionSkipReason.FluentValidationConditionWithoutClientGuard));
+            Is.EqualTo(ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard));
     }
 }

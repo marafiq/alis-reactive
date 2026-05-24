@@ -9,9 +9,9 @@ namespace Alis.Reactive.FluentValidator
 {
     public sealed partial class FluentValidationAdapter
     {
-        private sealed class ValidatorExtractionFrame
+        private sealed class ValidatorProjectionFrame
         {
-            private ValidatorExtractionFrame(
+            private ValidatorProjectionFrame(
                 ValidationFieldPath prefix,
                 ClientValidationProjectionDraft projection,
                 Func<Type, IValidator?> factory,
@@ -31,29 +31,29 @@ namespace Alis.Reactive.FluentValidator
             internal ClientConditionCatalog ClientConditions { get; }
             internal ValidationRuleCondition ParentCondition { get; }
 
-            internal static ValidatorExtractionFrame Root(
+            internal static ValidatorProjectionFrame Root(
                 ValidationFieldPath prefix,
                 ClientValidationProjectionDraft projection,
                 Func<Type, IValidator?> factory,
                 ClientConditionCatalog clientConditions) =>
-                new ValidatorExtractionFrame(prefix, projection, factory, clientConditions, ValidationRuleCondition.Always);
+                new ValidatorProjectionFrame(prefix, projection, factory, clientConditions, ValidationRuleCondition.Always);
 
-            internal ValidatorExtractionFrame WithParentCondition(ValidationRuleCondition parentCondition) =>
-                new ValidatorExtractionFrame(Prefix, Projection, Factory, ClientConditions, parentCondition);
+            internal ValidatorProjectionFrame WithParentCondition(ValidationRuleCondition parentCondition) =>
+                new ValidatorProjectionFrame(Prefix, Projection, Factory, ClientConditions, parentCondition);
 
-            internal ValidatorExtractionFrame ForNestedValidator(IValidator nested) =>
-                new ValidatorExtractionFrame(
+            internal ValidatorProjectionFrame ForNestedValidator(IValidator nested) =>
+                new ValidatorProjectionFrame(
                     Prefix,
                     Projection,
                     Factory,
                     ClientConditionCatalog.From(nested),
                     ParentCondition);
 
-            internal ValidatorExtractionFrame ForNestedValidator(
+            internal ValidatorProjectionFrame ForNestedValidator(
                 IValidator nested,
                 ValidationFieldPath prefix,
                 ValidationRuleCondition parentCondition) =>
-                new ValidatorExtractionFrame(
+                new ValidatorProjectionFrame(
                     prefix,
                     Projection,
                     Factory,
@@ -110,17 +110,17 @@ namespace Alis.Reactive.FluentValidator
                 return new MatchedClientCondition(condition);
             }
 
-            internal static ClientConditionMatch Skipped(ClientRuleExtractionSkipReason reason) =>
+            internal static ClientConditionMatch Skipped(ClientRuleProjectionSkipReason reason) =>
                 new SkippedClientCondition(reason);
 
-            internal abstract RuleExtractionScope ToRuleExtractionScope(ValidatorExtractionFrame frame);
+            internal abstract RuleProjectionScope ToRuleProjectionScope(ValidatorProjectionFrame frame);
 
             private sealed class FluentValidationConditionWithoutClientGuard : ClientConditionMatch
             {
-                internal override RuleExtractionScope ToRuleExtractionScope(ValidatorExtractionFrame frame)
+                internal override RuleProjectionScope ToRuleProjectionScope(ValidatorProjectionFrame frame)
                 {
                     if (frame == null) throw new ArgumentNullException(nameof(frame));
-                    return RuleExtractionScope.SkipClientProjection(ClientRuleExtractionSkipReason.FluentValidationConditionWithoutClientGuard);
+                    return RuleProjectionScope.SkipClientProjection(ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard);
                 }
             }
 
@@ -133,7 +133,7 @@ namespace Alis.Reactive.FluentValidator
                     _condition = condition ?? throw new ArgumentNullException(nameof(condition));
                 }
 
-                internal override RuleExtractionScope ToRuleExtractionScope(ValidatorExtractionFrame frame)
+                internal override RuleProjectionScope ToRuleProjectionScope(ValidatorProjectionFrame frame)
                 {
                     if (frame == null) throw new ArgumentNullException(nameof(frame));
 
@@ -141,64 +141,64 @@ namespace Alis.Reactive.FluentValidator
                         frame.Prefix,
                         frame.Projection.EnsureField);
                     var resolved = _condition.PrefixWith(prefixBinding);
-                    return RuleExtractionScope.ClientSide(resolved);
+                    return RuleProjectionScope.ClientSide(resolved);
                 }
             }
 
             private sealed class SkippedClientCondition : ClientConditionMatch
             {
-                private readonly ClientRuleExtractionSkipReason _reason;
+                private readonly ClientRuleProjectionSkipReason _reason;
 
-                internal SkippedClientCondition(ClientRuleExtractionSkipReason reason)
+                internal SkippedClientCondition(ClientRuleProjectionSkipReason reason)
                 {
                     _reason = reason;
                 }
 
-                internal override RuleExtractionScope ToRuleExtractionScope(ValidatorExtractionFrame frame)
+                internal override RuleProjectionScope ToRuleProjectionScope(ValidatorProjectionFrame frame)
                 {
                     if (frame == null) throw new ArgumentNullException(nameof(frame));
-                    return RuleExtractionScope.SkipClientProjection(_reason);
+                    return RuleProjectionScope.SkipClientProjection(_reason);
                 }
             }
         }
 
-        private abstract class RuleExtractionScope
+        private abstract class RuleProjectionScope
         {
-            private protected RuleExtractionScope() { }
+            private protected RuleProjectionScope() { }
 
-            internal static RuleExtractionScope Unconditional { get; } =
-                new ProjectedRuleExtractionScope(ValidationRuleCondition.Always);
+            internal static RuleProjectionScope Unconditional { get; } =
+                new ProjectedRuleProjectionScope(ValidationRuleCondition.Always);
 
-            internal static RuleExtractionScope SkipClientProjection(ClientRuleExtractionSkipReason reason) =>
-                new SkippedRuleExtractionScope(reason);
+            internal static RuleProjectionScope SkipClientProjection(ClientRuleProjectionSkipReason reason) =>
+                new SkippedRuleProjectionScope(reason);
 
-            internal static RuleExtractionScope ClientSide(FieldCondition condition)
+            internal static RuleProjectionScope ClientSide(FieldCondition condition)
             {
                 if (condition == null) throw new ArgumentNullException(nameof(condition));
-                return new ProjectedRuleExtractionScope(ValidationRuleCondition.When(condition));
+                return new ProjectedRuleProjectionScope(ValidationRuleCondition.When(condition));
             }
 
-            internal static RuleExtractionScope For(
+            internal static RuleProjectionScope For(
                 IValidationRule rule,
-                ValidatorExtractionFrame frame)
+                ValidatorProjectionFrame frame)
             {
                 if (rule == null) throw new ArgumentNullException(nameof(rule));
                 if (frame == null) throw new ArgumentNullException(nameof(frame));
-                return ResolveRuleExtractionScope(rule, frame);
+                return ResolveRuleProjectionScope(rule, frame);
             }
 
-            internal abstract void Extract(IValidationRule rule, ValidatorExtractionFrame frame);
+            internal abstract void Project(IValidationRule rule, ValidatorProjectionFrame frame);
 
-            private sealed class SkippedRuleExtractionScope : RuleExtractionScope
+            private sealed class SkippedRuleProjectionScope : RuleProjectionScope
             {
-                private readonly ClientRuleExtractionSkipReason _reason;
+                private readonly ClientRuleProjectionSkipReason _reason;
 
-                internal SkippedRuleExtractionScope(ClientRuleExtractionSkipReason reason)
+                internal SkippedRuleProjectionScope(ClientRuleProjectionSkipReason reason)
                 {
                     _reason = reason;
                 }
 
-                internal override void Extract(IValidationRule rule, ValidatorExtractionFrame frame)
+                internal override void Project(IValidationRule rule, ValidatorProjectionFrame frame)
                 {
                     if (rule == null) throw new ArgumentNullException(nameof(rule));
                     if (frame == null) throw new ArgumentNullException(nameof(frame));
@@ -211,16 +211,16 @@ namespace Alis.Reactive.FluentValidator
                 }
             }
 
-            private sealed class ProjectedRuleExtractionScope : RuleExtractionScope
+            private sealed class ProjectedRuleProjectionScope : RuleProjectionScope
             {
                 private readonly ValidationRuleCondition _condition;
 
-                internal ProjectedRuleExtractionScope(ValidationRuleCondition condition)
+                internal ProjectedRuleProjectionScope(ValidationRuleCondition condition)
                 {
                     _condition = condition ?? throw new ArgumentNullException(nameof(condition));
                 }
 
-                internal override void Extract(IValidationRule rule, ValidatorExtractionFrame frame)
+                internal override void Project(IValidationRule rule, ValidatorProjectionFrame frame)
                 {
                     if (rule == null) throw new ArgumentNullException(nameof(rule));
                     if (frame == null) throw new ArgumentNullException(nameof(frame));
@@ -246,7 +246,7 @@ namespace Alis.Reactive.FluentValidator
 
         private abstract class ClientRuleProjection
         {
-            internal static ClientRuleProjection SkipClientProjection(ClientRuleExtractionSkipReason reason) =>
+            internal static ClientRuleProjection SkipClientProjection(ClientRuleProjectionSkipReason reason) =>
                 new SkippedClientRuleProjection(reason);
 
             internal static ClientRuleProjection Project(ProjectedClientValidationRule rule)
@@ -262,9 +262,9 @@ namespace Alis.Reactive.FluentValidator
 
             private sealed class SkippedClientRuleProjection : ClientRuleProjection
             {
-                private readonly ClientRuleExtractionSkipReason _reason;
+                private readonly ClientRuleProjectionSkipReason _reason;
 
-                internal SkippedClientRuleProjection(ClientRuleExtractionSkipReason reason)
+                internal SkippedClientRuleProjection(ClientRuleProjectionSkipReason reason)
                 {
                     _reason = reason;
                 }
@@ -333,8 +333,8 @@ namespace Alis.Reactive.FluentValidator
         {
             private readonly Dictionary<string, ProjectedClientValidationField> _fields =
                 new Dictionary<string, ProjectedClientValidationField>(StringComparer.Ordinal);
-            private readonly List<SkippedClientRuleExtraction> _skippedClientRules =
-                new List<SkippedClientRuleExtraction>();
+            private readonly List<SkippedClientRuleProjection> _skippedClientRules =
+                new List<SkippedClientRuleProjection>();
 
             internal void EnsureField(ValidationFieldPath fieldPath)
             {
@@ -352,7 +352,7 @@ namespace Alis.Reactive.FluentValidator
                 _fields[fieldPath.Value].Add(rules);
             }
 
-            internal void RecordSkippedRule(SkippedClientRuleExtraction rule)
+            internal void RecordSkippedRule(SkippedClientRuleProjection rule)
             {
                 if (rule == null) throw new ArgumentNullException(nameof(rule));
                 _skippedClientRules.Add(rule);
@@ -370,15 +370,15 @@ namespace Alis.Reactive.FluentValidator
                     EnsureField(peerField);
             }
 
-            internal ValidationExtractionReport ToReport(ValidationContainerId validationContainer) =>
-                new ValidationExtractionReport(
+            internal ClientValidationProjection ToReport(ValidationContainerId validationContainer) =>
+                new ClientValidationProjection(
                     validationContainer,
                     ToValidationFields(),
                     _skippedClientRules.ToList());
 
-            private List<ValidationField> ToValidationFields()
+            private List<ClientValidationField> ToValidationFields()
             {
-                var fields = new List<ValidationField>();
+                var fields = new List<ClientValidationField>();
                 foreach (var field in _fields.Values)
                 {
                     var rules = new List<ValidationRule>();
@@ -387,7 +387,7 @@ namespace Alis.Reactive.FluentValidator
                         rules.Add(rule.ToValidationRule());
                     }
 
-                    fields.Add(new ValidationField(field.FieldPath, rules));
+                    fields.Add(new ClientValidationField(field.FieldPath, rules));
                 }
 
                 return fields;

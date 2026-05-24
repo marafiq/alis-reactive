@@ -21,19 +21,19 @@ public class ResidentQuickEditValidator : AbstractValidator<ResidentQuickEditMod
 }
 
 /// <summary>
-/// Proves the existing FluentValidation extraction path handles a validator whose fields
+/// Proves the existing FluentValidation projection path handles a validator whose fields
 /// are intended for FusionInPlaceEditor cards — no adapter changes required for the
 /// InPlaceEditor onboarding.
 /// </summary>
 [TestFixture]
-public class WhenExtractingRulesForInPlaceEditorFields
+public class WhenProjectingRulesForInPlaceEditorFields
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
-    public void Quick_edit_validator_extracts_all_three_fields()
+    public void Quick_edit_validator_projects_all_three_fields()
     {
-        var desc = _adapter.ExtractRules(typeof(ResidentQuickEditValidator), "resident-form");
+        var desc = _adapter.ProjectRules(typeof(ResidentQuickEditValidator), "resident-form");
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc.Select(f => f.FieldName).ToList();
@@ -45,7 +45,7 @@ public class WhenExtractingRulesForInPlaceEditorFields
     [Test]
     public void Nickname_has_required_and_maxLength_rules()
     {
-        var desc = _adapter.ExtractRules(typeof(ResidentQuickEditValidator), "resident-form");
+        var desc = _adapter.ProjectRules(typeof(ResidentQuickEditValidator), "resident-form");
 
         var nickname = desc.First(f => f.FieldName == "Nickname");
         var rules = nickname.Rules.Select(r => r.Rule).ToList();
@@ -56,7 +56,7 @@ public class WhenExtractingRulesForInPlaceEditorFields
     [Test]
     public void DateOfBirth_has_required_rule()
     {
-        var desc = _adapter.ExtractRules(typeof(ResidentQuickEditValidator), "resident-form");
+        var desc = _adapter.ProjectRules(typeof(ResidentQuickEditValidator), "resident-form");
 
         var dob = desc.First(f => f.FieldName == "DateOfBirth");
         var rules = dob.Rules.Select(r => r.Rule).ToList();
@@ -66,7 +66,7 @@ public class WhenExtractingRulesForInPlaceEditorFields
     [Test]
     public void MonthlyRate_has_gt_rule()
     {
-        var desc = _adapter.ExtractRules(typeof(ResidentQuickEditValidator), "resident-form");
+        var desc = _adapter.ProjectRules(typeof(ResidentQuickEditValidator), "resident-form");
 
         var rate = desc.First(f => f.FieldName == "MonthlyRate");
         var rules = rate.Rules.Select(r => r.Rule).ToList();

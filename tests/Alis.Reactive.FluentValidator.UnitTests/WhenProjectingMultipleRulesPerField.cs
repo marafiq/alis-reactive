@@ -1,14 +1,14 @@
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
-public class WhenExtractingMultipleRulesPerField
+public class WhenProjectingMultipleRulesPerField
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
-    public void All_rules_for_single_field_extracted_in_order()
+    public void All_rules_for_single_field_project_in_order()
     {
-        var desc = _adapter.ExtractRules(typeof(MultipleRulesValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(MultipleRulesValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc, Has.Count.EqualTo(1));

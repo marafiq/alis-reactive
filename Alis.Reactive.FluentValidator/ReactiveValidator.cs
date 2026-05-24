@@ -206,7 +206,7 @@ namespace Alis.Reactive.FluentValidator
         protected void WhenFieldArrayContains<TProp>(
             Expression<Func<T, IEnumerable<TProp>?>> field, TProp value, Action defineRules)
         {
-            var selectedField = SelectedValidationField<T, IEnumerable<TProp>?>.From(field);
+            var selectedField = SelectedClientValidationField<T, IEnumerable<TProp>?>.From(field);
             var guard = selectedField.GuardAgainstCollectionItem(
                 CompareOperator.ArrayContains,
                 value,
@@ -364,7 +364,7 @@ namespace Alis.Reactive.FluentValidator
                 var serverOnlyConditionIsActive = _serverOnlyConditionDepth > 0;
                 if (serverOnlyConditionIsActive)
                     return ClientConditionProjection.Skip(
-                        ClientRuleExtractionSkipReason.FluentValidationConditionWithoutClientGuard);
+                        ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard);
 
                 return ClientConditionProjection.Project(ActiveProjectionGuard());
             }

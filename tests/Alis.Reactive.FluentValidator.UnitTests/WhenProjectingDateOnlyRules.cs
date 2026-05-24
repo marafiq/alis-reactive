@@ -6,7 +6,7 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 /// DateOnly validation constraints serialize as yyyy-MM-dd plan literals.
 /// </summary>
 [TestFixture]
-public class WhenExtractingDateOnlyRules
+public class WhenProjectingDateOnlyRules
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
@@ -49,7 +49,7 @@ public class WhenExtractingDateOnlyRules
     [Test]
     public void DateOnly_GreaterThanOrEqualTo_constraint_is_serialized_as_yyyy_MM_dd_string()
     {
-        var desc = _adapter.ExtractRules(typeof(DateOnlyGreaterThanOrEqualToValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(DateOnlyGreaterThanOrEqualToValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc[0].Rules[0];
@@ -66,7 +66,7 @@ public class WhenExtractingDateOnlyRules
     [Test]
     public void DateOnly_LessThanOrEqualTo_constraint_is_serialized_as_yyyy_MM_dd_string()
     {
-        var desc = _adapter.ExtractRules(typeof(DateOnlyLessThanOrEqualToValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(DateOnlyLessThanOrEqualToValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc[0].Rules[0];
@@ -83,7 +83,7 @@ public class WhenExtractingDateOnlyRules
     [Test]
     public void DateOnly_InclusiveBetween_from_and_to_are_both_serialized_as_yyyy_MM_dd_strings()
     {
-        var desc = _adapter.ExtractRules(typeof(DateOnlyRangeValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(DateOnlyRangeValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc[0].Rules[0];

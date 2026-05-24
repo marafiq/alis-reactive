@@ -8,7 +8,7 @@ public class WhenFormIsEmpty
     [Test]
     public void Empty_validator_returns_empty_list()
     {
-        var fields = _adapter.ExtractRules(typeof(EmptyValidator), "testForm");
+        var fields = _adapter.ProjectRules(typeof(EmptyValidator), "testForm");
 
         Assert.That(fields, Is.Empty);
     }

@@ -114,17 +114,17 @@ public class UnsupportedNestedPeerComparisonValidator : AbstractValidator<Nested
 }
 
 [TestFixture]
-public class WhenExtractingNestedValidationIntent
+public class WhenProjectingNestedValidationIntent
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
     public void Nested_condition_field_carries_full_model_path()
     {
-        var fields = _adapter.ExtractRules(typeof(NestedConditionParentValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(NestedConditionParentValidator), "form");
 
         var confirmCity = fields.FirstOrDefault(f => f.FieldName == "Address.ConfirmCity");
-        Assert.That(confirmCity, Is.Not.Null, "Address.ConfirmCity field should be extracted");
+        Assert.That(confirmCity, Is.Not.Null, "Address.ConfirmCity field should be projected");
         Assert.That(confirmCity!.Rules, Has.Count.GreaterThan(0));
 
         var when = confirmCity.Rules[0].Condition();
@@ -138,10 +138,10 @@ public class WhenExtractingNestedValidationIntent
     [Test]
     public void Parent_and_child_conditions_compose_into_one_client_activation()
     {
-        var fields = _adapter.ExtractRules(typeof(ParentConditionalValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(ParentConditionalValidator), "form");
 
         var childName = fields.FirstOrDefault(f => f.FieldName == "Child.Name");
-        Assert.That(childName, Is.Not.Null, "Child.Name field should be extracted");
+        Assert.That(childName, Is.Not.Null, "Child.Name field should be projected");
         Assert.That(childName!.Rules, Has.Count.GreaterThan(0));
 
         var when = childName.Rules[0].Condition();
@@ -159,7 +159,7 @@ public class WhenExtractingNestedValidationIntent
         if (when is FieldCompare singleCmp)
         {
             Assert.Fail(
-                $"Only single condition extracted: Field={singleCmp.Field}, Op={singleCmp.Op}. " +
+                $"Only single condition projected: Field={singleCmp.Field}, Op={singleCmp.Op}. " +
                 "Parent condition was discarded. Client would show error when server skips it.");
         }
 
@@ -170,10 +170,10 @@ public class WhenExtractingNestedValidationIntent
     [Test]
     public void Nested_validator_peer_comparison_uses_same_object_model_path()
     {
-        var fields = _adapter.ExtractRules(typeof(NestedComparisonParentValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(NestedComparisonParentValidator), "form");
 
         var confirmCity = fields.FirstOrDefault(f => f.FieldName == "Address.ConfirmCity");
-        Assert.That(confirmCity, Is.Not.Null, "Address.ConfirmCity field should be extracted");
+        Assert.That(confirmCity, Is.Not.Null, "Address.ConfirmCity field should be projected");
         Assert.That(confirmCity!.Rules, Has.Count.GreaterThan(0));
 
         var rule = confirmCity.Rules[0];
@@ -186,10 +186,10 @@ public class WhenExtractingNestedValidationIntent
     [Test]
     public void Inline_nested_peer_comparison_uses_validated_field_sibling_scope()
     {
-        var fields = _adapter.ExtractRules(typeof(InlineNestedComparisonValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(InlineNestedComparisonValidator), "form");
 
         var confirmCity = fields.FirstOrDefault(f => f.FieldName == "Address.ConfirmCity");
-        Assert.That(confirmCity, Is.Not.Null, "Address.ConfirmCity field should be extracted");
+        Assert.That(confirmCity, Is.Not.Null, "Address.ConfirmCity field should be projected");
 
         var rule = confirmCity!.Rules[0];
         Assert.That(rule.Rule, Is.EqualTo("equalTo"));
@@ -200,21 +200,21 @@ public class WhenExtractingNestedValidationIntent
     [Test]
     public void Cross_object_peer_comparison_is_skipped_for_client_projection_when_only_leaf_member_is_available()
     {
-        var report = _adapter.ExtractReport(typeof(UnsupportedNestedPeerComparisonValidator), "form");
+        var report = _adapter.ProjectValidation(typeof(UnsupportedNestedPeerComparisonValidator), "form");
 
-        Assert.That(report.ClientFields.Select(field => field.FieldName), Does.Not.Contain("ConfirmEmail"));
-        Assert.That(report.SkippedClientRules, Has.Count.EqualTo(1));
-        Assert.That(report.SkippedClientRules[0].FieldName, Is.EqualTo("ConfirmEmail"));
-        Assert.That(report.SkippedClientRules[0].Reason, Is.EqualTo(ClientRuleExtractionSkipReason.CrossObjectPeerComparison));
+        Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("ConfirmEmail"));
+        Assert.That(report.SkippedRules, Has.Count.EqualTo(1));
+        Assert.That(report.SkippedRules[0].FieldName, Is.EqualTo("ConfirmEmail"));
+        Assert.That(report.SkippedRules[0].Reason, Is.EqualTo(ClientRuleProjectionSkipReason.CrossObjectPeerComparison));
     }
 
     [Test]
     public void Include_inside_client_condition_carries_parent_activation()
     {
-        var fields = _adapter.ExtractRules(typeof(IncludeConditionalValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(IncludeConditionalValidator), "form");
 
         var name = fields.FirstOrDefault(f => f.FieldName == "Name");
-        Assert.That(name, Is.Not.Null, "Name field should be extracted");
+        Assert.That(name, Is.Not.Null, "Name field should be projected");
         Assert.That(name!.Rules, Has.Count.GreaterThan(0));
 
         var rule = name.Rules[0];

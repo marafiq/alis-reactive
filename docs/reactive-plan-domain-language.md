@@ -86,7 +86,7 @@ flowchart LR
         DSL["Frozen Public DSL"]
         Slice["Component Vertical Slice"]
         PluginDsl["Plugin DSL / Contract"]
-        ValidationDsl["Validation Extraction"]
+        ValidationDsl["Validation Projection"]
     end
 
     subgraph PlanDomain["Plan Domain - Pure Intent"]
@@ -516,7 +516,7 @@ must preserve every authoring shape here.
 | Gather DSL | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, plugin result, explicit component include, typed component source include | explicit gather field, dynamic registered input, supplemental field, scalar slot, route template binding, component read |
 | Response DSL | untyped/typed `OnSuccess`, any/specific `OnError`, typed error body, chained request | response payload source, response media type, status handler, any-status handler, no-response outcome |
 | Dispatch DSL | `Dispatch`, literal typed dispatch, `DispatchWith<TPayload>` with typed field paths and source/literal assignments | dispatch payload contract, nested payload path, object value producer, custom-event payload type |
-| Validation DSL | `Validate<TValidator>`, `ValidationErrors`, render-time input registration, FluentValidation client projection, `WhenField*`, peer comparisons | validation extraction request/report, field binding, activation condition, peer operand, server error field name |
+| Validation DSL | `Validate<TValidator>`, `ValidationErrors`, render-time input registration, FluentValidation client projection, `WhenField*`, peer comparisons | client validation projection request/result, field binding, activation condition, peer operand, server error field name |
 | Plugin DSL | string plugin registration, typed `ReactivePlugin`, root/member function, root/member command, readable property, open/exact arguments, literal/source arguments | plugin contract, operation identity, property identity, argument contract, plugin registry entry |
 | Partial DSL/Lifecycle | root `ReactivePlan`, partial `ResolvePlan`, `RenderPlan`, `Into(...)`, partial slot load/unload | document contribution, initial composition, partial slot lifetime, ownership, existing component reference, contribution removal |
 | App Component DSL | fixed-id `Drawer`, `Loader`, `Toast`, `Confirm`, `ActionLink` inline request | layout-owned fixed component, inline action link plan, layout-object contribution, app-level runtime adapter |
@@ -545,12 +545,12 @@ These are the authoring forms most likely to expose an anemic model:
 | `Alis.Reactive/ComponentOnboarding` | Component identity and event bridge | Controlled ids, model-bound slots, object targets, event onboarding | Per-vendor rendering details or request/validation semantics |
 | `Alis.Reactive.Native` / `Alis.Reactive.Fusion` | Component vertical slices | Compile-time component API, render-time registration, vendor-specific events/members | Shared plan primitive rules or behavior graph orchestration |
 | `Alis.Reactive.FluentValidator` | Client validation projection adapter | Translating supported FluentValidation intent into deterministic client validation projections | Server validation authority, runtime validation execution, reflection-only guesses |
-| `Alis.Reactive/Validation` | Validation plan vocabulary | Extracted fields, operands, activation, binding, validation rule intent | FluentValidation-specific APIs or browser DOM behavior |
+| `Alis.Reactive/Validation` | Validation plan vocabulary | Client validation fields, operands, activation, binding, validation rule intent | FluentValidation-specific APIs or browser DOM behavior |
 | `runtime/domain` | Runtime object/value language | Runtime plan view, object/member/path/shape/value abstractions | Lifecycle ownership, HTTP transport, validation rules |
 | `runtime/lifecycle` | Plan lifetime | Boot composition, dynamic merge, partial load/unload, ownership, listener lifetime | Component member execution or validation rule semantics |
 | `runtime/execution` | Reaction execution | Set/call/request/dispatch/inject/gather execution using declared contracts | Reclassifying plan intent or weakening type/member invariants |
-| `runtime/conditions` | Condition execution | Compare/all/any/not/confirm evaluation and sync/async boundary | HTTP response routing or validation extraction |
-| `runtime/validation` | Browser validation execution | Rule activation, peer operands, scalar/range comparison, live clear, error display | Server rule extraction or component rendering |
+| `runtime/conditions` | Condition execution | Compare/all/any/not/confirm evaluation and sync/async boundary | HTTP response routing or validation projection |
+| `runtime/validation` | Browser validation execution | Rule activation, peer operands, scalar/range comparison, live clear, error display | Client projection or component rendering |
 | `runtime/resolution` | Browser object resolution | Vendor adapter lookup, DOM root lookup, semantic event wiring | Plan ownership or member access policy |
 
 When a type seems to belong to two rows, prefer moving the shared concept to the
@@ -593,7 +593,7 @@ move toward the language when touched.
 | Shared contribution assembler | Initial boot composition and dynamic partial load should use one contribution policy so merge rules cannot drift. | Boot and dynamic merge now share `ComponentContribution`; boot keeps a named initial validation coalescing path because initial documents have no unload lifetime. |
 | Layout-owned fixed components | Drawer, loader, toast, and confirm are layout-owned fixed identities, stronger than incidental root components. | Zero-arg app component DSL emits `layout-object`; explicit-id component references remain `object-target`. |
 | Mutable payload object | Payload mutation must be named as execution-context state or brought under object contracts. | Runtime supports payload target mutation; the model should not leave it as an unclassified executor path. |
-| Deferred validation model binding | Deferred validation fields bind model-shape knowledge after extraction and should stay outside FluentValidation-specific vocabulary. | `DeferredValidationField` belongs to validation plan binding language, not adapter language. |
+| Deferred validation model binding | Deferred validation fields bind model-shape knowledge after projection and should stay outside FluentValidation-specific vocabulary. | `DeferredClientValidationField` belongs to validation plan binding language, not adapter language. |
 | Plugin compatibility overloads | Typed plugin descriptors should be the primary long-term model; string overloads remain compatibility and prototyping surface. | Both string and typed plugin APIs now produce `PluginContract`. |
 
 ### Vocabulary Hygiene
@@ -602,7 +602,7 @@ move toward the language when touched.
   `Input Value Contract Enrichment` is better than `AddOrReplace`.
 - Do not use `fallback` unless the domain really defines fallback behavior.
   Most current "fallback" impulses are incomplete classification.
-- Do not use `server rule` to mean browser validation extraction. FluentValidation
+- Do not use `server rule` to mean browser validation projection. FluentValidation
   rules always run on the server; the browser receives a client projection.
 - Do not use `component` when the distinction is definition vs reference.
   Say `Component Definition Contribution` or `Reference-Only Component
@@ -627,7 +627,7 @@ when tests or code reveal a better classification.
 | Accepted | Initial owned definition coalescing | Treating duplicate first-DOM owned inputs as dynamic partial ownership collisions | MVC can render multiple initial plan scripts that mention the same already-mounted input. Boot has no unload lifetime, so identical owned definitions coalesce into the root-scoped boot plan; dynamic partial load remains stricter. | `ComponentContribution.coalescesInitialOwnedDefinition`, AdmissionAssessment Playwright slice |
 | Accepted | Reference-only component contribution | Partial component collision or replacement for matching root object | Partials often need to call/write a page-owned object or layout-owned app component without owning its lifecycle. | `ExistingComponentReference`, drawer/host merge tests |
 | Accepted | Root-owned validation extension | Partial owns or replaces the root validation container | A partial may contribute fields/rules to a root form/container, but unload must remove only those exact rule objects. | `ComponentValidationRules`, partial lifecycle tests |
-| Accepted | Client validation projection | Extracting "server rules" | FluentValidation remains server-authoritative; only deterministic browser projections enter the plan. Unsupported rules must be visible as skipped client projections. | `ValidationExtractionReport`, `SkippedClientRules`, FluentValidator unit tests |
+| Accepted | Client validation projection | Extracting "server rules" | FluentValidation remains server-authoritative; only deterministic browser projections enter the plan. Unsupported rules must be visible as skipped client projections. | `ClientValidationProjection`, `SkippedRules`, FluentValidator unit tests |
 | Accepted | Active client condition scope | Innermost validation guard wins | Nested `WhenField*` scopes are a server predicate stack. The browser projection must carry every active explicit guard, not only the most recent guard. | `ReactiveValidator.ClientConditionScope`, `Nested_WhenField_scopes_project_all_active_guards` |
 | Accepted | Complete client condition projection | Partial client guard for mixed server-only conditions | A rule under both `WhenField*` and server-only FluentValidation `When`/`Unless` has an incomplete browser activation. The adapter must skip it instead of projecting only the client-known part. | `ClientConditionProjection`, `Server_only_When_wrapping_WhenField_skips_client_projection` |
 | Accepted | Runtime declared object member execution | Runtime probing of arbitrary browser object capabilities | The runtime is intentionally dumb. It executes JSON intent; it does not discover framework behavior at runtime. | `RuntimeObject`, `execute.ts`, generated `plan.ts` |
@@ -646,7 +646,7 @@ when tests or code reveal a better classification.
 | Accepted | Shared component contribution policy | Boot-only component checks beside partial merge checks | Initial DOM scripts and dynamic partial loads are both document contributions. Object-target, layout-object, and validation-container contributions must reject the same malformed owned state and identity mismatches before mutating the composed plan. | `ComponentContribution`, `BootPlanAssembly.accept`, `PlanRegistry.mergeContribution`, initial-composition tests |
 | Accepted | Layout-owned fixed app component | Treating fixed app components as incidental root components | Drawer, loader, toast, and confirm have fixed identity and layout/page ownership. That should be visible in model language. | App-level Native/Fusion slices, drawer Playwright slice |
 | Accepted | Mutable payload object classification | Payload mutation as an uncontracted executor path | Payload mutation can be valid execution-context behavior, but it needs a named boundary or object contract semantics. | Runtime `ReactionTarget` pressure point |
-| Accepted | Deferred validation model binding | Treating deferred validation as FluentValidation extraction detail | Deferred binding resolves model-shape and component id after extraction, so it belongs to validation plan binding language. | `DeferredValidationField`, validation partial tests |
+| Accepted | Deferred validation model binding | Treating deferred validation as FluentValidation projection detail | Deferred binding resolves model-shape and component id after projection, so it belongs to validation plan binding language. | `DeferredClientValidationField`, validation partial tests |
 | Accepted | Runtime reaction tree | Each feature hand-walking only the reaction kinds it cares about | Sequence, branch, parallel completion, and request nodes are one deterministic graph. App-level components such as NativeActionLink should ask the graph for declared request nodes instead of maintaining partial switches. | `RuntimeReactionTree`, reaction-tree tests, `NativeActionLinkRequestTarget` |
 
 The central question for merge is not "does this key already exist?" The richer
@@ -748,27 +748,27 @@ different domain actions and must not share one collision rule.
 | Comparison Range Descriptor | Two-bound condition operand for `between`. Runtime accepts exactly two bounds; extra or missing bounds are malformed plan contracts, while non-comparable bound domains make the condition false. |
 | Text Condition Operand | Build-time operand for text-only condition operators. It carries `Shape.String` even though the compared source keeps its own shape. |
 | Minimum Text Length | Build-time and runtime condition constraint for `min-length`. The public condition DSL and validation `WhenFieldMinLength` reject negative lengths before plan JSON exists; the runtime still owns the finite non-negative number invariant for malformed external plan operands so they make the condition false instead of becoming `NaN` behavior. |
-| Comparison Literal Constraint | FluentValidation fixed comparison operand extracted into the plan. Null becomes an explicit null literal; date values are serialized before they become validation rule operands. |
+| Comparison Literal Constraint | FluentValidation fixed comparison operand projected into the plan. Null becomes an explicit null literal; date values are serialized before they become validation rule operands. |
 | Composite Condition Terms | Non-empty child condition list for `all` and `any`. Empty composites are malformed plan contracts; runtime must not inherit JavaScript `every([])` or `some([])` behavior as domain behavior. |
-| Validation Extraction Request | Integration contract given to a render-time validation adapter. It carries the validator type and `Validation Container Id`, so extraction is anchored to the validation boundary instead of a loose form string. |
-| Validation Extraction Report | Integration result from a validation adapter. It separates fields projected into browser validation from skipped client projections, so unsupported browser extraction remains visible and reasoned instead of disappearing. Server validation remains authoritative for every FluentValidation rule. |
-| Client Validation Field | Extracted validation field whose rules can be represented deterministically in the Reactive Plan and executed by the browser runtime. |
+| Client Validation Projection Request | Integration contract given to a render-time validation projection source. It carries the validator type and `Validation Container Id`, so projection is anchored to the validation boundary instead of a loose form string. |
+| Client Validation Projection | Integration result from a validation projection source. It separates fields projected into browser validation from skipped client projections, so unsupported browser projection remains visible and reasoned instead of disappearing. Server validation remains authoritative for every FluentValidation rule. |
+| Client Validation Field | Projected validation field whose rules can be represented deterministically in the Reactive Plan and executed by the browser runtime. |
 | Explicit Client Rule Projection | FluentValidation rule metadata declared with `ProjectToClient(...)`. It lets custom server validators state their deterministic browser rule using typed runtime validation primitives, so the adapter does not infer behavior from custom validator implementation details. |
 | Skipped Client Rule Projection | Validation rule omitted from the browser projection because the adapter cannot prove an equivalent deterministic browser rule. The report records the field, validator, and reason, such as FluentValidation conditions without a client guard, cross-object peer comparisons, missing range metadata, or unsupported validator shapes. |
-| Extracted Validation Rule Intent | Compile-time validation rule contract before render-time component binding. It names the constraint operand, peer-field operand, activation, and comparison shape without using null as behavior. |
-| Extracted Validation Operand | Validation extraction operand before it becomes a plan `ValueProducer`. `none`, `literal`, `range`, and `peer-field` are separate cases so literal null and no operand are not confused. |
-| Extracted Validation Activation | Validation extraction activation before render-time binding. `always` means unconditional; `when` carries the symbolic `FieldCondition` tree that will resolve against registered component values. |
+| Projected Validation Rule Intent | Compile-time validation rule contract before render-time component binding. It names the constraint operand, peer-field operand, activation, and comparison shape without using null as behavior. |
+| Projected Validation Operand | Validation projection operand before it becomes a plan `ValueProducer`. `none`, `literal`, `range`, and `peer-field` are separate cases so literal null and no operand are not confused. |
+| Projected Validation Activation | Validation projection activation before render-time binding. `always` means unconditional; `when` carries the symbolic `FieldCondition` tree that will resolve against registered component values. |
 | Active Client Condition Scope | The current stack of ReactiveValidator `WhenField*`/`WhenFields` scopes while a rule is declared. A rule inside one scope uses that guard directly; a rule inside nested scopes projects `all(...)` in server nesting order so browser activation matches the server predicate stack. |
 | Client Condition Projection | ReactiveValidator metadata for a rule-level condition. It is either a complete symbolic client guard or a skipped projection when the rule was also declared under a server-only FluentValidation condition scope. |
-| Validation Field Guard | FluentValidation extraction object that pairs the server predicate with the symbolic `FieldCondition`. Legacy protected `WhenField*` helpers and composed `WhenFields` build through the same guard so server and client conditions cannot drift; composed server predicates short-circuit with the same logical shape as runtime `all`/`any`. |
+| Validation Field Guard | FluentValidation projection object that pairs the server predicate with the symbolic `FieldCondition`. Legacy protected `WhenField*` helpers and composed `WhenFields` build through the same guard so server and client conditions cannot drift; composed server predicates short-circuit with the same logical shape as runtime `all`/`any`. |
 | Field Comparison Array Operand Shape | Build-time shape for symbolic validation field-condition operands such as `WhenFieldIn` and `WhenFieldBetween`. The operand is an array of the compared field shape; if the compared field has no declared shape, the operand remains an array with `any` items. The comparison itself keeps the scalar field shape. |
-| Validation Field Path | Dotted model field path extracted from a validator. It owns segment parsing and rejects empty segments before deferred partial binding resolves model shape or component ids. |
+| Validation Field Path | Dotted model field path projected by a validation source. It owns segment parsing and rejects empty segments before deferred partial binding resolves model shape or component ids. |
 | Same-Object Peer Comparison | FluentValidation comparison whose peer member belongs to the same CLR object scope as the field being validated. The peer is resolved under the validated field's parent path, so inline nested rules and nested validators both emit the same browser field path. Cross-object peer comparisons are skipped for client projection when FluentValidation exposes only the leaf member and the full path cannot be recovered. |
-| Validation Field Binding | Render-time binding from an extracted model field path to the component value the browser will read. Registered fields use their rendered component contract; deferred fields use the deterministic component id a partial will contribute later and keep the model field shape for validation/condition comparison. |
-| Validation Resolution Scope | Render-time context that owns all bindings from extracted validation intent to component value contracts. It is created from the registered input catalog and root model type, then binds rules, peer fields, and field conditions through the same field catalog. |
-| Bound Validation Field | An extracted validation field paired with its `Validation Field Binding`. It emits one `Component Validation Rules` entry, including the server field name, component value producer, and plan-bound rule executions. |
+| Validation Field Binding | Render-time binding from a projected model field path to the component value the browser will read. Registered fields use their rendered component contract; deferred fields use the deterministic component id a partial will contribute later and keep the model field shape for validation/condition comparison. |
+| Validation Resolution Scope | Render-time context that owns all bindings from projected validation intent to component value contracts. It is created from the registered input catalog and root model type, then binds rules, peer fields, and field conditions through the same field catalog. |
+| Bound Validation Field | A projected validation field paired with its `Validation Field Binding`. It emits one `Component Validation Rules` entry, including the server field name, component value producer, and plan-bound rule executions. |
 | Validation Plan Binding | Domain service used while emitting validation plan rules. It resolves peer-field operands and `when` conditions through `Validation Field Binding`, so registered components read their declared value member and deferred partial fields keep deterministic ids. |
-| Validation Date Literal | Date-shaped literal emitted by FluentValidation extraction for both rule constraints and `WhenField` conditions. Date-only values use `yyyy-MM-dd`; date-time values use the same sortable text form, so runtime date shape conversion does not depend on a component returning a Unix timestamp. |
+| Validation Date Literal | Date-shaped literal emitted by FluentValidation projection for both rule constraints and `WhenField` conditions. Date-only values use `yyyy-MM-dd`; date-time values use the same sortable text form, so runtime date shape conversion does not depend on a component returning a Unix timestamp. |
 | Validation Rule Execution | Explicit plan contract for how one validation rule runs: fixed constraint operand, peer-value operand, activation condition, and comparison shape. Runtime reads this object instead of guessing from optional fields. |
 | Validation Rule Operand | Discriminated validation operand. `none` means the rule has no operand; `value` carries a `ValueProducer`, so a literal null is still a present operand. |
 | Validation Rule Activation | Discriminated validation activation. `always` means the rule is unconditional; `when` carries the plan `Condition` that must pass before evaluation. |
@@ -848,7 +848,7 @@ different domain actions and must not share one collision rule.
 
 These features must keep the same language across C#, JSON, and TypeScript:
 
-- validation extraction, including client conditions and peer comparisons;
+- validation projection, including client conditions and peer comparisons;
 - HTTP simple, chained, parallel, route params, headers, payloads, response
   routing, completion, and validation gates;
 - branch conditions, nested branches, and default else;

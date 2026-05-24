@@ -10,12 +10,12 @@ namespace Alis.Reactive.FluentValidator
         internal static ClientConditionProjection Project(FieldCondition condition) =>
             new ProjectedClientCondition(condition);
 
-        internal static ClientConditionProjection Skip(ClientRuleExtractionSkipReason reason) =>
+        internal static ClientConditionProjection Skip(ClientRuleProjectionSkipReason reason) =>
             new SkippedClientCondition(reason);
 
         internal abstract TResult Match<TResult>(
             Func<FieldCondition, TResult> projected,
-            Func<ClientRuleExtractionSkipReason, TResult> skipped);
+            Func<ClientRuleProjectionSkipReason, TResult> skipped);
 
         private sealed class ProjectedClientCondition : ClientConditionProjection
         {
@@ -28,7 +28,7 @@ namespace Alis.Reactive.FluentValidator
 
             internal override TResult Match<TResult>(
                 Func<FieldCondition, TResult> projected,
-                Func<ClientRuleExtractionSkipReason, TResult> skipped)
+                Func<ClientRuleProjectionSkipReason, TResult> skipped)
             {
                 if (projected == null) throw new ArgumentNullException(nameof(projected));
                 if (skipped == null) throw new ArgumentNullException(nameof(skipped));
@@ -38,16 +38,16 @@ namespace Alis.Reactive.FluentValidator
 
         private sealed class SkippedClientCondition : ClientConditionProjection
         {
-            private readonly ClientRuleExtractionSkipReason _reason;
+            private readonly ClientRuleProjectionSkipReason _reason;
 
-            internal SkippedClientCondition(ClientRuleExtractionSkipReason reason)
+            internal SkippedClientCondition(ClientRuleProjectionSkipReason reason)
             {
                 _reason = reason;
             }
 
             internal override TResult Match<TResult>(
                 Func<FieldCondition, TResult> projected,
-                Func<ClientRuleExtractionSkipReason, TResult> skipped)
+                Func<ClientRuleProjectionSkipReason, TResult> skipped)
             {
                 if (projected == null) throw new ArgumentNullException(nameof(projected));
                 if (skipped == null) throw new ArgumentNullException(nameof(skipped));

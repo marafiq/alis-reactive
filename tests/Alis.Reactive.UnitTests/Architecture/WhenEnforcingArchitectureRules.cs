@@ -25,17 +25,17 @@ public class WhenEnforcingArchitectureRules
     {
         ReactivePlanConfig.Reset();
 
-        var extractor = new DummyExtractor();
-        ReactivePlanConfig.UseValidationExtractor(extractor);
+        var source = new DummyProjectionSource();
+        ReactivePlanConfig.UseClientValidationProjectionSource(source);
 
         Assert.Throws<InvalidOperationException>(() =>
-            ReactivePlanConfig.UseValidationExtractor(extractor));
+            ReactivePlanConfig.UseClientValidationProjectionSource(source));
 
         ReactivePlanConfig.Reset();
     }
 
     [Test]
-    public void Render_throws_when_validator_used_without_extractor()
+    public void Render_throws_when_validator_used_without_projection_source()
     {
         ReactivePlanConfig.Reset();
 
@@ -49,20 +49,20 @@ public class WhenEnforcingArchitectureRules
         });
 
         var ex = Assert.Throws<InvalidOperationException>(() => plan.Render());
-        Assert.That(ex!.Message, Does.Contain("UseValidationExtractor"));
+        Assert.That(ex!.Message, Does.Contain("UseClientValidationProjectionSource"));
 
         ReactivePlanConfig.Reset();
     }
 
     private class FakeValidator { }
 
-    private class DummyExtractor : Validation.IValidationExtractor
+    private class DummyProjectionSource : Validation.IClientValidationProjectionSource
     {
-        public Validation.ValidationExtractionReport Extract(Validation.ValidationExtractionRequest request)
+        public Validation.ClientValidationProjection Project(Validation.ClientValidationProjectionRequest request)
         {
-            return Validation.ValidationExtractionReport.ForClientFields(
+            return Validation.ClientValidationProjection.ForFields(
                 request,
-                new List<Validation.ValidationField>());
+                new List<Validation.ClientValidationField>());
         }
     }
 }

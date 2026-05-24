@@ -10,7 +10,7 @@ C# builders capture typed browser intent and render one JSON contract:
 - `bindings`
 - `workflows`
 
-The browser runtime is a dumb executor for that contract. There is no legacy plan, no compatibility layer, and no second schema to reason about.
+The browser runtime is a dumb executor for that contract. There is no legacy plan, no compatibility layer, and no second contract authority to reason about.
 
 ## Quality Bar
 
@@ -85,8 +85,8 @@ When adding or changing a capability:
 
 1. Model it in V2 terms first.
 2. Keep the C# DSL compile-time safe.
-3. Serialize directly to the V2 schema.
-4. Keep the runtime dumb.
+3. Serialize directly from the rich plan domain into the JSON contract.
+4. Keep the generated TypeScript contract and runtime aligned with the plan domain.
 5. Add or update unit, runtime, and Playwright coverage.
 6. Delete dead code immediately.
 
@@ -115,9 +115,9 @@ A reviewer MUST:
 2. **Run the flows**, not assume they work. If a change touches gather, trace
    a real gather through evaluateValue → transport → wire format.
 3. **Verify truth alignment** across all layers. If the domain model says
-   `ValueProducer`, the schema must say `$ref ValueProducer`, the TS type
-   must say `value: ValueProducer`, and the runtime must call `evaluateValue`.
-   Check each layer — do not assume alignment from one layer.
+   `ValueProducer`, the generated TypeScript contract must say
+   `value: ValueProducer`, and the runtime must call `evaluateValue`. Check
+   each layer — do not assume alignment from one layer.
 4. **Find what is NOT there**, not just validate what is. Missing error context
    in throw messages, missing shape propagation, missing XML docs on public
    members — absence is a finding.
@@ -180,8 +180,8 @@ with it. Every reviewer is the last line of defense — not a rubber stamp.
 - Do NOT just confirm what the plan says. Read the ACTUAL CODE the plan
   references. Run grep. Trace the flow. Find what the plan MISSED.
 - Every PASS must have evidence that proves correctness, not absence of failure.
-  "I checked and it looks right" is not evidence. "File:line shows X which
-  matches Y in the schema" is evidence.
+  "I checked and it looks right" is not evidence. "File:line shows X in the
+  plan domain, generated TypeScript contract, and runtime executor" is evidence.
 - Every BLOCK must have a concrete consequence: "If not fixed, X will happen
   at runtime." Theoretical concerns without consequences are DEFER, not BLOCK.
 - If another reviewer already found 5 issues and you found 0, something is wrong

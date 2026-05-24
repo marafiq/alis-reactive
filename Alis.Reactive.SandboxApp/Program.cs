@@ -27,7 +27,7 @@ builder.Services.AddSignalR();
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ALIS_NO_BROADCAST")))
     builder.Services.AddHostedService<RealTimeBroadcastService>();
 
-ReactivePlanConfig.UseValidationExtractor(
+ReactivePlanConfig.UseClientValidationProjectionSource(
     new FluentValidationAdapter(type => (FluentValidation.IValidator?)Activator.CreateInstance(type)));
 
 var app = builder.Build();

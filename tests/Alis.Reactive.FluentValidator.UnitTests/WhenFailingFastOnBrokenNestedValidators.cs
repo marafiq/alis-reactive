@@ -15,7 +15,7 @@ public class WhenFailingFastOnBrokenNestedValidators
         });
 
         Assert.Throws<InvalidOperationException>(() =>
-            adapter.ExtractRules(typeof(BrokenNestedValidator), "testForm"));
+            adapter.ProjectRules(typeof(BrokenNestedValidator), "testForm"));
     }
 
     [Test]
@@ -31,6 +31,6 @@ public class WhenFailingFastOnBrokenNestedValidators
         });
 
         Assert.Throws<InvalidOperationException>(() =>
-            adapter.ExtractRules(typeof(NestedValidator), "testForm"));
+            adapter.ProjectRules(typeof(NestedValidator), "testForm"));
     }
 }

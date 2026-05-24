@@ -1,14 +1,14 @@
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
-public class WhenExtractingEqualToRules
+public class WhenProjectingEqualToRules
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
-    public void Equal_to_other_field_extracts_equalTo_with_field()
+    public void Equal_to_other_field_projects_equalTo_with_field()
     {
-        var desc = _adapter.ExtractRules(typeof(EqualToValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(EqualToValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var field = desc.First(f => f.FieldName == "ConfirmEmail");
@@ -21,7 +21,7 @@ public class WhenExtractingEqualToRules
     [Test]
     public void Equal_to_with_custom_message_uses_custom_message()
     {
-        var desc = _adapter.ExtractRules(typeof(EqualToWithCustomMessageValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(EqualToWithCustomMessageValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var field = desc.First(f => f.FieldName == "ConfirmEmail");
@@ -31,9 +31,9 @@ public class WhenExtractingEqualToRules
     }
 
     [Test]
-    public void Equal_to_literal_null_extracts_explicit_null_constraint()
+    public void Equal_to_literal_null_projects_explicit_null_constraint()
     {
-        var desc = _adapter.ExtractRules(typeof(LiteralNullComparisonValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(LiteralNullComparisonValidator), "testForm");
 
         var field = desc.First(f => f.FieldName == "MiddleName");
         var equalRule = field.Rules.First(r => r.Rule == "equalTo");
@@ -44,9 +44,9 @@ public class WhenExtractingEqualToRules
     }
 
     [Test]
-    public void Not_equal_literal_null_extracts_explicit_null_constraint()
+    public void Not_equal_literal_null_projects_explicit_null_constraint()
     {
-        var desc = _adapter.ExtractRules(typeof(LiteralNullComparisonValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(LiteralNullComparisonValidator), "testForm");
 
         var field = desc.First(f => f.FieldName == "JobTitle");
         var notEqualRule = field.Rules.First(r => r.Rule == "notEqual");

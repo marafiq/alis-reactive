@@ -3,14 +3,14 @@ using Alis.Reactive.Validation;
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
-public class WhenExtractingFalsyAndNeqConditions
+public class WhenProjectingFalsyAndNeqConditions
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
-    public void WhenFieldNot_bool_extracts_falsy_condition()
+    public void WhenFieldNot_bool_projects_falsy_condition()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveFalsyConditionValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ReactiveFalsyConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var jobTitle = desc.First(f => f.FieldName == "JobTitle");
@@ -25,9 +25,9 @@ public class WhenExtractingFalsyAndNeqConditions
     }
 
     [Test]
-    public void WhenFieldNot_value_extracts_neq_condition()
+    public void WhenFieldNot_value_projects_neq_condition()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveNeqConditionValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ReactiveNeqConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var email = desc.First(f => f.FieldName == "Email");
@@ -40,9 +40,9 @@ public class WhenExtractingFalsyAndNeqConditions
     }
 
     [Test]
-    public void WhenFieldNot_unconditional_rules_still_extracted()
+    public void WhenFieldNot_unconditional_rules_still_project()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveFalsyConditionValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ReactiveFalsyConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var name = desc.First(f => f.FieldName == "Name");

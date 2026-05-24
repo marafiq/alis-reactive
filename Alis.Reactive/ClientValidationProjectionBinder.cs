@@ -11,7 +11,7 @@ namespace Alis.Reactive
     /// into the plan's component-level validation rules.
     /// <para>
     /// Each <see cref="ValidationJob"/> names a form and a validator type. The registered
-    /// <see cref="IValidationExtractor"/> returns the deterministic browser projection for
+    /// <see cref="IClientValidationProjectionSource"/> returns the deterministic browser projection for
     /// that validator. This binder maps each projected model field to the component that
     /// renders it, or to the deterministic component id a partial will render later, and
     /// attaches the resulting <see cref="ComponentValidation"/> rules to the form's
@@ -42,12 +42,12 @@ namespace Alis.Reactive
 
         private void BindJob(ValidationJob job)
         {
-            var extractor = ReactivePlanConfig.ValidationExtractor.RequireFor(job);
+            var source = ReactivePlanConfig.ClientValidationProjectionSource.RequireFor(job);
             var container = job.Container;
 
-            var extraction = extractor.Extract(ValidationExtractionRequest.For(job.ValidatorType, container));
+            var projection = source.Project(ClientValidationProjectionRequest.For(job.ValidatorType, container));
 
-            var componentValidations = extraction.ClientFields
+            var componentValidations = projection.Fields
                 .Select(field => _bindings.Bind(field).ToComponentValidation())
                 .ToList();
 

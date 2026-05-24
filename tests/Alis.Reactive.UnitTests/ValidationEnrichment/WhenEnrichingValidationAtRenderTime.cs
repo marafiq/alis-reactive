@@ -25,7 +25,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void SetUp()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseValidationExtractor(new StubExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new StubExtractor());
     }
 
     [TearDown]
@@ -61,7 +61,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Validation_rules_render_explicit_execution_contract()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseValidationExtractor(new SingleRuleExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new SingleRuleExtractor());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
         RegisterTextInput(plan, "Name", "name-input");
@@ -93,7 +93,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Deferred_validation_fields_keep_the_model_field_shape_for_partials()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseValidationExtractor(new DeferredDateFieldExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new DeferredDateFieldExtractor());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
 
@@ -119,7 +119,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Registered_validation_fields_read_the_component_value_contract()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseValidationExtractor(new BooleanRuleExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new BooleanRuleExtractor());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
         RegisterInput(plan, "ReceiveNotifications", "notify-input", "checked", Alis.Reactive.PlanModel.Shape.Boolean);
@@ -145,7 +145,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Registered_validation_conditions_read_the_component_value_contract()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseValidationExtractor(new ConditionalRuleExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new ConditionalRuleExtractor());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
         RegisterInput(plan, "Email", "email-input", "value", Alis.Reactive.PlanModel.Shape.String);
@@ -174,7 +174,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Registered_validation_peer_fields_read_the_component_value_contract()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseValidationExtractor(new PeerRuleExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new PeerRuleExtractor());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
         RegisterInput(plan, "Email", "email-input", "value", Alis.Reactive.PlanModel.Shape.String);
@@ -203,7 +203,7 @@ public class WhenEnrichingValidationAtRenderTime
     public void Deferred_validation_field_must_exist_on_the_model()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseValidationExtractor(new UnknownFieldExtractor());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new UnknownFieldExtractor());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
 
@@ -212,7 +212,7 @@ public class WhenEnrichingValidationAtRenderTime
 
         var exception = Assert.Throws<InvalidOperationException>(() => plan.Render());
 
-        Assert.That(exception!.Message, Does.Contain("Validation field 'MissingField' was extracted"));
+        Assert.That(exception!.Message, Does.Contain("Validation field 'MissingField' was projected"));
         Assert.That(exception.Message, Does.Contain("register the input component for that binding path"));
     }
 
@@ -254,20 +254,20 @@ public class WhenEnrichingValidationAtRenderTime
                 shape));
     }
 
-    private class StubExtractor : IValidationExtractor
+    private class StubExtractor : IClientValidationProjectionSource
     {
-        public ValidationExtractionReport Extract(ValidationExtractionRequest request) =>
-            ValidationExtractionReport.ForClientFields(request, new List<ValidationField>());
+        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
+            ClientValidationProjection.ForFields(request, new List<ClientValidationField>());
     }
 
-    private class SingleRuleExtractor : IValidationExtractor
+    private class SingleRuleExtractor : IClientValidationProjectionSource
     {
-        public ValidationExtractionReport Extract(ValidationExtractionRequest request) =>
-            ValidationExtractionReport.ForClientFields(
+        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
+            ClientValidationProjection.ForFields(
                 request,
-                new List<ValidationField>
+                new List<ClientValidationField>
                 {
-                    new ValidationField(
+                    new ClientValidationField(
                         ValidationFieldPath.Of("Name"),
                         new List<ValidationRule>
                         {
@@ -279,47 +279,47 @@ public class WhenEnrichingValidationAtRenderTime
                 });
     }
 
-    private class DeferredDateFieldExtractor : IValidationExtractor
+    private class DeferredDateFieldExtractor : IClientValidationProjectionSource
     {
-        public ValidationExtractionReport Extract(ValidationExtractionRequest request) =>
-            ValidationExtractionReport.ForClientFields(
+        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
+            ClientValidationProjection.ForFields(
                 request,
-                new List<ValidationField>
+                new List<ClientValidationField>
                 {
                     RequiredField("AdmissionDate", "Admission date is required"),
                 });
     }
 
-    private class BooleanRuleExtractor : IValidationExtractor
+    private class BooleanRuleExtractor : IClientValidationProjectionSource
     {
-        public ValidationExtractionReport Extract(ValidationExtractionRequest request) =>
-            ValidationExtractionReport.ForClientFields(
+        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
+            ClientValidationProjection.ForFields(
                 request,
-                new List<ValidationField>
+                new List<ClientValidationField>
                 {
                     RequiredField("ReceiveNotifications", "Notifications must be selected"),
                 });
     }
 
-    private class UnknownFieldExtractor : IValidationExtractor
+    private class UnknownFieldExtractor : IClientValidationProjectionSource
     {
-        public ValidationExtractionReport Extract(ValidationExtractionRequest request) =>
-            ValidationExtractionReport.ForClientFields(
+        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
+            ClientValidationProjection.ForFields(
                 request,
-                new List<ValidationField>
+                new List<ClientValidationField>
                 {
                     RequiredField("MissingField", "Missing field is required"),
                 });
     }
 
-    private class ConditionalRuleExtractor : IValidationExtractor
+    private class ConditionalRuleExtractor : IClientValidationProjectionSource
     {
-        public ValidationExtractionReport Extract(ValidationExtractionRequest request) =>
-            ValidationExtractionReport.ForClientFields(
+        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
+            ClientValidationProjection.ForFields(
                 request,
-                new List<ValidationField>
+                new List<ClientValidationField>
                 {
-                    new ValidationField(
+                    new ClientValidationField(
                         ValidationFieldPath.Of("Email"),
                         new List<ValidationRule>
                         {
@@ -335,14 +335,14 @@ public class WhenEnrichingValidationAtRenderTime
                 });
     }
 
-    private class PeerRuleExtractor : IValidationExtractor
+    private class PeerRuleExtractor : IClientValidationProjectionSource
     {
-        public ValidationExtractionReport Extract(ValidationExtractionRequest request) =>
-            ValidationExtractionReport.ForClientFields(
+        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
+            ClientValidationProjection.ForFields(
                 request,
-                new List<ValidationField>
+                new List<ClientValidationField>
                 {
-                    new ValidationField(
+                    new ClientValidationField(
                         ValidationFieldPath.Of("Email"),
                         new List<ValidationRule>
                         {
@@ -357,8 +357,8 @@ public class WhenEnrichingValidationAtRenderTime
                 });
     }
 
-    private static ValidationField RequiredField(string fieldName, string message) =>
-        new ValidationField(
+    private static ClientValidationField RequiredField(string fieldName, string message) =>
+        new ClientValidationField(
             ValidationFieldPath.Of(fieldName),
             new List<ValidationRule>
             {

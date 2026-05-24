@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// A single validation rule extracted from FluentValidation.
+    /// A single validation rule projected for browser execution.
     /// </summary>
     public sealed class ValidationRule
     {

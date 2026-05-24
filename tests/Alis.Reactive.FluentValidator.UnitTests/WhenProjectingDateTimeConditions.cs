@@ -7,14 +7,14 @@ namespace Alis.Reactive.FluentValidator.UnitTests;
 /// using the same date-shaped plan literals as validation constraints.
 /// </summary>
 [TestFixture]
-public class WhenExtractingDateTimeConditions
+public class WhenProjectingDateTimeConditions
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
     public void WhenField_DateTime_eq_serializes_value_as_date_literal()
     {
-        var desc = _adapter.ExtractRules(typeof(DateTimeConditionValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(DateTimeConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var nameField = desc.First(f => f.FieldName == "Name");
@@ -33,7 +33,7 @@ public class WhenExtractingDateTimeConditions
     [Test]
     public void WhenFieldNot_DateTime_neq_serializes_value_as_date_literal()
     {
-        var desc = _adapter.ExtractRules(typeof(DateTimeNeqConditionValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(DateTimeNeqConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var scoreField = desc.First(f => f.FieldName == "Score");
@@ -52,7 +52,7 @@ public class WhenExtractingDateTimeConditions
     public void WhenFieldNot_string_neq_keeps_string_value()
     {
         // Verify non-DateTime conditions are NOT affected by Unix ms serialization
-        var desc = _adapter.ExtractRules(typeof(ReactiveNeqConditionValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ReactiveNeqConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var emailField = desc.First(f => f.FieldName == "Email");

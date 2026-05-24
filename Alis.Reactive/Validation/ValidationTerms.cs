@@ -202,16 +202,16 @@ namespace Alis.Reactive.Validation
         public override string ToString() => Value;
     }
 
-    internal sealed class ExtractedValidationRules
+    internal sealed class ProjectedValidationRules
     {
         private readonly List<ValidationRule> _rules;
 
-        private ExtractedValidationRules(List<ValidationRule> rules)
+        private ProjectedValidationRules(List<ValidationRule> rules)
         {
             _rules = rules;
         }
 
-        internal static ExtractedValidationRules From(IEnumerable<ValidationRule> rules)
+        internal static ProjectedValidationRules From(IEnumerable<ValidationRule> rules)
         {
             if (rules == null) throw new ArgumentNullException(nameof(rules));
 
@@ -224,7 +224,7 @@ namespace Alis.Reactive.Validation
                 snapshot.Add(rule);
             }
 
-            return new ExtractedValidationRules(snapshot);
+            return new ProjectedValidationRules(snapshot);
         }
 
         internal List<ValidationRule> ToPublicList() =>

@@ -1,14 +1,14 @@
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
-public class WhenExtractingComparisonRules
+public class WhenProjectingComparisonRules
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
     public void GreaterThanOrEqualTo_produces_min_rule_with_number_coercion()
     {
-        var desc = _adapter.ExtractRules(typeof(MinComparisonValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(MinComparisonValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("min"));
@@ -19,7 +19,7 @@ public class WhenExtractingComparisonRules
     [Test]
     public void LessThanOrEqualTo_produces_max_rule_with_number_coercion()
     {
-        var desc = _adapter.ExtractRules(typeof(MaxComparisonValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(MaxComparisonValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("max"));
@@ -30,7 +30,7 @@ public class WhenExtractingComparisonRules
     [Test]
     public void GreaterThan_produces_gt_rule_with_number_coercion()
     {
-        var desc = _adapter.ExtractRules(typeof(StrictGreaterThanValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(StrictGreaterThanValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules.Count, Is.EqualTo(1));
@@ -42,7 +42,7 @@ public class WhenExtractingComparisonRules
     [Test]
     public void LessThan_produces_lt_rule_with_number_coercion()
     {
-        var desc = _adapter.ExtractRules(typeof(StrictLessThanValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(StrictLessThanValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules.Count, Is.EqualTo(1));

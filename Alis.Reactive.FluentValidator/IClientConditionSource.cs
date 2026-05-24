@@ -5,8 +5,8 @@ using Alis.Reactive.Validation;
 namespace Alis.Reactive.FluentValidator
 {
     /// <summary>
-    /// Implemented by ReactiveValidator to expose client-extractable conditions
-    /// registered via WhenField(). The adapter reads this during extraction.
+    /// Implemented by ReactiveValidator to expose client-projectable conditions
+    /// registered via WhenField(). The adapter reads this during projection.
     /// </summary>
     internal interface IClientConditionSource
     {

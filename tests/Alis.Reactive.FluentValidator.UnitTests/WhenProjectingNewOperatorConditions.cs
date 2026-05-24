@@ -4,16 +4,16 @@ using Alis.Reactive.Validation;
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
-public class WhenExtractingNewOperatorConditions
+public class WhenProjectingNewOperatorConditions
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     // ── Ordering operators ─────────────────────────────────────────────────
 
     [Test]
-    public void WhenFieldGt_extracts_gt_condition()
+    public void WhenFieldGt_projects_gt_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldGtValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldGtValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
         var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
 
@@ -23,9 +23,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldGte_extracts_gte_condition_with_decimal()
+    public void WhenFieldGte_projects_gte_condition_with_decimal()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldGteValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldGteValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
         var when = (FieldCompare)email.Rules[0].Condition()!;
 
@@ -35,9 +35,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldLt_extracts_lt_condition()
+    public void WhenFieldLt_projects_lt_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldLtValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldLtValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
         var when = (FieldCompare)name.Rules[0].Condition()!;
 
@@ -47,9 +47,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldLte_extracts_lte_condition_with_decimal()
+    public void WhenFieldLte_projects_lte_condition_with_decimal()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldLteValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldLteValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
         var when = (FieldCompare)notes.Rules[0].Condition()!;
 
@@ -61,9 +61,9 @@ public class WhenExtractingNewOperatorConditions
     // ── Presence operators ─────────────────────────────────────────────────
 
     [Test]
-    public void WhenFieldNull_extracts_is_null_condition()
+    public void WhenFieldNull_projects_is_null_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldNullValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldNullValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
         var when = (FieldCompare)notes.Rules[0].Condition()!;
 
@@ -73,9 +73,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldNotNull_extracts_not_null_condition()
+    public void WhenFieldNotNull_projects_not_null_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldNotNullValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldNotNullValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
         var when = (FieldCompare)name.Rules[0].Condition()!;
 
@@ -85,9 +85,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldEmpty_extracts_is_empty_condition()
+    public void WhenFieldEmpty_projects_is_empty_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldEmptyValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldEmptyValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
         var when = (FieldCompare)phone.Rules[0].Condition()!;
 
@@ -97,9 +97,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldNotEmpty_extracts_not_empty_condition()
+    public void WhenFieldNotEmpty_projects_not_empty_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldNotEmptyValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldNotEmptyValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
         var when = (FieldCompare)name.Rules[0].Condition()!;
 
@@ -111,9 +111,9 @@ public class WhenExtractingNewOperatorConditions
     // ── Membership operators ───────────────────────────────────────────────
 
     [Test]
-    public void WhenFieldIn_extracts_in_condition_with_array_value()
+    public void WhenFieldIn_projects_in_condition_with_array_value()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldInValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldInValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
         var when = (FieldCompare)notes.Rules[0].Condition()!;
 
@@ -125,9 +125,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldNotIn_extracts_not_in_condition_with_array_value()
+    public void WhenFieldNotIn_projects_not_in_condition_with_array_value()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldNotInValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldNotInValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
         var when = (FieldCompare)phone.Rules[0].Condition()!;
 
@@ -139,9 +139,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldBetween_extracts_between_condition_with_range()
+    public void WhenFieldBetween_projects_between_condition_with_range()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldBetweenValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldBetweenValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
         var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
 
@@ -159,7 +159,7 @@ public class WhenExtractingNewOperatorConditions
     [Test]
     public void WhenFieldBetween_keeps_array_operand_shape_when_field_shape_is_unspecified()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldBetweenValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldBetweenValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
         var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
 
@@ -172,9 +172,9 @@ public class WhenExtractingNewOperatorConditions
     // ── Text operators ─────────────────────────────────────────────────────
 
     [Test]
-    public void WhenFieldContains_extracts_contains_condition()
+    public void WhenFieldContains_projects_contains_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldContainsValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldContainsValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
         var when = (FieldCompare)phone.Rules[0].Condition()!;
 
@@ -184,9 +184,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldStartsWith_extracts_starts_with_condition()
+    public void WhenFieldStartsWith_projects_starts_with_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldStartsWithValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldStartsWithValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
         var when = (FieldCompare)email.Rules[0].Condition()!;
 
@@ -196,9 +196,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldEndsWith_extracts_ends_with_condition()
+    public void WhenFieldEndsWith_projects_ends_with_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldEndsWithValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldEndsWithValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
         var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
 
@@ -212,11 +212,11 @@ public class WhenExtractingNewOperatorConditions
     [Test]
     public void Condition_source_fields_are_included_for_all_operators()
     {
-        // Every WhenField* condition field must appear in the extracted fields
+        // Every WhenField* condition field must appear in the projected fields
         // so the runtime can read its value.
         void AssertSourceField(Type validatorType, string expectedSourceField)
         {
-            var fields = _adapter.ExtractRules(validatorType, "form");
+            var fields = _adapter.ProjectRules(validatorType, "form");
             var fieldNames = fields.Select(f => f.FieldName).ToList();
             Assert.That(fieldNames, Does.Contain(expectedSourceField),
                 $"{validatorType.Name}: condition source field '{expectedSourceField}' missing");
@@ -244,9 +244,9 @@ public class WhenExtractingNewOperatorConditions
     // ── Matches / MinLength / ArrayContains operators ──────────────────
 
     [Test]
-    public void WhenFieldMatches_extracts_matches_condition()
+    public void WhenFieldMatches_projects_matches_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldMatchesValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldMatchesValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
         var when = (FieldCompare)name.Rules[0].Condition()!;
 
@@ -256,9 +256,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldMinLength_extracts_min_length_condition()
+    public void WhenFieldMinLength_projects_min_length_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldMinLengthValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldMinLengthValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
         var when = (FieldCompare)email.Rules[0].Condition()!;
 
@@ -268,7 +268,7 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldMinLength_rejects_negative_lengths_before_extraction()
+    public void WhenFieldMinLength_rejects_negative_lengths_before_projection()
     {
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
             new NegativeWhenFieldMinLengthValidator());
@@ -278,9 +278,9 @@ public class WhenExtractingNewOperatorConditions
     }
 
     [Test]
-    public void WhenFieldArrayContains_extracts_array_contains_condition()
+    public void WhenFieldArrayContains_projects_array_contains_condition()
     {
-        var fields = _adapter.ExtractRules(typeof(WhenFieldArrayContainsValidator), "form");
+        var fields = _adapter.ProjectRules(typeof(WhenFieldArrayContainsValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
         var when = (FieldCompare)phone.Rules[0].Condition()!;
 

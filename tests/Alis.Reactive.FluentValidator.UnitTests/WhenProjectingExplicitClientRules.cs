@@ -32,28 +32,28 @@ public sealed class WhenProjectingExplicitClientRules
     [Test]
     public void Custom_server_rule_can_declare_regex_client_projection()
     {
-        var report = _adapter.ExtractReport(typeof(ExplicitClientRuleValidator), "form");
+        var report = _adapter.ProjectValidation(typeof(ExplicitClientRuleValidator), "form");
 
-        var code = report.ClientFields.Single(field => field.FieldName == "Code");
+        var code = report.Fields.Single(field => field.FieldName == "Code");
         var rule = code.Rules.Single();
 
         Assert.That(rule.Rule, Is.EqualTo("regex"));
         Assert.That(rule.Message, Is.EqualTo("Code must start with ALIS."));
         Assert.That(rule.ConstraintValue(), Is.EqualTo("^ALIS-"));
-        Assert.That(report.SkippedClientRules, Is.Empty);
+        Assert.That(report.SkippedRules, Is.Empty);
     }
 
     [Test]
     public void Custom_server_rule_can_declare_peer_field_client_projection()
     {
-        var report = _adapter.ExtractReport(typeof(ExplicitClientRuleValidator), "form");
+        var report = _adapter.ProjectValidation(typeof(ExplicitClientRuleValidator), "form");
 
-        var confirmEmail = report.ClientFields.Single(field => field.FieldName == "ConfirmEmail");
+        var confirmEmail = report.Fields.Single(field => field.FieldName == "ConfirmEmail");
         var rule = confirmEmail.Rules.Single();
 
         Assert.That(rule.Rule, Is.EqualTo("equalTo"));
         Assert.That(rule.PeerFieldName(), Is.EqualTo("Email"));
-        Assert.That(report.ClientFields.Select(field => field.FieldName), Does.Contain("Email"));
-        Assert.That(report.SkippedClientRules, Is.Empty);
+        Assert.That(report.Fields.Select(field => field.FieldName), Does.Contain("Email"));
+        Assert.That(report.SkippedRules, Is.Empty);
     }
 }

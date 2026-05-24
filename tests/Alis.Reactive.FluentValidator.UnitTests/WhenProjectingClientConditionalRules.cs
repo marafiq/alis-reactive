@@ -3,14 +3,14 @@ using Alis.Reactive.Validation;
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
-public class WhenExtractingClientConditionalRules
+public class WhenProjectingClientConditionalRules
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
-    public void WhenField_truthy_extracts_conditional_rule()
+    public void WhenField_truthy_projects_conditional_rule()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ReactiveConditionalValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var jobTitle = desc.First(f => f.FieldName == "JobTitle");
@@ -23,9 +23,9 @@ public class WhenExtractingClientConditionalRules
     }
 
     [Test]
-    public void WhenField_unconditional_rules_still_extracted()
+    public void WhenField_unconditional_rules_still_project()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ReactiveConditionalValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var name = desc.First(f => f.FieldName == "Name");
@@ -36,7 +36,7 @@ public class WhenExtractingClientConditionalRules
     [Test]
     public void WhenField_multiple_rules_in_block_all_get_condition()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveMultipleRulesValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ReactiveMultipleRulesValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
 
@@ -52,9 +52,9 @@ public class WhenExtractingClientConditionalRules
     }
 
     [Test]
-    public void WhenField_eq_extracts_equality_condition()
+    public void WhenField_eq_projects_equality_condition()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveEqConditionValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ReactiveEqConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var email = desc.First(f => f.FieldName == "Email");
@@ -68,7 +68,7 @@ public class WhenExtractingClientConditionalRules
     [Test]
     public void WhenField_direct_nested_property_keeps_full_field_path()
     {
-        var desc = _adapter.ExtractRules(typeof(DirectNestedWhenFieldValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(DirectNestedWhenFieldValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var jobTitle = desc.First(f => f.FieldName == "JobTitle");
@@ -81,7 +81,7 @@ public class WhenExtractingClientConditionalRules
     [Test]
     public void Nested_WhenField_scopes_project_all_active_guards()
     {
-        var desc = _adapter.ExtractRules(typeof(NestedReactiveConditionValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(NestedReactiveConditionValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
 
@@ -110,7 +110,7 @@ public class WhenExtractingClientConditionalRules
     [Test]
     public void Nested_WhenField_scope_exit_keeps_sibling_rules_on_outer_guard_only()
     {
-        var desc = _adapter.ExtractRules(typeof(NestedReactiveConditionValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(NestedReactiveConditionValidator), "testForm");
 
         var jobTitle = desc.First(f => f.FieldName == "JobTitle");
         Assert.That(jobTitle.Rules, Has.Count.EqualTo(1));
@@ -160,7 +160,7 @@ public class WhenExtractingClientConditionalRules
     [Test]
     public void Plain_When_still_skipped_in_mixed_validator()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveMixedValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ReactiveMixedValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc.Select(f => f.FieldName).ToList();
@@ -173,9 +173,9 @@ public class WhenExtractingClientConditionalRules
     }
 
     [Test]
-    public void WhenField_all_rule_types_extract_with_condition()
+    public void WhenField_all_rule_types_project_with_condition()
     {
-        var desc = _adapter.ExtractRules(typeof(ConditionalAllRulesValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ConditionalAllRulesValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
 
@@ -208,7 +208,7 @@ public class WhenExtractingClientConditionalRules
     [Test]
     public void WhenField_condition_source_field_included_in_descriptor()
     {
-        var desc = _adapter.ExtractRules(typeof(ReactiveConditionalValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(ReactiveConditionalValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc.Select(f => f.FieldName).ToList();

@@ -7,17 +7,17 @@ namespace Alis.Reactive.Validation
     /// Describes a single field's validation rules within a form.
     /// Enriched at render time from registered input component contracts.
     /// </summary>
-    public sealed class ValidationField
+    public sealed class ClientValidationField
     {
         private readonly ValidationFieldPath _fieldName;
 
         public string FieldName => _fieldName.Value;
         public List<ValidationRule> Rules { get; }
 
-        internal ValidationField(ValidationFieldPath fieldName, List<ValidationRule> rules)
+        internal ClientValidationField(ValidationFieldPath fieldName, List<ValidationRule> rules)
         {
             _fieldName = fieldName ?? throw new ArgumentNullException(nameof(fieldName));
-            Rules = ExtractedValidationRules.From(rules).ToPublicList();
+            Rules = ProjectedValidationRules.From(rules).ToPublicList();
         }
 
         internal ValidationFieldPath FieldPath => _fieldName;

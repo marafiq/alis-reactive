@@ -1,14 +1,14 @@
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
-public class WhenExtractingNestedValidators
+public class WhenProjectingNestedValidators
 {
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
     public void Nested_properties_use_dotted_field_names()
     {
-        var desc = _adapter.ExtractRules(typeof(NestedValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(NestedValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc.Select(f => f.FieldName).ToList();
@@ -21,7 +21,7 @@ public class WhenExtractingNestedValidators
     [Test]
     public void Deeply_nested_produces_correct_paths()
     {
-        var desc = _adapter.ExtractRules(typeof(DeeplyNestedValidator), "testForm");
+        var desc = _adapter.ProjectRules(typeof(DeeplyNestedValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
         var fieldNames = desc.Select(f => f.FieldName).ToList();

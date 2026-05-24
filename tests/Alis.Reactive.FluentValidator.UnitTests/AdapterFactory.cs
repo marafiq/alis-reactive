@@ -8,17 +8,17 @@ internal static class AdapterFactory
     internal static FluentValidationAdapter Create() =>
         new(type => (IValidator?)Activator.CreateInstance(type));
 
-    internal static IReadOnlyList<ValidationField> ExtractRules(
+    internal static IReadOnlyList<ClientValidationField> ProjectRules(
         this FluentValidationAdapter adapter,
         Type validatorType,
         string validationContainerId) =>
         adapter
-            .Extract(ValidationExtractionRequest.For(validatorType, validationContainerId))
-            .ClientFields;
+            .Project(ClientValidationProjectionRequest.For(validatorType, validationContainerId))
+            .Fields;
 
-    internal static ValidationExtractionReport ExtractReport(
+    internal static ClientValidationProjection ProjectValidation(
         this FluentValidationAdapter adapter,
         Type validatorType,
         string validationContainerId) =>
-        adapter.Extract(ValidationExtractionRequest.For(validatorType, validationContainerId));
+        adapter.Project(ClientValidationProjectionRequest.For(validatorType, validationContainerId));
 }

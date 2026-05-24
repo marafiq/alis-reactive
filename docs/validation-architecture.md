@@ -5,12 +5,12 @@ This document describes the current validation design. Keep it aligned with
 
 ## Boundary
 
-FluentValidation remains the server authority. Alis Reactive extracts only the
+FluentValidation remains the server authority. Alis Reactive projects only the
 deterministic client-side projection that can be represented in the Reactive
 Plan and executed in the browser runtime.
 
 Unsupported browser projections are not guessed. They are recorded in
-`ValidationExtractionReport.SkippedClientRules` with a reason, while the server
+`ClientValidationProjection.SkippedRules` with a reason, while the server
 rule still runs normally on postback or HTTP submit.
 
 ## Data Flow
@@ -35,8 +35,8 @@ Validate<TValidator>(containerId)
 
 `ClientValidationProjectionBinder` then:
 
-1. Requires a registered `IValidationExtractor`.
-2. Calls `Extract(ValidationExtractionRequest.For(validatorType, container))`.
+1. Requires a registered `IClientValidationProjectionSource`.
+2. Calls `Project(ClientValidationProjectionRequest.For(validatorType, container))`.
 3. Binds each `ClientValidationField` through `ValidationProjectionBindingScope`.
 4. Merges the resulting `ComponentValidation` rules onto the validation-container component.
 
@@ -99,14 +99,14 @@ components.
 | Area | Types |
 | --- | --- |
 | Request gate | `RequestValidation`, `ValidationJob`, `RequestValidationTarget` |
-| Extraction contract | `IValidationExtractor`, `ValidationExtractionRequest`, `ValidationExtractionReport` |
+| Projection contract | `IClientValidationProjectionSource`, `ClientValidationProjectionRequest`, `ClientValidationProjection` |
 | Projection binding | `ClientValidationProjectionBinder`, `ValidationProjectionBindingScope`, `ValidationFieldBinding` |
 | Plan payload | `ComponentValidation`, `ValidationRuleExecution`, `ValidationRuleOperand`, `ValidationRuleActivation` |
 | Runtime execution | `validateContainer`, `showServerErrors`, `RuntimeValidationActivation`, `RuntimeValidationPeerOperand`, `rule-engine.ts` |
 
 ## Design Rules
 
-- Do not call client projection “server rule extraction.”
+- Do not call client projection “server rules.”
 - Do not use null as behavior; `none`, missing component, and literal `null` are distinct cases.
 - Do not infer custom FluentValidation behavior from implementation details; require `ProjectToClient(...)`.
 - Do not create a separate validation read path in runtime; validation reads component values through the same declared object/member contract as gather and reactions.

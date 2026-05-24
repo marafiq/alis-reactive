@@ -7,7 +7,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// A symbolic condition tree built at extraction time using field NAMES.
+    /// A symbolic condition tree built at projection time using validation field paths.
     /// Resolved to <see cref="PlanModel.Condition"/> at render time when
     /// the component map is available.
     /// </summary>

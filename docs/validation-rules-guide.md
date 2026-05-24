@@ -37,7 +37,7 @@ namespace YourApp.Models
 }
 ```
 
-**Key:** The property TYPE matters. `int` → numeric comparison. `DateTime` → date comparison. `string` → string comparison. This is determined at extraction time, not runtime.
+**Key:** The property TYPE matters. `int` → numeric comparison. `DateTime` → date comparison. `string` → string comparison. This is determined at client projection time, not runtime.
 
 ---
 
