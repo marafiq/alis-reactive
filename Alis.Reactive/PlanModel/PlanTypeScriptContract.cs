@@ -317,8 +317,17 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("InjectReaction")
                 .Requires("kind", Literal("inject"))
-                .Requires("component", "string")
+                .Requires("target", "InjectionTarget")
                 .Requires("value", "ValueProducer"));
+
+            contract.Declare(Union(
+                "InjectionTarget",
+                "PartialSlotInjectionTarget"));
+
+            contract.Declare(Interface("PartialSlotInjectionTarget")
+                .Requires("kind", Literal("partial-slot"))
+                .Requires("component", "string")
+                .Requires("slotId", "string"));
 
             contract.Declare(Interface("ShowValidationErrorsReaction")
                 .Requires("kind", Literal("show-validation-errors"))

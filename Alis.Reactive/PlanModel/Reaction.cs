@@ -54,7 +54,7 @@ namespace Alis.Reactive.PlanModel
             new DispatchReaction(eventName, DispatchPayload.Typed(data, payloadType));
 
         internal static Reaction Inject(string component, ValueProducer value) =>
-            new InjectReaction(component, value);
+            new InjectReaction(InjectionTarget.PartialSlot(component), value);
 
         internal static Reaction ShowValidationErrors(string container) =>
             new ShowValidationErrorsReaction(container);
@@ -586,21 +586,57 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>Injects a value into a named component.</summary>
-    public sealed class InjectReaction : Reaction
+    /// <summary>Base class for HTML injection targets. Not constructed in application code.</summary>
+    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<InjectionTarget>))]
+    public abstract class InjectionTarget
+    {
+        private protected InjectionTarget() { }
+
+        /// <summary>Gets the target kind.</summary>
+        public abstract string Kind { get; }
+
+        /// <summary>Gets the target component key.</summary>
+        public abstract string Component { get; }
+
+        internal static InjectionTarget PartialSlot(string component) =>
+            new PartialSlotInjectionTarget(ComponentKey.Of(component), PartId.Of(component));
+    }
+
+    /// <summary>Replaces a browser partial slot with injected HTML and embedded plan contributions.</summary>
+    public sealed class PartialSlotInjectionTarget : InjectionTarget
     {
         private readonly ComponentKey _component;
+        private readonly PartId _slotId;
+
+        internal PartialSlotInjectionTarget(ComponentKey component, PartId slotId)
+        {
+            _component = component ?? throw new ArgumentNullException(nameof(component));
+            _slotId = slotId ?? throw new ArgumentNullException(nameof(slotId));
+        }
+
+        /// <summary>Gets the kind. Always <c>"partial-slot"</c>.</summary>
+        public override string Kind => "partial-slot";
+        /// <summary>Gets the component whose HTML is replaced.</summary>
+        public override string Component => _component.Value;
+        /// <summary>Gets the slot lifecycle identifier to load or unload.</summary>
+        public string SlotId => _slotId.Value;
+    }
+
+    /// <summary>Injects a value into a declared target.</summary>
+    public sealed class InjectReaction : Reaction
+    {
+        private readonly InjectionTarget _target;
 
         /// <summary>Gets the kind. Always <c>"inject"</c>.</summary>
         public string Kind => "inject";
-        /// <summary>Gets the target component name.</summary>
-        public string Component => _component.Value;
+        /// <summary>Gets the target component and lifecycle semantics.</summary>
+        public InjectionTarget Target => _target;
         /// <summary>Gets the value to inject.</summary>
         public ValueProducer Value { get; }
 
-        internal InjectReaction(string component, ValueProducer value)
+        internal InjectReaction(InjectionTarget target, ValueProducer value)
         {
-            _component = ComponentKey.Of(component);
+            _target = target ?? throw new ArgumentNullException(nameof(target));
             Value = value ?? throw new ArgumentNullException(nameof(value));
         }
     }

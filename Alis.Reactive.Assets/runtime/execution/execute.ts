@@ -178,15 +178,15 @@ class ReactionExecution {
   }
 
   private executeInject(reaction: InjectReaction): void {
-    const container = this.plan.components.element(reaction.component);
+    const container = this.plan.components.element(reaction.target.component);
     const value = evaluateValue(reaction.value, this.plan.document, this.context.raw);
     if (typeof value === "string") {
-      injectHtml(container, value);
-      log.trace("inject.applied", { component: reaction.component, size: value.length });
+      injectHtml(container, value, reaction.target);
+      log.trace("inject.applied", { component: reaction.target.component, target: reaction.target.kind, size: value.length });
       return;
     }
 
-    log.error("inject.wrong-type", { component: reaction.component, type: typeof value });
+    log.error("inject.wrong-type", { component: reaction.target.component, type: typeof value });
     throw new Error(`[alis] inject expects string HTML, got ${typeof value}`);
   }
 

@@ -1,8 +1,8 @@
-// inject.ts — Inject HTML into a container.
-// Extracts any <script data-reactive-plan> elements and merges them.
+// inject.ts — Inject HTML into a declared target.
+// Extracts any <script data-reactive-plan> elements and applies them by target lifecycle.
 
-import type { Plan } from "../types";
-import { loadPartialSlot, mergePlan, unloadPartialSlot } from "../lifecycle/boot";
+import type { InjectionTarget, Plan } from "../types";
+import { loadPartialSlot, unloadPartialSlot } from "../lifecycle/boot";
 
 interface SyncfusionBase {
   append(nodes: ChildNode[], target: HTMLElement, shouldClone?: boolean): void;
@@ -16,9 +16,10 @@ interface SyncfusionGlobal {
 
 /**
  * Inject HTML into a container, using ej.base.append when available (SF component init).
- * Extracts any <script data-reactive-plan> elements first and merges them into the booted plan.
+ * Extracts any <script data-reactive-plan> elements first and applies them using the
+ * lifecycle declared by the reaction target.
  */
-export function injectHtml(container: HTMLElement, html: string): void {
+export function injectHtml(container: HTMLElement, html: string, target: InjectionTarget): void {
   const temp = document.createElement("div");
   temp.innerHTML = html;
 
@@ -40,17 +41,11 @@ export function injectHtml(container: HTMLElement, html: string): void {
     container.append(...Array.from(temp.childNodes));
   }
 
-  const containerIdentifiesPartialSlot = container.id.length > 0;
-  if (containerIdentifiesPartialSlot) {
+  if (target.kind === "partial-slot") {
     if (plans.length === 0) {
-      unloadPartialSlot(container.id);
+      unloadPartialSlot(target.slotId);
     } else {
-      loadPartialSlot(container.id, plans);
+      loadPartialSlot(target.slotId, plans);
     }
-    return;
-  }
-
-  for (const plan of plans) {
-    mergePlan(plan);
   }
 }

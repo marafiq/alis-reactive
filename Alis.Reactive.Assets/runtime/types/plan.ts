@@ -394,8 +394,17 @@ export interface PresentDispatchPayload {
 
 export interface InjectReaction {
   kind: "inject";
-  component: string;
+  target: InjectionTarget;
   value: ValueProducer;
+}
+
+export type InjectionTarget =
+  | PartialSlotInjectionTarget;
+
+export interface PartialSlotInjectionTarget {
+  kind: "partial-slot";
+  component: string;
+  slotId: string;
 }
 
 export interface ShowValidationErrorsReaction {
