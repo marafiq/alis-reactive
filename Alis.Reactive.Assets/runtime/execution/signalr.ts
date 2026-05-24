@@ -15,6 +15,7 @@ interface ManagedConnection {
   readonly connection: signalR.HubConnection;
   startPromise: Promise<void>;
   readonly targetIds: Set<string>;
+  subscriptionCount: number;
   stopping: boolean;
 }
 
@@ -58,7 +59,7 @@ function retryConnection(hubUrl: string): void {
   managed.startPromise = startWithRetry(connection, hubUrl);
 }
 
-function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
+function getOrCreate(hubUrl: string): ManagedConnection {
   let managed = hubs.get(hubUrl);
   if (managed) return managed;
 
@@ -99,16 +100,8 @@ function getOrCreate(hubUrl: string, signal?: AbortSignal): ManagedConnection {
 
   const startPromise = startWithRetry(connection, hubUrl);
 
-  managed = { connection, startPromise, targetIds, stopping: false };
+  managed = { connection, startPromise, targetIds, subscriptionCount: 0, stopping: false };
   hubs.set(hubUrl, managed);
-
-  if (signal) {
-    signal.addEventListener("abort", () => {
-      const currentConnection = managed;
-      if (currentConnection !== undefined) currentConnection.stopping = true;
-      connection.stop();
-    });
-  }
 
   return managed;
 }
@@ -119,18 +112,34 @@ export function wireSignalR(
   plan: Plan,
   signal?: AbortSignal,
 ): void {
-  const managed = getOrCreate(trigger.hubUrl, signal);
+  const managed = getOrCreate(trigger.hubUrl);
   const { connection } = managed;
 
-  connection.on(trigger.method, (...args: unknown[]) => {
+  const handler = (...args: unknown[]) => {
     const evt = SignalRInvocationPayload.from(args, trigger);
     log.debug("method.received", { hubUrl: trigger.hubUrl, method: trigger.method });
     ReactionCompletion
       .from(executeReaction(reaction, plan, ExecutionContext.event(evt).raw))
       .catchAsync(err => log.error("reaction.failed", { hubUrl: trigger.hubUrl, method: trigger.method, error: String(err) }));
-  });
+  };
+
+  connection.on(trigger.method, handler);
+  managed.subscriptionCount += 1;
+  signal?.addEventListener("abort", () => {
+    connection.off(trigger.method, handler);
+    releaseSignalRSubscription(trigger.hubUrl, managed);
+  }, { once: true });
 
   log.debug("method.listening", { hubUrl: trigger.hubUrl, method: trigger.method });
+}
+
+function releaseSignalRSubscription(hubUrl: string, managed: ManagedConnection): void {
+  managed.subscriptionCount -= 1;
+  if (managed.subscriptionCount > 0) return;
+
+  managed.stopping = true;
+  managed.connection.stop();
+  hubs.delete(hubUrl);
 }
 
 class ReconnectDelaySchedule {

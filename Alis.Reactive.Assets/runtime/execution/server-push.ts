@@ -13,6 +13,7 @@ interface WiredBehavior {
   readonly trigger: ServerPushTrigger;
   readonly reaction: Reaction;
   readonly plan: Plan;
+  readonly handler: EventListener;
 }
 
 interface ManagedSource {
@@ -34,7 +35,7 @@ function retrySSE(url: string, behaviors: readonly WiredBehavior[]): void {
   }
 }
 
-function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
+function getOrCreate(url: string): ManagedSource {
   const cached = sources.get(url);
   if (cached) return cached;
 
@@ -68,15 +69,6 @@ function getOrCreate(url: string, signal?: AbortSignal): ManagedSource {
   const managed: ManagedSource = { es, targetIds, wired, stopping: false };
   sources.set(url, managed);
 
-  if (signal) {
-    signal.addEventListener("abort", () => {
-      managed.stopping = true;
-      es.close();
-      sources.delete(url);
-      log.debug("connection.closed", { url });
-    });
-  }
-
   log.debug("source.created", { url });
   return managed;
 }
@@ -87,10 +79,8 @@ export function wireServerPush(
   plan: Plan,
   signal?: AbortSignal,
 ): void {
-  const managed = getOrCreate(trigger.url, signal);
+  const managed = getOrCreate(trigger.url);
   const eventName = ServerPushEventName.from(trigger).value;
-
-  managed.wired.push({ trigger, reaction, plan });
 
   const handler = (e: MessageEvent) => {
     const evt: Record<string, unknown> = JSON.parse(e.data);
@@ -99,9 +89,33 @@ export function wireServerPush(
       .from(executeReaction(reaction, plan, ExecutionContext.event(evt).raw))
       .catchAsync(err => log.error("reaction.failed", { url: trigger.url, event: eventName, error: String(err) }));
   };
+  const wiredBehavior = { trigger, reaction, plan, handler: handler as EventListener };
 
-  managed.es.addEventListener(eventName, handler as EventListener);
+  managed.wired.push(wiredBehavior);
+
+  managed.es.addEventListener(eventName, wiredBehavior.handler);
+  signal?.addEventListener("abort", () => {
+    releaseServerPushSubscription(managed, eventName, wiredBehavior);
+  }, { once: true });
   log.debug("event.listening", { url: trigger.url, event: eventName });
+}
+
+function releaseServerPushSubscription(
+  managed: ManagedSource,
+  eventName: string,
+  wiredBehavior: WiredBehavior,
+): void {
+  managed.es.removeEventListener(eventName, wiredBehavior.handler);
+
+  const index = managed.wired.indexOf(wiredBehavior);
+  if (index >= 0) managed.wired.splice(index, 1);
+
+  if (managed.wired.length > 0) return;
+
+  managed.stopping = true;
+  managed.es.close();
+  sources.delete(wiredBehavior.trigger.url);
+  log.debug("connection.closed", { url: wiredBehavior.trigger.url });
 }
 
 class ServerPushEventName {
