@@ -80,9 +80,19 @@ namespace Alis.Reactive.PlanModel
             foreach (var component in components)
             {
                 ComponentKey.Of(component.Key);
-                snapshot[component.Key] = component.Value ?? throw new System.ArgumentException(
+                var value = component.Value ?? throw new System.ArgumentException(
                     "Plan component entry must not be null.",
                     nameof(components));
+
+                if (value.Id != component.Key)
+                {
+                    throw new System.ArgumentException(
+                        $"Plan component key '{component.Key}' cannot store component '{value.Id}'. " +
+                        "Component ids are deterministic runtime join keys; store the component under its own id.",
+                        nameof(components));
+                }
+
+                snapshot[component.Key] = value;
             }
 
             return new PlanComponents(snapshot);

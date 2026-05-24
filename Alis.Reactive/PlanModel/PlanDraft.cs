@@ -143,7 +143,10 @@ namespace Alis.Reactive.PlanModel
         internal void Set(ComponentKey componentKey, Component component)
         {
             if (componentKey == null) throw new ArgumentNullException(nameof(componentKey));
-            _components[componentKey.Value] = component ?? throw new ArgumentNullException(nameof(component));
+            if (component == null) throw new ArgumentNullException(nameof(component));
+
+            EnsureComponentEntryKeyMatchesId(componentKey.Value, component);
+            _components[componentKey.Value] = component;
         }
 
         internal ComponentKey EnsureElement(string elementId)
@@ -256,6 +259,14 @@ namespace Alis.Reactive.PlanModel
                 existing,
                 _types.Require(TypeKey.Of(existing.Type)));
             _components[componentId.Value] = enriched;
+        }
+
+        private static void EnsureComponentEntryKeyMatchesId(string componentKey, Component component)
+        {
+            if (component.Id != componentKey)
+                throw new InvalidOperationException(
+                    $"Plan component key '{componentKey}' cannot store component '{component.Id}'. " +
+                    "Component ids are deterministic runtime join keys; store the component under its own id.");
         }
     }
 

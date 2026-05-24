@@ -366,6 +366,10 @@ Browser slot facts:
 - Component keys and type keys are `Runtime Join Keys`. They are how behavior,
   gather, validation, and object member execution find active declarations.
   They are not lifecycle ownership ids.
+- A component map entry must use the component id as its key. The key is not a
+  secondary alias; it is the deterministic join key used across DOM, plan
+  registration, validation, gather, partial load/unload, and runtime object
+  lookup.
 - A partial slot unload should remove `Applied Artifacts` owned by that slot:
   behavior bindings, owned component definitions, layout object references,
   object contract fragments, and validation rule extensions.
