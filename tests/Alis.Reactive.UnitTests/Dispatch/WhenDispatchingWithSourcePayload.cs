@@ -8,13 +8,18 @@ namespace Alis.Reactive.UnitTests.Dispatch;
 public class NestedPayload
 {
     public string Name { get; set; } = "";
-    public NestedAddress Address { get; set; }
+    public NestedAddress Address { get; set; } = new();
 }
 
 public class NestedAddress
 {
     public string City { get; set; } = "";
     public string Zip { get; set; } = "";
+}
+
+public class DispatchPayloadModel
+{
+    public string Id { get; set; } = "";
 }
 
 /// <summary>
@@ -30,7 +35,7 @@ public class WhenDispatchingWithSourcePayload : PlanTestBase
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
         {
-            p.DispatchWith<TestModel>("transfer", d => d
+            p.DispatchWith<DispatchPayloadModel>("transfer", d => d
                 .Set(x => x.Id, "abc-123")
             );
         });
@@ -165,7 +170,7 @@ public class WhenDispatchingWithSourcePayload : PlanTestBase
         {
             Trigger(plan).DomReady(p =>
             {
-                p.DispatchWith<TestModel>("transfer", d => { });
+                p.DispatchWith<DispatchPayloadModel>("transfer", d => { });
             });
         });
     }

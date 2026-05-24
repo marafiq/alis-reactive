@@ -130,16 +130,16 @@ namespace Alis.Reactive.FluentValidator
 
         /// <summary>Applies an "is-empty" condition (null or empty string).</summary>
         protected void WhenFieldEmpty(
-            Expression<Func<T, string>> field, Action defineRules)
+            Expression<Func<T, string?>> field, Action defineRules)
         {
-            ApplyClientCondition(new FieldStart<T, string>(field).IsEmpty(), defineRules);
+            ApplyClientCondition(new FieldStart<T, string?>(field).IsEmpty(), defineRules);
         }
 
         /// <summary>Applies a "not-empty" condition (non-null and non-empty string).</summary>
         protected void WhenFieldNotEmpty(
-            Expression<Func<T, string>> field, Action defineRules)
+            Expression<Func<T, string?>> field, Action defineRules)
         {
-            ApplyClientCondition(new FieldStart<T, string>(field).NotEmpty(), defineRules);
+            ApplyClientCondition(new FieldStart<T, string?>(field).NotEmpty(), defineRules);
         }
 
         // ── Membership operators ───────────────────────────────────────────────
@@ -155,23 +155,23 @@ namespace Alis.Reactive.FluentValidator
 
         /// <summary>Applies a "contains" condition — string field contains substring.</summary>
         protected void WhenFieldContains(
-            Expression<Func<T, string>> field, string substring, Action defineRules)
+            Expression<Func<T, string?>> field, string substring, Action defineRules)
         {
-            ApplyClientCondition(new FieldStart<T, string>(field).Contains(substring), defineRules);
+            ApplyClientCondition(new FieldStart<T, string?>(field).Contains(substring), defineRules);
         }
 
         /// <summary>Applies a "starts-with" condition.</summary>
         protected void WhenFieldStartsWith(
-            Expression<Func<T, string>> field, string prefix, Action defineRules)
+            Expression<Func<T, string?>> field, string prefix, Action defineRules)
         {
-            ApplyClientCondition(new FieldStart<T, string>(field).StartsWith(prefix), defineRules);
+            ApplyClientCondition(new FieldStart<T, string?>(field).StartsWith(prefix), defineRules);
         }
 
         /// <summary>Applies an "ends-with" condition.</summary>
         protected void WhenFieldEndsWith(
-            Expression<Func<T, string>> field, string suffix, Action defineRules)
+            Expression<Func<T, string?>> field, string suffix, Action defineRules)
         {
-            ApplyClientCondition(new FieldStart<T, string>(field).EndsWith(suffix), defineRules);
+            ApplyClientCondition(new FieldStart<T, string?>(field).EndsWith(suffix), defineRules);
         }
 
         /// <summary>Applies a "not-in" condition — field value is NOT in the given set.</summary>
@@ -190,23 +190,23 @@ namespace Alis.Reactive.FluentValidator
 
         /// <summary>Applies a "matches" condition — string field matches regex pattern.</summary>
         protected void WhenFieldMatches(
-            Expression<Func<T, string>> field, string pattern, Action defineRules)
+            Expression<Func<T, string?>> field, string pattern, Action defineRules)
         {
-            ApplyClientCondition(new FieldStart<T, string>(field).Matches(pattern), defineRules);
+            ApplyClientCondition(new FieldStart<T, string?>(field).Matches(pattern), defineRules);
         }
 
         /// <summary>Applies a "min-length" condition — string field length >= minimum.</summary>
         protected void WhenFieldMinLength(
-            Expression<Func<T, string>> field, int minLength, Action defineRules)
+            Expression<Func<T, string?>> field, int minLength, Action defineRules)
         {
-            ApplyClientCondition(new FieldStart<T, string>(field).MinLength(minLength), defineRules);
+            ApplyClientCondition(new FieldStart<T, string?>(field).MinLength(minLength), defineRules);
         }
 
         /// <summary>Applies an "array-contains" condition — array field contains the given element.</summary>
         protected void WhenFieldArrayContains<TProp>(
-            Expression<Func<T, IEnumerable<TProp>>> field, TProp value, Action defineRules)
+            Expression<Func<T, IEnumerable<TProp>?>> field, TProp value, Action defineRules)
         {
-            var selectedField = SelectedValidationField<T, IEnumerable<TProp>>.From(field);
+            var selectedField = SelectedValidationField<T, IEnumerable<TProp>?>.From(field);
             var guard = selectedField.GuardAgainstCollectionItem(
                 CompareOperator.ArrayContains,
                 value,

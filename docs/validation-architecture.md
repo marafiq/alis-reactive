@@ -48,7 +48,11 @@ Field binding has two deterministic paths:
 ## FluentValidation Adapter
 
 `FluentValidationAdapter` translates supported FluentValidation validators into
-client projection primitives. Custom validators can opt in through
+client validation projections. The adapter builds a `ClientValidationProjectionDraft`
+while walking a validator: projected rules are attached to a field path, and
+unproven browser rules are recorded as skipped projections with a reason.
+
+Custom validators can opt in through
 `ProjectToClient(...)`, which attaches an explicit browser rule projection to the
 FluentValidation rule component.
 

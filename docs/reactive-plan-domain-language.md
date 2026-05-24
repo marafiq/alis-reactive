@@ -250,6 +250,18 @@ TypeScript.
 | Does validation project a server rule to browser? | Client Validation Projection | Emit deterministic browser rule intent or record skipped projection | Inferring from implementation details or pretending all server rules are client rules |
 | Does runtime need to execute a behavior? | Declared Object Member Execution | Resolve declared object/member and apply call/read/write using the plan contract | Discovering capabilities dynamically from browser objects |
 
+### Validation Terms
+
+- **Client Validation Projection**: the deterministic subset of validation intent
+  that can run in the browser. It is not the server validator and must not imply
+  server-only predicates or database-backed rules.
+- **Projected Client Validation Rule**: one browser-executable rule attached to
+  a model field path, with an explicit operand shape, peer value, and activation
+  condition.
+- **Skipped Client Rule Projection**: a server validation rule that remains
+  authoritative on the server but was not proven deterministic for browser
+  execution.
+
 ### Concept Flow
 
 The deterministic flow is always:

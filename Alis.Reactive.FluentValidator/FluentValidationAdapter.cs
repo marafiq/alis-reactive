@@ -36,18 +36,18 @@ namespace Alis.Reactive.FluentValidator
 
             var validator = ResolveRootValidator(request.ValidatorType);
 
-            var extractedForm = new ExtractedValidationContract();
+            var projection = new ClientValidationProjectionDraft();
             var clientConditions = ClientConditionCatalog.From(validator);
             var rootFrame = ValidatorExtractionFrame.Root(
                 ValidationFieldPath.Empty,
-                extractedForm,
+                projection,
                 _factory,
                 clientConditions);
 
             ExtractFromValidator(validator, rootFrame);
 
-            extractedForm.EnsurePeerFields();
-            return extractedForm.ToReport(request.ValidationContainer);
+            projection.EnsurePeerFields();
+            return projection.ToReport(request.ValidationContainer);
         }
 
         private IValidator ResolveRootValidator(Type validatorType)
@@ -122,7 +122,7 @@ namespace Alis.Reactive.FluentValidator
                 var componentHasComponentCondition = component.HasCondition || component.HasAsyncCondition;
                 if (componentHasComponentCondition)
                 {
-                    frame.ExtractedForm.AddSkippedClientRule(SkippedClientRuleFor(
+                    frame.Projection.RecordSkippedRule(SkippedClientRuleFor(
                         target.FullPath,
                         component.Validator,
                         ClientRuleExtractionSkipReason.RuleComponentCondition));
@@ -137,16 +137,12 @@ namespace Alis.Reactive.FluentValidator
                 }
 
                 var effectiveCondition = frame.ParentCondition.Combine(ruleCondition);
-                var extracted = MapComponent(
+                ProjectRuleComponentForBrowser(
                     RuleComponentMapping.For(
-                    component,
-                    target,
-                    effectiveCondition),
-                    frame.ExtractedForm);
-                if (extracted.Count > 0)
-                {
-                    frame.ExtractedForm.AddRules(target.FullPath, extracted);
-                }
+                        component,
+                        target,
+                        effectiveCondition),
+                    frame.Projection);
             }
         }
 
@@ -192,49 +188,50 @@ namespace Alis.Reactive.FluentValidator
             return validator;
         }
 
-        private static List<ExtractedRule> MapComponent(
+        private static void ProjectRuleComponentForBrowser(
             RuleComponentMapping mapping,
-            ExtractedValidationContract extractedForm)
+            ClientValidationProjectionDraft projection)
         {
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
-            if (extractedForm == null) throw new ArgumentNullException(nameof(extractedForm));
+            if (projection == null) throw new ArgumentNullException(nameof(projection));
 
-            var result = new List<ExtractedRule>();
+            var projectedRules = new List<ProjectedClientValidationRule>();
             var validator = mapping.Validator;
             var displayName = mapping.DisplayName;
 
             if (ClientValidationRuleProjectionCatalog.TryFind(mapping.Component, out var explicitClientRule))
             {
-                result.Add(new ExtractedRule(
+                projectedRules.Add(new ProjectedClientValidationRule(
                     explicitClientRule.Name,
                     mapping.Message.OrDefault(explicitClientRule.MessageFor(displayName).Value),
                     explicitClientRule.DetailsFor(mapping.RuleCondition)));
-                return result;
+                projection.AddProjectedRules(mapping.Target.FullPath, projectedRules);
+                return;
             }
 
             switch (validator)
             {
                 case INotEmptyValidator _:
                 case INotNullValidator _:
-                    result.Add(new ExtractedRule(
+                    projectedRules.Add(new ProjectedClientValidationRule(
                         ValidationRuleName.Required,
                         mapping.Message.OrDefault($"'{displayName}' is required."),
                         ValidationRuleDetails.NoOperand(mapping.RuleCondition)));
                     break;
 
                 case IEmptyValidator _:
-                    result.Add(new ExtractedRule(
+                    projectedRules.Add(new ProjectedClientValidationRule(
                         ValidationRuleName.Empty,
                         mapping.Message.OrDefault($"'{displayName}' must be empty."),
                         ValidationRuleDetails.NoOperand(mapping.RuleCondition)));
                     break;
 
                 case ILengthValidator lv:
-                    MapLengthValidator(lv, mapping, result);
+                    MapLengthValidator(lv, mapping, projectedRules);
                     break;
 
                 case IEmailValidator _:
-                    result.Add(new ExtractedRule(
+                    projectedRules.Add(new ProjectedClientValidationRule(
                         ValidationRuleName.Email,
                         mapping.Message.OrDefault($"'{displayName}' must be a valid email address."),
                         ValidationRuleDetails.NoOperand(mapping.RuleCondition)));
@@ -243,14 +240,14 @@ namespace Alis.Reactive.FluentValidator
                 case IRegularExpressionValidator rv:
                     if (string.IsNullOrEmpty(rv.Expression))
                     {
-                        extractedForm.AddSkippedClientRule(SkippedClientRuleFor(
+                        projection.RecordSkippedRule(SkippedClientRuleFor(
                             mapping.Target.FullPath,
                             validator,
                             ClientRuleExtractionSkipReason.MissingRegexExpression));
                     }
                     else
                     {
-                        result.Add(new ExtractedRule(
+                        projectedRules.Add(new ProjectedClientValidationRule(
                             ValidationRuleName.Regex,
                             mapping.Message.OrDefault($"'{displayName}' format is invalid."),
                             ValidationRuleDetails.WithConstraint(rv.Expression, mapping.RuleCondition, Shape.None)));
@@ -258,7 +255,7 @@ namespace Alis.Reactive.FluentValidator
                     break;
 
                 case FluentValidation.Validators.ICreditCardValidator _:
-                    result.Add(new ExtractedRule(
+                    projectedRules.Add(new ProjectedClientValidationRule(
                         ValidationRuleName.CreditCard,
                         mapping.Message.OrDefault($"'{displayName}' must be a valid credit card number."),
                         ValidationRuleDetails.NoOperand(mapping.RuleCondition)));
@@ -273,7 +270,7 @@ namespace Alis.Reactive.FluentValidator
                         ebv.From,
                         ebv.To,
                         defaultMessage,
-                        mapping.RuleCondition).AddTo(result, mapping, extractedForm);
+                        mapping.RuleCondition).AddTo(projectedRules, mapping, projection);
                     break;
                 }
 
@@ -286,31 +283,32 @@ namespace Alis.Reactive.FluentValidator
                         bv.From,
                         bv.To,
                         defaultMessage,
-                        mapping.RuleCondition).AddTo(result, mapping, extractedForm);
+                        mapping.RuleCondition).AddTo(projectedRules, mapping, projection);
                     break;
                 }
 
                 case IComparisonValidator cv:
                 {
-                    MapComparisonValidator(cv, mapping).AddTo(result, mapping, extractedForm);
+                    MapComparisonValidator(cv, mapping).AddTo(projectedRules, mapping, projection);
                     break;
                 }
 
                 default:
-                    extractedForm.AddSkippedClientRule(SkippedClientRuleFor(
+                    projection.RecordSkippedRule(SkippedClientRuleFor(
                         mapping.Target.FullPath,
                         validator,
                         ClientRuleExtractionSkipReason.UnsupportedValidator));
                     break;
             }
 
-            return result;
+            if (projectedRules.Count > 0)
+                projection.AddProjectedRules(mapping.Target.FullPath, projectedRules);
         }
 
         private static void MapLengthValidator(
             ILengthValidator lv,
             RuleComponentMapping mapping,
-            List<ExtractedRule> result)
+            List<ProjectedClientValidationRule> result)
         {
             if (lv == null) throw new ArgumentNullException(nameof(lv));
             if (mapping == null) throw new ArgumentNullException(nameof(mapping));
@@ -319,14 +317,14 @@ namespace Alis.Reactive.FluentValidator
             var displayName = mapping.DisplayName;
             if (lv.Min > 0)
             {
-                result.Add(new ExtractedRule(
+                result.Add(new ProjectedClientValidationRule(
                     ValidationRuleName.MinLength,
                     mapping.Message.OrDefault($"'{displayName}' must be at least {lv.Min} characters."),
                     ValidationRuleDetails.WithConstraint(lv.Min, mapping.RuleCondition, Shape.None)));
             }
             if (lv.Max > 0)
             {
-                result.Add(new ExtractedRule(
+                result.Add(new ProjectedClientValidationRule(
                     ValidationRuleName.MaxLength,
                     mapping.Message.OrDefault($"'{displayName}' must be at most {lv.Max} characters."),
                     ValidationRuleDetails.WithConstraint(lv.Max, mapping.RuleCondition, Shape.None)));
@@ -626,7 +624,7 @@ namespace Alis.Reactive.FluentValidator
                 if (ruleCondition == null) throw new ArgumentNullException(nameof(ruleCondition));
 
                 var bounds = ToValidationRangeBounds();
-                return ClientRuleProjection.Project(new ExtractedRule(
+                return ClientRuleProjection.Project(new ProjectedClientValidationRule(
                     ruleName,
                     message,
                     ValidationRuleDetails.WithConstraint(
@@ -731,7 +729,7 @@ namespace Alis.Reactive.FluentValidator
                 string defaultMessage,
                 RuleComponentMapping mapping)
             {
-                return ClientRuleProjection.Project(new ExtractedRule(
+                return ClientRuleProjection.Project(new ProjectedClientValidationRule(
                     ruleName,
                     mapping.Message.OrDefault(defaultMessage),
                     DetailsFor(mapping.RuleCondition)));
