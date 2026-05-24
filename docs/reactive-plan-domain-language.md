@@ -5,6 +5,9 @@ second specification. The source of truth is the C# plan domain, the generated
 TypeScript contract, and the runtime tests that prove the same terms execute in
 the browser.
 
+Use `docs/reactive-dsl-feature-atlas.md` as the grounded inventory of frozen DSL
+capabilities before renaming or rewriting a plan/runtime surface.
+
 Update this document in the same change that introduces or renames a domain
 term. If the code and this document disagree, fix the document immediately.
 
