@@ -111,6 +111,15 @@ function conditionalRuleWithMissingActivationSource(): ComponentValidation {
   };
 }
 
+function unmountedConditionalRuleWithMissingActivationSource(): ComponentValidation {
+  return {
+    ...conditionalRuleWithMissingActivationSource(),
+    component: "unmounted-dependent-field",
+    serverFieldName: "DependentField",
+    value: readComponentValue("unmounted-dependent-field"),
+  };
+}
+
 function peerRuleWithMissingPeerSource(): ComponentValidation {
   return {
     component: "resident-name-field",
@@ -350,6 +359,15 @@ describe("validation orchestrator client rules", () => {
 
     expect(() => validateContainer(runtimePlan, "resident-form"))
       .toThrow("[alis] component not found: missing-activation-source");
+  });
+
+  it("treats an unmounted activation dependency as inactive only for an unmounted validation field", () => {
+    renderValidationDom();
+    const runtimePlan = plan([
+      unmountedConditionalRuleWithMissingActivationSource(),
+    ]);
+
+    expect(validateContainer(runtimePlan, "resident-form")).toBe(true);
   });
 
   it("does not hide a miswired peer dependency behind an absent peer value", () => {

@@ -36,12 +36,12 @@ const textOperandShape: Shape = { kind: "string" };
 
 /** Sync condition evaluation. Confirm conditions return false in sync context. */
 export function evaluateCondition(condition: RuntimeEvaluableCondition, plan: Plan, ctx?: ExecContext): boolean {
-  return RuntimeCondition.from(condition, plan, ExecutionContext.from(ctx)).evaluateSync();
+  return evaluateConditionSync(condition, plan, ExecutionContext.from(ctx));
 }
 
 /** Async condition evaluation — required when conditions contain ConfirmCondition. */
 export async function evaluateConditionAsync(condition: Condition, plan: Plan, ctx?: ExecContext): Promise<boolean> {
-  return RuntimeCondition.from(condition, plan, ExecutionContext.from(ctx)).evaluateAsync();
+  return evaluateConditionAsyncCore(condition, plan, ExecutionContext.from(ctx));
 }
 
 /** Current-lane condition evaluation. Crosses to async only when a reached term requires it. */
@@ -50,216 +50,153 @@ export function evaluateConditionInCurrentLane(
   plan: Plan,
   ctx?: ExecContext,
 ): boolean | Promise<boolean> {
-  return RuntimeCondition.from(condition, plan, ExecutionContext.from(ctx)).evaluateInCurrentLane();
+  return evaluateConditionInLane(condition, plan, ExecutionContext.from(ctx));
 }
 
-abstract class RuntimeCondition {
-  static from(condition: RuntimeEvaluableCondition, plan: Plan, context: ExecutionContext): RuntimeCondition {
-    switch (condition.kind) {
-      case "compare":
-        return new CompareRuntimeCondition(condition, plan, context);
-      case "all":
-        return new AllRuntimeCondition(condition.terms, plan, context);
-      case "any":
-        return new AnyRuntimeCondition(condition.terms, plan, context);
-      case "not":
-        return new NotRuntimeCondition(condition.term, plan, context);
-      case "confirm":
-        return new ConfirmRuntimeCondition(condition.message);
-      default:
-        return assertNever(condition, "condition kind");
-    }
-  }
-
-  abstract evaluateSync(): boolean;
-
-  abstract evaluateAsync(): Promise<boolean>;
-
-  abstract evaluateInCurrentLane(): boolean | Promise<boolean>;
-}
-
-class CompareRuntimeCondition extends RuntimeCondition {
-  constructor(
-    private readonly condition: CompareCondition,
-    private readonly plan: Plan,
-    private readonly context: ExecutionContext,
-  ) {
-    super();
-  }
-
-  evaluateSync(): boolean {
-    return evaluateCompare(this.condition, this.plan, this.context);
-  }
-
-  async evaluateAsync(): Promise<boolean> {
-    return this.evaluateSync();
-  }
-
-  evaluateInCurrentLane(): boolean {
-    return this.evaluateSync();
+function evaluateConditionSync(
+  condition: RuntimeEvaluableCondition,
+  plan: Plan,
+  context: ExecutionContext,
+): boolean {
+  switch (condition.kind) {
+    case "compare":
+      return evaluateCompare(condition, plan, context);
+    case "all":
+      ensureCompositeConditionHasTerms("all", condition.terms);
+      return condition.terms.every(term => evaluateConditionSync(term, plan, context));
+    case "any":
+      ensureCompositeConditionHasTerms("any", condition.terms);
+      return condition.terms.some(term => evaluateConditionSync(term, plan, context));
+    case "not":
+      return !evaluateConditionSync(condition.term, plan, context);
+    case "confirm":
+      log.warn("confirm.sync-denied");
+      return false;
+    default:
+      return assertNever(condition, "condition kind");
   }
 }
 
-abstract class CompositeRuntimeCondition extends RuntimeCondition {
-  constructor(
-    kind: "all" | "any",
-    protected readonly terms: readonly RuntimeEvaluableCondition[],
-    protected readonly plan: Plan,
-    protected readonly context: ExecutionContext,
-  ) {
-    super();
-    if (terms.length === 0) {
-      throw new Error(`[alis] ${kind} condition requires at least one term`);
-    }
-  }
-
-  protected runtimeTerms(): RuntimeCondition[] {
-    return this.terms.map(term => RuntimeCondition.from(term, this.plan, this.context));
-  }
-
-  protected runtimeTerm(term: RuntimeEvaluableCondition): RuntimeCondition {
-    return RuntimeCondition.from(term, this.plan, this.context);
-  }
-}
-
-class AllRuntimeCondition extends CompositeRuntimeCondition {
-  constructor(terms: readonly RuntimeEvaluableCondition[], plan: Plan, context: ExecutionContext) {
-    super("all", terms, plan, context);
-  }
-
-  evaluateSync(): boolean {
-    return this.runtimeTerms().every(term => term.evaluateSync());
-  }
-
-  async evaluateAsync(): Promise<boolean> {
-    for (const term of this.runtimeTerms()) {
-      if (!await term.evaluateAsync()) return false;
-    }
-
-    return true;
-  }
-
-  evaluateInCurrentLane(): boolean | Promise<boolean> {
-    return this.evaluateFrom(0);
-  }
-
-  private evaluateFrom(startIndex: number): boolean | Promise<boolean> {
-    for (let index = startIndex; index < this.terms.length; index++) {
-      const term = this.terms[index]!;
-      const termMatches = this.runtimeTerm(term).evaluateInCurrentLane();
-      if (termMatches instanceof Promise) {
-        return this.evaluateAfterAsyncTerm(termMatches, index + 1);
+async function evaluateConditionAsyncCore(
+  condition: RuntimeEvaluableCondition,
+  plan: Plan,
+  context: ExecutionContext,
+): Promise<boolean> {
+  switch (condition.kind) {
+    case "compare":
+      return evaluateCompare(condition, plan, context);
+    case "all":
+      ensureCompositeConditionHasTerms("all", condition.terms);
+      for (const term of condition.terms) {
+        if (!await evaluateConditionAsyncCore(term, plan, context)) return false;
       }
-
-      if (!termMatches) return false;
-    }
-
-    return true;
-  }
-
-  private async evaluateAfterAsyncTerm(termMatches: Promise<boolean>, nextIndex: number): Promise<boolean> {
-    if (!await termMatches) return false;
-
-    return await this.evaluateFrom(nextIndex);
-  }
-}
-
-class AnyRuntimeCondition extends CompositeRuntimeCondition {
-  constructor(terms: readonly RuntimeEvaluableCondition[], plan: Plan, context: ExecutionContext) {
-    super("any", terms, plan, context);
-  }
-
-  evaluateSync(): boolean {
-    return this.runtimeTerms().some(term => term.evaluateSync());
-  }
-
-  async evaluateAsync(): Promise<boolean> {
-    for (const term of this.runtimeTerms()) {
-      if (await term.evaluateAsync()) return true;
-    }
-
-    return false;
-  }
-
-  evaluateInCurrentLane(): boolean | Promise<boolean> {
-    return this.evaluateFrom(0);
-  }
-
-  private evaluateFrom(startIndex: number): boolean | Promise<boolean> {
-    for (let index = startIndex; index < this.terms.length; index++) {
-      const term = this.terms[index]!;
-      const termMatches = this.runtimeTerm(term).evaluateInCurrentLane();
-      if (termMatches instanceof Promise) {
-        return this.evaluateAfterAsyncTerm(termMatches, index + 1);
+      return true;
+    case "any":
+      ensureCompositeConditionHasTerms("any", condition.terms);
+      for (const term of condition.terms) {
+        if (await evaluateConditionAsyncCore(term, plan, context)) return true;
       }
-
-      if (termMatches) return true;
-    }
-
-    return false;
-  }
-
-  private async evaluateAfterAsyncTerm(termMatches: Promise<boolean>, nextIndex: number): Promise<boolean> {
-    if (await termMatches) return true;
-
-    return await this.evaluateFrom(nextIndex);
+      return false;
+    case "not":
+      return !(await evaluateConditionAsyncCore(condition.term, plan, context));
+    case "confirm":
+      return evaluateConfirmCondition(condition.message);
+    default:
+      return assertNever(condition, "condition kind");
   }
 }
 
-class NotRuntimeCondition extends RuntimeCondition {
-  constructor(
-    private readonly term: RuntimeEvaluableCondition,
-    private readonly plan: Plan,
-    private readonly context: ExecutionContext,
-  ) {
-    super();
-  }
-
-  evaluateSync(): boolean {
-    return !RuntimeCondition.from(this.term, this.plan, this.context).evaluateSync();
-  }
-
-  async evaluateAsync(): Promise<boolean> {
-    return !(await RuntimeCondition.from(this.term, this.plan, this.context).evaluateAsync());
-  }
-
-  evaluateInCurrentLane(): boolean | Promise<boolean> {
-    const termMatches = RuntimeCondition.from(this.term, this.plan, this.context).evaluateInCurrentLane();
-    if (termMatches instanceof Promise) return this.negateAsync(termMatches);
-
-    return !termMatches;
-  }
-
-  private async negateAsync(termMatches: Promise<boolean>): Promise<boolean> {
-    return !(await termMatches);
+function evaluateConditionInLane(
+  condition: Condition,
+  plan: Plan,
+  context: ExecutionContext,
+): boolean | Promise<boolean> {
+  switch (condition.kind) {
+    case "compare":
+      return evaluateCompare(condition, plan, context);
+    case "all":
+      ensureCompositeConditionHasTerms("all", condition.terms);
+      return evaluateAllInLane(condition.terms, plan, context, 0);
+    case "any":
+      ensureCompositeConditionHasTerms("any", condition.terms);
+      return evaluateAnyInLane(condition.terms, plan, context, 0);
+    case "not":
+      return negateConditionInLane(condition.term, plan, context);
+    case "confirm":
+      return evaluateConfirmCondition(condition.message);
+    default:
+      return assertNever(condition, "condition kind");
   }
 }
 
-class ConfirmRuntimeCondition extends RuntimeCondition {
-  constructor(private readonly message: string) {
-    super();
-  }
-
-  evaluateSync(): boolean {
-    log.warn("confirm.sync-denied");
-    return false;
-  }
-
-  async evaluateAsync(): Promise<boolean> {
-    const confirmFn = (window as AlisBrowserApi).alis?.confirm;
-    if (!confirmFn) {
-      log.error("confirm.dialog-missing");
-      throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
+function evaluateAllInLane(
+  terms: readonly Condition[],
+  plan: Plan,
+  context: ExecutionContext,
+  startIndex: number,
+): boolean | Promise<boolean> {
+  for (let index = startIndex; index < terms.length; index++) {
+    const termMatches = evaluateConditionInLane(terms[index]!, plan, context);
+    if (termMatches instanceof Promise) {
+      return termMatches.then(matches =>
+        matches ? evaluateAllInLane(terms, plan, context, index + 1) : false);
     }
 
-    const accepted = await confirmFn(this.message);
-    log.debug("confirm.result", { accepted, message: this.message });
-    return accepted;
+    if (!termMatches) return false;
   }
 
-  evaluateInCurrentLane(): Promise<boolean> {
-    return this.evaluateAsync();
+  return true;
+}
+
+function evaluateAnyInLane(
+  terms: readonly Condition[],
+  plan: Plan,
+  context: ExecutionContext,
+  startIndex: number,
+): boolean | Promise<boolean> {
+  for (let index = startIndex; index < terms.length; index++) {
+    const termMatches = evaluateConditionInLane(terms[index]!, plan, context);
+    if (termMatches instanceof Promise) {
+      return termMatches.then(matches =>
+        matches ? true : evaluateAnyInLane(terms, plan, context, index + 1));
+    }
+
+    if (termMatches) return true;
   }
+
+  return false;
+}
+
+function negateConditionInLane(
+  condition: Condition,
+  plan: Plan,
+  context: ExecutionContext,
+): boolean | Promise<boolean> {
+  const termMatches = evaluateConditionInLane(condition, plan, context);
+  if (termMatches instanceof Promise) return termMatches.then(matches => !matches);
+
+  return !termMatches;
+}
+
+async function evaluateConfirmCondition(message: string): Promise<boolean> {
+  const confirmFn = (window as AlisBrowserApi).alis?.confirm;
+  if (!confirmFn) {
+    log.error("confirm.dialog-missing");
+    throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
+  }
+
+  const accepted = await confirmFn(message);
+  log.debug("confirm.result", { accepted, message });
+  return accepted;
+}
+
+function ensureCompositeConditionHasTerms(
+  kind: "all" | "any",
+  terms: readonly unknown[],
+): void {
+  if (terms.length > 0) return;
+
+  throw new Error(`[alis] ${kind} condition requires at least one term`);
 }
 
 // -- Compare evaluation --

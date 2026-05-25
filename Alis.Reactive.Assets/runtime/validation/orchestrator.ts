@@ -474,7 +474,7 @@ class RuntimeValidationRule {
   }
 
   isConditionallySkipped(surface: ValidationSurface): boolean {
-    return ValidationActivation.from(this.rule.execution.activation).isSkipped(surface);
+    return ValidationActivation.from(this.rule.execution.activation).isSkippedForUnmountedField(surface);
   }
 
   resolvePeerValue(plan: Plan): ResolvedPeerValue {
@@ -493,7 +493,7 @@ abstract class ValidationActivation {
 
   abstract isActive(surface: ValidationSurface): boolean;
 
-  abstract isSkipped(surface: ValidationSurface): boolean;
+  abstract isSkippedForUnmountedField(surface: ValidationSurface): boolean;
 }
 
 class AlwaysValidationActivation extends ValidationActivation {
@@ -503,7 +503,7 @@ class AlwaysValidationActivation extends ValidationActivation {
     return true;
   }
 
-  isSkipped(): boolean {
+  isSkippedForUnmountedField(): boolean {
     return false;
   }
 }
@@ -517,8 +517,13 @@ class ConditionalValidationActivation extends ValidationActivation {
     return evaluateValidationCondition(this.condition, surface.plan, surface.context.raw);
   }
 
-  isSkipped(surface: ValidationSurface): boolean {
-    return !evaluateValidationCondition(this.condition, surface.plan, surface.context.raw);
+  isSkippedForUnmountedField(surface: ValidationSurface): boolean {
+    try {
+      return !evaluateValidationCondition(this.condition, surface.plan, surface.context.raw);
+    } catch (e) {
+      if (isResolutionError(e)) return true;
+      throw e;
+    }
   }
 }
 
