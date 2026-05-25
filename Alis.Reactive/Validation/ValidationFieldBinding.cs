@@ -102,10 +102,13 @@ namespace Alis.Reactive
             if (_registeredInputs.TryGetValue(fieldPath.Value, out var registration))
                 return ValidationFieldBinding.Registered(registration);
 
-            var deferredField = _projectedFields.TryGetValue(fieldPath.Value, out var field)
-                ? field.ToDeferredField(_modelType)
-                : DeferredModelBoundClientValidationField.FromModel(_modelType, fieldPath);
-            return ValidationFieldBinding.Deferred(deferredField);
+            if (_projectedFields.TryGetValue(fieldPath.Value, out var field))
+                return ValidationFieldBinding.Deferred(field.ToDeferredField(_modelType));
+
+            throw new InvalidOperationException(
+                $"Validation field '{fieldPath.Value}' was referenced by a projected validation rule for model '{_modelType.FullName}', " +
+                "but that field was not included in the client validation projection. " +
+                "Declare peer fields and condition fields through the same typed client projection so their shape is known before render-time binding.");
         }
     }
 
@@ -183,16 +186,7 @@ namespace Alis.Reactive
 
         internal InputValueContract ValueContract => InputValueContract.ForCanonicalValue(Shape);
 
-        internal static DeferredModelBoundClientValidationField FromModel(Type modelType, ValidationFieldPath fieldPath)
-        {
-            if (modelType == null) throw new ArgumentNullException(nameof(modelType));
-            if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
-
-            var modelField = ValidationModelField.Resolve(modelType, fieldPath);
-            return FromProjectedShape(modelType, fieldPath, modelField.Shape);
-        }
-
-        internal static DeferredModelBoundClientValidationField FromProjectedShape(
+        internal static DeferredModelBoundClientValidationField ForProjectedField(
             Type modelType,
             ValidationFieldPath fieldPath,
             Shape shape)
@@ -204,66 +198,6 @@ namespace Alis.Reactive
             return new DeferredModelBoundClientValidationField(
                 Alis.Reactive.PlanModel.ComponentId.Of(IdGenerator.For(modelType, fieldPath.Value)),
                 shape);
-        }
-    }
-
-    internal sealed class ValidationModelField
-    {
-        private ValidationModelField(Shape shape)
-        {
-            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
-        }
-
-        internal Shape Shape { get; }
-
-        internal static ValidationModelField Resolve(Type modelType, ValidationFieldPath fieldPath)
-        {
-            if (modelType == null) throw new ArgumentNullException(nameof(modelType));
-            if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
-
-            var currentType = modelType;
-            foreach (var segment in fieldPath.Segments)
-            {
-                var member = ValidationModelMember.Find(modelType, currentType, segment, fieldPath);
-                currentType = member.ValueType;
-            }
-
-            return new ValidationModelField(Shape.FromClrType(currentType));
-        }
-    }
-
-    internal sealed class ValidationModelMember
-    {
-        private ValidationModelMember(Type valueType)
-        {
-            ValueType = valueType ?? throw new ArgumentNullException(nameof(valueType));
-        }
-
-        internal Type ValueType { get; }
-
-        internal static ValidationModelMember Find(
-            Type rootModelType,
-            Type declaringType,
-            string segment,
-            ValidationFieldPath fullPath)
-        {
-            if (rootModelType == null) throw new ArgumentNullException(nameof(rootModelType));
-            if (declaringType == null) throw new ArgumentNullException(nameof(declaringType));
-            if (segment == null) throw new ArgumentNullException(nameof(segment));
-            if (fullPath == null) throw new ArgumentNullException(nameof(fullPath));
-
-            var property = declaringType.GetProperty(segment);
-            if (property != null)
-                return new ValidationModelMember(property.PropertyType);
-
-            var field = declaringType.GetField(segment);
-            if (field != null)
-                return new ValidationModelMember(field.FieldType);
-
-            throw new InvalidOperationException(
-                $"Validation field '{fullPath.Value}' was projected for model '{rootModelType.FullName}', " +
-                $"but segment '{segment}' is not a public property or field on '{declaringType.FullName}'. " +
-                "Ensure the validator targets the model field rendered by the form, or register the input component for that binding path.");
         }
     }
 }

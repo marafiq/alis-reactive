@@ -43,7 +43,7 @@ Validate<TValidationSource>(containerId)
 Field binding has two deterministic paths:
 
 - Registered input fields use the rendered component id, value member, and shape from `ComponentRegistration`.
-- Deferred fields use the projection's declared field shape when the source supplies one, otherwise they resolve model shape from the root model. In both cases they use the deterministic component id a partial will render later.
+- Deferred fields use the projection's declared field shape and the deterministic component id a partial will render later.
 
 ## Core Projection Registry
 

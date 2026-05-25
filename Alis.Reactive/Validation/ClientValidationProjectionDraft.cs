@@ -72,8 +72,7 @@ namespace Alis.Reactive.Validation
 
         internal ClientValidationField ToField() =>
             new ClientValidationField(
-                _field.Path,
-                ClientValidationFieldShapeSource.Projected(_field.Shape),
+                _field,
                 _rules);
     }
 }

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Alis.Reactive.Validation;
+using Shape = Alis.Reactive.PlanModel.Shape;
 
 namespace Alis.Reactive.UnitTests.ValidationEnrichment;
 
@@ -90,7 +91,7 @@ public class WhenEnrichingValidationAtRenderTime
     }
 
     [Test]
-    public void Deferred_validation_fields_keep_the_model_field_shape_for_partials()
+    public void Deferred_validation_fields_keep_the_projected_field_shape_for_partials()
     {
         ReactivePlanConfig.Reset();
         ReactivePlanConfig.UseClientValidationProjectionSource(new DeferredDateFieldProjectionSource());
@@ -200,10 +201,10 @@ public class WhenEnrichingValidationAtRenderTime
     }
 
     [Test]
-    public void Deferred_validation_field_must_exist_on_the_model()
+    public void Referenced_validation_dependency_must_be_projected_or_registered()
     {
         ReactivePlanConfig.Reset();
-        ReactivePlanConfig.UseClientValidationProjectionSource(new UnknownFieldProjectionSource());
+        ReactivePlanConfig.UseClientValidationProjectionSource(new UnprojectedPeerRuleProjectionSource());
 
         var plan = new ReactivePlan<EnrichmentTestModel>();
 
@@ -212,8 +213,8 @@ public class WhenEnrichingValidationAtRenderTime
 
         var exception = Assert.Throws<InvalidOperationException>(() => plan.Render());
 
-        Assert.That(exception!.Message, Does.Contain("Validation field 'MissingField' was projected"));
-        Assert.That(exception.Message, Does.Contain("register the input component for that binding path"));
+        Assert.That(exception!.Message, Does.Contain("Validation field 'MissingField' was referenced"));
+        Assert.That(exception.Message, Does.Contain("not included in the client validation projection"));
     }
 
     [Test]
@@ -267,8 +268,9 @@ public class WhenEnrichingValidationAtRenderTime
                 request,
                 new List<ClientValidationField>
                 {
-                    new ClientValidationField(
-                        ValidationFieldPath.Of("Name"),
+                    Field(
+                        "Name",
+                        Shape.String,
                         new List<ValidationRule>
                         {
                             new ValidationRule(
@@ -286,7 +288,7 @@ public class WhenEnrichingValidationAtRenderTime
                 request,
                 new List<ClientValidationField>
                 {
-                    RequiredField("AdmissionDate", "Admission date is required"),
+                    RequiredField("AdmissionDate", Shape.Date, "Admission date is required"),
                 });
     }
 
@@ -297,18 +299,30 @@ public class WhenEnrichingValidationAtRenderTime
                 request,
                 new List<ClientValidationField>
                 {
-                    RequiredField("ReceiveNotifications", "Notifications must be selected"),
+                    RequiredField("ReceiveNotifications", Shape.Boolean, "Notifications must be selected"),
                 });
     }
 
-    private class UnknownFieldProjectionSource : IClientValidationProjectionSource
+    private class UnprojectedPeerRuleProjectionSource : IClientValidationProjectionSource
     {
         public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
             ClientValidationProjection.ForFields(
                 request,
                 new List<ClientValidationField>
                 {
-                    RequiredField("MissingField", "Missing field is required"),
+                    Field(
+                        "Email",
+                        Shape.String,
+                        new List<ValidationRule>
+                        {
+                            new ValidationRule(
+                                ValidationRuleName.EqualTo,
+                                ValidationMessage.Of("Email must match missing field"),
+                                ValidationRuleDetails.WithPeerField(
+                                    ValidationFieldPath.Of("MissingField"),
+                                    ValidationRuleCondition.Always,
+                                    Shape.String)),
+                        }),
                 });
     }
 
@@ -319,8 +333,9 @@ public class WhenEnrichingValidationAtRenderTime
                 request,
                 new List<ClientValidationField>
                 {
-                    new ClientValidationField(
-                        ValidationFieldPath.Of("Email"),
+                    Field(
+                        "Email",
+                        Shape.String,
                         new List<ValidationRule>
                         {
                             new ValidationRule(
@@ -342,8 +357,9 @@ public class WhenEnrichingValidationAtRenderTime
                 request,
                 new List<ClientValidationField>
                 {
-                    new ClientValidationField(
-                        ValidationFieldPath.Of("Email"),
+                    Field(
+                        "Email",
+                        Shape.String,
                         new List<ValidationRule>
                         {
                             new ValidationRule(
@@ -357,9 +373,10 @@ public class WhenEnrichingValidationAtRenderTime
                 });
     }
 
-    private static ClientValidationField RequiredField(string fieldName, string message) =>
-        new ClientValidationField(
-            ValidationFieldPath.Of(fieldName),
+    private static ClientValidationField RequiredField(string fieldName, Shape shape, string message) =>
+        Field(
+            fieldName,
+            shape,
             new List<ValidationRule>
             {
                 new ValidationRule(
@@ -367,4 +384,12 @@ public class WhenEnrichingValidationAtRenderTime
                     ValidationMessage.Of(message),
                     ValidationRuleDetails.NoOperand(ValidationRuleCondition.Always)),
             });
+
+    private static ClientValidationField Field(
+        string fieldName,
+        Shape shape,
+        List<ValidationRule> rules) =>
+        new ClientValidationField(
+            ClientValidationFieldReference.Of(ValidationFieldPath.Of(fieldName), shape),
+            rules);
 }
