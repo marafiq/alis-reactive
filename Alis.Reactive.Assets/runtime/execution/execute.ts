@@ -325,9 +325,6 @@ interface BranchExecutionContext {
 }
 
 function executeBranchReaction(branch: BranchExecutionContext): void | Promise<void> {
-  const branchHasNoCases = branch.cases.length === 0;
-  if (branchHasNoCases) throw new Error("[alis] branch reaction requires at least one case");
-
   return executeBranchFrom(branch, 0);
 }
 
@@ -336,10 +333,7 @@ function executeBranchFrom(
   startIndex: number,
 ): void | Promise<void> {
   for (let index = startIndex; index < branch.cases.length; index++) {
-    const branchCase = branch.cases[index];
-    if (branchCase === undefined) {
-      throw new Error(`[alis] branch reaction case ${index} is missing`);
-    }
+    const branchCase = branch.cases[index]!;
 
     const guardMatches = branchGuardMatches(branchCase, branch.plan, branch.context);
     if (guardMatches instanceof Promise) {

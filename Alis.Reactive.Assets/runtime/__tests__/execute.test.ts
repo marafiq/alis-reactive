@@ -356,15 +356,6 @@ describe("executeReaction member targets", () => {
     expect(local.status).toBe("done");
   });
 
-  it("rejects branch reactions with no cases", () => {
-    const reaction: Reaction = {
-      kind: "branch",
-      cases: [],
-    };
-
-    expect(() => executeReaction(reaction, textBoxPlan())).toThrow("at least one case");
-  });
-
   it("keeps branch execution synchronous when an earlier guard matches before a confirm guard", () => {
     document.body.innerHTML = `<input id="resident-name" value="Ada" />`;
     const browserWindow = window as BrowserWindowWithConfirm;
