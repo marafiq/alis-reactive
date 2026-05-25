@@ -98,7 +98,7 @@ namespace Alis.Reactive.Native.Components
 
             return Request.Create(
                 RequestEndpoint.To(HttpMethodName.From(request.Method), RequestUrl.Of(string.Empty)),
-                request.Payload,
+                request.Input,
                 lifecycle,
                 RequestParameters.From(
                     new Dictionary<string, ValueProducer>(),
