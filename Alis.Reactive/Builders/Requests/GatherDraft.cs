@@ -6,7 +6,7 @@ namespace Alis.Reactive.Builders.Requests
 {
     internal sealed class GatherDraft
     {
-        private readonly List<GatherField> _payloadFields = new List<GatherField>();
+        private readonly List<GatherPayloadField> _payloadFields = new List<GatherPayloadField>();
         private readonly Dictionary<string, ValueProducer> _supplementalFields =
             new Dictionary<string, ValueProducer>();
         private readonly Dictionary<string, ValueProducer> _headerFields =
@@ -14,8 +14,8 @@ namespace Alis.Reactive.Builders.Requests
         private readonly Dictionary<string, ValueProducer> _routeParameterFields =
             new Dictionary<string, ValueProducer>();
 
-        internal IReadOnlyList<GatherField> PayloadFields => _payloadFields;
-        internal IEnumerable<string> SupplementalPayloadKeys => _supplementalFields.Keys;
+        internal IReadOnlyList<GatherPayloadField> PayloadFields => _payloadFields;
+        internal IEnumerable<string> SupplementalPayloadPaths => _supplementalFields.Keys;
         internal GatherSelection Selection { get; private set; } = GatherSelection.ExplicitFields;
 
         internal void IncludeAllRegisteredInputs()
@@ -23,17 +23,17 @@ namespace Alis.Reactive.Builders.Requests
             Selection = GatherSelection.AllRegisteredInputs;
         }
 
-        internal void AddPayloadField(GatherField field)
+        internal void AddPayloadField(GatherPayloadField field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
             _payloadFields.Add(field);
         }
 
-        internal void AddSupplementalField(HttpPayloadKey key, ValueProducer value)
+        internal void AddSupplementalField(HttpPayloadPath path, ValueProducer value)
         {
-            if (key == null) throw new ArgumentNullException(nameof(key));
+            if (path == null) throw new ArgumentNullException(nameof(path));
             if (value == null) throw new ArgumentNullException(nameof(value));
-            _supplementalFields[key.Value] = value;
+            _supplementalFields[path.Value] = value;
         }
 
         internal void AddHeader(HeaderName name, ValueProducer value)

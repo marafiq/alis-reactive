@@ -43,7 +43,7 @@ describe("all registered input gather lifecycle", () => {
     });
   });
 
-  it("keeps explicit payload keys ahead of dynamically gathered partial inputs", () => {
+  it("keeps explicit payload paths ahead of dynamically gathered partial inputs", () => {
     document.body.innerHTML = `<input id="address-line" value="12 Main" />`;
     const registry = new PlanRegistry();
     const planId = "Resident.PartialGatherExplicitKey";
@@ -62,7 +62,7 @@ describe("all registered input gather lifecycle", () => {
       ...allRegisteredInputs(),
       payloadFields: [
         {
-          key: "addressLine",
+          payloadPath: "addressLine",
           value: literal("manual", stringShape),
         },
       ],
@@ -71,7 +71,7 @@ describe("all registered input gather lifecycle", () => {
     });
   });
 
-  it("keeps static payload keys ahead of dynamically gathered partial inputs", () => {
+  it("keeps supplemental payload paths ahead of dynamically gathered partial inputs", () => {
     document.body.innerHTML = `<input id="address-line" value="12 Main" />`;
     const registry = new PlanRegistry();
     const planId = "Resident.PartialGatherStaticKey";
@@ -99,7 +99,7 @@ describe("all registered input gather lifecycle", () => {
     });
   });
 
-  it("keeps static nested payload paths ahead of dynamically gathered partial inputs", () => {
+  it("keeps supplemental nested payload paths ahead of dynamically gathered partial inputs", () => {
     document.body.innerHTML = `<input id="address" value="12 Main" />`;
     const registry = new PlanRegistry();
     const planId = "Resident.PartialGatherStaticNestedPath";

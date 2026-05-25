@@ -477,19 +477,19 @@ namespace Alis.Reactive.PlanModel
     [JsonConverter(typeof(GatherInputJsonConverter))]
     internal sealed class GatherInput : RequestInput
     {
-        private readonly GatherFieldList _payloadFields;
+        private readonly GatherPayloadFieldList _payloadFields;
         private readonly RequestTransport _transport;
         private readonly SupplementalGatherFields _supplementalFields;
         private readonly GatherSelection _selection;
 
         public string Kind => "gather";
-        public IReadOnlyList<GatherField> PayloadFields => _payloadFields.ForJson;
+        public IReadOnlyList<GatherPayloadField> PayloadFields => _payloadFields.ForJson;
         public string Transport => _transport.Value;
         public SupplementalGatherFields SupplementalFields => _supplementalFields;
         public GatherSelection Selection => _selection;
 
         private GatherInput(
-            GatherFieldList payloadFields,
+            GatherPayloadFieldList payloadFields,
             RequestTransport transport,
             SupplementalGatherFields supplementalFields,
             GatherSelection selection)
@@ -501,12 +501,12 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal static GatherInput From(
-            IEnumerable<GatherField> payloadFields,
+            IEnumerable<GatherPayloadField> payloadFields,
             RequestTransport transport,
             SupplementalGatherFields supplementalFields,
             GatherSelection selection) =>
             new GatherInput(
-                GatherFieldList.From(payloadFields),
+                GatherPayloadFieldList.From(payloadFields),
                 transport,
                 supplementalFields,
                 selection);
@@ -544,31 +544,31 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class GatherFieldList
+    internal sealed class GatherPayloadFieldList
     {
-        private readonly IReadOnlyList<GatherField> _fields;
+        private readonly IReadOnlyList<GatherPayloadField> _fields;
 
-        private GatherFieldList(IReadOnlyList<GatherField> fields)
+        private GatherPayloadFieldList(IReadOnlyList<GatherPayloadField> fields)
         {
             _fields = fields;
         }
 
-        internal IReadOnlyList<GatherField> ForJson => _fields;
+        internal IReadOnlyList<GatherPayloadField> ForJson => _fields;
 
-        internal static GatherFieldList From(IEnumerable<GatherField> fields)
+        internal static GatherPayloadFieldList From(IEnumerable<GatherPayloadField> fields)
         {
             if (fields == null) throw new System.ArgumentNullException(nameof(fields));
 
-            var snapshot = new List<GatherField>();
+            var snapshot = new List<GatherPayloadField>();
             foreach (var field in fields)
             {
                 if (field == null)
-                    throw new System.ArgumentException("Gather field must not be null.", nameof(fields));
+                    throw new System.ArgumentException("Gather payload field must not be null.", nameof(fields));
 
                 snapshot.Add(field);
             }
 
-            return new GatherFieldList(snapshot);
+            return new GatherPayloadFieldList(snapshot);
         }
     }
 
@@ -655,7 +655,7 @@ namespace Alis.Reactive.PlanModel
         internal abstract bool MayExpandRegisteredInputsAtRuntime { get; }
 
         internal void AddBuildTimeFields(
-            List<GatherField> fields,
+            List<GatherPayloadField> fields,
             PlanBuildContext context,
             GatherPayloadClaims claims)
         {
@@ -667,7 +667,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         private protected abstract void AddBuildTimeFieldsCore(
-            List<GatherField> fields,
+            List<GatherPayloadField> fields,
             PlanBuildContext context,
             GatherPayloadClaims claims);
 
@@ -678,7 +678,7 @@ namespace Alis.Reactive.PlanModel
             internal override bool MayExpandRegisteredInputsAtRuntime => false;
 
             private protected override void AddBuildTimeFieldsCore(
-                List<GatherField> fields,
+                List<GatherPayloadField> fields,
                 PlanBuildContext context,
                 GatherPayloadClaims claims)
             {
@@ -692,11 +692,11 @@ namespace Alis.Reactive.PlanModel
             internal override bool MayExpandRegisteredInputsAtRuntime => true;
 
             private protected override void AddBuildTimeFieldsCore(
-                List<GatherField> fields,
+                List<GatherPayloadField> fields,
                 PlanBuildContext context,
                 GatherPayloadClaims claims)
             {
-                var buildTimeFields = BuildTimeGatherFields.From(fields, claims);
+                var buildTimeFields = BuildTimeGatherPayloadFields.From(fields, claims);
 
                 foreach (var registration in context.GetRegisteredComponents())
                     buildTimeFields.AddRegisteredInput(registration);
@@ -718,23 +718,23 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal static GatherPayloadClaims From(
-            IEnumerable<GatherField> fields,
-            IEnumerable<string> supplementalPayloadKeys)
+            IEnumerable<GatherPayloadField> fields,
+            IEnumerable<string> supplementalPayloadPaths)
         {
             if (fields == null) throw new System.ArgumentNullException(nameof(fields));
-            if (supplementalPayloadKeys == null)
-                throw new System.ArgumentNullException(nameof(supplementalPayloadKeys));
+            if (supplementalPayloadPaths == null)
+                throw new System.ArgumentNullException(nameof(supplementalPayloadPaths));
 
-            var fieldSnapshot = new List<GatherField>(fields);
+            var fieldSnapshot = new List<GatherPayloadField>(fields);
             var payloadSlots = GatherPayloadSlots.From(fieldSnapshot);
-            foreach (var payloadKey in supplementalPayloadKeys)
+            foreach (var payloadPath in supplementalPayloadPaths)
             {
-                if (payloadKey == null)
+                if (payloadPath == null)
                     throw new System.ArgumentException(
-                        "Supplemental gather payload key must not be null.",
-                        nameof(supplementalPayloadKeys));
+                        "Supplemental gather payload path must not be null.",
+                        nameof(supplementalPayloadPaths));
 
-                payloadSlots.ClaimDeclared(payloadKey);
+                payloadSlots.ClaimDeclared(payloadPath);
             }
 
             return new GatherPayloadClaims(
@@ -763,28 +763,28 @@ namespace Alis.Reactive.PlanModel
             _claimedPaths = claimedPaths ?? throw new System.ArgumentNullException(nameof(claimedPaths));
         }
 
-        internal static GatherPayloadSlots From(IEnumerable<GatherField> fields)
+        internal static GatherPayloadSlots From(IEnumerable<GatherPayloadField> fields)
         {
             if (fields == null) throw new System.ArgumentNullException(nameof(fields));
 
             var payloadSlots = new GatherPayloadSlots(new List<Path>());
             foreach (var field in fields)
-                payloadSlots.ClaimDeclared(field.Key);
+                payloadSlots.ClaimDeclared(field.PayloadPath);
 
             return payloadSlots;
         }
 
-        internal void ClaimDeclared(string payloadKey)
+        internal void ClaimDeclared(string payloadPath)
         {
-            if (payloadKey == null) throw new System.ArgumentNullException(nameof(payloadKey));
-            _claimedPaths.Add(Path.Parse(payloadKey));
+            if (payloadPath == null) throw new System.ArgumentNullException(nameof(payloadPath));
+            _claimedPaths.Add(Path.Parse(payloadPath));
         }
 
-        internal bool TryClaim(string payloadKey)
+        internal bool TryClaim(string payloadPath)
         {
-            if (payloadKey == null) throw new System.ArgumentNullException(nameof(payloadKey));
+            if (payloadPath == null) throw new System.ArgumentNullException(nameof(payloadPath));
 
-            var incoming = Path.Parse(payloadKey);
+            var incoming = Path.Parse(payloadPath);
             foreach (var claimedPath in _claimedPaths)
             {
                 var payloadPathAlreadyClaimed = claimedPath.Overlaps(incoming);
@@ -797,23 +797,23 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class BuildTimeGatherFields
+    internal sealed class BuildTimeGatherPayloadFields
     {
-        private readonly List<GatherField> _fields;
+        private readonly List<GatherPayloadField> _fields;
         private readonly GatherPayloadClaims _claims;
 
-        private BuildTimeGatherFields(
-            List<GatherField> fields,
+        private BuildTimeGatherPayloadFields(
+            List<GatherPayloadField> fields,
             GatherPayloadClaims claims)
         {
             _fields = fields ?? throw new System.ArgumentNullException(nameof(fields));
             _claims = claims ?? throw new System.ArgumentNullException(nameof(claims));
         }
 
-        internal static BuildTimeGatherFields From(
-            List<GatherField> fields,
+        internal static BuildTimeGatherPayloadFields From(
+            List<GatherPayloadField> fields,
             GatherPayloadClaims claims) =>
-            new BuildTimeGatherFields(fields, claims);
+            new BuildTimeGatherPayloadFields(fields, claims);
 
         internal void AddRegisteredInput(
             KeyValuePair<string, Alis.Reactive.ComponentRegistration> registration)
@@ -825,7 +825,7 @@ namespace Alis.Reactive.PlanModel
             _fields.Add(FieldFrom(registration));
         }
 
-        private static GatherField FieldFrom(
+        private static GatherPayloadField FieldFrom(
             KeyValuePair<string, Alis.Reactive.ComponentRegistration> registration)
         {
             var component = registration.Value;
@@ -834,7 +834,7 @@ namespace Alis.Reactive.PlanModel
                 component.ValueMember,
                 shape: component.Shape);
 
-            return GatherField.Of(registration.Key, componentValue);
+            return GatherPayloadField.Of(registration.Key, componentValue);
         }
     }
 
@@ -847,14 +847,14 @@ namespace Alis.Reactive.PlanModel
             _componentKeys = componentKeys ?? throw new System.ArgumentNullException(nameof(componentKeys));
         }
 
-        internal static SelectedGatherComponentReads From(IEnumerable<GatherField> fields)
+        internal static SelectedGatherComponentReads From(IEnumerable<GatherPayloadField> fields)
         {
             if (fields == null) throw new System.ArgumentNullException(nameof(fields));
 
             var componentKeys = new HashSet<string>(System.StringComparer.Ordinal);
             foreach (var field in fields)
             {
-                GatherFieldComponentRead
+                GatherPayloadFieldComponentRead
                     .From(field)
                     .RecordIn(componentKeys);
             }
@@ -869,11 +869,11 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal abstract class GatherFieldComponentRead
+    internal abstract class GatherPayloadFieldComponentRead
     {
-        private GatherFieldComponentRead() { }
+        private GatherPayloadFieldComponentRead() { }
 
-        internal static GatherFieldComponentRead From(GatherField field)
+        internal static GatherPayloadFieldComponentRead From(GatherPayloadField field)
         {
             if (field == null) throw new System.ArgumentNullException(nameof(field));
 
@@ -882,7 +882,7 @@ namespace Alis.Reactive.PlanModel
 
         internal abstract void RecordIn(HashSet<string> componentKeys);
 
-        private static GatherFieldComponentRead From(ValueProducer value)
+        private static GatherPayloadFieldComponentRead From(ValueProducer value)
         {
             if (!(value is ReadProducer read))
                 return NoComponentRead.Instance;
@@ -894,7 +894,7 @@ namespace Alis.Reactive.PlanModel
                 Alis.Reactive.PlanModel.ComponentKey.Of(componentSource.Component));
         }
 
-        private sealed class NoComponentRead : GatherFieldComponentRead
+        private sealed class NoComponentRead : GatherPayloadFieldComponentRead
         {
             internal static NoComponentRead Instance { get; } = new NoComponentRead();
 
@@ -903,7 +903,7 @@ namespace Alis.Reactive.PlanModel
             }
         }
 
-        private sealed class ComponentRead : GatherFieldComponentRead
+        private sealed class ComponentRead : GatherPayloadFieldComponentRead
         {
             private readonly ComponentKey _componentKey;
 
@@ -939,24 +939,24 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>Maps an HTTP parameter name to a value expression evaluated at request time.</summary>
-    internal sealed class GatherField
+    /// <summary>Maps an HTTP payload path to a value expression evaluated at request time.</summary>
+    internal sealed class GatherPayloadField
     {
-        private readonly BindingPath _key;
+        private readonly BindingPath _payloadPath;
 
-        /// <summary>HTTP parameter name (from model binding path or explicit override).</summary>
-        public string Key => _key.Value;
+        /// <summary>HTTP payload path (from model binding path or explicit override).</summary>
+        public string PayloadPath => _payloadPath.Value;
         /// <summary>How to read the value. Carries source, member, and shape.</summary>
         public ValueProducer Value { get; }
 
-        internal GatherField(string key, ValueProducer value)
+        internal GatherPayloadField(string payloadPath, ValueProducer value)
         {
-            _key = BindingPath.Of(key);
+            _payloadPath = BindingPath.Of(payloadPath);
             Value = value ?? throw new System.ArgumentNullException(nameof(value));
         }
 
-        internal static GatherField Of(string key, ValueProducer value)
-            => new GatherField(key, value);
+        internal static GatherPayloadField Of(string payloadPath, ValueProducer value)
+            => new GatherPayloadField(payloadPath, value);
     }
 
     /// <summary>Maps an HTTP response match to a reaction.</summary>

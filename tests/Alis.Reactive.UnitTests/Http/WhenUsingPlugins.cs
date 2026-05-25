@@ -353,7 +353,7 @@ public class WhenUsingPlugins : PlanTestBase
              .Response(r => r.OnSuccess(s => s.Element("x").Show()));
         });
         var json = plan.RenderFormatted();
-        Assert.That(json, Does.Contain("\"key\": \"token\""));
+        Assert.That(json, Does.Contain("\"payloadPath\": \"token\""));
         Assert.That(json, Does.Contain("\"kind\": \"plugin\""));
     }
 

@@ -2,7 +2,7 @@
 // Every field carries a ValueProducer — evaluated via evaluateValue().
 // No parallel read path. Shape flows from plan → transport for wire formatting.
 
-import type { Plan, Component, GatherField, GatherInput, HttpMethod, ObjectProducer, RequestInput, SupplementalGatherFields, Transport, ValueProducer } from "../types";
+import type { Plan, Component, GatherInput, GatherPayloadField, HttpMethod, ObjectProducer, RequestInput, SupplementalGatherFields, Transport, ValueProducer } from "../types";
 import type { ExecContext } from "../types";
 import { assertNever } from "../core/assert-never";
 import { toString } from "../core/shape-convert";
@@ -208,7 +208,7 @@ class GatherRequestInputResolver extends RequestInputResolver {
   }
 }
 
-/** Gather explicit request payload fields, tracking both their payload keys and any component reads. */
+/** Gather explicit request payload fields, tracking both their payload paths and any component reads. */
 function gatherExplicitPayloadFields(
   gatherInput: GatherInput,
   transport: TransportStrategy,
@@ -216,7 +216,7 @@ function gatherExplicitPayloadFields(
   claims: GatherPayloadClaims,
 ): void {
   for (const field of gatherInput.payloadFields) {
-    ExplicitGatherField.from(field).emitInto(transport, runtime, claims);
+    ExplicitGatherPayloadField.from(field).emitInto(transport, runtime, claims);
   }
 }
 
@@ -399,11 +399,11 @@ class GatherScalarWireValue {
   }
 }
 
-class ExplicitGatherField {
-  private constructor(private readonly field: GatherField) {}
+class ExplicitGatherPayloadField {
+  private constructor(private readonly field: GatherPayloadField) {}
 
-  static from(field: GatherField): ExplicitGatherField {
-    return new ExplicitGatherField(field);
+  static from(field: GatherPayloadField): ExplicitGatherPayloadField {
+    return new ExplicitGatherPayloadField(field);
   }
 
   emitInto(
@@ -415,7 +415,7 @@ class ExplicitGatherField {
 
     const raw = evaluateValue(this.field.value, runtime.plan, runtime.ctx);
     const shape = RuntimeShape.declaredBy(this.field.value);
-    emitValue(this.field.key, raw, shape, transport);
+    emitValue(this.field.payloadPath, raw, shape, transport);
   }
 }
 
@@ -429,17 +429,17 @@ class GatherPayloadClaims {
     return new GatherPayloadClaims(GatherPayloadSlots.empty(), new Set<string>());
   }
 
-  recordDeclaredField(field: GatherField): void {
-    this.claimPayloadKey(field.key);
+  recordDeclaredField(field: GatherPayloadField): void {
+    this.claimPayloadPath(field.payloadPath);
     ExplicitGatherComponentRead.from(field.value).recordIn(this.componentKeys);
   }
 
-  claimPayloadKey(payloadKey: string): void {
-    this.payloadSlots.claimDeclared(payloadKey);
+  claimPayloadPath(payloadPath: string): void {
+    this.payloadSlots.claimDeclared(payloadPath);
   }
 
-  tryClaimRuntimePayloadKey(payloadKey: string): boolean {
-    return this.payloadSlots.tryClaim(payloadKey);
+  tryClaimRuntimePayloadPath(payloadPath: string): boolean {
+    return this.payloadSlots.tryClaim(payloadPath);
   }
 
   hasComponent(componentKey: string): boolean {
@@ -454,12 +454,12 @@ class GatherPayloadSlots {
     return new GatherPayloadSlots([]);
   }
 
-  claimDeclared(payloadKey: string): void {
-    this.claimedPaths.push(JsonBodyPath.from(payloadKey));
+  claimDeclared(payloadPath: string): void {
+    this.claimedPaths.push(JsonBodyPath.from(payloadPath));
   }
 
-  tryClaim(payloadKey: string): boolean {
-    const incoming = JsonBodyPath.from(payloadKey);
+  tryClaim(payloadPath: string): boolean {
+    const incoming = JsonBodyPath.from(payloadPath);
     const payloadPathAlreadyClaimed = this.claimedPaths.some(path => path.overlaps(incoming));
     if (payloadPathAlreadyClaimed) return false;
 
@@ -604,7 +604,7 @@ class DeclaredObjectValueFields {
     claims: GatherPayloadClaims,
   ): void {
     this.emitEach((key, producer) => {
-      claims.claimPayloadKey(key);
+      claims.claimPayloadPath(key);
       const value = evaluateValue(producer, runtime.plan, runtime.ctx);
       emitValue(key, value, RuntimeShape.declaredBy(producer), transport);
     });
@@ -653,7 +653,7 @@ class RuntimeRegisteredInputGatherField {
     const registeredInputIsMounted = component.tryElement() !== undefined;
     if (!registeredInputIsMounted) return undefined;
 
-    const payloadSlotWasReserved = claims.tryClaimRuntimePayloadKey(contract.bindingPath);
+    const payloadSlotWasReserved = claims.tryClaimRuntimePayloadPath(contract.bindingPath);
     if (!payloadSlotWasReserved) return undefined;
 
     return new RuntimeRegisteredInputGatherField(component, contract);

@@ -97,7 +97,7 @@ public class WhenReadingUrlParams : PlanTestBase
 
         var planJson = plan.RenderFormatted();
 
-        Assert.That(planJson, Does.Contain("\"key\": \"facilityId\""));
+        Assert.That(planJson, Does.Contain("\"payloadPath\": \"facilityId\""));
         Assert.That(planJson, Does.Contain("\"kind\": \"url\""));
     }
 
@@ -114,7 +114,7 @@ public class WhenReadingUrlParams : PlanTestBase
 
         var planJson = plan.RenderFormatted();
 
-        Assert.That(planJson, Does.Contain("\"key\": \"unit\""));
+        Assert.That(planJson, Does.Contain("\"payloadPath\": \"unit\""));
     }
 
     // ── Conditions ───────────────────────────────────────────
@@ -285,7 +285,7 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        Assert.That(planJson, Does.Contain("\"key\": \"pageNum\""));
+        Assert.That(planJson, Does.Contain("\"payloadPath\": \"pageNum\""));
     }
 
     // ── Guard tests ──────────────────────────────────────────

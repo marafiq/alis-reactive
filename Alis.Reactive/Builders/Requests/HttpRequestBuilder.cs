@@ -247,7 +247,7 @@ namespace Alis.Reactive.Builders.Requests
             RequestGatherContext context,
             SupplementalRequestFields supplementalFields)
         {
-            var fieldSelection = GatherFieldSelection.From(_builder.Draft, context.BuildContext);
+            var fieldSelection = GatherPayloadFieldSelection.From(_builder.Draft, context.BuildContext);
             var gatherInputMustRemainExecutable = fieldSelection.RequiresGatherInput;
             if (gatherInputMustRemainExecutable)
             {
@@ -343,12 +343,12 @@ namespace Alis.Reactive.Builders.Requests
             new RequestGatherPlan(payload, parameters);
     }
 
-    internal sealed class GatherFieldSelection
+    internal sealed class GatherPayloadFieldSelection
     {
-        private readonly List<GatherField> _fields;
+        private readonly List<GatherPayloadField> _fields;
         private readonly GatherSelection _selection;
 
-        private GatherFieldSelection(List<GatherField> fields, GatherSelection selection)
+        private GatherPayloadFieldSelection(List<GatherPayloadField> fields, GatherSelection selection)
         {
             _fields = fields ?? throw new ArgumentNullException(nameof(fields));
             _selection = selection ?? throw new ArgumentNullException(nameof(selection));
@@ -359,21 +359,21 @@ namespace Alis.Reactive.Builders.Requests
         internal bool RequiresGatherInput =>
             HasFields || _selection.MayExpandRegisteredInputsAtRuntime;
 
-        internal static GatherFieldSelection From(
+        internal static GatherPayloadFieldSelection From(
             GatherDraft draft,
             PlanBuildContext context)
         {
             if (draft == null) throw new ArgumentNullException(nameof(draft));
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var fields = new List<GatherField>(draft.PayloadFields);
+            var fields = new List<GatherPayloadField>(draft.PayloadFields);
             var selection = draft.Selection;
             var claims = GatherPayloadClaims.From(
                 fields,
-                draft.SupplementalPayloadKeys);
+                draft.SupplementalPayloadPaths);
             selection.AddBuildTimeFields(fields, context, claims);
 
-            return new GatherFieldSelection(
+            return new GatherPayloadFieldSelection(
                 fields,
                 selection);
         }

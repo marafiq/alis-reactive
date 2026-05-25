@@ -96,7 +96,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("input")
             .GetProperty("payloadFields")
             .EnumerateArray()
-            .Select(field => field.GetProperty("key").GetString())
+            .Select(field => field.GetProperty("payloadPath").GetString())
             .ToList();
 
         Assert.That(fields, Is.EqualTo(new[] { "selectedId" }));
@@ -156,13 +156,13 @@ public class WhenBuildingHttpRequests : PlanTestBase
         var planJson = plan.RenderFormatted();
 
         using var doc = System.Text.Json.JsonDocument.Parse(planJson);
-        var components = doc.RootElement.GetProperty("behaviors")[0]
+        var payloadFields = doc.RootElement.GetProperty("behaviors")[0]
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
             .GetProperty("payloadFields");
 
-        Assert.That(components.GetArrayLength(), Is.EqualTo(0));
+        Assert.That(payloadFields.GetArrayLength(), Is.EqualTo(0));
     }
 
     [Test]

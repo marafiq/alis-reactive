@@ -474,7 +474,7 @@ export interface NoRequestInput {
 
 export interface GatherInput {
   kind: "gather";
-  payloadFields: GatherField[];
+  payloadFields: GatherPayloadField[];
   transport: Transport;
   supplementalFields: SupplementalGatherFields;
   selection: GatherSelection;
@@ -511,8 +511,8 @@ export interface ValueInput {
   transport: Transport;
 }
 
-export interface GatherField {
-  key: string;
+export interface GatherPayloadField {
+  payloadPath: string;
   value: ValueProducer;
 }
 

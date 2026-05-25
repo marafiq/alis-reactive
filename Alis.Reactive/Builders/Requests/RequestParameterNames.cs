@@ -21,21 +21,21 @@ namespace Alis.Reactive.Builders.Requests
         }
     }
 
-    internal sealed class HttpPayloadKey
+    internal sealed class HttpPayloadPath
     {
-        private HttpPayloadKey(string value)
+        private HttpPayloadPath(string value)
         {
             Value = value;
         }
 
         internal string Value { get; }
 
-        internal static HttpPayloadKey Of(string value)
+        internal static HttpPayloadPath Of(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("HTTP parameter name must not be null or whitespace.", nameof(value));
+                throw new ArgumentException("HTTP payload path must not be null or whitespace.", nameof(value));
 
-            return new HttpPayloadKey(value);
+            return new HttpPayloadPath(value);
         }
     }
 

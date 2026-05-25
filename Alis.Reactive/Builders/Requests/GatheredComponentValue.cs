@@ -6,18 +6,18 @@ namespace Alis.Reactive.Builders.Requests
     {
         private readonly RegisteredComponentIdentity _identity;
         private readonly BindingPath _bindingPath;
-        private readonly HttpPayloadKey _payloadKey;
+        private readonly HttpPayloadPath _payloadPath;
         private readonly InputValueContract _valueContract;
 
         private GatheredComponentValue(
             RegisteredComponentIdentity identity,
             BindingPath bindingPath,
-            HttpPayloadKey payloadKey,
+            HttpPayloadPath payloadPath,
             InputValueContract valueContract)
         {
             _identity = identity ?? throw new System.ArgumentNullException(nameof(identity));
             _bindingPath = bindingPath ?? throw new System.ArgumentNullException(nameof(bindingPath));
-            _payloadKey = payloadKey ?? throw new System.ArgumentNullException(nameof(payloadKey));
+            _payloadPath = payloadPath ?? throw new System.ArgumentNullException(nameof(payloadPath));
             _valueContract = valueContract ?? throw new System.ArgumentNullException(nameof(valueContract));
         }
 
@@ -28,7 +28,7 @@ namespace Alis.Reactive.Builders.Requests
                 _bindingPath,
                 _valueContract);
 
-        internal GatherField Field
+        internal GatherPayloadField Field
         {
             get
             {
@@ -37,19 +37,19 @@ namespace Alis.Reactive.Builders.Requests
                     _valueContract.ValueMember,
                     shape: _valueContract.Shape);
 
-                return GatherField.Of(_payloadKey.Value, componentValue);
+                return GatherPayloadField.Of(_payloadPath.Value, componentValue);
             }
         }
 
         internal static GatheredComponentValue For(
             RegisteredComponentIdentity identity,
             BindingPath bindingPath,
-            HttpPayloadKey payloadKey,
+            HttpPayloadPath payloadPath,
             InputValueContract valueContract) =>
             new GatheredComponentValue(
                 identity,
                 bindingPath,
-                payloadKey,
+                payloadPath,
                 valueContract);
     }
 }
