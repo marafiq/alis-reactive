@@ -582,10 +582,15 @@ namespace Alis.Reactive.PlanModel
         public abstract string Kind { get; }
         internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
-        internal static SupplementalGatherFields From(ObjectProducer value)
+        internal static SupplementalGatherFields From(IEnumerable<GatherPayloadField> fields)
         {
-            if (value == null) throw new System.ArgumentNullException(nameof(value));
-            return new DeclaredSupplementalGatherFields(value);
+            if (fields == null) throw new System.ArgumentNullException(nameof(fields));
+
+            var fieldList = GatherPayloadFieldList.From(fields);
+            var hasNoFields = fieldList.ForJson.Count == 0;
+            if (hasNoFields) return None;
+
+            return new DeclaredSupplementalGatherFields(fieldList);
         }
 
         private sealed class NoSupplementalGatherFields : SupplementalGatherFields
@@ -599,17 +604,17 @@ namespace Alis.Reactive.PlanModel
 
         private sealed class DeclaredSupplementalGatherFields : SupplementalGatherFields
         {
-            private readonly ObjectProducer _value;
+            private readonly GatherPayloadFieldList _fields;
 
-            internal DeclaredSupplementalGatherFields(ObjectProducer value)
+            internal DeclaredSupplementalGatherFields(GatherPayloadFieldList fields)
             {
-                _value = value ?? throw new System.ArgumentNullException(nameof(value));
+                _fields = fields ?? throw new System.ArgumentNullException(nameof(fields));
             }
 
             public override string Kind => "declared";
 
             internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-                SupplementalGatherFieldsJsonConverter.WriteProperty(writer, options, "value", _value);
+                SupplementalGatherFieldsJsonConverter.WriteProperty(writer, options, "fields", _fields.ForJson);
         }
     }
 

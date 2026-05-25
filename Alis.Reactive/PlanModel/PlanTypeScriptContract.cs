@@ -392,7 +392,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("DeclaredSupplementalGatherFields")
                 .Requires("kind", Literal("declared"))
-                .Requires("value", "ObjectProducer"));
+                .Requires("fields", "GatherPayloadField[]"));
 
             contract.Declare(Union(
                 "GatherSelection",

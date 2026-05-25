@@ -36,9 +36,12 @@ describe("resolveGather", () => {
       transport: "json",
       supplementalFields: {
         kind: "declared",
-        value: objectValue({
-          scheduledFor: literal(isoDate, dateShape),
-        }),
+        fields: [
+          {
+            payloadPath: "scheduledFor",
+            value: literal(isoDate, dateShape),
+          },
+        ],
       },
       selection: { kind: "explicit" },
     };

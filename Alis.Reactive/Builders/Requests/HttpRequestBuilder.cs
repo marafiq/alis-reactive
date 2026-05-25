@@ -587,15 +587,15 @@ namespace Alis.Reactive.Builders.Requests
 
     internal sealed class SupplementalRequestFields
     {
-        private readonly IReadOnlyDictionary<string, ValueProducer> _fields;
+        private readonly IReadOnlyList<GatherPayloadField> _fields;
 
-        private SupplementalRequestFields(IReadOnlyDictionary<string, ValueProducer> fields)
+        private SupplementalRequestFields(IReadOnlyList<GatherPayloadField> fields)
         {
             _fields = fields ?? throw new ArgumentNullException(nameof(fields));
         }
 
         internal static SupplementalRequestFields Empty { get; } =
-            new SupplementalRequestFields(new Dictionary<string, ValueProducer>());
+            new SupplementalRequestFields(Array.Empty<GatherPayloadField>());
 
         internal bool HasFields => _fields.Count > 0;
 
@@ -607,8 +607,7 @@ namespace Alis.Reactive.Builders.Requests
                 if (hasNoSupplementalFields)
                     return SupplementalGatherFields.None;
 
-                var supplementalFieldObject = ValueProducer.Object(CopyFields());
-                return SupplementalGatherFields.From(supplementalFieldObject);
+                return SupplementalGatherFields.From(_fields);
             }
         }
 
@@ -624,14 +623,14 @@ namespace Alis.Reactive.Builders.Requests
             }
         }
 
-        internal static SupplementalRequestFields From(IReadOnlyDictionary<string, ValueProducer> fields) =>
+        internal static SupplementalRequestFields From(IReadOnlyList<GatherPayloadField> fields) =>
             new SupplementalRequestFields(fields);
 
         private Dictionary<string, ValueProducer> CopyFields()
         {
             var copy = new Dictionary<string, ValueProducer>();
             foreach (var field in _fields)
-                copy[field.Key] = field.Value;
+                copy[field.PayloadPath] = field.Value;
             return copy;
         }
     }

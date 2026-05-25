@@ -490,7 +490,7 @@ export interface NoSupplementalGatherFields {
 
 export interface DeclaredSupplementalGatherFields {
   kind: "declared";
-  value: ObjectProducer;
+  fields: GatherPayloadField[];
 }
 
 export type GatherSelection =

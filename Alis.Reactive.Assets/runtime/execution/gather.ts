@@ -216,7 +216,7 @@ function gatherExplicitPayloadFields(
   claims: GatherPayloadClaims,
 ): void {
   for (const field of gatherInput.payloadFields) {
-    ExplicitGatherPayloadField.from(field).emitInto(transport, runtime, claims);
+    DeclaredGatherPayloadField.from(field).emitInto(transport, runtime, claims);
   }
 }
 
@@ -399,11 +399,11 @@ class GatherScalarWireValue {
   }
 }
 
-class ExplicitGatherPayloadField {
+class DeclaredGatherPayloadField {
   private constructor(private readonly field: GatherPayloadField) {}
 
-  static from(field: GatherPayloadField): ExplicitGatherPayloadField {
-    return new ExplicitGatherPayloadField(field);
+  static from(field: GatherPayloadField): DeclaredGatherPayloadField {
+    return new DeclaredGatherPayloadField(field);
   }
 
   emitInto(
@@ -548,7 +548,7 @@ abstract class SupplementalGatherValues {
       case "none":
         return NoSupplementalGatherValues.instance;
       case "declared":
-        return new DeclaredSupplementalGatherValues(supplementalFields.value);
+        return new DeclaredSupplementalGatherValues(supplementalFields.fields);
       default:
         return assertNever(supplementalFields, "supplemental gather fields");
     }
@@ -570,7 +570,7 @@ class NoSupplementalGatherValues extends SupplementalGatherValues {
 }
 
 class DeclaredSupplementalGatherValues extends SupplementalGatherValues {
-  constructor(private readonly producer: ObjectProducer) {
+  constructor(private readonly fields: GatherPayloadField[]) {
     super();
   }
 
@@ -579,7 +579,9 @@ class DeclaredSupplementalGatherValues extends SupplementalGatherValues {
     runtime: GatherRuntime,
     claims: GatherPayloadClaims,
   ): void {
-    DeclaredObjectValueFields.from(this.producer).emitIntoGather(transport, runtime, claims);
+    for (const field of this.fields) {
+      DeclaredGatherPayloadField.from(field).emitInto(transport, runtime, claims);
+    }
   }
 }
 
@@ -593,18 +595,6 @@ class DeclaredObjectValueFields {
 
   emitInto(transport: TransportStrategy, runtime: GatherRuntime): void {
     this.emitEach((key, producer) => {
-      const value = evaluateValue(producer, runtime.plan, runtime.ctx);
-      emitValue(key, value, RuntimeShape.declaredBy(producer), transport);
-    });
-  }
-
-  emitIntoGather(
-    transport: TransportStrategy,
-    runtime: GatherRuntime,
-    claims: GatherPayloadClaims,
-  ): void {
-    this.emitEach((key, producer) => {
-      claims.claimPayloadPath(key);
       const value = evaluateValue(producer, runtime.plan, runtime.ctx);
       emitValue(key, value, RuntimeShape.declaredBy(producer), transport);
     });

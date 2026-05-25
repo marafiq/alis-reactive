@@ -1,10 +1,9 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveGather } from "../../execution/gather";
 import { PlanRegistry } from "../../lifecycle/merge-plan";
-import type { Component, JsType, ObjectProducer, Plan, RequestInput, Shape, ValueProducer } from "../../types";
+import type { Component, JsType, Plan, RequestInput, Shape, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
-const noneShape: Shape = { kind: "none" };
 
 afterEach(() => {
   document.body.innerHTML = "";
@@ -90,9 +89,12 @@ describe("all registered input gather lifecycle", () => {
       ...allRegisteredInputs(),
       supplementalFields: {
         kind: "declared",
-        value: objectValue({
-          addressLine: literal("manual", stringShape),
-        }),
+        fields: [
+          {
+            payloadPath: "addressLine",
+            value: literal("manual", stringShape),
+          },
+        ],
       },
     }, "POST", resident, {}).body).toEqual({
       addressLine: "manual",
@@ -118,9 +120,12 @@ describe("all registered input gather lifecycle", () => {
       ...allRegisteredInputs(),
       supplementalFields: {
         kind: "declared",
-        value: objectValue({
-          "address.city": literal("Seattle", stringShape),
-        }),
+        fields: [
+          {
+            payloadPath: "address.city",
+            value: literal("Seattle", stringShape),
+          },
+        ],
       },
     }, "POST", resident, {}).body).toEqual({
       address: {
@@ -225,8 +230,4 @@ function allRegisteredInputs(): Extract<RequestInput, { kind: "gather" }> {
 
 function literal(value: string, shape: Shape): ValueProducer {
   return { kind: "literal", value, shape };
-}
-
-function objectValue(fields: Record<string, ValueProducer>): ObjectProducer {
-  return { kind: "object", fields, shape: noneShape };
 }

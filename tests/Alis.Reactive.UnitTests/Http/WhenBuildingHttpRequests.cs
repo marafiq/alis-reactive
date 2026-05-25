@@ -184,6 +184,27 @@ public class WhenBuildingHttpRequests : PlanTestBase
     }
 
     [Test]
+    public void gather_rejects_parent_child_supplemental_payload_path_conflicts()
+    {
+        var plan = CreatePlan();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Post("/api/profile", g => g
+                        .Static("address", "flat")
+                        .Static("address.city", "Seattle"))
+                    .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+            });
+        });
+
+        Assert.That(ex!.Message, Does.Contain("address.city"));
+        Assert.That(ex.Message, Does.Contain("address"));
+        Assert.That(ex.Message, Does.Contain("Use either the parent path or its child paths"));
+    }
+
+    [Test]
     public void include_all_does_not_duplicate_a_registered_input_claimed_by_static_payload()
     {
         var plan = CreatePlan();
@@ -213,11 +234,12 @@ public class WhenBuildingHttpRequests : PlanTestBase
                 .GetProperty("kind")
                 .GetString(),
             Is.EqualTo("declared"));
-        Assert.That(input.GetProperty("supplementalFields")
-                .GetProperty("value")
-                .GetProperty("fields")
-                .TryGetProperty("Id", out _),
-            Is.True);
+        var supplementalFields = input.GetProperty("supplementalFields")
+            .GetProperty("fields")
+            .EnumerateArray()
+            .Select(field => field.GetProperty("payloadPath").GetString())
+            .ToList();
+        Assert.That(supplementalFields, Is.EqualTo(new[] { "Id" }));
     }
 
     [Test]
