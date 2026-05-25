@@ -34,7 +34,7 @@ namespace Alis.Reactive.FluentValidator
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            var validator = ResolveRootValidator(request.ValidatorType);
+            var validator = ResolveRootValidator(request.ValidationSourceType);
 
             var projection = new ClientValidationProjectionDraft();
             var clientConditions = ClientConditionCatalog.From(validator);

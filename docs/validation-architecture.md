@@ -16,7 +16,7 @@ rule still runs normally on postback or HTTP submit.
 ## Data Flow
 
 ```text
-Validate<TValidator>(containerId)
+Validate<TValidationSource>(containerId)
   -> RequestValidation registers a ValidationJob
   -> ReactivePlan.Render() calls ResolveAll()
   -> input component registrations are materialized into the plan
@@ -31,12 +31,12 @@ Validate<TValidator>(containerId)
 
 - request URL, used for diagnostics;
 - validation container id;
-- validator type to project.
+- validation source type to project.
 
 `ClientValidationProjectionBinder` then:
 
 1. Requires a registered `IClientValidationProjectionSource`.
-2. Calls `Project(ClientValidationProjectionRequest.For(validatorType, container))`.
+2. Calls `Project(ClientValidationProjectionRequest.For(validationSourceType, container))`.
 3. Binds each `ClientValidationField` through `ValidationProjectionBindingScope`.
 4. Merges the resulting `ComponentValidation` rules onto the validation-container component.
 
@@ -50,7 +50,7 @@ Field binding has two deterministic paths:
 `ClientValidationProjectionRegistry` is the core-owned projection source for
 deterministic browser validation rules that are authored directly, without
 FluentValidation inspection. It keys projections by the validation source type
-named by `Validate<TValidator>()`, but public authoring selects fields through
+named by `Validate<TValidationSource>()`, but public authoring selects fields through
 typed expressions and `ClientValidationFieldToken<TModel, TValue>`, not field
 name strings.
 

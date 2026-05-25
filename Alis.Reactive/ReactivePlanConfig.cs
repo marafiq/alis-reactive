@@ -9,8 +9,8 @@ namespace Alis.Reactive
     /// </summary>
     /// <remarks>
     /// Call <see cref="UseClientValidationProjectionSource"/> in <c>Program.cs</c> or <c>Startup.cs</c>
-    /// to enable client-side validation projection from validators or generated model metadata.
-    /// Without this call, views that use <c>Validate&lt;TValidator&gt;()</c> will throw at render time.
+    /// to enable client-side validation projection from validators, registries, or generated model metadata.
+    /// Without this call, views that use <c>Validate&lt;TValidationSource&gt;()</c> will throw at render time.
     /// </remarks>
     public static class ReactivePlanConfig
     {
@@ -26,7 +26,7 @@ namespace Alis.Reactive
         /// Must be called exactly once at app startup. Calling it a second time throws
         /// to prevent accidental double-registration that would silently replace the projection source.
         /// </remarks>
-        /// <param name="source">The projection source implementation (typically from <c>Alis.Reactive.FluentValidator</c>).</param>
+        /// <param name="source">The projection source implementation, such as a core registry or the FluentValidation adapter.</param>
         /// <exception cref="InvalidOperationException">Thrown if a projection source is already registered.</exception>
         public static void UseClientValidationProjectionSource(IClientValidationProjectionSource source)
         {
@@ -59,7 +59,7 @@ namespace Alis.Reactive
         {
             if (job == null) throw new ArgumentNullException(nameof(job));
             throw new InvalidOperationException(
-                $"Request at '{job.RequestUrl}' specifies validator '{job.ValidatorType.Name}' " +
+                $"Request at '{job.RequestUrl}' specifies validation source '{job.ValidationSourceType.Name}' " +
                 "but no IClientValidationProjectionSource is registered. " +
                 "Call ReactivePlanConfig.UseClientValidationProjectionSource() at app startup.");
         }

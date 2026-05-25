@@ -10,9 +10,9 @@ namespace Alis.Reactive
     /// Binds client-side validation projections declared by request validation gates
     /// into the plan's component-level validation rules.
     /// <para>
-    /// Each <see cref="ValidationJob"/> names a form and a validator type. The registered
+    /// Each <see cref="ValidationJob"/> names a form and a validation source type. The registered
     /// <see cref="IClientValidationProjectionSource"/> returns the deterministic browser projection for
-    /// that validator. This binder maps each projected model field to the component that
+    /// that source. This binder maps each projected model field to the component that
     /// renders it, or to the deterministic component id a partial will render later, and
     /// attaches the resulting <see cref="ComponentValidation"/> rules to the form's
     /// <see cref="ContainerScope"/>. Server-side FluentValidation execution remains
@@ -47,7 +47,7 @@ namespace Alis.Reactive
             var source = ReactivePlanConfig.ClientValidationProjectionSource.RequireFor(job);
             var container = job.Container;
 
-            var projection = source.Project(ClientValidationProjectionRequest.For(job.ValidatorType, container));
+            var projection = source.Project(ClientValidationProjectionRequest.For(job.ValidationSourceType, container));
             var bindings = ValidationProjectionBindingScope.For(_registeredInputs, _modelType, projection.Fields);
 
             var componentValidations = projection.Fields

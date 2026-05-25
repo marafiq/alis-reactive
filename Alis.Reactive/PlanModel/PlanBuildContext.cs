@@ -43,9 +43,9 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Replaces a registered component, used when validation enriches a container scope.</summary>
         internal void SetComponent(ComponentKey key, Component component) => _components.Set(key, component);
 
-        /// <summary>Records that a request declared a validator, to be resolved during Render().</summary>
-        internal void RegisterValidationJob(Request request, ComponentId container, Type validatorType) =>
-            _validationJobs.Enqueue(request, container, validatorType);
+        /// <summary>Records that a request declared a validation source, to be resolved during Render().</summary>
+        internal void RegisterValidationJob(Request request, ComponentId container, Type validationSourceType) =>
+            _validationJobs.Enqueue(request, container, validationSourceType);
 
         /// <summary>The validation jobs declared during plan construction.</summary>
         internal IReadOnlyList<ValidationJob> ValidationJobs => _validationJobs.Jobs;

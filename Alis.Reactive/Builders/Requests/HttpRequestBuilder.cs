@@ -95,14 +95,14 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Validates the form before sending the request using the specified validator.</summary>
-        /// <typeparam name="TValidator">The validator type.</typeparam>
+        /// <summary>Validates the form before sending the request using the specified validation source.</summary>
+        /// <typeparam name="TValidationSource">The validation source type used by the configured client projection source.</typeparam>
         /// <param name="formId">The DOM element ID of the form container for error display.</param>
         /// <returns>This builder for chaining.</returns>
-        public HttpRequestBuilder<TModel> Validate<TValidator>(string formId)
-            where TValidator : class
+        public HttpRequestBuilder<TModel> Validate<TValidationSource>(string formId)
+            where TValidationSource : class
         {
-            _validation = RequestValidation.For(typeof(TValidator), formId);
+            _validation = RequestValidation.For(typeof(TValidationSource), formId);
             return this;
         }
 
@@ -547,8 +547,8 @@ namespace Alis.Reactive.Builders.Requests
     {
         internal static RequestValidation None { get; } = new NoRequestValidation();
 
-        internal static RequestValidation For(Type validatorType, string containerId) =>
-            new ConfiguredRequestValidation(validatorType, containerId);
+        internal static RequestValidation For(Type validationSourceType, string containerId) =>
+            new ConfiguredRequestValidation(validationSourceType, containerId);
 
         internal abstract RequestValidationTarget Target { get; }
 
@@ -566,12 +566,12 @@ namespace Alis.Reactive.Builders.Requests
 
     internal sealed class ConfiguredRequestValidation : RequestValidation
     {
-        private readonly Type _validatorType;
+        private readonly Type _validationSourceType;
         private readonly ComponentId _container;
 
-        internal ConfiguredRequestValidation(Type validatorType, string containerId)
+        internal ConfiguredRequestValidation(Type validationSourceType, string containerId)
         {
-            _validatorType = validatorType ?? throw new ArgumentNullException(nameof(validatorType));
+            _validationSourceType = validationSourceType ?? throw new ArgumentNullException(nameof(validationSourceType));
             _container = ComponentId.Of(containerId);
         }
 
@@ -581,7 +581,7 @@ namespace Alis.Reactive.Builders.Requests
         internal override void Register(PlanBuildContext context, Request request)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            context.RegisterValidationJob(request, _container, _validatorType);
+            context.RegisterValidationJob(request, _container, _validationSourceType);
         }
     }
 

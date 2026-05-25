@@ -206,7 +206,7 @@ Source:
 - `.Gather(g => ...)`
 - `.AsJson()`
 - `.AsFormData()`
-- `.Validate<TValidator>(formId)`
+- `.Validate<TValidationSource>(formId)`
 - `.WhileLoading(...)`
 - `.Finally(...)`
 - `.Response(r => r.OnSuccess(...).OnError(...).Chained(...))`

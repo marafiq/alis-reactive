@@ -30,10 +30,10 @@ namespace Alis.Reactive.Validation
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            if (!_definitions.TryGetValue(request.ValidatorType, out var definition))
+            if (!_definitions.TryGetValue(request.ValidationSourceType, out var definition))
             {
                 throw new InvalidOperationException(
-                    $"No client validation projection is registered for '{request.ValidatorType.FullName}'. " +
+                    $"No client validation projection is registered for validation source '{request.ValidationSourceType.FullName}'. " +
                     "Register it inside ClientValidationProjectionRegistry.Create(registry => registry.For<TValidationSource, TModel>(...)).");
             }
 

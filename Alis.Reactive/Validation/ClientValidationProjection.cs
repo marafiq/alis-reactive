@@ -38,17 +38,17 @@ namespace Alis.Reactive.Validation
     /// <summary>Request passed from plan resolution to a client validation projection source.</summary>
     public sealed class ClientValidationProjectionRequest
     {
-        private ClientValidationProjectionRequest(Type validatorType, ValidationContainerId validationContainer)
+        private ClientValidationProjectionRequest(Type validationSourceType, ValidationContainerId validationContainer)
         {
-            ValidatorType = validatorType ?? throw new ArgumentNullException(nameof(validatorType));
+            ValidationSourceType = validationSourceType ?? throw new ArgumentNullException(nameof(validationSourceType));
             ValidationContainer = validationContainer ?? throw new ArgumentNullException(nameof(validationContainer));
         }
 
-        public Type ValidatorType { get; }
+        public Type ValidationSourceType { get; }
         public ValidationContainerId ValidationContainer { get; }
 
-        public static ClientValidationProjectionRequest For(Type validatorType, string validationContainerId) =>
-            new ClientValidationProjectionRequest(validatorType, ValidationContainerId.Of(validationContainerId));
+        public static ClientValidationProjectionRequest For(Type validationSourceType, string validationContainerId) =>
+            new ClientValidationProjectionRequest(validationSourceType, ValidationContainerId.Of(validationContainerId));
     }
 
     /// <summary>Complete client validation projection split by projected fields and skipped browser rules.</summary>

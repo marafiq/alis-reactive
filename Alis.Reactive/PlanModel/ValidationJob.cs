@@ -3,7 +3,7 @@ using System;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// A validator declared on an HTTP request during plan construction, awaiting
+    /// A validation source declared on an HTTP request during plan construction, awaiting
     /// resolution into its form's <see cref="ComponentValidation"/> rules.
     /// <para>
     /// Recorded when a request calls <c>.Validate&lt;T&gt;(formId)</c> and resolved once,
@@ -19,17 +19,17 @@ namespace Alis.Reactive.PlanModel
 
         private readonly ComponentId _container;
 
-        /// <summary>The form element id whose components this validator covers.</summary>
+        /// <summary>The form element id whose components this validation source covers.</summary>
         public string Container => _container.Value;
 
-        /// <summary>The FluentValidation validator type whose rules are projected.</summary>
-        public Type ValidatorType { get; }
+        /// <summary>The source type used to project deterministic browser validation rules.</summary>
+        public Type ValidationSourceType { get; }
 
-        internal ValidationJob(string requestUrl, ComponentId container, Type validatorType)
+        internal ValidationJob(string requestUrl, ComponentId container, Type validationSourceType)
         {
             RequestUrl = requestUrl ?? throw new ArgumentNullException(nameof(requestUrl));
             _container = container ?? throw new ArgumentNullException(nameof(container));
-            ValidatorType = validatorType ?? throw new ArgumentNullException(nameof(validatorType));
+            ValidationSourceType = validationSourceType ?? throw new ArgumentNullException(nameof(validationSourceType));
         }
     }
 }

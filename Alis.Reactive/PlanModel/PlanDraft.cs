@@ -498,13 +498,13 @@ namespace Alis.Reactive.PlanModel
 
         internal IReadOnlyList<ValidationJob> Jobs => _jobs;
 
-        internal void Enqueue(Request request, ComponentId container, Type validatorType)
+        internal void Enqueue(Request request, ComponentId container, Type validationSourceType)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (container == null) throw new ArgumentNullException(nameof(container));
-            if (validatorType == null) throw new ArgumentNullException(nameof(validatorType));
+            if (validationSourceType == null) throw new ArgumentNullException(nameof(validationSourceType));
 
-            _jobs.Add(new ValidationJob(request.Url, container, validatorType));
+            _jobs.Add(new ValidationJob(request.Url, container, validationSourceType));
         }
     }
 }
