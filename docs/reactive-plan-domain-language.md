@@ -299,10 +299,10 @@ TypeScript.
   exposes a readable property, callable function, or command. String plugin
   registration and typed `ReactivePlugin` descriptors share this catalog so a
   member name cannot drift between property and method declarations.
-- **Plugin Operation Declaration**: either a live typed descriptor whose
-  arguments are finalized after `.Arg(...)`/`.Args(...)`, or an already-built
-  string registration contract. Both become the same `PluginOperationContract`
-  before entering the plan model.
+- **Plugin Operation Contract**: the callable-function or command contract
+  that enters the plan model. String registration and typed `ReactivePlugin`
+  descriptors both produce `PluginOperationContract`; argument collection is
+  authoring plumbing, not a separate domain term.
 
 ### Concept Flow
 
@@ -822,9 +822,8 @@ different domain actions and must not share one collision rule.
 | Field Comparison Array Operand Shape | Build-time shape for symbolic validation field-condition operands such as `WhenFieldIn` and `WhenFieldBetween`. The operand is an array of the compared field shape; if the compared field has no declared shape, the operand remains an array with `any` items. The comparison itself keeps the scalar field shape. |
 | Validation Field Path | Dotted model field path projected by a validation source. It owns segment parsing and rejects empty segments before deferred partial binding resolves component ids. |
 | Explicit Peer Validation Projection | FluentValidation peer comparisons are client-projectable only when `ProjectToClient(...)` declares the peer through a typed expression. Nested validators prefix that peer path from the containing rule, so the projected peer field remains deterministic without `MemberInfo` reconstruction. |
-| Validation Field Binding | Render-time binding from a projected model field path to the component value the browser will read. Registered fields use their rendered component contract; deferred fields use the deterministic component id a partial will contribute later and keep the projection-declared field shape for validation/condition comparison. |
+| Validation Field Binding | Render-time binding from a projected model field path to the component value the browser will read. Registered fields use their rendered component contract; deferred fields use the deterministic component id a partial will contribute later and keep the projection-declared field shape for validation/condition comparison. It emits the `Component Validation Rules` entry directly; there is no separate bound-field abstraction. |
 | Validation Resolution Scope | Render-time context that owns all bindings from projected validation intent to component value contracts. It is created from the registered input catalog and root model type, then binds rules, peer fields, and field conditions through the same field catalog. |
-| Bound Validation Field | A projected validation field paired with its `Validation Field Binding`. It emits one `Component Validation Rules` entry, including the server field name, component value producer, and plan-bound rule executions. |
 | Validation Plan Binding | Domain service used while emitting validation plan rules. It resolves peer-field operands and `when` conditions through `Validation Field Binding`, so registered components read their declared value member and deferred partial fields keep deterministic ids. |
 | Validation Date Literal | Date-shaped literal emitted by validation projections for both rule constraints and field conditions. Date-only values use `yyyy-MM-dd`; date-time values use the same sortable text form, so runtime date shape conversion does not depend on a component returning a Unix timestamp. |
 | Validation Rule Execution | Explicit plan contract for how one validation rule runs: fixed constraint operand, peer-value operand, activation condition, and comparison shape. Runtime reads this object instead of guessing from optional fields. |

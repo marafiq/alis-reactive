@@ -217,7 +217,7 @@ Domain terms:
 
 - `Request`
 - `RequestEndpoint`
-- `RequestPayload`
+- `RequestInput`
 - `RequestParameters`
 - `RequestLifecycle`
 - `RequestReactionStages`
