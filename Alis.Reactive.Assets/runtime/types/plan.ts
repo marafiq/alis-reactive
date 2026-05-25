@@ -404,7 +404,6 @@ export type InjectionTarget =
 export interface PartialSlotInjectionTarget {
   kind: "partial-slot";
   component: string;
-  slotId: string;
 }
 
 export interface ShowValidationErrorsReaction {

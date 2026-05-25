@@ -265,6 +265,20 @@ TypeScript.
 - **Projected Client Validation Rule**: one browser-executable rule attached to
   a model field path, with an explicit operand shape, peer value, and activation
   condition.
+- **Validation Rule Kind**: the typed role of a projected client rule, such as
+  required, length, comparison, regex, range, email, URL, credit card, or
+  at-least-one. Public inspection APIs expose this as a typed concept, not as
+  the JSON discriminator token.
+- **Validation Rule Operand**: the rule input shape: no operand, a literal
+  value, a range bound pair, or a peer field. This is the client-rule data the
+  browser can execute without invoking server validator logic.
+- **Validation Rule Activation**: whether a projected rule always runs or runs
+  when a deterministic field condition is true.
+- **Field Comparison Operator**: the typed comparison role in a validation
+  activation condition. It names the client-side condition behavior, not the
+  wire token used inside plan JSON.
+- **Field Comparison Operand**: the right side of a field comparison: absent,
+  literal, or array.
 - **Skipped Client Rule Projection**: a validator rule that still runs through
   the original validator but was not proven deterministic for browser
   execution.

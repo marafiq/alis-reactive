@@ -44,7 +44,6 @@ describe("injectHtml partial slot lifecycle", () => {
     const target: InjectionTarget = {
       kind: "partial-slot",
       component: "address-container",
-      slotId: "address-slot",
     };
 
     injectHtml(

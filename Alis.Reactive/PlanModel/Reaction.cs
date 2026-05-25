@@ -599,27 +599,23 @@ namespace Alis.Reactive.PlanModel
         public abstract string Component { get; }
 
         internal static InjectionTarget PartialSlot(string component) =>
-            new PartialSlotInjectionTarget(ComponentKey.Of(component), PartId.Of(component));
+            new PartialSlotInjectionTarget(ComponentKey.Of(component));
     }
 
     /// <summary>Replaces a browser partial slot with injected HTML and embedded plan contributions.</summary>
     public sealed class PartialSlotInjectionTarget : InjectionTarget
     {
         private readonly ComponentKey _component;
-        private readonly PartId _slotId;
 
-        internal PartialSlotInjectionTarget(ComponentKey component, PartId slotId)
+        internal PartialSlotInjectionTarget(ComponentKey component)
         {
             _component = component ?? throw new ArgumentNullException(nameof(component));
-            _slotId = slotId ?? throw new ArgumentNullException(nameof(slotId));
         }
 
         /// <summary>Gets the kind. Always <c>"partial-slot"</c>.</summary>
         public override string Kind => "partial-slot";
         /// <summary>Gets the component whose HTML is replaced.</summary>
         public override string Component => _component.Value;
-        /// <summary>Gets the slot lifecycle identifier to load or unload.</summary>
-        public string SlotId => _slotId.Value;
     }
 
     /// <summary>Injects a value into a declared target.</summary>
