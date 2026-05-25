@@ -26,7 +26,7 @@ describe("fusion component event lifecycle", () => {
     boot(resident);
 
     loadPartialSlot("fusion-slot", [
-      partialPlan(planId, "server-fusion-plan", {
+      partialPlan(planId, {
         types: { "fusion.fake": fusionEventType() },
         components: {
           source: fusionComponent("fusion-source"),
@@ -98,13 +98,12 @@ function rootPlan(planId: string, components: Record<string, Component>): Plan {
 
 function partialPlan(
   planId: string,
-  partId: string,
   entries: Partial<Pick<Plan, "components" | "behaviors" | "types">>,
 ): Plan {
   return {
     version: 3,
     planId,
-    scope: { kind: "partial", partId },
+    scope: { kind: "partial" },
     types: entries.types ?? {},
     components: entries.components ?? {},
     behaviors: entries.behaviors ?? [],

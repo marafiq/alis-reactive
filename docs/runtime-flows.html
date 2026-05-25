@@ -1666,7 +1666,7 @@ sequenceDiagram
     plans->>plans: unload previous contributions for partId
     plans->>plans: create one AbortController for this slot load
     loop Each plan document
-        plans->>plans: scope document to partId
+        plans->>plans: use partId as contribution handle
         plans->>plans: merge type/component fragments
         plans->>hooks: wireBehaviors(behaviors, target, signal)
         plans->>hooks: wireContainerValidation(target, signal)
@@ -1744,9 +1744,9 @@ sequenceDiagram
     end
 
     alt extracted plans exist
-        inject->>boot: loadPartialSlot(slotId, plans)
+        inject->>boot: loadPartialSlot(target.component, plans)
     else no extracted plans
-        inject->>boot: unloadPartialSlot(slotId)
+        inject->>boot: unloadPartialSlot(target.component)
     end
 </div>
 </section>

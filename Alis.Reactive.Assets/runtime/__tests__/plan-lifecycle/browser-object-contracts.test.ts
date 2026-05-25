@@ -21,12 +21,12 @@ describe("browser object contract fragments", () => {
     const sharedTypeKey = "plugin.address";
 
     browserPlans.loadPartialSlot("first-slot", [
-      partialPlan(planId, "server-first", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
       }),
     ], hooks);
     browserPlans.loadPartialSlot("second-slot", [
-      partialPlan(planId, "server-second", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
       }),
     ], hooks);
@@ -48,12 +48,12 @@ describe("browser object contract fragments", () => {
     const sharedTypeKey = "native.component.shared-drawer";
 
     browserPlans.loadPartialSlot("first-slot", [
-      partialPlan(planId, "server-first", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithWritableProperty("classRemove") },
       }),
     ], hooks);
     browserPlans.loadPartialSlot("second-slot", [
-      partialPlan(planId, "server-second", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithWritableProperty("classToggle") },
       }),
     ], hooks);
@@ -78,13 +78,13 @@ describe("browser object contract fragments", () => {
     const sharedTypeKey = "plugin.address";
 
     browserPlans.loadPartialSlot("first-slot", [
-      partialPlan(planId, "server-first", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
       }),
     ], hooks);
 
     expect(() => browserPlans.loadPartialSlot("second-slot", [
-      partialPlan(planId, "server-second", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "number" }) },
       }),
     ], hooks)).toThrow('partial plan contribution "second-slot" cannot declare type "plugin.address"');
@@ -97,12 +97,12 @@ describe("browser object contract fragments", () => {
     const sharedTypeKey = "plugin.address";
 
     browserPlans.loadPartialSlot("first-slot", [
-      partialPlan(planId, "server-first", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "any" }) },
       }),
     ], hooks);
     browserPlans.loadPartialSlot("second-slot", [
-      partialPlan(planId, "server-second", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "string" }) },
       }),
     ], hooks);
@@ -123,7 +123,7 @@ describe("browser object contract fragments", () => {
     const sharedTypeKey = "plugin.resident";
 
     browserPlans.loadPartialSlot("name-slot", [
-      partialPlan(planId, "server-name", {
+      partialPlan(planId, {
         types: {
           [sharedTypeKey]: jsTypeWithPropertyShape("profile", {
             kind: "object",
@@ -134,7 +134,7 @@ describe("browser object contract fragments", () => {
       }),
     ], hooks);
     browserPlans.loadPartialSlot("age-slot", [
-      partialPlan(planId, "server-age", {
+      partialPlan(planId, {
         types: {
           [sharedTypeKey]: jsTypeWithPropertyShape("profile", {
             kind: "object",
@@ -163,12 +163,12 @@ describe("browser object contract fragments", () => {
     const sharedTypeKey = "plugin.address";
 
     browserPlans.loadPartialSlot("first-slot", [
-      partialPlan(planId, "server-first", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithMethodShape("normalize", { kind: "any" }, { kind: "any" }) },
       }),
     ], hooks);
     browserPlans.loadPartialSlot("second-slot", [
-      partialPlan(planId, "server-second", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithMethodShape("normalize", { kind: "string" }, { kind: "string" }) },
       }),
     ], hooks);
@@ -185,7 +185,7 @@ describe("browser object contract fragments", () => {
     const sharedTypeKey = "native.component.shared-drawer";
 
     browserPlans.loadPartialSlot("first-slot", [
-      partialPlan(planId, "server-first", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
       }),
     ], hooks);
@@ -193,7 +193,7 @@ describe("browser object contract fragments", () => {
     browserPlans.unloadPartialSlot("first-slot");
 
     browserPlans.loadPartialSlot("second-slot", [
-      partialPlan(planId, "server-second", {
+      partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "number" }) },
       }),
     ], hooks);
@@ -219,7 +219,7 @@ describe("browser object contract fragments", () => {
     });
 
     browserPlans.loadPartialSlot("alis-drawer-content", [
-      partialPlan(planId, "server-form", {
+      partialPlan(planId, {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
         },
@@ -258,7 +258,7 @@ describe("browser object contract fragments", () => {
     });
 
     browserPlans.loadPartialSlot("first-drawer-content", [
-      partialPlan(planId, "server-first", {
+      partialPlan(planId, {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
         },
@@ -268,7 +268,7 @@ describe("browser object contract fragments", () => {
       }),
     ], hooks);
     browserPlans.loadPartialSlot("second-drawer-content", [
-      partialPlan(planId, "server-second", {
+      partialPlan(planId, {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classToggle"),
         },
@@ -310,7 +310,7 @@ describe("browser object contract fragments", () => {
     });
 
     browserPlans.loadPartialSlot("care-unit-editor", [
-      partialPlan(planId, "server-editor", {
+      partialPlan(planId, {
         types: {
           [typeKey]: jsTypeWithPropertyAccess("value", "write"),
         },
@@ -344,7 +344,7 @@ describe("browser object contract fragments", () => {
     });
 
     browserPlans.loadPartialSlot("step-container", [
-      partialPlan(planId, "server-step", {
+      partialPlan(planId, {
         types: {
           [hostTypeKey]: jsTypeWithWritableProperty("hidden"),
         },
@@ -383,7 +383,7 @@ describe("browser object contract fragments", () => {
     });
 
     browserPlans.loadPartialSlot("alis-drawer-content", [
-      partialPlan(partialPlanId, "server-form", {
+      partialPlan(partialPlanId, {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
         },

@@ -19,7 +19,7 @@ describe("partial slot lifecycle", () => {
 
     const oldBehavior = behavior();
     browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, "address-slot", {
+      partialPlan(planId, {
         types: { "native.element.address-line": jsType() },
         components: { "address-line": component("address-line") },
         behaviors: [oldBehavior],
@@ -34,7 +34,7 @@ describe("partial slot lifecycle", () => {
 
     const newBehavior = behavior();
     browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, "address-slot", {
+      partialPlan(planId, {
         types: { "native.element.zip-code": jsType() },
         components: { "zip-code": component("zip-code") },
         behaviors: [newBehavior],
@@ -58,7 +58,7 @@ describe("partial slot lifecycle", () => {
     const loadedBehavior = behavior();
 
     browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, "address-slot", {
+      partialPlan(planId, {
         types: { "native.element.address-line": jsType() },
         components: { "address-line": component("address-line") },
         behaviors: [loadedBehavior],
@@ -75,6 +75,27 @@ describe("partial slot lifecycle", () => {
     expect(browserPlans.get(planId)).toBeUndefined();
   });
 
+  it("uses the browser slot handle as lifecycle identity regardless of serialized plan scope", () => {
+    const browserPlans = new AppliedBrowserPlans();
+    const { hooks } = mergeHooks();
+    const planId = "Resident.Root";
+
+    browserPlans.register(rootPlan(planId));
+    browserPlans.loadPartialSlot("address-slot", [
+      {
+        ...rootPlan(planId),
+        types: { "native.element.address-line": jsType() },
+        components: { "address-line": component("address-line") },
+      },
+    ], hooks);
+
+    expect(browserPlans.get(planId)?.components["address-line"]).toBeDefined();
+
+    browserPlans.unloadPartialSlot("address-slot");
+
+    expect(browserPlans.get(planId)?.components["address-line"]).toBeUndefined();
+  });
+
   it("replaces a slot as one lifetime when it contains multiple plan documents", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks, behaviorSignals } = mergeHooks();
@@ -84,12 +105,12 @@ describe("partial slot lifecycle", () => {
     const billingBehavior = behavior();
 
     const affectedPlanIds = browserPlans.loadPartialSlot("drawer-slot", [
-      partialPlan(residentPlanId, "server-part-id", {
+      partialPlan(residentPlanId, {
         types: { "native.element.resident-name": jsType() },
         components: { "resident-name": component("resident-name") },
         behaviors: [residentBehavior],
       }),
-      partialPlan(billingPlanId, "server-part-id", {
+      partialPlan(billingPlanId, {
         types: { "native.element.invoice-total": jsType() },
         components: { "invoice-total": component("invoice-total") },
         behaviors: [billingBehavior],
@@ -114,12 +135,12 @@ describe("partial slot lifecycle", () => {
     const planId = "Resident.Dynamic";
 
     browserPlans.loadPartialSlot("type-slot", [
-      partialPlan(planId, "server-type-plan", {
+      partialPlan(planId, {
         types: { "native.element.shared": jsType() },
       }),
     ], hooks);
     browserPlans.loadPartialSlot("component-slot", [
-      partialPlan(planId, "server-component-plan", {
+      partialPlan(planId, {
         components: { "address-line": component("address-line", "native.element.shared") },
       }),
     ], hooks);

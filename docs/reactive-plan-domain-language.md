@@ -409,9 +409,9 @@ sequenceDiagram
 Browser slot facts:
 
 - `ResolvePlan<TModel>()` marks a plan document as a partial contribution, but
-  dynamic injection deliberately re-scopes loaded plans to the target container
-  id. The runtime lifecycle owner is the `Partial Slot`, not the server
-  document's original partial scope.
+  dynamic injection takes lifecycle identity from the target container id. The
+  runtime lifecycle owner is the `Partial Slot`, not a serialized partial id in
+  the server document.
 - Browser injection changes lifetime, not model ownership. A returned
   `ResolvePlan<TModel>()` script still belongs to the model-derived `planId`;
   the slot id only owns load/replacement/unload of that contribution.

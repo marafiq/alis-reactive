@@ -37,8 +37,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("root")));
 
             contract.Declare(Interface("PartialPlanScope")
-                .Requires("kind", Literal("partial"))
-                .Requires("partId", "string"));
+                .Requires("kind", Literal("partial")));
 
             contract.Declare(Interface("JsType")
                 .Requires("properties", "Record<string, Property>")

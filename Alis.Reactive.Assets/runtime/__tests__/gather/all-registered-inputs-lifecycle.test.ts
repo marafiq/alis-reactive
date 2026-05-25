@@ -23,7 +23,7 @@ describe("all registered input gather lifecycle", () => {
 
     browserPlans.register(resident);
     browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, "server-address-plan", {
+      partialPlan(planId, {
         components: {
           "address-line": inputComponent("address-line", "addressLine"),
         },
@@ -50,7 +50,7 @@ describe("all registered input gather lifecycle", () => {
 
     browserPlans.register(resident);
     browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, "server-address-plan", {
+      partialPlan(planId, {
         components: {
           "address-line": inputComponent("address-line", "addressLine"),
         },
@@ -78,7 +78,7 @@ describe("all registered input gather lifecycle", () => {
 
     browserPlans.register(resident);
     browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, "server-address-plan", {
+      partialPlan(planId, {
         components: {
           "address-line": inputComponent("address-line", "addressLine"),
         },
@@ -109,7 +109,7 @@ describe("all registered input gather lifecycle", () => {
 
     browserPlans.register(resident);
     browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, "server-address-plan", {
+      partialPlan(planId, {
         components: {
           address: inputComponent("address", "address"),
         },
@@ -142,7 +142,7 @@ describe("all registered input gather lifecycle", () => {
 
     browserPlans.register(resident);
     browserPlans.loadPartialSlot("name-slot", [
-      partialPlan(planId, "server-name-plan", {
+      partialPlan(planId, {
         components: {
           "first-name": registeredInputComponent("first-name", "firstName", "missingValue"),
         },
@@ -172,13 +172,12 @@ function rootPlan(planId: string, components: Record<string, Component>): Plan {
 
 function partialPlan(
   planId: string,
-  partId: string,
   entries: Partial<Pick<Plan, "components" | "behaviors" | "types">>,
 ): Plan {
   return {
     version: 3,
     planId,
-    scope: { kind: "partial", partId },
+    scope: { kind: "partial" },
     types: entries.types ?? {},
     components: entries.components ?? {},
     behaviors: entries.behaviors ?? [],

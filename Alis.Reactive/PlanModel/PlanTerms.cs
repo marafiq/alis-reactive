@@ -60,13 +60,6 @@ namespace Alis.Reactive.PlanModel
         internal static PlanId Of(string value) => new PlanId(value);
     }
 
-    internal sealed class PartId : PlanString
-    {
-        private PartId(string value) : base(value, nameof(value)) { }
-
-        internal static PartId Of(string value) => new PartId(value);
-    }
-
     internal sealed class PlanIdentity
     {
         private readonly PlanId _planId;
@@ -86,7 +79,7 @@ namespace Alis.Reactive.PlanModel
             new PlanIdentity(planId, PlanMergePart.Root);
 
         internal static PlanIdentity Partial(PlanId planId) =>
-            new PlanIdentity(planId, PlanMergePart.Part(PartId.Of(planId.Value)));
+            new PlanIdentity(planId, PlanMergePart.Partial);
     }
 
     internal abstract class PlanMergePart
@@ -95,13 +88,9 @@ namespace Alis.Reactive.PlanModel
 
         internal static PlanMergePart Root { get; } = new RootPlanMergePart();
 
-        internal abstract PlanScope ScopeForJson { get; }
+        internal static PlanMergePart Partial { get; } = new PartialPlanMergePart();
 
-        internal static PlanMergePart Part(PartId partId)
-        {
-            if (partId == null) throw new ArgumentNullException(nameof(partId));
-            return new PartialPlanMergePart(partId);
-        }
+        internal abstract PlanScope ScopeForJson { get; }
 
         private sealed class RootPlanMergePart : PlanMergePart
         {
@@ -110,14 +99,7 @@ namespace Alis.Reactive.PlanModel
 
         private sealed class PartialPlanMergePart : PlanMergePart
         {
-            private readonly PartId _partId;
-
-            internal PartialPlanMergePart(PartId partId)
-            {
-                _partId = partId ?? throw new ArgumentNullException(nameof(partId));
-            }
-
-            internal override PlanScope ScopeForJson => PlanScope.Partial(_partId);
+            internal override PlanScope ScopeForJson => PlanScope.Partial;
         }
     }
 
@@ -129,14 +111,10 @@ namespace Alis.Reactive.PlanModel
 
         internal static PlanScope Root { get; } = new RootPlanScope();
 
+        internal static PlanScope Partial { get; } = new PartialPlanScope();
+
         /// <summary>Gets the scope kind.</summary>
         public abstract string Kind { get; }
-
-        internal static PlanScope Partial(PartId partId)
-        {
-            if (partId == null) throw new ArgumentNullException(nameof(partId));
-            return new PartialPlanScope(partId);
-        }
     }
 
     /// <summary>Represents a root view plan.</summary>
@@ -151,18 +129,10 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Represents a partial plan contribution that can be merged into a root plan.</summary>
     public sealed class PartialPlanScope : PlanScope
     {
-        private readonly PartId _partId;
-
-        internal PartialPlanScope(PartId partId)
-        {
-            _partId = partId ?? throw new ArgumentNullException(nameof(partId));
-        }
+        internal PartialPlanScope() { }
 
         /// <summary>Gets the kind. Always <c>"partial"</c>.</summary>
         public override string Kind => "partial";
-
-        /// <summary>Gets the partial contribution identifier.</summary>
-        public string PartId => _partId.Value;
     }
 
     internal sealed class ComponentId : PlanString

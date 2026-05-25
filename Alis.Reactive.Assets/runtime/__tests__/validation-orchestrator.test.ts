@@ -273,7 +273,7 @@ describe("validation orchestrator server errors", () => {
       {
         version: 3,
         planId: runtimePlan.planId,
-        scope: { kind: "partial", partId: "server-address-plan" },
+        scope: { kind: "partial" },
         types: {},
         components: {
           "zip-code-field": nativeComponent("zip-code-input"),

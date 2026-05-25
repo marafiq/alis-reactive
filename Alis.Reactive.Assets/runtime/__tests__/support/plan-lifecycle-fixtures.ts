@@ -165,7 +165,6 @@ export function rootPlan(planId: string): Plan {
 
 export function partialPlan(
   planId: string,
-  partId: string,
   entries: {
     readonly types?: Record<string, JsType>;
     readonly components?: Record<string, Component>;
@@ -175,7 +174,7 @@ export function partialPlan(
   return {
     version: 3,
     planId,
-    scope: { kind: "partial", partId },
+    scope: { kind: "partial" },
     types: entries.types ?? {},
     components: entries.components ?? {},
     behaviors: entries.behaviors ?? [],

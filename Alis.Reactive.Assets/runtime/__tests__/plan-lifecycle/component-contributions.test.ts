@@ -21,14 +21,14 @@ describe("component contribution ownership", () => {
 
     const firstComponent = component("shared-field", "native.element.shared-a");
     browserPlans.loadPartialSlot("first-slot", [
-      partialPlan(planId, "first-slot", {
+      partialPlan(planId, {
         types: { "native.element.shared-a": jsType() },
         components: { "shared-field": firstComponent },
       }),
     ], hooks);
 
     expect(() => browserPlans.loadPartialSlot("second-slot", [
-      partialPlan(planId, "second-slot", {
+      partialPlan(planId, {
         types: { "native.element.shared-b": jsType() },
         components: { "shared-field": component("shared-field", "native.element.shared-b") },
       }),
@@ -43,13 +43,13 @@ describe("component contribution ownership", () => {
 
     browserPlans.register(rootPlan(planId));
     browserPlans.loadPartialSlot("first-slot", [
-      partialPlan(planId, "first-slot", {
+      partialPlan(planId, {
         components: { "shared-field": component("shared-field", "native.element.shared-a") },
       }),
     ], hooks);
 
     expect(() => browserPlans.loadPartialSlot("second-slot", [
-      partialPlan(planId, "second-slot", {
+      partialPlan(planId, {
         types: { "native.element.second-only": jsType() },
         components: { "shared-field": component("shared-field", "native.element.shared-b") },
       }),
@@ -74,7 +74,7 @@ describe("component contribution ownership", () => {
     });
 
     expect(() => browserPlans.loadPartialSlot("alis-drawer-content", [
-      partialPlan(planId, "server-form", {
+      partialPlan(planId, {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
         },
@@ -99,7 +99,7 @@ describe("layout object contributions", () => {
     browserPlans.register(rootPlan(planId));
 
     browserPlans.loadPartialSlot("first-toast-slot", [
-      partialPlan(planId, "first-toast-plan", {
+      partialPlan(planId, {
         types: {
           [toastTypeKey]: jsTypeWithWritableProperty("title"),
         },
@@ -109,7 +109,7 @@ describe("layout object contributions", () => {
       }),
     ], hooks);
     browserPlans.loadPartialSlot("second-toast-slot", [
-      partialPlan(planId, "second-toast-plan", {
+      partialPlan(planId, {
         types: {
           [toastTypeKey]: jsTypeWithWritableProperty("content"),
         },
@@ -143,7 +143,7 @@ describe("layout object contributions", () => {
 
     browserPlans.register(rootPlan(planId));
     browserPlans.loadPartialSlot("loader-slot", [
-      partialPlan(planId, "loader-plan", {
+      partialPlan(planId, {
         types: {
           [loaderTypeKey]: jsTypeWithWritableProperty("classAdd"),
         },
@@ -154,7 +154,7 @@ describe("layout object contributions", () => {
     ], hooks);
 
     expect(() => browserPlans.loadPartialSlot("owned-loader-slot", [
-      partialPlan(planId, "owned-loader-plan", {
+      partialPlan(planId, {
         types: {
           [loaderTypeKey]: jsTypeWithWritableProperty("classRemove"),
         },
@@ -186,7 +186,7 @@ describe("layout object contributions", () => {
     });
 
     expect(() => browserPlans.loadPartialSlot("drawer-slot", [
-      partialPlan(planId, "drawer-plan", {
+      partialPlan(planId, {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
         },

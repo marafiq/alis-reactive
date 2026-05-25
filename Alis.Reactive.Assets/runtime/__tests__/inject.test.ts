@@ -22,11 +22,11 @@ function component(id: string, type = `native.element.${id}`): Component {
   };
 }
 
-function partialPlan(planId: string, partId: string): Plan {
+function partialPlan(planId: string): Plan {
   return {
     version: 3,
     planId,
-    scope: { kind: "partial", partId },
+    scope: { kind: "partial" },
     types: { "native.element.address-line": jsType() },
     components: { "address-line": component("address-line") },
     behaviors: [],
@@ -49,7 +49,7 @@ describe("injectHtml partial slot lifecycle", () => {
     injectHtml(
       slot,
       `<script type="application/json" data-reactive-plan>${JSON.stringify(
-        partialPlan("Resident.Root", "server-generated-id"),
+        partialPlan("Resident.Root"),
       )}</script><input id="address-line" />`,
       target,
     );

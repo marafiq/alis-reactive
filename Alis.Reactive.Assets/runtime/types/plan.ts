@@ -21,7 +21,6 @@ export interface RootPlanScope {
 
 export interface PartialPlanScope {
   kind: "partial";
-  partId: string;
 }
 
 export interface JsType {

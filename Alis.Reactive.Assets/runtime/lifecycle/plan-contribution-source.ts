@@ -9,7 +9,7 @@ export type PlanContributionSource = RootPlanContributionSource | PartialPlanCon
 
 export function planContributionSourceFrom(plan: Plan): PlanContributionSource {
   const scope = plan.scope;
-  if (scope.kind === "partial") return new PartialPlanContributionSource(scope.partId);
+  if (scope.kind === "partial") return new PartialPlanContributionSource(plan.planId);
 
   return RootPlanContributionSource.instance;
 }

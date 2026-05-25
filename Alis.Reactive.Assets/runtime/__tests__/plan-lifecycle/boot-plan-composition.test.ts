@@ -28,7 +28,7 @@ describe("boot plan composition", () => {
         components: { "resident-name": component("resident-name") },
         behaviors: [residentReady],
       },
-      partialPlan(residentPlanId, "address-slot", {
+      partialPlan(residentPlanId, {
         types: { "native.element.address-line": jsType() },
         components: { "address-line": component("address-line") },
         behaviors: [addressReady],
@@ -55,7 +55,7 @@ describe("boot plan composition", () => {
     const rootReady = behavior();
 
     const composed = composeInitialPlans([
-      partialPlan(planId, "address-slot", {
+      partialPlan(planId, {
         types: { "native.element.address-line": jsType() },
         components: { "address-line": component("address-line") },
         behaviors: [partialReady],
@@ -80,7 +80,7 @@ describe("boot plan composition", () => {
     const typeKey = "native.component.care-unit";
 
     const composed = composeInitialPlans([
-      partialPlan(planId, "cognitive-section", {
+      partialPlan(planId, {
         types: { [typeKey]: jsTypeWithWritableProperty("value") },
         components: { [componentId]: component(componentId, typeKey) },
       }),
@@ -106,7 +106,7 @@ describe("boot plan composition", () => {
         types: { [typeKey]: jsTypeWithReadableProperty("value") },
         components: { [componentId]: registeredInputComponent(componentId, typeKey) },
       },
-      partialPlan(planId, "cognitive-section", {
+      partialPlan(planId, {
         types: { [typeKey]: jsTypeWithWritableProperty("value") },
         components: { [componentId]: component(componentId, typeKey) },
       }),
@@ -127,7 +127,7 @@ describe("boot plan composition", () => {
         types: { [typeKey]: jsTypeWithReadableProperty("value") },
         components: { [componentId]: registeredInputComponent(componentId, typeKey) },
       },
-      partialPlan(planId, "clinical-section", {
+      partialPlan(planId, {
         types: { [typeKey]: jsTypeWithWritableProperty("value") },
         components: { [componentId]: registeredInputComponent(componentId, typeKey) },
       }),
@@ -155,11 +155,11 @@ describe("boot plan composition", () => {
         types: { [typeKey]: jsTypeWithReadableProperty("value") },
         components: { [componentId]: registeredInputComponent(componentId, typeKey) },
       },
-      partialPlan(planId, "clinical-section", {
+      partialPlan(planId, {
         types: { [typeKey]: jsTypeWithWritableProperty("value") },
         components: { [componentId]: conflictingDefinition },
       }),
-    ])).toThrow('partial plan contribution "clinical-section" cannot declare component "resident-name"');
+    ])).toThrow('partial plan contribution "Resident.Step" cannot declare component "resident-name"');
   });
 
   it("rejects an initial layout-object contribution with a mismatched runtime identity", () => {
@@ -173,11 +173,11 @@ describe("boot plan composition", () => {
         types: { [typeKey]: jsTypeWithWritableProperty("title") },
         components: { [componentId]: layoutComponent(componentId, typeKey) },
       },
-      partialPlan(planId, "toast-section", {
+      partialPlan(planId, {
         types: { [typeKey]: jsTypeWithWritableProperty("content") },
         components: { [componentId]: layoutComponent("otherToast", typeKey) },
       }),
-    ])).toThrow('partial plan contribution "toast-section" cannot declare component "alisFusionToast"');
+    ])).toThrow('partial plan contribution "Resident.Step" cannot declare component "alisFusionToast"');
   });
 
   it("merges an initial layout-object reference without replacing the root component", () => {
@@ -191,7 +191,7 @@ describe("boot plan composition", () => {
         types: { [typeKey]: jsTypeWithWritableProperty("title") },
         components: { [componentId]: layoutComponent(componentId, typeKey) },
       },
-      partialPlan(planId, "toast-section", {
+      partialPlan(planId, {
         types: { [typeKey]: jsTypeWithWritableProperty("content") },
         components: { [componentId]: layoutComponent(componentId, typeKey) },
       }),
@@ -207,7 +207,7 @@ describe("boot plan composition", () => {
     const typeKey = "fusion.component.alisFusionToast";
 
     const composed = composeInitialPlans([
-      partialPlan(planId, "toast-section", {
+      partialPlan(planId, {
         types: { [typeKey]: jsTypeWithWritableProperty("content") },
         components: { [componentId]: layoutComponent(componentId, typeKey) },
       }),
@@ -235,7 +235,7 @@ describe("boot plan composition", () => {
           ]),
         },
       },
-      partialPlan(planId, "address-slot", {
+      partialPlan(planId, {
         components: {
           "resident-form": validationContainer("resident-form", [
             validationRule("zip-code", "new zip required"),
@@ -269,14 +269,14 @@ describe("boot plan composition", () => {
           ]),
         },
       },
-      partialPlan(planId, "address-slot", {
+      partialPlan(planId, {
         components: {
           "resident-form": validationContainer("other-form", [
             validationRule("city"),
           ]),
         },
       }),
-    ])).toThrow('partial plan contribution "address-slot" cannot declare component "resident-form"');
+    ])).toThrow('partial plan contribution "Resident.Root" cannot declare component "resident-form"');
   });
 
   it("rejects an initial validation-container contribution that carries binding state", () => {
@@ -299,12 +299,12 @@ describe("boot plan composition", () => {
           ]),
         },
       },
-      partialPlan(planId, "address-slot", {
+      partialPlan(planId, {
         components: {
           "resident-form": invalidContainer,
         },
       }),
-    ])).toThrow('partial plan contribution "address-slot" cannot declare component "resident-form"');
+    ])).toThrow('partial plan contribution "Resident.Root" cannot declare component "resident-form"');
   });
 });
 

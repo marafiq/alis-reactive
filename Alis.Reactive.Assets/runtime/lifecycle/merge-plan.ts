@@ -125,10 +125,9 @@ export class AppliedBrowserPlans {
 
     const slotLoad = new AbortController();
     for (const plan of plans) {
-      const incoming = scopedToPartialSlot(plan, partId);
       const source = new PartialPlanContributionSource(partId, slotLoad.signal);
-      const merged = this.mergeContribution(incoming, hooks, source);
-      this.recordAppliedPartialSlot(partId, slotLoad, incoming);
+      const merged = this.mergeContribution(plan, hooks, source);
+      this.recordAppliedPartialSlot(partId, slotLoad, plan);
       affectedPlanIds.add(merged.planId);
     }
 
@@ -348,13 +347,6 @@ export class AppliedBrowserPlans {
       for (const contribution of contributions) contribution.slotLoad.abort();
     }
   }
-}
-
-function scopedToPartialSlot(plan: Plan, partId: PartId): Plan {
-  return {
-    ...plan,
-    scope: { kind: "partial", partId },
-  };
 }
 
 function captureAppliedSlotContribution(

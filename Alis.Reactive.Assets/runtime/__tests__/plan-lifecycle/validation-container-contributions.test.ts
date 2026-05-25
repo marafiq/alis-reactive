@@ -26,7 +26,7 @@ describe("validation container contributions", () => {
     });
 
     browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, "address-form", {
+      partialPlan(planId, {
         components: {
           "resident-form": validationContainer("resident-form", [
             validationRule("zip-code", "zip required"),
@@ -62,7 +62,7 @@ describe("validation container contributions", () => {
     });
 
     expect(() => browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, "address-form", {
+      partialPlan(planId, {
         components: {
           "resident-form": validationContainer("other-form", [validationRule("city")]),
         },
@@ -91,7 +91,7 @@ describe("validation container contributions", () => {
     });
 
     expect(() => browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, "address-form", {
+      partialPlan(planId, {
         components: {
           "resident-form": invalidExtension,
         },
@@ -116,7 +116,7 @@ describe("validation container contributions", () => {
     });
 
     browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, "server-part-id", {
+      partialPlan(planId, {
         components: {
           "resident-form": validationContainer("resident-form", [
             validationRule("address-line"),

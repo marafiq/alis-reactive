@@ -21,7 +21,7 @@ describe("partial behavior lifecycle", () => {
     boot(resident);
 
     loadPartialSlot("drawer-slot", [
-      partialPlan(planId, "server-drawer-plan", {
+      partialPlan(planId, {
         behaviors: [
           {
             startsWhen: {
@@ -68,13 +68,12 @@ function rootPlan(planId: string, components: Record<string, Component>): Plan {
 
 function partialPlan(
   planId: string,
-  partId: string,
   entries: Partial<Pick<Plan, "components" | "behaviors" | "types">>,
 ): Plan {
   return {
     version: 3,
     planId,
-    scope: { kind: "partial", partId },
+    scope: { kind: "partial" },
     types: entries.types ?? {},
     components: entries.components ?? {},
     behaviors: entries.behaviors ?? [],

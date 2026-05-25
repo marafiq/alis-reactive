@@ -140,11 +140,11 @@ function rootPlan(planId: string): Plan {
   };
 }
 
-function partialPlan(planId: string, partId: string, behaviors: Plan["behaviors"]): Plan {
+function partialPlan(planId: string, behaviors: Plan["behaviors"]): Plan {
   return {
     version: 3,
     planId,
-    scope: { kind: "partial", partId },
+    scope: { kind: "partial" },
     types: {},
     components: {},
     behaviors,
@@ -168,7 +168,7 @@ describe("realtime trigger lifecycle", () => {
 
     boot(rootPlan(planId));
     loadPartialSlot("first-slot", [
-      partialPlan(planId, "server-first", [
+      partialPlan(planId, [
         {
           startsWhen: {
             kind: "server-push",
@@ -184,7 +184,7 @@ describe("realtime trigger lifecycle", () => {
       ]),
     ]);
     loadPartialSlot("second-slot", [
-      partialPlan(planId, "server-second", [
+      partialPlan(planId, [
         {
           startsWhen: {
             kind: "server-push",
@@ -226,7 +226,7 @@ describe("realtime trigger lifecycle", () => {
 
     boot(rootPlan(planId));
     loadPartialSlot("first-slot", [
-      partialPlan(planId, "signalr-first", [
+      partialPlan(planId, [
         {
           startsWhen: {
             kind: "signalr",
@@ -239,7 +239,7 @@ describe("realtime trigger lifecycle", () => {
       ]),
     ]);
     loadPartialSlot("second-slot", [
-      partialPlan(planId, "signalr-second", [
+      partialPlan(planId, [
         {
           startsWhen: {
             kind: "signalr",
