@@ -6,7 +6,7 @@ import type {
   Plan, Reaction, SequenceReaction, ParallelReaction, BranchReaction,
   BranchCase, SetReaction, CallReaction, DispatchReaction,
   InjectReaction, ShowValidationErrorsReaction,
-  ExecContext, Condition, PayloadSource, Source,
+  ExecContext, PayloadSource, Source,
 } from "../types";
 import { RuntimePlan } from "../domain/runtime-plan";
 import { evaluateValue } from "../core/evaluate";
@@ -122,12 +122,12 @@ class ReactionExecution {
   }
 
   private executeBranch(reaction: BranchReaction): void | Promise<void> {
-    return BranchReactionExecution.start(
-      reaction,
-      this.plan.document,
-      this.context,
-      child => this.execute(child),
-    ).execute();
+    return executeBranchReaction({
+      cases: reaction.cases,
+      plan: this.plan.document,
+      context: this.context,
+      runReaction: child => this.execute(child),
+    });
   }
 
   private async executeParallel(reaction: ParallelReaction): Promise<void> {
@@ -355,118 +355,67 @@ class MutablePayloadRoot {
   }
 }
 
-class BranchReactionExecution {
-  private constructor(
-    private readonly reaction: BranchReaction,
-    private readonly plan: Plan,
-    private readonly context: ExecutionContext,
-    private readonly executeReaction: (reaction: Reaction) => void | Promise<void>,
-  ) {}
-
-  static start(
-    reaction: BranchReaction,
-    plan: Plan,
-    context: ExecutionContext,
-    executeReaction: (reaction: Reaction) => void | Promise<void>,
-  ): BranchReactionExecution {
-    return new BranchReactionExecution(reaction, plan, context, executeReaction);
-  }
-
-  execute(): void | Promise<void> {
-    const context = {
-      cases: this.reaction.cases,
-      plan: this.plan,
-      context: this.context,
-      executeReaction: this.executeReaction,
-    };
-
-    return SequentialBranchExecution.from(context).execute();
-  }
-}
-
 interface BranchExecutionContext {
-  readonly cases: BranchCase[];
+  readonly cases: readonly BranchCase[];
   readonly plan: Plan;
   readonly context: ExecutionContext;
-  readonly executeReaction: (reaction: Reaction) => void | Promise<void>;
+  readonly runReaction: ReactionRunner;
 }
 
-class SequentialBranchExecution {
-  private constructor(private readonly context: BranchExecutionContext) {}
+function executeBranchReaction(branch: BranchExecutionContext): void | Promise<void> {
+  const branchHasNoCases = branch.cases.length === 0;
+  if (branchHasNoCases) throw new Error("[alis] branch reaction requires at least one case");
 
-  static from(context: BranchExecutionContext): SequentialBranchExecution {
-    const branchHasNoCases = context.cases.length === 0;
-    if (branchHasNoCases) throw new Error("[alis] branch reaction requires at least one case");
+  return executeBranchFrom(branch, 0);
+}
 
-    return new SequentialBranchExecution(context);
-  }
-
-  execute(): void | Promise<void> {
-    return this.executeFrom(0);
-  }
-
-  private executeFrom(startIndex: number): void | Promise<void> {
-    for (let index = startIndex; index < this.context.cases.length; index++) {
-      const branchCase = this.context.cases[index];
-      if (branchCase === undefined) {
-        throw new Error(`[alis] branch reaction case ${index} is missing`);
-      }
-
-      const guardMatches = BranchCondition.from(branchCase).matches(this.context);
-      if (guardMatches instanceof Promise) {
-        return this.executeAfterAsyncGuard(index, branchCase, guardMatches);
-      }
-
-      if (guardMatches) return this.context.executeReaction(branchCase.reaction);
+function executeBranchFrom(
+  branch: BranchExecutionContext,
+  startIndex: number,
+): void | Promise<void> {
+  for (let index = startIndex; index < branch.cases.length; index++) {
+    const branchCase = branch.cases[index];
+    if (branchCase === undefined) {
+      throw new Error(`[alis] branch reaction case ${index} is missing`);
     }
 
-    log.trace("branch.no-match", { caseCount: this.context.cases.length });
-  }
-
-  private async executeAfterAsyncGuard(
-    index: number,
-    branchCase: BranchCase,
-    guardMatches: Promise<boolean>,
-  ): Promise<void> {
-    if (await guardMatches) {
-      await waitForReaction(this.context.executeReaction(branchCase.reaction));
-      return;
+    const guardMatches = branchGuardMatches(branchCase, branch.plan, branch.context);
+    if (guardMatches instanceof Promise) {
+      return executeAfterAsyncBranchGuard(branch, index, branchCase, guardMatches);
     }
 
-    await waitForReaction(this.executeFrom(index + 1));
+    if (guardMatches) return branch.runReaction(branchCase.reaction);
   }
+
+  log.trace("branch.no-match", { caseCount: branch.cases.length });
 }
 
-abstract class BranchCondition {
-  static from(branchCase: BranchCase): BranchCondition {
-    switch (branchCase.guard.kind) {
-      case "default":
-        return DefaultBranchCondition.instance;
-      case "when":
-        return new GuardedBranchCondition(branchCase.guard.condition);
-      default:
-        return assertNever(branchCase.guard, "branch guard");
-    }
+async function executeAfterAsyncBranchGuard(
+  branch: BranchExecutionContext,
+  index: number,
+  branchCase: BranchCase,
+  guardMatches: Promise<boolean>,
+): Promise<void> {
+  if (await guardMatches) {
+    await waitForReaction(branch.runReaction(branchCase.reaction));
+    return;
   }
 
-  abstract matches(context: BranchExecutionContext): boolean | Promise<boolean>;
+  await waitForReaction(executeBranchFrom(branch, index + 1));
 }
 
-class DefaultBranchCondition extends BranchCondition {
-  static readonly instance = new DefaultBranchCondition();
-
-  matches(): boolean {
-    return true;
-  }
-}
-
-class GuardedBranchCondition extends BranchCondition {
-  constructor(private readonly condition: Condition) {
-    super();
-  }
-
-  matches(context: BranchExecutionContext): boolean | Promise<boolean> {
-    return evaluateConditionInCurrentLane(this.condition, context.plan, context.context.raw);
+function branchGuardMatches(
+  branchCase: BranchCase,
+  plan: Plan,
+  context: ExecutionContext,
+): boolean | Promise<boolean> {
+  switch (branchCase.guard.kind) {
+    case "default":
+      return true;
+    case "when":
+      return evaluateConditionInCurrentLane(branchCase.guard.condition, plan, context.raw);
+    default:
+      return assertNever(branchCase.guard, "branch guard");
   }
 }
 
