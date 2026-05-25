@@ -386,19 +386,20 @@ namespace Alis.Reactive.PlanModel
             if (typeKey == null) throw new ArgumentNullException(nameof(typeKey));
             if (contribution == null) throw new ArgumentNullException(nameof(contribution));
 
-            return contribution switch
-            {
-                ObjectTargetComponentContribution => Component.Element(
+            if (contribution == ComponentContributionIntent.ObjectTarget)
+                return Component.Element(
                     componentId.Value,
                     vendor.Value,
-                    typeKey.Value),
-                LayoutObjectComponentContribution => Component.LayoutObject(
+                    typeKey.Value);
+
+            if (contribution == ComponentContributionIntent.LayoutObject)
+                return Component.LayoutObject(
                     componentId.Value,
                     vendor.Value,
-                    typeKey.Value),
-                _ => throw new InvalidOperationException(
-                    $"Component '{componentId.Value}' cannot be created as '{contribution.Kind}' without a render-time registration.")
-            };
+                    typeKey.Value);
+
+            throw new InvalidOperationException(
+                $"Component '{componentId.Value}' cannot be created as '{contribution.Kind}' without a render-time registration.");
         }
 
         internal override Component EnrichExistingComponent(Component existing, JsType jsType)

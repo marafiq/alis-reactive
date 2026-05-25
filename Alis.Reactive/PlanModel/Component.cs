@@ -81,44 +81,28 @@ namespace Alis.Reactive.PlanModel
             new Component(_id, _vendor, _type, ComponentContributionIntent.ValidationContainer, _binding, _container.WithValidationRulesMerged(validationRules));
     }
 
-    [System.Text.Json.Serialization.JsonConverter(typeof(WriteOnlyPolymorphicConverter<ComponentContributionIntent>))]
-    public abstract class ComponentContributionIntent
+    public sealed class ComponentContributionIntent
     {
-        private protected ComponentContributionIntent() { }
+        private readonly string _kind;
+
+        private ComponentContributionIntent(string kind)
+        {
+            _kind = kind ?? throw new System.ArgumentNullException(nameof(kind));
+        }
 
         internal static ComponentContributionIntent ObjectTarget { get; } =
-            new ObjectTargetComponentContribution();
+            new ComponentContributionIntent("object-target");
 
         internal static ComponentContributionIntent OwnedDefinition { get; } =
-            new OwnedDefinitionComponentContribution();
+            new ComponentContributionIntent("owned-definition");
 
         internal static ComponentContributionIntent ValidationContainer { get; } =
-            new ValidationContainerComponentContribution();
+            new ComponentContributionIntent("validation-container");
 
         internal static ComponentContributionIntent LayoutObject { get; } =
-            new LayoutObjectComponentContribution();
+            new ComponentContributionIntent("layout-object");
 
-        public abstract string Kind { get; }
-    }
-
-    internal sealed class ObjectTargetComponentContribution : ComponentContributionIntent
-    {
-        public override string Kind => "object-target";
-    }
-
-    internal sealed class OwnedDefinitionComponentContribution : ComponentContributionIntent
-    {
-        public override string Kind => "owned-definition";
-    }
-
-    internal sealed class ValidationContainerComponentContribution : ComponentContributionIntent
-    {
-        public override string Kind => "validation-container";
-    }
-
-    internal sealed class LayoutObjectComponentContribution : ComponentContributionIntent
-    {
-        public override string Kind => "layout-object";
+        public string Kind => _kind;
     }
 
     [System.Text.Json.Serialization.JsonConverter(typeof(WriteOnlyPolymorphicConverter<ComponentBinding>))]
