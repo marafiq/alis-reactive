@@ -265,27 +265,11 @@ class ConfirmRuntimeCondition extends RuntimeCondition {
 // -- Compare evaluation --
 
 function evaluateCompare(cond: CompareCondition, plan: Plan, context: ExecutionContext): boolean {
-  return CompareEvaluation.from(cond, plan, context).evaluate();
-}
-
-class CompareEvaluation {
-  private constructor(
-    private readonly condition: CompareCondition,
-    private readonly plan: Plan,
-    private readonly context: ExecutionContext,
-  ) {}
-
-  static from(condition: CompareCondition, plan: Plan, context: ExecutionContext): CompareEvaluation {
-    return new CompareEvaluation(condition, plan, context);
-  }
-
-  evaluate(): boolean {
-    const left = ComparisonLeft.resolve(this.condition, this.plan, this.context);
-    const operation = ComparisonOperation.from(this.condition);
-    const right = ComparisonRight.resolve(this.condition, this.plan, this.context, operation);
-    log.trace("compare", { op: this.condition.op, left: left.shaped, right: right.traceValue });
-    return operation.evaluate(left, right);
-  }
+  const left = ComparisonLeft.resolve(cond, plan, context);
+  const operation = ComparisonOperation.from(cond);
+  const right = ComparisonRight.resolve(cond, plan, context, operation);
+  log.trace("compare", { op: cond.op, left: left.shaped, right: right.traceValue });
+  return operation.evaluate(left, right);
 }
 
 class ComparisonLeft {
