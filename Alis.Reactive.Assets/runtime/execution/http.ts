@@ -26,13 +26,13 @@ type HttpExchangeOutcome =
 
 /** Execute a single HTTP request with gather, before, response routing, complete, and chaining. */
 export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
-  await runHttpRequest(req, plan, RequestContext.start(ctx));
+  await runHttpRequest(req, plan, ExecutionContext.from(ctx));
 }
 
-async function runHttpRequest(request: Request, plan: Plan, context: RequestContext): Promise<void> {
+async function runHttpRequest(request: Request, plan: Plan, context: ExecutionContext): Promise<void> {
   if (!requestCanSend(request, plan, context)) return;
 
-  await runRequestReactions(request.before, plan, context.current);
+  await runRequestReactions(request.before, plan, context.asAvailable());
 
   let prepared: PreparedHttpRequest;
   try {
@@ -46,12 +46,12 @@ async function runHttpRequest(request: Request, plan: Plan, context: RequestCont
   await routeExchangeOutcome(outcome, request, plan, prepared.context);
 }
 
-function requestCanSend(request: Request, plan: Plan, context: RequestContext): boolean {
+function requestCanSend(request: Request, plan: Plan, context: ExecutionContext): boolean {
   const validation = request.validation;
   const requestRequiresClientValidation = validation.kind === "container";
   if (!requestRequiresClientValidation) return true;
 
-  const valid = validateContainer(plan, validation.container, context.current);
+  const valid = validateContainer(plan, validation.container, context.asAvailable());
   if (!valid) log.debug("validation.aborted", { id: validation.container, url: request.url });
 
   return valid;
@@ -59,13 +59,14 @@ function requestCanSend(request: Request, plan: Plan, context: RequestContext): 
 
 interface PreparedHttpRequest {
   readonly fetch: ResolvedFetch;
-  readonly context: RequestContext;
+  readonly context: ExecutionContext;
 }
 
-function prepareHttpRequest(request: Request, plan: Plan, context: RequestContext): PreparedHttpRequest {
-  const gathered = resolveGather(request.input, request.method, plan, context.current);
-  const requestContext = context.withRequest(gathered);
-  const fetch = resolveFetch(request, plan, context.current, gathered);
+function prepareHttpRequest(request: Request, plan: Plan, context: ExecutionContext): PreparedHttpRequest {
+  const currentContext = context.asAvailable();
+  const gathered = resolveGather(request.input, request.method, plan, currentContext);
+  const requestContext = context.withRequest(requestPayloadSnapshotFrom(gathered));
+  const fetch = resolveFetch(request, plan, currentContext, gathered);
 
   return { fetch, context: requestContext };
 }
@@ -73,7 +74,7 @@ function prepareHttpRequest(request: Request, plan: Plan, context: RequestContex
 async function routeClientFailure(
   request: Request,
   plan: Plan,
-  context: RequestContext,
+  context: ExecutionContext,
   error: unknown,
 ): Promise<void> {
   const outcome = exchangeOutcomeFromClientFailure(request, error);
@@ -121,7 +122,7 @@ async function routeExchangeOutcome(
   outcome: HttpExchangeOutcome,
   request: Request,
   plan: Plan,
-  context: RequestContext,
+  context: ExecutionContext,
 ): Promise<void> {
   switch (outcome.kind) {
     case "success":
@@ -191,53 +192,53 @@ function responseHandlerStatusFromPlan(value: number): number {
 async function routeSuccess(
   request: Request,
   plan: Plan,
-  context: RequestContext,
+  context: ExecutionContext,
   status: RequestOutcomeStatus,
   body: HttpResponseBody,
 ): Promise<void> {
   await routeAndComplete(request, plan, context, () =>
-    routeResponseHandlers(request.success, status, plan, context.withResponse(body).current));
+    routeResponseHandlers(request.success, status, plan, contextWithResponseBody(context, body).asAvailable()));
   await runFollowUpRequest(request.chain, plan, context);
 }
 
 async function routeError(
   request: Request,
   plan: Plan,
-  context: RequestContext,
+  context: ExecutionContext,
   status: RequestOutcomeStatus,
   body: HttpResponseBody,
 ): Promise<void> {
   await routeAndComplete(request, plan, context, () =>
-    routeResponseHandlers(request.error, status, plan, context.withResponse(body).current));
+    routeResponseHandlers(request.error, status, plan, contextWithResponseBody(context, body).asAvailable()));
 }
 
 async function routeResponseUnavailable(
   request: Request,
   plan: Plan,
-  context: RequestContext,
+  context: ExecutionContext,
   status: RequestOutcomeStatus,
 ): Promise<void> {
   await routeAndComplete(request, plan, context, () =>
-    routeResponseHandlers(request.error, status, plan, context.current));
+    routeResponseHandlers(request.error, status, plan, context.asAvailable()));
 }
 
 async function routeAndComplete(
   request: Request,
   plan: Plan,
-  context: RequestContext,
+  context: ExecutionContext,
   routeStage: () => Promise<void>,
 ): Promise<void> {
   try {
     await routeStage();
   } finally {
-    await runRequestReactions(request.complete, plan, context.current);
+    await runRequestReactions(request.complete, plan, context.asAvailable());
   }
 }
 
 async function runFollowUpRequest(
   chain: Request["chain"],
   plan: Plan,
-  context: RequestContext,
+  context: ExecutionContext,
 ): Promise<void> {
   switch (chain.kind) {
     case "terminal":
@@ -260,27 +261,11 @@ async function runRequestReactions(
   }
 }
 
-class RequestContext {
-  private constructor(private readonly context: ExecutionContext) {}
+function contextWithResponseBody(context: ExecutionContext, body: HttpResponseBody): ExecutionContext {
+  const bodyCanBeReadByReactions = body.kind === "available";
+  if (!bodyCanBeReadByReactions) return context;
 
-  get current(): ExecContext {
-    return this.context.asAvailable();
-  }
-
-  static start(context: ExecContext | undefined): RequestContext {
-    return new RequestContext(ExecutionContext.from(context));
-  }
-
-  withRequest(gathered: GatherResult): RequestContext {
-    return new RequestContext(this.context.withRequest(requestPayloadSnapshotFrom(gathered)));
-  }
-
-  withResponse(body: HttpResponseBody): RequestContext {
-    const bodyCanBeReadByReactions = body.kind === "available";
-    if (!bodyCanBeReadByReactions) return this;
-
-    return new RequestContext(this.context.withResponse(body.value));
-  }
+  return context.withResponse(body.value);
 }
 
 function requestPayloadSnapshotFrom(gathered: GatherResult): Record<string, unknown> {
@@ -370,5 +355,5 @@ export async function routeHandlers(
   plan: Plan,
   ctx?: ExecContext,
 ): Promise<void> {
-  await routeResponseHandlers(handlers, RequestOutcomeStatus.http(status), plan, RequestContext.start(ctx).current);
+  await routeResponseHandlers(handlers, RequestOutcomeStatus.http(status), plan, ExecutionContext.from(ctx).asAvailable());
 }
