@@ -1,17 +1,14 @@
 import type { Behavior, Plan } from "../types";
 import { layoutObjectKeysFrom, ValidationRuleContribution } from "./component-contribution";
-import { type PartId, PartialPlanContributionSource, type PlanId } from "./plan-contribution-source";
-
-class PartialSlotLifetime {
-  private readonly abort = new AbortController();
-
-  sourceFor(partId: PartId): PartialPlanContributionSource {
-    return new PartialPlanContributionSource(partId, this.abort);
-  }
-}
+import {
+  type PartId,
+  PartialListenerLifetime,
+  PartialPlanContributionSource,
+  type PlanId,
+} from "./plan-contribution-source";
 
 export class PartialSlotLoad {
-  private readonly lifetime = new PartialSlotLifetime();
+  private readonly listenerLifetime = PartialListenerLifetime.create();
 
   private constructor(
     readonly partId: PartId,
@@ -25,7 +22,7 @@ export class PartialSlotLoad {
   contributions(): PartialSlotContribution[] {
     return this.plans.map(plan => new PartialSlotContribution(
       this.scopedPlan(plan),
-      this.lifetime.sourceFor(this.partId),
+      new PartialPlanContributionSource(this.partId, this.listenerLifetime),
     ));
   }
 
@@ -47,7 +44,7 @@ export class PartialSlotContribution {
 interface AppliedSlotContributionSnapshot {
   readonly partId: PartId;
   readonly planId: PlanId;
-  readonly abort: AbortController;
+  readonly listenerLifetime: PartialListenerLifetime;
   readonly behaviors: Behavior[];
   readonly componentKeys: string[];
   readonly layoutObjectKeys: string[];
@@ -62,7 +59,7 @@ export class AppliedSlotContribution {
     return new AppliedSlotContribution({
       partId: source.partId,
       planId: incoming.planId,
-      abort: source.abortController,
+      listenerLifetime: source.listenerLifetime,
       behaviors: [...incoming.behaviors],
       componentKeys: Object.keys(incoming.components),
       layoutObjectKeys: layoutObjectKeysFrom(incoming),
@@ -99,8 +96,8 @@ export class AppliedSlotContribution {
     return this.snapshot.validationRuleContributions;
   }
 
-  revokeBehaviorSubscriptions(): void {
-    this.snapshot.abort.abort();
+  revokeListenerLifetime(): void {
+    this.snapshot.listenerLifetime.revoke();
   }
 }
 
@@ -120,7 +117,7 @@ export class PartialSlotRegistry {
   }
 
   reset(): void {
-    for (const slot of this.slots.values()) slot.revokeBehaviorSubscriptions();
+    for (const slot of this.slots.values()) slot.revokeListenerLifetimes();
     this.slots.clear();
   }
 
@@ -146,7 +143,7 @@ class AppliedPartialSlot {
     return [...this.appliedContributions];
   }
 
-  revokeBehaviorSubscriptions(): void {
-    for (const contribution of this.appliedContributions) contribution.revokeBehaviorSubscriptions();
+  revokeListenerLifetimes(): void {
+    for (const contribution of this.appliedContributions) contribution.revokeListenerLifetime();
   }
 }

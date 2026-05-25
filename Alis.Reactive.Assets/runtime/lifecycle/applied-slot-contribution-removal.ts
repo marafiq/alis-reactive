@@ -22,11 +22,11 @@ export class AppliedSlotContributionRemoval {
   remove(contribution: AppliedSlotContribution): void {
     const plan = this.plans.get(contribution.planId);
     if (plan === undefined) {
-      contribution.revokeBehaviorSubscriptions();
+      contribution.revokeListenerLifetime();
       return;
     }
 
-    contribution.revokeBehaviorSubscriptions();
+    contribution.revokeListenerLifetime();
     this.removeBehaviors(plan, contribution);
     const removedLayoutObjectKeys = this.removeLayoutObjects(plan, contribution);
     const removedComponentKeys = this.removeComponents(plan, contribution);

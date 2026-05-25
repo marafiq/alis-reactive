@@ -25,12 +25,30 @@ export class RootPlanContributionSource {
   private constructor() {}
 }
 
+export class PartialListenerLifetime {
+  private readonly abort = new AbortController();
+
+  static create(): PartialListenerLifetime {
+    return new PartialListenerLifetime();
+  }
+
+  private constructor() {}
+
+  get signal(): AbortSignal {
+    return this.abort.signal;
+  }
+
+  revoke(): void {
+    this.abort.abort();
+  }
+}
+
 export class PartialPlanContributionSource {
   readonly kind = "partial";
 
   constructor(
     readonly partId: PartId,
-    private readonly abort = new AbortController(),
+    readonly listenerLifetime: PartialListenerLifetime = PartialListenerLifetime.create(),
   ) {}
 
   get label(): string {
@@ -42,10 +60,6 @@ export class PartialPlanContributionSource {
   }
 
   get behaviorSignal(): AbortSignal {
-    return this.abort.signal;
-  }
-
-  get abortController(): AbortController {
-    return this.abort;
+    return this.listenerLifetime.signal;
   }
 }
