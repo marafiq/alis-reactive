@@ -157,8 +157,9 @@ namespace Alis.Reactive.Builders.Conditions
 
         private GuardBuilder<TModel> Build(CompareOperator op, ConditionOperand operand)
         {
-            var comparisonSource = ConditionComparisonSource.From(_typedSource.ToValueProducer(), _shape);
-            var condition = Condition.Compare(op, operand.ToComparisonOperands(comparisonSource));
+            var condition = Condition.Compare(
+                op,
+                operand.ToComparisonOperands(_typedSource.ToValueProducer(), _shape));
             return ComposeAndWrap(condition);
         }
 
@@ -203,13 +204,13 @@ namespace Alis.Reactive.Builders.Conditions
         internal static ConditionOperand InclusiveRange<T>(T low, T high) =>
             new InclusiveRangeConditionOperand<T>(low, high);
 
-        internal abstract ComparisonOperands ToComparisonOperands(ConditionComparisonSource source);
+        internal abstract ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape);
 
         private sealed class UnaryConditionOperand : ConditionOperand
         {
-            internal override ComparisonOperands ToComparisonOperands(ConditionComparisonSource source)
+            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
             {
-                return ComparisonOperands.Unary(source.Producer, source.Shape);
+                return ComparisonOperands.Unary(left, leftShape);
             }
         }
 
@@ -224,17 +225,17 @@ namespace Alis.Reactive.Builders.Conditions
                 _shape = shape ?? throw new System.ArgumentNullException(nameof(shape));
             }
 
-            internal override ComparisonOperands ToComparisonOperands(ConditionComparisonSource source)
+            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
             {
-                var literalShape = ShapeOrSourceShape(source.Shape);
+                var literalShape = ShapeOrLeftShape(leftShape);
                 return ComparisonOperands.Binary(
-                    source.Producer,
+                    left,
                     ValueProducer.LiteralRaw(_value, literalShape),
-                    source.Shape);
+                    leftShape);
             }
 
-            private Shape ShapeOrSourceShape(Shape sourceShape) =>
-                _shape.IsNone ? sourceShape : _shape;
+            private Shape ShapeOrLeftShape(Shape leftShape) =>
+                _shape.IsNone ? leftShape : _shape;
         }
 
         private sealed class ArrayConditionOperand : ConditionOperand
@@ -246,16 +247,16 @@ namespace Alis.Reactive.Builders.Conditions
                 _values = values ?? throw new System.ArgumentNullException(nameof(values));
             }
 
-            internal override ComparisonOperands ToComparisonOperands(ConditionComparisonSource source)
+            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
             {
                 var items = new System.Collections.Generic.List<ValueProducer>();
                 foreach (var item in _values)
-                    items.Add(ValueProducer.LiteralRaw(item, source.Shape));
+                    items.Add(ValueProducer.LiteralRaw(item, leftShape));
 
                 return ComparisonOperands.Binary(
-                    source.Producer,
-                    ValueProducer.Array(items, ConditionCollectionShape.FromItemShape(source.Shape)),
-                    source.Shape);
+                    left,
+                    ValueProducer.Array(items, ConditionCollectionShape.FromItemShape(leftShape)),
+                    leftShape);
             }
         }
 
@@ -268,9 +269,9 @@ namespace Alis.Reactive.Builders.Conditions
                 _value = value ?? throw new System.ArgumentNullException(nameof(value));
             }
 
-            internal override ComparisonOperands ToComparisonOperands(ConditionComparisonSource source)
+            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
             {
-                return ComparisonOperands.Binary(source.Producer, _value, source.Shape);
+                return ComparisonOperands.Binary(left, _value, leftShape);
             }
         }
 
@@ -285,10 +286,10 @@ namespace Alis.Reactive.Builders.Conditions
                 _itemShape = itemShape ?? throw new System.ArgumentNullException(nameof(itemShape));
             }
 
-            internal override ComparisonOperands ToComparisonOperands(ConditionComparisonSource source)
+            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
             {
                 var right = ValueProducer.LiteralRaw(_item, _itemShape);
-                return ComparisonOperands.CollectionItem(source.Producer, right, source.Shape, _itemShape);
+                return ComparisonOperands.CollectionItem(left, right, leftShape, _itemShape);
             }
         }
 
@@ -303,18 +304,18 @@ namespace Alis.Reactive.Builders.Conditions
                 _high = high;
             }
 
-            internal override ComparisonOperands ToComparisonOperands(ConditionComparisonSource source)
+            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
             {
                 var endpoints = new System.Collections.Generic.List<ValueProducer>
                 {
-                    ValueProducer.LiteralRaw(_low, source.Shape),
-                    ValueProducer.LiteralRaw(_high, source.Shape)
+                    ValueProducer.LiteralRaw(_low, leftShape),
+                    ValueProducer.LiteralRaw(_high, leftShape)
                 };
 
                 return ComparisonOperands.Binary(
-                    source.Producer,
-                    ValueProducer.Array(endpoints, ConditionCollectionShape.FromItemShape(source.Shape)),
-                    source.Shape);
+                    left,
+                    ValueProducer.Array(endpoints, ConditionCollectionShape.FromItemShape(leftShape)),
+                    leftShape);
             }
         }
     }
@@ -330,19 +331,4 @@ namespace Alis.Reactive.Builders.Conditions
         }
     }
 
-    internal sealed class ConditionComparisonSource
-    {
-        private ConditionComparisonSource(ValueProducer producer, Shape shape)
-        {
-            Producer = producer ?? throw new System.ArgumentNullException(nameof(producer));
-            Shape = shape ?? throw new System.ArgumentNullException(nameof(shape));
-        }
-
-        internal ValueProducer Producer { get; }
-
-        internal Shape Shape { get; }
-
-        internal static ConditionComparisonSource From(ValueProducer producer, Shape shape) =>
-            new ConditionComparisonSource(producer, shape);
-    }
 }
