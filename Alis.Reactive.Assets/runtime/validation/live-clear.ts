@@ -57,12 +57,10 @@ function wireField(field: LiveFieldWire): void {
   const changeEventWasAdded = wireComponentChangeEvent(field, events);
 
   if (domEventsWereAdded || changeEventWasAdded) {
-    LiveFieldWireFootprint
-      .for(field.component.id, {
-        domEvents: domEventsWereAdded,
-        componentChangeEvent: changeEventWasAdded,
-      })
-      .forgetOnAbort(field.signal, wiredFields);
+    forgetWiredFieldOnAbort(field.component.id, field.signal, {
+      domEvents: domEventsWereAdded,
+      componentChangeEvent: changeEventWasAdded,
+    });
   }
 }
 
@@ -181,22 +179,13 @@ interface LiveFieldWireKinds {
   readonly componentChangeEvent: boolean;
 }
 
-class LiveFieldWireFootprint {
-  private constructor(
-    private readonly componentDomId: string,
-    private readonly kinds: LiveFieldWireKinds,
-  ) {}
-
-  static for(componentDomId: string, kinds: LiveFieldWireKinds): LiveFieldWireFootprint {
-    return new LiveFieldWireFootprint(componentDomId, kinds);
-  }
-
-  forgetOnAbort(signal: AbortSignal | undefined, registry: LiveValidationWireRegistry): void {
-    signal?.addEventListener("abort", () => this.forgetFrom(registry), { once: true });
-  }
-
-  private forgetFrom(registry: LiveValidationWireRegistry): void {
-    if (this.kinds.domEvents) registry.forgetDomEvents(this.componentDomId);
-    if (this.kinds.componentChangeEvent) registry.forgetComponentChangeEvent(this.componentDomId);
-  }
+function forgetWiredFieldOnAbort(
+  componentDomId: string,
+  signal: AbortSignal | undefined,
+  kinds: LiveFieldWireKinds,
+): void {
+  signal?.addEventListener("abort", () => {
+    if (kinds.domEvents) wiredFields.forgetDomEvents(componentDomId);
+    if (kinds.componentChangeEvent) wiredFields.forgetComponentChangeEvent(componentDomId);
+  }, { once: true });
 }
