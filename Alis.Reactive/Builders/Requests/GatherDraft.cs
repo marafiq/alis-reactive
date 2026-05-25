@@ -77,12 +77,12 @@ namespace Alis.Reactive.Builders.Requests
             _routeParameterFields[name.Value] = value;
         }
 
-        internal SupplementalRequestFields ToSupplementalFields()
+        internal SupplementalGatherPayload ToSupplementalPayload()
         {
             var hasNoSupplementalFields = _supplementalFields.Count == 0;
-            if (hasNoSupplementalFields) return SupplementalRequestFields.Empty;
+            if (hasNoSupplementalFields) return SupplementalGatherPayload.Empty;
 
-            return SupplementalRequestFields.From(CopySupplementalFields());
+            return SupplementalGatherPayload.From(CopySupplementalFields());
         }
 
         internal IReadOnlyDictionary<string, ValueProducer> HeadersForRequest()

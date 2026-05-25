@@ -269,6 +269,24 @@ TypeScript.
   still fall back to model metadata, but typed projection sources should carry
   shape evidence.
 
+### Gather Terms
+
+- **Declared Gather Field**: a developer-authored payload path with a
+  `ValueProducer`. Explicit component includes, URL reads, plugin results, and
+  typed sources enter the request through this term.
+- **Build-Time Registered Input Field**: an `IncludeAll()` field expanded from
+  components already registered while the C# plan is rendered. It is separated
+  from declared fields so the plan preserves why the field exists.
+- **Supplemental Gather Payload**: static and event-derived payload fields that
+  can either become a standalone request body or travel inside a `GatherInput`
+  when declared/runtime registered inputs also participate.
+- **Runtime Registered Input Expansion**: the remaining `IncludeAll()` policy
+  executed against the current runtime plan so browser-loaded partial inputs
+  load and unload deterministically.
+- **Gather Payload Claim**: the reservation of a payload path and selected
+  component read. Claims ensure declared and supplemental fields win over
+  build-time or runtime `IncludeAll()` expansion.
+
 ### Plugin Terms
 
 - **Plugin Member Declaration**: the authoring-time claim that a plugin object
