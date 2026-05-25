@@ -7,20 +7,20 @@ type BrowserPluginFunction = (...args: unknown[]) => unknown;
 export type BrowserPluginRoot = object | BrowserPluginFunction;
 
 export class BrowserPluginCatalog {
-  private readonly plugins = new Map<string, BrowserPluginInstance>();
+  private readonly plugins = new Map<string, BrowserPluginRoot>();
 
   register(name: string, instance: unknown): void {
-    const pluginName = BrowserPluginName.from(name);
-    const pluginInstance = BrowserPluginInstance.from(pluginName, instance);
-    if (this.plugins.has(pluginName.value)) throw new Error(`[alis] plugin "${pluginName.value}" already registered`);
-    this.plugins.set(pluginName.value, pluginInstance);
+    assertPluginName(name);
+    const plugin = requireBrowserPlugin(name, instance);
+    if (this.plugins.has(name)) throw new Error(`[alis] plugin "${name}" already registered`);
+    this.plugins.set(name, plugin);
   }
 
   resolve(name: string): BrowserPluginRoot {
-    const pluginName = BrowserPluginName.from(name);
-    const instance = this.plugins.get(pluginName.value);
-    if (!instance) throw new Error(`[alis] plugin not found: "${pluginName.value}"`);
-    return instance.root;
+    assertPluginName(name);
+    const plugin = this.plugins.get(name);
+    if (!plugin) throw new Error(`[alis] plugin not found: "${name}"`);
+    return plugin;
   }
 
   clear(): void {
@@ -42,41 +42,28 @@ export function resetPluginRegistryForTests(): void {
   browserPlugins.clear();
 }
 
-class BrowserPluginName {
-  private constructor(readonly value: string) {}
+function assertPluginName(name: string): void {
+  const pluginNameWasProvided = name.length > 0;
+  const pluginNameHasText = name.trim().length > 0;
+  const pluginNameIsValid = pluginNameWasProvided && pluginNameHasText;
+  if (!pluginNameIsValid) throw new Error("[alis] plugin name must not be empty or whitespace");
 
-  static from(name: unknown): BrowserPluginName {
-    const pluginNameIsString = typeof name === "string";
-    if (!pluginNameIsString) throw new Error("[alis] plugin name must be a string");
-
-    const pluginNameWasProvided = name.length > 0;
-    const pluginNameHasText = name.trim().length > 0;
-    const pluginNameIsValid = pluginNameWasProvided && pluginNameHasText;
-    if (!pluginNameIsValid) throw new Error("[alis] plugin name must not be empty or whitespace");
-
-    const pluginNameContainsWhitespace = /\s/.test(name);
-    if (pluginNameContainsWhitespace) throw new Error("[alis] plugin name must not contain whitespace");
-
-    return new BrowserPluginName(name);
-  }
+  const pluginNameContainsWhitespace = /\s/.test(name);
+  if (pluginNameContainsWhitespace) throw new Error("[alis] plugin name must not contain whitespace");
 }
 
-class BrowserPluginInstance {
-  private constructor(readonly root: BrowserPluginRoot) {}
-
-  static from(name: BrowserPluginName, instance: unknown): BrowserPluginInstance {
-    const implementationWasProvided = instance !== null && instance !== undefined;
-    if (!implementationWasProvided) {
-      throw new Error(`[alis] plugin "${name.value}" instance must not be null`);
-    }
-
-    const implementationIsObject = typeof instance === "object";
-    const implementationIsFunction = typeof instance === "function";
-    const implementationCanExposeMembers = implementationIsObject || implementationIsFunction;
-    if (!implementationCanExposeMembers) {
-      throw new Error(`[alis] plugin "${name.value}" must be an object or function`);
-    }
-
-    return new BrowserPluginInstance(instance as BrowserPluginRoot);
+function requireBrowserPlugin(name: string, instance: unknown): BrowserPluginRoot {
+  const implementationWasProvided = instance !== null && instance !== undefined;
+  if (!implementationWasProvided) {
+    throw new Error(`[alis] plugin "${name}" instance must not be null`);
   }
+
+  const implementationIsObject = typeof instance === "object";
+  const implementationIsFunction = typeof instance === "function";
+  const implementationCanExposeMembers = implementationIsObject || implementationIsFunction;
+  if (!implementationCanExposeMembers) {
+    throw new Error(`[alis] plugin "${name}" must be an object or function`);
+  }
+
+  return instance as BrowserPluginRoot;
 }

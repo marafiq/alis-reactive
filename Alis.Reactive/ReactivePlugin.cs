@@ -149,7 +149,7 @@ namespace Alis.Reactive
 
     internal sealed class PluginMemberDeclarations
     {
-        private readonly List<PluginOperationDeclaration> _operations = new List<PluginOperationDeclaration>();
+        private readonly List<Func<PluginOperationContract>> _operations = new List<Func<PluginOperationContract>>();
         private readonly List<PluginPropertyContract> _properties = new List<PluginPropertyContract>();
         private readonly HashSet<MemberName> _memberNames = new HashSet<MemberName>();
 
@@ -160,7 +160,7 @@ namespace Alis.Reactive
             EnsurePluginMatches(pluginName, operation.OperationId.PluginName, operation.Label);
             DeclareMember(pluginName, operation.MemberName, operation.Label);
 
-            _operations.Add(PluginOperationDeclaration.Live(operation));
+            _operations.Add(operation.ToContract);
         }
 
         internal void Add(PluginName pluginName, PluginOperationContract operation)
@@ -170,7 +170,7 @@ namespace Alis.Reactive
             EnsurePluginMatches(pluginName, operation.PluginName, operation.Label);
             DeclareMember(pluginName, operation.PlanMethodName, operation.Label);
 
-            _operations.Add(PluginOperationDeclaration.Contract(operation));
+            _operations.Add(() => operation);
         }
 
         internal void Add<TValue>(PluginName pluginName, PluginProperty<TValue> property)
@@ -203,7 +203,7 @@ namespace Alis.Reactive
         {
             var contracts = new List<PluginOperationContract>(_operations.Count);
             foreach (var operation in _operations)
-                contracts.Add(operation.ToContract());
+                contracts.Add(operation());
             return contracts;
         }
 
@@ -241,50 +241,6 @@ namespace Alis.Reactive
         }
     }
 
-    internal abstract class PluginOperationDeclaration
-    {
-        private protected PluginOperationDeclaration() { }
-
-        internal static PluginOperationDeclaration Live(PluginOperation operation)
-        {
-            if (operation == null) throw new ArgumentNullException(nameof(operation));
-            return new LivePluginOperationDeclaration(operation);
-        }
-
-        internal static PluginOperationDeclaration Contract(PluginOperationContract contract)
-        {
-            if (contract == null) throw new ArgumentNullException(nameof(contract));
-            return new ContractPluginOperationDeclaration(contract);
-        }
-
-        internal abstract PluginOperationContract ToContract();
-
-        private sealed class LivePluginOperationDeclaration : PluginOperationDeclaration
-        {
-            private readonly PluginOperation _operation;
-
-            internal LivePluginOperationDeclaration(PluginOperation operation)
-            {
-                _operation = operation ?? throw new ArgumentNullException(nameof(operation));
-            }
-
-            internal override PluginOperationContract ToContract() =>
-                _operation.ToContract();
-        }
-
-        private sealed class ContractPluginOperationDeclaration : PluginOperationDeclaration
-        {
-            private readonly PluginOperationContract _contract;
-
-            internal ContractPluginOperationDeclaration(PluginOperationContract contract)
-            {
-                _contract = contract ?? throw new ArgumentNullException(nameof(contract));
-            }
-
-            internal override PluginOperationContract ToContract() => _contract;
-        }
-    }
-
     /// <summary>Base descriptor for a declared plugin function.</summary>
     public abstract class PluginOperation
     {
@@ -319,7 +275,6 @@ namespace Alis.Reactive
         internal PluginOperationId OperationId => _operation;
         internal string Label => _operation.Label;
         internal MemberName MemberName => _operation.PlanMethodName;
-        internal Shape Returns => _returns;
         internal MethodArgumentContract ArgumentContract => MethodArgumentContract.Exact(_args);
         internal MethodSignature Signature => MethodSignature.Exact(_args, _returns);
 

@@ -20,7 +20,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Declares a method that returns a typed value. Shape inferred from T.</summary>
         public PluginTypeBuilder Method<T>(string name)
         {
-            return AddMethod<T>(name, PluginMethodArguments.Open);
+            return AddMethod<T>(name, MethodArgumentContract.Open);
         }
 
         /// <summary>Declares a readable plugin object property.</summary>
@@ -38,13 +38,13 @@ namespace Alis.Reactive.Builders
         {
             return AddMethod<TReturn>(
                 name,
-                PluginMethodArguments.From(arguments));
+                ExactArguments(arguments));
         }
 
         /// <summary>Declares the plugin root function as returning a typed value.</summary>
         public PluginTypeBuilder Function<T>()
         {
-            return AddMethod<T>(PluginOperationId.Root(_pluginName), PluginMethodArguments.Open);
+            return AddMethod<T>(PluginOperationId.Root(_pluginName), MethodArgumentContract.Open);
         }
 
         /// <summary>Declares the plugin root function with an exact argument contract.</summary>
@@ -52,7 +52,7 @@ namespace Alis.Reactive.Builders
         {
             return AddMethod<TReturn>(
                 PluginOperationId.Root(_pluginName),
-                PluginMethodArguments.From(arguments));
+                ExactArguments(arguments));
         }
 
         /// <summary>Declares the plugin root function with one typed JavaScript argument.</summary>
@@ -60,7 +60,7 @@ namespace Alis.Reactive.Builders
         {
             return AddMethod<TReturn>(
                 PluginOperationId.Root(_pluginName),
-                PluginMethodArguments.Exact(Shape.FromClrType(typeof(TArg1))));
+                ExactArguments(Shape.FromClrType(typeof(TArg1))));
         }
 
         /// <summary>Declares the plugin root function with two typed JavaScript arguments.</summary>
@@ -68,7 +68,7 @@ namespace Alis.Reactive.Builders
         {
             return AddMethod<TReturn>(
                 PluginOperationId.Root(_pluginName),
-                PluginMethodArguments.Exact(
+                ExactArguments(
                     Shape.FromClrType(typeof(TArg1)),
                     Shape.FromClrType(typeof(TArg2))));
         }
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Builders
         {
             return AddMethod<TReturn>(
                 PluginOperationId.Root(_pluginName),
-                PluginMethodArguments.Exact(
+                ExactArguments(
                     Shape.FromClrType(typeof(TArg1)),
                     Shape.FromClrType(typeof(TArg2)),
                     Shape.FromClrType(typeof(TArg3))));
@@ -89,7 +89,7 @@ namespace Alis.Reactive.Builders
         {
             return AddMethod<TReturn>(
                 name,
-                PluginMethodArguments.Exact(Shape.FromClrType(typeof(TArg1))));
+                ExactArguments(Shape.FromClrType(typeof(TArg1))));
         }
 
         /// <summary>Declares a method with two typed JavaScript arguments.</summary>
@@ -97,7 +97,7 @@ namespace Alis.Reactive.Builders
         {
             return AddMethod<TReturn>(
                 name,
-                PluginMethodArguments.Exact(
+                ExactArguments(
                     Shape.FromClrType(typeof(TArg1)),
                     Shape.FromClrType(typeof(TArg2))));
         }
@@ -107,7 +107,7 @@ namespace Alis.Reactive.Builders
         {
             return AddMethod<TReturn>(
                 name,
-                PluginMethodArguments.Exact(
+                ExactArguments(
                     Shape.FromClrType(typeof(TArg1)),
                     Shape.FromClrType(typeof(TArg2)),
                     Shape.FromClrType(typeof(TArg3))));
@@ -116,7 +116,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Declares a void method (no return value).</summary>
         public PluginTypeBuilder Void(string name)
         {
-            return AddVoid(name, PluginMethodArguments.Open);
+            return AddVoid(name, MethodArgumentContract.Open);
         }
 
         /// <summary>Declares a void method with an exact argument contract.</summary>
@@ -124,13 +124,13 @@ namespace Alis.Reactive.Builders
         {
             return AddVoid(
                 name,
-                PluginMethodArguments.From(arguments));
+                ExactArguments(arguments));
         }
 
         /// <summary>Declares the plugin root function as a void command.</summary>
         public PluginTypeBuilder Void()
         {
-            return AddVoid(PluginOperationId.Root(_pluginName), PluginMethodArguments.Open);
+            return AddVoid(PluginOperationId.Root(_pluginName), MethodArgumentContract.Open);
         }
 
         /// <summary>Declares the plugin root command with an exact argument contract.</summary>
@@ -138,7 +138,7 @@ namespace Alis.Reactive.Builders
         {
             return AddVoid(
                 PluginOperationId.Root(_pluginName),
-                PluginMethodArguments.From(arguments));
+                ExactArguments(arguments));
         }
 
         /// <summary>Declares the plugin root command with one typed JavaScript argument.</summary>
@@ -146,7 +146,7 @@ namespace Alis.Reactive.Builders
         {
             return AddVoid(
                 PluginOperationId.Root(_pluginName),
-                PluginMethodArguments.Exact(Shape.FromClrType(typeof(TArg1))));
+                ExactArguments(Shape.FromClrType(typeof(TArg1))));
         }
 
         /// <summary>Declares the plugin root command with two typed JavaScript arguments.</summary>
@@ -154,7 +154,7 @@ namespace Alis.Reactive.Builders
         {
             return AddVoid(
                 PluginOperationId.Root(_pluginName),
-                PluginMethodArguments.Exact(
+                ExactArguments(
                     Shape.FromClrType(typeof(TArg1)),
                     Shape.FromClrType(typeof(TArg2))));
         }
@@ -164,7 +164,7 @@ namespace Alis.Reactive.Builders
         {
             return AddVoid(
                 PluginOperationId.Root(_pluginName),
-                PluginMethodArguments.Exact(
+                ExactArguments(
                     Shape.FromClrType(typeof(TArg1)),
                     Shape.FromClrType(typeof(TArg2)),
                     Shape.FromClrType(typeof(TArg3))));
@@ -175,7 +175,7 @@ namespace Alis.Reactive.Builders
         {
             return AddVoid(
                 name,
-                PluginMethodArguments.Exact(Shape.FromClrType(typeof(TArg1))));
+                ExactArguments(Shape.FromClrType(typeof(TArg1))));
         }
 
         /// <summary>Declares a void method with two typed JavaScript arguments.</summary>
@@ -183,7 +183,7 @@ namespace Alis.Reactive.Builders
         {
             return AddVoid(
                 name,
-                PluginMethodArguments.Exact(
+                ExactArguments(
                     Shape.FromClrType(typeof(TArg1)),
                     Shape.FromClrType(typeof(TArg2))));
         }
@@ -193,7 +193,7 @@ namespace Alis.Reactive.Builders
         {
             return AddVoid(
                 name,
-                PluginMethodArguments.Exact(
+                ExactArguments(
                     Shape.FromClrType(typeof(TArg1)),
                     Shape.FromClrType(typeof(TArg2)),
                     Shape.FromClrType(typeof(TArg3))));
@@ -201,40 +201,40 @@ namespace Alis.Reactive.Builders
 
         internal PluginContract Build() => _members.ToContract(_pluginName);
 
-        private PluginTypeBuilder AddMethod<TReturn>(string name, PluginMethodArguments args)
+        private PluginTypeBuilder AddMethod<TReturn>(string name, MethodArgumentContract arguments)
         {
             EnsureName(name);
             return AddMethod<TReturn>(
                 PluginOperationId.Of(_pluginName, MemberName.Of(name)),
-                args);
+                arguments);
         }
 
-        private PluginTypeBuilder AddMethod<TReturn>(PluginOperationId operation, PluginMethodArguments args)
+        private PluginTypeBuilder AddMethod<TReturn>(PluginOperationId operation, MethodArgumentContract arguments)
         {
             if (operation == null) throw new System.ArgumentNullException(nameof(operation));
-            if (args == null) throw new System.ArgumentNullException(nameof(args));
+            if (arguments == null) throw new System.ArgumentNullException(nameof(arguments));
             var returns = Shape.FromClrType(typeof(TReturn));
             _members.Add(_pluginName, PluginOperationContract.Create(
                 operation,
-                args.SignatureFor(returns)));
+                MethodSignature.WithArguments(arguments, returns)));
             return this;
         }
 
-        private PluginTypeBuilder AddVoid(string name, PluginMethodArguments args)
+        private PluginTypeBuilder AddVoid(string name, MethodArgumentContract arguments)
         {
             EnsureName(name);
             return AddVoid(
                 PluginOperationId.Of(_pluginName, MemberName.Of(name)),
-                args);
+                arguments);
         }
 
-        private PluginTypeBuilder AddVoid(PluginOperationId operation, PluginMethodArguments args)
+        private PluginTypeBuilder AddVoid(PluginOperationId operation, MethodArgumentContract arguments)
         {
             if (operation == null) throw new System.ArgumentNullException(nameof(operation));
-            if (args == null) throw new System.ArgumentNullException(nameof(args));
+            if (arguments == null) throw new System.ArgumentNullException(nameof(arguments));
             _members.Add(_pluginName, PluginOperationContract.Create(
                 operation,
-                args.SignatureFor(Shape.None)));
+                MethodSignature.WithArguments(arguments, Shape.None)));
             return this;
         }
 
@@ -244,64 +244,19 @@ namespace Alis.Reactive.Builders
                 throw new System.ArgumentException("Method name required.", nameof(name));
         }
 
-    }
-
-    internal abstract class PluginMethodArguments
-    {
-        internal static PluginMethodArguments Open { get; } =
-            new OpenPluginMethodArguments();
-
-        internal static PluginMethodArguments From(Action<PluginArgumentTypes> configure)
+        private static MethodArgumentContract ExactArguments(Action<PluginArgumentTypes> configure)
         {
             if (configure == null) throw new System.ArgumentNullException(nameof(configure));
             var builder = new PluginArgumentTypes();
             configure(builder);
-            return Exact(builder.Shapes);
+            return MethodArgumentContract.Exact(builder.Shapes);
         }
 
-        internal static PluginMethodArguments Exact(params Shape[] args)
+        private static MethodArgumentContract ExactArguments(params Shape[] args)
         {
             if (args == null) throw new System.ArgumentNullException(nameof(args));
-            return new ExactPluginMethodArguments(args);
+            return MethodArgumentContract.Exact(args);
         }
-
-        internal static PluginMethodArguments Exact(System.Collections.Generic.IEnumerable<Shape> args)
-        {
-            if (args == null) throw new System.ArgumentNullException(nameof(args));
-            return new ExactPluginMethodArguments(args);
-        }
-
-        internal abstract MethodSignature SignatureFor(Shape returns);
-    }
-
-    internal sealed class OpenPluginMethodArguments : PluginMethodArguments
-    {
-        internal override MethodSignature SignatureFor(Shape returns) =>
-            MethodSignature.Open(returns);
-    }
-
-    internal sealed class ExactPluginMethodArguments : PluginMethodArguments
-    {
-        private readonly System.Collections.Generic.IReadOnlyList<Shape> _args;
-
-        internal ExactPluginMethodArguments(System.Collections.Generic.IEnumerable<Shape> args)
-        {
-            if (args == null) throw new System.ArgumentNullException(nameof(args));
-
-            var snapshot = new System.Collections.Generic.List<Shape>();
-            foreach (var arg in args)
-            {
-                if (arg == null)
-                    throw new System.ArgumentException("Plugin method argument shape must not be null.", nameof(args));
-
-                snapshot.Add(arg);
-            }
-
-            _args = snapshot;
-        }
-
-        internal override MethodSignature SignatureFor(Shape returns) =>
-            MethodSignature.Exact(_args, returns);
     }
 
     /// <summary>Builds an exact plugin argument contract without imposing an arity limit.</summary>
