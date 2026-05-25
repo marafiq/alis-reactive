@@ -106,18 +106,18 @@ class ReactionExecution {
 
   private executeSequence(reaction: SequenceReaction): void | Promise<void> {
     for (const [index, step] of reaction.steps.entries()) {
-      const completion = ReactionCompletion.from(this.execute(step));
-      if (completion.isAsync) {
+      const result = this.execute(step);
+      if (reactionContinuesAsync(result)) {
         const remaining = reaction.steps.slice(index + 1);
-        return completion.thenRun(() => this.executeRemainingSequence(remaining));
+        return result.then(() => this.executeRemainingSequence(remaining));
       }
     }
   }
 
   private async executeRemainingSequence(steps: readonly Reaction[]): Promise<void> {
     for (const step of steps) {
-      const completion = ReactionCompletion.from(this.execute(step));
-      if (completion.isAsync) await completion.wait();
+      const result = this.execute(step);
+      if (reactionContinuesAsync(result)) await result;
     }
   }
 
@@ -213,7 +213,7 @@ class ParallelStepSettlements {
     runReaction: ReactionRunner,
   ): Promise<ParallelStepSettlements> {
     const results = await Promise.allSettled(
-      steps.map(step => ReactionCompletion.from(runReaction(step)).asPromise())
+      steps.map(step => reactionAsPromise(runReaction(step)))
     );
     return new ParallelStepSettlements(results);
   }
@@ -260,7 +260,7 @@ class SettledParallelCompletionExecution extends ParallelCompletionExecution {
   }
 
   async run(): Promise<void> {
-    await ReactionCompletion.from(this.runReaction(this.reaction)).wait();
+    await waitForReaction(this.runReaction(this.reaction));
   }
 }
 
@@ -323,67 +323,23 @@ function payloadTarget(
   return MutablePayloadObject.require(root, source, operation);
 }
 
-export abstract class ReactionCompletion {
-  static from(result: void | Promise<void>): ReactionCompletion {
-    const reactionContinuesAsync = result instanceof Promise;
-    if (reactionContinuesAsync) return new AsyncReactionCompletion(result);
-
-    return SyncReactionCompletion.instance;
-  }
-
-  abstract get isAsync(): boolean;
-
-  abstract asPromise(): Promise<void>;
-
-  abstract wait(): Promise<void>;
-
-  abstract catchAsync(onRejected: (error: unknown) => void): void;
-
-  thenRun(next: () => Promise<void>): Promise<void> {
-    return this.asPromise().then(next);
-  }
+export function catchAsyncReactionFailure(
+  result: void | Promise<void>,
+  onRejected: (error: unknown) => void,
+): void {
+  if (reactionContinuesAsync(result)) result.catch(onRejected);
 }
 
-class SyncReactionCompletion extends ReactionCompletion {
-  static readonly instance = new SyncReactionCompletion();
-
-  get isAsync(): boolean {
-    return false;
-  }
-
-  asPromise(): Promise<void> {
-    return Promise.resolve();
-  }
-
-  async wait(): Promise<void> {
-    return;
-  }
-
-  catchAsync(): void {
-    return;
-  }
+function reactionContinuesAsync(result: void | Promise<void>): result is Promise<void> {
+  return result instanceof Promise;
 }
 
-class AsyncReactionCompletion extends ReactionCompletion {
-  constructor(private readonly pending: Promise<void>) {
-    super();
-  }
+function reactionAsPromise(result: void | Promise<void>): Promise<void> {
+  return reactionContinuesAsync(result) ? result : Promise.resolve();
+}
 
-  get isAsync(): boolean {
-    return true;
-  }
-
-  asPromise(): Promise<void> {
-    return this.pending;
-  }
-
-  async wait(): Promise<void> {
-    await this.pending;
-  }
-
-  catchAsync(onRejected: (error: unknown) => void): void {
-    this.pending.catch(onRejected);
-  }
+async function waitForReaction(result: void | Promise<void>): Promise<void> {
+  if (reactionContinuesAsync(result)) await result;
 }
 
 class DispatchPayload {
@@ -513,11 +469,11 @@ class SequentialBranchExecution {
     guardMatches: Promise<boolean>,
   ): Promise<void> {
     if (await guardMatches) {
-      await ReactionCompletion.from(this.context.executeReaction(branchCase.reaction)).wait();
+      await waitForReaction(this.context.executeReaction(branchCase.reaction));
       return;
     }
 
-    await ReactionCompletion.from(this.executeFrom(index + 1)).wait();
+    await waitForReaction(this.executeFrom(index + 1));
   }
 }
 

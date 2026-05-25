@@ -3,7 +3,7 @@
 
 import * as signalR from "@microsoft/signalr";
 import type { SignalRTrigger, Reaction, Plan } from "../types";
-import { executeReaction, ReactionCompletion } from "./execute";
+import { catchAsyncReactionFailure, executeReaction } from "./execute";
 import { showRetryIndicators, removeRetryIndicators } from "./retry-indicator";
 import { scope } from "../core/trace";
 import { ExecutionContext } from "../domain/execution-context";
@@ -118,9 +118,10 @@ export function wireSignalR(
   const handler = (...args: unknown[]) => {
     const evt = SignalRInvocationPayload.from(args, trigger);
     log.debug("method.received", { hubUrl: trigger.hubUrl, method: trigger.method });
-    ReactionCompletion
-      .from(executeReaction(reaction, plan, ExecutionContext.event(evt).raw))
-      .catchAsync(err => log.error("reaction.failed", { hubUrl: trigger.hubUrl, method: trigger.method, error: String(err) }));
+    catchAsyncReactionFailure(
+      executeReaction(reaction, plan, ExecutionContext.event(evt).raw),
+      err => log.error("reaction.failed", { hubUrl: trigger.hubUrl, method: trigger.method, error: String(err) }),
+    );
   };
 
   connection.on(trigger.method, handler);

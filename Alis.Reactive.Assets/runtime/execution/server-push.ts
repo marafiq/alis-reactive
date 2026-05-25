@@ -2,7 +2,7 @@
 // Uses ServerPushTrigger from the plan schema.
 
 import type { ServerPushTrigger, Reaction, Plan } from "../types";
-import { executeReaction, ReactionCompletion } from "./execute";
+import { catchAsyncReactionFailure, executeReaction } from "./execute";
 import { showRetryIndicators, removeRetryIndicators } from "./retry-indicator";
 import { scope } from "../core/trace";
 import { ExecutionContext } from "../domain/execution-context";
@@ -85,9 +85,10 @@ export function wireServerPush(
   const handler = (e: MessageEvent) => {
     const evt: Record<string, unknown> = JSON.parse(e.data);
     log.debug("message.received", { url: trigger.url, event: eventName });
-    ReactionCompletion
-      .from(executeReaction(reaction, plan, ExecutionContext.event(evt).raw))
-      .catchAsync(err => log.error("reaction.failed", { url: trigger.url, event: eventName, error: String(err) }));
+    catchAsyncReactionFailure(
+      executeReaction(reaction, plan, ExecutionContext.event(evt).raw),
+      err => log.error("reaction.failed", { url: trigger.url, event: eventName, error: String(err) }),
+    );
   };
   const wiredBehavior = { trigger, reaction, plan, handler: handler as EventListener };
 

@@ -1,7 +1,7 @@
 import type { Plan, Reaction, StartsWhen } from "../types";
 import { wireEvent } from "../resolution/resolver";
 import { RuntimePlan } from "../domain/runtime-plan";
-import { executeReaction, ReactionCompletion } from "./execute";
+import { catchAsyncReactionFailure, executeReaction } from "./execute";
 import { wireServerPush } from "./server-push";
 import { wireSignalR } from "./signalr";
 import { assertNever } from "../core/assert-never";
@@ -20,9 +20,10 @@ const log = scope("trigger");
  */
 function runReaction(reaction: Reaction, plan: Plan, context: ExecutionContext, source: string): void {
   try {
-    ReactionCompletion
-      .from(executeReaction(reaction, plan, context.raw))
-      .catchAsync(err => log.error("reaction.failed", { source, sync: false, error: String(err) }));
+    catchAsyncReactionFailure(
+      executeReaction(reaction, plan, context.raw),
+      err => log.error("reaction.failed", { source, sync: false, error: String(err) }),
+    );
   } catch (err) {
     log.error("reaction.failed", { source, sync: true, error: String(err) });
   }
