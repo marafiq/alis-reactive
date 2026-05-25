@@ -9,6 +9,7 @@ import { scope } from "../core/trace";
 import { isMissingRuntimeValue } from "../domain/runtime-value";
 import { ExecutionContext } from "../domain/execution-context";
 import { HttpFetchBuilder, type ResolvedFetch } from "./http-fetch";
+import { assertNever } from "../core/assert-never";
 
 const log = scope("http");
 
@@ -47,8 +48,30 @@ class HttpRequestExecution {
     const validationGate = RequestValidationGate.for(this.request, this.plan, this.context);
     if (!validationGate.allowsSend()) return;
 
-    await RequestReactionSequence.run(this.request.before, this.plan, this.context.current);
-    await RequestDispatchAttempt.prepare(this.request, this.plan, this.context).dispatch();
+    await runRequestReactions(this.request.before, this.plan, this.context.current);
+    await this.dispatch();
+  }
+
+  private async dispatch(): Promise<void> {
+    let prepared: PreparedHttpRequest;
+    try {
+      prepared = prepareHttpRequest(this.request, this.plan, this.context);
+    } catch (err) {
+      await routeClientFailure(this.request, this.plan, this.context, err);
+      return;
+    }
+
+    const responsePlan = new HttpResponsePlan(this.request, this.plan, prepared.context);
+    const outcome = await this.exchangeOutcome(prepared.fetch);
+    await outcome.routeWith(responsePlan);
+  }
+
+  private async exchangeOutcome(fetchRequest: ResolvedFetch): Promise<HttpExchangeOutcome> {
+    try {
+      return await HttpExchange.from(this.request, fetchRequest).send();
+    } catch (err) {
+      return HttpExchangeOutcome.fromClientFailure(this.request, err);
+    }
   }
 }
 
@@ -75,73 +98,29 @@ class RequestValidationGate {
   }
 }
 
-class PreparedHttpRequest {
-  private constructor(
-    readonly fetch: ResolvedFetch,
-    readonly context: RequestContext,
-  ) {}
-
-  static from(request: Request, plan: Plan, context: RequestContext): PreparedHttpRequest {
-    const gathered = resolveGather(request.input, request.method, plan, context.current);
-    const requestContext = context.withRequest(gathered);
-    const fetch = HttpFetchBuilder
-      .for(request, plan, context.current)
-      .build(gathered);
-
-    return new PreparedHttpRequest(fetch, requestContext);
-  }
+interface PreparedHttpRequest {
+  readonly fetch: ResolvedFetch;
+  readonly context: RequestContext;
 }
 
-abstract class RequestDispatchAttempt {
-  static prepare(request: Request, plan: Plan, context: RequestContext): RequestDispatchAttempt {
-    try {
-      return new PreparedRequestDispatch(request, plan, PreparedHttpRequest.from(request, plan, context));
-    } catch (err) {
-      return new FailedRequestPreparation(request, plan, context, err);
-    }
-  }
+function prepareHttpRequest(request: Request, plan: Plan, context: RequestContext): PreparedHttpRequest {
+  const gathered = resolveGather(request.input, request.method, plan, context.current);
+  const requestContext = context.withRequest(gathered);
+  const fetch = HttpFetchBuilder
+    .for(request, plan, context.current)
+    .build(gathered);
 
-  abstract dispatch(): Promise<void>;
+  return { fetch, context: requestContext };
 }
 
-class PreparedRequestDispatch extends RequestDispatchAttempt {
-  constructor(
-    private readonly request: Request,
-    private readonly plan: Plan,
-    private readonly prepared: PreparedHttpRequest,
-  ) {
-    super();
-  }
-
-  async dispatch(): Promise<void> {
-    const responsePlan = new HttpResponsePlan(this.request, this.plan, this.prepared.context);
-    const outcome = await this.exchangeOutcome();
-    await outcome.routeWith(responsePlan);
-  }
-
-  private async exchangeOutcome(): Promise<HttpExchangeOutcome> {
-    try {
-      return await HttpExchange.from(this.request, this.prepared.fetch).send();
-    } catch (err) {
-      return HttpExchangeOutcome.fromClientFailure(this.request, err);
-    }
-  }
-}
-
-class FailedRequestPreparation extends RequestDispatchAttempt {
-  constructor(
-    private readonly request: Request,
-    private readonly plan: Plan,
-    private readonly context: RequestContext,
-    private readonly error: unknown,
-  ) {
-    super();
-  }
-
-  async dispatch(): Promise<void> {
-    const outcome = HttpExchangeOutcome.fromClientFailure(this.request, this.error);
-    await outcome.routeWith(new HttpResponsePlan(this.request, this.plan, this.context));
-  }
+async function routeClientFailure(
+  request: Request,
+  plan: Plan,
+  context: RequestContext,
+  error: unknown,
+): Promise<void> {
+  const outcome = HttpExchangeOutcome.fromClientFailure(request, error);
+  await outcome.routeWith(new HttpResponsePlan(request, plan, context));
 }
 
 class HttpExchange {
@@ -297,7 +276,7 @@ class HttpResponsePlan {
   async routeSuccess(status: RequestOutcomeStatus, body: HttpResponseBody): Promise<void> {
     await this.routeAndComplete(() =>
       this.route(this.request.success, status, this.context.withResponse(body).current));
-    await RequestFollowUp.from(this.request.chain).run(this.plan, this.context);
+    await runFollowUpRequest(this.request.chain, this.plan, this.context);
   }
 
   async routeError(status: RequestOutcomeStatus, body: HttpResponseBody): Promise<void> {
@@ -327,44 +306,33 @@ class HttpResponsePlan {
   }
 
   private async runComplete(): Promise<void> {
-    await RequestReactionSequence.run(this.request.complete, this.plan, this.context.current);
+    await runRequestReactions(this.request.complete, this.plan, this.context.current);
   }
 }
 
-abstract class RequestFollowUp {
-  static from(chain: Request["chain"]): RequestFollowUp {
-    const requestHasFollowUp = chain.kind === "follow-up";
-    if (!requestHasFollowUp) return TerminalRequest.instance;
-
-    return new ChainedRequest(chain.next);
-  }
-
-  abstract run(plan: Plan, context: RequestContext): Promise<void>;
-}
-
-class TerminalRequest extends RequestFollowUp {
-  static readonly instance = new TerminalRequest();
-
-  async run(): Promise<void> {
-    return;
+async function runFollowUpRequest(
+  chain: Request["chain"],
+  plan: Plan,
+  context: RequestContext,
+): Promise<void> {
+  switch (chain.kind) {
+    case "terminal":
+      return;
+    case "follow-up":
+      await new HttpRequestExecution(chain.next, plan, context).run();
+      return;
+    default:
+      return assertNever(chain, "request chain");
   }
 }
 
-class ChainedRequest extends RequestFollowUp {
-  constructor(private readonly next: Request) {
-    super();
-  }
-
-  async run(plan: Plan, context: RequestContext): Promise<void> {
-    await new HttpRequestExecution(this.next, plan, context).run();
-  }
-}
-
-class RequestReactionSequence {
-  static async run(reactions: readonly Reaction[], plan: Plan, context: ExecContext): Promise<void> {
-    for (const reaction of reactions) {
-      await executeReaction(reaction, plan, context);
-    }
+async function runRequestReactions(
+  reactions: readonly Reaction[],
+  plan: Plan,
+  context: ExecContext,
+): Promise<void> {
+  for (const reaction of reactions) {
+    await executeReaction(reaction, plan, context);
   }
 }
 
