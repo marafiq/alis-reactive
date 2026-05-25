@@ -164,6 +164,7 @@ namespace Alis.Reactive.Validation
         UnsupportedPeerShape,
         UnsupportedComparisonOperator,
         UnsupportedValidator,
+        AsyncValidator,
         MissingRegexExpression
     }
 }

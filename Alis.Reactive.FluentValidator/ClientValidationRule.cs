@@ -1,5 +1,4 @@
 using System;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using FluentValidation;
 using FluentValidation.Internal;
@@ -8,9 +7,6 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
 {
-    /// <summary>
-    /// FluentValidation rule extensions for declaring deterministic browser validation.
-    /// </summary>
     public static class ClientValidationRuleExtensions
     {
         public static IRuleBuilderOptions<TModel, TProperty> ProjectToClient<TModel, TProperty>(
@@ -38,171 +34,99 @@ namespace Alis.Reactive.FluentValidator
         }
     }
 
-    /// <summary>
-    /// Writes the deterministic browser-side projection for a FluentValidation rule.
-    /// </summary>
     public sealed class ClientValidationRuleWriter<TModel, TProperty>
     {
         internal ClientValidationRuleWriter() { }
 
-        public ClientValidationRule Required() =>
-            ClientValidationRule.NoOperand(
-                ValidationRuleName.Required,
-                displayName => $"'{displayName}' is required.");
-
-        public ClientValidationRule Empty() =>
-            ClientValidationRule.NoOperand(
-                ValidationRuleName.Empty,
-                displayName => $"'{displayName}' must be empty.");
+        public ClientValidationRule Required() => NoOperand(ValidationRuleName.Required, name => $"'{name}' is required.");
+        public ClientValidationRule Empty() => NoOperand(ValidationRuleName.Empty, name => $"'{name}' must be empty.");
+        public ClientValidationRule Email() => NoOperand(ValidationRuleName.Email, name => $"'{name}' must be a valid email address.");
+        public ClientValidationRule Url() => NoOperand(ValidationRuleName.Url, name => $"'{name}' must be a valid URL.");
+        public ClientValidationRule CreditCard() => NoOperand(ValidationRuleName.CreditCard, name => $"'{name}' must be a valid credit card number.");
+        public ClientValidationRule AtLeastOne() => NoOperand(ValidationRuleName.AtLeastOne, name => $"'{name}' must contain at least one value.");
+        public ClientValidationRule Min(TProperty value) => Literal(ValidationRuleName.Min, value, name => $"'{name}' must be at least {value}.");
+        public ClientValidationRule Max(TProperty value) => Literal(ValidationRuleName.Max, value, name => $"'{name}' must be at most {value}.");
+        public ClientValidationRule GreaterThan(TProperty value) => Literal(ValidationRuleName.Gt, value, name => $"'{name}' must be greater than {value}.");
+        public ClientValidationRule LessThan(TProperty value) => Literal(ValidationRuleName.Lt, value, name => $"'{name}' must be less than {value}.");
+        public ClientValidationRule EqualTo(TProperty value) => Literal(ValidationRuleName.EqualTo, value, name => $"'{name}' must equal {value}.");
+        public ClientValidationRule NotEqual(TProperty value) => Literal(ValidationRuleName.NotEqual, value, name => $"'{name}' must not equal '{value}'.");
 
         public ClientValidationRule MinLength(int length)
         {
             if (length < 0) throw new ArgumentOutOfRangeException(nameof(length), "Minimum length must not be negative.");
-            return ClientValidationRule.Literal(
-                ValidationRuleName.MinLength,
-                length,
-                Shape.None,
-                displayName => $"'{displayName}' must be at least {length} characters.");
+            return ClientValidationRule.Literal(ValidationRuleName.MinLength, length, Shape.None, name => $"'{name}' must be at least {length} characters.");
         }
 
         public ClientValidationRule MaxLength(int length)
         {
             if (length < 0) throw new ArgumentOutOfRangeException(nameof(length), "Maximum length must not be negative.");
-            return ClientValidationRule.Literal(
-                ValidationRuleName.MaxLength,
-                length,
-                Shape.None,
-                displayName => $"'{displayName}' must be at most {length} characters.");
+            return ClientValidationRule.Literal(ValidationRuleName.MaxLength, length, Shape.None, name => $"'{name}' must be at most {length} characters.");
         }
-
-        public ClientValidationRule Email() =>
-            ClientValidationRule.NoOperand(
-                ValidationRuleName.Email,
-                displayName => $"'{displayName}' must be a valid email address.");
 
         public ClientValidationRule Regex(string pattern)
         {
             if (string.IsNullOrEmpty(pattern))
                 throw new ArgumentException("A regex pattern is required for client validation projection.", nameof(pattern));
 
-            return ClientValidationRule.Literal(
-                ValidationRuleName.Regex,
-                pattern,
-                Shape.None,
-                displayName => $"'{displayName}' format is invalid.");
+            return ClientValidationRule.Literal(ValidationRuleName.Regex, pattern, Shape.None, name => $"'{name}' format is invalid.");
         }
-
-        public ClientValidationRule Url() =>
-            ClientValidationRule.NoOperand(
-                ValidationRuleName.Url,
-                displayName => $"'{displayName}' must be a valid URL.");
-
-        public ClientValidationRule CreditCard() =>
-            ClientValidationRule.NoOperand(
-                ValidationRuleName.CreditCard,
-                displayName => $"'{displayName}' must be a valid credit card number.");
 
         public ClientValidationRule Range(TProperty lowerBound, TProperty upperBound) =>
-            RangeRule(
-                ValidationRuleName.Range,
-                lowerBound,
-                upperBound,
-                displayName => $"'{displayName}' must be between {lowerBound} and {upperBound}.");
+            Range(ValidationRuleName.Range, lowerBound, upperBound, name => $"'{name}' must be between {lowerBound} and {upperBound}.");
 
         public ClientValidationRule ExclusiveRange(TProperty lowerBound, TProperty upperBound) =>
-            RangeRule(
-                ValidationRuleName.ExclusiveRange,
-                lowerBound,
-                upperBound,
-                displayName => $"'{displayName}' must be between {lowerBound} and {upperBound} (exclusive).");
+            Range(ValidationRuleName.ExclusiveRange, lowerBound, upperBound, name => $"'{name}' must be between {lowerBound} and {upperBound} (exclusive).");
 
-        public ClientValidationRule Min(TProperty minimum) =>
-            LiteralComparison(
-                ValidationRuleName.Min,
-                minimum,
-                displayName => $"'{displayName}' must be at least {minimum}.");
+        public ClientValidationRule EqualTo(System.Linq.Expressions.Expression<Func<TModel, TProperty>> peerField) =>
+            Peer(ValidationRuleName.EqualTo, peerField, name => $"'{name}' must match '{Humanize(peerField)}'.");
 
-        public ClientValidationRule Max(TProperty maximum) =>
-            LiteralComparison(
-                ValidationRuleName.Max,
-                maximum,
-                displayName => $"'{displayName}' must be at most {maximum}.");
+        public ClientValidationRule NotEqualTo(System.Linq.Expressions.Expression<Func<TModel, TProperty>> peerField) =>
+            Peer(ValidationRuleName.NotEqualTo, peerField, name => $"'{name}' must not match '{Humanize(peerField)}'.");
 
-        public ClientValidationRule GreaterThan(TProperty value) =>
-            LiteralComparison(
-                ValidationRuleName.Gt,
-                value,
-                displayName => $"'{displayName}' must be greater than {value}.");
+        private static ClientValidationRule NoOperand(ValidationRuleName rule, Func<string, string> message) =>
+            new ClientValidationRule(rule, message, condition => ValidationRuleDetails.NoOperand(condition));
 
-        public ClientValidationRule LessThan(TProperty value) =>
-            LiteralComparison(
-                ValidationRuleName.Lt,
-                value,
-                displayName => $"'{displayName}' must be less than {value}.");
+        private static ClientValidationRule Literal(
+            ValidationRuleName rule,
+            TProperty value,
+            Func<string, string> message)
+        {
+            var literal = ClientValidationProjectionLiteral.From(value);
+            return ClientValidationRule.Literal(rule, literal.Value, literal.Shape, message);
+        }
 
-        public ClientValidationRule EqualTo(TProperty expected) =>
-            LiteralComparison(
-                ValidationRuleName.EqualTo,
-                expected,
-                displayName => $"'{displayName}' must equal {expected}.");
-
-        public ClientValidationRule EqualTo(Expression<Func<TModel, TProperty>> peerField) =>
-            PeerComparison(
-                ValidationRuleName.EqualTo,
-                peerField,
-                displayName => $"'{displayName}' must match '{Humanize(peerField)}'.");
-
-        public ClientValidationRule NotEqual(TProperty forbidden) =>
-            LiteralComparison(
-                ValidationRuleName.NotEqual,
-                forbidden,
-                displayName => $"'{displayName}' must not equal '{forbidden}'.");
-
-        public ClientValidationRule NotEqualTo(Expression<Func<TModel, TProperty>> peerField) =>
-            PeerComparison(
-                ValidationRuleName.NotEqualTo,
-                peerField,
-                displayName => $"'{displayName}' must not match '{Humanize(peerField)}'.");
-
-        public ClientValidationRule AtLeastOne() =>
-            ClientValidationRule.NoOperand(
-                ValidationRuleName.AtLeastOne,
-                displayName => $"'{displayName}' must contain at least one value.");
-
-        private static ClientValidationRule RangeRule(
-            ValidationRuleName name,
+        private static ClientValidationRule Range(
+            ValidationRuleName rule,
             TProperty lowerBound,
             TProperty upperBound,
-            Func<string, string> defaultMessage)
+            Func<string, string> message)
         {
-            var bounds = ClientValidationRangeBounds.From(lowerBound, upperBound);
-            return ClientValidationRule.Range(name, bounds, defaultMessage);
+            var bounds = ClientValidationProjectionRangeBounds.From(lowerBound, upperBound);
+            return new ClientValidationRule(
+                rule,
+                message,
+                condition => ValidationRuleDetails.WithConstraint(
+                    bounds.ToValidationRangeBounds(),
+                    condition,
+                    bounds.EndpointShape));
         }
 
-        private static ClientValidationRule LiteralComparison(
-            ValidationRuleName name,
-            TProperty value,
-            Func<string, string> defaultMessage)
-        {
-            var literal = ClientValidationLiteral.From(value);
-            return ClientValidationRule.Literal(name, literal.Value, literal.Shape, defaultMessage);
-        }
-
-        private static ClientValidationRule PeerComparison(
-            ValidationRuleName name,
-            Expression<Func<TModel, TProperty>> peerField,
-            Func<string, string> defaultMessage)
+        private static ClientValidationRule Peer(
+            ValidationRuleName rule,
+            System.Linq.Expressions.Expression<Func<TModel, TProperty>> peerField,
+            Func<string, string> message)
         {
             if (peerField == null) throw new ArgumentNullException(nameof(peerField));
 
-            return ClientValidationRule.PeerField(
-                name,
-                ValidationFieldPath.Of(ExpressionPathHelper.ToPropertyName(peerField)),
-                Shape.FromClrType(typeof(TProperty)),
-                defaultMessage);
+            var field = ValidationFieldPath.Of(ExpressionPathHelper.ToPropertyName(peerField));
+            var shape = Shape.FromClrType(typeof(TProperty));
+            return new ClientValidationRule(
+                rule,
+                message,
+                condition => ValidationRuleDetails.WithPeerField(field, condition, shape));
         }
 
-        private static string Humanize(Expression<Func<TModel, TProperty>> peerField)
+        private static string Humanize(System.Linq.Expressions.Expression<Func<TModel, TProperty>> peerField)
         {
             if (peerField == null) throw new ArgumentNullException(nameof(peerField));
             return ExpressionPathHelper.ToPropertyName(peerField).Replace(".", " ");
@@ -211,234 +135,42 @@ namespace Alis.Reactive.FluentValidator
 
     public sealed class ClientValidationRule
     {
-        private readonly ClientValidationRuleOperand _operand;
-        private readonly Func<string, string> _defaultMessage;
+        private readonly Func<string, string> _message;
+        private readonly Func<ValidationRuleCondition, ValidationRuleDetails> _details;
 
-        private ClientValidationRule(
+        internal ClientValidationRule(
             ValidationRuleName name,
-            ClientValidationRuleOperand operand,
-            Shape comparisonShape,
-            Func<string, string> defaultMessage)
+            Func<string, string> message,
+            Func<ValidationRuleCondition, ValidationRuleDetails> details)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            _operand = operand ?? throw new ArgumentNullException(nameof(operand));
-            ComparisonShape = comparisonShape ?? throw new ArgumentNullException(nameof(comparisonShape));
-            _defaultMessage = defaultMessage ?? throw new ArgumentNullException(nameof(defaultMessage));
+            _message = message ?? throw new ArgumentNullException(nameof(message));
+            _details = details ?? throw new ArgumentNullException(nameof(details));
         }
 
         internal ValidationRuleName Name { get; }
-        internal Shape ComparisonShape { get; }
-
-        internal static ClientValidationRule NoOperand(
-            ValidationRuleName name,
-            Func<string, string> defaultMessage) =>
-            new ClientValidationRule(
-                name,
-                ClientValidationRuleOperand.None,
-                Shape.None,
-                defaultMessage);
 
         internal static ClientValidationRule Literal(
-            ValidationRuleName name,
+            ValidationRuleName rule,
             object? value,
             Shape shape,
-            Func<string, string> defaultMessage) =>
+            Func<string, string> message) =>
             new ClientValidationRule(
-                name,
-                ClientValidationRuleOperand.Literal(value),
-                shape,
-                defaultMessage);
-
-        internal static ClientValidationRule Range(
-            ValidationRuleName name,
-            ClientValidationRangeBounds bounds,
-            Func<string, string> defaultMessage)
-        {
-            if (bounds == null) throw new ArgumentNullException(nameof(bounds));
-            return new ClientValidationRule(
-                name,
-                ClientValidationRuleOperand.Range(bounds),
-                bounds.EndpointShape,
-                defaultMessage);
-        }
-
-        internal static ClientValidationRule PeerField(
-            ValidationRuleName name,
-            ValidationFieldPath peerField,
-            Shape shape,
-            Func<string, string> defaultMessage) =>
-            new ClientValidationRule(
-                name,
-                ClientValidationRuleOperand.PeerField(peerField),
-                shape,
-                defaultMessage);
+                rule,
+                message,
+                condition => ValidationRuleDetails.WithConstraint(value, condition, shape));
 
         internal ValidationMessage MessageFor(string displayName)
         {
             if (displayName == null) throw new ArgumentNullException(nameof(displayName));
-            return ValidationMessage.Of(_defaultMessage(displayName));
+            return ValidationMessage.Of(_message(displayName));
         }
 
         internal ValidationRuleDetails DetailsFor(ValidationRuleCondition condition)
         {
             if (condition == null) throw new ArgumentNullException(nameof(condition));
-            return _operand.ToDetails(condition, ComparisonShape);
+            return _details(condition);
         }
-    }
-
-    internal abstract class ClientValidationRuleOperand
-    {
-        private protected ClientValidationRuleOperand() { }
-
-        internal static ClientValidationRuleOperand None { get; } =
-            new NoClientValidationRuleOperand();
-
-        internal static ClientValidationRuleOperand Literal(object? value) =>
-            new LiteralClientValidationRuleOperand(value);
-
-        internal static ClientValidationRuleOperand Range(ClientValidationRangeBounds bounds)
-        {
-            if (bounds == null) throw new ArgumentNullException(nameof(bounds));
-            return new RangeClientValidationRuleOperand(bounds);
-        }
-
-        internal static ClientValidationRuleOperand PeerField(ValidationFieldPath fieldPath)
-        {
-            if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
-            return new PeerFieldClientValidationRuleOperand(fieldPath);
-        }
-
-        internal abstract ValidationRuleDetails ToDetails(
-            ValidationRuleCondition condition,
-            Shape comparisonShape);
-
-        private sealed class NoClientValidationRuleOperand : ClientValidationRuleOperand
-        {
-            internal override ValidationRuleDetails ToDetails(
-                ValidationRuleCondition condition,
-                Shape comparisonShape)
-            {
-                if (condition == null) throw new ArgumentNullException(nameof(condition));
-                if (comparisonShape == null) throw new ArgumentNullException(nameof(comparisonShape));
-                return ValidationRuleDetails.NoOperand(condition);
-            }
-        }
-
-        private sealed class LiteralClientValidationRuleOperand : ClientValidationRuleOperand
-        {
-            private readonly object? _value;
-
-            internal LiteralClientValidationRuleOperand(object? value)
-            {
-                _value = value;
-            }
-
-            internal override ValidationRuleDetails ToDetails(
-                ValidationRuleCondition condition,
-                Shape comparisonShape)
-            {
-                if (condition == null) throw new ArgumentNullException(nameof(condition));
-                if (comparisonShape == null) throw new ArgumentNullException(nameof(comparisonShape));
-                return ValidationRuleDetails.WithConstraint(_value, condition, comparisonShape);
-            }
-        }
-
-        private sealed class RangeClientValidationRuleOperand : ClientValidationRuleOperand
-        {
-            private readonly ClientValidationRangeBounds _bounds;
-
-            internal RangeClientValidationRuleOperand(ClientValidationRangeBounds bounds)
-            {
-                _bounds = bounds ?? throw new ArgumentNullException(nameof(bounds));
-            }
-
-            internal override ValidationRuleDetails ToDetails(
-                ValidationRuleCondition condition,
-                Shape comparisonShape)
-            {
-                if (condition == null) throw new ArgumentNullException(nameof(condition));
-                if (comparisonShape == null) throw new ArgumentNullException(nameof(comparisonShape));
-                return ValidationRuleDetails.WithConstraint(_bounds.ToValidationRangeBounds(), condition, _bounds.EndpointShape);
-            }
-        }
-
-        private sealed class PeerFieldClientValidationRuleOperand : ClientValidationRuleOperand
-        {
-            private readonly ValidationFieldPath _fieldPath;
-
-            internal PeerFieldClientValidationRuleOperand(ValidationFieldPath fieldPath)
-            {
-                _fieldPath = fieldPath ?? throw new ArgumentNullException(nameof(fieldPath));
-            }
-
-            internal override ValidationRuleDetails ToDetails(
-                ValidationRuleCondition condition,
-                Shape comparisonShape)
-            {
-                if (condition == null) throw new ArgumentNullException(nameof(condition));
-                if (comparisonShape == null) throw new ArgumentNullException(nameof(comparisonShape));
-                return ValidationRuleDetails.WithPeerField(_fieldPath, condition, comparisonShape);
-            }
-        }
-    }
-
-    internal sealed class ClientValidationLiteral
-    {
-        private ClientValidationLiteral(object? value, Shape shape)
-        {
-            Value = value;
-            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
-        }
-
-        internal object? Value { get; }
-        internal Shape Shape { get; }
-
-        internal static ClientValidationLiteral From<TValue>(TValue value)
-        {
-            if (value == null)
-                return new ClientValidationLiteral(null, Shape.None);
-
-            var shape = Shape.FromClrType(value.GetType());
-            return new ClientValidationLiteral(ValidationDateLiteral.From(value, shape), shape);
-        }
-    }
-
-    internal sealed class ClientValidationRangeBounds
-    {
-        private ClientValidationRangeBounds(object lowerBound, object upperBound, Shape endpointShape)
-        {
-            LowerBound = lowerBound ?? throw new ArgumentNullException(nameof(lowerBound));
-            UpperBound = upperBound ?? throw new ArgumentNullException(nameof(upperBound));
-            EndpointShape = endpointShape ?? throw new ArgumentNullException(nameof(endpointShape));
-        }
-
-        internal object LowerBound { get; }
-        internal object UpperBound { get; }
-        internal Shape EndpointShape { get; }
-
-        internal static ClientValidationRangeBounds From<TValue>(TValue lowerBound, TValue upperBound)
-        {
-            if (lowerBound == null) throw new ArgumentNullException(nameof(lowerBound));
-            if (upperBound == null) throw new ArgumentNullException(nameof(upperBound));
-
-            var lowerLiteral = ClientValidationLiteral.From(lowerBound);
-            var upperLiteral = ClientValidationLiteral.From(upperBound);
-            var endpointsHaveSameShape = lowerLiteral.Shape.Equals(upperLiteral.Shape);
-            if (!endpointsHaveSameShape)
-            {
-                throw new ArgumentException(
-                    "Client validation range bounds must have the same shape. " +
-                    $"Lower bound is '{lowerLiteral.Shape.Kind}', upper bound is '{upperLiteral.Shape.Kind}'.");
-            }
-
-            return new ClientValidationRangeBounds(
-                lowerLiteral.Value!,
-                upperLiteral.Value!,
-                lowerLiteral.Shape);
-        }
-
-        internal ValidationRangeBounds ToValidationRangeBounds() =>
-            ValidationRangeBounds.Between(LowerBound, UpperBound, EndpointShape);
     }
 
     internal static class ClientValidationRuleProjectionCatalog

@@ -10,18 +10,12 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
 {
-    /// <summary>
-    /// Base class for validators that need client-side conditional rules.
-    /// Use WhenField() instead of FV's .When() when a condition should also be
-    /// projected into browser validation. FV's .When() still runs on the server
-    /// and is intentionally skipped by client projection.
-    /// </summary>
     public abstract class ReactiveValidator<T> : AbstractValidator<T>, IClientConditionSource
         where T : class
     {
         private readonly Dictionary<IValidationRule, ClientConditionProjection> _clientConditions =
             new Dictionary<IValidationRule, ClientConditionProjection>();
-        private readonly ClientConditionScope _clientConditionScope = new ClientConditionScope();
+        private readonly ClientConditionScope _scope = new ClientConditionScope();
 
         IReadOnlyDictionary<IValidationRule, ClientConditionProjection> IClientConditionSource.ClientConditions =>
             _clientConditions;
@@ -29,321 +23,167 @@ namespace Alis.Reactive.FluentValidator
         protected override void OnRuleAdded(IValidationRule<T> rule)
         {
             base.OnRuleAdded(rule);
-            _clientConditionScope.Register(rule, _clientConditions);
+            _scope.Register(rule, _clientConditions);
         }
 
-        // ── Existing operators (unchanged signatures) ──────────────────────────
+        protected void WhenField(Expression<Func<T, bool>> field, Action defineRules) =>
+            Apply(new FieldStart<T, bool>(field).Truthy(), defineRules);
 
-        /// <summary>
-        /// Applies a "truthy" condition to all rules defined in the block.
-        /// Server: FV's When() runs the condition at validation time.
-        /// Client: Adapter extracts rules with the truthy comparison operator.
-        /// </summary>
-        /// <remarks>
-        /// For bool fields. Server predicate evaluates the bool expression directly.
-        /// For generic-typed truthy conditions via the composition API, use
-        /// <c>WhenFields</c> with <c>FieldStart.Truthy()</c> which checks all falsy
-        /// values (null, false, 0, empty string).
-        /// </remarks>
-        protected void WhenField(Expression<Func<T, bool>> conditionField, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, bool>(conditionField).Truthy(), defineRules);
-        }
+        protected void WhenField<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Eq(value), defineRules);
 
-        /// <summary>
-        /// Applies an "eq" condition to all rules defined in the block.
-        /// Server: FV's When() checks field == value at validation time.
-        /// Client: Adapter extracts rules with the equality comparison operator.
-        /// </summary>
-        protected void WhenField<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, TProp>(field).Eq(value), defineRules);
-        }
+        protected void WhenFieldNot(Expression<Func<T, bool>> field, Action defineRules) =>
+            Apply(new FieldStart<T, bool>(field).Falsy(), defineRules);
 
-        /// <summary>
-        /// Applies a "falsy" condition to all rules defined in the block.
-        /// Server: FV's When() runs !condition at validation time.
-        /// Client: Adapter extracts rules with the falsy comparison operator.
-        /// </summary>
-        protected void WhenFieldNot(Expression<Func<T, bool>> conditionField, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, bool>(conditionField).Falsy(), defineRules);
-        }
+        protected void WhenFieldNot<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Neq(value), defineRules);
 
-        /// <summary>
-        /// Applies a "neq" condition to all rules defined in the block.
-        /// Server: FV's When() checks field != value at validation time.
-        /// Client: Adapter extracts rules with the not-equal comparison operator.
-        /// </summary>
-        protected void WhenFieldNot<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, TProp>(field).Neq(value), defineRules);
-        }
+        protected void WhenFieldGt<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Gt(value), defineRules);
 
-        // ── Ordering operators ─────────────────────────────────────────────────
+        protected void WhenFieldGte<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Gte(value), defineRules);
 
-        /// <summary>Applies a "gt" (greater than) condition.</summary>
-        protected void WhenFieldGt<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, TProp>(field).Gt(value), defineRules);
-        }
+        protected void WhenFieldLt<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Lt(value), defineRules);
 
-        /// <summary>Applies a "gte" (greater than or equal) condition.</summary>
-        protected void WhenFieldGte<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, TProp>(field).Gte(value), defineRules);
-        }
+        protected void WhenFieldLte<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Lte(value), defineRules);
 
-        /// <summary>Applies a "lt" (less than) condition.</summary>
-        protected void WhenFieldLt<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, TProp>(field).Lt(value), defineRules);
-        }
+        protected void WhenFieldNull<TProp>(Expression<Func<T, TProp>> field, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).IsNull(), defineRules);
 
-        /// <summary>Applies a "lte" (less than or equal) condition.</summary>
-        protected void WhenFieldLte<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, TProp>(field).Lte(value), defineRules);
-        }
+        protected void WhenFieldNotNull<TProp>(Expression<Func<T, TProp>> field, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).NotNull(), defineRules);
 
-        // ── Presence operators ─────────────────────────────────────────────────
+        protected void WhenFieldEmpty(Expression<Func<T, string?>> field, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).IsEmpty(), defineRules);
 
-        /// <summary>Applies an "is-null" condition.</summary>
-        protected void WhenFieldNull<TProp>(
-            Expression<Func<T, TProp>> field, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, TProp>(field).IsNull(), defineRules);
-        }
+        protected void WhenFieldNotEmpty(Expression<Func<T, string?>> field, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).NotEmpty(), defineRules);
 
-        /// <summary>Applies a "not-null" condition.</summary>
-        protected void WhenFieldNotNull<TProp>(
-            Expression<Func<T, TProp>> field, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, TProp>(field).NotNull(), defineRules);
-        }
+        protected void WhenFieldIn<TProp>(Expression<Func<T, TProp>> field, TProp[] values, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).In(values), defineRules);
 
-        /// <summary>Applies an "is-empty" condition (null or empty string).</summary>
-        protected void WhenFieldEmpty(
-            Expression<Func<T, string?>> field, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, string?>(field).IsEmpty(), defineRules);
-        }
+        protected void WhenFieldNotIn<TProp>(Expression<Func<T, TProp>> field, TProp[] values, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).NotIn(values), defineRules);
 
-        /// <summary>Applies a "not-empty" condition (non-null and non-empty string).</summary>
-        protected void WhenFieldNotEmpty(
-            Expression<Func<T, string?>> field, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, string?>(field).NotEmpty(), defineRules);
-        }
-
-        // ── Membership operators ───────────────────────────────────────────────
-
-        /// <summary>Applies an "in" condition — field value is in the given set.</summary>
-        protected void WhenFieldIn<TProp>(
-            Expression<Func<T, TProp>> field, TProp[] values, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, TProp>(field).In(values), defineRules);
-        }
-
-        // ── Text operators ─────────────────────────────────────────────────────
-
-        /// <summary>Applies a "contains" condition — string field contains substring.</summary>
-        protected void WhenFieldContains(
-            Expression<Func<T, string?>> field, string substring, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, string?>(field).Contains(substring), defineRules);
-        }
-
-        /// <summary>Applies a "starts-with" condition.</summary>
-        protected void WhenFieldStartsWith(
-            Expression<Func<T, string?>> field, string prefix, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, string?>(field).StartsWith(prefix), defineRules);
-        }
-
-        /// <summary>Applies an "ends-with" condition.</summary>
-        protected void WhenFieldEndsWith(
-            Expression<Func<T, string?>> field, string suffix, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, string?>(field).EndsWith(suffix), defineRules);
-        }
-
-        /// <summary>Applies a "not-in" condition — field value is NOT in the given set.</summary>
-        protected void WhenFieldNotIn<TProp>(
-            Expression<Func<T, TProp>> field, TProp[] values, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, TProp>(field).NotIn(values), defineRules);
-        }
-
-        /// <summary>Applies a "between" condition — field value is between low and high (inclusive).</summary>
         protected void WhenFieldBetween<TProp>(
-            Expression<Func<T, TProp>> field, TProp low, TProp high, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, TProp>(field).Between(low, high), defineRules);
-        }
+            Expression<Func<T, TProp>> field,
+            TProp low,
+            TProp high,
+            Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Between(low, high), defineRules);
 
-        /// <summary>Applies a "matches" condition — string field matches regex pattern.</summary>
-        protected void WhenFieldMatches(
-            Expression<Func<T, string?>> field, string pattern, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, string?>(field).Matches(pattern), defineRules);
-        }
+        protected void WhenFieldContains(Expression<Func<T, string?>> field, string substring, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).Contains(substring), defineRules);
 
-        /// <summary>Applies a "min-length" condition — string field length >= minimum.</summary>
-        protected void WhenFieldMinLength(
-            Expression<Func<T, string?>> field, int minLength, Action defineRules)
-        {
-            ApplyClientCondition(new FieldStart<T, string?>(field).MinLength(minLength), defineRules);
-        }
+        protected void WhenFieldStartsWith(Expression<Func<T, string?>> field, string prefix, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).StartsWith(prefix), defineRules);
 
-        /// <summary>Applies an "array-contains" condition — array field contains the given element.</summary>
+        protected void WhenFieldEndsWith(Expression<Func<T, string?>> field, string suffix, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).EndsWith(suffix), defineRules);
+
+        protected void WhenFieldMatches(Expression<Func<T, string?>> field, string pattern, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).Matches(pattern), defineRules);
+
+        protected void WhenFieldMinLength(Expression<Func<T, string?>> field, int minLength, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).MinLength(minLength), defineRules);
+
         protected void WhenFieldArrayContains<TProp>(
-            Expression<Func<T, IEnumerable<TProp>?>> field, TProp value, Action defineRules)
+            Expression<Func<T, IEnumerable<TProp>?>> field,
+            TProp value,
+            Action defineRules)
         {
-            var selectedField = SelectedClientValidationField<T, IEnumerable<TProp>?>.From(field);
-            var guard = selectedField.GuardAgainstCollectionItem(
-                CompareOperator.ArrayContains,
-                value,
-                candidate => FieldConditionPredicates.EnumerableContains(candidate, value));
-
-            ApplyClientCondition(guard, defineRules);
+            var selected = SelectedClientValidationField<T, IEnumerable<TProp>?>.From(field);
+            Apply(
+                selected.GuardAgainstCollectionItem(
+                    CompareOperator.ArrayContains,
+                    value,
+                    candidate => FieldConditionPredicates.EnumerableContains(candidate, value)),
+                defineRules);
         }
 
-        // ── Composition ────────────────────────────────────────────────────────
-
-        /// <summary>
-        /// Applies a composed condition (And/Or/Not) to all rules defined in the block.
-        /// Server: combined predicate runs at validation time.
-        /// Client: adapter extracts the FieldCondition tree.
-        /// </summary>
         protected void WhenFields(
             Func<FieldConditionBuilder<T>, FieldGuard<T>> buildCondition,
             Action defineRules)
         {
-            var builder = new FieldConditionBuilder<T>();
-            var guard = buildCondition(builder);
-
-            ApplyClientCondition(guard, defineRules);
+            if (buildCondition == null) throw new ArgumentNullException(nameof(buildCondition));
+            Apply(buildCondition(new FieldConditionBuilder<T>()), defineRules);
         }
 
-        public new IConditionBuilder When(Func<T, bool> predicate, Action action)
-        {
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            return ApplyServerOnlyCondition(action, guardedAction => base.When(predicate, guardedAction));
-        }
+        public new IConditionBuilder When(Func<T, bool> predicate, Action action) =>
+            ServerOnly(predicate, action, guarded => base.When(predicate, guarded));
 
-        public new IConditionBuilder When(Func<T, ValidationContext<T>, bool> predicate, Action action)
-        {
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            return ApplyServerOnlyCondition(action, guardedAction => base.When(predicate, guardedAction));
-        }
+        public new IConditionBuilder When(Func<T, ValidationContext<T>, bool> predicate, Action action) =>
+            ServerOnly(predicate, action, guarded => base.When(predicate, guarded));
 
-        public new IConditionBuilder Unless(Func<T, bool> predicate, Action action)
-        {
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            return ApplyServerOnlyCondition(action, guardedAction => base.Unless(predicate, guardedAction));
-        }
+        public new IConditionBuilder Unless(Func<T, bool> predicate, Action action) =>
+            ServerOnly(predicate, action, guarded => base.Unless(predicate, guarded));
 
-        public new IConditionBuilder Unless(Func<T, ValidationContext<T>, bool> predicate, Action action)
-        {
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            return ApplyServerOnlyCondition(action, guardedAction => base.Unless(predicate, guardedAction));
-        }
+        public new IConditionBuilder Unless(Func<T, ValidationContext<T>, bool> predicate, Action action) =>
+            ServerOnly(predicate, action, guarded => base.Unless(predicate, guarded));
 
         public new IConditionBuilder WhenAsync(
             Func<T, CancellationToken, Task<bool>> predicate,
-            Action action)
-        {
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            return ApplyServerOnlyCondition(action, guardedAction => base.WhenAsync(predicate, guardedAction));
-        }
+            Action action) =>
+            ServerOnly(predicate, action, guarded => base.WhenAsync(predicate, guarded));
 
         public new IConditionBuilder WhenAsync(
             Func<T, ValidationContext<T>, CancellationToken, Task<bool>> predicate,
-            Action action)
-        {
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            return ApplyServerOnlyCondition(action, guardedAction => base.WhenAsync(predicate, guardedAction));
-        }
+            Action action) =>
+            ServerOnly(predicate, action, guarded => base.WhenAsync(predicate, guarded));
 
         public new IConditionBuilder UnlessAsync(
             Func<T, CancellationToken, Task<bool>> predicate,
-            Action action)
-        {
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            return ApplyServerOnlyCondition(action, guardedAction => base.UnlessAsync(predicate, guardedAction));
-        }
+            Action action) =>
+            ServerOnly(predicate, action, guarded => base.UnlessAsync(predicate, guarded));
 
         public new IConditionBuilder UnlessAsync(
             Func<T, ValidationContext<T>, CancellationToken, Task<bool>> predicate,
-            Action action)
+            Action action) =>
+            ServerOnly(predicate, action, guarded => base.UnlessAsync(predicate, guarded));
+
+        private void Apply(FieldGuard<T> guard, Action defineRules)
         {
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            return ApplyServerOnlyCondition(action, guardedAction => base.UnlessAsync(predicate, guardedAction));
+            if (guard == null) throw new ArgumentNullException(nameof(guard));
+            if (defineRules == null) throw new ArgumentNullException(nameof(defineRules));
+
+            using (_scope.Enter(ClientConditionProjection.Project(guard)))
+            {
+                base.When(guard.ServerPredicate, defineRules);
+            }
         }
 
-        // ── Internals ──────────────────────────────────────────────────────────
-
-        private IConditionBuilder ApplyServerOnlyCondition(
+        private IConditionBuilder ServerOnly<TPredicate>(
+            TPredicate predicate,
             Action defineRules,
             Func<Action, IConditionBuilder> applyCondition)
         {
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
             if (defineRules == null) throw new ArgumentNullException(nameof(defineRules));
             if (applyCondition == null) throw new ArgumentNullException(nameof(applyCondition));
 
-            IConditionBuilder conditionBuilder;
-            using (_clientConditionScope.EnterServerOnlyCondition())
-            {
-                conditionBuilder = applyCondition(defineRules);
-            }
-
-            return new ServerOnlyConditionBuilder(conditionBuilder, _clientConditionScope);
-        }
-
-        private void ApplyClientCondition(
-            Func<T, bool> serverPredicate,
-            ClientConditionProjection clientCondition,
-            Action defineRules)
-        {
-            if (serverPredicate == null) throw new ArgumentNullException(nameof(serverPredicate));
-            if (clientCondition == null) throw new ArgumentNullException(nameof(clientCondition));
-            if (defineRules == null) throw new ArgumentNullException(nameof(defineRules));
-
-            using (_clientConditionScope.Enter(clientCondition))
-            {
-                // FV's When() defines the rules and keeps the predicate in server validation.
-                base.When(serverPredicate, defineRules);
-            }
-        }
-
-        private void ApplyClientCondition(FieldGuard<T> guard, Action defineRules)
-        {
-            if (guard == null) throw new ArgumentNullException(nameof(guard));
-            ApplyClientCondition(guard.ServerPredicate, ClientConditionProjection.Project(guard), defineRules);
+            using (_scope.EnterServerOnly())
+                return new ServerOnlyConditionBuilder(applyCondition(defineRules), _scope);
         }
 
         private sealed class ClientConditionScope
         {
-            private readonly Stack<ClientConditionProjection> _activeConditions = new Stack<ClientConditionProjection>();
-            private int _serverOnlyConditionDepth;
+            private readonly Stack<ClientConditionProjection> _clientConditions = new Stack<ClientConditionProjection>();
+            private int _serverOnlyDepth;
 
             internal IDisposable Enter(ClientConditionProjection condition)
             {
                 if (condition == null) throw new ArgumentNullException(nameof(condition));
-                _activeConditions.Push(condition);
-                return new ScopeExit(this);
+                _clientConditions.Push(condition);
+                return new Exit(this, scope => scope.ExitClient());
             }
 
-            internal IDisposable EnterServerOnlyCondition()
+            internal IDisposable EnterServerOnly()
             {
-                _serverOnlyConditionDepth++;
-                return new ServerOnlyScopeExit(this);
+                _serverOnlyDepth++;
+                return new Exit(this, scope => scope.ExitServerOnly());
             }
 
             internal void Register(
@@ -352,57 +192,43 @@ namespace Alis.Reactive.FluentValidator
             {
                 if (rule == null) throw new ArgumentNullException(nameof(rule));
                 if (clientConditions == null) throw new ArgumentNullException(nameof(clientConditions));
+                if (_clientConditions.Count == 0) return;
 
-                var noClientConditionIsActive = _activeConditions.Count == 0;
-                if (noClientConditionIsActive) return;
-
-                clientConditions[rule] = ActiveProjection();
+                clientConditions[rule] = _serverOnlyDepth > 0
+                    ? ClientConditionProjection.Skip(ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard)
+                    : ActiveClientCondition();
             }
 
-            private ClientConditionProjection ActiveProjection()
+            private ClientConditionProjection ActiveClientCondition() =>
+                _clientConditions.Count == 1
+                    ? _clientConditions.Peek()
+                    : ClientConditionProjection.All(_clientConditions.Reverse().ToArray());
+
+            private void ExitClient()
             {
-                var serverOnlyConditionIsActive = _serverOnlyConditionDepth > 0;
-                if (serverOnlyConditionIsActive)
-                    return ClientConditionProjection.Skip(
-                        ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard);
-
-                return ActiveProjectionGuard();
-            }
-
-            private ClientConditionProjection ActiveProjectionGuard()
-            {
-                var singleActiveCondition = _activeConditions.Count == 1;
-                if (singleActiveCondition) return _activeConditions.Peek();
-
-                var conditionsInServerNestingOrder = _activeConditions.Reverse().ToArray();
-                return ClientConditionProjection.All(conditionsInServerNestingOrder);
-            }
-
-            private void Exit()
-            {
-                var noClientConditionIsActive = _activeConditions.Count == 0;
-                if (noClientConditionIsActive)
+                if (_clientConditions.Count == 0)
                     throw new InvalidOperationException("Cannot exit a client validation condition scope that was not entered.");
 
-                _activeConditions.Pop();
+                _clientConditions.Pop();
             }
 
-            private void ExitServerOnlyCondition()
+            private void ExitServerOnly()
             {
-                var noServerOnlyConditionIsActive = _serverOnlyConditionDepth == 0;
-                if (noServerOnlyConditionIsActive)
+                if (_serverOnlyDepth == 0)
                     throw new InvalidOperationException("Cannot exit a server-only validation condition scope that was not entered.");
 
-                _serverOnlyConditionDepth--;
+                _serverOnlyDepth--;
             }
 
-            private sealed class ScopeExit : IDisposable
+            private sealed class Exit : IDisposable
             {
                 private ClientConditionScope? _scope;
+                private readonly Action<ClientConditionScope> _exit;
 
-                internal ScopeExit(ClientConditionScope scope)
+                internal Exit(ClientConditionScope scope, Action<ClientConditionScope> exit)
                 {
                     _scope = scope ?? throw new ArgumentNullException(nameof(scope));
+                    _exit = exit ?? throw new ArgumentNullException(nameof(exit));
                 }
 
                 public void Dispose()
@@ -411,26 +237,7 @@ namespace Alis.Reactive.FluentValidator
                     if (scope == null) return;
 
                     _scope = null;
-                    scope.Exit();
-                }
-            }
-
-            private sealed class ServerOnlyScopeExit : IDisposable
-            {
-                private ClientConditionScope? _scope;
-
-                internal ServerOnlyScopeExit(ClientConditionScope scope)
-                {
-                    _scope = scope ?? throw new ArgumentNullException(nameof(scope));
-                }
-
-                public void Dispose()
-                {
-                    var scope = _scope;
-                    if (scope == null) return;
-
-                    _scope = null;
-                    scope.ExitServerOnlyCondition();
+                    _exit(scope);
                 }
             }
         }
@@ -438,26 +245,21 @@ namespace Alis.Reactive.FluentValidator
         private sealed class ServerOnlyConditionBuilder : IConditionBuilder
         {
             private readonly IConditionBuilder _inner;
-            private readonly ClientConditionScope _clientConditionScope;
+            private readonly ClientConditionScope _scope;
 
-            internal ServerOnlyConditionBuilder(
-                IConditionBuilder inner,
-                ClientConditionScope clientConditionScope)
+            internal ServerOnlyConditionBuilder(IConditionBuilder inner, ClientConditionScope scope)
             {
                 _inner = inner ?? throw new ArgumentNullException(nameof(inner));
-                _clientConditionScope = clientConditionScope ?? throw new ArgumentNullException(nameof(clientConditionScope));
+                _scope = scope ?? throw new ArgumentNullException(nameof(scope));
             }
 
             public void Otherwise(Action action)
             {
                 if (action == null) throw new ArgumentNullException(nameof(action));
-
                 _inner.Otherwise(() =>
                 {
-                    using (_clientConditionScope.EnterServerOnlyCondition())
-                    {
+                    using (_scope.EnterServerOnly())
                         action();
-                    }
                 });
             }
         }

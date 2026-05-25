@@ -1,3 +1,4 @@
+using Alis.Reactive.Validation;
 using FluentValidation;
 
 namespace Alis.Reactive.FluentValidator.UnitTests;
@@ -7,6 +8,7 @@ public sealed class ExplicitClientRuleModel
     public string? Code { get; set; }
     public string? Email { get; set; }
     public string? ConfirmEmail { get; set; }
+    public string? ExternalCode { get; set; }
 }
 
 public sealed class ExplicitClientRuleValidator : AbstractValidator<ExplicitClientRuleModel>
@@ -21,6 +23,16 @@ public sealed class ExplicitClientRuleValidator : AbstractValidator<ExplicitClie
         RuleFor(x => x.ConfirmEmail)
             .Must((model, confirmation) => string.IsNullOrEmpty(confirmation) || confirmation == model.Email)
             .ProjectToClient(rule => rule.EqualTo(x => x.Email));
+    }
+}
+
+public sealed class AsyncServerRuleValidator : AbstractValidator<ExplicitClientRuleModel>
+{
+    public AsyncServerRuleValidator()
+    {
+        RuleFor(x => x.ExternalCode)
+            .MustAsync((_, _) => Task.FromResult(true))
+            .ProjectToClient(rule => rule.Regex("^EXT-"));
     }
 }
 
@@ -55,5 +67,16 @@ public sealed class WhenProjectingExplicitClientRules
         Assert.That(rule.PeerFieldName(), Is.EqualTo("Email"));
         Assert.That(report.Fields.Select(field => field.FieldName), Does.Contain("Email"));
         Assert.That(report.SkippedRules, Is.Empty);
+    }
+
+    [Test]
+    public void Async_rules_stay_server_side_even_when_a_client_projection_is_declared()
+    {
+        var report = _adapter.ProjectValidation(typeof(AsyncServerRuleValidator), "form");
+
+        Assert.That(report.Fields, Is.Empty);
+        var skipped = report.SkippedRules.Single();
+        Assert.That(skipped.FieldName, Is.EqualTo("ExternalCode"));
+        Assert.That(skipped.Reason, Is.EqualTo(ClientRuleProjectionSkipReason.AsyncValidator));
     }
 }
