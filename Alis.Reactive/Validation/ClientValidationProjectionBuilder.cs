@@ -56,7 +56,7 @@ namespace Alis.Reactive.Validation
             }
         }
 
-        internal ClientValidationProjectionDefinition<TModel> ToDefinition() =>
-            new ClientValidationProjectionDefinition<TModel>(_projection.ToFields());
+        internal ClientValidationProjectionDefinition ToDefinition() =>
+            new ClientValidationProjectionDefinition(_projection.ToFields());
     }
 }

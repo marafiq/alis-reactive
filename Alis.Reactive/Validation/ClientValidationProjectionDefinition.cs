@@ -3,13 +3,7 @@ using System.Collections.Generic;
 
 namespace Alis.Reactive.Validation
 {
-    internal abstract class ClientValidationProjectionDefinition
-    {
-        internal abstract ClientValidationProjection Project(ClientValidationProjectionRequest request);
-    }
-
-    internal sealed class ClientValidationProjectionDefinition<TModel> : ClientValidationProjectionDefinition
-        where TModel : class
+    internal sealed class ClientValidationProjectionDefinition
     {
         private readonly IReadOnlyList<ClientValidationField> _fields;
 
@@ -18,7 +12,7 @@ namespace Alis.Reactive.Validation
             _fields = fields ?? throw new ArgumentNullException(nameof(fields));
         }
 
-        internal override ClientValidationProjection Project(ClientValidationProjectionRequest request)
+        internal ClientValidationProjection Project(ClientValidationProjectionRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
