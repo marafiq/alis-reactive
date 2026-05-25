@@ -377,21 +377,21 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("GatherInput")
                 .Requires("kind", Literal("gather"))
-                .Requires("components", "GatherField[]")
+                .Requires("payloadFields", "GatherField[]")
                 .Requires("transport", "Transport")
-                .Requires("statics", "GatherStatics")
+                .Requires("supplementalFields", "SupplementalGatherFields")
                 .Requires("selection", "GatherSelection"));
 
             contract.Declare(Union(
-                "GatherStatics",
-                "NoGatherStatics",
-                "StaticGatherValue"));
+                "SupplementalGatherFields",
+                "NoSupplementalGatherFields",
+                "DeclaredSupplementalGatherFields"));
 
-            contract.Declare(Interface("NoGatherStatics")
+            contract.Declare(Interface("NoSupplementalGatherFields")
                 .Requires("kind", Literal("none")));
 
-            contract.Declare(Interface("StaticGatherValue")
-                .Requires("kind", Literal("value"))
+            contract.Declare(Interface("DeclaredSupplementalGatherFields")
+                .Requires("kind", Literal("declared"))
                 .Requires("value", "ObjectProducer"));
 
             contract.Declare(Union(

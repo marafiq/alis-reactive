@@ -60,7 +60,7 @@ describe("all registered input gather lifecycle", () => {
 
     expect(resolveGather({
       ...allRegisteredInputs(),
-      components: [
+      payloadFields: [
         {
           key: "addressLine",
           value: literal("manual", stringShape),
@@ -88,8 +88,8 @@ describe("all registered input gather lifecycle", () => {
 
     expect(resolveGather({
       ...allRegisteredInputs(),
-      statics: {
-        kind: "value",
+      supplementalFields: {
+        kind: "declared",
         value: objectValue({
           addressLine: literal("manual", stringShape),
         }),
@@ -116,8 +116,8 @@ describe("all registered input gather lifecycle", () => {
 
     expect(resolveGather({
       ...allRegisteredInputs(),
-      statics: {
-        kind: "value",
+      supplementalFields: {
+        kind: "declared",
         value: objectValue({
           "address.city": literal("Seattle", stringShape),
         }),
@@ -216,9 +216,9 @@ function registeredInputComponent(id: string, bindingPath: string, valueMember: 
 function allRegisteredInputs(): Extract<RequestInput, { kind: "gather" }> {
   return {
     kind: "gather",
-    components: [],
+    payloadFields: [],
     transport: "json",
-    statics: { kind: "none" },
+    supplementalFields: { kind: "none" },
     selection: { kind: "all-registered-inputs" },
   };
 }

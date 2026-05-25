@@ -477,38 +477,38 @@ namespace Alis.Reactive.PlanModel
     [JsonConverter(typeof(GatherInputJsonConverter))]
     internal sealed class GatherInput : RequestInput
     {
-        private readonly GatherFieldList _components;
+        private readonly GatherFieldList _payloadFields;
         private readonly RequestTransport _transport;
-        private readonly GatherStatics _statics;
+        private readonly SupplementalGatherFields _supplementalFields;
         private readonly GatherSelection _selection;
 
         public string Kind => "gather";
-        public IReadOnlyList<GatherField> Components => _components.ForJson;
+        public IReadOnlyList<GatherField> PayloadFields => _payloadFields.ForJson;
         public string Transport => _transport.Value;
-        public GatherStatics Statics => _statics;
+        public SupplementalGatherFields SupplementalFields => _supplementalFields;
         public GatherSelection Selection => _selection;
 
         private GatherInput(
-            GatherFieldList components,
+            GatherFieldList payloadFields,
             RequestTransport transport,
-            GatherStatics statics,
+            SupplementalGatherFields supplementalFields,
             GatherSelection selection)
         {
-            _components = components ?? throw new System.ArgumentNullException(nameof(components));
+            _payloadFields = payloadFields ?? throw new System.ArgumentNullException(nameof(payloadFields));
             _transport = transport ?? throw new System.ArgumentNullException(nameof(transport));
-            _statics = statics ?? throw new System.ArgumentNullException(nameof(statics));
+            _supplementalFields = supplementalFields ?? throw new System.ArgumentNullException(nameof(supplementalFields));
             _selection = selection ?? throw new System.ArgumentNullException(nameof(selection));
         }
 
         internal static GatherInput From(
-            IEnumerable<GatherField> components,
+            IEnumerable<GatherField> payloadFields,
             RequestTransport transport,
-            GatherStatics statics,
+            SupplementalGatherFields supplementalFields,
             GatherSelection selection) =>
             new GatherInput(
-                GatherFieldList.From(components),
+                GatherFieldList.From(payloadFields),
                 transport,
-                statics,
+                supplementalFields,
                 selection);
     }
 
@@ -520,9 +520,9 @@ namespace Alis.Reactive.PlanModel
 
             writer.WriteStartObject();
             writer.WriteString("kind", value.Kind);
-            WriteProperty(writer, options, "components", value.Components);
+            WriteProperty(writer, options, "payloadFields", value.PayloadFields);
             writer.WriteString("transport", value.Transport);
-            WriteProperty(writer, options, "statics", value.Statics);
+            WriteProperty(writer, options, "supplementalFields", value.SupplementalFields);
             WriteProperty(writer, options, "selection", value.Selection);
             writer.WriteEndObject();
         }
@@ -572,23 +572,23 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    [JsonConverter(typeof(GatherStaticsJsonConverter))]
-    internal abstract class GatherStatics
+    [JsonConverter(typeof(SupplementalGatherFieldsJsonConverter))]
+    internal abstract class SupplementalGatherFields
     {
-        private GatherStatics() { }
+        private SupplementalGatherFields() { }
 
-        internal static GatherStatics None { get; } = new NoGatherStatics();
+        internal static SupplementalGatherFields None { get; } = new NoSupplementalGatherFields();
 
         public abstract string Kind { get; }
         internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
-        internal static GatherStatics From(ObjectProducer value)
+        internal static SupplementalGatherFields From(ObjectProducer value)
         {
             if (value == null) throw new System.ArgumentNullException(nameof(value));
-            return new StaticGatherValue(value);
+            return new DeclaredSupplementalGatherFields(value);
         }
 
-        private sealed class NoGatherStatics : GatherStatics
+        private sealed class NoSupplementalGatherFields : SupplementalGatherFields
         {
             public override string Kind => "none";
 
@@ -597,25 +597,25 @@ namespace Alis.Reactive.PlanModel
             }
         }
 
-        private sealed class StaticGatherValue : GatherStatics
+        private sealed class DeclaredSupplementalGatherFields : SupplementalGatherFields
         {
             private readonly ObjectProducer _value;
 
-            internal StaticGatherValue(ObjectProducer value)
+            internal DeclaredSupplementalGatherFields(ObjectProducer value)
             {
                 _value = value ?? throw new System.ArgumentNullException(nameof(value));
             }
 
-            public override string Kind => "value";
+            public override string Kind => "declared";
 
             internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-                GatherStaticsJsonConverter.WriteProperty(writer, options, "value", _value);
+                SupplementalGatherFieldsJsonConverter.WriteProperty(writer, options, "value", _value);
         }
     }
 
-    internal sealed class GatherStaticsJsonConverter : JsonConverter<GatherStatics>
+    internal sealed class SupplementalGatherFieldsJsonConverter : JsonConverter<SupplementalGatherFields>
     {
-        public override void Write(Utf8JsonWriter writer, GatherStatics value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, SupplementalGatherFields value, JsonSerializerOptions options)
         {
             if (value == null) throw new System.ArgumentNullException(nameof(value));
 
@@ -625,7 +625,7 @@ namespace Alis.Reactive.PlanModel
             writer.WriteEndObject();
         }
 
-        public override GatherStatics Read(
+        public override SupplementalGatherFields Read(
             ref Utf8JsonReader reader,
             System.Type typeToConvert,
             JsonSerializerOptions options) =>

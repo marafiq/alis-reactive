@@ -254,7 +254,7 @@ namespace Alis.Reactive.Builders.Requests
                 return RequestPayload.Send(
                     fieldSelection.ToInput(
                         context.Transport,
-                        supplementalFields.StaticsForGather));
+                        supplementalFields.ForGatherInput));
             }
 
             var requestBodyComesOnlyFromSupplementalFields = supplementalFields.HasFields;
@@ -378,15 +378,17 @@ namespace Alis.Reactive.Builders.Requests
                 selection);
         }
 
-        internal GatherInput ToInput(RequestTransport transport, GatherStatics statics)
+        internal GatherInput ToInput(
+            RequestTransport transport,
+            SupplementalGatherFields supplementalFields)
         {
             if (transport == null) throw new ArgumentNullException(nameof(transport));
-            if (statics == null) throw new ArgumentNullException(nameof(statics));
+            if (supplementalFields == null) throw new ArgumentNullException(nameof(supplementalFields));
 
             return GatherInput.From(
                 _fields,
                 transport,
-                statics,
+                supplementalFields,
                 _selection);
         }
     }
@@ -597,16 +599,16 @@ namespace Alis.Reactive.Builders.Requests
 
         internal bool HasFields => _fields.Count > 0;
 
-        internal GatherStatics StaticsForGather
+        internal SupplementalGatherFields ForGatherInput
         {
             get
             {
                 var hasNoSupplementalFields = !HasFields;
                 if (hasNoSupplementalFields)
-                    return GatherStatics.None;
+                    return SupplementalGatherFields.None;
 
                 var supplementalFieldObject = ValueProducer.Object(CopyFields());
-                return GatherStatics.From(supplementalFieldObject);
+                return SupplementalGatherFields.From(supplementalFieldObject);
             }
         }
 

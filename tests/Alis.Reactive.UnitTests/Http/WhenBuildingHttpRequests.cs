@@ -94,7 +94,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("components")
+            .GetProperty("payloadFields")
             .EnumerateArray()
             .Select(field => field.GetProperty("key").GetString())
             .ToList();
@@ -125,10 +125,14 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("input");
 
         Assert.That(input.GetProperty("kind").GetString(), Is.EqualTo("gather"));
-        Assert.That(input.GetProperty("components").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(input.GetProperty("payloadFields").GetArrayLength(), Is.EqualTo(0));
         Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
             Is.EqualTo("all-registered-inputs"));
-        Assert.That(input.GetProperty("statics")
+        Assert.That(input.GetProperty("supplementalFields")
+                .GetProperty("kind")
+                .GetString(),
+            Is.EqualTo("declared"));
+        Assert.That(input.GetProperty("supplementalFields")
                 .GetProperty("value")
                 .GetProperty("fields")
                 .TryGetProperty("Id", out _),
@@ -156,7 +160,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("components");
+            .GetProperty("payloadFields");
 
         Assert.That(components.GetArrayLength(), Is.EqualTo(0));
     }
@@ -181,7 +185,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("input");
 
         Assert.That(input.GetProperty("kind").GetString(), Is.EqualTo("gather"));
-        Assert.That(input.GetProperty("components").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(input.GetProperty("payloadFields").GetArrayLength(), Is.EqualTo(0));
         Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
             Is.EqualTo("all-registered-inputs"));
     }

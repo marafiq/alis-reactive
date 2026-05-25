@@ -474,22 +474,22 @@ export interface NoRequestInput {
 
 export interface GatherInput {
   kind: "gather";
-  components: GatherField[];
+  payloadFields: GatherField[];
   transport: Transport;
-  statics: GatherStatics;
+  supplementalFields: SupplementalGatherFields;
   selection: GatherSelection;
 }
 
-export type GatherStatics =
-  | NoGatherStatics
-  | StaticGatherValue;
+export type SupplementalGatherFields =
+  | NoSupplementalGatherFields
+  | DeclaredSupplementalGatherFields;
 
-export interface NoGatherStatics {
+export interface NoSupplementalGatherFields {
   kind: "none";
 }
 
-export interface StaticGatherValue {
-  kind: "value";
+export interface DeclaredSupplementalGatherFields {
+  kind: "declared";
   value: ObjectProducer;
 }
 

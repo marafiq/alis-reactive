@@ -2,7 +2,7 @@
 // Every field carries a ValueProducer — evaluated via evaluateValue().
 // No parallel read path. Shape flows from plan → transport for wire formatting.
 
-import type { Plan, Component, GatherField, GatherInput, GatherStatics, HttpMethod, ObjectProducer, RequestInput, Transport, ValueProducer } from "../types";
+import type { Plan, Component, GatherField, GatherInput, HttpMethod, ObjectProducer, RequestInput, SupplementalGatherFields, Transport, ValueProducer } from "../types";
 import type { ExecContext } from "../types";
 import { assertNever } from "../core/assert-never";
 import { toString } from "../core/shape-convert";
@@ -197,8 +197,8 @@ class GatherRequestInputResolver extends RequestInputResolver {
     const output = GatherOutput.for(this.input.transport, runtime.method);
 
     const claims = GatherPayloadClaims.empty();
-    gatherExplicitFields(this.input, output.transport, runtime, claims);
-    emitStaticValues(this.input, output.transport, runtime, claims);
+    gatherExplicitPayloadFields(this.input, output.transport, runtime, claims);
+    emitSupplementalFields(this.input, output.transport, runtime, claims);
 
     RuntimeRegisteredInputSelection
       .from(this.input.selection, claims)
@@ -208,26 +208,26 @@ class GatherRequestInputResolver extends RequestInputResolver {
   }
 }
 
-/** Gather explicit request fields, tracking both their payload keys and any component reads. */
-function gatherExplicitFields(
+/** Gather explicit request payload fields, tracking both their payload keys and any component reads. */
+function gatherExplicitPayloadFields(
   gatherInput: GatherInput,
   transport: TransportStrategy,
   runtime: GatherRuntime,
   claims: GatherPayloadClaims,
 ): void {
-  for (const field of gatherInput.components) {
+  for (const field of gatherInput.payloadFields) {
     ExplicitGatherField.from(field).emitInto(transport, runtime, claims);
   }
 }
 
-/** Emit static/event values merged alongside component fields. */
-function emitStaticValues(
+/** Emit supplemental static/event values merged alongside explicit payload fields. */
+function emitSupplementalFields(
   gatherInput: GatherInput,
   transport: TransportStrategy,
   runtime: GatherRuntime,
   claims: GatherPayloadClaims,
 ): void {
-  StaticGatherValues.from(gatherInput.statics).emitInto(transport, runtime, claims);
+  SupplementalGatherValues.from(gatherInput.supplementalFields).emitInto(transport, runtime, claims);
 }
 
 class GatheredValue {
@@ -542,15 +542,15 @@ class AllRegisteredInputsRuntimeSelection extends RuntimeRegisteredInputSelectio
   }
 }
 
-abstract class StaticGatherValues {
-  static from(statics: GatherStatics): StaticGatherValues {
-    switch (statics.kind) {
+abstract class SupplementalGatherValues {
+  static from(supplementalFields: SupplementalGatherFields): SupplementalGatherValues {
+    switch (supplementalFields.kind) {
       case "none":
-        return NoStaticGatherValues.instance;
-      case "value":
-        return new DeclaredStaticGatherValues(statics.value);
+        return NoSupplementalGatherValues.instance;
+      case "declared":
+        return new DeclaredSupplementalGatherValues(supplementalFields.value);
       default:
-        return assertNever(statics, "gather statics");
+        return assertNever(supplementalFields, "supplemental gather fields");
     }
   }
 
@@ -561,15 +561,15 @@ abstract class StaticGatherValues {
   ): void;
 }
 
-class NoStaticGatherValues extends StaticGatherValues {
-  static readonly instance = new NoStaticGatherValues();
+class NoSupplementalGatherValues extends SupplementalGatherValues {
+  static readonly instance = new NoSupplementalGatherValues();
 
   emitInto(): void {
     return;
   }
 }
 
-class DeclaredStaticGatherValues extends StaticGatherValues {
+class DeclaredSupplementalGatherValues extends SupplementalGatherValues {
   constructor(private readonly producer: ObjectProducer) {
     super();
   }
