@@ -474,7 +474,8 @@ export interface NoRequestInput {
 
 export interface GatherInput {
   kind: "gather";
-  payloadFields: GatherPayloadField[];
+  declaredFields: GatherPayloadField[];
+  registeredInputFields: GatherPayloadField[];
   transport: Transport;
   supplementalFields: SupplementalGatherFields;
   selection: GatherSelection;

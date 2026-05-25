@@ -255,8 +255,9 @@ Source:
 Domain terms:
 
 - `GatherDraft`
-- `GatherField`
-- `GatherFieldSelection`
+- `DeclaredGatherFields`
+- `BuildTimeRegisteredInputGatherFields`
+- `GatherPayloadFieldSelection`
 - `GatheredComponentValue`
 - `RequestScalarSlot`
 - `HeaderName`
@@ -267,8 +268,9 @@ Runtime behavior:
 
 Gather is a declared request input. It combines registered input components and
 supplemental fields. Scalar destinations such as headers and route parameters
-must stay scalar. `IncludeAll` expands registered input slots; it should not
-silently overwrite explicit payload claims.
+must stay scalar. `IncludeAll` expands registered input slots into separate
+build-time and runtime gather fields; it should not silently overwrite declared
+payload claims.
 
 Design consequence:
 

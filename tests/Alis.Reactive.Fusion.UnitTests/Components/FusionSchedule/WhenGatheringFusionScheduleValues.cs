@@ -28,7 +28,7 @@ public class WhenGatheringFusionScheduleValues : FusionTestBase
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("payloadFields");
+            .GetProperty("declaredFields");
 
         Assert.That(ReadShape(fields[0]), Is.EqualTo("string"));
         Assert.That(ReadShape(fields[1]), Is.EqualTo("date"));

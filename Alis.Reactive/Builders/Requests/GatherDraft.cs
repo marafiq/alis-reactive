@@ -6,7 +6,7 @@ namespace Alis.Reactive.Builders.Requests
 {
     internal sealed class GatherDraft
     {
-        private readonly List<GatherPayloadField> _payloadFields = new List<GatherPayloadField>();
+        private readonly List<GatherPayloadField> _declaredFields = new List<GatherPayloadField>();
         private readonly List<GatherPayloadField> _supplementalFields =
             new List<GatherPayloadField>();
         private readonly HashSet<string> _supplementalPayloadPaths =
@@ -16,7 +16,7 @@ namespace Alis.Reactive.Builders.Requests
         private readonly Dictionary<string, ValueProducer> _routeParameterFields =
             new Dictionary<string, ValueProducer>();
 
-        internal IReadOnlyList<GatherPayloadField> PayloadFields => _payloadFields;
+        internal IReadOnlyList<GatherPayloadField> DeclaredFields => _declaredFields;
         internal IEnumerable<string> SupplementalPayloadPaths
         {
             get
@@ -33,10 +33,10 @@ namespace Alis.Reactive.Builders.Requests
             Selection = GatherSelection.AllRegisteredInputs;
         }
 
-        internal void AddPayloadField(GatherPayloadField field)
+        internal void AddDeclaredField(GatherPayloadField field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
-            _payloadFields.Add(field);
+            _declaredFields.Add(field);
         }
 
         internal void AddSupplementalField(HttpPayloadPath path, ValueProducer value)

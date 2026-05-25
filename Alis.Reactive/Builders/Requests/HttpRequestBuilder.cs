@@ -345,16 +345,21 @@ namespace Alis.Reactive.Builders.Requests
 
     internal sealed class GatherPayloadFieldSelection
     {
-        private readonly List<GatherPayloadField> _fields;
+        private readonly List<GatherPayloadField> _declaredFields;
+        private readonly List<GatherPayloadField> _registeredInputFields;
         private readonly GatherSelection _selection;
 
-        private GatherPayloadFieldSelection(List<GatherPayloadField> fields, GatherSelection selection)
+        private GatherPayloadFieldSelection(
+            List<GatherPayloadField> declaredFields,
+            List<GatherPayloadField> registeredInputFields,
+            GatherSelection selection)
         {
-            _fields = fields ?? throw new ArgumentNullException(nameof(fields));
+            _declaredFields = declaredFields ?? throw new ArgumentNullException(nameof(declaredFields));
+            _registeredInputFields = registeredInputFields ?? throw new ArgumentNullException(nameof(registeredInputFields));
             _selection = selection ?? throw new ArgumentNullException(nameof(selection));
         }
 
-        internal bool HasFields => _fields.Count > 0;
+        internal bool HasFields => _declaredFields.Count > 0 || _registeredInputFields.Count > 0;
 
         internal bool RequiresGatherInput =>
             HasFields || _selection.MayExpandRegisteredInputsAtRuntime;
@@ -366,15 +371,17 @@ namespace Alis.Reactive.Builders.Requests
             if (draft == null) throw new ArgumentNullException(nameof(draft));
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var fields = new List<GatherPayloadField>(draft.PayloadFields);
+            var declaredFields = new List<GatherPayloadField>(draft.DeclaredFields);
+            var registeredInputFields = new List<GatherPayloadField>();
             var selection = draft.Selection;
             var claims = GatherPayloadClaims.From(
-                fields,
+                declaredFields,
                 draft.SupplementalPayloadPaths);
-            selection.AddBuildTimeFields(fields, context, claims);
+            selection.AddBuildTimeRegisteredInputFields(registeredInputFields, context, claims);
 
             return new GatherPayloadFieldSelection(
-                fields,
+                declaredFields,
+                registeredInputFields,
                 selection);
         }
 
@@ -386,7 +393,8 @@ namespace Alis.Reactive.Builders.Requests
             if (supplementalFields == null) throw new ArgumentNullException(nameof(supplementalFields));
 
             return GatherInput.From(
-                _fields,
+                _declaredFields,
+                _registeredInputFields,
                 transport,
                 supplementalFields,
                 _selection);

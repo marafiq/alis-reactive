@@ -94,12 +94,41 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("payloadFields")
+            .GetProperty("declaredFields")
             .EnumerateArray()
             .Select(field => field.GetProperty("payloadPath").GetString())
             .ToList();
 
         Assert.That(fields, Is.EqualTo(new[] { "selectedId" }));
+    }
+
+    [Test]
+    public void include_all_separates_build_time_registered_inputs_from_declared_payload_fields()
+    {
+        var plan = CreatePlan();
+        RegisterTextInput(plan, "Name", "name-input");
+
+        Trigger(plan).DomReady(p =>
+        {
+            p.Post("/api/profile", g => g.IncludeAll())
+                .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+        });
+
+        var planJson = plan.RenderFormatted();
+
+        using var doc = System.Text.Json.JsonDocument.Parse(planJson);
+        var input = doc.RootElement.GetProperty("behaviors")[0]
+            .GetProperty("reaction")
+            .GetProperty("request")
+            .GetProperty("input");
+        var registeredInputFields = input
+            .GetProperty("registeredInputFields")
+            .EnumerateArray()
+            .Select(field => field.GetProperty("payloadPath").GetString())
+            .ToList();
+
+        Assert.That(input.GetProperty("declaredFields").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(registeredInputFields, Is.EqualTo(new[] { "Name" }));
     }
 
     [Test]
@@ -227,7 +256,8 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("input");
 
         Assert.That(input.GetProperty("kind").GetString(), Is.EqualTo("gather"));
-        Assert.That(input.GetProperty("payloadFields").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(input.GetProperty("declaredFields").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(input.GetProperty("registeredInputFields").GetArrayLength(), Is.EqualTo(0));
         Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
             Is.EqualTo("all-registered-inputs"));
         Assert.That(input.GetProperty("supplementalFields")
@@ -259,13 +289,13 @@ public class WhenBuildingHttpRequests : PlanTestBase
         var planJson = plan.RenderFormatted();
 
         using var doc = System.Text.Json.JsonDocument.Parse(planJson);
-        var payloadFields = doc.RootElement.GetProperty("behaviors")[0]
+        var registeredInputFields = doc.RootElement.GetProperty("behaviors")[0]
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("payloadFields");
+            .GetProperty("registeredInputFields");
 
-        Assert.That(payloadFields.GetArrayLength(), Is.EqualTo(0));
+        Assert.That(registeredInputFields.GetArrayLength(), Is.EqualTo(0));
     }
 
     [Test]
@@ -288,7 +318,8 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("input");
 
         Assert.That(input.GetProperty("kind").GetString(), Is.EqualTo("gather"));
-        Assert.That(input.GetProperty("payloadFields").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(input.GetProperty("declaredFields").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(input.GetProperty("registeredInputFields").GetArrayLength(), Is.EqualTo(0));
         Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
             Is.EqualTo("all-registered-inputs"));
     }

@@ -477,36 +477,42 @@ namespace Alis.Reactive.PlanModel
     [JsonConverter(typeof(GatherInputJsonConverter))]
     internal sealed class GatherInput : RequestInput
     {
-        private readonly GatherPayloadFieldList _payloadFields;
+        private readonly GatherPayloadFieldList _declaredFields;
+        private readonly GatherPayloadFieldList _registeredInputFields;
         private readonly RequestTransport _transport;
         private readonly SupplementalGatherFields _supplementalFields;
         private readonly GatherSelection _selection;
 
         public string Kind => "gather";
-        public IReadOnlyList<GatherPayloadField> PayloadFields => _payloadFields.ForJson;
+        public IReadOnlyList<GatherPayloadField> DeclaredFields => _declaredFields.ForJson;
+        public IReadOnlyList<GatherPayloadField> RegisteredInputFields => _registeredInputFields.ForJson;
         public string Transport => _transport.Value;
         public SupplementalGatherFields SupplementalFields => _supplementalFields;
         public GatherSelection Selection => _selection;
 
         private GatherInput(
-            GatherPayloadFieldList payloadFields,
+            GatherPayloadFieldList declaredFields,
+            GatherPayloadFieldList registeredInputFields,
             RequestTransport transport,
             SupplementalGatherFields supplementalFields,
             GatherSelection selection)
         {
-            _payloadFields = payloadFields ?? throw new System.ArgumentNullException(nameof(payloadFields));
+            _declaredFields = declaredFields ?? throw new System.ArgumentNullException(nameof(declaredFields));
+            _registeredInputFields = registeredInputFields ?? throw new System.ArgumentNullException(nameof(registeredInputFields));
             _transport = transport ?? throw new System.ArgumentNullException(nameof(transport));
             _supplementalFields = supplementalFields ?? throw new System.ArgumentNullException(nameof(supplementalFields));
             _selection = selection ?? throw new System.ArgumentNullException(nameof(selection));
         }
 
         internal static GatherInput From(
-            IEnumerable<GatherPayloadField> payloadFields,
+            IEnumerable<GatherPayloadField> declaredFields,
+            IEnumerable<GatherPayloadField> registeredInputFields,
             RequestTransport transport,
             SupplementalGatherFields supplementalFields,
             GatherSelection selection) =>
             new GatherInput(
-                GatherPayloadFieldList.From(payloadFields),
+                GatherPayloadFieldList.From(declaredFields),
+                GatherPayloadFieldList.From(registeredInputFields),
                 transport,
                 supplementalFields,
                 selection);
@@ -520,7 +526,8 @@ namespace Alis.Reactive.PlanModel
 
             writer.WriteStartObject();
             writer.WriteString("kind", value.Kind);
-            WriteProperty(writer, options, "payloadFields", value.PayloadFields);
+            WriteProperty(writer, options, "declaredFields", value.DeclaredFields);
+            WriteProperty(writer, options, "registeredInputFields", value.RegisteredInputFields);
             writer.WriteString("transport", value.Transport);
             WriteProperty(writer, options, "supplementalFields", value.SupplementalFields);
             WriteProperty(writer, options, "selection", value.Selection);
@@ -659,20 +666,21 @@ namespace Alis.Reactive.PlanModel
 
         internal abstract bool MayExpandRegisteredInputsAtRuntime { get; }
 
-        internal void AddBuildTimeFields(
-            List<GatherPayloadField> fields,
+        internal void AddBuildTimeRegisteredInputFields(
+            List<GatherPayloadField> registeredInputFields,
             PlanBuildContext context,
             GatherPayloadClaims claims)
         {
-            if (fields == null) throw new System.ArgumentNullException(nameof(fields));
+            if (registeredInputFields == null)
+                throw new System.ArgumentNullException(nameof(registeredInputFields));
             if (context == null) throw new System.ArgumentNullException(nameof(context));
             if (claims == null) throw new System.ArgumentNullException(nameof(claims));
 
-            AddBuildTimeFieldsCore(fields, context, claims);
+            AddBuildTimeRegisteredInputFieldsCore(registeredInputFields, context, claims);
         }
 
-        private protected abstract void AddBuildTimeFieldsCore(
-            List<GatherPayloadField> fields,
+        private protected abstract void AddBuildTimeRegisteredInputFieldsCore(
+            List<GatherPayloadField> registeredInputFields,
             PlanBuildContext context,
             GatherPayloadClaims claims);
 
@@ -682,8 +690,8 @@ namespace Alis.Reactive.PlanModel
 
             internal override bool MayExpandRegisteredInputsAtRuntime => false;
 
-            private protected override void AddBuildTimeFieldsCore(
-                List<GatherPayloadField> fields,
+            private protected override void AddBuildTimeRegisteredInputFieldsCore(
+                List<GatherPayloadField> registeredInputFields,
                 PlanBuildContext context,
                 GatherPayloadClaims claims)
             {
@@ -696,12 +704,12 @@ namespace Alis.Reactive.PlanModel
 
             internal override bool MayExpandRegisteredInputsAtRuntime => true;
 
-            private protected override void AddBuildTimeFieldsCore(
-                List<GatherPayloadField> fields,
+            private protected override void AddBuildTimeRegisteredInputFieldsCore(
+                List<GatherPayloadField> registeredInputFields,
                 PlanBuildContext context,
                 GatherPayloadClaims claims)
             {
-                var buildTimeFields = BuildTimeGatherPayloadFields.From(fields, claims);
+                var buildTimeFields = BuildTimeRegisteredInputGatherFields.From(registeredInputFields, claims);
 
                 foreach (var registration in context.GetRegisteredComponents())
                     buildTimeFields.AddRegisteredInput(registration);
@@ -840,23 +848,24 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class BuildTimeGatherPayloadFields
+    internal sealed class BuildTimeRegisteredInputGatherFields
     {
-        private readonly List<GatherPayloadField> _fields;
+        private readonly List<GatherPayloadField> _registeredInputFields;
         private readonly GatherPayloadClaims _claims;
 
-        private BuildTimeGatherPayloadFields(
-            List<GatherPayloadField> fields,
+        private BuildTimeRegisteredInputGatherFields(
+            List<GatherPayloadField> registeredInputFields,
             GatherPayloadClaims claims)
         {
-            _fields = fields ?? throw new System.ArgumentNullException(nameof(fields));
+            _registeredInputFields = registeredInputFields
+                ?? throw new System.ArgumentNullException(nameof(registeredInputFields));
             _claims = claims ?? throw new System.ArgumentNullException(nameof(claims));
         }
 
-        internal static BuildTimeGatherPayloadFields From(
-            List<GatherPayloadField> fields,
+        internal static BuildTimeRegisteredInputGatherFields From(
+            List<GatherPayloadField> registeredInputFields,
             GatherPayloadClaims claims) =>
-            new BuildTimeGatherPayloadFields(fields, claims);
+            new BuildTimeRegisteredInputGatherFields(registeredInputFields, claims);
 
         internal void AddRegisteredInput(
             KeyValuePair<string, Alis.Reactive.ComponentRegistration> registration)
@@ -865,7 +874,7 @@ namespace Alis.Reactive.PlanModel
             if (!payloadSlotWasReserved)
                 return;
 
-            _fields.Add(FieldFrom(registration));
+            _registeredInputFields.Add(FieldFrom(registration));
         }
 
         private static GatherPayloadField FieldFrom(

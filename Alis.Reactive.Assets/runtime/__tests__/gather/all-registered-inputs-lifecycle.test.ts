@@ -59,7 +59,7 @@ describe("all registered input gather lifecycle", () => {
 
     expect(resolveGather({
       ...allRegisteredInputs(),
-      payloadFields: [
+      declaredFields: [
         {
           payloadPath: "addressLine",
           value: literal("manual", stringShape),
@@ -221,7 +221,8 @@ function registeredInputComponent(id: string, bindingPath: string, valueMember: 
 function allRegisteredInputs(): Extract<RequestInput, { kind: "gather" }> {
   return {
     kind: "gather",
-    payloadFields: [],
+    declaredFields: [],
+    registeredInputFields: [],
     transport: "json",
     supplementalFields: { kind: "none" },
     selection: { kind: "all-registered-inputs" },

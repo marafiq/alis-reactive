@@ -32,7 +32,8 @@ describe("resolveGather", () => {
   it("formats declared static fields through their own shapes", () => {
     const input: RequestInput = {
       kind: "gather",
-      payloadFields: [],
+      declaredFields: [],
+      registeredInputFields: [],
       transport: "json",
       supplementalFields: {
         kind: "declared",

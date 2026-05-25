@@ -197,7 +197,8 @@ class GatherRequestInputResolver extends RequestInputResolver {
     const output = GatherOutput.for(this.input.transport, runtime.method);
 
     const claims = GatherPayloadClaims.empty();
-    gatherExplicitPayloadFields(this.input, output.transport, runtime, claims);
+    gatherDeclaredPayloadFields(this.input, output.transport, runtime, claims);
+    gatherBuildTimeRegisteredInputFields(this.input, output.transport, runtime, claims);
     emitSupplementalFields(this.input, output.transport, runtime, claims);
 
     RuntimeRegisteredInputSelection
@@ -208,19 +209,31 @@ class GatherRequestInputResolver extends RequestInputResolver {
   }
 }
 
-/** Gather explicit request payload fields, tracking both their payload paths and any component reads. */
-function gatherExplicitPayloadFields(
+/** Gather developer-authored request payload fields, tracking payload paths and component reads. */
+function gatherDeclaredPayloadFields(
   gatherInput: GatherInput,
   transport: TransportStrategy,
   runtime: GatherRuntime,
   claims: GatherPayloadClaims,
 ): void {
-  for (const field of gatherInput.payloadFields) {
-    DeclaredGatherPayloadField.from(field).emitInto(transport, runtime, claims);
+  for (const field of gatherInput.declaredFields) {
+    PlanGatherPayloadField.from(field).emitInto(transport, runtime, claims);
   }
 }
 
-/** Emit supplemental static/event values merged alongside explicit payload fields. */
+/** Gather registered inputs already expanded by the C# plan domain at render time. */
+function gatherBuildTimeRegisteredInputFields(
+  gatherInput: GatherInput,
+  transport: TransportStrategy,
+  runtime: GatherRuntime,
+  claims: GatherPayloadClaims,
+): void {
+  for (const field of gatherInput.registeredInputFields) {
+    PlanGatherPayloadField.from(field).emitInto(transport, runtime, claims);
+  }
+}
+
+/** Emit supplemental static/event values merged alongside plan-declared fields. */
 function emitSupplementalFields(
   gatherInput: GatherInput,
   transport: TransportStrategy,
@@ -399,11 +412,11 @@ class GatherScalarWireValue {
   }
 }
 
-class DeclaredGatherPayloadField {
+class PlanGatherPayloadField {
   private constructor(private readonly field: GatherPayloadField) {}
 
-  static from(field: GatherPayloadField): DeclaredGatherPayloadField {
-    return new DeclaredGatherPayloadField(field);
+  static from(field: GatherPayloadField): PlanGatherPayloadField {
+    return new PlanGatherPayloadField(field);
   }
 
   emitInto(
@@ -411,7 +424,7 @@ class DeclaredGatherPayloadField {
     runtime: GatherRuntime,
     claims: GatherPayloadClaims,
   ): void {
-    claims.recordDeclaredField(this.field);
+    claims.recordPlanField(this.field);
 
     const raw = evaluateValue(this.field.value, runtime.plan, runtime.ctx);
     const shape = RuntimeShape.declaredBy(this.field.value);
@@ -429,9 +442,9 @@ class GatherPayloadClaims {
     return new GatherPayloadClaims(GatherPayloadSlots.empty(), new Set<string>());
   }
 
-  recordDeclaredField(field: GatherPayloadField): void {
+  recordPlanField(field: GatherPayloadField): void {
     this.claimPayloadPath(field.payloadPath);
-    ExplicitGatherComponentRead.from(field.value).recordIn(this.componentKeys);
+    PlannedGatherComponentRead.from(field.value).recordIn(this.componentKeys);
   }
 
   claimPayloadPath(payloadPath: string): void {
@@ -468,30 +481,30 @@ class GatherPayloadSlots {
   }
 }
 
-abstract class ExplicitGatherComponentRead {
-  static from(producer: ValueProducer): ExplicitGatherComponentRead {
+abstract class PlannedGatherComponentRead {
+  static from(producer: ValueProducer): PlannedGatherComponentRead {
     const producerReadsRuntimeValue = producer.kind === "read";
-    if (!producerReadsRuntimeValue) return NoExplicitGatherComponentRead.instance;
+    if (!producerReadsRuntimeValue) return NoPlannedGatherComponentRead.instance;
 
     const source = producer.from;
     const producerReadsComponent = source.kind === "component";
-    if (!producerReadsComponent) return NoExplicitGatherComponentRead.instance;
+    if (!producerReadsComponent) return NoPlannedGatherComponentRead.instance;
 
-    return new ComponentReadGatherField(source.component);
+    return new PlannedComponentGatherRead(source.component);
   }
 
   abstract recordIn(gatheredComponents: Set<string>): void;
 }
 
-class NoExplicitGatherComponentRead extends ExplicitGatherComponentRead {
-  static readonly instance = new NoExplicitGatherComponentRead();
+class NoPlannedGatherComponentRead extends PlannedGatherComponentRead {
+  static readonly instance = new NoPlannedGatherComponentRead();
 
   recordIn(): void {
     return;
   }
 }
 
-class ComponentReadGatherField extends ExplicitGatherComponentRead {
+class PlannedComponentGatherRead extends PlannedGatherComponentRead {
   constructor(private readonly componentKey: string) {
     super();
   }
@@ -580,7 +593,7 @@ class DeclaredSupplementalGatherValues extends SupplementalGatherValues {
     claims: GatherPayloadClaims,
   ): void {
     for (const field of this.fields) {
-      DeclaredGatherPayloadField.from(field).emitInto(transport, runtime, claims);
+      PlanGatherPayloadField.from(field).emitInto(transport, runtime, claims);
     }
   }
 }
