@@ -1,4 +1,4 @@
-import type { JsType } from "../types";
+import type { JsType, Shape } from "../types";
 import type { PartId, PlanContributionSource, PlanId } from "./plan-contribution-source";
 
 export class BrowserObjectContractLedger {
@@ -221,16 +221,22 @@ type JsEvent = JsType["events"][string];
 
 function canMergeProperties(existing: JsProperty, incoming: JsProperty): boolean {
   return stableJson(existing.path) === stableJson(incoming.path)
-    && stableJson(existing.shape) === stableJson(incoming.shape);
+    && mergeObjectContractShapes(existing.shape, incoming.shape) !== undefined;
 }
 
 function mergeProperties(existing: JsProperty, incoming: JsProperty): JsProperty {
-  if (!canMergeProperties(existing, incoming)) {
+  if (stableJson(existing.path) !== stableJson(incoming.path)) {
+    throw new Error("[alis] incompatible property contracts cannot be merged");
+  }
+
+  const shape = mergeObjectContractShapes(existing.shape, incoming.shape);
+  if (shape === undefined) {
     throw new Error("[alis] incompatible property contracts cannot be merged");
   }
 
   return {
     ...existing,
+    shape,
     access: mergeMemberAccess(existing.access, incoming.access),
   };
 }
@@ -245,37 +251,45 @@ function mergeMemberAccess(
 
 function canMergeMethods(existing: JsMethod, incoming: JsMethod): boolean {
   return stableJson(existing.path) === stableJson(incoming.path)
-    && canMergeMethodArguments(existing.arguments, incoming.arguments)
-    && stableJson(existing.returns) === stableJson(incoming.returns);
+    && mergeMethodArguments(existing.arguments, incoming.arguments) !== undefined
+    && mergeObjectContractShapes(existing.returns, incoming.returns) !== undefined;
 }
 
 function mergeMethods(existing: JsMethod, incoming: JsMethod): JsMethod {
-  if (!canMergeMethods(existing, incoming)) {
+  if (stableJson(existing.path) !== stableJson(incoming.path)) {
+    throw new Error("[alis] incompatible method contracts cannot be merged");
+  }
+
+  const args = mergeMethodArguments(existing.arguments, incoming.arguments);
+  const returns = mergeObjectContractShapes(existing.returns, incoming.returns);
+  if (args === undefined || returns === undefined) {
     throw new Error("[alis] incompatible method contracts cannot be merged");
   }
 
   return {
     ...existing,
-    arguments: mergeMethodArguments(existing.arguments, incoming.arguments),
+    arguments: args,
+    returns,
   };
-}
-
-function canMergeMethodArguments(
-  existing: JsMethod["arguments"],
-  incoming: JsMethod["arguments"],
-): boolean {
-  return existing.kind === "open"
-    || incoming.kind === "open"
-    || stableJson(existing.shapes) === stableJson(incoming.shapes);
 }
 
 function mergeMethodArguments(
   existing: JsMethod["arguments"],
   incoming: JsMethod["arguments"],
-): JsMethod["arguments"] {
+): JsMethod["arguments"] | undefined {
   if (existing.kind === "open") return incoming;
   if (incoming.kind === "open") return existing;
-  return existing;
+
+  if (existing.shapes.length !== incoming.shapes.length) return undefined;
+
+  const shapes: Shape[] = [];
+  for (let index = 0; index < existing.shapes.length; index++) {
+    const shape = mergeObjectContractShapes(existing.shapes[index]!, incoming.shapes[index]!);
+    if (shape === undefined) return undefined;
+    shapes.push(shape);
+  }
+
+  return { kind: "exact", shapes };
 }
 
 function canMergeEvents(existing: JsEvent, incoming: JsEvent): boolean {
@@ -288,6 +302,62 @@ function mergeEvents(existing: JsEvent, incoming: JsEvent): JsEvent {
   }
 
   return existing;
+}
+
+function mergeObjectContractShapes(existing: Shape, incoming: Shape): Shape | undefined {
+  if (stableJson(existing) === stableJson(incoming)) return existing;
+  if (existing.kind === "none" || incoming.kind === "none") return undefined;
+  if (existing.kind === "any") return incoming;
+  if (incoming.kind === "any") return existing;
+  if (isNullableOf(existing, incoming)) return existing;
+  if (isNullableOf(incoming, existing)) return incoming;
+  if (existing.kind === "array" && incoming.kind === "array") {
+    return mergeArrayShapes(existing, incoming);
+  }
+  if (existing.kind === "object" && incoming.kind === "object") {
+    return mergeObjectShapes(existing, incoming);
+  }
+
+  return undefined;
+}
+
+function isNullableOf(shape: Shape, inner: Shape): boolean {
+  return shape.kind === "nullable" && stableJson(shape.inner) === stableJson(inner);
+}
+
+function mergeArrayShapes(
+  existing: Extract<Shape, { kind: "array" }>,
+  incoming: Extract<Shape, { kind: "array" }>,
+): Shape | undefined {
+  const item = mergeObjectContractShapes(existing.item, incoming.item);
+  if (item === undefined) return undefined;
+  return { kind: "array", item };
+}
+
+function mergeObjectShapes(
+  existing: Extract<Shape, { kind: "object" }>,
+  incoming: Extract<Shape, { kind: "object" }>,
+): Shape | undefined {
+  const fields: Record<string, Shape> = { ...existing.fields };
+  for (const [field, incomingShape] of Object.entries(incoming.fields)) {
+    const existingShape = fields[field];
+    if (existingShape === undefined) {
+      fields[field] = incomingShape;
+      continue;
+    }
+
+    const merged = mergeObjectContractShapes(existingShape, incomingShape);
+    if (merged === undefined) return undefined;
+    fields[field] = merged;
+  }
+
+  const bothAreOpenObjects = existing.additional && incoming.additional;
+  const noDeclaredFields = Object.keys(fields).length === 0;
+  return {
+    kind: "object",
+    fields,
+    additional: bothAreOpenObjects && noDeclaredFields,
+  };
 }
 
 export function stableJson(value: unknown): string {

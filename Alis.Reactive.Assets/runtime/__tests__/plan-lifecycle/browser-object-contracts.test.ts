@@ -3,6 +3,7 @@ import { PlanRegistry } from "../../lifecycle/merge-plan";
 import {
   behavior,
   component,
+  jsTypeWithMethodShape,
   jsTypeWithPropertyAccess,
   jsTypeWithPropertyShape,
   jsTypeWithReadableProperty,
@@ -87,6 +88,94 @@ describe("browser object contract fragments", () => {
         types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "number" }) },
       }),
     ], hooks)).toThrow('partial plan contribution "second-slot" cannot declare type "plugin.address"');
+  });
+
+  it("refines compatible property shapes when object contract fragments merge", () => {
+    const registry = new PlanRegistry();
+    const { hooks } = mergeHooks();
+    const planId = "Resident.Root";
+    const sharedTypeKey = "plugin.address";
+
+    registry.loadPartialSlot("first-slot", [
+      partialPlan(planId, "server-first", {
+        types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "any" }) },
+      }),
+    ], hooks);
+    registry.loadPartialSlot("second-slot", [
+      partialPlan(planId, "server-second", {
+        types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "string" }) },
+      }),
+    ], hooks);
+
+    expect(registry.get(planId)?.types[sharedTypeKey].properties.token.shape)
+      .toEqual({ kind: "string" });
+
+    registry.unloadPartialSlot("second-slot");
+
+    expect(registry.get(planId)?.types[sharedTypeKey].properties.token.shape)
+      .toEqual({ kind: "any" });
+  });
+
+  it("merges compatible object property fields from separate fragments", () => {
+    const registry = new PlanRegistry();
+    const { hooks } = mergeHooks();
+    const planId = "Resident.Root";
+    const sharedTypeKey = "plugin.resident";
+
+    registry.loadPartialSlot("name-slot", [
+      partialPlan(planId, "server-name", {
+        types: {
+          [sharedTypeKey]: jsTypeWithPropertyShape("profile", {
+            kind: "object",
+            fields: { name: { kind: "string" } },
+            additional: false,
+          }),
+        },
+      }),
+    ], hooks);
+    registry.loadPartialSlot("age-slot", [
+      partialPlan(planId, "server-age", {
+        types: {
+          [sharedTypeKey]: jsTypeWithPropertyShape("profile", {
+            kind: "object",
+            fields: { age: { kind: "number" } },
+            additional: false,
+          }),
+        },
+      }),
+    ], hooks);
+
+    expect(registry.get(planId)?.types[sharedTypeKey].properties.profile.shape)
+      .toEqual({
+        kind: "object",
+        fields: {
+          name: { kind: "string" },
+          age: { kind: "number" },
+        },
+        additional: false,
+      });
+  });
+
+  it("merges compatible method argument and return shapes", () => {
+    const registry = new PlanRegistry();
+    const { hooks } = mergeHooks();
+    const planId = "Resident.Root";
+    const sharedTypeKey = "plugin.address";
+
+    registry.loadPartialSlot("first-slot", [
+      partialPlan(planId, "server-first", {
+        types: { [sharedTypeKey]: jsTypeWithMethodShape("normalize", { kind: "any" }, { kind: "any" }) },
+      }),
+    ], hooks);
+    registry.loadPartialSlot("second-slot", [
+      partialPlan(planId, "server-second", {
+        types: { [sharedTypeKey]: jsTypeWithMethodShape("normalize", { kind: "string" }, { kind: "string" }) },
+      }),
+    ], hooks);
+
+    const method = registry.get(planId)?.types[sharedTypeKey].methods.normalize;
+    expect(method?.arguments).toEqual({ kind: "exact", shapes: [{ kind: "string" }] });
+    expect(method?.returns).toEqual({ kind: "string" });
   });
 
   it("lets a later slot reuse a member differently after the previous fragment unloads", () => {

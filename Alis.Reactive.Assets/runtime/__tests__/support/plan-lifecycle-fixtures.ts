@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 import type { MergeHooks } from "../../lifecycle/merge-plan";
-import type { Behavior, Component, ComponentValidation, JsType, Plan } from "../../types";
+import type { Behavior, Component, ComponentValidation, JsType, Plan, Shape } from "../../types";
 
 export function jsType(): JsType {
   return {
@@ -48,6 +48,24 @@ export function jsTypeWithPropertyShape(
       },
     },
     methods: {},
+    events: {},
+  };
+}
+
+export function jsTypeWithMethodShape(
+  member: string,
+  argumentShape: Shape,
+  returnShape: Shape,
+): JsType {
+  return {
+    properties: {},
+    methods: {
+      [member]: {
+        path: [{ kind: "property", name: member }],
+        arguments: { kind: "exact", shapes: [argumentShape] },
+        returns: returnShape,
+      },
+    },
     events: {},
   };
 }
