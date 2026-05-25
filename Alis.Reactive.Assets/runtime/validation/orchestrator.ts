@@ -5,8 +5,7 @@
 
 import type {
   Plan, ValidationContainerComponent, ComponentValidation,
-  ValidationRule, ValueProducer,
-  ValidationCondition,
+  ValidationRule,
   ValidationRuleActivation as PlanValidationRuleActivation,
   ValidationRuleOperand as PlanValidationRuleOperand,
 } from "../types";
@@ -418,10 +417,9 @@ function evaluateRulesForField(
   surface: ValidationSurface,
 ): boolean {
   for (const rule of field.componentValidation.rules) {
-    const runtimeRule = RuntimeValidationRule.from(rule);
-    if (!runtimeRule.isActive(surface)) continue;
+    if (!isRuleActive(rule.execution.activation, surface)) continue;
 
-    const otherValue = runtimeRule.resolvePeerValue(surface.plan);
+    const otherValue = resolvePeerValue(rule.execution.otherValue, surface.plan);
 
     if (ruleFails({ rule, value: field.value, peerValue: otherValue })) {
       reportRuleFailure(field, rule, surface);
@@ -457,103 +455,47 @@ function isResolutionError(e: unknown): boolean {
 function allRulesConditionallySkipped(rules: ValidationRule[], surface: ValidationSurface): boolean {
   if (rules.length === 0) return true;
   for (const rule of rules) {
-    if (!RuntimeValidationRule.from(rule).isConditionallySkipped(surface)) return false;
+    if (!isRuleSkippedForUnmountedField(rule.execution.activation, surface)) return false;
   }
   return true;
 }
 
-class RuntimeValidationRule {
-  private constructor(private readonly rule: ValidationRule) {}
-
-  static from(rule: ValidationRule): RuntimeValidationRule {
-    return new RuntimeValidationRule(rule);
-  }
-
-  isActive(surface: ValidationSurface): boolean {
-    return ValidationActivation.from(this.rule.execution.activation).isActive(surface);
-  }
-
-  isConditionallySkipped(surface: ValidationSurface): boolean {
-    return ValidationActivation.from(this.rule.execution.activation).isSkippedForUnmountedField(surface);
-  }
-
-  resolvePeerValue(plan: Plan): ResolvedPeerValue {
-    return ValidationPeerOperand.from(this.rule.execution.otherValue).resolve(plan);
+function isRuleActive(
+  activation: PlanValidationRuleActivation,
+  surface: ValidationSurface,
+): boolean {
+  switch (activation.kind) {
+    case "always": return true;
+    case "when": return evaluateValidationCondition(activation.condition, surface.plan, surface.context.raw);
+    default: return assertNever(activation, "validation rule activation");
   }
 }
 
-abstract class ValidationActivation {
-  static from(activation: PlanValidationRuleActivation): ValidationActivation {
-    switch (activation.kind) {
-      case "always": return AlwaysValidationActivation.instance;
-      case "when": return new ConditionalValidationActivation(activation.condition);
-      default: return assertNever(activation, "validation rule activation");
-    }
-  }
-
-  abstract isActive(surface: ValidationSurface): boolean;
-
-  abstract isSkippedForUnmountedField(surface: ValidationSurface): boolean;
-}
-
-class AlwaysValidationActivation extends ValidationActivation {
-  static readonly instance = new AlwaysValidationActivation();
-
-  isActive(): boolean {
-    return true;
-  }
-
-  isSkippedForUnmountedField(): boolean {
-    return false;
+function isRuleSkippedForUnmountedField(
+  activation: PlanValidationRuleActivation,
+  surface: ValidationSurface,
+): boolean {
+  switch (activation.kind) {
+    case "always": return false;
+    case "when":
+      try {
+        return !evaluateValidationCondition(activation.condition, surface.plan, surface.context.raw);
+      } catch (e) {
+        if (isResolutionError(e)) return true;
+        throw e;
+      }
+    default: return assertNever(activation, "validation rule activation");
   }
 }
 
-class ConditionalValidationActivation extends ValidationActivation {
-  constructor(private readonly condition: ValidationCondition) {
-    super();
-  }
-
-  isActive(surface: ValidationSurface): boolean {
-    return evaluateValidationCondition(this.condition, surface.plan, surface.context.raw);
-  }
-
-  isSkippedForUnmountedField(surface: ValidationSurface): boolean {
-    try {
-      return !evaluateValidationCondition(this.condition, surface.plan, surface.context.raw);
-    } catch (e) {
-      if (isResolutionError(e)) return true;
-      throw e;
-    }
-  }
-}
-
-abstract class ValidationPeerOperand {
-  static from(operand: PlanValidationRuleOperand): ValidationPeerOperand {
-    switch (operand.kind) {
-      case "none": return MissingValidationPeerOperand.instance;
-      case "value": return new PresentValidationPeerOperand(operand.value);
-      default: return assertNever(operand, "validation peer operand");
-    }
-  }
-
-  abstract resolve(plan: Plan): ResolvedPeerValue;
-}
-
-class MissingValidationPeerOperand extends ValidationPeerOperand {
-  static readonly instance = new MissingValidationPeerOperand();
-
-  resolve(): ResolvedPeerValue {
-    return noPeerValue();
-  }
-}
-
-class PresentValidationPeerOperand extends ValidationPeerOperand {
-  constructor(private readonly value: ValueProducer) {
-    super();
-  }
-
-  resolve(plan: Plan): ResolvedPeerValue {
-    return peerValue(evaluateValue(this.value, plan));
+function resolvePeerValue(
+  operand: PlanValidationRuleOperand,
+  plan: Plan,
+): ResolvedPeerValue {
+  switch (operand.kind) {
+    case "none": return noPeerValue();
+    case "value": return peerValue(evaluateValue(operand.value, plan));
+    default: return assertNever(operand, "validation peer operand");
   }
 }
 
