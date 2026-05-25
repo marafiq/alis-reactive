@@ -2,9 +2,12 @@
 
 import type { Plan, Behavior } from "../types";
 import {
-  ComponentContribution,
   ComponentOwnershipLedger,
   LayoutObjectReferenceLedger,
+  assertComponentCanComposeInitialPlan,
+  assertComponentCanMerge,
+  composeInitialComponentIntoPlan,
+  mergeComponentIntoPlan,
 } from "./component-contribution";
 import { BrowserObjectContractLedger, mergeJsTypes } from "./object-contract-fragment";
 import { AppliedSlotContributionRemoval } from "./applied-slot-contribution-removal";
@@ -82,16 +85,21 @@ class BootPlanAssembly {
 
   private assertComponentsCanCompose(contribution: Plan, source: PlanContributionSource): void {
     for (const [key, component] of Object.entries(contribution.components)) {
-      const claim = this.componentOwnership.request(contribution.planId, key);
-      ComponentContribution.from(this.plan, key, component, source, claim).assertInitialComposable();
+      assertComponentCanComposeInitialPlan(
+        this.plan,
+        { planId: contribution.planId, key, component, source },
+        { ownership: this.componentOwnership, layoutObjects: this.layoutObjects },
+      );
     }
   }
 
   private mergeComponents(contribution: Plan, source: PlanContributionSource): void {
     for (const [key, component] of Object.entries(contribution.components)) {
-      const claim = this.componentOwnership.request(contribution.planId, key);
-      ComponentContribution.from(this.plan, key, component, source, claim)
-        .composeIntoInitialPlan(this.componentOwnership, this.layoutObjects);
+      composeInitialComponentIntoPlan(
+        this.plan,
+        { planId: contribution.planId, key, component, source },
+        { ownership: this.componentOwnership, layoutObjects: this.layoutObjects },
+      );
     }
   }
 
@@ -195,8 +203,11 @@ export class AppliedBrowserPlans {
 
   private assertComponentsCanMerge(incoming: Plan, target: Plan, source: PlanContributionSource): void {
     for (const [key, comp] of Object.entries(incoming.components)) {
-      const claim = this.componentOwnership.request(incoming.planId, key);
-      ComponentContribution.from(target, key, comp, source, claim).assertMergeable();
+      assertComponentCanMerge(
+        target,
+        { planId: incoming.planId, key, component: comp, source },
+        { ownership: this.componentOwnership, layoutObjects: this.layoutObjects },
+      );
     }
   }
 
@@ -220,9 +231,11 @@ export class AppliedBrowserPlans {
 
   private mergeComponents(incoming: Plan, target: Plan, source: PlanContributionSource): void {
     for (const [key, comp] of Object.entries(incoming.components)) {
-      const claim = this.componentOwnership.request(incoming.planId, key);
-      ComponentContribution.from(target, key, comp, source, claim)
-        .mergeInto(this.componentOwnership, this.layoutObjects);
+      mergeComponentIntoPlan(
+        target,
+        { planId: incoming.planId, key, component: comp, source },
+        { ownership: this.componentOwnership, layoutObjects: this.layoutObjects },
+      );
     }
   }
 

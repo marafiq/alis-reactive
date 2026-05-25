@@ -2,9 +2,8 @@ import type { Plan } from "../types";
 import { unwireField } from "../validation/live-clear";
 import {
   ComponentOwnershipLedger,
-  ComponentValidationRules,
   LayoutObjectReferenceLedger,
-  unionSets,
+  validationRulesOf,
 } from "./component-contribution";
 import { BrowserObjectContractLedger } from "./object-contract-fragment";
 import { type AppliedSlotContribution } from "./partial-slot";
@@ -29,7 +28,7 @@ export class AppliedSlotContributionRemoval {
     this.pruneOrphanedValidationRules(
       plan,
       contribution,
-      unionSets(removedComponentKeys, removedLayoutObjectKeys));
+      new Set([...removedComponentKeys, ...removedLayoutObjectKeys]));
     this.removeTypes(plan, contribution);
 
     if (this.canPruneMergedPlan(contribution.planId, plan)) {
@@ -47,8 +46,7 @@ export class AppliedSlotContributionRemoval {
   private removeLayoutObjects(plan: Plan, contribution: AppliedSlotContribution): Set<string> {
     const removed = new Set<string>();
     for (const key of contribution.layoutObjectKeys) {
-      const release = this.layoutObjects.release(contribution.planId, key, contribution.partId);
-      if (!release.shouldRemoveMaterializedObject) continue;
+      if (!this.layoutObjects.releaseMaterializedBy(contribution.planId, key, contribution.partId)) continue;
 
       const component = plan.components[key];
       if (component) unwireField(component.id);
@@ -80,7 +78,7 @@ export class AppliedSlotContributionRemoval {
   ): void {
     if (removedKeys.size === 0) return;
     for (const [compKey, comp] of Object.entries(plan.components)) {
-      const validationRules = ComponentValidationRules.from(comp);
+      const validationRules = validationRulesOf(comp);
       if (validationRules === undefined) continue;
       if (!this.componentOwnership.isOwnedBy(contribution.planId, compKey, contribution.partId)) continue;
       validationRules.removeRulesForComponents(removedKeys);
