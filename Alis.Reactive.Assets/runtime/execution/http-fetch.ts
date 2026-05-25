@@ -12,214 +12,89 @@ export interface ResolvedFetch {
   readonly init: RequestInit;
 }
 
-export class HttpFetchBuilder {
-  private constructor(
-    private readonly request: Request,
-    private readonly plan: Plan,
-    private readonly context: ExecContext,
-  ) {}
-
-  static for(request: Request, plan: Plan, context: ExecContext): HttpFetchBuilder {
-    return new HttpFetchBuilder(request, plan, context);
-  }
-
-  build(gathered: GatherResult): ResolvedFetch {
-    const url = RequestUrlBuilder
-      .for(this.request, this.plan, this.context)
-      .withQuery(gathered.urlParams);
-    const init = new RequestInitBuilder(this.request, this.plan, this.context)
-      .withBody(gathered)
-      .withHeaders()
-      .build();
-
-    return { url, init };
-  }
+export function resolveFetch(
+  request: Request,
+  plan: Plan,
+  context: ExecContext,
+  gathered: GatherResult,
+): ResolvedFetch {
+  const url = buildRequestUrl(request, plan, context, gathered.urlParams);
+  const init = buildRequestInit(request, plan, context, gathered);
+  return { url, init };
 }
 
-class RequestUrlBuilder {
-  static for(request: Request, plan: Plan, context: ExecContext): RequestUrlBuilder {
-    return new RequestUrlBuilder(request, plan, context);
-  }
+function buildRequestUrl(
+  request: Request,
+  plan: Plan,
+  context: ExecContext,
+  urlParams: string[],
+): string {
+  const url = resolveRouteParams(request.url, request.routeParams, plan, context);
+  if (urlParams.length === 0) return url;
 
-  private constructor(
-    private readonly request: Request,
-    private readonly plan: Plan,
-    private readonly context: ExecContext,
-  ) {}
-
-  withQuery(urlParams: string[]): string {
-    const url = this.withRouteParams();
-    if (urlParams.length === 0) return url;
-
-    return url + QueryStringSeparator.for(url).value + urlParams.join("&");
-  }
-
-  private withRouteParams(): string {
-    return resolveRouteParams(this.request.url, this.request.routeParams, this.plan, this.context);
-  }
+  return url + queryStringSeparator(url) + urlParams.join("&");
 }
 
-class QueryStringSeparator {
-  private constructor(readonly value: "?" | "&") {}
-
-  static for(url: string): QueryStringSeparator {
-    const queryStringAlreadyStarted = url.includes("?");
-    if (queryStringAlreadyStarted) return new QueryStringSeparator("&");
-
-    return new QueryStringSeparator("?");
-  }
+function queryStringSeparator(url: string): "?" | "&" {
+  return url.includes("?") ? "&" : "?";
 }
 
-class RequestInitBuilder {
-  private readonly init: RequestInit;
+function buildRequestInit(
+  request: Request,
+  plan: Plan,
+  context: ExecContext,
+  gathered: GatherResult,
+): RequestInit {
+  const init: RequestInit = { method: request.method };
+  const headers: Record<string, string> = {};
 
-  constructor(
-    private readonly request: Request,
-    private readonly plan: Plan,
-    private readonly context: ExecContext,
-  ) {
-    this.init = { method: request.method };
-  }
+  applyRequestBody(request, gathered, init, headers);
+  applyRequestHeaders(request, plan, context, headers);
 
-  withBody(gathered: GatherResult): RequestInitBuilder {
-    RequestBody.from(this.request, gathered).applyTo(this.init, this.headers);
-    return this;
-  }
-
-  withHeaders(): RequestInitBuilder {
-    for (const [name, producer] of Object.entries(this.request.headers)) {
-      RuntimeHeaderResolution
-        .from(name, producer, this.plan, this.context)
-        .applyTo(this.headers);
-    }
-
-    return this;
-  }
-
-  build(): RequestInit {
-    const headers = this.headers.toRecord();
-    if (Object.keys(headers).length > 0) this.init.headers = headers;
-    return this.init;
-  }
-
-  private get headers(): RuntimeHeaders {
-    return RuntimeHeaders.for(this.init);
-  }
+  if (Object.keys(headers).length > 0) init.headers = headers;
+  return init;
 }
 
-abstract class RequestBody {
-  static from(request: Request, gathered: GatherResult): RequestBody {
-    const requestMethod = HttpRequestMethod.from(request.method);
-    if (!requestMethod.acceptsRequestBody()) return NoRequestBody.instance;
+function applyRequestBody(
+  request: Request,
+  gathered: GatherResult,
+  init: RequestInit,
+  headers: Record<string, string>,
+): void {
+  const requestMethod = HttpRequestMethod.from(request.method);
+  if (!requestMethod.acceptsRequestBody()) return;
 
-    const gatheredBody = gathered.body;
-    if (gatheredBody instanceof FormData) return new MultipartRequestBody(gatheredBody);
-
-    return JsonRequestBody.fromJsonBody(gatheredBody);
-  }
-
-  abstract applyTo(init: RequestInit, headers: RuntimeHeaders): void;
-}
-
-class NoRequestBody extends RequestBody {
-  static readonly instance = new NoRequestBody();
-
-  applyTo(_init: RequestInit, _headers: RuntimeHeaders): void {
+  const gatheredBody = gathered.body;
+  if (gatheredBody instanceof FormData) {
+    init.body = gatheredBody;
     return;
   }
+
+  const bodyHasFields = Object.keys(gatheredBody).length > 0;
+  if (!bodyHasFields) return;
+
+  headers["Content-Type"] = "application/json";
+  init.body = JSON.stringify(gatheredBody);
 }
 
-class MultipartRequestBody extends RequestBody {
-  constructor(private readonly body: FormData) {
-    super();
-  }
-
-  applyTo(init: RequestInit): void {
-    init.body = this.body;
-  }
-}
-
-class JsonRequestBody extends RequestBody {
-  private constructor(private readonly body: Record<string, unknown>) {
-    super();
-  }
-
-  static fromJsonBody(body: Record<string, unknown>): RequestBody {
-    const bodyHasFields = Object.keys(body).length > 0;
-    if (!bodyHasFields) return NoRequestBody.instance;
-
-    return new JsonRequestBody(body);
-  }
-
-  applyTo(init: RequestInit, headers: RuntimeHeaders): void {
-    headers.set("Content-Type", "application/json");
-    init.body = JSON.stringify(this.body);
-  }
-}
-
-class RuntimeHeaders {
-  private constructor(private readonly headers: Record<string, string>) {}
-
-  static for(init: RequestInit): RuntimeHeaders {
-    const existing = init.headers as Record<string, string> | undefined;
-    if (existing !== undefined) return new RuntimeHeaders(existing);
-
-    const headers: Record<string, string> = {};
-    init.headers = headers;
-    return new RuntimeHeaders(headers);
-  }
-
-  set(name: string, value: string): void {
-    this.headers[name] = value;
-  }
-
-  toRecord(): Record<string, string> {
-    return this.headers;
-  }
-}
-
-abstract class RuntimeHeaderResolution {
-  static from(name: string, producer: ValueProducer, plan: Plan, context: ExecContext): RuntimeHeaderResolution {
+function applyRequestHeaders(
+  request: Request,
+  plan: Plan,
+  context: ExecContext,
+  headers: Record<string, string>,
+): void {
+  for (const [name, producer] of Object.entries(request.headers)) {
     const value = evaluateValue(producer, plan, context);
-    if (isMissingRuntimeValue(value)) return MissingRuntimeHeader.instance;
+    if (isMissingRuntimeValue(value)) continue;
 
-    return PresentRuntimeHeader.from(name, producer, value);
-  }
-
-  abstract applyTo(headers: RuntimeHeaders): void;
-}
-
-class MissingRuntimeHeader extends RuntimeHeaderResolution {
-  static readonly instance = new MissingRuntimeHeader();
-
-  applyTo(): void {
-    return;
+    headers[name] = requestHeaderWireValue(name, producer, value);
   }
 }
 
-class PresentRuntimeHeader extends RuntimeHeaderResolution {
-  private constructor(
-    private readonly name: string,
-    private readonly value: string,
-  ) {
-    super();
-  }
+function requestHeaderWireValue(name: string, producer: ValueProducer, value: unknown): string {
+  const wireValue = RuntimeShape.declaredBy(producer).formatForWire(value);
+  const text = convertToString(wireValue);
+  if (text.ok) return text.value;
 
-  static from(name: string, producer: ValueProducer, value: unknown): PresentRuntimeHeader {
-    return new PresentRuntimeHeader(name, RequestHeaderWireValue.from(name, producer, value));
-  }
-
-  applyTo(headers: RuntimeHeaders): void {
-    headers.set(this.name, this.value);
-  }
-}
-
-class RequestHeaderWireValue {
-  static from(name: string, producer: ValueProducer, value: unknown): string {
-    const wireValue = RuntimeShape.declaredBy(producer).formatForWire(value);
-    const text = convertToString(wireValue);
-    if (text.ok) return text.value;
-
-    throw new Error(`[alis] header "${name}" cannot be serialized as a scalar: ${text.error}`);
-  }
+  throw new Error(`[alis] header "${name}" cannot be serialized as a scalar: ${text.error}`);
 }

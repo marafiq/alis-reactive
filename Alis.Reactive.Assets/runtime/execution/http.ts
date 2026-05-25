@@ -8,7 +8,7 @@ import { validateContainer } from "../validation";
 import { scope } from "../core/trace";
 import { isMissingRuntimeValue } from "../domain/runtime-value";
 import { ExecutionContext } from "../domain/execution-context";
-import { HttpFetchBuilder, type ResolvedFetch } from "./http-fetch";
+import { resolveFetch, type ResolvedFetch } from "./http-fetch";
 import { assertNever } from "../core/assert-never";
 
 const log = scope("http");
@@ -106,9 +106,7 @@ interface PreparedHttpRequest {
 function prepareHttpRequest(request: Request, plan: Plan, context: RequestContext): PreparedHttpRequest {
   const gathered = resolveGather(request.input, request.method, plan, context.current);
   const requestContext = context.withRequest(gathered);
-  const fetch = HttpFetchBuilder
-    .for(request, plan, context.current)
-    .build(gathered);
+  const fetch = resolveFetch(request, plan, context.current, gathered);
 
   return { fetch, context: requestContext };
 }
