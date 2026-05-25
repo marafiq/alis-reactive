@@ -1,6 +1,7 @@
 // merge-plan.ts — applied browser plans and partial slot replacement.
 
 import type { Plan, Behavior } from "../types";
+import { unwireField } from "../validation/live-clear";
 import {
   ComponentOwnershipLedger,
   LayoutObjectReferenceLedger,
@@ -8,9 +9,9 @@ import {
   assertComponentCanMerge,
   composeInitialComponentIntoPlan,
   mergeComponentIntoPlan,
+  validationRulesOf,
 } from "./component-contribution";
 import { BrowserObjectContractLedger, mergeJsTypes } from "./object-contract-fragment";
-import { AppliedSlotContributionRemoval } from "./applied-slot-contribution-removal";
 import {
   planContributionSourceFrom,
   type PartId,
@@ -18,7 +19,7 @@ import {
   type PlanContributionSource,
   type PlanId,
 } from "./plan-contribution-source";
-import { AppliedPartialSlots } from "./partial-slot";
+import { AppliedPartialSlots, type AppliedSlotContribution } from "./partial-slot";
 
 type WireBehaviors = (behaviors: Behavior[], plan: Plan, signal?: AbortSignal) => void;
 type WireContainerValidation = (plan: Plan, signal?: AbortSignal) => void;
@@ -121,13 +122,6 @@ export class AppliedBrowserPlans {
   private readonly componentOwnership = new ComponentOwnershipLedger();
   private readonly layoutObjects = new LayoutObjectReferenceLedger();
   private readonly typeOwnership = new BrowserObjectContractLedger();
-  private readonly contributionRemoval = new AppliedSlotContributionRemoval(
-    this.plans,
-    this.rootPlanIds,
-    this.componentOwnership,
-    this.layoutObjects,
-    this.typeOwnership,
-  );
 
   register(plan: Plan): void {
     this.plans.set(plan.planId, plan);
@@ -174,10 +168,28 @@ export class AppliedBrowserPlans {
 
     for (const contribution of contributions) {
       affectedPlanIds.add(contribution.planId);
-      this.contributionRemoval.remove(contribution);
+      this.removeContribution(contribution);
     }
 
     return [...affectedPlanIds];
+  }
+
+  private removeContribution(contribution: AppliedSlotContribution): void {
+    const plan = this.plans.get(contribution.planId)!;
+    contribution.abortSlotLoad();
+    this.removeBehaviors(plan, contribution);
+    const removedLayoutObjectKeys = this.removeLayoutObjects(plan, contribution);
+    const removedComponentKeys = this.removeComponents(plan, contribution);
+    this.removeValidationRules(plan, contribution);
+    this.pruneOrphanedValidationRules(
+      plan,
+      contribution,
+      new Set([...removedComponentKeys, ...removedLayoutObjectKeys]));
+    this.removeTypes(plan, contribution);
+
+    if (this.canPruneMergedPlan(contribution.planId, plan)) {
+      this.plans.delete(contribution.planId);
+    }
   }
 
   private mergeContribution(incoming: Plan, hooks: MergeHooks, source: PlanContributionSource): Plan {
@@ -222,8 +234,6 @@ export class AppliedBrowserPlans {
 
   private mergeTypes(incoming: Plan, target: Plan, source: PlanContributionSource): void {
     for (const [key, type] of Object.entries(incoming.types)) {
-      const claim = this.typeOwnership.request(incoming.planId, key, type);
-      if (!claim.canBeHeldBy(source)) throw claim.collisionError(source);
       target.types[key] = mergeJsTypes(target.types[key], type);
       this.typeOwnership.claim(incoming.planId, key, type, source);
     }
@@ -246,6 +256,85 @@ export class AppliedBrowserPlans {
     for (const key of Object.keys(plan.components)) {
       this.componentOwnership.claimRoot(plan.planId, key);
     }
+  }
+
+  private removeBehaviors(plan: Plan, contribution: AppliedSlotContribution): void {
+    for (const behavior of contribution.behaviors) {
+      const idx = plan.behaviors.indexOf(behavior);
+      plan.behaviors.splice(idx, 1);
+    }
+  }
+
+  private removeLayoutObjects(plan: Plan, contribution: AppliedSlotContribution): Set<string> {
+    const removed = new Set<string>();
+    for (const key of contribution.layoutObjectKeys) {
+      if (!this.layoutObjects.releaseMaterializedBy(contribution.planId, key, contribution.partId)) continue;
+
+      const component = plan.components[key];
+      if (component) unwireField(component.id);
+      delete plan.components[key];
+      this.componentOwnership.release(contribution.planId, key);
+      removed.add(key);
+    }
+
+    return removed;
+  }
+
+  private removeComponents(plan: Plan, contribution: AppliedSlotContribution): Set<string> {
+    const removed = new Set<string>();
+    for (const key of contribution.componentKeys) {
+      if (!this.componentOwnership.isOwnedBy(contribution.planId, key, contribution.partId)) continue;
+
+      const component = plan.components[key];
+      if (component) unwireField(component.id);
+      delete plan.components[key];
+      this.componentOwnership.release(contribution.planId, key);
+      removed.add(key);
+    }
+
+    return removed;
+  }
+
+  private removeValidationRules(plan: Plan, contribution: AppliedSlotContribution): void {
+    for (const validationRuleContribution of contribution.validationRuleContributions) {
+      validationRuleContribution.removeFrom(plan);
+    }
+  }
+
+  private pruneOrphanedValidationRules(
+    plan: Plan,
+    contribution: AppliedSlotContribution,
+    removedKeys: Set<string>,
+  ): void {
+    if (removedKeys.size === 0) return;
+
+    for (const [componentKey, component] of Object.entries(plan.components)) {
+      const validationRules = validationRulesOf(component);
+      if (validationRules === undefined) continue;
+      if (!this.componentOwnership.isOwnedBy(contribution.planId, componentKey, contribution.partId)) continue;
+      validationRules.removeRulesForComponents(removedKeys);
+    }
+  }
+
+  private removeTypes(plan: Plan, contribution: AppliedSlotContribution): void {
+    for (const key of contribution.typeKeys) {
+      const remainingContract = this.typeOwnership.releasePartial(contribution.planId, key, contribution.partId);
+      if (remainingContract === undefined) {
+        delete plan.types[key];
+        continue;
+      }
+
+      plan.types[key] = remainingContract.toJsType();
+    }
+  }
+
+  private canPruneMergedPlan(planId: PlanId, plan: Plan): boolean {
+    const planWasNotBootedAsRoot = !this.rootPlanIds.has(planId);
+    const planHasNoBehaviors = plan.behaviors.length === 0;
+    const planHasNoComponents = Object.keys(plan.components).length === 0;
+    const planHasNoTypes = Object.keys(plan.types).length === 0;
+
+    return planWasNotBootedAsRoot && planHasNoBehaviors && planHasNoComponents && planHasNoTypes;
   }
 }
 
