@@ -215,54 +215,23 @@ function placeServerError(
   error: ServerValidationError,
   surface: ValidationSurface,
 ): boolean {
-  const msg = ServerValidationErrorMessage.from(error.messages);
-  return ServerErrorPlacementTarget
-    .for(error.name, surface)
-    .place(msg, surface);
-}
+  const msg = serverValidationErrorMessage(error.messages);
+  const validation = findComponentValidationByName(surface, error.name);
+  if (validation === undefined) return surface.summary.add(error.name, msg);
 
-abstract class ServerErrorPlacementTarget {
-  static for(serverFieldName: string, surface: ValidationSurface): ServerErrorPlacementTarget {
-    const validation = findComponentValidationByName(surface, serverFieldName);
-    if (validation === undefined) return new SummaryServerErrorTarget(serverFieldName);
+  const component = surface.runtime.components.find(validation.component);
+  if (component === undefined) return surface.summary.add(error.name, msg);
 
-    const component = surface.runtime.components.find(validation.component);
-    if (component === undefined) return new SummaryServerErrorTarget(serverFieldName);
+  const element = component.tryElement();
+  if (element === undefined) return surface.summary.add(error.name, msg);
 
-    const element = component.tryElement();
-    if (element === undefined) return new SummaryServerErrorTarget(serverFieldName);
-
-    const inlineMessageSlotCanRender = canRenderInlineValidationMessage(component.id);
-    if (!inlineMessageSlotCanRender) return new SummaryServerErrorTarget(serverFieldName);
-
-    return new InlineServerErrorTarget(component.id, element);
-  }
-
-  abstract place(message: string, surface: ValidationSurface): boolean;
-}
-
-class InlineServerErrorTarget extends ServerErrorPlacementTarget {
-  constructor(
-    private readonly componentDomId: string,
-    private readonly element: HTMLElement,
-  ) {
-    super();
-  }
-
-  place(message: string): boolean {
-    showServerErrorInline(this.componentDomId, message, this.element);
+  const inlineMessageSlotCanRender = canRenderInlineValidationMessage(component.id);
+  if (inlineMessageSlotCanRender) {
+    showServerErrorInline(component.id, msg, element);
     return false;
   }
-}
 
-class SummaryServerErrorTarget extends ServerErrorPlacementTarget {
-  constructor(private readonly serverFieldName: string) {
-    super();
-  }
-
-  place(message: string, surface: ValidationSurface): boolean {
-    return surface.summary.add(this.serverFieldName, message);
-  }
+  return surface.summary.add(error.name, msg);
 }
 
 /**
@@ -578,13 +547,11 @@ type ServerValidationPayloadShape =
   | "wrong-shape"
   | "field-errors";
 
-class ServerValidationErrorMessage {
-  static from(messages: unknown): string {
-    if (Array.isArray(messages)) return messages.join(", ");
+function serverValidationErrorMessage(messages: unknown): string {
+  if (Array.isArray(messages)) return messages.join(", ");
 
-    const message = toString(messages);
-    if (message.ok) return message.value;
+  const message = toString(messages);
+  if (message.ok) return message.value;
 
-    return "";
-  }
+  return "";
 }
