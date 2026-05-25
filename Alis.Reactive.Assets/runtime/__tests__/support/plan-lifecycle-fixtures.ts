@@ -73,13 +73,12 @@ export function jsTypeWithMethodShape(
 export function component(
   id: string,
   type = `native.element.${id}`,
-  contribution: Component["contribution"] = { kind: "object-target" },
 ): Component {
   return {
     id,
     vendor: "native",
     type,
-    contribution,
+    contribution: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };
@@ -87,22 +86,37 @@ export function component(
 
 export function registeredInputComponent(id: string, type = `native.component.${id}`): Component {
   return {
-    ...component(id, type, { kind: "owned-definition" }),
+    id,
+    vendor: "native",
+    type,
+    contribution: { kind: "owned-definition" },
     binding: {
       kind: "registered-input",
       bindingPath: "CareUnit",
       valueMember: "value",
     },
+    container: { kind: "none" },
   };
 }
 
 export function layoutComponent(id: string, type = `native.component.${id}`): Component {
-  return component(id, type, { kind: "layout-object" });
+  return {
+    id,
+    vendor: "native",
+    type,
+    contribution: { kind: "layout-object" },
+    binding: { kind: "none" },
+    container: { kind: "none" },
+  };
 }
 
 export function validationContainer(id: string, validationRules: ComponentValidation[]): Component {
   return {
-    ...component(id, `native.element.${id}`, { kind: "validation-container" }),
+    id,
+    vendor: "native",
+    type: `native.element.${id}`,
+    contribution: { kind: "validation-container" },
+    binding: { kind: "none" },
     container: {
       kind: "validation-container",
       components: [],

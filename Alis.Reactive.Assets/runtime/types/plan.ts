@@ -80,13 +80,46 @@ export interface Event {
 
 export type Vendor = string;
 
-export interface Component {
+export type Component =
+  | ObjectTargetComponent
+  | OwnedDefinitionComponent
+  | ValidationContainerComponentDefinition
+  | LayoutObjectComponent;
+
+export interface ObjectTargetComponent {
   id: string;
   vendor: Vendor;
   type: string;
-  contribution: ComponentContributionIntent;
+  contribution: ObjectTargetComponentContribution;
+  binding: UnboundComponentBinding;
+  container: UnscopedComponentContainer;
+}
+
+export interface OwnedDefinitionComponent {
+  id: string;
+  vendor: Vendor;
+  type: string;
+  contribution: OwnedDefinitionComponentContribution;
+  binding: RegisteredInputBinding;
+  container: UnscopedComponentContainer;
+}
+
+export interface ValidationContainerComponentDefinition {
+  id: string;
+  vendor: Vendor;
+  type: string;
+  contribution: ValidationContainerComponentContribution;
   binding: ComponentBinding;
-  container: ComponentContainer;
+  container: ValidationContainerScope;
+}
+
+export interface LayoutObjectComponent {
+  id: string;
+  vendor: Vendor;
+  type: string;
+  contribution: LayoutObjectComponentContribution;
+  binding: UnboundComponentBinding;
+  container: UnscopedComponentContainer;
 }
 
 export type ComponentContributionIntent =
@@ -127,13 +160,13 @@ export interface RegisteredInputBinding {
 
 export type ComponentContainer =
   | UnscopedComponentContainer
-  | ValidationContainerComponent;
+  | ValidationContainerScope;
 
 export interface UnscopedComponentContainer {
   kind: "none";
 }
 
-export interface ValidationContainerComponent {
+export interface ValidationContainerScope {
   kind: "validation-container";
   components: string[];
   validationRules: ComponentValidation[];

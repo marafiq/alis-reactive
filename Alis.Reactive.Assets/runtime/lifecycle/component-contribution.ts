@@ -166,10 +166,6 @@ export function mergeComponentIntoPlan(
   declaration: ComponentContributionDeclaration,
   state: ComponentMergeState,
 ): void {
-  if (referenceIntentCarriesOwnedState(declaration.component)) {
-    throw state.ownership.collisionError(declaration.planId, declaration.key, declaration.source);
-  }
-
   if (isLayoutObject(declaration.component)) {
     mergeLayoutObject(target, declaration, state);
     return;
@@ -214,7 +210,6 @@ function canMergeComponent(
   state: ComponentMergeState,
   allowInitialOwnedCoalescing: boolean,
 ): boolean {
-  if (referenceIntentCarriesOwnedState(declaration.component)) return false;
   if (isLayoutObject(declaration.component)) {
     return canMergeLayoutObject(target, declaration, state.ownership);
   }
@@ -292,24 +287,13 @@ function targetsRootOwnedComponentFromPartial(
     && ownership.ownerOf(declaration.planId, declaration.key) === rootOwnerId;
 }
 
-function referenceIntentCarriesOwnedState(component: Component): boolean {
-  return isReferenceOnlyIntent(component)
-    && (component.binding.kind !== "none" || component.container.kind !== "none");
-}
-
 function canMaterializeOrJoinReference(
   existing: Component | undefined,
   incoming: Component,
   kind: "object-target" | "layout-object",
 ): boolean {
   return incoming.contribution.kind === kind
-    && !referenceIntentCarriesOwnedState(incoming)
     && sameRuntimeIdentity(existing, incoming);
-}
-
-function isReferenceOnlyIntent(component: Component): boolean {
-  return component.contribution.kind === "object-target"
-    || component.contribution.kind === "layout-object";
 }
 
 function isLayoutObject(component: Component): boolean {

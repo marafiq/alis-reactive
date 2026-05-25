@@ -162,26 +162,6 @@ describe("boot plan composition", () => {
     ])).toThrow('partial plan contribution "clinical-section" cannot declare component "resident-name"');
   });
 
-  it("rejects an initial object-target contribution that carries binding state", () => {
-    const planId = "Resident.Step";
-    const componentId = "care-unit";
-    const typeKey = "native.component.care-unit";
-    const invalidObjectTarget = registeredInputComponent(componentId, typeKey);
-    invalidObjectTarget.contribution = { kind: "object-target" };
-
-    expect(() => composeInitialPlans([
-      {
-        ...rootPlan(planId),
-        types: { [typeKey]: jsTypeWithReadableProperty("value") },
-        components: { [componentId]: registeredInputComponent(componentId, typeKey) },
-      },
-      partialPlan(planId, "cognitive-section", {
-        types: { [typeKey]: jsTypeWithWritableProperty("value") },
-        components: { [componentId]: invalidObjectTarget },
-      }),
-    ])).toThrow('partial plan contribution "cognitive-section" cannot declare component "care-unit"');
-  });
-
   it("rejects an initial layout-object contribution with a mismatched runtime identity", () => {
     const planId = "Resident.Step";
     const componentId = "alisFusionToast";
@@ -196,30 +176,6 @@ describe("boot plan composition", () => {
       partialPlan(planId, "toast-section", {
         types: { [typeKey]: jsTypeWithWritableProperty("content") },
         components: { [componentId]: layoutComponent("otherToast", typeKey) },
-      }),
-    ])).toThrow('partial plan contribution "toast-section" cannot declare component "alisFusionToast"');
-  });
-
-  it("rejects an initial layout-object contribution that carries binding state", () => {
-    const planId = "Resident.Step";
-    const componentId = "alisFusionToast";
-    const typeKey = "fusion.component.alisFusionToast";
-    const invalidLayoutObject = layoutComponent(componentId, typeKey);
-    invalidLayoutObject.binding = {
-      kind: "registered-input",
-      bindingPath: "Toast",
-      valueMember: "value",
-    };
-
-    expect(() => composeInitialPlans([
-      {
-        ...rootPlan(planId),
-        types: { [typeKey]: jsTypeWithWritableProperty("title") },
-        components: { [componentId]: layoutComponent(componentId, typeKey) },
-      },
-      partialPlan(planId, "toast-section", {
-        types: { [typeKey]: jsTypeWithWritableProperty("content") },
-        components: { [componentId]: invalidLayoutObject },
       }),
     ])).toThrow('partial plan contribution "toast-section" cannot declare component "alisFusionToast"');
   });

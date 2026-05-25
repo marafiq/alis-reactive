@@ -4,7 +4,7 @@
 // No parallel read path — same concept as pipeline and gather.
 
 import type {
-  Plan, ValidationContainerComponent, ComponentValidation,
+  Plan, ValidationContainerScope, ComponentValidation,
   ValidationRule,
   ValidationRuleActivation as PlanValidationRuleActivation,
   ValidationRuleOperand as PlanValidationRuleOperand,
@@ -103,7 +103,7 @@ interface ValidationSurface {
   readonly plan: Plan;
   readonly runtime: RuntimePlan;
   readonly containerId: string;
-  readonly containerScope: ValidationContainerComponent;
+  readonly containerScope: ValidationContainerScope;
   readonly summary: ValidationSummary;
   readonly context: ExecutionContext;
 }

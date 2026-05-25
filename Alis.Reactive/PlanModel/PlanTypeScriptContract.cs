@@ -80,13 +80,32 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Alias("Vendor", "string"));
 
-            contract.Declare(Interface("Component")
-                .Requires("id", "string")
-                .Requires("vendor", "Vendor")
-                .Requires("type", "string")
-                .Requires("contribution", "ComponentContributionIntent")
-                .Requires("binding", "ComponentBinding")
-                .Requires("container", "ComponentContainer"));
+            contract.Declare(Union(
+                "Component",
+                "ObjectTargetComponent",
+                "OwnedDefinitionComponent",
+                "ValidationContainerComponentDefinition",
+                "LayoutObjectComponent"));
+            contract.Declare(ComponentVariant(
+                "ObjectTargetComponent",
+                "ObjectTargetComponentContribution",
+                "UnboundComponentBinding",
+                "UnscopedComponentContainer"));
+            contract.Declare(ComponentVariant(
+                "OwnedDefinitionComponent",
+                "OwnedDefinitionComponentContribution",
+                "RegisteredInputBinding",
+                "UnscopedComponentContainer"));
+            contract.Declare(ComponentVariant(
+                "ValidationContainerComponentDefinition",
+                "ValidationContainerComponentContribution",
+                "ComponentBinding",
+                "ValidationContainerScope"));
+            contract.Declare(ComponentVariant(
+                "LayoutObjectComponent",
+                "LayoutObjectComponentContribution",
+                "UnboundComponentBinding",
+                "UnscopedComponentContainer"));
 
             contract.Declare(Union(
                 "ComponentContributionIntent",
@@ -114,10 +133,10 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Union(
                 "ComponentContainer",
                 "UnscopedComponentContainer",
-                "ValidationContainerComponent"));
+                "ValidationContainerScope"));
             contract.Declare(Interface("UnscopedComponentContainer")
                 .Requires("kind", Literal("none")));
-            contract.Declare(Interface("ValidationContainerComponent")
+            contract.Declare(Interface("ValidationContainerScope")
                 .Requires("kind", Literal("validation-container"))
                 .Requires("components", "string[]")
                 .Requires("validationRules", "ComponentValidation[]"));
@@ -598,6 +617,19 @@ namespace Alis.Reactive.PlanModel
 
         private static TypeScriptInterface Interface(string name) =>
             new TypeScriptInterface(name);
+
+        private static TypeScriptInterface ComponentVariant(
+            string name,
+            string contribution,
+            string binding,
+            string container) =>
+            Interface(name)
+                .Requires("id", "string")
+                .Requires("vendor", "Vendor")
+                .Requires("type", "string")
+                .Requires("contribution", contribution)
+                .Requires("binding", binding)
+                .Requires("container", container);
 
         private static TypeScriptTypeAlias Alias(string name, string type) =>
             new TypeScriptTypeAlias(name, TypeScriptType.Single(type));

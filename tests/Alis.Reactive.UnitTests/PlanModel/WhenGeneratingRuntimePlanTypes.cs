@@ -63,6 +63,37 @@ public class WhenGeneratingRuntimePlanTypes
             "Validation condition negation should stay deterministic recursively, not only at the top level.");
     }
 
+    [Test]
+    public void generated_runtime_plan_types_encode_valid_component_contribution_shapes()
+    {
+        var generated = PlanTypeScriptContract.Render();
+
+        Assert.That(
+            generated,
+            Does.Contain("export type Component =\n  | ObjectTargetComponent"),
+            "Component contribution intent should be the discriminant for valid runtime component shapes.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface ObjectTargetComponent"),
+            "Object targets should be a named plan concept, not a flat component with arbitrary state.");
+        Assert.That(
+            generated,
+            Does.Contain("contribution: ObjectTargetComponentContribution;\n  binding: UnboundComponentBinding;\n  container: UnscopedComponentContainer;"),
+            "Object targets cannot carry owned input binding or validation container state.");
+        Assert.That(
+            generated,
+            Does.Contain("contribution: OwnedDefinitionComponentContribution;\n  binding: RegisteredInputBinding;\n  container: UnscopedComponentContainer;"),
+            "Owned component definitions represent registered inputs in generated plans.");
+        Assert.That(
+            generated,
+            Does.Contain("contribution: ValidationContainerComponentContribution;\n  binding: ComponentBinding;\n  container: ValidationContainerScope;"),
+            "Validation containers may still be backed by an input component, but must carry validation container scope.");
+        Assert.That(
+            generated,
+            Does.Contain("contribution: LayoutObjectComponentContribution;\n  binding: UnboundComponentBinding;\n  container: UnscopedComponentContainer;"),
+            "Layout objects are app-level object references and should not carry owned input state.");
+    }
+
     private static string FindRepoRoot(string startDirectory)
     {
         var directory = new DirectoryInfo(startDirectory);
