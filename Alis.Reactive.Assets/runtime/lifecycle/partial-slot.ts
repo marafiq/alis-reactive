@@ -1,5 +1,9 @@
 import type { Behavior, Plan } from "../types";
-import { layoutObjectKeysFrom, ValidationRuleContribution } from "./component-contribution";
+import {
+  captureValidationRuleContributions,
+  layoutObjectKeysFrom,
+  type ValidationRuleContribution,
+} from "./component-contribution";
 import { type PartId, type PlanId } from "./plan-contribution-source";
 
 export class AppliedSlotContribution {
@@ -23,7 +27,7 @@ export class AppliedSlotContribution {
       Object.keys(incoming.components),
       layoutObjectKeysFrom(incoming),
       Object.keys(incoming.types),
-      ValidationRuleContribution.captureFrom(incoming),
+      captureValidationRuleContributions(incoming),
     );
   }
 

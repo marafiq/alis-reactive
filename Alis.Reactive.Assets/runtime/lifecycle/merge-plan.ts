@@ -9,7 +9,8 @@ import {
   assertComponentCanMerge,
   composeInitialComponentIntoPlan,
   mergeComponentIntoPlan,
-  validationRulesOf,
+  removeValidationRuleContribution,
+  removeValidationRulesForComponents,
 } from "./component-contribution";
 import { BrowserObjectContractLedger, mergeJsTypes } from "./object-contract-fragment";
 import {
@@ -297,7 +298,7 @@ export class AppliedBrowserPlans {
 
   private removeValidationRules(plan: Plan, contribution: AppliedSlotContribution): void {
     for (const validationRuleContribution of contribution.validationRuleContributions) {
-      validationRuleContribution.removeFrom(plan);
+      removeValidationRuleContribution(plan, validationRuleContribution);
     }
   }
 
@@ -309,10 +310,8 @@ export class AppliedBrowserPlans {
     if (removedKeys.size === 0) return;
 
     for (const [componentKey, component] of Object.entries(plan.components)) {
-      const validationRules = validationRulesOf(component);
-      if (validationRules === undefined) continue;
       if (!this.componentOwnership.isOwnedBy(contribution.planId, componentKey, contribution.partId)) continue;
-      validationRules.removeRulesForComponents(removedKeys);
+      removeValidationRulesForComponents(component, removedKeys);
     }
   }
 

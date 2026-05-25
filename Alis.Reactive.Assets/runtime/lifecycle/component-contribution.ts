@@ -4,6 +4,11 @@ import { rootOwnerId, type PartId, type PlanContributionSource, type PlanId } fr
 
 type ValidationContainerComponent = Extract<Component["container"], { kind: "validation-container" }>;
 
+export interface ValidationRuleContribution {
+  readonly containerKey: string;
+  readonly rules: ComponentValidation[];
+}
+
 export interface ComponentContributionDeclaration {
   readonly planId: PlanId;
   readonly key: string;
@@ -267,7 +272,7 @@ function extendsRootValidationContainer(
   if (declaration.component.container.kind !== "validation-container") return false;
 
   return sameRuntimeIdentity(target.components[declaration.key], declaration.component)
-    && validationRulesOf(target.components[declaration.key]) !== undefined;
+    && validationContainerOf(target.components[declaration.key]) !== undefined;
 }
 
 function referencesRootComponent(
@@ -339,7 +344,10 @@ function replaceComponent(target: Plan, key: string, incoming: Component): void 
   const existingRules = validationRulesOf(target.components[key]);
   const incomingRules = validationRulesOf(incoming);
   if (existingRules !== undefined && incomingRules !== undefined) {
-    incomingRules.replaceWith(existingRules.withIncomingReplacingByValidatedComponent(incomingRules.snapshot()));
+    replaceValidationRules(
+      incoming,
+      withIncomingReplacingByValidatedComponent(existingRules, incomingRules),
+    );
   }
 
   target.components[key] = incoming;
@@ -350,82 +358,83 @@ function addNewValidationRules(existing: Component | undefined, incoming: Compon
   const incomingRules = validationRulesOf(incoming);
   if (existingRules === undefined || incomingRules === undefined) return;
 
-  existingRules.acceptNewValidatedComponentsFrom(incomingRules);
+  acceptNewValidatedComponents(existingRules, incomingRules);
 }
 
-export function validationRulesOf(component: Component | undefined): ComponentValidationRules | undefined {
-  if (component === undefined) return undefined;
+function validationContainerOf(component: Component | undefined): ValidationContainerComponent | undefined {
+  if (component?.container.kind !== "validation-container") return undefined;
 
-  const container = component.container;
-  if (container.kind === "none") return undefined;
-
-  return new ComponentValidationRules(container);
+  return component.container;
 }
 
-export class ComponentValidationRules {
-  constructor(private readonly container: ValidationContainerComponent) {}
+function validationRulesOf(component: Component | undefined): ComponentValidation[] | undefined {
+  return validationContainerOf(component)?.validationRules;
+}
 
-  snapshot(): ComponentValidation[] {
-    return [...this.container.validationRules];
+function replaceValidationRules(component: Component, validationRules: ComponentValidation[]): void {
+  const container = validationContainerOf(component);
+  if (container === undefined) return;
+
+  container.validationRules = validationRules;
+}
+
+function withIncomingReplacingByValidatedComponent(
+  existingRules: ComponentValidation[],
+  incomingRules: ComponentValidation[],
+): ComponentValidation[] {
+  const rulesByComponent = new Map(existingRules.map(rule => [rule.component, rule]));
+  for (const rule of incomingRules) {
+    rulesByComponent.set(rule.component, rule);
   }
 
-  replaceWith(validationRules: ComponentValidation[]): void {
-    this.container.validationRules = validationRules;
-  }
+  return [...rulesByComponent.values()];
+}
 
-  withIncomingReplacingByValidatedComponent(incoming: ComponentValidation[]): ComponentValidation[] {
-    const rulesByComponent = new Map(this.container.validationRules.map(rule => [rule.component, rule]));
-    for (const rule of incoming) {
-      rulesByComponent.set(rule.component, rule);
-    }
-
-    return [...rulesByComponent.values()];
-  }
-
-  acceptNewValidatedComponentsFrom(incoming: ComponentValidationRules): void {
-    const existingComponents = new Set(this.container.validationRules.map(rule => rule.component));
-    for (const rule of incoming.snapshot()) {
-      if (existingComponents.has(rule.component)) continue;
-      this.container.validationRules.push(rule);
-      existingComponents.add(rule.component);
-    }
-  }
-
-  removeExactRules(rules: ComponentValidation[]): void {
-    const removedRules = new Set(rules);
-    this.container.validationRules = this.container.validationRules
-      .filter(rule => !removedRules.has(rule));
-  }
-
-  removeRulesForComponents(componentKeys: Set<string>): void {
-    this.container.validationRules = this.container.validationRules
-      .filter(rule => !componentKeys.has(rule.component));
+function acceptNewValidatedComponents(
+  existingRules: ComponentValidation[],
+  incomingRules: ComponentValidation[],
+): void {
+  const existingComponents = new Set(existingRules.map(rule => rule.component));
+  for (const rule of incomingRules) {
+    if (existingComponents.has(rule.component)) continue;
+    existingRules.push(rule);
+    existingComponents.add(rule.component);
   }
 }
 
-export class ValidationRuleContribution {
-  private constructor(
-    private readonly containerKey: string,
-    private readonly rules: ComponentValidation[],
-  ) {}
-
-  static captureFrom(plan: Plan): ValidationRuleContribution[] {
-    const contributions: ValidationRuleContribution[] = [];
-    for (const [containerKey, component] of Object.entries(plan.components)) {
-      const validationRules = validationRulesOf(component);
-      if (validationRules === undefined) continue;
-      contributions.push(new ValidationRuleContribution(containerKey, validationRules.snapshot()));
-    }
-
-    return contributions;
+export function captureValidationRuleContributions(plan: Plan): ValidationRuleContribution[] {
+  const contributions: ValidationRuleContribution[] = [];
+  for (const [containerKey, component] of Object.entries(plan.components)) {
+    const validationRules = validationRulesOf(component);
+    if (validationRules === undefined) continue;
+    contributions.push({ containerKey, rules: [...validationRules] });
   }
 
-  removeFrom(plan: Plan): void {
-    const validationRules = validationRulesOf(plan.components[this.containerKey]);
-    if (validationRules === undefined) return;
+  return contributions;
+}
 
-    validationRules.removeExactRules(this.rules);
-  }
+export function removeValidationRuleContribution(plan: Plan, contribution: ValidationRuleContribution): void {
+  const component = plan.components[contribution.containerKey];
+  if (component === undefined) return;
+
+  const validationRules = validationRulesOf(component);
+  if (validationRules === undefined) return;
+
+  const removedRules = new Set(contribution.rules);
+  replaceValidationRules(
+    component,
+    validationRules.filter(rule => !removedRules.has(rule)),
+  );
+}
+
+export function removeValidationRulesForComponents(component: Component, componentKeys: Set<string>): void {
+  const validationRules = validationRulesOf(component);
+  if (validationRules === undefined) return;
+
+  replaceValidationRules(
+    component,
+    validationRules.filter(rule => !componentKeys.has(rule.component)),
+  );
 }
 
 export function layoutObjectKeysFrom(plan: Plan): string[] {
