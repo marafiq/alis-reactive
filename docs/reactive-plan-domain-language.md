@@ -248,7 +248,7 @@ TypeScript.
 | Does gather reserve an HTTP payload path? | Gather Payload Claim | Claim the payload path from declared payload fields, supplemental static/event fields, build-time registered input expansion, or runtime dynamic input expansion | Letting `IncludeAll` overwrite declared request fields |
 | Does a plan script appear during initial page load? | Initial Document Contribution | Compose through the shared contribution policy; coalesce identical owned definitions and validation containers because boot has no unload lifetime | Boot-only shortcut with weaker rules |
 | Does an injected partial disappear? | Partial Slot Unload | Abort listeners, remove owned definitions, remove exact validation rule contributions, keep root references | Removing root-owned hosts/app components |
-| Does validation project a server rule to browser? | Client Validation Projection | Emit deterministic browser rule intent or record skipped projection | Inferring from implementation details or pretending all server rules are client rules |
+| Does validation expose browser-executable validation intent? | Client Validation Projection | Emit deterministic browser rule intent or record skipped projection | Inferring from implementation details or pretending all server validator rules can execute in the browser |
 | Does runtime need to execute a behavior? | Declared Object Member Execution | Resolve declared object/member and apply call/read/write using the plan contract | Discovering capabilities dynamically from browser objects |
 
 ### Validation Terms
@@ -259,11 +259,11 @@ TypeScript.
 - **Projected Client Validation Rule**: one browser-executable rule attached to
   a model field path, with an explicit operand shape, peer value, and activation
   condition.
-- **Skipped Client Rule Projection**: a server validation rule that remains
-  authoritative on the server but was not proven deterministic for browser
+- **Skipped Client Rule Projection**: a validator rule that still runs through
+  the original validator but was not proven deterministic for browser
   execution.
 - **Validation Field Shape Evidence**: typed field-shape proof carried by a
-  client projection from the expression/FV rule member that created the field.
+  client projection from a typed expression or FluentValidation rule metadata.
   It lets deferred validation fields bind to deterministic component ids without
   rediscovering model members. Legacy projection sources that only name a field
   still fall back to model metadata, but typed projection sources should carry
@@ -517,7 +517,7 @@ without turning them into ceremony.
 | `p.When(...)` / nested branches | Ordered branch cases with guards/default | Condition tree plus reactions | Evaluate guards synchronously unless an async condition exists | Else is explicit default, not null behavior |
 | HTTP `.Post(...).Gather(...).Validate(...).Response(...)` | Request plan with input, validation gate, response routes, completion | Request document and value producers | Prepare request, optionally validate, fetch, route outcome | Validation failure is not an HTTP failure; response unavailable is explicit |
 | Validation adapter projection | Client validation fields and skipped projections | Bound validation rules and activations | Evaluate browser rules and display errors | Server rules always remain authoritative; client projection is deterministic subset |
-| Validation field shape evidence | Projected field reference from typed expression or FV rule member | Field path plus shape source | Bind deferred validation component and value contract | Typed projection should carry shape; model-member lookup is a legacy metadata fallback |
+| Validation field shape evidence | Projected field reference from typed expression or FluentValidation rule metadata | Field path plus shape source | Bind deferred validation component and value contract | Typed projection should carry shape; model-member lookup is a legacy metadata fallback |
 | Validation activation / peer operand | Bound value producer dependency | Component/payload/url/plugin source plus member contract | Resolve dependency and evaluate rule | Missing dependency is plan/runtime drift and must fail; it is not an inactive condition or absent peer |
 | `IncludeAll()` | Dynamic gather policy plus payload claims | Current runtime plan registered inputs and claimed payload slots | Gather mounted registered inputs whose component and payload slot are not already claimed | Partial load/unload changes the current input set deterministically |
 | Partial slot load | Plan contributions under one slot lifetime | Incoming plans and slot id | Merge contributions, wire listeners, and track exact removals | Same contribution policy as initial boot composition, plus unload ownership |
@@ -617,7 +617,7 @@ move toward the language when touched.
 | Shared contribution assembler | Initial boot composition and dynamic partial load should use one contribution policy so merge rules cannot drift. | Boot and dynamic merge now share `ComponentContribution`; boot keeps a named initial validation coalescing path because initial documents have no unload lifetime. |
 | Layout-owned fixed components | Drawer, loader, toast, and confirm are layout-owned fixed identities, stronger than incidental root components. | Zero-arg app component DSL emits `layout-object`; explicit-id component references remain `object-target`. |
 | Mutable payload object | Payload mutation must be named as execution-context state or brought under object contracts. | Runtime supports payload target mutation; the model should not leave it as an unclassified executor path. |
-| Deferred validation model binding | Deferred validation fields bind shape knowledge after projection and should stay outside FluentValidation-specific vocabulary. | `ClientValidationFieldShapeSource` lets registry fields carry typed projection shape while adapter fields can still use model-derived shape. |
+| Deferred validation model binding | Deferred validation fields bind shape knowledge after projection and should stay outside FluentValidation-specific vocabulary. | `ClientValidationFieldShapeSource` lets typed projection sources carry shape; FluentValidation adapter fields use rule `TypeToValidate`, while legacy projection sources can still fall back to model-derived shape. |
 | Plugin compatibility overloads | Typed plugin descriptors should be the primary long-term model; string overloads remain compatibility and prototyping surface. | Both string and typed plugin APIs now produce `PluginContract`. |
 
 ### Vocabulary Hygiene

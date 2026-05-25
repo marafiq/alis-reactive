@@ -20,7 +20,7 @@ public class WhenBindingProjectedFieldShapeEvidence
     }
 
     [Test]
-    public void Fluent_validation_projection_binds_deferred_fields_from_rule_member_shape_not_model_field_lookup()
+    public void Fluent_validation_projection_binds_deferred_fields_from_rule_type_not_model_field_lookup()
     {
         var plan = new ReactivePlan<ProjectedShapeModel>();
         var trigger = new Builders.TriggerBuilder<ProjectedShapeModel>(plan, plan.Context);

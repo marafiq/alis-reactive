@@ -68,6 +68,12 @@ client validation projections. The adapter builds a `ClientValidationProjectionD
 while walking a validator: projected rules are attached to a field path, and
 unproven browser rules are recorded as skipped projections with a reason.
 
+For projected fields, the adapter uses FluentValidation's rule metadata
+(`IValidationRule.PropertyName` and `IValidationRule.TypeToValidate`) to create
+the `ClientValidationFieldReference`. It does not look up the model member again
+to rediscover field shape, which keeps override-property-name scenarios and
+deferred partial binding deterministic.
+
 Custom validators can opt in through
 `ProjectToClient(...)`, which attaches an explicit browser rule projection to the
 FluentValidation rule component.

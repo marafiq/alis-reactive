@@ -365,18 +365,19 @@ namespace Alis.Reactive.FluentValidator
             private ValidationRuleTarget(
                 string propertyName,
                 ValidationFieldPath fullPath,
-                System.Reflection.MemberInfo? ruleMember)
+                ClientValidationFieldReference field,
+                ValidationPeerFieldScope peerScope)
             {
                 PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
                 FullPath = fullPath ?? throw new ArgumentNullException(nameof(fullPath));
-                Field = ValidationTargetField.From(fullPath, ruleMember);
+                Field = field ?? throw new ArgumentNullException(nameof(field));
                 DisplayName = Humanize(propertyName);
-                PeerScope = ValidationPeerFieldScope.ForRuleMember(ruleMember);
+                PeerScope = peerScope ?? throw new ArgumentNullException(nameof(peerScope));
             }
 
             internal string PropertyName { get; }
             internal ValidationFieldPath FullPath { get; }
-            private ValidationTargetField Field { get; }
+            private ClientValidationFieldReference Field { get; }
             internal ValidationFieldPath SameObjectPeerPrefix => FullPath.Parent();
             internal string DisplayName { get; }
             private ValidationPeerFieldScope PeerScope { get; }
@@ -393,7 +394,7 @@ namespace Alis.Reactive.FluentValidator
             {
                 if (projection == null) throw new ArgumentNullException(nameof(projection));
                 if (rules == null) throw new ArgumentNullException(nameof(rules));
-                Field.AddProjectedRules(projection, rules);
+                projection.AddProjectedRules(Field, rules);
             }
 
             internal static ValidationRuleTarget From(
@@ -403,132 +404,12 @@ namespace Alis.Reactive.FluentValidator
                 if (prefix == null) throw new ArgumentNullException(nameof(prefix));
                 if (rule == null) throw new ArgumentNullException(nameof(rule));
 
-                return From(prefix, rule.PropertyName, rule.Member);
-            }
-
-            private static ValidationRuleTarget From(
-                ValidationFieldPath prefix,
-                string propertyName,
-                System.Reflection.MemberInfo? ruleMember)
-            {
-                if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
-
+                var fullPath = prefix.Append(rule.PropertyName);
                 return new ValidationRuleTarget(
-                    propertyName,
-                    prefix.Append(propertyName),
-                    ruleMember);
-            }
-        }
-
-        private abstract class ValidationTargetField
-        {
-            private protected ValidationTargetField(ValidationFieldPath path)
-            {
-                Path = path ?? throw new ArgumentNullException(nameof(path));
-            }
-
-            internal ValidationFieldPath Path { get; }
-
-            internal static ValidationTargetField From(
-                ValidationFieldPath path,
-                System.Reflection.MemberInfo? member)
-            {
-                if (path == null) throw new ArgumentNullException(nameof(path));
-
-                var shape = ValidationTargetFieldShape.From(member);
-                return shape.ToField(path);
-            }
-
-            internal abstract void AddProjectedRules(
-                ClientValidationProjectionDraft projection,
-                IEnumerable<ProjectedClientValidationRule> rules);
-        }
-
-        private sealed class ModelMetadataValidationTargetField : ValidationTargetField
-        {
-            internal ModelMetadataValidationTargetField(ValidationFieldPath path)
-                : base(path)
-            {
-            }
-
-            internal override void AddProjectedRules(
-                ClientValidationProjectionDraft projection,
-                IEnumerable<ProjectedClientValidationRule> rules)
-            {
-                if (projection == null) throw new ArgumentNullException(nameof(projection));
-                if (rules == null) throw new ArgumentNullException(nameof(rules));
-                projection.AddProjectedRules(Path, rules);
-            }
-        }
-
-        private sealed class ProjectedShapeValidationTargetField : ValidationTargetField
-        {
-            private readonly Shape _shape;
-
-            internal ProjectedShapeValidationTargetField(ValidationFieldPath path, Shape shape)
-                : base(path)
-            {
-                _shape = shape ?? throw new ArgumentNullException(nameof(shape));
-            }
-
-            internal override void AddProjectedRules(
-                ClientValidationProjectionDraft projection,
-                IEnumerable<ProjectedClientValidationRule> rules)
-            {
-                if (projection == null) throw new ArgumentNullException(nameof(projection));
-                if (rules == null) throw new ArgumentNullException(nameof(rules));
-                projection.AddProjectedRules(ClientValidationFieldReference.Of(Path, _shape), rules);
-            }
-        }
-
-        private abstract class ValidationTargetFieldShape
-        {
-            private protected ValidationTargetFieldShape() { }
-
-            internal static ValidationTargetFieldShape From(System.Reflection.MemberInfo? member)
-            {
-                if (member is System.Reflection.PropertyInfo property)
-                    return Projected(Shape.FromClrType(property.PropertyType));
-                if (member is System.Reflection.FieldInfo field)
-                    return Projected(Shape.FromClrType(field.FieldType));
-
-                return ModelMetadata;
-            }
-
-            private static ValidationTargetFieldShape ModelMetadata { get; } =
-                new ModelMetadataValidationTargetFieldShape();
-
-            private static ValidationTargetFieldShape Projected(Shape shape)
-            {
-                if (shape == null) throw new ArgumentNullException(nameof(shape));
-                return new ProjectedValidationTargetFieldShape(shape);
-            }
-
-            internal abstract ValidationTargetField ToField(ValidationFieldPath path);
-
-            private sealed class ModelMetadataValidationTargetFieldShape : ValidationTargetFieldShape
-            {
-                internal override ValidationTargetField ToField(ValidationFieldPath path)
-                {
-                    if (path == null) throw new ArgumentNullException(nameof(path));
-                    return new ModelMetadataValidationTargetField(path);
-                }
-            }
-
-            private sealed class ProjectedValidationTargetFieldShape : ValidationTargetFieldShape
-            {
-                private readonly Shape _shape;
-
-                internal ProjectedValidationTargetFieldShape(Shape shape)
-                {
-                    _shape = shape ?? throw new ArgumentNullException(nameof(shape));
-                }
-
-                internal override ValidationTargetField ToField(ValidationFieldPath path)
-                {
-                    if (path == null) throw new ArgumentNullException(nameof(path));
-                    return new ProjectedShapeValidationTargetField(path, _shape);
-                }
+                    rule.PropertyName,
+                    fullPath,
+                    ClientValidationFieldReference.Of(fullPath, Shape.FromClrType(rule.TypeToValidate)),
+                    ValidationPeerFieldScope.ForRule(rule));
             }
         }
 
@@ -541,8 +422,12 @@ namespace Alis.Reactive.FluentValidator
                 _ownerType = ownerType;
             }
 
-            internal static ValidationPeerFieldScope ForRuleMember(System.Reflection.MemberInfo? ruleMember) =>
-                new ValidationPeerFieldScope(ruleMember?.DeclaringType);
+            internal static ValidationPeerFieldScope ForRule(IValidationRule rule)
+            {
+                if (rule == null) throw new ArgumentNullException(nameof(rule));
+
+                return new ValidationPeerFieldScope(rule.Member?.DeclaringType);
+            }
 
             internal ValidationPeerFieldProjection Classify(System.Reflection.MemberInfo peerMember)
             {
