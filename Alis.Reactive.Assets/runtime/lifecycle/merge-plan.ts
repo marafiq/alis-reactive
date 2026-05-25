@@ -43,30 +43,6 @@ interface AppliedSlotContribution {
   readonly validationRuleContributions: ValidationRuleContribution[];
 }
 
-class InitialPlanComposition {
-  private readonly assemblies = new Map<PlanId, BootPlanAssembly>();
-
-  static from(plans: Plan[]): InitialPlanComposition {
-    const composition = new InitialPlanComposition();
-    for (const plan of plans) composition.accept(plan);
-    return composition;
-  }
-
-  bootPlans(): Plan[] {
-    return Array.from(this.assemblies.values()).map(assembly => assembly.toPlan());
-  }
-
-  private accept(plan: Plan): void {
-    const existing = this.assemblies.get(plan.planId);
-    if (existing) {
-      existing.accept(plan);
-      return;
-    }
-
-    this.assemblies.set(plan.planId, BootPlanAssembly.seed(plan));
-  }
-}
-
 class BootPlanAssembly {
   private readonly componentOwnership = new ComponentOwnershipLedger();
   private readonly layoutObjects = new LayoutObjectReferenceLedger();
@@ -401,7 +377,17 @@ function captureAppliedSlotContribution(
 const browserPlans = new AppliedBrowserPlans();
 
 export function composeInitialPlans(plans: Plan[]): Plan[] {
-  return InitialPlanComposition.from(plans).bootPlans();
+  const assemblies = new Map<PlanId, BootPlanAssembly>();
+  for (const plan of plans) {
+    const existing = assemblies.get(plan.planId);
+    if (existing) {
+      existing.accept(plan);
+    } else {
+      assemblies.set(plan.planId, BootPlanAssembly.seed(plan));
+    }
+  }
+
+  return Array.from(assemblies.values()).map(assembly => assembly.toPlan());
 }
 
 export function registerBootedPlan(plan: Plan): void { browserPlans.register(plan); }
