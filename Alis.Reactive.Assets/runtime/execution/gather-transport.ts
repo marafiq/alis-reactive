@@ -56,14 +56,26 @@ export function emitGatheredValue(
   shape: RuntimeShape,
   transport: TransportStrategy,
 ): void {
-  GatheredValue.from(name, raw, shape).emitInto(transport);
+  const files = browserFiles(raw);
+  if (files !== undefined) {
+    transport.emitArray(name, files, shape);
+    log.trace("file.emitted", { name, count: files.length });
+    return;
+  }
+
+  if (Array.isArray(raw)) {
+    transport.emitArray(name, raw, shape.item());
+    return;
+  }
+
+  transport.emitScalar(name, raw, shape);
 }
 
 function createGetTransport(urlParams: string[]): TransportStrategy {
   return {
     emitScalar: (name, value, shape) => {
       const wire = shape.formatForWire(value);
-      urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(GatherScalarWireValue.from(wire, name))}`);
+      urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(scalarWireValue(wire, name))}`);
     },
     emitArray: (name, items, itemShape) => {
       const gatheredItems = GatheredArrayItems.from(items);
@@ -77,7 +89,7 @@ function createFormDataTransport(formData: FormData): TransportStrategy {
   return {
     emitScalar: (name, value, shape) => {
       const wire = shape.formatForWire(value);
-      formData.append(name, GatherScalarWireValue.from(wire, name));
+      formData.append(name, scalarWireValue(wire, name));
     },
     emitArray: (name, items, itemShape) => {
       GatheredArrayItems.from(items).appendToFormData(name, itemShape, formData);
@@ -89,7 +101,7 @@ function createJsonTransport(body: Record<string, unknown>): TransportStrategy {
   return {
     emitScalar: (name, value, shape) => {
       const wire = shape.formatForWire(value);
-      JsonBodyPath.from(name).assign(body, JsonBodyValue.fromWire(wire));
+      JsonBodyPath.from(name).assign(body, jsonBodyValue(wire));
     },
     emitArray: (name, items, itemShape) => {
       const gatheredItems = GatheredArrayItems.from(items);
@@ -100,70 +112,14 @@ function createJsonTransport(body: Record<string, unknown>): TransportStrategy {
   };
 }
 
-class GatheredValue {
-  private constructor(
-    private readonly name: string,
-    private readonly raw: unknown,
-    private readonly shape: RuntimeShape,
-  ) {}
+function browserFiles(raw: unknown): File[] | undefined {
+  const browserExposesFileList = typeof FileList !== "undefined";
+  if (!browserExposesFileList) return undefined;
 
-  static from(name: string, raw: unknown, shape: RuntimeShape): GatheredValue {
-    return new GatheredValue(name, raw, shape);
-  }
+  const rawIsFileList = raw instanceof FileList;
+  if (!rawIsFileList) return undefined;
 
-  emitInto(transport: TransportStrategy): void {
-    const fileList = BrowserFileList.tryFrom(this.raw);
-    const rawValueIsBrowserFileList = fileList !== undefined;
-    if (rawValueIsBrowserFileList) {
-      transport.emitArray(this.name, fileList.files(), this.shape);
-      log.trace("file.emitted", { name: this.name, count: fileList.count });
-      return;
-    }
-
-    const arrayValue = GatheredArrayValue.tryFrom(this.raw, this.shape);
-    const rawValueIsArray = arrayValue !== undefined;
-    if (rawValueIsArray) {
-      transport.emitArray(this.name, arrayValue.items, arrayValue.itemShape);
-      return;
-    }
-
-    transport.emitScalar(this.name, this.raw, this.shape);
-  }
-}
-
-class BrowserFileList {
-  private constructor(
-    private readonly value: FileList,
-    readonly count: number,
-  ) {}
-
-  static tryFrom(raw: unknown): BrowserFileList | undefined {
-    const browserExposesFileList = typeof FileList !== "undefined";
-    if (!browserExposesFileList) return undefined;
-
-    const rawIsFileList = raw instanceof FileList;
-    if (!rawIsFileList) return undefined;
-
-    return new BrowserFileList(raw, raw.length);
-  }
-
-  files(): File[] {
-    return Array.from(this.value);
-  }
-}
-
-class GatheredArrayValue {
-  private constructor(
-    readonly items: unknown[],
-    readonly itemShape: RuntimeShape,
-  ) {}
-
-  static tryFrom(raw: unknown, shape: RuntimeShape): GatheredArrayValue | undefined {
-    const rawIsArray = Array.isArray(raw);
-    if (!rawIsArray) return undefined;
-
-    return new GatheredArrayValue(raw, shape.item());
-  }
+  return Array.from(raw);
 }
 
 class GatheredArrayItems {
@@ -190,7 +146,7 @@ class GatheredArrayItems {
   }
 
   toJsonValue(itemShape: RuntimeShape): unknown[] {
-    return JsonArrayBodyValue.fromItems(
+    return jsonArrayBodyValue(
       this.items.map(item => item.rawValue),
       itemShape
     );
@@ -219,7 +175,7 @@ abstract class GatheredArrayItem {
 
   emitToQueryString(name: string, itemShape: RuntimeShape, urlParams: string[]): void {
     const wire = itemShape.formatForWire(this.rawValue);
-    urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(GatherScalarWireValue.from(wire, name))}`);
+    urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(scalarWireValue(wire, name))}`);
   }
 }
 
@@ -256,34 +212,28 @@ class SerializableArrayItem extends GatheredArrayItem {
 
   appendToFormData(name: string, itemShape: RuntimeShape, formData: FormData): void {
     const wire = itemShape.formatForWire(this.value);
-    formData.append(name, GatherScalarWireValue.from(wire, name));
+    formData.append(name, scalarWireValue(wire, name));
   }
 }
 
-class GatherScalarWireValue {
-  static from(value: unknown, name: string): string {
-    const result = toString(value);
-    if (result.ok) return result.value;
+function scalarWireValue(value: unknown, name: string): string {
+  const result = toString(value);
+  if (result.ok) return result.value;
 
-    throw new Error(`[alis] gather value "${name}" cannot be serialized as a scalar: ${result.error}`);
-  }
+  throw new Error(`[alis] gather value "${name}" cannot be serialized as a scalar: ${result.error}`);
 }
 
-class JsonBodyValue {
-  static fromWire(wireValue: unknown): unknown {
-    const emptyTextRepresentsClearedField = wireValue === "";
-    if (emptyTextRepresentsClearedField) return null;
+function jsonBodyValue(wireValue: unknown): unknown {
+  const emptyTextRepresentsClearedField = wireValue === "";
+  if (emptyTextRepresentsClearedField) return null;
 
-    return wireValue;
-  }
+  return wireValue;
 }
 
-class JsonArrayBodyValue {
-  static fromItems(items: unknown[], itemShape: RuntimeShape): unknown[] {
-    if (!itemShape.isDeclared) return items;
+function jsonArrayBodyValue(items: unknown[], itemShape: RuntimeShape): unknown[] {
+  if (!itemShape.isDeclared) return items;
 
-    return items.map(item => itemShape.formatForWire(item));
-  }
+  return items.map(item => itemShape.formatForWire(item));
 }
 
 class JsonBodyPath {
