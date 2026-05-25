@@ -29,65 +29,38 @@ export function resolveGather(
   ctx: ExecContext,
 ): GatherResult {
   const runtime = { method, plan, runtimePlan: RuntimePlan.from(plan), ctx };
-  return RequestInputResolver.from(input).resolve(runtime);
+  return resolveRequestInput(input, runtime);
 }
 
-abstract class RequestInputResolver {
-  static from(input: RequestInput): RequestInputResolver {
-    switch (input.kind) {
-      case "none":
-        return EmptyRequestInputResolver.instance;
-      case "value":
-        return new ValueRequestInputResolver(input);
-      case "gather":
-        return new GatherRequestInputResolver(input);
-      default:
-        return assertNever(input, "request input");
-    }
-  }
-
-  abstract resolve(runtime: GatherRuntime): GatherResult;
-}
-
-class EmptyRequestInputResolver extends RequestInputResolver {
-  static readonly instance = new EmptyRequestInputResolver();
-
-  resolve(): GatherResult {
-    return GatherOutput.empty();
+function resolveRequestInput(input: RequestInput, runtime: GatherRuntime): GatherResult {
+  switch (input.kind) {
+    case "none":
+      return GatherOutput.empty();
+    case "value":
+      return resolveValueInput(input, runtime);
+    case "gather":
+      return resolveGatherInput(input, runtime);
+    default:
+      return assertNever(input, "request input");
   }
 }
 
-class ValueRequestInputResolver extends RequestInputResolver {
-  constructor(private readonly input: Extract<RequestInput, { kind: "value" }>) {
-    super();
-  }
-
-  resolve(runtime: GatherRuntime): GatherResult {
-    const output = GatherOutput.for(this.input.transport, runtime.method);
-    DeclaredObjectValueFields.from(this.input.value).emitInto(output.transport, runtime);
-    return output.toResult();
-  }
+function resolveValueInput(input: Extract<RequestInput, { kind: "value" }>, runtime: GatherRuntime): GatherResult {
+  const output = GatherOutput.for(input.transport, runtime.method);
+  emitDeclaredObjectValueFields(input.value, output.transport, runtime);
+  return output.toResult();
 }
 
-class GatherRequestInputResolver extends RequestInputResolver {
-  constructor(private readonly input: GatherInput) {
-    super();
-  }
+function resolveGatherInput(input: GatherInput, runtime: GatherRuntime): GatherResult {
+  const output = GatherOutput.for(input.transport, runtime.method);
 
-  resolve(runtime: GatherRuntime): GatherResult {
-    const output = GatherOutput.for(this.input.transport, runtime.method);
+  const claims = GatherPayloadClaims.empty();
+  gatherDeclaredPayloadFields(input, output.transport, runtime, claims);
+  gatherBuildTimeRegisteredInputFields(input, output.transport, runtime, claims);
+  emitSupplementalFields(input.supplementalFields, output.transport, runtime, claims);
+  emitRuntimeRegisteredInputs(input.selection, claims, runtime, output.transport);
 
-    const claims = GatherPayloadClaims.empty();
-    gatherDeclaredPayloadFields(this.input, output.transport, runtime, claims);
-    gatherBuildTimeRegisteredInputFields(this.input, output.transport, runtime, claims);
-    emitSupplementalFields(this.input, output.transport, runtime, claims);
-
-    RuntimeRegisteredInputSelection
-      .from(this.input.selection, claims)
-      .emitInto(runtime, output.transport);
-
-    return output.toResult();
-  }
+  return output.toResult();
 }
 
 /** Gather developer-authored request payload fields, tracking payload paths and component reads. */
@@ -98,7 +71,7 @@ function gatherDeclaredPayloadFields(
   claims: GatherPayloadClaims,
 ): void {
   for (const field of gatherInput.declaredFields) {
-    PlanGatherPayloadField.from(field).emitInto(transport, runtime, claims);
+    emitPlanGatherPayloadField(field, transport, runtime, claims);
   }
 }
 
@@ -110,38 +83,41 @@ function gatherBuildTimeRegisteredInputFields(
   claims: GatherPayloadClaims,
 ): void {
   for (const field of gatherInput.registeredInputFields) {
-    PlanGatherPayloadField.from(field).emitInto(transport, runtime, claims);
+    emitPlanGatherPayloadField(field, transport, runtime, claims);
   }
 }
 
 /** Emit supplemental static/event values merged alongside plan-declared fields. */
 function emitSupplementalFields(
-  gatherInput: GatherInput,
+  supplementalFields: SupplementalGatherFields,
   transport: TransportStrategy,
   runtime: GatherRuntime,
   claims: GatherPayloadClaims,
 ): void {
-  SupplementalGatherValues.from(gatherInput.supplementalFields).emitInto(transport, runtime, claims);
+  switch (supplementalFields.kind) {
+    case "none":
+      return;
+    case "declared":
+      for (const field of supplementalFields.fields) {
+        emitPlanGatherPayloadField(field, transport, runtime, claims);
+      }
+      return;
+    default:
+      return assertNever(supplementalFields, "supplemental gather fields");
+  }
 }
 
-class PlanGatherPayloadField {
-  private constructor(private readonly field: GatherPayloadField) {}
+function emitPlanGatherPayloadField(
+  field: GatherPayloadField,
+  transport: TransportStrategy,
+  runtime: GatherRuntime,
+  claims: GatherPayloadClaims,
+): void {
+  claims.recordPlanField(field);
 
-  static from(field: GatherPayloadField): PlanGatherPayloadField {
-    return new PlanGatherPayloadField(field);
-  }
-
-  emitInto(
-    transport: TransportStrategy,
-    runtime: GatherRuntime,
-    claims: GatherPayloadClaims,
-  ): void {
-    claims.recordPlanField(this.field);
-
-    const raw = evaluateValue(this.field.value, runtime.plan, runtime.ctx);
-    const shape = RuntimeShape.declaredBy(this.field.value);
-    emitGatheredValue(this.field.payloadPath, raw, shape, transport);
-  }
+  const raw = evaluateValue(field.value, runtime.plan, runtime.ctx);
+  const shape = RuntimeShape.declaredBy(field.value);
+  emitGatheredValue(field.payloadPath, raw, shape, transport);
 }
 
 class GatherPayloadClaims {
@@ -156,7 +132,7 @@ class GatherPayloadClaims {
 
   recordPlanField(field: GatherPayloadField): void {
     this.claimPayloadPath(field.payloadPath);
-    PlannedGatherComponentRead.from(field.value).recordIn(this.componentKeys);
+    recordPlannedGatherComponentRead(field.value, this.componentKeys);
   }
 
   claimPayloadPath(payloadPath: string): void {
@@ -217,142 +193,47 @@ class GatherPayloadPath {
   }
 }
 
-abstract class PlannedGatherComponentRead {
-  static from(producer: ValueProducer): PlannedGatherComponentRead {
-    const producerReadsRuntimeValue = producer.kind === "read";
-    if (!producerReadsRuntimeValue) return NoPlannedGatherComponentRead.instance;
+function recordPlannedGatherComponentRead(producer: ValueProducer, gatheredComponents: Set<string>): void {
+  const producerReadsRuntimeValue = producer.kind === "read";
+  if (!producerReadsRuntimeValue) return;
 
-    const source = producer.from;
-    const producerReadsComponent = source.kind === "component";
-    if (!producerReadsComponent) return NoPlannedGatherComponentRead.instance;
+  const source = producer.from;
+  const producerReadsComponent = source.kind === "component";
+  if (!producerReadsComponent) return;
 
-    return new PlannedComponentGatherRead(source.component);
-  }
-
-  abstract recordIn(gatheredComponents: Set<string>): void;
+  gatheredComponents.add(source.component);
 }
 
-class NoPlannedGatherComponentRead extends PlannedGatherComponentRead {
-  static readonly instance = new NoPlannedGatherComponentRead();
+function emitRuntimeRegisteredInputs(
+  selection: GatherInput["selection"],
+  claims: GatherPayloadClaims,
+  runtime: GatherRuntime,
+  transport: TransportStrategy,
+): void {
+  switch (selection.kind) {
+    case "explicit":
+      return;
+    case "all-registered-inputs":
+      for (const component of runtime.runtimePlan.components.entries()) {
+        const runtimeField = RuntimeRegisteredInputGatherField.tryFrom(component, claims);
+        if (runtimeField === undefined) continue;
 
-  recordIn(): void {
-    return;
-  }
-}
-
-class PlannedComponentGatherRead extends PlannedGatherComponentRead {
-  constructor(private readonly componentKey: string) {
-    super();
-  }
-
-  recordIn(gatheredComponents: Set<string>): void {
-    gatheredComponents.add(this.componentKey);
-  }
-}
-
-abstract class RuntimeRegisteredInputSelection {
-  static from(
-    selection: GatherInput["selection"],
-    claims: GatherPayloadClaims,
-  ): RuntimeRegisteredInputSelection {
-    switch (selection.kind) {
-      case "explicit":
-        return PlanDeclaredGatherFieldsOnly.instance;
-      case "all-registered-inputs":
-        return new AllRegisteredInputsRuntimeSelection(claims);
-      default:
-        return assertNever(selection, "gather selection");
-    }
-  }
-
-  abstract emitInto(runtime: GatherRuntime, transport: TransportStrategy): void;
-}
-
-class PlanDeclaredGatherFieldsOnly extends RuntimeRegisteredInputSelection {
-  static readonly instance = new PlanDeclaredGatherFieldsOnly();
-
-  emitInto(): void {
-    return;
+        runtimeField.emitInto(transport);
+      }
+      return;
+    default:
+      return assertNever(selection, "gather selection");
   }
 }
 
-class AllRegisteredInputsRuntimeSelection extends RuntimeRegisteredInputSelection {
-  constructor(private readonly claims: GatherPayloadClaims) {
-    super();
-  }
-
-  emitInto(runtime: GatherRuntime, transport: TransportStrategy): void {
-    for (const component of runtime.runtimePlan.components.entries()) {
-      const runtimeField = RuntimeRegisteredInputGatherField.tryFrom(component, this.claims);
-      if (runtimeField === undefined) continue;
-
-      runtimeField.emitInto(transport);
-    }
-  }
-}
-
-abstract class SupplementalGatherValues {
-  static from(supplementalFields: SupplementalGatherFields): SupplementalGatherValues {
-    switch (supplementalFields.kind) {
-      case "none":
-        return NoSupplementalGatherValues.instance;
-      case "declared":
-        return new DeclaredSupplementalGatherValues(supplementalFields.fields);
-      default:
-        return assertNever(supplementalFields, "supplemental gather fields");
-    }
-  }
-
-  abstract emitInto(
-    transport: TransportStrategy,
-    runtime: GatherRuntime,
-    claims: GatherPayloadClaims,
-  ): void;
-}
-
-class NoSupplementalGatherValues extends SupplementalGatherValues {
-  static readonly instance = new NoSupplementalGatherValues();
-
-  emitInto(): void {
-    return;
-  }
-}
-
-class DeclaredSupplementalGatherValues extends SupplementalGatherValues {
-  constructor(private readonly fields: GatherPayloadField[]) {
-    super();
-  }
-
-  emitInto(
-    transport: TransportStrategy,
-    runtime: GatherRuntime,
-    claims: GatherPayloadClaims,
-  ): void {
-    for (const field of this.fields) {
-      PlanGatherPayloadField.from(field).emitInto(transport, runtime, claims);
-    }
-  }
-}
-
-class DeclaredObjectValueFields {
-  private constructor(private readonly fields: Record<string, ValueProducer>) {
-  }
-
-  static from(producer: ObjectProducer): DeclaredObjectValueFields {
-    return new DeclaredObjectValueFields(producer.fields);
-  }
-
-  emitInto(transport: TransportStrategy, runtime: GatherRuntime): void {
-    this.emitEach((key, producer) => {
-      const value = evaluateValue(producer, runtime.plan, runtime.ctx);
-      emitGatheredValue(key, value, RuntimeShape.declaredBy(producer), transport);
-    });
-  }
-
-  private emitEach(emit: (key: string, producer: ValueProducer) => void): void {
-    for (const [key, producer] of Object.entries(this.fields)) {
-      emit(key, producer);
-    }
+function emitDeclaredObjectValueFields(
+  producer: ObjectProducer,
+  transport: TransportStrategy,
+  runtime: GatherRuntime,
+): void {
+  for (const [key, fieldProducer] of Object.entries(producer.fields)) {
+    const value = evaluateValue(fieldProducer, runtime.plan, runtime.ctx);
+    emitGatheredValue(key, value, RuntimeShape.declaredBy(fieldProducer), transport);
   }
 }
 
