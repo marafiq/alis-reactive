@@ -3,7 +3,6 @@ import type { GatherResult } from "./gather";
 import { evaluateValue } from "../core/evaluate";
 import { toString as convertToString } from "../core/shape-convert";
 import { resolveRouteParams } from "../core/url-template";
-import { HttpRequestMethod } from "../domain/http-request-method";
 import { isMissingRuntimeValue } from "../domain/runtime-value";
 import { RuntimeShape } from "../domain/runtime-shape";
 
@@ -61,8 +60,7 @@ function applyRequestBody(
   init: RequestInit,
   headers: Record<string, string>,
 ): void {
-  const requestMethod = HttpRequestMethod.from(request.method);
-  if (!requestMethod.acceptsRequestBody()) return;
+  if (request.method === "GET") return;
 
   const gatheredBody = gathered.body;
   if (gatheredBody instanceof FormData) {

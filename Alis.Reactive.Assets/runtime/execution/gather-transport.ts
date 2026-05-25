@@ -1,7 +1,7 @@
 import type { HttpMethod, Transport } from "../types";
 import { toString } from "../core/shape-convert";
 import { scope } from "../core/trace";
-import { HttpRequestMethod } from "../domain/http-request-method";
+import { assertNever } from "../core/assert-never";
 import { PlainObjectRecord } from "../domain/object-record";
 import { RuntimeShape } from "../domain/runtime-shape";
 
@@ -31,8 +31,7 @@ export class GatherOutput {
 
   static for(requestTransport: Transport, method: HttpMethod): GatherOutput {
     const urlParams: string[] = [];
-    const requestMethod = HttpRequestMethod.from(method);
-    if (requestMethod.sendsInputInQueryString()) {
+    if (sendsInputInQueryString(method)) {
       return new GatherOutput(urlParams, {}, createGetTransport(urlParams));
     }
 
@@ -47,6 +46,20 @@ export class GatherOutput {
 
   toResult(): GatherResult {
     return { urlParams: this.urlParams, body: this.body };
+  }
+}
+
+function sendsInputInQueryString(method: HttpMethod): boolean {
+  switch (method) {
+    case "GET":
+      return true;
+    case "POST":
+    case "PUT":
+    case "DELETE":
+    case "PATCH":
+      return false;
+    default:
+      return assertNever(method, "HTTP method");
   }
 }
 
