@@ -74,6 +74,17 @@ namespace Alis.Reactive.Validation
                 Shape);
         }
 
+        internal ValidationRuleDetails PrefixPeerFieldWith(ValidationFieldPath prefix)
+        {
+            if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
+            if (prefix.IsEmpty) return this;
+            return new ValidationRuleDetails(
+                _constraint,
+                _condition,
+                _peerField.PrefixWith(prefix),
+                Shape);
+        }
+
         internal static ValidationRuleDetails NoOperand(ValidationRuleCondition condition) =>
             new ValidationRuleDetails(
                 ValidationConstraint.Missing,
@@ -301,6 +312,7 @@ namespace Alis.Reactive.Validation
 
         internal abstract ValidationRuleOperand ToPlanOperand(ValidationPlanBinding binding);
         internal abstract ValidationRuleOperandIntent ToIntent();
+        internal abstract ValidationPeerField PrefixWith(ValidationFieldPath prefix);
 
         internal static ValidationPeerField Of(ValidationFieldPath fieldPath, Shape shape)
         {
@@ -324,6 +336,12 @@ namespace Alis.Reactive.Validation
 
             internal override ValidationRuleOperandIntent ToIntent() =>
                 ValidationRuleOperandIntent.None;
+
+            internal override ValidationPeerField PrefixWith(ValidationFieldPath prefix)
+            {
+                if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
+                return this;
+            }
         }
 
         private sealed class NamedValidationPeerField : ValidationPeerField
@@ -348,6 +366,12 @@ namespace Alis.Reactive.Validation
 
             internal override ValidationRuleOperandIntent ToIntent() =>
                 ValidationRuleOperandIntent.PeerField(_field.Path);
+
+            internal override ValidationPeerField PrefixWith(ValidationFieldPath prefix)
+            {
+                if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
+                return Of(prefix.Append(_field.Path), _field.Shape);
+            }
         }
     }
 

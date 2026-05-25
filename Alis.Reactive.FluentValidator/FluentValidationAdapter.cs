@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using FluentValidation;
 using FluentValidation.Internal;
@@ -83,11 +81,12 @@ namespace Alis.Reactive.FluentValidator
 
             var field = ProjectedField.From(prefix, rule);
             foreach (var component in rule.Components)
-                ProjectComponent(component, field, inheritedCondition, projection);
+                ProjectComponent(component, prefix, field, inheritedCondition, projection);
         }
 
         private void ProjectComponent(
             IRuleComponent component,
+            ValidationFieldPath prefix,
             ProjectedField field,
             ValidationRuleCondition condition,
             ClientValidationProjectionAccumulator projection)
@@ -107,7 +106,11 @@ namespace Alis.Reactive.FluentValidator
 
             if (ClientValidationRuleProjectionCatalog.TryFind(component, out var explicitRule))
             {
-                projection.Add(field.Reference, explicitRule, Message(component, explicitRule.MessageFor(field.DisplayName)), condition);
+                projection.Add(
+                    field.Reference,
+                    explicitRule.Name,
+                    Message(component, explicitRule.MessageFor(field.DisplayName)),
+                    explicitRule.DetailsFor(condition, prefix));
                 return;
             }
 
@@ -239,16 +242,19 @@ namespace Alis.Reactive.FluentValidator
             ValidationRuleCondition condition,
             ClientValidationProjectionAccumulator projection)
         {
-            var ruleName = RuleNameFor(comparison.Comparison, comparison.MemberToCompare != null);
-            if (ruleName == null)
+            if (comparison.MemberToCompare != null)
             {
-                projection.Skip(field.Path, component.Validator, ClientRuleProjectionSkipReason.UnsupportedComparisonOperator);
+                projection.Skip(
+                    field.Path,
+                    component.Validator,
+                    ClientRuleProjectionSkipReason.PeerComparisonRequiresExplicitProjection);
                 return;
             }
 
-            if (comparison.MemberToCompare != null)
+            var ruleName = RuleNameFor(comparison.Comparison);
+            if (ruleName == null)
             {
-                ProjectPeerComparison(component, comparison, ruleName, field, condition, projection);
+                projection.Skip(field.Path, component.Validator, ClientRuleProjectionSkipReason.UnsupportedComparisonOperator);
                 return;
             }
 
@@ -258,28 +264,6 @@ namespace Alis.Reactive.FluentValidator
                 ruleName,
                 Message(component, LiteralComparisonMessage(comparison.Comparison, field.DisplayName, literal.Value)),
                 ValidationRuleDetails.WithConstraint(literal.Value, condition, literal.Shape));
-        }
-
-        private static void ProjectPeerComparison(
-            IRuleComponent component,
-            IComparisonValidator comparison,
-            ValidationRuleName ruleName,
-            ProjectedField field,
-            ValidationRuleCondition condition,
-            ClientValidationProjectionAccumulator projection)
-        {
-            if (!field.TryPeerFieldFor(comparison.MemberToCompare!, out var peer, out var skipReason))
-            {
-                projection.Skip(field.Path, component.Validator, skipReason);
-                return;
-            }
-
-            projection.Ensure(peer);
-            projection.Add(
-                field.Reference,
-                ruleName,
-                Message(component, PeerComparisonMessage(comparison.Comparison, field.DisplayName, peer.Path)),
-                ValidationRuleDetails.WithPeerField(peer.Path, condition, peer.Shape));
         }
 
         private static bool TryResolveRuleCondition(
@@ -384,12 +368,12 @@ namespace Alis.Reactive.FluentValidator
                 : defaultMessage;
         }
 
-        private static ValidationRuleName? RuleNameFor(Comparison comparison, bool peerComparison)
+        private static ValidationRuleName? RuleNameFor(Comparison comparison)
         {
             return comparison switch
             {
                 Comparison.Equal => ValidationRuleName.EqualTo,
-                Comparison.NotEqual => peerComparison ? ValidationRuleName.NotEqualTo : ValidationRuleName.NotEqual,
+                Comparison.NotEqual => ValidationRuleName.NotEqual,
                 Comparison.GreaterThanOrEqual => ValidationRuleName.Min,
                 Comparison.LessThanOrEqual => ValidationRuleName.Max,
                 Comparison.GreaterThan => ValidationRuleName.Gt,
@@ -411,23 +395,6 @@ namespace Alis.Reactive.FluentValidator
                 _ => $"'{fieldName}' is invalid."
             };
         }
-
-        private static string PeerComparisonMessage(Comparison comparison, string fieldName, ValidationFieldPath peer)
-        {
-            var peerName = Humanize(peer);
-            return comparison switch
-            {
-                Comparison.Equal => $"'{fieldName}' must match '{peerName}'.",
-                Comparison.NotEqual => $"'{fieldName}' must not match '{peerName}'.",
-                Comparison.GreaterThanOrEqual => $"'{fieldName}' must be at least '{peerName}'.",
-                Comparison.LessThanOrEqual => $"'{fieldName}' must be at most '{peerName}'.",
-                Comparison.GreaterThan => $"'{fieldName}' must be greater than '{peerName}'.",
-                Comparison.LessThan => $"'{fieldName}' must be less than '{peerName}'.",
-                _ => $"'{fieldName}' is invalid."
-            };
-        }
-
-        private static string Humanize(ValidationFieldPath fieldPath) => Humanize(fieldPath.Value);
 
         private static string Humanize(string propertyName)
         {
@@ -457,15 +424,6 @@ namespace Alis.Reactive.FluentValidator
             }
 
             internal void Ensure(ClientValidationFieldReference field) => _draft.EnsureField(field);
-
-            internal void Add(
-                ClientValidationFieldReference field,
-                ClientValidationRule rule,
-                ValidationMessage message,
-                ValidationRuleCondition condition)
-            {
-                Add(field, rule.Name, message, rule.DetailsFor(condition));
-            }
 
             internal void Add(
                 ClientValidationFieldReference field,
@@ -503,19 +461,15 @@ namespace Alis.Reactive.FluentValidator
 
         private sealed class ProjectedField
         {
-            private readonly Type? _ownerType;
-
             private ProjectedField(
                 string propertyName,
                 ValidationFieldPath path,
-                ClientValidationFieldReference reference,
-                Type? ownerType)
+                ClientValidationFieldReference reference)
             {
                 PropertyName = propertyName;
                 Path = path;
                 Reference = reference;
                 DisplayName = Humanize(propertyName);
-                _ownerType = ownerType;
             }
 
             internal string PropertyName { get; }
@@ -523,58 +477,13 @@ namespace Alis.Reactive.FluentValidator
             internal ClientValidationFieldReference Reference { get; }
             internal string DisplayName { get; }
 
-            internal bool TryPeerFieldFor(
-                MemberInfo member,
-                [NotNullWhen(true)] out ClientValidationFieldReference? reference,
-                out ClientRuleProjectionSkipReason skipReason)
-            {
-                if (_ownerType == null || member.DeclaringType == null)
-                {
-                    reference = null;
-                    skipReason = ClientRuleProjectionSkipReason.UnknownPeerFieldScope;
-                    return false;
-                }
-
-                if (!member.DeclaringType.IsAssignableFrom(_ownerType))
-                {
-                    reference = null;
-                    skipReason = ClientRuleProjectionSkipReason.CrossObjectPeerComparison;
-                    return false;
-                }
-
-                var shape = ShapeFor(member);
-                if (shape.IsAny)
-                {
-                    reference = null;
-                    skipReason = ClientRuleProjectionSkipReason.UnsupportedPeerShape;
-                    return false;
-                }
-
-                var peerPath = Path.Parent().Append(member.Name);
-                reference = ClientValidationFieldReference.Of(peerPath, shape);
-                skipReason = ClientRuleProjectionSkipReason.UnsupportedValidator;
-                return true;
-            }
-
             internal static ProjectedField From(ValidationFieldPath prefix, IValidationRule rule)
             {
                 var path = prefix.Append(rule.PropertyName);
                 return new ProjectedField(
                     rule.PropertyName,
                     path,
-                    ClientValidationFieldReference.Of(path, Shape.FromClrType(rule.TypeToValidate)),
-                    rule.Member?.DeclaringType);
-            }
-
-            private static Shape ShapeFor(MemberInfo member)
-            {
-                if (member is PropertyInfo property)
-                    return Shape.FromClrType(property.PropertyType);
-
-                if (member is FieldInfo field)
-                    return Shape.FromClrType(field.FieldType);
-
-                return Shape.Any;
+                    ClientValidationFieldReference.Of(path, Shape.FromClrType(rule.TypeToValidate)));
             }
         }
     }

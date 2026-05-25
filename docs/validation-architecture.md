@@ -74,9 +74,12 @@ the `ClientValidationFieldReference`. It does not look up the model member again
 to rediscover field shape, which keeps override-property-name scenarios and
 deferred partial binding deterministic.
 
-Custom validators can opt in through
+Custom validators and peer-field comparisons opt in through
 `ProjectToClient(...)`, which attaches an explicit browser rule projection to the
-FluentValidation rule component.
+FluentValidation rule component. The adapter does not reconstruct peer paths
+from FluentValidation `MemberInfo`; peer fields must be declared through typed
+client projection methods such as `EqualTo(...)`, `NotEqualTo(...)`, and
+`GreaterThan(...)`.
 
 Conditions are projected only when the validator supplies a matching symbolic
 client guard through the ReactiveValidator `WhenField*` language. Server-only

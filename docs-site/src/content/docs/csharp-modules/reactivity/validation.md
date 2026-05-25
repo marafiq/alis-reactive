@@ -1,6 +1,6 @@
 ---
 title: Validation
-description: Client-side validation with FluentValidation extraction — 16 rule types, 21 conditional operators, condition composition, cross-property comparisons, and fail-closed orchestration.
+description: Client-side validation with FluentValidation projection — deterministic rule extraction, explicit peer comparisons, 21 conditional operators, and fail-closed orchestration.
 sidebar:
   order: 8
 ---
@@ -71,7 +71,7 @@ The `"intake-form"` string is the form ID — it must match the `id` attribute o
 
 ## What rule types are available?
 
-16 rule types are extracted from FluentValidation. One additional type (`atLeastOne`) is supported by the runtime but must be added manually via `ValidationDescriptor`.
+Deterministic literal rules are extracted from FluentValidation. Peer-field comparisons use `ProjectToClient(...)` so the browser rule names the peer field explicitly. One additional type (`atLeastOne`) is supported by the runtime but must be added manually via `ValidationDescriptor`.
 
 ### Presence rules
 
@@ -138,12 +138,15 @@ RuleFor(x => x.Score).ExclusiveBetween(0, 100);
 
 | FluentValidation | Plan rule | Description |
 |------------------|-----------|-------------|
-| `Equal(x => x.Other)` | `equalTo` | Must equal another field's value |
+| `Equal(value)` | `equalTo` | Must equal a literal value |
+| `Equal(x => x.Other).ProjectToClient(rule => rule.EqualTo(x => x.Other))` | `equalTo` | Must equal another field's value |
 | `NotEqual(value)` | `notEqual` | Must not equal a literal value |
-| `NotEqual(x => x.Other)` | `notEqualTo` | Must not equal another field's value |
+| `NotEqual(x => x.Other).ProjectToClient(rule => rule.NotEqualTo(x => x.Other))` | `notEqualTo` | Must not equal another field's value |
 
 ```csharp
-RuleFor(x => x.PasswordConfirm).Equal(x => x.Password);
+RuleFor(x => x.PasswordConfirm)
+    .Equal(x => x.Password)
+    .ProjectToClient(rule => rule.EqualTo(x => x.Password));
 RuleFor(x => x.Status).NotEqual("Discharged");
 ```
 
@@ -352,19 +355,23 @@ public class InsuranceValidator : ReactiveValidator<InsuranceInfo>
 The extracted rules behave as follows:
 
 - **Condition composition:** The `Insurance.Provider` rule gets the parent's condition (`HasInsurance` is truthy). The `Insurance.MedicareId` rule gets both conditions composed with AND: `HasInsurance` is truthy AND `Insurance.IsMedicare` is truthy.
-- **Prefix carrying:** Peer field references inside the nested validator are automatically prefixed. `IsMedicare` in the nested validator becomes `Insurance.IsMedicare` in the plan, so the browser reads the correct field.
+- **Prefix carrying:** Condition fields and explicit peer fields inside the nested validator are prefixed. `IsMedicare` in the nested validator becomes `Insurance.IsMedicare` in the plan, so the browser reads the correct field.
 - **Include rules:** When using `Include()` to pull in a shared validator, the parent's condition passes through to the included rules the same way.
 
 ## How do cross-property rules work?
 
-When a comparison rule references another property instead of a literal value, it becomes a cross-property rule:
+When a comparison rule references another property instead of a literal value, add an explicit client projection. The FluentValidation rule still runs on the server; `ProjectToClient(...)` declares the deterministic browser peer comparison:
 
 ```csharp
 // Password confirmation must match
-RuleFor(x => x.PasswordConfirm).Equal(x => x.Password);
+RuleFor(x => x.PasswordConfirm)
+    .Equal(x => x.Password)
+    .ProjectToClient(rule => rule.EqualTo(x => x.Password));
 
 // Discharge date must be after admission
-RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate);
+RuleFor(x => x.DischargeDate)
+    .GreaterThan(x => x.AdmissionDate)
+    .ProjectToClient(rule => rule.GreaterThan(x => x.AdmissionDate));
 ```
 
 The plan carries a `field` property pointing to the peer field name. At runtime, the peer field's current value is read from the form and compared against the source field.

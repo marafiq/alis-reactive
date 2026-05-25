@@ -94,13 +94,15 @@ public class ResidentValidator : AbstractValidator<ResidentModel>
         // ── Cross-property text rules ─────────────────────────
 
         // Equal(x => x.OtherProp): value must match another field (skips empty)
-        // The OTHER field ("Email") is automatically included in the validation descriptor
+        // ProjectToClient declares the deterministic browser peer comparison.
         RuleFor(x => x.ConfirmEmail).Equal(x => x.Email)
-            .WithMessage("Emails must match.");
+            .WithMessage("Emails must match.")
+            .ProjectToClient(rule => rule.EqualTo(x => x.Email));
 
         // NotEqual(x => x.OtherProp): value must differ from another field (skips empty)
         RuleFor(x => x.AlternateEmail).NotEqual(x => x.Email)
-            .WithMessage("Alternate email must differ from primary.");
+            .WithMessage("Alternate email must differ from primary.")
+            .ProjectToClient(rule => rule.NotEqualTo(x => x.Email));
 
         // NotEqual("value"): value must not be a specific string (skips empty)
         RuleFor(x => x.Status).NotEqual("deleted")
@@ -146,7 +148,8 @@ public class ResidentValidator : AbstractValidator<ResidentModel>
 
         // GreaterThan(x => x.OtherDate): discharge must be AFTER admission (cross-property)
         RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)
-            .WithMessage("Discharge must be after admission date.");
+            .WithMessage("Discharge must be after admission date.")
+            .ProjectToClient(rule => rule.GreaterThan(x => x.AdmissionDate));
 
 
         // ── Empty rule ────────────────────────────────────────
@@ -333,12 +336,13 @@ WhenField(x => x.IsEmployed, () =>
 ### DO NOT forget `Html.InputField()` for peer fields
 
 ```csharp
-// If ConfirmEmail has .Equal(x => x.Email), then BOTH fields must be
+// If ConfirmEmail has .ProjectToClient(rule => rule.EqualTo(x => x.Email)),
+// then BOTH fields must be
 // registered via Html.InputField(). If Email is not in the form,
 // the equalTo rule fails closed (blocks the form).
 
-// The adapter auto-includes peer fields in the descriptor,
-// but the component must be registered via InputField in the view.
+// The explicit projection includes peer fields in the descriptor,
+// and the component must be registered via InputField in the view.
 ```
 
 ### DO NOT use `Html.Element()` for input components
@@ -383,12 +387,12 @@ new ValidationRule("min", "Too low", constraint: 0, shape: Shape.Number)
 
 | Rule | C# DSL (fixed value) | C# DSL (cross-property) | When empty |
 |------|---------------------|------------------------|-----------|
-| `min` | `.GreaterThanOrEqualTo(val)` | `.GreaterThanOrEqualTo(x => x.Prop)` | Skips |
-| `max` | `.LessThanOrEqualTo(val)` | `.LessThanOrEqualTo(x => x.Prop)` | Skips |
-| `gt` | `.GreaterThan(val)` | `.GreaterThan(x => x.Prop)` | **Fails** |
-| `lt` | `.LessThan(val)` | `.LessThan(x => x.Prop)` | Skips |
-| `equalTo` | `.Equal(val)` | `.Equal(x => x.Prop)` | Skips |
-| `notEqualTo` | — | `.NotEqual(x => x.Prop)` | Skips |
+| `min` | `.GreaterThanOrEqualTo(val)` | `.GreaterThanOrEqualTo(x => x.Prop).ProjectToClient(rule => rule.GreaterThanOrEqualTo(x => x.Prop))` | Skips |
+| `max` | `.LessThanOrEqualTo(val)` | `.LessThanOrEqualTo(x => x.Prop).ProjectToClient(rule => rule.LessThanOrEqualTo(x => x.Prop))` | Skips |
+| `gt` | `.GreaterThan(val)` | `.GreaterThan(x => x.Prop).ProjectToClient(rule => rule.GreaterThan(x => x.Prop))` | **Fails** |
+| `lt` | `.LessThan(val)` | `.LessThan(x => x.Prop).ProjectToClient(rule => rule.LessThan(x => x.Prop))` | Skips |
+| `equalTo` | `.Equal(val)` | `.Equal(x => x.Prop).ProjectToClient(rule => rule.EqualTo(x => x.Prop))` | Skips |
+| `notEqualTo` | — | `.NotEqual(x => x.Prop).ProjectToClient(rule => rule.NotEqualTo(x => x.Prop))` | Skips |
 
 ### Range Rules (shape set automatically)
 
@@ -401,7 +405,7 @@ new ValidationRule("min", "Too low", constraint: 0, shape: Shape.Number)
 
 ## What the Plan Looks Like
 
-For `RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)`:
+For `RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate).ProjectToClient(rule => rule.GreaterThan(x => x.AdmissionDate))`:
 
 ```json
 {

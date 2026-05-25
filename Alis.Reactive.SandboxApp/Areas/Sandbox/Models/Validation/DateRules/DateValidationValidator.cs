@@ -1,4 +1,5 @@
 using FluentValidation;
+using Alis.Reactive.FluentValidator;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
@@ -13,7 +14,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.DischargeDate).NotEmpty()
                 .WithMessage("Discharge date is required.");
             RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)
-                .WithMessage("Discharge date must be after admission date.");
+                .WithMessage("Discharge date must be after admission date.")
+                .ProjectToClient(rule => rule.GreaterThan(x => x.AdmissionDate));
         }
     }
 }

@@ -1,4 +1,5 @@
 using FluentValidation;
+using Alis.Reactive.FluentValidator;
 using Alis.Reactive.FluentValidator.Validators;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
@@ -29,7 +30,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
             // notEqualTo cross-property — alternate email must differ from primary
             RuleFor(x => x.AlternateEmail).NotEqual(x => x.Email)
-                .WithMessage("Alternate email must differ from primary email.");
+                .WithMessage("Alternate email must differ from primary email.")
+                .ProjectToClient(rule => rule.NotEqualTo(x => x.Email));
 
             // url
             RuleFor(x => x.Website).Matches(@"^https?:\/\/.+")

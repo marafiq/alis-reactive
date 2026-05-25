@@ -159,9 +159,7 @@ namespace Alis.Reactive.Validation
         FluentValidationConditionWithoutClientGuard,
         RuleComponentCondition,
         MissingRangeEndpoint,
-        CrossObjectPeerComparison,
-        UnknownPeerFieldScope,
-        UnsupportedPeerShape,
+        PeerComparisonRequiresExplicitProjection,
         UnsupportedComparisonOperator,
         UnsupportedValidator,
         MissingRegexExpression

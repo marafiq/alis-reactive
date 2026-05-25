@@ -87,6 +87,18 @@ namespace Alis.Reactive.FluentValidator
         public ClientValidationRule NotEqualTo(System.Linq.Expressions.Expression<Func<TModel, TProperty>> peerField) =>
             Peer(ValidationRuleName.NotEqualTo, peerField, name => $"'{name}' must not match '{Humanize(peerField)}'.");
 
+        public ClientValidationRule GreaterThan(System.Linq.Expressions.Expression<Func<TModel, TProperty>> peerField) =>
+            Peer(ValidationRuleName.Gt, peerField, name => $"'{name}' must be greater than '{Humanize(peerField)}'.");
+
+        public ClientValidationRule GreaterThanOrEqualTo(System.Linq.Expressions.Expression<Func<TModel, TProperty>> peerField) =>
+            Peer(ValidationRuleName.Min, peerField, name => $"'{name}' must be at least '{Humanize(peerField)}'.");
+
+        public ClientValidationRule LessThan(System.Linq.Expressions.Expression<Func<TModel, TProperty>> peerField) =>
+            Peer(ValidationRuleName.Lt, peerField, name => $"'{name}' must be less than '{Humanize(peerField)}'.");
+
+        public ClientValidationRule LessThanOrEqualTo(System.Linq.Expressions.Expression<Func<TModel, TProperty>> peerField) =>
+            Peer(ValidationRuleName.Max, peerField, name => $"'{name}' must be at most '{Humanize(peerField)}'.");
+
         private static ClientValidationRule NoOperand(ValidationRuleName rule, Func<string, string> message) =>
             new ClientValidationRule(rule, message, condition => ValidationRuleDetails.NoOperand(condition));
 
@@ -170,10 +182,13 @@ namespace Alis.Reactive.FluentValidator
             return ValidationMessage.Of(_message(displayName));
         }
 
-        internal ValidationRuleDetails DetailsFor(ValidationRuleCondition condition)
+        internal ValidationRuleDetails DetailsFor(
+            ValidationRuleCondition condition,
+            ValidationFieldPath fieldPrefix)
         {
             if (condition == null) throw new ArgumentNullException(nameof(condition));
-            return _details(condition);
+            if (fieldPrefix == null) throw new ArgumentNullException(nameof(fieldPrefix));
+            return _details(condition).PrefixPeerFieldWith(fieldPrefix);
         }
     }
 

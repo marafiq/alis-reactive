@@ -6,7 +6,7 @@ namespace Alis.Reactive
     /// <summary>
     /// Immutable registration of a component in the reactive plan.
     /// Populated at view render time by each vertical slice's HtmlExtensions.
-    /// Consumed by gather (HTTP serialization) and validation (field enrichment).
+    /// Consumed by gather (HTTP serialization) and validation field binding.
     /// </summary>
     public sealed class ComponentRegistration
     {
@@ -32,7 +32,7 @@ namespace Alis.Reactive
 
         /// <summary>
         /// Shape inferred from typeof(TProp) at registration time.
-        /// Flows to plan JSON — consumed by gather (serialization) and validation (field enrichment).
+        /// Flows to plan JSON and is consumed by gather serialization and validation binding.
         /// </summary>
         public Shape Shape { get; }
 

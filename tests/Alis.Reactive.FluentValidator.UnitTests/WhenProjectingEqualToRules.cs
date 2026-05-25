@@ -1,3 +1,5 @@
+using Alis.Reactive.Validation;
+
 namespace Alis.Reactive.FluentValidator.UnitTests;
 
 [TestFixture]
@@ -6,20 +8,18 @@ public class WhenProjectingEqualToRules
     private readonly FluentValidationAdapter _adapter = AdapterFactory.Create();
 
     [Test]
-    public void Equal_to_other_field_projects_equalTo_with_field()
+    public void FluentValidation_peer_comparison_requires_explicit_client_projection()
     {
-        var desc = _adapter.ProjectRules(typeof(EqualToValidator), "testForm");
+        var report = _adapter.ProjectValidation(typeof(EqualToValidator), "testForm");
 
-        Assert.That(desc, Is.Not.Null);
-        var field = desc.First(f => f.FieldName == "ConfirmEmail");
-        var equalRule = field.Rules.First(r => r.Rule == "equalTo");
-        Assert.That(equalRule.PeerFieldName(), Is.EqualTo("Email"));
-        Assert.That(equalRule.ConstraintValue(), Is.Null);
-        Assert.That(equalRule.Shape.Kind, Is.EqualTo("string"));
+        Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("ConfirmEmail"));
+        var skipped = report.SkippedRules.Single();
+        Assert.That(skipped.FieldName, Is.EqualTo("ConfirmEmail"));
+        Assert.That(skipped.Reason, Is.EqualTo(ClientRuleProjectionSkipReason.PeerComparisonRequiresExplicitProjection));
     }
 
     [Test]
-    public void Equal_to_with_custom_message_uses_custom_message()
+    public void Explicit_peer_comparison_projection_uses_custom_message()
     {
         var desc = _adapter.ProjectRules(typeof(EqualToWithCustomMessageValidator), "testForm");
 

@@ -84,7 +84,8 @@ public class AddressComparisonValidator : ReactiveValidator<NestedAddress>
     public AddressComparisonValidator()
     {
         RuleFor(x => x.ConfirmCity).Equal(x => x.City)
-            .WithMessage("Must match city");
+            .WithMessage("Must match city")
+            .ProjectToClient(rule => rule.EqualTo(x => x.City));
     }
 }
 
@@ -93,23 +94,6 @@ public class NestedComparisonParentValidator : AbstractValidator<NestedCondition
     public NestedComparisonParentValidator()
     {
         RuleFor(x => x.Address!).SetValidator(new AddressComparisonValidator());
-    }
-}
-
-public class InlineNestedComparisonValidator : AbstractValidator<NestedConditionModel>
-{
-    public InlineNestedComparisonValidator()
-    {
-        RuleFor(x => x.Address!.ConfirmCity).Equal(x => x.Address!.City)
-            .WithMessage("Must match city");
-    }
-}
-
-public class UnsupportedNestedPeerComparisonValidator : AbstractValidator<NestedConditionModel>
-{
-    public UnsupportedNestedPeerComparisonValidator()
-    {
-        RuleFor(x => x.ConfirmEmail).Equal(x => x.Contact!.Email);
     }
 }
 
@@ -168,7 +152,7 @@ public class WhenProjectingNestedValidationIntent
     }
 
     [Test]
-    public void Nested_validator_peer_comparison_uses_same_object_model_path()
+    public void Nested_validator_explicit_peer_projection_uses_same_object_model_path()
     {
         var fields = _adapter.ProjectRules(typeof(NestedComparisonParentValidator), "form");
 
@@ -180,32 +164,7 @@ public class WhenProjectingNestedValidationIntent
         Assert.That(rule.Rule, Is.EqualTo("equalTo"));
 
         Assert.That(rule.PeerFieldName(), Is.EqualTo("Address.City"),
-            "Peer field in cross-property comparison must carry the full nested path");
-    }
-
-    [Test]
-    public void Inline_nested_peer_comparison_uses_validated_field_sibling_scope()
-    {
-        var fields = _adapter.ProjectRules(typeof(InlineNestedComparisonValidator), "form");
-
-        var confirmCity = fields.FirstOrDefault(f => f.FieldName == "Address.ConfirmCity");
-        Assert.That(confirmCity, Is.Not.Null, "Address.ConfirmCity field should be projected");
-
-        var rule = confirmCity!.Rules[0];
-        Assert.That(rule.Rule, Is.EqualTo("equalTo"));
-        Assert.That(rule.PeerFieldName(), Is.EqualTo("Address.City"),
-            "Inline nested RuleFor paths should scope sibling peer comparisons to the same parent path");
-    }
-
-    [Test]
-    public void Cross_object_peer_comparison_is_skipped_for_client_projection_when_only_leaf_member_is_available()
-    {
-        var report = _adapter.ProjectValidation(typeof(UnsupportedNestedPeerComparisonValidator), "form");
-
-        Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("ConfirmEmail"));
-        Assert.That(report.SkippedRules, Has.Count.EqualTo(1));
-        Assert.That(report.SkippedRules[0].FieldName, Is.EqualTo("ConfirmEmail"));
-        Assert.That(report.SkippedRules[0].Reason, Is.EqualTo(ClientRuleProjectionSkipReason.CrossObjectPeerComparison));
+            "Explicit peer field projection inside a nested validator must carry the parent path.");
     }
 
     [Test]

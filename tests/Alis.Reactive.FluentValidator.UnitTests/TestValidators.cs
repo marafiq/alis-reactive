@@ -368,7 +368,9 @@ public class ConditionalAllRulesValidator : ReactiveValidator<TestModel>
             RuleFor(x => x.Salary).LessThanOrEqualTo(500000m).WithMessage("Salary max 500k");
             RuleFor(x => x.Salary).GreaterThan(0m).WithMessage("Salary gt 0");
             RuleFor(x => x.Salary).LessThan(1000000m).WithMessage("Salary lt 1M");
-            RuleFor(x => x.ConfirmEmail).Equal(x => x.Email).WithMessage("Emails must match");
+            RuleFor(x => x.ConfirmEmail)
+                .Equal(x => x.Email).WithMessage("Emails must match")
+                .ProjectToClient(rule => rule.EqualTo(x => x.Email));
         });
     }
 }
@@ -408,11 +410,17 @@ public class FullCoverageValidator : AbstractValidator<FullCoverageModel>
         RuleFor(x => x.Salary).LessThanOrEqualTo(500000m);
         RuleFor(x => x.MonthlyRate).GreaterThan(0m);
         RuleFor(x => x.MonthlyRate).LessThan(1000000m);
-        RuleFor(x => x.ConfirmEmail).Equal(x => x.Email);
-        RuleFor(x => x.AlternateEmail).NotEqual(x => x.Email);
+        RuleFor(x => x.ConfirmEmail)
+            .Equal(x => x.Email)
+            .ProjectToClient(rule => rule.EqualTo(x => x.Email));
+        RuleFor(x => x.AlternateEmail)
+            .NotEqual(x => x.Email)
+            .ProjectToClient(rule => rule.NotEqualTo(x => x.Email));
         RuleFor(x => x.Status).NotEqual("deleted");
         RuleFor(x => x.AdmissionDate).GreaterThanOrEqualTo(new DateTime(2020, 1, 1));
-        RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate);
+        RuleFor(x => x.DischargeDate)
+            .GreaterThan(x => x.AdmissionDate)
+            .ProjectToClient(rule => rule.GreaterThan(x => x.AdmissionDate));
         RuleFor(x => x.Nickname).IsEmpty();
     }
 }
@@ -435,11 +443,17 @@ public class FullCoverageConditionalValidator : ReactiveValidator<FullCoverageMo
             RuleFor(x => x.Salary).LessThanOrEqualTo(500000m);
             RuleFor(x => x.MonthlyRate).GreaterThan(0m);
             RuleFor(x => x.MonthlyRate).LessThan(1000000m);
-            RuleFor(x => x.ConfirmEmail).Equal(x => x.Email);
-            RuleFor(x => x.AlternateEmail).NotEqual(x => x.Email);
+            RuleFor(x => x.ConfirmEmail)
+                .Equal(x => x.Email)
+                .ProjectToClient(rule => rule.EqualTo(x => x.Email));
+            RuleFor(x => x.AlternateEmail)
+                .NotEqual(x => x.Email)
+                .ProjectToClient(rule => rule.NotEqualTo(x => x.Email));
             RuleFor(x => x.Status).NotEqual("deleted");
             RuleFor(x => x.AdmissionDate).GreaterThanOrEqualTo(new DateTime(2020, 1, 1));
-            RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate);
+            RuleFor(x => x.DischargeDate)
+                .GreaterThan(x => x.AdmissionDate)
+                .ProjectToClient(rule => rule.GreaterThan(x => x.AdmissionDate));
             RuleFor(x => x.Nickname).IsEmpty();
         });
     }
@@ -459,7 +473,9 @@ public class EqualToWithCustomMessageValidator : AbstractValidator<TestModel>
 {
     public EqualToWithCustomMessageValidator()
     {
-        RuleFor(x => x.ConfirmEmail).Equal(x => x.Email).WithMessage("Emails must match.");
+        RuleFor(x => x.ConfirmEmail)
+            .Equal(x => x.Email).WithMessage("Emails must match.")
+            .ProjectToClient(rule => rule.EqualTo(x => x.Email));
     }
 }
 
