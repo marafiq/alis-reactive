@@ -40,6 +40,29 @@ public class WhenGeneratingRuntimePlanTypes
             "Reactive Plan JSON should not use undefined as behavior.");
     }
 
+    [Test]
+    public void generated_runtime_plan_types_keep_validation_activation_conditions_deterministic()
+    {
+        var generated = PlanTypeScriptContract.Render();
+
+        Assert.That(
+            generated,
+            Does.Contain("condition: ValidationCondition;"),
+            "Validation activations should not accept the broad condition union because confirm prompts are async branch guards, not validation guards.");
+        Assert.That(
+            generated,
+            Does.Contain("export type ValidationCondition ="),
+            "The runtime contract should name the deterministic condition subset used by validation.");
+        Assert.That(
+            generated,
+            Does.Contain("terms: ValidationCondition[];"),
+            "Validation condition composition should stay deterministic recursively, not only at the top level.");
+        Assert.That(
+            generated,
+            Does.Contain("term: ValidationCondition;"),
+            "Validation condition negation should stay deterministic recursively, not only at the top level.");
+    }
+
     private static string FindRepoRoot(string startDirectory)
     {
         var directory = new DirectoryInfo(startDirectory);

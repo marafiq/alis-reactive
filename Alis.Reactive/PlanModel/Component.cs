@@ -685,7 +685,7 @@ namespace Alis.Reactive.PlanModel
         public abstract string Kind { get; }
         internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
-        internal static ValidationRuleActivation When(Condition condition) =>
+        internal static ValidationRuleActivation When(ValidationCondition condition) =>
             new ConditionallyActiveValidationRule(condition);
 
         private sealed class AlwaysActiveValidationRule : ValidationRuleActivation
@@ -699,15 +699,15 @@ namespace Alis.Reactive.PlanModel
 
         private sealed class ConditionallyActiveValidationRule : ValidationRuleActivation
         {
-            private readonly Condition _condition;
+            private readonly ValidationCondition _condition;
 
-            internal ConditionallyActiveValidationRule(Condition condition)
+            internal ConditionallyActiveValidationRule(ValidationCondition condition)
             {
                 _condition = condition ?? throw new System.ArgumentNullException(nameof(condition));
             }
 
             public override string Kind => "when";
-            public Condition Condition => _condition;
+            public ValidationCondition Condition => _condition;
             internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
                 ValidationRuleActivationJsonConverter.WriteProperty(writer, options, "condition", _condition);
         }

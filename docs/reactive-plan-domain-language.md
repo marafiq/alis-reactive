@@ -217,9 +217,10 @@ Kernel rules:
   source scopes for the same value-producing language.
 - A guard expression is a deterministic condition tree over value producers,
   plus the explicit confirm prompt primitive.
-- `.Reactive` branches and validation activation both end as `Condition`.
-  Validation starts as `FieldCondition` only because fields must be bound to
-  registered component value members during render.
+- `.Reactive` branches end as broad `Condition` because branches may include a
+  `Confirm` prompt. Validation activation ends as `ValidationCondition`, the
+  deterministic condition subset produced from `FieldCondition` after fields are
+  bound to registered component value members during render.
 - A reaction graph is deterministic structure. HTTP, parallel, and injection do
   not make it non-deterministic; they are declared reaction nodes with declared
   response routes and follow-up reactions.
@@ -797,7 +798,8 @@ different domain actions and must not share one collision rule.
 | Validation Date Literal | Date-shaped literal emitted by validation projections for both rule constraints and field conditions. Date-only values use `yyyy-MM-dd`; date-time values use the same sortable text form, so runtime date shape conversion does not depend on a component returning a Unix timestamp. |
 | Validation Rule Execution | Explicit plan contract for how one validation rule runs: fixed constraint operand, peer-value operand, activation condition, and comparison shape. Runtime reads this object instead of guessing from optional fields. |
 | Validation Rule Operand | Discriminated validation operand. `none` means the rule has no operand; `value` carries a `ValueProducer`, so a literal null is still a present operand. |
-| Validation Rule Activation | Discriminated validation activation. `always` means the rule is unconditional; `when` carries the plan `Condition` that must pass before evaluation. |
+| Validation Condition | Deterministic validation activation predicate. It uses compare/all/any/not over value producers and intentionally excludes `Confirm`, so browser validation stays in the immediate execution lane. |
+| Validation Rule Activation | Discriminated validation activation. `always` means the rule is unconditional; `when` carries the plan `ValidationCondition` that must pass before evaluation. |
 | Server Error Field Name | Plan-declared field name used to place server-returned validation errors. Runtime maps server errors through this field name only; component keys are not fallback field names. |
 | Server Error Placement Target | Runtime classification for one server validation error. `InlineServerErrorTarget` requires a known validation field, plan component, mounted DOM element, and rendered inline validation message slot. `SummaryServerErrorTarget` is used for unknown fields, currently missing/unmounted fields, and fields whose inline message slot is absent or hidden. |
 | Component Validation Rules | Runtime lifecycle view of the validation rules carried by one validation-container component. It owns replacement by validated component key, root-container extension, and partial contribution removal so plan merging does not edit rule arrays directly. |

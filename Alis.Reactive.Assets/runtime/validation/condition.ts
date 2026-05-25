@@ -1,4 +1,10 @@
-// Validation Condition — validation rules use the plan-level Condition type directly.
-// The conditions module handles all condition evaluation.
+import type { ExecContext, Plan, ValidationCondition } from "../types";
+import { evaluateCondition } from "../conditions/conditions";
 
-export {};
+export function evaluateValidationCondition(
+  condition: ValidationCondition,
+  plan: Plan,
+  ctx?: ExecContext,
+): boolean {
+  return evaluateCondition(condition, plan, ctx);
+}

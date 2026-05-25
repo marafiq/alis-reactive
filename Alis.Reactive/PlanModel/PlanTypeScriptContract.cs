@@ -163,7 +163,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("ConditionalValidationRuleActivation")
                 .Requires("kind", Literal("when"))
-                .Requires("condition", "Condition"));
+                .Requires("condition", "ValidationCondition"));
 
             contract.Declare(Union("Source", "ComponentSource", "PayloadSource", "UrlSource", "PluginSource"));
 
@@ -480,6 +480,25 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("array"))
                 .Requires("items", "ValueProducer[]")
                 .Requires("shape", "Shape"));
+
+            contract.Declare(Union(
+                "ValidationCondition",
+                "CompareCondition",
+                "ValidationAllCondition",
+                "ValidationAnyCondition",
+                "ValidationNotCondition"));
+
+            contract.Declare(Interface("ValidationAllCondition")
+                .Requires("kind", Literal("all"))
+                .Requires("terms", "ValidationCondition[]"));
+
+            contract.Declare(Interface("ValidationAnyCondition")
+                .Requires("kind", Literal("any"))
+                .Requires("terms", "ValidationCondition[]"));
+
+            contract.Declare(Interface("ValidationNotCondition")
+                .Requires("kind", Literal("not"))
+                .Requires("term", "ValidationCondition"));
 
             contract.Declare(Union(
                 "Condition",

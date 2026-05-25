@@ -202,7 +202,7 @@ export interface AlwaysValidationRuleActivation {
 
 export interface ConditionalValidationRuleActivation {
   kind: "when";
-  condition: Condition;
+  condition: ValidationCondition;
 }
 
 export type Source =
@@ -586,6 +586,27 @@ export interface ArrayProducer {
   kind: "array";
   items: ValueProducer[];
   shape: Shape;
+}
+
+export type ValidationCondition =
+  | CompareCondition
+  | ValidationAllCondition
+  | ValidationAnyCondition
+  | ValidationNotCondition;
+
+export interface ValidationAllCondition {
+  kind: "all";
+  terms: ValidationCondition[];
+}
+
+export interface ValidationAnyCondition {
+  kind: "any";
+  terms: ValidationCondition[];
+}
+
+export interface ValidationNotCondition {
+  kind: "not";
+  term: ValidationCondition;
 }
 
 export type Condition =

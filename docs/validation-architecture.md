@@ -81,6 +81,12 @@ Nested `WhenField*` scopes project as one active client condition. A single
 scope keeps its guard directly; multiple active scopes are composed with `all`
 in the same outer-to-inner order the server predicates use.
 
+After render-time field binding, client guards become `ValidationCondition`,
+the deterministic plan condition subset used by validation activation. It
+supports compare/all/any/not over declared value producers and excludes
+`Confirm`, which belongs to reactive branches because prompts cross into the
+async execution lane.
+
 If a rule is declared under both a `WhenField*` guard and a server-only
 FluentValidation `When`/`Unless` scope, the browser projection is skipped. The
 client guard would be only a partial activation, so the adapter records a
@@ -118,7 +124,7 @@ components.
 | Projection contract | `IClientValidationProjectionSource`, `ClientValidationProjectionRequest`, `ClientValidationProjection` |
 | Core projection source | `ClientValidationProjectionRegistry`, `ClientValidationProjectionBuilder<TModel>`, `ClientValidationFieldToken<TModel, TValue>` |
 | Projection binding | `ClientValidationProjectionBinder`, `ValidationProjectionBindingScope`, `ValidationFieldBinding` |
-| Plan payload | `ComponentValidation`, `ValidationRuleExecution`, `ValidationRuleOperand`, `ValidationRuleActivation` |
+| Plan payload | `ComponentValidation`, `ValidationRuleExecution`, `ValidationRuleOperand`, `ValidationRuleActivation`, `ValidationCondition` |
 | Runtime execution | `validateContainer`, `showServerErrors`, `RuntimeValidationActivation`, `RuntimeValidationPeerOperand`, `rule-engine.ts` |
 
 ## Design Rules

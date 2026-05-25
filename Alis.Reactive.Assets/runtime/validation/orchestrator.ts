@@ -6,13 +6,13 @@
 import type {
   Plan, ValidationContainerComponent, ComponentValidation,
   ValidationRule, ValueProducer,
-  Condition,
+  ValidationCondition,
   ValidationRuleActivation as PlanValidationRuleActivation,
   ValidationRuleOperand as PlanValidationRuleOperand,
 } from "../types";
 import type { ExecContext } from "../types";
 import { RuntimePlan, RuntimeResolutionError, type RuntimeComponent } from "../domain/runtime-plan";
-import { evaluateCondition } from "../conditions/conditions";
+import { evaluateValidationCondition } from "./condition";
 import { evaluateValue } from "../core/evaluate";
 import { scope } from "../core/trace";
 import { toString } from "../core/shape-convert";
@@ -509,16 +509,16 @@ class AlwaysValidationActivation extends ValidationActivation {
 }
 
 class ConditionalValidationActivation extends ValidationActivation {
-  constructor(private readonly condition: Condition) {
+  constructor(private readonly condition: ValidationCondition) {
     super();
   }
 
   isActive(surface: ValidationSurface): boolean {
-    return evaluateCondition(this.condition, surface.plan, surface.context.raw);
+    return evaluateValidationCondition(this.condition, surface.plan, surface.context.raw);
   }
 
   isSkipped(surface: ValidationSurface): boolean {
-    return !evaluateCondition(this.condition, surface.plan, surface.context.raw);
+    return !evaluateValidationCondition(this.condition, surface.plan, surface.context.raw);
   }
 }
 

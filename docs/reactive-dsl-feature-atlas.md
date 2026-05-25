@@ -192,10 +192,11 @@ Domain terms:
 
 Runtime behavior:
 
-Conditions are deterministic trees over value producers. Branches evaluate
-ordered cases and execute the first matching reaction; default is the explicit
-else branch. Validation activation uses the same `Condition` after field
-conditions are bound to component sources.
+Conditions are value-producer trees with an explicit async prompt primitive.
+Branches evaluate ordered cases and execute the first matching reaction; default
+is the explicit else branch. Validation activation binds `FieldCondition` to a
+`ValidationCondition`, the deterministic compare/all/any/not subset that cannot
+carry `Confirm`.
 
 ## HTTP Surface
 

@@ -168,7 +168,7 @@ namespace Alis.Reactive.Validation
             internal override ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
             {
                 if (binding == null) throw new System.ArgumentNullException(nameof(binding));
-                return ValidationRuleActivation.When(binding.ResolveCondition(_condition));
+                return ValidationRuleActivation.When(binding.ResolveActivationCondition(_condition));
             }
 
             internal override ValidationRuleActivationIntent ToIntent() =>
@@ -513,10 +513,10 @@ namespace Alis.Reactive.Validation
             return _fieldBindings.Resolve(fieldPath).ReadValue();
         }
 
-        internal Condition ResolveCondition(FieldCondition condition)
+        internal ValidationCondition ResolveActivationCondition(FieldCondition condition)
         {
             if (condition == null) throw new System.ArgumentNullException(nameof(condition));
-            return condition.ToPlanCondition(_conditionBinding);
+            return condition.ToValidationCondition(_conditionBinding);
         }
     }
 }

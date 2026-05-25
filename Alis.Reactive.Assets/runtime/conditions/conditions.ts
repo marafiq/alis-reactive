@@ -2,7 +2,7 @@
 // Uses SHARED resolver for value resolution.
 // Condition is a discriminated union: compare, all, any, not, confirm.
 
-import type { Condition, CompareCondition, CompareOp, Plan, Shape } from "../types";
+import type { Condition, CompareCondition, CompareOp, Plan, Shape, ValidationCondition } from "../types";
 import type { ExecContext } from "../types";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
@@ -12,6 +12,8 @@ import { ExecutionContext } from "../domain/execution-context";
 import { RuntimeShape } from "../domain/runtime-shape";
 
 const log = scope("conditions");
+
+type RuntimeEvaluableCondition = Condition | ValidationCondition;
 
 type TextOperand =
   | { readonly kind: "text"; readonly value: string }
@@ -33,7 +35,7 @@ const missingText: TextOperand = { kind: "missing" };
 const textOperandShape: Shape = { kind: "string" };
 
 /** Sync condition evaluation. Confirm conditions return false in sync context. */
-export function evaluateCondition(condition: Condition, plan: Plan, ctx?: ExecContext): boolean {
+export function evaluateCondition(condition: RuntimeEvaluableCondition, plan: Plan, ctx?: ExecContext): boolean {
   return RuntimeCondition.from(condition, plan, ExecutionContext.from(ctx)).evaluateSync();
 }
 
@@ -52,7 +54,7 @@ export function evaluateConditionInCurrentLane(
 }
 
 abstract class RuntimeCondition {
-  static from(condition: Condition, plan: Plan, context: ExecutionContext): RuntimeCondition {
+  static from(condition: RuntimeEvaluableCondition, plan: Plan, context: ExecutionContext): RuntimeCondition {
     switch (condition.kind) {
       case "compare":
         return new CompareRuntimeCondition(condition, plan, context);
@@ -101,7 +103,7 @@ class CompareRuntimeCondition extends RuntimeCondition {
 abstract class CompositeRuntimeCondition extends RuntimeCondition {
   constructor(
     kind: "all" | "any",
-    protected readonly terms: readonly Condition[],
+    protected readonly terms: readonly RuntimeEvaluableCondition[],
     protected readonly plan: Plan,
     protected readonly context: ExecutionContext,
   ) {
@@ -115,13 +117,13 @@ abstract class CompositeRuntimeCondition extends RuntimeCondition {
     return this.terms.map(term => RuntimeCondition.from(term, this.plan, this.context));
   }
 
-  protected runtimeTerm(term: Condition): RuntimeCondition {
+  protected runtimeTerm(term: RuntimeEvaluableCondition): RuntimeCondition {
     return RuntimeCondition.from(term, this.plan, this.context);
   }
 }
 
 class AllRuntimeCondition extends CompositeRuntimeCondition {
-  constructor(terms: readonly Condition[], plan: Plan, context: ExecutionContext) {
+  constructor(terms: readonly RuntimeEvaluableCondition[], plan: Plan, context: ExecutionContext) {
     super("all", terms, plan, context);
   }
 
@@ -163,7 +165,7 @@ class AllRuntimeCondition extends CompositeRuntimeCondition {
 }
 
 class AnyRuntimeCondition extends CompositeRuntimeCondition {
-  constructor(terms: readonly Condition[], plan: Plan, context: ExecutionContext) {
+  constructor(terms: readonly RuntimeEvaluableCondition[], plan: Plan, context: ExecutionContext) {
     super("any", terms, plan, context);
   }
 
@@ -206,7 +208,7 @@ class AnyRuntimeCondition extends CompositeRuntimeCondition {
 
 class NotRuntimeCondition extends RuntimeCondition {
   constructor(
-    private readonly term: Condition,
+    private readonly term: RuntimeEvaluableCondition,
     private readonly plan: Plan,
     private readonly context: ExecutionContext,
   ) {
