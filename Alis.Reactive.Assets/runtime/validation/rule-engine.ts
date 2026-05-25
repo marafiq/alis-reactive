@@ -30,51 +30,47 @@ export function noPeerValue(): ResolvedPeerValue {
 }
 
 export function ruleFails(evaluation: RuleEvaluation): boolean {
-  const ruleEvaluation = ValidationRuleEvaluation.from(evaluation);
-  return ValidationRuleOperations.from(ruleEvaluation.rule.name).fails(ruleEvaluation);
-}
+  const ruleEvaluation = prepareValidationRuleEvaluation(evaluation);
 
-class ValidationRuleEvaluation {
-  private constructor(
-    readonly rule: ValidationRule,
-    readonly subject: ValidationSubject,
-    private readonly peerValue: ResolvedPeerValue,
-  ) {}
-
-  static from(evaluation: RuleEvaluation): ValidationRuleEvaluation {
-    return new ValidationRuleEvaluation(
-      evaluation.rule,
-      ValidationSubject.from(evaluation.value),
-      evaluation.peerValue,
-    );
-  }
-
-  comparisonTarget(): ValidationScalarTarget {
-    return ValidationScalarTarget.fromResolvedPeerOrConstraint(
-      this.peerValue,
-      this.rule.execution.constraint,
-    );
-  }
-
-  constraint(): ValidationScalarTarget {
-    return ValidationScalarTarget.fromConstraintOperand(this.rule.execution.constraint);
-  }
-
-  get comparisonShape(): Shape {
-    return this.rule.execution.comparisonShape;
-  }
-
-  lengthConstraint(): ValidationLengthConstraint {
-    return ValidationLengthConstraint.fromOperand(this.rule.execution.constraint);
-  }
-
-  rangeTarget(): ValidationRangeTarget {
-    return ValidationRangeTarget.fromOperand(this.rule.execution.constraint);
+  switch (ruleEvaluation.rule.name) {
+    case "required": return requiredFails(ruleEvaluation);
+    case "empty": return emptyFails(ruleEvaluation);
+    case "minLength":
+    case "maxLength":
+      return lengthRuleFails(ruleEvaluation.rule.name, ruleEvaluation);
+    case "email": return emailFails(ruleEvaluation);
+    case "regex": return regexFails(ruleEvaluation);
+    case "url": return urlFails(ruleEvaluation);
+    case "creditCard": return creditCardFails(ruleEvaluation);
+    case "min":
+    case "max":
+    case "gt":
+    case "lt":
+      return orderedComparisonFails(ruleEvaluation.rule.name, ruleEvaluation);
+    case "range":
+    case "exclusiveRange":
+      return rangeFails(ruleEvaluation.rule.name, ruleEvaluation);
+    case "equalTo":
+    case "notEqual":
+    case "notEqualTo":
+      return equalityFails(ruleEvaluation.rule.name, ruleEvaluation);
+    case "atLeastOne": return atLeastOneFails(ruleEvaluation);
+    default: return assertNever(ruleEvaluation.rule.name, "validation rule");
   }
 }
 
-interface RuleOperation {
-  fails(evaluation: ValidationRuleEvaluation): boolean;
+interface ValidationRuleEvaluation {
+  readonly rule: ValidationRule;
+  readonly subject: ValidationSubject;
+  readonly peerValue: ResolvedPeerValue;
+}
+
+function prepareValidationRuleEvaluation(evaluation: RuleEvaluation): ValidationRuleEvaluation {
+  return {
+    rule: evaluation.rule,
+    subject: ValidationSubject.from(evaluation.value),
+    peerValue: evaluation.peerValue,
+  };
 }
 
 type LengthRuleName = Extract<ValidationRuleName, "minLength" | "maxLength">;
@@ -82,200 +78,162 @@ type OrderedComparisonRuleName = Extract<ValidationRuleName, "min" | "max" | "gt
 type RangeRuleName = Extract<ValidationRuleName, "range" | "exclusiveRange">;
 type EqualityRuleName = Extract<ValidationRuleName, "equalTo" | "notEqual" | "notEqualTo">;
 
-class ValidationRuleOperations {
-  static from(ruleName: ValidationRuleName): RuleOperation {
-    switch (ruleName) {
-      case "required": return new RequiredRuleOperation();
-      case "empty": return new EmptyRuleOperation();
-      case "minLength":
-      case "maxLength":
-        return new LengthRuleOperation(ruleName);
-      case "email": return new EmailRuleOperation();
-      case "regex": return new RegexRuleOperation();
-      case "url": return new UrlRuleOperation();
-      case "creditCard": return new CreditCardRuleOperation();
-      case "min":
-      case "max":
-      case "gt":
-      case "lt":
-        return new OrderedComparisonRuleOperation(ruleName);
-      case "range":
-      case "exclusiveRange":
-        return new RangeRuleOperation(ruleName);
-      case "equalTo":
-      case "notEqual":
-      case "notEqualTo":
-        return new EqualityRuleOperation(ruleName);
-      case "atLeastOne": return new AtLeastOneRuleOperation();
-      default: return assertNever(ruleName, "validation rule");
+function comparisonTarget(evaluation: ValidationRuleEvaluation): ValidationScalarTarget {
+  return ValidationScalarTarget.fromResolvedPeerOrConstraint(
+    evaluation.peerValue,
+    evaluation.rule.execution.constraint,
+  );
+}
+
+function constraint(evaluation: ValidationRuleEvaluation): ValidationScalarTarget {
+  return ValidationScalarTarget.fromConstraintOperand(evaluation.rule.execution.constraint);
+}
+
+function comparisonShape(evaluation: ValidationRuleEvaluation): Shape {
+  return evaluation.rule.execution.comparisonShape;
+}
+
+function lengthConstraint(evaluation: ValidationRuleEvaluation): ValidationLengthConstraint {
+  return ValidationLengthConstraint.fromOperand(evaluation.rule.execution.constraint);
+}
+
+function rangeTarget(evaluation: ValidationRuleEvaluation): ValidationRangeTarget {
+  return ValidationRangeTarget.fromOperand(evaluation.rule.execution.constraint);
+}
+
+function requiredFails(evaluation: ValidationRuleEvaluation): boolean {
+  return evaluation.subject.isEmpty;
+}
+
+function emptyFails(evaluation: ValidationRuleEvaluation): boolean {
+  return !evaluation.subject.isEmpty;
+}
+
+function lengthRuleFails(ruleName: LengthRuleName, evaluation: ValidationRuleEvaluation): boolean {
+  if (evaluation.subject.isEmpty) return false;
+
+  const actualLength = evaluation.subject.length;
+  const expectedLength = lengthConstraint(evaluation);
+
+  if (ruleName === "minLength") return expectedLength.isGreaterThan(actualLength);
+  return expectedLength.isLessThan(actualLength);
+}
+
+function emailFails(evaluation: ValidationRuleEvaluation): boolean {
+  const valueWasProvided = !evaluation.subject.isEmpty;
+  const valueLooksLikeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(evaluation.subject.text);
+  return valueWasProvided && !valueLooksLikeEmail;
+}
+
+function regexFails(evaluation: ValidationRuleEvaluation): boolean {
+  const pattern = constraint(evaluation).textOrEmpty();
+  try {
+    return !evaluation.subject.isEmpty && !new RegExp(pattern).test(evaluation.subject.text);
+  } catch {
+    return true;
+  }
+}
+
+function urlFails(evaluation: ValidationRuleEvaluation): boolean {
+  const valueWasProvided = !evaluation.subject.isEmpty;
+  const valueLooksLikeUrl = /^https?:\/\/.+/.test(evaluation.subject.text);
+  return valueWasProvided && !valueLooksLikeUrl;
+}
+
+function creditCardFails(evaluation: ValidationRuleEvaluation): boolean {
+  const valueWasProvided = !evaluation.subject.isEmpty;
+  const valuePassesLuhn = luhn(evaluation.subject.text.replace(/\D/g, ""));
+  return valueWasProvided && !valuePassesLuhn;
+}
+
+function orderedComparisonFails(
+  ruleName: OrderedComparisonRuleName,
+  evaluation: ValidationRuleEvaluation,
+): boolean {
+  const target = comparisonTarget(evaluation);
+  const comparison = evaluation.subject.compareTo(target, comparisonShape(evaluation));
+  const valueIsEmpty = evaluation.subject.isEmpty;
+
+  switch (ruleName) {
+    case "min": {
+      const valueIsBelowMinimum = comparison.cannotCompare || comparison.lessThanTarget;
+      return !valueIsEmpty && valueIsBelowMinimum;
     }
-  }
-}
-
-class RequiredRuleOperation implements RuleOperation {
-  fails(evaluation: ValidationRuleEvaluation): boolean {
-    return evaluation.subject.isEmpty;
-  }
-}
-
-class EmptyRuleOperation implements RuleOperation {
-  fails(evaluation: ValidationRuleEvaluation): boolean {
-    return !evaluation.subject.isEmpty;
-  }
-}
-
-class LengthRuleOperation implements RuleOperation {
-  constructor(private readonly ruleName: LengthRuleName) {}
-
-  fails(evaluation: ValidationRuleEvaluation): boolean {
-    if (evaluation.subject.isEmpty) return false;
-
-    const actualLength = evaluation.subject.length;
-    const expectedLength = evaluation.lengthConstraint();
-
-    if (this.ruleName === "minLength") return expectedLength.isGreaterThan(actualLength);
-    return expectedLength.isLessThan(actualLength);
-  }
-}
-
-class EmailRuleOperation implements RuleOperation {
-  fails(evaluation: ValidationRuleEvaluation): boolean {
-    const valueWasProvided = !evaluation.subject.isEmpty;
-    const valueLooksLikeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(evaluation.subject.text);
-    return valueWasProvided && !valueLooksLikeEmail;
-  }
-}
-
-class RegexRuleOperation implements RuleOperation {
-  fails(evaluation: ValidationRuleEvaluation): boolean {
-    const constraint = this.pattern(evaluation);
-    try {
-      return !evaluation.subject.isEmpty && !new RegExp(constraint).test(evaluation.subject.text);
-    } catch {
-      return true;
+    case "max": {
+      const valueIsAboveMaximum = comparison.cannotCompare || comparison.greaterThanTarget;
+      return !valueIsEmpty && valueIsAboveMaximum;
     }
-  }
-
-  private pattern(evaluation: ValidationRuleEvaluation): string {
-    return evaluation.constraint().textOrEmpty();
-  }
-}
-
-class UrlRuleOperation implements RuleOperation {
-  fails(evaluation: ValidationRuleEvaluation): boolean {
-    const valueWasProvided = !evaluation.subject.isEmpty;
-    const valueLooksLikeUrl = /^https?:\/\/.+/.test(evaluation.subject.text);
-    return valueWasProvided && !valueLooksLikeUrl;
-  }
-}
-
-class CreditCardRuleOperation implements RuleOperation {
-  fails(evaluation: ValidationRuleEvaluation): boolean {
-    const valueWasProvided = !evaluation.subject.isEmpty;
-    const valuePassesLuhn = luhn(evaluation.subject.text.replace(/\D/g, ""));
-    return valueWasProvided && !valuePassesLuhn;
-  }
-}
-
-class OrderedComparisonRuleOperation implements RuleOperation {
-  constructor(private readonly ruleName: OrderedComparisonRuleName) {}
-
-  fails(evaluation: ValidationRuleEvaluation): boolean {
-    const target = evaluation.comparisonTarget();
-    const comparison = evaluation.subject.compareTo(target, evaluation.comparisonShape);
-    const valueIsEmpty = evaluation.subject.isEmpty;
-
-    switch (this.ruleName) {
-      case "min": {
-        const valueIsBelowMinimum = comparison.cannotCompare || comparison.lessThanTarget;
-        return !valueIsEmpty && valueIsBelowMinimum;
-      }
-      case "max": {
-        const valueIsAboveMaximum = comparison.cannotCompare || comparison.greaterThanTarget;
-        return !valueIsEmpty && valueIsAboveMaximum;
-      }
-      case "gt": {
-        const valueIsNotGreaterThanTarget =
-          comparison.cannotCompare || comparison.lessThanTarget || comparison.equalToTarget;
-        return valueIsEmpty || valueIsNotGreaterThanTarget;
-      }
-      case "lt": {
-        const valueIsNotLessThanTarget =
-          comparison.cannotCompare || comparison.greaterThanTarget || comparison.equalToTarget;
-        return !valueIsEmpty && valueIsNotLessThanTarget;
-      }
-      default: return assertNever(this.ruleName, "ordered validation comparison");
+    case "gt": {
+      const valueIsNotGreaterThanTarget =
+        comparison.cannotCompare || comparison.lessThanTarget || comparison.equalToTarget;
+      return valueIsEmpty || valueIsNotGreaterThanTarget;
     }
-  }
-}
-
-class RangeRuleOperation implements RuleOperation {
-  constructor(private readonly ruleName: RangeRuleName) {}
-
-  fails(evaluation: ValidationRuleEvaluation): boolean {
-    const range = evaluation.rangeTarget();
-    if (!range.isAvailable) return true;
-    if (evaluation.subject.isEmpty) return false;
-
-    const lowerComparison = evaluation.subject.compareTo(range.lowerBound, evaluation.comparisonShape);
-    const upperComparison = evaluation.subject.compareTo(range.upperBound, evaluation.comparisonShape);
-    const rangeCannotBeCompared = lowerComparison.cannotCompare || upperComparison.cannotCompare;
-    if (rangeCannotBeCompared) return true;
-
-    if (this.ruleName === "range") {
-      const valueFallsOutsideInclusiveRange =
-        lowerComparison.lessThanTarget || upperComparison.greaterThanTarget;
-      return valueFallsOutsideInclusiveRange;
+    case "lt": {
+      const valueIsNotLessThanTarget =
+        comparison.cannotCompare || comparison.greaterThanTarget || comparison.equalToTarget;
+      return !valueIsEmpty && valueIsNotLessThanTarget;
     }
-
-    const valueFallsOutsideExclusiveRange =
-      lowerComparison.lessThanTarget || lowerComparison.equalToTarget ||
-      upperComparison.greaterThanTarget || upperComparison.equalToTarget;
-    return valueFallsOutsideExclusiveRange;
+    default: return assertNever(ruleName, "ordered validation comparison");
   }
 }
 
-class EqualityRuleOperation implements RuleOperation {
-  constructor(private readonly ruleName: EqualityRuleName) {}
+function rangeFails(ruleName: RangeRuleName, evaluation: ValidationRuleEvaluation): boolean {
+  const range = rangeTarget(evaluation);
+  if (!range.isAvailable) return true;
+  if (evaluation.subject.isEmpty) return false;
 
-  fails(evaluation: ValidationRuleEvaluation): boolean {
-    switch (this.ruleName) {
-      case "equalTo": return this.failsEqualTo(evaluation);
-      case "notEqual": return this.failsNotEqual(evaluation);
-      case "notEqualTo": return this.failsNotEqualTo(evaluation);
-      default: return assertNever(this.ruleName, "equality validation comparison");
-    }
+  const lowerComparison = evaluation.subject.compareTo(range.lowerBound, comparisonShape(evaluation));
+  const upperComparison = evaluation.subject.compareTo(range.upperBound, comparisonShape(evaluation));
+  const rangeCannotBeCompared = lowerComparison.cannotCompare || upperComparison.cannotCompare;
+  if (rangeCannotBeCompared) return true;
+
+  if (ruleName === "range") {
+    const valueFallsOutsideInclusiveRange =
+      lowerComparison.lessThanTarget || upperComparison.greaterThanTarget;
+    return valueFallsOutsideInclusiveRange;
   }
 
-  private failsEqualTo(evaluation: ValidationRuleEvaluation): boolean {
-    if (evaluation.subject.isEmpty) return false;
+  const valueFallsOutsideExclusiveRange =
+    lowerComparison.lessThanTarget || lowerComparison.equalToTarget ||
+    upperComparison.greaterThanTarget || upperComparison.equalToTarget;
+  return valueFallsOutsideExclusiveRange;
+}
 
-    const target = evaluation.comparisonTarget();
-    if (!target.isAvailable) return true;
-    return !evaluation.subject.equalsTarget(target, evaluation.comparisonShape);
-  }
-
-  private failsNotEqual(evaluation: ValidationRuleEvaluation): boolean {
-    const target = evaluation.constraint();
-    if (!target.isAvailable) return false;
-    const valueWasProvided = !evaluation.subject.isEmpty;
-    const valueEqualsForbiddenTarget = evaluation.subject.equalsTarget(target, evaluation.comparisonShape);
-    return valueWasProvided && valueEqualsForbiddenTarget;
-  }
-
-  private failsNotEqualTo(evaluation: ValidationRuleEvaluation): boolean {
-    const target = evaluation.comparisonTarget();
-    if (!target.isAvailable) return true;
-    const valueWasProvided = !evaluation.subject.isEmpty;
-    const valueEqualsPeerTarget = evaluation.subject.equalsTarget(target, evaluation.comparisonShape);
-    return valueWasProvided && valueEqualsPeerTarget;
+function equalityFails(ruleName: EqualityRuleName, evaluation: ValidationRuleEvaluation): boolean {
+  switch (ruleName) {
+    case "equalTo": return equalToFails(evaluation);
+    case "notEqual": return notEqualFails(evaluation);
+    case "notEqualTo": return notEqualToFails(evaluation);
+    default: return assertNever(ruleName, "equality validation comparison");
   }
 }
 
-class AtLeastOneRuleOperation implements RuleOperation {
-  fails(evaluation: ValidationRuleEvaluation): boolean {
-    return evaluation.subject.failsAtLeastOne();
-  }
+function equalToFails(evaluation: ValidationRuleEvaluation): boolean {
+  if (evaluation.subject.isEmpty) return false;
+
+  const target = comparisonTarget(evaluation);
+  if (!target.isAvailable) return true;
+  return !evaluation.subject.equalsTarget(target, comparisonShape(evaluation));
+}
+
+function notEqualFails(evaluation: ValidationRuleEvaluation): boolean {
+  const target = constraint(evaluation);
+  if (!target.isAvailable) return false;
+  const valueWasProvided = !evaluation.subject.isEmpty;
+  const valueEqualsForbiddenTarget = evaluation.subject.equalsTarget(target, comparisonShape(evaluation));
+  return valueWasProvided && valueEqualsForbiddenTarget;
+}
+
+function notEqualToFails(evaluation: ValidationRuleEvaluation): boolean {
+  const target = comparisonTarget(evaluation);
+  if (!target.isAvailable) return true;
+  const valueWasProvided = !evaluation.subject.isEmpty;
+  const valueEqualsPeerTarget = evaluation.subject.equalsTarget(target, comparisonShape(evaluation));
+  return valueWasProvided && valueEqualsPeerTarget;
+}
+
+function atLeastOneFails(evaluation: ValidationRuleEvaluation): boolean {
+  return evaluation.subject.failsAtLeastOne();
 }
 
 function luhn(digits: string): boolean {
