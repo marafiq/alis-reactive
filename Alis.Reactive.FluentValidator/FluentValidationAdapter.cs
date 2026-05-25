@@ -286,27 +286,15 @@ namespace Alis.Reactive.FluentValidator
                 return false;
             }
 
-            var projectedCondition = ValidationRuleCondition.Always;
-            var projectedSkipReason = ClientRuleProjectionSkipReason.UnsupportedValidator;
-            var canProject = clientCondition.Match(
-                (fieldCondition, fields) =>
-                {
-                    foreach (var field in fields)
-                        projection.Ensure(field.PrefixedBy(prefix));
+            if (!clientCondition.TryProject(out var fieldCondition, out var fields, out skipReason))
+                return false;
 
-                    var binding = new FieldConditionPrefixBinding(prefix);
-                    projectedCondition = ValidationRuleCondition.When(fieldCondition.PrefixWith(binding));
-                    return true;
-                },
-                reason =>
-                {
-                    projectedSkipReason = reason;
-                    return false;
-                });
+            foreach (var field in fields)
+                projection.Ensure(field.PrefixedBy(prefix));
 
-            condition = projectedCondition;
-            skipReason = projectedSkipReason;
-            return canProject;
+            var binding = new FieldConditionPrefixBinding(prefix);
+            condition = ValidationRuleCondition.When(fieldCondition.PrefixWith(binding));
+            return true;
         }
 
         private void ProjectChildValidators(

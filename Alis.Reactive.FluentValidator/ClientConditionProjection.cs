@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
@@ -27,14 +28,11 @@ namespace Alis.Reactive.FluentValidator
                 if (condition == null)
                     throw new ArgumentException("Client condition projection must not be null.", nameof(conditions));
 
-                condition.Match(
-                    (fieldCondition, fields) =>
-                    {
-                        projectedConditions.Add(fieldCondition);
-                        projectedFields.AddRange(fields);
-                        return true;
-                    },
-                    _ => true);
+                if (!condition.TryProject(out var fieldCondition, out var fields, out var reason))
+                    return Skip(reason);
+
+                projectedConditions.Add(fieldCondition);
+                projectedFields.AddRange(fields);
             }
 
             return new ProjectedClientCondition(
@@ -45,9 +43,10 @@ namespace Alis.Reactive.FluentValidator
         internal static ClientConditionProjection Skip(ClientRuleProjectionSkipReason reason) =>
             new SkippedClientCondition(reason);
 
-        internal abstract TResult Match<TResult>(
-            Func<FieldCondition, IReadOnlyList<ClientValidationFieldReference>, TResult> projected,
-            Func<ClientRuleProjectionSkipReason, TResult> skipped);
+        internal abstract bool TryProject(
+            [NotNullWhen(true)] out FieldCondition? condition,
+            out IReadOnlyList<ClientValidationFieldReference> fields,
+            out ClientRuleProjectionSkipReason skipReason);
 
         private sealed class ProjectedClientCondition : ClientConditionProjection
         {
@@ -62,13 +61,15 @@ namespace Alis.Reactive.FluentValidator
                 _fields = ClientValidationGuardFields.From(fields);
             }
 
-            internal override TResult Match<TResult>(
-                Func<FieldCondition, IReadOnlyList<ClientValidationFieldReference>, TResult> projected,
-                Func<ClientRuleProjectionSkipReason, TResult> skipped)
+            internal override bool TryProject(
+                [NotNullWhen(true)] out FieldCondition? condition,
+                out IReadOnlyList<ClientValidationFieldReference> fields,
+                out ClientRuleProjectionSkipReason skipReason)
             {
-                if (projected == null) throw new ArgumentNullException(nameof(projected));
-                if (skipped == null) throw new ArgumentNullException(nameof(skipped));
-                return projected(_condition, _fields);
+                condition = _condition;
+                fields = _fields;
+                skipReason = ClientRuleProjectionSkipReason.UnsupportedValidator;
+                return true;
             }
         }
 
@@ -81,13 +82,15 @@ namespace Alis.Reactive.FluentValidator
                 _reason = reason;
             }
 
-            internal override TResult Match<TResult>(
-                Func<FieldCondition, IReadOnlyList<ClientValidationFieldReference>, TResult> projected,
-                Func<ClientRuleProjectionSkipReason, TResult> skipped)
+            internal override bool TryProject(
+                [NotNullWhen(true)] out FieldCondition? condition,
+                out IReadOnlyList<ClientValidationFieldReference> fields,
+                out ClientRuleProjectionSkipReason skipReason)
             {
-                if (projected == null) throw new ArgumentNullException(nameof(projected));
-                if (skipped == null) throw new ArgumentNullException(nameof(skipped));
-                return skipped(_reason);
+                condition = null;
+                fields = Array.Empty<ClientValidationFieldReference>();
+                skipReason = _reason;
+                return false;
             }
         }
     }
