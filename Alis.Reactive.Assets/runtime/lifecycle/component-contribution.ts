@@ -161,7 +161,7 @@ class ComponentMerge {
   }
 
   static extendValidationContainer(existing: Component | undefined, incoming: Component): boolean {
-    return ComponentValidationContainerMerge.from(existing, incoming).appendMissingRulesToExisting();
+    return ComponentValidationContainerMerge.from(existing, incoming).mergeNewValidatedComponentsIntoExisting();
   }
 }
 
@@ -273,7 +273,7 @@ class ValidationContainerContribution {
       && this.incomingCarriesValidationContainerState
       && ComponentValidationContainerMerge
         .from(this.existing, this.incoming)
-        .canAppendMissingRules();
+        .canMergeByValidatedComponent();
   }
 
   private get hasSameRuntimeIdentity(): boolean {
@@ -468,16 +468,16 @@ class ComponentValidationContainerMerge {
     incomingRules.replaceWith(existingRules.withIncomingReplacingByValidatedComponent(incomingRules.snapshot()));
   }
 
-  appendMissingRulesToExisting(): boolean {
+  mergeNewValidatedComponentsIntoExisting(): boolean {
     const existingRules = ComponentValidationRules.from(this.existing);
     const incomingRules = ComponentValidationRules.from(this.incoming);
     if (existingRules === undefined || incomingRules === undefined) return false;
 
-    existingRules.appendMissingValidatedComponentsFrom(incomingRules);
+    existingRules.acceptNewValidatedComponentsFrom(incomingRules);
     return true;
   }
 
-  canAppendMissingRules(): boolean {
+  canMergeByValidatedComponent(): boolean {
     return ComponentValidationRules.from(this.existing) !== undefined
       && ComponentValidationRules.from(this.incoming) !== undefined;
   }
@@ -512,7 +512,7 @@ export class ComponentValidationRules {
     return [...rulesByComponent.values()];
   }
 
-  appendMissingValidatedComponentsFrom(incoming: ComponentValidationRules): void {
+  acceptNewValidatedComponentsFrom(incoming: ComponentValidationRules): void {
     const existingComponents = new Set(this.container.validationRules.map(rule => rule.component));
     for (const rule of incoming.snapshot()) {
       if (existingComponents.has(rule.component)) continue;

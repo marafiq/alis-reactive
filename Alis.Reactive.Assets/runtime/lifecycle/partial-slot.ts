@@ -1,17 +1,12 @@
 import type { Behavior, Plan } from "../types";
 import { layoutObjectKeysFrom, ValidationRuleContribution } from "./component-contribution";
-import {
-  type PartId,
-  PartialListenerLifetime,
-  PartialPlanContributionSource,
-  type PlanId,
-} from "./plan-contribution-source";
+import { type PartId, type PlanId } from "./plan-contribution-source";
 
 export class AppliedSlotContribution {
   private constructor(
     readonly partId: PartId,
     readonly planId: PlanId,
-    private readonly listenerLifetime: PartialListenerLifetime,
+    private readonly slotLoad: AbortController,
     readonly behaviors: Behavior[],
     readonly componentKeys: string[],
     readonly layoutObjectKeys: string[],
@@ -19,11 +14,11 @@ export class AppliedSlotContribution {
     readonly validationRuleContributions: ValidationRuleContribution[],
   ) {}
 
-  static capture(source: PartialPlanContributionSource, incoming: Plan): AppliedSlotContribution {
+  static capture(partId: PartId, slotLoad: AbortController, incoming: Plan): AppliedSlotContribution {
     return new AppliedSlotContribution(
-      source.partId,
+      partId,
       incoming.planId,
-      source.listenerLifetime,
+      slotLoad,
       [...incoming.behaviors],
       Object.keys(incoming.components),
       layoutObjectKeysFrom(incoming),
@@ -32,18 +27,18 @@ export class AppliedSlotContribution {
     );
   }
 
-  revokeListenerLifetime(): void {
-    this.listenerLifetime.revoke();
+  abortSlotLoad(): void {
+    this.slotLoad.abort();
   }
 }
 
 export class AppliedPartialSlots {
   private readonly slots = new Map<PartId, AppliedSlotContribution[]>();
 
-  recordApplied(source: PartialPlanContributionSource, incoming: Plan): void {
-    const contributions = this.slots.get(source.partId) ?? [];
-    contributions.push(AppliedSlotContribution.capture(source, incoming));
-    this.slots.set(source.partId, contributions);
+  recordApplied(partId: PartId, slotLoad: AbortController, incoming: Plan): void {
+    const contributions = this.slots.get(partId) ?? [];
+    contributions.push(AppliedSlotContribution.capture(partId, slotLoad, incoming));
+    this.slots.set(partId, contributions);
   }
 
   releaseAppliedContributions(partId: PartId): AppliedSlotContribution[] {
@@ -54,7 +49,7 @@ export class AppliedPartialSlots {
 
   reset(): void {
     for (const contributions of this.slots.values()) {
-      for (const contribution of contributions) contribution.revokeListenerLifetime();
+      for (const contribution of contributions) contribution.abortSlotLoad();
     }
     this.slots.clear();
   }

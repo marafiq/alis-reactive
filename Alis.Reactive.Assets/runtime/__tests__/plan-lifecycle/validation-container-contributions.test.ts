@@ -10,39 +10,33 @@ import {
 } from "../support/plan-lifecycle-fixtures";
 
 describe("validation container contributions", () => {
-  it("merges rules by validated component key", () => {
+  it("accepts matching validated component ids while adding new partial rules", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
 
-    browserPlans.register(rootPlan(planId));
-
-    browserPlans.add(
-      {
-        ...rootPlan(planId),
-        components: {
-          "resident-form": validationContainer("resident-form", [
-            validationRule("first-name"),
-            validationRule("zip-code", "old zip required"),
-          ]),
-        },
+    browserPlans.register({
+      ...rootPlan(planId),
+      components: {
+        "resident-form": validationContainer("resident-form", [
+          validationRule("first-name"),
+          validationRule("zip-code", "zip required"),
+        ]),
       },
-      hooks,
-    );
+    });
 
-    const merged = browserPlans.add(
-      {
-        ...rootPlan(planId),
+    browserPlans.loadPartialSlot("address-slot", [
+      partialPlan(planId, "address-form", {
         components: {
           "resident-form": validationContainer("resident-form", [
-            validationRule("zip-code", "new zip required"),
+            validationRule("zip-code", "zip required"),
             validationRule("city"),
           ]),
         },
-      },
-      hooks,
-    );
+      }),
+    ], hooks);
 
+    const merged = browserPlans.get(planId)!;
     const container = merged.components["resident-form"].container;
     const validationScope = expectValidationContainer(container);
 
@@ -52,7 +46,7 @@ describe("validation container contributions", () => {
       "city",
     ]);
     expect(validationScope.validationRules.find(rule => rule.component === "zip-code")?.rules[0]?.message)
-      .toBe("new zip required");
+      .toBe("zip required");
   });
 
   it("rejects an extension with a mismatched runtime identity", () => {

@@ -1,4 +1,4 @@
-// Boot — Plan lifecycle: boot, merge, reset.
+// Boot — Plan lifecycle: boot, partial slot load/unload, reset.
 // Single responsibility: wire behaviors (two-phase) and register plans.
 // Delegates applied plan state to merge-plan.ts.
 
@@ -15,7 +15,6 @@ import { resetPluginRegistryForTests } from "../core/plugin-registry";
 import {
   applyPartialSlotLoad,
   applyPartialSlotUnload,
-  applyMergedPlan,
   getBootedPlan as getTrackedBootedPlan,
   type MergeHooks,
   registerBootedPlan,
@@ -77,15 +76,6 @@ function wireContainerValidation(plan: Plan, signal?: AbortSignal): void {
       wireLiveValidation(plan, component.key, signal);
     }
   }
-}
-
-export function mergePlan(incoming: Plan): void {
-  const merged = applyMergedPlan(incoming, mergeHooks());
-
-  clearSummaryForPlan(merged.planId);
-
-  const incomingComponentCount = RuntimePlan.from(incoming).components.entries().length;
-  log.info("merged", { planId: merged.planId, newComponents: incomingComponentCount });
 }
 
 export function loadPartialSlot(partId: string, incoming: Plan[]): void {

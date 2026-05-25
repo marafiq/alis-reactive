@@ -162,7 +162,7 @@ sequenceDiagram
     participant drawer as drawer.ts (side-effect)
     participant loader as loader.ts (side-effect)
     participant checklist as checklist.ts (side-effect)
-    participant mergePlan as merge-plan.ts
+    participant appliedPlans as merge-plan.ts
     participant boot as boot.ts
 
     Browser->>root: ESM module loaded
@@ -190,9 +190,9 @@ sequenceDiagram
         end
     end
 
-    root->>mergePlan: composeInitialPlans(plans)
-    Note over mergePlan: Groups plans by planId,<br/>merges components + entries
-    mergePlan-->>root: Plan[] (one per unique planId)
+    root->>appliedPlans: composeInitialPlans(plans)
+    Note over appliedPlans: Groups plans by planId,<br/>merges components + behaviors
+    appliedPlans-->>root: Plan[] (one per unique planId)
 
     loop Each composed plan
         root->>boot: boot(plan)
@@ -204,47 +204,42 @@ sequenceDiagram
 <!-- 2. boot.ts                                                      -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <section id="boot">
-<h2>2. boot.ts &mdash; boot() + mergePlan() + Two-Phase Wiring</h2>
+<h2>2. boot.ts &mdash; boot() + Partial Slot Wiring</h2>
 <p class="path">Scripts/lifecycle/boot.ts</p>
-<p>Orchestrates enrichment, live-clear wiring, two-phase trigger wiring, and plan registration.
-<code>mergePlan()</code> handles partial reloads. <code>wireEntries()</code> guarantees custom-event listeners
-exist before dom-ready reactions fire.</p>
+<p>Orchestrates live validation wiring, two-phase trigger wiring, and plan registration.
+<code>loadPartialSlot()</code> handles browser-loaded partial replacement. <code>wireBehaviors()</code> guarantees custom-event listeners
+exist before page-ready reactions fire.</p>
 
 <h3>boot(plan)</h3>
 <div class="mermaid">
 sequenceDiagram
     participant Caller
     participant boot as boot.ts
-    participant enrichment as enrichment.ts
-    participant walkR as walk-reactions.ts
     participant liveClear as live-clear.ts
     participant trigger as trigger.ts
     participant registry as merge-plan.ts
 
     Caller->>boot: boot(plan)
-    boot->>boot: log.info("booting", {entries})
+    boot->>boot: log.info("booting", {planId, behaviors})
 
-    boot->>enrichment: enrichEntries(plan.entries, plan.components)
-    Note over enrichment: Enriches validation fields<br/>from plan.components
+    loop Each component with validation container scope
+        boot->>liveClear: wireLiveValidation(plan, componentKey, bootAbort.signal)
+    end
 
-    boot->>walkR: walkValidationDescriptors(plan.entries, wireLiveClearing)
-    Note over walkR: Walks reaction tree, finds<br/>ValidationDescriptors
-    walkR->>liveClear: wireLiveClearing(desc) [for each descriptor]
-
-    boot->>boot: wireEntries(plan.entries, plan.components, bootAbort.signal)
+    boot->>boot: wireBehaviors(plan.behaviors, plan, bootAbort.signal)
 
     Note over boot: TWO-PHASE WIRING (critical invariant)
     rect rgb(30, 58, 95)
-        Note over boot: Phase 1: Wire non-dom-ready triggers
-        loop Each entry where trigger.kind != "dom-ready"
-            boot->>trigger: wireTrigger(entry.trigger, entry.reaction, components, signal)
+        Note over boot: Phase 1: Wire non-page-ready triggers
+        loop Each behavior where startsWhen.kind != "page-ready"
+            boot->>trigger: wireBehavior(startsWhen, reaction, plan, signal)
         end
     end
 
     rect rgb(30, 80, 50)
-        Note over boot: Phase 2: Execute dom-ready triggers
-        loop Each deferred entry (trigger.kind == "dom-ready")
-            boot->>trigger: wireTrigger(entry.trigger, entry.reaction, components, signal)
+        Note over boot: Phase 2: Execute page-ready behaviors
+        loop Each deferred behavior
+            boot->>trigger: wireBehavior(startsWhen, reaction, plan, signal)
         end
     end
 
@@ -252,33 +247,28 @@ sequenceDiagram
     boot->>boot: log.info("booted")
 </div>
 
-<h3>mergePlan(incoming)</h3>
+<h3>loadPartialSlot(partId, plans)</h3>
 <div class="mermaid">
 sequenceDiagram
     participant Caller
     participant boot as boot.ts
     participant registry as merge-plan.ts
-    participant enrichment as enrichment.ts
-    participant walkR as walk-reactions.ts
-    participant liveClear as live-clear.ts
     participant errDisplay as error-display.ts
 
-    Caller->>boot: mergePlan(incoming)
-    boot->>registry: applyMergedPlan(incoming, {enrichEntries, wireEntries})
-    Note over registry: PlanRegistry.add() handles<br/>source dedup, re-enrichment,<br/>wiring with AbortController
-    registry-->>boot: merged Plan
+    Caller->>boot: loadPartialSlot(partId, plans)
+    boot->>registry: applyPartialSlotLoad(partId, plans, {wireBehaviors, wireContainerValidation})
+    Note over registry: Replaces prior slot contribution,<br/>applies plan documents,<br/>wires with one AbortController
+    registry-->>boot: affected plan ids
 
-    boot->>walkR: walkValidationDescriptors(merged.entries, wireLiveClearing)
-    walkR->>liveClear: wireLiveClearing(desc) [for each descriptor]
-
-    boot->>boot: clearSummaryForPlan(merged.planId)
-    boot->>errDisplay: findSummaryElement(planId)
-    alt summary element exists
-        boot->>errDisplay: clearSummary(el)
-        boot->>errDisplay: hideSummaryDiv(el)
+    loop Each affected plan id
+        boot->>errDisplay: findSummaryElement(planId)
+        alt summary element exists
+            boot->>errDisplay: clearSummary(el)
+            boot->>errDisplay: hideSummaryDiv(el)
+        end
     end
 
-    boot->>boot: log.info("merge", {planId, newComponents})
+    boot->>boot: log.info("partial-slot.load", {partId, plans, newComponents})
 </div>
 
 <h3>resetBootStateForTests()</h3>
@@ -1628,10 +1618,11 @@ sequenceDiagram
 <!-- 15. merge-plan.ts                                               -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <section id="merge-plan">
-<h2>15. merge-plan.ts &mdash; PlanRegistry</h2>
+<h2>15. merge-plan.ts &mdash; Applied Browser Plans</h2>
 <p class="path">Scripts/lifecycle/merge-plan.ts</p>
-<p>SOLID class encapsulating plan lifecycle state. Handles registration, merging with source dedup,
-removal of old sources, and full reset.</p>
+<p>Owns the browser-applied plan documents. Initial SSR plans are composed by <code>planId</code>.
+Browser-loaded partials are applied through explicit slot replacement; the slot id is the unload handle,
+while component ids and type keys remain runtime join keys.</p>
 
 <h3>composeInitialPlans()</h3>
 <div class="mermaid">
@@ -1645,118 +1636,71 @@ sequenceDiagram
         alt planId not seen yet
             mp->>mp: byPlanId.set(planId, copy of plan)
         else planId exists
-            mp->>mp: Object.assign(existing.components, plan.components)
-            mp->>mp: existing.entries.push(...plan.entries)
+            mp->>mp: merge type/component fragments
+            mp->>mp: append behaviors
         end
     end
     mp-->>Caller: Plan[] (one per unique planId)
 </div>
 
-<h3>PlanRegistry.register()</h3>
+<h3>AppliedBrowserPlans.register()</h3>
 <div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant reg as PlanRegistry
+    participant plans as AppliedBrowserPlans
 
-    Caller->>reg: register(plan)
-    reg->>reg: plans.set(plan.planId, plan)
-    reg->>reg: rootPlanIds.add(plan.planId)
+    Caller->>plans: register(plan)
+    plans->>plans: plans.set(plan.planId, plan)
+    plans->>plans: rootPlanIds.add(plan.planId)
+    plans->>plans: claim root component/type keys
 </div>
 
-<h3>PlanRegistry.add() &mdash; merge with source dedup</h3>
+<h3>AppliedBrowserPlans.loadPartialSlot()</h3>
 <div class="mermaid">
 sequenceDiagram
     participant Caller
-    participant reg as PlanRegistry
+    participant plans as AppliedBrowserPlans
     participant hooks as MergeHooks
 
-    Caller->>reg: add(incoming, hooks)
-    Note over reg: sourceId = incoming.sourceId
-
-    alt sourceId exists AND already tracked
-        reg->>reg: removeSource(previousPlanId, sourceId)
-        Note over reg: Aborts old listeners,<br/>removes old entries + component keys
+    Caller->>plans: loadPartialSlot(partId, planDocuments, hooks)
+    plans->>plans: unload previous contributions for partId
+    plans->>plans: create one AbortController for this slot load
+    loop Each plan document
+        plans->>plans: scope document to partId
+        plans->>plans: merge type/component fragments
+        plans->>hooks: wireBehaviors(behaviors, target, signal)
+        plans->>hooks: wireContainerValidation(target, signal)
+        plans->>plans: record applied contribution for partId
     end
-
-    reg->>reg: target = plans.get(incoming.planId)
-    alt target not found
-        reg->>reg: Create empty plan shell
-        reg->>reg: plans.set(planId, target)
-    end
-
-    reg->>reg: Object.assign(target.components, incoming.components)
-
-    alt target.entries.length > 0 (existing entries)
-        reg->>hooks: enrichEntries(target.entries, target.components)
-        Note over hooks: Re-enrich existing entries with new components
-    end
-
-    opt sourceId exists
-        reg->>reg: abort = new AbortController()
-    end
-    reg->>hooks: enrichEntries(incoming.entries, target.components)
-    reg->>hooks: wireEntries(incoming.entries, target.components, abort?.signal)
-    reg->>reg: target.entries.push(...incoming.entries)
-
-    opt sourceId exists
-        reg->>reg: sourceOwners.set(sourceId, planId)
-        reg->>reg: abortControllers.set(sourceId, abort)
-        reg->>reg: sourceEntries.set(sourceId, entries copy)
-        reg->>reg: sourceComponentKeys.set(sourceId, component keys)
-    end
-
-    reg-->>Caller: target (merged Plan)
+    plans-->>Caller: affected plan ids
 </div>
 
-<h3>PlanRegistry.removeSource()</h3>
+<h3>AppliedBrowserPlans.unloadPartialSlot()</h3>
 <div class="mermaid">
 sequenceDiagram
-    participant reg as PlanRegistry
+    participant plans as AppliedBrowserPlans
 
-    Note over reg: removeSource(planId, sourceId)
-    reg->>reg: plan = plans.get(planId)
-    alt plan not found
-        reg->>reg: clearTracking(sourceId)
-        reg-->>reg: return
+    Note over plans: unloadPartialSlot(partId)
+    plans->>plans: release applied contributions for partId
+    loop Each contribution
+        plans->>plans: abort slot load listeners
+        plans->>plans: remove behaviors/components/types/validation rules
     end
-
-    reg->>reg: abortControllers.get(sourceId)?.abort()
-    Note over reg: Aborts all event listeners for this source
-
-    opt old entries exist
-        loop Each old entry
-            reg->>reg: plan.entries.splice(idx, 1)
-        end
-    end
-
-    opt old component keys exist
-        loop Each key
-            reg->>reg: delete plan.components[key]
-        end
-    end
-
-    reg->>reg: clearTracking(sourceId)
-
-    alt plan is NOT a root plan AND empty
-        reg->>reg: plans.delete(planId)
+    alt non-root plan has no remaining artifacts
+        plans->>plans: delete plan
     end
 </div>
 
-<h3>PlanRegistry.reset()</h3>
+<h3>AppliedBrowserPlans.reset()</h3>
 <div class="mermaid">
 sequenceDiagram
-    participant reg as PlanRegistry
+    participant plans as AppliedBrowserPlans
 
-    Note over reg: reset()
-    reg->>reg: plans.clear()
-    reg->>reg: rootPlanIds.clear()
-    reg->>reg: sourceOwners.clear()
-    loop Each abort controller
-        reg->>reg: abort.abort()
-    end
-    reg->>reg: abortControllers.clear()
-    reg->>reg: sourceEntries.clear()
-    reg->>reg: sourceComponentKeys.clear()
+    Note over plans: reset()
+    plans->>plans: plans.clear()
+    plans->>plans: rootPlanIds.clear()
+    plans->>plans: slots.reset()
+    plans->>plans: ownership ledgers reset()
 </div>
 </section>
 
@@ -1767,7 +1711,7 @@ sequenceDiagram
 <h2>16. inject.ts &mdash; HTML Injection</h2>
 <p class="path">Scripts/execution/inject.ts</p>
 <p>Injects HTML into a container. Extracts <code>[data-reactive-plan]</code> script elements
-before injection, then merges them via <code>mergePlan()</code>. Uses <code>ej.base.append</code>
+before injection, then applies them via <code>loadPartialSlot()</code>. Uses <code>ej.base.append</code>
 when available for Syncfusion component initialization.</p>
 
 <div class="mermaid">
@@ -1799,11 +1743,10 @@ sequenceDiagram
         inject->>DOM: container.append(...childNodes)
     end
 
-    loop Each extracted plan
-        alt container has ID
-            inject->>inject: plan.sourceId = container.id
-        end
-        inject->>boot: mergePlan(plan)
+    alt extracted plans exist
+        inject->>boot: loadPartialSlot(slotId, plans)
+    else no extracted plans
+        inject->>boot: unloadPartialSlot(slotId)
     end
 </div>
 </section>
@@ -2085,75 +2028,6 @@ sequenceDiagram
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <section id="supplementary">
 <h2>Supplementary Modules</h2>
-
-<h3>enrichment.ts</h3>
-<p class="path">Scripts/lifecycle/enrichment.ts</p>
-<p>Enriches validation fields from <code>plan.components</code>. No DOM, no wiring. Uses <code>walkValidationDescriptors()</code>.</p>
-<div class="mermaid">
-sequenceDiagram
-    participant Caller
-    participant enrichment as enrichment.ts
-    participant walkR as walk-reactions.ts
-
-    Caller->>enrichment: enrichEntries(entries, components)
-    enrichment->>walkR: walkValidationDescriptors(entries, visitor)
-    Note over walkR: Walks reaction tree
-
-    loop Each ValidationDescriptor found
-        loop Each field in desc.fields
-            alt components[fieldName] exists
-                Note over enrichment: field.fieldId = comp.id
-                Note over enrichment: field.vendor = comp.vendor
-                Note over enrichment: field.readExpr = comp.readExpr
-            else component not found
-                opt field was previously enriched
-                    enrichment->>enrichment: log.warn("clearing enrichment")
-                end
-                Note over enrichment: field.fieldId = undefined
-                Note over enrichment: field.vendor = undefined
-                Note over enrichment: field.readExpr = undefined
-            end
-        end
-    end
-</div>
-
-<h3>walk-reactions.ts</h3>
-<p class="path">Scripts/lifecycle/walk-reactions.ts</p>
-<p>Shared reaction tree walker. Visits every <code>ValidationDescriptor</code> found in http/parallel-http requests
-(including chained). Used by both <code>enrichment.ts</code> and <code>boot.ts</code>.</p>
-<div class="mermaid">
-sequenceDiagram
-    participant Caller
-    participant wr as walk-reactions.ts
-
-    Caller->>wr: walkValidationDescriptors(entries, visitor)
-    loop Each entry
-        wr->>wr: walkReaction(entry.reaction, visitor)
-    end
-
-    Note over wr: walkReaction(reaction, visitor):
-    alt reaction.kind == "http"
-        wr->>wr: walkRequest(reaction.request, visitor)
-    else reaction.kind == "parallel-http"
-        loop Each request
-            wr->>wr: walkRequest(req, visitor)
-        end
-    else reaction.kind == "conditional"
-        loop Each branch
-            wr->>wr: walkReaction(branch.reaction, visitor)
-        end
-    else reaction.kind == "sequential"
-        Note over wr: no-op (no requests)
-    end
-
-    Note over wr: walkRequest(req, visitor):
-    opt req.validation exists
-        wr->>Caller: visitor(req.validation)
-    end
-    opt req.chained exists
-        wr->>wr: walkRequest(req.chained, visitor)
-    end
-</div>
 
 <h3>coerce.ts</h3>
 <p class="path">Scripts/core/coerce.ts</p>

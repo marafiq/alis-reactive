@@ -18,30 +18,30 @@ describe("partial slot lifecycle", () => {
     browserPlans.register(rootPlan(planId));
 
     const oldBehavior = behavior();
-    const first = browserPlans.add(
+    browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, "address-slot", {
         types: { "native.element.address-line": jsType() },
         components: { "address-line": component("address-line") },
         behaviors: [oldBehavior],
       }),
-      hooks,
-    );
+    ], hooks);
 
+    const first = browserPlans.get(planId)!;
     expect(first.components["address-line"]).toBeDefined();
     expect(first.types["native.element.address-line"]).toBeDefined();
     expect(first.behaviors).toContain(oldBehavior);
     expect(behaviorSignals[0]?.aborted).toBe(false);
 
     const newBehavior = behavior();
-    const second = browserPlans.add(
+    browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, "address-slot", {
         types: { "native.element.zip-code": jsType() },
         components: { "zip-code": component("zip-code") },
         behaviors: [newBehavior],
       }),
-      hooks,
-    );
+    ], hooks);
 
+    const second = browserPlans.get(planId)!;
     expect(behaviorSignals[0]?.aborted).toBe(true);
     expect(second.components["address-line"]).toBeUndefined();
     expect(second.types["native.element.address-line"]).toBeUndefined();
@@ -57,14 +57,13 @@ describe("partial slot lifecycle", () => {
     const planId = "Resident.Root";
     const loadedBehavior = behavior();
 
-    browserPlans.add(
+    browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, "address-slot", {
         types: { "native.element.address-line": jsType() },
         components: { "address-line": component("address-line") },
         behaviors: [loadedBehavior],
       }),
-      hooks,
-    );
+    ], hooks);
 
     expect(browserPlans.get(planId)?.components["address-line"]).toBeDefined();
     expect(behaviorSignals[0]?.aborted).toBe(false);

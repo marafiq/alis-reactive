@@ -20,27 +20,9 @@ export class RootPlanContributionSource {
   readonly kind = "root";
   readonly label = "root";
   readonly description = "root plan contribution";
-  readonly behaviorSignal = undefined;
+  readonly behaviorSignal: AbortSignal | undefined = undefined;
 
   private constructor() {}
-}
-
-export class PartialListenerLifetime {
-  private readonly abort = new AbortController();
-
-  static create(): PartialListenerLifetime {
-    return new PartialListenerLifetime();
-  }
-
-  private constructor() {}
-
-  get signal(): AbortSignal {
-    return this.abort.signal;
-  }
-
-  revoke(): void {
-    this.abort.abort();
-  }
 }
 
 export class PartialPlanContributionSource {
@@ -48,7 +30,7 @@ export class PartialPlanContributionSource {
 
   constructor(
     readonly partId: PartId,
-    readonly listenerLifetime: PartialListenerLifetime = PartialListenerLifetime.create(),
+    readonly behaviorSignal: AbortSignal | undefined = undefined,
   ) {}
 
   get label(): string {
@@ -57,9 +39,5 @@ export class PartialPlanContributionSource {
 
   get description(): string {
     return `partial plan contribution "${this.partId}"`;
-  }
-
-  get behaviorSignal(): AbortSignal {
-    return this.listenerLifetime.signal;
   }
 }

@@ -35,7 +35,6 @@ Tracked as GitHub issues or in `docs/issues.md`:
 | itemShape no fail-fast on non-array | `Scripts/conditions/conditions.ts:122-127` | issues.md #2 |
 | Unknown vendor error missing element ID | `Scripts/resolution/resolver.ts:72` | issues.md #3 |
 | ForTests functions exported from production modules | `Scripts/lifecycle/boot.ts:81`, `Scripts/validation/live-clear.ts:72`, `Scripts/components/native/native-action-link.ts:25` | — |
-| PlanRegistry class exported (only facade functions should be public) | `Scripts/lifecycle/merge-plan.ts:18` | — |
 
 SonarQube minor issues (#43, #45, #47) are open but may be partially resolved — verify against current code before acting.
 

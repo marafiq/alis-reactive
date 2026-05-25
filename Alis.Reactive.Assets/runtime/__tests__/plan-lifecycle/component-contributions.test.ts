@@ -20,21 +20,19 @@ describe("component contribution ownership", () => {
     browserPlans.register(rootPlan(planId));
 
     const firstComponent = component("shared-field", "native.element.shared-a");
-    browserPlans.add(
+    browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, "first-slot", {
         types: { "native.element.shared-a": jsType() },
         components: { "shared-field": firstComponent },
       }),
-      hooks,
-    );
+    ], hooks);
 
-    expect(() => browserPlans.add(
+    expect(() => browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, "second-slot", {
         types: { "native.element.shared-b": jsType() },
         components: { "shared-field": component("shared-field", "native.element.shared-b") },
       }),
-      hooks,
-    )).toThrow('partial plan contribution "second-slot" cannot declare component "shared-field"');
+    ], hooks)).toThrow('partial plan contribution "second-slot" cannot declare component "shared-field"');
     expect(browserPlans.get(planId)?.components["shared-field"]).toBe(firstComponent);
   });
 
@@ -44,20 +42,18 @@ describe("component contribution ownership", () => {
     const planId = "Resident.Root";
 
     browserPlans.register(rootPlan(planId));
-    browserPlans.add(
+    browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, "first-slot", {
         components: { "shared-field": component("shared-field", "native.element.shared-a") },
       }),
-      hooks,
-    );
+    ], hooks);
 
-    expect(() => browserPlans.add(
+    expect(() => browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, "second-slot", {
         types: { "native.element.second-only": jsType() },
         components: { "shared-field": component("shared-field", "native.element.shared-b") },
       }),
-      hooks,
-    )).toThrow('partial plan contribution "second-slot" cannot declare component "shared-field"');
+    ], hooks)).toThrow('partial plan contribution "second-slot" cannot declare component "shared-field"');
     expect(browserPlans.get(planId)?.types["native.element.second-only"]).toBeUndefined();
   });
 
@@ -266,37 +262,4 @@ describe("layout object contributions", () => {
       .toEqual(["classAdd"]);
   });
 
-  it("keeps a layout object when the root declares it after a partial materializes it", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
-    const planId = "Resident.Root";
-    const toastTypeKey = "fusion.component.alisFusionToast";
-
-    browserPlans.register(rootPlan(planId));
-    browserPlans.loadPartialSlot("toast-slot", [
-      partialPlan(planId, "toast-plan", {
-        types: {
-          [toastTypeKey]: jsTypeWithWritableProperty("title"),
-        },
-        components: {
-          alisFusionToast: layoutComponent("alisFusionToast", toastTypeKey),
-        },
-      }),
-    ], hooks);
-    browserPlans.add({
-      ...rootPlan(planId),
-      types: {
-        [toastTypeKey]: jsTypeWithWritableProperty("content"),
-      },
-      components: {
-        alisFusionToast: layoutComponent("alisFusionToast", toastTypeKey),
-      },
-    }, hooks);
-
-    browserPlans.unloadPartialSlot("toast-slot");
-
-    expect(browserPlans.get(planId)?.components.alisFusionToast).toBeDefined();
-    expect(Object.keys(browserPlans.get(planId)?.types[toastTypeKey].properties ?? {}))
-      .toEqual(["content"]);
-  });
 });

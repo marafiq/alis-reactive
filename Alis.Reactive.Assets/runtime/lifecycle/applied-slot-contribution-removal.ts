@@ -21,7 +21,7 @@ export class AppliedSlotContributionRemoval {
 
   remove(contribution: AppliedSlotContribution): void {
     const plan = this.plans.get(contribution.planId)!;
-    contribution.revokeListenerLifetime();
+    contribution.abortSlotLoad();
     this.removeBehaviors(plan, contribution);
     const removedLayoutObjectKeys = this.removeLayoutObjects(plan, contribution);
     const removedComponentKeys = this.removeComponents(plan, contribution);

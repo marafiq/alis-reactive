@@ -11,7 +11,6 @@ import { AppliedSlotContributionRemoval } from "./applied-slot-contribution-remo
 import {
   planContributionSourceFrom,
   type PartId,
-  PartialListenerLifetime,
   PartialPlanContributionSource,
   type PlanContributionSource,
   type PlanId,
@@ -128,21 +127,16 @@ export class AppliedBrowserPlans {
     this.claimRootKeys(plan);
   }
 
-  add(incoming: Plan, hooks: MergeHooks): Plan {
-    const source = planContributionSourceFrom(incoming);
-    if (source.kind === "partial") this.unapplyPartialSlot(source.partId);
-
-    return this.mergeContribution(incoming, hooks, source);
-  }
-
   loadPartialSlot(partId: PartId, plans: Plan[], hooks: MergeHooks): PlanId[] {
     const affectedPlanIds = new Set(this.unapplyPartialSlot(partId));
     if (plans.length === 0) return [...affectedPlanIds];
 
-    const listenerLifetime = PartialListenerLifetime.create();
+    const slotLoad = new AbortController();
     for (const plan of plans) {
-      const source = new PartialPlanContributionSource(partId, listenerLifetime);
-      const merged = this.mergeContribution(scopedToPartialSlot(plan, partId), hooks, source);
+      const incoming = scopedToPartialSlot(plan, partId);
+      const source = new PartialPlanContributionSource(partId, slotLoad.signal);
+      const merged = this.mergeContribution(incoming, hooks, source);
+      this.slots.recordApplied(partId, slotLoad, incoming);
       affectedPlanIds.add(merged.planId);
     }
 
@@ -188,7 +182,6 @@ export class AppliedBrowserPlans {
     hooks.wireBehaviors(incoming.behaviors, target, source.behaviorSignal);
     target.behaviors.push(...incoming.behaviors);
     hooks.wireContainerValidation(target, source.behaviorSignal);
-    this.trackMergedContribution(source, incoming);
 
     return target;
   }
@@ -233,12 +226,6 @@ export class AppliedBrowserPlans {
     }
   }
 
-  private trackMergedContribution(source: PlanContributionSource, incoming: Plan): void {
-    if (source.kind === "root") return;
-
-    this.slots.recordApplied(source, incoming);
-  }
-
   private claimRootKeys(plan: Plan): void {
     for (const [key, type] of Object.entries(plan.types)) {
       this.typeOwnership.claimRoot(plan.planId, key, type);
@@ -263,7 +250,6 @@ export function composeInitialPlans(plans: Plan[]): Plan[] {
 }
 
 export function registerBootedPlan(plan: Plan): void { browserPlans.register(plan); }
-export function applyMergedPlan(incoming: Plan, hooks: MergeHooks): Plan { return browserPlans.add(incoming, hooks); }
 export function applyPartialSlotLoad(partId: PartId, plans: Plan[], hooks: MergeHooks): PlanId[] {
   return browserPlans.loadPartialSlot(partId, plans, hooks);
 }
