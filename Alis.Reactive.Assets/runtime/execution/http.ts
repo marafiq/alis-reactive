@@ -170,23 +170,13 @@ class RequestOutcomeStatus {
   }
 
   matchesExact(planStatus: number): boolean {
-    const status = responseHandlerStatusFromPlan(planStatus);
     const responseHasHttpStatusCode = this.kind === "http";
-    return responseHasHttpStatusCode && this.value === status;
+    return responseHasHttpStatusCode && this.value === planStatus;
   }
 
   forLog(): number {
     return this.value;
   }
-}
-
-function responseHandlerStatusFromPlan(value: number): number {
-  const statusComesFromStandardHttpRange = value >= 100 && value <= 599;
-  if (statusComesFromStandardHttpRange) return value;
-
-  throw new Error(
-    `[alis] response handler status ${value} is invalid; expected an HTTP status from 100 to 599`,
-  );
 }
 
 async function routeSuccess(

@@ -62,10 +62,8 @@ function evaluateConditionSync(
     case "compare":
       return evaluateCompare(condition, plan, context);
     case "all":
-      ensureCompositeConditionHasTerms("all", condition.terms);
       return condition.terms.every(term => evaluateConditionSync(term, plan, context));
     case "any":
-      ensureCompositeConditionHasTerms("any", condition.terms);
       return condition.terms.some(term => evaluateConditionSync(term, plan, context));
     case "not":
       return !evaluateConditionSync(condition.term, plan, context);
@@ -86,13 +84,11 @@ async function evaluateConditionAsyncCore(
     case "compare":
       return evaluateCompare(condition, plan, context);
     case "all":
-      ensureCompositeConditionHasTerms("all", condition.terms);
       for (const term of condition.terms) {
         if (!await evaluateConditionAsyncCore(term, plan, context)) return false;
       }
       return true;
     case "any":
-      ensureCompositeConditionHasTerms("any", condition.terms);
       for (const term of condition.terms) {
         if (await evaluateConditionAsyncCore(term, plan, context)) return true;
       }
@@ -115,10 +111,8 @@ function evaluateConditionInLane(
     case "compare":
       return evaluateCompare(condition, plan, context);
     case "all":
-      ensureCompositeConditionHasTerms("all", condition.terms);
       return evaluateAllInLane(condition.terms, plan, context, 0);
     case "any":
-      ensureCompositeConditionHasTerms("any", condition.terms);
       return evaluateAnyInLane(condition.terms, plan, context, 0);
     case "not":
       return negateConditionInLane(condition.term, plan, context);
@@ -188,15 +182,6 @@ async function evaluateConfirmCondition(message: string): Promise<boolean> {
   const accepted = await confirmFn(message);
   log.debug("confirm.result", { accepted, message });
   return accepted;
-}
-
-function ensureCompositeConditionHasTerms(
-  kind: "all" | "any",
-  terms: readonly unknown[],
-): void {
-  if (terms.length > 0) return;
-
-  throw new Error(`[alis] ${kind} condition requires at least one term`);
 }
 
 // -- Compare evaluation --

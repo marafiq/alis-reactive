@@ -26,16 +26,6 @@ function literal(value: unknown, shape: Shape): ValueProducer {
 }
 
 describe("condition runtime", () => {
-  it("rejects empty all conditions as malformed plan contracts", () => {
-    expect(() => evaluateCondition({ kind: "all", terms: [] }, plan()))
-      .toThrow("[alis] all condition requires at least one term");
-  });
-
-  it("rejects empty any conditions as malformed plan contracts", () => {
-    expect(() => evaluateCondition({ kind: "any", terms: [] }, plan()))
-      .toThrow("[alis] any condition requires at least one term");
-  });
-
   it("orders numbers through a comparable condition value", () => {
     const condition: CompareCondition = {
       kind: "compare",

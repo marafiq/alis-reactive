@@ -411,17 +411,4 @@ describe("executeRequest HTTP lifecycle", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("rejects exact response handlers outside the HTTP status range", async () => {
-    document.body.innerHTML = `<span id="error"></span>`;
-
-    await expect(
-      routeHandlers(
-        [
-          { match: { kind: "status", status: 0 }, reaction: setText("error", literal("network")) },
-        ],
-        400,
-        nativeTextPlan(["error"]),
-      ),
-    ).rejects.toThrow("100 to 599");
-  });
 });
