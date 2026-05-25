@@ -35,6 +35,11 @@ If any of those five are missing, the work is not ready for a large refactor.
 Otherwise modules drift into local fixes, defensive runtime design, or tests that
 mirror helper classes instead of protecting framework behavior.
 
+Rich domain model is not a license to invent impressive-sounding terms. A term
+belongs only if it names real DSL behavior and makes the implementation simpler.
+Wrappers that only carry parameters, rename branches, or need explanation before
+their value is obvious are not domain model; they are noise.
+
 ## Domain Mind Map
 
 ```mermaid
@@ -106,7 +111,7 @@ flowchart LR
     end
 
     subgraph RuntimeDomain["Runtime Domain - Dumb Executor"]
-        Registry["Plan Registry"]
+        AppliedPlans["Applied Browser Plans"]
         RuntimePlan["Runtime Plan View"]
         RuntimeObject["Runtime Object"]
         Resolver["Component/Plugin Resolver"]
@@ -156,8 +161,8 @@ flowchart LR
     Contribution --> Ownership
     Contribution --> Reference
     Contribution --> Unload
-    Registry --> Boot
-    Registry --> Slot
+    AppliedPlans --> Boot
+    AppliedPlans --> Slot
 ```
 
 ### Plan Domain Kernel
@@ -225,12 +230,13 @@ Kernel rules:
   not make it non-deterministic; they are declared reaction nodes with declared
   response routes and follow-up reactions.
 - Runtime should resolve declared objects and execute declared member actions.
-  It should not infer member capability, discover payload shape, or invent
-  fallback behavior.
-- Defensive runtime design is a smell when the C# PlanModel can make invalid
-  behavior unrepresentable. Runtime checks belong at external corruption,
-  lifecycle, and integration-drift boundaries; they should expose domain drift
-  with clear context, not become ordinary control flow.
+  It should not infer member capability, discover payload shape, invent
+  fallback behavior, preflight generated plans, or add rollback machinery around
+  impossible bad plans.
+- Generated plan JSON is domain output. Invalid behavior belongs in the C#
+  PlanModel where it can be made unrepresentable. Runtime checks are for true
+  external boundaries only: DOM lookup, browser API failure, network, and
+  malformed non-framework input.
 
 ### Classification Rules
 

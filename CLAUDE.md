@@ -8,9 +8,17 @@ executes browser behavior. TypeScript never invents information the plan does
 not carry.
 
 Core architecture rule: DSL -> Rich Plan Domain -> Generated Rich TS Contract ->
-Runtime Executioner. Defensive runtime design is a smell when the PlanModel can
-make invalid behavior unrepresentable; runtime checks belong at external
-corruption, lifecycle, and integration-drift boundaries.
+Runtime Executioner. Runtime code executes framework-generated plans; it does
+not defend against impossible bad plans with preflight, rollback, fallback, or
+speculative recovery. Invalid behavior belongs in the C# PlanModel where it can
+be made unrepresentable. Runtime checks are for true external boundaries only:
+DOM lookup, browser API failure, network, and malformed non-framework input.
+
+Rich domain model does not mean inventing names, wrappers, registries, lifecycles,
+or abstractions so the code looks modeled. It means the smallest set of terms
+that directly explain the DSL behavior and make the implementation simpler to
+read, test, and change. If a type only carries parameters, renames a branch, or
+requires explanation before its value is obvious, delete it or inline it.
 
 Active rich-model vocabulary lives in `docs/reactive-plan-domain-language.md`.
 Keep that glossary aligned with code changes; it is a navigation aid for the
@@ -92,8 +100,6 @@ plan is missing information. Fix the C# plan model class to carry it.
 C# `Render()` serializes the plan to JSON inside a `<script type="application/json"
 data-reactive-plan>` element. The runtime discovers these elements, parses the JSON, merges
 partials by `planId`, and boots each composed plan. Sandbox URL: `http://localhost:5220`.
-
-Top-level JSON shape: `version` (3), `planId`, `partId`?, `types`, `components`, `behaviors`.
 
 `WriteOnlyPolymorphicConverter<T>` enables polymorphic serialization by delegating to the
 concrete type via `JsonSerializer.Serialize(writer, value, value.GetType(), options)`. Each
