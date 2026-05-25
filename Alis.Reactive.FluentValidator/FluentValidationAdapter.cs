@@ -294,7 +294,7 @@ namespace Alis.Reactive.FluentValidator
                     foreach (var field in fields)
                         projection.Ensure(field.PrefixedBy(prefix));
 
-                    var binding = new FieldConditionPrefixBinding(prefix, _ => { });
+                    var binding = new FieldConditionPrefixBinding(prefix);
                     projectedCondition = ValidationRuleCondition.When(fieldCondition.PrefixWith(binding));
                     return true;
                 },
@@ -462,17 +462,15 @@ namespace Alis.Reactive.FluentValidator
         private sealed class ProjectedField
         {
             private ProjectedField(
-                string propertyName,
+                string displayName,
                 ValidationFieldPath path,
                 ClientValidationFieldReference reference)
             {
-                PropertyName = propertyName;
                 Path = path;
                 Reference = reference;
-                DisplayName = Humanize(propertyName);
+                DisplayName = Humanize(displayName);
             }
 
-            internal string PropertyName { get; }
             internal ValidationFieldPath Path { get; }
             internal ClientValidationFieldReference Reference { get; }
             internal string DisplayName { get; }

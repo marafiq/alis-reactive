@@ -388,14 +388,10 @@ namespace Alis.Reactive.Validation
     internal sealed class FieldConditionPrefixBinding
     {
         private readonly ValidationFieldPath _prefix;
-        private readonly Action<ValidationFieldPath> _ensureField;
 
-        internal FieldConditionPrefixBinding(
-            ValidationFieldPath prefix,
-            Action<ValidationFieldPath> ensureField)
+        internal FieldConditionPrefixBinding(ValidationFieldPath prefix)
         {
             _prefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
-            _ensureField = ensureField ?? throw new ArgumentNullException(nameof(ensureField));
         }
 
         internal FieldCondition Compare(
@@ -408,7 +404,6 @@ namespace Alis.Reactive.Validation
             if (value == null) throw new ArgumentNullException(nameof(value));
 
             var fullField = _prefix.Append(field);
-            _ensureField(fullField);
             return FieldCondition.Compare(fullField, op, value);
         }
     }

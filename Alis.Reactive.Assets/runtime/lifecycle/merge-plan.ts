@@ -262,6 +262,11 @@ export class AppliedBrowserPlans {
   private removeBehaviors(plan: Plan, contribution: AppliedSlotContribution): void {
     for (const behavior of contribution.behaviors) {
       const idx = plan.behaviors.indexOf(behavior);
+      if (idx < 0) {
+        throw new Error(
+          `[alis] partial slot "${contribution.partId}" cannot unload behavior from plan "${contribution.planId}" because the applied behavior is no longer in the active plan`,
+        );
+      }
       plan.behaviors.splice(idx, 1);
     }
   }
