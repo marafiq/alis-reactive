@@ -43,11 +43,6 @@ public class WhenProjectingConditionalRules
         var report = _adapter.ProjectValidation(typeof(ServerOnlyWhenWrapsClientGuardValidator), "testForm");
 
         Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
-        Assert.That(report.SkippedRules, Has.Count.EqualTo(1));
-        Assert.That(report.SkippedRules[0].FieldName, Is.EqualTo("JobTitle"));
-        Assert.That(
-            report.SkippedRules[0].Reason,
-            Is.EqualTo(ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard));
 
         var validator = new ServerOnlyWhenWrapsClientGuardValidator();
         var result = validator.Validate(new TestModel
@@ -65,11 +60,6 @@ public class WhenProjectingConditionalRules
         var report = _adapter.ProjectValidation(typeof(ClientGuardWrapsServerOnlyWhenValidator), "testForm");
 
         Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
-        Assert.That(report.SkippedRules, Has.Count.EqualTo(1));
-        Assert.That(report.SkippedRules[0].FieldName, Is.EqualTo("JobTitle"));
-        Assert.That(
-            report.SkippedRules[0].Reason,
-            Is.EqualTo(ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard));
     }
 
     [Test]
@@ -78,9 +68,5 @@ public class WhenProjectingConditionalRules
         var report = _adapter.ProjectValidation(typeof(ServerOnlyOtherwiseWrapsClientGuardValidator), "testForm");
 
         Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
-        var jobTitleSkip = report.SkippedRules.Single(rule => rule.FieldName == "JobTitle");
-        Assert.That(
-            jobTitleSkip.Reason,
-            Is.EqualTo(ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard));
     }
 }

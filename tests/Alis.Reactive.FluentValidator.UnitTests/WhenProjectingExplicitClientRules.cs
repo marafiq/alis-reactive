@@ -52,7 +52,6 @@ public sealed class WhenProjectingExplicitClientRules
         Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Regex));
         Assert.That(rule.Message, Is.EqualTo("Code must start with ALIS."));
         Assert.That(rule.ConstraintValue(), Is.EqualTo("^ALIS-"));
-        Assert.That(report.SkippedRules, Is.Empty);
     }
 
     [Test]
@@ -66,7 +65,6 @@ public sealed class WhenProjectingExplicitClientRules
         Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.EqualTo));
         Assert.That(rule.PeerFieldName(), Is.EqualTo("Email"));
         Assert.That(report.Fields.Select(field => field.FieldName), Does.Contain("Email"));
-        Assert.That(report.SkippedRules, Is.Empty);
     }
 
     [Test]
@@ -75,8 +73,5 @@ public sealed class WhenProjectingExplicitClientRules
         var report = _adapter.ProjectValidation(typeof(AsyncServerRuleValidator), "form");
 
         Assert.That(report.Fields, Is.Empty);
-        var skipped = report.SkippedRules.Single();
-        Assert.That(skipped.FieldName, Is.EqualTo("ExternalCode"));
-        Assert.That(skipped.Reason, Is.EqualTo(ClientRuleProjectionSkipReason.UnsupportedValidator));
     }
 }

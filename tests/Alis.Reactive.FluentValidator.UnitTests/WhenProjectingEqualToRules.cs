@@ -13,9 +13,6 @@ public class WhenProjectingEqualToRules
         var report = _adapter.ProjectValidation(typeof(EqualToValidator), "testForm");
 
         Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("ConfirmEmail"));
-        var skipped = report.SkippedRules.Single();
-        Assert.That(skipped.FieldName, Is.EqualTo("ConfirmEmail"));
-        Assert.That(skipped.Reason, Is.EqualTo(ClientRuleProjectionSkipReason.PeerComparisonRequiresExplicitProjection));
     }
 
     [Test]

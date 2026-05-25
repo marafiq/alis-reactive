@@ -28,8 +28,8 @@ namespace Alis.Reactive.FluentValidator
                 if (condition == null)
                     throw new ArgumentException("Client condition projection must not be null.", nameof(conditions));
 
-                if (!condition.TryProject(out var fieldCondition, out var fields, out var reason))
-                    return Skip(reason);
+                if (!condition.TryProject(out var fieldCondition, out var fields))
+                    return Unprojected();
 
                 projectedConditions.Add(fieldCondition);
                 projectedFields.AddRange(fields);
@@ -40,13 +40,12 @@ namespace Alis.Reactive.FluentValidator
                 ClientValidationGuardFields.From(projectedFields));
         }
 
-        internal static ClientConditionProjection Skip(ClientRuleProjectionSkipReason reason) =>
-            new SkippedClientCondition(reason);
+        internal static ClientConditionProjection Unprojected() =>
+            UnprojectedClientCondition.Instance;
 
         internal abstract bool TryProject(
             [NotNullWhen(true)] out FieldCondition? condition,
-            out IReadOnlyList<ClientValidationFieldReference> fields,
-            out ClientRuleProjectionSkipReason skipReason);
+            out IReadOnlyList<ClientValidationFieldReference> fields);
 
         private sealed class ProjectedClientCondition : ClientConditionProjection
         {
@@ -63,33 +62,26 @@ namespace Alis.Reactive.FluentValidator
 
             internal override bool TryProject(
                 [NotNullWhen(true)] out FieldCondition? condition,
-                out IReadOnlyList<ClientValidationFieldReference> fields,
-                out ClientRuleProjectionSkipReason skipReason)
+                out IReadOnlyList<ClientValidationFieldReference> fields)
             {
                 condition = _condition;
                 fields = _fields;
-                skipReason = ClientRuleProjectionSkipReason.UnsupportedValidator;
                 return true;
             }
         }
 
-        private sealed class SkippedClientCondition : ClientConditionProjection
+        private sealed class UnprojectedClientCondition : ClientConditionProjection
         {
-            private readonly ClientRuleProjectionSkipReason _reason;
+            internal static UnprojectedClientCondition Instance { get; } = new UnprojectedClientCondition();
 
-            internal SkippedClientCondition(ClientRuleProjectionSkipReason reason)
-            {
-                _reason = reason;
-            }
+            private UnprojectedClientCondition() { }
 
             internal override bool TryProject(
                 [NotNullWhen(true)] out FieldCondition? condition,
-                out IReadOnlyList<ClientValidationFieldReference> fields,
-                out ClientRuleProjectionSkipReason skipReason)
+                out IReadOnlyList<ClientValidationFieldReference> fields)
             {
                 condition = null;
                 fields = Array.Empty<ClientValidationFieldReference>();
-                skipReason = _reason;
                 return false;
             }
         }

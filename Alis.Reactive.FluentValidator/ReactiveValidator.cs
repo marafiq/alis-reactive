@@ -195,7 +195,7 @@ namespace Alis.Reactive.FluentValidator
                 if (_clientConditions.Count == 0) return;
 
                 clientConditions[rule] = _serverOnlyDepth > 0
-                    ? ClientConditionProjection.Skip(ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard)
+                    ? ClientConditionProjection.Unprojected()
                     : ActiveClientCondition();
             }
 

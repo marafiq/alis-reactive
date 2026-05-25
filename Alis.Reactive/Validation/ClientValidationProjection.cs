@@ -51,40 +51,21 @@ namespace Alis.Reactive.Validation
             new ClientValidationProjectionRequest(validationSourceType, ValidationContainerId.Of(validationContainerId));
     }
 
-    /// <summary>Complete client validation projection split by projected fields and skipped browser rules.</summary>
+    /// <summary>Complete client validation extraction split by projected fields.</summary>
     public sealed class ClientValidationProjection
     {
         public ClientValidationProjection(
             ValidationContainerId validationContainer,
-            IReadOnlyList<ClientValidationField> fields,
-            IReadOnlyList<SkippedClientRuleProjection> skippedRules)
+            IReadOnlyList<ClientValidationField> fields)
         {
             ValidationContainer = validationContainer ?? throw new ArgumentNullException(nameof(validationContainer));
             if (fields == null) throw new ArgumentNullException(nameof(fields));
-            if (skippedRules == null) throw new ArgumentNullException(nameof(skippedRules));
 
             Fields = SnapshotFields(fields);
-            SkippedRules = Snapshot(skippedRules, nameof(skippedRules));
         }
 
         public ValidationContainerId ValidationContainer { get; }
         public IReadOnlyList<ClientValidationField> Fields { get; }
-        public IReadOnlyList<SkippedClientRuleProjection> SkippedRules { get; }
-
-        private static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items, string parameterName)
-            where T : class
-        {
-            var snapshot = new List<T>(items.Count);
-            foreach (var item in items)
-            {
-                if (item == null)
-                    throw new ArgumentException("Client validation projection items must not be null.", parameterName);
-
-                snapshot.Add(item);
-            }
-
-            return snapshot;
-        }
 
         private static IReadOnlyList<ClientValidationField> SnapshotFields(IReadOnlyList<ClientValidationField> fields)
         {
@@ -109,59 +90,7 @@ namespace Alis.Reactive.Validation
             if (request == null) throw new ArgumentNullException(nameof(request));
             return new ClientValidationProjection(
                 request.ValidationContainer,
-                fields,
-                Array.Empty<SkippedClientRuleProjection>());
+                fields);
         }
-    }
-
-    /// <summary>Rule intentionally omitted from the browser projection because no deterministic client rule was proven.</summary>
-    public sealed class SkippedClientRuleProjection
-    {
-        private SkippedClientRuleProjection(
-            ValidationFieldPath fieldPath,
-            string validatorName,
-            ClientRuleProjectionSkipReason reason)
-        {
-            if (string.IsNullOrWhiteSpace(validatorName))
-            {
-                throw new ArgumentException(
-                    "A skipped client validation rule must name the validator that could not be projected for the browser.",
-                    nameof(validatorName));
-            }
-
-            FieldPath = fieldPath ?? throw new ArgumentNullException(nameof(fieldPath));
-            ValidatorName = validatorName;
-            Reason = reason;
-        }
-
-        public string FieldName => FieldPath.Value;
-        public string ValidatorName { get; }
-        public ClientRuleProjectionSkipReason Reason { get; }
-
-        internal ValidationFieldPath FieldPath { get; }
-
-        public static SkippedClientRuleProjection ForField(
-            string fieldName,
-            string validatorName,
-            ClientRuleProjectionSkipReason reason) =>
-            new SkippedClientRuleProjection(ValidationFieldPath.Of(fieldName), validatorName, reason);
-
-        internal static SkippedClientRuleProjection For(
-            ValidationFieldPath fieldPath,
-            string validatorName,
-            ClientRuleProjectionSkipReason reason) =>
-            new SkippedClientRuleProjection(fieldPath, validatorName, reason);
-    }
-
-    /// <summary>Why a validation rule was not projected into browser validation.</summary>
-    public enum ClientRuleProjectionSkipReason
-    {
-        FluentValidationConditionWithoutClientGuard,
-        RuleComponentCondition,
-        MissingRangeEndpoint,
-        PeerComparisonRequiresExplicitProjection,
-        UnsupportedComparisonOperator,
-        UnsupportedValidator,
-        MissingRegexExpression
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using FluentValidation;
 using FluentValidation.Internal;
@@ -65,12 +64,8 @@ namespace Alis.Reactive.FluentValidator
             ClientValidationProjectionAccumulator projection,
             IReadOnlyDictionary<IValidationRule, ClientConditionProjection> clientConditions)
         {
-            if (!TryResolveRuleCondition(rule, prefix, projection, clientConditions, out var ruleCondition, out var skipReason))
-            {
-                if (!IsIncludeRule(rule))
-                    projection.Skip(prefix.Append(rule.PropertyName), rule, skipReason);
+            if (!TryResolveRuleCondition(rule, prefix, projection, clientConditions, out var ruleCondition))
                 return;
-            }
 
             var inheritedCondition = parentCondition.Combine(ruleCondition);
             if (IsIncludeRule(rule))
@@ -93,7 +88,6 @@ namespace Alis.Reactive.FluentValidator
         {
             if (component.HasCondition || component.HasAsyncCondition)
             {
-                projection.Skip(field.Path, component.Validator, ClientRuleProjectionSkipReason.RuleComponentCondition);
                 return;
             }
 
@@ -147,7 +141,7 @@ namespace Alis.Reactive.FluentValidator
 
                 case IRegularExpressionValidator regex:
                     if (string.IsNullOrEmpty(regex.Expression))
-                        projection.Skip(field.Path, validator, ClientRuleProjectionSkipReason.MissingRegexExpression);
+                        return;
                     else
                         projection.Add(field.Reference, ValidationRuleName.Regex, Message(component, $"'{displayName}' format is invalid."), ValidationRuleDetails.WithConstraint(regex.Expression, condition, Shape.None));
                     return;
@@ -169,7 +163,6 @@ namespace Alis.Reactive.FluentValidator
                     return;
 
                 default:
-                    projection.Skip(field.Path, validator, ClientRuleProjectionSkipReason.UnsupportedValidator);
                     return;
             }
         }
@@ -212,7 +205,6 @@ namespace Alis.Reactive.FluentValidator
         {
             if (!ClientValidationProjectionRangeBounds.TryFrom(lower, upper, out var bounds))
             {
-                projection.Skip(field.Path, component.Validator, ClientRuleProjectionSkipReason.MissingRangeEndpoint);
                 return;
             }
 
@@ -235,17 +227,12 @@ namespace Alis.Reactive.FluentValidator
         {
             if (comparison.MemberToCompare != null)
             {
-                projection.Skip(
-                    field.Path,
-                    component.Validator,
-                    ClientRuleProjectionSkipReason.PeerComparisonRequiresExplicitProjection);
                 return;
             }
 
             var ruleName = RuleNameFor(comparison.Comparison);
             if (ruleName == null)
             {
-                projection.Skip(field.Path, component.Validator, ClientRuleProjectionSkipReason.UnsupportedComparisonOperator);
                 return;
             }
 
@@ -262,22 +249,17 @@ namespace Alis.Reactive.FluentValidator
             ValidationFieldPath prefix,
             ClientValidationProjectionAccumulator projection,
             IReadOnlyDictionary<IValidationRule, ClientConditionProjection> clientConditions,
-            out ValidationRuleCondition condition,
-            out ClientRuleProjectionSkipReason skipReason)
+            out ValidationRuleCondition condition)
         {
             condition = ValidationRuleCondition.Always;
-            skipReason = ClientRuleProjectionSkipReason.UnsupportedValidator;
 
             if (!rule.HasCondition && !rule.HasAsyncCondition)
                 return true;
 
             if (!clientConditions.TryGetValue(rule, out var clientCondition))
-            {
-                skipReason = ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard;
                 return false;
-            }
 
-            if (!clientCondition.TryProject(out var fieldCondition, out var fields, out skipReason))
+            if (!clientCondition.TryProject(out var fieldCondition, out var fields))
                 return false;
 
             foreach (var field in fields)
@@ -395,7 +377,6 @@ namespace Alis.Reactive.FluentValidator
         {
             private readonly ValidationContainerId _container;
             private readonly ClientValidationProjectionDraft _draft = new ClientValidationProjectionDraft();
-            private readonly List<SkippedClientRuleProjection> _skippedRules = new List<SkippedClientRuleProjection>();
 
             internal ClientValidationProjectionAccumulator(ValidationContainerId container)
             {
@@ -416,26 +397,8 @@ namespace Alis.Reactive.FluentValidator
                 _draft.AddRule(field, new ClientValidationRuleModel(name, message, details));
             }
 
-            internal void Skip(
-                ValidationFieldPath fieldPath,
-                IPropertyValidator validator,
-                ClientRuleProjectionSkipReason reason) =>
-                _skippedRules.Add(SkippedClientRuleProjection.For(fieldPath, validator.Name, reason));
-
-            internal void Skip(
-                ValidationFieldPath fieldPath,
-                IValidationRule rule,
-                ClientRuleProjectionSkipReason reason)
-            {
-                var name = string.Join(", ", rule.Components.Select(component => component.Validator.Name));
-                if (string.IsNullOrWhiteSpace(name))
-                    name = rule.GetType().Name;
-
-                _skippedRules.Add(SkippedClientRuleProjection.For(fieldPath, name, reason));
-            }
-
             internal ClientValidationProjection ToProjection() =>
-                new ClientValidationProjection(_container, _draft.ToFields(), _skippedRules);
+                new ClientValidationProjection(_container, _draft.ToFields());
         }
 
         private sealed class ProjectedField
