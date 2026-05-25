@@ -215,10 +215,7 @@ function emitRuntimeRegisteredInputs(
       return;
     case "all-registered-inputs":
       for (const component of runtime.runtimePlan.components.entries()) {
-        const runtimeField = RuntimeRegisteredInputGatherField.tryFrom(component, claims);
-        if (runtimeField === undefined) continue;
-
-        runtimeField.emitInto(transport);
+        emitRuntimeRegisteredInput(component, claims, transport);
       }
       return;
     default:
@@ -237,54 +234,44 @@ function emitDeclaredObjectValueFields(
   }
 }
 
-class RuntimeRegisteredInputGatherField {
-  private constructor(
-    private readonly component: RuntimeComponent,
-    private readonly contract: RegisteredInputGatherContract,
-  ) {}
-
-  static tryFrom(
-    component: RuntimeComponent,
-    claims: GatherPayloadClaims,
-  ): RuntimeRegisteredInputGatherField | undefined {
-    const componentAlreadyGatheredAtBuildTime = claims.hasComponent(component.key);
-    if (componentAlreadyGatheredAtBuildTime) return undefined;
-
-    const contract = RegisteredInputGatherContract.tryFrom(component.definition);
-    if (contract === undefined) return undefined;
-
-    const registeredInputIsMounted = component.tryElement() !== undefined;
-    if (!registeredInputIsMounted) return undefined;
-
-    const payloadSlotWasReserved = claims.tryClaimRuntimePayloadPath(contract.bindingPath);
-    if (!payloadSlotWasReserved) return undefined;
-
-    return new RuntimeRegisteredInputGatherField(component, contract);
-  }
-
-  emitInto(transport: TransportStrategy): void {
-    const object = this.component.object();
-    const runtimeValue = object.read(this.contract.valueMember);
-
-    emitGatheredValue(
-      this.contract.bindingPath,
-      runtimeValue.usingDeclaredShape(),
-      RuntimeShape.from(runtimeValue.shape),
-      transport,
-    );
-  }
+interface RegisteredInputGatherContract {
+  readonly valueMember: string;
+  readonly bindingPath: string;
 }
 
-class RegisteredInputGatherContract {
-  private constructor(
-    readonly valueMember: string,
-    readonly bindingPath: string,
-  ) {}
+function emitRuntimeRegisteredInput(
+  component: RuntimeComponent,
+  claims: GatherPayloadClaims,
+  transport: TransportStrategy,
+): void {
+  if (claims.hasComponent(component.key)) return;
 
-  static tryFrom(component: Component): RegisteredInputGatherContract | undefined {
-    const binding = component.binding;
-    if (binding.kind === "none") return undefined;
+  const contract = registeredInputGatherContract(component.definition);
+  if (contract === undefined) return;
 
-    return new RegisteredInputGatherContract(binding.valueMember, binding.bindingPath);
+  const registeredInputIsMounted = component.tryElement() !== undefined;
+  if (!registeredInputIsMounted) return;
+
+  const payloadSlotWasReserved = claims.tryClaimRuntimePayloadPath(contract.bindingPath);
+  if (!payloadSlotWasReserved) return;
+
+  const object = component.object();
+  const runtimeValue = object.read(contract.valueMember);
+
+  emitGatheredValue(
+    contract.bindingPath,
+    runtimeValue.usingDeclaredShape(),
+    RuntimeShape.from(runtimeValue.shape),
+    transport,
+  );
+}
+
+function registeredInputGatherContract(component: Component): RegisteredInputGatherContract | undefined {
+  const binding = component.binding;
+  if (binding.kind === "none") return undefined;
+
+  return {
+    valueMember: binding.valueMember,
+    bindingPath: binding.bindingPath,
   }
 }
