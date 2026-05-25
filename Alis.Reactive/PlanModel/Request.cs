@@ -756,9 +756,9 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class GatherPayloadSlots
     {
-        private readonly List<Path> _claimedPaths;
+        private readonly List<ClaimedGatherPayloadPath> _claimedPaths;
 
-        private GatherPayloadSlots(List<Path> claimedPaths)
+        private GatherPayloadSlots(List<ClaimedGatherPayloadPath> claimedPaths)
         {
             _claimedPaths = claimedPaths ?? throw new System.ArgumentNullException(nameof(claimedPaths));
         }
@@ -767,7 +767,7 @@ namespace Alis.Reactive.PlanModel
         {
             if (fields == null) throw new System.ArgumentNullException(nameof(fields));
 
-            var payloadSlots = new GatherPayloadSlots(new List<Path>());
+            var payloadSlots = new GatherPayloadSlots(new List<ClaimedGatherPayloadPath>());
             foreach (var field in fields)
                 payloadSlots.ClaimDeclared(field.PayloadPath);
 
@@ -777,23 +777,61 @@ namespace Alis.Reactive.PlanModel
         internal void ClaimDeclared(string payloadPath)
         {
             if (payloadPath == null) throw new System.ArgumentNullException(nameof(payloadPath));
-            _claimedPaths.Add(Path.Parse(payloadPath));
+            var incoming = ClaimedGatherPayloadPath.From(payloadPath);
+            var conflict = FindOverlap(incoming);
+            if (conflict != null)
+                throw new System.InvalidOperationException(
+                    $"Gather payload path '{incoming.Text}' conflicts with already declared payload path '{conflict.Text}'. " +
+                    "Use either the parent path or its child paths, not both.");
+
+            _claimedPaths.Add(incoming);
         }
 
         internal bool TryClaim(string payloadPath)
         {
             if (payloadPath == null) throw new System.ArgumentNullException(nameof(payloadPath));
 
-            var incoming = Path.Parse(payloadPath);
+            var incoming = ClaimedGatherPayloadPath.From(payloadPath);
+            var payloadPathAlreadyClaimed = FindOverlap(incoming) != null;
+            if (payloadPathAlreadyClaimed)
+                return false;
+
+            _claimedPaths.Add(incoming);
+            return true;
+        }
+
+        private ClaimedGatherPayloadPath? FindOverlap(ClaimedGatherPayloadPath incoming)
+        {
             foreach (var claimedPath in _claimedPaths)
             {
                 var payloadPathAlreadyClaimed = claimedPath.Overlaps(incoming);
                 if (payloadPathAlreadyClaimed)
-                    return false;
+                    return claimedPath;
             }
 
-            _claimedPaths.Add(incoming);
-            return true;
+            return null;
+        }
+    }
+
+    internal sealed class ClaimedGatherPayloadPath
+    {
+        private readonly Path _path;
+
+        private ClaimedGatherPayloadPath(string text, Path path)
+        {
+            Text = text ?? throw new System.ArgumentNullException(nameof(text));
+            _path = path ?? throw new System.ArgumentNullException(nameof(path));
+        }
+
+        internal string Text { get; }
+
+        internal static ClaimedGatherPayloadPath From(string payloadPath) =>
+            new ClaimedGatherPayloadPath(payloadPath, Path.Parse(payloadPath));
+
+        internal bool Overlaps(ClaimedGatherPayloadPath other)
+        {
+            if (other == null) throw new System.ArgumentNullException(nameof(other));
+            return _path.Overlaps(other._path);
         }
     }
 

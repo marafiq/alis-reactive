@@ -73,7 +73,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
     }
 
     [Test]
-    public void include_all_does_not_duplicate_a_component_read_with_an_explicit_payload_key()
+    public void include_all_does_not_duplicate_a_component_read_with_an_explicit_payload_path()
     {
         var plan = CreatePlan();
         RegisterTextInput(plan, "Id", "id-input");
@@ -100,6 +100,87 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .ToList();
 
         Assert.That(fields, Is.EqualTo(new[] { "selectedId" }));
+    }
+
+    [Test]
+    public void gather_rejects_duplicate_explicit_payload_paths()
+    {
+        var plan = CreatePlan();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Get("/api/profile")
+                    .Gather(g => g
+                        .FromUrl("id", "residentId")
+                        .FromUrl("legacyId", "residentId"))
+                    .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+            });
+        });
+
+        Assert.That(ex!.Message, Does.Contain("residentId"));
+        Assert.That(ex.Message, Does.Contain("already declared payload path"));
+    }
+
+    [Test]
+    public void gather_rejects_explicit_and_supplemental_payload_path_conflicts()
+    {
+        var plan = CreatePlan();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Post("/api/profile", g => g
+                        .FromUrl("id", "residentId")
+                        .Static("residentId", "manual"))
+                    .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+            });
+        });
+
+        Assert.That(ex!.Message, Does.Contain("residentId"));
+        Assert.That(ex.Message, Does.Contain("conflicts with already declared payload path"));
+    }
+
+    [Test]
+    public void gather_rejects_parent_child_payload_path_conflicts()
+    {
+        var plan = CreatePlan();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Post("/api/profile", g => g
+                        .FromUrl("address", "address")
+                        .Static("address.city", "Seattle"))
+                    .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+            });
+        });
+
+        Assert.That(ex!.Message, Does.Contain("address.city"));
+        Assert.That(ex.Message, Does.Contain("address"));
+        Assert.That(ex.Message, Does.Contain("Use either the parent path or its child paths"));
+    }
+
+    [Test]
+    public void gather_rejects_duplicate_supplemental_payload_paths()
+    {
+        var plan = CreatePlan();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+        {
+            Trigger(plan).DomReady(p =>
+            {
+                p.Post("/api/profile", g => g
+                        .Static("residentId", "manual")
+                        .Static("residentId", "override"))
+                    .Response(r => r.OnSuccess(s => s.Element("result").Show()));
+            });
+        });
+
+        Assert.That(ex!.Message, Does.Contain("Supplemental gather payload path 'residentId' is already declared"));
     }
 
     [Test]

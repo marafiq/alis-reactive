@@ -33,7 +33,12 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
             if (value == null) throw new ArgumentNullException(nameof(value));
-            _supplementalFields[path.Value] = value;
+            var payloadPathAlreadyExists = _supplementalFields.ContainsKey(path.Value);
+            if (payloadPathAlreadyExists)
+                throw new InvalidOperationException(
+                    $"Supplemental gather payload path '{path.Value}' is already declared.");
+
+            _supplementalFields.Add(path.Value, value);
         }
 
         internal void AddHeader(HeaderName name, ValueProducer value)
