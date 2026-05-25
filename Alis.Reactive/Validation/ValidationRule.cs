@@ -12,7 +12,7 @@ namespace Alis.Reactive.Validation
         private readonly ValidationMessage _message;
         private readonly ValidationRuleDetails _details;
 
-        public string Rule => _rule.Value;
+        public ValidationRuleKind Kind => _rule.ToPublicKind();
         public string Message => _message.Value;
         public ValidationRuleExecutionIntent Execution => _details.ExecutionIntent;
         public Shape Shape => _details.Shape;
@@ -35,6 +35,28 @@ namespace Alis.Reactive.Validation
                 _message,
                 _details.ToPlanExecution(binding));
         }
+    }
+
+    public enum ValidationRuleKind
+    {
+        Required,
+        Empty,
+        MinLength,
+        MaxLength,
+        Email,
+        Regex,
+        Url,
+        CreditCard,
+        Range,
+        ExclusiveRange,
+        Min,
+        Max,
+        GreaterThan,
+        LessThan,
+        EqualTo,
+        NotEqual,
+        NotEqualTo,
+        AtLeastOne
     }
 
     internal sealed class ValidationRuleDetails
@@ -414,7 +436,7 @@ namespace Alis.Reactive.Validation
     {
         private protected ValidationRuleOperandIntent() { }
 
-        public abstract string Kind { get; }
+        public abstract ValidationRuleOperandKind Kind { get; }
 
         internal static ValidationRuleOperandIntent None { get; } =
             new NoValidationRuleOperandIntent();
@@ -439,7 +461,7 @@ namespace Alis.Reactive.Validation
     {
         internal NoValidationRuleOperandIntent() { }
 
-        public override string Kind => "none";
+        public override ValidationRuleOperandKind Kind => ValidationRuleOperandKind.None;
     }
 
     public sealed class LiteralValidationRuleOperandIntent : ValidationRuleOperandIntent
@@ -449,7 +471,7 @@ namespace Alis.Reactive.Validation
             Value = value;
         }
 
-        public override string Kind => "literal";
+        public override ValidationRuleOperandKind Kind => ValidationRuleOperandKind.Literal;
         public object? Value { get; }
         public bool IsLiteralNull => Value == null;
     }
@@ -464,7 +486,7 @@ namespace Alis.Reactive.Validation
             _bounds = bounds.ToDescriptorArray();
         }
 
-        public override string Kind => "range";
+        public override ValidationRuleOperandKind Kind => ValidationRuleOperandKind.Range;
         public System.Collections.Generic.IReadOnlyList<object> Bounds => _bounds;
     }
 
@@ -477,15 +499,23 @@ namespace Alis.Reactive.Validation
             _fieldPath = fieldPath ?? throw new System.ArgumentNullException(nameof(fieldPath));
         }
 
-        public override string Kind => "peer-field";
+        public override ValidationRuleOperandKind Kind => ValidationRuleOperandKind.PeerField;
         public string Field => _fieldPath.Value;
+    }
+
+    public enum ValidationRuleOperandKind
+    {
+        None,
+        Literal,
+        Range,
+        PeerField
     }
 
     public abstract class ValidationRuleActivationIntent
     {
         private protected ValidationRuleActivationIntent() { }
 
-        public abstract string Kind { get; }
+        public abstract ValidationRuleActivationKind Kind { get; }
 
         internal static ValidationRuleActivationIntent Always { get; } =
             new AlwaysValidationRuleActivationIntent();
@@ -501,7 +531,7 @@ namespace Alis.Reactive.Validation
     {
         internal AlwaysValidationRuleActivationIntent() { }
 
-        public override string Kind => "always";
+        public override ValidationRuleActivationKind Kind => ValidationRuleActivationKind.Always;
     }
 
     public sealed class ConditionalValidationRuleActivationIntent : ValidationRuleActivationIntent
@@ -513,8 +543,14 @@ namespace Alis.Reactive.Validation
             _condition = condition ?? throw new System.ArgumentNullException(nameof(condition));
         }
 
-        public override string Kind => "when";
+        public override ValidationRuleActivationKind Kind => ValidationRuleActivationKind.When;
         public FieldCondition Condition => _condition;
+    }
+
+    public enum ValidationRuleActivationKind
+    {
+        Always,
+        When
     }
 
     internal sealed class ValidationPlanBinding

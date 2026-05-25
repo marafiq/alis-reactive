@@ -115,8 +115,8 @@ namespace Alis.Reactive.Validation
         /// <summary>Property name to check (e.g. "IsEmployed").</summary>
         public string Field => _field.Value;
 
-        /// <summary>Operator from <see cref="PlanModel.CompareOp"/>.</summary>
-        public string Op => _op.Value;
+        /// <summary>Gets the comparison operator role.</summary>
+        public FieldComparisonOperator Op => FieldComparisonOperatorCatalog.From(_op);
 
         /// <summary>Gets the comparison operand with an explicit kind.</summary>
         public FieldComparisonOperand Operand => _value.ToOperand();
@@ -142,6 +142,67 @@ namespace Alis.Reactive.Validation
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             return binding.Compare(_field, _op, _value);
+        }
+    }
+
+    public enum FieldComparisonOperator
+    {
+        Equal,
+        NotEqual,
+        GreaterThan,
+        GreaterThanOrEqual,
+        LessThan,
+        LessThanOrEqual,
+        Truthy,
+        Falsy,
+        IsNull,
+        NotNull,
+        IsEmpty,
+        NotEmpty,
+        In,
+        NotIn,
+        Between,
+        Contains,
+        StartsWith,
+        EndsWith,
+        Matches,
+        MinLength,
+        ArrayContains
+    }
+
+    internal static class FieldComparisonOperatorCatalog
+    {
+        internal static FieldComparisonOperator From(CompareOperator op)
+        {
+            if (op == null) throw new ArgumentNullException(nameof(op));
+
+            switch (op.Value)
+            {
+                case CompareOp.Eq: return FieldComparisonOperator.Equal;
+                case CompareOp.Neq: return FieldComparisonOperator.NotEqual;
+                case CompareOp.Gt: return FieldComparisonOperator.GreaterThan;
+                case CompareOp.Gte: return FieldComparisonOperator.GreaterThanOrEqual;
+                case CompareOp.Lt: return FieldComparisonOperator.LessThan;
+                case CompareOp.Lte: return FieldComparisonOperator.LessThanOrEqual;
+                case CompareOp.Truthy: return FieldComparisonOperator.Truthy;
+                case CompareOp.Falsy: return FieldComparisonOperator.Falsy;
+                case CompareOp.IsNull: return FieldComparisonOperator.IsNull;
+                case CompareOp.NotNull: return FieldComparisonOperator.NotNull;
+                case CompareOp.IsEmpty: return FieldComparisonOperator.IsEmpty;
+                case CompareOp.NotEmpty: return FieldComparisonOperator.NotEmpty;
+                case CompareOp.In: return FieldComparisonOperator.In;
+                case CompareOp.NotIn: return FieldComparisonOperator.NotIn;
+                case CompareOp.Between: return FieldComparisonOperator.Between;
+                case CompareOp.Contains: return FieldComparisonOperator.Contains;
+                case CompareOp.StartsWith: return FieldComparisonOperator.StartsWith;
+                case CompareOp.EndsWith: return FieldComparisonOperator.EndsWith;
+                case CompareOp.Matches: return FieldComparisonOperator.Matches;
+                case CompareOp.MinLength: return FieldComparisonOperator.MinLength;
+                case CompareOp.ArrayContains: return FieldComparisonOperator.ArrayContains;
+                default:
+                    throw new InvalidOperationException(
+                        "Unknown field comparison operator '" + op.Value + "'.");
+            }
         }
     }
 
@@ -261,8 +322,8 @@ namespace Alis.Reactive.Validation
     {
         private protected FieldComparisonOperand() { }
 
-        /// <summary>Gets <c>none</c>, <c>literal</c>, or <c>array</c>.</summary>
-        public abstract string Kind { get; }
+        /// <summary>Gets the operand role in the comparison.</summary>
+        public abstract FieldComparisonOperandKind Kind { get; }
 
         internal static FieldComparisonOperand None { get; } = new NoFieldComparisonOperand();
 
@@ -280,7 +341,7 @@ namespace Alis.Reactive.Validation
     {
         internal NoFieldComparisonOperand() { }
 
-        public override string Kind => "none";
+        public override FieldComparisonOperandKind Kind => FieldComparisonOperandKind.None;
     }
 
     public sealed class LiteralFieldComparisonOperand : FieldComparisonOperand
@@ -290,7 +351,7 @@ namespace Alis.Reactive.Validation
             Value = value;
         }
 
-        public override string Kind => "literal";
+        public override FieldComparisonOperandKind Kind => FieldComparisonOperandKind.Literal;
         public object? Value { get; }
         public bool IsLiteralNull => Value == null;
     }
@@ -305,8 +366,15 @@ namespace Alis.Reactive.Validation
             _values = values.ToArray();
         }
 
-        public override string Kind => "array";
+        public override FieldComparisonOperandKind Kind => FieldComparisonOperandKind.Array;
         public IReadOnlyList<object?> Values => _values;
+    }
+
+    public enum FieldComparisonOperandKind
+    {
+        None,
+        Literal,
+        Array
     }
 
     /// <summary>Logical AND — all terms must be true.</summary>

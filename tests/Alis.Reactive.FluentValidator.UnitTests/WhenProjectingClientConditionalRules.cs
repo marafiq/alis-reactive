@@ -15,11 +15,11 @@ public class WhenProjectingClientConditionalRules
         Assert.That(desc, Is.Not.Null);
         var jobTitle = desc.First(f => f.FieldName == "JobTitle");
         Assert.That(jobTitle.Rules, Has.Count.EqualTo(1));
-        Assert.That(jobTitle.Rules[0].Rule, Is.EqualTo("required"));
+        Assert.That(jobTitle.Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Required));
         Assert.That(jobTitle.Rules[0].Condition(), Is.Not.Null);
         var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
         Assert.That(when.Field, Is.EqualTo("IsEmployed"));
-        Assert.That(when.Op, Is.EqualTo("truthy"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Truthy));
     }
 
     [Test]
@@ -29,7 +29,7 @@ public class WhenProjectingClientConditionalRules
 
         Assert.That(desc, Is.Not.Null);
         var name = desc.First(f => f.FieldName == "Name");
-        Assert.That(name.Rules[0].Rule, Is.EqualTo("required"));
+        Assert.That(name.Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Required));
         Assert.That(name.Rules[0].Condition(), Is.Null);
     }
 
@@ -61,7 +61,7 @@ public class WhenProjectingClientConditionalRules
         Assert.That(email.Rules[0].Condition(), Is.Not.Null);
         var eqWhen = (FieldCompare)email.Rules[0].Condition()!;
         Assert.That(eqWhen.Field, Is.EqualTo("Name"));
-        Assert.That(eqWhen.Op, Is.EqualTo("eq"));
+        Assert.That(eqWhen.Op, Is.EqualTo(FieldComparisonOperator.Equal));
         Assert.That(eqWhen.OperandValue(), Is.EqualTo("Admin"));
     }
 
@@ -96,11 +96,11 @@ public class WhenProjectingClientConditionalRules
 
         var outer = (FieldCompare)all.Terms[0];
         Assert.That(outer.Field, Is.EqualTo("IsEmployed"));
-        Assert.That(outer.Op, Is.EqualTo("truthy"));
+        Assert.That(outer.Op, Is.EqualTo(FieldComparisonOperator.Truthy));
 
         var inner = (FieldCompare)all.Terms[1];
         Assert.That(inner.Field, Is.EqualTo("CareLevel"));
-        Assert.That(inner.Op, Is.EqualTo("eq"));
+        Assert.That(inner.Op, Is.EqualTo(FieldComparisonOperator.Equal));
         Assert.That(inner.OperandValue(), Is.EqualTo("memory-care"));
 
         Assert.That(desc.Select(f => f.FieldName), Does.Contain("IsEmployed"));
@@ -120,7 +120,7 @@ public class WhenProjectingClientConditionalRules
 
         var compare = (FieldCompare)condition!;
         Assert.That(compare.Field, Is.EqualTo("IsEmployed"));
-        Assert.That(compare.Op, Is.EqualTo("truthy"));
+        Assert.That(compare.Op, Is.EqualTo(FieldComparisonOperator.Truthy));
     }
 
     [Test]
@@ -180,29 +180,29 @@ public class WhenProjectingClientConditionalRules
         Assert.That(desc, Is.Not.Null);
 
         // Verify each rule type has the IsEmployed condition
-        void AssertConditionalRule(string fieldName, string expectedRule, string label)
+        void AssertConditionalRule(string fieldName, ValidationRuleKind expectedRule, string label)
         {
             var field = desc.FirstOrDefault(f => f.FieldName == fieldName);
             Assert.That(field, Is.Not.Null, $"{label}: field '{fieldName}' missing");
-            var rule = field!.Rules.FirstOrDefault(r => r.Rule == expectedRule);
+            var rule = field!.Rules.FirstOrDefault(r => r.Kind == expectedRule);
             Assert.That(rule, Is.Not.Null, $"{label}: rule '{expectedRule}' missing on '{fieldName}'");
             Assert.That(rule!.Condition(), Is.Not.Null, $"{label}: condition missing");
             var ruleWhen = (FieldCompare)rule.Condition()!;
             Assert.That(ruleWhen.Field, Is.EqualTo("IsEmployed"), $"{label}: wrong condition field");
-            Assert.That(ruleWhen.Op, Is.EqualTo("truthy"), $"{label}: wrong condition op");
+            Assert.That(ruleWhen.Op, Is.EqualTo(FieldComparisonOperator.Truthy), $"{label}: wrong condition op");
         }
 
-        AssertConditionalRule("Name", "required", "NotEmpty");
-        AssertConditionalRule("Name", "minLength", "MinimumLength");
-        AssertConditionalRule("Name", "maxLength", "MaximumLength");
-        AssertConditionalRule("Email", "email", "EmailAddress");
-        AssertConditionalRule("Phone", "regex", "Matches");
-        AssertConditionalRule("Age", "range", "InclusiveBetween");
-        AssertConditionalRule("Salary", "min", "GreaterThanOrEqualTo");
-        AssertConditionalRule("Salary", "max", "LessThanOrEqualTo");
-        AssertConditionalRule("Salary", "gt", "GreaterThan");
-        AssertConditionalRule("Salary", "lt", "LessThan");
-        AssertConditionalRule("ConfirmEmail", "equalTo", "Equal");
+        AssertConditionalRule("Name", ValidationRuleKind.Required, "NotEmpty");
+        AssertConditionalRule("Name", ValidationRuleKind.MinLength, "MinimumLength");
+        AssertConditionalRule("Name", ValidationRuleKind.MaxLength, "MaximumLength");
+        AssertConditionalRule("Email", ValidationRuleKind.Email, "EmailAddress");
+        AssertConditionalRule("Phone", ValidationRuleKind.Regex, "Matches");
+        AssertConditionalRule("Age", ValidationRuleKind.Range, "InclusiveBetween");
+        AssertConditionalRule("Salary", ValidationRuleKind.Min, "GreaterThanOrEqualTo");
+        AssertConditionalRule("Salary", ValidationRuleKind.Max, "LessThanOrEqualTo");
+        AssertConditionalRule("Salary", ValidationRuleKind.GreaterThan, "GreaterThan");
+        AssertConditionalRule("Salary", ValidationRuleKind.LessThan, "LessThan");
+        AssertConditionalRule("ConfirmEmail", ValidationRuleKind.EqualTo, "Equal");
     }
 
     [Test]

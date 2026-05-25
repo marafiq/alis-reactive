@@ -26,9 +26,9 @@ public class WhenProjectingAllRuleTypes
         var desc = _adapter.ProjectRules(typeof(AllRulesValidator), "testForm");
 
         var nameField = desc.First(f => f.FieldName == "Name");
-        var ruleTypes = nameField.Rules.Select(r => r.Rule).ToList();
-        Assert.That(ruleTypes, Does.Contain("required"));
-        Assert.That(ruleTypes, Does.Contain("maxLength"));
+        var ruleTypes = nameField.Rules.Select(r => r.Kind).ToList();
+        Assert.That(ruleTypes, Does.Contain(ValidationRuleKind.Required));
+        Assert.That(ruleTypes, Does.Contain(ValidationRuleKind.MaxLength));
     }
 
     [Test]
@@ -37,7 +37,7 @@ public class WhenProjectingAllRuleTypes
         var desc = _adapter.ProjectRules(typeof(AllRulesValidator), "testForm");
 
         var emailField = desc.First(f => f.FieldName == "Email");
-        Assert.That(emailField.Rules[0].Rule, Is.EqualTo("email"));
+        Assert.That(emailField.Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Email));
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class WhenProjectingAllRuleTypes
         var desc = _adapter.ProjectRules(typeof(AllRulesValidator), "testForm");
 
         var phoneField = desc.First(f => f.FieldName == "Phone");
-        Assert.That(phoneField.Rules[0].Rule, Is.EqualTo("regex"));
+        Assert.That(phoneField.Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Regex));
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class WhenProjectingAllRuleTypes
         var desc = _adapter.ProjectRules(typeof(AllRulesValidator), "testForm");
 
         var ageField = desc.First(f => f.FieldName == "Age");
-        Assert.That(ageField.Rules[0].Rule, Is.EqualTo("range"));
+        Assert.That(ageField.Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Range));
     }
 
     [Test]
@@ -64,8 +64,8 @@ public class WhenProjectingAllRuleTypes
         var desc = _adapter.ProjectRules(typeof(AllRulesValidator), "testForm");
 
         var salaryField = desc.First(f => f.FieldName == "Salary");
-        var ruleTypes = salaryField.Rules.Select(r => r.Rule).ToList();
-        Assert.That(ruleTypes, Does.Contain("min"));
-        Assert.That(ruleTypes, Does.Contain("max"));
+        var ruleTypes = salaryField.Rules.Select(r => r.Kind).ToList();
+        Assert.That(ruleTypes, Does.Contain(ValidationRuleKind.Min));
+        Assert.That(ruleTypes, Does.Contain(ValidationRuleKind.Max));
     }
 }

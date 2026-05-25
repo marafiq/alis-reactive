@@ -22,7 +22,7 @@ public class WhenProjectingDateTimeConditions
         Assert.That(nameField.Rules[0].Condition(), Is.Not.Null);
         var when = (FieldCompare)nameField.Rules[0].Condition()!;
         Assert.That(when.Field, Is.EqualTo("AdmissionDate"));
-        Assert.That(when.Op, Is.EqualTo("eq"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Equal));
 
         var condValue = when.OperandValue();
         Assert.That(condValue, Is.TypeOf<string>(),
@@ -40,7 +40,7 @@ public class WhenProjectingDateTimeConditions
         Assert.That(scoreField.Rules[0].Condition(), Is.Not.Null);
         var neqWhen = (FieldCompare)scoreField.Rules[0].Condition()!;
         Assert.That(neqWhen.Field, Is.EqualTo("AdmissionDate"));
-        Assert.That(neqWhen.Op, Is.EqualTo("neq"));
+        Assert.That(neqWhen.Op, Is.EqualTo(FieldComparisonOperator.NotEqual));
 
         var condValue = neqWhen.OperandValue();
         Assert.That(condValue, Is.TypeOf<string>(),

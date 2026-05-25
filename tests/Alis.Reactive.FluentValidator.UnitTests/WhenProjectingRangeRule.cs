@@ -12,7 +12,7 @@ public class WhenProjectingRangeRule
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc[0].Rules[0];
-        Assert.That(rule.Rule, Is.EqualTo("range"));
+        Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Range));
 
         var constraint = rule.ConstraintValue() as object[];
         Assert.That(constraint, Is.Not.Null);

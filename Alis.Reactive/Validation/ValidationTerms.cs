@@ -141,6 +141,31 @@ namespace Alis.Reactive.Validation
 
         internal string Value { get; }
 
+        internal ValidationRuleKind ToPublicKind()
+        {
+            if (Equals(Required)) return ValidationRuleKind.Required;
+            if (Equals(Empty)) return ValidationRuleKind.Empty;
+            if (Equals(MinLength)) return ValidationRuleKind.MinLength;
+            if (Equals(MaxLength)) return ValidationRuleKind.MaxLength;
+            if (Equals(Email)) return ValidationRuleKind.Email;
+            if (Equals(Regex)) return ValidationRuleKind.Regex;
+            if (Equals(Url)) return ValidationRuleKind.Url;
+            if (Equals(CreditCard)) return ValidationRuleKind.CreditCard;
+            if (Equals(Range)) return ValidationRuleKind.Range;
+            if (Equals(ExclusiveRange)) return ValidationRuleKind.ExclusiveRange;
+            if (Equals(Min)) return ValidationRuleKind.Min;
+            if (Equals(Max)) return ValidationRuleKind.Max;
+            if (Equals(Gt)) return ValidationRuleKind.GreaterThan;
+            if (Equals(Lt)) return ValidationRuleKind.LessThan;
+            if (Equals(EqualTo)) return ValidationRuleKind.EqualTo;
+            if (Equals(NotEqual)) return ValidationRuleKind.NotEqual;
+            if (Equals(NotEqualTo)) return ValidationRuleKind.NotEqualTo;
+            if (Equals(AtLeastOne)) return ValidationRuleKind.AtLeastOne;
+
+            throw new InvalidOperationException(
+                "Unknown validation rule name '" + Value + "'.");
+        }
+
         internal static ValidationRuleName Required => Known["required"];
         internal static ValidationRuleName Empty => Known["empty"];
         internal static ValidationRuleName MinLength => Known["minLength"];

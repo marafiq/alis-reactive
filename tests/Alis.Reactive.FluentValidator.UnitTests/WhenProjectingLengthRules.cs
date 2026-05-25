@@ -11,7 +11,7 @@ public class WhenProjectingLengthRules
         var desc = _adapter.ProjectRules(typeof(MaxLengthValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("maxLength"));
+        Assert.That(desc[0].Rules[0].Kind, Is.EqualTo(ValidationRuleKind.MaxLength));
         Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(100));
     }
 
@@ -21,7 +21,7 @@ public class WhenProjectingLengthRules
         var desc = _adapter.ProjectRules(typeof(MinLengthValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("minLength"));
+        Assert.That(desc[0].Rules[0].Kind, Is.EqualTo(ValidationRuleKind.MinLength));
         Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(3));
     }
 
@@ -34,8 +34,8 @@ public class WhenProjectingLengthRules
         var rules = desc[0].Rules;
         Assert.That(rules, Has.Count.GreaterThanOrEqualTo(2));
 
-        var ruleTypes = rules.Select(r => r.Rule).ToList();
-        Assert.That(ruleTypes, Does.Contain("minLength"));
-        Assert.That(ruleTypes, Does.Contain("maxLength"));
+        var ruleTypes = rules.Select(r => r.Kind).ToList();
+        Assert.That(ruleTypes, Does.Contain(ValidationRuleKind.MinLength));
+        Assert.That(ruleTypes, Does.Contain(ValidationRuleKind.MaxLength));
     }
 }

@@ -18,7 +18,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Age"));
-        Assert.That(when.Op, Is.EqualTo("gt"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.GreaterThan));
         Assert.That(when.OperandValue(), Is.EqualTo(18));
     }
 
@@ -30,7 +30,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)email.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Salary"));
-        Assert.That(when.Op, Is.EqualTo("gte"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.GreaterThanOrEqual));
         Assert.That(when.OperandValue(), Is.EqualTo(50000m));
     }
 
@@ -42,7 +42,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)name.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Age"));
-        Assert.That(when.Op, Is.EqualTo("lt"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.LessThan));
         Assert.That(when.OperandValue(), Is.EqualTo(18));
     }
 
@@ -54,7 +54,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)notes.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Salary"));
-        Assert.That(when.Op, Is.EqualTo("lte"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.LessThanOrEqual));
         Assert.That(when.OperandValue(), Is.EqualTo(0m));
     }
 
@@ -68,7 +68,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)notes.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("MiddleName"));
-        Assert.That(when.Op, Is.EqualTo("is-null"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.IsNull));
         Assert.That(when.Operand, Is.InstanceOf<NoFieldComparisonOperand>());
     }
 
@@ -80,7 +80,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)name.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("MiddleName"));
-        Assert.That(when.Op, Is.EqualTo("not-null"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.NotNull));
         Assert.That(when.Operand, Is.InstanceOf<NoFieldComparisonOperand>());
     }
 
@@ -92,7 +92,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)phone.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Email"));
-        Assert.That(when.Op, Is.EqualTo("is-empty"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.IsEmpty));
         Assert.That(when.Operand, Is.InstanceOf<NoFieldComparisonOperand>());
     }
 
@@ -104,7 +104,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)name.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Notes"));
-        Assert.That(when.Op, Is.EqualTo("not-empty"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.NotEmpty));
         Assert.That(when.Operand, Is.InstanceOf<NoFieldComparisonOperand>());
     }
 
@@ -118,7 +118,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)notes.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("CareLevel"));
-        Assert.That(when.Op, Is.EqualTo("in"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.In));
         Assert.That(when.OperandValue(), Is.InstanceOf<object[]>());
         var values = (object[])when.OperandValue()!;
         Assert.That(values, Is.EqualTo(new object[] { "memory-care", "skilled-nursing" }));
@@ -132,7 +132,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)phone.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("CareLevel"));
-        Assert.That(when.Op, Is.EqualTo("not-in"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.NotIn));
         Assert.That(when.OperandValue(), Is.InstanceOf<object[]>());
         var values = (object[])when.OperandValue()!;
         Assert.That(values, Is.EqualTo(new object[] { "independent", "assisted" }));
@@ -146,7 +146,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Age"));
-        Assert.That(when.Op, Is.EqualTo("between"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Between));
         Assert.That(when.OperandValue(), Is.InstanceOf<object[]>());
         var range = (object[])when.OperandValue()!;
         Assert.That(range[0], Is.EqualTo(18));
@@ -179,7 +179,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)phone.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Notes"));
-        Assert.That(when.Op, Is.EqualTo("contains"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Contains));
         Assert.That(when.OperandValue(), Is.EqualTo("urgent"));
     }
 
@@ -191,7 +191,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)email.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Name"));
-        Assert.That(when.Op, Is.EqualTo("starts-with"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.StartsWith));
         Assert.That(when.OperandValue(), Is.EqualTo("Dr."));
     }
 
@@ -203,7 +203,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Email"));
-        Assert.That(when.Op, Is.EqualTo("ends-with"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.EndsWith));
         Assert.That(when.OperandValue(), Is.EqualTo("@hospital.org"));
     }
 
@@ -251,7 +251,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)name.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Phone"));
-        Assert.That(when.Op, Is.EqualTo("matches"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Matches));
         Assert.That(when.OperandValue(), Is.EqualTo(@"^\d{3}-"));
     }
 
@@ -263,7 +263,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)email.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Notes"));
-        Assert.That(when.Op, Is.EqualTo("min-length"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.MinLength));
         Assert.That(when.OperandValue(), Is.EqualTo(10));
     }
 
@@ -285,7 +285,7 @@ public class WhenProjectingNewOperatorConditions
         var when = (FieldCompare)phone.Rules[0].Condition()!;
 
         Assert.That(when.Field, Is.EqualTo("Tags"));
-        Assert.That(when.Op, Is.EqualTo("array-contains"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.ArrayContains));
         Assert.That(when.OperandValue(), Is.EqualTo("urgent"));
 
         var planCondition = ResolveWithArrayShape(when);

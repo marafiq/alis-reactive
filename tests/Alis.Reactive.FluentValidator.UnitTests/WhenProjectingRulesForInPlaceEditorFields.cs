@@ -48,9 +48,9 @@ public class WhenProjectingRulesForInPlaceEditorFields
         var desc = _adapter.ProjectRules(typeof(ResidentQuickEditValidator), "resident-form");
 
         var nickname = desc.First(f => f.FieldName == "Nickname");
-        var rules = nickname.Rules.Select(r => r.Rule).ToList();
-        Assert.That(rules, Does.Contain("required"));
-        Assert.That(rules, Does.Contain("maxLength"));
+        var rules = nickname.Rules.Select(r => r.Kind).ToList();
+        Assert.That(rules, Does.Contain(ValidationRuleKind.Required));
+        Assert.That(rules, Does.Contain(ValidationRuleKind.MaxLength));
     }
 
     [Test]
@@ -59,8 +59,8 @@ public class WhenProjectingRulesForInPlaceEditorFields
         var desc = _adapter.ProjectRules(typeof(ResidentQuickEditValidator), "resident-form");
 
         var dob = desc.First(f => f.FieldName == "DateOfBirth");
-        var rules = dob.Rules.Select(r => r.Rule).ToList();
-        Assert.That(rules, Does.Contain("required"));
+        var rules = dob.Rules.Select(r => r.Kind).ToList();
+        Assert.That(rules, Does.Contain(ValidationRuleKind.Required));
     }
 
     [Test]
@@ -69,7 +69,7 @@ public class WhenProjectingRulesForInPlaceEditorFields
         var desc = _adapter.ProjectRules(typeof(ResidentQuickEditValidator), "resident-form");
 
         var rate = desc.First(f => f.FieldName == "MonthlyRate");
-        var rules = rate.Rules.Select(r => r.Rule).ToList();
-        Assert.That(rules, Does.Contain("gt"));
+        var rules = rate.Rules.Select(r => r.Kind).ToList();
+        Assert.That(rules, Does.Contain(ValidationRuleKind.GreaterThan));
     }
 }

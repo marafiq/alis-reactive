@@ -13,7 +13,7 @@ public class WhenProjectingFullCoverageRules
     public void Name_required_projects_correctly()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "Name").Rules.First(r => r.Rule == "required");
+        var rule = desc.First(f => f.FieldName == "Name").Rules.First(r => r.Kind == ValidationRuleKind.Required);
         Assert.That(rule.ConstraintValue(), Is.Null);
         Assert.That(rule.PeerFieldName(), Is.Null);
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.None));
@@ -25,7 +25,7 @@ public class WhenProjectingFullCoverageRules
     public void Nickname_empty_projects_correctly()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "Nickname").Rules.First(r => r.Rule == "empty");
+        var rule = desc.First(f => f.FieldName == "Nickname").Rules.First(r => r.Kind == ValidationRuleKind.Empty);
         Assert.That(rule.ConstraintValue(), Is.Null);
     }
 
@@ -35,7 +35,7 @@ public class WhenProjectingFullCoverageRules
     public void Name_minLength_projects_with_constraint()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "Name").Rules.First(r => r.Rule == "minLength");
+        var rule = desc.First(f => f.FieldName == "Name").Rules.First(r => r.Kind == ValidationRuleKind.MinLength);
         Assert.That(rule.ConstraintValue(), Is.EqualTo(3));
     }
 
@@ -43,7 +43,7 @@ public class WhenProjectingFullCoverageRules
     public void Name_maxLength_projects_with_constraint()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "Name").Rules.First(r => r.Rule == "maxLength");
+        var rule = desc.First(f => f.FieldName == "Name").Rules.First(r => r.Kind == ValidationRuleKind.MaxLength);
         Assert.That(rule.ConstraintValue(), Is.EqualTo(100));
     }
 
@@ -53,7 +53,7 @@ public class WhenProjectingFullCoverageRules
     public void Email_projects_email_rule()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "Email").Rules.First(r => r.Rule == "email");
+        var rule = desc.First(f => f.FieldName == "Email").Rules.First(r => r.Kind == ValidationRuleKind.Email);
         Assert.That(rule.ConstraintValue(), Is.Null);
     }
 
@@ -63,7 +63,7 @@ public class WhenProjectingFullCoverageRules
     public void Phone_projects_regex_with_pattern()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "Phone").Rules.First(r => r.Rule == "regex");
+        var rule = desc.First(f => f.FieldName == "Phone").Rules.First(r => r.Kind == ValidationRuleKind.Regex);
         Assert.That(rule.ConstraintValue(), Is.EqualTo(@"^\d{3}-\d{3}-\d{4}$"));
     }
 
@@ -73,7 +73,7 @@ public class WhenProjectingFullCoverageRules
     public void CreditCardNumber_projects_creditCard_rule()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "CreditCardNumber").Rules.First(r => r.Rule == "creditCard");
+        var rule = desc.First(f => f.FieldName == "CreditCardNumber").Rules.First(r => r.Kind == ValidationRuleKind.CreditCard);
         Assert.That(rule.ConstraintValue(), Is.Null);
     }
 
@@ -83,7 +83,7 @@ public class WhenProjectingFullCoverageRules
     public void Age_range_projects_with_number_coercion()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "Age").Rules.First(r => r.Rule == "range");
+        var rule = desc.First(f => f.FieldName == "Age").Rules.First(r => r.Kind == ValidationRuleKind.Range);
         var constraint = rule.ConstraintValue() as object[];
         Assert.That(constraint, Is.Not.Null);
         Assert.That(constraint![0], Is.EqualTo(0));
@@ -97,7 +97,7 @@ public class WhenProjectingFullCoverageRules
     public void Score_exclusiveRange_projects_with_number_coercion()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "Score").Rules.First(r => r.Rule == "exclusiveRange");
+        var rule = desc.First(f => f.FieldName == "Score").Rules.First(r => r.Kind == ValidationRuleKind.ExclusiveRange);
         var constraint = rule.ConstraintValue() as object[];
         Assert.That(constraint, Is.Not.Null);
         Assert.That(constraint![0], Is.EqualTo(0m));
@@ -111,7 +111,7 @@ public class WhenProjectingFullCoverageRules
     public void Salary_min_projects_with_number_coercion()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "Salary").Rules.First(r => r.Rule == "min");
+        var rule = desc.First(f => f.FieldName == "Salary").Rules.First(r => r.Kind == ValidationRuleKind.Min);
         Assert.That(rule.ConstraintValue(), Is.EqualTo(0m));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
         Assert.That(rule.PeerFieldName(), Is.Null);
@@ -121,7 +121,7 @@ public class WhenProjectingFullCoverageRules
     public void Salary_max_projects_with_number_coercion()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "Salary").Rules.First(r => r.Rule == "max");
+        var rule = desc.First(f => f.FieldName == "Salary").Rules.First(r => r.Kind == ValidationRuleKind.Max);
         Assert.That(rule.ConstraintValue(), Is.EqualTo(500000m));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
@@ -132,7 +132,7 @@ public class WhenProjectingFullCoverageRules
     public void MonthlyRate_gt_projects_with_number_coercion()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "MonthlyRate").Rules.First(r => r.Rule == "gt");
+        var rule = desc.First(f => f.FieldName == "MonthlyRate").Rules.First(r => r.Kind == ValidationRuleKind.GreaterThan);
         Assert.That(rule.ConstraintValue(), Is.EqualTo(0m));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
@@ -141,7 +141,7 @@ public class WhenProjectingFullCoverageRules
     public void MonthlyRate_lt_projects_with_number_coercion()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "MonthlyRate").Rules.First(r => r.Rule == "lt");
+        var rule = desc.First(f => f.FieldName == "MonthlyRate").Rules.First(r => r.Kind == ValidationRuleKind.LessThan);
         Assert.That(rule.ConstraintValue(), Is.EqualTo(1000000m));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
@@ -152,7 +152,7 @@ public class WhenProjectingFullCoverageRules
     public void ConfirmEmail_equalTo_projects_with_field()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "ConfirmEmail").Rules.First(r => r.Rule == "equalTo");
+        var rule = desc.First(f => f.FieldName == "ConfirmEmail").Rules.First(r => r.Kind == ValidationRuleKind.EqualTo);
         Assert.That(rule.PeerFieldName(), Is.EqualTo("Email"));
         Assert.That(rule.ConstraintValue(), Is.Null);
     }
@@ -163,7 +163,7 @@ public class WhenProjectingFullCoverageRules
     public void AlternateEmail_notEqualTo_projects_with_field()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "AlternateEmail").Rules.First(r => r.Rule == "notEqualTo");
+        var rule = desc.First(f => f.FieldName == "AlternateEmail").Rules.First(r => r.Kind == ValidationRuleKind.NotEqualTo);
         Assert.That(rule.PeerFieldName(), Is.EqualTo("Email"));
         Assert.That(rule.ConstraintValue(), Is.Null);
     }
@@ -174,7 +174,7 @@ public class WhenProjectingFullCoverageRules
     public void Status_notEqual_projects_with_constraint()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "Status").Rules.First(r => r.Rule == "notEqual");
+        var rule = desc.First(f => f.FieldName == "Status").Rules.First(r => r.Kind == ValidationRuleKind.NotEqual);
         Assert.That(rule.ConstraintValue(), Is.EqualTo("deleted"));
         Assert.That(rule.PeerFieldName(), Is.Null);
     }
@@ -185,7 +185,7 @@ public class WhenProjectingFullCoverageRules
     public void AdmissionDate_min_projects_with_date_coercion_and_ISO_format()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "AdmissionDate").Rules.First(r => r.Rule == "min");
+        var rule = desc.First(f => f.FieldName == "AdmissionDate").Rules.First(r => r.Kind == ValidationRuleKind.Min);
         Assert.That(rule.ConstraintValue(), Is.EqualTo("2020-01-01"));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Date));
         Assert.That(rule.PeerFieldName(), Is.Null);
@@ -197,7 +197,7 @@ public class WhenProjectingFullCoverageRules
     public void DischargeDate_gt_projects_with_field_and_date_coercion()
     {
         var desc = _adapter.ProjectRules(typeof(FullCoverageValidator), "testForm")!;
-        var rule = desc.First(f => f.FieldName == "DischargeDate").Rules.First(r => r.Rule == "gt");
+        var rule = desc.First(f => f.FieldName == "DischargeDate").Rules.First(r => r.Kind == ValidationRuleKind.GreaterThan);
         Assert.That(rule.PeerFieldName(), Is.EqualTo("AdmissionDate"));
         Assert.That(rule.ConstraintValue(), Is.Null);
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Date));
@@ -244,10 +244,10 @@ public class WhenProjectingFullCoverageRules
         {
             foreach (var rule in field.Rules)
             {
-                Assert.That(rule.Condition(), Is.Not.Null, $"Rule '{rule.Rule}' on '{field.FieldName}' missing condition");
+                Assert.That(rule.Condition(), Is.Not.Null, $"Rule '{rule.Kind}' on '{field.FieldName}' missing condition");
                 var ruleWhen = (FieldCompare)rule.Condition()!;
-                Assert.That(ruleWhen.Field, Is.EqualTo("IsEmployed"), $"Rule '{rule.Rule}' on '{field.FieldName}' wrong condition field");
-                Assert.That(ruleWhen.Op, Is.EqualTo("truthy"), $"Rule '{rule.Rule}' on '{field.FieldName}' wrong condition op");
+                Assert.That(ruleWhen.Field, Is.EqualTo("IsEmployed"), $"Rule '{rule.Kind}' on '{field.FieldName}' wrong condition field");
+                Assert.That(ruleWhen.Op, Is.EqualTo(FieldComparisonOperator.Truthy), $"Rule '{rule.Kind}' on '{field.FieldName}' wrong condition op");
             }
         }
 
@@ -259,7 +259,7 @@ public class WhenProjectingFullCoverageRules
                 $"'{uField.FieldName}' rule count mismatch");
             for (int i = 0; i < uField.Rules.Count; i++)
             {
-                Assert.That(cField.Rules[i].Rule, Is.EqualTo(uField.Rules[i].Rule),
+                Assert.That(cField.Rules[i].Kind, Is.EqualTo(uField.Rules[i].Kind),
                     $"'{uField.FieldName}'[{i}] rule type mismatch");
                 Assert.That(cField.Rules[i].Shape, Is.EqualTo(uField.Rules[i].Shape),
                     $"'{uField.FieldName}'[{i}] shape mismatch");

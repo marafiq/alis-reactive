@@ -49,7 +49,7 @@ public sealed class WhenProjectingExplicitClientRules
         var code = report.Fields.Single(field => field.FieldName == "Code");
         var rule = code.Rules.Single();
 
-        Assert.That(rule.Rule, Is.EqualTo("regex"));
+        Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Regex));
         Assert.That(rule.Message, Is.EqualTo("Code must start with ALIS."));
         Assert.That(rule.ConstraintValue(), Is.EqualTo("^ALIS-"));
         Assert.That(report.SkippedRules, Is.Empty);
@@ -63,7 +63,7 @@ public sealed class WhenProjectingExplicitClientRules
         var confirmEmail = report.Fields.Single(field => field.FieldName == "ConfirmEmail");
         var rule = confirmEmail.Rules.Single();
 
-        Assert.That(rule.Rule, Is.EqualTo("equalTo"));
+        Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.EqualTo));
         Assert.That(rule.PeerFieldName(), Is.EqualTo("Email"));
         Assert.That(report.Fields.Select(field => field.FieldName), Does.Contain("Email"));
         Assert.That(report.SkippedRules, Is.Empty);

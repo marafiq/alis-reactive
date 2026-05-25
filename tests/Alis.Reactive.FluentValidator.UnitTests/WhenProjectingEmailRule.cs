@@ -11,7 +11,7 @@ public class WhenProjectingEmailRule
         var desc = _adapter.ProjectRules(typeof(EmailValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("email"));
+        Assert.That(desc[0].Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Email));
         Assert.That(desc[0].Rules[0].ConstraintValue(), Is.Null);
     }
 

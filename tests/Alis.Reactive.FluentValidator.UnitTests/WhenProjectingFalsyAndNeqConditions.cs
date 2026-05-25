@@ -15,12 +15,12 @@ public class WhenProjectingFalsyAndNeqConditions
         Assert.That(desc, Is.Not.Null);
         var jobTitle = desc.First(f => f.FieldName == "JobTitle");
         Assert.That(jobTitle.Rules, Has.Count.EqualTo(1));
-        Assert.That(jobTitle.Rules[0].Rule, Is.EqualTo("required"));
+        Assert.That(jobTitle.Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Required));
         Assert.That(jobTitle.Rules[0].Message, Is.EqualTo("Explain why not employed"));
         Assert.That(jobTitle.Rules[0].Condition(), Is.Not.Null);
         var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
         Assert.That(when.Field, Is.EqualTo("IsEmployed"));
-        Assert.That(when.Op, Is.EqualTo("falsy"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Falsy));
         Assert.That(when.Operand, Is.InstanceOf<NoFieldComparisonOperand>());
     }
 
@@ -31,11 +31,11 @@ public class WhenProjectingFalsyAndNeqConditions
 
         Assert.That(desc, Is.Not.Null);
         var email = desc.First(f => f.FieldName == "Email");
-        Assert.That(email.Rules[0].Rule, Is.EqualTo("required"));
+        Assert.That(email.Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Required));
         Assert.That(email.Rules[0].Condition(), Is.Not.Null);
         var neqWhen = (FieldCompare)email.Rules[0].Condition()!;
         Assert.That(neqWhen.Field, Is.EqualTo("Name"));
-        Assert.That(neqWhen.Op, Is.EqualTo("neq"));
+        Assert.That(neqWhen.Op, Is.EqualTo(FieldComparisonOperator.NotEqual));
         Assert.That(neqWhen.OperandValue(), Is.EqualTo("Independent"));
     }
 
@@ -46,7 +46,7 @@ public class WhenProjectingFalsyAndNeqConditions
 
         Assert.That(desc, Is.Not.Null);
         var name = desc.First(f => f.FieldName == "Name");
-        Assert.That(name.Rules[0].Rule, Is.EqualTo("required"));
+        Assert.That(name.Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Required));
         Assert.That(name.Rules[0].Condition(), Is.Null);
     }
 

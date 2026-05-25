@@ -161,7 +161,7 @@ public class WhenProjectingNestedValidationIntent
         Assert.That(confirmCity!.Rules, Has.Count.GreaterThan(0));
 
         var rule = confirmCity.Rules[0];
-        Assert.That(rule.Rule, Is.EqualTo("equalTo"));
+        Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.EqualTo));
 
         Assert.That(rule.PeerFieldName(), Is.EqualTo("Address.City"),
             "Explicit peer field projection inside a nested validator must carry the parent path.");
@@ -177,14 +177,14 @@ public class WhenProjectingNestedValidationIntent
         Assert.That(name!.Rules, Has.Count.GreaterThan(0));
 
         var rule = name.Rules[0];
-        Assert.That(rule.Rule, Is.EqualTo("required"));
+        Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Required));
 
         Assert.That(rule.Condition(), Is.Not.Null,
             "Included rules inside WhenField must carry the condition");
 
         var when = (FieldCompare)rule.Condition()!;
         Assert.That(when.Field, Is.EqualTo("IsEmployed"));
-        Assert.That(when.Op, Is.EqualTo("truthy"));
+        Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Truthy));
 
         var validator = new IncludeConditionalValidator();
         var result = validator.Validate(new TestModel { IsEmployed = false, Name = null });

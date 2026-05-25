@@ -53,7 +53,7 @@ public class WhenProjectingDateOnlyRules
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc[0].Rules[0];
-        Assert.That(rule.Rule, Is.EqualTo("min"));
+        Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Min));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Date),
             "Shape.FromClrType should map DateOnly to 'date'");
 
@@ -70,7 +70,7 @@ public class WhenProjectingDateOnlyRules
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc[0].Rules[0];
-        Assert.That(rule.Rule, Is.EqualTo("max"));
+        Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Max));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Date),
             "Shape.FromClrType should map DateOnly to 'date'");
 
@@ -87,7 +87,7 @@ public class WhenProjectingDateOnlyRules
 
         Assert.That(desc, Is.Not.Null);
         var rule = desc[0].Rules[0];
-        Assert.That(rule.Rule, Is.EqualTo("range"));
+        Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Range));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Date),
             "Shape.FromClrType should map DateOnly to 'date'");
 

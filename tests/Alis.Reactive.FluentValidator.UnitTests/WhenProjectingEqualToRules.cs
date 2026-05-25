@@ -25,7 +25,7 @@ public class WhenProjectingEqualToRules
 
         Assert.That(desc, Is.Not.Null);
         var field = desc.First(f => f.FieldName == "ConfirmEmail");
-        var equalRule = field.Rules.First(r => r.Rule == "equalTo");
+        var equalRule = field.Rules.First(r => r.Kind == ValidationRuleKind.EqualTo);
         Assert.That(equalRule.Message, Is.EqualTo("Emails must match."));
         Assert.That(equalRule.PeerFieldName(), Is.EqualTo("Email"));
     }
@@ -36,7 +36,7 @@ public class WhenProjectingEqualToRules
         var desc = _adapter.ProjectRules(typeof(LiteralNullComparisonValidator), "testForm");
 
         var field = desc.First(f => f.FieldName == "MiddleName");
-        var equalRule = field.Rules.First(r => r.Rule == "equalTo");
+        var equalRule = field.Rules.First(r => r.Kind == ValidationRuleKind.EqualTo);
 
         Assert.That(equalRule.HasConstraintOperand(), Is.True);
         Assert.That(equalRule.ConstraintValue(), Is.Null);
@@ -49,7 +49,7 @@ public class WhenProjectingEqualToRules
         var desc = _adapter.ProjectRules(typeof(LiteralNullComparisonValidator), "testForm");
 
         var field = desc.First(f => f.FieldName == "JobTitle");
-        var notEqualRule = field.Rules.First(r => r.Rule == "notEqual");
+        var notEqualRule = field.Rules.First(r => r.Kind == ValidationRuleKind.NotEqual);
 
         Assert.That(notEqualRule.HasConstraintOperand(), Is.True);
         Assert.That(notEqualRule.ConstraintValue(), Is.Null);

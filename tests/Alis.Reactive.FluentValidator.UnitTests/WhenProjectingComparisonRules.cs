@@ -11,7 +11,7 @@ public class WhenProjectingComparisonRules
         var desc = _adapter.ProjectRules(typeof(MinComparisonValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("min"));
+        Assert.That(desc[0].Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Min));
         Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(0m));
         Assert.That(desc[0].Rules[0].Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
@@ -22,7 +22,7 @@ public class WhenProjectingComparisonRules
         var desc = _adapter.ProjectRules(typeof(MaxComparisonValidator), "testForm");
 
         Assert.That(desc, Is.Not.Null);
-        Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("max"));
+        Assert.That(desc[0].Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Max));
         Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(500000m));
         Assert.That(desc[0].Rules[0].Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
@@ -34,7 +34,7 @@ public class WhenProjectingComparisonRules
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules.Count, Is.EqualTo(1));
-        Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("gt"));
+        Assert.That(desc[0].Rules[0].Kind, Is.EqualTo(ValidationRuleKind.GreaterThan));
         Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(0m));
         Assert.That(desc[0].Rules[0].Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }
@@ -46,7 +46,7 @@ public class WhenProjectingComparisonRules
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules.Count, Is.EqualTo(1));
-        Assert.That(desc[0].Rules[0].Rule, Is.EqualTo("lt"));
+        Assert.That(desc[0].Rules[0].Kind, Is.EqualTo(ValidationRuleKind.LessThan));
         Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(1000000m));
         Assert.That(desc[0].Rules[0].Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
     }

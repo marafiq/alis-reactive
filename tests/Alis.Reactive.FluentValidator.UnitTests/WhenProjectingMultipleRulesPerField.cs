@@ -16,9 +16,9 @@ public class WhenProjectingMultipleRulesPerField
         var rules = desc[0].Rules;
         Assert.That(rules, Has.Count.GreaterThanOrEqualTo(3));
 
-        var ruleTypes = rules.Select(r => r.Rule).ToList();
-        Assert.That(ruleTypes, Does.Contain("required"));
-        Assert.That(ruleTypes, Does.Contain("minLength"));
-        Assert.That(ruleTypes, Does.Contain("maxLength"));
+        var ruleTypes = rules.Select(r => r.Kind).ToList();
+        Assert.That(ruleTypes, Does.Contain(ValidationRuleKind.Required));
+        Assert.That(ruleTypes, Does.Contain(ValidationRuleKind.MinLength));
+        Assert.That(ruleTypes, Does.Contain(ValidationRuleKind.MaxLength));
     }
 }

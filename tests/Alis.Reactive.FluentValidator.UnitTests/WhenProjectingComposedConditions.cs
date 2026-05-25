@@ -23,11 +23,11 @@ public class WhenProjectingComposedConditions
 
         var left = (FieldCompare)all.Terms[0];
         Assert.That(left.Field, Is.EqualTo("IsEmployed"));
-        Assert.That(left.Op, Is.EqualTo("truthy"));
+        Assert.That(left.Op, Is.EqualTo(FieldComparisonOperator.Truthy));
 
         var right = (FieldCompare)all.Terms[1];
         Assert.That(right.Field, Is.EqualTo("Age"));
-        Assert.That(right.Op, Is.EqualTo("gte"));
+        Assert.That(right.Op, Is.EqualTo(FieldComparisonOperator.GreaterThanOrEqual));
         Assert.That(right.OperandValue(), Is.EqualTo(18));
     }
 
@@ -56,12 +56,12 @@ public class WhenProjectingComposedConditions
 
         var left = (FieldCompare)any.Terms[0];
         Assert.That(left.Field, Is.EqualTo("CareLevel"));
-        Assert.That(left.Op, Is.EqualTo("eq"));
+        Assert.That(left.Op, Is.EqualTo(FieldComparisonOperator.Equal));
         Assert.That(left.OperandValue(), Is.EqualTo("memory-care"));
 
         var right = (FieldCompare)any.Terms[1];
         Assert.That(right.Field, Is.EqualTo("CareLevel"));
-        Assert.That(right.Op, Is.EqualTo("eq"));
+        Assert.That(right.Op, Is.EqualTo(FieldComparisonOperator.Equal));
         Assert.That(right.OperandValue(), Is.EqualTo("skilled-nursing"));
     }
 
@@ -79,7 +79,7 @@ public class WhenProjectingComposedConditions
 
         var inner = (FieldCompare)not.Term;
         Assert.That(inner.Field, Is.EqualTo("IsEmployed"));
-        Assert.That(inner.Op, Is.EqualTo("truthy"));
+        Assert.That(inner.Op, Is.EqualTo(FieldComparisonOperator.Truthy));
     }
 
     // ── Complex composition ────────────────────────────────────────────────
@@ -104,17 +104,17 @@ public class WhenProjectingComposedConditions
 
         var employed = (FieldCompare)and.Terms[0];
         Assert.That(employed.Field, Is.EqualTo("IsEmployed"));
-        Assert.That(employed.Op, Is.EqualTo("truthy"));
+        Assert.That(employed.Op, Is.EqualTo(FieldComparisonOperator.Truthy));
 
         var salary = (FieldCompare)and.Terms[1];
         Assert.That(salary.Field, Is.EqualTo("Salary"));
-        Assert.That(salary.Op, Is.EqualTo("gt"));
+        Assert.That(salary.Op, Is.EqualTo(FieldComparisonOperator.GreaterThan));
         Assert.That(salary.OperandValue(), Is.EqualTo(50000m));
 
         // Right branch: age >= 65
         var age = (FieldCompare)or.Terms[1];
         Assert.That(age.Field, Is.EqualTo("Age"));
-        Assert.That(age.Op, Is.EqualTo("gte"));
+        Assert.That(age.Op, Is.EqualTo(FieldComparisonOperator.GreaterThanOrEqual));
         Assert.That(age.OperandValue(), Is.EqualTo(65));
     }
 
