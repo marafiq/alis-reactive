@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -18,29 +17,10 @@ namespace Alis.Reactive.PlanModel
         internal void WriteTo(Utf8JsonWriter writer, JsonSerializerOptions options) =>
             JsonSerializer.Serialize(writer, _predicate, options);
 
-        internal static ValidationCondition FromDeterministicCondition(Condition condition)
+        internal static ValidationCondition FromResolvedFieldCondition(Condition condition)
         {
             if (condition == null) throw new ArgumentNullException(nameof(condition));
-            if (ContainsConfirmationPrompt(condition))
-                throw new ArgumentException(
-                    "Validation activation conditions must be deterministic. Move Confirm(...) to a reactive branch before validation runs.",
-                    nameof(condition));
-
             return new ValidationCondition(condition);
-        }
-
-        private static bool ContainsConfirmationPrompt(Condition condition)
-        {
-            return condition switch
-            {
-                CompareCondition => false,
-                AllCondition all => all.Terms.Any(ContainsConfirmationPrompt),
-                AnyCondition any => any.Terms.Any(ContainsConfirmationPrompt),
-                NotCondition not => ContainsConfirmationPrompt(not.Term),
-                ConfirmCondition => true,
-                _ => throw new InvalidOperationException(
-                    "Validation condition cannot inspect unknown condition type '" + condition.GetType().FullName + "'.")
-            };
         }
     }
 
