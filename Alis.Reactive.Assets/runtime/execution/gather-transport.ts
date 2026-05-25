@@ -21,7 +21,7 @@ export interface TransportStrategy {
 export class GatherOutput {
   private constructor(
     private readonly urlParams: string[],
-    private readonly body: GatherRequestBody,
+    private readonly body: Record<string, unknown> | FormData,
     readonly transport: TransportStrategy,
   ) {}
 
@@ -33,20 +33,20 @@ export class GatherOutput {
     const urlParams: string[] = [];
     const requestMethod = HttpRequestMethod.from(method);
     if (requestMethod.sendsInputInQueryString()) {
-      return new GatherOutput(urlParams, GatherRequestBody.empty(), createGetTransport(urlParams));
+      return new GatherOutput(urlParams, {}, createGetTransport(urlParams));
     }
 
     if (requestTransport === "form-data") {
       const formData = new FormData();
-      return new GatherOutput(urlParams, new MultipartGatherBody(formData), createFormDataTransport(formData));
+      return new GatherOutput(urlParams, formData, createFormDataTransport(formData));
     }
 
-    const body = new JsonGatherBody({});
-    return new GatherOutput(urlParams, body, createJsonTransport(body.record));
+    const body: Record<string, unknown> = {};
+    return new GatherOutput(urlParams, body, createJsonTransport(body));
   }
 
   toResult(): GatherResult {
-    return { urlParams: this.urlParams, body: this.body.value() };
+    return { urlParams: this.urlParams, body: this.body };
   }
 }
 
@@ -57,34 +57,6 @@ export function emitGatheredValue(
   transport: TransportStrategy,
 ): void {
   GatheredValue.from(name, raw, shape).emitInto(transport);
-}
-
-abstract class GatherRequestBody {
-  static empty(): GatherRequestBody {
-    return new JsonGatherBody({});
-  }
-
-  abstract value(): Record<string, unknown> | FormData;
-}
-
-class JsonGatherBody extends GatherRequestBody {
-  constructor(readonly record: Record<string, unknown>) {
-    super();
-  }
-
-  value(): Record<string, unknown> {
-    return this.record;
-  }
-}
-
-class MultipartGatherBody extends GatherRequestBody {
-  constructor(private readonly formData: FormData) {
-    super();
-  }
-
-  value(): FormData {
-    return this.formData;
-  }
 }
 
 function createGetTransport(urlParams: string[]): TransportStrategy {
