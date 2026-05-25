@@ -14,14 +14,14 @@ namespace Alis.Reactive.Validation
         private readonly ClientValidationFieldReference _field;
 
         public string FieldName => _field.Path.Value;
-        public List<ValidationRule> Rules { get; }
+        public IReadOnlyList<ValidationRule> Rules { get; }
 
         internal ClientValidationField(
             ClientValidationFieldReference field,
-            List<ValidationRule> rules)
+            IEnumerable<ValidationRule> rules)
         {
             _field = field ?? throw new ArgumentNullException(nameof(field));
-            Rules = ProjectedValidationRules.From(rules).ToPublicList();
+            Rules = ProjectedValidationRules.From(rules).ToReadOnlyList();
         }
 
         internal ValidationFieldPath FieldPath => _field.Path;

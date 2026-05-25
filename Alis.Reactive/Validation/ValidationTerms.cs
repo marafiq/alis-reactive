@@ -204,9 +204,9 @@ namespace Alis.Reactive.Validation
 
     internal sealed class ProjectedValidationRules
     {
-        private readonly List<ValidationRule> _rules;
+        private readonly IReadOnlyList<ValidationRule> _rules;
 
-        private ProjectedValidationRules(List<ValidationRule> rules)
+        private ProjectedValidationRules(IReadOnlyList<ValidationRule> rules)
         {
             _rules = rules;
         }
@@ -224,10 +224,10 @@ namespace Alis.Reactive.Validation
                 snapshot.Add(rule);
             }
 
-            return new ProjectedValidationRules(snapshot);
+            return new ProjectedValidationRules(snapshot.AsReadOnly());
         }
 
-        internal List<ValidationRule> ToPublicList() =>
-            new List<ValidationRule>(_rules);
+        internal IReadOnlyList<ValidationRule> ToReadOnlyList() =>
+            _rules;
     }
 }
