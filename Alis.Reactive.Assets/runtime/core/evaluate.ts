@@ -61,7 +61,7 @@ class ValueEvaluation {
     if (producer.from.kind === "url") {
       return readFromUrl(producer, this.plan.urlParameters());
     }
-    return readFromPayload(producer, this.plan.payloads.resolve(producer.from, this.context));
+    return readFromPayload(producer, this.plan.resolvePayload(producer.from, this.context));
   }
 
   private readFromRuntimeObject(producer: ReadValueProducer): unknown {

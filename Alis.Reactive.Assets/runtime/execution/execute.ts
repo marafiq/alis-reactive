@@ -319,7 +319,7 @@ function payloadTarget(
   context: ExecutionContext,
   operation: string,
 ): MutablePayloadObject {
-  const root = plan.payloads.resolve(source, context);
+  const root = plan.resolvePayload(source, context);
   return MutablePayloadObject.require(root, source, operation);
 }
 

@@ -7,7 +7,6 @@ import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
 import { wireBehavior } from "../execution/trigger";
 import { resetActivePlanForTests, setActivePlan } from "../execution/execute";
-import { RuntimePlan } from "../domain/runtime-plan";
 import { resetLiveClearForTests, wireLiveValidation } from "../validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
 import { resetNativeActionLinksForTests } from "../components/native/native-action-link";
@@ -68,12 +67,10 @@ function wireBehaviors(behaviors: Behavior[], plan: Plan, signal?: AbortSignal):
   }
 }
 
-/** Wire live validation for all components that have container scopes. */
 function wireContainerValidation(plan: Plan, signal?: AbortSignal): void {
-  const runtimePlan = RuntimePlan.from(plan);
-  for (const component of runtimePlan.components.entries()) {
-    if (component.containerScope) {
-      wireLiveValidation(plan, component.key, signal);
+  for (const [componentKey, component] of Object.entries(plan.components)) {
+    if (component.container.kind !== "none") {
+      wireLiveValidation(plan, componentKey, signal);
     }
   }
 }
@@ -86,7 +83,7 @@ export function loadPartialSlot(partId: string, incoming: Plan[]): void {
   }
 
   const incomingComponentCount = incoming
-    .map(plan => RuntimePlan.from(plan).components.entries().length)
+    .map(plan => Object.keys(plan.components).length)
     .reduce((sum, count) => sum + count, 0);
   log.info("partial-slot.load", {
     partId,

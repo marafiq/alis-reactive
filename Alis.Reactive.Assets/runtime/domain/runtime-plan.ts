@@ -49,7 +49,6 @@ export class RuntimePlan {
   readonly components: RuntimeComponentCatalog;
   readonly types: RuntimeTypeCatalog;
   readonly plugins: RuntimePluginCatalog;
-  readonly payloads = new PayloadScopeResolver();
 
   private constructor(readonly document: Plan) {
     this.types = new RuntimeTypeCatalog(document);
@@ -84,6 +83,10 @@ export class RuntimePlan {
   urlParameters(): URLSearchParams {
     return new URLSearchParams(window.location.search);
   }
+
+  resolvePayload(source: PayloadSource, ctx: ExecutionContext): unknown {
+    return ctx.resolvePayload(source);
+  }
 }
 
 export class RuntimeTypeCatalog {
@@ -108,17 +111,9 @@ export class RuntimeComponentCatalog {
     return new RuntimeComponent(componentKey, component, this.types);
   }
 
-  has(componentKey: string): boolean {
-    return this.find(componentKey) !== undefined;
-  }
-
   entries(): RuntimeComponent[] {
     return Object.entries(this.plan.components)
       .map(([key, component]) => new RuntimeComponent(key, component, this.types));
-  }
-
-  require(componentKey: string): Component {
-    return this.requireComponent(componentKey).definition;
   }
 
   requireComponent(componentKey: string): RuntimeComponent {
@@ -129,10 +124,6 @@ export class RuntimeComponentCatalog {
 
   element(componentKey: string): HTMLElement {
     return this.requireComponent(componentKey).element();
-  }
-
-  resolveRoot(componentKey: string): unknown {
-    return this.requireComponent(componentKey).root();
   }
 
   jsType(componentKey: string): JsType {
@@ -210,11 +201,5 @@ export class RuntimePluginCatalog {
       this.instances.resolve(pluginName),
       jsType,
     );
-  }
-}
-
-export class PayloadScopeResolver {
-  resolve(source: PayloadSource, ctx: ExecutionContext): unknown {
-    return ctx.resolvePayload(source);
   }
 }
