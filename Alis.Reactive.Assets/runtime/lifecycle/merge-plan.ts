@@ -1,4 +1,4 @@
-// merge-plan.ts — Plan registry and partial contribution lifecycle orchestration.
+// merge-plan.ts — applied browser plans and partial slot replacement.
 
 import type { Plan, Behavior } from "../types";
 import {
@@ -11,10 +11,12 @@ import { AppliedSlotContributionRemoval } from "./applied-slot-contribution-remo
 import {
   planContributionSourceFrom,
   type PartId,
+  PartialListenerLifetime,
+  PartialPlanContributionSource,
   type PlanContributionSource,
   type PlanId,
 } from "./plan-contribution-source";
-import { PartialSlotLoad, PartialSlotRegistry } from "./partial-slot";
+import { AppliedPartialSlots } from "./partial-slot";
 
 type WireBehaviors = (behaviors: Behavior[], plan: Plan, signal?: AbortSignal) => void;
 type WireContainerValidation = (plan: Plan, signal?: AbortSignal) => void;
@@ -22,15 +24,6 @@ type WireContainerValidation = (plan: Plan, signal?: AbortSignal) => void;
 export interface MergeHooks {
   wireBehaviors: WireBehaviors;
   wireContainerValidation: WireContainerValidation;
-}
-
-export interface PartialSlotLoadResult {
-  readonly loadedPlans: Plan[];
-  readonly affectedPlanIds: PlanId[];
-}
-
-export interface PartialSlotUnloadResult {
-  readonly affectedPlanIds: PlanId[];
 }
 
 class InitialPlanComposition {
@@ -114,10 +107,10 @@ class BootPlanAssembly {
   }
 }
 
-export class PlanRegistry {
+export class AppliedBrowserPlans {
   private readonly plans = new Map<string, Plan>();
   private readonly rootPlanIds = new Set<string>();
-  private readonly slots = new PartialSlotRegistry();
+  private readonly slots = new AppliedPartialSlots();
   private readonly componentOwnership = new ComponentOwnershipLedger();
   private readonly layoutObjects = new LayoutObjectReferenceLedger();
   private readonly typeOwnership = new BrowserObjectContractLedger();
@@ -142,31 +135,22 @@ export class PlanRegistry {
     return this.mergeContribution(incoming, hooks, source);
   }
 
-  loadPartialSlot(partId: PartId, plans: Plan[], hooks: MergeHooks): PartialSlotLoadResult {
-    if (plans.length === 0) {
-      throw new Error("[alis] partial slot load requires at least one plan; unload the slot explicitly instead");
-    }
-
+  loadPartialSlot(partId: PartId, plans: Plan[], hooks: MergeHooks): PlanId[] {
     const affectedPlanIds = new Set(this.unapplyPartialSlot(partId));
-    const loadedPlans: Plan[] = [];
+    if (plans.length === 0) return [...affectedPlanIds];
 
-    const load = PartialSlotLoad.containing(partId, plans);
-    for (const contribution of load.contributions()) {
-      const merged = this.mergeContribution(contribution.plan, hooks, contribution.source);
-      loadedPlans.push(merged);
+    const listenerLifetime = PartialListenerLifetime.create();
+    for (const plan of plans) {
+      const source = new PartialPlanContributionSource(partId, listenerLifetime);
+      const merged = this.mergeContribution(scopedToPartialSlot(plan, partId), hooks, source);
       affectedPlanIds.add(merged.planId);
     }
 
-    return {
-      loadedPlans,
-      affectedPlanIds: [...affectedPlanIds],
-    };
+    return [...affectedPlanIds];
   }
 
-  unloadPartialSlot(partId: PartId): PartialSlotUnloadResult {
-    return {
-      affectedPlanIds: this.unapplyPartialSlot(partId),
-    };
+  unloadPartialSlot(partId: PartId): PlanId[] {
+    return this.unapplyPartialSlot(partId);
   }
 
   get(planId: string): Plan | undefined {
@@ -265,19 +249,26 @@ export class PlanRegistry {
   }
 }
 
-const registry = new PlanRegistry();
+function scopedToPartialSlot(plan: Plan, partId: PartId): Plan {
+  return {
+    ...plan,
+    scope: { kind: "partial", partId },
+  };
+}
+
+const browserPlans = new AppliedBrowserPlans();
 
 export function composeInitialPlans(plans: Plan[]): Plan[] {
   return InitialPlanComposition.from(plans).bootPlans();
 }
 
-export function registerBootedPlan(plan: Plan): void { registry.register(plan); }
-export function applyMergedPlan(incoming: Plan, hooks: MergeHooks): Plan { return registry.add(incoming, hooks); }
-export function applyPartialSlotLoad(partId: PartId, plans: Plan[], hooks: MergeHooks): PartialSlotLoadResult {
-  return registry.loadPartialSlot(partId, plans, hooks);
+export function registerBootedPlan(plan: Plan): void { browserPlans.register(plan); }
+export function applyMergedPlan(incoming: Plan, hooks: MergeHooks): Plan { return browserPlans.add(incoming, hooks); }
+export function applyPartialSlotLoad(partId: PartId, plans: Plan[], hooks: MergeHooks): PlanId[] {
+  return browserPlans.loadPartialSlot(partId, plans, hooks);
 }
-export function applyPartialSlotUnload(partId: PartId): PartialSlotUnloadResult {
-  return registry.unloadPartialSlot(partId);
+export function applyPartialSlotUnload(partId: PartId): PlanId[] {
+  return browserPlans.unloadPartialSlot(partId);
 }
-export function getBootedPlan(planId: string): Plan | undefined { return registry.get(planId); }
-export function resetMergePlanState(): void { registry.reset(); }
+export function getBootedPlan(planId: string): Plan | undefined { return browserPlans.get(planId); }
+export function resetMergePlanState(): void { browserPlans.reset(); }

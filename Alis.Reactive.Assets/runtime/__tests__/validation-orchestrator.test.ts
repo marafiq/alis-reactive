@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { PlanRegistry } from "../lifecycle/merge-plan";
+import { AppliedBrowserPlans } from "../lifecycle/merge-plan";
 import { showServerErrors, validateContainer } from "../validation/orchestrator";
 import type { Component, ComponentValidation, JsType, Plan, Shape, ValueProducer } from "../types";
 
@@ -254,13 +254,13 @@ describe("validation orchestrator server errors", () => {
 
   it("routes server errors for unloaded partial fields to the summary", () => {
     renderValidationDom();
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const runtimePlan = plan([
       requiredRule("zip-code-field", "Address.ZipCode", "zip-code-field"),
     ], {});
 
-    registry.register(runtimePlan);
-    registry.loadPartialSlot("address-slot", [
+    browserPlans.register(runtimePlan);
+    browserPlans.loadPartialSlot("address-slot", [
       {
         version: 3,
         planId: runtimePlan.planId,
@@ -272,7 +272,7 @@ describe("validation orchestrator server errors", () => {
         behaviors: [],
       },
     ], silentLifecycleHooks);
-    registry.unloadPartialSlot("address-slot");
+    browserPlans.unloadPartialSlot("address-slot");
 
     showServerErrors(runtimePlan, "resident-form", {
       errors: { "Address.ZipCode": ["Zip code is required"] },

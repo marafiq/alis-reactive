@@ -1,6 +1,6 @@
 // Boot — Plan lifecycle: boot, merge, reset.
 // Single responsibility: wire behaviors (two-phase) and register plans.
-// Delegates state to merge-plan.ts PlanRegistry.
+// Delegates applied plan state to merge-plan.ts.
 
 import type { Plan, Behavior } from "../types";
 import { setLevel } from "../core/trace";
@@ -89,9 +89,9 @@ export function mergePlan(incoming: Plan): void {
 }
 
 export function loadPartialSlot(partId: string, incoming: Plan[]): void {
-  const result = applyPartialSlotLoad(partId, incoming, mergeHooks());
+  const affectedPlanIds = applyPartialSlotLoad(partId, incoming, mergeHooks());
 
-  for (const planId of result.affectedPlanIds) {
+  for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
   }
 
@@ -100,21 +100,21 @@ export function loadPartialSlot(partId: string, incoming: Plan[]): void {
     .reduce((sum, count) => sum + count, 0);
   log.info("partial-slot.load", {
     partId,
-    plans: result.loadedPlans.length,
+    plans: incoming.length,
     newComponents: incomingComponentCount,
   });
 }
 
 export function unloadPartialSlot(partId: string): void {
-  const result = applyPartialSlotUnload(partId);
+  const affectedPlanIds = applyPartialSlotUnload(partId);
 
-  for (const planId of result.affectedPlanIds) {
+  for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
   }
 
   log.info("partial-slot.unload", {
     partId,
-    affectedPlans: result.affectedPlanIds.length,
+    affectedPlans: affectedPlanIds.length,
   });
 }
 

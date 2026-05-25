@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PlanRegistry } from "../../lifecycle/merge-plan";
+import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
 import {
   behavior,
   component,
@@ -11,14 +11,14 @@ import {
 
 describe("partial slot lifecycle", () => {
   it("replaces the previous contribution from the same slot", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks, behaviorSignals } = mergeHooks();
     const planId = "Resident.Root";
 
-    registry.register(rootPlan(planId));
+    browserPlans.register(rootPlan(planId));
 
     const oldBehavior = behavior();
-    const first = registry.add(
+    const first = browserPlans.add(
       partialPlan(planId, "address-slot", {
         types: { "native.element.address-line": jsType() },
         components: { "address-line": component("address-line") },
@@ -33,7 +33,7 @@ describe("partial slot lifecycle", () => {
     expect(behaviorSignals[0]?.aborted).toBe(false);
 
     const newBehavior = behavior();
-    const second = registry.add(
+    const second = browserPlans.add(
       partialPlan(planId, "address-slot", {
         types: { "native.element.zip-code": jsType() },
         components: { "zip-code": component("zip-code") },
@@ -52,12 +52,12 @@ describe("partial slot lifecycle", () => {
   });
 
   it("unloads an active slot explicitly", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks, behaviorSignals } = mergeHooks();
     const planId = "Resident.Root";
     const loadedBehavior = behavior();
 
-    registry.add(
+    browserPlans.add(
       partialPlan(planId, "address-slot", {
         types: { "native.element.address-line": jsType() },
         components: { "address-line": component("address-line") },
@@ -66,33 +66,25 @@ describe("partial slot lifecycle", () => {
       hooks,
     );
 
-    expect(registry.get(planId)?.components["address-line"]).toBeDefined();
+    expect(browserPlans.get(planId)?.components["address-line"]).toBeDefined();
     expect(behaviorSignals[0]?.aborted).toBe(false);
 
-    const result = registry.unloadPartialSlot("address-slot");
+    const affectedPlanIds = browserPlans.unloadPartialSlot("address-slot");
 
-    expect(result.affectedPlanIds).toEqual([planId]);
+    expect(affectedPlanIds).toEqual([planId]);
     expect(behaviorSignals[0]?.aborted).toBe(true);
-    expect(registry.get(planId)).toBeUndefined();
-  });
-
-  it("rejects an empty slot load so unload remains explicit", () => {
-    const registry = new PlanRegistry();
-    const { hooks } = mergeHooks();
-
-    expect(() => registry.loadPartialSlot("address-slot", [], hooks))
-      .toThrow("unload the slot explicitly");
+    expect(browserPlans.get(planId)).toBeUndefined();
   });
 
   it("replaces a slot as one lifetime when it contains multiple plan documents", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks, behaviorSignals } = mergeHooks();
     const residentPlanId = "Resident.Root";
     const billingPlanId = "Billing.Root";
     const residentBehavior = behavior();
     const billingBehavior = behavior();
 
-    const result = registry.loadPartialSlot("drawer-slot", [
+    const affectedPlanIds = browserPlans.loadPartialSlot("drawer-slot", [
       partialPlan(residentPlanId, "server-part-id", {
         types: { "native.element.resident-name": jsType() },
         components: { "resident-name": component("resident-name") },
@@ -105,42 +97,41 @@ describe("partial slot lifecycle", () => {
       }),
     ], hooks);
 
-    expect(result.affectedPlanIds).toEqual([residentPlanId, billingPlanId]);
-    expect(result.loadedPlans.map(plan => plan.planId)).toEqual([residentPlanId, billingPlanId]);
-    expect(registry.get(residentPlanId)?.components["resident-name"]).toBeDefined();
-    expect(registry.get(billingPlanId)?.components["invoice-total"]).toBeDefined();
+    expect(affectedPlanIds).toEqual([residentPlanId, billingPlanId]);
+    expect(browserPlans.get(residentPlanId)?.components["resident-name"]).toBeDefined();
+    expect(browserPlans.get(billingPlanId)?.components["invoice-total"]).toBeDefined();
     expect(behaviorSignals[0]).toBe(behaviorSignals[1]);
 
-    registry.unloadPartialSlot("drawer-slot");
+    browserPlans.unloadPartialSlot("drawer-slot");
 
     expect(behaviorSignals[0]?.aborted).toBe(true);
-    expect(registry.get(residentPlanId)).toBeUndefined();
-    expect(registry.get(billingPlanId)).toBeUndefined();
+    expect(browserPlans.get(residentPlanId)).toBeUndefined();
+    expect(browserPlans.get(billingPlanId)).toBeUndefined();
   });
 
   it("keeps a non-root merged plan alive while another slot still owns artifacts", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Dynamic";
 
-    registry.loadPartialSlot("type-slot", [
+    browserPlans.loadPartialSlot("type-slot", [
       partialPlan(planId, "server-type-plan", {
         types: { "native.element.shared": jsType() },
       }),
     ], hooks);
-    registry.loadPartialSlot("component-slot", [
+    browserPlans.loadPartialSlot("component-slot", [
       partialPlan(planId, "server-component-plan", {
         components: { "address-line": component("address-line", "native.element.shared") },
       }),
     ], hooks);
 
-    registry.unloadPartialSlot("component-slot");
+    browserPlans.unloadPartialSlot("component-slot");
 
-    expect(registry.get(planId)?.components["address-line"]).toBeUndefined();
-    expect(registry.get(planId)?.types["native.element.shared"]).toBeDefined();
+    expect(browserPlans.get(planId)?.components["address-line"]).toBeUndefined();
+    expect(browserPlans.get(planId)?.types["native.element.shared"]).toBeDefined();
 
-    registry.unloadPartialSlot("type-slot");
+    browserPlans.unloadPartialSlot("type-slot");
 
-    expect(registry.get(planId)).toBeUndefined();
+    expect(browserPlans.get(planId)).toBeUndefined();
   });
 });

@@ -20,12 +20,7 @@ export class AppliedSlotContributionRemoval {
   ) {}
 
   remove(contribution: AppliedSlotContribution): void {
-    const plan = this.plans.get(contribution.planId);
-    if (plan === undefined) {
-      contribution.revokeListenerLifetime();
-      return;
-    }
-
+    const plan = this.plans.get(contribution.planId)!;
     contribution.revokeListenerLifetime();
     this.removeBehaviors(plan, contribution);
     const removedLayoutObjectKeys = this.removeLayoutObjects(plan, contribution);
@@ -45,7 +40,7 @@ export class AppliedSlotContributionRemoval {
   private removeBehaviors(plan: Plan, contribution: AppliedSlotContribution): void {
     for (const behavior of contribution.behaviors) {
       const idx = plan.behaviors.indexOf(behavior);
-      if (idx >= 0) plan.behaviors.splice(idx, 1);
+      plan.behaviors.splice(idx, 1);
     }
   }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PlanRegistry } from "../../lifecycle/merge-plan";
+import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
 import {
   mergeHooks,
   partialPlan,
@@ -11,13 +11,13 @@ import {
 
 describe("validation container contributions", () => {
   it("merges rules by validated component key", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
 
-    registry.register(rootPlan(planId));
+    browserPlans.register(rootPlan(planId));
 
-    registry.add(
+    browserPlans.add(
       {
         ...rootPlan(planId),
         components: {
@@ -30,7 +30,7 @@ describe("validation container contributions", () => {
       hooks,
     );
 
-    const merged = registry.add(
+    const merged = browserPlans.add(
       {
         ...rootPlan(planId),
         components: {
@@ -56,18 +56,18 @@ describe("validation container contributions", () => {
   });
 
   it("rejects an extension with a mismatched runtime identity", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
 
-    registry.register({
+    browserPlans.register({
       ...rootPlan(planId),
       components: {
         "resident-form": validationContainer("resident-form", [validationRule("first-name")]),
       },
     });
 
-    expect(() => registry.loadPartialSlot("address-slot", [
+    expect(() => browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, "address-form", {
         components: {
           "resident-form": validationContainer("other-form", [validationRule("city")]),
@@ -75,11 +75,11 @@ describe("validation container contributions", () => {
       }),
     ], hooks)).toThrow('partial plan contribution "address-slot" cannot declare component "resident-form"');
 
-    expect(validationComponents(registry.get(planId)!, "resident-form")).toEqual(["first-name"]);
+    expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual(["first-name"]);
   });
 
   it("rejects an extension that carries registered input binding state", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const invalidExtension = validationContainer("resident-form", [validationRule("city")]);
@@ -89,14 +89,14 @@ describe("validation container contributions", () => {
       valueMember: "value",
     };
 
-    registry.register({
+    browserPlans.register({
       ...rootPlan(planId),
       components: {
         "resident-form": validationContainer("resident-form", [validationRule("first-name")]),
       },
     });
 
-    expect(() => registry.loadPartialSlot("address-slot", [
+    expect(() => browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, "address-form", {
         components: {
           "resident-form": invalidExtension,
@@ -104,15 +104,15 @@ describe("validation container contributions", () => {
       }),
     ], hooks)).toThrow('partial plan contribution "address-slot" cannot declare component "resident-form"');
 
-    expect(validationComponents(registry.get(planId)!, "resident-form")).toEqual(["first-name"]);
+    expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual(["first-name"]);
   });
 
   it("preserves root-owned validation containers when unloading a partial slot", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
 
-    registry.register({
+    browserPlans.register({
       ...rootPlan(planId),
       components: {
         "resident-form": validationContainer("resident-form", [
@@ -121,7 +121,7 @@ describe("validation container contributions", () => {
       },
     });
 
-    registry.loadPartialSlot("address-slot", [
+    browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, "server-part-id", {
         components: {
           "resident-form": validationContainer("resident-form", [
@@ -131,14 +131,14 @@ describe("validation container contributions", () => {
       }),
     ], hooks);
 
-    expect(validationComponents(registry.get(planId)!, "resident-form")).toEqual([
+    expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual([
       "first-name",
       "address-line",
     ]);
 
-    registry.unloadPartialSlot("address-slot");
+    browserPlans.unloadPartialSlot("address-slot");
 
-    expect(validationComponents(registry.get(planId)!, "resident-form")).toEqual(["first-name"]);
+    expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual(["first-name"]);
   });
 });
 

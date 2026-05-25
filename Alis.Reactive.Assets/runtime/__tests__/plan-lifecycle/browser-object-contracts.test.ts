@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PlanRegistry } from "../../lifecycle/merge-plan";
+import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
 import {
   behavior,
   component,
@@ -15,75 +15,75 @@ import {
 
 describe("browser object contract fragments", () => {
   it("shares an identical type contract across slots until the last owner unloads", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.address";
 
-    registry.loadPartialSlot("first-slot", [
+    browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, "server-first", {
         types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
       }),
     ], hooks);
-    registry.loadPartialSlot("second-slot", [
+    browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, "server-second", {
         types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
       }),
     ], hooks);
 
-    registry.unloadPartialSlot("first-slot");
+    browserPlans.unloadPartialSlot("first-slot");
 
-    expect(registry.get(planId)?.types[sharedTypeKey]).toBeDefined();
-    expect(registry.get(planId)?.types[sharedTypeKey].properties.token).toBeDefined();
+    expect(browserPlans.get(planId)?.types[sharedTypeKey]).toBeDefined();
+    expect(browserPlans.get(planId)?.types[sharedTypeKey].properties.token).toBeDefined();
 
-    registry.unloadPartialSlot("second-slot");
+    browserPlans.unloadPartialSlot("second-slot");
 
-    expect(registry.get(planId)).toBeUndefined();
+    expect(browserPlans.get(planId)).toBeUndefined();
   });
 
   it("removes only the unloaded fragment from a shared type key", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const sharedTypeKey = "native.component.shared-drawer";
 
-    registry.loadPartialSlot("first-slot", [
+    browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, "server-first", {
         types: { [sharedTypeKey]: jsTypeWithWritableProperty("classRemove") },
       }),
     ], hooks);
-    registry.loadPartialSlot("second-slot", [
+    browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, "server-second", {
         types: { [sharedTypeKey]: jsTypeWithWritableProperty("classToggle") },
       }),
     ], hooks);
 
-    expect(Object.keys(registry.get(planId)?.types[sharedTypeKey].properties ?? {}))
+    expect(Object.keys(browserPlans.get(planId)?.types[sharedTypeKey].properties ?? {}))
       .toEqual(["classRemove", "classToggle"]);
 
-    registry.unloadPartialSlot("first-slot");
+    browserPlans.unloadPartialSlot("first-slot");
 
-    expect(Object.keys(registry.get(planId)?.types[sharedTypeKey].properties ?? {}))
+    expect(Object.keys(browserPlans.get(planId)?.types[sharedTypeKey].properties ?? {}))
       .toEqual(["classToggle"]);
 
-    registry.unloadPartialSlot("second-slot");
+    browserPlans.unloadPartialSlot("second-slot");
 
-    expect(registry.get(planId)).toBeUndefined();
+    expect(browserPlans.get(planId)).toBeUndefined();
   });
 
   it("rejects a shared type key when the same member has an incompatible contract", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.address";
 
-    registry.loadPartialSlot("first-slot", [
+    browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, "server-first", {
         types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
       }),
     ], hooks);
 
-    expect(() => registry.loadPartialSlot("second-slot", [
+    expect(() => browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, "server-second", {
         types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "number" }) },
       }),
@@ -91,38 +91,38 @@ describe("browser object contract fragments", () => {
   });
 
   it("refines compatible property shapes when object contract fragments merge", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.address";
 
-    registry.loadPartialSlot("first-slot", [
+    browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, "server-first", {
         types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "any" }) },
       }),
     ], hooks);
-    registry.loadPartialSlot("second-slot", [
+    browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, "server-second", {
         types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "string" }) },
       }),
     ], hooks);
 
-    expect(registry.get(planId)?.types[sharedTypeKey].properties.token.shape)
+    expect(browserPlans.get(planId)?.types[sharedTypeKey].properties.token.shape)
       .toEqual({ kind: "string" });
 
-    registry.unloadPartialSlot("second-slot");
+    browserPlans.unloadPartialSlot("second-slot");
 
-    expect(registry.get(planId)?.types[sharedTypeKey].properties.token.shape)
+    expect(browserPlans.get(planId)?.types[sharedTypeKey].properties.token.shape)
       .toEqual({ kind: "any" });
   });
 
   it("merges compatible object property fields from separate fragments", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.resident";
 
-    registry.loadPartialSlot("name-slot", [
+    browserPlans.loadPartialSlot("name-slot", [
       partialPlan(planId, "server-name", {
         types: {
           [sharedTypeKey]: jsTypeWithPropertyShape("profile", {
@@ -133,7 +133,7 @@ describe("browser object contract fragments", () => {
         },
       }),
     ], hooks);
-    registry.loadPartialSlot("age-slot", [
+    browserPlans.loadPartialSlot("age-slot", [
       partialPlan(planId, "server-age", {
         types: {
           [sharedTypeKey]: jsTypeWithPropertyShape("profile", {
@@ -145,7 +145,7 @@ describe("browser object contract fragments", () => {
       }),
     ], hooks);
 
-    expect(registry.get(planId)?.types[sharedTypeKey].properties.profile.shape)
+    expect(browserPlans.get(planId)?.types[sharedTypeKey].properties.profile.shape)
       .toEqual({
         kind: "object",
         fields: {
@@ -157,58 +157,58 @@ describe("browser object contract fragments", () => {
   });
 
   it("merges compatible method argument and return shapes", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.address";
 
-    registry.loadPartialSlot("first-slot", [
+    browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, "server-first", {
         types: { [sharedTypeKey]: jsTypeWithMethodShape("normalize", { kind: "any" }, { kind: "any" }) },
       }),
     ], hooks);
-    registry.loadPartialSlot("second-slot", [
+    browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, "server-second", {
         types: { [sharedTypeKey]: jsTypeWithMethodShape("normalize", { kind: "string" }, { kind: "string" }) },
       }),
     ], hooks);
 
-    const method = registry.get(planId)?.types[sharedTypeKey].methods.normalize;
+    const method = browserPlans.get(planId)?.types[sharedTypeKey].methods.normalize;
     expect(method?.arguments).toEqual({ kind: "exact", shapes: [{ kind: "string" }] });
     expect(method?.returns).toEqual({ kind: "string" });
   });
 
   it("lets a later slot reuse a member differently after the previous fragment unloads", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const sharedTypeKey = "native.component.shared-drawer";
 
-    registry.loadPartialSlot("first-slot", [
+    browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, "server-first", {
         types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
       }),
     ], hooks);
 
-    registry.unloadPartialSlot("first-slot");
+    browserPlans.unloadPartialSlot("first-slot");
 
-    registry.loadPartialSlot("second-slot", [
+    browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, "server-second", {
         types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "number" }) },
       }),
     ], hooks);
 
-    expect(registry.get(planId)?.types[sharedTypeKey].properties.token.shape)
+    expect(browserPlans.get(planId)?.types[sharedTypeKey].properties.token.shape)
       .toEqual({ kind: "number" });
   });
 
   it("merges compatible fragments for a root-owned app-level component reference", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const drawerTypeKey = "native.component.alis-drawer";
 
-    registry.register({
+    browserPlans.register({
       ...rootPlan(planId),
       types: {
         [drawerTypeKey]: jsTypeWithWritableProperty("classAdd"),
@@ -218,7 +218,7 @@ describe("browser object contract fragments", () => {
       },
     });
 
-    const merged = registry.loadPartialSlot("alis-drawer-content", [
+    browserPlans.loadPartialSlot("alis-drawer-content", [
       partialPlan(planId, "server-form", {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
@@ -228,25 +228,26 @@ describe("browser object contract fragments", () => {
         },
         behaviors: [behavior()],
       }),
-    ], hooks).loadedPlans[0];
+    ], hooks);
 
+    const merged = browserPlans.get(planId)!;
     expect(merged.components["alis-drawer"]).toBeDefined();
     expect(Object.keys(merged.types[drawerTypeKey].properties)).toEqual(["classAdd", "classRemove"]);
 
-    registry.unloadPartialSlot("alis-drawer-content");
+    browserPlans.unloadPartialSlot("alis-drawer-content");
 
-    expect(registry.get(planId)?.components["alis-drawer"]).toBeDefined();
-    expect(Object.keys(registry.get(planId)?.types[drawerTypeKey].properties ?? {}))
+    expect(browserPlans.get(planId)?.components["alis-drawer"]).toBeDefined();
+    expect(Object.keys(browserPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
       .toEqual(["classAdd"]);
   });
 
   it("removes one partial fragment from a root-owned app-level component reference", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const drawerTypeKey = "native.component.alis-drawer";
 
-    registry.register({
+    browserPlans.register({
       ...rootPlan(planId),
       types: {
         [drawerTypeKey]: jsTypeWithWritableProperty("classAdd"),
@@ -256,7 +257,7 @@ describe("browser object contract fragments", () => {
       },
     });
 
-    registry.loadPartialSlot("first-drawer-content", [
+    browserPlans.loadPartialSlot("first-drawer-content", [
       partialPlan(planId, "server-first", {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
@@ -266,7 +267,7 @@ describe("browser object contract fragments", () => {
         },
       }),
     ], hooks);
-    registry.loadPartialSlot("second-drawer-content", [
+    browserPlans.loadPartialSlot("second-drawer-content", [
       partialPlan(planId, "server-second", {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classToggle"),
@@ -277,28 +278,28 @@ describe("browser object contract fragments", () => {
       }),
     ], hooks);
 
-    expect(Object.keys(registry.get(planId)?.types[drawerTypeKey].properties ?? {}))
+    expect(Object.keys(browserPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
       .toEqual(["classAdd", "classRemove", "classToggle"]);
 
-    registry.unloadPartialSlot("first-drawer-content");
+    browserPlans.unloadPartialSlot("first-drawer-content");
 
-    expect(registry.get(planId)?.components["alis-drawer"]).toBeDefined();
-    expect(Object.keys(registry.get(planId)?.types[drawerTypeKey].properties ?? {}))
+    expect(browserPlans.get(planId)?.components["alis-drawer"]).toBeDefined();
+    expect(Object.keys(browserPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
       .toEqual(["classAdd", "classToggle"]);
 
-    registry.unloadPartialSlot("second-drawer-content");
+    browserPlans.unloadPartialSlot("second-drawer-content");
 
-    expect(Object.keys(registry.get(planId)?.types[drawerTypeKey].properties ?? {}))
+    expect(Object.keys(browserPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
       .toEqual(["classAdd"]);
   });
 
   it("recomputes merged property access when a partial fragment unloads", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const typeKey = "native.component.care-unit";
 
-    registry.register({
+    browserPlans.register({
       ...rootPlan(planId),
       types: {
         [typeKey]: jsTypeWithPropertyAccess("value", "read"),
@@ -308,7 +309,7 @@ describe("browser object contract fragments", () => {
       },
     });
 
-    registry.loadPartialSlot("care-unit-editor", [
+    browserPlans.loadPartialSlot("care-unit-editor", [
       partialPlan(planId, "server-editor", {
         types: {
           [typeKey]: jsTypeWithPropertyAccess("value", "write"),
@@ -319,20 +320,20 @@ describe("browser object contract fragments", () => {
       }),
     ], hooks);
 
-    expect(registry.get(planId)?.types[typeKey].properties.value.access).toBe("readwrite");
+    expect(browserPlans.get(planId)?.types[typeKey].properties.value.access).toBe("readwrite");
 
-    registry.unloadPartialSlot("care-unit-editor");
+    browserPlans.unloadPartialSlot("care-unit-editor");
 
-    expect(registry.get(planId)?.types[typeKey].properties.value.access).toBe("read");
+    expect(browserPlans.get(planId)?.types[typeKey].properties.value.access).toBe("read");
   });
 
   it("allows a partial behavior to reference a root-owned injection host element", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const hostTypeKey = "native.element.step-container";
 
-    registry.register({
+    browserPlans.register({
       ...rootPlan(planId),
       types: {
         [hostTypeKey]: jsTypeWithWritableProperty("html"),
@@ -342,7 +343,7 @@ describe("browser object contract fragments", () => {
       },
     });
 
-    registry.loadPartialSlot("step-container", [
+    browserPlans.loadPartialSlot("step-container", [
       partialPlan(planId, "server-step", {
         types: {
           [hostTypeKey]: jsTypeWithWritableProperty("hidden"),
@@ -354,24 +355,24 @@ describe("browser object contract fragments", () => {
       }),
     ], hooks);
 
-    expect(Object.keys(registry.get(planId)?.types[hostTypeKey].properties ?? {}))
+    expect(Object.keys(browserPlans.get(planId)?.types[hostTypeKey].properties ?? {}))
       .toEqual(["html", "hidden"]);
 
-    registry.unloadPartialSlot("step-container");
+    browserPlans.unloadPartialSlot("step-container");
 
-    expect(registry.get(planId)?.components["step-container"]).toBeDefined();
-    expect(Object.keys(registry.get(planId)?.types[hostTypeKey].properties ?? {}))
+    expect(browserPlans.get(planId)?.components["step-container"]).toBeDefined();
+    expect(Object.keys(browserPlans.get(planId)?.types[hostTypeKey].properties ?? {}))
       .toEqual(["html"]);
   });
 
   it("scopes component and type ownership to the runtime plan document", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const rootPlanId = "Drawer.Root";
     const partialPlanId = "DrawerResident.Partial";
     const drawerTypeKey = "native.component.alis-drawer";
 
-    registry.register({
+    browserPlans.register({
       ...rootPlan(rootPlanId),
       types: {
         [drawerTypeKey]: jsTypeWithWritableProperty("classAdd"),
@@ -381,7 +382,7 @@ describe("browser object contract fragments", () => {
       },
     });
 
-    const loaded = registry.loadPartialSlot("alis-drawer-content", [
+    browserPlans.loadPartialSlot("alis-drawer-content", [
       partialPlan(partialPlanId, "server-form", {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
@@ -391,15 +392,16 @@ describe("browser object contract fragments", () => {
         },
         behaviors: [behavior()],
       }),
-    ], hooks).loadedPlans[0];
+    ], hooks);
 
+    const loaded = browserPlans.get(partialPlanId)!;
     expect(loaded.planId).toBe(partialPlanId);
     expect(loaded.components["alis-drawer"]).toBeDefined();
-    expect(registry.get(rootPlanId)?.components["alis-drawer"]).toBeDefined();
+    expect(browserPlans.get(rootPlanId)?.components["alis-drawer"]).toBeDefined();
 
-    registry.unloadPartialSlot("alis-drawer-content");
+    browserPlans.unloadPartialSlot("alis-drawer-content");
 
-    expect(registry.get(partialPlanId)).toBeUndefined();
-    expect(registry.get(rootPlanId)?.components["alis-drawer"]).toBeDefined();
+    expect(browserPlans.get(partialPlanId)).toBeUndefined();
+    expect(browserPlans.get(rootPlanId)?.components["alis-drawer"]).toBeDefined();
   });
 });

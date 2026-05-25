@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveGather } from "../../execution/gather";
-import { PlanRegistry } from "../../lifecycle/merge-plan";
+import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
 import type { Component, JsType, Plan, RequestInput, Shape, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -15,14 +15,14 @@ describe("all registered input gather lifecycle", () => {
       <input id="first-name" value="Ada" />
       <input id="address-line" value="12 Main" />
     `;
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const planId = "Resident.PartialGather";
     const resident = rootPlan(planId, {
       "first-name": inputComponent("first-name", "firstName"),
     });
 
-    registry.register(resident);
-    registry.loadPartialSlot("address-slot", [
+    browserPlans.register(resident);
+    browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, "server-address-plan", {
         components: {
           "address-line": inputComponent("address-line", "addressLine"),
@@ -35,7 +35,7 @@ describe("all registered input gather lifecycle", () => {
       addressLine: "12 Main",
     });
 
-    registry.unloadPartialSlot("address-slot");
+    browserPlans.unloadPartialSlot("address-slot");
 
     expect(resolveGather(allRegisteredInputs(), "POST", resident, {}).body).toEqual({
       firstName: "Ada",
@@ -44,12 +44,12 @@ describe("all registered input gather lifecycle", () => {
 
   it("keeps explicit payload paths ahead of dynamically gathered partial inputs", () => {
     document.body.innerHTML = `<input id="address-line" value="12 Main" />`;
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const planId = "Resident.PartialGatherExplicitKey";
     const resident = rootPlan(planId, {});
 
-    registry.register(resident);
-    registry.loadPartialSlot("address-slot", [
+    browserPlans.register(resident);
+    browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, "server-address-plan", {
         components: {
           "address-line": inputComponent("address-line", "addressLine"),
@@ -72,12 +72,12 @@ describe("all registered input gather lifecycle", () => {
 
   it("keeps supplemental payload paths ahead of dynamically gathered partial inputs", () => {
     document.body.innerHTML = `<input id="address-line" value="12 Main" />`;
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const planId = "Resident.PartialGatherStaticKey";
     const resident = rootPlan(planId, {});
 
-    registry.register(resident);
-    registry.loadPartialSlot("address-slot", [
+    browserPlans.register(resident);
+    browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, "server-address-plan", {
         components: {
           "address-line": inputComponent("address-line", "addressLine"),
@@ -103,12 +103,12 @@ describe("all registered input gather lifecycle", () => {
 
   it("keeps supplemental nested payload paths ahead of dynamically gathered partial inputs", () => {
     document.body.innerHTML = `<input id="address" value="12 Main" />`;
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const planId = "Resident.PartialGatherStaticNestedPath";
     const resident = rootPlan(planId, {});
 
-    registry.register(resident);
-    registry.loadPartialSlot("address-slot", [
+    browserPlans.register(resident);
+    browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, "server-address-plan", {
         components: {
           address: inputComponent("address", "address"),
@@ -136,12 +136,12 @@ describe("all registered input gather lifecycle", () => {
 
   it("rejects a registered input whose value member is missing from the component contract", () => {
     document.body.innerHTML = `<input id="first-name" value="Ada" />`;
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const planId = "Resident.PartialGatherContract";
     const resident = rootPlan(planId, {});
 
-    registry.register(resident);
-    registry.loadPartialSlot("name-slot", [
+    browserPlans.register(resident);
+    browserPlans.loadPartialSlot("name-slot", [
       partialPlan(planId, "server-name-plan", {
         components: {
           "first-name": registeredInputComponent("first-name", "firstName", "missingValue"),

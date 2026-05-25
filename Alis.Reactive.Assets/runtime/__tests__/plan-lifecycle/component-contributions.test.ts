@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PlanRegistry } from "../../lifecycle/merge-plan";
+import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
 import {
   component,
   jsType,
@@ -13,14 +13,14 @@ import {
 
 describe("component contribution ownership", () => {
   it("rejects a component key owned by a different partial slot", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
 
-    registry.register(rootPlan(planId));
+    browserPlans.register(rootPlan(planId));
 
     const firstComponent = component("shared-field", "native.element.shared-a");
-    registry.add(
+    browserPlans.add(
       partialPlan(planId, "first-slot", {
         types: { "native.element.shared-a": jsType() },
         components: { "shared-field": firstComponent },
@@ -28,46 +28,46 @@ describe("component contribution ownership", () => {
       hooks,
     );
 
-    expect(() => registry.add(
+    expect(() => browserPlans.add(
       partialPlan(planId, "second-slot", {
         types: { "native.element.shared-b": jsType() },
         components: { "shared-field": component("shared-field", "native.element.shared-b") },
       }),
       hooks,
     )).toThrow('partial plan contribution "second-slot" cannot declare component "shared-field"');
-    expect(registry.get(planId)?.components["shared-field"]).toBe(firstComponent);
+    expect(browserPlans.get(planId)?.components["shared-field"]).toBe(firstComponent);
   });
 
   it("keeps type fragments out when component preflight rejects the contribution", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
 
-    registry.register(rootPlan(planId));
-    registry.add(
+    browserPlans.register(rootPlan(planId));
+    browserPlans.add(
       partialPlan(planId, "first-slot", {
         components: { "shared-field": component("shared-field", "native.element.shared-a") },
       }),
       hooks,
     );
 
-    expect(() => registry.add(
+    expect(() => browserPlans.add(
       partialPlan(planId, "second-slot", {
         types: { "native.element.second-only": jsType() },
         components: { "shared-field": component("shared-field", "native.element.shared-b") },
       }),
       hooks,
     )).toThrow('partial plan contribution "second-slot" cannot declare component "shared-field"');
-    expect(registry.get(planId)?.types["native.element.second-only"]).toBeUndefined();
+    expect(browserPlans.get(planId)?.types["native.element.second-only"]).toBeUndefined();
   });
 
   it("rejects a partial owned definition for a root-owned component key", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const drawerTypeKey = "native.component.alis-drawer";
 
-    registry.register({
+    browserPlans.register({
       ...rootPlan(planId),
       types: {
         [drawerTypeKey]: jsTypeWithWritableProperty("classAdd"),
@@ -77,7 +77,7 @@ describe("component contribution ownership", () => {
       },
     });
 
-    expect(() => registry.loadPartialSlot("alis-drawer-content", [
+    expect(() => browserPlans.loadPartialSlot("alis-drawer-content", [
       partialPlan(planId, "server-form", {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
@@ -88,12 +88,12 @@ describe("component contribution ownership", () => {
       }),
     ], hooks)).toThrow('partial plan contribution "alis-drawer-content" cannot declare component "alis-drawer"');
 
-    expect(Object.keys(registry.get(planId)?.types[drawerTypeKey].properties ?? {}))
+    expect(Object.keys(browserPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
       .toEqual(["classAdd"]);
   });
 
   it("rejects an object-target contribution that carries owned binding state", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const componentId = "care-unit";
@@ -101,7 +101,7 @@ describe("component contribution ownership", () => {
     const invalidObjectTarget = registeredInputComponent(componentId, typeKey);
     invalidObjectTarget.contribution = { kind: "object-target" };
 
-    registry.register({
+    browserPlans.register({
       ...rootPlan(planId),
       types: {
         [typeKey]: jsTypeWithWritableProperty("value"),
@@ -111,7 +111,7 @@ describe("component contribution ownership", () => {
       },
     });
 
-    expect(() => registry.loadPartialSlot("care-unit-editor", [
+    expect(() => browserPlans.loadPartialSlot("care-unit-editor", [
       partialPlan(planId, "server-editor", {
         types: {
           [typeKey]: jsTypeWithWritableProperty("value"),
@@ -122,20 +122,20 @@ describe("component contribution ownership", () => {
       }),
     ], hooks)).toThrow('partial plan contribution "care-unit-editor" cannot declare component "care-unit"');
 
-    expect(registry.get(planId)?.components[componentId].binding.kind).toBe("none");
+    expect(browserPlans.get(planId)?.components[componentId].binding.kind).toBe("none");
   });
 });
 
 describe("layout object contributions", () => {
   it("lets multiple slots share one layout-owned app component", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const toastTypeKey = "fusion.component.alisFusionToast";
 
-    registry.register(rootPlan(planId));
+    browserPlans.register(rootPlan(planId));
 
-    registry.loadPartialSlot("first-toast-slot", [
+    browserPlans.loadPartialSlot("first-toast-slot", [
       partialPlan(planId, "first-toast-plan", {
         types: {
           [toastTypeKey]: jsTypeWithWritableProperty("title"),
@@ -145,7 +145,7 @@ describe("layout object contributions", () => {
         },
       }),
     ], hooks);
-    registry.loadPartialSlot("second-toast-slot", [
+    browserPlans.loadPartialSlot("second-toast-slot", [
       partialPlan(planId, "second-toast-plan", {
         types: {
           [toastTypeKey]: jsTypeWithWritableProperty("content"),
@@ -156,30 +156,30 @@ describe("layout object contributions", () => {
       }),
     ], hooks);
 
-    expect(registry.get(planId)?.components.alisFusionToast).toBeDefined();
-    expect(Object.keys(registry.get(planId)?.types[toastTypeKey].properties ?? {}))
+    expect(browserPlans.get(planId)?.components.alisFusionToast).toBeDefined();
+    expect(Object.keys(browserPlans.get(planId)?.types[toastTypeKey].properties ?? {}))
       .toEqual(["title", "content"]);
 
-    registry.unloadPartialSlot("first-toast-slot");
+    browserPlans.unloadPartialSlot("first-toast-slot");
 
-    expect(registry.get(planId)?.components.alisFusionToast).toBeDefined();
-    expect(Object.keys(registry.get(planId)?.types[toastTypeKey].properties ?? {}))
+    expect(browserPlans.get(planId)?.components.alisFusionToast).toBeDefined();
+    expect(Object.keys(browserPlans.get(planId)?.types[toastTypeKey].properties ?? {}))
       .toEqual(["content"]);
 
-    registry.unloadPartialSlot("second-toast-slot");
+    browserPlans.unloadPartialSlot("second-toast-slot");
 
-    expect(registry.get(planId)?.components.alisFusionToast).toBeUndefined();
-    expect(registry.get(planId)?.types[toastTypeKey]).toBeUndefined();
+    expect(browserPlans.get(planId)?.components.alisFusionToast).toBeUndefined();
+    expect(browserPlans.get(planId)?.types[toastTypeKey]).toBeUndefined();
   });
 
   it("rejects owned component state for a layout-owned app component key", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const loaderTypeKey = "native.component.alis-loader";
 
-    registry.register(rootPlan(planId));
-    registry.loadPartialSlot("loader-slot", [
+    browserPlans.register(rootPlan(planId));
+    browserPlans.loadPartialSlot("loader-slot", [
       partialPlan(planId, "loader-plan", {
         types: {
           [loaderTypeKey]: jsTypeWithWritableProperty("classAdd"),
@@ -190,7 +190,7 @@ describe("layout object contributions", () => {
       }),
     ], hooks);
 
-    expect(() => registry.loadPartialSlot("owned-loader-slot", [
+    expect(() => browserPlans.loadPartialSlot("owned-loader-slot", [
       partialPlan(planId, "owned-loader-plan", {
         types: {
           [loaderTypeKey]: jsTypeWithWritableProperty("classRemove"),
@@ -201,14 +201,14 @@ describe("layout object contributions", () => {
       }),
     ], hooks)).toThrow('partial plan contribution "owned-loader-slot" cannot declare component "alis-loader"');
 
-    registry.unloadPartialSlot("loader-slot");
+    browserPlans.unloadPartialSlot("loader-slot");
 
-    expect(registry.get(planId)?.components["alis-loader"]).toBeUndefined();
-    expect(registry.get(planId)?.types[loaderTypeKey]).toBeUndefined();
+    expect(browserPlans.get(planId)?.components["alis-loader"]).toBeUndefined();
+    expect(browserPlans.get(planId)?.types[loaderTypeKey]).toBeUndefined();
   });
 
   it("rejects a layout-object contribution that carries binding state", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const drawerTypeKey = "native.component.alis-drawer";
@@ -219,9 +219,9 @@ describe("layout object contributions", () => {
       valueMember: "value",
     };
 
-    registry.register(rootPlan(planId));
+    browserPlans.register(rootPlan(planId));
 
-    expect(() => registry.loadPartialSlot("drawer-slot", [
+    expect(() => browserPlans.loadPartialSlot("drawer-slot", [
       partialPlan(planId, "drawer-plan", {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classAdd"),
@@ -232,16 +232,16 @@ describe("layout object contributions", () => {
       }),
     ], hooks)).toThrow('partial plan contribution "drawer-slot" cannot declare component "alis-drawer"');
 
-    expect(registry.get(planId)?.components["alis-drawer"]).toBeUndefined();
+    expect(browserPlans.get(planId)?.components["alis-drawer"]).toBeUndefined();
   });
 
   it("rejects a layout-object reference with a mismatched runtime identity", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const drawerTypeKey = "native.component.alis-drawer";
 
-    registry.register({
+    browserPlans.register({
       ...rootPlan(planId),
       types: {
         [drawerTypeKey]: jsTypeWithWritableProperty("classAdd"),
@@ -251,7 +251,7 @@ describe("layout object contributions", () => {
       },
     });
 
-    expect(() => registry.loadPartialSlot("drawer-slot", [
+    expect(() => browserPlans.loadPartialSlot("drawer-slot", [
       partialPlan(planId, "drawer-plan", {
         types: {
           [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
@@ -262,18 +262,18 @@ describe("layout object contributions", () => {
       }),
     ], hooks)).toThrow('partial plan contribution "drawer-slot" cannot declare component "alis-drawer"');
 
-    expect(Object.keys(registry.get(planId)?.types[drawerTypeKey].properties ?? {}))
+    expect(Object.keys(browserPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
       .toEqual(["classAdd"]);
   });
 
   it("keeps a layout object when the root declares it after a partial materializes it", () => {
-    const registry = new PlanRegistry();
+    const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
     const toastTypeKey = "fusion.component.alisFusionToast";
 
-    registry.register(rootPlan(planId));
-    registry.loadPartialSlot("toast-slot", [
+    browserPlans.register(rootPlan(planId));
+    browserPlans.loadPartialSlot("toast-slot", [
       partialPlan(planId, "toast-plan", {
         types: {
           [toastTypeKey]: jsTypeWithWritableProperty("title"),
@@ -283,7 +283,7 @@ describe("layout object contributions", () => {
         },
       }),
     ], hooks);
-    registry.add({
+    browserPlans.add({
       ...rootPlan(planId),
       types: {
         [toastTypeKey]: jsTypeWithWritableProperty("content"),
@@ -293,10 +293,10 @@ describe("layout object contributions", () => {
       },
     }, hooks);
 
-    registry.unloadPartialSlot("toast-slot");
+    browserPlans.unloadPartialSlot("toast-slot");
 
-    expect(registry.get(planId)?.components.alisFusionToast).toBeDefined();
-    expect(Object.keys(registry.get(planId)?.types[toastTypeKey].properties ?? {}))
+    expect(browserPlans.get(planId)?.components.alisFusionToast).toBeDefined();
+    expect(Object.keys(browserPlans.get(planId)?.types[toastTypeKey].properties ?? {}))
       .toEqual(["content"]);
   });
 });

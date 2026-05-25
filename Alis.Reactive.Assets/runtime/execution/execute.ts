@@ -23,36 +23,20 @@ import { PlainObjectRecord } from "../domain/object-record";
 
 const log = scope("execute");
 
-class ActivePlanRegistry {
-  private document: Plan | undefined;
-  private runtime: RuntimePlan | undefined;
-
-  set(plan: Plan): void {
-    this.document = plan;
-    this.runtime = RuntimePlan.from(plan);
-  }
-
-  clear(): void {
-    this.document = undefined;
-    this.runtime = undefined;
-  }
-
-  resolve(candidate: Plan | undefined): RuntimePlan {
-    if (candidate) return RuntimePlan.from(candidate);
-    if (this.runtime) return this.runtime;
-    if (this.document) return RuntimePlan.from(this.document);
-    throw new Error("[alis] no active plan");
-  }
-}
-
-const activePlans = new ActivePlanRegistry();
+let activeRuntimePlan: RuntimePlan | undefined;
 
 export function setActivePlan(plan: Plan): void {
-  activePlans.set(plan);
+  activeRuntimePlan = RuntimePlan.from(plan);
 }
 
 export function resetActivePlanForTests(): void {
-  activePlans.clear();
+  activeRuntimePlan = undefined;
+}
+
+function runtimePlanFor(plan: Plan | undefined): RuntimePlan {
+  if (plan) return RuntimePlan.from(plan);
+  if (activeRuntimePlan) return activeRuntimePlan;
+  throw new Error("[alis] no active plan");
 }
 
 // Returns void for immediate-lane reaction kinds (set, call, dispatch, inject,
@@ -78,7 +62,7 @@ class ReactionExecution {
   ) {}
 
   static start(plan: Plan | undefined, context: ExecContext | undefined): ReactionExecution {
-    return new ReactionExecution(activePlans.resolve(plan), ExecutionContext.from(context));
+    return new ReactionExecution(runtimePlanFor(plan), ExecutionContext.from(context));
   }
 
   execute(reaction: Reaction): void | Promise<void> {
@@ -121,15 +105,10 @@ class ReactionExecution {
   }
 
   private executeSequence(reaction: SequenceReaction): void | Promise<void> {
-    for (let i = 0; i < reaction.steps.length; i++) {
-      const step = reaction.steps[i];
-      if (step === undefined) {
-        throw new Error(`[alis] sequence reaction step ${i} is missing`);
-      }
-
+    for (const [index, step] of reaction.steps.entries()) {
       const completion = ReactionCompletion.from(this.execute(step));
       if (completion.isAsync) {
-        const remaining = reaction.steps.slice(i + 1);
+        const remaining = reaction.steps.slice(index + 1);
         return completion.thenRun(() => this.executeRemainingSequence(remaining));
       }
     }
