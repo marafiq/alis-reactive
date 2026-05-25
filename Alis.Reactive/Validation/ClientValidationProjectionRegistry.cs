@@ -8,12 +8,12 @@ namespace Alis.Reactive.Validation
     /// </summary>
     public sealed class ClientValidationProjectionRegistry : IClientValidationProjectionSource
     {
-        private readonly IReadOnlyDictionary<Type, ClientValidationProjectionDefinition> _definitions;
+        private readonly IReadOnlyDictionary<Type, IReadOnlyList<ClientValidationField>> _fieldsByValidationSource;
 
         private ClientValidationProjectionRegistry(
-            IReadOnlyDictionary<Type, ClientValidationProjectionDefinition> definitions)
+            IReadOnlyDictionary<Type, IReadOnlyList<ClientValidationField>> fieldsByValidationSource)
         {
-            _definitions = definitions ?? throw new ArgumentNullException(nameof(definitions));
+            _fieldsByValidationSource = fieldsByValidationSource ?? throw new ArgumentNullException(nameof(fieldsByValidationSource));
         }
 
         public static ClientValidationProjectionRegistry Create(
@@ -30,14 +30,14 @@ namespace Alis.Reactive.Validation
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            if (!_definitions.TryGetValue(request.ValidationSourceType, out var definition))
+            if (!_fieldsByValidationSource.TryGetValue(request.ValidationSourceType, out var fields))
             {
                 throw new InvalidOperationException(
                     $"No client validation projection is registered for validation source '{request.ValidationSourceType.FullName}'. " +
                     "Register it inside ClientValidationProjectionRegistry.Create(registry => registry.For<TValidationSource, TModel>(...)).");
             }
 
-            return definition.Project(request);
+            return ClientValidationProjection.ForFields(request, fields);
         }
     }
 }

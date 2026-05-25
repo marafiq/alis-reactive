@@ -6,69 +6,6 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive
 {
-    internal sealed class ValidationProjectionBindingScope
-    {
-        private readonly ValidationFieldBindingCatalog _fieldBindings;
-        private readonly ValidationPlanBinding _ruleBinding;
-
-        private ValidationProjectionBindingScope(ValidationFieldBindingCatalog fieldBindings)
-        {
-            _fieldBindings = fieldBindings ?? throw new ArgumentNullException(nameof(fieldBindings));
-            _ruleBinding = ValidationPlanBinding.For(_fieldBindings);
-        }
-
-        internal static ValidationProjectionBindingScope For(
-            IReadOnlyDictionary<string, ComponentRegistration> registeredInputs,
-            Type modelType,
-            IReadOnlyList<ClientValidationField> projectedFields) =>
-            new ValidationProjectionBindingScope(new ValidationFieldBindingCatalog(registeredInputs, modelType, projectedFields));
-
-        internal BoundClientValidationField Bind(ClientValidationField field)
-        {
-            if (field == null) throw new ArgumentNullException(nameof(field));
-            return BoundClientValidationField.From(
-                field,
-                _fieldBindings.Resolve(field),
-                _ruleBinding);
-        }
-    }
-
-    internal sealed class BoundClientValidationField
-    {
-        private readonly ClientValidationField _field;
-        private readonly ValidationFieldBinding _binding;
-        private readonly ValidationPlanBinding _ruleBinding;
-
-        private BoundClientValidationField(
-            ClientValidationField field,
-            ValidationFieldBinding binding,
-            ValidationPlanBinding ruleBinding)
-        {
-            _field = field ?? throw new ArgumentNullException(nameof(field));
-            _binding = binding ?? throw new ArgumentNullException(nameof(binding));
-            _ruleBinding = ruleBinding ?? throw new ArgumentNullException(nameof(ruleBinding));
-        }
-
-        internal ComponentValidation ToComponentValidation()
-        {
-            var planRules = _field.Rules
-                .Select(rule => rule.ToPlanRule(_ruleBinding))
-                .ToList();
-
-            return ComponentValidation.ForServerField(
-                _binding.ComponentId,
-                _binding.ReadValue(),
-                planRules,
-                _field.FieldName);
-        }
-
-        internal static BoundClientValidationField From(
-            ClientValidationField field,
-            ValidationFieldBinding binding,
-            ValidationPlanBinding ruleBinding) =>
-            new BoundClientValidationField(field, binding, ruleBinding);
-    }
-
     internal sealed class ValidationFieldBindingCatalog
     {
         private readonly IReadOnlyDictionary<string, ComponentRegistration> _registeredInputs;
@@ -156,6 +93,24 @@ namespace Alis.Reactive
             FieldComparisonTarget.ForComponentValue(
                 ValueProducer.Read(ComponentSource.Of(ComponentId), _valueContract.ValueMember),
                 ShapeForValidation);
+
+        internal ComponentValidation ToComponentValidation(
+            ClientValidationField field,
+            ValidationPlanBinding ruleBinding)
+        {
+            if (field == null) throw new ArgumentNullException(nameof(field));
+            if (ruleBinding == null) throw new ArgumentNullException(nameof(ruleBinding));
+
+            var planRules = field.Rules
+                .Select(rule => rule.ToPlanRule(ruleBinding))
+                .ToList();
+
+            return ComponentValidation.ForServerField(
+                ComponentId,
+                ReadValue(),
+                planRules,
+                field.FieldName);
+        }
 
         internal static ValidationFieldBinding Registered(ComponentRegistration registration)
         {

@@ -48,10 +48,11 @@ namespace Alis.Reactive
             var container = job.Container;
 
             var projection = source.Project(ClientValidationProjectionRequest.For(job.ValidationSourceType, container));
-            var bindings = ValidationProjectionBindingScope.For(_registeredInputs, _modelType, projection.Fields);
+            var bindings = new ValidationFieldBindingCatalog(_registeredInputs, _modelType, projection.Fields);
+            var ruleBinding = ValidationPlanBinding.For(bindings);
 
             var componentValidations = projection.Fields
-                .Select(field => bindings.Bind(field).ToComponentValidation())
+                .Select(field => bindings.Resolve(field).ToComponentValidation(field, ruleBinding))
                 .ToList();
 
             // EnsureElement is idempotent — it returns the existing component when the

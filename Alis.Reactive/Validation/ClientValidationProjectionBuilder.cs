@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Validation
 {
@@ -56,7 +56,7 @@ namespace Alis.Reactive.Validation
             }
         }
 
-        internal ClientValidationProjectionDefinition ToDefinition() =>
-            new ClientValidationProjectionDefinition(_projection.ToFields());
+        internal IReadOnlyList<ClientValidationField> ToFields() =>
+            _projection.ToFields();
     }
 }

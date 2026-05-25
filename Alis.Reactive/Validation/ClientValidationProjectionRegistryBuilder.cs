@@ -8,8 +8,8 @@ namespace Alis.Reactive.Validation
     /// </summary>
     public sealed class ClientValidationProjectionRegistryBuilder
     {
-        private readonly Dictionary<Type, ClientValidationProjectionDefinition> _definitions =
-            new Dictionary<Type, ClientValidationProjectionDefinition>();
+        private readonly Dictionary<Type, IReadOnlyList<ClientValidationField>> _fieldsByValidationSource =
+            new Dictionary<Type, IReadOnlyList<ClientValidationField>>();
 
         internal ClientValidationProjectionRegistryBuilder() { }
 
@@ -20,7 +20,7 @@ namespace Alis.Reactive.Validation
             if (define == null) throw new ArgumentNullException(nameof(define));
 
             var sourceType = typeof(TValidationSource);
-            if (_definitions.ContainsKey(sourceType))
+            if (_fieldsByValidationSource.ContainsKey(sourceType))
             {
                 throw new InvalidOperationException(
                     $"Client validation projection for '{sourceType.FullName}' is already registered.");
@@ -28,11 +28,11 @@ namespace Alis.Reactive.Validation
 
             var projection = new ClientValidationProjectionBuilder<TModel>();
             define(projection);
-            _definitions.Add(sourceType, projection.ToDefinition());
+            _fieldsByValidationSource.Add(sourceType, projection.ToFields());
             return this;
         }
 
-        internal IReadOnlyDictionary<Type, ClientValidationProjectionDefinition> Build() =>
-            new Dictionary<Type, ClientValidationProjectionDefinition>(_definitions);
+        internal IReadOnlyDictionary<Type, IReadOnlyList<ClientValidationField>> Build() =>
+            new Dictionary<Type, IReadOnlyList<ClientValidationField>>(_fieldsByValidationSource);
     }
 }
