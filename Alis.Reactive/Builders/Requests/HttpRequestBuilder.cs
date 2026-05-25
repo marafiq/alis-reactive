@@ -128,7 +128,7 @@ namespace Alis.Reactive.Builders.Requests
 
             var request = Request.Create(
                 endpoint,
-                gatherPlan.Payload,
+                gatherPlan.Input,
                 ResolveRequestLifecycle(),
                 gatherPlan.Parameters,
                 _validation.Target);

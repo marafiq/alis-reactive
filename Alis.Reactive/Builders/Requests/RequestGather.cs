@@ -39,11 +39,11 @@ namespace Alis.Reactive.Builders.Requests
 
             var supplementalPayload = _builder.Draft.ToSupplementalPayload();
             return RequestGatherPlan.From(
-                ResolvePayload(context, supplementalPayload),
+                ResolveInput(context, supplementalPayload),
                 ResolveParameters(context.Url));
         }
 
-        private RequestPayload ResolvePayload(
+        private RequestInput ResolveInput(
             RequestGatherContext context,
             SupplementalGatherPayload supplementalPayload)
         {
@@ -51,20 +51,18 @@ namespace Alis.Reactive.Builders.Requests
             var gatherInputMustRemainExecutable = fieldSelection.RequiresGatherInput;
             if (gatherInputMustRemainExecutable)
             {
-                return RequestPayload.Send(
-                    fieldSelection.ToInput(
-                        context.Transport,
-                        supplementalPayload.AsGatherInputFields));
+                return fieldSelection.ToInput(
+                    context.Transport,
+                    supplementalPayload.AsGatherInputFields);
             }
 
             var requestBodyComesOnlyFromSupplementalFields = supplementalPayload.HasFields;
             if (requestBodyComesOnlyFromSupplementalFields)
-                return RequestPayload.Send(
-                    new ValueInput(
-                        supplementalPayload.AsStandaloneRequestBody,
-                        context.Transport));
+                return new ValueInput(
+                    supplementalPayload.AsStandaloneRequestBody,
+                    context.Transport);
 
-            return RequestPayload.None;
+            return RequestInput.None;
         }
 
         private RequestParameters ResolveParameters(RequestUrl url)
@@ -109,18 +107,17 @@ namespace Alis.Reactive.Builders.Requests
 
     internal sealed class RequestGatherPlan
     {
-        private readonly RequestPayload _payload;
         private readonly RequestParameters _parameters;
 
         private RequestGatherPlan(
-            RequestPayload payload,
+            RequestInput input,
             RequestParameters parameters)
         {
-            _payload = payload ?? throw new ArgumentNullException(nameof(payload));
+            Input = input ?? throw new ArgumentNullException(nameof(input));
             _parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        internal RequestPayload Payload => _payload;
+        internal RequestInput Input { get; }
         internal RequestParameters Parameters => _parameters;
 
         internal static RequestGatherPlan WithoutPayload(RequestUrl url)
@@ -131,16 +128,16 @@ namespace Alis.Reactive.Builders.Requests
                 .For(url)
                 .Bind(new Dictionary<string, ValueProducer>());
             return new RequestGatherPlan(
-                RequestPayload.None,
+                RequestInput.None,
                 RequestParameters.From(
                     new Dictionary<string, ValueProducer>(),
                     routeParameters));
         }
 
         internal static RequestGatherPlan From(
-            RequestPayload payload,
+            RequestInput input,
             RequestParameters parameters) =>
-            new RequestGatherPlan(payload, parameters);
+            new RequestGatherPlan(input, parameters);
     }
 
     internal sealed class GatherPayloadFieldSelection

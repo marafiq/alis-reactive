@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class Request
     {
         private readonly RequestEndpoint _endpoint;
-        private readonly RequestPayload _payload;
+        private readonly RequestInput _input;
         private readonly RequestLifecycle _lifecycle;
         private readonly RequestParameters _parameters;
         private readonly RequestValidationTarget _validationTarget;
@@ -20,7 +20,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the validation target used before sending this request.</summary>
         public RequestValidationTarget Validation => _validationTarget;
         /// <summary>Gets the request body strategy. Bodiless requests use <see cref="NoRequestInput"/>.</summary>
-        public RequestInput Input => _payload.InputForJson;
+        public RequestInput Input => _input;
         /// <summary>Gets reactions to execute before the request is sent.</summary>
         public IReadOnlyList<Reaction> Before => _lifecycle.Before;
         /// <summary>Gets the success response handlers.</summary>
@@ -36,17 +36,15 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the URL template parameters. Each value is evaluated and URI-encoded before replacing placeholders in the URL.</summary>
         public IReadOnlyDictionary<string, ValueProducer> RouteParams => _parameters.RouteParams;
 
-        internal RequestPayload Payload => _payload;
-
         private Request(
             RequestEndpoint endpoint,
-            RequestPayload payload,
+            RequestInput input,
             RequestLifecycle lifecycle,
             RequestParameters parameters,
             RequestValidationTarget validationTarget)
         {
             _endpoint = endpoint ?? throw new System.ArgumentNullException(nameof(endpoint));
-            _payload = payload ?? throw new System.ArgumentNullException(nameof(payload));
+            _input = input ?? throw new System.ArgumentNullException(nameof(input));
             _lifecycle = lifecycle ?? throw new System.ArgumentNullException(nameof(lifecycle));
             _parameters = parameters ?? throw new System.ArgumentNullException(nameof(parameters));
             _validationTarget = validationTarget ?? throw new System.ArgumentNullException(nameof(validationTarget));
@@ -54,17 +52,17 @@ namespace Alis.Reactive.PlanModel
 
         internal static Request Create(
             RequestEndpoint endpoint,
-            RequestPayload payload,
+            RequestInput input,
             RequestLifecycle lifecycle,
             RequestParameters parameters,
             RequestValidationTarget validationTarget) =>
-            new Request(endpoint, payload, lifecycle, parameters, validationTarget);
+            new Request(endpoint, input, lifecycle, parameters, validationTarget);
 
         /// <summary>Returns a copy of this request with <see cref="Before"/> replaced.</summary>
         internal Request WithBefore(IReadOnlyList<Reaction> before) =>
             new Request(
                 _endpoint,
-                _payload,
+                _input,
                 _lifecycle.WithBefore(before),
                 _parameters,
                 _validationTarget);
@@ -83,38 +81,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static RequestEndpoint To(HttpMethodName method, RequestUrl url) =>
             new RequestEndpoint(method, url);
-    }
-
-    internal abstract class RequestPayload
-    {
-        private RequestPayload() { }
-
-        internal static RequestPayload None { get; } = new BodilessRequestPayload();
-
-        internal abstract RequestInput InputForJson { get; }
-
-        internal static RequestPayload Send(RequestInput input)
-        {
-            if (input == null) throw new System.ArgumentNullException(nameof(input));
-            return new BodyRequestPayload(input);
-        }
-
-        private sealed class BodilessRequestPayload : RequestPayload
-        {
-            internal override RequestInput InputForJson => RequestInput.None;
-        }
-
-        private sealed class BodyRequestPayload : RequestPayload
-        {
-            private readonly RequestInput _input;
-
-            internal BodyRequestPayload(RequestInput input)
-            {
-                _input = input ?? throw new System.ArgumentNullException(nameof(input));
-            }
-
-            internal override RequestInput InputForJson => _input;
-        }
     }
 
     internal sealed class RequestLifecycle
