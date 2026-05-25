@@ -14,7 +14,7 @@ namespace Alis.Reactive.FluentValidator
         {
             private ValidatorProjectionFrame(
                 ValidationFieldPath prefix,
-                ClientValidationProjectionDraft projection,
+                FluentValidationProjectionDraft projection,
                 Func<Type, IValidator?> factory,
                 ClientConditionCatalog clientConditions,
                 ValidationRuleCondition parentCondition)
@@ -27,14 +27,14 @@ namespace Alis.Reactive.FluentValidator
             }
 
             internal ValidationFieldPath Prefix { get; }
-            internal ClientValidationProjectionDraft Projection { get; }
+            internal FluentValidationProjectionDraft Projection { get; }
             internal Func<Type, IValidator?> Factory { get; }
             internal ClientConditionCatalog ClientConditions { get; }
             internal ValidationRuleCondition ParentCondition { get; }
 
             internal static ValidatorProjectionFrame Root(
                 ValidationFieldPath prefix,
-                ClientValidationProjectionDraft projection,
+                FluentValidationProjectionDraft projection,
                 Func<Type, IValidator?> factory,
                 ClientConditionCatalog clientConditions) =>
                 new ValidatorProjectionFrame(prefix, projection, factory, clientConditions, ValidationRuleCondition.Always);
@@ -269,7 +269,7 @@ namespace Alis.Reactive.FluentValidator
             internal abstract void AddTo(
                 List<ProjectedClientValidationRule> rules,
                 RuleComponentMapping mapping,
-                ClientValidationProjectionDraft projection);
+                FluentValidationProjectionDraft projection);
 
             private sealed class SkippedClientRuleProjection : ClientRuleProjection
             {
@@ -283,7 +283,7 @@ namespace Alis.Reactive.FluentValidator
                 internal override void AddTo(
                     List<ProjectedClientValidationRule> rules,
                     RuleComponentMapping mapping,
-                    ClientValidationProjectionDraft projection)
+                    FluentValidationProjectionDraft projection)
                 {
                     if (rules == null) throw new ArgumentNullException(nameof(rules));
                     if (mapping == null) throw new ArgumentNullException(nameof(mapping));
@@ -308,7 +308,7 @@ namespace Alis.Reactive.FluentValidator
                 internal override void AddTo(
                     List<ProjectedClientValidationRule> rules,
                     RuleComponentMapping mapping,
-                    ClientValidationProjectionDraft projection)
+                    FluentValidationProjectionDraft projection)
                 {
                     if (rules == null) throw new ArgumentNullException(nameof(rules));
                     if (mapping == null) throw new ArgumentNullException(nameof(mapping));
@@ -340,7 +340,7 @@ namespace Alis.Reactive.FluentValidator
                 new ValidationRule(Rule, Message, Details);
         }
 
-        private sealed class ClientValidationProjectionDraft
+        private sealed class FluentValidationProjectionDraft
         {
             private readonly Dictionary<string, ProjectedClientValidationField> _fields =
                 new Dictionary<string, ProjectedClientValidationField>(StringComparer.Ordinal);
