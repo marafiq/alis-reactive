@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { evaluateCondition } from "../conditions/conditions";
-import type { CompareCondition, Plan, Shape, ValueProducer } from "../types";
+import type { CompareCondition, JsonValue, LiteralProducer, Plan, RangeComparisonProducer, Shape } from "../types";
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
@@ -8,7 +8,6 @@ const booleanShape: Shape = { kind: "boolean" };
 const dateShape: Shape = { kind: "date" };
 const rawShape: Shape = { kind: "raw" };
 const stringArrayShape: Shape = { kind: "array", item: stringShape };
-const numberArrayShape: Shape = { kind: "array", item: numberShape };
 
 function plan(): Plan {
   return {
@@ -21,8 +20,16 @@ function plan(): Plan {
   };
 }
 
-function literal(value: unknown, shape: Shape): ValueProducer {
+function literal(value: JsonValue, shape: Shape): LiteralProducer {
   return { kind: "literal", value, shape };
+}
+
+function range(low: JsonValue, high: JsonValue, itemShape: Shape): RangeComparisonProducer {
+  return {
+    kind: "array",
+    items: [literal(low, itemShape), literal(high, itemShape)],
+    shape: { kind: "array", item: itemShape },
+  };
 }
 
 describe("condition runtime", () => {
@@ -148,26 +155,12 @@ describe("condition runtime", () => {
       kind: "compare",
       left: literal("72", numberShape),
       op: "between",
-      right: { kind: "value", value: literal([60, 90], numberArrayShape) },
+      right: { kind: "value", value: range(60, 90, numberShape) },
       shape: numberShape,
       itemShape: numberShape,
     };
 
     expect(evaluateCondition(condition, plan())).toBe(true);
-  });
-
-  it("rejects malformed between range descriptors instead of inferring missing bounds", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal(72, numberShape),
-      op: "between",
-      right: { kind: "value", value: literal([60], numberArrayShape) },
-      shape: numberShape,
-      itemShape: numberShape,
-    };
-
-    expect(() => evaluateCondition(condition, plan()))
-      .toThrow("[alis] between comparison range must contain exactly two bounds, got 1");
   });
 
   it("evaluates date ranges with the same ordered condition value", () => {
@@ -175,27 +168,11 @@ describe("condition runtime", () => {
       kind: "compare",
       left: literal("2026-07-15", dateShape),
       op: "between",
-      right: {
-        kind: "value",
-        value: literal(["2026-06-01", "2026-08-01"], { kind: "array", item: dateShape }),
-      },
+      right: { kind: "value", value: range("2026-06-01", "2026-08-01", dateShape) },
       shape: dateShape,
       itemShape: dateShape,
     };
 
     expect(evaluateCondition(condition, plan())).toBe(true);
-  });
-
-  it("rejects malformed min-length constraints", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal("clinical note", stringShape),
-      op: "min-length",
-      right: { kind: "value", value: literal("not-a-length", stringShape) },
-      shape: stringShape,
-      itemShape: { kind: "none" },
-    };
-
-    expect(evaluateCondition(condition, plan())).toBe(false);
   });
 });

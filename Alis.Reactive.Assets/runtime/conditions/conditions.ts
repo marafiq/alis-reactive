@@ -2,7 +2,21 @@
 // Uses SHARED resolver for value resolution.
 // Condition is a discriminated union: compare, all, any, not, confirm.
 
-import type { Condition, CompareCondition, CompareOp, Plan, Shape, ValidationCondition } from "../types";
+import type {
+  Condition,
+  CompareCondition,
+  EqualityCompareOp,
+  MembershipCompareCondition,
+  MembershipCompareOp,
+  OrderedCompareOp,
+  Plan,
+  RangeCompareCondition,
+  Shape,
+  TextCompareOp,
+  UnaryCompareOp,
+  ValidationCondition,
+  ValueProducer,
+} from "../types";
 import type { ExecContext } from "../types";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
@@ -19,12 +33,6 @@ type TextOperand =
   | { readonly kind: "text"; readonly value: string }
   | { readonly kind: "missing" };
 
-type UnaryCompareOp = Extract<CompareOp, "is-null" | "not-null" | "is-empty" | "not-empty" | "truthy" | "falsy">;
-type EqualityCompareOp = Extract<CompareOp, "eq" | "neq">;
-type OrderedCompareOp = Extract<CompareOp, "gt" | "gte" | "lt" | "lte">;
-type MembershipCompareOp = Extract<CompareOp, "in" | "not-in">;
-type TextCompareOp = Extract<CompareOp, "contains" | "starts-with" | "ends-with">;
-
 interface AlisBrowserApi {
   readonly alis?: {
     readonly confirm?: (message: string) => Promise<boolean> | boolean;
@@ -32,7 +40,7 @@ interface AlisBrowserApi {
 }
 
 const missingText: TextOperand = { kind: "missing" };
-const textOperandShape: Shape = { kind: "string" };
+const noRightOperandTrace = { kind: "none" } as const;
 
 /** Sync condition evaluation. Confirm conditions return false in sync context. */
 export function evaluateCondition(condition: RuntimeEvaluableCondition, plan: Plan, ctx?: ExecContext): boolean {
@@ -186,12 +194,73 @@ async function evaluateConfirmCondition(message: string): Promise<boolean> {
 
 // -- Compare evaluation --
 
-function evaluateCompare(cond: CompareCondition, plan: Plan, context: ExecutionContext): boolean {
-  const left = ComparisonLeft.resolve(cond, plan, context);
-  const operation = ComparisonOperation.from(cond);
-  const right = ComparisonRight.resolve(cond, plan, context, operation);
-  log.trace("compare", { op: cond.op, left: left.shaped, right: right.traceValue });
-  return operation.evaluate(left, right);
+function evaluateCompare(condition: CompareCondition, plan: Plan, context: ExecutionContext): boolean {
+  const left = ComparisonLeft.resolve(condition, plan, context);
+
+  switch (condition.op) {
+    case "is-null":
+    case "not-null":
+    case "is-empty":
+    case "not-empty":
+    case "truthy":
+    case "falsy":
+      traceCompare(condition, left, noRightOperandTrace);
+      return unaryMatches(condition.op, left);
+
+    case "eq":
+    case "neq": {
+      const right = resolveRightValue(condition, plan, context, condition.shape);
+      traceCompare(condition, left, right);
+      return equalityMatches(condition.op, left, right);
+    }
+
+    case "gt":
+    case "gte":
+    case "lt":
+    case "lte": {
+      const right = resolveRightValue(condition, plan, context, condition.shape);
+      traceCompare(condition, left, right);
+      return ConditionOrdering.between(left.shaped, right).matches(condition.op);
+    }
+
+    case "in":
+    case "not-in": {
+      const right = resolveRightArray(condition, plan, context);
+      traceCompare(condition, left, right);
+      return membershipMatches(condition.op, left, right);
+    }
+
+    case "between": {
+      const [lower, upper] = resolveRightArray(condition, plan, context);
+      traceCompare(condition, left, [lower, upper]);
+      return ComparisonRange.between(lower, upper).contains(left.shaped);
+    }
+
+    case "array-contains": {
+      const right = resolveRightValue(condition, plan, context, condition.itemShape);
+      const items = shapeCollectionItems(left.shaped, condition.itemShape);
+      traceCompare(condition, left, right);
+      return Array.isArray(items) && items.includes(right);
+    }
+
+    case "contains":
+      return evaluateTextComparison(condition.op, left, condition.right.value.value, condition);
+
+    case "starts-with":
+      return evaluateTextComparison(condition.op, left, condition.right.value.value, condition);
+
+    case "ends-with":
+      return evaluateTextComparison(condition.op, left, condition.right.value.value, condition);
+
+    case "matches":
+      return evaluateRegexComparison(left, condition.right.value.value, condition);
+
+    case "min-length":
+      return evaluateMinimumLengthComparison(left, condition.right.value.value, condition);
+
+    default:
+      return assertNever(condition, "compare condition");
+  }
 }
 
 class ComparisonLeft {
@@ -207,196 +276,115 @@ class ComparisonLeft {
   }
 }
 
-class ComparisonRight {
-  private constructor(private readonly state: ComparisonRightState) {}
+type RightValuedCondition = Extract<CompareCondition, { readonly right: { readonly kind: "value" } }>;
 
-  static resolve(
-    condition: CompareCondition,
-    plan: Plan,
-    context: ExecutionContext,
-    operation: ComparisonOperation,
-  ): ComparisonRight {
-    if (condition.right.kind === "none") return ComparisonRight.absent();
+function traceCompare(condition: CompareCondition, left: ComparisonLeft, right: unknown): void {
+  log.trace("compare", { op: condition.op, left: left.shaped, right });
+}
 
-    const raw = evaluateValue(condition.right.value, plan, context.raw);
-    const rightOperandIsCollection = Array.isArray(raw) && operation.shapesRightCollection;
-    if (rightOperandIsCollection) {
-      return ComparisonRight.present(raw.map(item => applyShape(item, condition.shape)));
-    }
+function resolveRightValue(
+  condition: RightValuedCondition,
+  plan: Plan,
+  context: ExecutionContext,
+  shape: Shape,
+): unknown {
+  const raw = evaluateValue(condition.right.value as ValueProducer, plan, context.raw);
+  return applyShape(raw, shape);
+}
 
-    return ComparisonRight.present(applyShape(raw, operation.rightOperandShape(condition)));
-  }
+function resolveRightArray(
+  condition: MembershipCompareCondition | RangeCompareCondition,
+  plan: Plan,
+  context: ExecutionContext,
+): unknown[] {
+  const raw = evaluateValue(condition.right.value, plan, context.raw) as unknown[];
+  return raw.map(item => applyShape(item, condition.shape));
+}
 
-  static absent(): ComparisonRight {
-    return new ComparisonRight(absentComparisonRight);
-  }
-
-  static present(value: unknown): ComparisonRight {
-    return new ComparisonRight({ kind: "present", value });
-  }
-
-  get traceValue(): unknown {
-    if (this.state.kind === "present") return this.state.value;
-    return absentComparisonRightTrace;
-  }
-
-  requireValue(operator: string): unknown {
-    if (this.state.kind === "present") return this.state.value;
-
-    throw new Error(`[alis] comparison operator "${operator}" requires a right operand`);
-  }
-
-  collection(operator: string): ComparisonCollection {
-    return ComparisonCollection.from(this.requireValue(operator));
+function unaryMatches(op: UnaryCompareOp, left: ComparisonLeft): boolean {
+  switch (op) {
+    case "is-null":
+      return isMissingValue(left.raw);
+    case "not-null":
+      return !isMissingValue(left.raw);
+    case "is-empty":
+      return isEmpty(left.raw);
+    case "not-empty":
+      return !isEmpty(left.raw);
+    case "truthy":
+      return !!left.shaped;
+    case "falsy":
+      return !left.shaped;
+    default:
+      return assertNever(op, "unary comparison operator");
   }
 }
 
-type ComparisonRightState =
-  | { readonly kind: "present"; readonly value: unknown }
-  | { readonly kind: "absent" };
+function equalityMatches(op: EqualityCompareOp, left: ComparisonLeft, right: unknown): boolean {
+  const valuesAreEqual = left.shaped === right;
+  if (op === "eq") return valuesAreEqual;
 
-const absentComparisonRight: ComparisonRightState = { kind: "absent" };
-const absentComparisonRightTrace = { kind: "absent" } as const;
-
-abstract class ComparisonOperation {
-  readonly shapesRightCollection: boolean = false;
-
-  static from(condition: CompareCondition): ComparisonOperation {
-    switch (condition.op) {
-      case "is-null":
-      case "not-null":
-      case "is-empty":
-      case "not-empty":
-      case "truthy":
-      case "falsy":
-        return new UnaryComparisonOperation(condition.op);
-
-      case "eq":
-      case "neq":
-        return new EqualityComparisonOperation(condition.op);
-
-      case "gt":
-      case "gte":
-      case "lt":
-      case "lte":
-        return new OrderedComparisonOperation(condition.op);
-
-      case "in":
-      case "not-in":
-        return new MembershipComparisonOperation(condition.op);
-
-      case "between":
-        return new BetweenComparisonOperation();
-
-      case "array-contains":
-        return new ArrayContainsComparisonOperation(condition.itemShape);
-
-      case "contains":
-      case "starts-with":
-      case "ends-with":
-        return new TextComparisonOperation(condition.op);
-
-      case "matches":
-        return RegexComparisonOperation.instance;
-
-      case "min-length":
-        return MinLengthComparisonOperation.instance;
-
-      default:
-        return assertNever(condition.op, "condition operator");
-    }
-  }
-
-  rightOperandShape(condition: CompareCondition): Shape {
-    return condition.shape;
-  }
-
-  abstract evaluate(left: ComparisonLeft, right: ComparisonRight): boolean;
+  return !valuesAreEqual;
 }
 
-class UnaryComparisonOperation extends ComparisonOperation {
-  constructor(private readonly op: UnaryCompareOp) {
-    super();
-  }
+function membershipMatches(op: MembershipCompareOp, left: ComparisonLeft, values: readonly unknown[]): boolean {
+  const collectionContainsLeft = values.includes(left.shaped);
+  if (op === "in") return collectionContainsLeft;
 
-  evaluate(left: ComparisonLeft, _right: ComparisonRight): boolean {
-    switch (this.op) {
-      case "is-null":
-        return isMissingValue(left.raw);
-      case "not-null":
-        return !isMissingValue(left.raw);
-      case "is-empty":
-        return isEmpty(left.raw);
-      case "not-empty":
-        return !isEmpty(left.raw);
-      case "truthy":
-        return !!left.shaped;
-      case "falsy":
-        return !left.shaped;
-      default:
-        assertNever(this.op, "unary comparison operator");
-    }
+  return !collectionContainsLeft;
+}
+
+function shapeCollectionItems(value: unknown, itemShape: Shape): unknown {
+  return ComparisonCollection
+    .from(value)
+    .shapedOrOriginal(value, itemShape);
+}
+
+function evaluateTextComparison(
+  op: TextCompareOp,
+  left: ComparisonLeft,
+  right: string,
+  condition: CompareCondition,
+): boolean {
+  traceCompare(condition, left, right);
+
+  switch (op) {
+    case "contains":
+      return textOp(left.shaped, right, (source, operand) => source.includes(operand));
+    case "starts-with":
+      return textOp(left.shaped, right, (source, operand) => source.startsWith(operand));
+    case "ends-with":
+      return textOp(left.shaped, right, (source, operand) => source.endsWith(operand));
+    default:
+      return assertNever(op, "text comparison operator");
   }
 }
 
-class EqualityComparisonOperation extends ComparisonOperation {
-  constructor(private readonly op: EqualityCompareOp) {
-    super();
-  }
+function evaluateRegexComparison(left: ComparisonLeft, pattern: string, condition: CompareCondition): boolean {
+  traceCompare(condition, left, pattern);
 
-  evaluate(left: ComparisonLeft, right: ComparisonRight): boolean {
-    const rightValue = right.requireValue(this.op);
-    const valuesAreEqual = left.shaped === rightValue;
-    if (this.op === "eq") return valuesAreEqual;
+  const leftText = asText(left.shaped);
+  if (leftText.kind === "missing") return false;
 
-    return !valuesAreEqual;
-  }
-}
-
-class OrderedComparisonOperation extends ComparisonOperation {
-  constructor(private readonly op: OrderedCompareOp) {
-    super();
-  }
-
-  evaluate(left: ComparisonLeft, right: ComparisonRight): boolean {
-    return ConditionOrdering
-      .between(left.shaped, right.requireValue(this.op))
-      .matches(this.op);
+  try {
+    return new RegExp(pattern).test(leftText.value);
+  } catch {
+    log.warn("regex.invalid", { operand: pattern });
+    return false;
   }
 }
 
-class MembershipComparisonOperation extends ComparisonOperation {
-  override readonly shapesRightCollection = true;
+function evaluateMinimumLengthComparison(left: ComparisonLeft, minimumLength: number, condition: CompareCondition): boolean {
+  traceCompare(condition, left, minimumLength);
 
-  constructor(private readonly op: MembershipCompareOp) {
-    super();
-  }
-
-  evaluate(left: ComparisonLeft, right: ComparisonRight): boolean {
-    const collection = right.collection(this.op);
-    if (!collection.isAvailable) return this.op === "not-in";
-
-    const collectionContainsLeft = collection.includes(left.shaped);
-    if (this.op === "in") return collectionContainsLeft;
-    return !collectionContainsLeft;
-  }
-}
-
-class BetweenComparisonOperation extends ComparisonOperation {
-  override readonly shapesRightCollection = true;
-
-  evaluate(left: ComparisonLeft, right: ComparisonRight): boolean {
-    const range = ComparisonRange.from(right.requireValue("between"));
-    return range.contains(left.shaped);
-  }
+  const leftText = asText(left.shaped);
+  return leftText.kind === "text" && leftText.value.length >= minimumLength;
 }
 
 abstract class ComparisonRange {
-  static from(value: unknown): ComparisonRange {
-    const descriptor = ComparisonRangeDescriptor.from(value);
-
-    const lowerComparable = OrderedConditionValue.from(descriptor.lower);
-    const upperComparable = OrderedConditionValue.from(descriptor.upper);
+  static between(lower: unknown, upper: unknown): ComparisonRange {
+    const lowerComparable = OrderedConditionValue.from(lower);
+    const upperComparable = OrderedConditionValue.from(upper);
     const rangeHasComparableBounds = lowerComparable.tryCompareTo(upperComparable) !== undefined;
     if (!rangeHasComparableBounds) return MissingComparisonRange.instance;
 
@@ -404,26 +392,6 @@ abstract class ComparisonRange {
   }
 
   abstract contains(value: unknown): boolean;
-}
-
-class ComparisonRangeDescriptor {
-  private constructor(
-    readonly lower: unknown,
-    readonly upper: unknown,
-  ) {}
-
-  static from(value: unknown): ComparisonRangeDescriptor {
-    if (!Array.isArray(value)) {
-      throw new Error("[alis] between comparison range must be an array with exactly two bounds");
-    }
-
-    const rangeDeclaresExactlyTwoBounds = value.length === 2;
-    if (!rangeDeclaresExactlyTwoBounds) {
-      throw new Error(`[alis] between comparison range must contain exactly two bounds, got ${value.length}`);
-    }
-
-    return new ComparisonRangeDescriptor(value[0], value[1]);
-  }
 }
 
 class OrderedComparisonRange extends ComparisonRange {
@@ -453,27 +421,6 @@ class MissingComparisonRange extends ComparisonRange {
   }
 }
 
-class ArrayContainsComparisonOperation extends ComparisonOperation {
-  constructor(private readonly itemShape: Shape) {
-    super();
-  }
-
-  override rightOperandShape(): Shape {
-    return this.itemShape;
-  }
-
-  evaluate(left: ComparisonLeft, right: ComparisonRight): boolean {
-    const items = this.shapeItems(left.shaped);
-    return Array.isArray(items) && items.includes(right.requireValue("array-contains"));
-  }
-
-  private shapeItems(value: unknown): unknown {
-    return ComparisonCollection
-      .from(value)
-      .shapedOrOriginal(value, this.itemShape);
-  }
-}
-
 abstract class ComparisonCollection {
   static from(value: unknown): ComparisonCollection {
     const valueIsCollection = Array.isArray(value);
@@ -486,9 +433,7 @@ abstract class ComparisonCollection {
     return ComparisonCollection.from(value).isEmpty;
   }
 
-  abstract get isAvailable(): boolean;
   abstract get isEmpty(): boolean;
-  abstract includes(value: unknown): boolean;
   abstract shapedOrOriginal(original: unknown, itemShape: Shape): unknown;
 }
 
@@ -497,16 +442,8 @@ class AvailableComparisonCollection extends ComparisonCollection {
     super();
   }
 
-  get isAvailable(): boolean {
-    return true;
-  }
-
   get isEmpty(): boolean {
     return this.items.length === 0;
-  }
-
-  includes(value: unknown): boolean {
-    return this.items.includes(value);
   }
 
   shapedOrOriginal(_original: unknown, itemShape: Shape): unknown[] {
@@ -517,87 +454,12 @@ class AvailableComparisonCollection extends ComparisonCollection {
 class MissingComparisonCollection extends ComparisonCollection {
   static readonly instance = new MissingComparisonCollection();
 
-  get isAvailable(): boolean {
-    return false;
-  }
-
   get isEmpty(): boolean {
-    return false;
-  }
-
-  includes(_value: unknown): boolean {
     return false;
   }
 
   shapedOrOriginal(original: unknown, _itemShape: Shape): unknown {
     return original;
-  }
-}
-
-class TextComparisonOperation extends ComparisonOperation {
-  constructor(private readonly op: TextCompareOp) {
-    super();
-  }
-
-  override rightOperandShape(): Shape {
-    return textOperandShape;
-  }
-
-  evaluate(left: ComparisonLeft, right: ComparisonRight): boolean {
-    const rightValue = right.requireValue(this.op);
-    switch (this.op) {
-      case "contains":
-        return textOp(left.shaped, rightValue, (source, operand) => source.includes(operand));
-      case "starts-with":
-        return textOp(left.shaped, rightValue, (source, operand) => source.startsWith(operand));
-      case "ends-with":
-        return textOp(left.shaped, rightValue, (source, operand) => source.endsWith(operand));
-      default:
-        assertNever(this.op, "text comparison operator");
-    }
-  }
-}
-
-class RegexComparisonOperation extends ComparisonOperation {
-  static readonly instance = new RegexComparisonOperation();
-
-  private constructor() {
-    super();
-  }
-
-  override rightOperandShape(): Shape {
-    return textOperandShape;
-  }
-
-  evaluate(left: ComparisonLeft, right: ComparisonRight): boolean {
-    const rightValue = right.requireValue("matches");
-    const leftText = asText(left.shaped);
-    const rightText = asText(rightValue);
-    const operandsAreText = leftText.kind === "text" && rightText.kind === "text";
-    if (!operandsAreText) return false;
-
-    try {
-      return new RegExp(rightText.value).test(leftText.value);
-    } catch {
-      log.warn("regex.invalid", { operand: rightValue });
-      return false;
-    }
-  }
-}
-
-class MinLengthComparisonOperation extends ComparisonOperation {
-  static readonly instance = new MinLengthComparisonOperation();
-
-  private constructor() {
-    super();
-  }
-
-  evaluate(left: ComparisonLeft, right: ComparisonRight): boolean {
-    const rightValue = right.requireValue("min-length");
-    const leftText = asText(left.shaped);
-    if (leftText.kind === "missing") return false;
-
-    return MinimumTextLength.from(rightValue).accepts(leftText.value);
   }
 }
 
@@ -719,50 +581,9 @@ class MissingOrderedConditionValue extends OrderedConditionValue {
   }
 }
 
-abstract class MinimumTextLength {
-  static from(value: unknown): MinimumTextLength {
-    const minimum = MinimumTextLength.toFiniteNumber(value);
-    if (minimum === undefined) return MissingMinimumTextLength.instance;
-
-    return new PresentMinimumTextLength(minimum);
-  }
-
-  private static toFiniteNumber(value: unknown): number | undefined {
-    const parsed = typeof value === "number" || typeof value === "string"
-      ? Number(value)
-      : NaN;
-    const valueIsUsableLength = Number.isFinite(parsed) && parsed >= 0;
-    if (!valueIsUsableLength) return undefined;
-
-    return parsed;
-  }
-
-  abstract accepts(text: string): boolean;
-}
-
-class PresentMinimumTextLength extends MinimumTextLength {
-  constructor(private readonly value: number) {
-    super();
-  }
-
-  accepts(text: string): boolean {
-    return text.length >= this.value;
-  }
-}
-
-class MissingMinimumTextLength extends MinimumTextLength {
-  static readonly instance = new MissingMinimumTextLength();
-
-  accepts(_text: string): boolean {
-    return false;
-  }
-}
-
-function textOp(left: unknown, right: unknown, predicate: (source: string, operand: string) => boolean): boolean {
+function textOp(left: unknown, right: string, predicate: (source: string, operand: string) => boolean): boolean {
   const leftText = asText(left);
-  const rightText = asText(right);
-  const operandsAreText = leftText.kind === "text" && rightText.kind === "text";
-  return operandsAreText && predicate(leftText.value, rightText.value);
+  return leftText.kind === "text" && predicate(leftText.value, right);
 }
 
 function isEmpty(value: unknown): boolean {

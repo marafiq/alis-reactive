@@ -511,6 +511,63 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class CompareOperator : PlanString
     {
+        internal static readonly string[] EqualityValues =
+        {
+            CompareOp.Eq,
+            CompareOp.Neq,
+        };
+
+        internal static readonly string[] OrderedValues =
+        {
+            CompareOp.Gt,
+            CompareOp.Gte,
+            CompareOp.Lt,
+            CompareOp.Lte,
+        };
+
+        internal static readonly string[] UnaryValues =
+        {
+            CompareOp.Truthy,
+            CompareOp.Falsy,
+            CompareOp.IsNull,
+            CompareOp.NotNull,
+            CompareOp.IsEmpty,
+            CompareOp.NotEmpty,
+        };
+
+        internal static readonly string[] MembershipValues =
+        {
+            CompareOp.In,
+            CompareOp.NotIn,
+        };
+
+        internal static readonly string[] RangeValues =
+        {
+            CompareOp.Between,
+        };
+
+        internal static readonly string[] TextValues =
+        {
+            CompareOp.Contains,
+            CompareOp.StartsWith,
+            CompareOp.EndsWith,
+        };
+
+        internal static readonly string[] RegexValues =
+        {
+            CompareOp.Matches,
+        };
+
+        internal static readonly string[] TextLengthValues =
+        {
+            CompareOp.MinLength,
+        };
+
+        internal static readonly string[] CollectionItemValues =
+        {
+            CompareOp.ArrayContains,
+        };
+
         internal static CompareOperator Eq { get; } = new CompareOperator(CompareOp.Eq);
         internal static CompareOperator Neq { get; } = new CompareOperator(CompareOp.Neq);
         internal static CompareOperator Gt { get; } = new CompareOperator(CompareOp.Gt);
@@ -562,6 +619,8 @@ namespace Alis.Reactive.PlanModel
         private CompareOperator(string value) : base(value, nameof(value)) { }
 
         internal static IReadOnlyCollection<string> Values => Known.Keys;
+
+        internal bool RequiresRightOperand => Array.IndexOf(UnaryValues, Value) < 0;
 
         internal static CompareOperator From(string value)
         {

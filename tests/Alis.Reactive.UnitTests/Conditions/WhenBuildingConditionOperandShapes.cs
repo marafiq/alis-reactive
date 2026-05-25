@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.UnitTests.Conditions;
 
@@ -45,6 +46,26 @@ public class WhenBuildingConditionOperandShapes : PlanTestBase
 
         Assert.That(ex!.ParamName, Is.EqualTo("length"));
         Assert.That(ex.Message, Does.Contain("zero or greater"));
+    }
+
+    [Test]
+    public void compare_condition_rejects_operator_operand_family_mismatches()
+    {
+        var left = ValueProducer.Literal(1);
+        var right = ValueProducer.Literal(2);
+
+        var missingRight = Assert.Throws<ArgumentException>(() =>
+            Condition.Compare(
+                CompareOperator.Gt,
+                ComparisonOperands.Unary(left, Shape.Number)));
+
+        var unexpectedRight = Assert.Throws<ArgumentException>(() =>
+            Condition.Compare(
+                CompareOperator.Truthy,
+                ComparisonOperands.Binary(left, right, Shape.Number)));
+
+        Assert.That(missingRight!.Message, Does.Contain("Comparison operator 'gt' requires a right operand."));
+        Assert.That(unexpectedRight!.Message, Does.Contain("Comparison operator 'truthy' requires no right operand."));
     }
 
     private static JsonElement FindCompareCondition(JsonElement root, string op)

@@ -89,6 +89,11 @@ namespace Alis.Reactive.PlanModel
         {
             _op = op ?? throw new ArgumentNullException(nameof(op));
             _operands = operands ?? throw new ArgumentNullException(nameof(operands));
+            if (_op.RequiresRightOperand != _operands.HasRightOperand)
+                throw new ArgumentException(
+                    "Comparison operator '" + _op.Value + "' requires " +
+                    (_op.RequiresRightOperand ? "a right operand." : "no right operand."),
+                    nameof(operands));
         }
     }
 
@@ -142,6 +147,7 @@ namespace Alis.Reactive.PlanModel
 
         internal ValueProducer Left { get; }
         internal ComparisonRightOperand Right => _right;
+        internal bool HasRightOperand => _right.HasValue;
         internal Shape ShapeForJson => _shape.OperandShape;
         internal Shape ItemShapeForJson => _shape.ItemShape;
 
@@ -178,6 +184,7 @@ namespace Alis.Reactive.PlanModel
             new PresentComparisonRightOperand(value);
 
         public abstract string Kind { get; }
+        internal abstract bool HasValue { get; }
 
         internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
     }
@@ -194,6 +201,7 @@ namespace Alis.Reactive.PlanModel
         internal ValueProducer Value => _value;
 
         public override string Kind => "value";
+        internal override bool HasValue => true;
 
         internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
             ComparisonRightOperandJsonConverter.WriteProperty(writer, options, "value", _value);
@@ -202,6 +210,7 @@ namespace Alis.Reactive.PlanModel
     internal sealed class AbsentComparisonRightOperand : ComparisonRightOperand
     {
         public override string Kind => "none";
+        internal override bool HasValue => false;
 
         internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
         {

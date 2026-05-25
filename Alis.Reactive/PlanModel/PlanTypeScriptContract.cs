@@ -716,18 +716,109 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(LiteralUnion("CompareOp", CompareOperator.Values));
 
-            contract.Declare(Interface("CompareCondition")
+            contract.Declare(Union(
+                "CompareCondition",
+                "UnaryCompareCondition",
+                "EqualityCompareCondition",
+                "OrderedCompareCondition",
+                "MembershipCompareCondition",
+                "RangeCompareCondition",
+                "TextCompareCondition",
+                "RegexCompareCondition",
+                "TextLengthCompareCondition",
+                "CollectionItemCompareCondition"));
+
+            contract.Declare(LiteralUnion("UnaryCompareOp", CompareOperator.UnaryValues));
+            contract.Declare(LiteralUnion("EqualityCompareOp", CompareOperator.EqualityValues));
+            contract.Declare(LiteralUnion("OrderedCompareOp", CompareOperator.OrderedValues));
+            contract.Declare(LiteralUnion("MembershipCompareOp", CompareOperator.MembershipValues));
+            contract.Declare(LiteralUnion("RangeCompareOp", CompareOperator.RangeValues));
+            contract.Declare(LiteralUnion("TextCompareOp", CompareOperator.TextValues));
+            contract.Declare(LiteralUnion("RegexCompareOp", CompareOperator.RegexValues));
+            contract.Declare(LiteralUnion("TextLengthCompareOp", CompareOperator.TextLengthValues));
+            contract.Declare(LiteralUnion("CollectionItemCompareOp", CompareOperator.CollectionItemValues));
+
+            contract.Declare(Interface("UnaryCompareCondition")
                 .Requires("kind", Literal("compare"))
                 .Requires("left", "ValueProducer")
-                .Requires("op", "CompareOp")
-                .Requires("right", "ComparisonRightOperand")
+                .Requires("op", "UnaryCompareOp")
+                .Requires("right", "NoComparisonRightOperand")
+                .Requires("shape", "Shape")
+                .Requires("itemShape", "Shape"));
+
+            contract.Declare(Interface("EqualityCompareCondition")
+                .Requires("kind", Literal("compare"))
+                .Requires("left", "ValueProducer")
+                .Requires("op", "EqualityCompareOp")
+                .Requires("right", "PresentComparisonRightOperand")
+                .Requires("shape", "Shape")
+                .Requires("itemShape", "Shape"));
+
+            contract.Declare(Interface("OrderedCompareCondition")
+                .Requires("kind", Literal("compare"))
+                .Requires("left", "ValueProducer")
+                .Requires("op", "OrderedCompareOp")
+                .Requires("right", "PresentComparisonRightOperand")
+                .Requires("shape", "Shape")
+                .Requires("itemShape", "Shape"));
+
+            contract.Declare(Interface("MembershipCompareCondition")
+                .Requires("kind", Literal("compare"))
+                .Requires("left", "ValueProducer")
+                .Requires("op", "MembershipCompareOp")
+                .Requires("right", "CollectionComparisonRightOperand")
+                .Requires("shape", "Shape")
+                .Requires("itemShape", "Shape"));
+
+            contract.Declare(Interface("RangeCompareCondition")
+                .Requires("kind", Literal("compare"))
+                .Requires("left", "ValueProducer")
+                .Requires("op", "RangeCompareOp")
+                .Requires("right", "RangeComparisonRightOperand")
+                .Requires("shape", "Shape")
+                .Requires("itemShape", "Shape"));
+
+            contract.Declare(Interface("TextCompareCondition")
+                .Requires("kind", Literal("compare"))
+                .Requires("left", "ValueProducer")
+                .Requires("op", "TextCompareOp")
+                .Requires("right", "TextComparisonRightOperand")
+                .Requires("shape", "Shape")
+                .Requires("itemShape", "Shape"));
+
+            contract.Declare(Interface("RegexCompareCondition")
+                .Requires("kind", Literal("compare"))
+                .Requires("left", "ValueProducer")
+                .Requires("op", "RegexCompareOp")
+                .Requires("right", "TextComparisonRightOperand")
+                .Requires("shape", "Shape")
+                .Requires("itemShape", "Shape"));
+
+            contract.Declare(Interface("TextLengthCompareCondition")
+                .Requires("kind", Literal("compare"))
+                .Requires("left", "ValueProducer")
+                .Requires("op", "TextLengthCompareOp")
+                .Requires("right", "NumericComparisonRightOperand")
+                .Requires("shape", "Shape")
+                .Requires("itemShape", "Shape"));
+
+            contract.Declare(Interface("CollectionItemCompareCondition")
+                .Requires("kind", Literal("compare"))
+                .Requires("left", "ValueProducer")
+                .Requires("op", "CollectionItemCompareOp")
+                .Requires("right", "LiteralComparisonRightOperand")
                 .Requires("shape", "Shape")
                 .Requires("itemShape", "Shape"));
 
             contract.Declare(Union(
                 "ComparisonRightOperand",
                 "NoComparisonRightOperand",
-                "PresentComparisonRightOperand"));
+                "PresentComparisonRightOperand",
+                "CollectionComparisonRightOperand",
+                "RangeComparisonRightOperand",
+                "TextComparisonRightOperand",
+                "NumericComparisonRightOperand",
+                "LiteralComparisonRightOperand"));
 
             contract.Declare(Interface("NoComparisonRightOperand")
                 .Requires("kind", Literal("none")));
@@ -735,6 +826,30 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Interface("PresentComparisonRightOperand")
                 .Requires("kind", Literal("value"))
                 .Requires("value", "ValueProducer"));
+
+            contract.Declare(Interface("CollectionComparisonRightOperand")
+                .Requires("kind", Literal("value"))
+                .Requires("value", "ArrayProducer"));
+
+            contract.Declare(Alias(
+                "RangeComparisonProducer",
+                "ArrayProducer & { items: [ValueProducer, ValueProducer] }"));
+
+            contract.Declare(Interface("RangeComparisonRightOperand")
+                .Requires("kind", Literal("value"))
+                .Requires("value", "RangeComparisonProducer"));
+
+            contract.Declare(Interface("TextComparisonRightOperand")
+                .Requires("kind", Literal("value"))
+                .Requires("value", "TextLiteralProducer"));
+
+            contract.Declare(Interface("NumericComparisonRightOperand")
+                .Requires("kind", Literal("value"))
+                .Requires("value", "NumericLiteralProducer"));
+
+            contract.Declare(Interface("LiteralComparisonRightOperand")
+                .Requires("kind", Literal("value"))
+                .Requires("value", "LiteralProducer"));
 
             contract.Declare(Interface("AllCondition")
                 .Requires("kind", Literal("all"))

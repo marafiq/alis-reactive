@@ -199,6 +199,41 @@ public class WhenGeneratingRuntimePlanTypes
             "Peer equality rules should carry peer operands, not generic constraint operands.");
     }
 
+    [Test]
+    public void generated_runtime_plan_types_encode_condition_operator_families()
+    {
+        var generated = PlanTypeScriptContract.Render();
+
+        Assert.That(
+            generated,
+            Does.Contain("export type CompareCondition =\n  | UnaryCompareCondition\n  | EqualityCompareCondition\n  | OrderedCompareCondition\n  | MembershipCompareCondition\n  | RangeCompareCondition\n  | TextCompareCondition\n  | RegexCompareCondition\n  | TextLengthCompareCondition\n  | CollectionItemCompareCondition;"),
+            "Compare conditions should be typed by operator family, not one broad op/right bag.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface UnaryCompareCondition"),
+            "Unary operators are the only compare conditions that carry no right operand.");
+        Assert.That(
+            generated,
+            Does.Contain("right: NoComparisonRightOperand;"),
+            "Unary compare conditions should encode absence explicitly.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface RangeCompareCondition"),
+            "Between should be a range condition family.");
+        Assert.That(
+            generated,
+            Does.Contain("value: RangeComparisonProducer;"),
+            "Between should carry a two-bound range producer.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface TextLengthCompareCondition"),
+            "Text length conditions should be a separate family.");
+        Assert.That(
+            generated,
+            Does.Contain("right: NumericComparisonRightOperand;"),
+            "Text length conditions should carry numeric operands, not generic values.");
+    }
+
     private static string FindRepoRoot(string startDirectory)
     {
         var directory = new DirectoryInfo(startDirectory);

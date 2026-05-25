@@ -908,18 +908,145 @@ export type CompareOp =
   | "min-length"
   | "array-contains";
 
-export interface CompareCondition {
+export type CompareCondition =
+  | UnaryCompareCondition
+  | EqualityCompareCondition
+  | OrderedCompareCondition
+  | MembershipCompareCondition
+  | RangeCompareCondition
+  | TextCompareCondition
+  | RegexCompareCondition
+  | TextLengthCompareCondition
+  | CollectionItemCompareCondition;
+
+export type UnaryCompareOp =
+  | "truthy"
+  | "falsy"
+  | "is-null"
+  | "not-null"
+  | "is-empty"
+  | "not-empty";
+
+export type EqualityCompareOp =
+  | "eq"
+  | "neq";
+
+export type OrderedCompareOp =
+  | "gt"
+  | "gte"
+  | "lt"
+  | "lte";
+
+export type MembershipCompareOp =
+  | "in"
+  | "not-in";
+
+export type RangeCompareOp =
+  | "between";
+
+export type TextCompareOp =
+  | "contains"
+  | "starts-with"
+  | "ends-with";
+
+export type RegexCompareOp =
+  | "matches";
+
+export type TextLengthCompareOp =
+  | "min-length";
+
+export type CollectionItemCompareOp =
+  | "array-contains";
+
+export interface UnaryCompareCondition {
   kind: "compare";
   left: ValueProducer;
-  op: CompareOp;
-  right: ComparisonRightOperand;
+  op: UnaryCompareOp;
+  right: NoComparisonRightOperand;
+  shape: Shape;
+  itemShape: Shape;
+}
+
+export interface EqualityCompareCondition {
+  kind: "compare";
+  left: ValueProducer;
+  op: EqualityCompareOp;
+  right: PresentComparisonRightOperand;
+  shape: Shape;
+  itemShape: Shape;
+}
+
+export interface OrderedCompareCondition {
+  kind: "compare";
+  left: ValueProducer;
+  op: OrderedCompareOp;
+  right: PresentComparisonRightOperand;
+  shape: Shape;
+  itemShape: Shape;
+}
+
+export interface MembershipCompareCondition {
+  kind: "compare";
+  left: ValueProducer;
+  op: MembershipCompareOp;
+  right: CollectionComparisonRightOperand;
+  shape: Shape;
+  itemShape: Shape;
+}
+
+export interface RangeCompareCondition {
+  kind: "compare";
+  left: ValueProducer;
+  op: RangeCompareOp;
+  right: RangeComparisonRightOperand;
+  shape: Shape;
+  itemShape: Shape;
+}
+
+export interface TextCompareCondition {
+  kind: "compare";
+  left: ValueProducer;
+  op: TextCompareOp;
+  right: TextComparisonRightOperand;
+  shape: Shape;
+  itemShape: Shape;
+}
+
+export interface RegexCompareCondition {
+  kind: "compare";
+  left: ValueProducer;
+  op: RegexCompareOp;
+  right: TextComparisonRightOperand;
+  shape: Shape;
+  itemShape: Shape;
+}
+
+export interface TextLengthCompareCondition {
+  kind: "compare";
+  left: ValueProducer;
+  op: TextLengthCompareOp;
+  right: NumericComparisonRightOperand;
+  shape: Shape;
+  itemShape: Shape;
+}
+
+export interface CollectionItemCompareCondition {
+  kind: "compare";
+  left: ValueProducer;
+  op: CollectionItemCompareOp;
+  right: LiteralComparisonRightOperand;
   shape: Shape;
   itemShape: Shape;
 }
 
 export type ComparisonRightOperand =
   | NoComparisonRightOperand
-  | PresentComparisonRightOperand;
+  | PresentComparisonRightOperand
+  | CollectionComparisonRightOperand
+  | RangeComparisonRightOperand
+  | TextComparisonRightOperand
+  | NumericComparisonRightOperand
+  | LiteralComparisonRightOperand;
 
 export interface NoComparisonRightOperand {
   kind: "none";
@@ -928,6 +1055,33 @@ export interface NoComparisonRightOperand {
 export interface PresentComparisonRightOperand {
   kind: "value";
   value: ValueProducer;
+}
+
+export interface CollectionComparisonRightOperand {
+  kind: "value";
+  value: ArrayProducer;
+}
+
+export type RangeComparisonProducer = ArrayProducer & { items: [ValueProducer, ValueProducer] };
+
+export interface RangeComparisonRightOperand {
+  kind: "value";
+  value: RangeComparisonProducer;
+}
+
+export interface TextComparisonRightOperand {
+  kind: "value";
+  value: TextLiteralProducer;
+}
+
+export interface NumericComparisonRightOperand {
+  kind: "value";
+  value: NumericLiteralProducer;
+}
+
+export interface LiteralComparisonRightOperand {
+  kind: "value";
+  value: LiteralProducer;
 }
 
 export interface AllCondition {
