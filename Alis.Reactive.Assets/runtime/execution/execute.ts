@@ -52,154 +52,163 @@ export function executeReaction(
   plan?: Plan,
   ctx?: ExecContext,
 ): void | Promise<void> {
-  return ReactionExecution.start(plan, ctx).execute(reaction);
+  return executeReactionWith(reaction, runtimePlanFor(plan), ExecutionContext.from(ctx));
 }
 
-class ReactionExecution {
-  private constructor(
-    private readonly plan: RuntimePlan,
-    private readonly context: ExecutionContext,
-  ) {}
-
-  static start(plan: Plan | undefined, context: ExecContext | undefined): ReactionExecution {
-    return new ReactionExecution(runtimePlanFor(plan), ExecutionContext.from(context));
-  }
-
-  execute(reaction: Reaction): void | Promise<void> {
-    switch (reaction.kind) {
-      case "set":
-        this.executeSet(reaction);
-        return;
-
-      case "call":
-        this.executeCall(reaction);
-        return;
-
-      case "dispatch":
-        this.executeDispatch(reaction);
-        return;
-
-      case "inject":
-        this.executeInject(reaction);
-        return;
-
-      case "show-validation-errors":
-        this.executeShowValidationErrors(reaction);
-        return;
-
-      case "sequence":
-        return this.executeSequence(reaction);
-
-      case "branch":
-        return this.executeBranch(reaction);
-
-      case "request":
-        return executeRequest(reaction.request, this.plan.document, this.context.raw);
-
-      case "parallel":
-        return this.executeParallel(reaction);
-
-      default:
-        assertNever(reaction, "reaction kind");
-    }
-  }
-
-  private executeSequence(reaction: SequenceReaction): void | Promise<void> {
-    for (const [index, step] of reaction.steps.entries()) {
-      const result = this.execute(step);
-      if (reactionContinuesAsync(result)) {
-        const remaining = reaction.steps.slice(index + 1);
-        return result.then(() => this.executeRemainingSequence(remaining));
-      }
-    }
-  }
-
-  private async executeRemainingSequence(steps: readonly Reaction[]): Promise<void> {
-    for (const step of steps) {
-      const result = this.execute(step);
-      if (reactionContinuesAsync(result)) await result;
-    }
-  }
-
-  private executeBranch(reaction: BranchReaction): void | Promise<void> {
-    return executeBranchReaction({
-      cases: reaction.cases,
-      plan: this.plan.document,
-      context: this.context,
-      runReaction: child => this.execute(child),
-    });
-  }
-
-  private async executeParallel(reaction: ParallelReaction): Promise<void> {
-    const settledSteps = await Promise.allSettled(
-      reaction.steps.map(step => reactionAsPromise(this.execute(step))),
-    );
-    reportParallelStepFailures(settledSteps);
-
-    switch (reaction.completion.kind) {
-      case "none":
-        return;
-
-      case "on-settled":
-        await waitForReaction(this.execute(reaction.completion.reaction));
-        return;
-
-      default:
-        assertNever(reaction.completion, "parallel completion");
-    }
-  }
-
-  private executeSet(reaction: SetReaction): void {
-    const value = evaluateValue(reaction.value, this.plan.document, this.context.raw);
-    const target = ReactionTarget.forSet(reaction.on, this.plan, this.context);
-    log.trace("set", { target: target.label, property: reaction.property, value });
-    target.set(reaction.property, value);
-  }
-
-  private executeCall(reaction: CallReaction): void {
-    const args = reaction.args.map(arg => evaluateValue(arg, this.plan.document, this.context.raw));
-    const target = ReactionTarget.forCall(reaction.on, this.plan, this.context);
-    log.trace("call", { target: target.label, method: reaction.method, args });
-    target.call(reaction.method, args);
-  }
-
-  private executeDispatch(reaction: DispatchReaction): void {
-    const detail = dispatchPayload(reaction, this.plan.document, this.context);
-    log.trace("dispatch", { event: reaction.event, detail });
-    document.dispatchEvent(new CustomEvent(reaction.event, { detail }));
-  }
-
-  private executeInject(reaction: InjectReaction): void {
-    const container = this.plan.components.element(reaction.target.component);
-    const value = evaluateValue(reaction.value, this.plan.document, this.context.raw);
-    if (typeof value === "string") {
-      injectHtml(container, value, reaction.target);
-      log.trace("inject.applied", { component: reaction.target.component, target: reaction.target.kind, size: value.length });
+function executeReactionWith(
+  reaction: Reaction,
+  plan: RuntimePlan,
+  context: ExecutionContext,
+): void | Promise<void> {
+  switch (reaction.kind) {
+    case "set":
+      executeSet(reaction, plan, context);
       return;
-    }
 
-    log.error("inject.wrong-type", { component: reaction.target.component, type: typeof value });
-    throw new Error(`[alis] inject expects string HTML, got ${typeof value}`);
-  }
-
-  private executeShowValidationErrors(reaction: ShowValidationErrorsReaction): void {
-    const payload = this.serverValidationPayload();
-    if (payload.kind === "available") {
-      log.debug("show-validation.server", { id: reaction.container });
-      showServerErrors(this.plan.document, reaction.container, payload.response);
+    case "call":
+      executeCall(reaction, plan, context);
       return;
-    }
 
-    log.debug("show-validation.client", { id: reaction.container });
-    validateContainer(this.plan.document, reaction.container, this.context.raw);
-  }
+    case "dispatch":
+      executeDispatch(reaction, plan, context);
+      return;
 
-  private serverValidationPayload(): ServerValidationPayload {
-    return this.context.serverValidationPayload();
+    case "inject":
+      executeInject(reaction, plan, context);
+      return;
+
+    case "show-validation-errors":
+      executeShowValidationErrors(reaction, plan, context);
+      return;
+
+    case "sequence":
+      return executeSequence(reaction, plan, context);
+
+    case "branch":
+      return executeBranch(reaction, plan, context);
+
+    case "request":
+      return executeRequest(reaction.request, plan.document, context.raw);
+
+    case "parallel":
+      return executeParallel(reaction, plan, context);
+
+    default:
+      assertNever(reaction, "reaction kind");
   }
 }
 
 type ReactionRunner = (reaction: Reaction) => void | Promise<void>;
+
+function executeSequence(
+  reaction: SequenceReaction,
+  plan: RuntimePlan,
+  context: ExecutionContext,
+): void | Promise<void> {
+  for (const [index, step] of reaction.steps.entries()) {
+    const result = executeReactionWith(step, plan, context);
+    if (reactionContinuesAsync(result)) {
+      const remaining = reaction.steps.slice(index + 1);
+      return result.then(() => executeRemainingSequence(remaining, plan, context));
+    }
+  }
+}
+
+async function executeRemainingSequence(
+  steps: readonly Reaction[],
+  plan: RuntimePlan,
+  context: ExecutionContext,
+): Promise<void> {
+  for (const step of steps) {
+    const result = executeReactionWith(step, plan, context);
+    if (reactionContinuesAsync(result)) await result;
+  }
+}
+
+function executeBranch(
+  reaction: BranchReaction,
+  plan: RuntimePlan,
+  context: ExecutionContext,
+): void | Promise<void> {
+  return executeBranchReaction({
+    cases: reaction.cases,
+    plan: plan.document,
+    context,
+    runReaction: child => executeReactionWith(child, plan, context),
+  });
+}
+
+async function executeParallel(
+  reaction: ParallelReaction,
+  plan: RuntimePlan,
+  context: ExecutionContext,
+): Promise<void> {
+  const settledSteps = await Promise.allSettled(
+    reaction.steps.map(step => reactionAsPromise(executeReactionWith(step, plan, context))),
+  );
+  reportParallelStepFailures(settledSteps);
+
+  switch (reaction.completion.kind) {
+    case "none":
+      return;
+
+    case "on-settled":
+      await waitForReaction(executeReactionWith(reaction.completion.reaction, plan, context));
+      return;
+
+    default:
+      assertNever(reaction.completion, "parallel completion");
+  }
+}
+
+function executeSet(reaction: SetReaction, plan: RuntimePlan, context: ExecutionContext): void {
+  const value = evaluateValue(reaction.value, plan.document, context.raw);
+  const target = ReactionTarget.forSet(reaction.on, plan, context);
+  log.trace("set", { target: target.label, property: reaction.property, value });
+  target.set(reaction.property, value);
+}
+
+function executeCall(reaction: CallReaction, plan: RuntimePlan, context: ExecutionContext): void {
+  const args = reaction.args.map(arg => evaluateValue(arg, plan.document, context.raw));
+  const target = ReactionTarget.forCall(reaction.on, plan, context);
+  log.trace("call", { target: target.label, method: reaction.method, args });
+  target.call(reaction.method, args);
+}
+
+function executeDispatch(reaction: DispatchReaction, plan: RuntimePlan, context: ExecutionContext): void {
+  const detail = dispatchPayload(reaction, plan.document, context);
+  log.trace("dispatch", { event: reaction.event, detail });
+  document.dispatchEvent(new CustomEvent(reaction.event, { detail }));
+}
+
+function executeInject(reaction: InjectReaction, plan: RuntimePlan, context: ExecutionContext): void {
+  const container = plan.components.element(reaction.target.component);
+  const value = evaluateValue(reaction.value, plan.document, context.raw);
+  if (typeof value === "string") {
+    injectHtml(container, value, reaction.target);
+    log.trace("inject.applied", { component: reaction.target.component, target: reaction.target.kind, size: value.length });
+    return;
+  }
+
+  log.error("inject.wrong-type", { component: reaction.target.component, type: typeof value });
+  throw new Error(`[alis] inject expects string HTML, got ${typeof value}`);
+}
+
+function executeShowValidationErrors(
+  reaction: ShowValidationErrorsReaction,
+  plan: RuntimePlan,
+  context: ExecutionContext,
+): void {
+  const payload: ServerValidationPayload = context.serverValidationPayload();
+  if (payload.kind === "available") {
+    log.debug("show-validation.server", { id: reaction.container });
+    showServerErrors(plan.document, reaction.container, payload.response);
+    return;
+  }
+
+  log.debug("show-validation.client", { id: reaction.container });
+  validateContainer(plan.document, reaction.container, context.raw);
+}
 
 function reportParallelStepFailures(results: readonly PromiseSettledResult<void>[]): void {
   for (const result of results) {
