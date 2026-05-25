@@ -26,36 +26,24 @@ type HttpExchangeOutcome =
 
 /** Execute a single HTTP request with gather, before, response routing, complete, and chaining. */
 export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
-  await new HttpRequestExecution(req, plan, RequestContext.start(ctx)).run();
+  await runHttpRequest(req, plan, RequestContext.start(ctx));
 }
 
-class HttpRequestExecution {
-  constructor(
-    private readonly request: Request,
-    private readonly plan: Plan,
-    private readonly context: RequestContext,
-  ) {}
+async function runHttpRequest(request: Request, plan: Plan, context: RequestContext): Promise<void> {
+  if (!requestCanSend(request, plan, context)) return;
 
-  async run(): Promise<void> {
-    if (!requestCanSend(this.request, this.plan, this.context)) return;
+  await runRequestReactions(request.before, plan, context.current);
 
-    await runRequestReactions(this.request.before, this.plan, this.context.current);
-    await this.dispatch();
+  let prepared: PreparedHttpRequest;
+  try {
+    prepared = prepareHttpRequest(request, plan, context);
+  } catch (err) {
+    await routeClientFailure(request, plan, context, err);
+    return;
   }
 
-  private async dispatch(): Promise<void> {
-    let prepared: PreparedHttpRequest;
-    try {
-      prepared = prepareHttpRequest(this.request, this.plan, this.context);
-    } catch (err) {
-      await routeClientFailure(this.request, this.plan, this.context, err);
-      return;
-    }
-
-    const responsePlan = new HttpResponsePlan(this.request, this.plan, prepared.context);
-    const outcome = await sendHttpRequest(this.request, prepared.fetch);
-    await routeExchangeOutcome(outcome, responsePlan);
-  }
+  const outcome = await sendHttpRequest(request, prepared.fetch);
+  await routeExchangeOutcome(outcome, request, plan, prepared.context);
 }
 
 function requestCanSend(request: Request, plan: Plan, context: RequestContext): boolean {
@@ -89,7 +77,7 @@ async function routeClientFailure(
   error: unknown,
 ): Promise<void> {
   const outcome = exchangeOutcomeFromClientFailure(request, error);
-  await routeExchangeOutcome(outcome, new HttpResponsePlan(request, plan, context));
+  await routeExchangeOutcome(outcome, request, plan, context);
 }
 
 async function sendHttpRequest(request: Request, fetchRequest: ResolvedFetch): Promise<HttpExchangeOutcome> {
@@ -131,17 +119,19 @@ function exchangeOutcomeFromClientFailure(request: Request, err: unknown): HttpE
 
 async function routeExchangeOutcome(
   outcome: HttpExchangeOutcome,
-  plan: HttpResponsePlan,
+  request: Request,
+  plan: Plan,
+  context: RequestContext,
 ): Promise<void> {
   switch (outcome.kind) {
     case "success":
-      await plan.routeSuccess(outcome.status, outcome.body);
+      await routeSuccess(request, plan, context, outcome.status, outcome.body);
       return;
     case "error":
-      await plan.routeError(outcome.status, outcome.body);
+      await routeError(request, plan, context, outcome.status, outcome.body);
       return;
     case "response-unavailable":
-      await plan.routeResponseUnavailable(outcome.status);
+      await routeResponseUnavailable(request, plan, context, outcome.status);
       return;
     default:
       return assertNever(outcome, "HTTP exchange outcome");
@@ -206,47 +196,49 @@ class ResponseHandlerStatus {
   }
 }
 
-class HttpResponsePlan {
-  constructor(
-    private readonly request: Request,
-    private readonly plan: Plan,
-    private readonly context: RequestContext,
-  ) {}
+async function routeSuccess(
+  request: Request,
+  plan: Plan,
+  context: RequestContext,
+  status: RequestOutcomeStatus,
+  body: HttpResponseBody,
+): Promise<void> {
+  await routeAndComplete(request, plan, context, () =>
+    routeResponseHandlers(request.success, status, plan, context.withResponse(body).current));
+  await runFollowUpRequest(request.chain, plan, context);
+}
 
-  async routeSuccess(status: RequestOutcomeStatus, body: HttpResponseBody): Promise<void> {
-    await this.routeAndComplete(() =>
-      this.route(this.request.success, status, this.context.withResponse(body).current));
-    await runFollowUpRequest(this.request.chain, this.plan, this.context);
-  }
+async function routeError(
+  request: Request,
+  plan: Plan,
+  context: RequestContext,
+  status: RequestOutcomeStatus,
+  body: HttpResponseBody,
+): Promise<void> {
+  await routeAndComplete(request, plan, context, () =>
+    routeResponseHandlers(request.error, status, plan, context.withResponse(body).current));
+}
 
-  async routeError(status: RequestOutcomeStatus, body: HttpResponseBody): Promise<void> {
-    await this.routeAndComplete(() =>
-      this.route(this.request.error, status, this.context.withResponse(body).current));
-  }
+async function routeResponseUnavailable(
+  request: Request,
+  plan: Plan,
+  context: RequestContext,
+  status: RequestOutcomeStatus,
+): Promise<void> {
+  await routeAndComplete(request, plan, context, () =>
+    routeResponseHandlers(request.error, status, plan, context.current));
+}
 
-  async routeResponseUnavailable(status: RequestOutcomeStatus): Promise<void> {
-    await this.routeAndComplete(() =>
-      this.route(this.request.error, status, this.context.current));
-  }
-
-  private async route(
-    handlers: ResponseHandler[],
-    status: RequestOutcomeStatus,
-    context: ExecContext,
-  ): Promise<void> {
-    await routeResponseHandlers(handlers, status, this.plan, context);
-  }
-
-  private async routeAndComplete(routeStage: () => Promise<void>): Promise<void> {
-    try {
-      await routeStage();
-    } finally {
-      await this.runComplete();
-    }
-  }
-
-  private async runComplete(): Promise<void> {
-    await runRequestReactions(this.request.complete, this.plan, this.context.current);
+async function routeAndComplete(
+  request: Request,
+  plan: Plan,
+  context: RequestContext,
+  routeStage: () => Promise<void>,
+): Promise<void> {
+  try {
+    await routeStage();
+  } finally {
+    await runRequestReactions(request.complete, plan, context.current);
   }
 }
 
@@ -259,7 +251,7 @@ async function runFollowUpRequest(
     case "terminal":
       return;
     case "follow-up":
-      await new HttpRequestExecution(chain.next, plan, context).run();
+      await runHttpRequest(chain.next, plan, context);
       return;
     default:
       return assertNever(chain, "request chain");
