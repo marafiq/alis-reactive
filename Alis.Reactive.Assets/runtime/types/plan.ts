@@ -198,30 +198,192 @@ export type ValidationRuleName =
   | "notEqualTo"
   | "atLeastOne";
 
-export interface ValidationRule {
-  name: ValidationRuleName;
+export type ValidationRule =
+  | NoOperandValidationRule
+  | LengthValidationRule
+  | RegexValidationRule
+  | RangeValidationRule
+  | OrderedComparisonValidationRule
+  | LiteralEqualityValidationRule
+  | PeerEqualityValidationRule;
+
+export type NoOperandValidationRuleName =
+  | "required"
+  | "empty"
+  | "email"
+  | "url"
+  | "creditCard"
+  | "atLeastOne";
+
+export type LengthValidationRuleName =
+  | "minLength"
+  | "maxLength";
+
+export type RegexValidationRuleName =
+  | "regex";
+
+export type RangeValidationRuleName =
+  | "range"
+  | "exclusiveRange";
+
+export type OrderedComparisonValidationRuleName =
+  | "min"
+  | "max"
+  | "gt"
+  | "lt";
+
+export type LiteralEqualityValidationRuleName =
+  | "equalTo"
+  | "notEqual";
+
+export type PeerEqualityValidationRuleName =
+  | "equalTo"
+  | "notEqualTo";
+
+export interface NoOperandValidationRule {
+  name: NoOperandValidationRuleName;
   message: string;
-  execution: ValidationRuleExecution;
+  execution: NoOperandValidationRuleExecution;
 }
 
-export interface ValidationRuleExecution {
-  constraint: ValidationRuleOperand;
-  otherValue: ValidationRuleOperand;
+export interface LengthValidationRule {
+  name: LengthValidationRuleName;
+  message: string;
+  execution: NumericConstraintValidationRuleExecution;
+}
+
+export interface RegexValidationRule {
+  name: RegexValidationRuleName;
+  message: string;
+  execution: TextConstraintValidationRuleExecution;
+}
+
+export interface RangeValidationRule {
+  name: RangeValidationRuleName;
+  message: string;
+  execution: RangeConstraintValidationRuleExecution;
+}
+
+export interface OrderedComparisonValidationRule {
+  name: OrderedComparisonValidationRuleName;
+  message: string;
+  execution: ScalarConstraintValidationRuleExecution;
+}
+
+export interface LiteralEqualityValidationRule {
+  name: LiteralEqualityValidationRuleName;
+  message: string;
+  execution: ScalarConstraintValidationRuleExecution;
+}
+
+export interface PeerEqualityValidationRule {
+  name: PeerEqualityValidationRuleName;
+  message: string;
+  execution: PeerValidationRuleExecution;
+}
+
+export type ValidationRuleExecution =
+  | NoOperandValidationRuleExecution
+  | ScalarConstraintValidationRuleExecution
+  | NumericConstraintValidationRuleExecution
+  | TextConstraintValidationRuleExecution
+  | RangeConstraintValidationRuleExecution
+  | PeerValidationRuleExecution;
+
+export interface NoOperandValidationRuleExecution {
+  constraint: NoValidationRuleOperand;
+  otherValue: NoValidationRuleOperand;
+  activation: ValidationRuleActivation;
+  comparisonShape: Shape;
+}
+
+export interface ScalarConstraintValidationRuleExecution {
+  constraint: ScalarValidationConstraintOperand;
+  otherValue: NoValidationRuleOperand;
+  activation: ValidationRuleActivation;
+  comparisonShape: Shape;
+}
+
+export interface NumericConstraintValidationRuleExecution {
+  constraint: NumericValidationConstraintOperand;
+  otherValue: NoValidationRuleOperand;
+  activation: ValidationRuleActivation;
+  comparisonShape: Shape;
+}
+
+export interface TextConstraintValidationRuleExecution {
+  constraint: TextValidationConstraintOperand;
+  otherValue: NoValidationRuleOperand;
+  activation: ValidationRuleActivation;
+  comparisonShape: Shape;
+}
+
+export interface RangeConstraintValidationRuleExecution {
+  constraint: RangeValidationConstraintOperand;
+  otherValue: NoValidationRuleOperand;
+  activation: ValidationRuleActivation;
+  comparisonShape: Shape;
+}
+
+export interface PeerValidationRuleExecution {
+  constraint: NoValidationRuleOperand;
+  otherValue: PeerValidationRuleOperand;
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
 }
 
 export type ValidationRuleOperand =
   | NoValidationRuleOperand
-  | ValueValidationRuleOperand;
+  | ScalarValidationConstraintOperand
+  | NumericValidationConstraintOperand
+  | TextValidationConstraintOperand
+  | RangeValidationConstraintOperand
+  | PeerValidationRuleOperand;
+
+export type ValidationConstraintOperand =
+  | NoValidationRuleOperand
+  | ScalarValidationConstraintOperand
+  | NumericValidationConstraintOperand
+  | TextValidationConstraintOperand
+  | RangeValidationConstraintOperand;
+
+export type ValidationPeerOperand =
+  | NoValidationRuleOperand
+  | PeerValidationRuleOperand;
 
 export interface NoValidationRuleOperand {
   kind: "none";
 }
 
-export interface ValueValidationRuleOperand {
+export type LiteralValidationConstraintOperand =
+  | ScalarValidationConstraintOperand
+  | NumericValidationConstraintOperand
+  | TextValidationConstraintOperand
+  | RangeValidationConstraintOperand;
+
+export interface ScalarValidationConstraintOperand {
   kind: "value";
-  value: ValueProducer;
+  value: LiteralProducer;
+}
+
+export interface NumericValidationConstraintOperand {
+  kind: "value";
+  value: NumericLiteralProducer;
+}
+
+export interface TextValidationConstraintOperand {
+  kind: "value";
+  value: TextLiteralProducer;
+}
+
+export interface RangeValidationConstraintOperand {
+  kind: "value";
+  value: RangeLiteralProducer;
+}
+
+export interface PeerValidationRuleOperand {
+  kind: "value";
+  value: ReadProducer;
 }
 
 export type ValidationRuleActivation =
@@ -604,6 +766,24 @@ export type ReadProducer =
 export interface LiteralProducer {
   kind: "literal";
   value: JsonValue;
+  shape: Shape;
+}
+
+export interface NumericLiteralProducer {
+  kind: "literal";
+  value: number;
+  shape: Shape;
+}
+
+export interface TextLiteralProducer {
+  kind: "literal";
+  value: string;
+  shape: Shape;
+}
+
+export interface RangeLiteralProducer {
+  kind: "literal";
+  value: [JsonValue, JsonValue];
   shape: Shape;
 }
 

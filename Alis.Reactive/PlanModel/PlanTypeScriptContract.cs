@@ -148,28 +148,157 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(LiteralUnion("ValidationRuleName", ValidationRuleName.Values));
 
-            contract.Declare(Interface("ValidationRule")
-                .Requires("name", "ValidationRuleName")
-                .Requires("message", "string")
-                .Requires("execution", "ValidationRuleExecution"));
+            contract.Declare(Union(
+                "ValidationRule",
+                "NoOperandValidationRule",
+                "LengthValidationRule",
+                "RegexValidationRule",
+                "RangeValidationRule",
+                "OrderedComparisonValidationRule",
+                "LiteralEqualityValidationRule",
+                "PeerEqualityValidationRule"));
 
-            contract.Declare(Interface("ValidationRuleExecution")
-                .Requires("constraint", "ValidationRuleOperand")
-                .Requires("otherValue", "ValidationRuleOperand")
+            contract.Declare(LiteralUnion(
+                "NoOperandValidationRuleName",
+                new[] { "required", "empty", "email", "url", "creditCard", "atLeastOne" }));
+            contract.Declare(LiteralUnion("LengthValidationRuleName", new[] { "minLength", "maxLength" }));
+            contract.Declare(LiteralUnion("RegexValidationRuleName", new[] { "regex" }));
+            contract.Declare(LiteralUnion("RangeValidationRuleName", new[] { "range", "exclusiveRange" }));
+            contract.Declare(LiteralUnion("OrderedComparisonValidationRuleName", new[] { "min", "max", "gt", "lt" }));
+            contract.Declare(LiteralUnion("LiteralEqualityValidationRuleName", new[] { "equalTo", "notEqual" }));
+            contract.Declare(LiteralUnion("PeerEqualityValidationRuleName", new[] { "equalTo", "notEqualTo" }));
+
+            contract.Declare(Interface("NoOperandValidationRule")
+                .Requires("name", "NoOperandValidationRuleName")
+                .Requires("message", "string")
+                .Requires("execution", "NoOperandValidationRuleExecution"));
+
+            contract.Declare(Interface("LengthValidationRule")
+                .Requires("name", "LengthValidationRuleName")
+                .Requires("message", "string")
+                .Requires("execution", "NumericConstraintValidationRuleExecution"));
+
+            contract.Declare(Interface("RegexValidationRule")
+                .Requires("name", "RegexValidationRuleName")
+                .Requires("message", "string")
+                .Requires("execution", "TextConstraintValidationRuleExecution"));
+
+            contract.Declare(Interface("RangeValidationRule")
+                .Requires("name", "RangeValidationRuleName")
+                .Requires("message", "string")
+                .Requires("execution", "RangeConstraintValidationRuleExecution"));
+
+            contract.Declare(Interface("OrderedComparisonValidationRule")
+                .Requires("name", "OrderedComparisonValidationRuleName")
+                .Requires("message", "string")
+                .Requires("execution", "ScalarConstraintValidationRuleExecution"));
+
+            contract.Declare(Interface("LiteralEqualityValidationRule")
+                .Requires("name", "LiteralEqualityValidationRuleName")
+                .Requires("message", "string")
+                .Requires("execution", "ScalarConstraintValidationRuleExecution"));
+
+            contract.Declare(Interface("PeerEqualityValidationRule")
+                .Requires("name", "PeerEqualityValidationRuleName")
+                .Requires("message", "string")
+                .Requires("execution", "PeerValidationRuleExecution"));
+
+            contract.Declare(Union(
+                "ValidationRuleExecution",
+                "NoOperandValidationRuleExecution",
+                "ScalarConstraintValidationRuleExecution",
+                "NumericConstraintValidationRuleExecution",
+                "TextConstraintValidationRuleExecution",
+                "RangeConstraintValidationRuleExecution",
+                "PeerValidationRuleExecution"));
+
+            contract.Declare(Interface("NoOperandValidationRuleExecution")
+                .Requires("constraint", "NoValidationRuleOperand")
+                .Requires("otherValue", "NoValidationRuleOperand")
+                .Requires("activation", "ValidationRuleActivation")
+                .Requires("comparisonShape", "Shape"));
+
+            contract.Declare(Interface("ScalarConstraintValidationRuleExecution")
+                .Requires("constraint", "ScalarValidationConstraintOperand")
+                .Requires("otherValue", "NoValidationRuleOperand")
+                .Requires("activation", "ValidationRuleActivation")
+                .Requires("comparisonShape", "Shape"));
+
+            contract.Declare(Interface("NumericConstraintValidationRuleExecution")
+                .Requires("constraint", "NumericValidationConstraintOperand")
+                .Requires("otherValue", "NoValidationRuleOperand")
+                .Requires("activation", "ValidationRuleActivation")
+                .Requires("comparisonShape", "Shape"));
+
+            contract.Declare(Interface("TextConstraintValidationRuleExecution")
+                .Requires("constraint", "TextValidationConstraintOperand")
+                .Requires("otherValue", "NoValidationRuleOperand")
+                .Requires("activation", "ValidationRuleActivation")
+                .Requires("comparisonShape", "Shape"));
+
+            contract.Declare(Interface("RangeConstraintValidationRuleExecution")
+                .Requires("constraint", "RangeValidationConstraintOperand")
+                .Requires("otherValue", "NoValidationRuleOperand")
+                .Requires("activation", "ValidationRuleActivation")
+                .Requires("comparisonShape", "Shape"));
+
+            contract.Declare(Interface("PeerValidationRuleExecution")
+                .Requires("constraint", "NoValidationRuleOperand")
+                .Requires("otherValue", "PeerValidationRuleOperand")
                 .Requires("activation", "ValidationRuleActivation")
                 .Requires("comparisonShape", "Shape"));
 
             contract.Declare(Union(
                 "ValidationRuleOperand",
                 "NoValidationRuleOperand",
-                "ValueValidationRuleOperand"));
+                "ScalarValidationConstraintOperand",
+                "NumericValidationConstraintOperand",
+                "TextValidationConstraintOperand",
+                "RangeValidationConstraintOperand",
+                "PeerValidationRuleOperand"));
+
+            contract.Declare(Union(
+                "ValidationConstraintOperand",
+                "NoValidationRuleOperand",
+                "ScalarValidationConstraintOperand",
+                "NumericValidationConstraintOperand",
+                "TextValidationConstraintOperand",
+                "RangeValidationConstraintOperand"));
+
+            contract.Declare(Union(
+                "ValidationPeerOperand",
+                "NoValidationRuleOperand",
+                "PeerValidationRuleOperand"));
 
             contract.Declare(Interface("NoValidationRuleOperand")
                 .Requires("kind", Literal("none")));
 
-            contract.Declare(Interface("ValueValidationRuleOperand")
+            contract.Declare(Union(
+                "LiteralValidationConstraintOperand",
+                "ScalarValidationConstraintOperand",
+                "NumericValidationConstraintOperand",
+                "TextValidationConstraintOperand",
+                "RangeValidationConstraintOperand"));
+
+            contract.Declare(Interface("ScalarValidationConstraintOperand")
                 .Requires("kind", Literal("value"))
-                .Requires("value", "ValueProducer"));
+                .Requires("value", "LiteralProducer"));
+
+            contract.Declare(Interface("NumericValidationConstraintOperand")
+                .Requires("kind", Literal("value"))
+                .Requires("value", "NumericLiteralProducer"));
+
+            contract.Declare(Interface("TextValidationConstraintOperand")
+                .Requires("kind", Literal("value"))
+                .Requires("value", "TextLiteralProducer"));
+
+            contract.Declare(Interface("RangeValidationConstraintOperand")
+                .Requires("kind", Literal("value"))
+                .Requires("value", "RangeLiteralProducer"));
+
+            contract.Declare(Interface("PeerValidationRuleOperand")
+                .Requires("kind", Literal("value"))
+                .Requires("value", "ReadProducer"));
 
             contract.Declare(Union(
                 "ValidationRuleActivation",
@@ -479,6 +608,21 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Interface("LiteralProducer")
                 .Requires("kind", Literal("literal"))
                 .Requires("value", "JsonValue")
+                .Requires("shape", "Shape"));
+
+            contract.Declare(Interface("NumericLiteralProducer")
+                .Requires("kind", Literal("literal"))
+                .Requires("value", "number")
+                .Requires("shape", "Shape"));
+
+            contract.Declare(Interface("TextLiteralProducer")
+                .Requires("kind", Literal("literal"))
+                .Requires("value", "string")
+                .Requires("shape", "Shape"));
+
+            contract.Declare(Interface("RangeLiteralProducer")
+                .Requires("kind", Literal("literal"))
+                .Requires("value", "[JsonValue, JsonValue]")
                 .Requires("shape", "Shape"));
 
             contract.Declare(Interface("ObjectPropertyReadProducer")

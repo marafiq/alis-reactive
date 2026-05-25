@@ -164,6 +164,41 @@ public class WhenGeneratingRuntimePlanTypes
             "The existing JSON token for whole response payloads should be typed as the whole-payload read variant.");
     }
 
+    [Test]
+    public void generated_runtime_plan_types_encode_validation_rule_families()
+    {
+        var generated = PlanTypeScriptContract.Render();
+
+        Assert.That(
+            generated,
+            Does.Contain("export type ValidationRule =\n  | NoOperandValidationRule\n  | LengthValidationRule\n  | RegexValidationRule\n  | RangeValidationRule\n  | OrderedComparisonValidationRule\n  | LiteralEqualityValidationRule\n  | PeerEqualityValidationRule;"),
+            "Validation rule family should decide execution shape instead of a single broad operand bag.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface LengthValidationRule"),
+            "Length rules should be a named family.");
+        Assert.That(
+            generated,
+            Does.Contain("execution: NumericConstraintValidationRuleExecution;"),
+            "Length rules require numeric constraints.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface RangeValidationRule"),
+            "Range rules should be a named family.");
+        Assert.That(
+            generated,
+            Does.Contain("execution: RangeConstraintValidationRuleExecution;"),
+            "Range rules require two-bound range constraints.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface PeerEqualityValidationRule"),
+            "Peer equality rules should be separate from literal equality rules.");
+        Assert.That(
+            generated,
+            Does.Contain("execution: PeerValidationRuleExecution;"),
+            "Peer equality rules should carry peer operands, not generic constraint operands.");
+    }
+
     private static string FindRepoRoot(string startDirectory)
     {
         var directory = new DirectoryInfo(startDirectory);

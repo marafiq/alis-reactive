@@ -2,7 +2,7 @@
 // No DOM, no vendor, no side effects. The orchestrator resolves peers first.
 
 import { assertNever } from "../core/assert-never";
-import type { ValidationRule, ValidationRuleName, Shape } from "../types";
+import type { LengthValidationRule, RangeValidationRule, Shape, ValidationRule, ValidationRuleName } from "../types";
 import {
   ValidationLengthConstraint,
   ValidationRangeTarget,
@@ -37,7 +37,7 @@ export function ruleFails(evaluation: RuleEvaluation): boolean {
     case "empty": return emptyFails(ruleEvaluation);
     case "minLength":
     case "maxLength":
-      return lengthRuleFails(ruleEvaluation.rule.name, ruleEvaluation);
+      return lengthRuleFails(ruleEvaluation.rule.name, evaluationWithRule(ruleEvaluation, ruleEvaluation.rule));
     case "email": return emailFails(ruleEvaluation);
     case "regex": return regexFails(ruleEvaluation);
     case "url": return urlFails(ruleEvaluation);
@@ -49,13 +49,13 @@ export function ruleFails(evaluation: RuleEvaluation): boolean {
       return orderedComparisonFails(ruleEvaluation.rule.name, ruleEvaluation);
     case "range":
     case "exclusiveRange":
-      return rangeFails(ruleEvaluation.rule.name, ruleEvaluation);
+      return rangeFails(ruleEvaluation.rule.name, evaluationWithRule(ruleEvaluation, ruleEvaluation.rule));
     case "equalTo":
     case "notEqual":
     case "notEqualTo":
       return equalityFails(ruleEvaluation.rule.name, ruleEvaluation);
     case "atLeastOne": return atLeastOneFails(ruleEvaluation);
-    default: return assertNever(ruleEvaluation.rule.name, "validation rule");
+    default: return assertNever(ruleEvaluation.rule, "validation rule");
   }
 }
 
@@ -63,6 +63,20 @@ interface ValidationRuleEvaluation {
   readonly rule: ValidationRule;
   readonly subject: ValidationSubject;
   readonly peerValue: ResolvedPeerValue;
+}
+
+type ValidationRuleEvaluationFor<TRule extends ValidationRule> =
+  Omit<ValidationRuleEvaluation, "rule"> & { readonly rule: TRule };
+
+function evaluationWithRule<TRule extends ValidationRule>(
+  evaluation: ValidationRuleEvaluation,
+  rule: TRule,
+): ValidationRuleEvaluationFor<TRule> {
+  return {
+    rule,
+    subject: evaluation.subject,
+    peerValue: evaluation.peerValue,
+  };
 }
 
 function prepareValidationRuleEvaluation(evaluation: RuleEvaluation): ValidationRuleEvaluation {
@@ -93,11 +107,11 @@ function comparisonShape(evaluation: ValidationRuleEvaluation): Shape {
   return evaluation.rule.execution.comparisonShape;
 }
 
-function lengthConstraint(evaluation: ValidationRuleEvaluation): ValidationLengthConstraint {
+function lengthConstraint(evaluation: ValidationRuleEvaluationFor<LengthValidationRule>): ValidationLengthConstraint {
   return ValidationLengthConstraint.fromOperand(evaluation.rule.execution.constraint);
 }
 
-function rangeTarget(evaluation: ValidationRuleEvaluation): ValidationRangeTarget {
+function rangeTarget(evaluation: ValidationRuleEvaluationFor<RangeValidationRule>): ValidationRangeTarget {
   return ValidationRangeTarget.fromOperand(evaluation.rule.execution.constraint);
 }
 
@@ -109,7 +123,10 @@ function emptyFails(evaluation: ValidationRuleEvaluation): boolean {
   return !evaluation.subject.isEmpty;
 }
 
-function lengthRuleFails(ruleName: LengthRuleName, evaluation: ValidationRuleEvaluation): boolean {
+function lengthRuleFails(
+  ruleName: LengthRuleName,
+  evaluation: ValidationRuleEvaluationFor<LengthValidationRule>,
+): boolean {
   if (evaluation.subject.isEmpty) return false;
 
   const actualLength = evaluation.subject.length;
@@ -177,9 +194,8 @@ function orderedComparisonFails(
   }
 }
 
-function rangeFails(ruleName: RangeRuleName, evaluation: ValidationRuleEvaluation): boolean {
+function rangeFails(ruleName: RangeRuleName, evaluation: ValidationRuleEvaluationFor<RangeValidationRule>): boolean {
   const range = rangeTarget(evaluation);
-  if (!range.isAvailable) return true;
   if (evaluation.subject.isEmpty) return false;
 
   const lowerComparison = evaluation.subject.compareTo(range.lowerBound, comparisonShape(evaluation));

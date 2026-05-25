@@ -33,7 +33,7 @@ namespace Alis.Reactive.Validation
             return new Alis.Reactive.PlanModel.ValidationRule(
                 _rule,
                 _message,
-                _details.ToPlanExecution(binding));
+                _details.ToPlanExecution(_rule, binding));
         }
     }
 
@@ -86,10 +86,12 @@ namespace Alis.Reactive.Validation
                 _condition.ToIntent(),
                 Shape);
 
-        internal ValidationRuleExecution ToPlanExecution(ValidationPlanBinding binding)
+        internal ValidationRuleExecution ToPlanExecution(ValidationRuleName rule, ValidationPlanBinding binding)
         {
+            if (rule == null) throw new System.ArgumentNullException(nameof(rule));
             if (binding == null) throw new System.ArgumentNullException(nameof(binding));
-            return ValidationRuleExecution.Execute(
+            return ValidationRuleExecution.ForRule(
+                rule,
                 _constraint.ToPlanOperand(Shape),
                 _peerField.ToPlanOperand(binding),
                 _condition.ToPlanActivation(binding),
@@ -261,7 +263,7 @@ namespace Alis.Reactive.Validation
             internal override ValidationRuleOperand ToPlanOperand(Shape shape)
             {
                 if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-                return ValidationRuleOperand.From(ValueProducer.LiteralRaw(_value, shape));
+                return ValidationRuleOperand.Constraint(ValueProducer.LiteralRaw(_value, shape));
             }
 
             internal override ValidationRuleOperandIntent ToIntent() =>
@@ -280,7 +282,7 @@ namespace Alis.Reactive.Validation
             internal override ValidationRuleOperand ToPlanOperand(Shape shape)
             {
                 if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-                return ValidationRuleOperand.From(
+                return ValidationRuleOperand.Constraint(
                     ValueProducer.LiteralRaw(_bounds.ToDescriptorArray(), _bounds.DescriptorShape));
             }
 
@@ -383,7 +385,7 @@ namespace Alis.Reactive.Validation
             internal override ValidationRuleOperand ToPlanOperand(ValidationPlanBinding binding)
             {
                 if (binding == null) throw new System.ArgumentNullException(nameof(binding));
-                return ValidationRuleOperand.From(binding.ResolvePeerValue(_field.Path));
+                return ValidationRuleOperand.Peer(binding.ResolvePeerValue(_field.Path));
             }
 
             internal override ValidationRuleOperandIntent ToIntent() =>

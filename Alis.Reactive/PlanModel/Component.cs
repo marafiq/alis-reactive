@@ -578,16 +578,25 @@ namespace Alis.Reactive.PlanModel
         public ValidationRuleActivation Activation => _activation;
         public Shape ComparisonShape { get; }
 
-        internal static ValidationRuleExecution Execute(
+        internal static ValidationRuleExecution ForRule(
+            ValidationRuleName rule,
             ValidationRuleOperand constraint,
             ValidationRuleOperand otherValue,
             ValidationRuleActivation activation,
-            Shape comparisonShape) =>
-            new ValidationRuleExecution(
+            Shape comparisonShape)
+        {
+            if (rule == null) throw new System.ArgumentNullException(nameof(rule));
+            if (constraint == null) throw new System.ArgumentNullException(nameof(constraint));
+            if (otherValue == null) throw new System.ArgumentNullException(nameof(otherValue));
+
+            ValidationRuleExecutionShape.For(rule).EnsureSatisfiedBy(constraint, otherValue);
+
+            return new ValidationRuleExecution(
                 constraint,
                 otherValue,
                 activation,
                 comparisonShape);
+        }
     }
 
     [JsonConverter(typeof(ValidationRuleOperandJsonConverter))]
@@ -599,34 +608,166 @@ namespace Alis.Reactive.PlanModel
             new MissingValidationRuleOperand();
 
         public abstract string Kind { get; }
+        internal abstract ValidationRuleOperandRole Role { get; }
         internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
-        internal static ValidationRuleOperand From(ValueProducer value) =>
-            new PresentValidationRuleOperand(value);
+        internal static ValidationRuleOperand Constraint(ValueProducer value)
+        {
+            if (value is not LiteralProducer literal)
+                throw new System.ArgumentException("Validation rule constraints must be literal values.", nameof(value));
+
+            return new LiteralValidationConstraintOperand(literal);
+        }
+
+        internal static ValidationRuleOperand Peer(ValueProducer value)
+        {
+            if (value is not ReadProducer read)
+                throw new System.ArgumentException("Validation rule peer values must read another field value.", nameof(value));
+
+            return new PeerValidationRuleOperand(read);
+        }
 
         private sealed class MissingValidationRuleOperand : ValidationRuleOperand
         {
             public override string Kind => "none";
+            internal override ValidationRuleOperandRole Role => ValidationRuleOperandRole.None;
 
             internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
             {
             }
         }
 
-        private sealed class PresentValidationRuleOperand : ValidationRuleOperand
+        private sealed class LiteralValidationConstraintOperand : ValidationRuleOperand
         {
-            private readonly ValueProducer _value;
+            private readonly LiteralProducer _value;
 
-            internal PresentValidationRuleOperand(ValueProducer value)
+            internal LiteralValidationConstraintOperand(LiteralProducer value)
             {
                 _value = value ?? throw new System.ArgumentNullException(nameof(value));
             }
 
             public override string Kind => "value";
-            public ValueProducer Value => _value;
+            internal override ValidationRuleOperandRole Role => ValidationRuleOperandRole.Constraint;
+            public LiteralProducer Value => _value;
             internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
                 ValidationRuleOperandJsonConverter.WriteProperty(writer, options, "value", _value);
         }
+
+        private sealed class PeerValidationRuleOperand : ValidationRuleOperand
+        {
+            private readonly ReadProducer _value;
+
+            internal PeerValidationRuleOperand(ReadProducer value)
+            {
+                _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            }
+
+            public override string Kind => "value";
+            internal override ValidationRuleOperandRole Role => ValidationRuleOperandRole.Peer;
+            public ReadProducer Value => _value;
+            internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
+                ValidationRuleOperandJsonConverter.WriteProperty(writer, options, "value", _value);
+        }
+    }
+
+    internal enum ValidationRuleOperandRole
+    {
+        None,
+        Constraint,
+        Peer
+    }
+
+    internal sealed class ValidationRuleExecutionShape
+    {
+        private readonly ValidationRuleOperandRole _constraint;
+        private readonly ValidationRuleOperandRole _otherValue;
+
+        private ValidationRuleExecutionShape(
+            ValidationRuleOperandRole constraint,
+            ValidationRuleOperandRole otherValue)
+        {
+            _constraint = constraint;
+            _otherValue = otherValue;
+        }
+
+        internal static ValidationRuleExecutionShape For(ValidationRuleName rule)
+        {
+            if (rule == null) throw new System.ArgumentNullException(nameof(rule));
+
+            if (RuleHasNoOperands(rule)) return NoOperands;
+            if (RuleHasConstraint(rule)) return Constraint;
+            if (RuleHasPeer(rule)) return Peer;
+            if (rule.Equals(ValidationRuleName.EqualTo)) return ConstraintOrPeer;
+
+            throw new System.InvalidOperationException(
+                "Unknown validation rule family for '" + rule.Value + "'.");
+        }
+
+        internal void EnsureSatisfiedBy(
+            ValidationRuleOperand constraint,
+            ValidationRuleOperand otherValue)
+        {
+            if (constraint == null) throw new System.ArgumentNullException(nameof(constraint));
+            if (otherValue == null) throw new System.ArgumentNullException(nameof(otherValue));
+
+            if (ReferenceEquals(this, ConstraintOrPeer))
+            {
+                var hasLiteralConstraint = constraint.Role == ValidationRuleOperandRole.Constraint && otherValue.Role == ValidationRuleOperandRole.None;
+                var hasPeerValue = constraint.Role == ValidationRuleOperandRole.None && otherValue.Role == ValidationRuleOperandRole.Peer;
+                if (hasLiteralConstraint || hasPeerValue) return;
+            }
+
+            var shapeMatches =
+                constraint.Role == _constraint &&
+                otherValue.Role == _otherValue;
+            if (shapeMatches) return;
+
+            throw new System.InvalidOperationException(
+                "Validation rule execution shape does not match its rule family.");
+        }
+
+        private static ValidationRuleExecutionShape NoOperands { get; } =
+            new ValidationRuleExecutionShape(
+                ValidationRuleOperandRole.None,
+                ValidationRuleOperandRole.None);
+
+        private static ValidationRuleExecutionShape Constraint { get; } =
+            new ValidationRuleExecutionShape(
+                ValidationRuleOperandRole.Constraint,
+                ValidationRuleOperandRole.None);
+
+        private static ValidationRuleExecutionShape Peer { get; } =
+            new ValidationRuleExecutionShape(
+                ValidationRuleOperandRole.None,
+                ValidationRuleOperandRole.Peer);
+
+        private static ValidationRuleExecutionShape ConstraintOrPeer { get; } =
+            new ValidationRuleExecutionShape(
+                ValidationRuleOperandRole.Constraint,
+                ValidationRuleOperandRole.None);
+
+        private static bool RuleHasNoOperands(ValidationRuleName rule) =>
+            rule.Equals(ValidationRuleName.Required) ||
+            rule.Equals(ValidationRuleName.Empty) ||
+            rule.Equals(ValidationRuleName.Email) ||
+            rule.Equals(ValidationRuleName.Url) ||
+            rule.Equals(ValidationRuleName.CreditCard) ||
+            rule.Equals(ValidationRuleName.AtLeastOne);
+
+        private static bool RuleHasConstraint(ValidationRuleName rule) =>
+            rule.Equals(ValidationRuleName.MinLength) ||
+            rule.Equals(ValidationRuleName.MaxLength) ||
+            rule.Equals(ValidationRuleName.Regex) ||
+            rule.Equals(ValidationRuleName.Range) ||
+            rule.Equals(ValidationRuleName.ExclusiveRange) ||
+            rule.Equals(ValidationRuleName.Min) ||
+            rule.Equals(ValidationRuleName.Max) ||
+            rule.Equals(ValidationRuleName.Gt) ||
+            rule.Equals(ValidationRuleName.Lt) ||
+            rule.Equals(ValidationRuleName.NotEqual);
+
+        private static bool RuleHasPeer(ValidationRuleName rule) =>
+            rule.Equals(ValidationRuleName.NotEqualTo);
     }
 
     internal sealed class ValidationRuleOperandJsonConverter : JsonConverter<ValidationRuleOperand>

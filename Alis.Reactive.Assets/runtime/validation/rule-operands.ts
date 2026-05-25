@@ -4,8 +4,10 @@ import type { ConvertResult } from "../core/shape-convert";
 import { RuntimeShape } from "../domain/runtime-shape";
 import type {
   Shape,
-  ValueProducer,
-  ValidationRuleOperand as PlanValidationRuleOperand,
+  LiteralValidationConstraintOperand,
+  NumericValidationConstraintOperand,
+  RangeValidationConstraintOperand,
+  ValidationConstraintOperand,
 } from "../types";
 
 export type ResolvedPeerValue =
@@ -57,16 +59,16 @@ export class ValidationSubject {
 export abstract class ValidationScalarTarget {
   static fromResolvedPeerOrConstraint(
     peerValue: ResolvedPeerValue,
-    constraintOperand: PlanValidationRuleOperand,
+    constraintOperand: ValidationConstraintOperand,
   ): ValidationScalarTarget {
     if (peerValue.kind === "present") return ValidationScalarTarget.available(peerValue.value);
     return ValidationScalarTarget.fromConstraintOperand(constraintOperand);
   }
 
-  static fromConstraintOperand(operand: PlanValidationRuleOperand): ValidationScalarTarget {
+  static fromConstraintOperand(operand: ValidationConstraintOperand): ValidationScalarTarget {
     switch (operand.kind) {
       case "none": return ValidationScalarTarget.missing();
-      case "value": return ValidationScalarTarget.fromConstraintProducer(operand.value);
+      case "value": return ValidationScalarTarget.fromLiteral(operand);
       default: return assertNever(operand, "validation rule operand");
     }
   }
@@ -75,10 +77,8 @@ export abstract class ValidationScalarTarget {
     return new AvailableValidationScalarTarget(value);
   }
 
-  private static fromConstraintProducer(producer: ValueProducer): ValidationScalarTarget {
-    if (producer.kind === "literal") return ValidationScalarTarget.available(producer.value);
-
-    throw new Error(`[alis] validation constraint operand must be a literal, got "${producer.kind}"`);
+  private static fromLiteral(operand: LiteralValidationConstraintOperand): ValidationScalarTarget {
+    return ValidationScalarTarget.available(operand.value.value);
   }
 
   static missing(): ValidationScalarTarget {
@@ -142,30 +142,8 @@ class MissingValidationScalarTarget extends ValidationScalarTarget {
 export class ValidationLengthConstraint {
   private constructor(private readonly expectedLength: number) {}
 
-  static fromOperand(operand: PlanValidationRuleOperand): ValidationLengthConstraint {
-    switch (operand.kind) {
-      case "none":
-        throw new Error("[alis] validation length constraint is missing");
-      case "value":
-        return ValidationLengthConstraint.fromProducer(operand.value);
-      default:
-        return assertNever(operand, "validation length operand");
-    }
-  }
-
-  private static fromProducer(producer: ValueProducer): ValidationLengthConstraint {
-    if (producer.kind !== "literal") {
-      throw new Error(`[alis] validation constraint operand must be a literal, got "${producer.kind}"`);
-    }
-
-    return ValidationLengthConstraint.fromValue(producer.value);
-  }
-
-  private static fromValue(value: unknown): ValidationLengthConstraint {
-    const expectedLength = Number(value);
-    if (Number.isFinite(expectedLength)) return new ValidationLengthConstraint(expectedLength);
-
-    throw new Error(`[alis] validation length constraint must be a finite number, got "${String(value)}"`);
+  static fromOperand(operand: NumericValidationConstraintOperand): ValidationLengthConstraint {
+    return new ValidationLengthConstraint(operand.value.value);
   }
 
   isGreaterThan(actualLength: number): boolean {
@@ -266,82 +244,18 @@ class EmptyValidationCollection {
   }
 }
 
-export abstract class ValidationRangeTarget {
-  static fromOperand(operand: PlanValidationRuleOperand): ValidationRangeTarget {
-    switch (operand.kind) {
-      case "none":
-        return MissingValidationRangeTarget.instance;
-      case "value":
-        return ValidationRangeTarget.fromProducer(operand.value);
-      default:
-        return assertNever(operand, "validation range operand");
-    }
-  }
-
-  private static fromProducer(producer: ValueProducer): ValidationRangeTarget {
-    if (producer.kind !== "literal") {
-      throw new Error(`[alis] validation range constraint operand must be a literal, got "${producer.kind}"`);
-    }
-
-    const bounds = ValidationRangeDescriptor.from(producer.value);
-
-    return new AvailableValidationRangeTarget(
-      ValidationScalarTarget.available(bounds.lower),
-      ValidationScalarTarget.available(bounds.upper),
-    );
-  }
-
-  abstract get isAvailable(): boolean;
-  abstract get lowerBound(): ValidationScalarTarget;
-  abstract get upperBound(): ValidationScalarTarget;
-}
-
-class AvailableValidationRangeTarget extends ValidationRangeTarget {
-  constructor(
+export class ValidationRangeTarget {
+  private constructor(
     readonly lowerBound: ValidationScalarTarget,
     readonly upperBound: ValidationScalarTarget,
-  ) {
-    super();
-  }
-
-  get isAvailable(): boolean {
-    return true;
-  }
-}
-
-class MissingValidationRangeTarget extends ValidationRangeTarget {
-  static readonly instance = new MissingValidationRangeTarget();
-
-  get isAvailable(): boolean {
-    return false;
-  }
-
-  get lowerBound(): ValidationScalarTarget {
-    return ValidationScalarTarget.missing();
-  }
-
-  get upperBound(): ValidationScalarTarget {
-    return ValidationScalarTarget.missing();
-  }
-}
-
-class ValidationRangeDescriptor {
-  private constructor(
-    readonly lower: unknown,
-    readonly upper: unknown,
   ) {}
 
-  static from(value: unknown): ValidationRangeDescriptor {
-    const targetIsCollection = Array.isArray(value);
-    if (!targetIsCollection) {
-      throw new Error("[alis] validation range descriptor must be an array with exactly two bounds");
-    }
+  static fromOperand(operand: RangeValidationConstraintOperand): ValidationRangeTarget {
+    const [lower, upper] = operand.value.value;
 
-    const rangeDeclaresExactlyTwoBounds = value.length === 2;
-    if (!rangeDeclaresExactlyTwoBounds) {
-      throw new Error(`[alis] validation range descriptor must contain exactly two bounds, got ${value.length}`);
-    }
-
-    return new ValidationRangeDescriptor(value[0], value[1]);
+    return new ValidationRangeTarget(
+      ValidationScalarTarget.available(lower),
+      ValidationScalarTarget.available(upper),
+    );
   }
 }

@@ -11,17 +11,6 @@ function literal(value: string | number | boolean | null | (string | number)[], 
   return { kind: "literal", value, shape };
 }
 
-function componentRead(member: string, shape: Shape): ValueProducer {
-  return {
-    kind: "read",
-    from: { kind: "component", component: "field" },
-    member,
-    path: [],
-    shape,
-    access: { kind: "property" },
-  };
-}
-
 function rule(
   name: ValidationRuleName,
   overrides: Partial<ValidationRule["execution"]> = {},
@@ -91,44 +80,6 @@ describe("validation rule engine", () => {
     expect(ruleFails({ rule: minLength, value: "securepass", peerValue: noPeerValue() })).toBe(false);
     expect(ruleFails({ rule: maxLength, value: "securepass", peerValue: noPeerValue() })).toBe(true);
     expect(ruleFails({ rule: maxLength, value: "abc", peerValue: noPeerValue() })).toBe(false);
-  });
-
-  it("rejects unresolved constraint producers instead of treating them as missing", () => {
-    const minLength = rule("minLength", {
-      constraint: { kind: "value", value: componentRead("minimumLength", numberShape) },
-    });
-
-    expect(() => ruleFails({ rule: minLength, value: "Ada", peerValue: noPeerValue() }))
-      .toThrow("[alis] validation constraint operand must be a literal");
-  });
-
-  it("rejects malformed length constraints instead of comparing against NaN", () => {
-    const minLength = rule("minLength", {
-      constraint: { kind: "value", value: literal("abc") },
-    });
-
-    expect(() => ruleFails({ rule: minLength, value: "Ada", peerValue: noPeerValue() }))
-      .toThrow("[alis] validation length constraint must be a finite number");
-  });
-
-  it("rejects unresolved range constraint producers at the range boundary", () => {
-    const range = rule("range", {
-      constraint: { kind: "value", value: componentRead("bounds", { kind: "array", item: numberShape }) },
-      comparisonShape: numberShape,
-    });
-
-    expect(() => ruleFails({ rule: range, value: "7", peerValue: noPeerValue() }))
-      .toThrow("[alis] validation range constraint operand must be a literal");
-  });
-
-  it("rejects malformed range descriptors instead of ignoring extra bounds", () => {
-    const range = rule("range", {
-      constraint: { kind: "value", value: literal([5, 10, 15], { kind: "array", item: numberShape }) },
-      comparisonShape: numberShape,
-    });
-
-    expect(() => ruleFails({ rule: range, value: "7", peerValue: noPeerValue() }))
-      .toThrow("[alis] validation range descriptor must contain exactly two bounds, got 3");
   });
 
   it("orders date values only after the declared shape produces comparable values", () => {

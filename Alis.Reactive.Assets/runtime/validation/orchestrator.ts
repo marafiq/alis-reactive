@@ -7,7 +7,7 @@ import type {
   Plan, ValidationContainerScope, ComponentValidation,
   ValidationRule,
   ValidationRuleActivation as PlanValidationRuleActivation,
-  ValidationRuleOperand as PlanValidationRuleOperand,
+  ValidationPeerOperand as PlanValidationPeerOperand,
 } from "../types";
 import type { ExecContext } from "../types";
 import { RuntimePlan, RuntimeResolutionError, type RuntimeComponent } from "../domain/runtime-plan";
@@ -458,7 +458,7 @@ function isRuleSkippedForUnmountedField(
 }
 
 function resolvePeerValue(
-  operand: PlanValidationRuleOperand,
+  operand: PlanValidationPeerOperand,
   plan: Plan,
 ): ResolvedPeerValue {
   switch (operand.kind) {
