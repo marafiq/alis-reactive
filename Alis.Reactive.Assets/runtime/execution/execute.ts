@@ -131,9 +131,23 @@ class ReactionExecution {
   }
 
   private async executeParallel(reaction: ParallelReaction): Promise<void> {
-    await ParallelReactionExecution
-      .from(reaction, child => this.execute(child))
-      .run();
+    const settledSteps = await ParallelStepSettlements.from(
+      reaction.steps,
+      child => this.execute(child),
+    );
+    settledSteps.reportFailures();
+
+    switch (reaction.completion.kind) {
+      case "none":
+        return;
+
+      case "on-settled":
+        await waitForReaction(this.execute(reaction.completion.reaction));
+        return;
+
+      default:
+        assertNever(reaction.completion, "parallel completion");
+    }
   }
 
   private executeSet(reaction: SetReaction): void {
@@ -188,23 +202,6 @@ class ReactionExecution {
 
 type ReactionRunner = (reaction: Reaction) => void | Promise<void>;
 
-class ParallelReactionExecution {
-  private constructor(
-    private readonly reaction: ParallelReaction,
-    private readonly runReaction: ReactionRunner,
-  ) {}
-
-  static from(reaction: ParallelReaction, runReaction: ReactionRunner): ParallelReactionExecution {
-    return new ParallelReactionExecution(reaction, runReaction);
-  }
-
-  async run(): Promise<void> {
-    const settledSteps = await ParallelStepSettlements.from(this.reaction.steps, this.runReaction);
-    settledSteps.reportFailures();
-    await ParallelCompletionExecution.from(this.reaction.completion, this.runReaction).run();
-  }
-}
-
 class ParallelStepSettlements {
   private constructor(private readonly results: PromiseSettledResult<void>[]) {}
 
@@ -224,43 +221,6 @@ class ParallelStepSettlements {
         log.error("parallel.step-failed", { error: String(result.reason) });
       }
     }
-  }
-}
-
-abstract class ParallelCompletionExecution {
-  static from(
-    completion: ParallelReaction["completion"],
-    runReaction: ReactionRunner,
-  ): ParallelCompletionExecution {
-    const parallelRunsCompletion = completion.kind === "on-settled";
-    if (parallelRunsCompletion) {
-      return new SettledParallelCompletionExecution(completion.reaction, runReaction);
-    }
-
-    return NoParallelCompletionExecution.instance;
-  }
-
-  abstract run(): Promise<void>;
-}
-
-class NoParallelCompletionExecution extends ParallelCompletionExecution {
-  static readonly instance = new NoParallelCompletionExecution();
-
-  async run(): Promise<void> {
-    return;
-  }
-}
-
-class SettledParallelCompletionExecution extends ParallelCompletionExecution {
-  constructor(
-    private readonly reaction: Reaction,
-    private readonly runReaction: ReactionRunner,
-  ) {
-    super();
-  }
-
-  async run(): Promise<void> {
-    await waitForReaction(this.runReaction(this.reaction));
   }
 }
 
