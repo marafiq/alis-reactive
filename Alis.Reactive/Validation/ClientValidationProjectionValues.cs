@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Validation
@@ -41,20 +42,32 @@ namespace Alis.Reactive.Validation
         {
             if (lowerBound == null) throw new ArgumentNullException(nameof(lowerBound));
             if (upperBound == null) throw new ArgumentNullException(nameof(upperBound));
+            if (TryFrom(lowerBound, upperBound, out var bounds)) return bounds;
 
+            var lowerShape = ClientValidationProjectionLiteral.From(lowerBound).Shape;
+            var upperShape = ClientValidationProjectionLiteral.From(upperBound).Shape;
+            throw new ArgumentException(
+                "Client validation range bounds must have the same shape. " +
+                $"Lower bound is '{lowerShape.Kind}', upper bound is '{upperShape.Kind}'.");
+        }
+
+        internal static bool TryFrom(
+            object? lowerBound,
+            object? upperBound,
+            [NotNullWhen(true)] out ClientValidationProjectionRangeBounds? bounds)
+        {
+            bounds = null;
+            if (lowerBound == null || upperBound == null) return false;
             var lowerLiteral = ClientValidationProjectionLiteral.From(lowerBound);
             var upperLiteral = ClientValidationProjectionLiteral.From(upperBound);
-            if (!lowerLiteral.Shape.Equals(upperLiteral.Shape))
-            {
-                throw new ArgumentException(
-                    "Client validation range bounds must have the same shape. " +
-                    $"Lower bound is '{lowerLiteral.Shape.Kind}', upper bound is '{upperLiteral.Shape.Kind}'.");
-            }
+            if (!lowerLiteral.Shape.Equals(upperLiteral.Shape)) return false;
+            if (lowerLiteral.Value == null || upperLiteral.Value == null) return false;
 
-            return new ClientValidationProjectionRangeBounds(
-                lowerLiteral.Value!,
-                upperLiteral.Value!,
+            bounds = new ClientValidationProjectionRangeBounds(
+                lowerLiteral.Value,
+                upperLiteral.Value,
                 lowerLiteral.Shape);
+            return true;
         }
 
         internal ValidationRangeBounds ToValidationRangeBounds() =>

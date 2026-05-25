@@ -210,29 +210,20 @@ namespace Alis.Reactive.FluentValidator
             ValidationRuleCondition condition,
             ClientValidationProjectionAccumulator projection)
         {
-            if (lower == null || upper == null)
+            if (!ClientValidationProjectionRangeBounds.TryFrom(lower, upper, out var bounds))
             {
                 projection.Skip(field.Path, component.Validator, ClientRuleProjectionSkipReason.MissingRangeEndpoint);
                 return;
             }
 
-            var lowerLiteral = ClientValidationProjectionLiteral.From(lower);
-            var upperLiteral = ClientValidationProjectionLiteral.From(upper);
-            if (!lowerLiteral.Shape.Equals(upperLiteral.Shape))
-            {
-                projection.Skip(field.Path, component.Validator, ClientRuleProjectionSkipReason.MissingRangeEndpoint);
-                return;
-            }
-
-            var bounds = ValidationRangeBounds.Between(
-                lowerLiteral.Value!,
-                upperLiteral.Value!,
-                lowerLiteral.Shape);
             projection.Add(
                 field.Reference,
                 ruleName,
                 Message(component, defaultMessage),
-                ValidationRuleDetails.WithConstraint(ValidationConstraint.InclusiveRange(bounds), condition, bounds.Shape));
+                ValidationRuleDetails.WithConstraint(
+                    ValidationConstraint.InclusiveRange(bounds.ToValidationRangeBounds()),
+                    condition,
+                    bounds.EndpointShape));
         }
 
         private static void ProjectComparison(
