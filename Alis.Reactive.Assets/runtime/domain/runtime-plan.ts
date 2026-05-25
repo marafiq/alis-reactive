@@ -1,13 +1,11 @@
 import type {
   Component,
   JsType,
-  PayloadSource,
   Plan,
   Source,
 } from "../types";
 import { browserPlugins, type BrowserPluginCatalog } from "../core/plugin-registry";
 import { RuntimeObject } from "./runtime-object";
-import { ExecutionContext } from "./execution-context";
 import { ComponentRuntime } from "./component-runtime";
 
 export { RuntimeComponentReadinessError } from "./component-runtime";
@@ -83,10 +81,6 @@ export class RuntimePlan {
   urlParameters(): URLSearchParams {
     return new URLSearchParams(window.location.search);
   }
-
-  resolvePayload(source: PayloadSource, ctx: ExecutionContext): unknown {
-    return ctx.resolvePayload(source);
-  }
 }
 
 export class RuntimeTypeCatalog {
@@ -124,10 +118,6 @@ export class RuntimeComponentCatalog {
 
   element(componentKey: string): HTMLElement {
     return this.requireComponent(componentKey).element();
-  }
-
-  jsType(componentKey: string): JsType {
-    return this.requireComponent(componentKey).jsType();
   }
 
   object(componentKey: string): RuntimeObject {

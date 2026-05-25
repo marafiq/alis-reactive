@@ -172,7 +172,7 @@ function executeSet(reaction: SetReaction, plan: RuntimePlan, context: Execution
 
     case "payload":
       log.trace("set", { target: reaction.on.scope, property: reaction.property, value });
-      payloadTarget(reaction.on, plan, context, "set property").set(reaction.property, value);
+      payloadTarget(reaction.on, context, "set property").set(reaction.property, value);
       return;
 
     default:
@@ -196,7 +196,7 @@ function executeCall(reaction: CallReaction, plan: RuntimePlan, context: Executi
 
     case "payload":
       log.trace("call", { target: reaction.on.scope, method: reaction.method, args });
-      payloadTarget(reaction.on, plan, context, "call method").call(reaction.method, args);
+      payloadTarget(reaction.on, context, "call method").call(reaction.method, args);
       return;
 
     default:
@@ -249,11 +249,10 @@ function reportParallelStepFailures(results: readonly PromiseSettledResult<void>
 
 function payloadTarget(
   source: PayloadSource,
-  plan: RuntimePlan,
   context: ExecutionContext,
   operation: string,
 ): MutablePayloadObject {
-  const root = plan.resolvePayload(source, context);
+  const root = context.resolvePayload(source);
   return MutablePayloadObject.require(root, source, operation);
 }
 
