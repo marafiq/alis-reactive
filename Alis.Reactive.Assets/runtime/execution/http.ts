@@ -19,18 +19,10 @@ type HttpResponseBody =
 
 const missingResponseBody: HttpResponseBody = { kind: "missing" };
 
-class CapturedResponseBody {
-  static from(rawBody: unknown): HttpResponseBody {
-    const bodyCanBeReadByReactions = !isMissingRuntimeValue(rawBody);
-    if (!bodyCanBeReadByReactions) return missingResponseBody;
-
-    return { kind: "available", value: rawBody };
-  }
-
-  static missing(): HttpResponseBody {
-    return missingResponseBody;
-  }
-}
+type HttpExchangeOutcome =
+  | { readonly kind: "success"; readonly status: RequestOutcomeStatus; readonly body: HttpResponseBody }
+  | { readonly kind: "error"; readonly status: RequestOutcomeStatus; readonly body: HttpResponseBody }
+  | { readonly kind: "response-unavailable"; readonly status: RequestOutcomeStatus };
 
 /** Execute a single HTTP request with gather, before, response routing, complete, and chaining. */
 export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
@@ -45,8 +37,7 @@ class HttpRequestExecution {
   ) {}
 
   async run(): Promise<void> {
-    const validationGate = RequestValidationGate.for(this.request, this.plan, this.context);
-    if (!validationGate.allowsSend()) return;
+    if (!requestCanSend(this.request, this.plan, this.context)) return;
 
     await runRequestReactions(this.request.before, this.plan, this.context.current);
     await this.dispatch();
@@ -62,40 +53,20 @@ class HttpRequestExecution {
     }
 
     const responsePlan = new HttpResponsePlan(this.request, this.plan, prepared.context);
-    const outcome = await this.exchangeOutcome(prepared.fetch);
-    await outcome.routeWith(responsePlan);
-  }
-
-  private async exchangeOutcome(fetchRequest: ResolvedFetch): Promise<HttpExchangeOutcome> {
-    try {
-      return await HttpExchange.from(this.request, fetchRequest).send();
-    } catch (err) {
-      return HttpExchangeOutcome.fromClientFailure(this.request, err);
-    }
+    const outcome = await sendHttpRequest(this.request, prepared.fetch);
+    await routeExchangeOutcome(outcome, responsePlan);
   }
 }
 
-class RequestValidationGate {
-  private constructor(private readonly openForSend: boolean) {}
+function requestCanSend(request: Request, plan: Plan, context: RequestContext): boolean {
+  const validation = request.validation;
+  const requestRequiresClientValidation = validation.kind === "container";
+  if (!requestRequiresClientValidation) return true;
 
-  static open(): RequestValidationGate {
-    return new RequestValidationGate(true);
-  }
+  const valid = validateContainer(plan, validation.container, context.current);
+  if (!valid) log.debug("validation.aborted", { id: validation.container, url: request.url });
 
-  static for(request: Request, plan: Plan, context: RequestContext): RequestValidationGate {
-    const validation = request.validation;
-    const requestRequiresClientValidation = validation.kind === "container";
-    if (!requestRequiresClientValidation) return RequestValidationGate.open();
-
-    const valid = validateContainer(plan, validation.container, context.current);
-    if (!valid) log.debug("validation.aborted", { id: validation.container, url: request.url });
-
-    return new RequestValidationGate(valid);
-  }
-
-  allowsSend(): boolean {
-    return this.openForSend;
-  }
+  return valid;
 }
 
 interface PreparedHttpRequest {
@@ -117,92 +88,63 @@ async function routeClientFailure(
   context: RequestContext,
   error: unknown,
 ): Promise<void> {
-  const outcome = HttpExchangeOutcome.fromClientFailure(request, error);
-  await outcome.routeWith(new HttpResponsePlan(request, plan, context));
+  const outcome = exchangeOutcomeFromClientFailure(request, error);
+  await routeExchangeOutcome(outcome, new HttpResponsePlan(request, plan, context));
 }
 
-class HttpExchange {
-  private constructor(
-    private readonly request: Request,
-    private readonly fetchRequest: ResolvedFetch,
-  ) {}
-
-  static from(request: Request, fetchRequest: ResolvedFetch): HttpExchange {
-    return new HttpExchange(request, fetchRequest);
-  }
-
-  async send(): Promise<HttpExchangeOutcome> {
-    log.debug("fetch.send", { method: this.request.method, url: this.fetchRequest.url });
+async function sendHttpRequest(request: Request, fetchRequest: ResolvedFetch): Promise<HttpExchangeOutcome> {
+  try {
+    log.debug("fetch.send", { method: request.method, url: fetchRequest.url });
 
     const start = performance.now();
-    const response = await fetch(this.fetchRequest.url, this.fetchRequest.init);
+    const response = await fetch(fetchRequest.url, fetchRequest.init);
     log.debug("fetch.response", {
-      method: this.request.method,
-      url: this.fetchRequest.url,
+      method: request.method,
+      url: fetchRequest.url,
       status: response.status,
       ms: Math.round(performance.now() - start),
     });
 
-    const body = await ResponseBody.read(response);
-    return HttpExchangeOutcome.fromResponse(response, body);
+    return exchangeOutcomeFromResponse(response, await readResponseBody(response));
+  } catch (err) {
+    return exchangeOutcomeFromClientFailure(request, err);
   }
 }
 
-abstract class HttpExchangeOutcome {
-  static fromResponse(response: Response, body: HttpResponseBody): HttpExchangeOutcome {
-    const status = RequestOutcomeStatus.http(response.status);
-    const statusIsSuccessful = response.ok;
-    if (statusIsSuccessful) return new SuccessfulHttpExchange(status, body);
-
-    return new FailedHttpExchange(status, body);
-  }
-
-  static fromClientFailure(request: Request, err: unknown): HttpExchangeOutcome {
-    const failure = ClientRequestFailure.from(err);
-    log.error(failure.traceEvent, {
-      method: request.method,
-      url: request.url,
-      error: String(err),
-    });
-    return new ResponseUnavailableHttpExchange(failure.status);
-  }
-
-  abstract routeWith(plan: HttpResponsePlan): Promise<void>;
+function exchangeOutcomeFromResponse(response: Response, body: HttpResponseBody): HttpExchangeOutcome {
+  const status = RequestOutcomeStatus.http(response.status);
+  const statusIsSuccessful = response.ok;
+  return statusIsSuccessful
+    ? { kind: "success", status, body }
+    : { kind: "error", status, body };
 }
 
-class SuccessfulHttpExchange extends HttpExchangeOutcome {
-  constructor(
-    private readonly status: RequestOutcomeStatus,
-    private readonly body: HttpResponseBody,
-  ) {
-    super();
-  }
-
-  async routeWith(plan: HttpResponsePlan): Promise<void> {
-    await plan.routeSuccess(this.status, this.body);
-  }
+function exchangeOutcomeFromClientFailure(request: Request, err: unknown): HttpExchangeOutcome {
+  const failure = ClientRequestFailure.from(err);
+  log.error(failure.traceEvent, {
+    method: request.method,
+    url: request.url,
+    error: String(err),
+  });
+  return { kind: "response-unavailable", status: failure.status };
 }
 
-class FailedHttpExchange extends HttpExchangeOutcome {
-  constructor(
-    private readonly status: RequestOutcomeStatus,
-    private readonly body: HttpResponseBody,
-  ) {
-    super();
-  }
-
-  async routeWith(plan: HttpResponsePlan): Promise<void> {
-    await plan.routeError(this.status, this.body);
-  }
-}
-
-class ResponseUnavailableHttpExchange extends HttpExchangeOutcome {
-  constructor(private readonly status: RequestOutcomeStatus) {
-    super();
-  }
-
-  async routeWith(plan: HttpResponsePlan): Promise<void> {
-    await plan.routeResponseUnavailable(this.status);
+async function routeExchangeOutcome(
+  outcome: HttpExchangeOutcome,
+  plan: HttpResponsePlan,
+): Promise<void> {
+  switch (outcome.kind) {
+    case "success":
+      await plan.routeSuccess(outcome.status, outcome.body);
+      return;
+    case "error":
+      await plan.routeError(outcome.status, outcome.body);
+      return;
+    case "response-unavailable":
+      await plan.routeResponseUnavailable(outcome.status);
+      return;
+    default:
+      return assertNever(outcome, "HTTP exchange outcome");
   }
 }
 
@@ -292,7 +234,7 @@ class HttpResponsePlan {
     status: RequestOutcomeStatus,
     context: ExecContext,
   ): Promise<void> {
-    await new ResponseRouter(handlers, status, this.plan, context).run();
+    await routeResponseHandlers(handlers, status, this.plan, context);
   }
 
   private async routeAndComplete(routeStage: () => Promise<void>): Promise<void> {
@@ -367,157 +309,65 @@ class RequestPayloadSnapshot {
   }
 }
 
-class ResponseBody {
-  static async read(response: Response): Promise<HttpResponseBody> {
-    const contentType = response.headers.get("Content-Type");
-    const kind = ResponseContentType.from(contentType);
-    return kind.read(response);
+async function readResponseBody(response: Response): Promise<HttpResponseBody> {
+  const kind = responseContentKind(response.headers.get("Content-Type"));
+  switch (kind) {
+    case "json":
+      return jsonResponseBodyFrom(await response.text());
+    case "text":
+      return responseBodyFrom(await response.text());
+    case "empty":
+      return missingResponseBody;
+    default:
+      return assertNever(kind, "response content kind");
   }
 }
 
-abstract class ResponseContentType {
-  static from(contentType: string | null): ResponseContentType {
-    const header = ResponseContentTypeHeader.from(contentType);
-    if (!header.isPresent) return NoResponseContent.instance;
-    if (header.isJson) return JsonResponseContent.instance;
-    if (header.isText) return TextResponseContent.instance;
-    return NoResponseContent.instance;
-  }
-
-  abstract read(response: Response): Promise<HttpResponseBody>;
+function responseContentKind(contentType: string | null): "json" | "text" | "empty" {
+  const mediaType = responseMediaType(contentType);
+  if (mediaType === undefined) return "empty";
+  if (mediaType === "application/json" || mediaType.endsWith("+json")) return "json";
+  if (mediaType.startsWith("text/") || mediaType.includes("html")) return "text";
+  return "empty";
 }
 
-class ResponseContentTypeHeader {
-  private constructor(private readonly mediaType: string | undefined) {}
-
-  static from(value: string | null): ResponseContentTypeHeader {
-    if (value === null || value.length === 0) {
-      return new ResponseContentTypeHeader(undefined);
-    }
-
-    return new ResponseContentTypeHeader(ResponseMediaType.from(value).value);
-  }
-
-  get isPresent(): boolean {
-    return this.mediaType !== undefined;
-  }
-
-  get isJson(): boolean {
-    if (this.mediaType === undefined) return false;
-
-    return this.mediaType === "application/json" || this.mediaType.endsWith("+json");
-  }
-
-  get isText(): boolean {
-    if (this.mediaType === undefined) return false;
-
-    return this.mediaType.startsWith("text/") || this.mediaType.includes("html");
-  }
+function responseMediaType(contentType: string | null): string | undefined {
+  if (contentType === null || contentType.length === 0) return undefined;
+  return contentType.split(";")[0]?.trim().toLowerCase() ?? "";
 }
 
-class ResponseMediaType {
-  private constructor(readonly value: string) {}
+function jsonResponseBodyFrom(textBody: string): HttpResponseBody {
+  const bodyIsEmpty = textBody.trim().length === 0;
+  if (bodyIsEmpty) return missingResponseBody;
 
-  static from(contentType: string): ResponseMediaType {
-    return new ResponseMediaType(contentType.split(";")[0]?.trim().toLowerCase() ?? "");
-  }
+  return responseBodyFrom(JSON.parse(textBody));
 }
 
-class JsonResponseContent extends ResponseContentType {
-  static readonly instance = new JsonResponseContent();
+function responseBodyFrom(rawBody: unknown): HttpResponseBody {
+  const bodyCanBeReadByReactions = !isMissingRuntimeValue(rawBody);
+  if (!bodyCanBeReadByReactions) return missingResponseBody;
 
-  async read(response: Response): Promise<HttpResponseBody> {
-    const textBody = await response.text();
-    return JsonResponseText.from(textBody).toResponseBody();
-  }
+  return { kind: "available", value: rawBody };
 }
 
-class JsonResponseText {
-  private constructor(private readonly value: string) {}
-
-  static from(value: string): JsonResponseText {
-    return new JsonResponseText(value);
+async function routeResponseHandlers(
+  handlers: ResponseHandler[],
+  status: RequestOutcomeStatus,
+  plan: Plan,
+  context: ExecContext,
+): Promise<void> {
+  const handler = handlers.find(handlerMatchesStatus(status)) ?? handlers.find(handlerMatchesAnyStatus);
+  if (handler) {
+    await executeReaction(handler.reaction, plan, context);
+    return;
   }
 
-  toResponseBody(): HttpResponseBody {
-    const bodyIsEmpty = this.value.trim().length === 0;
-    if (bodyIsEmpty) return CapturedResponseBody.missing();
+  if (handlers.length === 0) return;
 
-    return CapturedResponseBody.from(JSON.parse(this.value));
-  }
-}
-
-class TextResponseContent extends ResponseContentType {
-  static readonly instance = new TextResponseContent();
-
-  async read(response: Response): Promise<HttpResponseBody> {
-    const textBody = await response.text();
-    return CapturedResponseBody.from(textBody);
-  }
-}
-
-class NoResponseContent extends ResponseContentType {
-  static readonly instance = new NoResponseContent();
-
-  async read(): Promise<HttpResponseBody> {
-    return CapturedResponseBody.missing();
-  }
-}
-
-class ResponseRouter {
-  constructor(
-    private readonly handlers: ResponseHandler[],
-    private readonly status: RequestOutcomeStatus,
-    private readonly plan: Plan,
-    private readonly context: ExecContext,
-  ) {}
-
-  async run(): Promise<void> {
-    const selected = ResponseHandlerSelection.from(this.handlers, this.status);
-    await selected.route(this.plan, this.context);
-  }
-}
-
-abstract class ResponseHandlerSelection {
-  static from(handlers: ResponseHandler[], status: RequestOutcomeStatus): ResponseHandlerSelection {
-    const exactStatusHandler = handlers.find(handlerMatchesStatus(status));
-    if (exactStatusHandler) return new MatchedResponseHandler(exactStatusHandler);
-
-    const anyStatusHandler = handlers.find(handlerMatchesAnyStatus);
-    if (anyStatusHandler) return new MatchedResponseHandler(anyStatusHandler);
-
-    return new UnmatchedResponseStatus(status, handlers.length);
-  }
-
-  abstract route(plan: Plan, context: ExecContext): Promise<void>;
-}
-
-class MatchedResponseHandler extends ResponseHandlerSelection {
-  constructor(private readonly handler: ResponseHandler) {
-    super();
-  }
-
-  async route(plan: Plan, context: ExecContext): Promise<void> {
-    await executeReaction(this.handler.reaction, plan, context);
-  }
-}
-
-class UnmatchedResponseStatus extends ResponseHandlerSelection {
-  constructor(
-    private readonly status: RequestOutcomeStatus,
-    private readonly handlerCount: number,
-  ) {
-    super();
-  }
-
-  async route(): Promise<void> {
-    if (this.handlerCount === 0) return;
-
-    log.warn("response.unhandled", {
-      status: this.status.forLog(),
-      handlerCount: this.handlerCount,
-    });
-  }
+  log.warn("response.unhandled", {
+    status: status.forLog(),
+    handlerCount: handlers.length,
+  });
 }
 
 function handlerMatchesStatus(status: RequestOutcomeStatus): (handler: ResponseHandler) => boolean {
@@ -538,5 +388,5 @@ export async function routeHandlers(
   plan: Plan,
   ctx?: ExecContext,
 ): Promise<void> {
-  await new ResponseRouter(handlers, RequestOutcomeStatus.http(status), plan, RequestContext.start(ctx).current).run();
+  await routeResponseHandlers(handlers, RequestOutcomeStatus.http(status), plan, RequestContext.start(ctx).current);
 }
