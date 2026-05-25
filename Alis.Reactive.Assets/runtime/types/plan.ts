@@ -243,6 +243,15 @@ export type Source =
   | UrlSource
   | PluginSource;
 
+export type SetTargetSource =
+  | ComponentSource
+  | PayloadSource;
+
+export type CallTargetSource =
+  | ComponentSource
+  | PayloadSource
+  | PluginSource;
+
 export interface ComponentSource {
   kind: "component";
   component: string;
@@ -388,14 +397,14 @@ export interface ConditionalBranchGuard {
 
 export interface SetReaction {
   kind: "set";
-  on: Source;
+  on: SetTargetSource;
   property: string;
   value: ValueProducer;
 }
 
 export interface CallReaction {
   kind: "call";
-  on: Source;
+  on: CallTargetSource;
   method: string;
   args: ValueProducer[];
 }

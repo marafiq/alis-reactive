@@ -94,6 +94,29 @@ public class WhenGeneratingRuntimePlanTypes
             "Layout objects are app-level object references and should not carry owned input state.");
     }
 
+    [Test]
+    public void generated_runtime_plan_types_narrow_reaction_target_sources()
+    {
+        var generated = PlanTypeScriptContract.Render();
+
+        Assert.That(
+            generated,
+            Does.Contain("export type SetTargetSource =\n  | ComponentSource\n  | PayloadSource;"),
+            "Set reactions target mutable component objects or mutable payload objects; URL/plugin sources are not set targets.");
+        Assert.That(
+            generated,
+            Does.Contain("export type CallTargetSource =\n  | ComponentSource\n  | PayloadSource\n  | PluginSource;"),
+            "Call reactions target component methods, payload callback methods, or plugin methods.");
+        Assert.That(
+            generated,
+            Does.Contain("on: SetTargetSource;"),
+            "SetReaction should not expose the broad Source union.");
+        Assert.That(
+            generated,
+            Does.Contain("on: CallTargetSource;"),
+            "CallReaction should not expose the broad Source union.");
+    }
+
     private static string FindRepoRoot(string startDirectory)
     {
         var directory = new DirectoryInfo(startDirectory);

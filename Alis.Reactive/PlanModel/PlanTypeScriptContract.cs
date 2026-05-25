@@ -184,6 +184,8 @@ namespace Alis.Reactive.PlanModel
                 .Requires("condition", "ValidationCondition"));
 
             contract.Declare(Union("Source", "ComponentSource", "PayloadSource", "UrlSource", "PluginSource"));
+            contract.Declare(Union("SetTargetSource", "ComponentSource", "PayloadSource"));
+            contract.Declare(Union("CallTargetSource", "ComponentSource", "PayloadSource", "PluginSource"));
 
             contract.Declare(Interface("ComponentSource")
                 .Requires("kind", Literal("component"))
@@ -302,13 +304,13 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("SetReaction")
                 .Requires("kind", Literal("set"))
-                .Requires("on", "Source")
+                .Requires("on", "SetTargetSource")
                 .Requires("property", "string")
                 .Requires("value", "ValueProducer"));
 
             contract.Declare(Interface("CallReaction")
                 .Requires("kind", Literal("call"))
-                .Requires("on", "Source")
+                .Requires("on", "CallTargetSource")
                 .Requires("method", "string")
                 .Requires("args", "ValueProducer[]"));
 

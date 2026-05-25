@@ -6,7 +6,7 @@ import type {
   Plan, Reaction, SequenceReaction, ParallelReaction, BranchReaction,
   BranchCase, SetReaction, CallReaction, DispatchReaction,
   InjectReaction, ShowValidationErrorsReaction,
-  ExecContext, PayloadSource, Source,
+  ExecContext, PayloadSource,
 } from "../types";
 import { RuntimePlan } from "../domain/runtime-plan";
 import { evaluateValue } from "../core/evaluate";
@@ -174,9 +174,6 @@ function executeSet(reaction: SetReaction, plan: RuntimePlan, context: Execution
       log.trace("set", { target: reaction.on.scope, property: reaction.property, value });
       payloadTarget(reaction.on, context, "set property").set(reaction.property, value);
       return;
-
-    default:
-      throw unsupportedSource("Set reaction", reaction.on, "component and payload sources");
   }
 }
 
@@ -198,9 +195,6 @@ function executeCall(reaction: CallReaction, plan: RuntimePlan, context: Executi
       log.trace("call", { target: reaction.on.scope, method: reaction.method, args });
       payloadTarget(reaction.on, context, "call method").call(reaction.method, args);
       return;
-
-    default:
-      throw unsupportedSource("Call reaction", reaction.on, "component, payload, and plugin sources");
   }
 }
 
@@ -373,10 +367,4 @@ function branchGuardMatches(
     default:
       return assertNever(branchCase.guard, "branch guard");
   }
-}
-
-function unsupportedSource(owner: string, source: Source, expected: string): Error {
-  return new Error(
-    `[alis] ${owner} does not support source kind "${source.kind}". Only ${expected} can be targets.`
-  );
 }
