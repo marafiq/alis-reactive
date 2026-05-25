@@ -1,10 +1,8 @@
-import type { JsType, MemberAccess, Method, MethodArgumentContract, Property } from "../types";
+import type { JsType, MemberAccess, Method, MethodArgumentContract, Property, Shape } from "../types";
 import { assertNever } from "../core/assert-never";
 import { RuntimePath } from "./runtime-path";
 import { RuntimeValue } from "./runtime-value";
 import { RuntimeShape } from "./runtime-shape";
-
-type ExactMethodArgumentContract = Extract<MethodArgumentContract, { kind: "exact" }>;
 
 export class RuntimeObject {
   constructor(
@@ -128,45 +126,33 @@ class RuntimeMethodInvocation {
   }
 }
 
-abstract class RuntimeMethodArguments {
+class RuntimeMethodArguments {
+  private constructor(private readonly contract: MethodArgumentContract) {}
+
   static from(contract: MethodArgumentContract): RuntimeMethodArguments {
     switch (contract.kind) {
       case "open":
-        return OpenRuntimeMethodArguments.instance;
       case "exact":
-        return new ExactRuntimeMethodArguments(contract.shapes);
+        return new RuntimeMethodArguments(contract);
       default:
         assertNever(contract, "method argument contract");
     }
   }
 
-  abstract prepare(label: string, args: unknown[]): unknown[];
-}
-
-class OpenRuntimeMethodArguments extends RuntimeMethodArguments {
-  static readonly instance = new OpenRuntimeMethodArguments();
-
-  prepare(_label: string, args: unknown[]): unknown[] {
-    return args;
-  }
-}
-
-class ExactRuntimeMethodArguments extends RuntimeMethodArguments {
-  constructor(private readonly shapes: ExactMethodArgumentContract["shapes"]) {
-    super();
-  }
-
   prepare(label: string, args: unknown[]): unknown[] {
-    const argumentCountMatchesContract = args.length === this.shapes.length;
+    if (this.contract.kind === "open") return args;
+
+    const argumentCountMatchesContract = args.length === this.contract.shapes.length;
     if (!argumentCountMatchesContract) {
-      throw new Error(`[alis] method "${label}" expects ${this.shapes.length} argument(s) but received ${args.length}`);
+      throw new Error(`[alis] method "${label}" expects ${this.contract.shapes.length} argument(s) but received ${args.length}`);
     }
 
-    return args.map((arg, index) => RuntimeShape.from(this.shapeAt(index, label)).apply(arg));
+    const shapes = this.contract.shapes;
+    return args.map((arg, index) => RuntimeShape.from(this.shapeAt(shapes, index, label)).apply(arg));
   }
 
-  private shapeAt(index: number, label: string) {
-    const shape = this.shapes[index];
+  private shapeAt(shapes: readonly Shape[], index: number, label: string): Shape {
+    const shape = shapes[index];
     if (shape !== undefined) return shape;
 
     throw new Error(`[alis] method "${label}" argument ${index} has no declared shape`);
