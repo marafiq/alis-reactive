@@ -1,4 +1,4 @@
-import type { JsType, MemberAccess, Method, MethodArgumentContract, Property, Shape } from "../types";
+import type { JsType, MemberAccess, Method, MethodArgumentContract, Property } from "../types";
 import { assertNever } from "../core/assert-never";
 import { RuntimePath } from "./runtime-path";
 import { RuntimeValue } from "./runtime-value";
@@ -148,13 +148,6 @@ class RuntimeMethodArguments {
     }
 
     const shapes = this.contract.shapes;
-    return args.map((arg, index) => RuntimeShape.from(this.shapeAt(shapes, index, label)).apply(arg));
-  }
-
-  private shapeAt(shapes: readonly Shape[], index: number, label: string): Shape {
-    const shape = shapes[index];
-    if (shape !== undefined) return shape;
-
-    throw new Error(`[alis] method "${label}" argument ${index} has no declared shape`);
+    return args.map((arg, index) => RuntimeShape.from(shapes[index]!).apply(arg));
   }
 }
