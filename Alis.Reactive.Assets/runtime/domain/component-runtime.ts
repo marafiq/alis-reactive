@@ -17,17 +17,6 @@ export interface ComponentRuntimeDriver {
   ): void;
 }
 
-class RuntimeVendorToken {
-  private constructor(readonly value: Vendor) {}
-
-  static from(vendor: Vendor): RuntimeVendorToken {
-    const vendorWasDeclared = typeof vendor === "string" && vendor.trim().length > 0;
-    if (vendorWasDeclared) return new RuntimeVendorToken(vendor);
-
-    throw ComponentRuntimeRegistrationError.invalidVendor(vendor);
-  }
-}
-
 export class RuntimeComponentReadinessError extends Error {
   private constructor(
     readonly componentId: string,
@@ -51,61 +40,11 @@ export class RuntimeComponentReadinessError extends Error {
   }
 }
 
-export class ComponentRuntimeRegistrationError extends Error {
-  private constructor(message: string) {
-    super(message);
-    this.name = "ComponentRuntimeRegistrationError";
-  }
-
-  static invalidVendor(vendor: unknown): ComponentRuntimeRegistrationError {
-    return new ComponentRuntimeRegistrationError(
-      `[alis] component runtime vendor must be a non-empty string; received ${String(vendor)}`,
-    );
-  }
-
-  static duplicate(vendor: Vendor): ComponentRuntimeRegistrationError {
-    return new ComponentRuntimeRegistrationError(
-      `[alis] component runtime already registered for vendor "${vendor}"`,
-    );
-  }
-}
-
-export class ComponentRuntimeNotRegisteredError extends Error {
-  private constructor(
-    readonly componentId: string,
-    readonly vendor: Vendor,
-    message: string,
-  ) {
-    super(message);
-    this.name = "ComponentRuntimeNotRegisteredError";
-  }
-
-  static missing(
-    componentId: string,
-    vendor: Vendor,
-    registeredVendors: readonly Vendor[],
-  ): ComponentRuntimeNotRegisteredError {
-    const registered = registeredVendors.length === 0
-      ? "none"
-      : registeredVendors.join(", ");
-
-    return new ComponentRuntimeNotRegisteredError(
-      componentId,
-      vendor,
-      `[alis] component runtime not registered for component "${componentId}" (vendor: ${vendor}; registered: ${registered})`,
-    );
-  }
-}
-
 export class ComponentRuntime {
-  private constructor(private readonly driver: ComponentRuntimeDriver) {}
+  constructor(private readonly driver: ComponentRuntimeDriver) {}
 
   static for(componentId: string, vendor: Vendor): ComponentRuntime {
     return componentRuntimes.require(componentId, vendor);
-  }
-
-  static fromDriver(driver: ComponentRuntimeDriver): ComponentRuntime {
-    return new ComponentRuntime(driver);
   }
 
   resolveRoot(element: HTMLElement): unknown {
@@ -126,23 +65,32 @@ class ComponentRuntimeRegistry {
   private readonly drivers = new Map<Vendor, ComponentRuntimeDriver>();
 
   register(vendor: Vendor, driver: ComponentRuntimeDriver): void {
-    const token = RuntimeVendorToken.from(vendor);
-    if (this.drivers.has(token.value)) throw ComponentRuntimeRegistrationError.duplicate(token.value);
+    if (this.drivers.has(vendor)) throw new Error(`[alis] component runtime already registered for vendor "${vendor}"`);
 
-    this.drivers.set(token.value, driver);
+    this.drivers.set(vendor, driver);
   }
 
   require(componentId: string, vendor: Vendor): ComponentRuntime {
-    const token = RuntimeVendorToken.from(vendor);
-    const driver = this.drivers.get(token.value);
-    if (driver) return ComponentRuntime.fromDriver(driver);
+    const driver = this.drivers.get(vendor);
+    if (driver) return new ComponentRuntime(driver);
 
-    throw ComponentRuntimeNotRegisteredError.missing(
-      componentId,
-      token.value,
-      [...this.drivers.keys()],
-    );
+    throw componentRuntimeNotRegistered(componentId, vendor, [...this.drivers.keys()]);
   }
+}
+
+function componentRuntimeNotRegistered(
+  componentId: string,
+  vendor: Vendor,
+  registeredVendors: readonly Vendor[],
+): Error {
+  const registered = registeredVendors.length === 0
+    ? "none"
+    : registeredVendors.join(", ");
+
+  return new Error(
+    `[alis] component runtime not registered for component "${componentId}" ` +
+    `(vendor: ${vendor}; registered: ${registered})`,
+  );
 }
 
 const componentRuntimes = new ComponentRuntimeRegistry();
