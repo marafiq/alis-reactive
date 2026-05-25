@@ -243,6 +243,10 @@ export type Source =
   | UrlSource
   | PluginSource;
 
+export type RuntimeObjectSource =
+  | ComponentSource
+  | PluginSource;
+
 export type SetTargetSource =
   | ComponentSource
   | PayloadSource;
@@ -590,19 +594,62 @@ export type ValueProducer =
   | ObjectProducer
   | ArrayProducer;
 
+export type ReadProducer =
+  | ObjectPropertyReadProducer
+  | ObjectMethodReadProducer
+  | UrlParameterReadProducer
+  | PayloadPathReadProducer
+  | WholePayloadReadProducer;
+
 export interface LiteralProducer {
   kind: "literal";
   value: JsonValue;
   shape: Shape;
 }
 
-export interface ReadProducer {
+export interface ObjectPropertyReadProducer {
   kind: "read";
-  from: Source;
+  from: RuntimeObjectSource;
   member: string;
-  path: Path;
+  path: EmptyPath;
   shape: Shape;
-  access: ValueReadAccess;
+  access: PropertyValueReadAccess;
+}
+
+export interface ObjectMethodReadProducer {
+  kind: "read";
+  from: RuntimeObjectSource;
+  member: string;
+  path: EmptyPath;
+  shape: Shape;
+  access: MethodValueReadAccess;
+}
+
+export interface UrlParameterReadProducer {
+  kind: "read";
+  from: UrlSource;
+  member: string;
+  path: EmptyPath;
+  shape: Shape;
+  access: PropertyValueReadAccess;
+}
+
+export interface PayloadPathReadProducer {
+  kind: "read";
+  from: PayloadSource;
+  member: string;
+  path: StructuredPath;
+  shape: Shape;
+  access: PropertyValueReadAccess;
+}
+
+export interface WholePayloadReadProducer {
+  kind: "read";
+  from: PayloadSource;
+  member: "responseBody";
+  path: EmptyPath;
+  shape: Shape;
+  access: PropertyValueReadAccess;
 }
 
 export type ValueReadAccess =
@@ -780,6 +827,10 @@ export interface NoneShape {
 }
 
 export type Path = PathSegment[];
+
+export type EmptyPath = [];
+
+export type StructuredPath = [PathSegment, ...PathSegment[]];
 
 export type PathSegment =
   | PropertySegment

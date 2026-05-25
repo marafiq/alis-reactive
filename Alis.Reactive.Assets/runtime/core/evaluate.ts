@@ -2,7 +2,11 @@
 // The ONE way to read a value from any source: component, event, response, literal.
 // Every module that needs a value calls evaluateValue(). No parallel paths.
 
-import type { Plan, ValueProducer, ExecContext, Source } from "../types";
+import type {
+  Plan, ValueProducer, ExecContext, ReadProducer, RuntimeObjectSource,
+  ObjectPropertyReadProducer, ObjectMethodReadProducer,
+  UrlParameterReadProducer, PayloadPathReadProducer, WholePayloadReadProducer,
+} from "../types";
 import { RuntimePlan } from "../domain/runtime-plan";
 import { applyShape } from "./shape-convert";
 import { assertNever } from "./assert-never";
@@ -11,11 +15,8 @@ import { RuntimePath } from "../domain/runtime-path";
 import { ExecutionContext } from "../domain/execution-context";
 import { RuntimeObject } from "../domain/runtime-object";
 
-type RuntimeObjectReadableSource =
-  | Extract<Source, { kind: "component" }>
-  | Extract<Source, { kind: "plugin" }>;
-
-type ReadValueProducer = Extract<ValueProducer, { kind: "read" }>;
+type ObjectReadProducer = ObjectPropertyReadProducer | ObjectMethodReadProducer;
+type PayloadReadProducer = PayloadPathReadProducer | WholePayloadReadProducer;
 
 export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecContext): unknown {
   return ValueEvaluation.from(plan, ctx).evaluate(producer);
@@ -54,24 +55,28 @@ class ValueEvaluation {
     }
   }
 
-  private evaluateRead(producer: ReadValueProducer): unknown {
-    if (RuntimeObjectSource.matches(producer.from)) {
-      return this.readFromRuntimeObject(producer);
+  private evaluateRead(producer: ReadProducer): unknown {
+    if (isObjectRead(producer)) {
+      return this.readFromRuntimeObject(producer, producer.from);
     }
-    if (producer.from.kind === "url") {
+    if (isUrlRead(producer)) {
       return readFromUrl(producer, this.plan.urlParameters());
     }
-    return readFromPayload(producer, this.context.resolvePayload(producer.from));
+    if (isPayloadRead(producer)) {
+      return readFromPayload(producer, this.context.resolvePayload(producer.from));
+    }
+
+    return assertNever(producer, "read producer");
   }
 
-  private readFromRuntimeObject(producer: ReadValueProducer): unknown {
-    const object = this.plan.objectForSource(producer.from);
+  private readFromRuntimeObject(producer: ObjectReadProducer, source: RuntimeObjectSource): unknown {
+    const object = this.plan.objectForSource(source);
     const value = this.resolveRuntimeObjectRead(producer, object);
     return value.usingRequestedShape(producer.shape);
   }
 
   private resolveRuntimeObjectRead(
-    producer: ReadValueProducer,
+    producer: ObjectReadProducer,
     object: RuntimeObject,
   ): RuntimeValue {
     switch (producer.access.kind) {
@@ -97,66 +102,37 @@ class ValueEvaluation {
   }
 }
 
+function isObjectRead(producer: ReadProducer): producer is ObjectReadProducer {
+  return producer.from.kind === "component" || producer.from.kind === "plugin";
+}
+
+function isUrlRead(producer: ReadProducer): producer is UrlParameterReadProducer {
+  return producer.from.kind === "url";
+}
+
+function isPayloadRead(producer: ReadProducer): producer is PayloadReadProducer {
+  return producer.from.kind === "payload";
+}
+
 /** Read a query parameter from URL source. */
 function readFromUrl(
-  producer: ReadValueProducer, params: URLSearchParams,
+  producer: UrlParameterReadProducer, params: URLSearchParams,
 ): unknown {
-  requirePropertyRead(producer, "URL parameters");
   const raw = params.get(producer.member);
   return applyShapeWhenPresent(raw, producer.shape);
 }
 
 /** Read from a payload source through its structured path or explicit whole-body member. */
 function readFromPayload(
-  producer: ReadValueProducer, root: unknown,
+  producer: PayloadReadProducer, root: unknown,
 ): unknown {
-  requirePropertyRead(producer, "payload sources");
-  return PayloadRead.from(producer, root).usingRequestedShape();
+  const raw = readsWholePayload(producer)
+    ? root
+    : RuntimePath.from(producer.path).read(root);
+
+  return applyShapeWhenPresent(raw, producer.shape);
 }
 
-function requirePropertyRead(producer: ReadValueProducer, sourceLabel: string): void {
-  const readUsesPropertyAccess = producer.access.kind === "property";
-  if (readUsesPropertyAccess) return;
-
-  throw new Error(`[alis] ${sourceLabel} only support property reads, got ${producer.access.kind}`);
-}
-
-class PayloadRead {
-  private constructor(
-    private readonly raw: unknown,
-    private readonly shape: ReadValueProducer["shape"],
-  ) {}
-
-  static from(producer: ReadValueProducer, root: unknown): PayloadRead {
-    const structuredPathWasProvided = producer.path.length > 0;
-    if (structuredPathWasProvided) {
-      return new PayloadRead(RuntimePath.from(producer.path).read(root), producer.shape);
-    }
-
-    const wholeResponseBodyWasRequested = producer.member === "responseBody";
-    if (wholeResponseBodyWasRequested) {
-      return new PayloadRead(root, producer.shape);
-    }
-
-    throw new Error(`[alis] payload read "${producer.member}" requires a structured path`);
-  }
-
-  usingRequestedShape(): unknown {
-    return applyShapeWhenPresent(this.raw, this.shape);
-  }
-}
-
-class RuntimeObjectSource {
-  static matches(source: Source): source is RuntimeObjectReadableSource {
-    switch (source.kind) {
-      case "component":
-      case "plugin":
-        return true;
-      case "payload":
-      case "url":
-        return false;
-      default:
-        assertNever(source, "runtime object source");
-    }
-  }
+function readsWholePayload(producer: PayloadReadProducer): producer is WholePayloadReadProducer {
+  return producer.member === "responseBody";
 }

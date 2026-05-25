@@ -80,7 +80,7 @@ namespace Alis.Reactive.PlanModel
         internal static ValueProducer ReadPayload(PayloadSource from, string path, Shape shape) =>
             Read(from, path, Path.Parse(path), shape);
 
-        internal static ValueProducer Invoke(Source from, string method, Shape returns, IReadOnlyList<ValueProducer> args) =>
+        internal static ValueProducer Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueProducer> args) =>
             new ReadProducer(ValueRead.Method(from, method, ProducedShape.Known(returns), ValueArguments.Of(args)));
 
         internal static ObjectProducer Object(IReadOnlyDictionary<string, ValueProducer> fields)
@@ -202,7 +202,7 @@ namespace Alis.Reactive.PlanModel
                 shape,
                 ValueReadAccess.Property);
 
-        internal static ValueRead Method(Source from, string member, ProducedShape shape, ValueArguments args) =>
+        internal static ValueRead Method(RuntimeObjectSource from, string member, ProducedShape shape, ValueArguments args) =>
             new ValueRead(
                 ValueReadTarget.ForMember(from, member),
                 shape,

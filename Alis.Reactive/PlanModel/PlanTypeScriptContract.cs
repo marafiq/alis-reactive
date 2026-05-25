@@ -184,6 +184,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("condition", "ValidationCondition"));
 
             contract.Declare(Union("Source", "ComponentSource", "PayloadSource", "UrlSource", "PluginSource"));
+            contract.Declare(Union("RuntimeObjectSource", "ComponentSource", "PluginSource"));
             contract.Declare(Union("SetTargetSource", "ComponentSource", "PayloadSource"));
             contract.Declare(Union("CallTargetSource", "ComponentSource", "PayloadSource", "PluginSource"));
 
@@ -467,18 +468,58 @@ namespace Alis.Reactive.PlanModel
                 "ObjectProducer",
                 "ArrayProducer"));
 
+            contract.Declare(Union(
+                "ReadProducer",
+                "ObjectPropertyReadProducer",
+                "ObjectMethodReadProducer",
+                "UrlParameterReadProducer",
+                "PayloadPathReadProducer",
+                "WholePayloadReadProducer"));
+
             contract.Declare(Interface("LiteralProducer")
                 .Requires("kind", Literal("literal"))
                 .Requires("value", "JsonValue")
                 .Requires("shape", "Shape"));
 
-            contract.Declare(Interface("ReadProducer")
+            contract.Declare(Interface("ObjectPropertyReadProducer")
                 .Requires("kind", Literal("read"))
-                .Requires("from", "Source")
+                .Requires("from", "RuntimeObjectSource")
                 .Requires("member", "string")
-                .Requires("path", "Path")
+                .Requires("path", "EmptyPath")
                 .Requires("shape", "Shape")
-                .Requires("access", "ValueReadAccess"));
+                .Requires("access", "PropertyValueReadAccess"));
+
+            contract.Declare(Interface("ObjectMethodReadProducer")
+                .Requires("kind", Literal("read"))
+                .Requires("from", "RuntimeObjectSource")
+                .Requires("member", "string")
+                .Requires("path", "EmptyPath")
+                .Requires("shape", "Shape")
+                .Requires("access", "MethodValueReadAccess"));
+
+            contract.Declare(Interface("UrlParameterReadProducer")
+                .Requires("kind", Literal("read"))
+                .Requires("from", "UrlSource")
+                .Requires("member", "string")
+                .Requires("path", "EmptyPath")
+                .Requires("shape", "Shape")
+                .Requires("access", "PropertyValueReadAccess"));
+
+            contract.Declare(Interface("PayloadPathReadProducer")
+                .Requires("kind", Literal("read"))
+                .Requires("from", "PayloadSource")
+                .Requires("member", "string")
+                .Requires("path", "StructuredPath")
+                .Requires("shape", "Shape")
+                .Requires("access", "PropertyValueReadAccess"));
+
+            contract.Declare(Interface("WholePayloadReadProducer")
+                .Requires("kind", Literal("read"))
+                .Requires("from", "PayloadSource")
+                .Requires("member", Literal("responseBody"))
+                .Requires("path", "EmptyPath")
+                .Requires("shape", "Shape")
+                .Requires("access", "PropertyValueReadAccess"));
 
             contract.Declare(Union(
                 "ValueReadAccess",
@@ -603,6 +644,8 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Interface("NoneShape").Requires("kind", Literal("none")));
 
             contract.Declare(Alias("Path", "PathSegment[]"));
+            contract.Declare(Alias("EmptyPath", "[]"));
+            contract.Declare(Alias("StructuredPath", "[PathSegment, ...PathSegment[]]"));
             contract.Declare(Union("PathSegment", "PropertySegment", "IndexSegment"));
 
             contract.Declare(Interface("PropertySegment")

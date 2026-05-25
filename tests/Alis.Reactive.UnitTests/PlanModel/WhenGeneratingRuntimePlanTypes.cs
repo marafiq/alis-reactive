@@ -117,6 +117,53 @@ public class WhenGeneratingRuntimePlanTypes
             "CallReaction should not expose the broad Source union.");
     }
 
+    [Test]
+    public void generated_runtime_plan_types_narrow_read_access_sources()
+    {
+        var generated = PlanTypeScriptContract.Render();
+
+        Assert.That(
+            generated,
+            Does.Contain("export type RuntimeObjectSource =\n  | ComponentSource\n  | PluginSource;"),
+            "Runtime object reads resolve only component and plugin objects.");
+        Assert.That(
+            generated,
+            Does.Contain("export type ReadProducer =\n  | ObjectPropertyReadProducer\n  | ObjectMethodReadProducer\n  | UrlParameterReadProducer\n  | PayloadPathReadProducer\n  | WholePayloadReadProducer;"),
+            "Read producers should name object, URL, payload path, and whole-payload reads separately.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface ObjectPropertyReadProducer"),
+            "Object property reads should be separate from payload and URL reads.");
+        Assert.That(
+            generated,
+            Does.Contain("from: RuntimeObjectSource;\n  member: string;\n  path: EmptyPath;"),
+            "Object property reads resolve against declared component or plugin object contracts.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface ObjectMethodReadProducer"),
+            "Method-return reads are a distinct plan concept.");
+        Assert.That(
+            generated,
+            Does.Contain("from: RuntimeObjectSource;\n  member: string;"),
+            "Method-return value reads resolve against declared component or plugin object contracts.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface PayloadPathReadProducer"),
+            "Payload path reads should be a named read concept, not an inferred missing response body.");
+        Assert.That(
+            generated,
+            Does.Contain("path: StructuredPath;"),
+            "Payload path reads should carry at least one path segment.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface WholePayloadReadProducer"),
+            "Whole-payload reads should be explicit instead of relying on an empty payload path fallback.");
+        Assert.That(
+            generated,
+            Does.Contain("member: \"responseBody\";\n  path: EmptyPath;"),
+            "The existing JSON token for whole response payloads should be typed as the whole-payload read variant.");
+    }
+
     private static string FindRepoRoot(string startDirectory)
     {
         var directory = new DirectoryInfo(startDirectory);

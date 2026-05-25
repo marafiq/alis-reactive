@@ -12,8 +12,14 @@ namespace Alis.Reactive.PlanModel
         private protected Source() { }
     }
 
+    /// <summary>Identifies a browser object whose declared properties and methods can be evaluated at runtime.</summary>
+    public abstract class RuntimeObjectSource : Source
+    {
+        private protected RuntimeObjectSource() { }
+    }
+
     /// <summary>Identifies a registered UI component as the value source.</summary>
-    public sealed class ComponentSource : Source
+    public sealed class ComponentSource : RuntimeObjectSource
     {
         private readonly ComponentKey _component;
 
@@ -89,7 +95,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Reads a value from a named plugin object registered by the application.</summary>
-    public sealed class PluginSource : Source
+    public sealed class PluginSource : RuntimeObjectSource
     {
         private readonly PluginName _name;
         private readonly TypeKey _type;

@@ -2,7 +2,7 @@ import type {
   Component,
   JsType,
   Plan,
-  Source,
+  RuntimeObjectSource,
 } from "../types";
 import { browserPlugins, type BrowserPluginCatalog } from "../core/plugin-registry";
 import { RuntimeObject } from "./runtime-object";
@@ -67,14 +67,12 @@ export class RuntimePlan {
     return this.document.planId;
   }
 
-  objectForSource(source: Source): RuntimeObject {
+  objectForSource(source: RuntimeObjectSource): RuntimeObject {
     switch (source.kind) {
       case "component":
         return this.components.object(source.component);
       case "plugin":
         return this.plugins.object(source.name, source.type);
-      default:
-        throw new Error(`[alis] objectForSource does not support source kind "${source.kind}"`);
     }
   }
 

@@ -171,21 +171,6 @@ describe("evaluateValue", () => {
     expect(evaluateValue(producer, plan(), { response: payload })).toBe(payload);
   });
 
-  it("rejects payload member reads that have no structured path", () => {
-    const producer: ValueProducer = {
-      kind: "read",
-      from: { kind: "payload", scope: "event", type: { kind: "untyped" } },
-      member: "address.zipCode",
-      path: [],
-      shape: numberShape,
-      access: { kind: "property" },
-    };
-
-    expect(() => evaluateValue(producer, plan(), {
-      event: { address: { zipCode: "90210" } },
-    })).toThrow('payload read "address.zipCode" requires a structured path');
-  });
-
   it("reads component properties and calls component methods from the declared JS object contract", () => {
     document.body.innerHTML = `<input id="resident-name" value="Ada" />`;
     const element = document.getElementById("resident-name") as HTMLInputElement & {
