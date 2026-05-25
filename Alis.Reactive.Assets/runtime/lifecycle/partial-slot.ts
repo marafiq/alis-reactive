@@ -104,16 +104,14 @@ export class AppliedSlotContribution {
 export class PartialSlotRegistry {
   private readonly slots = new Map<PartId, AppliedPartialSlot>();
 
-  contributions(partId: PartId): AppliedSlotContribution[] {
-    return this.slots.get(partId)?.contributions() ?? [];
-  }
-
   recordApplied(source: PartialPlanContributionSource, incoming: Plan): void {
     this.slotFor(source.partId).record(AppliedSlotContribution.capture(source, incoming));
   }
 
-  clear(partId: PartId): void {
+  releaseAppliedContributions(partId: PartId): AppliedSlotContribution[] {
+    const contributions = this.slots.get(partId)?.contributions() ?? [];
     this.slots.delete(partId);
+    return contributions;
   }
 
   reset(): void {

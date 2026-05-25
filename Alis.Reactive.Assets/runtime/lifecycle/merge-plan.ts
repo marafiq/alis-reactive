@@ -137,7 +137,7 @@ export class PlanRegistry {
 
   add(incoming: Plan, hooks: MergeHooks): Plan {
     const source = planContributionSourceFrom(incoming);
-    if (source.kind === "partial") this.removePartialSlot(source.partId);
+    if (source.kind === "partial") this.unapplyPartialSlot(source.partId);
 
     return this.mergeContribution(incoming, hooks, source);
   }
@@ -147,7 +147,7 @@ export class PlanRegistry {
       throw new Error("[alis] partial slot load requires at least one plan; unload the slot explicitly instead");
     }
 
-    const affectedPlanIds = new Set(this.removePartialSlot(partId));
+    const affectedPlanIds = new Set(this.unapplyPartialSlot(partId));
     const loadedPlans: Plan[] = [];
 
     const load = PartialSlotLoad.containing(partId, plans);
@@ -165,7 +165,7 @@ export class PlanRegistry {
 
   unloadPartialSlot(partId: PartId): PartialSlotUnloadResult {
     return {
-      affectedPlanIds: this.removePartialSlot(partId),
+      affectedPlanIds: this.unapplyPartialSlot(partId),
     };
   }
 
@@ -182,8 +182,8 @@ export class PlanRegistry {
     this.typeOwnership.reset();
   }
 
-  private removePartialSlot(partId: PartId): PlanId[] {
-    const contributions = this.slots.contributions(partId);
+  private unapplyPartialSlot(partId: PartId): PlanId[] {
+    const contributions = this.slots.releaseAppliedContributions(partId);
     const affectedPlanIds = new Set<PlanId>();
 
     for (const contribution of contributions) {
@@ -191,7 +191,6 @@ export class PlanRegistry {
       this.contributionRemoval.remove(contribution);
     }
 
-    this.slots.clear(partId);
     return [...affectedPlanIds];
   }
 
