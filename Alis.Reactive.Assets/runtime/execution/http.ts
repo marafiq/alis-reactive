@@ -108,7 +108,7 @@ function exchangeOutcomeFromResponse(response: Response, body: HttpResponseBody)
 }
 
 function exchangeOutcomeFromClientFailure(request: Request, err: unknown): HttpExchangeOutcome {
-  const failure = ClientRequestFailure.from(err);
+  const failure = clientRequestFailureFrom(err);
   log.error(failure.traceEvent, {
     method: request.method,
     url: request.url,
@@ -138,20 +138,16 @@ async function routeExchangeOutcome(
   }
 }
 
-class ClientRequestFailure {
-  private constructor(
-    readonly status: RequestOutcomeStatus,
-    readonly traceEvent: "fetch.network-error" | "fetch.client-error",
-  ) {}
+type ClientRequestFailure = {
+  readonly status: RequestOutcomeStatus;
+  readonly traceEvent: "fetch.network-error" | "fetch.client-error";
+};
 
-  static from(error: unknown): ClientRequestFailure {
-    const requestFailedBeforeResponse = error instanceof TypeError;
-    if (requestFailedBeforeResponse) {
-      return new ClientRequestFailure(RequestOutcomeStatus.networkFailure(), "fetch.network-error");
-    }
-
-    return new ClientRequestFailure(RequestOutcomeStatus.clientFailure(), "fetch.client-error");
-  }
+function clientRequestFailureFrom(error: unknown): ClientRequestFailure {
+  const requestFailedBeforeResponse = error instanceof TypeError;
+  return requestFailedBeforeResponse
+    ? { status: RequestOutcomeStatus.networkFailure(), traceEvent: "fetch.network-error" }
+    : { status: RequestOutcomeStatus.clientFailure(), traceEvent: "fetch.client-error" };
 }
 
 class RequestOutcomeStatus {
@@ -173,9 +169,9 @@ class RequestOutcomeStatus {
   }
 
   matchesExact(planStatus: number): boolean {
-    const status = ResponseHandlerStatus.fromPlan(planStatus);
+    const status = responseHandlerStatusFromPlan(planStatus);
     const responseHasHttpStatusCode = this.kind === "http";
-    return responseHasHttpStatusCode && this.value === status.value;
+    return responseHasHttpStatusCode && this.value === status;
   }
 
   forLog(): number {
@@ -183,17 +179,13 @@ class RequestOutcomeStatus {
   }
 }
 
-class ResponseHandlerStatus {
-  private constructor(readonly value: number) {}
+function responseHandlerStatusFromPlan(value: number): number {
+  const statusComesFromStandardHttpRange = value >= 100 && value <= 599;
+  if (statusComesFromStandardHttpRange) return value;
 
-  static fromPlan(value: number): ResponseHandlerStatus {
-    const statusComesFromStandardHttpRange = value >= 100 && value <= 599;
-    if (statusComesFromStandardHttpRange) return new ResponseHandlerStatus(value);
-
-    throw new Error(
-      `[alis] response handler status ${value} is invalid; expected an HTTP status from 100 to 599`,
-    );
-  }
+  throw new Error(
+    `[alis] response handler status ${value} is invalid; expected an HTTP status from 100 to 599`,
+  );
 }
 
 async function routeSuccess(
@@ -280,7 +272,7 @@ class RequestContext {
   }
 
   withRequest(gathered: GatherResult): RequestContext {
-    return new RequestContext(this.context.withRequest(RequestPayloadSnapshot.from(gathered)));
+    return new RequestContext(this.context.withRequest(requestPayloadSnapshotFrom(gathered)));
   }
 
   withResponse(body: HttpResponseBody): RequestContext {
@@ -291,14 +283,12 @@ class RequestContext {
   }
 }
 
-class RequestPayloadSnapshot {
-  static from(gathered: GatherResult): Record<string, unknown> {
-    const body = gathered.body;
-    const bodyUsesMultipartTransport = body instanceof FormData;
-    if (bodyUsesMultipartTransport) return {};
+function requestPayloadSnapshotFrom(gathered: GatherResult): Record<string, unknown> {
+  const body = gathered.body;
+  const bodyUsesMultipartTransport = body instanceof FormData;
+  if (bodyUsesMultipartTransport) return {};
 
-    return body;
-  }
+  return body;
 }
 
 async function readResponseBody(response: Response): Promise<HttpResponseBody> {
