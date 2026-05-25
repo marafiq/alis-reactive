@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using FluentValidation;
 using FluentValidation.Internal;
+using FluentValidation.Validators;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
@@ -28,6 +29,9 @@ namespace Alis.Reactive.FluentValidator
                         "ProjectToClient must be called after a FluentValidation property validator, " +
                         "for example RuleFor(x => x.Code).Must(...).ProjectToClient(rule => rule.Regex(...)).");
                 }
+
+                if (component.Validator is IAsyncPropertyValidator<TModel, TProperty>)
+                    return;
 
                 ClientValidationRuleProjectionCatalog.Register(component, clientRule);
             });

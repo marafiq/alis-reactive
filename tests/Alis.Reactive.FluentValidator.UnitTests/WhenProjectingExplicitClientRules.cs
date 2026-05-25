@@ -77,6 +77,6 @@ public sealed class WhenProjectingExplicitClientRules
         Assert.That(report.Fields, Is.Empty);
         var skipped = report.SkippedRules.Single();
         Assert.That(skipped.FieldName, Is.EqualTo("ExternalCode"));
-        Assert.That(skipped.Reason, Is.EqualTo(ClientRuleProjectionSkipReason.AsyncValidator));
+        Assert.That(skipped.Reason, Is.EqualTo(ClientRuleProjectionSkipReason.UnsupportedValidator));
     }
 }
