@@ -131,11 +131,10 @@ class ReactionExecution {
   }
 
   private async executeParallel(reaction: ParallelReaction): Promise<void> {
-    const settledSteps = await ParallelStepSettlements.from(
-      reaction.steps,
-      child => this.execute(child),
+    const settledSteps = await Promise.allSettled(
+      reaction.steps.map(step => reactionAsPromise(this.execute(step))),
     );
-    settledSteps.reportFailures();
+    reportParallelStepFailures(settledSteps);
 
     switch (reaction.completion.kind) {
       case "none":
@@ -165,7 +164,7 @@ class ReactionExecution {
   }
 
   private executeDispatch(reaction: DispatchReaction): void {
-    const detail = DispatchPayload.from(reaction, this.plan.document, this.context);
+    const detail = dispatchPayload(reaction, this.plan.document, this.context);
     log.trace("dispatch", { event: reaction.event, detail });
     document.dispatchEvent(new CustomEvent(reaction.event, { detail }));
   }
@@ -202,24 +201,10 @@ class ReactionExecution {
 
 type ReactionRunner = (reaction: Reaction) => void | Promise<void>;
 
-class ParallelStepSettlements {
-  private constructor(private readonly results: PromiseSettledResult<void>[]) {}
-
-  static async from(
-    steps: readonly Reaction[],
-    runReaction: ReactionRunner,
-  ): Promise<ParallelStepSettlements> {
-    const results = await Promise.allSettled(
-      steps.map(step => reactionAsPromise(runReaction(step)))
-    );
-    return new ParallelStepSettlements(results);
-  }
-
-  reportFailures(): void {
-    for (const result of this.results) {
-      if (result.status === "rejected") {
-        log.error("parallel.step-failed", { error: String(result.reason) });
-      }
+function reportParallelStepFailures(results: readonly PromiseSettledResult<void>[]): void {
+  for (const result of results) {
+    if (result.status === "rejected") {
+      log.error("parallel.step-failed", { error: String(result.reason) });
     }
   }
 }
@@ -302,12 +287,10 @@ async function waitForReaction(result: void | Promise<void>): Promise<void> {
   if (reactionContinuesAsync(result)) await result;
 }
 
-class DispatchPayload {
-  static from(reaction: DispatchReaction, plan: Plan, context: ExecutionContext): unknown {
-    if (reaction.payload.kind === "none") return {};
+function dispatchPayload(reaction: DispatchReaction, plan: Plan, context: ExecutionContext): unknown {
+  if (reaction.payload.kind === "none") return {};
 
-    return evaluateValue(reaction.payload.data, plan, context.raw);
-  }
+  return evaluateValue(reaction.payload.data, plan, context.raw);
 }
 
 class MutablePayloadObject {
