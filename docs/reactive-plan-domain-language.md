@@ -317,6 +317,10 @@ TypeScript.
   that enters the plan model. String registration and typed `ReactivePlugin`
   descriptors both produce `PluginOperationContract`; argument collection is
   authoring plumbing, not a separate domain term.
+- **Plugin Object Source**: a plan source that carries both the browser plugin
+  registry name and the plugin object contract type key. Runtime resolves the
+  plugin instance by name and the member contract by declared type key; it does
+  not reconstruct plugin type-key naming rules.
 
 ### Concept Flow
 

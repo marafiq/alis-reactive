@@ -223,6 +223,7 @@ export interface UrlSource {
 export interface PluginSource {
   kind: "plugin";
   name: string;
+  type: string;
 }
 
 export type PayloadScope =

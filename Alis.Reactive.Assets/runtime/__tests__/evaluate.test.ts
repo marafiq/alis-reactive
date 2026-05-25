@@ -408,7 +408,7 @@ describe("evaluateValue", () => {
     };
     const producer: ValueProducer = {
       kind: "read",
-      from: { kind: "plugin", name: pluginName },
+      from: { kind: "plugin", name: pluginName, type: "plugin." + pluginName },
       member: "$call",
       path: [],
       shape: stringShape,
@@ -440,7 +440,7 @@ describe("evaluateValue", () => {
     };
     const producer: ValueProducer = {
       kind: "read",
-      from: { kind: "plugin", name: pluginName },
+      from: { kind: "plugin", name: pluginName, type: "plugin." + pluginName },
       member: "token",
       path: [],
       shape: stringShape,

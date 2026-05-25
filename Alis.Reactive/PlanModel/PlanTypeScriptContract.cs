@@ -176,7 +176,8 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("PluginSource")
                 .Requires("kind", Literal("plugin"))
-                .Requires("name", "string"));
+                .Requires("name", "string")
+                .Requires("type", "string"));
 
             contract.Declare(LiteralUnion("PayloadScope", PayloadScope.Values));
 

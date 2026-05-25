@@ -72,7 +72,7 @@ export class RuntimePlan {
       case "component":
         return this.components.object(source.component);
       case "plugin":
-        return this.plugins.object(source.name);
+        return this.plugins.object(source.name, source.type);
       default:
         throw new Error(`[alis] objectForSource does not support source kind "${source.kind}"`);
     }
@@ -180,12 +180,12 @@ export class RuntimePluginCatalog {
     private readonly instances: BrowserPluginCatalog,
   ) {}
 
-  jsType(pluginName: string): JsType {
-    return this.types.require("plugin." + pluginName);
+  jsType(typeKey: string): JsType {
+    return this.types.require(typeKey);
   }
 
-  object(pluginName: string): RuntimeObject {
-    const jsType = this.jsType(pluginName);
+  object(pluginName: string, typeKey: string): RuntimeObject {
+    const jsType = this.jsType(typeKey);
     return new RuntimeObject(
       `plugin "${pluginName}"`,
       this.instances.resolve(pluginName),

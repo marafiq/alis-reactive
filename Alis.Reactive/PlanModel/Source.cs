@@ -92,14 +92,18 @@ namespace Alis.Reactive.PlanModel
     public sealed class PluginSource : Source
     {
         private readonly PluginName _name;
+        private readonly TypeKey _type;
 
         /// <summary>Gets the kind. Always <c>"plugin"</c>.</summary>
         public string Kind => "plugin";
         /// <summary>Gets the plugin registry name.</summary>
         public string Name => _name.Value;
+        /// <summary>Gets the plugin object contract type key.</summary>
+        public string Type => _type.Value;
         private PluginSource(string name)
         {
             _name = PluginName.Of(name);
+            _type = TypeKey.Plugin(_name);
         }
         internal static PluginSource Of(string name) => new PluginSource(name);
     }
