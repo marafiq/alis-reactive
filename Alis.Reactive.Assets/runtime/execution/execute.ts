@@ -163,16 +163,45 @@ async function executeParallel(
 
 function executeSet(reaction: SetReaction, plan: RuntimePlan, context: ExecutionContext): void {
   const value = evaluateValue(reaction.value, plan.document, context.raw);
-  const target = ReactionTarget.forSet(reaction.on, plan, context);
-  log.trace("set", { target: target.label, property: reaction.property, value });
-  target.set(reaction.property, value);
+
+  switch (reaction.on.kind) {
+    case "component":
+      log.trace("set", { target: reaction.on.component, property: reaction.property, value });
+      plan.objectForSource(reaction.on).set(reaction.property, value);
+      return;
+
+    case "payload":
+      log.trace("set", { target: reaction.on.scope, property: reaction.property, value });
+      payloadTarget(reaction.on, plan, context, "set property").set(reaction.property, value);
+      return;
+
+    default:
+      throw unsupportedSource("Set reaction", reaction.on, "component and payload sources");
+  }
 }
 
 function executeCall(reaction: CallReaction, plan: RuntimePlan, context: ExecutionContext): void {
   const args = reaction.args.map(arg => evaluateValue(arg, plan.document, context.raw));
-  const target = ReactionTarget.forCall(reaction.on, plan, context);
-  log.trace("call", { target: target.label, method: reaction.method, args });
-  target.call(reaction.method, args);
+
+  switch (reaction.on.kind) {
+    case "component":
+      log.trace("call", { target: reaction.on.component, method: reaction.method, args });
+      plan.objectForSource(reaction.on).call(reaction.method, args);
+      return;
+
+    case "plugin":
+      log.trace("call", { target: reaction.on.name, method: reaction.method, args });
+      plan.objectForSource(reaction.on).call(reaction.method, args);
+      return;
+
+    case "payload":
+      log.trace("call", { target: reaction.on.scope, method: reaction.method, args });
+      payloadTarget(reaction.on, plan, context, "call method").call(reaction.method, args);
+      return;
+
+    default:
+      throw unsupportedSource("Call reaction", reaction.on, "component, payload, and plugin sources");
+  }
 }
 
 function executeDispatch(reaction: DispatchReaction, plan: RuntimePlan, context: ExecutionContext): void {
@@ -218,55 +247,6 @@ function reportParallelStepFailures(results: readonly PromiseSettledResult<void>
   }
 }
 
-interface MutableMemberTarget {
-  set(member: string, value: unknown): void;
-  call(member: string, args: unknown[]): void;
-}
-
-class ReactionTarget {
-  private constructor(
-    readonly label: string,
-    private readonly target: MutableMemberTarget,
-  ) {}
-
-  static forSet(source: Source, plan: RuntimePlan, context: ExecutionContext): ReactionTarget {
-    switch (source.kind) {
-      case "component":
-        return new ReactionTarget(source.component, plan.objectForSource(source));
-
-      case "payload":
-        return new ReactionTarget(source.scope, payloadTarget(source, plan, context, "set property"));
-
-      default:
-        throw unsupportedSource("Set reaction", source, "component and payload sources");
-    }
-  }
-
-  static forCall(source: Source, plan: RuntimePlan, context: ExecutionContext): ReactionTarget {
-    switch (source.kind) {
-      case "component":
-        return new ReactionTarget(source.component, plan.objectForSource(source));
-
-      case "plugin":
-        return new ReactionTarget(source.name, plan.objectForSource(source));
-
-      case "payload":
-        return new ReactionTarget(source.scope, payloadTarget(source, plan, context, "call method"));
-
-      default:
-        throw unsupportedSource("Call reaction", source, "component, payload, and plugin sources");
-    }
-  }
-
-  set(member: string, value: unknown): void {
-    this.target.set(member, value);
-  }
-
-  call(member: string, args: unknown[]): void {
-    this.target.call(member, args);
-  }
-}
-
 function payloadTarget(
   source: PayloadSource,
   plan: RuntimePlan,
@@ -309,8 +289,18 @@ class MutablePayloadObject {
   ) {}
 
   static require(root: unknown, source: PayloadSource, operation: string): MutablePayloadObject {
-    const payloadRoot = MutablePayloadRoot.require(root, source, operation);
-    return new MutablePayloadObject(payloadRoot.record, source.scope);
+    const payloadWasProvided = !isMissingRuntimeValue(root);
+    if (!payloadWasProvided) {
+      throw new Error(`[alis] cannot ${operation} on null payload (scope: ${source.scope})`);
+    }
+
+    const payload = PlainObjectRecord.tryFrom(root);
+    const payloadCanHoldMembers = payload !== undefined;
+    if (!payloadCanHoldMembers) {
+      throw new Error(`[alis] cannot ${operation} on ${typeof root} payload (scope: ${source.scope})`);
+    }
+
+    return new MutablePayloadObject(payload.raw, source.scope);
   }
 
   set(property: string, value: unknown): void {
@@ -325,25 +315,6 @@ class MutablePayloadObject {
     }
 
     member.apply(this.root, args);
-  }
-}
-
-class MutablePayloadRoot {
-  private constructor(readonly record: Record<string, unknown>) {}
-
-  static require(root: unknown, source: PayloadSource, operation: string): MutablePayloadRoot {
-    const payloadWasProvided = !isMissingRuntimeValue(root);
-    if (!payloadWasProvided) {
-      throw new Error(`[alis] cannot ${operation} on null payload (scope: ${source.scope})`);
-    }
-
-    const payload = PlainObjectRecord.tryFrom(root);
-    const payloadCanHoldMembers = payload !== undefined;
-    if (!payloadCanHoldMembers) {
-      throw new Error(`[alis] cannot ${operation} on ${typeof root} payload (scope: ${source.scope})`);
-    }
-
-    return new MutablePayloadRoot(payload.raw);
   }
 }
 
