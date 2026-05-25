@@ -80,54 +80,30 @@ class RuntimeProperty {
   }
 }
 
-abstract class RuntimePropertyAccess {
+class RuntimePropertyAccess {
+  private constructor(private readonly access: MemberAccess) {}
+
   static from(label: string, access: MemberAccess): RuntimePropertyAccess {
     switch (access) {
       case "read":
-        return ReadOnlyRuntimePropertyAccess.instance;
       case "write":
-        return WriteOnlyRuntimePropertyAccess.instance;
       case "readwrite":
-        return ReadWriteRuntimePropertyAccess.instance;
+        return new RuntimePropertyAccess(access);
       default:
         assertNever(access, `property access for ${label}`);
     }
   }
 
-  abstract requireReadable(label: string): void;
-
-  abstract requireWritable(label: string): void;
-}
-
-class ReadOnlyRuntimePropertyAccess extends RuntimePropertyAccess {
-  static readonly instance = new ReadOnlyRuntimePropertyAccess();
-
-  requireReadable(_label: string): void {
+  requireReadable(label: string): void {
+    if (this.access === "write") {
+      throw new Error(`[alis] property ${label} is not readable`);
+    }
   }
 
   requireWritable(label: string): void {
-    throw new Error(`[alis] property ${label} is not writable`);
-  }
-}
-
-class WriteOnlyRuntimePropertyAccess extends RuntimePropertyAccess {
-  static readonly instance = new WriteOnlyRuntimePropertyAccess();
-
-  requireReadable(label: string): void {
-    throw new Error(`[alis] property ${label} is not readable`);
-  }
-
-  requireWritable(_label: string): void {
-  }
-}
-
-class ReadWriteRuntimePropertyAccess extends RuntimePropertyAccess {
-  static readonly instance = new ReadWriteRuntimePropertyAccess();
-
-  requireReadable(_label: string): void {
-  }
-
-  requireWritable(_label: string): void {
+    if (this.access === "read") {
+      throw new Error(`[alis] property ${label} is not writable`);
+    }
   }
 }
 
