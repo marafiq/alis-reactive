@@ -42,5 +42,11 @@ namespace Alis.Reactive.Validation
 
         internal static ClientValidationFieldReference Of(ValidationFieldPath path, Shape shape) =>
             new ClientValidationFieldReference(path, shape);
+
+        internal ClientValidationFieldReference PrefixedBy(ValidationFieldPath prefix)
+        {
+            if (prefix == null) throw new ArgumentNullException(nameof(prefix));
+            return Of(prefix.Append(Path), Shape);
+        }
     }
 }

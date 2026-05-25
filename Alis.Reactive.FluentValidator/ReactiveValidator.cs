@@ -308,7 +308,7 @@ namespace Alis.Reactive.FluentValidator
 
         private void ApplyClientCondition(
             Func<T, bool> serverPredicate,
-            FieldCondition clientCondition,
+            ClientConditionProjection clientCondition,
             Action defineRules)
         {
             if (serverPredicate == null) throw new ArgumentNullException(nameof(serverPredicate));
@@ -325,15 +325,15 @@ namespace Alis.Reactive.FluentValidator
         private void ApplyClientCondition(FieldGuard<T> guard, Action defineRules)
         {
             if (guard == null) throw new ArgumentNullException(nameof(guard));
-            ApplyClientCondition(guard.ServerPredicate, guard.Condition, defineRules);
+            ApplyClientCondition(guard.ServerPredicate, ClientConditionProjection.Project(guard), defineRules);
         }
 
         private sealed class ClientConditionScope
         {
-            private readonly Stack<FieldCondition> _activeConditions = new Stack<FieldCondition>();
+            private readonly Stack<ClientConditionProjection> _activeConditions = new Stack<ClientConditionProjection>();
             private int _serverOnlyConditionDepth;
 
-            internal IDisposable Enter(FieldCondition condition)
+            internal IDisposable Enter(ClientConditionProjection condition)
             {
                 if (condition == null) throw new ArgumentNullException(nameof(condition));
                 _activeConditions.Push(condition);
@@ -366,16 +366,16 @@ namespace Alis.Reactive.FluentValidator
                     return ClientConditionProjection.Skip(
                         ClientRuleProjectionSkipReason.FluentValidationConditionWithoutClientGuard);
 
-                return ClientConditionProjection.Project(ActiveProjectionGuard());
+                return ActiveProjectionGuard();
             }
 
-            private FieldCondition ActiveProjectionGuard()
+            private ClientConditionProjection ActiveProjectionGuard()
             {
                 var singleActiveCondition = _activeConditions.Count == 1;
                 if (singleActiveCondition) return _activeConditions.Peek();
 
                 var conditionsInServerNestingOrder = _activeConditions.Reverse().ToArray();
-                return FieldCondition.All(conditionsInServerNestingOrder);
+                return ClientConditionProjection.All(conditionsInServerNestingOrder);
             }
 
             private void Exit()

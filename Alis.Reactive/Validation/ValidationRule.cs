@@ -55,7 +55,7 @@ namespace Alis.Reactive.Validation
             Shape = shape ?? throw new System.ArgumentNullException(nameof(shape));
         }
 
-        internal System.Collections.Generic.IEnumerable<ValidationFieldPath> PeerFields => _peerField.Fields;
+        internal System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences => _peerField.FieldReferences;
         internal Shape Shape { get; }
         internal ValidationRuleExecutionIntent ExecutionIntent =>
             ValidationRuleExecutionIntent.From(
@@ -108,7 +108,7 @@ namespace Alis.Reactive.Validation
             new ValidationRuleDetails(
                 ValidationConstraint.Missing,
                 condition,
-                ValidationPeerField.Of(peerField),
+                ValidationPeerField.Of(peerField, shape),
                 shape);
     }
 
@@ -297,20 +297,21 @@ namespace Alis.Reactive.Validation
         internal static ValidationPeerField None { get; } =
             new NoValidationPeerField();
 
-        internal abstract System.Collections.Generic.IEnumerable<ValidationFieldPath> Fields { get; }
+        internal abstract System.Collections.Generic.IEnumerable<ClientValidationFieldReference> FieldReferences { get; }
 
         internal abstract ValidationRuleOperand ToPlanOperand(ValidationPlanBinding binding);
         internal abstract ValidationRuleOperandIntent ToIntent();
 
-        internal static ValidationPeerField Of(ValidationFieldPath fieldPath)
+        internal static ValidationPeerField Of(ValidationFieldPath fieldPath, Shape shape)
         {
             if (fieldPath == null) throw new System.ArgumentNullException(nameof(fieldPath));
-            return new NamedValidationPeerField(fieldPath);
+            if (shape == null) throw new System.ArgumentNullException(nameof(shape));
+            return new NamedValidationPeerField(ClientValidationFieldReference.Of(fieldPath, shape));
         }
 
         private sealed class NoValidationPeerField : ValidationPeerField
         {
-            internal override System.Collections.Generic.IEnumerable<ValidationFieldPath> Fields
+            internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> FieldReferences
             {
                 get { yield break; }
             }
@@ -327,26 +328,26 @@ namespace Alis.Reactive.Validation
 
         private sealed class NamedValidationPeerField : ValidationPeerField
         {
-            private readonly ValidationFieldPath _fieldPath;
+            private readonly ClientValidationFieldReference _field;
 
-            internal NamedValidationPeerField(ValidationFieldPath fieldPath)
+            internal NamedValidationPeerField(ClientValidationFieldReference field)
             {
-                _fieldPath = fieldPath ?? throw new System.ArgumentNullException(nameof(fieldPath));
+                _field = field ?? throw new System.ArgumentNullException(nameof(field));
             }
 
-            internal override System.Collections.Generic.IEnumerable<ValidationFieldPath> Fields
+            internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> FieldReferences
             {
-                get { yield return _fieldPath; }
+                get { yield return _field; }
             }
 
             internal override ValidationRuleOperand ToPlanOperand(ValidationPlanBinding binding)
             {
                 if (binding == null) throw new System.ArgumentNullException(nameof(binding));
-                return ValidationRuleOperand.From(binding.ResolvePeerValue(_fieldPath));
+                return ValidationRuleOperand.From(binding.ResolvePeerValue(_field.Path));
             }
 
             internal override ValidationRuleOperandIntent ToIntent() =>
-                ValidationRuleOperandIntent.PeerField(_fieldPath);
+                ValidationRuleOperandIntent.PeerField(_field.Path);
         }
     }
 

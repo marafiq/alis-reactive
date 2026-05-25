@@ -205,7 +205,7 @@ namespace Alis.Reactive.FluentValidator
                     explicitClientRule.Name,
                     mapping.Message.OrDefault(explicitClientRule.MessageFor(displayName).Value),
                     explicitClientRule.DetailsFor(mapping.RuleCondition)));
-                projection.AddProjectedRules(mapping.Target.FullPath, projectedRules);
+                mapping.Target.AddProjectedRules(projection, projectedRules);
                 return;
             }
 
@@ -302,7 +302,7 @@ namespace Alis.Reactive.FluentValidator
             }
 
             if (projectedRules.Count > 0)
-                projection.AddProjectedRules(mapping.Target.FullPath, projectedRules);
+                mapping.Target.AddProjectedRules(projection, projectedRules);
         }
 
         private static void MapLengthValidator(
@@ -369,12 +369,14 @@ namespace Alis.Reactive.FluentValidator
             {
                 PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
                 FullPath = fullPath ?? throw new ArgumentNullException(nameof(fullPath));
+                Field = ValidationTargetField.From(fullPath, ruleMember);
                 DisplayName = Humanize(propertyName);
                 PeerScope = ValidationPeerFieldScope.ForRuleMember(ruleMember);
             }
 
             internal string PropertyName { get; }
             internal ValidationFieldPath FullPath { get; }
+            private ValidationTargetField Field { get; }
             internal ValidationFieldPath SameObjectPeerPrefix => FullPath.Parent();
             internal string DisplayName { get; }
             private ValidationPeerFieldScope PeerScope { get; }
@@ -383,6 +385,15 @@ namespace Alis.Reactive.FluentValidator
             {
                 if (member == null) throw new ArgumentNullException(nameof(member));
                 return PeerScope.Classify(member);
+            }
+
+            internal void AddProjectedRules(
+                ClientValidationProjectionDraft projection,
+                IEnumerable<ProjectedClientValidationRule> rules)
+            {
+                if (projection == null) throw new ArgumentNullException(nameof(projection));
+                if (rules == null) throw new ArgumentNullException(nameof(rules));
+                Field.AddProjectedRules(projection, rules);
             }
 
             internal static ValidationRuleTarget From(
@@ -406,6 +417,118 @@ namespace Alis.Reactive.FluentValidator
                     propertyName,
                     prefix.Append(propertyName),
                     ruleMember);
+            }
+        }
+
+        private abstract class ValidationTargetField
+        {
+            private protected ValidationTargetField(ValidationFieldPath path)
+            {
+                Path = path ?? throw new ArgumentNullException(nameof(path));
+            }
+
+            internal ValidationFieldPath Path { get; }
+
+            internal static ValidationTargetField From(
+                ValidationFieldPath path,
+                System.Reflection.MemberInfo? member)
+            {
+                if (path == null) throw new ArgumentNullException(nameof(path));
+
+                var shape = ValidationTargetFieldShape.From(member);
+                return shape.ToField(path);
+            }
+
+            internal abstract void AddProjectedRules(
+                ClientValidationProjectionDraft projection,
+                IEnumerable<ProjectedClientValidationRule> rules);
+        }
+
+        private sealed class ModelMetadataValidationTargetField : ValidationTargetField
+        {
+            internal ModelMetadataValidationTargetField(ValidationFieldPath path)
+                : base(path)
+            {
+            }
+
+            internal override void AddProjectedRules(
+                ClientValidationProjectionDraft projection,
+                IEnumerable<ProjectedClientValidationRule> rules)
+            {
+                if (projection == null) throw new ArgumentNullException(nameof(projection));
+                if (rules == null) throw new ArgumentNullException(nameof(rules));
+                projection.AddProjectedRules(Path, rules);
+            }
+        }
+
+        private sealed class ProjectedShapeValidationTargetField : ValidationTargetField
+        {
+            private readonly Shape _shape;
+
+            internal ProjectedShapeValidationTargetField(ValidationFieldPath path, Shape shape)
+                : base(path)
+            {
+                _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            }
+
+            internal override void AddProjectedRules(
+                ClientValidationProjectionDraft projection,
+                IEnumerable<ProjectedClientValidationRule> rules)
+            {
+                if (projection == null) throw new ArgumentNullException(nameof(projection));
+                if (rules == null) throw new ArgumentNullException(nameof(rules));
+                projection.AddProjectedRules(ClientValidationFieldReference.Of(Path, _shape), rules);
+            }
+        }
+
+        private abstract class ValidationTargetFieldShape
+        {
+            private protected ValidationTargetFieldShape() { }
+
+            internal static ValidationTargetFieldShape From(System.Reflection.MemberInfo? member)
+            {
+                if (member is System.Reflection.PropertyInfo property)
+                    return Projected(Shape.FromClrType(property.PropertyType));
+                if (member is System.Reflection.FieldInfo field)
+                    return Projected(Shape.FromClrType(field.FieldType));
+
+                return ModelMetadata;
+            }
+
+            private static ValidationTargetFieldShape ModelMetadata { get; } =
+                new ModelMetadataValidationTargetFieldShape();
+
+            private static ValidationTargetFieldShape Projected(Shape shape)
+            {
+                if (shape == null) throw new ArgumentNullException(nameof(shape));
+                return new ProjectedValidationTargetFieldShape(shape);
+            }
+
+            internal abstract ValidationTargetField ToField(ValidationFieldPath path);
+
+            private sealed class ModelMetadataValidationTargetFieldShape : ValidationTargetFieldShape
+            {
+                internal override ValidationTargetField ToField(ValidationFieldPath path)
+                {
+                    if (path == null) throw new ArgumentNullException(nameof(path));
+                    return new ModelMetadataValidationTargetField(path);
+                }
+            }
+
+            private sealed class ProjectedValidationTargetFieldShape : ValidationTargetFieldShape
+            {
+                private readonly Shape _shape;
+
+                internal ProjectedValidationTargetFieldShape(Shape shape)
+                {
+                    _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+                }
+
+                internal override ValidationTargetField ToField(ValidationFieldPath path)
+                {
+                    if (path == null) throw new ArgumentNullException(nameof(path));
+                    return new ProjectedShapeValidationTargetField(path, _shape);
+                }
             }
         }
 

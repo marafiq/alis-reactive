@@ -292,12 +292,17 @@ namespace Alis.Reactive.FluentValidator
     public sealed class FieldGuard<T> where T : class
     {
         internal FieldCondition Condition { get; }
+        internal IReadOnlyList<ClientValidationFieldReference> Fields { get; }
         internal Func<T, bool> ServerPredicate { get; }
 
-        internal FieldGuard(FieldCondition condition, Func<T, bool> serverPredicate)
+        internal FieldGuard(
+            FieldCondition condition,
+            IEnumerable<ClientValidationFieldReference> fields,
+            Func<T, bool> serverPredicate)
         {
-            Condition = condition;
-            ServerPredicate = serverPredicate;
+            Condition = condition ?? throw new ArgumentNullException(nameof(condition));
+            Fields = ClientValidationGuardFields.From(fields);
+            ServerPredicate = serverPredicate ?? throw new ArgumentNullException(nameof(serverPredicate));
         }
 
         /// <summary>Logical AND — both this and the other condition must be true.</summary>
@@ -312,6 +317,7 @@ namespace Alis.Reactive.FluentValidator
 
             return new FieldGuard<T>(
                 FieldCondition.All(Condition, other.Condition),
+                ClientValidationGuardFields.Combine(Fields, other.Fields),
                 BothConditionsPass);
         }
 
@@ -327,6 +333,7 @@ namespace Alis.Reactive.FluentValidator
 
             return new FieldGuard<T>(
                 FieldCondition.Any(Condition, other.Condition),
+                ClientValidationGuardFields.Combine(Fields, other.Fields),
                 EitherConditionPasses);
         }
 
@@ -334,7 +341,61 @@ namespace Alis.Reactive.FluentValidator
         public FieldGuard<T> Not() =>
             new FieldGuard<T>(
                 FieldCondition.Not(Condition),
+                Fields,
                 x => !ServerPredicate(x));
+    }
+
+    internal static class ClientValidationGuardFields
+    {
+        internal static IReadOnlyList<ClientValidationFieldReference> From(
+            IEnumerable<ClientValidationFieldReference> fields)
+        {
+            if (fields == null) throw new ArgumentNullException(nameof(fields));
+
+            var byPath = new Dictionary<string, ClientValidationFieldReference>(StringComparer.Ordinal);
+            foreach (var field in fields)
+                Add(byPath, field);
+
+            return byPath.Values.ToArray();
+        }
+
+        internal static IReadOnlyList<ClientValidationFieldReference> Combine(
+            IEnumerable<ClientValidationFieldReference> first,
+            IEnumerable<ClientValidationFieldReference> second)
+        {
+            if (first == null) throw new ArgumentNullException(nameof(first));
+            if (second == null) throw new ArgumentNullException(nameof(second));
+
+            var byPath = new Dictionary<string, ClientValidationFieldReference>(StringComparer.Ordinal);
+            foreach (var field in first)
+                Add(byPath, field);
+            foreach (var field in second)
+                Add(byPath, field);
+
+            return byPath.Values.ToArray();
+        }
+
+        private static void Add(
+            Dictionary<string, ClientValidationFieldReference> byPath,
+            ClientValidationFieldReference field)
+        {
+            if (byPath == null) throw new ArgumentNullException(nameof(byPath));
+            if (field == null) throw new ArgumentException("Client validation guard field must not be null.", nameof(field));
+
+            if (byPath.TryGetValue(field.Path.Value, out var existing))
+            {
+                if (!existing.Shape.Equals(field.Shape))
+                {
+                    throw new InvalidOperationException(
+                        $"Client validation condition field '{field.Path.Value}' was declared with conflicting shapes: " +
+                        $"'{existing.Shape.Kind}' and '{field.Shape.Kind}'.");
+                }
+
+                return;
+            }
+
+            byPath.Add(field.Path.Value, field);
+        }
     }
 
     internal static class FieldConditionPredicates

@@ -4,6 +4,7 @@ using System.Linq;
 using FluentValidation;
 using FluentValidation.Internal;
 using Alis.Reactive.Validation;
+using Shape = Alis.Reactive.PlanModel.Shape;
 
 namespace Alis.Reactive.FluentValidator
 {
@@ -104,10 +105,13 @@ namespace Alis.Reactive.FluentValidator
             internal static ClientConditionMatch Missing { get; } =
                 new FluentValidationConditionWithoutClientGuard();
 
-            internal static ClientConditionMatch Found(FieldCondition condition)
+            internal static ClientConditionMatch Found(
+                FieldCondition condition,
+                IReadOnlyList<ClientValidationFieldReference> fields)
             {
                 if (condition == null) throw new ArgumentNullException(nameof(condition));
-                return new MatchedClientCondition(condition);
+                if (fields == null) throw new ArgumentNullException(nameof(fields));
+                return new MatchedClientCondition(condition, fields);
             }
 
             internal static ClientConditionMatch Skipped(ClientRuleProjectionSkipReason reason) =>
@@ -127,15 +131,22 @@ namespace Alis.Reactive.FluentValidator
             private sealed class MatchedClientCondition : ClientConditionMatch
             {
                 private readonly FieldCondition _condition;
+                private readonly IReadOnlyList<ClientValidationFieldReference> _fields;
 
-                internal MatchedClientCondition(FieldCondition condition)
+                internal MatchedClientCondition(
+                    FieldCondition condition,
+                    IReadOnlyList<ClientValidationFieldReference> fields)
                 {
                     _condition = condition ?? throw new ArgumentNullException(nameof(condition));
+                    _fields = ClientValidationGuardFields.From(fields);
                 }
 
                 internal override RuleProjectionScope ToRuleProjectionScope(ValidatorProjectionFrame frame)
                 {
                     if (frame == null) throw new ArgumentNullException(nameof(frame));
+
+                    foreach (var field in _fields)
+                        frame.Projection.EnsureField(field.PrefixedBy(frame.Prefix));
 
                     var prefixBinding = new FieldConditionPrefixBinding(
                         frame.Prefix,
@@ -323,7 +334,7 @@ namespace Alis.Reactive.FluentValidator
                 Details = details ?? throw new ArgumentNullException(nameof(details));
             }
 
-            internal IEnumerable<ValidationFieldPath> PeerFields => Details.PeerFields;
+            internal IEnumerable<ClientValidationFieldReference> PeerFieldReferences => Details.PeerFieldReferences;
 
             internal ValidationRule ToValidationRule() =>
                 new ValidationRule(Rule, Message, Details);
@@ -340,7 +351,24 @@ namespace Alis.Reactive.FluentValidator
             {
                 if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
                 if (_fields.ContainsKey(fieldPath.Value)) return;
-                _fields[fieldPath.Value] = new ProjectedClientValidationField(fieldPath);
+                _fields[fieldPath.Value] = new ProjectedClientValidationField(
+                    fieldPath,
+                    ProjectedFieldShapeEvidence.ModelMetadata);
+            }
+
+            internal void EnsureField(ClientValidationFieldReference field)
+            {
+                if (field == null) throw new ArgumentNullException(nameof(field));
+
+                if (_fields.TryGetValue(field.Path.Value, out var existing))
+                {
+                    existing.RecordProjectedShape(field.Shape);
+                    return;
+                }
+
+                _fields[field.Path.Value] = new ProjectedClientValidationField(
+                    field.Path,
+                    ProjectedFieldShapeEvidence.Projected(field.Shape));
             }
 
             internal void AddProjectedRules(ValidationFieldPath fieldPath, IEnumerable<ProjectedClientValidationRule> rules)
@@ -350,6 +378,15 @@ namespace Alis.Reactive.FluentValidator
 
                 EnsureField(fieldPath);
                 _fields[fieldPath.Value].Add(rules);
+            }
+
+            internal void AddProjectedRules(ClientValidationFieldReference field, IEnumerable<ProjectedClientValidationRule> rules)
+            {
+                if (field == null) throw new ArgumentNullException(nameof(field));
+                if (rules == null) throw new ArgumentNullException(nameof(rules));
+
+                EnsureField(field);
+                _fields[field.Path.Value].Add(rules);
             }
 
             internal void RecordSkippedRule(SkippedClientRuleProjection rule)
@@ -362,8 +399,8 @@ namespace Alis.Reactive.FluentValidator
             {
                 var peerFields = _fields.Values
                     .SelectMany(field => field.Rules)
-                    .SelectMany(rule => rule.PeerFields)
-                    .Where(field => !_fields.ContainsKey(field.Value))
+                    .SelectMany(rule => rule.PeerFieldReferences)
+                    .Where(field => !_fields.ContainsKey(field.Path.Value))
                     .ToList();
 
                 foreach (var peerField in peerFields)
@@ -387,7 +424,10 @@ namespace Alis.Reactive.FluentValidator
                         rules.Add(rule.ToValidationRule());
                     }
 
-                    fields.Add(new ClientValidationField(field.FieldPath, rules));
+                    fields.Add(new ClientValidationField(
+                        field.FieldPath,
+                        field.ShapeEvidence.ToShapeSource(),
+                        rules));
                 }
 
                 return fields;
@@ -397,18 +437,94 @@ namespace Alis.Reactive.FluentValidator
         private sealed class ProjectedClientValidationField
         {
             private readonly List<ProjectedClientValidationRule> _rules = new List<ProjectedClientValidationRule>();
+            private ProjectedFieldShapeEvidence _shapeEvidence;
 
-            internal ProjectedClientValidationField(ValidationFieldPath fieldPath)
+            internal ProjectedClientValidationField(
+                ValidationFieldPath fieldPath,
+                ProjectedFieldShapeEvidence shapeEvidence)
             {
                 FieldPath = fieldPath ?? throw new ArgumentNullException(nameof(fieldPath));
+                _shapeEvidence = shapeEvidence ?? throw new ArgumentNullException(nameof(shapeEvidence));
             }
 
             internal ValidationFieldPath FieldPath { get; }
             internal IReadOnlyList<ProjectedClientValidationRule> Rules => _rules;
+            internal ProjectedFieldShapeEvidence ShapeEvidence => _shapeEvidence;
 
             internal void Add(IEnumerable<ProjectedClientValidationRule> rules)
             {
                 _rules.AddRange(rules);
+            }
+
+            internal void RecordProjectedShape(Shape shape)
+            {
+                if (shape == null) throw new ArgumentNullException(nameof(shape));
+                _shapeEvidence = _shapeEvidence.Merge(shape, FieldPath);
+            }
+        }
+
+        private abstract class ProjectedFieldShapeEvidence
+        {
+            private protected ProjectedFieldShapeEvidence() { }
+
+            internal static ProjectedFieldShapeEvidence ModelMetadata { get; } =
+                new ModelMetadataFieldShapeEvidence();
+
+            internal static ProjectedFieldShapeEvidence Projected(Shape shape)
+            {
+                if (shape == null) throw new ArgumentNullException(nameof(shape));
+                return new ProjectedFieldShape(shape);
+            }
+
+            internal abstract ClientValidationFieldShapeSource ToShapeSource();
+
+            internal abstract ProjectedFieldShapeEvidence Merge(
+                Shape shape,
+                ValidationFieldPath fieldPath);
+
+            private sealed class ModelMetadataFieldShapeEvidence : ProjectedFieldShapeEvidence
+            {
+                internal override ClientValidationFieldShapeSource ToShapeSource() =>
+                    ClientValidationFieldShapeSource.ModelField;
+
+                internal override ProjectedFieldShapeEvidence Merge(
+                    Shape shape,
+                    ValidationFieldPath fieldPath)
+                {
+                    if (shape == null) throw new ArgumentNullException(nameof(shape));
+                    if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
+                    return Projected(shape);
+                }
+            }
+
+            private sealed class ProjectedFieldShape : ProjectedFieldShapeEvidence
+            {
+                private readonly Shape _shape;
+
+                internal ProjectedFieldShape(Shape shape)
+                {
+                    _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+                }
+
+                internal override ClientValidationFieldShapeSource ToShapeSource() =>
+                    ClientValidationFieldShapeSource.Projected(_shape);
+
+                internal override ProjectedFieldShapeEvidence Merge(
+                    Shape shape,
+                    ValidationFieldPath fieldPath)
+                {
+                    if (shape == null) throw new ArgumentNullException(nameof(shape));
+                    if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
+
+                    if (!_shape.Equals(shape))
+                    {
+                        throw new InvalidOperationException(
+                            $"Client validation field '{fieldPath.Value}' was projected with conflicting shapes: " +
+                            $"'{_shape.Kind}' and '{shape.Kind}'.");
+                    }
+
+                    return this;
+                }
             }
         }
     }
