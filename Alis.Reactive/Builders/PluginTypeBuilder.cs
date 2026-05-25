@@ -10,10 +10,7 @@ namespace Alis.Reactive.Builders
     public sealed class PluginTypeBuilder
     {
         private readonly PluginName _pluginName;
-        private readonly System.Collections.Generic.List<PluginPropertyContract> _properties =
-            new System.Collections.Generic.List<PluginPropertyContract>();
-        private readonly System.Collections.Generic.List<PluginOperationContract> _operations =
-            new System.Collections.Generic.List<PluginOperationContract>();
+        private readonly PluginMemberDeclarations _members = new PluginMemberDeclarations();
 
         internal PluginTypeBuilder(string pluginName)
         {
@@ -30,7 +27,7 @@ namespace Alis.Reactive.Builders
         public PluginTypeBuilder Property<T>(string name)
         {
             EnsureName(name);
-            _properties.Add(PluginPropertyContract.Create(
+            _members.Add(_pluginName, PluginPropertyContract.Create(
                 PluginPropertyId.Of(_pluginName, MemberName.Of(name)),
                 Shape.FromClrType(typeof(T))));
             return this;
@@ -202,8 +199,7 @@ namespace Alis.Reactive.Builders
                     Shape.FromClrType(typeof(TArg3))));
         }
 
-        internal PluginContract Build() =>
-            PluginContract.Create(_pluginName, _properties, _operations);
+        internal PluginContract Build() => _members.ToContract(_pluginName);
 
         private PluginTypeBuilder AddMethod<TReturn>(string name, PluginMethodArguments args)
         {
@@ -218,7 +214,7 @@ namespace Alis.Reactive.Builders
             if (operation == null) throw new System.ArgumentNullException(nameof(operation));
             if (args == null) throw new System.ArgumentNullException(nameof(args));
             var returns = Shape.FromClrType(typeof(TReturn));
-            _operations.Add(PluginOperationContract.Create(
+            _members.Add(_pluginName, PluginOperationContract.Create(
                 operation,
                 args.SignatureFor(returns)));
             return this;
@@ -236,7 +232,7 @@ namespace Alis.Reactive.Builders
         {
             if (operation == null) throw new System.ArgumentNullException(nameof(operation));
             if (args == null) throw new System.ArgumentNullException(nameof(args));
-            _operations.Add(PluginOperationContract.Create(
+            _members.Add(_pluginName, PluginOperationContract.Create(
                 operation,
                 args.SignatureFor(Shape.None)));
             return this;

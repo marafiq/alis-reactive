@@ -496,6 +496,22 @@ public class WhenUsingPlugins : PlanTestBase
     }
 
     [Test]
+    public void string_plugin_member_cannot_be_declared_twice()
+    {
+        var plan = CreatePlan();
+
+        var exception = Assert.Throws<System.InvalidOperationException>(() =>
+            plan.RegisterPlugin("auth", p =>
+            {
+                p.Method<string>("token");
+                p.Method<string>("token");
+            }));
+
+        Assert.That(exception!.Message, Does.Contain("already declares member"));
+        Assert.That(exception.Message, Does.Contain("auth.token"));
+    }
+
+    [Test]
     public void plugin_member_paths_reject_empty_segments()
     {
         var plan = CreatePlan();

@@ -149,7 +149,7 @@ namespace Alis.Reactive
 
     internal sealed class PluginMemberDeclarations
     {
-        private readonly List<PluginOperation> _operations = new List<PluginOperation>();
+        private readonly List<PluginOperationDeclaration> _operations = new List<PluginOperationDeclaration>();
         private readonly List<PluginPropertyContract> _properties = new List<PluginPropertyContract>();
         private readonly HashSet<MemberName> _memberNames = new HashSet<MemberName>();
 
@@ -157,22 +157,37 @@ namespace Alis.Reactive
         {
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (operation == null) throw new ArgumentNullException(nameof(operation));
-            if (!_memberNames.Add(operation.MemberName))
-                throw new InvalidOperationException(
-                    $"Plugin '{pluginName.Value}' already declares member '{operation.Label}'.");
+            EnsurePluginMatches(pluginName, operation.OperationId.PluginName, operation.Label);
+            DeclareMember(pluginName, operation.MemberName, operation.Label);
 
-            _operations.Add(operation);
+            _operations.Add(PluginOperationDeclaration.Live(operation));
+        }
+
+        internal void Add(PluginName pluginName, PluginOperationContract operation)
+        {
+            if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
+            if (operation == null) throw new ArgumentNullException(nameof(operation));
+            EnsurePluginMatches(pluginName, operation.PluginName, operation.Label);
+            DeclareMember(pluginName, operation.PlanMethodName, operation.Label);
+
+            _operations.Add(PluginOperationDeclaration.Contract(operation));
         }
 
         internal void Add<TValue>(PluginName pluginName, PluginProperty<TValue> property)
         {
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (property == null) throw new ArgumentNullException(nameof(property));
-            if (!_memberNames.Add(property.MemberName))
-                throw new InvalidOperationException(
-                    $"Plugin '{pluginName.Value}' already declares member '{property.Label}'.");
+            Add(pluginName, property.ToContract());
+        }
 
-            _properties.Add(property.ToContract());
+        internal void Add(PluginName pluginName, PluginPropertyContract property)
+        {
+            if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
+            if (property == null) throw new ArgumentNullException(nameof(property));
+            EnsurePluginMatches(pluginName, property.PluginName, property.Label);
+            DeclareMember(pluginName, property.PlanMemberName, property.Label);
+
+            _properties.Add(property);
         }
 
         internal PluginContract ToContract(PluginName pluginName)
@@ -195,6 +210,78 @@ namespace Alis.Reactive
         private IReadOnlyList<PluginPropertyContract> ToPropertyContracts()
         {
             return new List<PluginPropertyContract>(_properties);
+        }
+
+        private void DeclareMember(
+            PluginName pluginName,
+            MemberName member,
+            string label)
+        {
+            if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
+            if (member == null) throw new ArgumentNullException(nameof(member));
+            if (label == null) throw new ArgumentNullException(nameof(label));
+
+            if (!_memberNames.Add(member))
+                throw new InvalidOperationException(
+                    $"Plugin '{pluginName.Value}' already declares member '{label}'.");
+        }
+
+        private static void EnsurePluginMatches(
+            PluginName expected,
+            PluginName actual,
+            string label)
+        {
+            if (expected == null) throw new ArgumentNullException(nameof(expected));
+            if (actual == null) throw new ArgumentNullException(nameof(actual));
+            if (label == null) throw new ArgumentNullException(nameof(label));
+
+            if (!actual.Equals(expected))
+                throw new InvalidOperationException(
+                    $"Plugin '{expected.Value}' cannot declare member '{label}' for plugin '{actual.Value}'.");
+        }
+    }
+
+    internal abstract class PluginOperationDeclaration
+    {
+        private protected PluginOperationDeclaration() { }
+
+        internal static PluginOperationDeclaration Live(PluginOperation operation)
+        {
+            if (operation == null) throw new ArgumentNullException(nameof(operation));
+            return new LivePluginOperationDeclaration(operation);
+        }
+
+        internal static PluginOperationDeclaration Contract(PluginOperationContract contract)
+        {
+            if (contract == null) throw new ArgumentNullException(nameof(contract));
+            return new ContractPluginOperationDeclaration(contract);
+        }
+
+        internal abstract PluginOperationContract ToContract();
+
+        private sealed class LivePluginOperationDeclaration : PluginOperationDeclaration
+        {
+            private readonly PluginOperation _operation;
+
+            internal LivePluginOperationDeclaration(PluginOperation operation)
+            {
+                _operation = operation ?? throw new ArgumentNullException(nameof(operation));
+            }
+
+            internal override PluginOperationContract ToContract() =>
+                _operation.ToContract();
+        }
+
+        private sealed class ContractPluginOperationDeclaration : PluginOperationDeclaration
+        {
+            private readonly PluginOperationContract _contract;
+
+            internal ContractPluginOperationDeclaration(PluginOperationContract contract)
+            {
+                _contract = contract ?? throw new ArgumentNullException(nameof(contract));
+            }
+
+            internal override PluginOperationContract ToContract() => _contract;
         }
     }
 

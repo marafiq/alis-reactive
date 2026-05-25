@@ -268,6 +268,17 @@ TypeScript.
   still fall back to model metadata, but typed projection sources should carry
   shape evidence.
 
+### Plugin Terms
+
+- **Plugin Member Declaration**: the authoring-time claim that a plugin object
+  exposes a readable property, callable function, or command. String plugin
+  registration and typed `ReactivePlugin` descriptors share this catalog so a
+  member name cannot drift between property and method declarations.
+- **Plugin Operation Declaration**: either a live typed descriptor whose
+  arguments are finalized after `.Arg(...)`/`.Args(...)`, or an already-built
+  string registration contract. Both become the same `PluginOperationContract`
+  before entering the plan model.
+
 ### Concept Flow
 
 The deterministic flow is always:
