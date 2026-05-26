@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { noPeerValue, peerValue, ruleFails } from "../validation/rule-engine";
-import type { Shape, ValidationRule, ValidationRuleName, ValueProducer } from "../types";
+import { ruleFails } from "../validation/rule-engine";
+import type {
+  LengthValidationRule,
+  NoOperandValidationRule,
+  OrderedComparisonValidationRule,
+  PeerEqualityValidationRule,
+  RangeValidationRule,
+  Shape,
+  ValueProducer,
+} from "../types";
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
@@ -11,10 +19,7 @@ function literal(value: string | number | boolean | null | (string | number)[], 
   return { kind: "literal", value, shape };
 }
 
-function rule(
-  name: ValidationRuleName,
-  overrides: Partial<ValidationRule["execution"]> = {},
-): ValidationRule {
+function noOperandRule(name: NoOperandValidationRule["name"]): NoOperandValidationRule {
   return {
     name,
     message: `${name} failed`,
@@ -23,73 +28,123 @@ function rule(
       otherValue: { kind: "none" },
       activation: { kind: "always" },
       comparisonShape: noneShape,
-      ...overrides,
+    },
+  };
+}
+
+function lengthRule(name: LengthValidationRule["name"], length: number): LengthValidationRule {
+  return {
+    name,
+    message: `${name} failed`,
+    execution: {
+      constraint: { kind: "value", value: literal(length, numberShape) },
+      otherValue: { kind: "none" },
+      activation: { kind: "always" },
+      comparisonShape: noneShape,
+    },
+  };
+}
+
+function rangeRule(
+  name: RangeValidationRule["name"],
+  bounds: [number, number],
+  comparisonShape: Shape,
+): RangeValidationRule {
+  return {
+    name,
+    message: `${name} failed`,
+    execution: {
+      constraint: { kind: "value", value: literal(bounds, { kind: "array", item: numberShape }) },
+      otherValue: { kind: "none" },
+      activation: { kind: "always" },
+      comparisonShape,
+    },
+  };
+}
+
+function orderedRule(
+  name: OrderedComparisonValidationRule["name"],
+  value: string | number,
+  valueShape: Shape,
+  comparisonShape: Shape,
+): OrderedComparisonValidationRule {
+  return {
+    name,
+    message: `${name} failed`,
+    execution: {
+      constraint: { kind: "value", value: literal(value, valueShape) },
+      otherValue: { kind: "none" },
+      activation: { kind: "always" },
+      comparisonShape,
+    },
+  };
+}
+
+function peerEqualityRule(name: PeerEqualityValidationRule["name"]): PeerEqualityValidationRule {
+  return {
+    name,
+    message: `${name} failed`,
+    execution: {
+      constraint: { kind: "none" },
+      otherValue: {
+        kind: "value",
+        value: { kind: "component", component: "confirmPassword", member: "value", shape: stringShape },
+      },
+      activation: { kind: "always" },
+      comparisonShape: stringShape,
     },
   };
 }
 
 describe("validation rule engine", () => {
   it("treats missing, false, empty text, and empty arrays as empty validation subjects", () => {
-    const required = rule("required");
+    const required = noOperandRule("required");
 
-    expect(ruleFails({ rule: required, value: undefined, peerValue: noPeerValue() })).toBe(true);
-    expect(ruleFails({ rule: required, value: false, peerValue: noPeerValue() })).toBe(true);
-    expect(ruleFails({ rule: required, value: "", peerValue: noPeerValue() })).toBe(true);
-    expect(ruleFails({ rule: required, value: [], peerValue: noPeerValue() })).toBe(true);
-    expect(ruleFails({ rule: required, value: "Ada", peerValue: noPeerValue() })).toBe(false);
+    expect(ruleFails({ rule: required, value: undefined })).toBe(true);
+    expect(ruleFails({ rule: required, value: false })).toBe(true);
+    expect(ruleFails({ rule: required, value: "" })).toBe(true);
+    expect(ruleFails({ rule: required, value: [] })).toBe(true);
+    expect(ruleFails({ rule: required, value: "Ada" })).toBe(false);
   });
 
   it("uses peer values as the target for equalTo and notEqualTo rules", () => {
-    const equalToPeer = rule("equalTo", { comparisonShape: stringShape });
-    const notEqualToPeer = rule("notEqualTo", { comparisonShape: stringShape });
+    const equalToPeer = peerEqualityRule("equalTo");
+    const notEqualToPeer = peerEqualityRule("notEqualTo");
 
-    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: peerValue("West") })).toBe(false);
-    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: peerValue("East") })).toBe(true);
-    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: noPeerValue() })).toBe(true);
+    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: "West" })).toBe(false);
+    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: "East" })).toBe(true);
+    expect(ruleFails({ rule: equalToPeer, value: "West", peerValue: undefined })).toBe(true);
 
-    expect(ruleFails({ rule: notEqualToPeer, value: "West", peerValue: peerValue("East") })).toBe(false);
-    expect(ruleFails({ rule: notEqualToPeer, value: "West", peerValue: peerValue("West") })).toBe(true);
+    expect(ruleFails({ rule: notEqualToPeer, value: "West", peerValue: "East" })).toBe(false);
+    expect(ruleFails({ rule: notEqualToPeer, value: "West", peerValue: "West" })).toBe(true);
   });
 
   it("compares inclusive and exclusive ranges through the declared rule shape", () => {
-    const inclusiveRange = rule("range", {
-      constraint: { kind: "value", value: literal([5, 10], { kind: "array", item: numberShape }) },
-      comparisonShape: numberShape,
-    });
-    const exclusiveRange = rule("exclusiveRange", {
-      constraint: { kind: "value", value: literal([5, 10], { kind: "array", item: numberShape }) },
-      comparisonShape: numberShape,
-    });
+    const inclusiveRange = rangeRule("range", [5, 10], numberShape);
+    const exclusiveRange = rangeRule("exclusiveRange", [5, 10], numberShape);
 
-    expect(ruleFails({ rule: inclusiveRange, value: "5", peerValue: noPeerValue() })).toBe(false);
-    expect(ruleFails({ rule: inclusiveRange, value: "11", peerValue: noPeerValue() })).toBe(true);
+    expect(ruleFails({ rule: inclusiveRange, value: "5" })).toBe(false);
+    expect(ruleFails({ rule: inclusiveRange, value: "11" })).toBe(true);
 
-    expect(ruleFails({ rule: exclusiveRange, value: "5", peerValue: noPeerValue() })).toBe(true);
-    expect(ruleFails({ rule: exclusiveRange, value: "6", peerValue: noPeerValue() })).toBe(false);
+    expect(ruleFails({ rule: exclusiveRange, value: "5" })).toBe(true);
+    expect(ruleFails({ rule: exclusiveRange, value: "6" })).toBe(false);
   });
 
   it("evaluates length constraints from the expected length perspective", () => {
-    const minLength = rule("minLength", {
-      constraint: { kind: "value", value: literal(8, numberShape) },
-    });
-    const maxLength = rule("maxLength", {
-      constraint: { kind: "value", value: literal(8, numberShape) },
-    });
+    const minLength = lengthRule("minLength", 8);
+    const maxLength = lengthRule("maxLength", 8);
 
-    expect(ruleFails({ rule: minLength, value: "abc", peerValue: noPeerValue() })).toBe(true);
-    expect(ruleFails({ rule: minLength, value: "securepass", peerValue: noPeerValue() })).toBe(false);
-    expect(ruleFails({ rule: maxLength, value: "securepass", peerValue: noPeerValue() })).toBe(true);
-    expect(ruleFails({ rule: maxLength, value: "abc", peerValue: noPeerValue() })).toBe(false);
+    expect(ruleFails({ rule: minLength, value: "abc" })).toBe(true);
+    expect(ruleFails({ rule: minLength, value: "securepass" })).toBe(false);
+    expect(ruleFails({ rule: maxLength, value: "securepass" })).toBe(true);
+    expect(ruleFails({ rule: maxLength, value: "abc" })).toBe(false);
   });
 
   it("orders date values only after the declared shape produces comparable values", () => {
-    const minDate = rule("min", {
-      constraint: { kind: "value", value: literal("2026-01-01", dateShape) },
-      comparisonShape: dateShape,
-    });
+    const minDate = orderedRule("min", "2026-01-01", dateShape, dateShape);
 
-    expect(ruleFails({ rule: minDate, value: "2026-01-01", peerValue: noPeerValue() })).toBe(false);
-    expect(ruleFails({ rule: minDate, value: "2025-12-31", peerValue: noPeerValue() })).toBe(true);
-    expect(ruleFails({ rule: minDate, value: "not-a-date", peerValue: noPeerValue() })).toBe(true);
+    expect(ruleFails({ rule: minDate, value: "2026-01-01" })).toBe(false);
+    expect(ruleFails({ rule: minDate, value: "2025-12-31" })).toBe(true);
+    expect(ruleFails({ rule: minDate, value: "not-a-date" })).toBe(true);
   });
 });

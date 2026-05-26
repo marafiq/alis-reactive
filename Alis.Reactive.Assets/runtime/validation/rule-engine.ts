@@ -2,174 +2,147 @@
 // No DOM, no vendor, no side effects. The orchestrator resolves peers first.
 
 import { assertNever } from "../core/assert-never";
-import type { LengthValidationRule, RangeValidationRule, Shape, ValidationRule, ValidationRuleName } from "../types";
+import type {
+  LengthValidationRule,
+  LiteralEqualityValidationRule,
+  NoOperandValidationRule,
+  OrderedComparisonValidationRule,
+  PeerEqualityValidationRule,
+  RangeValidationRule,
+  RegexValidationRule,
+  Shape,
+  ValidationRule,
+  ValidationRuleName,
+} from "../types";
 import {
   ValidationLengthConstraint,
   ValidationRangeTarget,
   ValidationScalarTarget,
   ValidationSubject,
 } from "./rule-operands";
-import type { ResolvedPeerValue } from "./rule-operands";
 
-export type { ResolvedPeerValue } from "./rule-operands";
+type NonPeerValidationRule =
+  | NoOperandValidationRule
+  | LengthValidationRule
+  | RegexValidationRule
+  | RangeValidationRule
+  | OrderedComparisonValidationRule
+  | LiteralEqualityValidationRule;
+type EqualityRuleEvaluation =
+  | { readonly rule: LiteralEqualityValidationRule; readonly value: unknown }
+  | { readonly rule: PeerEqualityValidationRule; readonly value: unknown; readonly peerValue: unknown };
 
-export interface RuleEvaluation {
-  readonly rule: ValidationRule;
-  readonly value: unknown;
-  readonly peerValue: ResolvedPeerValue;
-}
-
-const missingPeerValue: ResolvedPeerValue = { kind: "absent" };
-
-export function peerValue(value: unknown): ResolvedPeerValue {
-  return { kind: "present", value };
-}
-
-export function noPeerValue(): ResolvedPeerValue {
-  return missingPeerValue;
-}
+export type RuleEvaluation =
+  | { readonly rule: NonPeerValidationRule; readonly value: unknown }
+  | { readonly rule: PeerEqualityValidationRule; readonly value: unknown; readonly peerValue: unknown };
 
 export function ruleFails(evaluation: RuleEvaluation): boolean {
-  const ruleEvaluation = prepareValidationRuleEvaluation(evaluation);
+  const subject = ValidationSubject.from(evaluation.value);
 
-  switch (ruleEvaluation.rule.name) {
-    case "required": return requiredFails(ruleEvaluation);
-    case "empty": return emptyFails(ruleEvaluation);
+  switch (evaluation.rule.name) {
+    case "required": return requiredFails(subject);
+    case "empty": return emptyFails(subject);
     case "minLength":
     case "maxLength":
-      return lengthRuleFails(ruleEvaluation.rule.name, evaluationWithRule(ruleEvaluation, ruleEvaluation.rule));
-    case "email": return emailFails(ruleEvaluation);
-    case "regex": return regexFails(ruleEvaluation);
-    case "url": return urlFails(ruleEvaluation);
-    case "creditCard": return creditCardFails(ruleEvaluation);
+      return lengthRuleFails(evaluation.rule.name, subject, evaluation.rule);
+    case "email": return emailFails(subject);
+    case "regex": return regexFails(subject, evaluation.rule);
+    case "url": return urlFails(subject);
+    case "creditCard": return creditCardFails(subject);
     case "min":
     case "max":
     case "gt":
     case "lt":
-      return orderedComparisonFails(ruleEvaluation.rule.name, ruleEvaluation);
+      return orderedComparisonFails(evaluation.rule.name, subject, evaluation.rule);
     case "range":
     case "exclusiveRange":
-      return rangeFails(ruleEvaluation.rule.name, evaluationWithRule(ruleEvaluation, ruleEvaluation.rule));
+      return rangeFails(evaluation.rule.name, subject, evaluation.rule);
     case "equalTo":
     case "notEqual":
     case "notEqualTo":
-      return equalityFails(ruleEvaluation.rule.name, ruleEvaluation);
-    case "atLeastOne": return atLeastOneFails(ruleEvaluation);
-    default: return assertNever(ruleEvaluation.rule, "validation rule");
+      if ("peerValue" in evaluation) return equalityFails(evaluation, subject);
+      return equalityFails({ rule: evaluation.rule, value: evaluation.value }, subject);
+    case "atLeastOne": return atLeastOneFails(subject);
+    default: return assertNever(evaluation.rule, "validation rule");
   }
-}
-
-interface ValidationRuleEvaluation {
-  readonly rule: ValidationRule;
-  readonly subject: ValidationSubject;
-  readonly peerValue: ResolvedPeerValue;
-}
-
-type ValidationRuleEvaluationFor<TRule extends ValidationRule> =
-  Omit<ValidationRuleEvaluation, "rule"> & { readonly rule: TRule };
-
-function evaluationWithRule<TRule extends ValidationRule>(
-  evaluation: ValidationRuleEvaluation,
-  rule: TRule,
-): ValidationRuleEvaluationFor<TRule> {
-  return {
-    rule,
-    subject: evaluation.subject,
-    peerValue: evaluation.peerValue,
-  };
-}
-
-function prepareValidationRuleEvaluation(evaluation: RuleEvaluation): ValidationRuleEvaluation {
-  return {
-    rule: evaluation.rule,
-    subject: ValidationSubject.from(evaluation.value),
-    peerValue: evaluation.peerValue,
-  };
 }
 
 type LengthRuleName = Extract<ValidationRuleName, "minLength" | "maxLength">;
 type OrderedComparisonRuleName = Extract<ValidationRuleName, "min" | "max" | "gt" | "lt">;
 type RangeRuleName = Extract<ValidationRuleName, "range" | "exclusiveRange">;
-type EqualityRuleName = Extract<ValidationRuleName, "equalTo" | "notEqual" | "notEqualTo">;
-
-function comparisonTarget(evaluation: ValidationRuleEvaluation): ValidationScalarTarget {
-  return ValidationScalarTarget.fromResolvedPeerOrConstraint(
-    evaluation.peerValue,
-    evaluation.rule.execution.constraint,
-  );
+function constraint(rule: OrderedComparisonValidationRule | RegexValidationRule): ValidationScalarTarget {
+  return ValidationScalarTarget.fromConstraintOperand(rule.execution.constraint);
 }
 
-function constraint(evaluation: ValidationRuleEvaluation): ValidationScalarTarget {
-  return ValidationScalarTarget.fromConstraintOperand(evaluation.rule.execution.constraint);
+function comparisonShape(rule: ValidationRule): Shape {
+  return rule.execution.comparisonShape;
 }
 
-function comparisonShape(evaluation: ValidationRuleEvaluation): Shape {
-  return evaluation.rule.execution.comparisonShape;
+function lengthConstraint(rule: LengthValidationRule): ValidationLengthConstraint {
+  return ValidationLengthConstraint.fromOperand(rule.execution.constraint);
 }
 
-function lengthConstraint(evaluation: ValidationRuleEvaluationFor<LengthValidationRule>): ValidationLengthConstraint {
-  return ValidationLengthConstraint.fromOperand(evaluation.rule.execution.constraint);
+function rangeTarget(rule: RangeValidationRule): ValidationRangeTarget {
+  return ValidationRangeTarget.fromOperand(rule.execution.constraint);
 }
 
-function rangeTarget(evaluation: ValidationRuleEvaluationFor<RangeValidationRule>): ValidationRangeTarget {
-  return ValidationRangeTarget.fromOperand(evaluation.rule.execution.constraint);
+function requiredFails(subject: ValidationSubject): boolean {
+  return subject.isEmpty;
 }
 
-function requiredFails(evaluation: ValidationRuleEvaluation): boolean {
-  return evaluation.subject.isEmpty;
-}
-
-function emptyFails(evaluation: ValidationRuleEvaluation): boolean {
-  return !evaluation.subject.isEmpty;
+function emptyFails(subject: ValidationSubject): boolean {
+  return !subject.isEmpty;
 }
 
 function lengthRuleFails(
   ruleName: LengthRuleName,
-  evaluation: ValidationRuleEvaluationFor<LengthValidationRule>,
+  subject: ValidationSubject,
+  rule: LengthValidationRule,
 ): boolean {
-  if (evaluation.subject.isEmpty) return false;
+  if (subject.isEmpty) return false;
 
-  const actualLength = evaluation.subject.length;
-  const expectedLength = lengthConstraint(evaluation);
+  const actualLength = subject.length;
+  const expectedLength = lengthConstraint(rule);
 
   if (ruleName === "minLength") return expectedLength.isGreaterThan(actualLength);
   return expectedLength.isLessThan(actualLength);
 }
 
-function emailFails(evaluation: ValidationRuleEvaluation): boolean {
-  const valueWasProvided = !evaluation.subject.isEmpty;
-  const valueLooksLikeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(evaluation.subject.text);
+function emailFails(subject: ValidationSubject): boolean {
+  const valueWasProvided = !subject.isEmpty;
+  const valueLooksLikeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(subject.text);
   return valueWasProvided && !valueLooksLikeEmail;
 }
 
-function regexFails(evaluation: ValidationRuleEvaluation): boolean {
-  const pattern = constraint(evaluation).textOrEmpty();
+function regexFails(subject: ValidationSubject, rule: RegexValidationRule): boolean {
+  const pattern = constraint(rule).textOrEmpty();
   try {
-    return !evaluation.subject.isEmpty && !new RegExp(pattern).test(evaluation.subject.text);
+    return !subject.isEmpty && !new RegExp(pattern).test(subject.text);
   } catch {
     return true;
   }
 }
 
-function urlFails(evaluation: ValidationRuleEvaluation): boolean {
-  const valueWasProvided = !evaluation.subject.isEmpty;
-  const valueLooksLikeUrl = /^https?:\/\/.+/.test(evaluation.subject.text);
+function urlFails(subject: ValidationSubject): boolean {
+  const valueWasProvided = !subject.isEmpty;
+  const valueLooksLikeUrl = /^https?:\/\/.+/.test(subject.text);
   return valueWasProvided && !valueLooksLikeUrl;
 }
 
-function creditCardFails(evaluation: ValidationRuleEvaluation): boolean {
-  const valueWasProvided = !evaluation.subject.isEmpty;
-  const valuePassesLuhn = luhn(evaluation.subject.text.replace(/\D/g, ""));
+function creditCardFails(subject: ValidationSubject): boolean {
+  const valueWasProvided = !subject.isEmpty;
+  const valuePassesLuhn = luhn(subject.text.replace(/\D/g, ""));
   return valueWasProvided && !valuePassesLuhn;
 }
 
 function orderedComparisonFails(
   ruleName: OrderedComparisonRuleName,
-  evaluation: ValidationRuleEvaluation,
+  subject: ValidationSubject,
+  rule: OrderedComparisonValidationRule,
 ): boolean {
-  const target = comparisonTarget(evaluation);
-  const comparison = evaluation.subject.compareTo(target, comparisonShape(evaluation));
-  const valueIsEmpty = evaluation.subject.isEmpty;
+  const target = constraint(rule);
+  const comparison = subject.compareTo(target, comparisonShape(rule));
+  const valueIsEmpty = subject.isEmpty;
 
   switch (ruleName) {
     case "min": {
@@ -194,12 +167,12 @@ function orderedComparisonFails(
   }
 }
 
-function rangeFails(ruleName: RangeRuleName, evaluation: ValidationRuleEvaluationFor<RangeValidationRule>): boolean {
-  const range = rangeTarget(evaluation);
-  if (evaluation.subject.isEmpty) return false;
+function rangeFails(ruleName: RangeRuleName, subject: ValidationSubject, rule: RangeValidationRule): boolean {
+  const range = rangeTarget(rule);
+  if (subject.isEmpty) return false;
 
-  const lowerComparison = evaluation.subject.compareTo(range.lowerBound, comparisonShape(evaluation));
-  const upperComparison = evaluation.subject.compareTo(range.upperBound, comparisonShape(evaluation));
+  const lowerComparison = subject.compareTo(range.lowerBound, comparisonShape(rule));
+  const upperComparison = subject.compareTo(range.upperBound, comparisonShape(rule));
   const rangeCannotBeCompared = lowerComparison.cannotCompare || upperComparison.cannotCompare;
   if (rangeCannotBeCompared) return true;
 
@@ -215,41 +188,56 @@ function rangeFails(ruleName: RangeRuleName, evaluation: ValidationRuleEvaluatio
   return valueFallsOutsideExclusiveRange;
 }
 
-function equalityFails(ruleName: EqualityRuleName, evaluation: ValidationRuleEvaluation): boolean {
-  switch (ruleName) {
-    case "equalTo": return equalToFails(evaluation);
-    case "notEqual": return notEqualFails(evaluation);
-    case "notEqualTo": return notEqualToFails(evaluation);
-    default: return assertNever(ruleName, "equality validation comparison");
+function equalityFails(evaluation: EqualityRuleEvaluation, subject: ValidationSubject): boolean {
+  if ("peerValue" in evaluation) {
+    const target = ValidationScalarTarget.available(evaluation.peerValue);
+    if (evaluation.rule.name === "notEqualTo") {
+      return notEqualToFails(subject, target, comparisonShape(evaluation.rule));
+    }
+
+    return equalToFails(subject, target, comparisonShape(evaluation.rule));
   }
+
+  const target = ValidationScalarTarget.fromConstraintOperand(evaluation.rule.execution.constraint);
+  if (evaluation.rule.name === "notEqual") {
+    return notEqualFails(subject, target, comparisonShape(evaluation.rule));
+  }
+
+  return equalToFails(subject, target, comparisonShape(evaluation.rule));
 }
 
-function equalToFails(evaluation: ValidationRuleEvaluation): boolean {
-  if (evaluation.subject.isEmpty) return false;
+function equalToFails(
+  subject: ValidationSubject,
+  target: ValidationScalarTarget,
+  shape: Shape,
+): boolean {
+  if (subject.isEmpty) return false;
 
-  const target = comparisonTarget(evaluation);
-  if (!target.isAvailable) return true;
-  return !evaluation.subject.equalsTarget(target, comparisonShape(evaluation));
+  return !subject.equalsTarget(target, shape);
 }
 
-function notEqualFails(evaluation: ValidationRuleEvaluation): boolean {
-  const target = constraint(evaluation);
-  if (!target.isAvailable) return false;
-  const valueWasProvided = !evaluation.subject.isEmpty;
-  const valueEqualsForbiddenTarget = evaluation.subject.equalsTarget(target, comparisonShape(evaluation));
+function notEqualFails(
+  subject: ValidationSubject,
+  target: ValidationScalarTarget,
+  shape: Shape,
+): boolean {
+  const valueWasProvided = !subject.isEmpty;
+  const valueEqualsForbiddenTarget = subject.equalsTarget(target, shape);
   return valueWasProvided && valueEqualsForbiddenTarget;
 }
 
-function notEqualToFails(evaluation: ValidationRuleEvaluation): boolean {
-  const target = comparisonTarget(evaluation);
-  if (!target.isAvailable) return true;
-  const valueWasProvided = !evaluation.subject.isEmpty;
-  const valueEqualsPeerTarget = evaluation.subject.equalsTarget(target, comparisonShape(evaluation));
+function notEqualToFails(
+  subject: ValidationSubject,
+  target: ValidationScalarTarget,
+  shape: Shape,
+): boolean {
+  const valueWasProvided = !subject.isEmpty;
+  const valueEqualsPeerTarget = subject.equalsTarget(target, shape);
   return valueWasProvided && valueEqualsPeerTarget;
 }
 
-function atLeastOneFails(evaluation: ValidationRuleEvaluation): boolean {
-  return evaluation.subject.failsAtLeastOne();
+function atLeastOneFails(subject: ValidationSubject): boolean {
+  return subject.failsAtLeastOne();
 }
 
 function luhn(digits: string): boolean {

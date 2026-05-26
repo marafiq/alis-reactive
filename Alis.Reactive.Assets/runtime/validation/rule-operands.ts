@@ -1,4 +1,3 @@
-import { assertNever } from "../core/assert-never";
 import { toString } from "../core/shape-convert";
 import type { ConvertResult } from "../core/shape-convert";
 import { RuntimeShape } from "../domain/runtime-shape";
@@ -7,12 +6,7 @@ import type {
   LiteralValidationConstraintOperand,
   NumericValidationConstraintOperand,
   RangeValidationConstraintOperand,
-  ValidationConstraintOperand,
 } from "../types";
-
-export type ResolvedPeerValue =
-  | { readonly kind: "present"; readonly value: unknown }
-  | { readonly kind: "absent" };
 
 export class ValidationSubject {
   private constructor(
@@ -56,51 +50,15 @@ export class ValidationSubject {
   }
 }
 
-export abstract class ValidationScalarTarget {
-  static fromResolvedPeerOrConstraint(
-    peerValue: ResolvedPeerValue,
-    constraintOperand: ValidationConstraintOperand,
-  ): ValidationScalarTarget {
-    if (peerValue.kind === "present") return ValidationScalarTarget.available(peerValue.value);
-    return ValidationScalarTarget.fromConstraintOperand(constraintOperand);
-  }
+export class ValidationScalarTarget {
+  private constructor(private readonly value: unknown) {}
 
-  static fromConstraintOperand(operand: ValidationConstraintOperand): ValidationScalarTarget {
-    switch (operand.kind) {
-      case "none": return ValidationScalarTarget.missing();
-      case "value": return ValidationScalarTarget.fromLiteral(operand);
-      default: return assertNever(operand, "validation rule operand");
-    }
-  }
-
-  static available(value: unknown): ValidationScalarTarget {
-    return new AvailableValidationScalarTarget(value);
-  }
-
-  private static fromLiteral(operand: LiteralValidationConstraintOperand): ValidationScalarTarget {
+  static fromConstraintOperand(operand: LiteralValidationConstraintOperand): ValidationScalarTarget {
     return ValidationScalarTarget.available(operand.value.value);
   }
 
-  static missing(): ValidationScalarTarget {
-    return MissingValidationScalarTarget.instance;
-  }
-
-  abstract get isAvailable(): boolean;
-
-  abstract textOrEmpty(): string;
-
-  abstract compareWithSubject(subject: unknown, shape: Shape): ShapedComparison;
-
-  abstract equalsSubject(subject: unknown, shape: Shape): boolean;
-}
-
-class AvailableValidationScalarTarget extends ValidationScalarTarget {
-  constructor(private readonly value: unknown) {
-    super();
-  }
-
-  get isAvailable(): boolean {
-    return true;
+  static available(value: unknown): ValidationScalarTarget {
+    return new ValidationScalarTarget(value);
   }
 
   textOrEmpty(): string {
@@ -116,26 +74,6 @@ class AvailableValidationScalarTarget extends ValidationScalarTarget {
 
   equalsSubject(subject: unknown, shape: Shape): boolean {
     return ShapeAwareEquality.matches(subject, this.value, shape);
-  }
-}
-
-class MissingValidationScalarTarget extends ValidationScalarTarget {
-  static readonly instance = new MissingValidationScalarTarget();
-
-  get isAvailable(): boolean {
-    return false;
-  }
-
-  textOrEmpty(): string {
-    return "";
-  }
-
-  compareWithSubject(): ShapedComparison {
-    return ShapedComparison.missing();
-  }
-
-  equalsSubject(): boolean {
-    return false;
   }
 }
 

@@ -7,7 +7,7 @@ import type {
   Plan, ValidationContainerScope, ComponentValidation,
   ValidationRule,
   ValidationRuleActivation as PlanValidationRuleActivation,
-  ValidationPeerOperand as PlanValidationPeerOperand,
+  PeerEqualityValidationRule,
 } from "../types";
 import type { ExecContext } from "../types";
 import { RuntimePlan, RuntimeResolutionError, type RuntimeComponent } from "../domain/runtime-plan";
@@ -15,8 +15,7 @@ import { evaluateCondition } from "../conditions/conditions";
 import { evaluateValue } from "../core/evaluate";
 import { scope } from "../core/trace";
 import { toString } from "../core/shape-convert";
-import type { ResolvedPeerValue } from "./rule-engine";
-import { noPeerValue, peerValue, ruleFails } from "./rule-engine";
+import { ruleFails } from "./rule-engine";
 import {
   showInline, clearInline,
   addToSummary, removeSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
@@ -388,9 +387,7 @@ function evaluateRulesForField(
   for (const rule of field.componentValidation.rules) {
     if (!isRuleActive(rule.execution.activation, surface)) continue;
 
-    const otherValue = resolvePeerValue(rule.execution.otherValue, surface.plan);
-
-    if (ruleFails({ rule, value: field.value, peerValue: otherValue })) {
+    if (failsRule(rule, field.value, surface.plan)) {
       reportRuleFailure(field, rule, surface);
       return false;
     }
@@ -457,15 +454,24 @@ function isRuleSkippedForUnmountedField(
   }
 }
 
-function resolvePeerValue(
-  operand: PlanValidationPeerOperand,
+function failsRule(
+  rule: ValidationRule,
+  value: unknown,
   plan: Plan,
-): ResolvedPeerValue {
-  switch (operand.kind) {
-    case "none": return noPeerValue();
-    case "value": return peerValue(evaluateValue(operand.value, plan));
-    default: return assertNever(operand, "validation peer operand");
+): boolean {
+  if (hasPeerTarget(rule)) {
+    return ruleFails({
+      rule,
+      value,
+      peerValue: evaluateValue(rule.execution.otherValue.value, plan),
+    });
   }
+
+  return ruleFails({ rule, value });
+}
+
+function hasPeerTarget(rule: ValidationRule): rule is PeerEqualityValidationRule {
+  return rule.execution.otherValue.kind === "value";
 }
 
 function clearContainerErrors(
