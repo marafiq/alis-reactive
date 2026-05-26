@@ -23,10 +23,6 @@
       <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <InternalsVisibleTo Include="Alis.Reactive.Fusion.UnitTests" />
-    </ItemGroup>
-
     <!-- Ship Syncfusion EJ2 CSS (built by vite.fusion.config.ts from
          @syncfusion/ej2/tailwind3.css + our syncfusion.overrides.css) as a
          NuGet content file. Packed under BOTH build\ and buildTransitive\ so

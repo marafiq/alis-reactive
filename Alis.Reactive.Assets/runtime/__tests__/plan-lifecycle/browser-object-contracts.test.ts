@@ -3,11 +3,11 @@ import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
 import {
   behavior,
   component,
-  jsTypeWithMethodShape,
-  jsTypeWithPropertyAccess,
-  jsTypeWithPropertyShape,
-  jsTypeWithReadableProperty,
-  jsTypeWithWritableProperty,
+  objectContractWithMethodShape,
+  objectContractWithPropertyAccess,
+  objectContractWithPropertyShape,
+  objectContractWithReadableProperty,
+  objectContractWithWritableProperty,
   mergeHooks,
   partialPlan,
   rootPlan,
@@ -22,12 +22,12 @@ describe("browser object contract fragments", () => {
 
     browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
+        types: { [sharedTypeKey]: objectContractWithReadableProperty("token") },
       }),
     ], hooks);
     browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
+        types: { [sharedTypeKey]: objectContractWithReadableProperty("token") },
       }),
     ], hooks);
 
@@ -49,12 +49,12 @@ describe("browser object contract fragments", () => {
 
     browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithWritableProperty("classRemove") },
+        types: { [sharedTypeKey]: objectContractWithWritableProperty("classRemove") },
       }),
     ], hooks);
     browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithWritableProperty("classToggle") },
+        types: { [sharedTypeKey]: objectContractWithWritableProperty("classToggle") },
       }),
     ], hooks);
 
@@ -79,13 +79,13 @@ describe("browser object contract fragments", () => {
 
     browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
+        types: { [sharedTypeKey]: objectContractWithReadableProperty("token") },
       }),
     ], hooks);
 
     expect(() => browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "number" }) },
+        types: { [sharedTypeKey]: objectContractWithPropertyShape("token", { kind: "number" }) },
       }),
     ], hooks)).toThrow("incompatible property contracts cannot be merged");
   });
@@ -98,12 +98,12 @@ describe("browser object contract fragments", () => {
 
     browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "any" }) },
+        types: { [sharedTypeKey]: objectContractWithPropertyShape("token", { kind: "any" }) },
       }),
     ], hooks);
     browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "string" }) },
+        types: { [sharedTypeKey]: objectContractWithPropertyShape("token", { kind: "string" }) },
       }),
     ], hooks);
 
@@ -125,7 +125,7 @@ describe("browser object contract fragments", () => {
     browserPlans.loadPartialSlot("name-slot", [
       partialPlan(planId, {
         types: {
-          [sharedTypeKey]: jsTypeWithPropertyShape("profile", {
+          [sharedTypeKey]: objectContractWithPropertyShape("profile", {
             kind: "object",
             fields: { name: { kind: "string" } },
             additional: false,
@@ -136,7 +136,7 @@ describe("browser object contract fragments", () => {
     browserPlans.loadPartialSlot("age-slot", [
       partialPlan(planId, {
         types: {
-          [sharedTypeKey]: jsTypeWithPropertyShape("profile", {
+          [sharedTypeKey]: objectContractWithPropertyShape("profile", {
             kind: "object",
             fields: { age: { kind: "number" } },
             additional: false,
@@ -164,12 +164,12 @@ describe("browser object contract fragments", () => {
 
     browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithMethodShape("normalize", { kind: "any" }, { kind: "any" }) },
+        types: { [sharedTypeKey]: objectContractWithMethodShape("normalize", { kind: "any" }, { kind: "any" }) },
       }),
     ], hooks);
     browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithMethodShape("normalize", { kind: "string" }, { kind: "string" }) },
+        types: { [sharedTypeKey]: objectContractWithMethodShape("normalize", { kind: "string" }, { kind: "string" }) },
       }),
     ], hooks);
 
@@ -186,7 +186,7 @@ describe("browser object contract fragments", () => {
 
     browserPlans.loadPartialSlot("first-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithReadableProperty("token") },
+        types: { [sharedTypeKey]: objectContractWithReadableProperty("token") },
       }),
     ], hooks);
 
@@ -194,7 +194,7 @@ describe("browser object contract fragments", () => {
 
     browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, {
-        types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "number" }) },
+        types: { [sharedTypeKey]: objectContractWithPropertyShape("token", { kind: "number" }) },
       }),
     ], hooks);
 
@@ -211,7 +211,7 @@ describe("browser object contract fragments", () => {
     browserPlans.register({
       ...rootPlan(planId),
       types: {
-        [drawerTypeKey]: jsTypeWithWritableProperty("classAdd"),
+        [drawerTypeKey]: objectContractWithWritableProperty("classAdd"),
       },
       components: {
         "alis-drawer": component("alis-drawer", drawerTypeKey),
@@ -221,7 +221,7 @@ describe("browser object contract fragments", () => {
     browserPlans.loadPartialSlot("alis-drawer-content", [
       partialPlan(planId, {
         types: {
-          [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
+          [drawerTypeKey]: objectContractWithWritableProperty("classRemove"),
         },
         components: {
           "alis-drawer": component("alis-drawer", drawerTypeKey),
@@ -250,7 +250,7 @@ describe("browser object contract fragments", () => {
     browserPlans.register({
       ...rootPlan(planId),
       types: {
-        [drawerTypeKey]: jsTypeWithWritableProperty("classAdd"),
+        [drawerTypeKey]: objectContractWithWritableProperty("classAdd"),
       },
       components: {
         "alis-drawer": component("alis-drawer", drawerTypeKey),
@@ -260,7 +260,7 @@ describe("browser object contract fragments", () => {
     browserPlans.loadPartialSlot("first-drawer-content", [
       partialPlan(planId, {
         types: {
-          [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
+          [drawerTypeKey]: objectContractWithWritableProperty("classRemove"),
         },
         components: {
           "alis-drawer": component("alis-drawer", drawerTypeKey),
@@ -270,7 +270,7 @@ describe("browser object contract fragments", () => {
     browserPlans.loadPartialSlot("second-drawer-content", [
       partialPlan(planId, {
         types: {
-          [drawerTypeKey]: jsTypeWithWritableProperty("classToggle"),
+          [drawerTypeKey]: objectContractWithWritableProperty("classToggle"),
         },
         components: {
           "alis-drawer": component("alis-drawer", drawerTypeKey),
@@ -302,7 +302,7 @@ describe("browser object contract fragments", () => {
     browserPlans.register({
       ...rootPlan(planId),
       types: {
-        [typeKey]: jsTypeWithPropertyAccess("value", "read"),
+        [typeKey]: objectContractWithPropertyAccess("value", "read"),
       },
       components: {
         "care-unit": component("care-unit", typeKey),
@@ -312,7 +312,7 @@ describe("browser object contract fragments", () => {
     browserPlans.loadPartialSlot("care-unit-editor", [
       partialPlan(planId, {
         types: {
-          [typeKey]: jsTypeWithPropertyAccess("value", "write"),
+          [typeKey]: objectContractWithPropertyAccess("value", "write"),
         },
         components: {
           "care-unit": component("care-unit", typeKey),
@@ -336,7 +336,7 @@ describe("browser object contract fragments", () => {
     browserPlans.register({
       ...rootPlan(planId),
       types: {
-        [hostTypeKey]: jsTypeWithWritableProperty("html"),
+        [hostTypeKey]: objectContractWithWritableProperty("html"),
       },
       components: {
         "step-container": component("step-container", hostTypeKey),
@@ -346,7 +346,7 @@ describe("browser object contract fragments", () => {
     browserPlans.loadPartialSlot("step-container", [
       partialPlan(planId, {
         types: {
-          [hostTypeKey]: jsTypeWithWritableProperty("hidden"),
+          [hostTypeKey]: objectContractWithWritableProperty("hidden"),
         },
         components: {
           "step-container": component("step-container", hostTypeKey),
@@ -375,7 +375,7 @@ describe("browser object contract fragments", () => {
     browserPlans.register({
       ...rootPlan(rootPlanId),
       types: {
-        [drawerTypeKey]: jsTypeWithWritableProperty("classAdd"),
+        [drawerTypeKey]: objectContractWithWritableProperty("classAdd"),
       },
       components: {
         "alis-drawer": component("alis-drawer", drawerTypeKey),
@@ -385,7 +385,7 @@ describe("browser object contract fragments", () => {
     browserPlans.loadPartialSlot("alis-drawer-content", [
       partialPlan(partialPlanId, {
         types: {
-          [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
+          [drawerTypeKey]: objectContractWithWritableProperty("classRemove"),
         },
         components: {
           "alis-drawer": component("alis-drawer", drawerTypeKey),

@@ -125,9 +125,9 @@ namespace Alis.Reactive.Fusion.Components
         {
             self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor);
 
-            var registration = self.Pipeline.Context.FindRegistrationById(self.TargetId);
-            var registeredShape = registration.RequireShape(
-                ComponentRegistrationRequirement.ForFusionInPlaceEditorValueRead(self.TargetId));
+            var valueRead = RegisteredInputValueRead.ForFusionInPlaceEditorValueRead(self.TargetId);
+            var registration = self.Pipeline.Context.RequireRegistrationById(self.TargetId, valueRead);
+            var registeredShape = registration.RequireValueContract(valueRead.ValueMember).Shape;
 
             return self.Read(ValueProperty.WithShape(registeredShape));
         }

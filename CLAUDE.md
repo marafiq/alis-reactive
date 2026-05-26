@@ -46,7 +46,7 @@ indirection.
 ```
 Layer 1  Frozen Public DSL in cshtml
          Quality: typed authoring, compile-time component/member APIs, no string magic except plugin compatibility
-         Harness: developer-facing unit tests and Playwright slices that use the DSL
+         Harness: source-grounded DSL proof plus Playwright slices that use the DSL
          ↓
          BOUNDARY: DSL intent must be representable without server-side browser execution
          ↓
@@ -203,17 +203,10 @@ A branch with no such files (this branch has none) makes vitest print
 `No test files found` and exit non-zero — that is the empty-suite signal, not a
 failure in your code.
 
-**C# unit tests — fast, no server needed:**
+**C# build gate — compile the DSL, plan model, generators, runtime host, and Playwright harness:**
 
 ```bash
 dotnet build
-dotnet test tests/Alis.Reactive.UnitTests                    # Core plan domain
-dotnet test tests/Alis.Reactive.Native.UnitTests             # Native
-dotnet test tests/Alis.Reactive.Fusion.UnitTests             # Fusion
-dotnet test tests/Alis.Reactive.FluentValidator.UnitTests    # Validation
-dotnet test tests/Alis.Reactive.Analyzers.Tests              # Analyzers
-dotnet test tests/Alis.Reactive.DesignSystem.Tests           # Design system
-dotnet test tests/Alis.Reactive.NativeTagHelpers.Tests       # Tag helpers
 ```
 
 **Playwright — browser, end-to-end:**

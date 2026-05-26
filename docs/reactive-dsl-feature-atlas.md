@@ -344,7 +344,7 @@ Source:
 
 Domain terms:
 
-- `JsType`
+- `BrowserObjectContract`
 - `JsPropertyContract`
 - `JsMethodContract`
 - `JsEventContract`

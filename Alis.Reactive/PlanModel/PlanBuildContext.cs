@@ -5,24 +5,24 @@ namespace Alis.Reactive.PlanModel
 {
     /// <summary>
     /// Construction boundary used by the public DSL builders.
-    /// It delegates domain decisions to the plan draft aggregates and only exposes the
+    /// It delegates domain decisions to the plan authoring state and only exposes the
     /// narrow mutation verbs the DSL needs while authoring a plan.
     /// </summary>
     public sealed class PlanBuildContext
     {
         private readonly PlanIdentity _identity;
-        private readonly JsTypeCatalog _types;
-        private readonly ComponentCatalog _components;
+        private readonly BrowserObjectContracts _objectContracts;
+        private readonly ComponentObjects _components;
         private readonly BehaviorGraph _behaviors;
-        private readonly ValidationWorkQueue _validationJobs = new ValidationWorkQueue();
+        private readonly PendingValidationProjections _validationJobs = new PendingValidationProjections();
 
         internal PlanBuildContext(
             PlanIdentity identity,
-            ComponentRegistrationCatalog registrations)
+            RegisteredInputComponents registrations)
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
-            _types = new JsTypeCatalog();
-            _components = new ComponentCatalog(_types, registrations);
+            _objectContracts = new BrowserObjectContracts();
+            _components = new ComponentObjects(_objectContracts, registrations);
             _behaviors = new BehaviorGraph(_components);
         }
 
@@ -30,7 +30,7 @@ namespace Alis.Reactive.PlanModel
         internal Plan BuildPlan() =>
             new Plan(
                 _identity,
-                _types.Snapshot(),
+                _objectContracts.Snapshot(),
                 _components.Snapshot(),
                 _behaviors.Snapshot());
 
@@ -38,10 +38,10 @@ namespace Alis.Reactive.PlanModel
         internal IReadOnlyList<Behavior> Behaviors => _behaviors.Behaviors;
 
         /// <summary>Gets a component already registered in the plan.</summary>
-        internal Component GetComponent(ComponentKey key) => _components.Get(key);
+        internal ComponentObject GetComponent(ComponentKey key) => _components.Get(key);
 
         /// <summary>Replaces a registered component, used when validation enriches a container scope.</summary>
-        internal void SetComponent(ComponentKey key, Component component) => _components.Set(key, component);
+        internal void SetComponent(ComponentKey key, ComponentObject component) => _components.Set(key, component);
 
         /// <summary>Records that a request declared a validation source, to be resolved during Render().</summary>
         internal void RegisterValidationJob(Request request, ComponentId container, Type validationSourceType) =>
@@ -51,7 +51,7 @@ namespace Alis.Reactive.PlanModel
         internal IReadOnlyList<ValidationJob> ValidationJobs => _validationJobs.Jobs;
 
         /// <summary>
-        /// Ensures a DOM element is registered as a native component with a JsType.
+        /// Ensures a DOM element is registered as a native component with a BrowserObjectContract.
         /// Returns the component key for use in source references.
         /// </summary>
         internal ComponentKey EnsureElement(string elementId) => _components.EnsureElement(elementId);
@@ -60,7 +60,7 @@ namespace Alis.Reactive.PlanModel
         /// Ensures a component is registered with its vendor, type metadata, and any known input binding.
         /// </summary>
         internal ComponentKey EnsureComponent(string componentId, string vendor) =>
-            EnsureComponent(componentId, vendor, ComponentContributionIntent.ObjectTarget);
+            EnsureComponent(componentId, vendor, ComponentRole.ObjectTarget);
 
         /// <summary>
         /// Ensures a component is registered with the contribution intent that caused the reference.
@@ -68,14 +68,14 @@ namespace Alis.Reactive.PlanModel
         internal ComponentKey EnsureComponent(
             string componentId,
             string vendor,
-            ComponentContributionIntent contribution) =>
+            ComponentRole contribution) =>
             _components.EnsureComponent(componentId, vendor, contribution);
 
-        /// <summary>
-        /// Searches the registration map for a registration whose ComponentId matches.
-        /// </summary>
-        internal ComponentRegistrationMatch FindRegistrationById(string componentId) =>
-            _components.FindRegistrationById(componentId);
+        /// <summary>Returns the render-time registration for a component value read.</summary>
+        internal ComponentRegistration RequireRegistrationById(
+            string componentId,
+            RegisteredInputValueRead valueRead) =>
+            _components.RequireRegistrationById(componentId, valueRead);
 
         /// <summary>
         /// Ensures a registered input component exists in the plan with readable value metadata.
@@ -83,25 +83,25 @@ namespace Alis.Reactive.PlanModel
         internal ComponentKey EnsureInputComponent(InputComponentPlanBinding binding) =>
             _components.EnsureInputComponent(binding);
 
-        /// <summary>Ensures a property member exists on a component's JsType.</summary>
-        internal void EnsureProperty(ComponentKey componentKey, JsPropertyContract contract) =>
+        /// <summary>Ensures a property member exists on a component's BrowserObjectContract.</summary>
+        internal void EnsureProperty(ComponentKey componentKey, ObjectPropertyContract contract) =>
             _components.EnsureProperty(componentKey, contract);
 
-        /// <summary>Ensures a method member exists on a component's JsType.</summary>
-        internal JsMethod EnsureMethod(ComponentKey componentKey, JsMethodContract contract) =>
+        /// <summary>Ensures a method member exists on a component's BrowserObjectContract.</summary>
+        internal ObjectMethod EnsureMethod(ComponentKey componentKey, ObjectMethodContract contract) =>
             _components.EnsureMethod(componentKey, contract);
 
         /// <summary>Registers a plugin contract. Throws on duplicate registration.</summary>
         internal void RegisterPlugin(PluginContract contract) =>
-            _types.RegisterPlugin(contract);
+            _objectContracts.RegisterPlugin(contract);
 
-        /// <summary>Ensures a plugin method exists in the plan's JsType registry.</summary>
+        /// <summary>Ensures a plugin method exists in the browser object contracts.</summary>
         internal MethodSignature EnsurePluginMethod(PluginMethodRequirement requirement) =>
-            _types.EnsurePluginMethod(requirement);
+            _objectContracts.EnsurePluginMethod(requirement);
 
-        /// <summary>Ensures a plugin property exists in the plan's JsType registry.</summary>
+        /// <summary>Ensures a plugin property exists in the browser object contracts.</summary>
         internal void EnsurePluginProperty(PluginPropertyRequirement requirement) =>
-            _types.EnsurePluginProperty(requirement);
+            _objectContracts.EnsurePluginProperty(requirement);
 
         /// <summary>
         /// Registers all input components from the ReactivePlan's input component onboarding catalog into the plan.

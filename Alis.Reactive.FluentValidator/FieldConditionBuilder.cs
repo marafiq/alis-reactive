@@ -51,9 +51,9 @@ namespace Alis.Reactive.FluentValidator
         public FieldGuard<T> MinLength(int minLength)
         {
             var minimum = MinimumTextLength.From(minLength, nameof(minLength));
-            return Literal(
+            return _field.GuardWithOperand(
                 CompareOperator.MinLength,
-                minimum.Value,
+                FieldComparisonValue.Number(minimum.Value),
                 value => value is string text && text.Length >= minimum.Value);
         }
 
@@ -112,7 +112,10 @@ namespace Alis.Reactive.FluentValidator
             CompareOperator op,
             string operand,
             Func<string, bool> predicate) =>
-            Literal(op, operand, value => value is string text && predicate(text));
+            _field.GuardWithOperand(
+                op,
+                FieldComparisonValue.Text(operand),
+                value => value is string text && predicate(text));
 
         private static bool IsFalsy(TProp value) => value switch
         {
@@ -130,7 +133,22 @@ namespace Alis.Reactive.FluentValidator
         private static bool IsEmptyValue(TProp value)
         {
             if (value == null) return true;
-            return value is string text && string.IsNullOrEmpty(text);
+            if (value is string text) return string.IsNullOrEmpty(text);
+            if (value is IEnumerable items) return IsEmptySequence(items);
+            return false;
+        }
+
+        private static bool IsEmptySequence(IEnumerable items)
+        {
+            var enumerator = items.GetEnumerator();
+            try
+            {
+                return !enumerator.MoveNext();
+            }
+            finally
+            {
+                (enumerator as IDisposable)?.Dispose();
+            }
         }
 
         private static HashSet<TProp> ValueSet(TProp[] values)

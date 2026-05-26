@@ -51,6 +51,7 @@ function noOperandRule(name: NoOperandValidationRule["name"]): NoOperandValidati
     name,
     message: `${name} failed`,
     execution: {
+      target: "none",
       constraint: { kind: "none" },
       otherValue: { kind: "none" },
       activation: { kind: "always" },
@@ -64,6 +65,7 @@ function lengthRule(name: LengthValidationRule["name"], length: number): LengthV
     name,
     message: `${name} failed`,
     execution: {
+      target: "constraint",
       constraint: { kind: "value", value: numericLiteral(length) },
       otherValue: { kind: "none" },
       activation: { kind: "always" },
@@ -81,6 +83,7 @@ function rangeRule(
     name,
     message: `${name} failed`,
     execution: {
+      target: "constraint",
       constraint: { kind: "value", value: rangeLiteral(bounds) },
       otherValue: { kind: "none" },
       activation: { kind: "always" },
@@ -99,6 +102,7 @@ function orderedRule(
     name,
     message: `${name} failed`,
     execution: {
+      target: "constraint",
       constraint: { kind: "value", value: literal(value, valueShape) },
       otherValue: { kind: "none" },
       activation: { kind: "always" },
@@ -112,6 +116,7 @@ function peerEqualityRule(name: PeerEqualityValidationRule["name"]): PeerEqualit
     name,
     message: `${name} failed`,
     execution: {
+      target: "peer",
       constraint: { kind: "none" },
       otherValue: {
         kind: "value",
@@ -128,6 +133,7 @@ function peerOrderedRule(name: PeerOrderedComparisonValidationRule["name"]): Pee
     name,
     message: `${name} failed`,
     execution: {
+      target: "peer",
       constraint: { kind: "none" },
       otherValue: {
         kind: "value",

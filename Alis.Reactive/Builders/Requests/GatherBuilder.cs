@@ -217,9 +217,10 @@ namespace Alis.Reactive.Builders.Requests
         /// </summary>
         public GatherBuilder<TModel> Include(string componentId, string vendor, string propertyName, string valueMember)
         {
-            var registration = _context.FindRegistrationById(componentId);
+            var valueRead = RegisteredInputValueRead.ForGatherValueRead(componentId, valueMember);
+            var registration = _context.RequireRegistrationById(componentId, valueRead);
             var valueContract = registration.RequireValueContract(
-                ComponentRegistrationRequirement.ForGatherValueRead(componentId, valueMember));
+                valueRead.ValueMember);
             return Include(componentId, vendor, propertyName, valueContract);
         }
 

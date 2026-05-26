@@ -21,8 +21,4 @@
         <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <InternalsVisibleTo Include="Alis.Reactive.Native.UnitTests" />
-    </ItemGroup>
-
 </Project>

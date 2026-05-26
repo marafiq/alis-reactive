@@ -1,4 +1,4 @@
-import type { JsType, MemberAccess, Method, MethodArgumentContract, Property } from "../types";
+import type { BrowserObjectContract, MemberAccess, Method, MethodArgumentContract, Property } from "../types";
 import { assertNever } from "../core/assert-never";
 import { RuntimePath } from "./runtime-path";
 import { RuntimeValue } from "./runtime-value";
@@ -8,7 +8,7 @@ export class RuntimeObject {
   constructor(
     readonly label: string,
     readonly root: unknown,
-    readonly jsType: JsType,
+    readonly objectContract: BrowserObjectContract,
   ) {}
 
   read(member: string): RuntimeValue {
@@ -42,14 +42,14 @@ export class RuntimeObject {
   }
 
   private tryProperty(member: string): RuntimeProperty | undefined {
-    const property = this.jsType.properties[member];
+    const property = this.objectContract.properties[member];
     if (property === undefined) return undefined;
 
     return RuntimeProperty.from(this.label, member, property);
   }
 
   private tryMethod(member: string): Method | undefined {
-    return this.jsType.methods[member];
+    return this.objectContract.methods[member];
   }
 }
 

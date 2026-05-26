@@ -91,26 +91,29 @@ namespace Alis.Reactive.Validation
             CompareArray(CompareOperator.Between, new[] { lowerBound, upperBound });
 
         public ClientValidationCondition<TModel> Contains(string substring) =>
-            CompareLiteral(CompareOperator.Contains, substring);
+            CompareText(CompareOperator.Contains, substring);
 
         public ClientValidationCondition<TModel> StartsWith(string prefix) =>
-            CompareLiteral(CompareOperator.StartsWith, prefix);
+            CompareText(CompareOperator.StartsWith, prefix);
 
         public ClientValidationCondition<TModel> EndsWith(string suffix) =>
-            CompareLiteral(CompareOperator.EndsWith, suffix);
+            CompareText(CompareOperator.EndsWith, suffix);
 
         public ClientValidationCondition<TModel> Matches(string pattern)
         {
             if (string.IsNullOrEmpty(pattern))
                 throw new ArgumentException("A regex pattern is required for a client validation condition.", nameof(pattern));
 
-            return CompareLiteral(CompareOperator.Matches, pattern);
+            return CompareText(CompareOperator.Matches, pattern);
         }
 
         public ClientValidationCondition<TModel> MinLength(int minLength)
         {
             var minimumLength = MinimumTextLength.From(minLength, nameof(minLength));
-            return CompareLiteral(CompareOperator.MinLength, minimumLength.Value);
+            return Build(FieldCondition.Compare(
+                _field.Reference.Path,
+                CompareOperator.MinLength,
+                FieldComparisonValue.Number(minimumLength.Value)));
         }
 
         public ClientValidationCondition<TModel> ArrayContains<TItem>(TItem item)
@@ -136,6 +139,14 @@ namespace Alis.Reactive.Validation
 
             var literal = ClientValidationProjectionLiteral.From(value);
             return Build(FieldCondition.Compare(_field.Reference.Path, op, literal.Value));
+        }
+
+        private ClientValidationCondition<TModel> CompareText(
+            CompareOperator op,
+            string value)
+        {
+            if (op == null) throw new ArgumentNullException(nameof(op));
+            return Build(FieldCondition.Compare(_field.Reference.Path, op, FieldComparisonValue.Text(value)));
         }
 
         private ClientValidationCondition<TModel> CompareArray(

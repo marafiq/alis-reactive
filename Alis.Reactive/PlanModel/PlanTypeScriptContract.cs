@@ -27,8 +27,8 @@ namespace Alis.Reactive.PlanModel
                 .Requires("version", "3")
                 .Requires("planId", "string")
                 .Requires("scope", "PlanScope")
-                .Requires("types", "Record<string, JsType>")
-                .Requires("components", "Record<string, Component>")
+                .Requires("types", "Record<string, BrowserObjectContract>")
+                .Requires("components", "Record<string, ComponentObject>")
                 .Requires("behaviors", "Behavior[]"));
 
             contract.Declare(Union("PlanScope", "RootPlanScope", "PartialPlanScope"));
@@ -39,7 +39,7 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Interface("PartialPlanScope")
                 .Requires("kind", Literal("partial")));
 
-            contract.Declare(Interface("JsType")
+            contract.Declare(Interface("BrowserObjectContract")
                 .Requires("properties", "Record<string, Property>")
                 .Requires("methods", "Record<string, Method>")
                 .Requires("events", "Record<string, Event>"));
@@ -80,7 +80,7 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Alias("Vendor", "string"));
 
             contract.Declare(Union(
-                "Component",
+                "ComponentObject",
                 "ObjectTargetComponent",
                 "OwnedDefinitionComponent",
                 "ValidationContainerComponentDefinition",
@@ -88,26 +88,26 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(ComponentVariant(
                 "ObjectTargetComponent",
                 "ObjectTargetComponentContribution",
-                "UnboundComponentBinding",
-                "UnscopedComponentContainer"));
+                "NoInputBinding",
+                "NoValidationContainer"));
             contract.Declare(ComponentVariant(
                 "OwnedDefinitionComponent",
                 "OwnedDefinitionComponentContribution",
                 "RegisteredInputBinding",
-                "UnscopedComponentContainer"));
+                "NoValidationContainer"));
             contract.Declare(ComponentVariant(
                 "ValidationContainerComponentDefinition",
                 "ValidationContainerComponentContribution",
-                "ComponentBinding",
+                "InputBinding",
                 "ValidationContainerScope"));
             contract.Declare(ComponentVariant(
                 "LayoutObjectComponent",
                 "LayoutObjectComponentContribution",
-                "UnboundComponentBinding",
-                "UnscopedComponentContainer"));
+                "NoInputBinding",
+                "NoValidationContainer"));
 
             contract.Declare(Union(
-                "ComponentContributionIntent",
+                "ComponentRole",
                 "ObjectTargetComponentContribution",
                 "OwnedDefinitionComponentContribution",
                 "ValidationContainerComponentContribution",
@@ -121,8 +121,8 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Interface("LayoutObjectComponentContribution")
                 .Requires("kind", Literal("layout-object")));
 
-            contract.Declare(Union("ComponentBinding", "UnboundComponentBinding", "RegisteredInputBinding"));
-            contract.Declare(Interface("UnboundComponentBinding")
+            contract.Declare(Union("InputBinding", "NoInputBinding", "RegisteredInputBinding"));
+            contract.Declare(Interface("NoInputBinding")
                 .Requires("kind", Literal("none")));
             contract.Declare(Interface("RegisteredInputBinding")
                 .Requires("kind", Literal("registered-input"))
@@ -131,14 +131,13 @@ namespace Alis.Reactive.PlanModel
                 .Requires("valueMember", "string"));
 
             contract.Declare(Union(
-                "ComponentContainer",
-                "UnscopedComponentContainer",
+                "ValidationContainerBinding",
+                "NoValidationContainer",
                 "ValidationContainerScope"));
-            contract.Declare(Interface("UnscopedComponentContainer")
+            contract.Declare(Interface("NoValidationContainer")
                 .Requires("kind", Literal("none")));
             contract.Declare(Interface("ValidationContainerScope")
                 .Requires("kind", Literal("validation-container"))
-                .Requires("components", "string[]")
                 .Requires("validationRules", "ComponentValidation[]"));
 
             contract.Declare(Interface("ComponentValidation")
@@ -221,36 +220,42 @@ namespace Alis.Reactive.PlanModel
                 "PeerValidationRuleExecution"));
 
             contract.Declare(Interface("NoOperandValidationRuleExecution")
+                .Requires("target", Literal("none"))
                 .Requires("constraint", "NoValidationRuleOperand")
                 .Requires("otherValue", "NoValidationRuleOperand")
                 .Requires("activation", "ValidationRuleActivation")
                 .Requires("comparisonShape", "Shape"));
 
             contract.Declare(Interface("ScalarConstraintValidationRuleExecution")
+                .Requires("target", Literal("constraint"))
                 .Requires("constraint", "ScalarValidationConstraintOperand")
                 .Requires("otherValue", "NoValidationRuleOperand")
                 .Requires("activation", "ValidationRuleActivation")
                 .Requires("comparisonShape", "Shape"));
 
             contract.Declare(Interface("NumericConstraintValidationRuleExecution")
+                .Requires("target", Literal("constraint"))
                 .Requires("constraint", "NumericValidationConstraintOperand")
                 .Requires("otherValue", "NoValidationRuleOperand")
                 .Requires("activation", "ValidationRuleActivation")
                 .Requires("comparisonShape", "Shape"));
 
             contract.Declare(Interface("TextConstraintValidationRuleExecution")
+                .Requires("target", Literal("constraint"))
                 .Requires("constraint", "TextValidationConstraintOperand")
                 .Requires("otherValue", "NoValidationRuleOperand")
                 .Requires("activation", "ValidationRuleActivation")
                 .Requires("comparisonShape", "Shape"));
 
             contract.Declare(Interface("RangeConstraintValidationRuleExecution")
+                .Requires("target", Literal("constraint"))
                 .Requires("constraint", "RangeValidationConstraintOperand")
                 .Requires("otherValue", "NoValidationRuleOperand")
                 .Requires("activation", "ValidationRuleActivation")
                 .Requires("comparisonShape", "Shape"));
 
             contract.Declare(Interface("PeerValidationRuleExecution")
+                .Requires("target", Literal("peer"))
                 .Requires("constraint", "NoValidationRuleOperand")
                 .Requires("otherValue", "PeerValidationRuleOperand")
                 .Requires("activation", "ValidationRuleActivation")

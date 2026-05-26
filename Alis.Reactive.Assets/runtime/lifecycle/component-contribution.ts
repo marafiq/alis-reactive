@@ -1,4 +1,4 @@
-import type { Component, ComponentValidation, Plan } from "../types";
+import type { ComponentObject, ComponentValidation, Plan } from "../types";
 import {
   rootOwnerId,
   type ContributionId,
@@ -6,7 +6,7 @@ import {
   type PlanId,
 } from "./plan-contribution-source";
 
-type ValidationContainerComponent = Extract<Component["container"], { kind: "validation-container" }>;
+type ValidationContainerComponent = Extract<ComponentObject["container"], { kind: "validation-container" }>;
 
 export interface ValidationRuleContribution {
   readonly containerKey: string;
@@ -16,7 +16,7 @@ export interface ValidationRuleContribution {
 export interface ComponentContributionDeclaration {
   readonly planId: PlanId;
   readonly key: string;
-  readonly component: Component;
+  readonly component: ComponentObject;
   readonly source: PlanContributionSource;
 }
 
@@ -200,7 +200,7 @@ function mergeLayoutObject(
 }
 
 function extendsRootValidationContainer(
-  existing: Component | undefined,
+  existing: ComponentObject | undefined,
   declaration: ComponentContributionDeclaration,
   ownership: ComponentOwnership,
 ): boolean {
@@ -220,19 +220,19 @@ function targetsRootOwnedComponentFromPartial(
 }
 
 function joinsExistingRuntimeObject(
-  existing: Component | undefined,
-  incoming: Component,
+  existing: ComponentObject | undefined,
+  incoming: ComponentObject,
 ): boolean {
   return existing !== undefined
     && incoming.contribution.kind === "object-target"
     && sameRuntimeIdentity(existing, incoming);
 }
 
-function isLayoutObject(component: Component): boolean {
+function isLayoutObject(component: ComponentObject): boolean {
   return component.contribution.kind === "layout-object";
 }
 
-function sameRuntimeIdentity(existing: Component | undefined, incoming: Component): boolean {
+function sameRuntimeIdentity(existing: ComponentObject | undefined, incoming: ComponentObject): boolean {
   if (existing === undefined) return false;
 
   return existing.id === incoming.id
@@ -240,13 +240,13 @@ function sameRuntimeIdentity(existing: Component | undefined, incoming: Componen
     && existing.type === incoming.type;
 }
 
-function isInitialValidationContainerMerge(existing: Component | undefined, incoming: Component): boolean {
+function isInitialValidationContainerMerge(existing: ComponentObject | undefined, incoming: ComponentObject): boolean {
   return isValidationContainer(existing)
     && isValidationContainer(incoming)
     && sameRuntimeIdentity(existing, incoming);
 }
 
-function replaceComponent(target: Plan, key: string, incoming: Component): void {
+function replaceComponent(target: Plan, key: string, incoming: ComponentObject): void {
   const existingRules = validationRulesOf(target.components[key]);
   const incomingRules = validationRulesOf(incoming);
   if (existingRules !== undefined && incomingRules !== undefined) {
@@ -259,7 +259,7 @@ function replaceComponent(target: Plan, key: string, incoming: Component): void 
   target.components[key] = incoming;
 }
 
-function appendRulesForNewValidatedComponents(existing: Component | undefined, incoming: Component): void {
+function appendRulesForNewValidatedComponents(existing: ComponentObject | undefined, incoming: ComponentObject): void {
   const existingRules = validationRulesOf(existing);
   const incomingRules = validationRulesOf(incoming);
   if (existingRules === undefined || incomingRules === undefined) return;
@@ -267,23 +267,23 @@ function appendRulesForNewValidatedComponents(existing: Component | undefined, i
   appendOnlyNewValidatedComponents(existingRules, incomingRules);
 }
 
-function validationContainerOf(component: Component | undefined): ValidationContainerComponent | undefined {
+function validationContainerOf(component: ComponentObject | undefined): ValidationContainerComponent | undefined {
   if (!isValidationContainer(component)) return undefined;
 
   return component.container;
 }
 
 function isValidationContainer(
-  component: Component | undefined,
-): component is Component & { container: ValidationContainerComponent } {
+  component: ComponentObject | undefined,
+): component is ComponentObject & { container: ValidationContainerComponent } {
   return component?.container.kind === "validation-container";
 }
 
-function validationRulesOf(component: Component | undefined): ComponentValidation[] | undefined {
+function validationRulesOf(component: ComponentObject | undefined): ComponentValidation[] | undefined {
   return validationContainerOf(component)?.validationRules;
 }
 
-function replaceValidationRules(component: Component, validationRules: ComponentValidation[]): void {
+function replaceValidationRules(component: ComponentObject, validationRules: ComponentValidation[]): void {
   const container = validationContainerOf(component);
   if (container === undefined) return;
 

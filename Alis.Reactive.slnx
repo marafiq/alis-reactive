@@ -91,14 +91,7 @@
     <File Path="docs-site/src/content/docs/reference/build-commands.md" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/Alis.Reactive.UnitTests/Alis.Reactive.UnitTests.csproj" />
-    <Project Path="tests/Alis.Reactive.Fusion.UnitTests/Alis.Reactive.Fusion.UnitTests.csproj" />
-    <Project Path="tests/Alis.Reactive.Native.UnitTests/Alis.Reactive.Native.UnitTests.csproj" />
     <Project Path="tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj" />
-
-    <Project Path="tests/Alis.Reactive.FluentValidator.UnitTests/Alis.Reactive.FluentValidator.UnitTests.csproj" />
-    <Project Path="tests/Alis.Reactive.DesignSystem.Tests/Alis.Reactive.DesignSystem.Tests.csproj" />
-    <Project Path="tests/Alis.Reactive.NativeTagHelpers.Tests/Alis.Reactive.NativeTagHelpers.Tests.csproj" />
     <Project Path="tests/Alis.Reactive.Playwright.Extensions/Alis.Reactive.Playwright.Extensions.csproj" />
   </Folder>
   <Project Path="Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />

@@ -38,7 +38,7 @@ export class ComponentEventContract {
   ) {}
 
   static declaredBy(component: RuntimeComponent, eventName: string): ComponentEventContract {
-    const events = component.jsType().events;
+    const events = component.objectContract().events;
     const declaredEvent = events[eventName];
     if (declaredEvent === undefined) {
       throw ComponentEventContractError.missing(component, eventName, Object.keys(events));

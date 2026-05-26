@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { resetLiveClearForTests, wireLiveValidation } from "../validation/live-clear";
 import type {
-  Component,
+  ComponentObject,
   ComponentValidation,
-  JsType,
+  BrowserObjectContract,
   Plan,
   Shape,
   ValueProducer,
@@ -97,7 +97,7 @@ function eventListenerCount(
     .length;
 }
 
-function planWithValidationField(component: Component): Plan {
+function planWithValidationField(component: ComponentObject): Plan {
   return {
     version: 3,
     planId: "Runtime.LiveValidation",
@@ -113,7 +113,7 @@ function planWithValidationField(component: Component): Plan {
   };
 }
 
-function validationContainer(id: string, validationRules: ComponentValidation[]): Component {
+function validationContainer(id: string, validationRules: ComponentValidation[]): ComponentObject {
   return {
     id,
     vendor: "native",
@@ -122,7 +122,6 @@ function validationContainer(id: string, validationRules: ComponentValidation[])
     binding: { kind: "none" },
     container: {
       kind: "validation-container",
-      components: [],
       validationRules,
     },
   };
@@ -138,6 +137,7 @@ function validationRule(componentKey: string): ComponentValidation {
         name: "required",
         message: "Care date is required",
         execution: {
+          target: "none",
           constraint: { kind: "none" },
           otherValue: { kind: "none" },
           activation: { kind: "always" },
@@ -148,7 +148,7 @@ function validationRule(componentKey: string): ComponentValidation {
   };
 }
 
-function fusionField(id: string): Component {
+function fusionField(id: string): ComponentObject {
   return {
     id,
     vendor: "fusion",
@@ -163,7 +163,7 @@ function literal(value: string, shape: Shape): ValueProducer {
   return { kind: "literal", value, shape };
 }
 
-function fusionType(): JsType {
+function fusionType(): BrowserObjectContract {
   return {
     properties: {},
     methods: {},
@@ -171,7 +171,7 @@ function fusionType(): JsType {
   };
 }
 
-function nativeType(): JsType {
+function nativeType(): BrowserObjectContract {
   return {
     properties: {},
     methods: {},

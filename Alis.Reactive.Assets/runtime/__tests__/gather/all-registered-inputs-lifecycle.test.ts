@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveGather } from "../../execution/gather";
 import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
-import type { Component, RequestPayloadTarget, JsType, PathSegment, Plan, RequestInput, Shape, StructuredPath, ValueProducer } from "../../types";
+import type { ComponentObject, RequestPayloadTarget, BrowserObjectContract, PathSegment, Plan, RequestInput, Shape, StructuredPath, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -101,7 +101,7 @@ const silentLifecycleHooks = {
   wireContainerValidation: () => undefined,
 };
 
-function rootPlan(planId: string, components: Record<string, Component>): Plan {
+function rootPlan(planId: string, components: Record<string, ComponentObject>): Plan {
   return {
     version: 3,
     planId,
@@ -126,7 +126,7 @@ function partialPlan(
   };
 }
 
-function nativeInputType(): JsType {
+function nativeInputType(): BrowserObjectContract {
   return {
     properties: {
       value: {
@@ -140,11 +140,11 @@ function nativeInputType(): JsType {
   };
 }
 
-function inputComponent(id: string, bindingPath: string): Component {
+function inputComponent(id: string, bindingPath: string): ComponentObject {
   return registeredInputComponent(id, bindingPath, "value");
 }
 
-function unboundComponent(id: string): Component {
+function unboundComponent(id: string): ComponentObject {
   return {
     id,
     vendor: "native",
@@ -155,7 +155,7 @@ function unboundComponent(id: string): Component {
   };
 }
 
-function registeredInputComponent(id: string, bindingPath: string, valueMember: string): Component {
+function registeredInputComponent(id: string, bindingPath: string, valueMember: string): ComponentObject {
   return {
     id,
     vendor: "native",

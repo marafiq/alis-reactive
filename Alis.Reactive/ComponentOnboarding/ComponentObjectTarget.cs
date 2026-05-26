@@ -13,7 +13,7 @@ namespace Alis.Reactive
         private ComponentObjectTarget(
             ComponentId componentId,
             ComponentVendor vendor,
-            ComponentContributionIntent contribution)
+            ComponentRole contribution)
         {
             ComponentId = componentId ?? throw new ArgumentNullException(nameof(componentId));
             Vendor = vendor ?? throw new ArgumentNullException(nameof(vendor));
@@ -24,7 +24,7 @@ namespace Alis.Reactive
 
         internal ComponentVendor Vendor { get; }
 
-        internal ComponentContributionIntent Contribution { get; }
+        internal ComponentRole Contribution { get; }
 
         internal string IdForJson => ComponentId.Value;
 
@@ -40,7 +40,7 @@ namespace Alis.Reactive
             if (componentId == null) throw new ArgumentNullException(nameof(componentId));
 
             var component = new TComponent();
-            return For(componentId, component.Vendor, ComponentContributionIntent.ObjectTarget);
+            return For(componentId, component.Vendor, ComponentRole.ObjectTarget);
         }
 
         internal static ComponentObjectTarget ForLayout<TComponent>(string componentId)
@@ -49,16 +49,16 @@ namespace Alis.Reactive
             if (componentId == null) throw new ArgumentNullException(nameof(componentId));
 
             var component = new TComponent();
-            return For(componentId, component.Vendor, ComponentContributionIntent.LayoutObject);
+            return For(componentId, component.Vendor, ComponentRole.LayoutObject);
         }
 
         internal static ComponentObjectTarget For(string componentId, string vendor)
-            => For(componentId, vendor, ComponentContributionIntent.ObjectTarget);
+            => For(componentId, vendor, ComponentRole.ObjectTarget);
 
         private static ComponentObjectTarget For(
             string componentId,
             string vendor,
-            ComponentContributionIntent contribution)
+            ComponentRole contribution)
         {
             if (componentId == null) throw new ArgumentNullException(nameof(componentId));
             if (vendor == null) throw new ArgumentNullException(nameof(vendor));

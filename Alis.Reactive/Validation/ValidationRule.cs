@@ -36,6 +36,9 @@ namespace Alis.Reactive.Validation
                 _message,
                 _details.ToPlanExecution(binding));
         }
+
+        internal System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences =>
+            _details.PeerFieldReferences;
     }
 
     public enum ValidationRuleKind

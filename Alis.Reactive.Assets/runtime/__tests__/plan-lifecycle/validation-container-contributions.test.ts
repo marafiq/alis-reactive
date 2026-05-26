@@ -178,8 +178,8 @@ describe("validation container contributions", () => {
 });
 
 function expectValidationContainer(
-  container: Component["container"],
-): Extract<Component["container"], { kind: "validation-container" }> {
+  container: ComponentObject["container"],
+): Extract<ComponentObject["container"], { kind: "validation-container" }> {
   expect(container.kind).toBe("validation-container");
   if (container.kind !== "validation-container") {
     throw new Error(`Expected validation-container scope, received "${container.kind}"`);

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { AppliedBrowserPlans } from "../lifecycle/merge-plan";
 import { showServerErrors, validateContainer } from "../validation/orchestrator";
-import type { Component, ComponentValidation, JsType, Plan, ReadProducer, Shape, ValueProducer } from "../types";
+import type { ComponentObject, ComponentValidation, BrowserObjectContract, Plan, ReadProducer, Shape, ValueProducer } from "../types";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };
@@ -10,7 +10,7 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
-function nativeInputType(): JsType {
+function nativeInputType(): BrowserObjectContract {
   return {
     properties: {
       value: {
@@ -24,7 +24,7 @@ function nativeInputType(): JsType {
   };
 }
 
-function nativeComponent(id: string): Component {
+function nativeComponent(id: string): ComponentObject {
   return {
     id,
     vendor: "native",
@@ -35,7 +35,7 @@ function nativeComponent(id: string): Component {
   };
 }
 
-function validationContainer(id: string, rules: ComponentValidation[]): Component {
+function validationContainer(id: string, rules: ComponentValidation[]): ComponentObject {
   return {
     id,
     vendor: "native",
@@ -44,7 +44,6 @@ function validationContainer(id: string, rules: ComponentValidation[]): Componen
     binding: { kind: "none" },
     container: {
       kind: "validation-container",
-      components: [],
       validationRules: rules,
     },
   };
@@ -71,6 +70,7 @@ function requiredRule(
         name: "required",
         message: `${serverFieldName} is required`,
         execution: {
+          target: "none",
           constraint: { kind: "none" },
           otherValue: { kind: "none" },
           activation: { kind: "always" },
@@ -91,6 +91,7 @@ function conditionalRuleWithMissingActivationSource(): ComponentValidation {
         name: "required",
         message: "Name is required",
         execution: {
+          target: "none",
           constraint: { kind: "none" },
           otherValue: { kind: "none" },
           activation: {
@@ -130,6 +131,7 @@ function peerRuleWithMissingPeerSource(): ComponentValidation {
         name: "equalTo",
         message: "Name must match",
         execution: {
+          target: "peer",
           constraint: { kind: "none" },
           otherValue: {
             kind: "value",
@@ -164,7 +166,7 @@ function literal(value: string): ValueProducer {
 
 function plan(
   validationRules: ComponentValidation[],
-  components: Record<string, Component> = {
+  components: Record<string, ComponentObject> = {
     "resident-name-field": nativeComponent("resident-name-input"),
   },
 ): Plan {
@@ -341,6 +343,19 @@ describe("validation orchestrator server errors", () => {
 });
 
 describe("validation orchestrator client rules", () => {
+  it("matches summary entries by component key without CSS selector interpolation", () => {
+    renderValidationDomWithHiddenErrorSlot();
+    const componentKey = 'resident["name"]';
+    const runtimePlan = plan([
+      requiredRule(componentKey, "Name"),
+    ], {
+      [componentKey]: nativeComponent("resident-name-input"),
+    });
+
+    expect(validateContainer(runtimePlan, "resident-form")).toBe(false);
+    expect(summaryTextFor(componentKey)).toBe("Name is required");
+  });
+
   it("does not hide a miswired validation value producer behind missing field behavior", () => {
     renderValidationDom();
     const runtimePlan = plan([
@@ -385,3 +400,15 @@ const silentLifecycleHooks = {
   wireBehaviors: () => undefined,
   wireContainerValidation: () => undefined,
 };
+
+function summaryTextFor(name: string): string | undefined {
+  const summary = document.getElementById("Runtime_ValidationServerErrors_validation_summary");
+  if (summary === null) return undefined;
+
+  for (const child of summary.children) {
+    if (!(child instanceof HTMLElement)) continue;
+    if (child.dataset.valmsgSummaryFor === name) return child.textContent ?? undefined;
+  }
+
+  return undefined;
+}

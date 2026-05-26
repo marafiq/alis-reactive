@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
 import {
-  jsTypeWithWritableProperty,
+  objectContractWithWritableProperty,
   layoutComponent,
   mergeHooks,
   partialPlan,
@@ -20,7 +20,7 @@ describe("layout object contributions", () => {
     browserPlans.loadPartialSlot("first-toast-slot", [
       partialPlan(planId, {
         types: {
-          [toastTypeKey]: jsTypeWithWritableProperty("title"),
+          [toastTypeKey]: objectContractWithWritableProperty("title"),
         },
         components: {
           alisFusionToast: layoutComponent("alisFusionToast", toastTypeKey),
@@ -30,7 +30,7 @@ describe("layout object contributions", () => {
     browserPlans.loadPartialSlot("second-toast-slot", [
       partialPlan(planId, {
         types: {
-          [toastTypeKey]: jsTypeWithWritableProperty("content"),
+          [toastTypeKey]: objectContractWithWritableProperty("content"),
         },
         components: {
           alisFusionToast: layoutComponent("alisFusionToast", toastTypeKey),

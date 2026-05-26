@@ -155,7 +155,7 @@ namespace Alis.Reactive.PlanModel
 
         internal static TypeKey Of(string value) => new TypeKey(value);
         internal static TypeKey NativeElement(ComponentId componentId) => Of("native.element." + componentId.Value);
-        internal static TypeKey Component(ComponentVendor vendor, ComponentId componentId) => Of(vendor.Value + ".component." + componentId.Value);
+        internal static TypeKey ComponentObject(ComponentVendor vendor, ComponentId componentId) => Of(vendor.Value + ".component." + componentId.Value);
         internal static TypeKey Plugin(PluginName pluginName) => Of("plugin." + pluginName.Value);
     }
 

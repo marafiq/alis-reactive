@@ -38,10 +38,10 @@ namespace Alis.Reactive
 
         internal Shape Shape => _shape;
 
-        internal JsPropertyContract ContractFor(MemberAccess access)
+        internal ObjectPropertyContract ContractFor(MemberAccess access)
         {
             if (access == null) throw new ArgumentNullException(nameof(access));
-            return JsPropertyContract.Create(_member, _path, _shape, access);
+            return ObjectPropertyContract.Create(_member, _path, _shape, access);
         }
 
         /// <summary>Declares a property whose plan member and JavaScript path are the same.</summary>
@@ -88,10 +88,10 @@ namespace Alis.Reactive
         /// <summary>Gets the plan member name used by call reactions.</summary>
         internal string Member => _member.Value;
 
-        internal JsMethodContract ContractReturning(Shape returns)
+        internal ObjectMethodContract ContractReturning(Shape returns)
         {
             if (returns == null) throw new ArgumentNullException(nameof(returns));
-            return JsMethodContract.Create(
+            return ObjectMethodContract.Create(
                 _member,
                 _path,
                 MethodSignature.WithArguments(_arguments, returns));

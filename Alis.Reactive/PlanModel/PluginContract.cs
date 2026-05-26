@@ -151,8 +151,8 @@ namespace Alis.Reactive.PlanModel
             MethodSignature signature) =>
             new PluginOperationContract(operation, signature);
 
-        internal JsMethodContract ToJsMethodContract() =>
-            JsMethodContract.Create(_operation.PlanMethodName, _operation.InvocationPath, _signature);
+        internal ObjectMethodContract ToObjectMethodContract() =>
+            ObjectMethodContract.Create(_operation.PlanMethodName, _operation.InvocationPath, _signature);
 
         internal bool IsSameContract(PluginOperationContract other)
         {
@@ -181,8 +181,8 @@ namespace Alis.Reactive.PlanModel
         internal static PluginPropertyContract Create(PluginPropertyId property, Shape shape) =>
             new PluginPropertyContract(property, shape);
 
-        internal JsPropertyContract ToJsPropertyContract() =>
-            JsPropertyContract.Create(
+        internal ObjectPropertyContract ToObjectPropertyContract() =>
+            ObjectPropertyContract.Create(
                 _property.PlanMemberName,
                 _property.AccessPath,
                 _shape,
@@ -233,14 +233,14 @@ namespace Alis.Reactive.PlanModel
                 PluginOperationContracts.From(name, operations));
         }
 
-        internal JsType ToJsType()
+        internal BrowserObjectContract ToBrowserObjectContract()
         {
-            var jsType = new JsType();
+            var objectContract = new BrowserObjectContract();
             foreach (var property in _properties.Items)
-                jsType.Declare(property.ToJsPropertyContract());
+                objectContract.Declare(property.ToObjectPropertyContract());
             foreach (var operation in _operations.Items)
-                jsType.Declare(operation.ToJsMethodContract());
-            return jsType;
+                objectContract.Declare(operation.ToObjectMethodContract());
+            return objectContract;
         }
 
         private static void EnsureNoPropertyMethodCollision(
@@ -374,8 +374,8 @@ namespace Alis.Reactive.PlanModel
         internal ObjectMemberKey Member => _operation.Member;
         internal MethodSignature Signature { get; }
 
-        internal JsMethodContract ToJsMethodContract() =>
-            PluginOperationContract.Create(_operation, Signature).ToJsMethodContract();
+        internal ObjectMethodContract ToObjectMethodContract() =>
+            PluginOperationContract.Create(_operation, Signature).ToObjectMethodContract();
 
         internal static PluginMethodRequirement Function(PluginOperationId operation, Shape returns)
         {
@@ -423,8 +423,8 @@ namespace Alis.Reactive.PlanModel
 
         internal PluginName PluginName => _property.PluginName;
 
-        internal JsPropertyContract ToJsPropertyContract() =>
-            PluginPropertyContract.Create(_property, _shape).ToJsPropertyContract();
+        internal ObjectPropertyContract ToObjectPropertyContract() =>
+            PluginPropertyContract.Create(_property, _shape).ToObjectPropertyContract();
 
         internal static PluginPropertyRequirement Read(PluginPropertyId property, Shape shape)
         {

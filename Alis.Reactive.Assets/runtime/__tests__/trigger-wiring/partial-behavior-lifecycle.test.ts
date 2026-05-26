@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../lifecycle/boot";
-import type { BranchCase, Component, Condition, JsType, Plan, Reaction, Shape, ValueProducer } from "../../types";
+import type { BranchCase, ComponentObject, Condition, BrowserObjectContract, Plan, Reaction, Shape, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 const booleanShape: Shape = { kind: "boolean" };
@@ -55,7 +55,7 @@ describe("partial behavior lifecycle", () => {
   });
 });
 
-function rootPlan(planId: string, components: Record<string, Component>): Plan {
+function rootPlan(planId: string, components: Record<string, ComponentObject>): Plan {
   return {
     version: 3,
     planId,
@@ -80,7 +80,7 @@ function partialPlan(
   };
 }
 
-function nativeInputType(): JsType {
+function nativeInputType(): BrowserObjectContract {
   return {
     properties: {
       textContent: {
@@ -94,7 +94,7 @@ function nativeInputType(): JsType {
   };
 }
 
-function displayComponent(id: string): Component {
+function displayComponent(id: string): ComponentObject {
   return {
     id,
     vendor: "native",

@@ -1,8 +1,8 @@
 import { vi } from "vitest";
 import type { MergeHooks } from "../../lifecycle/merge-plan";
-import type { Behavior, Component, ComponentValidation, JsType, PathSegment, Plan, Shape, StructuredPath } from "../../types";
+import type { Behavior, ComponentObject, ComponentValidation, BrowserObjectContract, PathSegment, Plan, Shape, StructuredPath } from "../../types";
 
-export function jsType(): JsType {
+export function objectContract(): BrowserObjectContract {
   return {
     properties: {},
     methods: {},
@@ -10,18 +10,18 @@ export function jsType(): JsType {
   };
 }
 
-export function jsTypeWithReadableProperty(member: string): JsType {
-  return jsTypeWithPropertyAccess(member, "read");
+export function objectContractWithReadableProperty(member: string): BrowserObjectContract {
+  return objectContractWithPropertyAccess(member, "read");
 }
 
-export function jsTypeWithWritableProperty(member: string): JsType {
-  return jsTypeWithPropertyAccess(member, "write");
+export function objectContractWithWritableProperty(member: string): BrowserObjectContract {
+  return objectContractWithPropertyAccess(member, "write");
 }
 
-export function jsTypeWithPropertyAccess(
+export function objectContractWithPropertyAccess(
   member: string,
-  access: JsType["properties"][string]["access"],
-): JsType {
+  access: BrowserObjectContract["properties"][string]["access"],
+): BrowserObjectContract {
   return {
     properties: {
       [member]: {
@@ -35,10 +35,10 @@ export function jsTypeWithPropertyAccess(
   };
 }
 
-export function jsTypeWithPropertyShape(
+export function objectContractWithPropertyShape(
   member: string,
-  shape: JsType["properties"][string]["shape"],
-): JsType {
+  shape: BrowserObjectContract["properties"][string]["shape"],
+): BrowserObjectContract {
   return {
     properties: {
       [member]: {
@@ -52,11 +52,11 @@ export function jsTypeWithPropertyShape(
   };
 }
 
-export function jsTypeWithMethodShape(
+export function objectContractWithMethodShape(
   member: string,
   argumentShape: Shape,
   returnShape: Shape,
-): JsType {
+): BrowserObjectContract {
   return {
     properties: {},
     methods: {
@@ -73,7 +73,7 @@ export function jsTypeWithMethodShape(
 export function component(
   id: string,
   type = `native.element.${id}`,
-): Component {
+): ComponentObject {
   return {
     id,
     vendor: "native",
@@ -84,7 +84,7 @@ export function component(
   };
 }
 
-export function registeredInputComponent(id: string, type = `native.component.${id}`): Component {
+export function registeredInputComponent(id: string, type = `native.component.${id}`): ComponentObject {
   return {
     id,
     vendor: "native",
@@ -111,7 +111,7 @@ function pathSegment(part: string): PathSegment {
   return { kind: "property", name: part };
 }
 
-export function layoutComponent(id: string, type = `native.component.${id}`): Component {
+export function layoutComponent(id: string, type = `native.component.${id}`): ComponentObject {
   return {
     id,
     vendor: "native",
@@ -122,7 +122,7 @@ export function layoutComponent(id: string, type = `native.component.${id}`): Co
   };
 }
 
-export function validationContainer(id: string, validationRules: ComponentValidation[]): Component {
+export function validationContainer(id: string, validationRules: ComponentValidation[]): ComponentObject {
   return {
     id,
     vendor: "native",
@@ -131,7 +131,6 @@ export function validationContainer(id: string, validationRules: ComponentValida
     binding: { kind: "none" },
     container: {
       kind: "validation-container",
-      components: [],
       validationRules,
     },
   };
@@ -147,6 +146,7 @@ export function validationRule(componentKey: string, message = `${componentKey} 
         name: "required",
         message,
         execution: {
+          target: "none",
           constraint: { kind: "none" },
           otherValue: { kind: "none" },
           activation: { kind: "always" },
@@ -178,8 +178,8 @@ export function rootPlan(planId: string): Plan {
 export function partialPlan(
   planId: string,
   entries: {
-    readonly types?: Record<string, JsType>;
-    readonly components?: Record<string, Component>;
+    readonly types?: Record<string, BrowserObjectContract>;
+    readonly components?: Record<string, ComponentObject>;
     readonly behaviors?: Behavior[];
   },
 ): Plan {

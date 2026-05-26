@@ -2,7 +2,7 @@
 // V3: uses component IDs directly (not ValidationField objects).
 // Error spans found by predictable ID: {componentDomId}_error (O(1) lookup).
 // Summary found by predictable ID: {planId_sanitized}_validation_summary.
-// No fallbacks. No querySelector scanning. ID-aware only.
+// Summary entries are matched by dataset value, not CSS selector interpolation.
 
 const ERR_CLASS = "alis-has-error";
 
@@ -44,8 +44,12 @@ export function addToSummary(summaryEl: HTMLElement, name: string, message: stri
 }
 
 export function removeSummaryEntry(summaryEl: HTMLElement, name: string): void {
-  const entry = summaryEl.querySelector(`[data-valmsg-summary-for="${name}"]`);
+  const entry = findSummaryEntry(summaryEl, name);
   if (entry) entry.remove();
+}
+
+export function hasSummaryEntry(summaryEl: HTMLElement, name: string): boolean {
+  return findSummaryEntry(summaryEl, name) !== undefined;
 }
 
 export function clearSummary(summaryEl: HTMLElement): void {
@@ -92,4 +96,13 @@ export function showServerErrorInline(
 
 function findErrorSpan(componentDomId: string): HTMLElement | null {
   return document.getElementById(componentDomId + "_error");
+}
+
+function findSummaryEntry(summaryEl: HTMLElement, name: string): HTMLElement | undefined {
+  for (const child of summaryEl.children) {
+    if (!(child instanceof HTMLElement)) continue;
+    if (child.dataset.valmsgSummaryFor === name) return child;
+  }
+
+  return undefined;
 }

@@ -1,6 +1,6 @@
 import type {
-  Component,
-  JsType,
+  BrowserObjectContract,
+  ComponentObject,
   Plan,
   RuntimeObjectSource,
 } from "../types";
@@ -12,7 +12,7 @@ export { RuntimeComponentReadinessError } from "./component-runtime";
 
 const cache = new WeakMap<Plan, RuntimePlan>();
 
-type RuntimeValidationContainer = Extract<Component["container"], { kind: "validation-container" }>;
+type RuntimeValidationContainer = Extract<ComponentObject["container"], { kind: "validation-container" }>;
 
 type RuntimeResolutionTarget =
   | { readonly kind: "component"; readonly key: string }
@@ -45,13 +45,13 @@ export class RuntimeResolutionError extends Error {
 
 export class RuntimePlan {
   readonly components: RuntimeComponentCatalog;
-  readonly types: RuntimeTypeCatalog;
+  readonly objectContracts: RuntimeObjectContractCatalog;
   readonly plugins: RuntimePluginCatalog;
 
   private constructor(readonly document: Plan) {
-    this.types = new RuntimeTypeCatalog(document);
-    this.components = new RuntimeComponentCatalog(document, this.types);
-    this.plugins = new RuntimePluginCatalog(this.types, browserPlugins);
+    this.objectContracts = new RuntimeObjectContractCatalog(document);
+    this.components = new RuntimeComponentCatalog(document, this.objectContracts);
+    this.plugins = new RuntimePluginCatalog(this.objectContracts, browserPlugins);
   }
 
   static from(plan: Plan): RuntimePlan {
@@ -81,31 +81,31 @@ export class RuntimePlan {
   }
 }
 
-export class RuntimeTypeCatalog {
+export class RuntimeObjectContractCatalog {
   constructor(private readonly plan: Plan) {}
 
-  require(typeKey: string): JsType {
-    const jsType = this.plan.types[typeKey];
-    if (!jsType) throw new Error(`[alis] type not found: ${typeKey}`);
-    return jsType;
+  require(typeKey: string): BrowserObjectContract {
+    const objectContract = this.plan.types[typeKey];
+    if (!objectContract) throw new Error(`[alis] object contract not found: ${typeKey}`);
+    return objectContract;
   }
 }
 
 export class RuntimeComponentCatalog {
   constructor(
     private readonly plan: Plan,
-    private readonly types: RuntimeTypeCatalog,
+    private readonly objectContracts: RuntimeObjectContractCatalog,
   ) {}
 
   find(componentKey: string): RuntimeComponent | undefined {
     const component = this.plan.components[componentKey];
     if (!component) return undefined;
-    return new RuntimeComponent(componentKey, component, this.types);
+    return new RuntimeComponent(componentKey, component, this.objectContracts);
   }
 
   entries(): RuntimeComponent[] {
     return Object.entries(this.plan.components)
-      .map(([key, component]) => new RuntimeComponent(key, component, this.types));
+      .map(([key, component]) => new RuntimeComponent(key, component, this.objectContracts));
   }
 
   requireComponent(componentKey: string): RuntimeComponent {
@@ -126,8 +126,8 @@ export class RuntimeComponentCatalog {
 export class RuntimeComponent {
   constructor(
     readonly key: string,
-    readonly definition: Component,
-    private readonly types: RuntimeTypeCatalog,
+    readonly definition: ComponentObject,
+    private readonly objectContracts: RuntimeObjectContractCatalog,
   ) {}
 
   get id(): string {
@@ -155,15 +155,15 @@ export class RuntimeComponent {
     return this.runtime().resolveRoot(this.element());
   }
 
-  jsType(): JsType {
-    return this.types.require(this.definition.type);
+  objectContract(): BrowserObjectContract {
+    return this.objectContracts.require(this.definition.type);
   }
 
   object(): RuntimeObject {
     return new RuntimeObject(
       `component "${this.key}"`,
       this.root(),
-      this.jsType(),
+      this.objectContract(),
     );
   }
 
@@ -174,20 +174,20 @@ export class RuntimeComponent {
 
 export class RuntimePluginCatalog {
   constructor(
-    private readonly types: RuntimeTypeCatalog,
+    private readonly objectContracts: RuntimeObjectContractCatalog,
     private readonly instances: BrowserPluginCatalog,
   ) {}
 
-  jsType(typeKey: string): JsType {
-    return this.types.require(typeKey);
+  objectContract(typeKey: string): BrowserObjectContract {
+    return this.objectContracts.require(typeKey);
   }
 
   object(pluginName: string, typeKey: string): RuntimeObject {
-    const jsType = this.jsType(typeKey);
+    const objectContract = this.objectContract(typeKey);
     return new RuntimeObject(
       `plugin "${pluginName}"`,
       this.instances.resolve(pluginName),
-      jsType,
+      objectContract,
     );
   }
 }

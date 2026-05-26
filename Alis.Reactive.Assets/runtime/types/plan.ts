@@ -6,8 +6,8 @@ export interface Plan {
   version: 3;
   planId: string;
   scope: PlanScope;
-  types: Record<string, JsType>;
-  components: Record<string, Component>;
+  types: Record<string, BrowserObjectContract>;
+  components: Record<string, ComponentObject>;
   behaviors: Behavior[];
 }
 
@@ -23,7 +23,7 @@ export interface PartialPlanScope {
   kind: "partial";
 }
 
-export interface JsType {
+export interface BrowserObjectContract {
   properties: Record<string, Property>;
   methods: Record<string, Method>;
   events: Record<string, Event>;
@@ -79,7 +79,7 @@ export interface Event {
 
 export type Vendor = string;
 
-export type Component =
+export type ComponentObject =
   | ObjectTargetComponent
   | OwnedDefinitionComponent
   | ValidationContainerComponentDefinition
@@ -90,8 +90,8 @@ export interface ObjectTargetComponent {
   vendor: Vendor;
   type: string;
   contribution: ObjectTargetComponentContribution;
-  binding: UnboundComponentBinding;
-  container: UnscopedComponentContainer;
+  binding: NoInputBinding;
+  container: NoValidationContainer;
 }
 
 export interface OwnedDefinitionComponent {
@@ -100,7 +100,7 @@ export interface OwnedDefinitionComponent {
   type: string;
   contribution: OwnedDefinitionComponentContribution;
   binding: RegisteredInputBinding;
-  container: UnscopedComponentContainer;
+  container: NoValidationContainer;
 }
 
 export interface ValidationContainerComponentDefinition {
@@ -108,7 +108,7 @@ export interface ValidationContainerComponentDefinition {
   vendor: Vendor;
   type: string;
   contribution: ValidationContainerComponentContribution;
-  binding: ComponentBinding;
+  binding: InputBinding;
   container: ValidationContainerScope;
 }
 
@@ -117,11 +117,11 @@ export interface LayoutObjectComponent {
   vendor: Vendor;
   type: string;
   contribution: LayoutObjectComponentContribution;
-  binding: UnboundComponentBinding;
-  container: UnscopedComponentContainer;
+  binding: NoInputBinding;
+  container: NoValidationContainer;
 }
 
-export type ComponentContributionIntent =
+export type ComponentRole =
   | ObjectTargetComponentContribution
   | OwnedDefinitionComponentContribution
   | ValidationContainerComponentContribution
@@ -143,11 +143,11 @@ export interface LayoutObjectComponentContribution {
   kind: "layout-object";
 }
 
-export type ComponentBinding =
-  | UnboundComponentBinding
+export type InputBinding =
+  | NoInputBinding
   | RegisteredInputBinding;
 
-export interface UnboundComponentBinding {
+export interface NoInputBinding {
   kind: "none";
 }
 
@@ -158,17 +158,16 @@ export interface RegisteredInputBinding {
   valueMember: string;
 }
 
-export type ComponentContainer =
-  | UnscopedComponentContainer
+export type ValidationContainerBinding =
+  | NoValidationContainer
   | ValidationContainerScope;
 
-export interface UnscopedComponentContainer {
+export interface NoValidationContainer {
   kind: "none";
 }
 
 export interface ValidationContainerScope {
   kind: "validation-container";
-  components: string[];
   validationRules: ComponentValidation[];
 }
 
@@ -305,6 +304,7 @@ export type ValidationRuleExecution =
   | PeerValidationRuleExecution;
 
 export interface NoOperandValidationRuleExecution {
+  target: "none";
   constraint: NoValidationRuleOperand;
   otherValue: NoValidationRuleOperand;
   activation: ValidationRuleActivation;
@@ -312,6 +312,7 @@ export interface NoOperandValidationRuleExecution {
 }
 
 export interface ScalarConstraintValidationRuleExecution {
+  target: "constraint";
   constraint: ScalarValidationConstraintOperand;
   otherValue: NoValidationRuleOperand;
   activation: ValidationRuleActivation;
@@ -319,6 +320,7 @@ export interface ScalarConstraintValidationRuleExecution {
 }
 
 export interface NumericConstraintValidationRuleExecution {
+  target: "constraint";
   constraint: NumericValidationConstraintOperand;
   otherValue: NoValidationRuleOperand;
   activation: ValidationRuleActivation;
@@ -326,6 +328,7 @@ export interface NumericConstraintValidationRuleExecution {
 }
 
 export interface TextConstraintValidationRuleExecution {
+  target: "constraint";
   constraint: TextValidationConstraintOperand;
   otherValue: NoValidationRuleOperand;
   activation: ValidationRuleActivation;
@@ -333,6 +336,7 @@ export interface TextConstraintValidationRuleExecution {
 }
 
 export interface RangeConstraintValidationRuleExecution {
+  target: "constraint";
   constraint: RangeValidationConstraintOperand;
   otherValue: NoValidationRuleOperand;
   activation: ValidationRuleActivation;
@@ -340,6 +344,7 @@ export interface RangeConstraintValidationRuleExecution {
 }
 
 export interface PeerValidationRuleExecution {
+  target: "peer";
   constraint: NoValidationRuleOperand;
   otherValue: PeerValidationRuleOperand;
   activation: ValidationRuleActivation;

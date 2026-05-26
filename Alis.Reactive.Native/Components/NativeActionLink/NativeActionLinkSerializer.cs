@@ -21,7 +21,7 @@ namespace Alis.Reactive.Native.Components
         {
             var planIdentity = PlanIdentity.Root(PlanId.Of("action-link"));
             var context = new PlanBuildContext(
-                planIdentity, new ComponentRegistrationCatalog());
+                planIdentity, new RegisteredInputComponents());
             var pb = new PipelineBuilder<TModel>(context);
             pipeline(pb);
 
@@ -86,21 +86,16 @@ namespace Alis.Reactive.Native.Components
                 throw new InvalidOperationException(
                     "NativeActionLink does not support chained requests.");
 
-            var lifecycle = RequestLifecycle.Create(
-                RequestReactionStages.From(
-                    request.Before,
-                    request.Success,
-                    request.Error,
-                    Array.Empty<Reaction>()),
-                RequestChain.Terminal);
-
             return Request.Create(
                 RequestEndpoint.To(HttpMethodName.From(request.Method), RequestUrl.Of(string.Empty)),
                 request.Input,
-                lifecycle,
-                RequestParameters.From(
-                    new Dictionary<string, ValueProducer>(),
-                    new Dictionary<string, ValueProducer>()),
+                request.Before,
+                request.Success,
+                request.Error,
+                Array.Empty<Reaction>(),
+                RequestChain.Terminal,
+                new Dictionary<string, ValueProducer>(),
+                new Dictionary<string, ValueProducer>(),
                 RequestValidationTarget.None);
         }
 

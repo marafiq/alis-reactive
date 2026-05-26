@@ -34,9 +34,17 @@ namespace Alis.Reactive.Validation
             if (field == null) throw new ArgumentNullException(nameof(field));
             if (rule == null) throw new ArgumentNullException(nameof(rule));
 
+            EnsureFields(rule.PeerFieldReferences);
             EnsureField(field);
             _fields[field.Path.Value].AddRule(rule);
         }
+
+        internal void AddRule(
+            ClientValidationFieldReference field,
+            ValidationRuleName name,
+            ValidationMessage message,
+            ValidationRuleDetails details) =>
+            AddRule(field, new ValidationRule(name, message, details));
 
         internal IReadOnlyList<ClientValidationField> ToFields() =>
             _fields.Values.Select(field => field.ToField()).ToArray();

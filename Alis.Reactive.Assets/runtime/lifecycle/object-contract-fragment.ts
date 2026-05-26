@@ -1,11 +1,11 @@
-import type { JsType, Shape } from "../types";
+import type { BrowserObjectContract, Shape } from "../types";
 import { describePlanContribution } from "./plan-contribution-source";
 import type { ContributionId, PlanContributionSource, PlanId } from "./plan-contribution-source";
 
 export class BrowserObjectContracts {
   private readonly owners = new Map<string, BrowserObjectContractFragments>();
 
-  record(planId: PlanId, key: string, type: JsType, source: PlanContributionSource): void {
+  record(planId: PlanId, key: string, type: BrowserObjectContract, source: PlanContributionSource): void {
     const fragment = BrowserObjectContractFragment.from(type);
     const ownershipKey = this.ownershipKey(planId, key);
     if (source.kind === "root") {
@@ -30,7 +30,7 @@ export class BrowserObjectContracts {
     record.addPartial(source.contributionId, fragment);
   }
 
-  recordRoot(planId: PlanId, key: string, type: JsType): void {
+  recordRoot(planId: PlanId, key: string, type: BrowserObjectContract): void {
     this.owners.set(
       this.ownershipKey(planId, key),
       BrowserObjectContractFragments.root(BrowserObjectContractFragment.from(type)),
@@ -115,30 +115,30 @@ class BrowserObjectContractFragments {
 }
 
 export class BrowserObjectContractFragment {
-  private constructor(private readonly value: JsType) {}
+  private constructor(private readonly value: BrowserObjectContract) {}
 
-  static from(type: JsType): BrowserObjectContractFragment {
-    return new BrowserObjectContractFragment(cloneJsType(type));
+  static from(type: BrowserObjectContract): BrowserObjectContractFragment {
+    return new BrowserObjectContractFragment(cloneObjectContract(type));
   }
 
   canMerge(other: BrowserObjectContractFragment): boolean {
-    return canMergeJsTypes(this.value, other.value);
+    return canMergeObjectContracts(this.value, other.value);
   }
 
   merge(other: BrowserObjectContractFragment): BrowserObjectContractFragment {
-    return new BrowserObjectContractFragment(mergeJsTypes(this.value, other.value));
+    return new BrowserObjectContractFragment(mergeObjectContracts(this.value, other.value));
   }
 
-  toJsType(): JsType {
-    return cloneJsType(this.value);
+  toObjectContract(): BrowserObjectContract {
+    return cloneObjectContract(this.value);
   }
 }
 
-function cloneJsType(type: JsType): JsType {
-  return mergeJsTypes(emptyJsType(), type);
+function cloneObjectContract(type: BrowserObjectContract): BrowserObjectContract {
+  return mergeObjectContracts(emptyObjectContract(), type);
 }
 
-function emptyJsType(): JsType {
+function emptyObjectContract(): BrowserObjectContract {
   return {
     properties: {},
     methods: {},
@@ -146,14 +146,14 @@ function emptyJsType(): JsType {
   };
 }
 
-function canMergeJsTypes(existing: JsType, incoming: JsType): boolean {
+function canMergeObjectContracts(existing: BrowserObjectContract, incoming: BrowserObjectContract): boolean {
   return canMergeMemberContracts(existing.properties, incoming.properties, canMergeProperties)
     && canMergeMemberContracts(existing.methods, incoming.methods, canMergeMethods)
     && canMergeMemberContracts(existing.events, incoming.events, canMergeEvents);
 }
 
-export function mergeJsTypes(existing: JsType | undefined, incoming: JsType): JsType {
-  if (existing === undefined) return cloneJsType(incoming);
+export function mergeObjectContracts(existing: BrowserObjectContract | undefined, incoming: BrowserObjectContract): BrowserObjectContract {
+  if (existing === undefined) return cloneObjectContract(incoming);
 
   return {
     properties: mergeMemberContracts(existing.properties, incoming.properties, mergeProperties),
@@ -192,16 +192,16 @@ function mergeMemberContracts<T>(
   return merged;
 }
 
-type JsProperty = JsType["properties"][string];
-type JsMethod = JsType["methods"][string];
-type JsEvent = JsType["events"][string];
+type ContractProperty = BrowserObjectContract["properties"][string];
+type ContractMethod = BrowserObjectContract["methods"][string];
+type ContractEvent = BrowserObjectContract["events"][string];
 
-function canMergeProperties(existing: JsProperty, incoming: JsProperty): boolean {
+function canMergeProperties(existing: ContractProperty, incoming: ContractProperty): boolean {
   return stableJson(existing.path) === stableJson(incoming.path)
     && mergeObjectContractShapes(existing.shape, incoming.shape) !== undefined;
 }
 
-function mergeProperties(existing: JsProperty, incoming: JsProperty): JsProperty {
+function mergeProperties(existing: ContractProperty, incoming: ContractProperty): ContractProperty {
   if (stableJson(existing.path) !== stableJson(incoming.path)) {
     throw new Error("[alis] incompatible property contracts cannot be merged");
   }
@@ -219,20 +219,20 @@ function mergeProperties(existing: JsProperty, incoming: JsProperty): JsProperty
 }
 
 function mergeMemberAccess(
-  existing: JsProperty["access"],
-  incoming: JsProperty["access"],
-): JsProperty["access"] {
+  existing: ContractProperty["access"],
+  incoming: ContractProperty["access"],
+): ContractProperty["access"] {
   if (existing === incoming) return existing;
   return "readwrite";
 }
 
-function canMergeMethods(existing: JsMethod, incoming: JsMethod): boolean {
+function canMergeMethods(existing: ContractMethod, incoming: ContractMethod): boolean {
   return stableJson(existing.path) === stableJson(incoming.path)
     && mergeMethodArguments(existing.arguments, incoming.arguments) !== undefined
     && mergeObjectContractShapes(existing.returns, incoming.returns) !== undefined;
 }
 
-function mergeMethods(existing: JsMethod, incoming: JsMethod): JsMethod {
+function mergeMethods(existing: ContractMethod, incoming: ContractMethod): ContractMethod {
   if (stableJson(existing.path) !== stableJson(incoming.path)) {
     throw new Error("[alis] incompatible method contracts cannot be merged");
   }
@@ -251,9 +251,9 @@ function mergeMethods(existing: JsMethod, incoming: JsMethod): JsMethod {
 }
 
 function mergeMethodArguments(
-  existing: JsMethod["arguments"],
-  incoming: JsMethod["arguments"],
-): JsMethod["arguments"] | undefined {
+  existing: ContractMethod["arguments"],
+  incoming: ContractMethod["arguments"],
+): ContractMethod["arguments"] | undefined {
   if (existing.kind === "open") return incoming;
   if (incoming.kind === "open") return existing;
 
@@ -269,11 +269,11 @@ function mergeMethodArguments(
   return { kind: "exact", shapes };
 }
 
-function canMergeEvents(existing: JsEvent, incoming: JsEvent): boolean {
+function canMergeEvents(existing: ContractEvent, incoming: ContractEvent): boolean {
   return stableJson(existing) === stableJson(incoming);
 }
 
-function mergeEvents(existing: JsEvent, incoming: JsEvent): JsEvent {
+function mergeEvents(existing: ContractEvent, incoming: ContractEvent): ContractEvent {
   if (!canMergeEvents(existing, incoming)) {
     throw new Error("[alis] incompatible event contracts cannot be merged");
   }

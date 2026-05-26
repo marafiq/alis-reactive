@@ -30,7 +30,7 @@ namespace Alis.Reactive
             plan.Context.WireComponentEvent(
                 target.IdForJson,
                 target.Vendor.Value,
-                descriptor.JsEvent,
+                descriptor.ObjectEvent,
                 pipelineBuilder.BuildReactions());
         }
     }

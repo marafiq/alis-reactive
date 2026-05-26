@@ -19,7 +19,7 @@ import { toString } from "../core/shape-convert";
 import { ruleFails } from "./rule-engine";
 import {
   showInline, clearInline,
-  addToSummary, removeSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
+  addToSummary, removeSummaryEntry, hasSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
   showServerErrorInline,
 } from "./error-display";
 import { ExecutionContext } from "../domain/execution-context";
@@ -62,7 +62,7 @@ class RenderedValidationSummary extends ValidationSummary {
   }
 
   hasEntry(componentKey: string): boolean {
-    return this.element.querySelector(`[data-valmsg-summary-for="${componentKey}"]`) !== null;
+    return hasSummaryEntry(this.element, componentKey);
   }
 
   showWhen(hasErrors: boolean): void {
@@ -329,7 +329,7 @@ function handleMissingComponent(
   surface: ValidationSurface,
 ): boolean {
   log.trace("component.not-found", { component: cv.component });
-  if (allRulesConditionallySkipped(cv.rules, surface)) return true;
+  if (allRulesInactiveForUnmountedField(cv.rules, surface)) return true;
   const message = firstRuleMessage(cv);
   if (message !== undefined) {
     surface.summary.add(cv.component, message);
@@ -349,7 +349,7 @@ function resolveFieldElement(
     return { done: false, element: component.element() };
   } catch (e) {
     if (!isResolutionError(e)) throw e;
-    if (allRulesConditionallySkipped(cv.rules, surface)) return { done: true, result: true };
+    if (allRulesInactiveForUnmountedField(cv.rules, surface)) return { done: true, result: true };
     const message = firstRuleMessage(cv);
     if (message !== undefined) {
       surface.summary.add(cv.component, message);
@@ -419,10 +419,10 @@ function isResolutionError(e: unknown): boolean {
 
 // -- Helpers --
 
-function allRulesConditionallySkipped(rules: ValidationRule[], surface: ValidationSurface): boolean {
+function allRulesInactiveForUnmountedField(rules: ValidationRule[], surface: ValidationSurface): boolean {
   if (rules.length === 0) return true;
   for (const rule of rules) {
-    if (!isRuleSkippedForUnmountedField(rule.execution.activation, surface)) return false;
+    if (!isRuleInactiveWhenFieldIsUnmounted(rule.execution.activation, surface)) return false;
   }
   return true;
 }
@@ -438,7 +438,7 @@ function isRuleActive(
   }
 }
 
-function isRuleSkippedForUnmountedField(
+function isRuleInactiveWhenFieldIsUnmounted(
   activation: PlanValidationRuleActivation,
   surface: ValidationSurface,
 ): boolean {
@@ -474,7 +474,7 @@ function failsRule(
 type PeerTargetValidationRule = PeerEqualityValidationRule | PeerOrderedComparisonValidationRule;
 
 function hasPeerTarget(rule: ValidationRule): rule is PeerTargetValidationRule {
-  return rule.execution.otherValue.kind === "value";
+  return rule.execution.target === "peer";
 }
 
 function clearContainerErrors(

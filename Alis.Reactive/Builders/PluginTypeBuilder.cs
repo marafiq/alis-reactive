@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Configures a plugin's JsType members during plan construction.
+    /// Configures a plugin's BrowserObjectContract members during plan construction.
     /// Used by <c>plan.RegisterPlugin("name", p =&gt; p.Method&lt;string&gt;("getToken"))</c>.
     /// </summary>
     public sealed class PluginTypeBuilder

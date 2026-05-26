@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { evaluateValue } from "../core/evaluate";
 import { registerPlugin } from "../core/plugin-registry";
 import { RuntimeResolutionError } from "../domain/runtime-plan";
-import type { Component, JsType, Plan, Shape, ValueProducer } from "../types";
+import type { ComponentObject, BrowserObjectContract, Plan, Shape, ValueProducer } from "../types";
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
@@ -26,8 +26,8 @@ const numberArrayShape: Shape = { kind: "array", item: numberShape };
 const rawShape: Shape = { kind: "raw" };
 
 function plan(entries: {
-  readonly types?: Record<string, JsType>;
-  readonly components?: Record<string, Component>;
+  readonly types?: Record<string, BrowserObjectContract>;
+  readonly components?: Record<string, ComponentObject>;
 } = {}): Plan {
   return {
     version: 3,
@@ -180,7 +180,7 @@ describe("evaluateValue", () => {
       return this.value + suffix;
     };
 
-    const jsType: JsType = {
+    const objectContract: BrowserObjectContract = {
       properties: {
         value: {
           path: [{ kind: "property", name: "value" }],
@@ -197,7 +197,7 @@ describe("evaluateValue", () => {
       },
       events: {},
     };
-    const component: Component = {
+    const component: ComponentObject = {
       id: "resident-name",
       vendor: "native",
       type: "native.textbox",
@@ -206,7 +206,7 @@ describe("evaluateValue", () => {
       container: { kind: "none" },
     };
     const runtimePlan = plan({
-      types: { "native.textbox": jsType },
+      types: { "native.textbox": objectContract },
       components: { "resident-name": component },
     });
 
@@ -236,7 +236,7 @@ describe("evaluateValue", () => {
 
   it("rejects reads against write-only component properties", () => {
     document.body.innerHTML = `<input id="resident-name" value="Ada" />`;
-    const jsType: JsType = {
+    const objectContract: BrowserObjectContract = {
       properties: {
         value: {
           path: [{ kind: "property", name: "value" }],
@@ -257,7 +257,7 @@ describe("evaluateValue", () => {
     };
 
     expect(() => evaluateValue(producer, plan({
-      types: { "native.textbox": jsType },
+      types: { "native.textbox": objectContract },
       components: {
         "resident-name": {
           id: "resident-name",
@@ -273,7 +273,7 @@ describe("evaluateValue", () => {
 
   it("rejects declared runtime object property paths that are not present on the JS object", () => {
     document.body.innerHTML = `<div id="resident-name"></div>`;
-    const jsType: JsType = {
+    const objectContract: BrowserObjectContract = {
       properties: {
         value: {
           path: [{ kind: "property", name: "value" }],
@@ -294,7 +294,7 @@ describe("evaluateValue", () => {
     };
 
     expect(() => evaluateValue(producer, plan({
-      types: { "native.textbox": jsType },
+      types: { "native.textbox": objectContract },
       components: {
         "resident-name": {
           id: "resident-name",
@@ -330,7 +330,7 @@ describe("evaluateValue", () => {
   });
 
   it("throws typed runtime resolution errors for missing component elements", () => {
-    const jsType: JsType = {
+    const objectContract: BrowserObjectContract = {
       properties: {
         value: {
           path: [{ kind: "property", name: "value" }],
@@ -354,7 +354,7 @@ describe("evaluateValue", () => {
 
     try {
       evaluateValue(producer, plan({
-        types: { "native.textbox": jsType },
+        types: { "native.textbox": objectContract },
         components: {
           "resident-name": {
             id: "resident-name",
@@ -380,7 +380,7 @@ describe("evaluateValue", () => {
     registerPlugin(pluginName, (value: string): string =>
       value.toLowerCase().replace(/\s+/g, "-"));
 
-    const pluginType: JsType = {
+    const pluginType: BrowserObjectContract = {
       properties: {},
       methods: {
         $call: {
@@ -412,7 +412,7 @@ describe("evaluateValue", () => {
     const pluginName = "authRuntimeProperty";
     registerPlugin(pluginName, { token: "abc-123" });
 
-    const pluginType: JsType = {
+    const pluginType: BrowserObjectContract = {
       properties: {
         token: {
           path: [{ kind: "property", name: "token" }],
@@ -445,7 +445,7 @@ describe("evaluateValue", () => {
     element.submit = function submit(_label: string): void {
     };
 
-    const jsType: JsType = {
+    const objectContract: BrowserObjectContract = {
       properties: {},
       methods: {
         submit: {
@@ -470,7 +470,7 @@ describe("evaluateValue", () => {
     };
 
     expect(() => evaluateValue(producer, plan({
-      types: { "native.button": jsType },
+      types: { "native.button": objectContract },
       components: {
         save: {
           id: "save",
@@ -493,7 +493,7 @@ describe("evaluateValue", () => {
       return `${typeof age}:${age}`;
     };
 
-    const jsType: JsType = {
+    const objectContract: BrowserObjectContract = {
       properties: {},
       methods: {
         describeAge: {
@@ -518,7 +518,7 @@ describe("evaluateValue", () => {
     };
 
     expect(evaluateValue(producer, plan({
-      types: { "native.button": jsType },
+      types: { "native.button": objectContract },
       components: {
         save: {
           id: "save",

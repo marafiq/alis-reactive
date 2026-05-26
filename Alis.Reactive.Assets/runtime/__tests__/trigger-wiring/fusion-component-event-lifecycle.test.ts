@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../lifecycle/boot";
-import type { Component, JsType, Plan, Reaction, Shape, ValueProducer } from "../../types";
+import type { ComponentObject, BrowserObjectContract, Plan, Reaction, Shape, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -85,7 +85,7 @@ class FakeFusionRoot {
   }
 }
 
-function rootPlan(planId: string, components: Record<string, Component>): Plan {
+function rootPlan(planId: string, components: Record<string, ComponentObject>): Plan {
   return {
     version: 3,
     planId,
@@ -110,7 +110,7 @@ function partialPlan(
   };
 }
 
-function nativeTextType(): JsType {
+function nativeTextType(): BrowserObjectContract {
   return {
     properties: {
       textContent: {
@@ -124,7 +124,7 @@ function nativeTextType(): JsType {
   };
 }
 
-function fusionEventType(): JsType {
+function fusionEventType(): BrowserObjectContract {
   return {
     properties: {},
     methods: {},
@@ -137,7 +137,7 @@ function fusionEventType(): JsType {
   };
 }
 
-function displayComponent(id: string): Component {
+function displayComponent(id: string): ComponentObject {
   return {
     id,
     vendor: "native",
@@ -148,7 +148,7 @@ function displayComponent(id: string): Component {
   };
 }
 
-function fusionComponent(id: string): Component {
+function fusionComponent(id: string): ComponentObject {
   return {
     id,
     vendor: "fusion",

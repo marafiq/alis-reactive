@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { registerComponentRuntime, type ComponentRuntimeDriver } from "../domain/component-runtime";
 import { executeReaction } from "../execution/execute";
 import type {
-  Component, Condition, ExecContext, JsType, JsonValue, MemberAccess, Plan, Reaction, Shape, ValueProducer,
+  ComponentObject, Condition, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, Plan, Reaction, Shape, ValueProducer,
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -77,7 +77,7 @@ function textBoxPlan(): Plan {
 }
 
 function textBoxPlanWithValueAccess(access: MemberAccess): Plan {
-  const type: JsType = {
+  const type: BrowserObjectContract = {
     properties: {
       value: {
         path: [{ kind: "property", name: "value" }],
@@ -94,7 +94,7 @@ function textBoxPlanWithValueAccess(access: MemberAccess): Plan {
     },
     events: {},
   };
-  const component: Component = {
+  const component: ComponentObject = {
     id: "resident-name",
     vendor: "native",
     type: "native.textbox",
@@ -114,7 +114,7 @@ function textBoxPlanWithValueAccess(access: MemberAccess): Plan {
 }
 
 function customWidgetPlan(): Plan {
-  const type: JsType = {
+  const type: BrowserObjectContract = {
     properties: {
       value: {
         path: [{ kind: "property", name: "value" }],
@@ -210,7 +210,7 @@ describe("executeReaction member targets", () => {
 
   it("prepares property writes through the declared target shape", () => {
     document.body.innerHTML = `<input id="active-status" type="checkbox" />`;
-    const type: JsType = {
+    const type: BrowserObjectContract = {
       properties: {
         checked: {
           path: [{ kind: "property", name: "checked" }],
@@ -252,7 +252,7 @@ describe("executeReaction member targets", () => {
 
   it("writes array values to text properties using browser string semantics", () => {
     document.body.innerHTML = `<span id="allergy-echo"></span>`;
-    const type: JsType = {
+    const type: BrowserObjectContract = {
       properties: {
         text: {
           path: [{ kind: "property", name: "textContent" }],

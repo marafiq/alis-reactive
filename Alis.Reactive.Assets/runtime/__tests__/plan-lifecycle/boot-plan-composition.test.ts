@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { composeInitialPlans } from "../../lifecycle/merge-plan";
-import type { Component } from "../../types";
+import type { ComponentObject } from "../../types";
 import {
   behavior,
   component,
-  jsType,
-  jsTypeWithReadableProperty,
-  jsTypeWithWritableProperty,
+  objectContract,
+  objectContractWithReadableProperty,
+  objectContractWithWritableProperty,
   layoutComponent,
   partialPlan,
   registeredInputComponent,
@@ -25,12 +25,12 @@ describe("boot plan composition", () => {
     const composed = composeInitialPlans([
       {
         ...rootPlan(residentPlanId),
-        types: { "native.element.resident-name": jsType() },
+        types: { "native.element.resident-name": objectContract() },
         components: { "resident-name": component("resident-name") },
         behaviors: [residentReady],
       },
       partialPlan(residentPlanId, {
-        types: { "native.element.address-line": jsType() },
+        types: { "native.element.address-line": objectContract() },
         components: { "address-line": component("address-line") },
         behaviors: [addressReady],
       }),
@@ -57,13 +57,13 @@ describe("boot plan composition", () => {
 
     const composed = composeInitialPlans([
       partialPlan(planId, {
-        types: { "native.element.address-line": jsType() },
+        types: { "native.element.address-line": objectContract() },
         components: { "address-line": component("address-line") },
         behaviors: [partialReady],
       }),
       {
         ...rootPlan(planId),
-        types: { "native.element.resident-name": jsType() },
+        types: { "native.element.resident-name": objectContract() },
         components: { "resident-name": component("resident-name") },
         behaviors: [rootReady],
       },
@@ -82,12 +82,12 @@ describe("boot plan composition", () => {
 
     const composed = composeInitialPlans([
       partialPlan(planId, {
-        types: { [typeKey]: jsTypeWithWritableProperty("value") },
+        types: { [typeKey]: objectContractWithWritableProperty("value") },
         components: { [componentId]: component(componentId, typeKey) },
       }),
       {
         ...rootPlan(planId),
-        types: { [typeKey]: jsTypeWithReadableProperty("value") },
+        types: { [typeKey]: objectContractWithReadableProperty("value") },
         components: { [componentId]: registeredInputComponent(componentId, typeKey) },
       },
     ]);
@@ -104,11 +104,11 @@ describe("boot plan composition", () => {
     const composed = composeInitialPlans([
       {
         ...rootPlan(planId),
-        types: { [typeKey]: jsTypeWithReadableProperty("value") },
+        types: { [typeKey]: objectContractWithReadableProperty("value") },
         components: { [componentId]: registeredInputComponent(componentId, typeKey) },
       },
       partialPlan(planId, {
-        types: { [typeKey]: jsTypeWithWritableProperty("value") },
+        types: { [typeKey]: objectContractWithWritableProperty("value") },
         components: { [componentId]: component(componentId, typeKey) },
       }),
     ]);
@@ -125,11 +125,11 @@ describe("boot plan composition", () => {
     const composed = composeInitialPlans([
       {
         ...rootPlan(planId),
-        types: { [typeKey]: jsTypeWithReadableProperty("value") },
+        types: { [typeKey]: objectContractWithReadableProperty("value") },
         components: { [componentId]: registeredInputComponent(componentId, typeKey) },
       },
       partialPlan(planId, {
-        types: { [typeKey]: jsTypeWithWritableProperty("value") },
+        types: { [typeKey]: objectContractWithWritableProperty("value") },
         components: { [componentId]: registeredInputComponent(componentId, typeKey) },
       }),
     ]);
@@ -145,12 +145,12 @@ describe("boot plan composition", () => {
 
     const composed = composeInitialPlans([
       partialPlan(planId, {
-        types: { [typeKey]: jsTypeWithWritableProperty("value") },
+        types: { [typeKey]: objectContractWithWritableProperty("value") },
         components: { [componentId]: registeredInputComponent(componentId, typeKey) },
       }),
       {
         ...rootPlan(planId),
-        types: { [typeKey]: jsTypeWithReadableProperty("value") },
+        types: { [typeKey]: objectContractWithReadableProperty("value") },
         components: { [componentId]: registeredInputComponent(componentId, typeKey) },
       },
     ]);
@@ -167,11 +167,11 @@ describe("boot plan composition", () => {
     const composed = composeInitialPlans([
       {
         ...rootPlan(planId),
-        types: { [typeKey]: jsTypeWithWritableProperty("title") },
+        types: { [typeKey]: objectContractWithWritableProperty("title") },
         components: { [componentId]: layoutComponent(componentId, typeKey) },
       },
       partialPlan(planId, {
-        types: { [typeKey]: jsTypeWithWritableProperty("content") },
+        types: { [typeKey]: objectContractWithWritableProperty("content") },
         components: { [componentId]: layoutComponent(componentId, typeKey) },
       }),
     ]);
@@ -187,12 +187,12 @@ describe("boot plan composition", () => {
 
     const composed = composeInitialPlans([
       partialPlan(planId, {
-        types: { [typeKey]: jsTypeWithWritableProperty("content") },
+        types: { [typeKey]: objectContractWithWritableProperty("content") },
         components: { [componentId]: layoutComponent(componentId, typeKey) },
       }),
       {
         ...rootPlan(planId),
-        types: { [typeKey]: jsTypeWithWritableProperty("title") },
+        types: { [typeKey]: objectContractWithWritableProperty("title") },
         components: { [componentId]: layoutComponent(componentId, typeKey) },
       },
     ]);
@@ -273,8 +273,8 @@ describe("boot plan composition", () => {
 });
 
 function expectValidationContainer(
-  container: Component["container"],
-): Extract<Component["container"], { kind: "validation-container" }> {
+  container: ComponentObject["container"],
+): Extract<ComponentObject["container"], { kind: "validation-container" }> {
   expect(container.kind).toBe("validation-container");
   if (container.kind !== "validation-container") {
     throw new Error(`Expected validation-container scope, received "${container.kind}"`);

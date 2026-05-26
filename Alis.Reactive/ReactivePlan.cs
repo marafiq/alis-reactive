@@ -11,8 +11,8 @@ namespace Alis.Reactive
     /// </summary>
     public sealed class ReactivePlan<TModel> where TModel : class
     {
-        private readonly ComponentRegistrationCatalog _registeredInputComponents =
-            new ComponentRegistrationCatalog();
+        private readonly RegisteredInputComponents _registeredInputComponents =
+            new RegisteredInputComponents();
 
         private readonly PlanId _planId = Alis.Reactive.PlanModel.PlanId.ForModel(typeof(TModel));
         private readonly PlanBuildContext _context;

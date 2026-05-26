@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { injectHtml } from "../execution/inject";
 import { getBootedPlan, resetBootStateForTests } from "../lifecycle/boot";
-import type { Component, InjectionTarget, JsType, Plan } from "../types";
+import type { ComponentObject, InjectionTarget, BrowserObjectContract, Plan } from "../types";
 
-function jsType(): JsType {
+function objectContract(): BrowserObjectContract {
   return {
     properties: {},
     methods: {},
@@ -11,7 +11,7 @@ function jsType(): JsType {
   };
 }
 
-function component(id: string, type = `native.element.${id}`): Component {
+function component(id: string, type = `native.element.${id}`): ComponentObject {
   return {
     id,
     vendor: "native",
@@ -27,7 +27,7 @@ function partialPlan(planId: string): Plan {
     version: 3,
     planId,
     scope: { kind: "partial" },
-    types: { "native.element.address-line": jsType() },
+    types: { "native.element.address-line": objectContract() },
     components: { "address-line": component("address-line") },
     behaviors: [],
   };

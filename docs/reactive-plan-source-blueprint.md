@@ -120,7 +120,7 @@ These are the concepts the rich model needs. They are fewer than the DSL methods
 | `ConditionGraph` | Guards: compare, all, any, not, confirm | `When`, `GuardBuilder`, validation condition builders | `Condition` union | `evaluateConditionInCurrentLane` |
 | `RequestPlan` | HTTP endpoint, gather payload, body format, route/header parameters, validation gate, response routes, chain | `Get/Post/Put/Delete`, `GatherBuilder`, `ResponseBuilder`, `ParallelBuilder` | `Request` | `executeRequest`, `gather`, `http-fetch` |
 | `ValidationProjection` | Client-executable fields, rules, operands, activation conditions, component binding | direct validation DSL, `FluentValidationAdapter`, `ReactiveValidator.WhenField*`, `.ProjectToClient` | component validation rules under validation container | validation orchestrator and rule engine |
-| `PluginBridge` | Plugin object contract and invocation language for behavior difficult to express in deterministic DSL | `RegisterPlugin`, `ReactivePlugin`, `PluginTypeBuilder`, plugin read/call builders | plugin `JsType` plus plugin source | plugin object resolver and runtime object call/read |
+| `PluginBridge` | Plugin object contract and invocation language for behavior difficult to express in deterministic DSL | `RegisterPlugin`, `ReactivePlugin`, `PluginTypeBuilder`, plugin read/call builders | plugin `BrowserObjectContract` plus plugin source | plugin object resolver and runtime object call/read |
 | `RenderContract` | HTML-only configuration and templates | component builders, Fusion templates | HTML only unless render registers ids/bindings/events | browser rendering; no behavior executor |
 
 The design rule is: every implementation type must name one of these concepts or a sub-concept directly required by one of them. Names such as registries, frames, validators, lifecycle requirements, or coverage helpers are not domain concepts unless they can be traced back to a DSL source row and a runtime role.
@@ -842,8 +842,8 @@ The central model is a deterministic browser object graph.
 
 | DSL source | Domain concept | JSON contract | Runtime role |
 | --- | --- | --- | --- |
-| `plan.RegisterPlugin(name, p => ...)` | String plugin contract | `JsType` plus plugin source | Resolve browser plugin by name |
-| `plan.RegisterPlugin(ReactivePlugin)` | Typed plugin contract | `JsType` plus plugin source | Resolve browser plugin by name |
+| `plan.RegisterPlugin(name, p => ...)` | String plugin contract | `BrowserObjectContract` plus plugin source | Resolve browser plugin by name |
+| `plan.RegisterPlugin(ReactivePlugin)` | Typed plugin contract | `BrowserObjectContract` plus plugin source | Resolve browser plugin by name |
 | `plan.RegisterPlugin<TPlugin>()` | Construct typed plugin contract | Same | Same |
 | `PluginTypeBuilder.Method<T>` | Member function returning value | Method member with return shape | Runtime object call in value evaluation |
 | `PluginTypeBuilder.Property<T>` | Readable property | Property member read access | Runtime object property read |
@@ -909,7 +909,7 @@ The implementation target is this source-derived model. These names are allowed 
 | `PlanArtifact` | Root view, same-model partial contribution, independent root, inline action plan | `ReactivePlan`, `ResolvePlan`, action-link render | `PlanDocument` |
 | `PlanIdentity` | Plan id plus root/partial scope | model type + plan scope | `planId`, `scope` |
 | `ContributionHandle` | Browser slot load/unload handle | partial slot load | not a component key; runtime bookkeeping only |
-| `BrowserObjectContract` | JS object capabilities: properties, methods, events/callbacks | component extensions, plugin registration, DOM element DSL | `JsType` |
+| `BrowserObjectContract` | JS object capabilities: properties, methods, events/callbacks | component extensions, plugin registration, DOM element DSL | `BrowserObjectContract` |
 | `ObjectProperty` | Read/write property with member name, JS path, shape, access | `Set*`, `Value`, plugin property, element text/html/hidden | `properties[member]` |
 | `ObjectMethod` | Callable method with member name, JS path, argument shapes, return shape | `FocusIn`, `DataBind`, plugin methods, event-arg commands | `methods[member]` |
 | `ObjectEvent` | Event/callback channel with payload contract | `TypedEvent<TArgs>` descriptors and `Reactive(...)` | `events[member]` |
@@ -922,7 +922,7 @@ The implementation target is this source-derived model. These names are allowed 
 | `GatherPlan` | What sources are read and where they are written | `GatherBuilder` and gather extensions | `RequestInput`, headers, route params |
 | `ResponseRoute` | Success/error/status branch | `ResponseBuilder` | response handlers |
 | `ValidationProjection` | Client-executable validation rules | direct validation DSL and FluentValidation projection | validation container rules |
-| `PluginContract` | Browser plugin object contract | `RegisterPlugin`, `ReactivePlugin`, `PluginTypeBuilder` | plugin `JsType` + source |
+| `PluginContract` | Browser plugin object contract | `RegisterPlugin`, `ReactivePlugin`, `PluginTypeBuilder` | plugin `BrowserObjectContract` + source |
 | `RenderContract` | Render-only configuration/templates | component builders, Fusion templates | HTML only unless it also registers id/event/input |
 
 ### Type Boundaries
@@ -952,7 +952,7 @@ The JSON should remain a small published language:
 | Domain concept | JSON discriminant |
 | --- | --- |
 | Plan artifact | `Plan.scope: root | partial` |
-| JS object contract | `JsType.properties`, `methods`, `events` |
+| JS object contract | `BrowserObjectContract.properties`, `methods`, `events` |
 | Component role | `Component.contribution: owned-definition | object-target | validation-container | layout-object` |
 | Input binding | `binding: registered-input` |
 | Validation container | `container: validation-container` |

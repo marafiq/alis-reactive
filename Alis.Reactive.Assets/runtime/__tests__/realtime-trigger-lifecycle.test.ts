@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../lifecycle/boot";
-import type { Component, JsType, Plan, Reaction, Shape } from "../types";
+import type { ComponentObject, BrowserObjectContract, Plan, Reaction, Shape } from "../types";
 
 const signalR = vi.hoisted(() => {
   class FakeHubConnection {
@@ -101,7 +101,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function nativeTextType(): JsType {
+function nativeTextType(): BrowserObjectContract {
   return {
     properties: {
       textContent: {
@@ -115,7 +115,7 @@ function nativeTextType(): JsType {
   };
 }
 
-function displayComponent(id: string): Component {
+function displayComponent(id: string): ComponentObject {
   return {
     id,
     vendor: "native",

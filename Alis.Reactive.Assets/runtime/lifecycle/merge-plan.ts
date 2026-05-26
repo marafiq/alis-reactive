@@ -12,7 +12,7 @@ import {
   removeValidationRuleContribution,
   type ValidationRuleContribution,
 } from "./component-contribution";
-import { BrowserObjectContracts, mergeJsTypes } from "./object-contract-fragment";
+import { BrowserObjectContracts, mergeObjectContracts } from "./object-contract-fragment";
 import {
   planContributionSourceFrom,
   type ContributionId,
@@ -61,7 +61,7 @@ class BootPlanAssembly {
     const source = planContributionSourceFrom(contribution);
 
     for (const [key, type] of Object.entries(contribution.types)) {
-      this.plan.types[key] = mergeJsTypes(this.plan.types[key], type);
+      this.plan.types[key] = mergeObjectContracts(this.plan.types[key], type);
     }
 
     this.mergeComponents(contribution, source);
@@ -179,7 +179,7 @@ export class AppliedBrowserPlans {
 
   private mergeTypes(incoming: Plan, target: Plan, source: PlanContributionSource): void {
     for (const [key, type] of Object.entries(incoming.types)) {
-      target.types[key] = mergeJsTypes(target.types[key], type);
+      target.types[key] = mergeObjectContracts(target.types[key], type);
       this.typeOwnership.record(incoming.planId, key, type, source);
     }
   }
@@ -244,7 +244,7 @@ export class AppliedBrowserPlans {
         continue;
       }
 
-      plan.types[key] = remainingContract.toJsType();
+      plan.types[key] = remainingContract.toObjectContract();
     }
   }
 

@@ -218,6 +218,12 @@ namespace Alis.Reactive.Validation
                 : new LiteralFieldComparisonValue(value);
         }
 
+        internal static FieldComparisonValue Text(string value) =>
+            new ShapedLiteralFieldComparisonValue(value, Shape.String);
+
+        internal static FieldComparisonValue Number(int value) =>
+            new ShapedLiteralFieldComparisonValue(value, Shape.Number);
+
         internal static FieldComparisonValue Array(IEnumerable<object?> items) =>
             new ArrayFieldComparisonValue(items);
 
@@ -247,6 +253,24 @@ namespace Alis.Reactive.Validation
 
             internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape) =>
                 ComparisonOperands.Binary(left, ValueProducer.LiteralRaw(_value, fieldShape), fieldShape);
+        }
+
+        private sealed class ShapedLiteralFieldComparisonValue : FieldComparisonValue
+        {
+            private readonly object? _value;
+            private readonly Shape _literalShape;
+
+            internal ShapedLiteralFieldComparisonValue(object? value, Shape literalShape)
+            {
+                _value = value;
+                _literalShape = literalShape ?? throw new ArgumentNullException(nameof(literalShape));
+            }
+
+            internal override FieldComparisonOperand ToOperand() =>
+                FieldComparisonOperand.Literal(_value);
+
+            internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape) =>
+                ComparisonOperands.Binary(left, ValueProducer.LiteralRaw(_value, _literalShape), fieldShape);
         }
 
         private sealed class ArrayFieldComparisonValue : FieldComparisonValue

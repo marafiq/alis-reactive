@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { executeRequest, routeHandlers } from "../execution/http";
 import type {
-  Component,
+  ComponentObject,
   RequestPayloadAssignment,
   RequestPayloadTarget,
-  JsType,
+  BrowserObjectContract,
   PathSegment,
   PayloadScope,
   Plan,
@@ -91,7 +91,7 @@ function request(overrides: Partial<Request>): Request {
 }
 
 function nativeTextPlan(componentKeys: string[]): Plan {
-  const textType: JsType = {
+  const textType: BrowserObjectContract = {
     properties: {
       textContent: {
         path: [{ kind: "property", name: "textContent" }],
@@ -116,7 +116,7 @@ function nativeTextPlan(componentKeys: string[]): Plan {
   };
 }
 
-function nativeComponent(id: string): Component {
+function nativeComponent(id: string): ComponentObject {
   return {
     id,
     vendor: "native",

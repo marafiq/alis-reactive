@@ -3,7 +3,7 @@ import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
 import {
   behavior,
   component,
-  jsType,
+  objectContract,
   mergeHooks,
   partialPlan,
   rootPlan,
@@ -20,7 +20,7 @@ describe("partial slot lifecycle", () => {
     const oldBehavior = behavior();
     browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
-        types: { "native.element.address-line": jsType() },
+        types: { "native.element.address-line": objectContract() },
         components: { "address-line": component("address-line") },
         behaviors: [oldBehavior],
       }),
@@ -35,7 +35,7 @@ describe("partial slot lifecycle", () => {
     const newBehavior = behavior();
     browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
-        types: { "native.element.zip-code": jsType() },
+        types: { "native.element.zip-code": objectContract() },
         components: { "zip-code": component("zip-code") },
         behaviors: [newBehavior],
       }),
@@ -59,7 +59,7 @@ describe("partial slot lifecycle", () => {
 
     browserPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
-        types: { "native.element.address-line": jsType() },
+        types: { "native.element.address-line": objectContract() },
         components: { "address-line": component("address-line") },
         behaviors: [loadedBehavior],
       }),
@@ -84,7 +84,7 @@ describe("partial slot lifecycle", () => {
     browserPlans.loadPartialSlot("address-slot", [
       {
         ...rootPlan(planId),
-        types: { "native.element.address-line": jsType() },
+        types: { "native.element.address-line": objectContract() },
         components: { "address-line": component("address-line") },
       },
     ], hooks);
@@ -106,12 +106,12 @@ describe("partial slot lifecycle", () => {
 
     const affectedPlanIds = browserPlans.loadPartialSlot("drawer-slot", [
       partialPlan(residentPlanId, {
-        types: { "native.element.resident-name": jsType() },
+        types: { "native.element.resident-name": objectContract() },
         components: { "resident-name": component("resident-name") },
         behaviors: [residentBehavior],
       }),
       partialPlan(billingPlanId, {
-        types: { "native.element.invoice-total": jsType() },
+        types: { "native.element.invoice-total": objectContract() },
         components: { "invoice-total": component("invoice-total") },
         behaviors: [billingBehavior],
       }),
@@ -136,7 +136,7 @@ describe("partial slot lifecycle", () => {
 
     browserPlans.loadPartialSlot("type-slot", [
       partialPlan(planId, {
-        types: { "native.element.shared": jsType() },
+        types: { "native.element.shared": objectContract() },
       }),
     ], hooks);
     browserPlans.loadPartialSlot("component-slot", [

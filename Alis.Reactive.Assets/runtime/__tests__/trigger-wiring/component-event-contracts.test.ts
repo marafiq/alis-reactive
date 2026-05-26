@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { boot, resetBootStateForTests } from "../../lifecycle/boot";
-import type { Component, JsType, Plan, Reaction, Shape, ValueProducer } from "../../types";
+import type { ComponentObject, BrowserObjectContract, Plan, Reaction, Shape, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -36,7 +36,7 @@ describe("component event trigger contracts", () => {
   });
 });
 
-function planWithComponentEvent(events: JsType["events"]): Plan {
+function planWithComponentEvent(events: BrowserObjectContract["events"]): Plan {
   return {
     version: 3,
     planId: "Resident.EventContracts",
@@ -62,7 +62,7 @@ function planWithComponentEvent(events: JsType["events"]): Plan {
   };
 }
 
-function eventSourceType(events: JsType["events"]): JsType {
+function eventSourceType(events: BrowserObjectContract["events"]): BrowserObjectContract {
   return {
     properties: {},
     methods: {},
@@ -70,7 +70,7 @@ function eventSourceType(events: JsType["events"]): JsType {
   };
 }
 
-function displayType(): JsType {
+function displayType(): BrowserObjectContract {
   return {
     properties: {
       textContent: {
@@ -84,7 +84,7 @@ function displayType(): JsType {
   };
 }
 
-function component(id: string, type: string): Component {
+function component(id: string, type: string): ComponentObject {
   return {
     id,
     vendor: "native",
