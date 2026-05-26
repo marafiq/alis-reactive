@@ -6,46 +6,47 @@ namespace Alis.Reactive.Builders.Requests
 {
     internal sealed class GatherDraft
     {
-        private readonly List<RequestPayloadAssignment> _fields = new List<RequestPayloadAssignment>();
-        private readonly Dictionary<string, ValueProducer> _headerFields =
+        private readonly List<RequestPayloadAssignment> _payloadAssignments = new List<RequestPayloadAssignment>();
+        private readonly Dictionary<string, ValueProducer> _headers =
             new Dictionary<string, ValueProducer>();
-        private readonly Dictionary<string, ValueProducer> _routeParameterFields =
+        private readonly Dictionary<string, ValueProducer> _routeParameters =
             new Dictionary<string, ValueProducer>();
 
-        internal IReadOnlyList<RequestPayloadAssignment> Fields => _fields;
+        internal IReadOnlyList<RequestPayloadAssignment> PayloadAssignments => _payloadAssignments;
 
-        internal GatherSelection Selection { get; private set; } = GatherSelection.ExplicitFields;
+        internal GatherSourceSelection SourceSelection { get; private set; } =
+            GatherSourceSelection.ExplicitPayloadAssignments;
 
         internal void IncludeAllRegisteredInputs()
         {
-            Selection = GatherSelection.AllRegisteredInputs;
+            SourceSelection = GatherSourceSelection.AllRegisteredInputs;
         }
 
-        internal void AddField(RequestPayloadAssignment field)
+        internal void AddPayloadAssignment(RequestPayloadAssignment payloadAssignment)
         {
-            if (field == null) throw new ArgumentNullException(nameof(field));
-            _fields.Add(field);
+            if (payloadAssignment == null) throw new ArgumentNullException(nameof(payloadAssignment));
+            _payloadAssignments.Add(payloadAssignment);
         }
 
-        internal void AddField(BindingPath path, ValueProducer value)
+        internal void AddPayloadAssignment(BindingPath path, ValueProducer value)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
             if (value == null) throw new ArgumentNullException(nameof(value));
-            var payloadField = RequestPayloadAssignment.Of(path, value);
-            _fields.Add(payloadField);
+            var payloadAssignment = RequestPayloadAssignment.Of(path, value);
+            _payloadAssignments.Add(payloadAssignment);
         }
 
         internal void AddHeader(HeaderName name, ValueProducer value)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (value == null) throw new ArgumentNullException(nameof(value));
-            _headerFields[name.Value] = value;
+            _headers[name.Value] = value;
         }
 
         internal RouteParameterName RegisterRouteParameter(string name)
         {
             var routeParameter = RouteParameterName.Of(name);
-            var routeParameterAlreadyExists = _routeParameterFields.ContainsKey(routeParameter.Value);
+            var routeParameterAlreadyExists = _routeParameters.ContainsKey(routeParameter.Value);
             if (routeParameterAlreadyExists)
                 throw new InvalidOperationException(
                     $"Route param '{name}' is already defined. Each route param can only be set once.");
@@ -57,16 +58,16 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (value == null) throw new ArgumentNullException(nameof(value));
-            _routeParameterFields[name.Value] = value;
+            _routeParameters[name.Value] = value;
         }
 
         internal IReadOnlyDictionary<string, ValueProducer> HeadersForRequest()
         {
-            var requestHasNoHeaders = _headerFields.Count == 0;
+            var requestHasNoHeaders = _headers.Count == 0;
             if (requestHasNoHeaders)
                 return new Dictionary<string, ValueProducer>();
 
-            return new Dictionary<string, ValueProducer>(_headerFields);
+            return new Dictionary<string, ValueProducer>(_headers);
         }
 
         internal IReadOnlyDictionary<string, ValueProducer> RouteParametersFor(RequestUrl url)
@@ -74,7 +75,7 @@ namespace Alis.Reactive.Builders.Requests
             if (url == null) throw new ArgumentNullException(nameof(url));
             return RequestRouteTemplate
                 .For(url)
-                .Bind(_routeParameterFields);
+                .Bind(_routeParameters);
         }
 
     }

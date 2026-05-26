@@ -95,26 +95,26 @@ public class WhenGeneratingRuntimePlanTypes
     }
 
     [Test]
-    public void generated_runtime_plan_types_model_gather_as_fields_plus_selection()
+    public void generated_runtime_plan_types_model_gather_as_payload_assignments_plus_source_selection()
     {
         var generated = PlanTypeScriptContract.Render();
 
         Assert.That(
             generated,
-            Does.Contain("export interface GatherInput {\n  kind: \"gather\";\n  fields: RequestPayloadAssignment[];\n  transport: Transport;\n  selection: GatherSelection;\n}"),
-            "Gather input should be one ordered field list plus the registered-input selection policy.");
+            Does.Contain("export interface GatherInput {\n  kind: \"gather\";\n  payloadAssignments: RequestPayloadAssignment[];\n  bodyFormat: RequestBodyFormat;\n  sourceSelection: GatherSourceSelection;\n}"),
+            "Gather input should be one ordered payload assignment list plus the registered-input source selection policy.");
         Assert.That(
             generated,
-            Does.Not.Contain("declaredFields"),
-            "Gather should not split authored request fields into plan buckets.");
+            Does.Not.Contain("declaredPayloadAssignments"),
+            "Gather should not split authored request payload assignments into plan buckets.");
         Assert.That(
             generated,
-            Does.Not.Contain("registeredInputFields"),
+            Does.Not.Contain("registeredInputPayloadAssignments"),
             "IncludeAll should execute from the runtime plan selection, not serialized build-time expansion.");
         Assert.That(
             generated,
-            Does.Not.Contain("supplementalFields"),
-            "Static/event gather fields are ordinary authored request payload assignments.");
+            Does.Not.Contain("supplementalPayloadAssignments"),
+            "Static/event gather values are ordinary authored request payload assignments.");
     }
 
     [Test]

@@ -26,15 +26,15 @@ function literal(value: string): ValueProducer {
   return { kind: "literal", value, shape: stringShape };
 }
 
-function gatherInput(fields: Record<string, ValueProducer>): Request["input"] {
+function gatherInput(sourcesByPayloadName: Record<string, ValueProducer>): Request["input"] {
   return {
     kind: "gather",
-    fields: Object.entries(fields).map(([name, value]): RequestPayloadAssignment => ({
+    payloadAssignments: Object.entries(sourcesByPayloadName).map(([name, value]): RequestPayloadAssignment => ({
       target: target(name),
       source: value,
     })),
-    transport: "json",
-    selection: { kind: "explicit" },
+    bodyFormat: "json",
+    sourceSelection: { kind: "explicit" },
   };
 }
 

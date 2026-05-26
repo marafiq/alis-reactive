@@ -6,49 +6,49 @@ namespace Alis.Reactive.PlanModel
     internal sealed class GatherInput : RequestInput
     {
         public string Kind => "gather";
-        public IReadOnlyList<RequestPayloadAssignment> Fields { get; }
-        public string Transport => RequestTransport.Value;
-        public GatherSelection Selection { get; }
+        public IReadOnlyList<RequestPayloadAssignment> PayloadAssignments { get; }
+        public string BodyFormat => RequestBodyFormat.Value;
+        public GatherSourceSelection SourceSelection { get; }
 
-        private RequestTransport RequestTransport { get; }
+        private RequestBodyFormat RequestBodyFormat { get; }
 
         private GatherInput(
-            IReadOnlyList<RequestPayloadAssignment> fields,
-            RequestTransport transport,
-            GatherSelection selection)
+            IReadOnlyList<RequestPayloadAssignment> payloadAssignments,
+            RequestBodyFormat bodyFormat,
+            GatherSourceSelection sourceSelection)
         {
-            Fields = fields;
-            RequestTransport = transport;
-            Selection = selection;
+            PayloadAssignments = payloadAssignments;
+            RequestBodyFormat = bodyFormat;
+            SourceSelection = sourceSelection;
         }
 
         internal static GatherInput From(
-            IEnumerable<RequestPayloadAssignment> fields,
-            RequestTransport transport,
-            GatherSelection selection) =>
+            IEnumerable<RequestPayloadAssignment> payloadAssignments,
+            RequestBodyFormat bodyFormat,
+            GatherSourceSelection sourceSelection) =>
             new GatherInput(
-                fields.ToList(),
-                transport,
-                selection);
+                payloadAssignments.ToList(),
+                bodyFormat,
+                sourceSelection);
     }
 
-    internal abstract class GatherSelection
+    internal abstract class GatherSourceSelection
     {
-        private GatherSelection() { }
+        private GatherSourceSelection() { }
 
-        internal static GatherSelection ExplicitFields { get; } = new ExplicitGatherSelection();
-        internal static GatherSelection AllRegisteredInputs { get; } = new AllRegisteredInputsGatherSelection();
+        internal static GatherSourceSelection ExplicitPayloadAssignments { get; } = new ExplicitGatherSourceSelection();
+        internal static GatherSourceSelection AllRegisteredInputs { get; } = new AllRegisteredInputsGatherSourceSelection();
 
         public abstract string Kind { get; }
         internal abstract bool SelectsRegisteredInputs { get; }
 
-        private sealed class ExplicitGatherSelection : GatherSelection
+        private sealed class ExplicitGatherSourceSelection : GatherSourceSelection
         {
             public override string Kind => "explicit";
             internal override bool SelectsRegisteredInputs => false;
         }
 
-        private sealed class AllRegisteredInputsGatherSelection : GatherSelection
+        private sealed class AllRegisteredInputsGatherSourceSelection : GatherSourceSelection
         {
             public override string Kind => "all-registered-inputs";
             internal override bool SelectsRegisteredInputs => true;

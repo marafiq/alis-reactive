@@ -243,8 +243,8 @@ function contextWithResponseBody(context: ExecutionContext, body: HttpResponseBo
 
 function requestPayloadSnapshotFrom(gathered: GatherResult): Record<string, unknown> {
   const body = gathered.body;
-  const bodyUsesMultipartTransport = body instanceof FormData;
-  if (bodyUsesMultipartTransport) return {};
+  const bodyIsFormData = body instanceof FormData;
+  if (bodyIsFormData) return {};
 
   return body;
 }

@@ -22,9 +22,9 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("fields")
+            .GetProperty("payloadAssignments")
             .EnumerateArray()
-            .Single(field => TargetName(field) == "optional")
+            .Single(assignment => TargetName(assignment) == "optional")
             .GetProperty("source");
 
         Assert.That(literal.GetProperty("kind").GetString(), Is.EqualTo("literal"));
@@ -91,11 +91,11 @@ public class WhenBuildingHttpRequests : PlanTestBase
         var planJson = plan.RenderFormatted();
 
         using var doc = System.Text.Json.JsonDocument.Parse(planJson);
-        var fields = doc.RootElement.GetProperty("behaviors")[0]
+        var payloadAssignments = doc.RootElement.GetProperty("behaviors")[0]
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("fields")
+            .GetProperty("payloadAssignments")
             .EnumerateArray()
             .Select(TargetName)
             .ToList();
@@ -103,16 +103,16 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("selection")
+            .GetProperty("sourceSelection")
             .GetProperty("kind")
             .GetString();
 
-        Assert.That(fields, Is.EqualTo(new[] { "selectedId" }));
+        Assert.That(payloadAssignments, Is.EqualTo(new[] { "selectedId" }));
         Assert.That(selection, Is.EqualTo("all-registered-inputs"));
     }
 
     [Test]
-    public void include_all_selects_registered_inputs_without_serializing_build_time_fields()
+    public void include_all_selects_registered_inputs_without_serializing_build_time_payload_assignments()
     {
         var plan = CreatePlan();
         RegisterTextInput(plan, "Name", "name-input");
@@ -131,13 +131,13 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("request")
             .GetProperty("input");
 
-        Assert.That(input.GetProperty("fields").GetArrayLength(), Is.EqualTo(0));
-        Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
+        Assert.That(input.GetProperty("payloadAssignments").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(input.GetProperty("sourceSelection").GetProperty("kind").GetString(),
             Is.EqualTo("all-registered-inputs"));
     }
 
     [Test]
-    public void include_all_keeps_static_assignments_as_authored_fields()
+    public void include_all_keeps_static_values_as_authored_payload_assignments()
     {
         var plan = CreatePlan();
         RegisterTextInput(plan, "Id", "id-input");
@@ -159,13 +159,13 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("input");
 
         Assert.That(input.GetProperty("kind").GetString(), Is.EqualTo("gather"));
-        Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
+        Assert.That(input.GetProperty("sourceSelection").GetProperty("kind").GetString(),
             Is.EqualTo("all-registered-inputs"));
-        var fields = input.GetProperty("fields")
+        var payloadAssignments = input.GetProperty("payloadAssignments")
             .EnumerateArray()
             .Select(TargetName)
             .ToList();
-        Assert.That(fields, Is.EqualTo(new[] { "Id" }));
+        Assert.That(payloadAssignments, Is.EqualTo(new[] { "Id" }));
     }
 
     [Test]
@@ -189,18 +189,18 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input");
-        var fields = input.GetProperty("fields")
+        var payloadAssignments = input.GetProperty("payloadAssignments")
             .EnumerateArray()
             .Select(TargetName)
             .ToList();
 
-        Assert.That(fields, Is.EqualTo(new[] { "Address.City" }));
-        Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
+        Assert.That(payloadAssignments, Is.EqualTo(new[] { "Address.City" }));
+        Assert.That(input.GetProperty("sourceSelection").GetProperty("kind").GetString(),
             Is.EqualTo("all-registered-inputs"));
     }
 
     [Test]
-    public void include_all_without_build_time_fields_still_emits_gather_input_for_runtime_partials()
+    public void include_all_without_build_time_payload_assignments_still_emits_gather_input_for_runtime_partials()
     {
         var plan = CreatePlan();
 
@@ -219,8 +219,8 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("input");
 
         Assert.That(input.GetProperty("kind").GetString(), Is.EqualTo("gather"));
-        Assert.That(input.GetProperty("fields").GetArrayLength(), Is.EqualTo(0));
-        Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
+        Assert.That(input.GetProperty("payloadAssignments").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(input.GetProperty("sourceSelection").GetProperty("kind").GetString(),
             Is.EqualTo("all-registered-inputs"));
     }
 
@@ -338,6 +338,6 @@ public class WhenBuildingHttpRequests : PlanTestBase
                 shape));
     }
 
-    private static string? TargetName(System.Text.Json.JsonElement field) =>
-        field.GetProperty("target").GetProperty("name").GetString();
+    private static string? TargetName(System.Text.Json.JsonElement assignment) =>
+        assignment.GetProperty("target").GetProperty("name").GetString();
 }

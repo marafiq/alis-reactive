@@ -1,6 +1,6 @@
-// gather.ts — Gather values for HTTP requests using the SHARED value concept.
-// Every field carries a ValueProducer — evaluated via evaluateValue().
-// No parallel read path. Shape flows from plan → transport for wire formatting.
+// gather.ts — Gather values for HTTP requests using the shared ValueProducer concept.
+// Every payload assignment is evaluated by evaluateValue(); runtime registered
+// inputs use the same writer path after reading their component value member.
 
 import type { Plan, GatherInput, RequestPayloadAssignment, HttpMethod, RequestInput } from "../types";
 import type { ExecContext } from "../types";
@@ -8,9 +8,9 @@ import { assertNever } from "../core/assert-never";
 import { evaluateValue } from "../core/evaluate";
 import { RuntimePlan, type RuntimeComponent } from "../domain/runtime-plan";
 import { RuntimeShape } from "../domain/runtime-shape";
-import { GatherOutput, emitGatheredValue, type GatherResult, type TransportStrategy } from "./gather-transport";
+import { GatheredRequestInput, writeGatheredValue, type GatherResult, type RequestPayloadWriter } from "./request-payload-writer";
 
-export type { GatherResult } from "./gather-transport";
+export type { GatherResult } from "./request-payload-writer";
 
 interface GatherRuntime {
   readonly method: HttpMethod;
@@ -35,7 +35,7 @@ export function resolveGather(
 function resolveRequestInput(input: RequestInput, runtime: GatherRuntime): GatherResult {
   switch (input.kind) {
     case "none":
-      return GatherOutput.empty();
+      return GatheredRequestInput.empty();
     case "gather":
       return resolveGatherInput(input, runtime);
     default:
@@ -44,48 +44,48 @@ function resolveRequestInput(input: RequestInput, runtime: GatherRuntime): Gathe
 }
 
 function resolveGatherInput(input: GatherInput, runtime: GatherRuntime): GatherResult {
-  const output = GatherOutput.for(input.transport, runtime.method);
+  const gathered = GatheredRequestInput.for(input.bodyFormat, runtime.method);
 
-  for (const field of input.fields) {
-    emitPlanRequestPayloadAssignment(field, output.transport, runtime);
+  for (const assignment of input.payloadAssignments) {
+    writePayloadAssignment(assignment, gathered.writer, runtime);
   }
 
-  emitRuntimeRegisteredInputs(input.selection, runtime, output.transport);
+  writeRuntimeSelectedInputs(input.sourceSelection, runtime, gathered.writer);
 
-  return output.toResult();
+  return gathered.toResult();
 }
 
-function emitPlanRequestPayloadAssignment(
-  field: RequestPayloadAssignment,
-  transport: TransportStrategy,
+function writePayloadAssignment(
+  assignment: RequestPayloadAssignment,
+  writer: RequestPayloadWriter,
   runtime: GatherRuntime,
 ): void {
-  const raw = evaluateValue(field.source, runtime.plan, runtime.ctx);
-  const shape = RuntimeShape.declaredBy(field.source);
-  emitGatheredValue(field.target, raw, shape, transport);
+  const raw = evaluateValue(assignment.source, runtime.plan, runtime.ctx);
+  const shape = RuntimeShape.declaredBy(assignment.source);
+  writeGatheredValue(assignment.target, raw, shape, writer);
 }
 
-function emitRuntimeRegisteredInputs(
-  selection: GatherInput["selection"],
+function writeRuntimeSelectedInputs(
+  sourceSelection: GatherInput["sourceSelection"],
   runtime: GatherRuntime,
-  transport: TransportStrategy,
+  writer: RequestPayloadWriter,
 ): void {
-  switch (selection.kind) {
+  switch (sourceSelection.kind) {
     case "explicit":
       return;
     case "all-registered-inputs":
       for (const component of runtime.runtimePlan.components.entries()) {
-        emitRuntimeRegisteredInput(component, transport);
+        writeRuntimeRegisteredInput(component, writer);
       }
       return;
     default:
-      return assertNever(selection, "gather selection");
+      return assertNever(sourceSelection, "gather source selection");
   }
 }
 
-function emitRuntimeRegisteredInput(
+function writeRuntimeRegisteredInput(
   component: RuntimeComponent,
-  transport: TransportStrategy,
+  writer: RequestPayloadWriter,
 ): void {
   const binding = component.definition.binding;
   if (binding.kind === "none") return;
@@ -96,13 +96,13 @@ function emitRuntimeRegisteredInput(
   const object = component.object();
   const runtimeValue = object.read(binding.valueMember);
 
-  emitGatheredValue(
+  writeGatheredValue(
     {
       name: binding.bindingPath,
       path: binding.path,
     },
     runtimeValue.usingDeclaredShape(),
     RuntimeShape.from(runtimeValue.shape),
-    transport,
+    writer,
   );
 }

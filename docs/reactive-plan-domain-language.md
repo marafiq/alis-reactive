@@ -294,7 +294,7 @@ TypeScript.
 - **Request Payload Assignment**: one deterministic `target <- source` entry in
   an HTTP gather plan. The target owns the HTTP name plus structured path. The
   source is a `ValueProducer` evaluated when the request executes.
-- **Authored Gather Field**: a developer-authored request payload assignment
+- **Authored Payload Assignment**: a developer-authored request payload assignment
   from explicit component include, typed source, static value, URL read, plugin
   result, or event/response payload.
 - **Runtime Registered Input Expansion**: `IncludeAll()` applied to the current
@@ -577,8 +577,8 @@ must preserve every authoring shape here.
 | Element DSL | `SetText`, `SetHtml`, `Show`, `Hide`, `AddClass`, `RemoveClass`, `ToggleClass`, literal/event/response/typed-source values | DOM element as native browser object, property write, method call, value producer shape |
 | Component DSL | Vendor-specific `.Value()`, `.SetValue(...)`, `.Show()`, `.Hide()`, `.Open()`, `.Close()`, `.FocusIn()`, component events | component object contract, member name/path, access mode, event payload, vendor resolution |
 | Condition DSL | payload source, response source, typed source, `Confirm`, `Eq/NotEq/Gt/Gte/Lt/Lte`, source-vs-source comparisons, truthy/falsy/null/empty, `In/NotIn`, `Between`, text operators, array contains, nested branches, else | comparison source, operand kind, operand shape, branch case, default branch, sync/async condition boundary |
-| HTTP DSL | `Get/Post/Put/Delete`, inline gather, `AsJson/AsFormData`, `WhileLoading`, `Finally`, `Validate<TValidationSource>`, `Response`, `Chained`, `Parallel`, `OnAllSettled` | request endpoint, gather plan, transport, request stages, validation gate, response routing, chain, parallel completion |
-| Gather DSL | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, plugin result, explicit component include, typed component source include | authored gather field, dynamic registered input, scalar slot, route template binding, component read |
+| HTTP DSL | `Get/Post/Put/Delete`, inline gather, `AsJson/AsFormData`, `WhileLoading`, `Finally`, `Validate<TValidationSource>`, `Response`, `Chained`, `Parallel`, `OnAllSettled` | request endpoint, gather plan, request body format, request stages, validation gate, response routing, chain, parallel completion |
+| Gather DSL | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, plugin result, explicit component include, typed component source include | authored payload assignment, source selection, scalar slot, route template binding, component read |
 | Response DSL | untyped/typed `OnSuccess`, any/specific `OnError`, typed error body, chained request | response payload source, response media type, status handler, any-status handler, no-response outcome |
 | Dispatch DSL | `Dispatch`, literal typed dispatch, `DispatchWith<TPayload>` with typed field paths and source/literal assignments | dispatch payload contract, nested payload path, object value producer, custom-event payload type |
 | Validation DSL | `Validate<TValidationSource>`, `ValidationErrors`, render-time input registration, FluentValidation client projection, core projection registry, `WhenField*`, peer comparisons | client validation projection request/result, field binding, activation condition, peer operand, server error field name |
@@ -795,9 +795,10 @@ different domain actions and must not share one collision rule.
 | Request Completion Stage | HTTP `complete` reactions that run after a request outcome exists. They are guaranteed around response/error routing failures, but they do not run when the request is blocked before dispatch, such as a failing `before` reaction or failed validation gate. |
 | No Response Outcome | Request outcome for failures before a readable HTTP response exists. It still routes error and complete handlers with the prepared request context when gathering succeeded. |
 | Response Media Type | Runtime classification of an HTTP response `Content-Type`. JSON includes both `application/json` and structured syntax suffixes such as `application/problem+json`; text includes text and HTML media types. |
-| Gather Selection | Request input policy. `explicit` emits authored fields only; `all-registered-inputs` also expands against the current Runtime Plan View so partial load and unload affect gather deterministically. |
-| Request Payload Assignment | Deterministic HTTP gather entry: assign a source value to a target payload name/path. Authored fields and runtime registered-input expansion share this same shape. |
-| Authored Gather Fields | Developer-authored request payload fields from `Include`, `Static`, `FromUrl`, `FromEvent`, plugin reads, or typed component sources. They are serialized as one ordered `fields` list because the DSL already declares the source and target. |
+| Gather Source Selection | Request input policy. `explicit` emits authored payload assignments only; `all-registered-inputs` also expands against the current Runtime Plan View so partial load and unload affect gather deterministically. |
+| Request Payload Assignment | Deterministic HTTP gather entry: assign a source value to a target payload name/path. Authored payload assignments and runtime registered-input expansion share this same shape. |
+| Authored Payload Assignments | Developer-authored request payload assignments from `Include`, `Static`, `FromUrl`, `FromEvent`, plugin reads, or typed component sources. They are serialized as one ordered `payloadAssignments` list because the DSL already declares the source and target. |
+| Request Body Format | The generated request body format selected by `AsJson` or `AsFormData`. GET requests still write gathered input into query string parameters; POST/PUT/PATCH/DELETE use the selected body format. |
 | Dynamic Gather Component | Runtime contribution included by `all-registered-inputs` after partial plan merge. It is skipped when the component is not mounted; if mounted and selected, its declared binding member must exist and be readable on the component contract. |
 | Declared Object Value Fields | Runtime request-body view of an `object` `ValueProducer`. Each field is emitted from its own `ValueProducer` and shape so dates, arrays, and nullable values keep their declared wire behavior instead of becoming loose properties on an already-evaluated object. |
 | Gather Scalar Wire Value | Runtime scalar serialization boundary for query string and form-data slots. Values that cannot become one text value are contract errors; they are not silently sent as empty strings. |

@@ -77,14 +77,14 @@ function assignment(name: string, source: ValueProducer): RequestPayloadAssignme
 }
 
 function gatherInput(
-  fields: RequestPayloadAssignment[],
-  transport: Extract<RequestInput, { kind: "gather" }>["transport"] = "json",
+  payloadAssignments: RequestPayloadAssignment[],
+  bodyFormat: Extract<RequestInput, { kind: "gather" }>["bodyFormat"] = "json",
 ): RequestInput {
   return {
     kind: "gather",
-    fields,
-    transport,
-    selection: { kind: "explicit" },
+    payloadAssignments,
+    bodyFormat,
+    sourceSelection: { kind: "explicit" },
   };
 }
 
@@ -165,7 +165,7 @@ describe("resolveGather", () => {
     });
   });
 
-  it("emits form-data fields from scalar, array, and browser file values", () => {
+  it("writes form-data from scalar, array, and browser file values", () => {
     const file = new File(["hello"], "summary.txt", { type: "text/plain" });
     const input = gatherInput([
       assignment("resident", literal("Ada", stringShape)),
@@ -191,13 +191,13 @@ describe("resolveGather", () => {
     expect(body.getAll("documents")).toEqual([file]);
   });
 
-  it("requires form-data when browser files are gathered into the request body", () => {
+  it("requires form-data body format when browser files are gathered into the request body", () => {
     const file = new File(["hello"], "summary.txt", { type: "text/plain" });
     const input = gatherInput([
       assignment("documents", browserValue([file], arrayShape(rawShape))),
     ]);
 
-    expect(() => resolveBody(input)).toThrow("[alis] File objects require transport: form-data");
+    expect(() => resolveBody(input)).toThrow("[alis] File objects require form-data body format");
   });
 
   it("does not send browser files through query parameters", () => {

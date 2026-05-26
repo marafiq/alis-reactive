@@ -684,7 +684,7 @@ export type RequestInput =
   | NoRequestInput
   | GatherInput;
 
-export type Transport =
+export type RequestBodyFormat =
   | "json"
   | "form-data";
 
@@ -694,20 +694,20 @@ export interface NoRequestInput {
 
 export interface GatherInput {
   kind: "gather";
-  fields: RequestPayloadAssignment[];
-  transport: Transport;
-  selection: GatherSelection;
+  payloadAssignments: RequestPayloadAssignment[];
+  bodyFormat: RequestBodyFormat;
+  sourceSelection: GatherSourceSelection;
 }
 
-export type GatherSelection =
-  | ExplicitGatherSelection
-  | AllRegisteredInputsGatherSelection;
+export type GatherSourceSelection =
+  | ExplicitGatherSourceSelection
+  | AllRegisteredInputsGatherSourceSelection;
 
-export interface ExplicitGatherSelection {
+export interface ExplicitGatherSourceSelection {
   kind: "explicit";
 }
 
-export interface AllRegisteredInputsGatherSelection {
+export interface AllRegisteredInputsGatherSourceSelection {
   kind: "all-registered-inputs";
 }
 

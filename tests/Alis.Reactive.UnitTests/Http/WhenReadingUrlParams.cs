@@ -85,7 +85,7 @@ public class WhenReadingUrlParams : PlanTestBase
     // ── Per-overload: GatherBuilder.FromUrl ───────────────────
 
     [Test]
-    public void from_url_gather_produces_gather_field()
+    public void from_url_gather_produces_payload_assignment()
     {
         var plan = CreatePlan();
         Trigger(plan).DomReady(p =>
@@ -266,10 +266,10 @@ public class WhenReadingUrlParams : PlanTestBase
         var planJson = plan.RenderFormatted();
 
         using var doc = JsonDocument.Parse(planJson);
-        var field = doc.RootElement.GetProperty("behaviors")[0]
+        var payloadAssignment = doc.RootElement.GetProperty("behaviors")[0]
             .GetProperty("reaction").GetProperty("request")
-            .GetProperty("input").GetProperty("fields")[0];
-        Assert.That(field.GetProperty("source").GetProperty("shape")
+            .GetProperty("input").GetProperty("payloadAssignments")[0];
+        Assert.That(payloadAssignment.GetProperty("source").GetProperty("shape")
             .GetProperty("kind").GetString(), Is.EqualTo("number"));
     }
 

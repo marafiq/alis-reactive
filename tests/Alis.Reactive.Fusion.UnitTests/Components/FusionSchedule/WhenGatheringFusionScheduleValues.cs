@@ -24,18 +24,18 @@ public class WhenGatheringFusionScheduleValues : FusionTestBase
         var json = plan.RenderFormatted();
 
         using var doc = JsonDocument.Parse(json);
-        var fields = doc.RootElement.GetProperty("behaviors")[0]
+        var payloadAssignments = doc.RootElement.GetProperty("behaviors")[0]
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("fields");
+            .GetProperty("payloadAssignments");
 
-        Assert.That(ReadShape(fields[0]), Is.EqualTo("string"));
-        Assert.That(ReadShape(fields[1]), Is.EqualTo("date"));
+        Assert.That(ReadShape(payloadAssignments[0]), Is.EqualTo("string"));
+        Assert.That(ReadShape(payloadAssignments[1]), Is.EqualTo("date"));
     }
 
-    private static string? ReadShape(JsonElement field) =>
-        field.GetProperty("source")
+    private static string? ReadShape(JsonElement payloadAssignment) =>
+        payloadAssignment.GetProperty("source")
             .GetProperty("shape")
             .GetProperty("kind")
             .GetString();

@@ -58,7 +58,7 @@ describe("all registered input gather lifecycle", () => {
     });
   });
 
-  it("emits explicit fields before dynamically gathered registered input assignments", () => {
+  it("writes authored payload assignments before runtime selected registered inputs", () => {
     document.body.innerHTML = `
       <input id="first-name" value="Ada" />
       <input id="address" value="12 Main" />
@@ -80,7 +80,7 @@ describe("all registered input gather lifecycle", () => {
 
     expect(resolveGather({
       ...allRegisteredInputs(),
-      fields: [{
+      payloadAssignments: [{
         target: target("selected"),
         source: literal("manual", stringShape),
       }, {
@@ -189,9 +189,9 @@ function pathSegment(part: string): PathSegment {
 function allRegisteredInputs(): Extract<RequestInput, { kind: "gather" }> {
   return {
     kind: "gather",
-    fields: [],
-    transport: "json",
-    selection: { kind: "all-registered-inputs" },
+    payloadAssignments: [],
+    bodyFormat: "json",
+    sourceSelection: { kind: "all-registered-inputs" },
   };
 }
 

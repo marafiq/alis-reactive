@@ -1,4 +1,4 @@
-import type { RequestPayloadTarget, HttpMethod, PathSegment, Transport } from "../types";
+import type { RequestPayloadTarget, HttpMethod, PathSegment, RequestBodyFormat } from "../types";
 import { toString } from "../core/shape-convert";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
@@ -16,36 +16,41 @@ export interface GatherResult {
   body: Record<string, unknown> | FormData;
 }
 
-/** Transport strategies for emitting name/value pairs into GET, FormData, or JSON. */
-export interface TransportStrategy {
+/** Writes gathered name/value pairs into query string, FormData, or JSON body. */
+export interface RequestPayloadWriter {
   emitScalar(target: RequestPayloadTarget, value: unknown, shape: RuntimeShape): void;
   emitArray(target: RequestPayloadTarget, items: unknown[], itemShape: RuntimeShape): void;
 }
 
-export class GatherOutput {
+export class GatheredRequestInput {
   private constructor(
     private readonly urlParams: string[],
     private readonly body: Record<string, unknown> | FormData,
-    readonly transport: TransportStrategy,
+    readonly writer: RequestPayloadWriter,
   ) {}
 
   static empty(): GatherResult {
     return { urlParams: [], body: {} };
   }
 
-  static for(requestTransport: Transport, method: HttpMethod): GatherOutput {
+  static for(bodyFormat: RequestBodyFormat, method: HttpMethod): GatheredRequestInput {
     const urlParams: string[] = [];
     if (sendsInputInQueryString(method)) {
-      return new GatherOutput(urlParams, {}, createGetTransport(urlParams));
+      return new GatheredRequestInput(urlParams, {}, createQueryStringWriter(urlParams));
     }
 
-    if (requestTransport === "form-data") {
-      const formData = new FormData();
-      return new GatherOutput(urlParams, formData, createFormDataTransport(formData));
+    switch (bodyFormat) {
+      case "form-data": {
+        const formData = new FormData();
+        return new GatheredRequestInput(urlParams, formData, createFormDataWriter(formData));
+      }
+      case "json": {
+        const body: Record<string, unknown> = {};
+        return new GatheredRequestInput(urlParams, body, createJsonBodyWriter(body));
+      }
+      default:
+        return assertNever(bodyFormat, "request body format");
     }
-
-    const body: Record<string, unknown> = {};
-    return new GatherOutput(urlParams, body, createJsonTransport(body));
   }
 
   toResult(): GatherResult {
@@ -67,28 +72,28 @@ function sendsInputInQueryString(method: HttpMethod): boolean {
   }
 }
 
-export function emitGatheredValue(
+export function writeGatheredValue(
   target: RequestPayloadTarget,
   raw: unknown,
   shape: RuntimeShape,
-  transport: TransportStrategy,
+  writer: RequestPayloadWriter,
 ): void {
   const files = browserFiles(raw);
   if (files !== undefined) {
-    transport.emitArray(target, files, shape);
+    writer.emitArray(target, files, shape);
     log.trace("file.emitted", { name: target.name, count: files.length });
     return;
   }
 
   if (Array.isArray(raw)) {
-    transport.emitArray(target, raw, shape.item());
+    writer.emitArray(target, raw, shape.item());
     return;
   }
 
-  transport.emitScalar(target, raw, shape);
+  writer.emitScalar(target, raw, shape);
 }
 
-function createGetTransport(urlParams: string[]): TransportStrategy {
+function createQueryStringWriter(urlParams: string[]): RequestPayloadWriter {
   return {
     emitScalar: (target, value, shape) => {
       const wire = shape.formatForWire(value);
@@ -97,12 +102,12 @@ function createGetTransport(urlParams: string[]): TransportStrategy {
     emitArray: (target, items, itemShape) => {
       const gatheredItems = gatheredArrayItems(items);
       if (arrayContainsFile(gatheredItems)) throw new Error("[alis] File objects cannot be sent via GET");
-      emitArrayItemsToQueryString(target.name, gatheredItems, itemShape, urlParams);
+      appendArrayItemsToQueryString(target.name, gatheredItems, itemShape, urlParams);
     },
   };
 }
 
-function createFormDataTransport(formData: FormData): TransportStrategy {
+function createFormDataWriter(formData: FormData): RequestPayloadWriter {
   return {
     emitScalar: (target, value, shape) => {
       const wire = shape.formatForWire(value);
@@ -114,7 +119,7 @@ function createFormDataTransport(formData: FormData): TransportStrategy {
   };
 }
 
-function createJsonTransport(body: Record<string, unknown>): TransportStrategy {
+function createJsonBodyWriter(body: Record<string, unknown>): RequestPayloadWriter {
   return {
     emitScalar: (target, value, shape) => {
       const wire = shape.formatForWire(value);
@@ -122,7 +127,7 @@ function createJsonTransport(body: Record<string, unknown>): TransportStrategy {
     },
     emitArray: (target, items, itemShape) => {
       const gatheredItems = gatheredArrayItems(items);
-      if (arrayContainsFile(gatheredItems)) throw new Error("[alis] File objects require transport: form-data");
+      if (arrayContainsFile(gatheredItems)) throw new Error("[alis] File objects require form-data body format");
       const wireItems = jsonArrayBodyValue(gatheredItems.map(rawArrayItemValue), itemShape);
       assignJsonBodyValue(body, target, wireItems);
     },
@@ -159,7 +164,7 @@ function arrayContainsFile(items: readonly GatheredArrayItem[]): boolean {
   return items.some(item => item.kind === "file");
 }
 
-function emitArrayItemsToQueryString(
+function appendArrayItemsToQueryString(
   name: string,
   items: readonly GatheredArrayItem[],
   itemShape: RuntimeShape,

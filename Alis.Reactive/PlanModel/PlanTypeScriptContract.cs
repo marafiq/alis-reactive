@@ -528,26 +528,26 @@ namespace Alis.Reactive.PlanModel
                 .Requires("next", "Request"));
 
             contract.Declare(Union("RequestInput", "NoRequestInput", "GatherInput"));
-            contract.Declare(LiteralUnion("Transport", RequestTransport.Values));
+            contract.Declare(LiteralUnion("RequestBodyFormat", RequestBodyFormat.Values));
 
             contract.Declare(Interface("NoRequestInput")
                 .Requires("kind", Literal("none")));
 
             contract.Declare(Interface("GatherInput")
                 .Requires("kind", Literal("gather"))
-                .Requires("fields", "RequestPayloadAssignment[]")
-                .Requires("transport", "Transport")
-                .Requires("selection", "GatherSelection"));
+                .Requires("payloadAssignments", "RequestPayloadAssignment[]")
+                .Requires("bodyFormat", "RequestBodyFormat")
+                .Requires("sourceSelection", "GatherSourceSelection"));
 
             contract.Declare(Union(
-                "GatherSelection",
-                "ExplicitGatherSelection",
-                "AllRegisteredInputsGatherSelection"));
+                "GatherSourceSelection",
+                "ExplicitGatherSourceSelection",
+                "AllRegisteredInputsGatherSourceSelection"));
 
-            contract.Declare(Interface("ExplicitGatherSelection")
+            contract.Declare(Interface("ExplicitGatherSourceSelection")
                 .Requires("kind", Literal("explicit")));
 
-            contract.Declare(Interface("AllRegisteredInputsGatherSelection")
+            contract.Declare(Interface("AllRegisteredInputsGatherSourceSelection")
                 .Requires("kind", Literal("all-registered-inputs")));
 
             contract.Declare(Interface("RequestPayloadAssignment")

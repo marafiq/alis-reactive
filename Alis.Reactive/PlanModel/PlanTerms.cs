@@ -370,27 +370,27 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class RequestTransport : PlanString
+    internal sealed class RequestBodyFormat : PlanString
     {
-        private static readonly Dictionary<string, RequestTransport> Known =
-            new Dictionary<string, RequestTransport>(StringComparer.Ordinal)
+        private static readonly Dictionary<string, RequestBodyFormat> Known =
+            new Dictionary<string, RequestBodyFormat>(StringComparer.Ordinal)
             {
-                { "json", new RequestTransport("json") },
-                { "form-data", new RequestTransport("form-data") },
+                { "json", new RequestBodyFormat("json") },
+                { "form-data", new RequestBodyFormat("form-data") },
             };
 
-        private RequestTransport(string value) : base(value, nameof(value)) { }
+        private RequestBodyFormat(string value) : base(value, nameof(value)) { }
 
-        internal static RequestTransport Json => Known["json"];
-        internal static RequestTransport FormData => Known["form-data"];
+        internal static RequestBodyFormat Json => Known["json"];
+        internal static RequestBodyFormat FormData => Known["form-data"];
         internal static IReadOnlyCollection<string> Values => Known.Keys;
 
-        internal static RequestTransport From(string value)
+        internal static RequestBodyFormat From(string value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
-            if (Known.TryGetValue(value, out var transport)) return transport;
+            if (Known.TryGetValue(value, out var bodyFormat)) return bodyFormat;
             throw new ArgumentException(
-                "Unknown request transport '" + value + "'. Expected json or form-data.",
+                "Unknown request body format '" + value + "'. Expected json or form-data.",
                 nameof(value));
         }
     }

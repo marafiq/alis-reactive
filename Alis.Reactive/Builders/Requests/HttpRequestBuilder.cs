@@ -16,7 +16,7 @@ namespace Alis.Reactive.Builders.Requests
         private readonly PlanBuildContext _context;
         private RequestEndpointDraft _endpoint = RequestEndpointDraft.Unselected;
         private GatherBuilder<TModel>? _gather;
-        private RequestTransport _transport = RequestTransport.Json;
+        private RequestBodyFormat _bodyFormat = RequestBodyFormat.Json;
         private readonly List<Reaction> _whileLoading = new List<Reaction>();
         private readonly List<Reaction> _finally = new List<Reaction>();
         private ResponseBuilder<TModel> _response;
@@ -46,7 +46,7 @@ namespace Alis.Reactive.Builders.Requests
         public HttpRequestBuilder<TModel> Delete(string url) { _endpoint = RequestEndpointDraft.Select(HttpMethodName.Delete, RequestUrl.Of(url)); return this; }
 
         /// <summary>Configures the request body by gathering values from components, events, plugins, and static data.</summary>
-        /// <param name="gather">Builds the gather fields: <c>g =&gt; g.Include(m =&gt; m.Name).Header("X-Key", source)</c>.</param>
+        /// <param name="gather">Builds the gather payload assignments: <c>g =&gt; g.Include(m =&gt; m.Name).Header("X-Key", source)</c>.</param>
         /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
         {
@@ -58,10 +58,10 @@ namespace Alis.Reactive.Builders.Requests
 
         /// <summary>Sends the request body as JSON (default).</summary>
         /// <returns>This builder for chaining.</returns>
-        public HttpRequestBuilder<TModel> AsJson() { _transport = RequestTransport.Json; return this; }
+        public HttpRequestBuilder<TModel> AsJson() { _bodyFormat = RequestBodyFormat.Json; return this; }
         /// <summary>Sends the request body as form-data.</summary>
         /// <returns>This builder for chaining.</returns>
-        public HttpRequestBuilder<TModel> AsFormData() { _transport = RequestTransport.FormData; return this; }
+        public HttpRequestBuilder<TModel> AsFormData() { _bodyFormat = RequestBodyFormat.FormData; return this; }
 
         /// <summary>Executes a reaction graph before the HTTP request is sent (e.g. show a spinner or run a guarded prerequisite).</summary>
         /// <param name="pipeline">Builds the reaction graph to execute before the request.</param>
@@ -139,19 +139,19 @@ namespace Alis.Reactive.Builders.Requests
             if (_gather == null)
                 return RequestInput.None;
 
-            var fields = new List<RequestPayloadAssignment>(_gather.Draft.Fields);
-            var selection = _gather.Draft.Selection;
+            var payloadAssignments = new List<RequestPayloadAssignment>(_gather.Draft.PayloadAssignments);
+            var sourceSelection = _gather.Draft.SourceSelection;
 
             var gatherDslAddedInput =
-                fields.Count > 0
-                || selection.SelectsRegisteredInputs;
+                payloadAssignments.Count > 0
+                || sourceSelection.SelectsRegisteredInputs;
             if (!gatherDslAddedInput)
                 return RequestInput.None;
 
             return GatherInput.From(
-                fields,
-                _transport,
-                selection);
+                payloadAssignments,
+                _bodyFormat,
+                sourceSelection);
         }
 
         private RequestParameters ResolveParameters(RequestUrl url)
