@@ -30,9 +30,9 @@ namespace Alis.Reactive.PlanModel
         internal Plan BuildPlan() =>
             new Plan(
                 _identity,
-                PlanTypes.From(_types.Snapshot()),
-                PlanComponents.From(_components.Snapshot()),
-                PlanBehaviors.From(_behaviors.Snapshot()));
+                _types.Snapshot(),
+                _components.Snapshot(),
+                _behaviors.Snapshot());
 
         /// <summary>Behaviors collected so far — a read-only view for mid-build inspection.</summary>
         internal IReadOnlyList<Behavior> Behaviors => _behaviors.Behaviors;
