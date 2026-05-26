@@ -113,16 +113,16 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class RequestReactionStages
     {
-        private readonly RequestReactionList _before;
-        private readonly ResponseHandlerList _success;
-        private readonly ResponseHandlerList _error;
-        private readonly RequestReactionList _complete;
+        private readonly IReadOnlyList<Reaction> _before;
+        private readonly IReadOnlyList<ResponseHandler> _success;
+        private readonly IReadOnlyList<ResponseHandler> _error;
+        private readonly IReadOnlyList<Reaction> _complete;
 
         private RequestReactionStages(
-            RequestReactionList before,
-            ResponseHandlerList success,
-            ResponseHandlerList error,
-            RequestReactionList complete)
+            IReadOnlyList<Reaction> before,
+            IReadOnlyList<ResponseHandler> success,
+            IReadOnlyList<ResponseHandler> error,
+            IReadOnlyList<Reaction> complete)
         {
             _before = before ?? throw new System.ArgumentNullException(nameof(before));
             _success = success ?? throw new System.ArgumentNullException(nameof(success));
@@ -130,10 +130,10 @@ namespace Alis.Reactive.PlanModel
             _complete = complete ?? throw new System.ArgumentNullException(nameof(complete));
         }
 
-        internal IReadOnlyList<Reaction> Before => _before.ForJson;
-        internal IReadOnlyList<ResponseHandler> Success => _success.ForJson;
-        internal IReadOnlyList<ResponseHandler> Error => _error.ForJson;
-        internal IReadOnlyList<Reaction> Complete => _complete.ForJson;
+        internal IReadOnlyList<Reaction> Before => _before;
+        internal IReadOnlyList<ResponseHandler> Success => _success;
+        internal IReadOnlyList<ResponseHandler> Error => _error;
+        internal IReadOnlyList<Reaction> Complete => _complete;
 
         internal static RequestReactionStages From(
             IReadOnlyList<Reaction> before,
@@ -141,89 +141,23 @@ namespace Alis.Reactive.PlanModel
             IReadOnlyList<ResponseHandler> error,
             IReadOnlyList<Reaction> complete) =>
             new RequestReactionStages(
-                RequestReactionList.From(before),
-                ResponseHandlerList.From(success),
-                ResponseHandlerList.From(error),
-                RequestReactionList.From(complete));
+                Snapshot(before),
+                Snapshot(success),
+                Snapshot(error),
+                Snapshot(complete));
 
         internal RequestReactionStages WithBefore(IReadOnlyList<Reaction> before) =>
             new RequestReactionStages(
-                RequestReactionList.From(before),
+                Snapshot(before),
                 _success,
                 _error,
                 _complete);
 
-        internal RequestReactionStages WithoutCompletionStage() =>
-            new RequestReactionStages(
-                _before,
-                _success,
-                _error,
-                RequestReactionList.Empty);
-    }
-
-    internal sealed class RequestReactionList
-    {
-        private readonly IReadOnlyList<Reaction> _items;
-
-        private RequestReactionList(IReadOnlyList<Reaction> items)
+        private static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items)
         {
-            _items = items;
-        }
-
-        internal IReadOnlyList<Reaction> ForJson => _items;
-
-        internal static RequestReactionList Empty { get; } =
-            new RequestReactionList(System.Array.Empty<Reaction>());
-
-        internal static RequestReactionList From(IEnumerable<Reaction> items)
-        {
-            if (items == null) throw new System.ArgumentNullException(nameof(items));
-
-            var snapshot = new List<Reaction>();
-            foreach (var item in items)
-            {
-                if (item == null)
-                    throw new System.ArgumentException("Request reaction must not be null.", nameof(items));
-
-                snapshot.Add(item);
-            }
-
-            var hasNoReactions = snapshot.Count == 0;
-            if (hasNoReactions) return Empty;
-            return new RequestReactionList(snapshot);
-        }
-    }
-
-    internal sealed class ResponseHandlerList
-    {
-        private readonly IReadOnlyList<ResponseHandler> _items;
-
-        private ResponseHandlerList(IReadOnlyList<ResponseHandler> items)
-        {
-            _items = items;
-        }
-
-        internal IReadOnlyList<ResponseHandler> ForJson => _items;
-
-        internal static ResponseHandlerList Empty { get; } =
-            new ResponseHandlerList(System.Array.Empty<ResponseHandler>());
-
-        internal static ResponseHandlerList From(IEnumerable<ResponseHandler> items)
-        {
-            if (items == null) throw new System.ArgumentNullException(nameof(items));
-
-            var snapshot = new List<ResponseHandler>();
-            foreach (var item in items)
-            {
-                if (item == null)
-                    throw new System.ArgumentException("Response handler must not be null.", nameof(items));
-
-                snapshot.Add(item);
-            }
-
-            var hasNoHandlers = snapshot.Count == 0;
-            if (hasNoHandlers) return Empty;
-            return new ResponseHandlerList(snapshot);
+            var hasNoItems = items.Count == 0;
+            if (hasNoItems) return System.Array.Empty<T>();
+            return new List<T>(items);
         }
     }
 
