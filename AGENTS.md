@@ -2,6 +2,8 @@
 
 Primary architecture rule: DSL -> Rich Plan Domain -> Generated Rich TS Contract -> Runtime Executioner.
 
+Blueprint-first rule: do not make plan-model or runtime refactor choices from the current helper code alone. Before editing a module, ground the change in the frozen DSL source and the source blueprint/matrix (`docs/reactive-plan-source-blueprint.md`, `docs/reactive-dsl-feature-atlas.md`). If the change cannot be traced as `DSL API -> developer intent -> domain concept -> JSON/TS term -> runtime execution`, do not make the edit.
+
 The public DSL is frozen except plugin improvements. Read the DSL before changing the plan model or runtime. Do not infer missing behavior from runtime code when the DSL already expresses the intent.
 
 Rich domain model is not permission to invent fluff. Add a concept only when it directly names a real DSL behavior and makes code simpler. Delete wrappers that only carry parameters, rename branches, or need explanation to justify their existence.

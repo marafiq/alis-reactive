@@ -19,6 +19,13 @@ assigned to target B, the runtime reads A and writes B. Bookkeeping names should
 describe what is remembered for execution or unload, not imply the plan is
 suspicious.
 
+Blueprint-first rule: plan-model and runtime refactors must be designed from
+the frozen DSL source and the source blueprint/matrix, not from the current
+helper code alone. A change is allowed only when it can be traced as
+`DSL API -> developer intent -> domain concept -> JSON/TS term -> runtime
+execution`. If that trace is missing, stop and complete the blueprint before
+editing code.
+
 Rich domain model does not mean inventing names, wrappers, registries, lifecycles,
 or abstractions so the code looks modeled. It means the smallest set of terms
 that directly explain the DSL behavior and make the implementation simpler to
