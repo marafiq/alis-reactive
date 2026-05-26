@@ -25,6 +25,8 @@ export interface ComponentMergeState {
   readonly layoutObjects: LayoutObjectReferences;
 }
 
+export type ComponentMergePhase = "boot" | "partial-slot";
+
 export class ComponentOwnership {
   private readonly owners = new Map<string, ContributionId>();
 
@@ -125,41 +127,22 @@ class LayoutObjectContributionReferences {
   }
 }
 
-export function mergeComponentIntoPlan(
+export function mergeComponentContributionIntoPlan(
   target: Plan,
   declaration: ComponentContributionDeclaration,
   state: ComponentMergeState,
+  phase: ComponentMergePhase,
 ): void {
   const existing = target.components[declaration.key];
+
+  if (phase === "boot" && isInitialValidationContainerMerge(existing, declaration.component)) {
+    replaceComponent(target, declaration.key, declaration.component);
+    state.ownership.record(declaration.planId, declaration.key, declaration.source);
+    return;
+  }
 
   if (extendsRootValidationContainer(existing, declaration, state.ownership)) {
     appendRulesForNewValidatedComponents(existing, declaration.component);
-    return;
-  }
-
-  if (isLayoutObject(declaration.component)) {
-    mergeLayoutObject(target, declaration, state);
-    return;
-  }
-
-  if (joinsExistingRuntimeObject(existing, declaration.component)) {
-    return;
-  }
-
-  replaceComponent(target, declaration.key, declaration.component);
-  state.ownership.record(declaration.planId, declaration.key, declaration.source);
-}
-
-export function composeInitialComponentIntoPlan(
-  target: Plan,
-  declaration: ComponentContributionDeclaration,
-  state: ComponentMergeState,
-): void {
-  const existing = target.components[declaration.key];
-
-  if (isInitialValidationContainerMerge(existing, declaration.component)) {
-    replaceComponent(target, declaration.key, declaration.component);
-    state.ownership.record(declaration.planId, declaration.key, declaration.source);
     return;
   }
 

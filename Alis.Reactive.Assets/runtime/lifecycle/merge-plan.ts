@@ -6,9 +6,8 @@ import {
   ComponentOwnership,
   LayoutObjectReferences,
   captureValidationRuleContributions,
-  composeInitialComponentIntoPlan,
   layoutObjectKeysFrom,
-  mergeComponentIntoPlan,
+  mergeComponentContributionIntoPlan,
   removeValidationRuleContribution,
   type ValidationRuleContribution,
 } from "./component-contribution";
@@ -70,10 +69,11 @@ class BootPlanAssembly {
 
   private mergeComponents(contribution: Plan, source: PlanContributionSource): void {
     for (const [key, component] of Object.entries(contribution.components)) {
-      composeInitialComponentIntoPlan(
+      mergeComponentContributionIntoPlan(
         this.plan,
         { planId: contribution.planId, key, component, source },
         { ownership: this.componentOwnership, layoutObjects: this.layoutObjects },
+        "boot",
       );
     }
   }
@@ -186,10 +186,11 @@ export class AppliedBrowserPlans {
 
   private mergeComponents(incoming: Plan, target: Plan, source: PlanContributionSource): void {
     for (const [key, comp] of Object.entries(incoming.components)) {
-      mergeComponentIntoPlan(
+      mergeComponentContributionIntoPlan(
         target,
         { planId: incoming.planId, key, component: comp, source },
         { ownership: this.componentOwnership, layoutObjects: this.layoutObjects },
+        "partial-slot",
       );
     }
   }
