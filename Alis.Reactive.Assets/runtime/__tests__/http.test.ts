@@ -29,13 +29,11 @@ function literal(value: string): ValueProducer {
 function gatherInput(fields: Record<string, ValueProducer>): Request["input"] {
   return {
     kind: "gather",
-    declaredFields: [],
-    registeredInputFields: [],
-    transport: "json",
-    supplementalFields: Object.entries(fields).map(([name, value]): RequestPayloadAssignment => ({
+    fields: Object.entries(fields).map(([name, value]): RequestPayloadAssignment => ({
       target: target(name),
       source: value,
     })),
+    transport: "json",
     selection: { kind: "explicit" },
   };
 }

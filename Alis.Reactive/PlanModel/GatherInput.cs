@@ -6,39 +6,29 @@ namespace Alis.Reactive.PlanModel
     internal sealed class GatherInput : RequestInput
     {
         public string Kind => "gather";
-        public IReadOnlyList<RequestPayloadAssignment> DeclaredFields { get; }
-        public IReadOnlyList<RequestPayloadAssignment> RegisteredInputFields { get; }
+        public IReadOnlyList<RequestPayloadAssignment> Fields { get; }
         public string Transport => RequestTransport.Value;
-        public IReadOnlyList<RequestPayloadAssignment> SupplementalFields { get; }
         public GatherSelection Selection { get; }
 
         private RequestTransport RequestTransport { get; }
 
         private GatherInput(
-            IReadOnlyList<RequestPayloadAssignment> declaredFields,
-            IReadOnlyList<RequestPayloadAssignment> registeredInputFields,
+            IReadOnlyList<RequestPayloadAssignment> fields,
             RequestTransport transport,
-            IReadOnlyList<RequestPayloadAssignment> supplementalFields,
             GatherSelection selection)
         {
-            DeclaredFields = declaredFields;
-            RegisteredInputFields = registeredInputFields;
+            Fields = fields;
             RequestTransport = transport;
-            SupplementalFields = supplementalFields;
             Selection = selection;
         }
 
         internal static GatherInput From(
-            IEnumerable<RequestPayloadAssignment> declaredFields,
-            IEnumerable<RequestPayloadAssignment> registeredInputFields,
+            IEnumerable<RequestPayloadAssignment> fields,
             RequestTransport transport,
-            IEnumerable<RequestPayloadAssignment> supplementalFields,
             GatherSelection selection) =>
             new GatherInput(
-                declaredFields.ToList(),
-                registeredInputFields.ToList(),
+                fields.ToList(),
                 transport,
-                supplementalFields.ToList(),
                 selection);
     }
 
@@ -50,51 +40,18 @@ namespace Alis.Reactive.PlanModel
         internal static GatherSelection AllRegisteredInputs { get; } = new AllRegisteredInputsGatherSelection();
 
         public abstract string Kind { get; }
-        internal abstract bool MayExpandRegisteredInputsAtRuntime { get; }
-
-        internal void AddBuildTimeRegisteredInputFields(
-            List<RequestPayloadAssignment> registeredInputFields,
-            PlanBuildContext context) =>
-            AddBuildTimeRegisteredInputFieldsCore(registeredInputFields, context);
-
-        private protected abstract void AddBuildTimeRegisteredInputFieldsCore(
-            List<RequestPayloadAssignment> registeredInputFields,
-            PlanBuildContext context);
+        internal abstract bool SelectsRegisteredInputs { get; }
 
         private sealed class ExplicitGatherSelection : GatherSelection
         {
             public override string Kind => "explicit";
-            internal override bool MayExpandRegisteredInputsAtRuntime => false;
-
-            private protected override void AddBuildTimeRegisteredInputFieldsCore(
-                List<RequestPayloadAssignment> registeredInputFields,
-                PlanBuildContext context)
-            {
-            }
+            internal override bool SelectsRegisteredInputs => false;
         }
 
         private sealed class AllRegisteredInputsGatherSelection : GatherSelection
         {
             public override string Kind => "all-registered-inputs";
-            internal override bool MayExpandRegisteredInputsAtRuntime => true;
-
-            private protected override void AddBuildTimeRegisteredInputFieldsCore(
-                List<RequestPayloadAssignment> registeredInputFields,
-                PlanBuildContext context)
-            {
-                foreach (var registration in context.GetRegisteredComponents())
-                    registeredInputFields.Add(AssignmentFrom(registration.Value));
-            }
-
-            private static RequestPayloadAssignment AssignmentFrom(Alis.Reactive.ComponentRegistration component)
-            {
-                var componentValue = ValueProducer.Read(
-                    ComponentSource.Of(component.ComponentId),
-                    component.ValueMember,
-                    shape: component.Shape);
-
-                return RequestPayloadAssignment.Of(component.RegisteredBindingPath, componentValue);
-            }
+            internal override bool SelectsRegisteredInputs => true;
         }
     }
 

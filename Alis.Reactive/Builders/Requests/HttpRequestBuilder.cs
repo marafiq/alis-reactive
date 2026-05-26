@@ -139,26 +139,18 @@ namespace Alis.Reactive.Builders.Requests
             if (_gather == null)
                 return RequestInput.None;
 
-            var declaredFields = new List<RequestPayloadAssignment>(_gather.Draft.DeclaredFields);
-            var registeredInputFields = new List<RequestPayloadAssignment>();
+            var fields = new List<RequestPayloadAssignment>(_gather.Draft.Fields);
             var selection = _gather.Draft.Selection;
-            var supplementalFields = _gather.Draft.SupplementalFields;
-
-            selection.AddBuildTimeRegisteredInputFields(registeredInputFields, _context);
 
             var gatherDslAddedInput =
-                declaredFields.Count > 0
-                || registeredInputFields.Count > 0
-                || supplementalFields.Count > 0
-                || selection.MayExpandRegisteredInputsAtRuntime;
+                fields.Count > 0
+                || selection.SelectsRegisteredInputs;
             if (!gatherDslAddedInput)
                 return RequestInput.None;
 
             return GatherInput.From(
-                declaredFields,
-                registeredInputFields,
+                fields,
                 _transport,
-                supplementalFields,
                 selection);
         }
 

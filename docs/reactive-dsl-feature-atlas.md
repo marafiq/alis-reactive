@@ -267,13 +267,13 @@ Domain terms:
 
 Runtime behavior:
 
-Gather is a declared request input. It is a list of assignments:
-`target <- source`. A target is the HTTP payload name plus structured path. A
-source is any `ValueProducer`: literal, URL value, event/response payload,
-component property read, plugin result, object, or array. Scalar destinations
-such as headers and route parameters stay scalar. `IncludeAll` appends
-registered input assignments known at render and lets the runtime append
-currently mounted registered input assignments from partials.
+Gather is a declared request input. It is one ordered list of authored
+assignments: `target <- source`. A target is the HTTP payload name plus
+structured path. A source is any `ValueProducer`: literal, URL value,
+event/response payload, component property read, plugin result, object, or
+array. Scalar destinations such as headers and route parameters stay scalar.
+`IncludeAll` is a selection policy over the current runtime plan, so registered
+inputs from the root view and loaded partials load and unload deterministically.
 
 Design consequence:
 
@@ -281,10 +281,10 @@ Gather depends on controlled component IDs. ID control is an absolute
 requirement because component render, registration, validation, gather, partial
 merge/unmerge, and runtime lookup all join on that ID.
 
-There is no payload claim/coverage model. The DSL and model-bound component IDs
-are the correctness mechanism. Runtime executes every assignment in the
-generated plan; it does not negotiate precedence or double-check a generated
-plan before execution.
+There is no payload ownership accounting model. The DSL and model-bound
+component IDs are the correctness mechanism. Runtime executes every assignment
+in the generated plan; it does not negotiate precedence or double-check a
+generated plan before execution.
 
 ## Validation Surface
 

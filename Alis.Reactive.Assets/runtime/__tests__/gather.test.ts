@@ -44,16 +44,14 @@ function gatherInput(
 ): RequestInput {
   return {
     kind: "gather",
-    declaredFields: [],
-    registeredInputFields: [],
+    fields,
     transport,
-    supplementalFields: fields,
     selection: { kind: "explicit" },
   };
 }
 
 describe("resolveGather", () => {
-  it("formats declared static fields through their own shapes", () => {
+  it("formats request fields through their own shapes", () => {
     const input = gatherInput([
       {
         target: target("scheduledFor"),

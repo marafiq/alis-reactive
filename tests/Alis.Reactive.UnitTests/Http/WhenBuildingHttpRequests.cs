@@ -22,7 +22,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("supplementalFields")
+            .GetProperty("fields")
             .EnumerateArray()
             .Single(field => TargetName(field) == "optional")
             .GetProperty("source");
@@ -74,7 +74,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
     }
 
     [Test]
-    public void include_all_keeps_declared_assignments_and_registered_input_assignments_separate()
+    public void include_all_keeps_authored_assignments_and_registered_input_selection_separate()
     {
         var plan = CreatePlan();
         RegisterTextInput(plan, "Id", "id-input");
@@ -95,25 +95,24 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("declaredFields")
+            .GetProperty("fields")
             .EnumerateArray()
             .Select(TargetName)
             .ToList();
-        var registeredFields = doc.RootElement.GetProperty("behaviors")[0]
+        var selection = doc.RootElement.GetProperty("behaviors")[0]
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("registeredInputFields")
-            .EnumerateArray()
-            .Select(TargetName)
-            .ToList();
+            .GetProperty("selection")
+            .GetProperty("kind")
+            .GetString();
 
         Assert.That(fields, Is.EqualTo(new[] { "selectedId" }));
-        Assert.That(registeredFields, Is.EqualTo(new[] { "Id" }));
+        Assert.That(selection, Is.EqualTo("all-registered-inputs"));
     }
 
     [Test]
-    public void include_all_separates_build_time_registered_inputs_from_declared_payload_fields()
+    public void include_all_selects_registered_inputs_without_serializing_build_time_fields()
     {
         var plan = CreatePlan();
         RegisterTextInput(plan, "Name", "name-input");
@@ -131,18 +130,14 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input");
-        var registeredInputFields = input
-            .GetProperty("registeredInputFields")
-            .EnumerateArray()
-            .Select(TargetName)
-            .ToList();
 
-        Assert.That(input.GetProperty("declaredFields").GetArrayLength(), Is.EqualTo(0));
-        Assert.That(registeredInputFields, Is.EqualTo(new[] { "Name" }));
+        Assert.That(input.GetProperty("fields").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
+            Is.EqualTo("all-registered-inputs"));
     }
 
     [Test]
-    public void include_all_keeps_supplemental_assignments_and_registered_input_assignments_separate()
+    public void include_all_keeps_static_assignments_as_authored_fields()
     {
         var plan = CreatePlan();
         RegisterTextInput(plan, "Id", "id-input");
@@ -164,19 +159,17 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("input");
 
         Assert.That(input.GetProperty("kind").GetString(), Is.EqualTo("gather"));
-        Assert.That(input.GetProperty("declaredFields").GetArrayLength(), Is.EqualTo(0));
-        Assert.That(input.GetProperty("registeredInputFields").GetArrayLength(), Is.EqualTo(1));
         Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
             Is.EqualTo("all-registered-inputs"));
-        var supplementalFields = input.GetProperty("supplementalFields")
+        var fields = input.GetProperty("fields")
             .EnumerateArray()
             .Select(TargetName)
             .ToList();
-        Assert.That(supplementalFields, Is.EqualTo(new[] { "Id" }));
+        Assert.That(fields, Is.EqualTo(new[] { "Id" }));
     }
 
     [Test]
-    public void include_all_adds_registered_inputs_even_when_supplemental_assignments_use_nested_paths()
+    public void include_all_selection_is_independent_from_authored_nested_payload_paths()
     {
         var plan = CreatePlan();
         RegisterTextInput(plan, "Address", "address-input");
@@ -192,13 +185,18 @@ public class WhenBuildingHttpRequests : PlanTestBase
         var planJson = plan.RenderFormatted();
 
         using var doc = System.Text.Json.JsonDocument.Parse(planJson);
-        var registeredInputFields = doc.RootElement.GetProperty("behaviors")[0]
+        var input = doc.RootElement.GetProperty("behaviors")[0]
             .GetProperty("reaction")
             .GetProperty("request")
-            .GetProperty("input")
-            .GetProperty("registeredInputFields");
+            .GetProperty("input");
+        var fields = input.GetProperty("fields")
+            .EnumerateArray()
+            .Select(TargetName)
+            .ToList();
 
-        Assert.That(registeredInputFields.GetArrayLength(), Is.EqualTo(1));
+        Assert.That(fields, Is.EqualTo(new[] { "Address.City" }));
+        Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
+            Is.EqualTo("all-registered-inputs"));
     }
 
     [Test]
@@ -221,8 +219,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("input");
 
         Assert.That(input.GetProperty("kind").GetString(), Is.EqualTo("gather"));
-        Assert.That(input.GetProperty("declaredFields").GetArrayLength(), Is.EqualTo(0));
-        Assert.That(input.GetProperty("registeredInputFields").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(input.GetProperty("fields").GetArrayLength(), Is.EqualTo(0));
         Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
             Is.EqualTo("all-registered-inputs"));
     }

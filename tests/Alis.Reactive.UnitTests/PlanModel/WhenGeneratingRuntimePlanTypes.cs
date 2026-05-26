@@ -95,6 +95,29 @@ public class WhenGeneratingRuntimePlanTypes
     }
 
     [Test]
+    public void generated_runtime_plan_types_model_gather_as_fields_plus_selection()
+    {
+        var generated = PlanTypeScriptContract.Render();
+
+        Assert.That(
+            generated,
+            Does.Contain("export interface GatherInput {\n  kind: \"gather\";\n  fields: RequestPayloadAssignment[];\n  transport: Transport;\n  selection: GatherSelection;\n}"),
+            "Gather input should be one ordered field list plus the registered-input selection policy.");
+        Assert.That(
+            generated,
+            Does.Not.Contain("declaredFields"),
+            "Gather should not split authored request fields into plan buckets.");
+        Assert.That(
+            generated,
+            Does.Not.Contain("registeredInputFields"),
+            "IncludeAll should execute from the runtime plan selection, not serialized build-time expansion.");
+        Assert.That(
+            generated,
+            Does.Not.Contain("supplementalFields"),
+            "Static/event gather fields are ordinary authored request payload assignments.");
+    }
+
+    [Test]
     public void generated_runtime_plan_types_narrow_reaction_target_sources()
     {
         var generated = PlanTypeScriptContract.Render();

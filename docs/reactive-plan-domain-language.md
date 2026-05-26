@@ -251,7 +251,7 @@ TypeScript.
 | Does this code use a fixed app-level object from layout? | Layout Object Contribution | Materialize or join the fixed id without partial ownership transfer; remove only when a partial materialized it and the last partial reference unloads | Treating layout objects as incidental object targets |
 | Does this declaration add members to the same browser object? | Object Contract Fragment Contribution | Record the source-owned fragment, materialize the active merged contract, and widen access on same path/compatible shape | `Object.assign`, `AddOrReplace`, last-writer-wins, or trying to subtract from an already-merged type |
 | Does render-time input registration describe a value member? | Input Value Contract Enrichment | Ensure the type exists, then enrich it with readable value metadata | Replacing a writable type with a read-only input type |
-| Does gather add data to an HTTP request? | Request Payload Assignment | Emit `target <- source`; the target carries HTTP name and structured path, the source is a `ValueProducer` | Adding claim/coverage/dedupe logic around generated plan assignments |
+| Does gather add data to an HTTP request? | Request Payload Assignment | Emit `target <- source`; the target carries HTTP name and structured path, the source is a `ValueProducer` | Adding defensive path accounting around generated plan assignments |
 | Does a plan script appear during initial page load? | Initial Document Contribution | Compose through the shared contribution policy; coalesce identical owned definitions and validation containers because boot has no unload lifetime | Boot-only shortcut with weaker rules |
 | Does an injected partial disappear? | Partial Slot Unload | Abort listeners, remove owned definitions, remove exact validation rule contributions, keep root references | Removing root-owned hosts/app components |
 | Does validation expose browser-executable validation intent? | Client Validation Projection | Emit deterministic browser rule intent or record skipped projection | Inferring from implementation details or pretending all server validator rules can execute in the browser |
@@ -294,17 +294,13 @@ TypeScript.
 - **Request Payload Assignment**: one deterministic `target <- source` entry in
   an HTTP gather plan. The target owns the HTTP name plus structured path. The
   source is a `ValueProducer` evaluated when the request executes.
-- **Declared Assignment**: a developer-authored gather assignment from explicit
-  component include, typed source, URL read, plugin result, or event/response
-  payload.
-- **Registered Input Assignment**: an `IncludeAll()` assignment expanded from a
-  model-bound input already registered during C# render.
-- **Supplemental Assignment**: a static or event-derived assignment added beside
-  declared and registered assignments.
+- **Authored Gather Field**: a developer-authored request payload assignment
+  from explicit component include, typed source, static value, URL read, plugin
+  result, or event/response payload.
 - **Runtime Registered Input Expansion**: `IncludeAll()` applied to the current
   runtime plan so browser-loaded partial inputs load and unload
-  deterministically. It appends assignments; it does not claim paths, negotiate
-  precedence, or validate the generated plan.
+  deterministically. It appends assignments; it does not track path ownership,
+  negotiate precedence, or validate the generated plan.
 
 ### Plugin Terms
 
@@ -567,7 +563,7 @@ without turning them into ceremony.
 
 ### DSL Feature Inventory
 
-This inventory is a coverage map for the frozen DSL. Any rich-model refactor
+This inventory is a feature map for the frozen DSL. Any rich-model refactor
 must preserve every authoring shape here.
 
 | DSL Surface | Authoring Forms | Plan Concepts Forced By The DSL |
@@ -578,7 +574,7 @@ must preserve every authoring shape here.
 | Component DSL | Vendor-specific `.Value()`, `.SetValue(...)`, `.Show()`, `.Hide()`, `.Open()`, `.Close()`, `.FocusIn()`, component events | component object contract, member name/path, access mode, event payload, vendor resolution |
 | Condition DSL | payload source, response source, typed source, `Confirm`, `Eq/NotEq/Gt/Gte/Lt/Lte`, source-vs-source comparisons, truthy/falsy/null/empty, `In/NotIn`, `Between`, text operators, array contains, nested branches, else | comparison source, operand kind, operand shape, branch case, default branch, sync/async condition boundary |
 | HTTP DSL | `Get/Post/Put/Delete`, inline gather, `AsJson/AsFormData`, `WhileLoading`, `Finally`, `Validate<TValidationSource>`, `Response`, `Chained`, `Parallel`, `OnAllSettled` | request endpoint, gather plan, transport, request stages, validation gate, response routing, chain, parallel completion |
-| Gather DSL | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, plugin result, explicit component include, typed component source include | explicit gather field, dynamic registered input, supplemental field, scalar slot, route template binding, component read |
+| Gather DSL | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, plugin result, explicit component include, typed component source include | authored gather field, dynamic registered input, scalar slot, route template binding, component read |
 | Response DSL | untyped/typed `OnSuccess`, any/specific `OnError`, typed error body, chained request | response payload source, response media type, status handler, any-status handler, no-response outcome |
 | Dispatch DSL | `Dispatch`, literal typed dispatch, `DispatchWith<TPayload>` with typed field paths and source/literal assignments | dispatch payload contract, nested payload path, object value producer, custom-event payload type |
 | Validation DSL | `Validate<TValidationSource>`, `ValidationErrors`, render-time input registration, FluentValidation client projection, core projection registry, `WhenField*`, peer comparisons | client validation projection request/result, field binding, activation condition, peer operand, server error field name |
@@ -705,7 +701,7 @@ when tests or code reveal a better classification.
 | Accepted | Execution lanes | Making every reaction async for implementation convenience | Component event mutations need same-tick visibility. The immediate lane handles set/call/dispatch/inject/validation display and sync guards; the async lane is entered only when execution reaches request, parallel, or a prompt/user-decision guard such as confirm. | `Immediate Execution Lane`, `Async Execution Lane`, `Reaction Completion`, trigger/runtime tests |
 | Accepted | Lifecycle stages carry reaction graphs | Rejecting branch/request/parallel just because a lifecycle callback was originally command-oriented | If the frozen DSL can express a deterministic reaction graph, the plan should preserve it. Runtime execution lanes decide when to stay immediate and when to await selected async concepts. | `RequestLifecycle`, `WhileLoading`, `Finally`, `ParallelCompletion.OnSettled`, `WhenBuildingLifecycleReactionGraphs` |
 | Accepted | Unique last default branch | Allowing default branch cases anywhere in the list | `default` is else, so it must be the final branch and can appear only once. The DSL already guides this; PlanModel now enforces it as an invariant. | `BranchCases`, `WhenBuildingConditionalBranches` |
-| Rejected | Gather payload claims | Treating `IncludeAll` as raw assignment append | The DSL controls component ids and model-bound paths. Runtime executes generated assignments; path-claim/coverage/dedupe logic was defensive code around a trusted plan and made the model harder to read. | `RequestPayloadAssignment`, simple gather loops, DSL behavior tests |
+| Rejected | Gather payload ownership accounting | Treating `IncludeAll` as raw assignment append | The DSL controls component ids and model-bound paths. Runtime executes generated assignments; path ownership and dedupe logic was defensive code around a trusted plan and made the model harder to read. | `RequestPayloadAssignment`, simple gather loops, DSL behavior tests |
 | Accepted | Contribution removal is domain cleanup | Treating unload as DOM cleanup only | Unload must remove listeners, owned component definitions, type fragments, exact validation rule contributions, and dynamic gather reachability. | `Slot Load AbortController`, `Validation Rule Contribution`, partial lifecycle tests |
 | Accepted | Subtractive object contract fragments | Keeping merged type members until every owner disappears | Root and partial type fragments are source-owned contributions. Partial unload recomputes the active object contract from remaining fragments so root-owned app components and injection hosts keep root members but lose unloaded partial members. | `ObjectContractFragmentOwnership`, merge-plan fragment lifecycle tests |
 | Accepted | Server error placement target | Silently dropping server errors for known but currently missing fields | Server errors are deterministic placement decisions: mounted known fields render inline; known but missing/unmounted fields route to summary; unknown server fields route to summary. | `ServerErrorPlacementTarget`, validation orchestrator tests |
@@ -795,12 +791,10 @@ different domain actions and must not share one collision rule.
 | Request Completion Stage | HTTP `complete` reactions that run after a request outcome exists. They are guaranteed around response/error routing failures, but they do not run when the request is blocked before dispatch, such as a failing `before` reaction or failed validation gate. |
 | No Response Outcome | Request outcome for failures before a readable HTTP response exists. It still routes error and complete handlers with the prepared request context when gathering succeeded. |
 | Response Media Type | Runtime classification of an HTTP response `Content-Type`. JSON includes both `application/json` and structured syntax suffixes such as `application/problem+json`; text includes text and HTML media types. |
-| Gather Selection | Request input policy. `explicit` gathers declared fields only; `all-registered-inputs` expands against the current Runtime Plan View so partial load and unload affect gather deterministically. |
-| Request Payload Assignment | Deterministic HTTP gather entry: assign a source value to a target payload name/path. Declared, supplemental, build-time registered, and runtime registered inputs all share this same shape. |
-| Declared Gather Fields | Developer-authored request payload fields from `Include`, `FromUrl`, `FromEvent`, plugin reads, or typed component sources. They stay separate from `Build-Time Registered Input Gather Field` in plan JSON so authored intent is not confused with `IncludeAll` expansion. |
-| Gathered Component Read | Explicit classification of a selected gather field whose value producer reads a component source. Build-time IncludeAll and runtime dynamic expansion use the component identity, not the HTTP payload path, to avoid gathering the same component twice when a declared field aliases the request path. Non-component gather fields are represented as their own no-op classification rather than nullable absence. |
-| Dynamic Gather Component | Runtime contribution included by `all-registered-inputs` after partial plan merge. It is skipped when an explicit field already selected the component or payload path, or when the component is not mounted; if mounted and selected, its declared binding member must exist and be readable on the component contract. |
-| Supplemental Gather Fields | Explicit request-input contract for supplemental fields. `none` means no supplemental fields; `declared` carries supplemental payload fields as `payloadPath + value`, so runtime does not rediscover gather intent by decomposing an object producer. |
+| Gather Selection | Request input policy. `explicit` emits authored fields only; `all-registered-inputs` also expands against the current Runtime Plan View so partial load and unload affect gather deterministically. |
+| Request Payload Assignment | Deterministic HTTP gather entry: assign a source value to a target payload name/path. Authored fields and runtime registered-input expansion share this same shape. |
+| Authored Gather Fields | Developer-authored request payload fields from `Include`, `Static`, `FromUrl`, `FromEvent`, plugin reads, or typed component sources. They are serialized as one ordered `fields` list because the DSL already declares the source and target. |
+| Dynamic Gather Component | Runtime contribution included by `all-registered-inputs` after partial plan merge. It is skipped when the component is not mounted; if mounted and selected, its declared binding member must exist and be readable on the component contract. |
 | Declared Object Value Fields | Runtime request-body view of an `object` `ValueProducer`. Each field is emitted from its own `ValueProducer` and shape so dates, arrays, and nullable values keep their declared wire behavior instead of becoming loose properties on an already-evaluated object. |
 | Gather Scalar Wire Value | Runtime scalar serialization boundary for query string and form-data slots. Values that cannot become one text value are contract errors; they are not silently sent as empty strings. |
 | Payload Read Path | Structured path carried by payload reads. C# translates typed payload member intent into `Path`; runtime only accepts a structured path or the explicit whole-body `responseBody` member. |
@@ -908,7 +902,6 @@ different domain actions and must not share one collision rule.
 | Runtime Property Write Value | Browser-side preparation of an evaluated value before assigning a declared component property. The target property shape owns this boundary, so a raw producer can still satisfy a typed target without executor-specific coercion. |
 | Shape Compatibility Policy | Plan-model rule for deciding whether a produced value shape can satisfy a consumer shape. `any` refines structurally inside arrays and objects, `none` never acts as a value wildcard, and object consumers require declared fields unless the producer is an open object. |
 | Registered Input Binding | Component binding that participates in gather/validation through a binding path and value member. |
-| Build-Time Registered Input Gather Field | Request payload field produced by `IncludeAll()` while the C# plan is built from registered model-bound inputs already present in the current view. It is serialized separately from declared gather fields because it is expansion output, not authored payload intent. |
 | Runtime Registered Input Assignment | Request payload assignment materialized by the browser runtime for a mounted registered input contributed after boot, usually through partial plan load. |
 | Plugin Contract | Registered JavaScript function/object contract for behavior that is intentionally outside deterministic plan primitives, while still carrying typed argument and return shapes. |
 | Plugin Operation Identity | C# value object for a plugin call target. It owns the plugin name, root/member target, plan method key, invocation path, and diagnostic label so string plugin DSL and typed plugin descriptors produce the same plan contract. |

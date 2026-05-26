@@ -64,11 +64,10 @@ describe("all registered input gather lifecycle", () => {
 
     expect(resolveGather({
       ...allRegisteredInputs(),
-      declaredFields: [{
+      fields: [{
         target: target("selected"),
         source: literal("manual", stringShape),
-      }],
-      supplementalFields: [{
+      }, {
         target: target("address.city"),
         source: literal("Seattle", stringShape),
       }],
@@ -181,10 +180,8 @@ function pathSegment(part: string): PathSegment {
 function allRegisteredInputs(): Extract<RequestInput, { kind: "gather" }> {
   return {
     kind: "gather",
-    declaredFields: [],
-    registeredInputFields: [],
+    fields: [],
     transport: "json",
-    supplementalFields: [],
     selection: { kind: "all-registered-inputs" },
   };
 }

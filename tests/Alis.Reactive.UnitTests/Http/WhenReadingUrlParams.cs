@@ -268,7 +268,7 @@ public class WhenReadingUrlParams : PlanTestBase
         using var doc = JsonDocument.Parse(planJson);
         var field = doc.RootElement.GetProperty("behaviors")[0]
             .GetProperty("reaction").GetProperty("request")
-            .GetProperty("input").GetProperty("declaredFields")[0];
+            .GetProperty("input").GetProperty("fields")[0];
         Assert.That(field.GetProperty("source").GetProperty("shape")
             .GetProperty("kind").GetString(), Is.EqualTo("number"));
     }

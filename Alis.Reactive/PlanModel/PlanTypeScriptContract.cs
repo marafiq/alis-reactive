@@ -535,10 +535,8 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("GatherInput")
                 .Requires("kind", Literal("gather"))
-                .Requires("declaredFields", "RequestPayloadAssignment[]")
-                .Requires("registeredInputFields", "RequestPayloadAssignment[]")
+                .Requires("fields", "RequestPayloadAssignment[]")
                 .Requires("transport", "Transport")
-                .Requires("supplementalFields", "RequestPayloadAssignment[]")
                 .Requires("selection", "GatherSelection"));
 
             contract.Declare(Union(

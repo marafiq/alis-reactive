@@ -46,15 +46,7 @@ function resolveRequestInput(input: RequestInput, runtime: GatherRuntime): Gathe
 function resolveGatherInput(input: GatherInput, runtime: GatherRuntime): GatherResult {
   const output = GatherOutput.for(input.transport, runtime.method);
 
-  for (const field of input.declaredFields) {
-    emitPlanRequestPayloadAssignment(field, output.transport, runtime);
-  }
-
-  for (const field of input.registeredInputFields) {
-    emitPlanRequestPayloadAssignment(field, output.transport, runtime);
-  }
-
-  for (const field of input.supplementalFields) {
+  for (const field of input.fields) {
     emitPlanRequestPayloadAssignment(field, output.transport, runtime);
   }
 

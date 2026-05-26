@@ -6,16 +6,13 @@ namespace Alis.Reactive.Builders.Requests
 {
     internal sealed class GatherDraft
     {
-        private readonly List<RequestPayloadAssignment> _declaredFields = new List<RequestPayloadAssignment>();
-        private readonly List<RequestPayloadAssignment> _supplementalFields =
-            new List<RequestPayloadAssignment>();
+        private readonly List<RequestPayloadAssignment> _fields = new List<RequestPayloadAssignment>();
         private readonly Dictionary<string, ValueProducer> _headerFields =
             new Dictionary<string, ValueProducer>();
         private readonly Dictionary<string, ValueProducer> _routeParameterFields =
             new Dictionary<string, ValueProducer>();
 
-        internal IReadOnlyList<RequestPayloadAssignment> DeclaredFields => _declaredFields;
-        internal IReadOnlyList<RequestPayloadAssignment> SupplementalFields => _supplementalFields;
+        internal IReadOnlyList<RequestPayloadAssignment> Fields => _fields;
 
         internal GatherSelection Selection { get; private set; } = GatherSelection.ExplicitFields;
 
@@ -24,18 +21,18 @@ namespace Alis.Reactive.Builders.Requests
             Selection = GatherSelection.AllRegisteredInputs;
         }
 
-        internal void AddDeclaredField(RequestPayloadAssignment field)
+        internal void AddField(RequestPayloadAssignment field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
-            _declaredFields.Add(field);
+            _fields.Add(field);
         }
 
-        internal void AddSupplementalField(BindingPath path, ValueProducer value)
+        internal void AddField(BindingPath path, ValueProducer value)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
             if (value == null) throw new ArgumentNullException(nameof(value));
             var payloadField = RequestPayloadAssignment.Of(path, value);
-            _supplementalFields.Add(payloadField);
+            _fields.Add(payloadField);
         }
 
         internal void AddHeader(HeaderName name, ValueProducer value)
