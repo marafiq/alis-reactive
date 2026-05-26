@@ -171,7 +171,7 @@ public class WhenGeneratingRuntimePlanTypes
 
         Assert.That(
             generated,
-            Does.Contain("export type ValidationRule =\n  | NoOperandValidationRule\n  | LengthValidationRule\n  | RegexValidationRule\n  | RangeValidationRule\n  | OrderedComparisonValidationRule\n  | LiteralEqualityValidationRule\n  | PeerEqualityValidationRule;"),
+            Does.Contain("export type ValidationRule =\n  | NoOperandValidationRule\n  | LengthValidationRule\n  | RegexValidationRule\n  | RangeValidationRule\n  | OrderedComparisonValidationRule\n  | PeerOrderedComparisonValidationRule\n  | LiteralEqualityValidationRule\n  | PeerEqualityValidationRule;"),
             "Validation rule family should decide execution shape instead of a single broad operand bag.");
         Assert.That(
             generated,
@@ -193,6 +193,10 @@ public class WhenGeneratingRuntimePlanTypes
             generated,
             Does.Contain("export interface PeerEqualityValidationRule"),
             "Peer equality rules should be separate from literal equality rules.");
+        Assert.That(
+            generated,
+            Does.Contain("export interface PeerOrderedComparisonValidationRule"),
+            "Peer ordered comparisons should be separate from literal ordered comparisons.");
         Assert.That(
             generated,
             Does.Contain("execution: PeerValidationRuleExecution;"),

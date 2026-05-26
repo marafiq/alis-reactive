@@ -10,6 +10,7 @@ public class EnrichmentTestModel
     public string? Email { get; set; }
     public bool ReceiveNotifications { get; set; }
     public DateTime AdmissionDate { get; set; }
+    public DateTime DischargeDate { get; set; }
     public EnrichmentAddress? Address { get; set; }
 }
 
@@ -201,6 +202,40 @@ public class WhenEnrichingValidationAtRenderTime
     }
 
     [Test]
+    public void Registered_validation_peer_ordered_comparisons_read_the_component_value_contract()
+    {
+        ReactivePlanConfig.Reset();
+        ReactivePlanConfig.UseClientValidationProjectionSource(new PeerOrderedRuleProjectionSource());
+
+        var plan = new ReactivePlan<EnrichmentTestModel>();
+        RegisterInput(plan, "AdmissionDate", "admission-date", "value", Alis.Reactive.PlanModel.Shape.Date);
+        RegisterInput(plan, "DischargeDate", "discharge-date", "value", Alis.Reactive.PlanModel.Shape.Date);
+
+        var trigger = new Builders.TriggerBuilder<EnrichmentTestModel>(plan, plan.Context);
+        trigger.DomReady(p => p.Post("/save", g => g.IncludeAll()).Validate<FakeEnrichmentValidator>("test-form"));
+
+        using var document = JsonDocument.Parse(plan.Render());
+        var execution = document.RootElement
+            .GetProperty("components")
+            .GetProperty("test-form")
+            .GetProperty("container")
+            .GetProperty("validationRules")[0]
+            .GetProperty("rules")[0]
+            .GetProperty("execution");
+
+        Assert.That(execution.GetProperty("constraint").GetProperty("kind").GetString(), Is.EqualTo("none"));
+
+        var peerValue = execution
+            .GetProperty("otherValue")
+            .GetProperty("value");
+
+        Assert.That(peerValue.GetProperty("from").GetProperty("component").GetString(), Is.EqualTo("admission-date"));
+        Assert.That(peerValue.GetProperty("member").GetString(), Is.EqualTo("value"));
+        Assert.That(peerValue.GetProperty("shape").GetProperty("kind").GetString(), Is.EqualTo("date"));
+        Assert.That(execution.GetProperty("comparisonShape").GetProperty("kind").GetString(), Is.EqualTo("date"));
+    }
+
+    [Test]
     public void Referenced_validation_dependency_must_be_projected_or_registered()
     {
         ReactivePlanConfig.Reset();
@@ -357,6 +392,27 @@ public class WhenEnrichingValidationAtRenderTime
                                 ValidationFieldPath.Of("Name"),
                                 ValidationRuleCondition.Always,
                                 Alis.Reactive.PlanModel.Shape.String)),
+                    }),
+            };
+    }
+
+    private class PeerOrderedRuleProjectionSource : IClientValidationProjectionSource
+    {
+        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType) =>
+            new List<ClientValidationField>
+            {
+                Field(
+                    "DischargeDate",
+                    Shape.Date,
+                    new List<ValidationRule>
+                    {
+                        new ValidationRule(
+                            ValidationRuleName.Gt,
+                            ValidationMessage.Of("Discharge date must be after admission date"),
+                            ValidationRuleDetails.WithPeerField(
+                                ValidationFieldPath.Of("AdmissionDate"),
+                                ValidationRuleCondition.Always,
+                                Alis.Reactive.PlanModel.Shape.Date)),
                     }),
             };
     }

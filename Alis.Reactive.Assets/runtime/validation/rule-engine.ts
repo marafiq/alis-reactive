@@ -8,6 +8,7 @@ import type {
   NoOperandValidationRule,
   OrderedComparisonValidationRule,
   PeerEqualityValidationRule,
+  PeerOrderedComparisonValidationRule,
   RangeValidationRule,
   RegexValidationRule,
   Shape,
@@ -28,17 +29,31 @@ type NonPeerValidationRule =
   | RangeValidationRule
   | OrderedComparisonValidationRule
   | LiteralEqualityValidationRule;
+type PeerTargetValidationRule =
+  | PeerEqualityValidationRule
+  | PeerOrderedComparisonValidationRule;
 type EqualityRuleEvaluation =
   | { readonly rule: LiteralEqualityValidationRule; readonly value: unknown }
   | { readonly rule: PeerEqualityValidationRule; readonly value: unknown; readonly peerValue: unknown };
+type OrderedRuleEvaluation =
+  | { readonly rule: OrderedComparisonValidationRule; readonly value: unknown }
+  | { readonly rule: PeerOrderedComparisonValidationRule; readonly value: unknown; readonly peerValue: unknown };
 
 export type RuleEvaluation =
   | { readonly rule: NonPeerValidationRule; readonly value: unknown }
-  | { readonly rule: PeerEqualityValidationRule; readonly value: unknown; readonly peerValue: unknown };
+  | { readonly rule: PeerTargetValidationRule; readonly value: unknown; readonly peerValue: unknown };
 
 export function ruleFails(evaluation: RuleEvaluation): boolean {
   const subject = ValidationSubject.from(evaluation.value);
+  if ("peerValue" in evaluation) return peerTargetRuleFails(evaluation, subject);
 
+  return fieldRuleFails(evaluation, subject);
+}
+
+function fieldRuleFails(
+  evaluation: { readonly rule: NonPeerValidationRule; readonly value: unknown },
+  subject: ValidationSubject,
+): boolean {
   switch (evaluation.rule.name) {
     case "required": return requiredFails(subject);
     case "empty": return emptyFails(subject);
@@ -53,22 +68,44 @@ export function ruleFails(evaluation: RuleEvaluation): boolean {
     case "max":
     case "gt":
     case "lt":
-      return orderedComparisonFails(evaluation.rule.name, subject, evaluation.rule);
+      return orderedComparisonFails({ rule: evaluation.rule, value: evaluation.value }, subject);
     case "range":
     case "exclusiveRange":
       return rangeFails(evaluation.rule.name, subject, evaluation.rule);
     case "equalTo":
     case "notEqual":
-    case "notEqualTo":
-      if ("peerValue" in evaluation) return equalityFails(evaluation, subject);
       return equalityFails({ rule: evaluation.rule, value: evaluation.value }, subject);
     case "atLeastOne": return atLeastOneFails(subject);
     default: return assertNever(evaluation.rule, "validation rule");
   }
 }
 
+function peerTargetRuleFails(
+  evaluation: { readonly rule: PeerTargetValidationRule; readonly value: unknown; readonly peerValue: unknown },
+  subject: ValidationSubject,
+): boolean {
+  switch (evaluation.rule.name) {
+    case "min":
+    case "max":
+    case "gt":
+    case "lt":
+      return orderedComparisonFails({
+        rule: evaluation.rule,
+        value: evaluation.value,
+        peerValue: evaluation.peerValue,
+      }, subject);
+    case "equalTo":
+    case "notEqualTo":
+      return equalityFails({
+        rule: evaluation.rule,
+        value: evaluation.value,
+        peerValue: evaluation.peerValue,
+      }, subject);
+    default: return assertNever(evaluation.rule, "peer validation rule");
+  }
+}
+
 type LengthRuleName = Extract<ValidationRuleName, "minLength" | "maxLength">;
-type OrderedComparisonRuleName = Extract<ValidationRuleName, "min" | "max" | "gt" | "lt">;
 type RangeRuleName = Extract<ValidationRuleName, "range" | "exclusiveRange">;
 function constraint(rule: OrderedComparisonValidationRule | RegexValidationRule): ValidationScalarTarget {
   return ValidationScalarTarget.fromConstraintOperand(rule.execution.constraint);
@@ -136,15 +173,16 @@ function creditCardFails(subject: ValidationSubject): boolean {
 }
 
 function orderedComparisonFails(
-  ruleName: OrderedComparisonRuleName,
+  evaluation: OrderedRuleEvaluation,
   subject: ValidationSubject,
-  rule: OrderedComparisonValidationRule,
 ): boolean {
-  const target = constraint(rule);
-  const comparison = subject.compareTo(target, comparisonShape(rule));
+  const target = "peerValue" in evaluation
+    ? ValidationScalarTarget.available(evaluation.peerValue)
+    : constraint(evaluation.rule);
+  const comparison = subject.compareTo(target, comparisonShape(evaluation.rule));
   const valueIsEmpty = subject.isEmpty;
 
-  switch (ruleName) {
+  switch (evaluation.rule.name) {
     case "min": {
       const valueIsBelowMinimum = comparison.cannotCompare || comparison.lessThanTarget;
       return !valueIsEmpty && valueIsBelowMinimum;
@@ -163,7 +201,7 @@ function orderedComparisonFails(
         comparison.cannotCompare || comparison.greaterThanTarget || comparison.equalToTarget;
       return !valueIsEmpty && valueIsNotLessThanTarget;
     }
-    default: return assertNever(ruleName, "ordered validation comparison");
+    default: return assertNever(evaluation.rule, "ordered validation comparison");
   }
 }
 

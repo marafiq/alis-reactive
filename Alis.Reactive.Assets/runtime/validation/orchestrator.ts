@@ -8,6 +8,7 @@ import type {
   ValidationRule,
   ValidationRuleActivation as PlanValidationRuleActivation,
   PeerEqualityValidationRule,
+  PeerOrderedComparisonValidationRule,
 } from "../types";
 import type { ExecContext } from "../types";
 import { RuntimePlan, RuntimeResolutionError, type RuntimeComponent } from "../domain/runtime-plan";
@@ -470,7 +471,9 @@ function failsRule(
   return ruleFails({ rule, value });
 }
 
-function hasPeerTarget(rule: ValidationRule): rule is PeerEqualityValidationRule {
+type PeerTargetValidationRule = PeerEqualityValidationRule | PeerOrderedComparisonValidationRule;
+
+function hasPeerTarget(rule: ValidationRule): rule is PeerTargetValidationRule {
   return rule.execution.otherValue.kind === "value";
 }
 

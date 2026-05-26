@@ -5,6 +5,7 @@ import type {
   NoOperandValidationRule,
   OrderedComparisonValidationRule,
   PeerEqualityValidationRule,
+  PeerOrderedComparisonValidationRule,
   RangeValidationRule,
   Shape,
   ValueProducer,
@@ -96,6 +97,22 @@ function peerEqualityRule(name: PeerEqualityValidationRule["name"]): PeerEqualit
   };
 }
 
+function peerOrderedRule(name: PeerOrderedComparisonValidationRule["name"]): PeerOrderedComparisonValidationRule {
+  return {
+    name,
+    message: `${name} failed`,
+    execution: {
+      constraint: { kind: "none" },
+      otherValue: {
+        kind: "value",
+        value: { kind: "component", component: "startDate", member: "value", shape: dateShape },
+      },
+      activation: { kind: "always" },
+      comparisonShape: dateShape,
+    },
+  };
+}
+
 describe("validation rule engine", () => {
   it("treats missing, false, empty text, and empty arrays as empty validation subjects", () => {
     const required = noOperandRule("required");
@@ -146,5 +163,13 @@ describe("validation rule engine", () => {
     expect(ruleFails({ rule: minDate, value: "2026-01-01" })).toBe(false);
     expect(ruleFails({ rule: minDate, value: "2025-12-31" })).toBe(true);
     expect(ruleFails({ rule: minDate, value: "not-a-date" })).toBe(true);
+  });
+
+  it("uses peer values as the target for ordered comparison rules", () => {
+    const greaterThanPeer = peerOrderedRule("gt");
+
+    expect(ruleFails({ rule: greaterThanPeer, value: "2026-01-02", peerValue: "2026-01-01" })).toBe(false);
+    expect(ruleFails({ rule: greaterThanPeer, value: "2026-01-01", peerValue: "2026-01-01" })).toBe(true);
+    expect(ruleFails({ rule: greaterThanPeer, value: "2025-12-31", peerValue: "2026-01-01" })).toBe(true);
   });
 });

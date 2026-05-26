@@ -156,6 +156,7 @@ namespace Alis.Reactive.PlanModel
                 "RegexValidationRule",
                 "RangeValidationRule",
                 "OrderedComparisonValidationRule",
+                "PeerOrderedComparisonValidationRule",
                 "LiteralEqualityValidationRule",
                 "PeerEqualityValidationRule"));
 
@@ -166,6 +167,7 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(LiteralUnion("RegexValidationRuleName", new[] { "regex" }));
             contract.Declare(LiteralUnion("RangeValidationRuleName", new[] { "range", "exclusiveRange" }));
             contract.Declare(LiteralUnion("OrderedComparisonValidationRuleName", new[] { "min", "max", "gt", "lt" }));
+            contract.Declare(LiteralUnion("PeerOrderedComparisonValidationRuleName", new[] { "min", "max", "gt", "lt" }));
             contract.Declare(LiteralUnion("LiteralEqualityValidationRuleName", new[] { "equalTo", "notEqual" }));
             contract.Declare(LiteralUnion("PeerEqualityValidationRuleName", new[] { "equalTo", "notEqualTo" }));
 
@@ -193,6 +195,11 @@ namespace Alis.Reactive.PlanModel
                 .Requires("name", "OrderedComparisonValidationRuleName")
                 .Requires("message", "string")
                 .Requires("execution", "ScalarConstraintValidationRuleExecution"));
+
+            contract.Declare(Interface("PeerOrderedComparisonValidationRule")
+                .Requires("name", "PeerOrderedComparisonValidationRuleName")
+                .Requires("message", "string")
+                .Requires("execution", "PeerValidationRuleExecution"));
 
             contract.Declare(Interface("LiteralEqualityValidationRule")
                 .Requires("name", "LiteralEqualityValidationRuleName")

@@ -696,9 +696,9 @@ namespace Alis.Reactive.PlanModel
             if (rule == null) throw new System.ArgumentNullException(nameof(rule));
 
             if (RuleHasNoOperands(rule)) return NoOperands;
+            if (RuleCanReadLiteralOrPeerTarget(rule)) return ConstraintOrPeer;
             if (RuleHasConstraint(rule)) return Constraint;
             if (RuleHasPeer(rule)) return Peer;
-            if (rule.Equals(ValidationRuleName.EqualTo)) return ConstraintOrPeer;
 
             throw new System.InvalidOperationException(
                 "Unknown validation rule family for '" + rule.Value + "'.");
@@ -747,6 +747,13 @@ namespace Alis.Reactive.PlanModel
                 ValidationRuleOperandRole.Constraint,
                 ValidationRuleOperandRole.None);
 
+        private static bool RuleCanReadLiteralOrPeerTarget(ValidationRuleName rule) =>
+            rule.Equals(ValidationRuleName.EqualTo) ||
+            rule.Equals(ValidationRuleName.Min) ||
+            rule.Equals(ValidationRuleName.Max) ||
+            rule.Equals(ValidationRuleName.Gt) ||
+            rule.Equals(ValidationRuleName.Lt);
+
         private static bool RuleHasNoOperands(ValidationRuleName rule) =>
             rule.Equals(ValidationRuleName.Required) ||
             rule.Equals(ValidationRuleName.Empty) ||
@@ -761,10 +768,6 @@ namespace Alis.Reactive.PlanModel
             rule.Equals(ValidationRuleName.Regex) ||
             rule.Equals(ValidationRuleName.Range) ||
             rule.Equals(ValidationRuleName.ExclusiveRange) ||
-            rule.Equals(ValidationRuleName.Min) ||
-            rule.Equals(ValidationRuleName.Max) ||
-            rule.Equals(ValidationRuleName.Gt) ||
-            rule.Equals(ValidationRuleName.Lt) ||
             rule.Equals(ValidationRuleName.NotEqual);
 
         private static bool RuleHasPeer(ValidationRuleName rule) =>

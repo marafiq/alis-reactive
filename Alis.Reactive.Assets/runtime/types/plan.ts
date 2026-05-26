@@ -205,6 +205,7 @@ export type ValidationRule =
   | RegexValidationRule
   | RangeValidationRule
   | OrderedComparisonValidationRule
+  | PeerOrderedComparisonValidationRule
   | LiteralEqualityValidationRule
   | PeerEqualityValidationRule;
 
@@ -228,6 +229,12 @@ export type RangeValidationRuleName =
   | "exclusiveRange";
 
 export type OrderedComparisonValidationRuleName =
+  | "min"
+  | "max"
+  | "gt"
+  | "lt";
+
+export type PeerOrderedComparisonValidationRuleName =
   | "min"
   | "max"
   | "gt"
@@ -269,6 +276,12 @@ export interface OrderedComparisonValidationRule {
   name: OrderedComparisonValidationRuleName;
   message: string;
   execution: ScalarConstraintValidationRuleExecution;
+}
+
+export interface PeerOrderedComparisonValidationRule {
+  name: PeerOrderedComparisonValidationRuleName;
+  message: string;
+  execution: PeerValidationRuleExecution;
 }
 
 export interface LiteralEqualityValidationRule {
