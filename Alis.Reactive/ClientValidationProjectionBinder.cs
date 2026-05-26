@@ -47,11 +47,11 @@ namespace Alis.Reactive
             var source = ReactivePlanConfig.ClientValidationProjectionSource.RequireFor(job);
             var container = job.Container;
 
-            var projection = source.Project(ClientValidationProjectionRequest.For(job.ValidationSourceType, container));
-            var bindings = new ValidationFieldBindingCatalog(_registeredInputs, _modelType, projection.Fields);
+            var fields = source.ProjectClientRules(job.ValidationSourceType);
+            var bindings = new ValidationFieldBindingCatalog(_registeredInputs, _modelType, fields);
             var ruleBinding = ValidationPlanBinding.For(bindings);
 
-            var componentValidations = projection.Fields
+            var componentValidations = fields
                 .Select(field => bindings.Resolve(field).ToComponentValidation(field, ruleBinding))
                 .ToList();
 

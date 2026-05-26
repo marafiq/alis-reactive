@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Alis.Reactive.Validation
 {
@@ -7,6 +8,6 @@ namespace Alis.Reactive.Validation
     /// </summary>
     public interface IClientValidationProjectionSource
     {
-        ClientValidationProjection Project(ClientValidationProjectionRequest request);
+        IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType);
     }
 }

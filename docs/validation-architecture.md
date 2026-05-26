@@ -9,9 +9,8 @@ FluentValidation remains the server authority. Alis Reactive projects only the
 deterministic client-side projection that can be represented in the Reactive
 Plan and executed in the browser runtime.
 
-Unsupported browser projections are not guessed. They are recorded in
-`ClientValidationProjection.SkippedRules` with a reason, while the server
-rule still runs normally on postback or HTTP submit.
+Unsupported browser projections are not guessed or emitted into the plan. The
+server rule still runs normally on postback or HTTP submit.
 
 ## Data Flow
 
@@ -36,8 +35,8 @@ Validate<TValidationSource>(containerId)
 `ClientValidationProjectionBinder` then:
 
 1. Requires a registered `IClientValidationProjectionSource`.
-2. Calls `Project(ClientValidationProjectionRequest.For(validationSourceType, container))`.
-3. Binds each `ClientValidationField` through `ValidationProjectionBindingScope`.
+2. Calls `ProjectClientRules(validationSourceType)`.
+3. Binds each `ClientValidationField` through `ValidationFieldBindingCatalog`.
 4. Merges the resulting `ComponentValidation` rules onto the validation-container component.
 
 Field binding has two deterministic paths:
@@ -66,7 +65,7 @@ rules.
 `FluentValidationAdapter` translates supported FluentValidation validators into
 client validation projections. The adapter builds a `ClientValidationProjectionDraft`
 while walking a validator: projected rules are attached to a field path, and
-unproven browser rules are recorded as skipped projections with a reason.
+unproven browser rules are omitted from the browser projection.
 
 For projected fields, the adapter uses FluentValidation's rule metadata
 (`IValidationRule.PropertyName` and `IValidationRule.TypeToValidate`) to create
@@ -98,8 +97,8 @@ async execution lane.
 
 If a rule is declared under both a `WhenField*` guard and a server-only
 FluentValidation `When`/`Unless` scope, the browser projection is skipped. The
-client guard would be only a partial activation, so the adapter records a
-skipped client projection instead of guessing the missing predicate.
+client guard would be only a partial activation, so the adapter omits the
+browser rule instead of guessing the missing predicate.
 
 ## Runtime Side
 
@@ -130,9 +129,9 @@ components.
 | Area | Types |
 | --- | --- |
 | Request gate | `RequestValidation`, `ValidationJob`, `RequestValidationTarget` |
-| Projection contract | `IClientValidationProjectionSource`, `ClientValidationProjectionRequest`, `ClientValidationProjection` |
+| Projection contract | `IClientValidationProjectionSource.ProjectClientRules(Type)` returning `IReadOnlyList<ClientValidationField>` |
 | Core projection source | `ClientValidationProjectionRegistry`, `ClientValidationProjectionBuilder<TModel>`, `ClientValidationFieldToken<TModel, TValue>` |
-| Projection binding | `ClientValidationProjectionBinder`, `ValidationProjectionBindingScope`, `ValidationFieldBinding` |
+| Projection binding | `ClientValidationProjectionBinder`, `ValidationFieldBindingCatalog`, `ValidationFieldBinding` |
 | Plan payload | `ComponentValidation`, `ValidationRuleExecution`, `ValidationRuleOperand`, `ValidationRuleActivation`, `ValidationCondition` |
 | Runtime execution | `validateContainer`, `showServerErrors`, `RuntimeValidationActivation`, `RuntimeValidationPeerOperand`, `rule-engine.ts` |
 

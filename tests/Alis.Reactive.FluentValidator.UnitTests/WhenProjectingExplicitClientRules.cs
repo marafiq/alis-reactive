@@ -44,9 +44,9 @@ public sealed class WhenProjectingExplicitClientRules
     [Test]
     public void Custom_server_rule_can_declare_regex_client_projection()
     {
-        var report = _adapter.ProjectValidation(typeof(ExplicitClientRuleValidator), "form");
+        var fields = _adapter.ProjectFields(typeof(ExplicitClientRuleValidator), "form");
 
-        var code = report.Fields.Single(field => field.FieldName == "Code");
+        var code = fields.Single(field => field.FieldName == "Code");
         var rule = code.Rules.Single();
 
         Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Regex));
@@ -57,21 +57,21 @@ public sealed class WhenProjectingExplicitClientRules
     [Test]
     public void Custom_server_rule_can_declare_peer_field_client_projection()
     {
-        var report = _adapter.ProjectValidation(typeof(ExplicitClientRuleValidator), "form");
+        var fields = _adapter.ProjectFields(typeof(ExplicitClientRuleValidator), "form");
 
-        var confirmEmail = report.Fields.Single(field => field.FieldName == "ConfirmEmail");
+        var confirmEmail = fields.Single(field => field.FieldName == "ConfirmEmail");
         var rule = confirmEmail.Rules.Single();
 
         Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.EqualTo));
         Assert.That(rule.PeerFieldName(), Is.EqualTo("Email"));
-        Assert.That(report.Fields.Select(field => field.FieldName), Does.Contain("Email"));
+        Assert.That(fields.Select(field => field.FieldName), Does.Contain("Email"));
     }
 
     [Test]
     public void Async_rules_stay_server_side_even_when_a_client_projection_is_declared()
     {
-        var report = _adapter.ProjectValidation(typeof(AsyncServerRuleValidator), "form");
+        var fields = _adapter.ProjectFields(typeof(AsyncServerRuleValidator), "form");
 
-        Assert.That(report.Fields, Is.Empty);
+        Assert.That(fields, Is.Empty);
     }
 }

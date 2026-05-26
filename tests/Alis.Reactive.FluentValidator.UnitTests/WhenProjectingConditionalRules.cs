@@ -40,9 +40,9 @@ public class WhenProjectingConditionalRules
     [Test]
     public void Server_only_When_wrapping_WhenField_skips_client_projection()
     {
-        var report = _adapter.ProjectValidation(typeof(ServerOnlyWhenWrapsClientGuardValidator), "testForm");
+        var fields = _adapter.ProjectFields(typeof(ServerOnlyWhenWrapsClientGuardValidator), "testForm");
 
-        Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
+        Assert.That(fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
 
         var validator = new ServerOnlyWhenWrapsClientGuardValidator();
         var result = validator.Validate(new TestModel
@@ -57,16 +57,16 @@ public class WhenProjectingConditionalRules
     [Test]
     public void WhenField_wrapping_server_only_When_skips_client_projection()
     {
-        var report = _adapter.ProjectValidation(typeof(ClientGuardWrapsServerOnlyWhenValidator), "testForm");
+        var fields = _adapter.ProjectFields(typeof(ClientGuardWrapsServerOnlyWhenValidator), "testForm");
 
-        Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
+        Assert.That(fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
     }
 
     [Test]
     public void Server_only_Otherwise_wrapping_WhenField_skips_client_projection()
     {
-        var report = _adapter.ProjectValidation(typeof(ServerOnlyOtherwiseWrapsClientGuardValidator), "testForm");
+        var fields = _adapter.ProjectFields(typeof(ServerOnlyOtherwiseWrapsClientGuardValidator), "testForm");
 
-        Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
+        Assert.That(fields.Select(field => field.FieldName), Does.Not.Contain("JobTitle"));
     }
 }

@@ -257,120 +257,108 @@ public class WhenEnrichingValidationAtRenderTime
 
     private class EmptyProjectionSource : IClientValidationProjectionSource
     {
-        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
-            ClientValidationProjection.ForFields(request, new List<ClientValidationField>());
+        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType) =>
+            new List<ClientValidationField>();
     }
 
     private class SingleRuleProjectionSource : IClientValidationProjectionSource
     {
-        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
-            ClientValidationProjection.ForFields(
-                request,
-                new List<ClientValidationField>
-                {
-                    Field(
-                        "Name",
-                        Shape.String,
-                        new List<ValidationRule>
-                        {
-                            new ValidationRule(
-                                ValidationRuleName.Required,
-                                ValidationMessage.Of("Name is required"),
-                                ValidationRuleDetails.NoOperand(ValidationRuleCondition.Always)),
-                        }),
-                });
+        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType) =>
+            new List<ClientValidationField>
+            {
+                Field(
+                    "Name",
+                    Shape.String,
+                    new List<ValidationRule>
+                    {
+                        new ValidationRule(
+                            ValidationRuleName.Required,
+                            ValidationMessage.Of("Name is required"),
+                            ValidationRuleDetails.NoOperand(ValidationRuleCondition.Always)),
+                    }),
+            };
     }
 
     private class DeferredDateFieldProjectionSource : IClientValidationProjectionSource
     {
-        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
-            ClientValidationProjection.ForFields(
-                request,
-                new List<ClientValidationField>
-                {
-                    RequiredField("AdmissionDate", Shape.Date, "Admission date is required"),
-                });
+        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType) =>
+            new List<ClientValidationField>
+            {
+                RequiredField("AdmissionDate", Shape.Date, "Admission date is required"),
+            };
     }
 
     private class BooleanRuleProjectionSource : IClientValidationProjectionSource
     {
-        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
-            ClientValidationProjection.ForFields(
-                request,
-                new List<ClientValidationField>
-                {
-                    RequiredField("ReceiveNotifications", Shape.Boolean, "Notifications must be selected"),
-                });
+        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType) =>
+            new List<ClientValidationField>
+            {
+                RequiredField("ReceiveNotifications", Shape.Boolean, "Notifications must be selected"),
+            };
     }
 
     private class UnprojectedPeerRuleProjectionSource : IClientValidationProjectionSource
     {
-        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
-            ClientValidationProjection.ForFields(
-                request,
-                new List<ClientValidationField>
-                {
-                    Field(
-                        "Email",
-                        Shape.String,
-                        new List<ValidationRule>
-                        {
-                            new ValidationRule(
-                                ValidationRuleName.EqualTo,
-                                ValidationMessage.Of("Email must match missing field"),
-                                ValidationRuleDetails.WithPeerField(
-                                    ValidationFieldPath.Of("MissingField"),
-                                    ValidationRuleCondition.Always,
-                                    Shape.String)),
-                        }),
-                });
+        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType) =>
+            new List<ClientValidationField>
+            {
+                Field(
+                    "Email",
+                    Shape.String,
+                    new List<ValidationRule>
+                    {
+                        new ValidationRule(
+                            ValidationRuleName.EqualTo,
+                            ValidationMessage.Of("Email must match missing field"),
+                            ValidationRuleDetails.WithPeerField(
+                                ValidationFieldPath.Of("MissingField"),
+                                ValidationRuleCondition.Always,
+                                Shape.String)),
+                    }),
+            };
     }
 
     private class ConditionalRuleProjectionSource : IClientValidationProjectionSource
     {
-        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
-            ClientValidationProjection.ForFields(
-                request,
-                new List<ClientValidationField>
-                {
-                    Field(
-                        "Email",
-                        Shape.String,
-                        new List<ValidationRule>
-                        {
-                            new ValidationRule(
-                                ValidationRuleName.Required,
-                                ValidationMessage.Of("Email is required"),
-                                ValidationRuleDetails.NoOperand(
-                                    ValidationRuleCondition.When(
-                                        FieldCondition.Compare(
-                                            ValidationFieldPath.Of("Name"),
-                                            Alis.Reactive.PlanModel.CompareOperator.Truthy)))),
-                        }),
-                });
+        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType) =>
+            new List<ClientValidationField>
+            {
+                Field(
+                    "Email",
+                    Shape.String,
+                    new List<ValidationRule>
+                    {
+                        new ValidationRule(
+                            ValidationRuleName.Required,
+                            ValidationMessage.Of("Email is required"),
+                            ValidationRuleDetails.NoOperand(
+                                ValidationRuleCondition.When(
+                                    FieldCondition.Compare(
+                                        ValidationFieldPath.Of("Name"),
+                                        Alis.Reactive.PlanModel.CompareOperator.Truthy)))),
+                    }),
+            };
     }
 
     private class PeerRuleProjectionSource : IClientValidationProjectionSource
     {
-        public ClientValidationProjection Project(ClientValidationProjectionRequest request) =>
-            ClientValidationProjection.ForFields(
-                request,
-                new List<ClientValidationField>
-                {
-                    Field(
-                        "Email",
-                        Shape.String,
-                        new List<ValidationRule>
-                        {
-                            new ValidationRule(
-                                ValidationRuleName.EqualTo,
-                                ValidationMessage.Of("Email must match name"),
-                                ValidationRuleDetails.WithPeerField(
-                                    ValidationFieldPath.Of("Name"),
-                                    ValidationRuleCondition.Always,
-                                    Alis.Reactive.PlanModel.Shape.String)),
-                        }),
-                });
+        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType) =>
+            new List<ClientValidationField>
+            {
+                Field(
+                    "Email",
+                    Shape.String,
+                    new List<ValidationRule>
+                    {
+                        new ValidationRule(
+                            ValidationRuleName.EqualTo,
+                            ValidationMessage.Of("Email must match name"),
+                            ValidationRuleDetails.WithPeerField(
+                                ValidationFieldPath.Of("Name"),
+                                ValidationRuleCondition.Always,
+                                Alis.Reactive.PlanModel.Shape.String)),
+                    }),
+            };
     }
 
     private static ClientValidationField RequiredField(string fieldName, Shape shape, string message) =>

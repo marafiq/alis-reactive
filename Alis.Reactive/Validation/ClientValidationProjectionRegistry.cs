@@ -26,18 +26,18 @@ namespace Alis.Reactive.Validation
             return new ClientValidationProjectionRegistry(builder.Build());
         }
 
-        public ClientValidationProjection Project(ClientValidationProjectionRequest request)
+        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (validationSourceType == null) throw new ArgumentNullException(nameof(validationSourceType));
 
-            if (!_fieldsByValidationSource.TryGetValue(request.ValidationSourceType, out var fields))
+            if (!_fieldsByValidationSource.TryGetValue(validationSourceType, out var fields))
             {
                 throw new InvalidOperationException(
-                    $"No client validation projection is registered for validation source '{request.ValidationSourceType.FullName}'. " +
+                    $"No client validation projection is registered for validation source '{validationSourceType.FullName}'. " +
                     "Register it inside ClientValidationProjectionRegistry.Create(registry => registry.For<TValidationSource, TModel>(...)).");
             }
 
-            return ClientValidationProjection.ForFields(request, fields);
+            return fields;
         }
     }
 }

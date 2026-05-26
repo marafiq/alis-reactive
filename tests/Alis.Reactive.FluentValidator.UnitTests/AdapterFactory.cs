@@ -12,13 +12,11 @@ internal static class AdapterFactory
         this FluentValidationAdapter adapter,
         Type validatorType,
         string validationContainerId) =>
-        adapter
-            .Project(ClientValidationProjectionRequest.For(validatorType, validationContainerId))
-            .Fields;
+        adapter.ProjectClientRules(validatorType);
 
-    internal static ClientValidationProjection ProjectValidation(
+    internal static IReadOnlyList<ClientValidationField> ProjectFields(
         this FluentValidationAdapter adapter,
         Type validatorType,
         string validationContainerId) =>
-        adapter.Project(ClientValidationProjectionRequest.For(validatorType, validationContainerId));
+        adapter.ProjectClientRules(validatorType);
 }

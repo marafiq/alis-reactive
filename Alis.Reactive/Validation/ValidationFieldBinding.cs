@@ -19,7 +19,7 @@ namespace Alis.Reactive
         {
             _registeredInputs = registeredInputs ?? throw new ArgumentNullException(nameof(registeredInputs));
             _modelType = modelType ?? throw new ArgumentNullException(nameof(modelType));
-            _projectedFields = ProjectedValidationFieldCatalog.From(projectedFields);
+            _projectedFields = IndexProjectedFields(projectedFields);
         }
 
         internal ValidationFieldBinding Resolve(ClientValidationField field)
@@ -47,11 +47,9 @@ namespace Alis.Reactive
                 "but that field was not included in the client validation projection. " +
                 "Declare peer fields and condition fields through the same typed client projection so their shape is known before render-time binding.");
         }
-    }
 
-    internal static class ProjectedValidationFieldCatalog
-    {
-        internal static IReadOnlyDictionary<string, ClientValidationField> From(IReadOnlyList<ClientValidationField> fields)
+        private static IReadOnlyDictionary<string, ClientValidationField> IndexProjectedFields(
+            IReadOnlyList<ClientValidationField> fields)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
 

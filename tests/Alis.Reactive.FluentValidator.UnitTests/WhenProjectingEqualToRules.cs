@@ -10,9 +10,9 @@ public class WhenProjectingEqualToRules
     [Test]
     public void FluentValidation_peer_comparison_requires_explicit_client_projection()
     {
-        var report = _adapter.ProjectValidation(typeof(EqualToValidator), "testForm");
+        var fields = _adapter.ProjectFields(typeof(EqualToValidator), "testForm");
 
-        Assert.That(report.Fields.Select(field => field.FieldName), Does.Not.Contain("ConfirmEmail"));
+        Assert.That(fields.Select(field => field.FieldName), Does.Not.Contain("ConfirmEmail"));
     }
 
     [Test]

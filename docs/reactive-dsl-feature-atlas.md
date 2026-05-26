@@ -301,8 +301,7 @@ Source:
 
 Domain terms:
 
-- `ClientValidationProjectionRequest`
-- `ClientValidationProjection`
+- `IClientValidationProjectionSource.ProjectClientRules`
 - `ClientValidationProjectionRegistry`
 - `ClientValidationFieldToken`
 - `ClientValidationField`

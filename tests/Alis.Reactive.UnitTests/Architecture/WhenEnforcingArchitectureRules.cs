@@ -58,11 +58,7 @@ public class WhenEnforcingArchitectureRules
 
     private class DummyProjectionSource : Validation.IClientValidationProjectionSource
     {
-        public Validation.ClientValidationProjection Project(Validation.ClientValidationProjectionRequest request)
-        {
-            return Validation.ClientValidationProjection.ForFields(
-                request,
-                new List<Validation.ClientValidationField>());
-        }
+        public IReadOnlyList<Validation.ClientValidationField> ProjectClientRules(Type validationSourceType) =>
+            new List<Validation.ClientValidationField>();
     }
 }

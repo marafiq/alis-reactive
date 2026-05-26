@@ -21,7 +21,7 @@ namespace Alis.Reactive.Validation
             IEnumerable<ValidationRule> rules)
         {
             _field = field ?? throw new ArgumentNullException(nameof(field));
-            Rules = ProjectedValidationRules.From(rules).ToReadOnlyList();
+            Rules = SnapshotRules(rules);
         }
 
         internal ValidationFieldPath FieldPath => _field.Path;
@@ -29,7 +29,20 @@ namespace Alis.Reactive.Validation
         internal DeferredModelBoundClientValidationField ToDeferredField(Type modelType) =>
             DeferredModelBoundClientValidationField.ForProjectedField(modelType, _field.Path, _field.Shape);
 
-        internal ClientValidationField Snapshot() =>
-            new ClientValidationField(_field, Rules);
+        private static IReadOnlyList<ValidationRule> SnapshotRules(IEnumerable<ValidationRule> rules)
+        {
+            if (rules == null) throw new ArgumentNullException(nameof(rules));
+
+            var snapshot = new List<ValidationRule>();
+            foreach (var rule in rules)
+            {
+                if (rule == null)
+                    throw new ArgumentException("Validation rule must not be null.", nameof(rules));
+
+                snapshot.Add(rule);
+            }
+
+            return snapshot.AsReadOnly();
+        }
     }
 }

@@ -29,19 +29,19 @@ namespace Alis.Reactive.FluentValidator
                 nameof(factory));
         }
 
-        public ClientValidationProjection Project(ClientValidationProjectionRequest request)
+        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (validationSourceType == null) throw new ArgumentNullException(nameof(validationSourceType));
 
             var root = ResolveValidator(
-                request.ValidationSourceType,
+                validationSourceType,
                 "validator",
                 "Ensure it is registered in the validator factory passed to FluentValidationAdapter.");
-            var projection = new ClientValidationProjectionAccumulator(request.ValidationContainer);
+            var projection = new ClientValidationProjectionAccumulator();
 
             ProjectValidator(root, ValidationFieldPath.Empty, ValidationRuleCondition.Always, projection);
 
-            return projection.ToProjection();
+            return projection.ToFields();
         }
 
         private void ProjectValidator(
@@ -375,13 +375,7 @@ namespace Alis.Reactive.FluentValidator
 
         private sealed class ClientValidationProjectionAccumulator
         {
-            private readonly ValidationContainerId _container;
             private readonly ClientValidationProjectionDraft _draft = new ClientValidationProjectionDraft();
-
-            internal ClientValidationProjectionAccumulator(ValidationContainerId container)
-            {
-                _container = container;
-            }
 
             internal void Ensure(ClientValidationFieldReference field) => _draft.EnsureField(field);
 
@@ -397,8 +391,8 @@ namespace Alis.Reactive.FluentValidator
                 _draft.AddRule(field, new ClientValidationRuleModel(name, message, details));
             }
 
-            internal ClientValidationProjection ToProjection() =>
-                new ClientValidationProjection(_container, _draft.ToFields());
+            internal IReadOnlyList<ClientValidationField> ToFields() =>
+                _draft.ToFields();
         }
 
         private sealed class ProjectedField
