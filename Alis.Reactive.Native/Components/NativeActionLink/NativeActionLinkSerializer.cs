@@ -87,13 +87,11 @@ namespace Alis.Reactive.Native.Components
                     "NativeActionLink does not support chained requests.");
 
             var lifecycle = RequestLifecycle.Create(
-                RequestReactionStages
-                    .From(
-                        request.Before,
-                        request.Success,
-                        request.Error,
-                        request.Complete)
-                    .WithoutCompletionStage(),
+                RequestReactionStages.From(
+                    request.Before,
+                    request.Success,
+                    request.Error,
+                    Array.Empty<Reaction>()),
                 RequestChain.Terminal);
 
             return Request.Create(
