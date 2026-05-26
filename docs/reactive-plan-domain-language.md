@@ -308,6 +308,10 @@ TypeScript.
   exposes a readable property, callable function, or command. String plugin
   registration and typed `ReactivePlugin` descriptors share this catalog so a
   member name cannot drift between property and method declarations.
+- **Object Member Key**: the shared C# key for one declared browser object
+  member. Plugin functions, commands, readable properties, and the synthetic
+  plugin root call all use it before JSON exists; `$call` is the root call's
+  plan method name, while `root` is only its diagnostic label.
 - **Plugin Operation Contract**: the callable-function or command contract
   that enters the plan model. String registration and typed `ReactivePlugin`
   descriptors both produce `PluginOperationContract`; argument collection is
@@ -904,8 +908,9 @@ different domain actions and must not share one collision rule.
 | Registered Input Binding | Component binding that participates in gather/validation through a binding path and value member. |
 | Runtime Registered Input Assignment | Request payload assignment materialized by the browser runtime for a mounted registered input contributed after boot, usually through partial plan load. |
 | Plugin Contract | Registered JavaScript function/object contract for behavior that is intentionally outside deterministic plan primitives, while still carrying typed argument and return shapes. |
-| Plugin Operation Identity | C# value object for a plugin call target. It owns the plugin name, root/member target, plan method key, invocation path, and diagnostic label so string plugin DSL and typed plugin descriptors produce the same plan contract. |
-| Plugin Property Identity | C# value object for a readable property on a plugin object. It owns the plugin name, member key, invocation path, and diagnostic label so plugin objects can expose data through the same runtime object property primitive as components. |
+| Object Member Key | C# value object for one declared member on a browser object. Plugin operation and property identities share it so root calls, member calls, and readable properties use the same member/path/collision language. |
+| Plugin Operation Identity | C# value object for a plugin call target. It owns the plugin name plus `Object Member Key` so string plugin DSL and typed plugin descriptors produce the same plan contract. |
+| Plugin Property Identity | C# value object for a readable property on a plugin object. It owns the plugin name plus `Object Member Key` so plugin objects can expose data through the same runtime object property primitive as components. |
 | Plugin Argument Contract Builder | Fluent C# builder for exact plugin argument lists. Both string plugin registration and typed `ReactivePlugin` descriptors use this so plugin contracts are not limited by fixed generic overload arity. |
 | Plugin Invocation Argument | One argument supplied to a plugin function or command. It carries the `ValueProducer` and declared shape together, so invocation validation never handles a loose producer/shape pair. |
 | Plugin Literal Argument | Explicit plugin invocation value added with `ArgValue<TValue>`. Its value is serialized as a literal producer and its CLR-derived shape is validated against the plugin argument contract before plan JSON exists. |
