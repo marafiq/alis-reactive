@@ -11,7 +11,7 @@ import type {
 } from "../types";
 import type { ExecContext } from "../types";
 import { RuntimePlan, RuntimeResolutionError, type RuntimeComponent } from "../domain/runtime-plan";
-import { evaluateValidationCondition } from "./condition";
+import { evaluateCondition } from "../conditions/conditions";
 import { evaluateValue } from "../core/evaluate";
 import { scope } from "../core/trace";
 import { toString } from "../core/shape-convert";
@@ -435,7 +435,7 @@ function isRuleActive(
 ): boolean {
   switch (activation.kind) {
     case "always": return true;
-    case "when": return evaluateValidationCondition(activation.condition, surface.plan, surface.context.raw);
+    case "when": return evaluateCondition(activation.condition, surface.plan, surface.context.raw);
     default: return assertNever(activation, "validation rule activation");
   }
 }
@@ -448,7 +448,7 @@ function isRuleSkippedForUnmountedField(
     case "always": return false;
     case "when":
       try {
-        return !evaluateValidationCondition(activation.condition, surface.plan, surface.context.raw);
+        return !evaluateCondition(activation.condition, surface.plan, surface.context.raw);
       } catch (e) {
         if (isResolutionError(e)) return true;
         throw e;

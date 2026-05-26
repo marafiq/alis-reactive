@@ -1,6 +1,7 @@
 // conditions.ts — V3 Condition evaluation.
 // Uses SHARED resolver for value resolution.
 // Condition is a discriminated union: compare, all, any, not, confirm.
+// ValidationCondition is the sync subset: compare, all, any, not.
 
 import type {
   Condition,
@@ -27,8 +28,6 @@ import { RuntimeShape } from "../domain/runtime-shape";
 
 const log = scope("conditions");
 
-type RuntimeEvaluableCondition = Condition | ValidationCondition;
-
 type TextOperand =
   | { readonly kind: "text"; readonly value: string }
   | { readonly kind: "missing" };
@@ -42,8 +41,8 @@ interface AlisBrowserApi {
 const missingText: TextOperand = { kind: "missing" };
 const noRightOperandTrace = { kind: "none" } as const;
 
-/** Sync condition evaluation. Confirm conditions return false in sync context. */
-export function evaluateCondition(condition: RuntimeEvaluableCondition, plan: Plan, ctx?: ExecContext): boolean {
+/** Sync condition evaluation for validation conditions. */
+export function evaluateCondition(condition: ValidationCondition, plan: Plan, ctx?: ExecContext): boolean {
   return evaluateConditionSync(condition, plan, ExecutionContext.from(ctx));
 }
 
@@ -62,7 +61,7 @@ export function evaluateConditionInCurrentLane(
 }
 
 function evaluateConditionSync(
-  condition: RuntimeEvaluableCondition,
+  condition: ValidationCondition,
   plan: Plan,
   context: ExecutionContext,
 ): boolean {
@@ -75,16 +74,13 @@ function evaluateConditionSync(
       return condition.terms.some(term => evaluateConditionSync(term, plan, context));
     case "not":
       return !evaluateConditionSync(condition.term, plan, context);
-    case "confirm":
-      log.warn("confirm.sync-denied");
-      return false;
     default:
       return assertNever(condition, "condition kind");
   }
 }
 
 async function evaluateConditionAsyncCore(
-  condition: RuntimeEvaluableCondition,
+  condition: Condition,
   plan: Plan,
   context: ExecutionContext,
 ): Promise<boolean> {
