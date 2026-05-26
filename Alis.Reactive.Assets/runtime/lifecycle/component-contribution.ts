@@ -1,6 +1,12 @@
 import type { Component, ComponentValidation, Plan } from "../types";
 import { stableJson } from "./object-contract-fragment";
-import { rootOwnerId, type PartId, type PlanContributionSource, type PlanId } from "./plan-contribution-source";
+import {
+  describePlanContribution,
+  rootOwnerId,
+  type ContributionId,
+  type PlanContributionSource,
+  type PlanId,
+} from "./plan-contribution-source";
 
 type ValidationContainerComponent = Extract<Component["container"], { kind: "validation-container" }>;
 
@@ -17,14 +23,14 @@ export interface ComponentContributionDeclaration {
 }
 
 export interface ComponentMergeState {
-  readonly ownership: ComponentOwnershipLedger;
-  readonly layoutObjects: LayoutObjectReferenceLedger;
+  readonly ownership: ComponentOwnership;
+  readonly layoutObjects: LayoutObjectReferences;
 }
 
-export class ComponentOwnershipLedger {
-  private readonly owners = new Map<string, PartId>();
+export class ComponentOwnership {
+  private readonly owners = new Map<string, ContributionId>();
 
-  ownerOf(planId: PlanId, key: string): PartId | undefined {
+  ownerOf(planId: PlanId, key: string): ContributionId | undefined {
     return this.owners.get(this.ownershipKey(planId, key));
   }
 
@@ -32,7 +38,7 @@ export class ComponentOwnershipLedger {
     if (source.kind === "root") return true;
 
     const owner = this.ownerOf(planId, key);
-    return owner === undefined || owner === source.partId;
+    return owner === undefined || owner === source.contributionId;
   }
 
   record(planId: PlanId, key: string, source: PlanContributionSource): void {
@@ -41,15 +47,15 @@ export class ComponentOwnershipLedger {
       return;
     }
 
-    this.owners.set(this.ownershipKey(planId, key), source.partId);
+    this.owners.set(this.ownershipKey(planId, key), source.contributionId);
   }
 
   recordRoot(planId: PlanId, key: string): void {
     this.owners.set(this.ownershipKey(planId, key), rootOwnerId);
   }
 
-  isOwnedBy(planId: PlanId, key: string, partId: PartId): boolean {
-    return this.ownerOf(planId, key) === partId;
+  isOwnedBy(planId: PlanId, key: string, contributionId: ContributionId): boolean {
+    return this.ownerOf(planId, key) === contributionId;
   }
 
   release(planId: PlanId, key: string): void {
@@ -58,7 +64,7 @@ export class ComponentOwnershipLedger {
 
   collisionError(planId: PlanId, key: string, source: PlanContributionSource): Error {
     return new Error(
-      `[alis] ${source.description} cannot declare component "${key}"; ` +
+      `[alis] ${describePlanContribution(source)} cannot declare component "${key}"; ` +
       `that key is already owned by ${this.ownerDescription(planId, key)}. ` +
       "Partial plan keys are deterministic join keys and must have one owner.",
     );
@@ -80,24 +86,24 @@ export class ComponentOwnershipLedger {
   }
 }
 
-export class LayoutObjectReferenceLedger {
-  private readonly references = new Map<string, LayoutObjectReferences>();
+export class LayoutObjectReferences {
+  private readonly references = new Map<string, LayoutObjectContributionReferences>();
 
   track(planId: PlanId, key: string, source: PlanContributionSource, materializedByPartial: boolean): void {
     if (source.kind === "root") return;
 
     const referenceKey = this.referenceKey(planId, key);
-    const references = this.references.get(referenceKey) ?? new LayoutObjectReferences();
-    references.add(source.partId, materializedByPartial);
+    const references = this.references.get(referenceKey) ?? new LayoutObjectContributionReferences();
+    references.add(source.contributionId, materializedByPartial);
     this.references.set(referenceKey, references);
   }
 
-  releaseMaterializedBy(planId: PlanId, key: string, partId: PartId): boolean {
+  releaseMaterializedBy(planId: PlanId, key: string, contributionId: ContributionId): boolean {
     const referenceKey = this.referenceKey(planId, key);
     const references = this.references.get(referenceKey);
     if (references === undefined) return false;
 
-    references.release(partId);
+    references.release(contributionId);
     if (references.hasPartialReferences) return false;
 
     this.references.delete(referenceKey);
@@ -117,17 +123,17 @@ export class LayoutObjectReferenceLedger {
   }
 }
 
-class LayoutObjectReferences {
-  private readonly partIds = new Set<PartId>();
+class LayoutObjectContributionReferences {
+  private readonly contributionIds = new Set<ContributionId>();
   private materialized = false;
 
-  add(partId: PartId, materializedByPartial: boolean): void {
-    this.partIds.add(partId);
+  add(contributionId: ContributionId, materializedByPartial: boolean): void {
+    this.contributionIds.add(contributionId);
     this.materialized = this.materialized || materializedByPartial;
   }
 
-  release(partId: PartId): void {
-    this.partIds.delete(partId);
+  release(contributionId: ContributionId): void {
+    this.contributionIds.delete(contributionId);
   }
 
   markRootOwned(): void {
@@ -135,7 +141,7 @@ class LayoutObjectReferences {
   }
 
   get hasPartialReferences(): boolean {
-    return this.partIds.size > 0;
+    return this.contributionIds.size > 0;
   }
 
   get wasMaterializedByPartial(): boolean {
@@ -177,10 +183,16 @@ export function composeInitialComponentIntoPlan(
   declaration: ComponentContributionDeclaration,
   state: ComponentMergeState,
 ): void {
-  if (coalescesInitialOwnedDefinition(target, declaration, state.ownership)
+  if (coalescesInitialOwnedDefinition(target, declaration)
+    || coalescesInitialValidationContainer(target, declaration)
     || extendsRootValidationContainer(target, declaration, state.ownership)) {
     replaceComponent(target, declaration.key, declaration.component);
     return;
+  }
+
+  if (hasConflictingInitialOwnedDefinition(target, declaration)
+    || hasConflictingInitialValidationContainer(target, declaration)) {
+    throw state.ownership.collisionError(declaration.planId, declaration.key, declaration.source);
   }
 
   mergeComponentIntoPlan(target, declaration, state);
@@ -215,7 +227,7 @@ function mergeLayoutObject(
 function canMergeLayoutObject(
   target: Plan,
   declaration: ComponentContributionDeclaration,
-  ownership: ComponentOwnershipLedger,
+  ownership: ComponentOwnership,
 ): boolean {
   const currentOwner = ownership.ownerOf(declaration.planId, declaration.key);
   return (currentOwner === undefined || currentOwner === rootOwnerId)
@@ -225,7 +237,7 @@ function canMergeLayoutObject(
 function extendsRootValidationContainer(
   target: Plan,
   declaration: ComponentContributionDeclaration,
-  ownership: ComponentOwnershipLedger,
+  ownership: ComponentOwnership,
 ): boolean {
   if (!targetsRootOwnedComponentFromPartial(declaration, ownership)) return false;
   if (declaration.component.contribution.kind !== "validation-container") return false;
@@ -239,7 +251,7 @@ function extendsRootValidationContainer(
 function referencesRootComponent(
   target: Plan,
   declaration: ComponentContributionDeclaration,
-  ownership: ComponentOwnershipLedger,
+  ownership: ComponentOwnership,
 ): boolean {
   return targetsRootOwnedComponentFromPartial(declaration, ownership)
     && canMaterializeOrJoinReference(target.components[declaration.key], declaration.component, "object-target");
@@ -247,7 +259,7 @@ function referencesRootComponent(
 
 function targetsRootOwnedComponentFromPartial(
   declaration: ComponentContributionDeclaration,
-  ownership: ComponentOwnershipLedger,
+  ownership: ComponentOwnership,
 ): boolean {
   return declaration.source.kind === "partial"
     && ownership.ownerOf(declaration.planId, declaration.key) === rootOwnerId;
@@ -277,17 +289,54 @@ function sameRuntimeIdentity(existing: Component | undefined, incoming: Componen
 function coalescesInitialOwnedDefinition(
   target: Plan,
   declaration: ComponentContributionDeclaration,
-  ownership: ComponentOwnershipLedger,
 ): boolean {
   const existing = target.components[declaration.key];
   if (existing === undefined) return false;
 
-  return ownership.ownerOf(declaration.planId, declaration.key) === rootOwnerId
-    && existing.contribution.kind === "owned-definition"
+  return existing.contribution.kind === "owned-definition"
     && declaration.component.contribution.kind === "owned-definition"
     && sameRuntimeIdentity(existing, declaration.component)
     && stableJson(existing.binding) === stableJson(declaration.component.binding)
     && stableJson(existing.container) === stableJson(declaration.component.container);
+}
+
+function hasConflictingInitialOwnedDefinition(
+  target: Plan,
+  declaration: ComponentContributionDeclaration,
+): boolean {
+  const existing = target.components[declaration.key];
+  if (existing === undefined) return false;
+
+  return existing.contribution.kind === "owned-definition"
+    && declaration.component.contribution.kind === "owned-definition";
+}
+
+function coalescesInitialValidationContainer(
+  target: Plan,
+  declaration: ComponentContributionDeclaration,
+): boolean {
+  const existing = target.components[declaration.key];
+  if (existing === undefined) return false;
+
+  return existing.contribution.kind === "validation-container"
+    && declaration.component.contribution.kind === "validation-container"
+    && existing.binding.kind === "none"
+    && existing.container.kind === "validation-container"
+    && declaration.component.binding.kind === "none"
+    && declaration.component.container.kind === "validation-container"
+    && sameRuntimeIdentity(existing, declaration.component)
+    && validationContainerOf(existing) !== undefined;
+}
+
+function hasConflictingInitialValidationContainer(
+  target: Plan,
+  declaration: ComponentContributionDeclaration,
+): boolean {
+  const existing = target.components[declaration.key];
+  if (existing === undefined) return false;
+
+  return existing.contribution.kind === "validation-container"
+    && declaration.component.contribution.kind === "validation-container";
 }
 
 function replaceComponent(target: Plan, key: string, incoming: Component): void {
@@ -374,16 +423,6 @@ export function removeValidationRuleContribution(plan: Plan, contribution: Valid
   replaceValidationRules(
     component,
     validationRules.filter(rule => !removedRules.has(rule)),
-  );
-}
-
-export function removeValidationRulesForComponents(component: Component, componentKeys: Set<string>): void {
-  const validationRules = validationRulesOf(component);
-  if (validationRules === undefined) return;
-
-  replaceValidationRules(
-    component,
-    validationRules.filter(rule => !componentKeys.has(rule.component)),
   );
 }
 

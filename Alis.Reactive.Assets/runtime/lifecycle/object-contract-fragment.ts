@@ -1,47 +1,48 @@
 import type { JsType, Shape } from "../types";
-import type { PartId, PlanContributionSource, PlanId } from "./plan-contribution-source";
+import { describePlanContribution } from "./plan-contribution-source";
+import type { ContributionId, PlanContributionSource, PlanId } from "./plan-contribution-source";
 
-export class BrowserObjectContractLedger {
-  private readonly owners = new Map<string, BrowserObjectContractOwnership>();
+export class BrowserObjectContracts {
+  private readonly owners = new Map<string, BrowserObjectContractFragments>();
 
   record(planId: PlanId, key: string, type: JsType, source: PlanContributionSource): void {
     const fragment = BrowserObjectContractFragment.from(type);
     const ownershipKey = this.ownershipKey(planId, key);
     if (source.kind === "root") {
-      this.owners.set(ownershipKey, BrowserObjectContractOwnership.root(fragment));
+      this.owners.set(ownershipKey, BrowserObjectContractFragments.root(fragment));
       return;
     }
 
     const record = this.owners.get(ownershipKey);
     if (record === undefined) {
-      this.owners.set(ownershipKey, BrowserObjectContractOwnership.partial(source.partId, fragment));
+      this.owners.set(ownershipKey, BrowserObjectContractFragments.partial(source.contributionId, fragment));
       return;
     }
 
-    if (!record.acceptsPartial(source.partId, fragment)) {
+    if (!record.acceptsPartial(source.contributionId, fragment)) {
       throw new Error(
-        `[alis] ${source.description} cannot declare type "${key}"; ` +
+        `[alis] ${describePlanContribution(source)} cannot declare type "${key}"; ` +
         `type key is already owned by ${record.description} with an incompatible object contract fragment. ` +
         "Shared types may be declared by multiple sources only when their fragments can merge."
       );
     }
 
-    record.addPartial(source.partId, fragment);
+    record.addPartial(source.contributionId, fragment);
   }
 
   recordRoot(planId: PlanId, key: string, type: JsType): void {
     this.owners.set(
       this.ownershipKey(planId, key),
-      BrowserObjectContractOwnership.root(BrowserObjectContractFragment.from(type)),
+      BrowserObjectContractFragments.root(BrowserObjectContractFragment.from(type)),
     );
   }
 
-  releasePartial(planId: PlanId, key: string, partId: PartId): BrowserObjectContractFragment | undefined {
+  releasePartial(planId: PlanId, key: string, contributionId: ContributionId): BrowserObjectContractFragment | undefined {
     const ownershipKey = this.ownershipKey(planId, key);
     const record = this.owners.get(ownershipKey);
     if (record === undefined) return undefined;
 
-    record.releasePartial(partId);
+    record.releasePartial(contributionId);
     const remaining = record.contract;
     if (remaining !== undefined) return remaining;
 
@@ -58,20 +59,20 @@ export class BrowserObjectContractLedger {
   }
 }
 
-class BrowserObjectContractOwnership {
+class BrowserObjectContractFragments {
   private constructor(
     private readonly rootContract: BrowserObjectContractFragment | undefined,
-    private readonly partialContracts: Map<PartId, BrowserObjectContractFragment>,
+    private readonly partialContracts: Map<ContributionId, BrowserObjectContractFragment>,
   ) {}
 
-  static root(contract: BrowserObjectContractFragment): BrowserObjectContractOwnership {
-    return new BrowserObjectContractOwnership(contract, new Map<PartId, BrowserObjectContractFragment>());
+  static root(contract: BrowserObjectContractFragment): BrowserObjectContractFragments {
+    return new BrowserObjectContractFragments(contract, new Map<ContributionId, BrowserObjectContractFragment>());
   }
 
-  static partial(partId: PartId, contract: BrowserObjectContractFragment): BrowserObjectContractOwnership {
-    return new BrowserObjectContractOwnership(
+  static partial(contributionId: ContributionId, contract: BrowserObjectContractFragment): BrowserObjectContractFragments {
+    return new BrowserObjectContractFragments(
       undefined,
-      new Map<PartId, BrowserObjectContractFragment>([[partId, contract]]),
+      new Map<ContributionId, BrowserObjectContractFragment>([[contributionId, contract]]),
     );
   }
 
@@ -89,27 +90,27 @@ class BrowserObjectContractOwnership {
     return [...this.partialContracts.keys()].map(owner => `"${owner}"`).join(", ");
   }
 
-  acceptsPartial(partId: PartId, contract: BrowserObjectContractFragment): boolean {
+  acceptsPartial(contributionId: ContributionId, contract: BrowserObjectContractFragment): boolean {
     const current = this.contract;
     if (current === undefined) return true;
 
-    return this.partialContracts.has(partId) || current.canMerge(contract);
+    return this.partialContracts.has(contributionId) || current.canMerge(contract);
   }
 
-  addPartial(partId: PartId, contract: BrowserObjectContractFragment): void {
-    if (!this.acceptsPartial(partId, contract)) {
+  addPartial(contributionId: ContributionId, contract: BrowserObjectContractFragment): void {
+    if (!this.acceptsPartial(contributionId, contract)) {
       throw new Error("[alis] type ownership accepted an incompatible contract");
     }
 
-    const existingFragment = this.partialContracts.get(partId);
+    const existingFragment = this.partialContracts.get(contributionId);
     this.partialContracts.set(
-      partId,
+      contributionId,
       existingFragment === undefined ? contract : existingFragment.merge(contract),
     );
   }
 
-  releasePartial(partId: PartId): void {
-    this.partialContracts.delete(partId);
+  releasePartial(contributionId: ContributionId): void {
+    this.partialContracts.delete(contributionId);
   }
 }
 

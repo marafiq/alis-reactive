@@ -345,16 +345,16 @@ sequenceDiagram
     participant Plan as C# Plan Domain
     participant Script as JSON Plan Script
     participant Boot as Runtime Boot
-    participant Registry as Plan Registry
+    participant AppliedPlans as Applied Plan State
     participant Runtime as Runtime Modules
 
     View->>Plan: ReactivePlan / ResolvePlan records typed intent
     Plan->>Script: RenderPlan emits data-reactive-plan JSON
-    Boot->>Registry: discover all first-DOM scripts
-    Registry->>Registry: compose by plan id as initial document contributions
-    Registry-->>Boot: one root-scoped boot plan per plan id
+    Boot->>AppliedPlans: discover all first-DOM scripts
+    AppliedPlans->>AppliedPlans: compose by plan id as initial document contributions
+    AppliedPlans-->>Boot: one root-scoped boot plan per plan id
     Boot->>Runtime: wire behaviors and live validation with page lifetime
-    Runtime->>Registry: gather/validation/behavior reads the active plan view
+    Runtime->>AppliedPlans: gather/validation/behavior reads the active plan view
 ```
 
 SSR facts:
@@ -384,21 +384,21 @@ sequenceDiagram
     participant DSL as Root DSL Behavior
     participant HTTP as HTTP Runtime
     participant Inject as HTML Injection
-    participant Registry as Plan Registry
+    participant AppliedPlans as Applied Plan State
     participant Runtime as Runtime Modules
 
     DSL->>HTTP: OnSuccess(... Into(targetElementId))
     HTTP->>Inject: inject HTML response into target element
     Inject->>Inject: extract data-reactive-plan scripts
-    Inject->>Registry: unload existing slot with targetElementId
-    Inject->>Registry: load targetElementId with extracted plans
-    Registry->>Registry: merge each plan document as slot-owned contribution
-    Registry->>Runtime: wire behaviors and validation with slot lifetime
-    Runtime->>Registry: gather/validation/behavior reads active plan view
+    Inject->>AppliedPlans: unload existing slot with targetElementId
+    Inject->>AppliedPlans: load targetElementId with extracted plans
+    AppliedPlans->>AppliedPlans: merge each plan document as slot-owned contribution
+    AppliedPlans->>Runtime: wire behaviors and validation with slot lifetime
+    Runtime->>AppliedPlans: gather/validation/behavior reads active plan view
     DSL->>HTTP: later behavior injects replacement or empty HTML
     HTTP->>Inject: replace or clear same target element
-    Inject->>Registry: unload slot targetElementId
-    Registry->>Registry: abort slot lifetime and remove slot-owned state
+    Inject->>AppliedPlans: unload slot targetElementId
+    AppliedPlans->>AppliedPlans: abort slot lifetime and remove slot-owned state
 ```
 
 Browser slot facts:
@@ -737,7 +737,7 @@ different domain actions and must not share one collision rule.
 | Generated Runtime Contract | TypeScript `plan.ts` emitted from the C# plan domain. `WhenGeneratingRuntimePlanTypes` fails when the checked-in runtime contract is stale. |
 | Initial Plan Composition | Browser boot assembly of all plan scripts present in the first DOM. Contributions keep DOM order, but the assembled boot document is root-scoped even when a partial contribution appears first. |
 | Initial Document Contribution | One plan script discovered during browser boot. It may be a root view plan or a partial contribution already present in the first DOM; boot composition must use the same merge language as dynamic partial loading. |
-| Initial Owned Definition Coalescing | Boot-time merge for duplicate owned component definitions already present in the first DOM. It requires the same component contribution kind, id, vendor, type, binding, and container state, then merges object contract fragments without creating a partial owner. Dynamic partial load still rejects a partial owned definition for a root-owned component key. |
+| Initial Owned Definition Coalescing | Boot-time merge for duplicate owned component definitions already present in the first DOM. It requires the same component contribution kind, id, vendor, type, binding, and container state, then merges object contract fragments without creating a partial owner. Dynamic partial load keeps a root-owned component key from accepting a partial owned definition. |
 | Initial Validation Container Coalescing | Boot-time validation-container merge for the first DOM. Because initial documents have no later partial unload lifetime, duplicate validation rules are coalesced by validated component key and later DOM fragments replace earlier ones. Dynamic partial load uses exact rule contribution tracking instead. |
 | Runtime Plan View | TypeScript view of a booted or merged plan used to resolve components, types, plugins, payloads, and validation scopes. |
 | Active Execution Context | Runtime context used only when an executor call does not receive an explicit plan. Boot sets it; test/reset lifecycles must clear it so stale plans cannot survive across boots. |
@@ -859,15 +859,15 @@ different domain actions and must not share one collision rule.
 | --- | --- |
 | Partial Slot | Browser lifetime boundary for injected HTML. Loading a slot replaces its previous contributions; unloading removes them explicitly. |
 | Plan Document Contribution | One plan document merged into a booted Runtime Plan View from a root source or partial source. |
-| Component Contribution Intent | Plan-declared merge meaning for one component entry. `object-target` declares a deterministic browser object handle, `owned-definition` declares authoritative component state such as registered input binding, `validation-container` declares validation container rules, and `layout-object` declares a fixed app-level object owned by layout/page lifetime. Runtime computes ownership outcomes from this intent plus the current ownership ledger. |
+| Component Contribution Intent | Plan-declared merge meaning for one component entry. `object-target` declares a deterministic browser object handle, `owned-definition` declares authoritative component state such as registered input binding, `validation-container` declares validation container rules, and `layout-object` declares a fixed app-level object owned by layout/page lifetime. Runtime computes ownership outcomes from this intent plus current component ownership. |
 | Component Definition Contribution | `owned-definition` contribution that owns authoritative rendered object state for a component key. It may carry binding or other ownership state; unloading removes it only when its source owns it. |
 | Object Target Contribution | `object-target` contribution used by property reads, property writes, method calls, injection hosts, and explicit-id component references. It can record ownership of an unowned component key, or join an existing root-owned component when id/vendor/type match and it carries no binding/container state. |
 | Slot Load AbortController | Native browser controller owned by one slot load and shared by every contribution in that load. Component-event behavior and live validation listeners attach to its signal so unload can stop browser callbacks deterministically. |
 | Contribution Ownership | Runtime record of which page/root/slot contribution introduced an artifact. Root-owned artifacts cannot be deleted by partial unload. |
-| Component Contribution Ledger | Runtime lifecycle ledger of component definition ownership. It answers which contribution introduced, referenced, extended, or removed a component key. |
-| Object Contract Fragment Ledger | Runtime lifecycle ledger of object contract fragment contributions. It keeps root and partial fragments separate, lets compatible fragments merge into the active type, and materializes the remaining contract after unload. |
+| Component Ownership | Runtime record of which root or slot contribution owns a component definition key. It decides whether unload may remove the component or whether a partial may only reference the existing runtime object. |
+| Object Contract Fragments | Runtime record of root and partial fragments for a JavaScript object type key. Compatible fragments merge into the active type; unload releases only the slot fragment and materializes the remaining contract. |
 | Shared Type Ownership | Runtime ownership rule for plan type keys. Multiple sources may declare the same JavaScript object type when overlapping members have compatible contracts; non-overlapping members are fragments of the same browser object contract. Unload releases only the contributing source's fragment and removes the type only after no live source needs it. |
-| Plan Merge Collision | Fail-fast partial merge invariant for non-shareable keys. Component definitions have one owner, root-owned validation containers may accept rule extensions, and root-owned page objects may be referenced by compatible partial fragments. A failed merge must not mutate the target runtime plan. |
+| Plan Merge Collision | Fail-fast partial merge invariant for non-shareable keys. Component definitions have one owner, root-owned validation containers may accept rule extensions, and root-owned page objects may be referenced by compatible partial fragments. Framework-generated plans should not hit this path; runtime does not add rollback machinery around impossible bad plans. |
 | Reference-Only Component Contribution | Shared runtime lifecycle policy for `object-target` and `layout-object` entries. It requires an accepted reference intent, no binding/container ownership state, and matching id/vendor/type when an existing component key is present. Boot composition and dynamic partial merge use this same classifier. |
 | Merged Plan Pruning | Runtime lifecycle decision for deleting a non-root merged plan after partial unload. A plan may be pruned only when no root boot owns it and no behaviors, components, or types remain; type-only contributions are still live plan state. |
 | Validation Rule Contribution | The exact validation rule objects a partial appended to an existing validation container. Unload removes those objects without damaging root rules. |

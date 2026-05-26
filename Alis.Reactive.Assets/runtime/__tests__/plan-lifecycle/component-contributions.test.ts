@@ -12,7 +12,7 @@ import {
 } from "../support/plan-lifecycle-fixtures";
 
 describe("component contribution ownership", () => {
-  it("rejects a component key owned by a different partial slot", () => {
+  it("keeps one owner for a component key across partial slots", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
@@ -36,7 +36,7 @@ describe("component contribution ownership", () => {
     expect(browserPlans.get(planId)?.components["shared-field"]).toBe(firstComponent);
   });
 
-  it("rejects a partial owned definition for a root-owned component key", () => {
+  it("keeps root-owned component keys from being replaced by partial owned definitions", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
@@ -111,7 +111,7 @@ describe("layout object contributions", () => {
     expect(browserPlans.get(planId)?.types[toastTypeKey]).toBeUndefined();
   });
 
-  it("rejects owned component state for a layout-owned app component key", () => {
+  it("keeps layout-owned app component keys from accepting owned component state", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
@@ -144,7 +144,7 @@ describe("layout object contributions", () => {
 
     expect(browserPlans.get(planId)?.components["alis-loader"]).toBeUndefined();
   });
-  it("rejects a layout-object reference with a mismatched runtime identity", () => {
+  it("requires layout-object references to keep the same runtime identity", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";

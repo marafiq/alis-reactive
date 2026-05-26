@@ -1,7 +1,7 @@
 import type { Plan } from "../types";
 
 export type PlanId = string;
-export type PartId = string;
+export type ContributionId = string;
 
 export const rootOwnerId = "$root";
 
@@ -9,35 +9,40 @@ export type PlanContributionSource = RootPlanContributionSource | PartialPlanCon
 
 export function planContributionSourceFrom(plan: Plan): PlanContributionSource {
   const scope = plan.scope;
-  if (scope.kind === "partial") return new PartialPlanContributionSource(plan.planId);
+  if (scope.kind === "partial") return partialPlanContribution(plan.planId);
 
-  return RootPlanContributionSource.instance;
+  return rootPlanContribution;
 }
 
-export class RootPlanContributionSource {
-  static readonly instance = new RootPlanContributionSource();
-
-  readonly kind = "root";
-  readonly label = "root";
-  readonly description = "root plan contribution";
-  readonly behaviorSignal: AbortSignal | undefined = undefined;
-
-  private constructor() {}
+export interface RootPlanContributionSource {
+  readonly kind: "root";
+  readonly behaviorSignal: AbortSignal | undefined;
 }
 
-export class PartialPlanContributionSource {
-  readonly kind = "partial";
+export interface PartialPlanContributionSource {
+  readonly kind: "partial";
+  readonly contributionId: ContributionId;
+  readonly behaviorSignal: AbortSignal | undefined;
+}
 
-  constructor(
-    readonly partId: PartId,
-    readonly behaviorSignal: AbortSignal | undefined = undefined,
-  ) {}
+const rootPlanContribution: RootPlanContributionSource = {
+  kind: "root",
+  behaviorSignal: undefined,
+};
 
-  get label(): string {
-    return this.partId;
-  }
+export function partialPlanContribution(
+  contributionId: ContributionId,
+  behaviorSignal: AbortSignal | undefined = undefined,
+): PartialPlanContributionSource {
+  return {
+    kind: "partial",
+    contributionId,
+    behaviorSignal,
+  };
+}
 
-  get description(): string {
-    return `partial plan contribution "${this.partId}"`;
-  }
+export function describePlanContribution(source: PlanContributionSource): string {
+  if (source.kind === "root") return "root plan contribution";
+
+  return `partial plan contribution "${source.contributionId}"`;
 }

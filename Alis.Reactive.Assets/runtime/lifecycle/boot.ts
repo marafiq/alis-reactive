@@ -75,8 +75,8 @@ function wireContainerValidation(plan: Plan, signal?: AbortSignal): void {
   }
 }
 
-export function loadPartialSlot(partId: string, incoming: Plan[]): void {
-  const affectedPlanIds = applyPartialSlotLoad(partId, incoming, mergeHooks());
+export function loadPartialSlot(slotId: string, incoming: Plan[]): void {
+  const affectedPlanIds = applyPartialSlotLoad(slotId, incoming, mergeHooks());
 
   for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
@@ -86,21 +86,21 @@ export function loadPartialSlot(partId: string, incoming: Plan[]): void {
     .map(plan => Object.keys(plan.components).length)
     .reduce((sum, count) => sum + count, 0);
   log.info("partial-slot.load", {
-    partId,
+    slotId,
     plans: incoming.length,
     newComponents: incomingComponentCount,
   });
 }
 
-export function unloadPartialSlot(partId: string): void {
-  const affectedPlanIds = applyPartialSlotUnload(partId);
+export function unloadPartialSlot(slotId: string): void {
+  const affectedPlanIds = applyPartialSlotUnload(slotId);
 
   for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
   }
 
   log.info("partial-slot.unload", {
-    partId,
+    slotId,
     affectedPlans: affectedPlanIds.length,
   });
 }

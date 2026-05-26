@@ -50,7 +50,7 @@ describe("validation container contributions", () => {
       .toBe("zip required");
   });
 
-  it("rejects an extension with a mismatched runtime identity", () => {
+  it("requires a validation extension to keep the root container runtime identity", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
@@ -73,7 +73,7 @@ describe("validation container contributions", () => {
     expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual(["first-name"]);
   });
 
-  it("rejects an extension that carries registered input binding state", () => {
+  it("keeps validation extensions from carrying registered input binding state", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";

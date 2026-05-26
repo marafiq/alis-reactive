@@ -71,7 +71,7 @@ describe("browser object contract fragments", () => {
     expect(browserPlans.get(planId)).toBeUndefined();
   });
 
-  it("rejects a shared type key when the same member has an incompatible contract", () => {
+  it("requires shared type fragments for the same member to have compatible contracts", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
