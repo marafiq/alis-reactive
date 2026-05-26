@@ -38,12 +38,6 @@ namespace Alis.Reactive.Validation
 
         internal abstract Condition ToPlanCondition(FieldConditionPlanBinding binding);
 
-        internal ValidationCondition ToValidationCondition(FieldConditionPlanBinding binding)
-        {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return ValidationCondition.FromResolvedFieldCondition(ToPlanCondition(binding));
-        }
-
         internal abstract FieldCondition PrefixWith(FieldConditionPrefixBinding binding);
     }
 

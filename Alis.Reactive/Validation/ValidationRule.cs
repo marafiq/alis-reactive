@@ -575,10 +575,10 @@ namespace Alis.Reactive.Validation
             return _fieldBindings.Resolve(fieldPath).ReadValue();
         }
 
-        internal ValidationCondition ResolveActivationCondition(FieldCondition condition)
+        internal Condition ResolveActivationCondition(FieldCondition condition)
         {
             if (condition == null) throw new System.ArgumentNullException(nameof(condition));
-            return condition.ToValidationCondition(_conditionBinding);
+            return condition.ToPlanCondition(_conditionBinding);
         }
     }
 }
