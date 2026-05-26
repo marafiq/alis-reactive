@@ -63,44 +63,23 @@ namespace Alis.Reactive.PlanModel
     internal sealed class PlanIdentity
     {
         private readonly PlanId _planId;
-        private readonly PlanMergePart _mergePart;
+        private readonly PlanScope _scope;
 
-        private PlanIdentity(PlanId planId, PlanMergePart mergePart)
+        private PlanIdentity(PlanId planId, PlanScope scope)
         {
             _planId = planId ?? throw new ArgumentNullException(nameof(planId));
-            _mergePart = mergePart ?? throw new ArgumentNullException(nameof(mergePart));
+            _scope = scope ?? throw new ArgumentNullException(nameof(scope));
         }
 
         internal string PlanIdForJson => _planId.Value;
 
-        internal PlanScope ScopeForJson => _mergePart.ScopeForJson;
+        internal PlanScope ScopeForJson => _scope;
 
         internal static PlanIdentity Root(PlanId planId) =>
-            new PlanIdentity(planId, PlanMergePart.Root);
+            new PlanIdentity(planId, PlanScope.Root);
 
         internal static PlanIdentity Partial(PlanId planId) =>
-            new PlanIdentity(planId, PlanMergePart.Partial);
-    }
-
-    internal abstract class PlanMergePart
-    {
-        private protected PlanMergePart() { }
-
-        internal static PlanMergePart Root { get; } = new RootPlanMergePart();
-
-        internal static PlanMergePart Partial { get; } = new PartialPlanMergePart();
-
-        internal abstract PlanScope ScopeForJson { get; }
-
-        private sealed class RootPlanMergePart : PlanMergePart
-        {
-            internal override PlanScope ScopeForJson => PlanScope.Root;
-        }
-
-        private sealed class PartialPlanMergePart : PlanMergePart
-        {
-            internal override PlanScope ScopeForJson => PlanScope.Partial;
-        }
+            new PlanIdentity(planId, PlanScope.Partial);
     }
 
     /// <summary>Base class for plan merge scope. Not constructed in application code.</summary>
