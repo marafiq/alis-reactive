@@ -4,7 +4,6 @@ import {
   mergeHooks,
   partialPlan,
   rootPlan,
-  structuredPath,
   validationComponents,
   validationContainer,
   validationRule,
@@ -48,59 +47,6 @@ describe("validation container contributions", () => {
     ]);
     expect(validationScope.validationRules.find(rule => rule.component === "zip-code")?.rules[0]?.message)
       .toBe("zip required");
-  });
-
-  it("requires a validation extension to keep the root container runtime identity", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
-    const planId = "Resident.Root";
-
-    browserPlans.register({
-      ...rootPlan(planId),
-      components: {
-        "resident-form": validationContainer("resident-form", [validationRule("first-name")]),
-      },
-    });
-
-    expect(() => browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, {
-        components: {
-          "resident-form": validationContainer("other-form", [validationRule("city")]),
-        },
-      }),
-    ], hooks)).toThrow('partial plan contribution "address-slot" cannot declare component "resident-form"');
-
-    expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual(["first-name"]);
-  });
-
-  it("keeps validation extensions from carrying registered input binding state", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
-    const planId = "Resident.Root";
-    const invalidExtension = validationContainer("resident-form", [validationRule("city")]);
-    invalidExtension.binding = {
-      kind: "registered-input",
-      bindingPath: "ResidentForm",
-      path: structuredPath("ResidentForm"),
-      valueMember: "value",
-    };
-
-    browserPlans.register({
-      ...rootPlan(planId),
-      components: {
-        "resident-form": validationContainer("resident-form", [validationRule("first-name")]),
-      },
-    });
-
-    expect(() => browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, {
-        components: {
-          "resident-form": invalidExtension,
-        },
-      }),
-    ], hooks)).toThrow('partial plan contribution "address-slot" cannot declare component "resident-form"');
-
-    expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual(["first-name"]);
   });
 
   it("preserves root-owned validation containers when unloading a partial slot", () => {

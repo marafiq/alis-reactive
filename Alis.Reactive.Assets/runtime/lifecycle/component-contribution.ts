@@ -1,7 +1,5 @@
 import type { Component, ComponentValidation, Plan } from "../types";
-import { stableJson } from "./object-contract-fragment";
 import {
-  describePlanContribution,
   rootOwnerId,
   type ContributionId,
   type PlanContributionSource,
@@ -34,13 +32,6 @@ export class ComponentOwnership {
     return this.owners.get(this.ownershipKey(planId, key));
   }
 
-  canBeDeclaredBy(planId: PlanId, key: string, source: PlanContributionSource): boolean {
-    if (source.kind === "root") return true;
-
-    const owner = this.ownerOf(planId, key);
-    return owner === undefined || owner === source.contributionId;
-  }
-
   record(planId: PlanId, key: string, source: PlanContributionSource): void {
     if (source.kind === "root") {
       this.recordRoot(planId, key);
@@ -62,23 +53,8 @@ export class ComponentOwnership {
     this.owners.delete(this.ownershipKey(planId, key));
   }
 
-  collisionError(planId: PlanId, key: string, source: PlanContributionSource): Error {
-    return new Error(
-      `[alis] ${describePlanContribution(source)} cannot declare component "${key}"; ` +
-      `that key is already owned by ${this.ownerDescription(planId, key)}. ` +
-      "Partial plan keys are deterministic join keys and must have one owner.",
-    );
-  }
-
   reset(): void {
     this.owners.clear();
-  }
-
-  private ownerDescription(planId: PlanId, key: string): string {
-    const owner = this.ownerOf(planId, key);
-    if (owner === undefined) return "another source";
-    if (owner === rootOwnerId) return "root";
-    return `"${owner}"`;
   }
 
   private ownershipKey(planId: PlanId, key: string): string {
@@ -154,28 +130,24 @@ export function mergeComponentIntoPlan(
   declaration: ComponentContributionDeclaration,
   state: ComponentMergeState,
 ): void {
+  const existing = target.components[declaration.key];
+
+  if (extendsRootValidationContainer(existing, declaration, state.ownership)) {
+    appendRulesForNewValidatedComponents(existing, declaration.component);
+    return;
+  }
+
   if (isLayoutObject(declaration.component)) {
     mergeLayoutObject(target, declaration, state);
     return;
   }
 
-  if (state.ownership.canBeDeclaredBy(declaration.planId, declaration.key, declaration.source)) {
-    replaceComponent(target, declaration.key, declaration.component);
-    state.ownership.record(declaration.planId, declaration.key, declaration.source);
-    if (declaration.source.kind === "root") {
-      state.layoutObjects.markRootOwned(declaration.planId, declaration.key);
-    }
+  if (joinsExistingRuntimeObject(existing, declaration.component)) {
     return;
   }
 
-  if (isRootValidationContainerExtension(target, declaration, state.ownership)) {
-    appendRulesForNewValidatedComponents(target.components[declaration.key], declaration.component);
-    return;
-  }
-
-  if (referencesRootComponent(target, declaration, state.ownership)) return;
-
-  throw state.ownership.collisionError(declaration.planId, declaration.key, declaration.source);
+  replaceComponent(target, declaration.key, declaration.component);
+  state.ownership.record(declaration.planId, declaration.key, declaration.source);
 }
 
 export function composeInitialComponentIntoPlan(
@@ -183,19 +155,25 @@ export function composeInitialComponentIntoPlan(
   declaration: ComponentContributionDeclaration,
   state: ComponentMergeState,
 ): void {
-  if (coalescesInitialOwnedDefinition(target, declaration)
-    || coalescesInitialValidationContainer(target, declaration)
-    || isRootValidationContainerExtension(target, declaration, state.ownership)) {
+  const existing = target.components[declaration.key];
+
+  if (isInitialValidationContainerMerge(existing, declaration.component)) {
     replaceComponent(target, declaration.key, declaration.component);
+    state.ownership.record(declaration.planId, declaration.key, declaration.source);
     return;
   }
 
-  if (hasConflictingInitialOwnedDefinition(target, declaration)
-    || hasConflictingInitialValidationContainer(target, declaration)) {
-    throw state.ownership.collisionError(declaration.planId, declaration.key, declaration.source);
+  if (isLayoutObject(declaration.component)) {
+    mergeLayoutObject(target, declaration, state);
+    return;
   }
 
-  mergeComponentIntoPlan(target, declaration, state);
+  if (joinsExistingRuntimeObject(existing, declaration.component)) {
+    return;
+  }
+
+  replaceComponent(target, declaration.key, declaration.component);
+  state.ownership.record(declaration.planId, declaration.key, declaration.source);
 }
 
 function mergeLayoutObject(
@@ -203,11 +181,8 @@ function mergeLayoutObject(
   declaration: ComponentContributionDeclaration,
   state: ComponentMergeState,
 ): void {
-  if (!canMergeLayoutObject(target, declaration, state.ownership)) {
-    throw state.ownership.collisionError(declaration.planId, declaration.key, declaration.source);
-  }
-
-  const materializedByThisContribution = target.components[declaration.key] === undefined;
+  const existing = target.components[declaration.key];
+  const materializedByThisContribution = existing === undefined || !sameRuntimeIdentity(existing, declaration.component);
   if (materializedByThisContribution) {
     replaceComponent(target, declaration.key, declaration.component);
     state.ownership.recordRoot(declaration.planId, declaration.key);
@@ -224,37 +199,16 @@ function mergeLayoutObject(
   );
 }
 
-function canMergeLayoutObject(
-  target: Plan,
-  declaration: ComponentContributionDeclaration,
-  ownership: ComponentOwnership,
-): boolean {
-  const currentOwner = ownership.ownerOf(declaration.planId, declaration.key);
-  return (currentOwner === undefined || currentOwner === rootOwnerId)
-    && canMaterializeOrJoinReference(target.components[declaration.key], declaration.component, "layout-object");
-}
-
-function isRootValidationContainerExtension(
-  target: Plan,
+function extendsRootValidationContainer(
+  existing: Component | undefined,
   declaration: ComponentContributionDeclaration,
   ownership: ComponentOwnership,
 ): boolean {
   if (!targetsRootOwnedComponentFromPartial(declaration, ownership)) return false;
-  if (declaration.component.contribution.kind !== "validation-container") return false;
-  if (declaration.component.binding.kind !== "none") return false;
-  if (declaration.component.container.kind !== "validation-container") return false;
-
-  return sameRuntimeIdentity(target.components[declaration.key], declaration.component)
-    && validationContainerOf(target.components[declaration.key]) !== undefined;
-}
-
-function referencesRootComponent(
-  target: Plan,
-  declaration: ComponentContributionDeclaration,
-  ownership: ComponentOwnership,
-): boolean {
-  return targetsRootOwnedComponentFromPartial(declaration, ownership)
-    && canMaterializeOrJoinReference(target.components[declaration.key], declaration.component, "object-target");
+  return isValidationContainer(existing)
+    && isValidationContainer(declaration.component)
+    && declaration.component.binding.kind === "none"
+    && sameRuntimeIdentity(existing, declaration.component);
 }
 
 function targetsRootOwnedComponentFromPartial(
@@ -265,12 +219,12 @@ function targetsRootOwnedComponentFromPartial(
     && ownership.ownerOf(declaration.planId, declaration.key) === rootOwnerId;
 }
 
-function canMaterializeOrJoinReference(
+function joinsExistingRuntimeObject(
   existing: Component | undefined,
   incoming: Component,
-  kind: "object-target" | "layout-object",
 ): boolean {
-  return incoming.contribution.kind === kind
+  return existing !== undefined
+    && incoming.contribution.kind === "object-target"
     && sameRuntimeIdentity(existing, incoming);
 }
 
@@ -279,64 +233,17 @@ function isLayoutObject(component: Component): boolean {
 }
 
 function sameRuntimeIdentity(existing: Component | undefined, incoming: Component): boolean {
-  if (existing === undefined) return true;
+  if (existing === undefined) return false;
 
   return existing.id === incoming.id
     && existing.vendor === incoming.vendor
     && existing.type === incoming.type;
 }
 
-function coalescesInitialOwnedDefinition(
-  target: Plan,
-  declaration: ComponentContributionDeclaration,
-): boolean {
-  const existing = target.components[declaration.key];
-  if (existing === undefined) return false;
-
-  return existing.contribution.kind === "owned-definition"
-    && declaration.component.contribution.kind === "owned-definition"
-    && sameRuntimeIdentity(existing, declaration.component)
-    && stableJson(existing.binding) === stableJson(declaration.component.binding)
-    && stableJson(existing.container) === stableJson(declaration.component.container);
-}
-
-function hasConflictingInitialOwnedDefinition(
-  target: Plan,
-  declaration: ComponentContributionDeclaration,
-): boolean {
-  const existing = target.components[declaration.key];
-  if (existing === undefined) return false;
-
-  return existing.contribution.kind === "owned-definition"
-    && declaration.component.contribution.kind === "owned-definition";
-}
-
-function coalescesInitialValidationContainer(
-  target: Plan,
-  declaration: ComponentContributionDeclaration,
-): boolean {
-  const existing = target.components[declaration.key];
-  if (existing === undefined) return false;
-
-  return existing.contribution.kind === "validation-container"
-    && declaration.component.contribution.kind === "validation-container"
-    && existing.binding.kind === "none"
-    && existing.container.kind === "validation-container"
-    && declaration.component.binding.kind === "none"
-    && declaration.component.container.kind === "validation-container"
-    && sameRuntimeIdentity(existing, declaration.component)
-    && validationContainerOf(existing) !== undefined;
-}
-
-function hasConflictingInitialValidationContainer(
-  target: Plan,
-  declaration: ComponentContributionDeclaration,
-): boolean {
-  const existing = target.components[declaration.key];
-  if (existing === undefined) return false;
-
-  return existing.contribution.kind === "validation-container"
-    && declaration.component.contribution.kind === "validation-container";
+function isInitialValidationContainerMerge(existing: Component | undefined, incoming: Component): boolean {
+  return isValidationContainer(existing)
+    && isValidationContainer(incoming)
+    && sameRuntimeIdentity(existing, incoming);
 }
 
 function replaceComponent(target: Plan, key: string, incoming: Component): void {
@@ -361,9 +268,15 @@ function appendRulesForNewValidatedComponents(existing: Component | undefined, i
 }
 
 function validationContainerOf(component: Component | undefined): ValidationContainerComponent | undefined {
-  if (component?.container.kind !== "validation-container") return undefined;
+  if (!isValidationContainer(component)) return undefined;
 
   return component.container;
+}
+
+function isValidationContainer(
+  component: Component | undefined,
+): component is Component & { container: ValidationContainerComponent } {
+  return component?.container.kind === "validation-container";
 }
 
 function validationRulesOf(component: Component | undefined): ComponentValidation[] | undefined {

@@ -1,69 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
 import {
-  component,
-  jsType,
   jsTypeWithWritableProperty,
   layoutComponent,
   mergeHooks,
   partialPlan,
-  registeredInputComponent,
   rootPlan,
 } from "../support/plan-lifecycle-fixtures";
-
-describe("component contribution ownership", () => {
-  it("keeps one owner for a component key across partial slots", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
-    const planId = "Resident.Root";
-
-    browserPlans.register(rootPlan(planId));
-
-    const firstComponent = component("shared-field", "native.element.shared-a");
-    browserPlans.loadPartialSlot("first-slot", [
-      partialPlan(planId, {
-        types: { "native.element.shared-a": jsType() },
-        components: { "shared-field": firstComponent },
-      }),
-    ], hooks);
-
-    expect(() => browserPlans.loadPartialSlot("second-slot", [
-      partialPlan(planId, {
-        types: { "native.element.shared-b": jsType() },
-        components: { "shared-field": component("shared-field", "native.element.shared-b") },
-      }),
-    ], hooks)).toThrow('partial plan contribution "second-slot" cannot declare component "shared-field"');
-    expect(browserPlans.get(planId)?.components["shared-field"]).toBe(firstComponent);
-  });
-
-  it("keeps root-owned component keys from being replaced by partial owned definitions", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
-    const planId = "Resident.Root";
-    const drawerTypeKey = "native.component.alis-drawer";
-
-    browserPlans.register({
-      ...rootPlan(planId),
-      types: {
-        [drawerTypeKey]: jsTypeWithWritableProperty("classAdd"),
-      },
-      components: {
-        "alis-drawer": component("alis-drawer", drawerTypeKey),
-      },
-    });
-
-    expect(() => browserPlans.loadPartialSlot("alis-drawer-content", [
-      partialPlan(planId, {
-        types: {
-          [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
-        },
-        components: {
-          "alis-drawer": registeredInputComponent("alis-drawer", drawerTypeKey),
-        },
-      }),
-    ], hooks)).toThrow('partial plan contribution "alis-drawer-content" cannot declare component "alis-drawer"');
-  });
-});
 
 describe("layout object contributions", () => {
   it("lets multiple slots share one layout-owned app component", () => {
@@ -109,67 +52,6 @@ describe("layout object contributions", () => {
 
     expect(browserPlans.get(planId)?.components.alisFusionToast).toBeUndefined();
     expect(browserPlans.get(planId)?.types[toastTypeKey]).toBeUndefined();
-  });
-
-  it("keeps layout-owned app component keys from accepting owned component state", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
-    const planId = "Resident.Root";
-    const loaderTypeKey = "native.component.alis-loader";
-
-    browserPlans.register(rootPlan(planId));
-    browserPlans.loadPartialSlot("loader-slot", [
-      partialPlan(planId, {
-        types: {
-          [loaderTypeKey]: jsTypeWithWritableProperty("classAdd"),
-        },
-        components: {
-          "alis-loader": layoutComponent("alis-loader", loaderTypeKey),
-        },
-      }),
-    ], hooks);
-
-    expect(() => browserPlans.loadPartialSlot("owned-loader-slot", [
-      partialPlan(planId, {
-        types: {
-          [loaderTypeKey]: jsTypeWithWritableProperty("classRemove"),
-        },
-        components: {
-          "alis-loader": registeredInputComponent("alis-loader", loaderTypeKey),
-        },
-      }),
-    ], hooks)).toThrow('partial plan contribution "owned-loader-slot" cannot declare component "alis-loader"');
-
-    browserPlans.unloadPartialSlot("loader-slot");
-
-    expect(browserPlans.get(planId)?.components["alis-loader"]).toBeUndefined();
-  });
-  it("requires layout-object references to keep the same runtime identity", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
-    const planId = "Resident.Root";
-    const drawerTypeKey = "native.component.alis-drawer";
-
-    browserPlans.register({
-      ...rootPlan(planId),
-      types: {
-        [drawerTypeKey]: jsTypeWithWritableProperty("classAdd"),
-      },
-      components: {
-        "alis-drawer": layoutComponent("alis-drawer", drawerTypeKey),
-      },
-    });
-
-    expect(() => browserPlans.loadPartialSlot("drawer-slot", [
-      partialPlan(planId, {
-        types: {
-          [drawerTypeKey]: jsTypeWithWritableProperty("classRemove"),
-        },
-        components: {
-          "alis-drawer": layoutComponent("other-drawer", drawerTypeKey),
-        },
-      }),
-    ], hooks)).toThrow('partial plan contribution "drawer-slot" cannot declare component "alis-drawer"');
   });
 
 });

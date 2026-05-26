@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { composeInitialPlans } from "../../lifecycle/merge-plan";
-import type { Component, ComponentValidation } from "../../types";
+import type { Component } from "../../types";
 import {
   behavior,
   component,
@@ -11,7 +11,6 @@ import {
   partialPlan,
   registeredInputComponent,
   rootPlan,
-  structuredPath,
   validationContainer,
   validationRule,
 } from "../support/plan-lifecycle-fixtures";
@@ -160,70 +159,6 @@ describe("boot plan composition", () => {
     expect(composed[0].components[componentId]).toEqual(registeredInputComponent(componentId, typeKey));
   });
 
-  it("keeps duplicate initial owned component definitions from changing binding state", () => {
-    const planId = "Resident.Step";
-    const componentId = "resident-name";
-    const typeKey = "native.component.resident-name";
-    const conflictingDefinition = registeredInputComponentBoundTo(
-      componentId,
-      typeKey,
-      "Clinical.ResidentName",
-    );
-
-    expect(() => composeInitialPlans([
-      {
-        ...rootPlan(planId),
-        types: { [typeKey]: jsTypeWithReadableProperty("value") },
-        components: { [componentId]: registeredInputComponent(componentId, typeKey) },
-      },
-      partialPlan(planId, {
-        types: { [typeKey]: jsTypeWithWritableProperty("value") },
-        components: { [componentId]: conflictingDefinition },
-      }),
-    ])).toThrow('partial plan contribution "Resident.Step" cannot declare component "resident-name"');
-  });
-
-  it("keeps duplicate partial-first owned component definitions from changing binding state", () => {
-    const planId = "Resident.Step";
-    const componentId = "resident-name";
-    const typeKey = "native.component.resident-name";
-    const conflictingDefinition = registeredInputComponentBoundTo(
-      componentId,
-      typeKey,
-      "Clinical.ResidentName",
-    );
-
-    expect(() => composeInitialPlans([
-      partialPlan(planId, {
-        types: { [typeKey]: jsTypeWithWritableProperty("value") },
-        components: { [componentId]: registeredInputComponent(componentId, typeKey) },
-      }),
-      {
-        ...rootPlan(planId),
-        types: { [typeKey]: jsTypeWithReadableProperty("value") },
-        components: { [componentId]: conflictingDefinition },
-      },
-    ])).toThrow('root plan contribution cannot declare component "resident-name"');
-  });
-
-  it("requires initial layout-object contributions to keep the same runtime identity", () => {
-    const planId = "Resident.Step";
-    const componentId = "alisFusionToast";
-    const typeKey = "fusion.component.alisFusionToast";
-
-    expect(() => composeInitialPlans([
-      {
-        ...rootPlan(planId),
-        types: { [typeKey]: jsTypeWithWritableProperty("title") },
-        components: { [componentId]: layoutComponent(componentId, typeKey) },
-      },
-      partialPlan(planId, {
-        types: { [typeKey]: jsTypeWithWritableProperty("content") },
-        components: { [componentId]: layoutComponent("otherToast", typeKey) },
-      }),
-    ])).toThrow('partial plan contribution "Resident.Step" cannot declare component "alisFusionToast"');
-  });
-
   it("merges an initial layout-object reference without replacing the root component", () => {
     const planId = "Resident.Step";
     const componentId = "alisFusionToast";
@@ -335,160 +270,7 @@ describe("boot plan composition", () => {
       .toBe("old zip required");
   });
 
-  it("requires initial validation-container contributions to keep the same runtime identity", () => {
-    const planId = "Resident.Root";
-
-    expect(() => composeInitialPlans([
-      {
-        ...rootPlan(planId),
-        components: {
-          "resident-form": validationContainer("resident-form", [
-            validationRule("first-name"),
-          ]),
-        },
-      },
-      partialPlan(planId, {
-        components: {
-          "resident-form": validationContainer("other-form", [
-            validationRule("city"),
-          ]),
-        },
-      }),
-    ])).toThrow('partial plan contribution "Resident.Root" cannot declare component "resident-form"');
-  });
-
-  it("requires partial-first validation-container contributions to keep the same runtime identity", () => {
-    const planId = "Resident.Root";
-
-    expect(() => composeInitialPlans([
-      partialPlan(planId, {
-        components: {
-          "resident-form": validationContainer("resident-form", [
-            validationRule("city"),
-          ]),
-        },
-      }),
-      {
-        ...rootPlan(planId),
-        components: {
-          "resident-form": validationContainer("other-form", [
-            validationRule("first-name"),
-          ]),
-        },
-      },
-    ])).toThrow('root plan contribution cannot declare component "resident-form"');
-  });
-
-  it("keeps initial validation-container contributions from carrying binding state", () => {
-    const planId = "Resident.Root";
-    const invalidContainer = validationContainerBoundTo("resident-form", "Resident", [
-      validationRule("city"),
-    ]);
-
-    expect(() => composeInitialPlans([
-      {
-        ...rootPlan(planId),
-        components: {
-          "resident-form": validationContainer("resident-form", [
-            validationRule("first-name"),
-          ]),
-        },
-      },
-      partialPlan(planId, {
-        components: {
-          "resident-form": invalidContainer,
-        },
-      }),
-    ])).toThrow('partial plan contribution "Resident.Root" cannot declare component "resident-form"');
-  });
-
-  it("keeps partial-first validation-container contributions from carrying binding state", () => {
-    const planId = "Resident.Root";
-    const invalidContainer = validationContainerBoundTo("resident-form", "Resident", [
-      validationRule("first-name"),
-    ]);
-
-    expect(() => composeInitialPlans([
-      partialPlan(planId, {
-        components: {
-          "resident-form": validationContainer("resident-form", [
-            validationRule("city"),
-          ]),
-        },
-      }),
-      {
-        ...rootPlan(planId),
-        components: {
-          "resident-form": invalidContainer,
-        },
-      },
-    ])).toThrow('root plan contribution cannot declare component "resident-form"');
-  });
-
-  it("keeps invalid partial-first validation-container binding state from being erased by the root", () => {
-    const planId = "Resident.Root";
-    const invalidContainer = validationContainerBoundTo("resident-form", "Resident", [
-      validationRule("city"),
-    ]);
-
-    expect(() => composeInitialPlans([
-      partialPlan(planId, {
-        components: {
-          "resident-form": invalidContainer,
-        },
-      }),
-      {
-        ...rootPlan(planId),
-        components: {
-          "resident-form": validationContainer("resident-form", [
-            validationRule("first-name"),
-          ]),
-        },
-      },
-    ])).toThrow('root plan contribution cannot declare component "resident-form"');
-  });
 });
-
-function expectRegisteredInputBinding(component: Component): Extract<Component["binding"], { kind: "registered-input" }> {
-  expect(component.binding.kind).toBe("registered-input");
-  if (component.binding.kind !== "registered-input") {
-    throw new Error(`Expected component "${component.id}" to have registered input binding`);
-  }
-
-  return component.binding;
-}
-
-function registeredInputComponentBoundTo(
-  componentId: string,
-  typeKey: string,
-  bindingPath: string,
-): Component {
-  const component = registeredInputComponent(componentId, typeKey);
-  const binding = expectRegisteredInputBinding(component);
-  component.binding = {
-    ...binding,
-    bindingPath,
-    path: structuredPath(bindingPath),
-  };
-
-  return component;
-}
-
-function validationContainerBoundTo(
-  componentId: string,
-  bindingPath: string,
-  rules: ComponentValidation[],
-): Component {
-  const component = validationContainer(componentId, rules);
-  component.binding = {
-    kind: "registered-input",
-    bindingPath,
-    path: structuredPath(bindingPath),
-    valueMember: "value",
-  };
-
-  return component;
-}
 
 function expectValidationContainer(
   container: Component["container"],
