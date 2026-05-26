@@ -1,8 +1,20 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { resolveGather } from "../execution/gather";
-import type { RequestPayloadAssignment, RequestPayloadTarget, PathSegment, Plan, RequestInput, Shape, StructuredPath, ValueProducer } from "../types";
+import type {
+  JsonValue,
+  PathSegment,
+  Plan,
+  RequestInput,
+  RequestPayloadAssignment,
+  RequestPayloadTarget,
+  Shape,
+  StructuredPath,
+  ValueProducer,
+} from "../types";
 
+const stringShape: Shape = { kind: "string" };
 const dateShape: Shape = { kind: "date" };
+const rawShape: Shape = { kind: "raw" };
 const objectShape: Shape = { kind: "object", fields: {}, additional: true };
 const isoDate = "2026-01-02T03:04:05.000Z";
 
@@ -15,11 +27,33 @@ const emptyPlan: Plan = {
   behaviors: [],
 };
 
-function literal(value: string, shape: Shape): ValueProducer {
+function literal(value: JsonValue, shape: Shape): ValueProducer {
   return { kind: "literal", value, shape };
 }
 
-function literalValue(value: unknown, shape: Shape): ValueProducer {
+function readEventPayload(path: string, shape: Shape): ValueProducer {
+  return {
+    kind: "read",
+    from: { kind: "payload", scope: "event", type: { kind: "untyped" } },
+    member: path,
+    path: structuredPath(path),
+    shape,
+    access: { kind: "property" },
+  };
+}
+
+function readUrlParameter(name: string, shape: Shape): ValueProducer {
+  return {
+    kind: "read",
+    from: { kind: "url" },
+    member: name,
+    path: [],
+    shape,
+    access: { kind: "property" },
+  };
+}
+
+function browserValue(value: unknown, shape: Shape): ValueProducer {
   return { kind: "literal", value, shape };
 }
 
@@ -38,6 +72,10 @@ function pathSegment(part: string): PathSegment {
   return { kind: "property", name: part };
 }
 
+function assignment(name: string, source: ValueProducer): RequestPayloadAssignment {
+  return { target: target(name), source };
+}
+
 function gatherInput(
   fields: RequestPayloadAssignment[],
   transport: Extract<RequestInput, { kind: "gather" }>["transport"] = "json",
@@ -50,41 +88,142 @@ function gatherInput(
   };
 }
 
-describe("resolveGather", () => {
-  it("formats request fields through their own shapes", () => {
-    const input = gatherInput([
-      {
-        target: target("scheduledFor"),
-        source: literal(isoDate, dateShape),
-      },
-    ]);
+function arrayShape(item: Shape): Shape {
+  return { kind: "array", item };
+}
 
-    expect(resolveGather(input, "POST", emptyPlan, {}).body).toEqual({
-      scheduledFor: isoDate,
+function resolveBody(input: RequestInput, method: "GET" | "POST" = "POST"): Record<string, unknown> | FormData {
+  return resolveGather(input, method, emptyPlan, {}).body;
+}
+
+afterEach(() => {
+  history.replaceState({}, "", "/");
+});
+
+describe("resolveGather", () => {
+  it("returns an empty payload for requests without gathered input", () => {
+    expect(resolveGather({ kind: "none" }, "POST", emptyPlan, {})).toEqual({
+      urlParams: [],
+      body: {},
     });
   });
 
-  it("rejects object values sent through scalar query-string slots", () => {
+  it("emits JSON bodies from explicit payload assignments", () => {
     const input = gatherInput([
-      {
-        target: target("metadata"),
-        source: literalValue({ acuity: "high" }, objectShape),
-      },
+      assignment("resident.scheduledFor", literal(isoDate, dateShape)),
+      assignment("resident.metadata", literal({ acuity: "high" }, objectShape)),
+      assignment("tags", literal(["fall-risk", "new"], arrayShape(stringShape))),
+      assignment("nickname", literal("", stringShape)),
     ]);
 
-    expect(() => resolveGather(input, "GET", emptyPlan, {}))
+    expect(resolveBody(input)).toEqual({
+      resident: {
+        scheduledFor: isoDate,
+        metadata: { acuity: "high" },
+      },
+      tags: ["fall-risk", "new"],
+      nickname: null,
+    });
+  });
+
+  it("reads event payload values through the shared value producer path", () => {
+    const input = gatherInput([
+      assignment("resident.name", readEventPayload("detail.name", stringShape)),
+    ]);
+
+    expect(resolveGather(input, "POST", emptyPlan, {
+      event: { detail: { name: "Ada" } },
+    }).body).toEqual({
+      resident: { name: "Ada" },
+    });
+  });
+
+  it("reads URL query values through the shared value producer path", () => {
+    history.replaceState({}, "", "/residents?filter=fall%20risk");
+    const input = gatherInput([
+      assignment("filter", readUrlParameter("filter", stringShape)),
+    ]);
+
+    expect(resolveBody(input)).toEqual({
+      filter: "fall risk",
+    });
+  });
+
+  it("emits GET input as query parameters and keeps the request body empty", () => {
+    const input = gatherInput([
+      assignment("search", literal("Ada Lovelace", stringShape)),
+      assignment("tags", literal(["fall risk", "new"], arrayShape(stringShape))),
+    ]);
+
+    expect(resolveGather(input, "GET", emptyPlan, {})).toEqual({
+      urlParams: [
+        "search=Ada%20Lovelace",
+        "tags=fall%20risk",
+        "tags=new",
+      ],
+      body: {},
+    });
+  });
+
+  it("emits form-data fields from scalar, array, and browser file values", () => {
+    const file = new File(["hello"], "summary.txt", { type: "text/plain" });
+    const input = gatherInput([
+      assignment("resident", literal("Ada", stringShape)),
+      assignment("tags", literal(["fall-risk", "new"], arrayShape(stringShape))),
+      assignment("documents", browserValue([file], arrayShape(rawShape))),
+    ], "form-data");
+
+    const body = resolveBody(input) as FormData;
+
+    expect(body.getAll("resident")).toEqual(["Ada"]);
+    expect(body.getAll("tags")).toEqual(["fall-risk", "new"]);
+    expect(body.getAll("documents")).toEqual([file]);
+  });
+
+  it("uses rawFile wrappers as browser file values for form-data", () => {
+    const file = new File(["hello"], "summary.txt", { type: "text/plain" });
+    const input = gatherInput([
+      assignment("documents", browserValue([{ rawFile: file }], arrayShape(rawShape))),
+    ], "form-data");
+
+    const body = resolveBody(input) as FormData;
+
+    expect(body.getAll("documents")).toEqual([file]);
+  });
+
+  it("requires form-data when browser files are gathered into the request body", () => {
+    const file = new File(["hello"], "summary.txt", { type: "text/plain" });
+    const input = gatherInput([
+      assignment("documents", browserValue([file], arrayShape(rawShape))),
+    ]);
+
+    expect(() => resolveBody(input)).toThrow("[alis] File objects require transport: form-data");
+  });
+
+  it("does not send browser files through query parameters", () => {
+    const file = new File(["hello"], "summary.txt", { type: "text/plain" });
+    const input = gatherInput([
+      assignment("documents", browserValue([file], arrayShape(rawShape))),
+    ]);
+
+    expect(() => resolveBody(input, "GET")).toThrow("[alis] File objects cannot be sent via GET");
+  });
+
+  it("cannot serialize object values through scalar query-string slots", () => {
+    const input = gatherInput([
+      assignment("metadata", literal({ acuity: "high" }, objectShape)),
+    ]);
+
+    expect(() => resolveBody(input, "GET"))
       .toThrow('gather value "metadata" cannot be serialized as a scalar');
   });
 
-  it("rejects object values sent through scalar form-data slots", () => {
+  it("cannot serialize object values through scalar form-data slots", () => {
     const input = gatherInput([
-      {
-        target: target("metadata"),
-        source: literalValue({ acuity: "high" }, objectShape),
-      },
+      assignment("metadata", literal({ acuity: "high" }, objectShape)),
     ], "form-data");
 
-    expect(() => resolveGather(input, "POST", emptyPlan, {}))
+    expect(() => resolveBody(input))
       .toThrow('gather value "metadata" cannot be serialized as a scalar');
   });
 });

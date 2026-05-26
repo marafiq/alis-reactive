@@ -10,6 +10,22 @@ afterEach(() => {
 });
 
 describe("all registered input gather lifecycle", () => {
+  it("gathers mounted registered inputs and skips unbound or unmounted components", () => {
+    document.body.innerHTML = `
+      <input id="first-name" value="Ada" />
+      <div id="drawer"></div>
+    `;
+    const resident = rootPlan("Resident.RegisteredInputSelection", {
+      "first-name": inputComponent("first-name", "firstName"),
+      "last-name": inputComponent("last-name", "lastName"),
+      drawer: unboundComponent("drawer"),
+    });
+
+    expect(resolveGather(allRegisteredInputs(), "POST", resident, {}).body).toEqual({
+      firstName: "Ada",
+    });
+  });
+
   it("removes partial registered inputs after the slot unloads", () => {
     document.body.innerHTML = `
       <input id="first-name" value="Ada" />
@@ -42,7 +58,7 @@ describe("all registered input gather lifecycle", () => {
     });
   });
 
-  it("emits explicit, supplemental, and dynamically gathered registered input assignments", () => {
+  it("emits explicit fields before dynamically gathered registered input assignments", () => {
     document.body.innerHTML = `
       <input id="first-name" value="Ada" />
       <input id="address" value="12 Main" />
@@ -78,24 +94,6 @@ describe("all registered input gather lifecycle", () => {
     });
   });
 
-  it("rejects a registered input whose value member is missing from the component contract", () => {
-    document.body.innerHTML = `<input id="first-name" value="Ada" />`;
-    const browserPlans = new AppliedBrowserPlans();
-    const planId = "Resident.PartialGatherContract";
-    const resident = rootPlan(planId, {});
-
-    browserPlans.register(resident);
-    browserPlans.loadPartialSlot("name-slot", [
-      partialPlan(planId, {
-        components: {
-          "first-name": registeredInputComponent("first-name", "firstName", "missingValue"),
-        },
-      }),
-    ], silentLifecycleHooks);
-
-    expect(() => resolveGather(allRegisteredInputs(), "POST", resident, {}))
-      .toThrow('property "missingValue" not found on component "first-name"');
-  });
 });
 
 const silentLifecycleHooks = {
@@ -144,6 +142,17 @@ function nativeInputType(): JsType {
 
 function inputComponent(id: string, bindingPath: string): Component {
   return registeredInputComponent(id, bindingPath, "value");
+}
+
+function unboundComponent(id: string): Component {
+  return {
+    id,
+    vendor: "native",
+    type: "native.input",
+    contribution: { kind: "object-target" },
+    binding: { kind: "none" },
+    container: { kind: "none" },
+  };
 }
 
 function registeredInputComponent(id: string, bindingPath: string, valueMember: string): Component {

@@ -7,6 +7,10 @@ import { RuntimeShape } from "../domain/runtime-shape";
 
 const log = scope("gather");
 
+type GatheredArrayItem =
+  | { readonly kind: "file"; readonly file: File }
+  | { readonly kind: "value"; readonly value: unknown };
+
 export interface GatherResult {
   urlParams: string[];
   body: Record<string, unknown> | FormData;
@@ -91,9 +95,9 @@ function createGetTransport(urlParams: string[]): TransportStrategy {
       urlParams.push(`${encodeURIComponent(target.name)}=${encodeURIComponent(scalarWireValue(wire, target.name))}`);
     },
     emitArray: (target, items, itemShape) => {
-      const gatheredItems = GatheredArrayItems.from(items);
-      if (gatheredItems.containsFile) throw new Error("[alis] File objects cannot be sent via GET");
-      gatheredItems.emitToQueryString(target.name, itemShape, urlParams);
+      const gatheredItems = gatheredArrayItems(items);
+      if (arrayContainsFile(gatheredItems)) throw new Error("[alis] File objects cannot be sent via GET");
+      emitArrayItemsToQueryString(target.name, gatheredItems, itemShape, urlParams);
     },
   };
 }
@@ -105,7 +109,7 @@ function createFormDataTransport(formData: FormData): TransportStrategy {
       formData.append(target.name, scalarWireValue(wire, target.name));
     },
     emitArray: (target, items, itemShape) => {
-      GatheredArrayItems.from(items).appendToFormData(target.name, itemShape, formData);
+      appendArrayItemsToFormData(target.name, gatheredArrayItems(items), itemShape, formData);
     },
   };
 }
@@ -117,9 +121,9 @@ function createJsonTransport(body: Record<string, unknown>): TransportStrategy {
       assignJsonBodyValue(body, target, jsonBodyValue(wire));
     },
     emitArray: (target, items, itemShape) => {
-      const gatheredItems = GatheredArrayItems.from(items);
-      if (gatheredItems.containsFile) throw new Error("[alis] File objects require transport: form-data");
-      const wireItems = gatheredItems.toJsonValue(itemShape);
+      const gatheredItems = gatheredArrayItems(items);
+      if (arrayContainsFile(gatheredItems)) throw new Error("[alis] File objects require transport: form-data");
+      const wireItems = jsonArrayBodyValue(gatheredItems.map(rawArrayItemValue), itemShape);
       assignJsonBodyValue(body, target, wireItems);
     },
   };
@@ -135,97 +139,77 @@ function browserFiles(raw: unknown): File[] | undefined {
   return Array.from(raw);
 }
 
-class GatheredArrayItems {
-  private constructor(private readonly items: GatheredArrayItem[]) {}
-
-  static from(items: unknown[]): GatheredArrayItems {
-    return new GatheredArrayItems(items.map(item => GatheredArrayItem.from(item)));
-  }
-
-  get containsFile(): boolean {
-    return this.items.some(item => item.containsFile);
-  }
-
-  emitToQueryString(name: string, itemShape: RuntimeShape, urlParams: string[]): void {
-    for (const item of this.items) {
-      item.emitToQueryString(name, itemShape, urlParams);
-    }
-  }
-
-  appendToFormData(name: string, itemShape: RuntimeShape, formData: FormData): void {
-    for (const item of this.items) {
-      item.appendToFormData(name, itemShape, formData);
-    }
-  }
-
-  toJsonValue(itemShape: RuntimeShape): unknown[] {
-    return jsonArrayBodyValue(
-      this.items.map(item => item.rawValue),
-      itemShape
-    );
-  }
+function gatheredArrayItems(items: unknown[]): GatheredArrayItem[] {
+  return items.map(gatheredArrayItem);
 }
 
-abstract class GatheredArrayItem {
-  static from(item: unknown): GatheredArrayItem {
-    const itemIsBrowserFile = item instanceof File;
-    if (itemIsBrowserFile) return new UploadedFileArrayItem(item);
+function gatheredArrayItem(item: unknown): GatheredArrayItem {
+  if (item instanceof File) return { kind: "file", file: item };
 
-    const wrapper = PlainObjectRecord.tryFrom(item);
-    const itemCanWrapBrowserFile = wrapper !== undefined;
-    if (itemCanWrapBrowserFile) {
-      const rawFile = wrapper.get("rawFile");
-      const itemWrapsBrowserFile = rawFile instanceof File;
-      if (itemWrapsBrowserFile) return new UploadedFileArrayItem(rawFile);
-    }
-
-    return new SerializableArrayItem(item);
+  const wrapper = PlainObjectRecord.tryFrom(item);
+  if (wrapper !== undefined) {
+    const rawFile = wrapper.get("rawFile");
+    if (rawFile instanceof File) return { kind: "file", file: rawFile };
   }
 
-  abstract get containsFile(): boolean;
-  abstract get rawValue(): unknown;
-  abstract appendToFormData(name: string, itemShape: RuntimeShape, formData: FormData): void;
+  return { kind: "value", value: item };
+}
 
-  emitToQueryString(name: string, itemShape: RuntimeShape, urlParams: string[]): void {
-    const wire = itemShape.formatForWire(this.rawValue);
+function arrayContainsFile(items: readonly GatheredArrayItem[]): boolean {
+  return items.some(item => item.kind === "file");
+}
+
+function emitArrayItemsToQueryString(
+  name: string,
+  items: readonly GatheredArrayItem[],
+  itemShape: RuntimeShape,
+  urlParams: string[],
+): void {
+  for (const item of items) {
+    const wire = itemShape.formatForWire(rawArrayItemValue(item));
     urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(scalarWireValue(wire, name))}`);
   }
 }
 
-class UploadedFileArrayItem extends GatheredArrayItem {
-  constructor(private readonly file: File) {
-    super();
-  }
-
-  get containsFile(): boolean {
-    return true;
-  }
-
-  get rawValue(): unknown {
-    return this.file;
-  }
-
-  appendToFormData(name: string, _itemShape: RuntimeShape, formData: FormData): void {
-    formData.append(name, this.file, this.file.name);
+function appendArrayItemsToFormData(
+  name: string,
+  items: readonly GatheredArrayItem[],
+  itemShape: RuntimeShape,
+  formData: FormData,
+): void {
+  for (const item of items) {
+    appendArrayItemToFormData(name, item, itemShape, formData);
   }
 }
 
-class SerializableArrayItem extends GatheredArrayItem {
-  constructor(private readonly value: unknown) {
-    super();
+function appendArrayItemToFormData(
+  name: string,
+  item: GatheredArrayItem,
+  itemShape: RuntimeShape,
+  formData: FormData,
+): void {
+  switch (item.kind) {
+    case "file":
+      formData.append(name, item.file, item.file.name);
+      return;
+    case "value": {
+      const wire = itemShape.formatForWire(item.value);
+      formData.append(name, scalarWireValue(wire, name));
+      return;
+    }
+    default:
+      return assertNever(item, "gathered array item");
   }
+}
 
-  get containsFile(): boolean {
-    return false;
-  }
-
-  get rawValue(): unknown {
-    return this.value;
-  }
-
-  appendToFormData(name: string, itemShape: RuntimeShape, formData: FormData): void {
-    const wire = itemShape.formatForWire(this.value);
-    formData.append(name, scalarWireValue(wire, name));
+function rawArrayItemValue(item: GatheredArrayItem): unknown {
+  switch (item.kind) {
+    case "file":
+      return item.file;
+    case "value":
+      return item.value;
+    default:
+      return assertNever(item, "gathered array item");
   }
 }
 
