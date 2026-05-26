@@ -22,6 +22,8 @@ import type {
   RangeComparisonProducer,
   RegexCompareCondition,
   Shape,
+  NumericLiteralProducer,
+  TextLiteralProducer,
   TextCompareCondition,
   TextCompareOp,
   TextLengthCompareCondition,
@@ -56,6 +58,14 @@ function plan(): Plan {
 
 function literal(value: JsonValue, shape: Shape): LiteralProducer {
   return { kind: "literal", value, shape };
+}
+
+function textLiteral(value: string): TextLiteralProducer {
+  return { kind: "literal", value, shape: stringShape };
+}
+
+function numericLiteral(value: number): NumericLiteralProducer {
+  return { kind: "literal", value, shape: numberShape };
 }
 
 function eventPayloadValue(member: string, shape: Shape): PayloadPathReadProducer {
@@ -177,7 +187,7 @@ function text(op: TextCompareOp, left: JsonValue, right: string, shape: Shape = 
     kind: "compare",
     left: literal(left, shape),
     op,
-    right: { kind: "value", value: literal(right, stringShape) },
+    right: { kind: "value", value: textLiteral(right) },
     shape,
     itemShape: noneShape,
   };
@@ -188,7 +198,7 @@ function regex(left: JsonValue, pattern: string, shape: Shape = stringShape): Re
     kind: "compare",
     left: literal(left, shape),
     op: "matches",
-    right: { kind: "value", value: literal(pattern, stringShape) },
+    right: { kind: "value", value: textLiteral(pattern) },
     shape,
     itemShape: noneShape,
   };
@@ -199,7 +209,7 @@ function minLength(left: JsonValue, minimumLength: number, shape: Shape = string
     kind: "compare",
     left: literal(left, shape),
     op: "min-length",
-    right: { kind: "value", value: literal(minimumLength, numberShape) },
+    right: { kind: "value", value: numericLiteral(minimumLength) },
     shape,
     itemShape: noneShape,
   };

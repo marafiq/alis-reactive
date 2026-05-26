@@ -2,13 +2,16 @@ import { describe, expect, it } from "vitest";
 import { ruleFails } from "../validation/rule-engine";
 import type {
   LengthValidationRule,
+  LiteralProducer,
   NoOperandValidationRule,
+  NumericLiteralProducer,
   OrderedComparisonValidationRule,
   PeerEqualityValidationRule,
   PeerOrderedComparisonValidationRule,
   RangeValidationRule,
+  RangeLiteralProducer,
+  ReadProducer,
   Shape,
-  ValueProducer,
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -16,8 +19,31 @@ const numberShape: Shape = { kind: "number" };
 const dateShape: Shape = { kind: "date" };
 const noneShape: Shape = { kind: "none" };
 
-function literal(value: string | number | boolean | null | (string | number)[], shape: Shape = stringShape): ValueProducer {
+function literal(value: string | number | boolean | null, shape: Shape = stringShape): LiteralProducer {
   return { kind: "literal", value, shape };
+}
+
+function numericLiteral(value: number): NumericLiteralProducer {
+  return { kind: "literal", value, shape: numberShape };
+}
+
+function rangeLiteral(bounds: [number, number]): RangeLiteralProducer {
+  return {
+    kind: "literal",
+    value: bounds,
+    shape: { kind: "array", item: numberShape },
+  };
+}
+
+function componentValue(component: string, shape: Shape): ReadProducer {
+  return {
+    kind: "read",
+    from: { kind: "component", component },
+    member: "value",
+    path: [],
+    shape,
+    access: { kind: "property" },
+  };
 }
 
 function noOperandRule(name: NoOperandValidationRule["name"]): NoOperandValidationRule {
@@ -38,7 +64,7 @@ function lengthRule(name: LengthValidationRule["name"], length: number): LengthV
     name,
     message: `${name} failed`,
     execution: {
-      constraint: { kind: "value", value: literal(length, numberShape) },
+      constraint: { kind: "value", value: numericLiteral(length) },
       otherValue: { kind: "none" },
       activation: { kind: "always" },
       comparisonShape: noneShape,
@@ -55,7 +81,7 @@ function rangeRule(
     name,
     message: `${name} failed`,
     execution: {
-      constraint: { kind: "value", value: literal(bounds, { kind: "array", item: numberShape }) },
+      constraint: { kind: "value", value: rangeLiteral(bounds) },
       otherValue: { kind: "none" },
       activation: { kind: "always" },
       comparisonShape,
@@ -89,7 +115,7 @@ function peerEqualityRule(name: PeerEqualityValidationRule["name"]): PeerEqualit
       constraint: { kind: "none" },
       otherValue: {
         kind: "value",
-        value: { kind: "component", component: "confirmPassword", member: "value", shape: stringShape },
+        value: componentValue("confirmPassword", stringShape),
       },
       activation: { kind: "always" },
       comparisonShape: stringShape,
@@ -105,7 +131,7 @@ function peerOrderedRule(name: PeerOrderedComparisonValidationRule["name"]): Pee
       constraint: { kind: "none" },
       otherValue: {
         kind: "value",
-        value: { kind: "component", component: "startDate", member: "value", shape: dateShape },
+        value: componentValue("startDate", dateShape),
       },
       activation: { kind: "always" },
       comparisonShape: dateShape,

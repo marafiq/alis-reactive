@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { AppliedBrowserPlans } from "../lifecycle/merge-plan";
 import { showServerErrors, validateContainer } from "../validation/orchestrator";
-import type { Component, ComponentValidation, JsType, Plan, Shape, ValueProducer } from "../types";
+import type { Component, ComponentValidation, JsType, Plan, ReadProducer, Shape, ValueProducer } from "../types";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };
@@ -143,7 +143,7 @@ function peerRuleWithMissingPeerSource(): ComponentValidation {
   };
 }
 
-function readComponentValue(component: string): ValueProducer {
+function readComponentValue(component: string): ReadProducer {
   return {
     kind: "read",
     from: { kind: "component", component },
