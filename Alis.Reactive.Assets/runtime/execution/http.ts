@@ -321,12 +321,3 @@ function handlerMatchesStatus(status: RequestOutcomeStatus): (handler: ResponseH
 function handlerMatchesAnyStatus(handler: ResponseHandler): boolean {
   return handler.match.kind === "any";
 }
-
-export async function routeHandlers(
-  handlers: ResponseHandler[],
-  status: number,
-  plan: Plan,
-  ctx?: ExecContext,
-): Promise<void> {
-  await routeResponseHandlers(handlers, RequestOutcomeStatus.http(status), plan, ExecutionContext.from(ctx).asAvailable());
-}
