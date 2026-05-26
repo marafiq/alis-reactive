@@ -6,17 +6,23 @@
 import type {
   Condition,
   CompareCondition,
+  CollectionItemCompareCondition,
   EqualityCompareOp,
+  EqualityCompareCondition,
   MembershipCompareCondition,
   MembershipCompareOp,
   OrderedCompareOp,
+  OrderedCompareCondition,
   Plan,
   RangeCompareCondition,
+  RegexCompareCondition,
   Shape,
+  TextLengthCompareCondition,
   TextCompareOp,
+  TextCompareCondition,
   UnaryCompareOp,
-  ValidationCondition,
   ValueProducer,
+  ValidationCondition,
 } from "../types";
 import type { ExecContext } from "../types";
 import { scope } from "../core/trace";
@@ -233,13 +239,13 @@ function evaluateCompare(condition: CompareCondition, plan: Plan, context: Execu
 
     case "in":
     case "not-in": {
-      const right = resolveRightArray(condition, plan, context);
+      const right = resolveMembershipItems(condition, plan, context);
       traceCompare(condition, left, right);
       return membershipMatches(condition.op, left, right);
     }
 
     case "between": {
-      const [lower, upper] = resolveRightArray(condition, plan, context);
+      const [lower, upper] = resolveRangeBounds(condition, plan, context);
       traceCompare(condition, left, [lower, upper]);
       return inclusiveRangeContains(lower, upper, left.shaped);
     }
@@ -252,19 +258,19 @@ function evaluateCompare(condition: CompareCondition, plan: Plan, context: Execu
     }
 
     case "contains":
-      return evaluateTextComparison(condition.op, left, condition.right.value.value, condition);
+      return evaluateTextComparison(condition.op, left, textOperand(condition), condition);
 
     case "starts-with":
-      return evaluateTextComparison(condition.op, left, condition.right.value.value, condition);
+      return evaluateTextComparison(condition.op, left, textOperand(condition), condition);
 
     case "ends-with":
-      return evaluateTextComparison(condition.op, left, condition.right.value.value, condition);
+      return evaluateTextComparison(condition.op, left, textOperand(condition), condition);
 
     case "matches":
-      return evaluateRegexComparison(left, condition.right.value.value, condition);
+      return evaluateRegexComparison(left, textOperand(condition), condition);
 
     case "min-length":
-      return evaluateMinimumLengthComparison(left, condition.right.value.value, condition);
+      return evaluateMinimumLengthComparison(left, minimumTextLength(condition), condition);
 
     default:
       return assertNever(condition, "compare condition");
@@ -277,29 +283,65 @@ function resolveComparisonLeft(condition: CompareCondition, plan: Plan, context:
   return { raw, shaped };
 }
 
-type RightValuedCondition = Extract<CompareCondition, { readonly right: { readonly kind: "value" } }>;
+type ScalarRightCondition =
+  | EqualityCompareCondition
+  | OrderedCompareCondition
+  | CollectionItemCompareCondition;
+
+type TextRightCondition =
+  | TextCompareCondition
+  | RegexCompareCondition;
 
 function traceCompare(condition: CompareCondition, left: ComparisonLeft, right: unknown): void {
   log.trace("compare", { op: condition.op, left: left.shaped, right });
 }
 
 function resolveRightValue(
-  condition: RightValuedCondition,
+  condition: ScalarRightCondition,
   plan: Plan,
   context: ExecutionContext,
   shape: Shape,
 ): unknown {
-  const raw = evaluateValue(condition.right.value as ValueProducer, plan, context.raw);
+  const raw = evaluateValue(condition.right.value, plan, context.raw);
   return applyShape(raw, shape);
 }
 
-function resolveRightArray(
-  condition: MembershipCompareCondition | RangeCompareCondition,
+function resolveMembershipItems(
+  condition: MembershipCompareCondition,
   plan: Plan,
   context: ExecutionContext,
 ): unknown[] {
-  const raw = evaluateValue(condition.right.value, plan, context.raw) as unknown[];
-  return raw.map(item => applyShape(item, condition.shape));
+  return condition.right.value.items.map(item =>
+    resolveShapedComparisonItem(item, plan, context, condition.shape));
+}
+
+function resolveRangeBounds(
+  condition: RangeCompareCondition,
+  plan: Plan,
+  context: ExecutionContext,
+): [unknown, unknown] {
+  const [lower, upper] = condition.right.value.items;
+  return [
+    resolveShapedComparisonItem(lower, plan, context, condition.shape),
+    resolveShapedComparisonItem(upper, plan, context, condition.shape),
+  ];
+}
+
+function resolveShapedComparisonItem(
+  producer: ValueProducer,
+  plan: Plan,
+  context: ExecutionContext,
+  shape: Shape,
+): unknown {
+  return applyShape(evaluateValue(producer, plan, context.raw), shape);
+}
+
+function textOperand(condition: TextRightCondition): string {
+  return condition.right.value.value;
+}
+
+function minimumTextLength(condition: TextLengthCompareCondition): number {
+  return condition.right.value.value;
 }
 
 function unaryMatches(op: UnaryCompareOp, left: ComparisonLeft): boolean {

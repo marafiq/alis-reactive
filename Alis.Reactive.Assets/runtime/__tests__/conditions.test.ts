@@ -5,18 +5,29 @@ import {
   evaluateConditionInCurrentLane,
 } from "../conditions/conditions";
 import type {
-  CompareCondition,
+  CollectionItemCompareCondition,
   Condition,
+  EqualityCompareCondition,
   EqualityCompareOp,
+  ExecContext,
   JsonValue,
   LiteralProducer,
+  MembershipCompareCondition,
   MembershipCompareOp,
+  OrderedCompareCondition,
   OrderedCompareOp,
+  PayloadPathReadProducer,
   Plan,
+  RangeCompareCondition,
   RangeComparisonProducer,
+  RegexCompareCondition,
   Shape,
+  TextCompareCondition,
   TextCompareOp,
+  TextLengthCompareCondition,
+  UnaryCompareCondition,
   UnaryCompareOp,
+  ValueProducer,
   ValidationCondition,
 } from "../types";
 
@@ -47,6 +58,17 @@ function literal(value: JsonValue, shape: Shape): LiteralProducer {
   return { kind: "literal", value, shape };
 }
 
+function eventPayloadValue(member: string, shape: Shape): PayloadPathReadProducer {
+  return {
+    kind: "read",
+    from: { kind: "payload", scope: "event", type: { kind: "untyped" } },
+    member,
+    path: [{ kind: "property", name: member }],
+    shape,
+    access: { kind: "property" },
+  };
+}
+
 function range(low: JsonValue, high: JsonValue, itemShape: Shape): RangeComparisonProducer {
   return {
     kind: "array",
@@ -55,7 +77,7 @@ function range(low: JsonValue, high: JsonValue, itemShape: Shape): RangeComparis
   };
 }
 
-function unary(op: UnaryCompareOp, left: JsonValue, shape: Shape = rawShape): CompareCondition {
+function unary(op: UnaryCompareOp, left: JsonValue, shape: Shape = rawShape): UnaryCompareCondition {
   return {
     kind: "compare",
     left: literal(left, shape),
@@ -71,12 +93,21 @@ function equality(
   left: JsonValue,
   right: JsonValue,
   shape: Shape,
-): CompareCondition {
+): EqualityCompareCondition {
+  return equalityFromProducers(op, literal(left, shape), literal(right, shape), shape);
+}
+
+function equalityFromProducers(
+  op: EqualityCompareOp,
+  left: ValueProducer,
+  right: ValueProducer,
+  shape: Shape,
+): EqualityCompareCondition {
   return {
     kind: "compare",
-    left: literal(left, shape),
+    left,
     op,
-    right: { kind: "value", value: literal(right, shape) },
+    right: { kind: "value", value: right },
     shape,
     itemShape: noneShape,
   };
@@ -87,12 +118,21 @@ function ordered(
   left: JsonValue,
   right: JsonValue,
   shape: Shape,
-): CompareCondition {
+): OrderedCompareCondition {
+  return orderedFromProducers(op, literal(left, shape), literal(right, shape), shape);
+}
+
+function orderedFromProducers(
+  op: OrderedCompareOp,
+  left: ValueProducer,
+  right: ValueProducer,
+  shape: Shape,
+): OrderedCompareCondition {
   return {
     kind: "compare",
-    left: literal(left, shape),
+    left,
     op,
-    right: { kind: "value", value: literal(right, shape) },
+    right: { kind: "value", value: right },
     shape,
     itemShape: noneShape,
   };
@@ -103,7 +143,7 @@ function membership(
   left: JsonValue,
   values: JsonValue[],
   itemShape: Shape,
-): CompareCondition {
+): MembershipCompareCondition {
   return {
     kind: "compare",
     left: literal(left, itemShape),
@@ -121,7 +161,7 @@ function membership(
   };
 }
 
-function between(left: JsonValue, low: JsonValue, high: JsonValue, itemShape: Shape): CompareCondition {
+function between(left: JsonValue, low: JsonValue, high: JsonValue, itemShape: Shape): RangeCompareCondition {
   return {
     kind: "compare",
     left: literal(left, itemShape),
@@ -132,7 +172,7 @@ function between(left: JsonValue, low: JsonValue, high: JsonValue, itemShape: Sh
   };
 }
 
-function text(op: TextCompareOp, left: JsonValue, right: string, shape: Shape = stringShape): CompareCondition {
+function text(op: TextCompareOp, left: JsonValue, right: string, shape: Shape = stringShape): TextCompareCondition {
   return {
     kind: "compare",
     left: literal(left, shape),
@@ -143,7 +183,7 @@ function text(op: TextCompareOp, left: JsonValue, right: string, shape: Shape = 
   };
 }
 
-function regex(left: JsonValue, pattern: string, shape: Shape = stringShape): CompareCondition {
+function regex(left: JsonValue, pattern: string, shape: Shape = stringShape): RegexCompareCondition {
   return {
     kind: "compare",
     left: literal(left, shape),
@@ -154,7 +194,7 @@ function regex(left: JsonValue, pattern: string, shape: Shape = stringShape): Co
   };
 }
 
-function minLength(left: JsonValue, minimumLength: number, shape: Shape = stringShape): CompareCondition {
+function minLength(left: JsonValue, minimumLength: number, shape: Shape = stringShape): TextLengthCompareCondition {
   return {
     kind: "compare",
     left: literal(left, shape),
@@ -165,7 +205,7 @@ function minLength(left: JsonValue, minimumLength: number, shape: Shape = string
   };
 }
 
-function arrayContains(left: JsonValue[], right: JsonValue, itemShape: Shape): CompareCondition {
+function arrayContains(left: JsonValue[], right: JsonValue, itemShape: Shape): CollectionItemCompareCondition {
   return {
     kind: "compare",
     left: literal(left, { kind: "array", item: itemShape }),
@@ -176,8 +216,8 @@ function arrayContains(left: JsonValue[], right: JsonValue, itemShape: Shape): C
   };
 }
 
-function matches(condition: ValidationCondition): boolean {
-  return evaluateCondition(condition, plan());
+function matches(condition: ValidationCondition, ctx?: ExecContext): boolean {
+  return evaluateCondition(condition, plan(), ctx);
 }
 
 afterEach(() => {
@@ -215,6 +255,15 @@ describe("condition runtime", () => {
       expect(matches(ordered("gt", "not-a-date", "2026-06-01", dateShape))).toBe(false);
       expect(matches(ordered("gte", "not-a-number", 0, numberShape))).toBe(false);
       expect(matches(ordered("gt", "72", 60, rawShape))).toBe(false);
+    });
+
+    it("compares value producers on both sides of source-to-source conditions", () => {
+      const left = eventPayloadValue("entered", numberShape);
+      const right = eventPayloadValue("expected", numberShape);
+      const context = { event: { entered: "72", expected: 70 } };
+
+      expect(matches(orderedFromProducers("gt", left, right, numberShape), context)).toBe(true);
+      expect(matches(equalityFromProducers("eq", left, right, numberShape), context)).toBe(false);
     });
   });
 
