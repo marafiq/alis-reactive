@@ -35,16 +35,16 @@ export class ComponentOwnershipLedger {
     return owner === undefined || owner === source.partId;
   }
 
-  claim(planId: PlanId, key: string, source: PlanContributionSource): void {
+  record(planId: PlanId, key: string, source: PlanContributionSource): void {
     if (source.kind === "root") {
-      this.claimRoot(planId, key);
+      this.recordRoot(planId, key);
       return;
     }
 
     this.owners.set(this.ownershipKey(planId, key), source.partId);
   }
 
-  claimRoot(planId: PlanId, key: string): void {
+  recordRoot(planId: PlanId, key: string): void {
     this.owners.set(this.ownershipKey(planId, key), rootOwnerId);
   }
 
@@ -143,24 +143,6 @@ class LayoutObjectReferences {
   }
 }
 
-export function assertComponentCanMerge(
-  target: Plan,
-  declaration: ComponentContributionDeclaration,
-  state: ComponentMergeState,
-): void {
-  if (canMergeComponent(target, declaration, state, false)) return;
-  throw state.ownership.collisionError(declaration.planId, declaration.key, declaration.source);
-}
-
-export function assertComponentCanComposeInitialPlan(
-  target: Plan,
-  declaration: ComponentContributionDeclaration,
-  state: ComponentMergeState,
-): void {
-  if (canMergeComponent(target, declaration, state, true)) return;
-  throw state.ownership.collisionError(declaration.planId, declaration.key, declaration.source);
-}
-
 export function mergeComponentIntoPlan(
   target: Plan,
   declaration: ComponentContributionDeclaration,
@@ -173,7 +155,7 @@ export function mergeComponentIntoPlan(
 
   if (state.ownership.canBeDeclaredBy(declaration.planId, declaration.key, declaration.source)) {
     replaceComponent(target, declaration.key, declaration.component);
-    state.ownership.claim(declaration.planId, declaration.key, declaration.source);
+    state.ownership.record(declaration.planId, declaration.key, declaration.source);
     if (declaration.source.kind === "root") {
       state.layoutObjects.markRootOwned(declaration.planId, declaration.key);
     }
@@ -204,22 +186,6 @@ export function composeInitialComponentIntoPlan(
   mergeComponentIntoPlan(target, declaration, state);
 }
 
-function canMergeComponent(
-  target: Plan,
-  declaration: ComponentContributionDeclaration,
-  state: ComponentMergeState,
-  allowInitialOwnedCoalescing: boolean,
-): boolean {
-  if (isLayoutObject(declaration.component)) {
-    return canMergeLayoutObject(target, declaration, state.ownership);
-  }
-
-  return state.ownership.canBeDeclaredBy(declaration.planId, declaration.key, declaration.source)
-    || extendsRootValidationContainer(target, declaration, state.ownership)
-    || referencesRootComponent(target, declaration, state.ownership)
-    || (allowInitialOwnedCoalescing && coalescesInitialOwnedDefinition(target, declaration, state.ownership));
-}
-
 function mergeLayoutObject(
   target: Plan,
   declaration: ComponentContributionDeclaration,
@@ -232,7 +198,7 @@ function mergeLayoutObject(
   const materializedByThisContribution = target.components[declaration.key] === undefined;
   if (materializedByThisContribution) {
     replaceComponent(target, declaration.key, declaration.component);
-    state.ownership.claimRoot(declaration.planId, declaration.key);
+    state.ownership.recordRoot(declaration.planId, declaration.key);
   }
 
   if (declaration.source.kind === "root") {

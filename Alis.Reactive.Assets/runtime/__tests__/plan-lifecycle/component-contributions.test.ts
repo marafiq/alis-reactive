@@ -36,27 +36,6 @@ describe("component contribution ownership", () => {
     expect(browserPlans.get(planId)?.components["shared-field"]).toBe(firstComponent);
   });
 
-  it("keeps type fragments out when component preflight rejects the contribution", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
-    const planId = "Resident.Root";
-
-    browserPlans.register(rootPlan(planId));
-    browserPlans.loadPartialSlot("first-slot", [
-      partialPlan(planId, {
-        components: { "shared-field": component("shared-field", "native.element.shared-a") },
-      }),
-    ], hooks);
-
-    expect(() => browserPlans.loadPartialSlot("second-slot", [
-      partialPlan(planId, {
-        types: { "native.element.second-only": jsType() },
-        components: { "shared-field": component("shared-field", "native.element.shared-b") },
-      }),
-    ], hooks)).toThrow('partial plan contribution "second-slot" cannot declare component "shared-field"');
-    expect(browserPlans.get(planId)?.types["native.element.second-only"]).toBeUndefined();
-  });
-
   it("rejects a partial owned definition for a root-owned component key", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
@@ -83,9 +62,6 @@ describe("component contribution ownership", () => {
         },
       }),
     ], hooks)).toThrow('partial plan contribution "alis-drawer-content" cannot declare component "alis-drawer"');
-
-    expect(Object.keys(browserPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
-      .toEqual(["classAdd"]);
   });
 });
 
@@ -167,7 +143,6 @@ describe("layout object contributions", () => {
     browserPlans.unloadPartialSlot("loader-slot");
 
     expect(browserPlans.get(planId)?.components["alis-loader"]).toBeUndefined();
-    expect(browserPlans.get(planId)?.types[loaderTypeKey]).toBeUndefined();
   });
   it("rejects a layout-object reference with a mismatched runtime identity", () => {
     const browserPlans = new AppliedBrowserPlans();
@@ -195,9 +170,6 @@ describe("layout object contributions", () => {
         },
       }),
     ], hooks)).toThrow('partial plan contribution "drawer-slot" cannot declare component "alis-drawer"');
-
-    expect(Object.keys(browserPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
-      .toEqual(["classAdd"]);
   });
 
 });

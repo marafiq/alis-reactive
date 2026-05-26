@@ -2,12 +2,16 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { executeRequest, routeHandlers } from "../execution/http";
 import type {
   Component,
+  RequestPayloadAssignment,
+  RequestPayloadTarget,
   JsType,
+  PathSegment,
   PayloadScope,
   Plan,
   Reaction,
   Request,
   Shape,
+  StructuredPath,
   ValueProducer,
 } from "../types";
 
@@ -25,6 +29,35 @@ function literal(value: string): ValueProducer {
 
 function objectProducer(fields: Record<string, ValueProducer>): ValueProducer {
   return { kind: "object", fields, shape: objectShape };
+}
+
+function gatherInput(fields: Record<string, ValueProducer>): Request["input"] {
+  return {
+    kind: "gather",
+    declaredFields: [],
+    registeredInputFields: [],
+    transport: "json",
+    supplementalFields: Object.entries(fields).map(([name, value]): RequestPayloadAssignment => ({
+      target: target(name),
+      source: value,
+    })),
+    selection: { kind: "explicit" },
+  };
+}
+
+function target(name: string): RequestPayloadTarget {
+  return { name, path: structuredPath(name) };
+}
+
+function structuredPath(name: string): StructuredPath {
+  const [first, ...rest] = name.split(".").map(pathSegment);
+  if (first === undefined) throw new Error(`Expected path for ${name}`);
+
+  return [first, ...rest];
+}
+
+function pathSegment(part: string): PathSegment {
+  return { kind: "property", name: part };
 }
 
 function payloadRead(scope: PayloadScope, member: string): ValueProducer {
@@ -132,11 +165,7 @@ describe("executeRequest HTTP lifecycle", () => {
       url: "/residents/{residentId}",
       routeParams: { residentId: literal("42") },
       headers: { "X-Unit": literal("memory-care") },
-      input: {
-        kind: "value",
-        value: objectProducer({ name: literal("Ada") }),
-        transport: "json",
-      },
+      input: gatherInput({ name: literal("Ada") }),
       before: [setText("before", literal("Started"))],
       success: [
         { match: { kind: "any" }, reaction: setText("success", payloadRead("success", "message")) },
@@ -219,11 +248,7 @@ describe("executeRequest HTTP lifecycle", () => {
       ],
     });
     const failingSave = request({
-      input: {
-        kind: "value",
-        value: objectProducer({ name: literal("Ada") }),
-        transport: "json",
-      },
+      input: gatherInput({ name: literal("Ada") }),
       error: [
         { match: { kind: "status", status: 422 }, reaction: setText("error", payloadRead("error", "errorSummary")) },
       ],
@@ -312,11 +337,7 @@ describe("executeRequest HTTP lifecycle", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
     const failingSave = request({
-      input: {
-        kind: "value",
-        value: objectProducer({ name: literal("Ada") }),
-        transport: "json",
-      },
+      input: gatherInput({ name: literal("Ada") }),
       error: [
         { match: { kind: "any" }, reaction: setText("error", payloadRead("request", "name")) },
       ],

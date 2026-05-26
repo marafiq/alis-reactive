@@ -6,25 +6,16 @@ namespace Alis.Reactive.Builders.Requests
 {
     internal sealed class GatherDraft
     {
-        private readonly List<GatherPayloadField> _declaredFields = new List<GatherPayloadField>();
-        private readonly List<GatherPayloadField> _supplementalFields =
-            new List<GatherPayloadField>();
-        private readonly HashSet<string> _supplementalPayloadPaths =
-            new HashSet<string>(StringComparer.Ordinal);
+        private readonly List<RequestPayloadAssignment> _declaredFields = new List<RequestPayloadAssignment>();
+        private readonly List<RequestPayloadAssignment> _supplementalFields =
+            new List<RequestPayloadAssignment>();
         private readonly Dictionary<string, ValueProducer> _headerFields =
             new Dictionary<string, ValueProducer>();
         private readonly Dictionary<string, ValueProducer> _routeParameterFields =
             new Dictionary<string, ValueProducer>();
 
-        internal IReadOnlyList<GatherPayloadField> DeclaredFields => _declaredFields;
-        internal IEnumerable<string> SupplementalPayloadPaths
-        {
-            get
-            {
-                foreach (var payloadField in _supplementalFields)
-                    yield return payloadField.PayloadPath;
-            }
-        }
+        internal IReadOnlyList<RequestPayloadAssignment> DeclaredFields => _declaredFields;
+        internal IReadOnlyList<RequestPayloadAssignment> SupplementalFields => _supplementalFields;
 
         internal GatherSelection Selection { get; private set; } = GatherSelection.ExplicitFields;
 
@@ -33,22 +24,17 @@ namespace Alis.Reactive.Builders.Requests
             Selection = GatherSelection.AllRegisteredInputs;
         }
 
-        internal void AddDeclaredField(GatherPayloadField field)
+        internal void AddDeclaredField(RequestPayloadAssignment field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
             _declaredFields.Add(field);
         }
 
-        internal void AddSupplementalField(HttpPayloadPath path, ValueProducer value)
+        internal void AddSupplementalField(BindingPath path, ValueProducer value)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
             if (value == null) throw new ArgumentNullException(nameof(value));
-            var payloadField = GatherPayloadField.Of(path.Value, value);
-            var payloadPathAlreadyExists = !_supplementalPayloadPaths.Add(payloadField.PayloadPath);
-            if (payloadPathAlreadyExists)
-                throw new InvalidOperationException(
-                    $"Supplemental gather payload path '{payloadField.PayloadPath}' is already declared.");
-
+            var payloadField = RequestPayloadAssignment.Of(path, value);
             _supplementalFields.Add(payloadField);
         }
 
@@ -77,14 +63,6 @@ namespace Alis.Reactive.Builders.Requests
             _routeParameterFields[name.Value] = value;
         }
 
-        internal SupplementalGatherPayload ToSupplementalPayload()
-        {
-            var hasNoSupplementalFields = _supplementalFields.Count == 0;
-            if (hasNoSupplementalFields) return SupplementalGatherPayload.Empty;
-
-            return SupplementalGatherPayload.From(CopySupplementalFields());
-        }
-
         internal IReadOnlyDictionary<string, ValueProducer> HeadersForRequest()
         {
             var requestHasNoHeaders = _headerFields.Count == 0;
@@ -102,9 +80,5 @@ namespace Alis.Reactive.Builders.Requests
                 .Bind(_routeParameterFields);
         }
 
-        private IReadOnlyList<GatherPayloadField> CopySupplementalFields()
-        {
-            return new List<GatherPayloadField>(_supplementalFields);
-        }
     }
 }

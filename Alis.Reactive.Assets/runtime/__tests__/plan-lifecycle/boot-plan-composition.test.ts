@@ -10,6 +10,7 @@ import {
   partialPlan,
   registeredInputComponent,
   rootPlan,
+  structuredPath,
   validationContainer,
   validationRule,
 } from "../support/plan-lifecycle-fixtures";
@@ -147,6 +148,7 @@ describe("boot plan composition", () => {
     conflictingDefinition.binding = {
       ...conflictingBinding,
       bindingPath: "Clinical.ResidentName",
+      path: structuredPath("Clinical.ResidentName"),
     };
 
     expect(() => composeInitialPlans([
@@ -287,6 +289,7 @@ describe("boot plan composition", () => {
     invalidContainer.binding = {
       kind: "registered-input",
       bindingPath: "Resident",
+      path: structuredPath("Resident"),
       valueMember: "value",
     };
 

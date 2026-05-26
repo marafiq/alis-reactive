@@ -19,22 +19,4 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "none";
     }
 
-    /// <summary>Sends a single evaluated value as the request body.</summary>
-    public sealed class ValueInput : RequestInput
-    {
-        private readonly RequestTransport _transport;
-
-        /// <summary>Gets the kind. Always <c>"value"</c>.</summary>
-        public string Kind => "value";
-        /// <summary>Gets the value expression to send as the body.</summary>
-        public ObjectProducer Value { get; }
-        /// <summary>Gets the transport format (json or form).</summary>
-        public string Transport => _transport.Value;
-
-        internal ValueInput(ObjectProducer value, RequestTransport transport)
-        {
-            Value = value ?? throw new System.ArgumentNullException(nameof(value));
-            _transport = transport ?? throw new System.ArgumentNullException(nameof(transport));
-        }
-    }
 }

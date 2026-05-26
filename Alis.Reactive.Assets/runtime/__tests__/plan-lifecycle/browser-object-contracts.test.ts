@@ -87,7 +87,7 @@ describe("browser object contract fragments", () => {
       partialPlan(planId, {
         types: { [sharedTypeKey]: jsTypeWithPropertyShape("token", { kind: "number" }) },
       }),
-    ], hooks)).toThrow('partial plan contribution "second-slot" cannot declare type "plugin.address"');
+    ], hooks)).toThrow("incompatible property contracts cannot be merged");
   });
 
   it("refines compatible property shapes when object contract fragments merge", () => {

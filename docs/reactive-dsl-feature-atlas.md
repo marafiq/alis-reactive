@@ -255,9 +255,10 @@ Source:
 Domain terms:
 
 - `GatherDraft`
-- `DeclaredGatherFields`
-- `BuildTimeRegisteredInputGatherFields`
-- `GatherPayloadFieldSelection`
+- `RequestPayloadAssignment`
+- `RequestPayloadTarget`
+- `ValueProducer`
+- `RegisteredInputAssignment`
 - `GatheredComponentValue`
 - `RequestScalarSlot`
 - `HeaderName`
@@ -266,17 +267,24 @@ Domain terms:
 
 Runtime behavior:
 
-Gather is a declared request input. It combines registered input components and
-supplemental fields. Scalar destinations such as headers and route parameters
-must stay scalar. `IncludeAll` expands registered input slots into separate
-build-time and runtime gather fields; it should not silently overwrite declared
-payload claims.
+Gather is a declared request input. It is a list of assignments:
+`target <- source`. A target is the HTTP payload name plus structured path. A
+source is any `ValueProducer`: literal, URL value, event/response payload,
+component property read, plugin result, object, or array. Scalar destinations
+such as headers and route parameters stay scalar. `IncludeAll` appends
+registered input assignments known at render and lets the runtime append
+currently mounted registered input assignments from partials.
 
 Design consequence:
 
 Gather depends on controlled component IDs. ID control is an absolute
 requirement because component render, registration, validation, gather, partial
 merge/unmerge, and runtime lookup all join on that ID.
+
+There is no payload claim/coverage model. The DSL and model-bound component IDs
+are the correctness mechanism. Runtime executes every assignment in the
+generated plan; it does not negotiate precedence or double-check a generated
+plan before execution.
 
 ## Validation Surface
 
@@ -472,7 +480,7 @@ The next closed surfaces should be chosen by blast radius and domain clarity:
    definitions, references, validation and listener removal.
 4. Validation projection/binding: client rule projection, field conditions,
    peer fields, skipped server-only conditions.
-5. Gather/request: payload claims, scalar slots, route/header/url binding,
+5. Gather/request: source-to-target payload assignments, scalar slots, route/header/url binding,
    chained/parallel lifecycle.
 
 Delete-and-rewrite is acceptable for a surface only when this atlas identifies

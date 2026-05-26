@@ -150,6 +150,7 @@ namespace Alis.Reactive.PlanModel
 
         public override string Kind => "registered-input";
         public string BindingPath => _bindingPath.Value;
+        public Path Path => _bindingPath.Path;
         public string ValueMember => _valueMember.Value;
 
         internal override ComponentBinding FillIfAbsent(ComponentBinding incoming)

@@ -13,6 +13,11 @@ not defend against impossible bad plans with preflight, rollback, fallback, or
 speculative recovery. Invalid behavior belongs in the C# PlanModel where it can
 be made unrepresentable. Runtime checks are for true external boundaries only:
 DOM lookup, browser API failure, network, and malformed non-framework input.
+Do not model normal execution bookkeeping as validation, claims, rejects,
+lifecycle gates, or registries. If the server-generated plan says source A is
+assigned to target B, the runtime reads A and writes B. Bookkeeping names should
+describe what is remembered for execution or unload, not imply the plan is
+suspicious.
 
 Rich domain model does not mean inventing names, wrappers, registries, lifecycles,
 or abstractions so the code looks modeled. It means the smallest set of terms

@@ -4,32 +4,32 @@ import type { PartId, PlanContributionSource, PlanId } from "./plan-contribution
 export class BrowserObjectContractLedger {
   private readonly owners = new Map<string, BrowserObjectContractOwnership>();
 
-  request(planId: PlanId, key: string, type: JsType): BrowserObjectContractClaim {
-    return new BrowserObjectContractClaim(
-      key,
-      BrowserObjectContractFragment.from(type),
-      this.owners.get(this.ownershipKey(planId, key)),
-    );
-  }
-
-  claim(planId: PlanId, key: string, type: JsType, source: PlanContributionSource): void {
-    const claim = this.request(planId, key, type);
+  record(planId: PlanId, key: string, type: JsType, source: PlanContributionSource): void {
+    const fragment = BrowserObjectContractFragment.from(type);
     const ownershipKey = this.ownershipKey(planId, key);
     if (source.kind === "root") {
-      this.owners.set(ownershipKey, BrowserObjectContractOwnership.root(claim.contract));
+      this.owners.set(ownershipKey, BrowserObjectContractOwnership.root(fragment));
       return;
     }
 
     const record = this.owners.get(ownershipKey);
     if (record === undefined) {
-      this.owners.set(ownershipKey, BrowserObjectContractOwnership.partial(source.partId, claim.contract));
+      this.owners.set(ownershipKey, BrowserObjectContractOwnership.partial(source.partId, fragment));
       return;
     }
 
-    record.addPartial(source.partId, claim.contract);
+    if (!record.acceptsPartial(source.partId, fragment)) {
+      throw new Error(
+        `[alis] ${source.description} cannot declare type "${key}"; ` +
+        `type key is already owned by ${record.description} with an incompatible object contract fragment. ` +
+        "Shared types may be declared by multiple sources only when their fragments can merge."
+      );
+    }
+
+    record.addPartial(source.partId, fragment);
   }
 
-  claimRoot(planId: PlanId, key: string, type: JsType): void {
+  recordRoot(planId: PlanId, key: string, type: JsType): void {
     this.owners.set(
       this.ownershipKey(planId, key),
       BrowserObjectContractOwnership.root(BrowserObjectContractFragment.from(type)),
@@ -55,30 +55,6 @@ export class BrowserObjectContractLedger {
 
   private ownershipKey(planId: PlanId, key: string): string {
     return `${planId}:${key}`;
-  }
-}
-
-export class BrowserObjectContractClaim {
-  constructor(
-    readonly key: string,
-    readonly contract: BrowserObjectContractFragment,
-    private readonly currentOwner: BrowserObjectContractOwnership | undefined,
-  ) {}
-
-  canBeHeldBy(source: PlanContributionSource): boolean {
-    if (source.kind === "root") return true;
-    if (this.currentOwner === undefined) return true;
-
-    return this.currentOwner.acceptsPartial(source.partId, this.contract);
-  }
-
-  collisionError(source: PlanContributionSource): Error {
-    return new Error(
-      `[alis] ${source.description} cannot declare type "${this.key}"; ` +
-      `type key is already owned by ${this.currentOwner?.description ?? "another source"} ` +
-      "with an incompatible object contract fragment. Shared types may be declared by multiple " +
-      "sources only when their fragments can merge."
-    );
   }
 }
 

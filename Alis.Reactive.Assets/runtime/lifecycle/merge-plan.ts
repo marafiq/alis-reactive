@@ -5,8 +5,6 @@ import { unwireField } from "../validation/live-clear";
 import {
   ComponentOwnershipLedger,
   LayoutObjectReferenceLedger,
-  assertComponentCanComposeInitialPlan,
-  assertComponentCanMerge,
   captureValidationRuleContributions,
   composeInitialComponentIntoPlan,
   layoutObjectKeysFrom,
@@ -58,13 +56,12 @@ class BootPlanAssembly {
       components: { ...plan.components },
       behaviors: [...plan.behaviors],
     });
-    assembly.claimBootRootComponents();
+    assembly.recordBootRootComponents();
     return assembly;
   }
 
   accept(contribution: Plan): void {
     const source = planContributionSourceFrom(contribution);
-    this.assertComponentsCanCompose(contribution, source);
 
     for (const [key, type] of Object.entries(contribution.types)) {
       this.plan.types[key] = mergeJsTypes(this.plan.types[key], type);
@@ -72,16 +69,6 @@ class BootPlanAssembly {
 
     this.mergeComponents(contribution, source);
     this.plan.behaviors.push(...contribution.behaviors);
-  }
-
-  private assertComponentsCanCompose(contribution: Plan, source: PlanContributionSource): void {
-    for (const [key, component] of Object.entries(contribution.components)) {
-      assertComponentCanComposeInitialPlan(
-        this.plan,
-        { planId: contribution.planId, key, component, source },
-        { ownership: this.componentOwnership, layoutObjects: this.layoutObjects },
-      );
-    }
   }
 
   private mergeComponents(contribution: Plan, source: PlanContributionSource): void {
@@ -94,9 +81,9 @@ class BootPlanAssembly {
     }
   }
 
-  private claimBootRootComponents(): void {
+  private recordBootRootComponents(): void {
     for (const key of Object.keys(this.plan.components)) {
-      this.componentOwnership.claimRoot(this.plan.planId, key);
+      this.componentOwnership.recordRoot(this.plan.planId, key);
     }
   }
 
@@ -116,7 +103,7 @@ export class AppliedBrowserPlans {
   register(plan: Plan): void {
     this.plans.set(plan.planId, plan);
     this.rootPlanIds.add(plan.planId);
-    this.claimRootKeys(plan);
+    this.recordRootKeys(plan);
   }
 
   loadPartialSlot(partId: PartId, plans: Plan[], hooks: MergeHooks): PlanId[] {
@@ -184,8 +171,6 @@ export class AppliedBrowserPlans {
 
   private mergeContribution(incoming: Plan, hooks: MergeHooks, source: PlanContributionSource): Plan {
     const target = this.ensureTarget(incoming.planId);
-    this.assertTypesCanMerge(incoming, source);
-    this.assertComponentsCanMerge(incoming, target, source);
     this.mergeTypes(incoming, target, source);
     this.mergeComponents(incoming, target, source);
 
@@ -194,23 +179,6 @@ export class AppliedBrowserPlans {
     hooks.wireContainerValidation(target, source.behaviorSignal);
 
     return target;
-  }
-
-  private assertTypesCanMerge(incoming: Plan, source: PlanContributionSource): void {
-    for (const [key, type] of Object.entries(incoming.types)) {
-      const claim = this.typeOwnership.request(incoming.planId, key, type);
-      if (!claim.canBeHeldBy(source)) throw claim.collisionError(source);
-    }
-  }
-
-  private assertComponentsCanMerge(incoming: Plan, target: Plan, source: PlanContributionSource): void {
-    for (const [key, comp] of Object.entries(incoming.components)) {
-      assertComponentCanMerge(
-        target,
-        { planId: incoming.planId, key, component: comp, source },
-        { ownership: this.componentOwnership, layoutObjects: this.layoutObjects },
-      );
-    }
   }
 
   private ensureTarget(planId: string): Plan {
@@ -225,7 +193,7 @@ export class AppliedBrowserPlans {
   private mergeTypes(incoming: Plan, target: Plan, source: PlanContributionSource): void {
     for (const [key, type] of Object.entries(incoming.types)) {
       target.types[key] = mergeJsTypes(target.types[key], type);
-      this.typeOwnership.claim(incoming.planId, key, type, source);
+      this.typeOwnership.record(incoming.planId, key, type, source);
     }
   }
 
@@ -239,12 +207,12 @@ export class AppliedBrowserPlans {
     }
   }
 
-  private claimRootKeys(plan: Plan): void {
+  private recordRootKeys(plan: Plan): void {
     for (const [key, type] of Object.entries(plan.types)) {
-      this.typeOwnership.claimRoot(plan.planId, key, type);
+      this.typeOwnership.recordRoot(plan.planId, key, type);
     }
     for (const key of Object.keys(plan.components)) {
-      this.componentOwnership.claimRoot(plan.planId, key);
+      this.componentOwnership.recordRoot(plan.planId, key);
     }
   }
 

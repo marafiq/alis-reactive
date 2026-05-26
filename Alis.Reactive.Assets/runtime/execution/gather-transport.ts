@@ -1,4 +1,4 @@
-import type { HttpMethod, Transport } from "../types";
+import type { RequestPayloadTarget, HttpMethod, PathSegment, Transport } from "../types";
 import { toString } from "../core/shape-convert";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
@@ -14,8 +14,8 @@ export interface GatherResult {
 
 /** Transport strategies for emitting name/value pairs into GET, FormData, or JSON. */
 export interface TransportStrategy {
-  emitScalar(name: string, value: unknown, shape: RuntimeShape): void;
-  emitArray(name: string, items: unknown[], itemShape: RuntimeShape): void;
+  emitScalar(target: RequestPayloadTarget, value: unknown, shape: RuntimeShape): void;
+  emitArray(target: RequestPayloadTarget, items: unknown[], itemShape: RuntimeShape): void;
 }
 
 export class GatherOutput {
@@ -64,63 +64,63 @@ function sendsInputInQueryString(method: HttpMethod): boolean {
 }
 
 export function emitGatheredValue(
-  name: string,
+  target: RequestPayloadTarget,
   raw: unknown,
   shape: RuntimeShape,
   transport: TransportStrategy,
 ): void {
   const files = browserFiles(raw);
   if (files !== undefined) {
-    transport.emitArray(name, files, shape);
-    log.trace("file.emitted", { name, count: files.length });
+    transport.emitArray(target, files, shape);
+    log.trace("file.emitted", { name: target.name, count: files.length });
     return;
   }
 
   if (Array.isArray(raw)) {
-    transport.emitArray(name, raw, shape.item());
+    transport.emitArray(target, raw, shape.item());
     return;
   }
 
-  transport.emitScalar(name, raw, shape);
+  transport.emitScalar(target, raw, shape);
 }
 
 function createGetTransport(urlParams: string[]): TransportStrategy {
   return {
-    emitScalar: (name, value, shape) => {
+    emitScalar: (target, value, shape) => {
       const wire = shape.formatForWire(value);
-      urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(scalarWireValue(wire, name))}`);
+      urlParams.push(`${encodeURIComponent(target.name)}=${encodeURIComponent(scalarWireValue(wire, target.name))}`);
     },
-    emitArray: (name, items, itemShape) => {
+    emitArray: (target, items, itemShape) => {
       const gatheredItems = GatheredArrayItems.from(items);
       if (gatheredItems.containsFile) throw new Error("[alis] File objects cannot be sent via GET");
-      gatheredItems.emitToQueryString(name, itemShape, urlParams);
+      gatheredItems.emitToQueryString(target.name, itemShape, urlParams);
     },
   };
 }
 
 function createFormDataTransport(formData: FormData): TransportStrategy {
   return {
-    emitScalar: (name, value, shape) => {
+    emitScalar: (target, value, shape) => {
       const wire = shape.formatForWire(value);
-      formData.append(name, scalarWireValue(wire, name));
+      formData.append(target.name, scalarWireValue(wire, target.name));
     },
-    emitArray: (name, items, itemShape) => {
-      GatheredArrayItems.from(items).appendToFormData(name, itemShape, formData);
+    emitArray: (target, items, itemShape) => {
+      GatheredArrayItems.from(items).appendToFormData(target.name, itemShape, formData);
     },
   };
 }
 
 function createJsonTransport(body: Record<string, unknown>): TransportStrategy {
   return {
-    emitScalar: (name, value, shape) => {
+    emitScalar: (target, value, shape) => {
       const wire = shape.formatForWire(value);
-      JsonBodyPath.from(name).assign(body, jsonBodyValue(wire));
+      assignJsonBodyValue(body, target, jsonBodyValue(wire));
     },
-    emitArray: (name, items, itemShape) => {
+    emitArray: (target, items, itemShape) => {
       const gatheredItems = GatheredArrayItems.from(items);
       if (gatheredItems.containsFile) throw new Error("[alis] File objects require transport: form-data");
       const wireItems = gatheredItems.toJsonValue(itemShape);
-      JsonBodyPath.from(name).assign(body, wireItems);
+      assignJsonBodyValue(body, target, wireItems);
     },
   };
 }
@@ -249,134 +249,40 @@ function jsonArrayBodyValue(items: unknown[], itemShape: RuntimeShape): unknown[
   return items.map(item => itemShape.formatForWire(item));
 }
 
-class JsonBodyPath {
-  private constructor(
-    private readonly key: string,
-    private readonly parts: [string, ...string[]],
-  ) {}
-
-  static from(key: string): JsonBodyPath {
-    const parts = key.split(".");
-    const keyContainsEmptySegment = parts.some(part => part.length === 0);
-    if (keyContainsEmptySegment) {
-      throw new Error(`[alis] gather key "${key}" contains an empty path segment`);
-    }
-
-    return new JsonBodyPath(key, parts as [string, ...string[]]);
+function assignJsonBodyValue(
+  body: Record<string, unknown>,
+  target: RequestPayloadTarget,
+  value: unknown,
+): void {
+  const segments = target.path.map(bodySegment);
+  const first = segments[0];
+  if (first === undefined) {
+    throw new Error(`[alis] gather key "${target.name}" contains no path segments`);
   }
 
-  assign(body: Record<string, unknown>, value: unknown): void {
-    const pathTargetsRootField = this.parts.length === 1;
-    if (pathTargetsRootField) {
-      JsonBodyLeaf.from(body, this.rootPart(), this.key).assign(value);
-      return;
-    }
-
-    const parent = this.parentObject(body);
-    JsonBodyLeaf.from(parent, this.lastPart(), this.key).assign(value);
-  }
-
-  overlaps(other: JsonBodyPath): boolean {
-    return this.isPrefixOf(other) || other.isPrefixOf(this);
-  }
-
-  private isPrefixOf(other: JsonBodyPath): boolean {
-    if (this.parts.length > other.parts.length) return false;
-
-    return this.parts.every((part, index) => part === other.parts[index]);
-  }
-
-  private parentObject(body: Record<string, unknown>): Record<string, unknown> {
-    let current = body;
-    const parentPath = this.parts.slice(0, -1);
-    const walkedPath: string[] = [];
-
-    for (const segment of parentPath) {
-      walkedPath.push(segment);
-      current = JsonBodySlot.from(current, segment, this.key, walkedPath.join(".")).ensureObject();
-    }
-
-    return current;
-  }
-
-  private rootPart(): string {
-    return this.parts[0];
-  }
-
-  private lastPart(): string {
-    const part = this.parts[this.parts.length - 1];
-    if (part === undefined) {
-      throw new Error("[alis] gather path is empty");
-    }
-
-    return part;
-  }
-}
-
-class JsonBodySlot {
-  private constructor(
-    private readonly parent: Record<string, unknown>,
-    private readonly segment: string,
-    private readonly ownerKey: string,
-    private readonly segmentPath: string,
-  ) {}
-
-  static from(
-    parent: Record<string, unknown>,
-    segment: string,
-    ownerKey: string,
-    segmentPath: string,
-  ): JsonBodySlot {
-    return new JsonBodySlot(parent, segment, ownerKey, segmentPath);
-  }
-
-  ensureObject(): Record<string, unknown> {
-    const value = this.parent[this.segment];
-    const segmentHasNoValue = !(this.segment in this.parent);
-    if (segmentHasNoValue) {
-      this.parent[this.segment] = {};
-      return this.parent[this.segment] as Record<string, unknown>;
-    }
-
+  let parent = body;
+  for (const segment of segments.slice(0, -1)) {
+    const value = parent[segment];
     const nestedObject = PlainObjectRecord.tryFrom(value);
-    if (nestedObject !== undefined) return nestedObject.raw;
-
-    throw new Error(
-      `[alis] gather key "${this.ownerKey}" conflicts at "${this.segmentPath}": ` +
-      "an existing scalar value cannot hold nested fields. " +
-      `Use either "${this.segmentPath}" or "${this.segmentPath}.*" fields, not both.`
-    );
-  }
-}
-
-class JsonBodyLeaf {
-  private constructor(
-    private readonly parent: Record<string, unknown>,
-    private readonly segment: string,
-    private readonly ownerKey: string,
-  ) {}
-
-  static from(parent: Record<string, unknown>, segment: string, ownerKey: string): JsonBodyLeaf {
-    return new JsonBodyLeaf(parent, segment, ownerKey);
-  }
-
-  assign(value: unknown): void {
-    const existingValue = this.parent[this.segment];
-    const segmentHasValue = this.segment in this.parent;
-    const existingValueIsNestedObject = PlainObjectRecord.tryFrom(existingValue) !== undefined;
-    const incomingValueIsNestedObject = PlainObjectRecord.tryFrom(value) !== undefined;
-    const assignmentWouldReplaceNestedFields =
-      segmentHasValue
-      && existingValueIsNestedObject
-      && !incomingValueIsNestedObject;
-    if (assignmentWouldReplaceNestedFields) {
-      throw new Error(
-        `[alis] gather key "${this.ownerKey}" conflicts at "${this.segment}": ` +
-        "nested fields were already assigned under this key. " +
-        `Use either "${this.segment}" or "${this.segment}.*" fields, not both.`
-      );
+    if (nestedObject !== undefined) {
+      parent = nestedObject.raw;
+      continue;
     }
 
-    this.parent[this.segment] = value;
+    parent[segment] = {};
+    parent = parent[segment] as Record<string, unknown>;
+  }
+
+  parent[segments[segments.length - 1]!] = value;
+}
+
+function bodySegment(segment: PathSegment): string | number {
+  switch (segment.kind) {
+    case "property":
+      return segment.name;
+    case "index":
+      return segment.index;
+    default:
+      return assertNever(segment, "path segment");
   }
 }

@@ -22,9 +22,10 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("reaction")
             .GetProperty("request")
             .GetProperty("input")
-            .GetProperty("value")
-            .GetProperty("fields")
-            .GetProperty("optional");
+            .GetProperty("supplementalFields")
+            .EnumerateArray()
+            .Single(field => TargetName(field) == "optional")
+            .GetProperty("source");
 
         Assert.That(literal.GetProperty("kind").GetString(), Is.EqualTo("literal"));
         Assert.That(literal.GetProperty("value").ValueKind, Is.EqualTo(System.Text.Json.JsonValueKind.Null));
@@ -73,7 +74,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
     }
 
     [Test]
-    public void include_all_does_not_duplicate_a_component_read_with_an_explicit_payload_path()
+    public void include_all_keeps_declared_assignments_and_registered_input_assignments_separate()
     {
         var plan = CreatePlan();
         RegisterTextInput(plan, "Id", "id-input");
@@ -96,10 +97,19 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("input")
             .GetProperty("declaredFields")
             .EnumerateArray()
-            .Select(field => field.GetProperty("payloadPath").GetString())
+            .Select(TargetName)
+            .ToList();
+        var registeredFields = doc.RootElement.GetProperty("behaviors")[0]
+            .GetProperty("reaction")
+            .GetProperty("request")
+            .GetProperty("input")
+            .GetProperty("registeredInputFields")
+            .EnumerateArray()
+            .Select(TargetName)
             .ToList();
 
         Assert.That(fields, Is.EqualTo(new[] { "selectedId" }));
+        Assert.That(registeredFields, Is.EqualTo(new[] { "Id" }));
     }
 
     [Test]
@@ -124,7 +134,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
         var registeredInputFields = input
             .GetProperty("registeredInputFields")
             .EnumerateArray()
-            .Select(field => field.GetProperty("payloadPath").GetString())
+            .Select(TargetName)
             .ToList();
 
         Assert.That(input.GetProperty("declaredFields").GetArrayLength(), Is.EqualTo(0));
@@ -132,109 +142,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
     }
 
     [Test]
-    public void gather_rejects_duplicate_explicit_payload_paths()
-    {
-        var plan = CreatePlan();
-
-        var ex = Assert.Throws<InvalidOperationException>(() =>
-        {
-            Trigger(plan).DomReady(p =>
-            {
-                p.Get("/api/profile")
-                    .Gather(g => g
-                        .FromUrl("id", "residentId")
-                        .FromUrl("legacyId", "residentId"))
-                    .Response(r => r.OnSuccess(s => s.Element("result").Show()));
-            });
-        });
-
-        Assert.That(ex!.Message, Does.Contain("residentId"));
-        Assert.That(ex.Message, Does.Contain("already declared payload path"));
-    }
-
-    [Test]
-    public void gather_rejects_explicit_and_supplemental_payload_path_conflicts()
-    {
-        var plan = CreatePlan();
-
-        var ex = Assert.Throws<InvalidOperationException>(() =>
-        {
-            Trigger(plan).DomReady(p =>
-            {
-                p.Post("/api/profile", g => g
-                        .FromUrl("id", "residentId")
-                        .Static("residentId", "manual"))
-                    .Response(r => r.OnSuccess(s => s.Element("result").Show()));
-            });
-        });
-
-        Assert.That(ex!.Message, Does.Contain("residentId"));
-        Assert.That(ex.Message, Does.Contain("conflicts with already declared payload path"));
-    }
-
-    [Test]
-    public void gather_rejects_parent_child_payload_path_conflicts()
-    {
-        var plan = CreatePlan();
-
-        var ex = Assert.Throws<InvalidOperationException>(() =>
-        {
-            Trigger(plan).DomReady(p =>
-            {
-                p.Post("/api/profile", g => g
-                        .FromUrl("address", "address")
-                        .Static("address.city", "Seattle"))
-                    .Response(r => r.OnSuccess(s => s.Element("result").Show()));
-            });
-        });
-
-        Assert.That(ex!.Message, Does.Contain("address.city"));
-        Assert.That(ex.Message, Does.Contain("address"));
-        Assert.That(ex.Message, Does.Contain("Use either the parent path or its child paths"));
-    }
-
-    [Test]
-    public void gather_rejects_duplicate_supplemental_payload_paths()
-    {
-        var plan = CreatePlan();
-
-        var ex = Assert.Throws<InvalidOperationException>(() =>
-        {
-            Trigger(plan).DomReady(p =>
-            {
-                p.Post("/api/profile", g => g
-                        .Static("residentId", "manual")
-                        .Static("residentId", "override"))
-                    .Response(r => r.OnSuccess(s => s.Element("result").Show()));
-            });
-        });
-
-        Assert.That(ex!.Message, Does.Contain("Supplemental gather payload path 'residentId' is already declared"));
-    }
-
-    [Test]
-    public void gather_rejects_parent_child_supplemental_payload_path_conflicts()
-    {
-        var plan = CreatePlan();
-
-        var ex = Assert.Throws<InvalidOperationException>(() =>
-        {
-            Trigger(plan).DomReady(p =>
-            {
-                p.Post("/api/profile", g => g
-                        .Static("address", "flat")
-                        .Static("address.city", "Seattle"))
-                    .Response(r => r.OnSuccess(s => s.Element("result").Show()));
-            });
-        });
-
-        Assert.That(ex!.Message, Does.Contain("address.city"));
-        Assert.That(ex.Message, Does.Contain("address"));
-        Assert.That(ex.Message, Does.Contain("Use either the parent path or its child paths"));
-    }
-
-    [Test]
-    public void include_all_does_not_duplicate_a_registered_input_claimed_by_static_payload()
+    public void include_all_keeps_supplemental_assignments_and_registered_input_assignments_separate()
     {
         var plan = CreatePlan();
         RegisterTextInput(plan, "Id", "id-input");
@@ -257,23 +165,18 @@ public class WhenBuildingHttpRequests : PlanTestBase
 
         Assert.That(input.GetProperty("kind").GetString(), Is.EqualTo("gather"));
         Assert.That(input.GetProperty("declaredFields").GetArrayLength(), Is.EqualTo(0));
-        Assert.That(input.GetProperty("registeredInputFields").GetArrayLength(), Is.EqualTo(0));
+        Assert.That(input.GetProperty("registeredInputFields").GetArrayLength(), Is.EqualTo(1));
         Assert.That(input.GetProperty("selection").GetProperty("kind").GetString(),
             Is.EqualTo("all-registered-inputs"));
-        Assert.That(input.GetProperty("supplementalFields")
-                .GetProperty("kind")
-                .GetString(),
-            Is.EqualTo("declared"));
         var supplementalFields = input.GetProperty("supplementalFields")
-            .GetProperty("fields")
             .EnumerateArray()
-            .Select(field => field.GetProperty("payloadPath").GetString())
+            .Select(TargetName)
             .ToList();
         Assert.That(supplementalFields, Is.EqualTo(new[] { "Id" }));
     }
 
     [Test]
-    public void include_all_does_not_add_registered_input_when_static_payload_claims_a_nested_path()
+    public void include_all_adds_registered_inputs_even_when_supplemental_assignments_use_nested_paths()
     {
         var plan = CreatePlan();
         RegisterTextInput(plan, "Address", "address-input");
@@ -295,7 +198,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
             .GetProperty("input")
             .GetProperty("registeredInputFields");
 
-        Assert.That(registeredInputFields.GetArrayLength(), Is.EqualTo(0));
+        Assert.That(registeredInputFields.GetArrayLength(), Is.EqualTo(1));
     }
 
     [Test]
@@ -437,4 +340,7 @@ public class WhenBuildingHttpRequests : PlanTestBase
                 componentKind,
                 shape));
     }
+
+    private static string? TargetName(System.Text.Json.JsonElement field) =>
+        field.GetProperty("target").GetProperty("name").GetString();
 }

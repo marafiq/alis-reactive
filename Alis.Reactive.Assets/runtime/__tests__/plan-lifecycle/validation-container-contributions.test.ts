@@ -4,6 +4,7 @@ import {
   mergeHooks,
   partialPlan,
   rootPlan,
+  structuredPath,
   validationComponents,
   validationContainer,
   validationRule,
@@ -80,6 +81,7 @@ describe("validation container contributions", () => {
     invalidExtension.binding = {
       kind: "registered-input",
       bindingPath: "ResidentForm",
+      path: structuredPath("ResidentForm"),
       valueMember: "value",
     };
 

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveGather } from "../../execution/gather";
 import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
-import type { Component, JsType, Plan, RequestInput, Shape, ValueProducer } from "../../types";
+import type { Component, RequestPayloadTarget, JsType, PathSegment, Plan, RequestInput, Shape, StructuredPath, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -42,70 +42,16 @@ describe("all registered input gather lifecycle", () => {
     });
   });
 
-  it("keeps explicit payload paths ahead of dynamically gathered partial inputs", () => {
-    document.body.innerHTML = `<input id="address-line" value="12 Main" />`;
+  it("emits explicit, supplemental, and dynamically gathered registered input assignments", () => {
+    document.body.innerHTML = `
+      <input id="first-name" value="Ada" />
+      <input id="address" value="12 Main" />
+    `;
     const browserPlans = new AppliedBrowserPlans();
-    const planId = "Resident.PartialGatherExplicitKey";
-    const resident = rootPlan(planId, {});
-
-    browserPlans.register(resident);
-    browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, {
-        components: {
-          "address-line": inputComponent("address-line", "addressLine"),
-        },
-      }),
-    ], silentLifecycleHooks);
-
-    expect(resolveGather({
-      ...allRegisteredInputs(),
-      declaredFields: [
-        {
-          payloadPath: "addressLine",
-          value: literal("manual", stringShape),
-        },
-      ],
-    }, "POST", resident, {}).body).toEqual({
-      addressLine: "manual",
+    const planId = "Resident.PartialGatherAssignments";
+    const resident = rootPlan(planId, {
+      "first-name": inputComponent("first-name", "firstName"),
     });
-  });
-
-  it("keeps supplemental payload paths ahead of dynamically gathered partial inputs", () => {
-    document.body.innerHTML = `<input id="address-line" value="12 Main" />`;
-    const browserPlans = new AppliedBrowserPlans();
-    const planId = "Resident.PartialGatherStaticKey";
-    const resident = rootPlan(planId, {});
-
-    browserPlans.register(resident);
-    browserPlans.loadPartialSlot("address-slot", [
-      partialPlan(planId, {
-        components: {
-          "address-line": inputComponent("address-line", "addressLine"),
-        },
-      }),
-    ], silentLifecycleHooks);
-
-    expect(resolveGather({
-      ...allRegisteredInputs(),
-      supplementalFields: {
-        kind: "declared",
-        fields: [
-          {
-            payloadPath: "addressLine",
-            value: literal("manual", stringShape),
-          },
-        ],
-      },
-    }, "POST", resident, {}).body).toEqual({
-      addressLine: "manual",
-    });
-  });
-
-  it("keeps supplemental nested payload paths ahead of dynamically gathered partial inputs", () => {
-    document.body.innerHTML = `<input id="address" value="12 Main" />`;
-    const browserPlans = new AppliedBrowserPlans();
-    const planId = "Resident.PartialGatherStaticNestedPath";
-    const resident = rootPlan(planId, {});
 
     browserPlans.register(resident);
     browserPlans.loadPartialSlot("address-slot", [
@@ -118,19 +64,18 @@ describe("all registered input gather lifecycle", () => {
 
     expect(resolveGather({
       ...allRegisteredInputs(),
-      supplementalFields: {
-        kind: "declared",
-        fields: [
-          {
-            payloadPath: "address.city",
-            value: literal("Seattle", stringShape),
-          },
-        ],
-      },
+      declaredFields: [{
+        target: target("selected"),
+        source: literal("manual", stringShape),
+      }],
+      supplementalFields: [{
+        target: target("address.city"),
+        source: literal("Seattle", stringShape),
+      }],
     }, "POST", resident, {}).body).toEqual({
-      address: {
-        city: "Seattle",
-      },
+      selected: "manual",
+      firstName: "Ada",
+      address: "12 Main",
     });
   });
 
@@ -211,10 +156,26 @@ function registeredInputComponent(id: string, bindingPath: string, valueMember: 
     binding: {
       kind: "registered-input",
       bindingPath,
+      path: structuredPath(bindingPath),
       valueMember,
     },
     container: { kind: "none" },
   };
+}
+
+function target(name: string): RequestPayloadTarget {
+  return { name, path: structuredPath(name) };
+}
+
+function structuredPath(name: string): StructuredPath {
+  const [first, ...rest] = name.split(".").map(pathSegment);
+  if (first === undefined) throw new Error(`Expected path for ${name}`);
+
+  return [first, ...rest];
+}
+
+function pathSegment(part: string): PathSegment {
+  return { kind: "property", name: part };
 }
 
 function allRegisteredInputs(): Extract<RequestInput, { kind: "gather" }> {
@@ -223,7 +184,7 @@ function allRegisteredInputs(): Extract<RequestInput, { kind: "gather" }> {
     declaredFields: [],
     registeredInputFields: [],
     transport: "json",
-    supplementalFields: { kind: "none" },
+    supplementalFields: [],
     selection: { kind: "all-registered-inputs" },
   };
 }

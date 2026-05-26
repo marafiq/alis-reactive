@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Requests
     {
         private readonly PlanBuildContext _context;
         private RequestEndpointDraft _endpoint = RequestEndpointDraft.Unselected;
-        private RequestGather<TModel> _gather = RequestGather<TModel>.None;
+        private GatherBuilder<TModel>? _gather;
         private RequestTransport _transport = RequestTransport.Json;
         private readonly List<Reaction> _whileLoading = new List<Reaction>();
         private readonly List<Reaction> _finally = new List<Reaction>();
@@ -52,7 +52,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var builder = new GatherBuilder<TModel>(_context);
             gather(builder);
-            _gather = RequestGather<TModel>.Configured(builder);
+            _gather = builder;
             return this;
         }
 
@@ -120,22 +120,64 @@ namespace Alis.Reactive.Builders.Requests
         internal Request BuildRequest()
         {
             var endpoint = _endpoint.Build();
-            var gatherPlan = _gather.Resolve(
-                RequestGatherContext.For(
-                    _context,
-                    _transport,
-                    endpoint.Url));
+            var input = ResolveInput();
 
             var request = Request.Create(
                 endpoint,
-                gatherPlan.Input,
+                input,
                 ResolveRequestLifecycle(),
-                gatherPlan.Parameters,
+                ResolveParameters(endpoint.Url),
                 _validation.Target);
 
             _validation.Register(_context, request);
 
             return request;
+        }
+
+        private RequestInput ResolveInput()
+        {
+            if (_gather == null)
+                return RequestInput.None;
+
+            var declaredFields = new List<RequestPayloadAssignment>(_gather.Draft.DeclaredFields);
+            var registeredInputFields = new List<RequestPayloadAssignment>();
+            var selection = _gather.Draft.Selection;
+            var supplementalFields = _gather.Draft.SupplementalFields;
+
+            selection.AddBuildTimeRegisteredInputFields(registeredInputFields, _context);
+
+            var gatherDslAddedInput =
+                declaredFields.Count > 0
+                || registeredInputFields.Count > 0
+                || supplementalFields.Count > 0
+                || selection.MayExpandRegisteredInputsAtRuntime;
+            if (!gatherDslAddedInput)
+                return RequestInput.None;
+
+            return GatherInput.From(
+                declaredFields,
+                registeredInputFields,
+                _transport,
+                supplementalFields,
+                selection);
+        }
+
+        private RequestParameters ResolveParameters(RequestUrl url)
+        {
+            if (_gather == null)
+            {
+                var routeParameters = RequestRouteTemplate
+                    .For(url)
+                    .Bind(new Dictionary<string, ValueProducer>());
+
+                return RequestParameters.From(
+                    new Dictionary<string, ValueProducer>(),
+                    routeParameters);
+            }
+
+            return RequestParameters.From(
+                _gather.Draft.HeadersForRequest(),
+                _gather.Draft.RouteParametersFor(url));
         }
 
         private RequestLifecycle ResolveRequestLifecycle()

@@ -125,7 +125,7 @@ flowchart LR
         Boot["Initial Boot Composition"]
         Slot["Partial Slot"]
         Contribution["Plan Document Contribution"]
-        Ownership["Ownership Claim"]
+    Ownership["Contribution Ownership"]
         Reference["Existing Component Reference"]
         Unload["Contribution Removal"]
     end
@@ -246,12 +246,12 @@ TypeScript.
 
 | Question | Domain Classification | Correct Action | Smell |
 | --- | --- | --- | --- |
-| Does this code introduce/render the browser object? | Component Definition Contribution | Claim component ownership and declare the object contract | Treating it like a loose reference |
+| Does this code introduce/render the browser object? | Component Definition Contribution | Record contribution ownership and declare the object contract | Treating it like a loose reference |
 | Does this code only need to call/read/write an existing object? | Existing Component Reference | Require matching id/vendor/type and no binding/container state | Replacing the existing component definition |
 | Does this code use a fixed app-level object from layout? | Layout Object Contribution | Materialize or join the fixed id without partial ownership transfer; remove only when a partial materialized it and the last partial reference unloads | Treating layout objects as incidental object targets |
 | Does this declaration add members to the same browser object? | Object Contract Fragment Contribution | Record the source-owned fragment, materialize the active merged contract, and widen access on same path/compatible shape | `Object.assign`, `AddOrReplace`, last-writer-wins, or trying to subtract from an already-merged type |
 | Does render-time input registration describe a value member? | Input Value Contract Enrichment | Ensure the type exists, then enrich it with readable value metadata | Replacing a writable type with a read-only input type |
-| Does gather reserve an HTTP payload path? | Gather Payload Claim | Claim the payload path from declared payload fields, supplemental static/event fields, build-time registered input expansion, or runtime dynamic input expansion | Letting `IncludeAll` overwrite declared request fields |
+| Does gather add data to an HTTP request? | Request Payload Assignment | Emit `target <- source`; the target carries HTTP name and structured path, the source is a `ValueProducer` | Adding claim/coverage/dedupe logic around generated plan assignments |
 | Does a plan script appear during initial page load? | Initial Document Contribution | Compose through the shared contribution policy; coalesce identical owned definitions and validation containers because boot has no unload lifetime | Boot-only shortcut with weaker rules |
 | Does an injected partial disappear? | Partial Slot Unload | Abort listeners, remove owned definitions, remove exact validation rule contributions, keep root references | Removing root-owned hosts/app components |
 | Does validation expose browser-executable validation intent? | Client Validation Projection | Emit deterministic browser rule intent or record skipped projection | Inferring from implementation details or pretending all server validator rules can execute in the browser |
@@ -291,25 +291,24 @@ TypeScript.
 
 ### Gather Terms
 
-- **Declared Gather Field**: a developer-authored payload path with a
-  `ValueProducer`. Explicit component includes, URL reads, plugin results, and
-  typed sources enter the request through this term.
-- **Build-Time Registered Input Field**: an `IncludeAll()` field expanded from
-  components already registered while the C# plan is rendered. It is separated
-  from declared fields so the plan preserves why the field exists.
-- **Supplemental Gather Payload**: static and event-derived payload fields that
-  can either become a standalone request body or travel inside a `GatherInput`
-  when declared/runtime registered inputs also participate.
-- **Runtime Registered Input Expansion**: the remaining `IncludeAll()` policy
-  executed against the current runtime plan so browser-loaded partial inputs
-  load and unload deterministically.
-- **Gather Payload Claim**: the reservation of a payload path and selected
-  component read. Claims ensure declared and supplemental fields win over
-  build-time or runtime `IncludeAll()` expansion.
+- **Request Payload Assignment**: one deterministic `target <- source` entry in
+  an HTTP gather plan. The target owns the HTTP name plus structured path. The
+  source is a `ValueProducer` evaluated when the request executes.
+- **Declared Assignment**: a developer-authored gather assignment from explicit
+  component include, typed source, URL read, plugin result, or event/response
+  payload.
+- **Registered Input Assignment**: an `IncludeAll()` assignment expanded from a
+  model-bound input already registered during C# render.
+- **Supplemental Assignment**: a static or event-derived assignment added beside
+  declared and registered assignments.
+- **Runtime Registered Input Expansion**: `IncludeAll()` applied to the current
+  runtime plan so browser-loaded partial inputs load and unload
+  deterministically. It appends assignments; it does not claim paths, negotiate
+  precedence, or validate the generated plan.
 
 ### Plugin Terms
 
-- **Plugin Member Declaration**: the authoring-time claim that a plugin object
+- **Plugin Member Declaration**: the authoring-time declaration that a plugin object
   exposes a readable property, callable function, or command. String plugin
   registration and typed `ReactivePlugin` descriptors share this catalog so a
   member name cannot drift between property and method declarations.
@@ -561,7 +560,7 @@ without turning them into ceremony.
 | Validation adapter projection | Client validation fields and skipped projections | Bound validation rules and activations | Evaluate browser rules and display errors | Server rules always remain authoritative; client projection is deterministic subset |
 | Validation field shape evidence | Projected field reference from typed expression or FluentValidation rule metadata | Field path plus projected shape | Bind deferred validation component and value contract | Projection carries shape; render-time binding must not rediscover it from the model |
 | Validation activation / peer operand | Bound value producer dependency | Component/payload/url/plugin source plus member contract | Resolve dependency and evaluate rule | Missing dependency is plan/runtime drift and must fail; it is not an inactive condition or absent peer |
-| `IncludeAll()` | Dynamic gather policy plus payload claims | Current runtime plan registered inputs and claimed payload slots | Gather mounted registered inputs whose component and payload slot are not already claimed | Partial load/unload changes the current input set deterministically |
+| `IncludeAll()` | Dynamic gather policy plus registered input assignments | Current runtime plan registered inputs | Gather mounted registered inputs by appending `target <- component.value` assignments | Partial load/unload changes the current input set deterministically |
 | Partial slot load | Plan contributions under one slot lifetime | Incoming plans and slot id | Merge contributions, wire listeners, and track exact removals | Same contribution policy as initial boot composition, plus unload ownership |
 | Partial slot unload | Contribution removal | Tracked owners/listeners/rule objects | Abort listeners, remove owned state, preserve root references | Root-owned hosts/layout-owned app components survive unload |
 | Plugin registration/call | Plugin object/function contract | Plugin name, member path, argument/return shapes | Resolve plugin object and call/read declared member | Plugin is an explicit escape hatch, not dynamic runtime discovery |
@@ -706,7 +705,7 @@ when tests or code reveal a better classification.
 | Accepted | Execution lanes | Making every reaction async for implementation convenience | Component event mutations need same-tick visibility. The immediate lane handles set/call/dispatch/inject/validation display and sync guards; the async lane is entered only when execution reaches request, parallel, or a prompt/user-decision guard such as confirm. | `Immediate Execution Lane`, `Async Execution Lane`, `Reaction Completion`, trigger/runtime tests |
 | Accepted | Lifecycle stages carry reaction graphs | Rejecting branch/request/parallel just because a lifecycle callback was originally command-oriented | If the frozen DSL can express a deterministic reaction graph, the plan should preserve it. Runtime execution lanes decide when to stay immediate and when to await selected async concepts. | `RequestLifecycle`, `WhileLoading`, `Finally`, `ParallelCompletion.OnSettled`, `WhenBuildingLifecycleReactionGraphs` |
 | Accepted | Unique last default branch | Allowing default branch cases anywhere in the list | `default` is else, so it must be the final branch and can appear only once. The DSL already guides this; PlanModel now enforces it as an invariant. | `BranchCases`, `WhenBuildingConditionalBranches` |
-| Accepted | Gather payload claims | Treating `IncludeAll` as a raw append of every registered input | Explicit payload fields, supplemental static/event fields, and dynamic registered inputs all compete for the same HTTP payload paths. `IncludeAll` must respect exact and parent/child path claims and stay serialized so future partial inputs can be gathered. | `GatherPayloadClaims`, `GatherPayloadSlots`, partial gather tests |
+| Rejected | Gather payload claims | Treating `IncludeAll` as raw assignment append | The DSL controls component ids and model-bound paths. Runtime executes generated assignments; path-claim/coverage/dedupe logic was defensive code around a trusted plan and made the model harder to read. | `RequestPayloadAssignment`, simple gather loops, DSL behavior tests |
 | Accepted | Contribution removal is domain cleanup | Treating unload as DOM cleanup only | Unload must remove listeners, owned component definitions, type fragments, exact validation rule contributions, and dynamic gather reachability. | `Slot Load AbortController`, `Validation Rule Contribution`, partial lifecycle tests |
 | Accepted | Subtractive object contract fragments | Keeping merged type members until every owner disappears | Root and partial type fragments are source-owned contributions. Partial unload recomputes the active object contract from remaining fragments so root-owned app components and injection hosts keep root members but lose unloaded partial members. | `ObjectContractFragmentOwnership`, merge-plan fragment lifecycle tests |
 | Accepted | Server error placement target | Silently dropping server errors for known but currently missing fields | Server errors are deterministic placement decisions: mounted known fields render inline; known but missing/unmounted fields route to summary; unknown server fields route to summary. | `ServerErrorPlacementTarget`, validation orchestrator tests |
@@ -725,7 +724,7 @@ different domain actions and must not share one collision rule.
 | Classification | Owner | Merge Rule | Unload Rule |
 | --- | --- | --- | --- |
 | Owned Component Definition | The source that renders/introduces the component object | Key must be unowned or already owned by the same partial slot | Remove component, type ownership contribution, behavior listeners, and validation/gather reachability owned by the slot |
-| Object Target Contribution | The source needs a deterministic browser object handle. If the component key is unowned, the source may claim it; if root already owns the same id/vendor/type, the contribution joins it. | Component identity must match an existing root-owned object before it can join; object-target contributions must not carry binding/container state | Remove the component only when the source claimed it; otherwise release only the source's type fragment/listeners |
+| Object Target Contribution | The source needs a deterministic browser object handle. If the component key is unowned, record the source as its owner; if root already owns the same id/vendor/type, the contribution joins it. | Component identity must match an existing root-owned object before it can join; object-target contributions must not carry binding/container state | Remove the component only when the source owns it; otherwise release only the source's type fragment/listeners |
 | Root Injection Host | Root page owns the container receiving `Into(...)` content | Same as existing component reference; the partial may reference the host for follow-up injections or visibility changes | Unload slot content/listeners without deleting the host |
 | Root-Owned Validation Extension | Root page owns the validation container; partial contributes fields/rules | Append or replace validation rules by validated component key | Remove only the exact rule contribution |
 | Layout Object Contribution | Layout owns one fixed-id object such as drawer, loader, toast, confirm | Materialize the fixed object only when no root object exists; otherwise join the matching id/vendor/type | Keep root-owned layout objects; remove a partial-materialized layout object only after the last referencing partial unloads |
@@ -797,7 +796,7 @@ different domain actions and must not share one collision rule.
 | No Response Outcome | Request outcome for failures before a readable HTTP response exists. It still routes error and complete handlers with the prepared request context when gathering succeeded. |
 | Response Media Type | Runtime classification of an HTTP response `Content-Type`. JSON includes both `application/json` and structured syntax suffixes such as `application/problem+json`; text includes text and HTML media types. |
 | Gather Selection | Request input policy. `explicit` gathers declared fields only; `all-registered-inputs` expands against the current Runtime Plan View so partial load and unload affect gather deterministically. |
-| Gather Payload Claim | Ownership of an HTTP payload path during gather construction/execution. Build time claims declared payload fields and supplemental static/event fields before expanding registered inputs; runtime claims declared/supplemental/build-time fields before mounted partial inputs. Parent and child paths overlap, so `Address.City` claims enough intent to block dynamic `Address` from `IncludeAll`. |
+| Request Payload Assignment | Deterministic HTTP gather entry: assign a source value to a target payload name/path. Declared, supplemental, build-time registered, and runtime registered inputs all share this same shape. |
 | Declared Gather Fields | Developer-authored request payload fields from `Include`, `FromUrl`, `FromEvent`, plugin reads, or typed component sources. They stay separate from `Build-Time Registered Input Gather Field` in plan JSON so authored intent is not confused with `IncludeAll` expansion. |
 | Gathered Component Read | Explicit classification of a selected gather field whose value producer reads a component source. Build-time IncludeAll and runtime dynamic expansion use the component identity, not the HTTP payload path, to avoid gathering the same component twice when a declared field aliases the request path. Non-component gather fields are represented as their own no-op classification rather than nullable absence. |
 | Dynamic Gather Component | Runtime contribution included by `all-registered-inputs` after partial plan merge. It is skipped when an explicit field already selected the component or payload path, or when the component is not mounted; if mounted and selected, its declared binding member must exist and be readable on the component contract. |
@@ -870,10 +869,10 @@ different domain actions and must not share one collision rule.
 | Plan Document Contribution | One plan document merged into a booted Runtime Plan View from a root source or partial source. |
 | Component Contribution Intent | Plan-declared merge meaning for one component entry. `object-target` declares a deterministic browser object handle, `owned-definition` declares authoritative component state such as registered input binding, `validation-container` declares validation container rules, and `layout-object` declares a fixed app-level object owned by layout/page lifetime. Runtime computes ownership outcomes from this intent plus the current ownership ledger. |
 | Component Definition Contribution | `owned-definition` contribution that owns authoritative rendered object state for a component key. It may carry binding or other ownership state; unloading removes it only when its source owns it. |
-| Object Target Contribution | `object-target` contribution used by property reads, property writes, method calls, injection hosts, and explicit-id component references. It can claim an unowned component key, or join an existing root-owned component when id/vendor/type match and it carries no binding/container state. |
+| Object Target Contribution | `object-target` contribution used by property reads, property writes, method calls, injection hosts, and explicit-id component references. It can record ownership of an unowned component key, or join an existing root-owned component when id/vendor/type match and it carries no binding/container state. |
 | Slot Load AbortController | Native browser controller owned by one slot load and shared by every contribution in that load. Component-event behavior and live validation listeners attach to its signal so unload can stop browser callbacks deterministically. |
-| Ownership Claim | Runtime record of which source owns a type or component key. Root-owned keys cannot be deleted by partial unload. |
-| Component Ownership Ledger | Runtime lifecycle ledger of component definition ownership. It answers whether a component key can be claimed, referenced, extended, or removed for a plan document contribution. |
+| Contribution Ownership | Runtime record of which page/root/slot contribution introduced an artifact. Root-owned artifacts cannot be deleted by partial unload. |
+| Component Contribution Ledger | Runtime lifecycle ledger of component definition ownership. It answers which contribution introduced, referenced, extended, or removed a component key. |
 | Object Contract Fragment Ledger | Runtime lifecycle ledger of object contract fragment contributions. It keeps root and partial fragments separate, lets compatible fragments merge into the active type, and materializes the remaining contract after unload. |
 | Shared Type Ownership | Runtime ownership rule for plan type keys. Multiple sources may declare the same JavaScript object type when overlapping members have compatible contracts; non-overlapping members are fragments of the same browser object contract. Unload releases only the contributing source's fragment and removes the type only after no live source needs it. |
 | Plan Merge Collision | Fail-fast partial merge invariant for non-shareable keys. Component definitions have one owner, root-owned validation containers may accept rule extensions, and root-owned page objects may be referenced by compatible partial fragments. A failed merge must not mutate the target runtime plan. |
@@ -912,7 +911,7 @@ different domain actions and must not share one collision rule.
 | Shape Compatibility Policy | Plan-model rule for deciding whether a produced value shape can satisfy a consumer shape. `any` refines structurally inside arrays and objects, `none` never acts as a value wildcard, and object consumers require declared fields unless the producer is an open object. |
 | Registered Input Binding | Component binding that participates in gather/validation through a binding path and value member. |
 | Build-Time Registered Input Gather Field | Request payload field produced by `IncludeAll()` while the C# plan is built from registered model-bound inputs already present in the current view. It is serialized separately from declared gather fields because it is expansion output, not authored payload intent. |
-| Runtime Registered Input Gather Field | Request payload field materialized by the browser runtime for a mounted registered input contributed after boot, usually through partial plan load. It can only fill an unclaimed payload path and cannot duplicate an explicit or static payload field. |
+| Runtime Registered Input Assignment | Request payload assignment materialized by the browser runtime for a mounted registered input contributed after boot, usually through partial plan load. |
 | Plugin Contract | Registered JavaScript function/object contract for behavior that is intentionally outside deterministic plan primitives, while still carrying typed argument and return shapes. |
 | Plugin Operation Identity | C# value object for a plugin call target. It owns the plugin name, root/member target, plan method key, invocation path, and diagnostic label so string plugin DSL and typed plugin descriptors produce the same plan contract. |
 | Plugin Property Identity | C# value object for a readable property on a plugin object. It owns the plugin name, member key, invocation path, and diagnostic label so plugin objects can expose data through the same runtime object property primitive as components. |

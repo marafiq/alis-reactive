@@ -161,7 +161,14 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class BindingPath : PlanString
     {
-        private BindingPath(string value) : base(value, nameof(value)) { }
+        private readonly Path _path;
+
+        private BindingPath(string value) : base(value, nameof(value))
+        {
+            _path = Path.Parse(value);
+        }
+
+        public Path Path => _path;
 
         internal static BindingPath Of(string value) => new BindingPath(value);
     }

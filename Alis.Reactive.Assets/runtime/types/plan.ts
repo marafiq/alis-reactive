@@ -154,6 +154,7 @@ export interface UnboundComponentBinding {
 export interface RegisteredInputBinding {
   kind: "registered-input";
   bindingPath: string;
+  path: StructuredPath;
   valueMember: string;
 }
 
@@ -668,8 +669,7 @@ export interface FollowUpRequestChain {
 
 export type RequestInput =
   | NoRequestInput
-  | GatherInput
-  | ValueInput;
+  | GatherInput;
 
 export type Transport =
   | "json"
@@ -681,24 +681,11 @@ export interface NoRequestInput {
 
 export interface GatherInput {
   kind: "gather";
-  declaredFields: GatherPayloadField[];
-  registeredInputFields: GatherPayloadField[];
+  declaredFields: RequestPayloadAssignment[];
+  registeredInputFields: RequestPayloadAssignment[];
   transport: Transport;
-  supplementalFields: SupplementalGatherFields;
+  supplementalFields: RequestPayloadAssignment[];
   selection: GatherSelection;
-}
-
-export type SupplementalGatherFields =
-  | NoSupplementalGatherFields
-  | DeclaredSupplementalGatherFields;
-
-export interface NoSupplementalGatherFields {
-  kind: "none";
-}
-
-export interface DeclaredSupplementalGatherFields {
-  kind: "declared";
-  fields: GatherPayloadField[];
 }
 
 export type GatherSelection =
@@ -713,15 +700,14 @@ export interface AllRegisteredInputsGatherSelection {
   kind: "all-registered-inputs";
 }
 
-export interface ValueInput {
-  kind: "value";
-  value: ObjectProducer;
-  transport: Transport;
+export interface RequestPayloadAssignment {
+  target: RequestPayloadTarget;
+  source: ValueProducer;
 }
 
-export interface GatherPayloadField {
-  payloadPath: string;
-  value: ValueProducer;
+export interface RequestPayloadTarget {
+  name: string;
+  path: StructuredPath;
 }
 
 export interface ResponseHandler {

@@ -38,7 +38,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <returns>This builder for chaining.</returns>
         public GatherBuilder<TModel> Static(string param, object value)
         {
-            var payloadPath = HttpPayloadPath.Of(param);
+            var payloadPath = BindingPath.Of(param);
             _draft.AddSupplementalField(
                 payloadPath,
                 ValueProducer.LiteralFromValue(value));
@@ -57,7 +57,7 @@ namespace Alis.Reactive.Builders.Requests
             Expression<Func<TArgs, TProp>> path,
             string param)
         {
-            var payloadPath = HttpPayloadPath.Of(param);
+            var payloadPath = BindingPath.Of(param);
             var eventPath = ExpressionPathHelper.ToEventPath(path);
             var shape = Shape.FromClrType(typeof(TProp));
             _draft.AddSupplementalField(
@@ -159,7 +159,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var urlParam = UrlParameterName.Of(paramName);
             var value = ValueProducer.ReadUrl(urlParam.Value);
-            _draft.AddDeclaredField(GatherPayloadField.Of(urlParam.Value, value));
+            _draft.AddDeclaredField(RequestPayloadAssignment.Of(urlParam.Value, value));
             return this;
         }
 
@@ -169,9 +169,9 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> FromUrl(string paramName, string asParam)
         {
             var urlParam = UrlParameterName.Of(paramName);
-            var payloadPath = HttpPayloadPath.Of(asParam);
+            var payloadPath = BindingPath.Of(asParam);
             var value = ValueProducer.ReadUrl(urlParam.Value);
-            _draft.AddDeclaredField(GatherPayloadField.Of(payloadPath.Value, value));
+            _draft.AddDeclaredField(RequestPayloadAssignment.Of(payloadPath, value));
             return this;
         }
 
@@ -183,7 +183,7 @@ namespace Alis.Reactive.Builders.Requests
             var urlParam = UrlParameterName.Of(paramName);
             var shape = RequestScalarSlot.UrlQueryParameter(urlParam).RequireShape<T>();
             var value = ValueProducer.ReadUrl(urlParam.Value, shape);
-            _draft.AddDeclaredField(GatherPayloadField.Of(urlParam.Value, value));
+            _draft.AddDeclaredField(RequestPayloadAssignment.Of(urlParam.Value, value));
             return this;
         }
 
@@ -193,10 +193,10 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> FromUrl<T>(string paramName, string asParam)
         {
             var urlParam = UrlParameterName.Of(paramName);
-            var payloadPath = HttpPayloadPath.Of(asParam);
+            var payloadPath = BindingPath.Of(asParam);
             var shape = RequestScalarSlot.UrlQueryParameter(urlParam).RequireShape<T>();
             var value = ValueProducer.ReadUrl(urlParam.Value, shape);
-            _draft.AddDeclaredField(GatherPayloadField.Of(payloadPath.Value, value));
+            _draft.AddDeclaredField(RequestPayloadAssignment.Of(payloadPath, value));
             return this;
         }
 
@@ -206,8 +206,8 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> Plugin<T>(Conditions.TypedPluginSource<T> source, string paramName)
         {
             if (source == null) throw new System.ArgumentNullException(nameof(source));
-            var payloadPath = HttpPayloadPath.Of(paramName);
-            _draft.AddDeclaredField(GatherPayloadField.Of(payloadPath.Value, source.ToValueProducer()));
+            var payloadPath = BindingPath.Of(paramName);
+            _draft.AddDeclaredField(RequestPayloadAssignment.Of(payloadPath, source.ToValueProducer()));
             return this;
         }
 
@@ -247,14 +247,17 @@ namespace Alis.Reactive.Builders.Requests
             if (valueContract == null) throw new System.ArgumentNullException(nameof(valueContract));
             var componentIdentity = RegisteredComponentIdentity.For(componentId, vendor);
             var planBindingPath = BindingPath.Of(propertyName);
-            var payloadPath = HttpPayloadPath.Of(propertyName);
-            var gatheredValue = GatheredComponentValue.For(
-                componentIdentity,
+            var componentValue = ValueProducer.Read(
+                ComponentSource.Of(componentIdentity.ComponentId.Value),
+                valueContract.ValueMember,
+                shape: valueContract.Shape);
+            var planBinding = InputComponentPlanBinding.For(
+                componentIdentity.ComponentId,
+                componentIdentity.Vendor,
                 planBindingPath,
-                payloadPath,
                 valueContract);
-            _context.EnsureInputComponent(gatheredValue.PlanBinding);
-            _draft.AddDeclaredField(gatheredValue.Field);
+            _context.EnsureInputComponent(planBinding);
+            _draft.AddDeclaredField(RequestPayloadAssignment.Of(planBindingPath, componentValue));
             return this;
         }
 
@@ -263,8 +266,8 @@ namespace Alis.Reactive.Builders.Requests
             string paramName)
         {
             if (source == null) throw new System.ArgumentNullException(nameof(source));
-            var payloadPath = HttpPayloadPath.Of(paramName);
-            _draft.AddDeclaredField(GatherPayloadField.Of(payloadPath.Value, source.ToValueProducer()));
+            var payloadPath = BindingPath.Of(paramName);
+            _draft.AddDeclaredField(RequestPayloadAssignment.Of(payloadPath, source.ToValueProducer()));
             return this;
         }
     }

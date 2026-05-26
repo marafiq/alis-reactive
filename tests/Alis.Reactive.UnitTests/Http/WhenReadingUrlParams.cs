@@ -97,7 +97,7 @@ public class WhenReadingUrlParams : PlanTestBase
 
         var planJson = plan.RenderFormatted();
 
-        Assert.That(planJson, Does.Contain("\"payloadPath\": \"facilityId\""));
+        Assert.That(planJson, Does.Contain("\"name\": \"facilityId\""));
         Assert.That(planJson, Does.Contain("\"kind\": \"url\""));
     }
 
@@ -114,7 +114,7 @@ public class WhenReadingUrlParams : PlanTestBase
 
         var planJson = plan.RenderFormatted();
 
-        Assert.That(planJson, Does.Contain("\"payloadPath\": \"unit\""));
+        Assert.That(planJson, Does.Contain("\"name\": \"unit\""));
     }
 
     // ── Conditions ───────────────────────────────────────────
@@ -269,7 +269,7 @@ public class WhenReadingUrlParams : PlanTestBase
         var field = doc.RootElement.GetProperty("behaviors")[0]
             .GetProperty("reaction").GetProperty("request")
             .GetProperty("input").GetProperty("declaredFields")[0];
-        Assert.That(field.GetProperty("value").GetProperty("shape")
+        Assert.That(field.GetProperty("source").GetProperty("shape")
             .GetProperty("kind").GetString(), Is.EqualTo("number"));
     }
 
@@ -285,7 +285,7 @@ public class WhenReadingUrlParams : PlanTestBase
         });
 
         var planJson = plan.RenderFormatted();
-        Assert.That(planJson, Does.Contain("\"payloadPath\": \"pageNum\""));
+        Assert.That(planJson, Does.Contain("\"name\": \"pageNum\""));
     }
 
     // ── Guard tests ──────────────────────────────────────────

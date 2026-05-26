@@ -35,7 +35,7 @@ public class WhenGatheringFusionScheduleValues : FusionTestBase
     }
 
     private static string? ReadShape(JsonElement field) =>
-        field.GetProperty("value")
+        field.GetProperty("source")
             .GetProperty("shape")
             .GetProperty("kind")
             .GetString();

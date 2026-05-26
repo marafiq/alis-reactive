@@ -127,6 +127,7 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Interface("RegisteredInputBinding")
                 .Requires("kind", Literal("registered-input"))
                 .Requires("bindingPath", "string")
+                .Requires("path", "StructuredPath")
                 .Requires("valueMember", "string"));
 
             contract.Declare(Union(
@@ -519,7 +520,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("follow-up"))
                 .Requires("next", "Request"));
 
-            contract.Declare(Union("RequestInput", "NoRequestInput", "GatherInput", "ValueInput"));
+            contract.Declare(Union("RequestInput", "NoRequestInput", "GatherInput"));
             contract.Declare(LiteralUnion("Transport", RequestTransport.Values));
 
             contract.Declare(Interface("NoRequestInput")
@@ -527,23 +528,11 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("GatherInput")
                 .Requires("kind", Literal("gather"))
-                .Requires("declaredFields", "GatherPayloadField[]")
-                .Requires("registeredInputFields", "GatherPayloadField[]")
+                .Requires("declaredFields", "RequestPayloadAssignment[]")
+                .Requires("registeredInputFields", "RequestPayloadAssignment[]")
                 .Requires("transport", "Transport")
-                .Requires("supplementalFields", "SupplementalGatherFields")
+                .Requires("supplementalFields", "RequestPayloadAssignment[]")
                 .Requires("selection", "GatherSelection"));
-
-            contract.Declare(Union(
-                "SupplementalGatherFields",
-                "NoSupplementalGatherFields",
-                "DeclaredSupplementalGatherFields"));
-
-            contract.Declare(Interface("NoSupplementalGatherFields")
-                .Requires("kind", Literal("none")));
-
-            contract.Declare(Interface("DeclaredSupplementalGatherFields")
-                .Requires("kind", Literal("declared"))
-                .Requires("fields", "GatherPayloadField[]"));
 
             contract.Declare(Union(
                 "GatherSelection",
@@ -556,14 +545,13 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Interface("AllRegisteredInputsGatherSelection")
                 .Requires("kind", Literal("all-registered-inputs")));
 
-            contract.Declare(Interface("ValueInput")
-                .Requires("kind", Literal("value"))
-                .Requires("value", "ObjectProducer")
-                .Requires("transport", "Transport"));
+            contract.Declare(Interface("RequestPayloadAssignment")
+                .Requires("target", "RequestPayloadTarget")
+                .Requires("source", "ValueProducer"));
 
-            contract.Declare(Interface("GatherPayloadField")
-                .Requires("payloadPath", "string")
-                .Requires("value", "ValueProducer"));
+            contract.Declare(Interface("RequestPayloadTarget")
+                .Requires("name", "string")
+                .Requires("path", "StructuredPath"));
 
             contract.Declare(Interface("ResponseHandler")
                 .Requires("match", "ResponseStatusMatch")

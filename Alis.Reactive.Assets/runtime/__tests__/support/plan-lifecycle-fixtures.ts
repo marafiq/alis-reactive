@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 import type { MergeHooks } from "../../lifecycle/merge-plan";
-import type { Behavior, Component, ComponentValidation, JsType, Plan, Shape } from "../../types";
+import type { Behavior, Component, ComponentValidation, JsType, PathSegment, Plan, Shape, StructuredPath } from "../../types";
 
 export function jsType(): JsType {
   return {
@@ -93,10 +93,22 @@ export function registeredInputComponent(id: string, type = `native.component.${
     binding: {
       kind: "registered-input",
       bindingPath: "CareUnit",
+      path: structuredPath("CareUnit"),
       valueMember: "value",
     },
     container: { kind: "none" },
   };
+}
+
+export function structuredPath(name: string): StructuredPath {
+  const [first, ...rest] = name.split(".").map(pathSegment);
+  if (first === undefined) throw new Error(`Expected path for ${name}`);
+
+  return [first, ...rest];
+}
+
+function pathSegment(part: string): PathSegment {
+  return { kind: "property", name: part };
 }
 
 export function layoutComponent(id: string, type = `native.component.${id}`): Component {
