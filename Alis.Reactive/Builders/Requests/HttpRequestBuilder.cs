@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Requests
     {
         private readonly PlanBuildContext _context;
         private RequestEndpointDraft _endpoint = RequestEndpointDraft.Unselected;
-        private GatherBuilder<TModel>? _gather;
+        private GatherDraft _gather = new GatherDraft();
         private RequestBodyFormat _bodyFormat = RequestBodyFormat.Json;
         private readonly List<Reaction> _whileLoading = new List<Reaction>();
         private readonly List<Reaction> _finally = new List<Reaction>();
@@ -50,9 +50,10 @@ namespace Alis.Reactive.Builders.Requests
         /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
         {
-            var builder = new GatherBuilder<TModel>(_context);
+            var draft = new GatherDraft();
+            var builder = new GatherBuilder<TModel>(_context, draft);
             gather(builder);
-            _gather = builder;
+            _gather = draft;
             return this;
         }
 
@@ -141,40 +142,17 @@ namespace Alis.Reactive.Builders.Requests
 
         private RequestInput ResolveInput()
         {
-            if (_gather == null)
-                return RequestInput.None;
-
-            var payloadAssignments = new List<RequestPayloadAssignment>(_gather.Draft.PayloadAssignments);
-            var sourceSelection = _gather.Draft.SourceSelection;
-
-            var gatherDslAddedInput =
-                payloadAssignments.Count > 0
-                || sourceSelection.SelectsRegisteredInputs;
-            if (!gatherDslAddedInput)
-                return RequestInput.None;
-
-            return GatherInput.From(
-                payloadAssignments,
-                _bodyFormat,
-                sourceSelection);
+            return _gather.BuildRequestInput(_bodyFormat);
         }
 
         private IReadOnlyDictionary<string, ValueProducer> HeadersForRequest()
         {
-            if (_gather == null)
-                return new Dictionary<string, ValueProducer>();
-
-            return _gather.Draft.HeadersForRequest();
+            return _gather.HeadersForRequest();
         }
 
         private IReadOnlyDictionary<string, ValueProducer> RouteParametersFor(RequestUrl url)
         {
-            if (_gather == null)
-                return RequestRouteTemplate
-                    .For(url)
-                    .Bind(new Dictionary<string, ValueProducer>());
-
-            return _gather.Draft.RouteParametersFor(url);
+            return _gather.RouteParametersFor(url);
         }
 
         private static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items)

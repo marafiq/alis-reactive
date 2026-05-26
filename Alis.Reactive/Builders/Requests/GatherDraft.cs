@@ -17,6 +17,21 @@ namespace Alis.Reactive.Builders.Requests
         internal GatherSourceSelection SourceSelection { get; private set; } =
             GatherSourceSelection.ExplicitPayloadAssignments;
 
+        internal bool ReadsRequestInput =>
+            _payloadAssignments.Count > 0
+            || SourceSelection.SelectsRegisteredInputs;
+
+        internal RequestInput BuildRequestInput(RequestBodyFormat bodyFormat)
+        {
+            if (!ReadsRequestInput)
+                return RequestInput.None;
+
+            return GatherInput.From(
+                _payloadAssignments,
+                bodyFormat,
+                SourceSelection);
+        }
+
         internal void IncludeAllRegisteredInputs()
         {
             SourceSelection = GatherSourceSelection.AllRegisteredInputs;
@@ -63,10 +78,6 @@ namespace Alis.Reactive.Builders.Requests
 
         internal IReadOnlyDictionary<string, ValueProducer> HeadersForRequest()
         {
-            var requestHasNoHeaders = _headers.Count == 0;
-            if (requestHasNoHeaders)
-                return new Dictionary<string, ValueProducer>();
-
             return new Dictionary<string, ValueProducer>(_headers);
         }
 
