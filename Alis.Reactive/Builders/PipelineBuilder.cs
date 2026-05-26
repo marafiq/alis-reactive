@@ -274,7 +274,7 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> Into(string elementId)
         {
             Context.EnsureElement(elementId);
-            var responseBody = ValueProducer.Read(PayloadSource.Success(), "responseBody");
+            var responseBody = ValueProducer.ReadWholePayload(PayloadSource.Success());
             AddStep(Reaction.Inject(elementId, responseBody));
             return this;
         }

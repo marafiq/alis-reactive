@@ -80,6 +80,12 @@ namespace Alis.Reactive.PlanModel
         internal static ValueProducer ReadPayload(PayloadSource from, string path, Shape shape) =>
             Read(from, path, Path.Parse(path), shape);
 
+        internal static ValueProducer ReadWholePayload(PayloadSource from) =>
+            new ReadProducer(ValueRead.WholePayload(from, Shape.None));
+
+        internal static ValueProducer ReadWholePayload(PayloadSource from, Shape shape) =>
+            new ReadProducer(ValueRead.WholePayload(from, shape));
+
         internal static ValueProducer Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueProducer> args) =>
             new ReadProducer(ValueRead.Method(from, method, returns, ValueArguments.Of(args)));
 
@@ -191,10 +197,18 @@ namespace Alis.Reactive.PlanModel
                 ValueReadTarget.ForMember(from, member),
                 shape,
                 ValueReadAccess.Method(args));
+
+        internal static ValueRead WholePayload(PayloadSource from, Shape shape) =>
+            new ValueRead(
+                ValueReadTarget.ForWholePayload(from),
+                shape,
+                ValueReadAccess.Property);
     }
 
     internal sealed class ValueReadTarget
     {
+        private const string WholePayloadMember = "responseBody";
+
         private ValueReadTarget(Source from, MemberName member, Path path)
         {
             From = from ?? throw new ArgumentNullException(nameof(from));
@@ -211,6 +225,9 @@ namespace Alis.Reactive.PlanModel
 
         internal static ValueReadTarget ForMember(Source from, string member, Path path) =>
             new ValueReadTarget(from, MemberName.Of(member), path);
+
+        internal static ValueReadTarget ForWholePayload(PayloadSource from) =>
+            new ValueReadTarget(from, MemberName.Of(WholePayloadMember), Path.None);
 
         private static ValueReadTarget ForMember(Source from, MemberName member) =>
             new ValueReadTarget(from, member, ValueReadPath.For(from, member));
@@ -231,14 +248,9 @@ namespace Alis.Reactive.PlanModel
 
     internal static class PayloadReadPath
     {
-        private const string WholePayloadMember = "responseBody";
-
         internal static Path FromMember(MemberName member)
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
-
-            if (string.Equals(member.Value, WholePayloadMember, StringComparison.Ordinal))
-                return Path.None;
 
             return Path.Parse(member.Value);
         }
