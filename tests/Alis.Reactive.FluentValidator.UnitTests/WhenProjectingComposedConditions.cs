@@ -15,7 +15,7 @@ public class WhenProjectingComposedConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldsAndValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
-        var when = jobTitle.Rules[0].Condition;
+        var when = jobTitle.Rules[0].WhenCondition();
 
         Assert.That(when, Is.InstanceOf<FieldAll>());
         var all = (FieldAll)when!;
@@ -48,7 +48,7 @@ public class WhenProjectingComposedConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldsOrValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
-        var when = notes.Rules[0].Condition;
+        var when = notes.Rules[0].WhenCondition();
 
         Assert.That(when, Is.InstanceOf<FieldAny>());
         var any = (FieldAny)when!;
@@ -72,7 +72,7 @@ public class WhenProjectingComposedConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldsNotValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
-        var when = notes.Rules[0].Condition;
+        var when = notes.Rules[0].WhenCondition();
 
         Assert.That(when, Is.InstanceOf<FieldNot>());
         var not = (FieldNot)when!;
@@ -90,7 +90,7 @@ public class WhenProjectingComposedConditions
         // Validator: (employed AND salary > 50k) OR (age >= 65)
         var fields = _adapter.ProjectRules(typeof(WhenFieldsComplexValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
-        var when = email.Rules[0].Condition;
+        var when = email.Rules[0].WhenCondition();
 
         // Top level: Any (OR)
         Assert.That(when, Is.InstanceOf<FieldAny>());

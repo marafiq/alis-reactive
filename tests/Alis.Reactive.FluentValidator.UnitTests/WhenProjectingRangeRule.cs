@@ -14,10 +14,8 @@ public class WhenProjectingRangeRule
         var rule = desc[0].Rules[0];
         Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Range));
 
-        var constraint = rule.ConstraintValue as object[];
-        Assert.That(constraint, Is.Not.Null);
-        Assert.That(constraint!, Has.Length.EqualTo(2));
-        Assert.That(constraint[0], Is.EqualTo(0));
-        Assert.That(constraint[1], Is.EqualTo(120));
+        var range = rule.RangeOperand();
+        Assert.That(range.LowerBound, Is.EqualTo(0));
+        Assert.That(range.UpperBound, Is.EqualTo(120));
     }
 }

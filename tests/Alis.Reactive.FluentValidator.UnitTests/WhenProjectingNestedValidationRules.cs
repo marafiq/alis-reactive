@@ -111,7 +111,7 @@ public class WhenProjectingNestedValidationRules
         Assert.That(confirmCity, Is.Not.Null, "Address.ConfirmCity field should be projected");
         Assert.That(confirmCity!.Rules, Has.Count.GreaterThan(0));
 
-        var when = confirmCity.Rules[0].Condition;
+        var when = confirmCity.Rules[0].WhenCondition();
         Assert.That(when, Is.Not.Null, "Conditional rule should have a When");
 
         var cmp = (FieldCompare)when!;
@@ -128,7 +128,7 @@ public class WhenProjectingNestedValidationRules
         Assert.That(childName, Is.Not.Null, "Child.Name field should be projected");
         Assert.That(childName!.Rules, Has.Count.GreaterThan(0));
 
-        var when = childName.Rules[0].Condition;
+        var when = childName.Rules[0].WhenCondition();
         Assert.That(when, Is.Not.Null, "Should have a condition");
 
         var validator = new ParentConditionalValidator();
@@ -163,7 +163,7 @@ public class WhenProjectingNestedValidationRules
         var rule = confirmCity.Rules[0];
         Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.EqualTo));
 
-        Assert.That(rule.PeerFieldName, Is.EqualTo("Address.City"),
+        Assert.That(rule.PeerOperand().FieldName, Is.EqualTo("Address.City"),
             "Explicit peer field projection inside a nested validator must carry the parent path.");
     }
 
@@ -179,10 +179,7 @@ public class WhenProjectingNestedValidationRules
         var rule = name.Rules[0];
         Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Required));
 
-        Assert.That(rule.Condition, Is.Not.Null,
-            "Included rules inside WhenField must carry the condition");
-
-        var when = (FieldCompare)rule.Condition!;
+        var when = (FieldCompare)rule.WhenCondition();
         Assert.That(when.Field, Is.EqualTo("IsEmployed"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Truthy));
 

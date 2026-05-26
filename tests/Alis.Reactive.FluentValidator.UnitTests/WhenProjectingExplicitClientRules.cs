@@ -56,7 +56,7 @@ public sealed class WhenProjectingExplicitClientRules
 
         Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Regex));
         Assert.That(rule.Message, Is.EqualTo("Code must start with ALIS."));
-        Assert.That(rule.ConstraintValue, Is.EqualTo("^ALIS-"));
+        Assert.That(rule.LiteralOperand().Value, Is.EqualTo("^ALIS-"));
     }
 
     [Test]
@@ -68,7 +68,7 @@ public sealed class WhenProjectingExplicitClientRules
         var rule = confirmEmail.Rules.Single();
 
         Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.EqualTo));
-        Assert.That(rule.PeerFieldName, Is.EqualTo("Email"));
+        Assert.That(rule.PeerOperand().FieldName, Is.EqualTo("Email"));
         Assert.That(fields.Select(field => field.FieldName), Does.Contain("Email"));
     }
 
@@ -79,12 +79,11 @@ public sealed class WhenProjectingExplicitClientRules
 
         var age = fields.Single(field => field.FieldName == "Age");
         var rule = age.Rules.Single();
-        var constraint = rule.ConstraintValue as object[];
+        var range = rule.RangeOperand();
 
         Assert.That(rule.Kind, Is.EqualTo(ValidationRuleKind.Range));
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Number));
-        Assert.That(constraint, Is.Not.Null);
-        Assert.That(constraint!, Is.EqualTo(new object[] { 18, 65 }));
+        Assert.That(range.ToArray(), Is.EqualTo(new object[] { 18, 65 }));
     }
 
     [Test]

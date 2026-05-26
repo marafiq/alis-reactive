@@ -24,7 +24,7 @@ public class WhenProjectingEqualToRules
         var field = desc.First(f => f.FieldName == "ConfirmEmail");
         var equalRule = field.Rules.First(r => r.Kind == ValidationRuleKind.EqualTo);
         Assert.That(equalRule.Message, Is.EqualTo("Emails must match."));
-        Assert.That(equalRule.PeerFieldName, Is.EqualTo("Email"));
+        Assert.That(equalRule.PeerOperand().FieldName, Is.EqualTo("Email"));
     }
 
     [Test]
@@ -35,8 +35,7 @@ public class WhenProjectingEqualToRules
         var field = desc.First(f => f.FieldName == "MiddleName");
         var equalRule = field.Rules.First(r => r.Kind == ValidationRuleKind.EqualTo);
 
-        Assert.That(equalRule.HasConstraint, Is.True);
-        Assert.That(equalRule.ConstraintValue, Is.Null);
+        Assert.That(equalRule.LiteralOperand().Value, Is.Null);
         Assert.That(equalRule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.None));
     }
 
@@ -48,8 +47,7 @@ public class WhenProjectingEqualToRules
         var field = desc.First(f => f.FieldName == "JobTitle");
         var notEqualRule = field.Rules.First(r => r.Kind == ValidationRuleKind.NotEqual);
 
-        Assert.That(notEqualRule.HasConstraint, Is.True);
-        Assert.That(notEqualRule.ConstraintValue, Is.Null);
+        Assert.That(notEqualRule.LiteralOperand().Value, Is.Null);
         Assert.That(notEqualRule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.None));
     }
 }
