@@ -151,14 +151,14 @@ namespace Alis.Reactive
     {
         private readonly List<Func<PluginOperationContract>> _operations = new List<Func<PluginOperationContract>>();
         private readonly List<PluginPropertyContract> _properties = new List<PluginPropertyContract>();
-        private readonly HashSet<MemberName> _memberNames = new HashSet<MemberName>();
+        private readonly HashSet<ObjectMemberKey> _members = new HashSet<ObjectMemberKey>();
 
         internal void Add(PluginName pluginName, PluginOperation operation)
         {
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (operation == null) throw new ArgumentNullException(nameof(operation));
             EnsurePluginMatches(pluginName, operation.OperationId.PluginName, operation.Label);
-            DeclareMember(pluginName, operation.MemberName, operation.Label);
+            DeclareMember(pluginName, operation.MemberKey, operation.Label);
 
             _operations.Add(operation.ToContract);
         }
@@ -168,7 +168,7 @@ namespace Alis.Reactive
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (operation == null) throw new ArgumentNullException(nameof(operation));
             EnsurePluginMatches(pluginName, operation.PluginName, operation.Label);
-            DeclareMember(pluginName, operation.PlanMethodName, operation.Label);
+            DeclareMember(pluginName, operation.Member, operation.Label);
 
             _operations.Add(() => operation);
         }
@@ -177,7 +177,10 @@ namespace Alis.Reactive
         {
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (property == null) throw new ArgumentNullException(nameof(property));
-            Add(pluginName, property.ToContract());
+            EnsurePluginMatches(pluginName, property.PropertyId.PluginName, property.Label);
+            DeclareMember(pluginName, property.MemberKey, property.Label);
+
+            _properties.Add(property.ToContract());
         }
 
         internal void Add(PluginName pluginName, PluginPropertyContract property)
@@ -185,7 +188,7 @@ namespace Alis.Reactive
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (property == null) throw new ArgumentNullException(nameof(property));
             EnsurePluginMatches(pluginName, property.PluginName, property.Label);
-            DeclareMember(pluginName, property.PlanMemberName, property.Label);
+            DeclareMember(pluginName, property.Member, property.Label);
 
             _properties.Add(property);
         }
@@ -214,14 +217,14 @@ namespace Alis.Reactive
 
         private void DeclareMember(
             PluginName pluginName,
-            MemberName member,
+            ObjectMemberKey member,
             string label)
         {
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (member == null) throw new ArgumentNullException(nameof(member));
             if (label == null) throw new ArgumentNullException(nameof(label));
 
-            if (!_memberNames.Add(member))
+            if (!_members.Add(member))
                 throw new InvalidOperationException(
                     $"Plugin '{pluginName.Value}' already declares member '{label}'.");
         }
@@ -274,7 +277,7 @@ namespace Alis.Reactive
 
         internal PluginOperationId OperationId => _operation;
         internal string Label => _operation.Label;
-        internal MemberName MemberName => _operation.PlanMethodName;
+        internal ObjectMemberKey MemberKey => _operation.Member;
         internal MethodArgumentContract ArgumentContract => MethodArgumentContract.Exact(_args);
         internal MethodSignature Signature => MethodSignature.Exact(_args, _returns);
 
@@ -323,7 +326,7 @@ namespace Alis.Reactive
         public string Member => _property.PlanMemberNameValue;
 
         internal PluginPropertyId PropertyId => _property;
-        internal MemberName MemberName => _property.PlanMemberName;
+        internal ObjectMemberKey MemberKey => _property.Member;
         internal string Label => _property.Label;
         internal Shape Shape => _shape;
 

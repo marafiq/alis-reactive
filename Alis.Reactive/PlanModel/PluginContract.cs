@@ -6,35 +6,36 @@ namespace Alis.Reactive.PlanModel
     internal sealed class PluginOperationId : IEquatable<PluginOperationId>
     {
         private readonly PluginName _pluginName;
-        private readonly PluginOperationTarget _target;
+        private readonly ObjectMemberKey _member;
 
-        private PluginOperationId(PluginName pluginName, PluginOperationTarget target)
+        private PluginOperationId(PluginName pluginName, ObjectMemberKey member)
         {
             _pluginName = pluginName ?? throw new ArgumentNullException(nameof(pluginName));
-            _target = target ?? throw new ArgumentNullException(nameof(target));
+            _member = member ?? throw new ArgumentNullException(nameof(member));
         }
 
         internal PluginName PluginName => _pluginName;
-        internal MemberName PlanMethodName => _target.PlanMethodName;
-        internal Path InvocationPath => _target.InvocationPath;
+        internal ObjectMemberKey Member => _member;
+        internal MemberName PlanMethodName => _member.Name;
+        internal Path InvocationPath => _member.Path;
         internal string PluginNameValue => _pluginName.Value;
-        internal string PlanMethodNameValue => _target.PlanMethodName.Value;
-        internal string TargetLabel => _target.Label;
-        internal string Label => _pluginName.Value + "." + _target.Label;
+        internal string PlanMethodNameValue => _member.Value;
+        internal string TargetLabel => _member.Label;
+        internal string Label => _pluginName.Value + "." + _member.Label;
 
         internal static PluginOperationId Of(string pluginName, string member) =>
             new PluginOperationId(
                 PluginName.Of(pluginName),
-                PluginOperationTarget.Member(MemberName.Of(member)));
+                ObjectMemberKey.Member(MemberName.Of(member)));
 
         internal static PluginOperationId Of(PluginName pluginName, MemberName member) =>
-            new PluginOperationId(pluginName, PluginOperationTarget.Member(member));
+            new PluginOperationId(pluginName, ObjectMemberKey.Member(member));
 
         internal static PluginOperationId Root(string pluginName) =>
-            new PluginOperationId(PluginName.Of(pluginName), PluginOperationTarget.Root);
+            new PluginOperationId(PluginName.Of(pluginName), ObjectMemberKey.RootCall);
 
         internal static PluginOperationId Root(PluginName pluginName) =>
-            new PluginOperationId(pluginName, PluginOperationTarget.Root);
+            new PluginOperationId(pluginName, ObjectMemberKey.RootCall);
 
         internal static PluginOperationId Of(PluginOperation operation)
         {
@@ -45,7 +46,7 @@ namespace Alis.Reactive.PlanModel
         public bool Equals(PluginOperationId? other) =>
             other != null
             && _pluginName.Equals(other._pluginName)
-            && _target.Equals(other._target);
+            && _member.Equals(other._member);
 
         public override bool Equals(object? obj) => Equals(obj as PluginOperationId);
 
@@ -53,7 +54,7 @@ namespace Alis.Reactive.PlanModel
         {
             unchecked
             {
-                return (_pluginName.GetHashCode() * 397) ^ _target.GetHashCode();
+                return (_pluginName.GetHashCode() * 397) ^ _member.GetHashCode();
             }
         }
     }
@@ -61,22 +62,21 @@ namespace Alis.Reactive.PlanModel
     internal sealed class PluginPropertyId : IEquatable<PluginPropertyId>
     {
         private readonly PluginName _pluginName;
-        private readonly MemberName _member;
-        private readonly Path _path;
+        private readonly ObjectMemberKey _member;
 
         private PluginPropertyId(PluginName pluginName, MemberName member)
         {
             _pluginName = pluginName ?? throw new ArgumentNullException(nameof(pluginName));
-            _member = member ?? throw new ArgumentNullException(nameof(member));
-            _path = Path.Parse(member.Value);
+            _member = ObjectMemberKey.Member(member);
         }
 
         internal PluginName PluginName => _pluginName;
-        internal MemberName PlanMemberName => _member;
-        internal Path AccessPath => _path;
+        internal ObjectMemberKey Member => _member;
+        internal MemberName PlanMemberName => _member.Name;
+        internal Path AccessPath => _member.Path;
         internal string PluginNameValue => _pluginName.Value;
         internal string PlanMemberNameValue => _member.Value;
-        internal string Label => _pluginName.Value + "." + _member.Value;
+        internal string Label => _pluginName.Value + "." + _member.Label;
 
         internal static PluginPropertyId Of(string pluginName, string member) =>
             new PluginPropertyId(PluginName.Of(pluginName), MemberName.Of(member));
@@ -100,70 +100,34 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal abstract class PluginOperationTarget : IEquatable<PluginOperationTarget>
+    internal sealed class ObjectMemberKey : IEquatable<ObjectMemberKey>
     {
-        private const string RootMethodKey = "$call";
+        private static readonly MemberName RootCallName = MemberName.Of("$call");
 
-        internal static PluginOperationTarget Root { get; } =
-            new RootPluginOperationTarget();
-
-        private protected PluginOperationTarget() { }
-
-        internal abstract MemberName PlanMethodName { get; }
-        internal abstract Path InvocationPath { get; }
-        internal abstract string Label { get; }
-        private protected abstract bool HasSameTarget(PluginOperationTarget other);
-        private protected abstract int TargetHashCode { get; }
-
-        internal static PluginOperationTarget Member(MemberName member)
+        private ObjectMemberKey(MemberName name, Path path, string label)
         {
-            if (member == null) throw new ArgumentNullException(nameof(member));
-            return new MemberPluginOperationTarget(member);
+            Name = name;
+            Path = path;
+            Label = label;
         }
 
-        public bool Equals(PluginOperationTarget? other) =>
-            other != null
-            && HasSameTarget(other);
+        internal MemberName Name { get; }
+        internal Path Path { get; }
+        internal string Value => Name.Value;
+        internal string Label { get; }
 
-        public override bool Equals(object? obj) => Equals(obj as PluginOperationTarget);
+        internal static ObjectMemberKey RootCall { get; } =
+            new ObjectMemberKey(RootCallName, Path.None, "root");
 
-        public override int GetHashCode() => TargetHashCode;
+        internal static ObjectMemberKey Member(MemberName member) =>
+            new ObjectMemberKey(member, Path.Parse(member.Value), member.Value);
 
-        private sealed class RootPluginOperationTarget : PluginOperationTarget
-        {
-            private static readonly MemberName RootPlanMethodName = MemberName.Of(RootMethodKey);
+        public bool Equals(ObjectMemberKey? other) =>
+            other != null && Name.Equals(other.Name);
 
-            internal override MemberName PlanMethodName => RootPlanMethodName;
-            internal override Path InvocationPath => Path.None;
-            internal override string Label => "root";
+        public override bool Equals(object? obj) => Equals(obj as ObjectMemberKey);
 
-            private protected override bool HasSameTarget(PluginOperationTarget other) =>
-                other is RootPluginOperationTarget;
-
-            private protected override int TargetHashCode => RootPlanMethodName.GetHashCode();
-        }
-
-        private sealed class MemberPluginOperationTarget : PluginOperationTarget
-        {
-            private readonly MemberName _member;
-            private readonly Path _path;
-
-            internal MemberPluginOperationTarget(MemberName member)
-            {
-                _member = member ?? throw new ArgumentNullException(nameof(member));
-                _path = Path.Parse(member.Value);
-            }
-
-            internal override MemberName PlanMethodName => _member;
-            internal override Path InvocationPath => _path;
-            internal override string Label => _member.Value;
-
-            private protected override bool HasSameTarget(PluginOperationTarget other) =>
-                other is MemberPluginOperationTarget member
-                && _member.Equals(member._member);
-
-            private protected override int TargetHashCode => _member.GetHashCode();
-        }
+        public override int GetHashCode() => Name.GetHashCode();
     }
 
     internal sealed class PluginOperationContract
@@ -178,6 +142,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal PluginName PluginName => _operation.PluginName;
+        internal ObjectMemberKey Member => _operation.Member;
         internal MemberName PlanMethodName => _operation.PlanMethodName;
         internal string Label => _operation.Label;
 
@@ -209,6 +174,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal PluginName PluginName => _property.PluginName;
+        internal ObjectMemberKey Member => _property.Member;
         internal MemberName PlanMemberName => _property.PlanMemberName;
         internal string Label => _property.Label;
 
@@ -282,13 +248,13 @@ namespace Alis.Reactive.PlanModel
             PluginPropertyContracts properties,
             PluginOperationContracts operations)
         {
-            var propertyNames = new HashSet<string>(StringComparer.Ordinal);
+            var propertyNames = new HashSet<ObjectMemberKey>();
             foreach (var property in properties.Items)
-                propertyNames.Add(property.PlanMemberName.Value);
+                propertyNames.Add(property.Member);
 
             foreach (var operation in operations.Items)
             {
-                if (!propertyNames.Contains(operation.PlanMethodName.Value)) continue;
+                if (!propertyNames.Contains(operation.Member)) continue;
 
                 throw new InvalidOperationException(
                     $"Plugin '{name.Value}' declares member '{operation.PlanMethodName.Value}' as both a property and a function.");
@@ -314,7 +280,7 @@ namespace Alis.Reactive.PlanModel
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (properties == null) throw new ArgumentNullException(nameof(properties));
 
-            var unique = new Dictionary<string, PluginPropertyContract>(StringComparer.Ordinal);
+            var unique = new Dictionary<ObjectMemberKey, PluginPropertyContract>();
             foreach (var property in properties)
                 Add(pluginName, unique, property);
 
@@ -323,7 +289,7 @@ namespace Alis.Reactive.PlanModel
 
         private static void Add(
             PluginName pluginName,
-            Dictionary<string, PluginPropertyContract> unique,
+            Dictionary<ObjectMemberKey, PluginPropertyContract> unique,
             PluginPropertyContract property)
         {
             if (property == null)
@@ -333,7 +299,7 @@ namespace Alis.Reactive.PlanModel
                     $"Plugin '{pluginName.Value}' cannot declare property '{property.Label}' " +
                     $"for plugin '{property.PluginName.Value}'.");
 
-            if (unique.TryGetValue(property.PlanMemberName.Value, out var existing))
+            if (unique.TryGetValue(property.Member, out var existing))
             {
                 if (!existing.IsSameContract(property))
                     throw new InvalidOperationException(
@@ -341,7 +307,7 @@ namespace Alis.Reactive.PlanModel
                 return;
             }
 
-            unique.Add(property.PlanMemberName.Value, property);
+            unique.Add(property.Member, property);
         }
     }
 
@@ -363,7 +329,7 @@ namespace Alis.Reactive.PlanModel
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (operations == null) throw new ArgumentNullException(nameof(operations));
 
-            var unique = new Dictionary<string, PluginOperationContract>(StringComparer.Ordinal);
+            var unique = new Dictionary<ObjectMemberKey, PluginOperationContract>();
             foreach (var operation in operations)
                 Add(pluginName, unique, operation);
 
@@ -372,7 +338,7 @@ namespace Alis.Reactive.PlanModel
 
         private static void Add(
             PluginName pluginName,
-            Dictionary<string, PluginOperationContract> unique,
+            Dictionary<ObjectMemberKey, PluginOperationContract> unique,
             PluginOperationContract operation)
         {
             if (operation == null)
@@ -382,7 +348,7 @@ namespace Alis.Reactive.PlanModel
                     $"Plugin '{pluginName.Value}' cannot declare function '{operation.Label}' " +
                     $"for plugin '{operation.PluginName.Value}'.");
 
-            if (unique.TryGetValue(operation.PlanMethodName.Value, out var existing))
+            if (unique.TryGetValue(operation.Member, out var existing))
             {
                 if (!existing.IsSameContract(operation))
                     throw new InvalidOperationException(
@@ -390,7 +356,7 @@ namespace Alis.Reactive.PlanModel
                 return;
             }
 
-            unique.Add(operation.PlanMethodName.Value, operation);
+            unique.Add(operation.Member, operation);
         }
     }
 
@@ -405,7 +371,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal PluginName PluginName => _operation.PluginName;
-        internal MemberName PlanMethodName => _operation.PlanMethodName;
+        internal ObjectMemberKey Member => _operation.Member;
         internal MethodSignature Signature { get; }
 
         internal JsMethodContract ToJsMethodContract() =>

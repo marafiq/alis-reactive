@@ -361,6 +361,22 @@ public class WhenUsingPlugins : PlanTestBase
     }
 
     [Test]
+    public void root_plugin_and_call_member_share_one_runtime_member_key()
+    {
+        var plan = CreatePlan();
+
+        var exception = Assert.Throws<System.InvalidOperationException>(() =>
+            plan.RegisterPlugin("track", p =>
+            {
+                p.Command();
+                p.Command("$call");
+            }));
+
+        Assert.That(exception!.Message, Does.Contain("already declares member"));
+        Assert.That(exception.Message, Does.Contain("track.$call"));
+    }
+
+    [Test]
     public void plugin_void_call_with_arg_fire()
     {
         var plan = CreatePlan();
