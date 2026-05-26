@@ -133,35 +133,38 @@ namespace Alis.Reactive.PlanModel
     internal sealed class ComparisonOperands
     {
         private readonly ComparisonRightOperand _right;
-        private readonly ComparisonShapeProfile _shape;
 
         private ComparisonOperands(
             ValueProducer left,
             ComparisonRightOperand right,
-            ComparisonShapeProfile shape)
+            Shape shape,
+            Shape itemShape)
         {
             Left = left ?? throw new ArgumentNullException(nameof(left));
             _right = right ?? throw new ArgumentNullException(nameof(right));
-            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            ShapeForJson = shape ?? throw new ArgumentNullException(nameof(shape));
+            ItemShapeForJson = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
         }
 
         internal ValueProducer Left { get; }
         internal ComparisonRightOperand Right => _right;
         internal bool HasRightOperand => _right.HasValue;
-        internal Shape ShapeForJson => _shape.OperandShape;
-        internal Shape ItemShapeForJson => _shape.ItemShape;
+        internal Shape ShapeForJson { get; }
+        internal Shape ItemShapeForJson { get; }
 
         internal static ComparisonOperands Unary(ValueProducer left, Shape shape) =>
             new ComparisonOperands(
                 left,
                 ComparisonRightOperand.Absent,
-                ComparisonShapeProfile.Scalar(shape));
+                shape,
+                Shape.None);
 
         internal static ComparisonOperands Binary(ValueProducer left, ValueProducer right, Shape shape) =>
             new ComparisonOperands(
                 left,
                 ComparisonRightOperand.Present(right),
-                ComparisonShapeProfile.Scalar(shape));
+                shape,
+                Shape.None);
 
         internal static ComparisonOperands CollectionItem(
             ValueProducer left,
@@ -171,7 +174,8 @@ namespace Alis.Reactive.PlanModel
             new ComparisonOperands(
                 left,
                 ComparisonRightOperand.Present(right),
-                ComparisonShapeProfile.Collection(collectionShape, itemShape));
+                collectionShape,
+                itemShape);
     }
 
     [JsonConverter(typeof(ComparisonRightOperandJsonConverter))]
@@ -247,24 +251,6 @@ namespace Alis.Reactive.PlanModel
             writer.WritePropertyName(name);
             JsonSerializer.Serialize(writer, value, options);
         }
-    }
-
-    internal sealed class ComparisonShapeProfile
-    {
-        private ComparisonShapeProfile(Shape operandShape, Shape itemShape)
-        {
-            OperandShape = operandShape ?? throw new ArgumentNullException(nameof(operandShape));
-            ItemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
-        }
-
-        internal Shape OperandShape { get; }
-        internal Shape ItemShape { get; }
-
-        internal static ComparisonShapeProfile Scalar(Shape shape) =>
-            new ComparisonShapeProfile(shape, Shape.None);
-
-        internal static ComparisonShapeProfile Collection(Shape collectionShape, Shape itemShape) =>
-            new ComparisonShapeProfile(collectionShape, itemShape);
     }
 
     /// <summary>Logical AND: all child conditions must be true.</summary>
