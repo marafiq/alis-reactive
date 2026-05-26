@@ -16,7 +16,6 @@ import type {
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
-const objectShape: Shape = { kind: "object", fields: {}, additional: true };
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -25,10 +24,6 @@ afterEach(() => {
 
 function literal(value: string): ValueProducer {
   return { kind: "literal", value, shape: stringShape };
-}
-
-function objectProducer(fields: Record<string, ValueProducer>): ValueProducer {
-  return { kind: "object", fields, shape: objectShape };
 }
 
 function gatherInput(fields: Record<string, ValueProducer>): Request["input"] {
@@ -349,41 +344,6 @@ describe("executeRequest HTTP lifecycle", () => {
     expect(document.getElementById("error")?.textContent).toBe("Ada");
     expect(document.getElementById("complete")?.textContent).toBe("Ada");
     expect(fetchMock).toHaveBeenCalledTimes(1);
-  });
-
-  it("routes unresolved route template placeholders before fetch is attempted", async () => {
-    document.body.innerHTML = `<span id="error"></span>`;
-    const fetchMock = mockFetch([responseJson({ message: "Saved" })]);
-    const invalidRequest = request({
-      method: "GET",
-      url: "/residents/{residentId}",
-      error: [
-        { match: { kind: "any" }, reaction: setText("error", literal("route missing")) },
-      ],
-    });
-
-    await executeRequest(invalidRequest, nativeTextPlan(["error"]));
-
-    expect(document.getElementById("error")?.textContent).toBe("route missing");
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it("routes object-valued headers as request preparation failures before fetch", async () => {
-    document.body.innerHTML = `<span id="error"></span>`;
-    const fetchMock = mockFetch([responseJson({ message: "Saved" })]);
-    const invalidRequest = request({
-      headers: {
-        "X-Metadata": objectProducer({ acuity: literal("high") }),
-      },
-      error: [
-        { match: { kind: "any" }, reaction: setText("error", literal("header failed")) },
-      ],
-    });
-
-    await executeRequest(invalidRequest, nativeTextPlan(["error"]));
-
-    expect(document.getElementById("error")?.textContent).toBe("header failed");
-    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("does not translate before-reaction failures into request outcomes", async () => {

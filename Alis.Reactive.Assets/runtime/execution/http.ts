@@ -34,14 +34,7 @@ async function runHttpRequest(request: Request, plan: Plan, context: ExecutionCo
 
   await runRequestReactions(request.before, plan, context.asAvailable());
 
-  let prepared: PreparedHttpRequest;
-  try {
-    prepared = prepareHttpRequest(request, plan, context);
-  } catch (err) {
-    await routeClientFailure(request, plan, context, err);
-    return;
-  }
-
+  const prepared = prepareHttpRequest(request, plan, context);
   const outcome = await sendHttpRequest(request, prepared.fetch);
   await routeExchangeOutcome(outcome, request, plan, prepared.context);
 }
@@ -69,16 +62,6 @@ function prepareHttpRequest(request: Request, plan: Plan, context: ExecutionCont
   const fetch = resolveFetch(request, plan, currentContext, gathered);
 
   return { fetch, context: requestContext };
-}
-
-async function routeClientFailure(
-  request: Request,
-  plan: Plan,
-  context: ExecutionContext,
-  error: unknown,
-): Promise<void> {
-  const outcome = exchangeOutcomeFromClientFailure(request, error);
-  await routeExchangeOutcome(outcome, request, plan, context);
 }
 
 async function sendHttpRequest(request: Request, fetchRequest: ResolvedFetch): Promise<HttpExchangeOutcome> {
