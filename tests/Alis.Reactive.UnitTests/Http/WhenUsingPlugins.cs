@@ -327,6 +327,40 @@ public class WhenUsingPlugins : PlanTestBase
     }
 
     [Test]
+    public void plugin_command_registration_names_behavior_without_return_value()
+    {
+        var plan = CreatePlan();
+        plan.RegisterPlugin("analytics", p => p.Command("track", args => args.Arg<string>()));
+
+        Trigger(plan).DomReady(p =>
+        {
+            p.Plugin("analytics", "track").Arg("pageView").Fire();
+        });
+
+        var json = plan.RenderFormatted();
+        Assert.That(json, Does.Contain("\"plugin.analytics\""));
+        Assert.That(json, Does.Contain("\"method\": \"track\""));
+        Assert.That(json, Does.Contain("\"pageView\""));
+    }
+
+    [Test]
+    public void root_plugin_command_registration_uses_root_call_contract()
+    {
+        var plan = CreatePlan();
+        plan.RegisterPlugin("track", p => p.Command(args => args.Arg<string>()));
+
+        Trigger(plan).DomReady(p =>
+        {
+            p.Plugin("track").Arg("pageView").Fire();
+        });
+
+        var json = plan.RenderFormatted();
+        Assert.That(json, Does.Contain("\"plugin.track\""));
+        Assert.That(json, Does.Contain("\"method\": \"$call\""));
+        Assert.That(json, Does.Contain("\"pageView\""));
+    }
+
+    [Test]
     public void plugin_void_call_with_arg_fire()
     {
         var plan = CreatePlan();

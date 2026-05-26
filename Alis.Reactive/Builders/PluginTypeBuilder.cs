@@ -119,6 +119,10 @@ namespace Alis.Reactive.Builders
             return AddVoid(name, MethodArgumentContract.Open);
         }
 
+        /// <summary>Declares a command method (no return value).</summary>
+        public PluginTypeBuilder Command(string name) =>
+            Void(name);
+
         /// <summary>Declares a void method with an exact argument contract.</summary>
         public PluginTypeBuilder Void(string name, Action<PluginArgumentTypes> arguments)
         {
@@ -127,11 +131,19 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
+        /// <summary>Declares a command method with an exact argument contract.</summary>
+        public PluginTypeBuilder Command(string name, Action<PluginArgumentTypes> arguments) =>
+            Void(name, arguments);
+
         /// <summary>Declares the plugin root function as a void command.</summary>
         public PluginTypeBuilder Void()
         {
             return AddVoid(PluginOperationId.Root(_pluginName), MethodArgumentContract.Open);
         }
+
+        /// <summary>Declares the plugin root function as a command.</summary>
+        public PluginTypeBuilder Command() =>
+            Void();
 
         /// <summary>Declares the plugin root command with an exact argument contract.</summary>
         public PluginTypeBuilder Void(Action<PluginArgumentTypes> arguments)
@@ -140,6 +152,10 @@ namespace Alis.Reactive.Builders
                 PluginOperationId.Root(_pluginName),
                 ExactArguments(arguments));
         }
+
+        /// <summary>Declares the plugin root command with an exact argument contract.</summary>
+        public PluginTypeBuilder Command(Action<PluginArgumentTypes> arguments) =>
+            Void(arguments);
 
         /// <summary>Declares the plugin root command with one typed JavaScript argument.</summary>
         public PluginTypeBuilder Void<TArg1>()

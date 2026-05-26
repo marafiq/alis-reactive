@@ -278,6 +278,7 @@ Configures a plugin's JsType members during plan construction.
 
 ```csharp
 Method<T>()
+Command()
 Void()
 ```
 
