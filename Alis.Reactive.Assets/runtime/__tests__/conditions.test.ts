@@ -1,13 +1,36 @@
-import { describe, expect, it } from "vitest";
-import { evaluateCondition } from "../conditions/conditions";
-import type { CompareCondition, JsonValue, LiteralProducer, Plan, RangeComparisonProducer, Shape } from "../types";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  evaluateCondition,
+  evaluateConditionAsync,
+  evaluateConditionInCurrentLane,
+} from "../conditions/conditions";
+import type {
+  CompareCondition,
+  Condition,
+  EqualityCompareOp,
+  JsonValue,
+  LiteralProducer,
+  MembershipCompareOp,
+  OrderedCompareOp,
+  Plan,
+  RangeComparisonProducer,
+  Shape,
+  TextCompareOp,
+  UnaryCompareOp,
+  ValidationCondition,
+} from "../types";
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
 const booleanShape: Shape = { kind: "boolean" };
 const dateShape: Shape = { kind: "date" };
 const rawShape: Shape = { kind: "raw" };
+const noneShape: Shape = { kind: "none" };
 const stringArrayShape: Shape = { kind: "array", item: stringShape };
+
+type BrowserWindowWithConfirm = typeof window & {
+  alis?: { confirm?: (message: string) => boolean | Promise<boolean> };
+};
 
 function plan(): Plan {
   return {
@@ -32,147 +55,256 @@ function range(low: JsonValue, high: JsonValue, itemShape: Shape): RangeComparis
   };
 }
 
+function unary(op: UnaryCompareOp, left: JsonValue, shape: Shape = rawShape): CompareCondition {
+  return {
+    kind: "compare",
+    left: literal(left, shape),
+    op,
+    right: { kind: "none" },
+    shape,
+    itemShape: noneShape,
+  };
+}
+
+function equality(
+  op: EqualityCompareOp,
+  left: JsonValue,
+  right: JsonValue,
+  shape: Shape,
+): CompareCondition {
+  return {
+    kind: "compare",
+    left: literal(left, shape),
+    op,
+    right: { kind: "value", value: literal(right, shape) },
+    shape,
+    itemShape: noneShape,
+  };
+}
+
+function ordered(
+  op: OrderedCompareOp,
+  left: JsonValue,
+  right: JsonValue,
+  shape: Shape,
+): CompareCondition {
+  return {
+    kind: "compare",
+    left: literal(left, shape),
+    op,
+    right: { kind: "value", value: literal(right, shape) },
+    shape,
+    itemShape: noneShape,
+  };
+}
+
+function membership(
+  op: MembershipCompareOp,
+  left: JsonValue,
+  values: JsonValue[],
+  itemShape: Shape,
+): CompareCondition {
+  return {
+    kind: "compare",
+    left: literal(left, itemShape),
+    op,
+    right: {
+      kind: "value",
+      value: {
+        kind: "array",
+        items: values.map(value => literal(value, itemShape)),
+        shape: { kind: "array", item: itemShape },
+      },
+    },
+    shape: itemShape,
+    itemShape,
+  };
+}
+
+function between(left: JsonValue, low: JsonValue, high: JsonValue, itemShape: Shape): CompareCondition {
+  return {
+    kind: "compare",
+    left: literal(left, itemShape),
+    op: "between",
+    right: { kind: "value", value: range(low, high, itemShape) },
+    shape: itemShape,
+    itemShape,
+  };
+}
+
+function text(op: TextCompareOp, left: JsonValue, right: string, shape: Shape = stringShape): CompareCondition {
+  return {
+    kind: "compare",
+    left: literal(left, shape),
+    op,
+    right: { kind: "value", value: literal(right, stringShape) },
+    shape,
+    itemShape: noneShape,
+  };
+}
+
+function regex(left: JsonValue, pattern: string, shape: Shape = stringShape): CompareCondition {
+  return {
+    kind: "compare",
+    left: literal(left, shape),
+    op: "matches",
+    right: { kind: "value", value: literal(pattern, stringShape) },
+    shape,
+    itemShape: noneShape,
+  };
+}
+
+function minLength(left: JsonValue, minimumLength: number, shape: Shape = stringShape): CompareCondition {
+  return {
+    kind: "compare",
+    left: literal(left, shape),
+    op: "min-length",
+    right: { kind: "value", value: literal(minimumLength, numberShape) },
+    shape,
+    itemShape: noneShape,
+  };
+}
+
+function arrayContains(left: JsonValue[], right: JsonValue, itemShape: Shape): CompareCondition {
+  return {
+    kind: "compare",
+    left: literal(left, { kind: "array", item: itemShape }),
+    op: "array-contains",
+    right: { kind: "value", value: literal(right, itemShape) },
+    shape: { kind: "array", item: itemShape },
+    itemShape,
+  };
+}
+
+function matches(condition: ValidationCondition): boolean {
+  return evaluateCondition(condition, plan());
+}
+
+afterEach(() => {
+  delete (window as BrowserWindowWithConfirm).alis;
+});
+
 describe("condition runtime", () => {
-  it("orders numbers through a comparable condition value", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal("72", numberShape),
-      op: "gt",
-      right: { kind: "value", value: literal(60, numberShape) },
-      shape: numberShape,
-      itemShape: { kind: "none" },
-    };
-
-    expect(evaluateCondition(condition, plan())).toBe(true);
+  describe("unary comparisons", () => {
+    it("evaluates null, empty, and truthy state from the shaped left operand", () => {
+      expect(matches(unary("is-null", null))).toBe(true);
+      expect(matches(unary("not-null", ""))).toBe(true);
+      expect(matches(unary("is-empty", "", stringShape))).toBe(true);
+      expect(matches(unary("is-empty", [], stringArrayShape))).toBe(true);
+      expect(matches(unary("not-empty", ["Ada"], stringArrayShape))).toBe(true);
+      expect(matches(unary("truthy", "yes", booleanShape))).toBe(true);
+      expect(matches(unary("falsy", "", booleanShape))).toBe(true);
+    });
   });
 
-  it("orders dates through the declared date shape", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal("2026-07-15", dateShape),
-      op: "gt",
-      right: { kind: "value", value: literal("2026-06-01", dateShape) },
-      shape: dateShape,
-      itemShape: { kind: "none" },
-    };
+  describe("value comparisons", () => {
+    it("applies the declared shape before equality", () => {
+      expect(matches(equality("eq", "72", 72, numberShape))).toBe(true);
+      expect(matches(equality("neq", "Ada", "Grace", stringShape))).toBe(true);
+      expect(matches(equality("eq", "2026-07-01", "2026-07-01", dateShape))).toBe(true);
+    });
 
-    expect(evaluateCondition(condition, plan())).toBe(true);
+    it("orders values inside a single comparable shape", () => {
+      expect(matches(ordered("gt", "72", 60, numberShape))).toBe(true);
+      expect(matches(ordered("gte", true, false, booleanShape))).toBe(true);
+      expect(matches(ordered("lt", "alpha", "beta", stringShape))).toBe(true);
+      expect(matches(ordered("gt", "2026-07-15", "2026-06-01", dateShape))).toBe(true);
+    });
+
+    it("treats malformed ordered values as non-matching behavior", () => {
+      expect(matches(ordered("gt", "not-a-date", "2026-06-01", dateShape))).toBe(false);
+      expect(matches(ordered("gte", "not-a-number", 0, numberShape))).toBe(false);
+      expect(matches(ordered("gt", "72", 60, rawShape))).toBe(false);
+    });
   });
 
-  it("compares date-shaped equality with date literal text", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal("2026-07-01", dateShape),
-      op: "eq",
-      right: { kind: "value", value: literal("2026-07-01", dateShape) },
-      shape: dateShape,
-      itemShape: { kind: "none" },
-    };
+  describe("collection comparisons", () => {
+    it("matches membership against shaped collection operands", () => {
+      expect(matches(membership("in", "72", [60, 72, 90], numberShape))).toBe(true);
+      expect(matches(membership("not-in", "Ada", ["Grace", "Katherine"], stringShape))).toBe(true);
+    });
 
-    expect(evaluateCondition(condition, plan())).toBe(true);
+    it("matches inclusive ranges through the declared item shape", () => {
+      expect(matches(between("72", 60, 90, numberShape))).toBe(true);
+      expect(matches(between("2026-07-15", "2026-06-01", "2026-08-01", dateShape))).toBe(true);
+    });
+
+    it("uses the declared item shape for array-contains", () => {
+      expect(matches(arrayContains(["1", "2"], 2, numberShape))).toBe(true);
+      expect(matches(arrayContains(["routine", "urgent"], "urgent", stringShape))).toBe(true);
+    });
   });
 
-  it("rejects invalid date ordering instead of treating NaN as behavior", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal("not-a-date", dateShape),
-      op: "gt",
-      right: { kind: "value", value: literal("2026-06-01", dateShape) },
-      shape: dateShape,
-      itemShape: { kind: "none" },
-    };
+  describe("text comparisons", () => {
+    it("matches substring, prefix, suffix, regex, and minimum length", () => {
+      expect(matches(text("contains", "resident-ready", "ready"))).toBe(true);
+      expect(matches(text("starts-with", "resident-ready", "resident"))).toBe(true);
+      expect(matches(text("ends-with", "resident-ready", "ready"))).toBe(true);
+      expect(matches(regex("RN-204", "^RN-\\d+$"))).toBe(true);
+      expect(matches(minLength("Grace", 5))).toBe(true);
+    });
 
-    expect(evaluateCondition(condition, plan())).toBe(false);
+    it("treats missing text and invalid regex patterns as non-matching behavior", () => {
+      expect(matches(text("contains", null, "ready"))).toBe(false);
+      expect(matches(regex("RN-204", "["))).toBe(false);
+    });
   });
 
-  it("rejects invalid numeric ordering instead of treating malformed text as zero", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal("not-a-number", numberShape),
-      op: "gte",
-      right: { kind: "value", value: literal(0, numberShape) },
-      shape: numberShape,
-      itemShape: { kind: "none" },
-    };
+  describe("logical composition", () => {
+    const active = equality("eq", true, true, booleanShape);
+    const inactive = equality("eq", false, true, booleanShape);
 
-    expect(evaluateCondition(condition, plan())).toBe(false);
+    it("evaluates all, any, and not using nested validation conditions", () => {
+      expect(matches({ kind: "all", terms: [active, active] })).toBe(true);
+      expect(matches({ kind: "all", terms: [active, inactive] })).toBe(false);
+      expect(matches({ kind: "any", terms: [inactive, active] })).toBe(true);
+      expect(matches({ kind: "not", term: inactive })).toBe(true);
+    });
   });
 
-  it("preserves ordered string comparisons already expressible by the DSL", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal("beta", stringShape),
-      op: "gt",
-      right: { kind: "value", value: literal("alpha", stringShape) },
-      shape: stringShape,
-      itemShape: { kind: "none" },
-    };
+  describe("confirm conditions", () => {
+    it("executes confirm only when the current lane reaches an async condition", async () => {
+      const confirm = vi.fn(async () => true);
+      (window as BrowserWindowWithConfirm).alis = { confirm };
+      const condition: Condition = {
+        kind: "all",
+        terms: [
+          equality("eq", true, true, booleanShape),
+          { kind: "confirm", message: "Continue?" },
+        ],
+      };
 
-    expect(evaluateCondition(condition, plan())).toBe(true);
-  });
+      const completion = evaluateConditionInCurrentLane(condition, plan());
 
-  it("preserves ordered boolean comparisons already expressible by the DSL", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal(true, booleanShape),
-      op: "gt",
-      right: { kind: "value", value: literal(false, booleanShape) },
-      shape: booleanShape,
-      itemShape: { kind: "none" },
-    };
+      expect(completion).toBeInstanceOf(Promise);
+      await expect(completion).resolves.toBe(true);
+      expect(confirm).toHaveBeenCalledWith("Continue?");
+    });
 
-    expect(evaluateCondition(condition, plan())).toBe(true);
-  });
+    it("stays synchronous when logical terms decide before confirm is reached", () => {
+      const confirm = vi.fn(() => true);
+      (window as BrowserWindowWithConfirm).alis = { confirm };
+      const condition: Condition = {
+        kind: "any",
+        terms: [
+          equality("eq", true, true, booleanShape),
+          { kind: "confirm", message: "Continue?" },
+        ],
+      };
 
-  it("rejects mixed ordered comparison domains", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal("72", rawShape),
-      op: "gt",
-      right: { kind: "value", value: literal(60, rawShape) },
-      shape: rawShape,
-      itemShape: { kind: "none" },
-    };
+      const completion = evaluateConditionInCurrentLane(condition, plan());
 
-    expect(evaluateCondition(condition, plan())).toBe(false);
-  });
+      expect(completion).toBe(true);
+      expect(confirm).not.toHaveBeenCalled();
+    });
 
-  it("uses the declared item shape for array-contains right operand", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal(["routine", "urgent"], stringArrayShape),
-      op: "array-contains",
-      right: { kind: "value", value: literal("urgent", stringShape) },
-      shape: stringArrayShape,
-      itemShape: stringShape,
-    };
+    it("runs confirm from the async condition API", async () => {
+      const confirm = vi.fn(() => false);
+      (window as BrowserWindowWithConfirm).alis = { confirm };
 
-    expect(evaluateCondition(condition, plan())).toBe(true);
-  });
-
-  it("evaluates between through an explicit numeric range", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal("72", numberShape),
-      op: "between",
-      right: { kind: "value", value: range(60, 90, numberShape) },
-      shape: numberShape,
-      itemShape: numberShape,
-    };
-
-    expect(evaluateCondition(condition, plan())).toBe(true);
-  });
-
-  it("evaluates date ranges with the same ordered condition value", () => {
-    const condition: CompareCondition = {
-      kind: "compare",
-      left: literal("2026-07-15", dateShape),
-      op: "between",
-      right: { kind: "value", value: range("2026-06-01", "2026-08-01", dateShape) },
-      shape: dateShape,
-      itemShape: dateShape,
-    };
-
-    expect(evaluateCondition(condition, plan())).toBe(true);
+      await expect(evaluateConditionAsync({ kind: "confirm", message: "Delete?" }, plan()))
+        .resolves.toBe(false);
+      expect(confirm).toHaveBeenCalledWith("Delete?");
+    });
   });
 });

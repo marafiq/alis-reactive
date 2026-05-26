@@ -32,6 +32,17 @@ type TextOperand =
   | { readonly kind: "text"; readonly value: string }
   | { readonly kind: "missing" };
 
+interface ComparisonLeft {
+  readonly raw: unknown;
+  readonly shaped: unknown;
+}
+
+type OrderedConditionValue =
+  | { readonly kind: "number"; readonly value: number }
+  | { readonly kind: "text"; readonly value: string }
+  | { readonly kind: "boolean"; readonly value: boolean }
+  | { readonly kind: "missing" };
+
 interface AlisBrowserApi {
   readonly alis?: {
     readonly confirm?: (message: string) => Promise<boolean> | boolean;
@@ -39,6 +50,7 @@ interface AlisBrowserApi {
 }
 
 const missingText: TextOperand = { kind: "missing" };
+const missingOrderedConditionValue: OrderedConditionValue = { kind: "missing" };
 const noRightOperandTrace = { kind: "none" } as const;
 
 /** Sync condition evaluation for validation conditions. */
@@ -191,7 +203,7 @@ async function evaluateConfirmCondition(message: string): Promise<boolean> {
 // -- Compare evaluation --
 
 function evaluateCompare(condition: CompareCondition, plan: Plan, context: ExecutionContext): boolean {
-  const left = ComparisonLeft.resolve(condition, plan, context);
+  const left = resolveComparisonLeft(condition, plan, context);
 
   switch (condition.op) {
     case "is-null":
@@ -216,7 +228,7 @@ function evaluateCompare(condition: CompareCondition, plan: Plan, context: Execu
     case "lte": {
       const right = resolveRightValue(condition, plan, context, condition.shape);
       traceCompare(condition, left, right);
-      return ConditionOrdering.between(left.shaped, right).matches(condition.op);
+      return orderedComparisonMatches(condition.op, left.shaped, right);
     }
 
     case "in":
@@ -229,14 +241,14 @@ function evaluateCompare(condition: CompareCondition, plan: Plan, context: Execu
     case "between": {
       const [lower, upper] = resolveRightArray(condition, plan, context);
       traceCompare(condition, left, [lower, upper]);
-      return ComparisonRange.between(lower, upper).contains(left.shaped);
+      return inclusiveRangeContains(lower, upper, left.shaped);
     }
 
     case "array-contains": {
       const right = resolveRightValue(condition, plan, context, condition.itemShape);
       const items = shapeCollectionItems(left.shaped, condition.itemShape);
       traceCompare(condition, left, right);
-      return Array.isArray(items) && items.includes(right);
+      return items !== undefined && items.includes(right);
     }
 
     case "contains":
@@ -259,17 +271,10 @@ function evaluateCompare(condition: CompareCondition, plan: Plan, context: Execu
   }
 }
 
-class ComparisonLeft {
-  private constructor(
-    readonly raw: unknown,
-    readonly shaped: unknown,
-  ) {}
-
-  static resolve(condition: CompareCondition, plan: Plan, context: ExecutionContext): ComparisonLeft {
-    const raw = evaluateValue(condition.left, plan, context.raw);
-    const shaped = applyShape(raw, condition.shape);
-    return new ComparisonLeft(raw, shaped);
-  }
+function resolveComparisonLeft(condition: CompareCondition, plan: Plan, context: ExecutionContext): ComparisonLeft {
+  const raw = evaluateValue(condition.left, plan, context.raw);
+  const shaped = applyShape(raw, condition.shape);
+  return { raw, shaped };
 }
 
 type RightValuedCondition = Extract<CompareCondition, { readonly right: { readonly kind: "value" } }>;
@@ -330,10 +335,10 @@ function membershipMatches(op: MembershipCompareOp, left: ComparisonLeft, values
   return !collectionContainsLeft;
 }
 
-function shapeCollectionItems(value: unknown, itemShape: Shape): unknown {
-  return ComparisonCollection
-    .from(value)
-    .shapedOrOriginal(value, itemShape);
+function shapeCollectionItems(value: unknown, itemShape: Shape): unknown[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  return RuntimeShape.from(itemShape).applyEach(value);
 }
 
 function evaluateTextComparison(
@@ -377,204 +382,67 @@ function evaluateMinimumLengthComparison(left: ComparisonLeft, minimumLength: nu
   return leftText.kind === "text" && leftText.value.length >= minimumLength;
 }
 
-abstract class ComparisonRange {
-  static between(lower: unknown, upper: unknown): ComparisonRange {
-    const lowerComparable = OrderedConditionValue.from(lower);
-    const upperComparable = OrderedConditionValue.from(upper);
-    const rangeHasComparableBounds = lowerComparable.tryCompareTo(upperComparable) !== undefined;
-    if (!rangeHasComparableBounds) return MissingComparisonRange.instance;
+function orderedComparisonMatches(op: OrderedCompareOp, left: unknown, right: unknown): boolean {
+  const comparison = compareOrderedValues(left, right);
+  if (comparison === undefined) return false;
 
-    return new OrderedComparisonRange(lowerComparable, upperComparable);
-  }
-
-  abstract contains(value: unknown): boolean;
-}
-
-class OrderedComparisonRange extends ComparisonRange {
-  constructor(
-    private readonly lowerBound: OrderedConditionValue,
-    private readonly upperBound: OrderedConditionValue,
-  ) {
-    super();
-  }
-
-  contains(value: unknown): boolean {
-    const subject = OrderedConditionValue.from(value);
-    const lowerComparison = subject.tryCompareTo(this.lowerBound);
-    const upperComparison = subject.tryCompareTo(this.upperBound);
-    const subjectHasRangeShape = lowerComparison !== undefined && upperComparison !== undefined;
-    if (!subjectHasRangeShape) return false;
-
-    return lowerComparison >= 0 && upperComparison <= 0;
+  switch (op) {
+    case "gt":
+      return comparison > 0;
+    case "gte":
+      return comparison >= 0;
+    case "lt":
+      return comparison < 0;
+    case "lte":
+      return comparison <= 0;
+    default:
+      assertNever(op, "ordered comparison operator");
   }
 }
 
-class MissingComparisonRange extends ComparisonRange {
-  static readonly instance = new MissingComparisonRange();
+function inclusiveRangeContains(lower: unknown, upper: unknown, value: unknown): boolean {
+  const boundsCanBeOrdered = compareOrderedValues(lower, upper) !== undefined;
+  if (!boundsCanBeOrdered) return false;
 
-  contains(_value: unknown): boolean {
-    return false;
+  const lowerComparison = compareOrderedValues(value, lower);
+  const upperComparison = compareOrderedValues(value, upper);
+  if (lowerComparison === undefined || upperComparison === undefined) return false;
+
+  return lowerComparison >= 0 && upperComparison <= 0;
+}
+
+function compareOrderedValues(left: unknown, right: unknown): number | undefined {
+  const leftValue = toOrderedConditionValue(left);
+  const rightValue = toOrderedConditionValue(right);
+
+  switch (leftValue.kind) {
+    case "number":
+      return rightValue.kind === "number" ? leftValue.value - rightValue.value : undefined;
+    case "text":
+      if (rightValue.kind !== "text") return undefined;
+      if (leftValue.value === rightValue.value) return 0;
+      return leftValue.value > rightValue.value ? 1 : -1;
+    case "boolean":
+      return rightValue.kind === "boolean"
+        ? booleanRank(leftValue.value) - booleanRank(rightValue.value)
+        : undefined;
+    case "missing":
+      return undefined;
+    default:
+      return assertNever(leftValue, "ordered condition value");
   }
 }
 
-abstract class ComparisonCollection {
-  static from(value: unknown): ComparisonCollection {
-    const valueIsCollection = Array.isArray(value);
-    if (!valueIsCollection) return MissingComparisonCollection.instance;
+function toOrderedConditionValue(value: unknown): OrderedConditionValue {
+  if (typeof value === "number" && Number.isFinite(value)) return { kind: "number", value };
+  if (typeof value === "string") return { kind: "text", value };
+  if (typeof value === "boolean") return { kind: "boolean", value };
 
-    return new AvailableComparisonCollection(value);
-  }
-
-  static isEmpty(value: unknown): boolean {
-    return ComparisonCollection.from(value).isEmpty;
-  }
-
-  abstract get isEmpty(): boolean;
-  abstract shapedOrOriginal(original: unknown, itemShape: Shape): unknown;
+  return missingOrderedConditionValue;
 }
 
-class AvailableComparisonCollection extends ComparisonCollection {
-  constructor(private readonly items: unknown[]) {
-    super();
-  }
-
-  get isEmpty(): boolean {
-    return this.items.length === 0;
-  }
-
-  shapedOrOriginal(_original: unknown, itemShape: Shape): unknown[] {
-    return RuntimeShape.from(itemShape).applyEach(this.items);
-  }
-}
-
-class MissingComparisonCollection extends ComparisonCollection {
-  static readonly instance = new MissingComparisonCollection();
-
-  get isEmpty(): boolean {
-    return false;
-  }
-
-  shapedOrOriginal(original: unknown, _itemShape: Shape): unknown {
-    return original;
-  }
-}
-
-class ConditionOrdering {
-  private constructor(private readonly comparison: number | undefined) {}
-
-  static between(left: unknown, right: unknown): ConditionOrdering {
-    const leftValue = OrderedConditionValue.from(left);
-    const rightValue = OrderedConditionValue.from(right);
-    const comparison = leftValue.tryCompareTo(rightValue);
-    if (comparison === undefined) return ConditionOrdering.unavailable;
-
-    return new ConditionOrdering(comparison);
-  }
-
-  matches(op: OrderedCompareOp): boolean {
-    if (this.comparison === undefined) return false;
-
-    switch (op) {
-      case "gt":
-        return this.comparison > 0;
-      case "gte":
-        return this.comparison >= 0;
-      case "lt":
-        return this.comparison < 0;
-      case "lte":
-        return this.comparison <= 0;
-      default:
-        assertNever(op, "ordered comparison operator");
-    }
-  }
-
-  private static readonly unavailable = new ConditionOrdering(undefined);
-}
-
-type OrderedConditionDomain = "number" | "text" | "boolean" | "missing";
-
-abstract class OrderedConditionValue {
-  static from(value: unknown): OrderedConditionValue {
-    if (typeof value === "number") return NumberOrderedConditionValue.from(value);
-    if (typeof value === "string") return new TextOrderedConditionValue(value);
-    if (typeof value === "boolean") return new BooleanOrderedConditionValue(value);
-
-    return MissingOrderedConditionValue.instance;
-  }
-
-  abstract get domain(): OrderedConditionDomain;
-  abstract tryCompareTo(other: OrderedConditionValue): number | undefined;
-}
-
-class NumberOrderedConditionValue extends OrderedConditionValue {
-  private constructor(private readonly value: number) {
-    super();
-  }
-
-  static from(value: number): OrderedConditionValue {
-    if (!Number.isFinite(value)) return MissingOrderedConditionValue.instance;
-
-    return new NumberOrderedConditionValue(value);
-  }
-
-  get domain(): OrderedConditionDomain {
-    return "number";
-  }
-
-  tryCompareTo(other: OrderedConditionValue): number | undefined {
-    if (!(other instanceof NumberOrderedConditionValue)) return undefined;
-
-    return this.value - other.value;
-  }
-}
-
-class TextOrderedConditionValue extends OrderedConditionValue {
-  constructor(private readonly value: string) {
-    super();
-  }
-
-  get domain(): OrderedConditionDomain {
-    return "text";
-  }
-
-  tryCompareTo(other: OrderedConditionValue): number | undefined {
-    if (!(other instanceof TextOrderedConditionValue)) return undefined;
-    if (this.value === other.value) return 0;
-
-    return this.value > other.value ? 1 : -1;
-  }
-}
-
-class BooleanOrderedConditionValue extends OrderedConditionValue {
-  constructor(private readonly value: boolean) {
-    super();
-  }
-
-  get domain(): OrderedConditionDomain {
-    return "boolean";
-  }
-
-  tryCompareTo(other: OrderedConditionValue): number | undefined {
-    if (!(other instanceof BooleanOrderedConditionValue)) return undefined;
-
-    return BooleanOrderedConditionValue.toRank(this.value) - BooleanOrderedConditionValue.toRank(other.value);
-  }
-
-  private static toRank(value: boolean): number {
-    return value ? 1 : 0;
-  }
-}
-
-class MissingOrderedConditionValue extends OrderedConditionValue {
-  static readonly instance = new MissingOrderedConditionValue();
-
-  get domain(): OrderedConditionDomain {
-    return "missing";
-  }
-
-  tryCompareTo(_other: OrderedConditionValue): number | undefined {
-    return undefined;
-  }
+function booleanRank(value: boolean): number {
+  return value ? 1 : 0;
 }
 
 function textOp(left: unknown, right: string, predicate: (source: string, operand: string) => boolean): boolean {
@@ -585,7 +453,7 @@ function textOp(left: unknown, right: string, predicate: (source: string, operan
 function isEmpty(value: unknown): boolean {
   const valueIsEmptyText = value === "";
   const valueIsMissing = isMissingValue(value);
-  const valueIsEmptyCollection = ComparisonCollection.isEmpty(value);
+  const valueIsEmptyCollection = Array.isArray(value) && value.length === 0;
   return valueIsEmptyText || valueIsMissing || valueIsEmptyCollection;
 }
 
