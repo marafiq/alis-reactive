@@ -16,28 +16,28 @@ namespace Alis.Reactive.PlanModel
         internal abstract Shape OutputShape { get; }
 
         internal static ValueProducer Literal(bool value) =>
-            new LiteralProducer(value, ProducedShape.Known(Shape.Boolean));
+            new LiteralProducer(value, Shape.Boolean);
 
         internal static ValueProducer Literal(string value) =>
-            new LiteralProducer(value, ProducedShape.Known(Shape.String));
+            new LiteralProducer(value, Shape.String);
 
         internal static ValueProducer Literal(int value) =>
-            new LiteralProducer(value, ProducedShape.Known(Shape.Number));
+            new LiteralProducer(value, Shape.Number);
 
         internal static ValueProducer Literal(long value) =>
-            new LiteralProducer(value, ProducedShape.Known(Shape.Number));
+            new LiteralProducer(value, Shape.Number);
 
         internal static ValueProducer Literal(decimal value) =>
-            new LiteralProducer(value, ProducedShape.Known(Shape.Number));
+            new LiteralProducer(value, Shape.Number);
 
         internal static ValueProducer Literal(double value) =>
-            new LiteralProducer(value, ProducedShape.Known(Shape.Number));
+            new LiteralProducer(value, Shape.Number);
 
         internal static ValueProducer Literal(DateTime value) =>
-            new LiteralProducer(value.ToString("O"), ProducedShape.Known(Shape.Date));
+            new LiteralProducer(value.ToString("O"), Shape.Date);
 
         internal static ValueProducer Null() =>
-            new LiteralProducer(null, ProducedShape.Unspecified);
+            new LiteralProducer(null, Shape.None);
 
         /// <summary>
         /// Creates a literal with any JSON-serializable value.
@@ -45,7 +45,7 @@ namespace Alis.Reactive.PlanModel
         /// No reflection. No type inspection. The serializer does the work.
         /// </summary>
         internal static ValueProducer LiteralRaw(object? value, Shape shape) =>
-            new LiteralProducer(value, ProducedShape.Known(shape));
+            new LiteralProducer(value, shape);
 
         internal static ValueProducer LiteralFromValue(object? value)
         {
@@ -63,16 +63,16 @@ namespace Alis.Reactive.PlanModel
             Read(UrlSource.Instance, paramName, shape);
 
         internal static ValueProducer Read(Source from, string member) =>
-            new ReadProducer(ValueRead.Property(from, member, ProducedShape.Unspecified));
+            new ReadProducer(ValueRead.Property(from, member, Shape.None));
 
         internal static ValueProducer Read(Source from, string member, Path path) =>
-            new ReadProducer(ValueRead.Property(from, member, path, ProducedShape.Unspecified));
+            new ReadProducer(ValueRead.Property(from, member, path, Shape.None));
 
         internal static ValueProducer Read(Source from, string member, Shape shape) =>
-            new ReadProducer(ValueRead.Property(from, member, ProducedShape.Known(shape)));
+            new ReadProducer(ValueRead.Property(from, member, shape));
 
         internal static ValueProducer Read(Source from, string member, Path path, Shape shape) =>
-            new ReadProducer(ValueRead.Property(from, member, path, ProducedShape.Known(shape)));
+            new ReadProducer(ValueRead.Property(from, member, path, shape));
 
         internal static ValueProducer ReadPayload(PayloadSource from, string path) =>
             Read(from, path, Path.Parse(path));
@@ -81,25 +81,25 @@ namespace Alis.Reactive.PlanModel
             Read(from, path, Path.Parse(path), shape);
 
         internal static ValueProducer Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueProducer> args) =>
-            new ReadProducer(ValueRead.Method(from, method, ProducedShape.Known(returns), ValueArguments.Of(args)));
+            new ReadProducer(ValueRead.Method(from, method, returns, ValueArguments.Of(args)));
 
         internal static ObjectProducer Object(IReadOnlyDictionary<string, ValueProducer> fields)
         {
             var objectFields = ValueObjectFields.From(fields);
-            return new ObjectProducer(objectFields, ProducedShape.Known(objectFields.Shape));
+            return new ObjectProducer(objectFields, objectFields.Shape);
         }
 
         internal static ObjectProducer Object(IReadOnlyDictionary<string, ValueProducer> fields, Shape shape) =>
-            new ObjectProducer(ValueObjectFields.From(fields), ProducedShape.Known(shape));
+            new ObjectProducer(ValueObjectFields.From(fields), shape);
 
         internal static ValueProducer Array(IReadOnlyList<ValueProducer> items)
         {
             var arrayItems = ValueArrayItems.From(items);
-            return new ArrayProducer(arrayItems, ProducedShape.Known(arrayItems.Shape));
+            return new ArrayProducer(arrayItems, arrayItems.Shape);
         }
 
         internal static ValueProducer Array(IReadOnlyList<ValueProducer> items, Shape shape) =>
-            new ArrayProducer(ValueArrayItems.From(items), ProducedShape.Known(shape));
+            new ArrayProducer(ValueArrayItems.From(items), shape);
     }
 
     /// <summary>A constant value embedded in the plan.</summary>
@@ -116,29 +116,13 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the expected type shape. Defaults to <see cref="PlanModel.Shape.None"/> when not specified.</summary>
         public Shape Shape { get; }
 
-        internal LiteralProducer(object? value, ProducedShape shape)
+        internal LiteralProducer(object? value, Shape shape)
         {
             Value = value;
-            Shape = shape.ShapeForJson;
+            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
         internal override Shape OutputShape => Shape;
-    }
-
-    internal sealed class ProducedShape
-    {
-        private ProducedShape(Shape shape)
-        {
-            ShapeForJson = shape ?? throw new ArgumentNullException(nameof(shape));
-        }
-
-        internal static ProducedShape Unspecified { get; } =
-            new ProducedShape(Shape.None);
-
-        internal Shape ShapeForJson { get; }
-
-        internal static ProducedShape Known(Shape shape) => new ProducedShape(shape);
-
     }
 
     /// <summary>A value read from a live source when the plan executes in the browser.</summary>
@@ -161,7 +145,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the nested property path. Defaults to empty for direct reads.</summary>
         public Path Path => _read.Path;
         /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
-        public Shape Shape => _read.Shape.ShapeForJson;
+        public Shape Shape => _read.Shape;
         /// <summary>Gets whether the read accesses a property or invokes a method.</summary>
         public ValueReadAccess Access => _read.Access;
 
@@ -175,7 +159,7 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class ValueRead
     {
-        private ValueRead(ValueReadTarget target, ProducedShape shape, ValueReadAccess access)
+        private ValueRead(ValueReadTarget target, Shape shape, ValueReadAccess access)
         {
             Target = target ?? throw new ArgumentNullException(nameof(target));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
@@ -185,24 +169,24 @@ namespace Alis.Reactive.PlanModel
         internal Source From => Target.From;
         internal MemberName Member => Target.Member;
         internal Path Path => Target.Path;
-        internal ProducedShape Shape { get; }
+        internal Shape Shape { get; }
         internal ValueReadAccess Access { get; }
 
         private ValueReadTarget Target { get; }
 
-        internal static ValueRead Property(Source from, string member, ProducedShape shape) =>
+        internal static ValueRead Property(Source from, string member, Shape shape) =>
             new ValueRead(
                 ValueReadTarget.ForMember(from, member),
                 shape,
                 ValueReadAccess.Property);
 
-        internal static ValueRead Property(Source from, string member, Path path, ProducedShape shape) =>
+        internal static ValueRead Property(Source from, string member, Path path, Shape shape) =>
             new ValueRead(
                 ValueReadTarget.ForMember(from, member, path),
                 shape,
                 ValueReadAccess.Property);
 
-        internal static ValueRead Method(RuntimeObjectSource from, string member, ProducedShape shape, ValueArguments args) =>
+        internal static ValueRead Method(RuntimeObjectSource from, string member, Shape shape, ValueArguments args) =>
             new ValueRead(
                 ValueReadTarget.ForMember(from, member),
                 shape,
@@ -532,10 +516,10 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
         public Shape Shape { get; }
 
-        internal ObjectProducer(ValueObjectFields fields, ProducedShape shape)
+        internal ObjectProducer(ValueObjectFields fields, Shape shape)
         {
             _fields = fields ?? throw new ArgumentNullException(nameof(fields));
-            Shape = shape.ShapeForJson;
+            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
         internal override Shape OutputShape => Shape;
@@ -553,10 +537,10 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
         public Shape Shape { get; }
 
-        internal ArrayProducer(ValueArrayItems items, ProducedShape shape)
+        internal ArrayProducer(ValueArrayItems items, Shape shape)
         {
             _items = items ?? throw new ArgumentNullException(nameof(items));
-            Shape = shape.ShapeForJson;
+            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
         internal override Shape OutputShape => Shape;
