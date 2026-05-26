@@ -213,7 +213,7 @@ namespace Alis.Reactive.FluentValidator
                 ruleName,
                 Message(component, defaultMessage),
                 ValidationRuleDetails.WithConstraint(
-                    ValidationConstraint.InclusiveRange(bounds.ToValidationRangeBounds()),
+                    ValidationRuleTarget.Range(bounds.ToValidationRangeBounds()),
                     condition,
                     bounds.EndpointShape));
         }

@@ -122,7 +122,7 @@ namespace Alis.Reactive.FluentValidator
                 rule,
                 message,
                 condition => ValidationRuleDetails.WithConstraint(
-                    bounds.ToValidationRangeBounds(),
+                    ValidationRuleTarget.Range(bounds.ToValidationRangeBounds()),
                     condition,
                     bounds.EndpointShape));
         }

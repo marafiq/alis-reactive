@@ -20,7 +20,7 @@ Validate<TValidationSource>(containerId)
   -> ReactivePlan.Render() calls ResolveAll()
   -> input component registrations are materialized into the plan
   -> ClientValidationProjectionBinder binds queued validation jobs
-  -> Component.container.validationRules carries browser validation intent
+  -> Component.container.validationRules carries browser validation rules
   -> HTTP runtime validates the container before dispatch
 ```
 

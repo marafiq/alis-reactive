@@ -16,7 +16,7 @@ public class WhenProjectingRequiredRules
         Assert.That(desc[0].Rules, Has.Count.EqualTo(1));
         Assert.That(desc[0].Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Required));
         Assert.That(desc[0].Rules[0].Message, Is.EqualTo("'Name' is required."));
-        Assert.That(desc[0].Rules[0].ConstraintValue(), Is.Null);
+        Assert.That(desc[0].Rules[0].ConstraintValue, Is.Null);
     }
 
     [Test]

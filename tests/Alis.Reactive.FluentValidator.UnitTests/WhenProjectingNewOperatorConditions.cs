@@ -15,7 +15,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldGtValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
-        var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
+        var when = (FieldCompare)jobTitle.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Age"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.GreaterThan));
@@ -27,7 +27,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldGteValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
-        var when = (FieldCompare)email.Rules[0].Condition()!;
+        var when = (FieldCompare)email.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Salary"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.GreaterThanOrEqual));
@@ -39,7 +39,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldLtValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
-        var when = (FieldCompare)name.Rules[0].Condition()!;
+        var when = (FieldCompare)name.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Age"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.LessThan));
@@ -51,7 +51,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldLteValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
-        var when = (FieldCompare)notes.Rules[0].Condition()!;
+        var when = (FieldCompare)notes.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Salary"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.LessThanOrEqual));
@@ -65,7 +65,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldNullValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
-        var when = (FieldCompare)notes.Rules[0].Condition()!;
+        var when = (FieldCompare)notes.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("MiddleName"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.IsNull));
@@ -77,7 +77,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldNotNullValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
-        var when = (FieldCompare)name.Rules[0].Condition()!;
+        var when = (FieldCompare)name.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("MiddleName"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.NotNull));
@@ -89,7 +89,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldEmptyValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
-        var when = (FieldCompare)phone.Rules[0].Condition()!;
+        var when = (FieldCompare)phone.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Email"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.IsEmpty));
@@ -101,7 +101,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldNotEmptyValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
-        var when = (FieldCompare)name.Rules[0].Condition()!;
+        var when = (FieldCompare)name.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Notes"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.NotEmpty));
@@ -115,7 +115,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldInValidator), "form");
         var notes = fields.First(f => f.FieldName == "Notes");
-        var when = (FieldCompare)notes.Rules[0].Condition()!;
+        var when = (FieldCompare)notes.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("CareLevel"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.In));
@@ -129,7 +129,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldNotInValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
-        var when = (FieldCompare)phone.Rules[0].Condition()!;
+        var when = (FieldCompare)phone.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("CareLevel"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.NotIn));
@@ -143,7 +143,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldBetweenValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
-        var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
+        var when = (FieldCompare)jobTitle.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Age"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Between));
@@ -161,7 +161,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldBetweenValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
-        var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
+        var when = (FieldCompare)jobTitle.Rules[0].Condition!;
 
         var planCondition = ResolveWithShape(when, Shape.None);
 
@@ -176,7 +176,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldContainsValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
-        var when = (FieldCompare)phone.Rules[0].Condition()!;
+        var when = (FieldCompare)phone.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Notes"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Contains));
@@ -188,7 +188,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldStartsWithValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
-        var when = (FieldCompare)email.Rules[0].Condition()!;
+        var when = (FieldCompare)email.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Name"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.StartsWith));
@@ -200,7 +200,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldEndsWithValidator), "form");
         var jobTitle = fields.First(f => f.FieldName == "JobTitle");
-        var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
+        var when = (FieldCompare)jobTitle.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Email"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.EndsWith));
@@ -248,7 +248,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldMatchesValidator), "form");
         var name = fields.First(f => f.FieldName == "Name");
-        var when = (FieldCompare)name.Rules[0].Condition()!;
+        var when = (FieldCompare)name.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Phone"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Matches));
@@ -260,7 +260,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldMinLengthValidator), "form");
         var email = fields.First(f => f.FieldName == "Email");
-        var when = (FieldCompare)email.Rules[0].Condition()!;
+        var when = (FieldCompare)email.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Notes"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.MinLength));
@@ -282,7 +282,7 @@ public class WhenProjectingNewOperatorConditions
     {
         var fields = _adapter.ProjectRules(typeof(WhenFieldArrayContainsValidator), "form");
         var phone = fields.First(f => f.FieldName == "Phone");
-        var when = (FieldCompare)phone.Rules[0].Condition()!;
+        var when = (FieldCompare)phone.Rules[0].Condition!;
 
         Assert.That(when.Field, Is.EqualTo("Tags"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.ArrayContains));

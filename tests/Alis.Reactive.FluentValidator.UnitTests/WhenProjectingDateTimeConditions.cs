@@ -19,8 +19,8 @@ public class WhenProjectingDateTimeConditions
         Assert.That(desc, Is.Not.Null);
         var nameField = desc.First(f => f.FieldName == "Name");
         Assert.That(nameField.Rules, Has.Count.EqualTo(1));
-        Assert.That(nameField.Rules[0].Condition(), Is.Not.Null);
-        var when = (FieldCompare)nameField.Rules[0].Condition()!;
+        Assert.That(nameField.Rules[0].Condition, Is.Not.Null);
+        var when = (FieldCompare)nameField.Rules[0].Condition!;
         Assert.That(when.Field, Is.EqualTo("AdmissionDate"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Equal));
 
@@ -37,8 +37,8 @@ public class WhenProjectingDateTimeConditions
 
         Assert.That(desc, Is.Not.Null);
         var scoreField = desc.First(f => f.FieldName == "Score");
-        Assert.That(scoreField.Rules[0].Condition(), Is.Not.Null);
-        var neqWhen = (FieldCompare)scoreField.Rules[0].Condition()!;
+        Assert.That(scoreField.Rules[0].Condition, Is.Not.Null);
+        var neqWhen = (FieldCompare)scoreField.Rules[0].Condition!;
         Assert.That(neqWhen.Field, Is.EqualTo("AdmissionDate"));
         Assert.That(neqWhen.Op, Is.EqualTo(FieldComparisonOperator.NotEqual));
 
@@ -56,7 +56,7 @@ public class WhenProjectingDateTimeConditions
 
         Assert.That(desc, Is.Not.Null);
         var emailField = desc.First(f => f.FieldName == "Email");
-        var condition = emailField.Rules[0].Condition();
+        var condition = emailField.Rules[0].Condition;
         Assert.That(condition, Is.Not.Null);
         var strWhen = (FieldCompare)condition!;
         Assert.That(strWhen.OperandValue(), Is.EqualTo("Independent"),

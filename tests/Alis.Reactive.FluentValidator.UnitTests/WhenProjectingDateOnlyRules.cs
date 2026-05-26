@@ -57,9 +57,9 @@ public class WhenProjectingDateOnlyRules
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Date),
             "Shape.FromClrType should map DateOnly to 'date'");
 
-        Assert.That(rule.ConstraintValue(), Is.InstanceOf<string>(),
+        Assert.That(rule.ConstraintValue, Is.InstanceOf<string>(),
             "DateOnly constraint must be serialized as a string, not a raw DateOnly object");
-        Assert.That(rule.ConstraintValue(), Is.EqualTo("2026-01-01"),
+        Assert.That(rule.ConstraintValue, Is.EqualTo("2026-01-01"),
             "DateOnly(2026, 1, 1) must serialize to 'yyyy-MM-dd' format");
     }
 
@@ -74,9 +74,9 @@ public class WhenProjectingDateOnlyRules
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Date),
             "Shape.FromClrType should map DateOnly to 'date'");
 
-        Assert.That(rule.ConstraintValue(), Is.InstanceOf<string>(),
+        Assert.That(rule.ConstraintValue, Is.InstanceOf<string>(),
             "DateOnly constraint must be serialized as a string, not a raw DateOnly object");
-        Assert.That(rule.ConstraintValue(), Is.EqualTo("2026-12-31"),
+        Assert.That(rule.ConstraintValue, Is.EqualTo("2026-12-31"),
             "DateOnly(2026, 12, 31) must serialize to 'yyyy-MM-dd' format");
     }
 
@@ -91,7 +91,7 @@ public class WhenProjectingDateOnlyRules
         Assert.That(rule.Shape, Is.EqualTo(Alis.Reactive.PlanModel.Shape.Date),
             "Shape.FromClrType should map DateOnly to 'date'");
 
-        var constraint = rule.ConstraintValue() as object[];
+        var constraint = rule.ConstraintValue as object[];
         Assert.That(constraint, Is.Not.Null, "range constraint must be an array");
         Assert.That(constraint!, Has.Length.EqualTo(2));
 

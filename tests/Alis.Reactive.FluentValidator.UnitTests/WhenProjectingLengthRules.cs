@@ -12,7 +12,7 @@ public class WhenProjectingLengthRules
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules[0].Kind, Is.EqualTo(ValidationRuleKind.MaxLength));
-        Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(100));
+        Assert.That(desc[0].Rules[0].ConstraintValue, Is.EqualTo(100));
     }
 
     [Test]
@@ -22,7 +22,7 @@ public class WhenProjectingLengthRules
 
         Assert.That(desc, Is.Not.Null);
         Assert.That(desc[0].Rules[0].Kind, Is.EqualTo(ValidationRuleKind.MinLength));
-        Assert.That(desc[0].Rules[0].ConstraintValue(), Is.EqualTo(3));
+        Assert.That(desc[0].Rules[0].ConstraintValue, Is.EqualTo(3));
     }
 
     [Test]

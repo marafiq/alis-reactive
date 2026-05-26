@@ -31,8 +31,8 @@ public class WhenProjectingConditionalRules
         var jobTitleField = desc.First(f => f.FieldName == "JobTitle");
         Assert.That(jobTitleField.Rules, Has.Count.EqualTo(1));
         Assert.That(jobTitleField.Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Required));
-        Assert.That(jobTitleField.Rules[0].Condition(), Is.Not.Null);
-        var when = (FieldCompare)jobTitleField.Rules[0].Condition()!;
+        Assert.That(jobTitleField.Rules[0].Condition, Is.Not.Null);
+        var when = (FieldCompare)jobTitleField.Rules[0].Condition!;
         Assert.That(when.Field, Is.EqualTo("IsEmployed"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Truthy));
     }

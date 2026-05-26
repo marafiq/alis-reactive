@@ -16,8 +16,8 @@ public class WhenProjectingClientConditionalRules
         var jobTitle = desc.First(f => f.FieldName == "JobTitle");
         Assert.That(jobTitle.Rules, Has.Count.EqualTo(1));
         Assert.That(jobTitle.Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Required));
-        Assert.That(jobTitle.Rules[0].Condition(), Is.Not.Null);
-        var when = (FieldCompare)jobTitle.Rules[0].Condition()!;
+        Assert.That(jobTitle.Rules[0].Condition, Is.Not.Null);
+        var when = (FieldCompare)jobTitle.Rules[0].Condition!;
         Assert.That(when.Field, Is.EqualTo("IsEmployed"));
         Assert.That(when.Op, Is.EqualTo(FieldComparisonOperator.Truthy));
     }
@@ -30,7 +30,7 @@ public class WhenProjectingClientConditionalRules
         Assert.That(desc, Is.Not.Null);
         var name = desc.First(f => f.FieldName == "Name");
         Assert.That(name.Rules[0].Kind, Is.EqualTo(ValidationRuleKind.Required));
-        Assert.That(name.Rules[0].Condition(), Is.Null);
+        Assert.That(name.Rules[0].Condition, Is.Null);
     }
 
     [Test]
@@ -42,12 +42,12 @@ public class WhenProjectingClientConditionalRules
 
         var jobTitle = desc.First(f => f.FieldName == "JobTitle");
         Assert.That(jobTitle.Rules.Count, Is.GreaterThanOrEqualTo(2));
-        Assert.That(jobTitle.Rules.All(r => r.Condition() != null), Is.True);
-        Assert.That(jobTitle.Rules.All(r => r.Condition() is FieldCompare fc && fc.Field == "IsEmployed"), Is.True);
+        Assert.That(jobTitle.Rules.All(r => r.Condition != null), Is.True);
+        Assert.That(jobTitle.Rules.All(r => r.Condition is FieldCompare fc && fc.Field == "IsEmployed"), Is.True);
 
         var salary = desc.First(f => f.FieldName == "Salary");
-        Assert.That(salary.Rules[0].Condition(), Is.Not.Null);
-        var salaryWhen = (FieldCompare)salary.Rules[0].Condition()!;
+        Assert.That(salary.Rules[0].Condition, Is.Not.Null);
+        var salaryWhen = (FieldCompare)salary.Rules[0].Condition!;
         Assert.That(salaryWhen.Field, Is.EqualTo("IsEmployed"));
     }
 
@@ -58,8 +58,8 @@ public class WhenProjectingClientConditionalRules
 
         Assert.That(desc, Is.Not.Null);
         var email = desc.First(f => f.FieldName == "Email");
-        Assert.That(email.Rules[0].Condition(), Is.Not.Null);
-        var eqWhen = (FieldCompare)email.Rules[0].Condition()!;
+        Assert.That(email.Rules[0].Condition, Is.Not.Null);
+        var eqWhen = (FieldCompare)email.Rules[0].Condition!;
         Assert.That(eqWhen.Field, Is.EqualTo("Name"));
         Assert.That(eqWhen.Op, Is.EqualTo(FieldComparisonOperator.Equal));
         Assert.That(eqWhen.OperandValue(), Is.EqualTo("Admin"));
@@ -72,8 +72,8 @@ public class WhenProjectingClientConditionalRules
 
         Assert.That(desc, Is.Not.Null);
         var jobTitle = desc.First(f => f.FieldName == "JobTitle");
-        Assert.That(jobTitle.Rules[0].Condition(), Is.Not.Null);
-        var condition = (FieldCompare)jobTitle.Rules[0].Condition()!;
+        Assert.That(jobTitle.Rules[0].Condition, Is.Not.Null);
+        var condition = (FieldCompare)jobTitle.Rules[0].Condition!;
         Assert.That(condition.Field, Is.EqualTo("Address.City"));
         Assert.That(desc.Select(f => f.FieldName), Does.Contain("Address.City"));
     }
@@ -88,7 +88,7 @@ public class WhenProjectingClientConditionalRules
         var notes = desc.First(f => f.FieldName == "Notes");
         Assert.That(notes.Rules, Has.Count.EqualTo(1));
 
-        var condition = notes.Rules[0].Condition();
+        var condition = notes.Rules[0].Condition;
         Assert.That(condition, Is.InstanceOf<FieldAll>());
 
         var all = (FieldAll)condition!;
@@ -115,7 +115,7 @@ public class WhenProjectingClientConditionalRules
         var jobTitle = desc.First(f => f.FieldName == "JobTitle");
         Assert.That(jobTitle.Rules, Has.Count.EqualTo(1));
 
-        var condition = jobTitle.Rules[0].Condition();
+        var condition = jobTitle.Rules[0].Condition;
         Assert.That(condition, Is.InstanceOf<FieldCompare>());
 
         var compare = (FieldCompare)condition!;
@@ -186,8 +186,8 @@ public class WhenProjectingClientConditionalRules
             Assert.That(field, Is.Not.Null, $"{label}: field '{fieldName}' missing");
             var rule = field!.Rules.FirstOrDefault(r => r.Kind == expectedRule);
             Assert.That(rule, Is.Not.Null, $"{label}: rule '{expectedRule}' missing on '{fieldName}'");
-            Assert.That(rule!.Condition(), Is.Not.Null, $"{label}: condition missing");
-            var ruleWhen = (FieldCompare)rule.Condition()!;
+            Assert.That(rule!.Condition, Is.Not.Null, $"{label}: condition missing");
+            var ruleWhen = (FieldCompare)rule.Condition!;
             Assert.That(ruleWhen.Field, Is.EqualTo("IsEmployed"), $"{label}: wrong condition field");
             Assert.That(ruleWhen.Op, Is.EqualTo(FieldComparisonOperator.Truthy), $"{label}: wrong condition op");
         }
