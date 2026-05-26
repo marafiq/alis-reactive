@@ -14,7 +14,7 @@ namespace Alis.Reactive.PlanModel
         private readonly BrowserObjectContracts _objectContracts;
         private readonly ComponentObjects _components;
         private readonly BehaviorGraph _behaviors;
-        private readonly PendingValidationProjections _validationJobs = new PendingValidationProjections();
+        private readonly List<ValidationJob> _validationJobs = new List<ValidationJob>();
 
         internal PlanBuildContext(
             PlanIdentity identity,
@@ -45,10 +45,10 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>Records that a request declared a validation source, to be resolved during Render().</summary>
         internal void RegisterValidationJob(Request request, ComponentId container, Type validationSourceType) =>
-            _validationJobs.Enqueue(request, container, validationSourceType);
+            _validationJobs.Add(new ValidationJob(request.Url, container, validationSourceType));
 
         /// <summary>The validation jobs declared during plan construction.</summary>
-        internal IReadOnlyList<ValidationJob> ValidationJobs => _validationJobs.Jobs;
+        internal IReadOnlyList<ValidationJob> ValidationJobs => _validationJobs;
 
         /// <summary>
         /// Ensures a DOM element is registered as a native component with a BrowserObjectContract.
