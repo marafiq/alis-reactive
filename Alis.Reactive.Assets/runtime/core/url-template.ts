@@ -1,6 +1,6 @@
 // url-template.ts — URL template parameter resolution.
 // Pure function: resolves {param} placeholders using evaluated ValueProducers.
-// Fail-fast: throws on unresolved placeholder, null value, or stringify failure.
+// Throws when a dynamic route value is missing or cannot become URL text.
 
 import { type Plan, type ValueProducer, type ExecContext } from "../types";
 import { evaluateValue } from "./evaluate";
@@ -16,87 +16,27 @@ export function resolveRouteParams(
   plan: Plan,
   ctx: ExecContext,
 ): string {
-  return RouteTemplate
-    .from(urlTemplate)
-    .bind(RouteParameterBindings.from(routeParams, plan, ctx));
+  return urlTemplate.replace(ROUTE_PARAM_RE, (_match, paramName: string) =>
+    encodeRouteParameter(paramName, routeParams[paramName]!, plan, ctx));
 }
 
-class RouteTemplate {
-  private constructor(private readonly value: string) {}
-
-  static from(value: string): RouteTemplate {
-    return new RouteTemplate(value);
+function encodeRouteParameter(
+  paramName: string,
+  producer: ValueProducer,
+  plan: Plan,
+  ctx: ExecContext,
+): string {
+  const raw = evaluateValue(producer, plan, ctx);
+  const valueIsMissing = raw === null || raw === undefined;
+  if (valueIsMissing) {
+    throw new Error(`[alis] route param "${paramName}" evaluated to null; cannot build URL`);
   }
 
-  bind(bindings: RouteParameterBindings): string {
-    return this.value.replace(ROUTE_PARAM_RE, (_match, paramName: string) =>
-      bindings.require(paramName, this.value).encodedValue());
-  }
-}
-
-class RouteParameterBindings {
-  private constructor(
-    private readonly routeParams: Record<string, ValueProducer>,
-    private readonly plan: Plan,
-    private readonly context: ExecContext,
-  ) {}
-
-  static from(
-    routeParams: Record<string, ValueProducer>,
-    plan: Plan,
-    context: ExecContext,
-  ): RouteParameterBindings {
-    return new RouteParameterBindings(routeParams, plan, context);
+  const wire = formatForWire(raw, producer.shape);
+  const result = toString(wire);
+  if (!result.ok) {
+    throw new Error(`[alis] route param "${paramName}" could not be stringified: ${result.error}`);
   }
 
-  require(paramName: string, urlTemplate: string): RouteParameterBinding {
-    const producer = this.routeParams[paramName];
-    if (producer === undefined) {
-      throw new Error(`[alis] unresolved route param: "${paramName}" in URL template "${urlTemplate}"`);
-    }
-
-    return RouteParameterBinding.from(paramName, producer, this.plan, this.context);
-  }
-}
-
-class RouteParameterBinding {
-  private constructor(
-    private readonly paramName: string,
-    private readonly producer: ValueProducer,
-    private readonly plan: Plan,
-    private readonly context: ExecContext,
-  ) {}
-
-  static from(
-    paramName: string,
-    producer: ValueProducer,
-    plan: Plan,
-    context: ExecContext,
-  ): RouteParameterBinding {
-    return new RouteParameterBinding(paramName, producer, plan, context);
-  }
-
-  encodedValue(): string {
-    const raw = RouteParameterValue.from(this.paramName, evaluateValue(this.producer, this.plan, this.context));
-    const wire = formatForWire(raw.value, this.producer.shape);
-    const result = toString(wire);
-    if (!result.ok) {
-      throw new Error(`[alis] route param "${this.paramName}" could not be stringified: ${result.error}`);
-    }
-
-    return encodeURIComponent(result.value);
-  }
-}
-
-class RouteParameterValue {
-  private constructor(readonly value: unknown) {}
-
-  static from(paramName: string, value: unknown): RouteParameterValue {
-    const valueIsMissing = value === null || value === undefined;
-    if (valueIsMissing) {
-      throw new Error(`[alis] route param "${paramName}" evaluated to null — cannot build URL`);
-    }
-
-    return new RouteParameterValue(value);
-  }
+  return encodeURIComponent(result.value);
 }
