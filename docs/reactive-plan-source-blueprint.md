@@ -49,6 +49,367 @@ source API -> developer intent -> domain concept -> JSON concept -> runtime exec
 
 The rich model should be smaller than the source inventory. Public DSL variations are many, but they collapse to a short set of deterministic browser concepts: artifact, trigger, behavior, value, condition, request, gather source, validation projection, object contract, component slice, plugin contract.
 
+## Source-Grounded Design Proof
+
+This section is the actual blueprint. It is derived from the source files listed above. If a design concept cannot point to a DSL source method, event descriptor, component extension, builder API, or render hook, it is not part of the design.
+
+### Source Requirement Matrix
+
+The DSL source is the requirements document. The model is valid only if these source surfaces map without loss.
+
+| Source requirement | Verbatim source surface | Required domain concept |
+| --- | --- | --- |
+| Views create and render plan artifacts | `ReactivePlan<TModel>`, `ResolvePlan<TModel>`, `RenderPlan<TModel>` | `PlanArtifact` with root, same-model partial contribution, independent root, serialization boundary |
+| `Html.On` attaches behavior definitions | `On<TModel>(html, plan, Action<TriggerBuilder<TModel>>)` | `BehaviorDefinitionSet` over a `Trigger` plus `BehaviorGraph` |
+| Triggers start deterministic behavior | `DomReady`, `CustomEvent`, typed `CustomEvent<TPayload>`, `ServerPush`, typed/named `ServerPush`, `SignalR`, typed `SignalR`, component `Reactive(...)` | `Trigger` with payload contract where the source is typed |
+| Pipeline commands build ordered reactions | `Dispatch`, `DispatchWith`, `Element`, `Component`, `FromUrl`, plugin read/call, `ValidationErrors`, `Into`, HTTP starters, `When`, `Confirm` | `BehaviorGraph`, `ValueExpression`, `ConditionGraph`, `RequestPlan` |
+| DOM elements are JS objects | `ElementBuilder.AddClass/RemoveClass/ToggleClass/SetText/SetHtml/Show/Hide` | `BrowserObjectContract` for native element properties/methods |
+| Components are JS objects | component `*Extensions.cs` returning `ComponentRef` or `TypedComponentSource<T>` | `BrowserObjectContract` plus `ComponentObject` runtime join key |
+| Component render owns ids and input bindings | component `*HtmlExtensions.cs`, `InputField`, `ModelBoundInputComponentSlot`, `ComponentRegistration` | `ComponentObject` plus optional `InputBinding` |
+| Component events/callbacks start behavior | component `*ReactiveExtensions.cs`, `*Events.cs`, `TypedEvent<TArgs>` | `Trigger.ComponentEvent` plus event payload object contract |
+| App-level components are layout objects | `NativeDrawer`, `NativeLoader`, `FusionToast`, `FusionConfirm`, app-level `Component<TApp>()` | `ComponentObject.LayoutObject` with fixed id |
+| Event args are mutable JS payload objects | Syncfusion/native event arg extension methods like `PreventDefault`, `UpdateData` | `Behavior.Call` or `Behavior.Set` against `PayloadSource.Event` in the sync lane |
+| Conditions are deterministic graphs | `When`, `ConditionSourceBuilder`, `GuardBuilder.And/Or/Not/Then`, `BranchBuilder.ElseIf/Else`, validation condition builders | `ConditionGraph` and ordered `BranchCase` |
+| HTTP is async behavior with stages | `Get/Post/Put/Delete`, `WhileLoading`, `Finally`, `Validate`, `Response`, `Chained`, `Parallel`, `OnAllSettled` | `RequestPlan`, response routes, chain, parallel group |
+| Gather is source-to-target projection | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, `Plugin`, `Include` overloads | `GatherPlan` made of source reads and write targets |
+| Dispatch payload is runtime object construction | `DispatchPayloadBuilder.Set(...)` overloads | `ValueExpression.Object` |
+| Direct validation projects client rules | `ClientValidationProjectionRegistry.Create`, `For`, `Field`, rule methods, `.When(...)` | `ValidationProjection` with fields, rules, operands, activation |
+| FluentValidation projects only client-executable rules | `.ProjectToClient`, `ClientValidationRuleWriter`, `ReactiveValidator.WhenField*`, `WhenFields`, server-only `When/Unless/WhenAsync/UnlessAsync` | `ValidationProjection` bridge that skips server-only/async behavior |
+| Plugins bridge non-DSL browser functions | `RegisterPlugin`, `ReactivePlugin`, `PluginTypeBuilder`, `PluginReadBuilder`, `PluginCallBuilder` | `PluginBridge` as browser object contract plus invocation arguments |
+| Fusion templates render HTML only | `FusionTemplateBuilder`, `TemplateElements`, conditional template helpers | `RenderContract`; no runtime behavior unless nested render registers ids/behavior |
+
+The design has one invariant:
+
+```text
+Every public DSL call either declares a browser object, starts a behavior, computes a value,
+guards a behavior, performs HTTP, projects validation, or renders HTML.
+```
+
+The plan domain owns those concepts. JSON is only the serialization boundary. The runtime owns only execution.
+
+### Deterministic Flow
+
+```text
+Razor DSL source
+  -> Plan authoring model
+  -> Plan document
+  -> Generated TypeScript contract
+  -> Runtime executor
+```
+
+| Layer | Source-grounded responsibility | Must not do |
+| --- | --- | --- |
+| DSL builders | Capture developer intent from typed C# expressions, typed component references, typed plugin descriptors, validation projections, and render calls | Execute browser behavior on the server |
+| Plan authoring model | Turn DSL intent into deterministic domain objects: artifacts, object contracts, values, conditions, requests, validation projections, behavior graph | Invent runtime fallback behavior or validate impossible generated shapes repeatedly |
+| Plan document | Serialize the domain model as a small published language | Become a second schema with its own concepts |
+| Generated TS contract | Mirror the C# plan domain shape used by runtime | Drift from C# or add optional fields just because JSON can omit them |
+| Runtime | Resolve browser objects and execute declared behavior in the correct lane | Infer missing members, guess ids, rebuild domain intent, or reject valid DSL output |
+
+### Core Domain Model
+
+These are the concepts the rich model needs. They are fewer than the DSL methods because many DSL methods express the same deterministic browser concept.
+
+| Domain concept | Owns | DSL source evidence | JSON emitted | Runtime executor |
+| --- | --- | --- | --- | --- |
+| `PlanArtifact` | Root view, same-model partial contribution, independent partial root, inline action-link plan | `ReactivePlan`, `ResolvePlan`, `RenderPlan`, `NativeActionLink` | `planId`, `scope`, `types`, `components`, `behaviors` | `boot`, `composeInitialPlans`, `loadPartialSlot`, native action-link executor |
+| `BrowserObjectContract` | JS object members: properties, methods, events/callbacks, member paths, shapes, access | `ComponentMember`, `ComponentRef`, component `*Extensions`, `PluginTypeBuilder`, `ReactivePlugin`, element DSL | `types[typeKey].properties/methods/events` | `RuntimeObject`, `ObjectResolver` |
+| `ComponentObject` | Runtime join key, vendor, type key, contribution intent, optional input binding, optional validation container | component `*HtmlExtensions`, `InputField`, `p.Component`, app-level components | `components[componentKey]` | `RuntimePlan.components`, vendor/native/fusion resolvers |
+| `Trigger` | What starts a behavior graph | `TriggerBuilder`, component `Reactive(...)` extensions | `behavior.startsWhen` | `wireBehavior`, `server-push`, `signalr`, vendor event wiring |
+| `BehaviorGraph` | Ordered executable reactions: sequence, set, call, dispatch, branch, request, parallel, inject, validation display | `PipelineBuilder`, `ElementBuilder`, component extensions, request builders, branch builders | `Reaction` union | `executeReaction` |
+| `ValueExpression` | Runtime-computable values: literal, URL read, payload read, object read/call, object/array construction | `FromUrl`, event/response expressions, component `Value`, plugin reads, dispatch payload, gather | `ValueProducer` union | `evaluateValue` |
+| `ConditionGraph` | Guards: compare, all, any, not, confirm | `When`, `GuardBuilder`, validation condition builders | `Condition` union | `evaluateConditionInCurrentLane` |
+| `RequestPlan` | HTTP endpoint, gather payload, body format, route/header parameters, validation gate, response routes, chain | `Get/Post/Put/Delete`, `GatherBuilder`, `ResponseBuilder`, `ParallelBuilder` | `Request` | `executeRequest`, `gather`, `http-fetch` |
+| `ValidationProjection` | Client-executable fields, rules, operands, activation conditions, component binding | direct validation DSL, `FluentValidationAdapter`, `ReactiveValidator.WhenField*`, `.ProjectToClient` | component validation rules under validation container | validation orchestrator and rule engine |
+| `PluginBridge` | Plugin object contract and invocation language for behavior difficult to express in deterministic DSL | `RegisterPlugin`, `ReactivePlugin`, `PluginTypeBuilder`, plugin read/call builders | plugin `JsType` plus plugin source | plugin object resolver and runtime object call/read |
+| `RenderContract` | HTML-only configuration and templates | component builders, Fusion templates | HTML only unless render registers ids/bindings/events | browser rendering; no behavior executor |
+
+The design rule is: every implementation type must name one of these concepts or a sub-concept directly required by one of them. Names such as registries, frames, validators, lifecycle requirements, or coverage helpers are not domain concepts unless they can be traced back to a DSL source row and a runtime role.
+
+### Plan Artifact Flows
+
+#### Root View
+
+```text
+Html.ReactivePlan<TModel>()
+  -> PlanArtifact.Root(model plan id)
+  -> DSL builders add object contracts, components, behaviors, validation jobs
+  -> Html.RenderPlan(plan)
+  -> script[data-reactive-plan] JSON with scope root
+  -> boot(plan)
+  -> wire validation and triggers, set active runtime plan
+```
+
+Runtime does not need to discover intent. `plan.types`, `plan.components`, and `plan.behaviors` already contain the full behavior graph.
+
+#### Same-Model SSR Partial
+
+```text
+Html.ResolvePlan<TModel>()
+  -> PlanArtifact.PartialContribution(same model plan id)
+  -> Html.RenderPlan(partialPlan)
+  -> script[data-reactive-plan] JSON with scope partial
+  -> composeInitialPlans groups artifacts by planId before boot
+  -> root and same-model partials become one booted plan
+```
+
+No browser unload handle is needed for initial SSR composition. The join key is `planId`.
+
+#### Browser-Loaded Partial
+
+```text
+request Response -> p.Into(slotId)
+  -> InjectReaction(target slot, responseBody)
+  -> injectHtml(slot, html, target)
+  -> extract rendered plan scripts from injected HTML
+  -> loadPartialSlot(slotId, plans)
+  -> for each incoming plan: merge by incoming.planId
+  -> record contribution handle = slotId + slot load abort signal
+  -> wire incoming behaviors with that abort signal
+```
+
+Unload is the reverse:
+
+```text
+unloadPartialSlot(slotId)
+  -> abort listeners for that slot load
+  -> remove behavior references contributed by that slot
+  -> remove components owned by that slot
+  -> remove validation rule contributions from containers
+  -> remove or recompute object contract fragments contributed by that slot
+  -> prune merged plan only when it was not booted as root and has no remaining content
+```
+
+`planId`, component ids, type keys, plugin names, and event names are runtime join keys. The slot contribution handle is only ownership for browser load/unload rollback. It must not replace component ids or type keys.
+
+#### Inline Action Link
+
+```text
+NativeActionLink(...)
+  -> render anchor with inline action payload
+  -> payload contains plan fragment and reaction
+  -> runtime click handler executes the inline reaction against the declared plan
+```
+
+The action link is an app-level bridge because it carries behavior in HTML attributes instead of a normal plan script. It still follows the same rule: plan fragment plus reaction, executed by runtime.
+
+### Browser Object Model
+
+The framework models JavaScript as the browser actually exposes it:
+
+```text
+JS object = properties + methods + events/callbacks
+```
+
+Every component, DOM element, plugin, app-level object, and event payload object reduces to that shape.
+
+| Source DSL | Domain operation | Runtime operation |
+| --- | --- | --- |
+| `p.Element(id).SetText(...)` | declare DOM element property `text -> textContent`, emit set reaction | resolve DOM element, set property |
+| `p.Element(id).AddClass(...)` | declare DOM element method `classAdd -> classList.add`, emit call reaction | resolve DOM element, call method |
+| `p.Component<T>(...).SetValue(...)` | declare component property, emit set reaction | resolve component object, set property |
+| `p.Component<T>(...).Value()` | declare component readable property, emit value read | resolve component object, read property |
+| event args `PreventDefault()` or `UpdateData(...)` | emit call/set on payload object | mutate event args in sync lane |
+| plugin property/function/command | declare plugin object contract, emit read/call | resolve plugin object, read/call |
+
+This is the center of the rich model. Component onboarding becomes a vertical slice that declares:
+
+```text
+component id + vendor + type key + object contract + optional input binding + optional event contracts
+```
+
+Adding a vendor component should only require a new slice that declares these facts. It must not require runtime behavior changes unless the vendor needs a new root resolver.
+
+### Behavior And Lane Design
+
+The runtime has two lanes because the DSL can express both immediate browser mutations and async browser/HTTP work.
+
+| Behavior concept | DSL source | Lane |
+| --- | --- | --- |
+| property set, method call, dispatch, value read, validation rule evaluation, DOM/component event callback | element/component/plugin/event args/validation DSL | sync |
+| request, parallel request group, SSE, SignalR, confirm, branch/sequence that reaches one of these | HTTP/realtime/confirm DSL | async |
+
+The execution rule:
+
+```text
+execute sync until an async concept is reached;
+when async is reached, return Promise and continue remaining sequence after await.
+```
+
+This preserves Syncfusion callback semantics. Event-arg mutations such as cancel/prevent-default/update-data must happen in the same browser callback tick.
+
+### Value Expression Design
+
+All dynamic data movement goes through one value model.
+
+| Value source | DSL source | Domain shape | Runtime read |
+| --- | --- | --- | --- |
+| literal | dispatch payload, gather static values, set literals, validation literal operands | `ValueExpression.Literal(shape, value)` | shape conversion |
+| URL query | `FromUrl`, gather `FromUrl` | `ValueExpression.Read(UrlSource, member, shape)` | `URLSearchParams` |
+| event payload | typed custom events, component events, gather `FromEvent`, conditions | `ValueExpression.Read(PayloadSource.Event, path, shape)` | payload path read |
+| response body | `ResponseBody<T>` in response handlers, `Into` | `ValueExpression.Read(PayloadSource.Success/Error, path/root, shape)` | payload path/root read |
+| component property | component `Value` or property source | `ValueExpression.Read(ComponentSource, member/property, shape)` | runtime object read |
+| plugin property/method | plugin property/function sources | `ValueExpression.Read(PluginSource, property/method, shape, args)` | runtime object read/call |
+| object/array | `DispatchWith`, condition operands | composed `ValueExpression` | recursive evaluation |
+
+No module should invent a second read path. Gather, dispatch payload, conditions, HTTP headers, route params, plugin args, and validation operands all reuse value expressions.
+
+### Condition Design
+
+The condition DSL has one graph:
+
+```text
+Compare(left, operator, optional right)
+All(conditions)
+Any(conditions)
+Not(condition)
+Confirm(message)
+```
+
+`Then`, `ElseIf`, and `Else` do not create special runtime concepts; they create an ordered branch:
+
+```text
+BranchCase.Guarded(condition, reaction)
+BranchCase.Default(reaction)
+```
+
+Branch execution is deterministic: evaluate cases in order, execute the first matching guarded case, otherwise execute default if present. Nested `And`/`Or` remain condition composition. Reactive conditions and validation conditions use the same conceptual graph, but validation conditions read from field/component values rather than trigger payload/response context.
+
+### HTTP And Gather Design
+
+HTTP is an async behavior whose input is a projection.
+
+```text
+RequestPlan =
+  endpoint(method, url)
+  + route parameters
+  + headers
+  + optional GatherPlan
+  + optional validation gate
+  + before reactions
+  + response routes
+  + finally reactions
+  + optional follow-up chain
+```
+
+Gather asks two questions:
+
+```text
+What source is read?
+Where is it written?
+```
+
+| Gather source | Source DSL | Writes to |
+| --- | --- | --- |
+| all registered inputs | `IncludeAll()` | payload paths from input bindings |
+| literal | `Static(name, value)` | payload path |
+| event payload | `FromEvent(args, path, param)` | payload path |
+| URL query | `FromUrl(...)` | payload path |
+| plugin read | `Plugin(source, param)` | payload path |
+| component value/property | `Include(...)` | payload path |
+| typed source header | `Header(name, source)` | request header |
+| event/literal header | `Header(...)` overloads | request header |
+| typed/event/literal route param | `RouteParam(...)` overloads | URL template placeholder |
+
+The runtime must not know about C# expressions or model paths. The plan carries payload assignments, headers, route params, body format, and source selection.
+
+### Validation Design
+
+Validation has one purpose in the plan: client-executable rules.
+
+```text
+Request.Validate<TValidationSource>(formId)
+  -> ValidationProjectionJob(validation source, container id)
+  -> projection source returns client fields/rules
+  -> binder maps projected fields to component ids by model binding path
+  -> validation rules attach to the container component
+  -> runtime validates before request and during live validation
+```
+
+FluentValidation remains the server authority. Client projection rules are a deterministic subset:
+
+| FluentValidation source | Client plan result |
+| --- | --- |
+| built-in sync client-compatible validators | projected |
+| `.ProjectToClient(...)` after a sync property validator | projected as explicitly declared |
+| async property validators | skipped |
+| ordinary `When/Unless/WhenAsync/UnlessAsync` | server-only unless paired with a `ReactiveValidator.WhenField*` client condition |
+| `ReactiveValidator.WhenField*` / `WhenFields` | projected activation condition plus server predicate |
+| child validators/includes | projected recursively when deterministic and prefixed |
+
+Peer validation is a value read against another bound component. The binder is responsible for ensuring peer fields are known to the validation container through model binding paths.
+
+### Plugin Design
+
+Plugins are browser object contracts for behaviors not worth expressing in the deterministic DSL.
+
+```text
+RegisterPlugin(...)
+  -> PluginBridge declares plugin JS object properties/methods/root function
+  -> plugin read DSL emits ValueExpression.Read(PluginSource, access, args)
+  -> plugin command DSL emits Behavior.Call(PluginSource, method, args)
+```
+
+The developer-facing rich plugin DSL should prefer typed descriptors over string members. Strings may remain internal or in the string-based registration overload, but the primary consumer path should be:
+
+```text
+typed plugin descriptor -> typed source/command -> value expression or call behavior
+```
+
+The runtime does not distinguish plugin calls from component calls after resolution: both are object property reads or method calls.
+
+### Generated TypeScript Contract
+
+The C# plan domain is the source for runtime types.
+
+```text
+C# domain union/concept
+  -> generated TypeScript discriminated union/interface
+  -> runtime imports generated types
+```
+
+There should be no hand-written runtime schema that independently decides which fields are optional or which reaction kinds exist. When a C# plan concept changes, TypeScript contract generation changes with it and runtime compilation exposes missing executor support.
+
+### File Organization Target
+
+The code should read like the domain:
+
+```text
+PlanModel/Artifacts
+PlanModel/Objects
+PlanModel/Components
+PlanModel/Values
+PlanModel/Behaviors
+PlanModel/Conditions
+PlanModel/Requests
+PlanModel/Validation
+PlanModel/Plugins
+PlanModel/Rendering
+```
+
+Vertical component slices stay vertical:
+
+```text
+Native/Components/<Component>/*
+Fusion/Components/<Component>/*
+```
+
+Those slices declare component object contracts and render bindings. They do not own the plan primitives.
+
+### Implementation Order
+
+The refactor should proceed by closing one source-grounded surface at a time. A surface is done only when the design, C# domain model, generated TS contract, runtime executor, and behavior tests all line up.
+
+1. `Objects + Components`: browser object contracts, component identity, app-level objects, model-bound input slots.
+2. `Values + Behaviors`: one value expression model and one reaction executor model.
+3. `Conditions`: reactive branch graph plus validation condition graph using shared language.
+4. `Requests + Gather`: source-to-target payload projection, headers, route params, response routes, chain, parallel.
+5. `Validation`: direct projection and FluentValidation client projection with server-only rules excluded.
+6. `Artifacts + Lifecycle`: root, SSR partial composition, browser partial load/unload, inline action link.
+7. `Plugins`: richer typed plugin descriptors while preserving existing DSL except intentional plugin refactor.
+8. `TS generation`: make generated runtime contract the only runtime plan type source.
+
+Each step should delete old indirection that does not name a source-grounded concept.
+
 ## Verbatim DSL Inventory
 
 This inventory uses source names from the DSL. It is the design checklist for implementation.
