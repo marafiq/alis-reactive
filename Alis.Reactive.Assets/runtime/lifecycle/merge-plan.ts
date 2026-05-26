@@ -39,48 +39,10 @@ interface AppliedSlotContribution {
   readonly validationRuleContributions: ValidationRuleContribution[];
 }
 
-class BootPlanAssembly {
-  private readonly componentOwnership = new ComponentOwnership();
-  private readonly layoutObjects = new LayoutObjectReferences();
-
-  private constructor(private readonly plan: Plan) {}
-
-  static forPlanId(planId: PlanId): BootPlanAssembly {
-    return new BootPlanAssembly({
-      version: 3,
-      planId,
-      scope: { kind: "root" },
-      types: {},
-      components: {},
-      behaviors: [],
-    });
-  }
-
-  accept(contribution: Plan): void {
-    const source = planContributionSourceFrom(contribution);
-
-    for (const [key, type] of Object.entries(contribution.types)) {
-      this.plan.types[key] = mergeObjectContracts(this.plan.types[key], type);
-    }
-
-    this.mergeComponents(contribution, source);
-    this.plan.behaviors.push(...contribution.behaviors);
-  }
-
-  private mergeComponents(contribution: Plan, source: PlanContributionSource): void {
-    for (const [key, component] of Object.entries(contribution.components)) {
-      mergeComponentContributionIntoPlan(
-        this.plan,
-        { planId: contribution.planId, key, component, source },
-        { ownership: this.componentOwnership, layoutObjects: this.layoutObjects },
-        "boot",
-      );
-    }
-  }
-
-  toPlan(): Plan {
-    return this.plan;
-  }
+interface InitialPlanComposition {
+  readonly plan: Plan;
+  readonly componentOwnership: ComponentOwnership;
+  readonly layoutObjects: LayoutObjectReferences;
 }
 
 export class AppliedBrowserPlans {
@@ -297,18 +259,48 @@ function captureAppliedSlotContribution(
 const browserPlans = new AppliedBrowserPlans();
 
 export function composeInitialPlans(plans: Plan[]): Plan[] {
-  const assemblies = new Map<PlanId, BootPlanAssembly>();
+  const assemblies = new Map<PlanId, InitialPlanComposition>();
   for (const plan of plans) {
     let assembly = assemblies.get(plan.planId);
     if (assembly === undefined) {
-      assembly = BootPlanAssembly.forPlanId(plan.planId);
+      assembly = {
+        plan: {
+          version: 3,
+          planId: plan.planId,
+          scope: { kind: "root" },
+          types: {},
+          components: {},
+          behaviors: [],
+        },
+        componentOwnership: new ComponentOwnership(),
+        layoutObjects: new LayoutObjectReferences(),
+      };
       assemblies.set(plan.planId, assembly);
     }
 
-    assembly.accept(plan);
+    acceptInitialPlanContribution(assembly, plan);
   }
 
-  return Array.from(assemblies.values()).map(assembly => assembly.toPlan());
+  return Array.from(assemblies.values()).map(assembly => assembly.plan);
+}
+
+function acceptInitialPlanContribution(assembly: InitialPlanComposition, contribution: Plan): void {
+  const source = planContributionSourceFrom(contribution);
+
+  for (const [key, type] of Object.entries(contribution.types)) {
+    assembly.plan.types[key] = mergeObjectContracts(assembly.plan.types[key], type);
+  }
+
+  for (const [key, component] of Object.entries(contribution.components)) {
+    mergeComponentContributionIntoPlan(
+      assembly.plan,
+      { planId: contribution.planId, key, component, source },
+      { ownership: assembly.componentOwnership, layoutObjects: assembly.layoutObjects },
+      "boot",
+    );
+  }
+
+  assembly.plan.behaviors.push(...contribution.behaviors);
 }
 
 export function registerBootedPlan(plan: Plan): void { browserPlans.register(plan); }
