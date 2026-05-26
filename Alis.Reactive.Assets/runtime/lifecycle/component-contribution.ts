@@ -168,8 +168,8 @@ export function mergeComponentIntoPlan(
     return;
   }
 
-  if (extendsRootValidationContainer(target, declaration, state.ownership)) {
-    addNewValidationRules(target.components[declaration.key], declaration.component);
+  if (isRootValidationContainerExtension(target, declaration, state.ownership)) {
+    appendRulesForNewValidatedComponents(target.components[declaration.key], declaration.component);
     return;
   }
 
@@ -185,7 +185,7 @@ export function composeInitialComponentIntoPlan(
 ): void {
   if (coalescesInitialOwnedDefinition(target, declaration)
     || coalescesInitialValidationContainer(target, declaration)
-    || extendsRootValidationContainer(target, declaration, state.ownership)) {
+    || isRootValidationContainerExtension(target, declaration, state.ownership)) {
     replaceComponent(target, declaration.key, declaration.component);
     return;
   }
@@ -234,7 +234,7 @@ function canMergeLayoutObject(
     && canMaterializeOrJoinReference(target.components[declaration.key], declaration.component, "layout-object");
 }
 
-function extendsRootValidationContainer(
+function isRootValidationContainerExtension(
   target: Plan,
   declaration: ComponentContributionDeclaration,
   ownership: ComponentOwnership,
@@ -345,19 +345,19 @@ function replaceComponent(target: Plan, key: string, incoming: Component): void 
   if (existingRules !== undefined && incomingRules !== undefined) {
     replaceValidationRules(
       incoming,
-      withIncomingReplacingByValidatedComponent(existingRules, incomingRules),
+      replaceRulesForSameValidatedComponent(existingRules, incomingRules),
     );
   }
 
   target.components[key] = incoming;
 }
 
-function addNewValidationRules(existing: Component | undefined, incoming: Component): void {
+function appendRulesForNewValidatedComponents(existing: Component | undefined, incoming: Component): void {
   const existingRules = validationRulesOf(existing);
   const incomingRules = validationRulesOf(incoming);
   if (existingRules === undefined || incomingRules === undefined) return;
 
-  acceptNewValidatedComponents(existingRules, incomingRules);
+  appendOnlyNewValidatedComponents(existingRules, incomingRules);
 }
 
 function validationContainerOf(component: Component | undefined): ValidationContainerComponent | undefined {
@@ -377,7 +377,7 @@ function replaceValidationRules(component: Component, validationRules: Component
   container.validationRules = validationRules;
 }
 
-function withIncomingReplacingByValidatedComponent(
+function replaceRulesForSameValidatedComponent(
   existingRules: ComponentValidation[],
   incomingRules: ComponentValidation[],
 ): ComponentValidation[] {
@@ -389,7 +389,7 @@ function withIncomingReplacingByValidatedComponent(
   return [...rulesByComponent.values()];
 }
 
-function acceptNewValidatedComponents(
+function appendOnlyNewValidatedComponents(
   existingRules: ComponentValidation[],
   incomingRules: ComponentValidation[],
 ): void {
