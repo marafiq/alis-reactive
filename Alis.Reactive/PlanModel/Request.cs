@@ -9,8 +9,13 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly RequestEndpoint _endpoint;
         private readonly RequestInput _input;
-        private readonly RequestLifecycle _lifecycle;
-        private readonly RequestParameters _parameters;
+        private readonly IReadOnlyList<Reaction> _before;
+        private readonly IReadOnlyList<ResponseHandler> _success;
+        private readonly IReadOnlyList<ResponseHandler> _error;
+        private readonly IReadOnlyList<Reaction> _complete;
+        private readonly RequestChain _chain;
+        private readonly IReadOnlyDictionary<string, ValueProducer> _headers;
+        private readonly IReadOnlyDictionary<string, ValueProducer> _routeParams;
         private readonly RequestValidationTarget _validationTarget;
 
         /// <summary>Gets the HTTP method (GET, POST, PUT, DELETE, PATCH).</summary>
@@ -22,50 +27,96 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the request body strategy. Bodiless requests use <see cref="NoRequestInput"/>.</summary>
         public RequestInput Input => _input;
         /// <summary>Gets reactions to execute before the request is sent.</summary>
-        public IReadOnlyList<Reaction> Before => _lifecycle.Before;
+        public IReadOnlyList<Reaction> Before => _before;
         /// <summary>Gets the success response handlers.</summary>
-        public IReadOnlyList<ResponseHandler> Success => _lifecycle.Success;
+        public IReadOnlyList<ResponseHandler> Success => _success;
         /// <summary>Gets the error response handlers.</summary>
-        public IReadOnlyList<ResponseHandler> Error => _lifecycle.Error;
+        public IReadOnlyList<ResponseHandler> Error => _error;
         /// <summary>Gets reactions to execute after the request completes regardless of outcome.</summary>
-        public IReadOnlyList<Reaction> Complete => _lifecycle.Complete;
+        public IReadOnlyList<Reaction> Complete => _complete;
         /// <summary>Gets the request chain: terminal or followed by another request.</summary>
-        public RequestChain Chain => _lifecycle.Chain;
+        public RequestChain Chain => _chain;
         /// <summary>Gets the custom HTTP headers. Each value is evaluated at request time.</summary>
-        public IReadOnlyDictionary<string, ValueProducer> Headers => _parameters.Headers;
+        public IReadOnlyDictionary<string, ValueProducer> Headers => _headers;
         /// <summary>Gets the URL template parameters. Each value is evaluated and URI-encoded before replacing placeholders in the URL.</summary>
-        public IReadOnlyDictionary<string, ValueProducer> RouteParams => _parameters.RouteParams;
+        public IReadOnlyDictionary<string, ValueProducer> RouteParams => _routeParams;
 
         private Request(
             RequestEndpoint endpoint,
             RequestInput input,
-            RequestLifecycle lifecycle,
-            RequestParameters parameters,
+            IReadOnlyList<Reaction> before,
+            IReadOnlyList<ResponseHandler> success,
+            IReadOnlyList<ResponseHandler> error,
+            IReadOnlyList<Reaction> complete,
+            RequestChain chain,
+            IReadOnlyDictionary<string, ValueProducer> headers,
+            IReadOnlyDictionary<string, ValueProducer> routeParams,
             RequestValidationTarget validationTarget)
         {
             _endpoint = endpoint ?? throw new System.ArgumentNullException(nameof(endpoint));
             _input = input ?? throw new System.ArgumentNullException(nameof(input));
-            _lifecycle = lifecycle ?? throw new System.ArgumentNullException(nameof(lifecycle));
-            _parameters = parameters ?? throw new System.ArgumentNullException(nameof(parameters));
+            _before = Snapshot(before);
+            _success = Snapshot(success);
+            _error = Snapshot(error);
+            _complete = Snapshot(complete);
+            _chain = chain ?? throw new System.ArgumentNullException(nameof(chain));
+            _headers = Snapshot(headers);
+            _routeParams = Snapshot(routeParams);
             _validationTarget = validationTarget ?? throw new System.ArgumentNullException(nameof(validationTarget));
         }
 
         internal static Request Create(
             RequestEndpoint endpoint,
             RequestInput input,
-            RequestLifecycle lifecycle,
-            RequestParameters parameters,
+            IReadOnlyList<Reaction> before,
+            IReadOnlyList<ResponseHandler> success,
+            IReadOnlyList<ResponseHandler> error,
+            IReadOnlyList<Reaction> complete,
+            RequestChain chain,
+            IReadOnlyDictionary<string, ValueProducer> headers,
+            IReadOnlyDictionary<string, ValueProducer> routeParams,
             RequestValidationTarget validationTarget) =>
-            new Request(endpoint, input, lifecycle, parameters, validationTarget);
+            new Request(
+                endpoint,
+                input,
+                before,
+                success,
+                error,
+                complete,
+                chain,
+                headers,
+                routeParams,
+                validationTarget);
 
         /// <summary>Returns a copy of this request with <see cref="Before"/> replaced.</summary>
         internal Request WithBefore(IReadOnlyList<Reaction> before) =>
             new Request(
                 _endpoint,
                 _input,
-                _lifecycle.WithBefore(before),
-                _parameters,
+                before,
+                _success,
+                _error,
+                _complete,
+                _chain,
+                _headers,
+                _routeParams,
                 _validationTarget);
+
+        private static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items)
+        {
+            var hasNoItems = items.Count == 0;
+            if (hasNoItems) return System.Array.Empty<T>();
+            return new List<T>(items);
+        }
+
+        private static IReadOnlyDictionary<string, ValueProducer> Snapshot(
+            IReadOnlyDictionary<string, ValueProducer> values)
+        {
+            if (values.Count == 0)
+                return new Dictionary<string, ValueProducer>();
+
+            return new Dictionary<string, ValueProducer>(values, System.StringComparer.Ordinal);
+        }
     }
 
     internal sealed class RequestEndpoint
@@ -81,84 +132,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static RequestEndpoint To(HttpMethodName method, RequestUrl url) =>
             new RequestEndpoint(method, url);
-    }
-
-    internal sealed class RequestLifecycle
-    {
-        private readonly RequestReactionStages _stages;
-        private readonly RequestChain _chain;
-
-        private RequestLifecycle(
-            RequestReactionStages stages,
-            RequestChain chain)
-        {
-            _stages = stages ?? throw new System.ArgumentNullException(nameof(stages));
-            _chain = chain ?? throw new System.ArgumentNullException(nameof(chain));
-        }
-
-        internal IReadOnlyList<Reaction> Before => _stages.Before;
-        internal IReadOnlyList<ResponseHandler> Success => _stages.Success;
-        internal IReadOnlyList<ResponseHandler> Error => _stages.Error;
-        internal IReadOnlyList<Reaction> Complete => _stages.Complete;
-        internal RequestChain Chain => _chain;
-
-        internal static RequestLifecycle Create(
-            RequestReactionStages stages,
-            RequestChain chain) =>
-            new RequestLifecycle(stages, chain);
-
-        internal RequestLifecycle WithBefore(IReadOnlyList<Reaction> before) =>
-            new RequestLifecycle(_stages.WithBefore(before), _chain);
-    }
-
-    internal sealed class RequestReactionStages
-    {
-        private readonly IReadOnlyList<Reaction> _before;
-        private readonly IReadOnlyList<ResponseHandler> _success;
-        private readonly IReadOnlyList<ResponseHandler> _error;
-        private readonly IReadOnlyList<Reaction> _complete;
-
-        private RequestReactionStages(
-            IReadOnlyList<Reaction> before,
-            IReadOnlyList<ResponseHandler> success,
-            IReadOnlyList<ResponseHandler> error,
-            IReadOnlyList<Reaction> complete)
-        {
-            _before = before ?? throw new System.ArgumentNullException(nameof(before));
-            _success = success ?? throw new System.ArgumentNullException(nameof(success));
-            _error = error ?? throw new System.ArgumentNullException(nameof(error));
-            _complete = complete ?? throw new System.ArgumentNullException(nameof(complete));
-        }
-
-        internal IReadOnlyList<Reaction> Before => _before;
-        internal IReadOnlyList<ResponseHandler> Success => _success;
-        internal IReadOnlyList<ResponseHandler> Error => _error;
-        internal IReadOnlyList<Reaction> Complete => _complete;
-
-        internal static RequestReactionStages From(
-            IReadOnlyList<Reaction> before,
-            IReadOnlyList<ResponseHandler> success,
-            IReadOnlyList<ResponseHandler> error,
-            IReadOnlyList<Reaction> complete) =>
-            new RequestReactionStages(
-                Snapshot(before),
-                Snapshot(success),
-                Snapshot(error),
-                Snapshot(complete));
-
-        internal RequestReactionStages WithBefore(IReadOnlyList<Reaction> before) =>
-            new RequestReactionStages(
-                Snapshot(before),
-                _success,
-                _error,
-                _complete);
-
-        private static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items)
-        {
-            var hasNoItems = items.Count == 0;
-            if (hasNoItems) return System.Array.Empty<T>();
-            return new List<T>(items);
-        }
     }
 
     [JsonConverter(typeof(WriteOnlyPolymorphicConverter<RequestChain>))]
@@ -211,106 +184,6 @@ namespace Alis.Reactive.PlanModel
             throw new System.InvalidOperationException(
                 "A response can declare only one chained request. " +
                 "To continue the sequence, attach the next Chained request to the existing follow-up request.");
-        }
-    }
-
-    internal sealed class RequestParameters
-    {
-        private readonly RequestHeaders _headers;
-        private readonly RequestRouteParameters _routeParams;
-
-        private RequestParameters(
-            RequestHeaders headers,
-            RequestRouteParameters routeParams)
-        {
-            _headers = headers ?? throw new System.ArgumentNullException(nameof(headers));
-            _routeParams = routeParams ?? throw new System.ArgumentNullException(nameof(routeParams));
-        }
-
-        internal IReadOnlyDictionary<string, ValueProducer> Headers => _headers.ForJson;
-        internal IReadOnlyDictionary<string, ValueProducer> RouteParams => _routeParams.ForJson;
-
-        internal static RequestParameters From(
-            IReadOnlyDictionary<string, ValueProducer> headers,
-            IReadOnlyDictionary<string, ValueProducer> routeParams) =>
-            new RequestParameters(
-                RequestHeaders.From(headers),
-                RequestRouteParameters.From(routeParams));
-    }
-
-    internal sealed class RequestHeaders
-    {
-        private readonly IReadOnlyDictionary<string, ValueProducer> _headers;
-
-        private RequestHeaders(IReadOnlyDictionary<string, ValueProducer> headers)
-        {
-            _headers = headers;
-        }
-
-        internal IReadOnlyDictionary<string, ValueProducer> ForJson => _headers;
-
-        internal static RequestHeaders Empty { get; } =
-            new RequestHeaders(new Dictionary<string, ValueProducer>());
-
-        internal static RequestHeaders From(IReadOnlyDictionary<string, ValueProducer> headers)
-        {
-            if (headers == null) throw new System.ArgumentNullException(nameof(headers));
-
-            var snapshot = new Dictionary<string, ValueProducer>(System.StringComparer.Ordinal);
-            foreach (var header in headers)
-                snapshot[HeaderName.Of(header.Key).Value] = RequireValue(header.Value, header.Key);
-
-            var requestHasNoHeaders = snapshot.Count == 0;
-            if (requestHasNoHeaders) return Empty;
-            return new RequestHeaders(snapshot);
-        }
-
-        private static ValueProducer RequireValue(ValueProducer value, string header)
-        {
-            if (value == null)
-                throw new System.ArgumentException(
-                    "Request header '" + header + "' must have a value producer.",
-                    nameof(value));
-
-            return value;
-        }
-    }
-
-    internal sealed class RequestRouteParameters
-    {
-        private readonly IReadOnlyDictionary<string, ValueProducer> _routeParams;
-
-        private RequestRouteParameters(IReadOnlyDictionary<string, ValueProducer> routeParams)
-        {
-            _routeParams = routeParams;
-        }
-
-        internal IReadOnlyDictionary<string, ValueProducer> ForJson => _routeParams;
-
-        internal static RequestRouteParameters Empty { get; } =
-            new RequestRouteParameters(new Dictionary<string, ValueProducer>());
-
-        internal static RequestRouteParameters From(IReadOnlyDictionary<string, ValueProducer> routeParams)
-        {
-            if (routeParams == null) throw new System.ArgumentNullException(nameof(routeParams));
-
-            var snapshot = new Dictionary<string, ValueProducer>(System.StringComparer.Ordinal);
-            foreach (var routeParam in routeParams)
-                snapshot[RouteParameterName.Of(routeParam.Key).Value] = RequireValue(routeParam.Value, routeParam.Key);
-
-            var requestHasNoRouteParameters = snapshot.Count == 0;
-            if (requestHasNoRouteParameters) return Empty;
-            return new RequestRouteParameters(snapshot);
-        }
-
-        private static ValueProducer RequireValue(ValueProducer value, string routeParam)
-        {
-            if (value == null)
-                throw new System.ArgumentException(
-                    "Route parameter '" + routeParam + "' must have a value producer.",
-                    nameof(value));
-
-            return value;
         }
     }
 

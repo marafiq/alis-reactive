@@ -125,8 +125,13 @@ namespace Alis.Reactive.Builders.Requests
             var request = Request.Create(
                 endpoint,
                 input,
-                ResolveRequestLifecycle(),
-                ResolveParameters(endpoint.Url),
+                Snapshot(_whileLoading),
+                Snapshot(_response.Draft.SuccessHandlers),
+                Snapshot(_response.Draft.ErrorHandlers),
+                Snapshot(_finally),
+                _response.Draft.Chain,
+                HeadersForRequest(),
+                RouteParametersFor(endpoint.Url),
                 _validation.Target);
 
             _validation.Register(_context, request);
@@ -154,33 +159,22 @@ namespace Alis.Reactive.Builders.Requests
                 sourceSelection);
         }
 
-        private RequestParameters ResolveParameters(RequestUrl url)
+        private IReadOnlyDictionary<string, ValueProducer> HeadersForRequest()
         {
             if (_gather == null)
-            {
-                var routeParameters = RequestRouteTemplate
+                return new Dictionary<string, ValueProducer>();
+
+            return _gather.Draft.HeadersForRequest();
+        }
+
+        private IReadOnlyDictionary<string, ValueProducer> RouteParametersFor(RequestUrl url)
+        {
+            if (_gather == null)
+                return RequestRouteTemplate
                     .For(url)
                     .Bind(new Dictionary<string, ValueProducer>());
 
-                return RequestParameters.From(
-                    new Dictionary<string, ValueProducer>(),
-                    routeParameters);
-            }
-
-            return RequestParameters.From(
-                _gather.Draft.HeadersForRequest(),
-                _gather.Draft.RouteParametersFor(url));
-        }
-
-        private RequestLifecycle ResolveRequestLifecycle()
-        {
-            return RequestLifecycle.Create(
-                RequestReactionStages.From(
-                    Snapshot(_whileLoading),
-                    Snapshot(_response.Draft.SuccessHandlers),
-                    Snapshot(_response.Draft.ErrorHandlers),
-                    Snapshot(_finally)),
-                _response.Draft.Chain);
+            return _gather.Draft.RouteParametersFor(url);
         }
 
         private static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items)
