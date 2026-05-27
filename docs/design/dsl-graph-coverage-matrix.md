@@ -45,7 +45,7 @@ across repeated vertical slices.
 
 | Capability group | Actual public DSL inputs from source | Required domain concept |
 | --- | --- | --- |
-| Plan lifetime | `Html.ReactivePlan<TModel>()`, `Html.ResolvePlan<TModel>()`, `Html.RenderPlan(plan)`, `plan.Render()`, `plan.RenderFormatted()` | Plan document, plan identity, root scope, partial scope, rendered plan artifact |
+| Plan lifetime | `Html.ReactivePlan<TModel>()`, `Html.ResolvePlan<TModel>()`, `Html.RenderPlan(plan)`, `plan.Render()`, `plan.RenderFormatted()` | Plan document, plan identity, root scope, partial scope, rendered plan document |
 | Plugin registration | `plan.RegisterPlugin(name, configure)`, `plan.RegisterPlugin(plugin)`, `plan.RegisterPlugin<TPlugin>()` | Browser plugin contract with typed properties, functions, commands |
 | Input field slot | `Html.InputField(plan, expr)`, `Html.InputField(plan, expr, configure)` | Model-bound component slot, controlled component id, validation display slot |
 | Trigger starts | `DomReady`, `CustomEvent`, `CustomEvent<TPayload>`, `ServerPush(url)`, `ServerPush(url,eventType)`, `ServerPush<TPayload>`, `SignalR`, `SignalR<TPayload>` | Trigger with optional event payload scope |
@@ -60,20 +60,20 @@ across repeated vertical slices.
 | Plugin command | `Plugin(plugin,member)`, `Plugin(plugin)`, `Plugin(PluginCommand)` followed by zero or more `Arg` overloads and `Fire()` | Plugin command reaction |
 | Plugin arguments | `Arg(response,path)`, `Arg(event,path)`, `Arg(TypedSource<T>)`, scalar literals, `ArgValue<T>` | Ordered invocation argument list from value expressions |
 | Validation display | `ValidationErrors(formId)` | Validation errors display reaction |
-| Partial injection | `Into(elementId)` | Inject success body into partial slot; partial plan artifact must be loadable/unloadable |
+| Partial injection | `Into(elementId)` | Inject success body into partial slot; partial plan document must be loadable/unloadable |
 | Conditions start | `When(event,path)`, `When(response,path)`, `When(TypedSource<T>)`, `Confirm(message)` | Condition graph with payload/object/url/plugin sources and confirm guard |
 | Condition operators | `Eq/NotEq/Gt/Gte/Lt/Lte`, `Truthy/Falsy`, `IsNull/NotNull`, `IsEmpty/NotEmpty`, `In/NotIn`, `Between`, `Contains/StartsWith/EndsWith/Matches/MinLength`, `ArrayContains`, source-vs-source comparisons | Compare condition with unary, literal, array/range, text, collection-item, or source right operand |
 | Condition composition | `And`, `Or`, nested `And(Func<ConditionStart, GuardBuilder>)`, nested `Or(Func<ConditionStart, GuardBuilder>)`, `Not`, `Then`, `ElseIf`, `Else` | Branch graph preserving authored order and one default case |
 | Request start | `Get`, `Post`, `Post(url,gather)`, `Put(url,gather)`, `Delete`, request builder `Get/Post/Put/Delete` | HTTP request plan with method and URL template |
 | Request stages | `Gather`, `AsJson`, `AsFormData`, `WhileLoading`, `Finally`, `Validate<TValidationSource>`, `Response` | Request input projection, body format, before graph, complete graph, validation target, response routes |
-| Gather targets | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, `Plugin`, `Include(component)`, `Include(TypedComponentSource)`, `Include(source,param)` | Request input assignments to body/query payload, headers, and route params |
+| Gather targets | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, `Plugin`, explicit component-id `Include(...)`, `Include(TypedComponentSource)`, `Include(source,param)` | Request input assignments to body/query payload, headers, and route params |
 | Response routes | `OnSuccess`, `OnSuccess<T>`, `OnError`, `OnError(status)`, `OnError<T>`, `OnError<T>(status)`, `Chained` | Response match with success/error payload scope and optional follow-up request |
 | Parallel requests | `Parallel(branches).OnAllSettled(pipeline)` | Concurrent request graph with all-settled completion graph |
 | Response payload source | `ResponseBody<T>.Read(expr)` plus direct `SetText(response,path)` | Success/error payload value expression |
 | Direct validation projection | `Field`, field rule methods, projection `When`, validation condition builders | Client validation projection with fields, rules, peer fields, and activation conditions |
 | FluentValidation client projection | `ProjectToClient`, `ReactiveValidator.WhenField*`, `WhenFields`, server-only `When/Unless/WhenAsync/UnlessAsync` | Adapter that extracts only client-declared rules and client-declared conditions; async/server-only conditions stay server-only |
 | App-level objects | `FusionToast`, `FusionConfirm`, `NativeDrawer`, `NativeLoader`, app-level `Component<TApp>()` | Layout browser object with fixed id and typed commands/properties |
-| Native ActionLink | `NativeActionLinkBuilder`, serializer, HTML extension | Inline plan artifact carried in attributes for behavior that starts from a rendered link |
+| Native ActionLink | `NativeActionLinkBuilder`, serializer, HTML extension | Inline plan payload carried in attributes for behavior that starts from a rendered link |
 | Fusion templates | `FusionTemplate`, `FusionTemplateBuilder`, `FusionConditionalBuilder`, `EventButton`, `ShowIf`, template expression helpers | Vendor template authoring; does not change runtime plan graph except event/action hook payloads |
 
 ## Component Vertical Slice Inventory
@@ -116,7 +116,7 @@ component extensions -> typed property set/read and method call/read
 | `FusionInputMask` | 6 | Syncfusion masked input object |
 | `FusionDateRangePicker` | 6 | Syncfusion range object with start/end/value reads |
 | `FusionAccordion` | 6 | Syncfusion accordion object and expanded event |
-| `NativeActionLink` | 5 | Inline action link plan artifact |
+| `NativeActionLink` | 5 | Inline action link plan payload |
 | `NativeLoader` | 5 | App-level loader object |
 | `FusionSwitch` | 5 | Syncfusion boolean input object |
 | `NativeDrawer` | 4 | App-level drawer object |
@@ -163,7 +163,7 @@ flowchart TD
 
 ## Public Method Family Matrix
 
-| Source family | Method families | Graph edge | Design artifact status |
+| Source family | Method families | Graph edge | Design evidence status |
 | --- | --- | --- | --- |
 | `PlanExtensions` | `ReactivePlan`, `ResolvePlan`, `RenderPlan` | plan DSL -> plan document -> JSON script | covered by `Reactive Plan Domain Design / Plan, Fragment, Input Slot` |
 | `HtmlExtensions` | `On` | plan -> trigger builder | covered by `Trigger` matrix |
