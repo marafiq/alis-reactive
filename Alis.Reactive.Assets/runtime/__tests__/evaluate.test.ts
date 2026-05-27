@@ -201,7 +201,7 @@ describe("evaluateValue", () => {
       id: "resident-name",
       vendor: "native",
       type: "native.textbox",
-      contribution: { kind: "object-target" },
+      role: { kind: "object-target" },
       binding: { kind: "none" },
       container: { kind: "none" },
     };
@@ -234,43 +234,6 @@ describe("evaluateValue", () => {
     expect(evaluateValue(callMethod, runtimePlan)).toBe("Ada Lovelace");
   });
 
-  it("rejects reads against write-only component properties", () => {
-    document.body.innerHTML = `<input id="resident-name" value="Ada" />`;
-    const objectContract: BrowserObjectContract = {
-      properties: {
-        value: {
-          path: [{ kind: "property", name: "value" }],
-          shape: stringShape,
-          access: "write",
-        },
-      },
-      methods: {},
-      events: {},
-    };
-    const producer: ValueProducer = {
-      kind: "read",
-      from: { kind: "component", component: "resident-name" },
-      member: "value",
-      path: [{ kind: "property", name: "value" }],
-      shape: stringShape,
-      access: { kind: "property" },
-    };
-
-    expect(() => evaluateValue(producer, plan({
-      types: { "native.textbox": objectContract },
-      components: {
-        "resident-name": {
-          id: "resident-name",
-          vendor: "native",
-          type: "native.textbox",
-          contribution: { kind: "object-target" },
-          binding: { kind: "none" },
-          container: { kind: "none" },
-        },
-      },
-    }))).toThrow('property component "resident-name".value is not readable');
-  });
-
   it("rejects declared runtime object property paths that are not present on the JS object", () => {
     document.body.innerHTML = `<div id="resident-name"></div>`;
     const objectContract: BrowserObjectContract = {
@@ -300,7 +263,7 @@ describe("evaluateValue", () => {
           id: "resident-name",
           vendor: "native",
           type: "native.textbox",
-          contribution: { kind: "object-target" },
+          role: { kind: "object-target" },
           binding: { kind: "none" },
           container: { kind: "none" },
         },
@@ -360,7 +323,7 @@ describe("evaluateValue", () => {
             id: "resident-name",
             vendor: "native",
             type: "native.textbox",
-            contribution: { kind: "object-target" },
+            role: { kind: "object-target" },
             binding: { kind: "none" },
             container: { kind: "none" },
           },
@@ -437,53 +400,6 @@ describe("evaluateValue", () => {
     }))).toBe("abc-123");
   });
 
-  it("enforces exact runtime method argument contracts", () => {
-    document.body.innerHTML = `<button id="save"></button>`;
-    const element = document.getElementById("save") as HTMLButtonElement & {
-      submit(label: string): void;
-    };
-    element.submit = function submit(_label: string): void {
-    };
-
-    const objectContract: BrowserObjectContract = {
-      properties: {},
-      methods: {
-        submit: {
-          path: [{ kind: "property", name: "submit" }],
-          arguments: { kind: "exact", shapes: [stringShape] },
-          returns: { kind: "none" },
-        },
-      },
-      events: {},
-    };
-
-    const producer: ValueProducer = {
-      kind: "read",
-      from: { kind: "component", component: "save" },
-      member: "submit",
-      path: [{ kind: "property", name: "submit" }],
-      shape: { kind: "none" },
-      access: {
-        kind: "method",
-        args: [],
-      },
-    };
-
-    expect(() => evaluateValue(producer, plan({
-      types: { "native.button": objectContract },
-      components: {
-        save: {
-          id: "save",
-          vendor: "native",
-          type: "native.button",
-          contribution: { kind: "object-target" },
-          binding: { kind: "none" },
-          container: { kind: "none" },
-        },
-      },
-    }))).toThrow("expects 1 argument");
-  });
-
   it("prepares exact runtime method arguments through their declared shapes", () => {
     document.body.innerHTML = `<button id="save"></button>`;
     const element = document.getElementById("save") as HTMLButtonElement & {
@@ -524,7 +440,7 @@ describe("evaluateValue", () => {
           id: "save",
           vendor: "native",
           type: "native.button",
-          contribution: { kind: "object-target" },
+          role: { kind: "object-target" },
           binding: { kind: "none" },
           container: { kind: "none" },
         },

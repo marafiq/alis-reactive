@@ -164,6 +164,47 @@ public sealed class WhenGatherDslBuildsRequestInput
         });
     }
 
+    [Test]
+    public void typed_plugin_descriptors_project_to_the_shared_browser_object_contract()
+    {
+        var plan = PlanExtensions.ReactivePlan(Html);
+        var plugin = plan.RegisterPlugin<GatherProjectionPlugin>();
+
+        HtmlExtensions.On(Html, plan, trigger =>
+            trigger.CustomEvent<GatherProjectionEvent>("plugin", (args, pipeline) =>
+            {
+                TypedPluginSource<string> slug =
+                    pipeline.Plugin(plugin.Slugify)
+                        .Arg(args, x => x.Filter);
+                var token = pipeline.Plugin(plugin.Token);
+
+                pipeline.DispatchWith<GatherProjectionPluginPayload>("plugin-projected", payload => payload
+                    .Set(x => x.Slug, slug)
+                    .Set(x => x.Token, token));
+
+                pipeline.Plugin(plugin.Track)
+                    .Arg(slug)
+                    .Fire();
+            }));
+
+        using var doc = JsonDocument.Parse(plan.RenderFormatted());
+        var pluginType = doc.RootElement
+            .GetProperty("types")
+            .GetProperty("plugin.gatherProjection");
+        var dispatchSourceKinds = AllValueSources(doc.RootElement)
+            .Select(SourceKindFor)
+            .Where(x => x == "plugin")
+            .ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(pluginType.GetProperty("properties").TryGetProperty("token", out _), Is.True);
+            Assert.That(pluginType.GetProperty("methods").TryGetProperty("slugify", out _), Is.True);
+            Assert.That(pluginType.GetProperty("methods").TryGetProperty("track", out _), Is.True);
+            Assert.That(dispatchSourceKinds, Has.Length.GreaterThanOrEqualTo(3));
+        });
+    }
+
     private static JsonElement SingleGatherInput(JsonElement root)
     {
         var inputs = AllGatherInputs(root);
@@ -200,6 +241,44 @@ public sealed class WhenGatherDslBuildsRequestInput
                     CollectGatherInputs(item, inputs);
                 return;
         }
+    }
+
+    private static List<JsonElement> AllValueSources(JsonElement root)
+    {
+        var sources = new List<JsonElement>();
+        CollectValueSources(root, sources);
+        return sources;
+    }
+
+    private static void CollectValueSources(JsonElement element, List<JsonElement> sources)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Object:
+                if (element.TryGetProperty("kind", out var kind)
+                    && kind.GetString() == "read"
+                    && element.TryGetProperty("from", out var source))
+                {
+                    sources.Add(source);
+                }
+
+                foreach (var property in element.EnumerateObject())
+                    CollectValueSources(property.Value, sources);
+                return;
+
+            case JsonValueKind.Array:
+                foreach (var item in element.EnumerateArray())
+                    CollectValueSources(item, sources);
+                return;
+        }
+    }
+
+    private static string SourceKindFor(JsonElement source)
+    {
+        var kind = source.GetProperty("kind").GetString();
+        if (kind != "payload") return kind!;
+
+        return "payload:" + source.GetProperty("scope").GetString();
     }
 
     private sealed record GatherAssignment(
@@ -243,5 +322,26 @@ public sealed class WhenGatherDslBuildsRequestInput
     private sealed class GatherProjectionResidentResponse
     {
         public int ResidentId { get; set; }
+    }
+
+    private sealed class GatherProjectionPluginPayload
+    {
+        public string Slug { get; set; } = "";
+        public string Token { get; set; } = "";
+    }
+
+    private sealed class GatherProjectionPlugin : ReactivePlugin
+    {
+        public GatherProjectionPlugin()
+            : base("gatherProjection")
+        {
+            Token = Property<string>("token");
+            Slugify = Function<string, string>("slugify");
+            Track = Command<string>("track");
+        }
+
+        public PluginProperty<string> Token { get; }
+        public PluginFunction<string> Slugify { get; }
+        public PluginCommand Track { get; }
     }
 }
