@@ -7,7 +7,7 @@ namespace Alis.Reactive.Builders
     {
         /// <summary>Starts an HTTP GET request to the specified URL.</summary>
         /// <param name="url">The request URL, which may contain template placeholders.</param>
-        /// <returns>An HTTP request builder for configuring gather, validation, and response handling.</returns>
+        /// <returns>An HTTP request builder for configuring gather, validation, and response routing.</returns>
         public HttpRequestBuilder<TModel> Get(string url)
         {
             return _draft.BeginHttp(Context).Get(url);
@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Starts an HTTP POST request to the specified URL.</summary>
         /// <param name="url">The request URL, which may contain template placeholders.</param>
-        /// <returns>An HTTP request builder for configuring gather, validation, and response handling.</returns>
+        /// <returns>An HTTP request builder for configuring gather, validation, and response routing.</returns>
         public HttpRequestBuilder<TModel> Post(string url)
         {
             return _draft.BeginHttp(Context).Post(url);
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Starts an HTTP DELETE request to the specified URL.</summary>
         /// <param name="url">The request URL, which may contain template placeholders.</param>
-        /// <returns>An HTTP request builder for configuring gather, validation, and response handling.</returns>
+        /// <returns>An HTTP request builder for configuring gather, validation, and response routing.</returns>
         public HttpRequestBuilder<TModel> Delete(string url)
         {
             return _draft.BeginHttp(Context).Delete(url);

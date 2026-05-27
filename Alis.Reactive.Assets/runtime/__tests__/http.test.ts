@@ -245,7 +245,7 @@ describe("executeRequest HTTP lifecycle", () => {
     expect(secondInit.headers).toMatchObject({ "X-Hop": "second" });
   });
 
-  it("lets a request declared inside a success handler gather from the previous response", async () => {
+  it("lets a request declared inside a success route gather from the previous response", async () => {
     document.body.innerHTML = `
       <span id="resident"></span>
       <span id="facility"></span>

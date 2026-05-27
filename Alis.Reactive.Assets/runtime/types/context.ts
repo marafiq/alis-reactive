@@ -9,7 +9,7 @@ export interface ExecContext {
    */
   readonly event?: unknown;
   /**
-   * HTTP response body — set by the request handler on success or error.
+   * HTTP response body — set by HTTP response routing on success or error.
    * Resolved by PayloadSource with scope "success" or "error".
    */
   readonly response?: unknown;

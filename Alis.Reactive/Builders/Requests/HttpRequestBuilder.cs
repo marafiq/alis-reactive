@@ -5,7 +5,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Builds an HTTP request with optional gather, validation, response handling, and chaining.
+    /// Builds an HTTP request with optional gather, validation, response routing, and chaining.
     /// </summary>
     /// <remarks>
     /// Obtained via <c>p.Get("/url")</c>, <c>p.Post("/url")</c>, etc.

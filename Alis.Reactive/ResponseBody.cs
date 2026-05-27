@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Provides typed access to HTTP response payload properties in success and error handlers.
+    /// Provides typed access to HTTP response payload properties in success and error routes.
     /// </summary>
     /// <remarks>
     /// <para>
