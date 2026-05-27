@@ -142,7 +142,7 @@ function displayComponent(id: string): ComponentObject {
     id,
     vendor: "native",
     type: "native.input",
-    contribution: { kind: "object-target" },
+    role: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };
@@ -153,7 +153,7 @@ function fusionComponent(id: string): ComponentObject {
     id,
     vendor: "fusion",
     type: "fusion.fake",
-    contribution: { kind: "object-target" },
+    role: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };

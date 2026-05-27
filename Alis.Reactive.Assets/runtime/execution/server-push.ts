@@ -80,7 +80,7 @@ export function wireServerPush(
   signal?: AbortSignal,
 ): void {
   const managed = getOrCreate(trigger.url);
-  const eventName = ServerPushEventName.from(trigger).value;
+  const eventName = serverPushEventName(trigger);
 
   const handler = (e: MessageEvent) => {
     const evt: Record<string, unknown> = JSON.parse(e.data);
@@ -119,13 +119,9 @@ function releaseServerPushSubscription(
   log.debug("connection.closed", { url: wiredBehavior.trigger.url });
 }
 
-class ServerPushEventName {
-  private constructor(readonly value: string) {}
+function serverPushEventName(trigger: ServerPushTrigger): string {
+  const filter = trigger.eventFilter;
+  if (filter.kind === "any") return "message";
 
-  static from(trigger: ServerPushTrigger): ServerPushEventName {
-    const filter = trigger.eventFilter;
-    if (filter.kind === "any") return new ServerPushEventName("message");
-
-    return new ServerPushEventName(filter.event);
-  }
+  return filter.event;
 }

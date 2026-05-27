@@ -7,7 +7,7 @@ import { catchAsyncReactionFailure, executeReaction } from "./execute";
 import { showRetryIndicators, removeRetryIndicators } from "./retry-indicator";
 import { scope } from "../core/trace";
 import { ExecutionContext } from "../domain/execution-context";
-import { ObjectRecord } from "../domain/object-record";
+import { objectRecordFrom } from "../domain/object-record";
 
 const log = scope("signalr");
 
@@ -21,21 +21,22 @@ interface ManagedConnection {
 
 // Connection pool — singleton HubConnection per hubUrl
 const hubs = new Map<string, ManagedConnection>();
+const reconnectDelays = [0, 2000, 10000, 30000] as const;
 
 async function startWithRetry(connection: signalR.HubConnection, hubUrl: string): Promise<void> {
-  for (let attempt = 0; attempt < ReconnectDelaySchedule.attemptCount; attempt++) {
+  for (let attempt = 0; attempt < reconnectDelays.length; attempt++) {
     try {
       await connection.start();
       log.info("connected", { hubUrl });
       return;
     } catch (err) {
-      const delay = ReconnectDelaySchedule.forAttempt(attempt);
+      const delay = reconnectDelayForAttempt(attempt);
       log.warn("start.retry", { hubUrl, attempt: attempt + 1, delay, error: String(err) });
       await new Promise(r => setTimeout(r, delay));
     }
   }
 
-  log.error("start.failed", { hubUrl, attempts: ReconnectDelaySchedule.attemptCount });
+  log.error("start.failed", { hubUrl, attempts: reconnectDelays.length });
   const managed = hubs.get(hubUrl);
   if (managed) showRetryIndicators(hubUrl, managed.targetIds, () => retryConnection(hubUrl));
 }
@@ -77,7 +78,7 @@ function getOrCreate(hubUrl: string): ManagedConnection {
   const targetIds = new Set<string>();
 
   connection.onreconnecting(err => {
-    log.warn("connection.reconnecting", { hubUrl, error: SignalRErrorMessage.from(err) });
+    log.warn("connection.reconnecting", { hubUrl, error: signalRErrorMessage(err) });
   });
 
   connection.onreconnected(connectionId => {
@@ -93,7 +94,7 @@ function getOrCreate(hubUrl: string): ManagedConnection {
       log.debug("connection.stopped", { hubUrl });
       hubs.delete(hubUrl);
     } else {
-      log.warn("connection.disconnected", { hubUrl, error: SignalRErrorMessage.from(err) });
+      log.warn("connection.disconnected", { hubUrl, error: signalRErrorMessage(err) });
       showRetryIndicators(hubUrl, targetIds, () => retryConnection(hubUrl));
     }
   });
@@ -116,7 +117,7 @@ export function wireSignalR(
   const { connection } = managed;
 
   const handler = (...args: unknown[]) => {
-    const evt = SignalRInvocationPayload.from(args, trigger);
+    const evt = signalRInvocationPayload(args, trigger);
     log.debug("method.received", { hubUrl: trigger.hubUrl, method: trigger.method });
     catchAsyncReactionFailure(
       executeReaction(reaction, plan, ExecutionContext.event(evt).raw),
@@ -143,44 +144,32 @@ function releaseSignalRSubscription(hubUrl: string, managed: ManagedConnection):
   hubs.delete(hubUrl);
 }
 
-class ReconnectDelaySchedule {
-  private static readonly delays = [0, 2000, 10000, 30000];
+function reconnectDelayForAttempt(attempt: number): number {
+  const configuredDelay = reconnectDelays[attempt];
+  if (configuredDelay !== undefined) return configuredDelay;
 
-  static get attemptCount(): number {
-    return ReconnectDelaySchedule.delays.length;
-  }
-
-  static forAttempt(attempt: number): number {
-    const configuredDelay = ReconnectDelaySchedule.delays[attempt];
-    if (configuredDelay !== undefined) return configuredDelay;
-
-    throw new Error(`[alis:signalr] retry attempt ${attempt} is outside the reconnect delay schedule`);
-  }
+  throw new Error(`[alis:signalr] retry attempt ${attempt} is outside the reconnect delay schedule`);
 }
 
-class SignalRErrorMessage {
-  static from(error: unknown): string | undefined {
-    const errorWasProvided = error !== null && error !== undefined;
-    if (!errorWasProvided) return undefined;
+function signalRErrorMessage(error: unknown): string | undefined {
+  const errorWasProvided = error !== null && error !== undefined;
+  if (!errorWasProvided) return undefined;
 
-    return String(error);
-  }
+  return String(error);
 }
 
-class SignalRInvocationPayload {
-  static from(args: unknown[], trigger: SignalRTrigger): Record<string, unknown> {
-    const payload = args[0];
-    const payloadIsSingleArgument = args.length === 1;
-    const payloadRecord = ObjectRecord.tryFrom(payload);
-    const payloadMatchesContract = payloadIsSingleArgument && payloadRecord !== undefined;
+function signalRInvocationPayload(args: unknown[], trigger: SignalRTrigger): Record<string, unknown> {
+  const payload = args[0];
+  const payloadIsSingleArgument = args.length === 1;
+  const payloadRecord = objectRecordFrom(payload);
+  const payloadMatchesContract = payloadIsSingleArgument && payloadRecord !== undefined;
 
-    if (!payloadMatchesContract) {
-      throw new Error(
-        `[alis:signalr] ${trigger.hubUrl}/${trigger.method}: ` +
-        `expected single object argument, got ${args.length} args (first: ${typeof payload})`
-      );
-    }
-
-    return payloadRecord.raw;
+  if (!payloadMatchesContract) {
+    throw new Error(
+      `[alis:signalr] ${trigger.hubUrl}/${trigger.method}: ` +
+      `expected single object argument, got ${args.length} args (first: ${typeof payload})`
+    );
   }
+
+  return payloadRecord;
 }

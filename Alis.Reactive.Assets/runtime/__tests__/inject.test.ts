@@ -16,7 +16,7 @@ function component(id: string, type = `native.element.${id}`): ComponentObject {
     id,
     vendor: "native",
     type,
-    contribution: { kind: "object-target" },
+    role: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };

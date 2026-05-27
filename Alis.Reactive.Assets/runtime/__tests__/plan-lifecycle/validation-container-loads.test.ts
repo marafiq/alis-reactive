@@ -9,7 +9,7 @@ import {
   validationRule,
 } from "../support/plan-lifecycle-fixtures";
 
-describe("validation container contributions", () => {
+describe("validation container loads", () => {
   it("accepts matching validated component ids while adding new partial rules", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
@@ -174,6 +174,52 @@ describe("validation container contributions", () => {
       "first-name",
       "phone",
     ]);
+  });
+
+  it("unloading one validation extension keeps duplicate field rules from a later active slot", () => {
+    const browserPlans = new AppliedBrowserPlans();
+    const { hooks } = mergeHooks();
+    const planId = "Resident.Root";
+
+    browserPlans.register({
+      ...rootPlan(planId),
+      components: {
+        "resident-form": validationContainer("resident-form", [
+          validationRule("first-name"),
+        ]),
+      },
+    });
+
+    browserPlans.loadPartialSlot("address-slot", [
+      partialPlan(planId, {
+        components: {
+          "resident-form": validationContainer("resident-form", [
+            validationRule("city", "address city required"),
+          ]),
+        },
+      }),
+    ], hooks);
+    browserPlans.loadPartialSlot("contact-slot", [
+      partialPlan(planId, {
+        components: {
+          "resident-form": validationContainer("resident-form", [
+            validationRule("city", "contact city required"),
+          ]),
+        },
+      }),
+    ], hooks);
+
+    const beforeUnload = expectValidationContainer(browserPlans.get(planId)!.components["resident-form"].container);
+    expect(beforeUnload.validationRules.map(rule => rule.component)).toEqual(["first-name", "city"]);
+    expect(beforeUnload.validationRules.find(rule => rule.component === "city")?.rules[0]?.message)
+      .toBe("address city required");
+
+    browserPlans.unloadPartialSlot("address-slot");
+
+    const afterUnload = expectValidationContainer(browserPlans.get(planId)!.components["resident-form"].container);
+    expect(afterUnload.validationRules.map(rule => rule.component)).toEqual(["first-name", "city"]);
+    expect(afterUnload.validationRules.find(rule => rule.component === "city")?.rules[0]?.message)
+      .toBe("contact city required");
   });
 });
 

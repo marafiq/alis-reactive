@@ -89,7 +89,7 @@ function component(id: string, type: string): ComponentObject {
     id,
     vendor: "native",
     type,
-    contribution: { kind: "object-target" },
+    role: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };

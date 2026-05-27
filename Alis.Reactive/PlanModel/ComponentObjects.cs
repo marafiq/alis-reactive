@@ -48,7 +48,7 @@ namespace Alis.Reactive.PlanModel
         internal ComponentKey EnsureComponent(
             string componentId,
             string vendor,
-            ComponentRole contribution)
+            ComponentRole role)
         {
             var id = ComponentId.Of(componentId);
             var componentVendor = ComponentVendor.From(vendor);
@@ -69,7 +69,7 @@ namespace Alis.Reactive.PlanModel
             else
             {
                 _objectContracts.EnsureEmpty(typeKey);
-                _components[id.Value] = CreateUnregisteredComponent(id, componentVendor, typeKey, contribution);
+                _components[id.Value] = CreateUnregisteredComponent(id, componentVendor, typeKey, role);
             }
 
             return ComponentKey.Of(id.Value);
@@ -162,22 +162,22 @@ namespace Alis.Reactive.PlanModel
             ComponentId componentId,
             ComponentVendor vendor,
             TypeKey typeKey,
-            ComponentRole contribution)
+            ComponentRole role)
         {
-            if (contribution == ComponentRole.ObjectTarget)
+            if (role == ComponentRole.ObjectTarget)
                 return ComponentObject.Element(
                     componentId.Value,
                     vendor.Value,
                     typeKey.Value);
 
-            if (contribution == ComponentRole.LayoutObject)
+            if (role == ComponentRole.LayoutObject)
                 return ComponentObject.LayoutObject(
                     componentId.Value,
                     vendor.Value,
                     typeKey.Value);
 
             throw new InvalidOperationException(
-                $"Component '{componentId.Value}' cannot be created as '{contribution.Kind}' without a render-time registration.");
+                $"Component '{componentId.Value}' cannot be created as '{role.Kind}' without a render-time registration.");
         }
     }
 }

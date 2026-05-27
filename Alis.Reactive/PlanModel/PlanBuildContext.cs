@@ -63,13 +63,13 @@ namespace Alis.Reactive.PlanModel
             EnsureComponent(componentId, vendor, ComponentRole.ObjectTarget);
 
         /// <summary>
-        /// Ensures a component is registered with the contribution intent that caused the reference.
+        /// Ensures a component is registered with the browser-object role that caused the reference.
         /// </summary>
         internal ComponentKey EnsureComponent(
             string componentId,
             string vendor,
-            ComponentRole contribution) =>
-            _components.EnsureComponent(componentId, vendor, contribution);
+            ComponentRole role) =>
+            _components.EnsureComponent(componentId, vendor, role);
 
         /// <summary>Returns the render-time registration for a component value read.</summary>
         internal ComponentRegistration RequireRegistrationById(

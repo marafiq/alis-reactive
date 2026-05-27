@@ -35,7 +35,7 @@ export function wireBehavior(
   plan: Plan,
   signal?: AbortSignal
 ): void {
-  const opts = ListenerOptions.from(signal);
+  const opts = listenerOptions(signal);
 
   switch (trigger.kind) {
     case "page-ready":
@@ -52,7 +52,7 @@ export function wireBehavior(
       const source = `document-event:${trigger.event}`;
       log.debug("document-event.listening", { event: trigger.event });
       document.addEventListener(trigger.event, (e: Event) => {
-        const context = ExecutionContext.event(DocumentEventPayload.from(e));
+        const context = ExecutionContext.event(documentEventPayload(e));
         runReaction(reaction, plan, context, source);
       }, opts);
       break;
@@ -90,20 +90,16 @@ export function wireBehavior(
   }
 }
 
-class ListenerOptions {
-  static from(signal: AbortSignal | undefined): AddEventListenerOptions | undefined {
-    if (signal === undefined) return undefined;
+function listenerOptions(signal: AbortSignal | undefined): AddEventListenerOptions | undefined {
+  if (signal === undefined) return undefined;
 
-    return { signal };
-  }
+  return { signal };
 }
 
-class DocumentEventPayload {
-  static from(event: Event): unknown {
-    const detail = (event as CustomEvent).detail;
-    const eventCarriesDetail = detail !== null && detail !== undefined;
-    if (eventCarriesDetail) return detail;
+function documentEventPayload(event: Event): unknown {
+  const detail = (event as CustomEvent).detail;
+  const eventCarriesDetail = detail !== null && detail !== undefined;
+  if (eventCarriesDetail) return detail;
 
-    return event;
-  }
+  return event;
 }

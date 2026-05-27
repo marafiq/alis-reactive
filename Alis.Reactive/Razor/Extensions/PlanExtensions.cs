@@ -10,7 +10,7 @@ namespace Alis.Reactive.Native.Extensions
     /// <remarks>
     /// Every view must call <see cref="ReactivePlan{TModel}(IHtmlHelper{TModel})"/> at the start of view and
     /// <see cref="RenderPlan{TModel}"/> at the end of view. Partial views that share the same
-    /// model and need to contribute to the same plan use
+    /// model and need to merge into the same browser plan use
     /// <see cref="ResolvePlan{TModel}(IHtmlHelper{TModel})"/> instead.
     /// If a partial has its own independent model, treat it as
     /// its own view with <c>ReactivePlan</c> and <c>RenderPlan</c>.
@@ -37,8 +37,8 @@ namespace Alis.Reactive.Native.Extensions
         }
 
         /// <summary>
-        /// Creates a <see cref="ReactivePlan{TModel}"/> for a partial view that contributes
-        /// to an existing plan.
+        /// Creates a <see cref="ReactivePlan{TModel}"/> for a partial view that merges
+        /// into an existing browser plan.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -56,7 +56,7 @@ namespace Alis.Reactive.Native.Extensions
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
             where TModel : class
         {
-            return new ReactivePlan<TModel>(ReactivePlanScope.PartialContribution);
+            return new ReactivePlan<TModel>(ReactivePlanScope.PartialView);
         }
 
         /// <summary>

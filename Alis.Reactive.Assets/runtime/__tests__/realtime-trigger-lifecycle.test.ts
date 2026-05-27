@@ -120,7 +120,7 @@ function displayComponent(id: string): ComponentObject {
     id,
     vendor: "native",
     type: "native.text",
-    contribution: { kind: "object-target" },
+    role: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };

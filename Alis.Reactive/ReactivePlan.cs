@@ -109,8 +109,8 @@ namespace Alis.Reactive
         internal static ReactivePlanScope RootView { get; } =
             new RootViewPlanScope();
 
-        internal static ReactivePlanScope PartialContribution { get; } =
-            new PartialContributionPlanScope();
+        internal static ReactivePlanScope PartialView { get; } =
+            new PartialViewPlanScope();
 
         internal abstract bool IsPartial { get; }
 
@@ -132,7 +132,7 @@ namespace Alis.Reactive
         }
     }
 
-    internal sealed class PartialContributionPlanScope : ReactivePlanScope
+    internal sealed class PartialViewPlanScope : ReactivePlanScope
     {
         internal override bool IsPartial => true;
 

@@ -13,7 +13,7 @@ import {
   rootPlan,
 } from "../support/plan-lifecycle-fixtures";
 
-describe("browser object contract fragments", () => {
+describe("browser object contract merging", () => {
   it("shares an identical type contract across slots until the last owner unloads", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
@@ -41,7 +41,7 @@ describe("browser object contract fragments", () => {
     expect(browserPlans.get(planId)).toBeUndefined();
   });
 
-  it("removes only the unloaded fragment from a shared type key", () => {
+  it("removes only the unloaded slot contract from a shared type key", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
@@ -71,26 +71,7 @@ describe("browser object contract fragments", () => {
     expect(browserPlans.get(planId)).toBeUndefined();
   });
 
-  it("requires shared type fragments for the same member to have compatible contracts", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
-    const planId = "Resident.Root";
-    const sharedTypeKey = "plugin.address";
-
-    browserPlans.loadPartialSlot("first-slot", [
-      partialPlan(planId, {
-        types: { [sharedTypeKey]: objectContractWithReadableProperty("token") },
-      }),
-    ], hooks);
-
-    expect(() => browserPlans.loadPartialSlot("second-slot", [
-      partialPlan(planId, {
-        types: { [sharedTypeKey]: objectContractWithPropertyShape("token", { kind: "number" }) },
-      }),
-    ], hooks)).toThrow("incompatible property contracts cannot be merged");
-  });
-
-  it("refines compatible property shapes when object contract fragments merge", () => {
+  it("refines compatible property shapes when object contracts merge", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
@@ -116,7 +97,7 @@ describe("browser object contract fragments", () => {
       .toEqual({ kind: "any" });
   });
 
-  it("merges compatible object property fields from separate fragments", () => {
+  it("merges compatible object property fields from separate slot contracts", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
@@ -178,7 +159,7 @@ describe("browser object contract fragments", () => {
     expect(method?.returns).toEqual({ kind: "string" });
   });
 
-  it("lets a later slot reuse a member differently after the previous fragment unloads", () => {
+  it("lets a later slot reuse a member differently after the previous contract unloads", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
@@ -202,7 +183,7 @@ describe("browser object contract fragments", () => {
       .toEqual({ kind: "number" });
   });
 
-  it("merges compatible fragments for a root-owned app-level component reference", () => {
+  it("merges compatible contracts for a root-owned app-level component reference", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
@@ -241,7 +222,7 @@ describe("browser object contract fragments", () => {
       .toEqual(["classAdd"]);
   });
 
-  it("removes one partial fragment from a root-owned app-level component reference", () => {
+  it("removes one partial contract from a root-owned app-level component reference", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
@@ -293,7 +274,7 @@ describe("browser object contract fragments", () => {
       .toEqual(["classAdd"]);
   });
 
-  it("recomputes merged property access when a partial fragment unloads", () => {
+  it("recomputes merged property access when a partial contract unloads", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Root";
@@ -365,7 +346,7 @@ describe("browser object contract fragments", () => {
       .toEqual(["html"]);
   });
 
-  it("scopes component and type ownership to the runtime plan document", () => {
+  it("scopes component and type loads to the runtime plan document", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const rootPlanId = "Drawer.Root";

@@ -1,5 +1,5 @@
 import type { ExecContext, PayloadSource } from "../types";
-import { ObjectRecord } from "./object-record";
+import { objectRecordFrom } from "./object-record";
 
 export type ServerValidationPayload =
   | { readonly kind: "available"; readonly response: unknown }
@@ -65,10 +65,10 @@ export class ExecutionContext {
   }
 
   serverValidationPayload(): ServerValidationPayload {
-    const response = ObjectRecord.tryFrom(this.values?.response);
+    const response = objectRecordFrom(this.values?.response);
     if (response === undefined) return absentServerValidationPayload;
 
-    return { kind: "available", response: response.raw };
+    return { kind: "available", response };
   }
 
   private requireValues(source: PayloadSource): ExecContext {

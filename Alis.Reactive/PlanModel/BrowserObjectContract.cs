@@ -150,15 +150,14 @@ namespace Alis.Reactive.PlanModel
         {
             if (incoming == null) throw new System.ArgumentNullException(nameof(incoming));
 
-            var mergedReturn = ShapeContractCompatibility.MergeContracts(Returns, incoming.Returns);
-            if (mergedReturn.IsConflict)
+            if (!ShapeContractCompatibility.TryMergeContracts(Returns, incoming.Returns, out var mergedReturn))
                 throw new System.InvalidOperationException(
                     $"Method '{name.Value}' registered with return shape '{Returns.DescribeContract()}' " +
                     $"but re-registered with conflicting return shape '{incoming.Returns.DescribeContract()}'.");
 
             return new MethodSignature(
                 _arguments.Merge(name, incoming._arguments),
-                mergedReturn.Shape);
+                mergedReturn);
         }
 
         internal bool IsSameContract(MethodSignature other)
@@ -282,12 +281,11 @@ namespace Alis.Reactive.PlanModel
             var merged = new List<Shape>(existing._shapes.Count);
             for (var i = 0; i < existing._shapes.Count; i++)
             {
-                var shape = ShapeContractCompatibility.MergeContracts(existing._shapes[i], _shapes[i]);
-                if (shape.IsConflict)
+                if (!ShapeContractCompatibility.TryMergeContracts(existing._shapes[i], _shapes[i], out var mergedShape))
                     throw new System.InvalidOperationException(
                         $"Method '{name.Value}' argument {i} registered with shape '{existing._shapes[i].DescribeContract()}' " +
                         $"but re-registered with conflicting shape '{_shapes[i].DescribeContract()}'.");
-                merged.Add(shape.Shape);
+                merged.Add(mergedShape);
             }
 
             return Exact(merged);
@@ -367,13 +365,12 @@ namespace Alis.Reactive.PlanModel
                     $"Property '{incoming.Name.Value}' registered with path '{Path}' " +
                     $"but re-registered with path '{incoming.Path}'.");
 
-            var compatibility = ShapeContractCompatibility.MergeContracts(Shape, incoming.Shape);
-            if (compatibility.IsConflict)
+            if (!ShapeContractCompatibility.TryMergeContracts(Shape, incoming.Shape, out var mergedShape))
                 throw new System.InvalidOperationException(
                     $"Property '{incoming.Name.Value}' registered with shape '{Shape.DescribeContract()}' " +
                     $"but re-registered with conflicting shape '{incoming.Shape.DescribeContract()}'.");
 
-            return new ObjectProperty(Path, compatibility.Shape, _access.Widen(incoming.Access));
+            return new ObjectProperty(Path, mergedShape, _access.Widen(incoming.Access));
         }
     }
 

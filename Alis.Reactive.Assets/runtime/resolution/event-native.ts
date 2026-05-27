@@ -12,49 +12,28 @@ export function wire(
   handler: (data: unknown) => void,
   opts?: AddEventListenerOptions,
 ): void {
-  NativeEventSource.from(root).subscribe(channel, event => {
-    handler(NativeEventPayload.from(event));
+  const target = root as EventTarget;
+  target.addEventListener(channel, event => {
+    handler(nativeEventPayload(event));
   }, opts);
 }
 
-class NativeEventSource {
-  private constructor(private readonly target: EventTarget) {}
+function nativeEventPayload(event: Event): unknown {
+  if (event instanceof CustomEvent) return customEventPayload(event);
 
-  static from(root: unknown): NativeEventSource {
-    return new NativeEventSource(root as EventTarget);
-  }
-
-  subscribe(
-    channel: string,
-    handler: (event: Event) => void,
-    opts: AddEventListenerOptions | undefined,
-  ): void {
-    this.target.addEventListener(channel, handler, opts);
-  }
+  return domEventPayload(event);
 }
 
-class NativeEventPayload {
-  static from(event: Event): unknown {
-    if (event instanceof CustomEvent) return CustomEventPayload.from(event);
+function customEventPayload(event: CustomEvent): unknown {
+  const detailWasProvided = event.detail !== null && event.detail !== undefined;
+  if (detailWasProvided) return event.detail;
 
-    return DomEventPayload.from(event);
-  }
+  return {};
 }
 
-class CustomEventPayload {
-  static from(event: CustomEvent): unknown {
-    const detailWasProvided = event.detail !== null && event.detail !== undefined;
-    if (detailWasProvided) return event.detail;
+function domEventPayload(event: Event): unknown {
+  if (event.currentTarget !== null) return event.currentTarget;
+  if (event.target !== null) return event.target;
 
-    return {};
-  }
-}
-
-class DomEventPayload {
-  static from(event: Event): unknown {
-    if (event.currentTarget !== null) return event.currentTarget;
-    if (event.target !== null) return event.target;
-
-    return event;
-  }
+  return event;
 }

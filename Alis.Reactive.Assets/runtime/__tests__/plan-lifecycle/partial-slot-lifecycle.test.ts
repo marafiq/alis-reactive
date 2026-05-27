@@ -10,7 +10,7 @@ import {
 } from "../support/plan-lifecycle-fixtures";
 
 describe("partial slot lifecycle", () => {
-  it("replaces the previous contribution from the same slot", () => {
+  it("replaces the previous load from the same slot", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks, behaviorSignals } = mergeHooks();
     const planId = "Resident.Root";
@@ -129,7 +129,7 @@ describe("partial slot lifecycle", () => {
     expect(browserPlans.get(billingPlanId)).toBeUndefined();
   });
 
-  it("keeps a non-root merged plan alive while another slot still owns artifacts", () => {
+  it("keeps a non-root merged plan alive while another slot still owns entries", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();
     const planId = "Resident.Dynamic";

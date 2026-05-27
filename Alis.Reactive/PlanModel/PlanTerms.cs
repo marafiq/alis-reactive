@@ -105,7 +105,7 @@ namespace Alis.Reactive.PlanModel
         public override string Kind => "root";
     }
 
-    /// <summary>Represents a partial plan contribution that can be merged into a root plan.</summary>
+    /// <summary>Represents a partial plan emitted by a view that can be loaded into a browser slot.</summary>
     public sealed class PartialPlanScope : PlanScope
     {
         internal PartialPlanScope() { }
@@ -608,11 +608,5 @@ namespace Alis.Reactive.PlanModel
 
         internal bool RequiresRightOperand => Array.IndexOf(UnaryValues, Value) < 0;
 
-        internal static CompareOperator From(string value)
-        {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            if (Known.TryGetValue(value, out var op)) return op;
-            throw new ArgumentException("Unknown comparison operator '" + value + "'.", nameof(value));
-        }
     }
 }

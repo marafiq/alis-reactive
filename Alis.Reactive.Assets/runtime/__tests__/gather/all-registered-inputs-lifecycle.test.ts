@@ -80,7 +80,7 @@ describe("all registered input gather lifecycle", () => {
 
     expect(resolveGather({
       ...allRegisteredInputs(),
-      payloadAssignments: [{
+      assignments: [{
         target: target("selected"),
         source: literal("manual", stringShape),
       }, {
@@ -149,7 +149,7 @@ function unboundComponent(id: string): ComponentObject {
     id,
     vendor: "native",
     type: "native.input",
-    contribution: { kind: "object-target" },
+    role: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };
@@ -160,7 +160,7 @@ function registeredInputComponent(id: string, bindingPath: string, valueMember: 
     id,
     vendor: "native",
     type: "native.input",
-    contribution: { kind: "owned-definition" },
+    role: { kind: "owned-definition" },
     binding: {
       kind: "registered-input",
       bindingPath,
@@ -172,7 +172,7 @@ function registeredInputComponent(id: string, bindingPath: string, valueMember: 
 }
 
 function target(name: string): RequestPayloadTarget {
-  return { name, path: structuredPath(name) };
+  return { kind: "payload", name, path: structuredPath(name) };
 }
 
 function structuredPath(name: string): StructuredPath {
@@ -189,7 +189,7 @@ function pathSegment(part: string): PathSegment {
 function allRegisteredInputs(): Extract<RequestInput, { kind: "gather" }> {
   return {
     kind: "gather",
-    payloadAssignments: [],
+    assignments: [],
     bodyFormat: "json",
     sourceSelection: { kind: "all-registered-inputs" },
   };

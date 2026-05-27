@@ -44,7 +44,7 @@ export class ComponentRuntime {
   constructor(private readonly driver: ComponentRuntimeDriver) {}
 
   static for(componentId: string, vendor: Vendor): ComponentRuntime {
-    return componentRuntimes.require(componentId, vendor);
+    return new ComponentRuntime(requireComponentRuntimeDriver(componentId, vendor));
   }
 
   resolveRoot(element: HTMLElement): unknown {
@@ -61,22 +61,7 @@ export class ComponentRuntime {
   }
 }
 
-class ComponentRuntimeRegistry {
-  private readonly drivers = new Map<Vendor, ComponentRuntimeDriver>();
-
-  register(vendor: Vendor, driver: ComponentRuntimeDriver): void {
-    if (this.drivers.has(vendor)) throw new Error(`[alis] component runtime already registered for vendor "${vendor}"`);
-
-    this.drivers.set(vendor, driver);
-  }
-
-  require(componentId: string, vendor: Vendor): ComponentRuntime {
-    const driver = this.drivers.get(vendor);
-    if (driver) return new ComponentRuntime(driver);
-
-    throw componentRuntimeNotRegistered(componentId, vendor, [...this.drivers.keys()]);
-  }
-}
+const componentRuntimeDrivers = new Map<Vendor, ComponentRuntimeDriver>();
 
 function componentRuntimeNotRegistered(
   componentId: string,
@@ -93,10 +78,17 @@ function componentRuntimeNotRegistered(
   );
 }
 
-const componentRuntimes = new ComponentRuntimeRegistry();
+function requireComponentRuntimeDriver(componentId: string, vendor: Vendor): ComponentRuntimeDriver {
+  const driver = componentRuntimeDrivers.get(vendor);
+  if (driver) return driver;
+
+  throw componentRuntimeNotRegistered(componentId, vendor, [...componentRuntimeDrivers.keys()]);
+}
 
 export function registerComponentRuntime(vendor: Vendor, driver: ComponentRuntimeDriver): void {
-  componentRuntimes.register(vendor, driver);
+  if (componentRuntimeDrivers.has(vendor)) throw new Error(`[alis] component runtime already registered for vendor "${vendor}"`);
+
+  componentRuntimeDrivers.set(vendor, driver);
 }
 
 const nativeComponentRuntime: ComponentRuntimeDriver = {

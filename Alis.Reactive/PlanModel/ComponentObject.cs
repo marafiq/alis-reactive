@@ -11,14 +11,14 @@ namespace Alis.Reactive.PlanModel
         private readonly ComponentId _id;
         private readonly ComponentVendor _vendor;
         private readonly TypeKey _type;
-        private readonly ComponentRole _contribution;
+        private readonly ComponentRole _role;
         private readonly InputBinding _binding;
         private readonly ValidationContainerBinding _container;
 
         public string Id => _id.Value;
         public string Vendor => _vendor.Value;
         public string Type => _type.Value;
-        public ComponentRole Contribution => _contribution;
+        public ComponentRole Role => _role;
         public InputBinding Binding => _binding;
         public ValidationContainerBinding Container => _container;
 
@@ -26,14 +26,14 @@ namespace Alis.Reactive.PlanModel
             ComponentId id,
             ComponentVendor vendor,
             TypeKey type,
-            ComponentRole contribution,
+            ComponentRole role,
             InputBinding binding,
             ValidationContainerBinding container)
         {
             _id = id ?? throw new System.ArgumentNullException(nameof(id));
             _vendor = vendor ?? throw new System.ArgumentNullException(nameof(vendor));
             _type = type ?? throw new System.ArgumentNullException(nameof(type));
-            _contribution = contribution ?? throw new System.ArgumentNullException(nameof(contribution));
+            _role = role ?? throw new System.ArgumentNullException(nameof(role));
             _binding = binding ?? throw new System.ArgumentNullException(nameof(binding));
             _container = container ?? throw new System.ArgumentNullException(nameof(container));
         }
@@ -510,161 +510,74 @@ namespace Alis.Reactive.PlanModel
             ValidationRuleExecution execution)
         {
             writer.WritePropertyName("execution");
-            writer.WriteStartObject();
-            writer.WriteString("target", execution.TargetKind);
-            WriteProperty(writer, options, "constraint", execution.Constraint);
-            WriteProperty(writer, options, "otherValue", execution.OtherValue);
-            WriteProperty(writer, options, "activation", execution.Activation);
-            WriteProperty(writer, options, "comparisonShape", execution.ComparisonShape);
-            writer.WriteEndObject();
+            execution.WriteTo(writer, options);
         }
     }
 
-    internal sealed class ValidationRuleExecution
+    internal abstract class ValidationRuleExecution
     {
-        private readonly ValidationRuleOperand _constraint;
-        private readonly ValidationRuleOperand _otherValue;
         private readonly ValidationRuleActivation _activation;
 
-        private ValidationRuleExecution(
-            string targetKind,
-            ValidationRuleOperand constraint,
-            ValidationRuleOperand otherValue,
+        private protected ValidationRuleExecution(
             ValidationRuleActivation activation,
             Shape comparisonShape)
         {
-            TargetKind = targetKind ?? throw new System.ArgumentNullException(nameof(targetKind));
-            _constraint = constraint ?? throw new System.ArgumentNullException(nameof(constraint));
-            _otherValue = otherValue ?? throw new System.ArgumentNullException(nameof(otherValue));
             _activation = activation ?? throw new System.ArgumentNullException(nameof(activation));
             ComparisonShape = comparisonShape ?? throw new System.ArgumentNullException(nameof(comparisonShape));
         }
 
-        public ValidationRuleOperand Constraint => _constraint;
-        public ValidationRuleOperand OtherValue => _otherValue;
         public ValidationRuleActivation Activation => _activation;
-        public string TargetKind { get; }
         public Shape ComparisonShape { get; }
+        public abstract string Kind { get; }
+
+        internal void WriteTo(Utf8JsonWriter writer, JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("kind", Kind);
+            WriteOperand(writer, options);
+            WriteProperty(writer, options, "activation", Activation);
+            WriteProperty(writer, options, "comparisonShape", ComparisonShape);
+            writer.WriteEndObject();
+        }
+
+        internal abstract void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options);
 
         internal static ValidationRuleExecution WithoutTarget(
             ValidationRuleActivation activation,
             Shape comparisonShape) =>
-            new ValidationRuleExecution(
-                "none",
-                ValidationRuleOperand.None,
-                ValidationRuleOperand.None,
+            new NoOperandValidationRuleExecution(
                 activation,
                 comparisonShape);
 
         internal static ValidationRuleExecution WithConstraint(
             ValueProducer constraint,
             ValidationRuleActivation activation,
-            Shape comparisonShape) =>
-            new ValidationRuleExecution(
-                "constraint",
-                ValidationRuleOperand.Constraint(constraint),
-                ValidationRuleOperand.None,
+            Shape comparisonShape)
+        {
+            if (constraint is not LiteralProducer literal)
+                throw new System.ArgumentException("Validation rule constraints must be literal values.", nameof(constraint));
+
+            return new ConstraintValidationRuleExecution(
+                literal,
                 activation,
                 comparisonShape);
+        }
 
         internal static ValidationRuleExecution WithPeer(
             ValueProducer peer,
             ValidationRuleActivation activation,
-            Shape comparisonShape) =>
-            new ValidationRuleExecution(
-                "peer",
-                ValidationRuleOperand.None,
-                ValidationRuleOperand.Peer(peer),
+            Shape comparisonShape)
+        {
+            if (peer is not ReadProducer read)
+                throw new System.ArgumentException("Validation rule peer values must read another field value.", nameof(peer));
+
+            return new PeerValidationRuleExecution(
+                read,
                 activation,
                 comparisonShape);
-    }
-
-    [JsonConverter(typeof(ValidationRuleOperandJsonConverter))]
-    internal abstract class ValidationRuleOperand
-    {
-        private protected ValidationRuleOperand() { }
-
-        internal static ValidationRuleOperand None { get; } =
-            new MissingValidationRuleOperand();
-
-        public abstract string Kind { get; }
-        internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
-
-        internal static ValidationRuleOperand Constraint(ValueProducer value)
-        {
-            if (value is not LiteralProducer literal)
-                throw new System.ArgumentException("Validation rule constraints must be literal values.", nameof(value));
-
-            return new LiteralValidationConstraintOperand(literal);
         }
 
-        internal static ValidationRuleOperand Peer(ValueProducer value)
-        {
-            if (value is not ReadProducer read)
-                throw new System.ArgumentException("Validation rule peer values must read another field value.", nameof(value));
-
-            return new PeerValidationRuleOperand(read);
-        }
-
-        private sealed class MissingValidationRuleOperand : ValidationRuleOperand
-        {
-            public override string Kind => "none";
-
-            internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
-            {
-            }
-        }
-
-        private sealed class LiteralValidationConstraintOperand : ValidationRuleOperand
-        {
-            private readonly LiteralProducer _value;
-
-            internal LiteralValidationConstraintOperand(LiteralProducer value)
-            {
-                _value = value ?? throw new System.ArgumentNullException(nameof(value));
-            }
-
-            public override string Kind => "value";
-            public LiteralProducer Value => _value;
-            internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-                ValidationRuleOperandJsonConverter.WriteProperty(writer, options, "value", _value);
-        }
-
-        private sealed class PeerValidationRuleOperand : ValidationRuleOperand
-        {
-            private readonly ReadProducer _value;
-
-            internal PeerValidationRuleOperand(ReadProducer value)
-            {
-                _value = value ?? throw new System.ArgumentNullException(nameof(value));
-            }
-
-            public override string Kind => "value";
-            public ReadProducer Value => _value;
-            internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-                ValidationRuleOperandJsonConverter.WriteProperty(writer, options, "value", _value);
-        }
-    }
-
-    internal sealed class ValidationRuleOperandJsonConverter : JsonConverter<ValidationRuleOperand>
-    {
-        public override void Write(Utf8JsonWriter writer, ValidationRuleOperand value, JsonSerializerOptions options)
-        {
-            if (value == null) throw new System.ArgumentNullException(nameof(value));
-
-            writer.WriteStartObject();
-            writer.WriteString("kind", value.Kind);
-            value.WritePayload(writer, options);
-            writer.WriteEndObject();
-        }
-
-        public override ValidationRuleOperand Read(
-            ref Utf8JsonReader reader,
-            System.Type typeToConvert,
-            JsonSerializerOptions options) =>
-            throw new System.NotSupportedException("Plan types are write-only.");
-
-        internal static void WriteProperty<T>(
+        private static void WriteProperty<T>(
             Utf8JsonWriter writer,
             JsonSerializerOptions options,
             string name,
@@ -672,6 +585,62 @@ namespace Alis.Reactive.PlanModel
         {
             writer.WritePropertyName(name);
             JsonSerializer.Serialize(writer, value, options);
+        }
+
+        private sealed class NoOperandValidationRuleExecution : ValidationRuleExecution
+        {
+            public override string Kind => "none";
+
+            internal NoOperandValidationRuleExecution(
+                ValidationRuleActivation activation,
+                Shape comparisonShape)
+                : base(activation, comparisonShape)
+            {
+            }
+
+            internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options)
+            {
+            }
+        }
+
+        private sealed class ConstraintValidationRuleExecution : ValidationRuleExecution
+        {
+            private readonly LiteralProducer _value;
+
+            internal ConstraintValidationRuleExecution(
+                LiteralProducer value,
+                ValidationRuleActivation activation,
+                Shape comparisonShape)
+                : base(activation, comparisonShape)
+            {
+                _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            }
+
+            public override string Kind => "constraint";
+            public LiteralProducer Value => _value;
+
+            internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options) =>
+                WriteProperty(writer, options, "value", _value);
+        }
+
+        private sealed class PeerValidationRuleExecution : ValidationRuleExecution
+        {
+            private readonly ReadProducer _value;
+
+            internal PeerValidationRuleExecution(
+                ReadProducer value,
+                ValidationRuleActivation activation,
+                Shape comparisonShape)
+                : base(activation, comparisonShape)
+            {
+                _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            }
+
+            public override string Kind => "peer";
+            public ReadProducer Value => _value;
+
+            internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options) =>
+                WriteProperty(writer, options, "value", _value);
         }
     }
 

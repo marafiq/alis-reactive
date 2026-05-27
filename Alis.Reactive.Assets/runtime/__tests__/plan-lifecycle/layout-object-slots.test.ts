@@ -8,7 +8,7 @@ import {
   rootPlan,
 } from "../support/plan-lifecycle-fixtures";
 
-describe("layout object contributions", () => {
+describe("layout object slots", () => {
   it("lets multiple slots share one layout-owned app component", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { hooks } = mergeHooks();

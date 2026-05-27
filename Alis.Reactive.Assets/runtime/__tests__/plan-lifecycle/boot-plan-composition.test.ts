@@ -16,7 +16,7 @@ import {
 } from "../support/plan-lifecycle-fixtures";
 
 describe("boot plan composition", () => {
-  it("assembles one boot plan per plan id while preserving contribution order", () => {
+  it("assembles one boot plan per plan id while preserving load order", () => {
     const residentPlanId = "Resident.Root";
     const residentReady = behavior();
     const addressReady = behavior();
@@ -50,7 +50,7 @@ describe("boot plan composition", () => {
     expect(composed[1]).toEqual(billingPlan);
   });
 
-  it("emits a root-scoped boot plan even when a partial contribution appears first", () => {
+  it("emits a root-scoped boot plan even when a partial plan appears first", () => {
     const planId = "Resident.Root";
     const partialReady = behavior();
     const rootReady = behavior();
@@ -75,7 +75,7 @@ describe("boot plan composition", () => {
     expect(composed[0].behaviors).toEqual([partialReady, rootReady]);
   });
 
-  it("merges initial type fragments instead of letting root overwrite partial write access", () => {
+  it("merges initial type contracts instead of letting root overwrite partial write access", () => {
     const planId = "Resident.Step";
     const componentId = "care-unit";
     const typeKey = "native.component.care-unit";
@@ -96,7 +96,7 @@ describe("boot plan composition", () => {
     expect(composed[0].components[componentId].binding.kind).toBe("registered-input");
   });
 
-  it("does not let an initial reference-only contribution erase a registered input definition", () => {
+  it("does not let an initial reference-only plan erase a registered input definition", () => {
     const planId = "Resident.Step";
     const componentId = "care-unit";
     const typeKey = "native.component.care-unit";
@@ -180,7 +180,7 @@ describe("boot plan composition", () => {
     expect(Object.keys(composed[0].types[typeKey].properties)).toEqual(["title", "content"]);
   });
 
-  it("lets an initial partial layout object appear before the root contribution", () => {
+  it("lets an initial partial layout object appear before the root plan", () => {
     const planId = "Resident.Step";
     const componentId = "alisFusionToast";
     const typeKey = "fusion.component.alisFusionToast";

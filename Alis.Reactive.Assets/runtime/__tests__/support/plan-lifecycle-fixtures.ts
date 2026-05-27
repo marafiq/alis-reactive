@@ -78,7 +78,7 @@ export function component(
     id,
     vendor: "native",
     type,
-    contribution: { kind: "object-target" },
+    role: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };
@@ -89,7 +89,7 @@ export function registeredInputComponent(id: string, type = `native.component.${
     id,
     vendor: "native",
     type,
-    contribution: { kind: "owned-definition" },
+    role: { kind: "owned-definition" },
     binding: {
       kind: "registered-input",
       bindingPath: "CareUnit",
@@ -116,7 +116,7 @@ export function layoutComponent(id: string, type = `native.component.${id}`): Co
     id,
     vendor: "native",
     type,
-    contribution: { kind: "layout-object" },
+    role: { kind: "layout-object" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };
@@ -127,7 +127,7 @@ export function validationContainer(id: string, validationRules: ComponentValida
     id,
     vendor: "native",
     type: `native.element.${id}`,
-    contribution: { kind: "validation-container" },
+    role: { kind: "validation-container" },
     binding: { kind: "none" },
     container: {
       kind: "validation-container",
@@ -146,9 +146,7 @@ export function validationRule(componentKey: string, message = `${componentKey} 
         name: "required",
         message,
         execution: {
-          target: "none",
-          constraint: { kind: "none" },
-          otherValue: { kind: "none" },
+          kind: "none",
           activation: { kind: "always" },
           comparisonShape: { kind: "none" },
         },

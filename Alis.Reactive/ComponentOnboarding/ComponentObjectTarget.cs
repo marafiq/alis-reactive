@@ -13,25 +13,25 @@ namespace Alis.Reactive
         private ComponentObjectTarget(
             ComponentId componentId,
             ComponentVendor vendor,
-            ComponentRole contribution)
+            ComponentRole role)
         {
             ComponentId = componentId ?? throw new ArgumentNullException(nameof(componentId));
             Vendor = vendor ?? throw new ArgumentNullException(nameof(vendor));
-            Contribution = contribution ?? throw new ArgumentNullException(nameof(contribution));
+            Role = role ?? throw new ArgumentNullException(nameof(role));
         }
 
         internal ComponentId ComponentId { get; }
 
         internal ComponentVendor Vendor { get; }
 
-        internal ComponentRole Contribution { get; }
+        internal ComponentRole Role { get; }
 
         internal string IdForJson => ComponentId.Value;
 
         internal ComponentKey EnsureIn(PlanBuildContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            return context.EnsureComponent(ComponentId.Value, Vendor.Value, Contribution);
+            return context.EnsureComponent(ComponentId.Value, Vendor.Value, Role);
         }
 
         internal static ComponentObjectTarget For<TComponent>(string componentId)
@@ -58,16 +58,16 @@ namespace Alis.Reactive
         private static ComponentObjectTarget For(
             string componentId,
             string vendor,
-            ComponentRole contribution)
+            ComponentRole role)
         {
             if (componentId == null) throw new ArgumentNullException(nameof(componentId));
             if (vendor == null) throw new ArgumentNullException(nameof(vendor));
-            if (contribution == null) throw new ArgumentNullException(nameof(contribution));
+            if (role == null) throw new ArgumentNullException(nameof(role));
 
             return new ComponentObjectTarget(
                 ComponentId.Of(componentId),
                 ComponentVendor.From(vendor),
-                contribution);
+                role);
         }
     }
 }
