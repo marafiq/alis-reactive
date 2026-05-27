@@ -29,10 +29,14 @@ interface ObjectContractLoad {
 
 interface SlotPlanLoad {
   readonly planId: PlanId;
-  readonly abortController: AbortController;
   readonly behaviors: Behavior[];
   readonly componentLoads: ComponentLoad[];
   readonly objectContractLoads: ObjectContractLoad[];
+}
+
+interface SlotLoad {
+  readonly abortController: AbortController;
+  readonly planLoads: SlotPlanLoad[];
 }
 
 export class AppliedBrowserPlans {
@@ -41,7 +45,7 @@ export class AppliedBrowserPlans {
   private readonly rootComponents = new Set<string>();
   private readonly rootTypes = new Map<string, BrowserObjectContract>();
   private readonly rootValidationRules = new Map<string, ComponentValidation[]>();
-  private readonly slots = new Map<SlotId, SlotPlanLoad[]>();
+  private readonly slots = new Map<SlotId, SlotLoad>();
 
   register(plan: Plan): void {
     this.plans.set(plan.planId, plan);
@@ -61,7 +65,7 @@ export class AppliedBrowserPlans {
       affectedPlanIds.add(planLoad.planId);
     }
 
-    this.slots.set(slotId, planLoads);
+    this.slots.set(slotId, { abortController, planLoads });
     return [...affectedPlanIds];
   }
 
@@ -84,11 +88,12 @@ export class AppliedBrowserPlans {
   }
 
   private removePartialSlot(slotId: SlotId): PlanId[] {
-    const planLoads = this.takeSlotPlanLoads(slotId);
+    const slotLoad = this.takeSlotLoad(slotId);
     const affectedPlanIds = new Set<PlanId>();
-    if (planLoads.length > 0) planLoads[0]!.abortController.abort();
+    if (slotLoad === undefined) return [];
 
-    for (const planLoad of planLoads) {
+    slotLoad.abortController.abort();
+    for (const planLoad of slotLoad.planLoads) {
       affectedPlanIds.add(planLoad.planId);
       this.removePlanLoad(planLoad);
     }
@@ -111,7 +116,6 @@ export class AppliedBrowserPlans {
 
     return {
       planId: incoming.planId,
-      abortController,
       behaviors: [...incoming.behaviors],
       componentLoads,
       objectContractLoads,
@@ -290,15 +294,15 @@ export class AppliedBrowserPlans {
     return planWasNotBootedAsRoot && planHasNoBehaviors && planHasNoComponents && planHasNoTypes;
   }
 
-  private takeSlotPlanLoads(slotId: SlotId): SlotPlanLoad[] {
-    const planLoads = this.slots.get(slotId) ?? [];
+  private takeSlotLoad(slotId: SlotId): SlotLoad | undefined {
+    const slotLoad = this.slots.get(slotId);
     this.slots.delete(slotId);
-    return [...planLoads];
+    return slotLoad;
   }
 
   private *activeSlotPlanLoads(): Iterable<SlotPlanLoad> {
-    for (const planLoads of this.slots.values()) {
-      yield* planLoads;
+    for (const slotLoad of this.slots.values()) {
+      yield* slotLoad.planLoads;
     }
   }
 
@@ -317,8 +321,8 @@ export class AppliedBrowserPlans {
   }
 
   private abortSlotLoads(): void {
-    for (const planLoads of this.slots.values()) {
-      if (planLoads.length > 0) planLoads[0]!.abortController.abort();
+    for (const slotLoad of this.slots.values()) {
+      slotLoad.abortController.abort();
     }
   }
 }
