@@ -210,6 +210,18 @@
             .Else(else_ => else_.Element("direct-or-result").SetText("Denied"))
     ));
 
+    // ── Section 27: Nested branch block inside a Then branch ──
+    Html.On(plan, t => t.CustomEvent<ScorePayload>("check-nested-branch", (args, p) =>
+        p.When(args, x => x.Score).Gte(90)
+            .Then(then =>
+            {
+                then.When(args, x => x.Status).Eq("active")
+                    .Then(innerThen => innerThen.Element("nested-branch-result").SetText("Senior Active"))
+                    .Else(innerElse => innerElse.Element("nested-branch-result").SetText("Senior Inactive"));
+            })
+            .Else(else_ => else_.Element("nested-branch-result").SetText("Junior"))
+    ));
+
     var formattedJson = plan.RenderFormatted();
 }
 
@@ -520,6 +532,18 @@
             @DispatchButton("btn-direct-or-viewer", "viewer", "check-direct-or", new RolePayload { Role = "viewer" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
         </native-hstack>
         <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="direct-or-result">&mdash;</span></native-hstack>
+    </native-card-body></native-card>
+
+    <!-- Section 27: Nested branch block -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Nested Branch — Then Contains When</native-heading>
+        <p class="text-xs text-text-secondary mb-3">Score &ge; 90 enters an outer branch; Status decides the inner branch.</p>
+        <native-hstack gap="Sm" class="mb-4">
+            @DispatchButton("btn-nested-branch-active", "95 + active", "check-nested-branch", new ScorePayload { Score = 95, Status = "active" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
+            @DispatchButton("btn-nested-branch-inactive", "95 + inactive", "check-nested-branch", new ScorePayload { Score = 95, Status = "inactive" }, "px-3 py-1.5 rounded bg-amber-600 text-white text-xs font-medium")
+            @DispatchButton("btn-nested-branch-low", "70 + active", "check-nested-branch", new ScorePayload { Score = 70, Status = "active" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
+        </native-hstack>
+        <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="nested-branch-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
 
     <!-- Plan JSON -->

@@ -87,10 +87,12 @@ namespace Alis.Reactive.Builders
 
     internal sealed class DispatchPayloadDraft
     {
-        private readonly Dictionary<string, DispatchPayloadSlot> _slots =
-            new Dictionary<string, DispatchPayloadSlot>(StringComparer.Ordinal);
+        private readonly Dictionary<string, ValueProducer> _leaves =
+            new Dictionary<string, ValueProducer>(StringComparer.Ordinal);
+        private readonly Dictionary<string, DispatchPayloadDraft> _objects =
+            new Dictionary<string, DispatchPayloadDraft>(StringComparer.Ordinal);
 
-        internal bool HasFields => _slots.Count > 0;
+        internal bool HasFields => _leaves.Count > 0 || _objects.Count > 0;
 
         internal void Set(string path, ValueProducer value)
         {
@@ -115,35 +117,48 @@ namespace Alis.Reactive.Builders
 
         private DispatchPayloadDraft GetOrCreateObject(string segment, string fullPath)
         {
-            if (!_slots.TryGetValue(segment, out var existing))
+            if (_leaves.ContainsKey(segment))
+                throw new InvalidOperationException(
+                    $"Dispatch payload conflict: '{segment}' is set as a leaf value " +
+                    $"but also used as a parent for '{fullPath}'. " +
+                    "Set either the parent or the children, not both.");
+
+            if (!_objects.TryGetValue(segment, out var child))
             {
-                var child = new DispatchPayloadDraft();
-                _slots[segment] = DispatchPayloadSlot.Object(child);
-                return child;
+                child = new DispatchPayloadDraft();
+                _objects[segment] = child;
             }
 
-            if (existing is DispatchPayloadObjectSlot objectSlot)
-                return objectSlot.Draft;
-
-            throw new InvalidOperationException(
-                $"Dispatch payload conflict: '{segment}' is set as a leaf value " +
-                $"but also used as a parent for '{fullPath}'. " +
-                "Set either the parent or the children, not both.");
+            return child;
         }
 
         private void SetLeaf(string leaf, ValueProducer value, string fullPath)
         {
-            var assignment = DispatchPayloadAssignment.ForLeaf(leaf, _slots);
-            assignment.EnsureLeafCanBeSet(fullPath);
+            EnsureLeafCanBeSet(leaf, fullPath);
 
-            _slots[leaf] = DispatchPayloadSlot.Leaf(value);
+            _leaves[leaf] = value;
+        }
+
+        private void EnsureLeafCanBeSet(string leaf, string fullPath)
+        {
+            if (string.IsNullOrWhiteSpace(leaf))
+                throw new ArgumentException("Dispatch payload leaf must not be empty.", nameof(leaf));
+
+            if (!_objects.ContainsKey(leaf)) return;
+
+            throw new InvalidOperationException(
+                $"Dispatch payload conflict: '{fullPath}' has nested children " +
+                "but is also set as a leaf value. " +
+                "Set either the parent or the children, not both.");
         }
 
         private Dictionary<string, ValueProducer> ToFields()
         {
             var fields = new Dictionary<string, ValueProducer>(StringComparer.Ordinal);
-            foreach (var slot in _slots)
-                fields[slot.Key] = slot.Value.ToValueProducer();
+            foreach (var leaf in _leaves)
+                fields[leaf.Key] = leaf.Value;
+            foreach (var child in _objects)
+                fields[child.Key] = child.Value.ToValueProducer();
 
             return fields;
         }
@@ -189,88 +204,4 @@ namespace Alis.Reactive.Builders
         }
     }
 
-    internal abstract class DispatchPayloadSlot
-    {
-        private protected DispatchPayloadSlot() { }
-
-        internal abstract ValueProducer ToValueProducer();
-
-        internal static DispatchPayloadSlot Leaf(ValueProducer value) =>
-            new DispatchPayloadLeafSlot(value);
-
-        internal static DispatchPayloadSlot Object(DispatchPayloadDraft draft) =>
-            new DispatchPayloadObjectSlot(draft);
-
-    }
-
-    internal sealed class DispatchPayloadLeafSlot : DispatchPayloadSlot
-    {
-        private readonly ValueProducer _value;
-
-        internal DispatchPayloadLeafSlot(ValueProducer value)
-        {
-            _value = value ?? throw new ArgumentNullException(nameof(value));
-        }
-
-        internal override ValueProducer ToValueProducer() => _value;
-    }
-
-    internal sealed class DispatchPayloadObjectSlot : DispatchPayloadSlot
-    {
-        internal DispatchPayloadObjectSlot(DispatchPayloadDraft draft)
-        {
-            Draft = draft ?? throw new ArgumentNullException(nameof(draft));
-        }
-
-        internal DispatchPayloadDraft Draft { get; }
-
-        internal override ValueProducer ToValueProducer() =>
-            Draft.ToValueProducer();
-    }
-
-    internal abstract class DispatchPayloadAssignment
-    {
-        private protected DispatchPayloadAssignment() { }
-
-        internal static DispatchPayloadAssignment ForLeaf(
-            string leaf,
-            IReadOnlyDictionary<string, DispatchPayloadSlot> existingSlots)
-        {
-            if (string.IsNullOrWhiteSpace(leaf))
-                throw new ArgumentException("Dispatch payload leaf must not be empty.", nameof(leaf));
-            if (existingSlots == null) throw new ArgumentNullException(nameof(existingSlots));
-
-            var leafAlreadyOwnsNestedPayload =
-                existingSlots.TryGetValue(leaf, out var existing) && existing is DispatchPayloadObjectSlot;
-            if (leafAlreadyOwnsNestedPayload)
-                return new LeafConflictsWithNestedPayload();
-
-            return LeafCanBeAssigned.Instance;
-        }
-
-        internal abstract void EnsureLeafCanBeSet(string fullPath);
-    }
-
-    internal sealed class LeafCanBeAssigned : DispatchPayloadAssignment
-    {
-        internal static LeafCanBeAssigned Instance { get; } = new LeafCanBeAssigned();
-
-        private LeafCanBeAssigned() { }
-
-        internal override void EnsureLeafCanBeSet(string fullPath)
-        {
-        }
-    }
-
-    internal sealed class LeafConflictsWithNestedPayload : DispatchPayloadAssignment
-    {
-        internal override void EnsureLeafCanBeSet(string fullPath)
-        {
-            throw new InvalidOperationException(
-                $"Dispatch payload conflict: '{fullPath}' has nested children " +
-                "but is also set as a leaf value. " +
-                "Set either the parent or the children, not both.");
-
-        }
-    }
 }
