@@ -445,6 +445,25 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    [Test]
+    public async Task explicit_component_id_include_posts_the_registered_member_value_only()
+    {
+        await NavigateAndBoot();
+        await Page.Locator($"#{Scope}ResidentName").FillAsync("Explicit Ada");
+
+        await Page.RunAndWaitForRequestAsync(
+            async () => await ClickWhenStable(Page.Locator("#submit-explicit-id-btn")),
+            "**/Patterns/ComponentGather/EchoJson");
+
+        await Expect(Page.Locator("#submit-mode"))
+            .ToHaveTextAsync("ExplicitId", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#echo-resident-name"))
+            .ToContainTextAsync("Explicit Ada", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#echo-field-count"))
+            .ToHaveTextAsync("1", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
     // ── Validation ──
 
     [Test]
