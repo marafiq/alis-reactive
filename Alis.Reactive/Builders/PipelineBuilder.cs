@@ -19,7 +19,7 @@ namespace Alis.Reactive.Builders
     {
         internal PlanBuildContext Context { get; }
 
-        private readonly PipelineDraft<TModel> _draft = new PipelineDraft<TModel>();
+        private readonly ReactionSequenceDraft<TModel> _draft = new ReactionSequenceDraft<TModel>();
 
         internal PipelineBuilder(PlanBuildContext context)
         {
