@@ -8,7 +8,7 @@ must prove the same intent.
 Use this with:
 
 - `docs/reactive-plan-source-blueprint.md` for the input/output matrix.
-- `docs/reactive-dsl-feature-atlas.md` for the source-grounded DSL inventory.
+- `docs/reactive-dsl-feature-atlas.md` for complete facts grounded in actual DSL source.
 - `AGENTS.md` for operating rules.
 
 ## Design Rule

@@ -1,8 +1,9 @@
 # Reactive DSL Feature Atlas
 
-This atlas is a source-grounded map from the frozen public DSL to the rich plan
-domain and runtime execution model. It is not a separate specification. When in
-doubt, the source builders and real cshtml usage win.
+This atlas records complete facts grounded in actual DSL source, mapped from the
+frozen public DSL to the rich plan domain and runtime execution model. It is not
+a separate specification. When in doubt, the source builders and real cshtml
+usage win.
 
 The reason this document exists: broad refactors must start from DSL capability,
 not from current helper classes or JSON shape. Each row below should pressure

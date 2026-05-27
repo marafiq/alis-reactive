@@ -64,7 +64,7 @@ indirection.
 ```
 Layer 1  Frozen Public DSL in cshtml
          Quality: typed authoring, compile-time component/member APIs, no string magic except plugin compatibility
-         Harness: source-grounded DSL proof plus Playwright slices that use the DSL
+         Harness: complete facts grounded in actual DSL source plus Playwright slices that use the DSL
          ↓
          BOUNDARY: DSL intent must be representable without server-side browser execution
          ↓
