@@ -11,7 +11,7 @@ namespace Alis.Reactive.Validation
         where TModel : class
     {
         private readonly ClientValidationProjectionDraft _projection = new ClientValidationProjectionDraft();
-        private ValidationRuleCondition _activeCondition = ValidationRuleCondition.Always;
+        private ValidationRuleActivation _activeActivation = ValidationRuleActivation.Always;
 
         internal ClientValidationProjectionBuilder() { }
 
@@ -28,7 +28,7 @@ namespace Alis.Reactive.Validation
             return new ClientValidationFieldRuleBuilder<TModel, TValue>(
                 _projection,
                 field,
-                _activeCondition);
+                _activeActivation);
         }
 
         public void When(
@@ -44,15 +44,15 @@ namespace Alis.Reactive.Validation
 
             _projection.EnsureFields(projectedCondition.Fields);
 
-            var previousCondition = _activeCondition;
-            _activeCondition = previousCondition.Combine(ValidationRuleCondition.When(projectedCondition.Condition));
+            var previousActivation = _activeActivation;
+            _activeActivation = previousActivation.Combine(ValidationRuleActivation.When(projectedCondition.Condition));
             try
             {
                 define(this);
             }
             finally
             {
-                _activeCondition = previousCondition;
+                _activeActivation = previousActivation;
             }
         }
 

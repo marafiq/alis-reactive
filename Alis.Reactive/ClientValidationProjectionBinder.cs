@@ -15,8 +15,8 @@ namespace Alis.Reactive
     /// that source. This binder maps each projected model field to the component that
     /// renders it, or to the deterministic component id a partial will render later, and
     /// attaches the resulting <see cref="ComponentValidation"/> rules to the form's
-    /// <see cref="ContainerScope"/>. Server-side FluentValidation execution remains
-    /// authoritative for every rule.
+    /// <see cref="ContainerScope"/>. Normal validator execution is separate; this binder
+    /// handles only the browser projection.
     /// </para>
     /// </summary>
     internal sealed class ClientValidationProjectionBinder

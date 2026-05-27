@@ -29,7 +29,7 @@ function nativeComponent(id: string): ComponentObject {
     id,
     vendor: "native",
     type: "native.input",
-    contribution: { kind: "object-target" },
+    role: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };
@@ -40,7 +40,7 @@ function validationContainer(id: string, rules: ComponentValidation[]): Componen
     id,
     vendor: "native",
     type: "native.input",
-    contribution: { kind: "validation-container" },
+    role: { kind: "validation-container" },
     binding: { kind: "none" },
     container: {
       kind: "validation-container",
@@ -70,9 +70,7 @@ function requiredRule(
         name: "required",
         message: `${serverFieldName} is required`,
         execution: {
-          target: "none",
-          constraint: { kind: "none" },
-          otherValue: { kind: "none" },
+          kind: "none",
           activation: { kind: "always" },
           comparisonShape: noneShape,
         },
@@ -91,9 +89,7 @@ function conditionalRuleWithMissingActivationSource(): ComponentValidation {
         name: "required",
         message: "Name is required",
         execution: {
-          target: "none",
-          constraint: { kind: "none" },
-          otherValue: { kind: "none" },
+          kind: "none",
           activation: {
             kind: "when",
             condition: {
@@ -131,12 +127,8 @@ function peerRuleWithMissingPeerSource(): ComponentValidation {
         name: "equalTo",
         message: "Name must match",
         execution: {
-          target: "peer",
-          constraint: { kind: "none" },
-          otherValue: {
-            kind: "value",
-            value: readComponentValue("missing-peer-source"),
-          },
+          kind: "peer",
+          value: readComponentValue("missing-peer-source"),
           activation: { kind: "always" },
           comparisonShape: stringShape,
         },

@@ -23,80 +23,48 @@ import {
   showServerErrorInline,
 } from "./error-display";
 import { ExecutionContext } from "../domain/execution-context";
-import { ObjectRecord } from "../domain/object-record";
+import { objectRecordFrom } from "../domain/object-record";
 import { assertNever } from "../core/assert-never";
 
 const log = scope("validation");
 
-abstract class ValidationSummary {
-  static forPlan(planId: string): ValidationSummary {
-    const element = findSummaryElement(planId);
-    if (element === null) return MissingValidationSummary.instance;
-
-    return new RenderedValidationSummary(element);
-  }
-
-  abstract add(componentKey: string, message: string): boolean;
-
-  abstract remove(componentKey: string): void;
-
-  abstract hasEntry(componentKey: string): boolean;
-
-  abstract showWhen(hasErrors: boolean): void;
-
-  abstract clearAndHide(): void;
+interface ValidationSummary {
+  readonly element: HTMLElement | undefined;
 }
 
-class RenderedValidationSummary extends ValidationSummary {
-  constructor(private readonly element: HTMLElement) {
-    super();
-  }
-
-  add(componentKey: string, message: string): boolean {
-    addToSummary(this.element, componentKey, message);
-    return true;
-  }
-
-  remove(componentKey: string): void {
-    removeSummaryEntry(this.element, componentKey);
-  }
-
-  hasEntry(componentKey: string): boolean {
-    return hasSummaryEntry(this.element, componentKey);
-  }
-
-  showWhen(hasErrors: boolean): void {
-    if (hasErrors) showSummaryDiv(this.element);
-  }
-
-  clearAndHide(): void {
-    clearSummary(this.element);
-    hideSummaryDiv(this.element);
-  }
+function validationSummaryForPlan(planId: string): ValidationSummary {
+  return { element: findSummaryElement(planId) ?? undefined };
 }
 
-class MissingValidationSummary extends ValidationSummary {
-  static readonly instance = new MissingValidationSummary();
+function addSummaryError(summary: ValidationSummary, componentKey: string, message: string): boolean {
+  if (summary.element === undefined) return false;
 
-  add(): boolean {
-    return false;
-  }
+  addToSummary(summary.element, componentKey, message);
+  return true;
+}
 
-  remove(): void {
-    return;
-  }
+function removeSummaryError(summary: ValidationSummary, componentKey: string): void {
+  if (summary.element === undefined) return;
 
-  hasEntry(): boolean {
-    return false;
-  }
+  removeSummaryEntry(summary.element, componentKey);
+}
 
-  showWhen(): void {
-    return;
-  }
+function summaryHasError(summary: ValidationSummary, componentKey: string): boolean {
+  if (summary.element === undefined) return false;
 
-  clearAndHide(): void {
-    return;
-  }
+  return hasSummaryEntry(summary.element, componentKey);
+}
+
+function showSummaryWhen(summary: ValidationSummary, hasErrors: boolean): void {
+  if (summary.element === undefined) return;
+  if (hasErrors) showSummaryDiv(summary.element);
+}
+
+function clearAndHideSummary(summary: ValidationSummary): void {
+  if (summary.element === undefined) return;
+
+  clearSummary(summary.element);
+  hideSummaryDiv(summary.element);
 }
 
 interface ValidationSurface {
@@ -144,7 +112,7 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
     return true;
   }
 
-  const summary = ValidationSummary.forPlan(plan.planId);
+  const summary = validationSummaryForPlan(plan.planId);
   const surface: ValidationSurface = {
     plan,
     runtime,
@@ -166,11 +134,11 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
   for (const cv of containerScope.validationRules) {
     if (!evaluateComponentRules(cv, surface, container)) {
       valid = false;
-      summaryHasErrors = summaryHasErrors || surface.summary.hasEntry(cv.component);
+      summaryHasErrors = summaryHasErrors || summaryHasError(surface.summary, cv.component);
     }
   }
 
-  surface.summary.showWhen(summaryHasErrors);
+  showSummaryWhen(surface.summary, summaryHasErrors);
 
   log.debug("validated", { id: containerId, valid });
   return valid;
@@ -183,7 +151,7 @@ export function showServerErrors(plan: Plan, containerKey: string, data: unknown
   if (!containerComp || !containerScope) return;
 
   const containerId = containerComp.id;
-  const summary = ValidationSummary.forPlan(plan.planId);
+  const summary = validationSummaryForPlan(plan.planId);
   const surface: ValidationSurface = {
     plan,
     runtime,
@@ -195,9 +163,10 @@ export function showServerErrors(plan: Plan, containerKey: string, data: unknown
 
   clearContainerErrors(surface);
 
-  const errors = ServerValidationErrors.from(data);
-  if (errors.wrongShape) log.warn("server-errors.wrong-shape");
-  if (!errors.found) return;
+  const errors = serverValidationErrorsFrom(data);
+  if (errors.kind === "wrong-shape") log.warn("server-errors.wrong-shape");
+  if (errors.kind !== "field-errors") return;
+  if (errors.fields.length === 0) return;
 
   let summaryHasErrors = false;
 
@@ -206,7 +175,7 @@ export function showServerErrors(plan: Plan, containerKey: string, data: unknown
     if (addedToSummary) summaryHasErrors = true;
   }
 
-  surface.summary.showWhen(summaryHasErrors);
+  showSummaryWhen(surface.summary, summaryHasErrors);
   log.debug("server-errors.shown", { id: containerId, fieldCount: errors.fields.length });
 }
 
@@ -217,13 +186,13 @@ function placeServerError(
 ): boolean {
   const msg = serverValidationErrorMessage(error.messages);
   const validation = findComponentValidationByName(surface, error.name);
-  if (validation === undefined) return surface.summary.add(error.name, msg);
+  if (validation === undefined) return addSummaryError(surface.summary, error.name, msg);
 
   const component = surface.runtime.components.find(validation.component);
-  if (component === undefined) return surface.summary.add(error.name, msg);
+  if (component === undefined) return addSummaryError(surface.summary, error.name, msg);
 
   const element = component.tryElement();
-  if (element === undefined) return surface.summary.add(error.name, msg);
+  if (element === undefined) return addSummaryError(surface.summary, error.name, msg);
 
   const inlineMessageSlotCanRender = canRenderInlineValidationMessage(component.id);
   if (inlineMessageSlotCanRender) {
@@ -231,7 +200,7 @@ function placeServerError(
     return false;
   }
 
-  return surface.summary.add(error.name, msg);
+  return addSummaryError(surface.summary, error.name, msg);
 }
 
 /**
@@ -262,7 +231,7 @@ export function revalidateField(plan: Plan, containerKey: string, componentKey: 
     return;
   }
 
-  const summary = ValidationSummary.forPlan(plan.planId);
+  const summary = validationSummaryForPlan(plan.planId);
   const surface: ValidationSurface = {
     plan,
     runtime,
@@ -282,7 +251,7 @@ export function clearContainerValidation(plan: Plan, containerKey: string): void
   if (!containerComp || !containerScope) return;
 
   const containerId = containerComp.id;
-  const summary = ValidationSummary.forPlan(plan.planId);
+  const summary = validationSummaryForPlan(plan.planId);
   clearContainerErrors({
     plan,
     runtime,
@@ -332,7 +301,7 @@ function handleMissingComponent(
   if (allRulesInactiveForUnmountedField(cv.rules, surface)) return true;
   const message = firstRuleMessage(cv);
   if (message !== undefined) {
-    surface.summary.add(cv.component, message);
+    addSummaryError(surface.summary, cv.component, message);
   }
   return false;
 }
@@ -352,7 +321,7 @@ function resolveFieldElement(
     if (allRulesInactiveForUnmountedField(cv.rules, surface)) return { done: true, result: true };
     const message = firstRuleMessage(cv);
     if (message !== undefined) {
-      surface.summary.add(cv.component, message);
+      addSummaryError(surface.summary, cv.component, message);
     }
     return { done: true, result: false };
   }
@@ -405,10 +374,10 @@ function reportRuleFailure(
   const component = field.componentValidation.component;
   log.trace("rule.failed", { component, rule: rule.name, value: field.value, message: rule.message });
   if (field.hidden) {
-    surface.summary.add(component, rule.message);
+    addSummaryError(surface.summary, component, rule.message);
   } else {
     showInline(field.componentDomId, rule.message);
-    surface.summary.remove(component);
+    removeSummaryError(surface.summary, component);
   }
 }
 
@@ -464,7 +433,7 @@ function failsRule(
     return ruleFails({
       rule,
       value,
-      peerValue: evaluateValue(rule.execution.otherValue.value, plan),
+      peerValue: evaluateValue(rule.execution.value, plan),
     });
   }
 
@@ -474,7 +443,7 @@ function failsRule(
 type PeerTargetValidationRule = PeerEqualityValidationRule | PeerOrderedComparisonValidationRule;
 
 function hasPeerTarget(rule: ValidationRule): rule is PeerTargetValidationRule {
-  return rule.execution.target === "peer";
+  return rule.execution.kind === "peer";
 }
 
 function clearContainerErrors(
@@ -484,7 +453,7 @@ function clearContainerErrors(
     const comp = surface.runtime.components.find(cv.component);
     if (comp) clearInline(comp.id);
   }
-  surface.summary.clearAndHide();
+  clearAndHideSummary(surface.summary);
 }
 
 function findComponentValidationByName(surface: ValidationSurface, name: string): ComponentValidation | undefined {
@@ -512,49 +481,23 @@ interface ServerValidationError {
   readonly messages: unknown;
 }
 
-class ServerValidationErrors {
-  private constructor(
-    readonly fields: ServerValidationError[],
-    private readonly payloadShape: ServerValidationPayloadShape,
-  ) {}
+type ServerValidationErrors =
+  | { readonly kind: "not-validation-payload" }
+  | { readonly kind: "wrong-shape" }
+  | { readonly kind: "field-errors"; readonly fields: ServerValidationError[] };
 
-  static from(data: unknown): ServerValidationErrors {
-    const payload = ObjectRecord.tryFrom(data);
-    if (payload === undefined) return ServerValidationErrors.notPresent();
+function serverValidationErrorsFrom(data: unknown): ServerValidationErrors {
+  const payload = objectRecordFrom(data);
+  if (payload === undefined) return { kind: "not-validation-payload" };
 
-    const errors = ObjectRecord.tryFrom(payload.get("errors"));
-    if (errors === undefined) return ServerValidationErrors.wrongShape();
+  const errors = objectRecordFrom(payload["errors"]);
+  if (errors === undefined) return { kind: "wrong-shape" };
 
-    return ServerValidationErrors.withFields(
-      errors.entries().map(([name, messages]) => ({ name, messages })),
-    );
-  }
-
-  private static notPresent(): ServerValidationErrors {
-    return new ServerValidationErrors([], "not-validation-payload");
-  }
-
-  private static wrongShape(): ServerValidationErrors {
-    return new ServerValidationErrors([], "wrong-shape");
-  }
-
-  private static withFields(fields: ServerValidationError[]): ServerValidationErrors {
-    return new ServerValidationErrors(fields, "field-errors");
-  }
-
-  get wrongShape(): boolean {
-    return this.payloadShape === "wrong-shape";
-  }
-
-  get found(): boolean {
-    return this.fields.length > 0;
-  }
+  return {
+    kind: "field-errors",
+    fields: Object.entries(errors).map(([name, messages]) => ({ name, messages })),
+  };
 }
-
-type ServerValidationPayloadShape =
-  | "not-validation-payload"
-  | "wrong-shape"
-  | "field-errors";
 
 function serverValidationErrorMessage(messages: unknown): string {
   if (Array.isArray(messages)) return messages.join(", ");

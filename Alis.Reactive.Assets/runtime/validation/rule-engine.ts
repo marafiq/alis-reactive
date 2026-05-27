@@ -108,7 +108,7 @@ function peerTargetRuleFails(
 type LengthRuleName = Extract<ValidationRuleName, "minLength" | "maxLength">;
 type RangeRuleName = Extract<ValidationRuleName, "range" | "exclusiveRange">;
 function constraint(rule: OrderedComparisonValidationRule | RegexValidationRule): ValidationScalarTarget {
-  return ValidationScalarTarget.fromConstraintOperand(rule.execution.constraint);
+  return ValidationScalarTarget.fromLiteral(rule.execution.value);
 }
 
 function comparisonShape(rule: ValidationRule): Shape {
@@ -116,11 +116,11 @@ function comparisonShape(rule: ValidationRule): Shape {
 }
 
 function lengthConstraint(rule: LengthValidationRule): ValidationLengthConstraint {
-  return ValidationLengthConstraint.fromOperand(rule.execution.constraint);
+  return ValidationLengthConstraint.fromLiteral(rule.execution.value);
 }
 
 function rangeTarget(rule: RangeValidationRule): ValidationRangeTarget {
-  return ValidationRangeTarget.fromOperand(rule.execution.constraint);
+  return ValidationRangeTarget.fromLiteral(rule.execution.value);
 }
 
 function requiredFails(subject: ValidationSubject): boolean {
@@ -236,7 +236,7 @@ function equalityFails(evaluation: EqualityRuleEvaluation, subject: ValidationSu
     return equalToFails(subject, target, comparisonShape(evaluation.rule));
   }
 
-  const target = ValidationScalarTarget.fromConstraintOperand(evaluation.rule.execution.constraint);
+  const target = ValidationScalarTarget.fromLiteral(evaluation.rule.execution.value);
   if (evaluation.rule.name === "notEqual") {
     return notEqualFails(subject, target, comparisonShape(evaluation.rule));
   }

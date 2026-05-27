@@ -113,36 +113,36 @@ namespace Alis.Reactive.FluentValidator
         }
 
         public new IConditionBuilder When(Func<T, bool> predicate, Action action) =>
-            ServerOnly(predicate, action, guarded => base.When(predicate, guarded));
+            ApplyServerOnlyCondition(predicate, action, guarded => base.When(predicate, guarded));
 
         public new IConditionBuilder When(Func<T, ValidationContext<T>, bool> predicate, Action action) =>
-            ServerOnly(predicate, action, guarded => base.When(predicate, guarded));
+            ApplyServerOnlyCondition(predicate, action, guarded => base.When(predicate, guarded));
 
         public new IConditionBuilder Unless(Func<T, bool> predicate, Action action) =>
-            ServerOnly(predicate, action, guarded => base.Unless(predicate, guarded));
+            ApplyServerOnlyCondition(predicate, action, guarded => base.Unless(predicate, guarded));
 
         public new IConditionBuilder Unless(Func<T, ValidationContext<T>, bool> predicate, Action action) =>
-            ServerOnly(predicate, action, guarded => base.Unless(predicate, guarded));
+            ApplyServerOnlyCondition(predicate, action, guarded => base.Unless(predicate, guarded));
 
         public new IConditionBuilder WhenAsync(
             Func<T, CancellationToken, Task<bool>> predicate,
             Action action) =>
-            ServerOnly(predicate, action, guarded => base.WhenAsync(predicate, guarded));
+            ApplyServerOnlyCondition(predicate, action, guarded => base.WhenAsync(predicate, guarded));
 
         public new IConditionBuilder WhenAsync(
             Func<T, ValidationContext<T>, CancellationToken, Task<bool>> predicate,
             Action action) =>
-            ServerOnly(predicate, action, guarded => base.WhenAsync(predicate, guarded));
+            ApplyServerOnlyCondition(predicate, action, guarded => base.WhenAsync(predicate, guarded));
 
         public new IConditionBuilder UnlessAsync(
             Func<T, CancellationToken, Task<bool>> predicate,
             Action action) =>
-            ServerOnly(predicate, action, guarded => base.UnlessAsync(predicate, guarded));
+            ApplyServerOnlyCondition(predicate, action, guarded => base.UnlessAsync(predicate, guarded));
 
         public new IConditionBuilder UnlessAsync(
             Func<T, ValidationContext<T>, CancellationToken, Task<bool>> predicate,
             Action action) =>
-            ServerOnly(predicate, action, guarded => base.UnlessAsync(predicate, guarded));
+            ApplyServerOnlyCondition(predicate, action, guarded => base.UnlessAsync(predicate, guarded));
 
         private void Apply(FieldGuard<T> guard, Action defineRules)
         {
@@ -155,7 +155,7 @@ namespace Alis.Reactive.FluentValidator
             }
         }
 
-        private IConditionBuilder ServerOnly<TPredicate>(
+        private IConditionBuilder ApplyServerOnlyCondition<TPredicate>(
             TPredicate predicate,
             Action defineRules,
             Func<Action, IConditionBuilder> applyCondition)
@@ -164,7 +164,7 @@ namespace Alis.Reactive.FluentValidator
             if (defineRules == null) throw new ArgumentNullException(nameof(defineRules));
             if (applyCondition == null) throw new ArgumentNullException(nameof(applyCondition));
 
-            using (_scope.EnterServerOnly())
+            using (_scope.EnterServerOnlyCondition())
                 return new ServerOnlyConditionBuilder(applyCondition(defineRules), _scope);
         }
 
@@ -180,10 +180,10 @@ namespace Alis.Reactive.FluentValidator
                 return new Exit(this, scope => scope.ExitClient());
             }
 
-            internal IDisposable EnterServerOnly()
+            internal IDisposable EnterServerOnlyCondition()
             {
                 _serverOnlyDepth++;
-                return new Exit(this, scope => scope.ExitServerOnly());
+                return new Exit(this, scope => scope.ExitServerOnlyCondition());
             }
 
             internal void Register(
@@ -195,7 +195,7 @@ namespace Alis.Reactive.FluentValidator
                 if (_clientConditions.Count == 0) return;
 
                 clientConditions[rule] = _serverOnlyDepth > 0
-                    ? ClientConditionProjection.Unprojected()
+                    ? ClientConditionProjection.ServerOnly()
                     : ActiveClientCondition();
             }
 
@@ -212,7 +212,7 @@ namespace Alis.Reactive.FluentValidator
                 _clientConditions.Pop();
             }
 
-            private void ExitServerOnly()
+            private void ExitServerOnlyCondition()
             {
                 if (_serverOnlyDepth == 0)
                     throw new InvalidOperationException("Cannot exit a server-only validation condition scope that was not entered.");
@@ -258,7 +258,7 @@ namespace Alis.Reactive.FluentValidator
                 if (action == null) throw new ArgumentNullException(nameof(action));
                 _inner.Otherwise(() =>
                 {
-                    using (_scope.EnterServerOnly())
+                    using (_scope.EnterServerOnlyCondition())
                         action();
                 });
             }

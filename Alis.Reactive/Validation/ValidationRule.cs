@@ -1,5 +1,6 @@
 using Alis.Reactive;
 using Alis.Reactive.PlanModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Alis.Reactive.Validation
 {
@@ -10,22 +11,25 @@ namespace Alis.Reactive.Validation
     {
         private readonly ValidationRuleName _rule;
         private readonly ValidationMessage _message;
-        private readonly ValidationRuleDetails _details;
+        private readonly ValidationRuleOperand _operand;
+        private readonly ValidationRuleActivation _activation;
+        private readonly Shape _shape;
 
-        public ValidationRuleKind Kind => _rule.ToPublicKind();
         public string Message => _message.Value;
-        public Shape Shape => _details.Shape;
-        public ValidationRuleOperand Operand => _details.Operand;
-        public ValidationRuleActivation Activation => _details.Activation;
+        public Shape Shape => _shape;
 
         internal ValidationRule(
             ValidationRuleName rule,
             ValidationMessage message,
-            ValidationRuleDetails details)
+            ValidationRuleOperand operand,
+            ValidationRuleActivation activation,
+            Shape shape)
         {
             _rule = rule ?? throw new System.ArgumentNullException(nameof(rule));
             _message = message ?? throw new System.ArgumentNullException(nameof(message));
-            _details = details ?? throw new System.ArgumentNullException(nameof(details));
+            _operand = operand ?? throw new System.ArgumentNullException(nameof(operand));
+            _activation = activation ?? throw new System.ArgumentNullException(nameof(activation));
+            _shape = shape ?? throw new System.ArgumentNullException(nameof(shape));
         }
 
         internal Alis.Reactive.PlanModel.ValidationRule ToPlanRule(ValidationPlanBinding binding)
@@ -34,457 +38,215 @@ namespace Alis.Reactive.Validation
             return new Alis.Reactive.PlanModel.ValidationRule(
                 _rule,
                 _message,
-                _details.ToPlanExecution(binding));
+                _operand.ToPlanExecution(
+                    _activation.ToPlanActivation(binding),
+                    binding,
+                    _shape));
         }
 
         internal System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences =>
-            _details.PeerFieldReferences;
+            _operand.PeerFieldReferences;
     }
 
-    public enum ValidationRuleKind
-    {
-        Required,
-        Empty,
-        MinLength,
-        MaxLength,
-        Email,
-        Regex,
-        Url,
-        CreditCard,
-        Range,
-        ExclusiveRange,
-        Min,
-        Max,
-        GreaterThan,
-        LessThan,
-        EqualTo,
-        NotEqual,
-        NotEqualTo,
-        AtLeastOne
-    }
-
-    public enum ValidationRuleOperandKind
-    {
-        None,
-        Literal,
-        Range,
-        PeerField
-    }
-
-    public abstract class ValidationRuleOperand
+    internal abstract class ValidationRuleOperand
     {
         private protected ValidationRuleOperand() { }
 
-        public abstract ValidationRuleOperandKind Kind { get; }
-    }
+        internal static ValidationRuleOperand None { get; } = new NoValidationRuleOperand();
 
-    public sealed class NoValidationRuleOperand : ValidationRuleOperand
-    {
-        internal NoValidationRuleOperand() { }
+        internal static ValidationRuleOperand Literal(object? value, Shape shape) =>
+            new LiteralValidationRuleOperand(value, shape);
 
-        public override ValidationRuleOperandKind Kind => ValidationRuleOperandKind.None;
-    }
+        internal static ValidationRuleOperand Range(ValidationRangeBounds bounds) =>
+            new RangeValidationRuleOperand(bounds);
 
-    public sealed class LiteralValidationRuleOperand : ValidationRuleOperand
-    {
-        internal LiteralValidationRuleOperand(object? value, Shape shape)
+        internal static ValidationRuleOperand PeerField(ValidationFieldPath fieldPath, Shape shape)
         {
-            Value = value;
-            Shape = shape ?? throw new System.ArgumentNullException(nameof(shape));
+            if (fieldPath == null) throw new System.ArgumentNullException(nameof(fieldPath));
+            if (shape == null) throw new System.ArgumentNullException(nameof(shape));
+            return new PeerFieldValidationRuleOperand(ClientValidationFieldReference.Of(fieldPath, shape));
         }
-
-        public override ValidationRuleOperandKind Kind => ValidationRuleOperandKind.Literal;
-        public object? Value { get; }
-        public Shape Shape { get; }
-    }
-
-    public sealed class RangeValidationRuleOperand : ValidationRuleOperand
-    {
-        internal RangeValidationRuleOperand(ValidationRangeBounds bounds)
-        {
-            if (bounds == null) throw new System.ArgumentNullException(nameof(bounds));
-            LowerBound = bounds.LowerBound;
-            UpperBound = bounds.UpperBound;
-            EndpointShape = bounds.Shape;
-        }
-
-        public override ValidationRuleOperandKind Kind => ValidationRuleOperandKind.Range;
-        public object LowerBound { get; }
-        public object UpperBound { get; }
-        public Shape EndpointShape { get; }
-
-        public object[] ToArray() =>
-            new[] { LowerBound, UpperBound };
-    }
-
-    public sealed class PeerFieldValidationRuleOperand : ValidationRuleOperand
-    {
-        internal PeerFieldValidationRuleOperand(ClientValidationFieldReference field)
-        {
-            if (field == null) throw new System.ArgumentNullException(nameof(field));
-            FieldName = field.Path.Value;
-            Shape = field.Shape;
-        }
-
-        public override ValidationRuleOperandKind Kind => ValidationRuleOperandKind.PeerField;
-        public string FieldName { get; }
-        public Shape Shape { get; }
-    }
-
-    public enum ValidationRuleActivationKind
-    {
-        Always,
-        When
-    }
-
-    public abstract class ValidationRuleActivation
-    {
-        private protected ValidationRuleActivation() { }
-
-        public abstract ValidationRuleActivationKind Kind { get; }
-    }
-
-    public sealed class AlwaysValidationRuleActivation : ValidationRuleActivation
-    {
-        internal AlwaysValidationRuleActivation() { }
-
-        public override ValidationRuleActivationKind Kind => ValidationRuleActivationKind.Always;
-    }
-
-    public sealed class ConditionalValidationRuleActivation : ValidationRuleActivation
-    {
-        internal ConditionalValidationRuleActivation(FieldCondition condition)
-        {
-            Condition = condition ?? throw new System.ArgumentNullException(nameof(condition));
-        }
-
-        public override ValidationRuleActivationKind Kind => ValidationRuleActivationKind.When;
-        public FieldCondition Condition { get; }
-    }
-
-    internal sealed class ValidationRuleDetails
-    {
-        private readonly ValidationRuleTarget _target;
-        private readonly ValidationRuleCondition _condition;
-
-        private ValidationRuleDetails(
-            ValidationRuleTarget target,
-            ValidationRuleCondition condition,
-            Shape shape)
-        {
-            _target = target ?? throw new System.ArgumentNullException(nameof(target));
-            _condition = condition ?? throw new System.ArgumentNullException(nameof(condition));
-            Shape = shape ?? throw new System.ArgumentNullException(nameof(shape));
-        }
-
-        internal System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences => _target.PeerFieldReferences;
-        internal Shape Shape { get; }
-        internal ValidationRuleOperand Operand => _target.ToPublicOperand(Shape);
-        internal ValidationRuleActivation Activation => _condition.ToPublicActivation();
-
-        internal ValidationRuleExecution ToPlanExecution(ValidationPlanBinding binding)
-        {
-            if (binding == null) throw new System.ArgumentNullException(nameof(binding));
-            return _target.ToPlanExecution(_condition.ToPlanActivation(binding), binding, Shape);
-        }
-
-        internal ValidationRuleDetails PrefixPeerFieldWith(ValidationFieldPath prefix)
-        {
-            if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
-            if (prefix.IsEmpty) return this;
-            return new ValidationRuleDetails(
-                _target.PrefixPeerFieldWith(prefix),
-                _condition,
-                Shape);
-        }
-
-        internal static ValidationRuleDetails NoOperand(ValidationRuleCondition condition) =>
-            new ValidationRuleDetails(
-                ValidationRuleTarget.None,
-                condition,
-                Shape.None);
-
-        internal static ValidationRuleDetails WithConstraint(
-            object? constraint,
-            ValidationRuleCondition condition,
-            Shape shape) =>
-            new ValidationRuleDetails(
-                ValidationRuleTarget.Literal(constraint),
-                condition,
-                shape);
-
-        internal static ValidationRuleDetails WithConstraint(
-            ValidationRuleTarget target,
-            ValidationRuleCondition condition,
-            Shape shape) =>
-            new ValidationRuleDetails(
-                target,
-                condition,
-                shape);
-
-        internal static ValidationRuleDetails WithPeerField(
-            ValidationFieldPath peerField,
-            ValidationRuleCondition condition,
-            Shape shape) =>
-            new ValidationRuleDetails(
-                ValidationRuleTarget.PeerField(peerField, shape),
-                condition,
-                shape);
-    }
-
-    internal abstract class ValidationRuleCondition
-    {
-        private ValidationRuleCondition() { }
-
-        internal static ValidationRuleCondition Always { get; } =
-            new AlwaysValidationRuleCondition();
-
-        internal abstract Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding);
-        internal abstract ValidationRuleActivation ToPublicActivation();
-
-        internal static ValidationRuleCondition When(FieldCondition condition)
-        {
-            if (condition == null) throw new System.ArgumentNullException(nameof(condition));
-            return new ConditionalValidationRuleCondition(condition);
-        }
-
-        internal abstract ValidationRuleCondition Combine(ValidationRuleCondition incoming);
-
-        internal abstract ValidationRuleCondition AppendTo(FieldCondition existingCondition);
-
-        private sealed class AlwaysValidationRuleCondition : ValidationRuleCondition
-        {
-            internal override Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
-            {
-                if (binding == null) throw new System.ArgumentNullException(nameof(binding));
-                return Alis.Reactive.PlanModel.ValidationRuleActivation.Always;
-            }
-
-            internal override ValidationRuleActivation ToPublicActivation() =>
-                new AlwaysValidationRuleActivation();
-
-            internal override ValidationRuleCondition Combine(ValidationRuleCondition incoming)
-            {
-                if (incoming == null) throw new System.ArgumentNullException(nameof(incoming));
-                return incoming;
-            }
-
-            internal override ValidationRuleCondition AppendTo(FieldCondition existingCondition)
-            {
-                if (existingCondition == null) throw new System.ArgumentNullException(nameof(existingCondition));
-                return When(existingCondition);
-            }
-        }
-
-        private sealed class ConditionalValidationRuleCondition : ValidationRuleCondition
-        {
-            private readonly FieldCondition _condition;
-
-            internal ConditionalValidationRuleCondition(FieldCondition condition)
-            {
-                _condition = condition ?? throw new System.ArgumentNullException(nameof(condition));
-            }
-
-            internal override Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
-            {
-                if (binding == null) throw new System.ArgumentNullException(nameof(binding));
-                return Alis.Reactive.PlanModel.ValidationRuleActivation.When(binding.ResolveActivationCondition(_condition));
-            }
-
-            internal override ValidationRuleActivation ToPublicActivation() =>
-                new ConditionalValidationRuleActivation(_condition);
-
-            internal override ValidationRuleCondition Combine(ValidationRuleCondition incoming)
-            {
-                if (incoming == null) throw new System.ArgumentNullException(nameof(incoming));
-                return incoming.AppendTo(_condition);
-            }
-
-            internal override ValidationRuleCondition AppendTo(FieldCondition existingCondition)
-            {
-                if (existingCondition == null) throw new System.ArgumentNullException(nameof(existingCondition));
-                return When(FieldCondition.All(existingCondition, _condition));
-            }
-        }
-    }
-
-    internal abstract class ValidationRuleTarget
-    {
-        private ValidationRuleTarget() { }
-
-        internal static ValidationRuleTarget None { get; } =
-            new NoValidationRuleTarget();
 
         internal abstract System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences { get; }
-        internal abstract ValidationRuleOperand ToPublicOperand(Shape shape);
 
         internal abstract ValidationRuleExecution ToPlanExecution(
             Alis.Reactive.PlanModel.ValidationRuleActivation activation,
             ValidationPlanBinding binding,
-            Shape shape);
+            Shape comparisonShape);
+    }
 
-        internal abstract ValidationRuleTarget PrefixPeerFieldWith(ValidationFieldPath prefix);
+    internal sealed class NoValidationRuleOperand : ValidationRuleOperand
+    {
+        internal NoValidationRuleOperand() { }
 
-        internal static ValidationRuleTarget Literal(object? value) =>
-            new LiteralValidationRuleTarget(value);
-
-        internal static ValidationRuleTarget Range(ValidationRangeBounds bounds) =>
-            new RangeValidationRuleTarget(bounds);
-
-        internal static ValidationRuleTarget PeerField(ValidationFieldPath fieldPath, Shape shape)
+        internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
-            if (fieldPath == null) throw new System.ArgumentNullException(nameof(fieldPath));
-            if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-            return new PeerValidationRuleTarget(ClientValidationFieldReference.Of(fieldPath, shape));
+            get { yield break; }
         }
 
-        private sealed class NoValidationRuleTarget : ValidationRuleTarget
+        internal override ValidationRuleExecution ToPlanExecution(
+            Alis.Reactive.PlanModel.ValidationRuleActivation activation,
+            ValidationPlanBinding binding,
+            Shape comparisonShape)
         {
-            internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
-            {
-                get { yield break; }
-            }
+            if (binding == null) throw new System.ArgumentNullException(nameof(binding));
+            return ValidationRuleExecution.WithoutTarget(activation, comparisonShape);
+        }
+    }
 
-            internal override ValidationRuleOperand ToPublicOperand(Shape shape)
-            {
-                if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-                return new NoValidationRuleOperand();
-            }
+    internal sealed class LiteralValidationRuleOperand : ValidationRuleOperand
+    {
+        private readonly object? _value;
+        private readonly Shape _shape;
 
-            internal override ValidationRuleExecution ToPlanExecution(
-                Alis.Reactive.PlanModel.ValidationRuleActivation activation,
-                ValidationPlanBinding binding,
-                Shape shape)
-            {
-                if (binding == null) throw new System.ArgumentNullException(nameof(binding));
-                return ValidationRuleExecution.WithoutTarget(activation, shape);
-            }
-
-            internal override ValidationRuleTarget PrefixPeerFieldWith(ValidationFieldPath prefix)
-            {
-                if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
-                return this;
-            }
+        internal LiteralValidationRuleOperand(object? value, Shape shape)
+        {
+            _value = value;
+            _shape = shape ?? throw new System.ArgumentNullException(nameof(shape));
         }
 
-        private sealed class LiteralValidationRuleTarget : ValidationRuleTarget
+        internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
-            private readonly object? _value;
-
-            internal LiteralValidationRuleTarget(object? value)
-            {
-                _value = value;
-            }
-
-            internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
-            {
-                get { yield break; }
-            }
-
-            internal override ValidationRuleOperand ToPublicOperand(Shape shape)
-            {
-                if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-                return new LiteralValidationRuleOperand(_value, shape);
-            }
-
-            internal override ValidationRuleExecution ToPlanExecution(
-                Alis.Reactive.PlanModel.ValidationRuleActivation activation,
-                ValidationPlanBinding binding,
-                Shape shape)
-            {
-                if (binding == null) throw new System.ArgumentNullException(nameof(binding));
-                if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-                return ValidationRuleExecution.WithConstraint(
-                    ValueProducer.LiteralRaw(_value, shape),
-                    activation,
-                    shape);
-            }
-
-            internal override ValidationRuleTarget PrefixPeerFieldWith(ValidationFieldPath prefix)
-            {
-                if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
-                return this;
-            }
+            get { yield break; }
         }
 
-        private sealed class RangeValidationRuleTarget : ValidationRuleTarget
+        internal override ValidationRuleExecution ToPlanExecution(
+            Alis.Reactive.PlanModel.ValidationRuleActivation activation,
+            ValidationPlanBinding binding,
+            Shape comparisonShape)
         {
-            private readonly ValidationRangeBounds _bounds;
+            if (binding == null) throw new System.ArgumentNullException(nameof(binding));
+            return ValidationRuleExecution.WithConstraint(
+                ValueProducer.LiteralRaw(_value, _shape),
+                activation,
+                comparisonShape);
+        }
+    }
 
-            internal RangeValidationRuleTarget(ValidationRangeBounds bounds)
-            {
-                _bounds = bounds ?? throw new System.ArgumentNullException(nameof(bounds));
-            }
+    internal sealed class RangeValidationRuleOperand : ValidationRuleOperand
+    {
+        private readonly ValidationRangeBounds _bounds;
 
-            internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
-            {
-                get { yield break; }
-            }
-
-            internal override ValidationRuleOperand ToPublicOperand(Shape shape)
-            {
-                if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-                return new RangeValidationRuleOperand(_bounds);
-            }
-
-            internal override ValidationRuleExecution ToPlanExecution(
-                Alis.Reactive.PlanModel.ValidationRuleActivation activation,
-                ValidationPlanBinding binding,
-                Shape shape)
-            {
-                if (binding == null) throw new System.ArgumentNullException(nameof(binding));
-                if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-                return ValidationRuleExecution.WithConstraint(
-                    ValueProducer.LiteralRaw(_bounds.ToDescriptorArray(), _bounds.DescriptorShape),
-                    activation,
-                    shape);
-            }
-
-            internal override ValidationRuleTarget PrefixPeerFieldWith(ValidationFieldPath prefix)
-            {
-                if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
-                return this;
-            }
+        internal RangeValidationRuleOperand(ValidationRangeBounds bounds)
+        {
+            if (bounds == null) throw new System.ArgumentNullException(nameof(bounds));
+            _bounds = bounds;
         }
 
-        private sealed class PeerValidationRuleTarget : ValidationRuleTarget
+        internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
-            private readonly ClientValidationFieldReference _field;
+            get { yield break; }
+        }
 
-            internal PeerValidationRuleTarget(ClientValidationFieldReference field)
-            {
-                _field = field ?? throw new System.ArgumentNullException(nameof(field));
-            }
+        internal override ValidationRuleExecution ToPlanExecution(
+            Alis.Reactive.PlanModel.ValidationRuleActivation activation,
+            ValidationPlanBinding binding,
+            Shape comparisonShape)
+        {
+            if (binding == null) throw new System.ArgumentNullException(nameof(binding));
+            return ValidationRuleExecution.WithConstraint(
+                ValueProducer.LiteralRaw(_bounds.ToDescriptorArray(), _bounds.DescriptorShape),
+                activation,
+                comparisonShape);
+        }
+    }
 
-            internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
-            {
-                get { yield return _field; }
-            }
+    internal sealed class PeerFieldValidationRuleOperand : ValidationRuleOperand
+    {
+        private readonly ClientValidationFieldReference _field;
 
-            internal override ValidationRuleOperand ToPublicOperand(Shape shape)
-            {
-                if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-                return new PeerFieldValidationRuleOperand(_field);
-            }
+        internal PeerFieldValidationRuleOperand(ClientValidationFieldReference field)
+        {
+            if (field == null) throw new System.ArgumentNullException(nameof(field));
+            _field = field;
+        }
 
-            internal override ValidationRuleExecution ToPlanExecution(
-                Alis.Reactive.PlanModel.ValidationRuleActivation activation,
-                ValidationPlanBinding binding,
-                Shape shape)
-            {
-                if (binding == null) throw new System.ArgumentNullException(nameof(binding));
-                if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-                return ValidationRuleExecution.WithPeer(
-                    binding.ResolvePeerValue(_field.Path),
-                    activation,
-                    shape);
-            }
+        internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
+        {
+            get { yield return _field; }
+        }
 
-            internal override ValidationRuleTarget PrefixPeerFieldWith(ValidationFieldPath prefix)
-            {
-                if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
-                return PeerField(prefix.Append(_field.Path), _field.Shape);
-            }
+        internal override ValidationRuleExecution ToPlanExecution(
+            Alis.Reactive.PlanModel.ValidationRuleActivation activation,
+            ValidationPlanBinding binding,
+            Shape comparisonShape)
+        {
+            if (binding == null) throw new System.ArgumentNullException(nameof(binding));
+            return ValidationRuleExecution.WithPeer(
+                binding.ResolvePeerValue(_field.Path),
+                activation,
+                comparisonShape);
+        }
+    }
+
+    internal abstract class ValidationRuleActivation
+    {
+        private protected ValidationRuleActivation() { }
+
+        internal static ValidationRuleActivation Always { get; } =
+            new AlwaysValidationRuleActivation();
+
+        internal static ValidationRuleActivation When(FieldCondition condition)
+        {
+            if (condition == null) throw new System.ArgumentNullException(nameof(condition));
+            return new ConditionalValidationRuleActivation(condition);
+        }
+
+        internal abstract Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding);
+
+        internal abstract ValidationRuleActivation Combine(ValidationRuleActivation incoming);
+
+        internal abstract ValidationRuleActivation AppendTo(FieldCondition existingCondition);
+    }
+
+    internal sealed class AlwaysValidationRuleActivation : ValidationRuleActivation
+    {
+        internal AlwaysValidationRuleActivation() { }
+
+        internal override Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
+        {
+            if (binding == null) throw new System.ArgumentNullException(nameof(binding));
+            return Alis.Reactive.PlanModel.ValidationRuleActivation.Always;
+        }
+
+        internal override ValidationRuleActivation Combine(ValidationRuleActivation incoming)
+        {
+            if (incoming == null) throw new System.ArgumentNullException(nameof(incoming));
+            return incoming;
+        }
+
+        internal override ValidationRuleActivation AppendTo(FieldCondition existingCondition)
+        {
+            if (existingCondition == null) throw new System.ArgumentNullException(nameof(existingCondition));
+            return When(existingCondition);
+        }
+    }
+
+    internal sealed class ConditionalValidationRuleActivation : ValidationRuleActivation
+    {
+        private readonly FieldCondition _condition;
+
+        internal ConditionalValidationRuleActivation(FieldCondition condition)
+        {
+            _condition = condition ?? throw new System.ArgumentNullException(nameof(condition));
+        }
+
+        internal override Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
+        {
+            if (binding == null) throw new System.ArgumentNullException(nameof(binding));
+            return Alis.Reactive.PlanModel.ValidationRuleActivation.When(binding.ResolveActivationCondition(_condition));
+        }
+
+        internal override ValidationRuleActivation Combine(ValidationRuleActivation incoming)
+        {
+            if (incoming == null) throw new System.ArgumentNullException(nameof(incoming));
+            return incoming.AppendTo(_condition);
+        }
+
+        internal override ValidationRuleActivation AppendTo(FieldCondition existingCondition)
+        {
+            if (existingCondition == null) throw new System.ArgumentNullException(nameof(existingCondition));
+            return When(FieldCondition.All(existingCondition, _condition));
         }
     }
 
@@ -504,24 +266,46 @@ namespace Alis.Reactive.Validation
         internal object LowerBound => _lowerBound;
         internal object UpperBound => _upperBound;
 
-        internal Shape DescriptorShape => ValidationRangeDescriptorShape.FromEndpointShape(Shape);
+        internal Shape DescriptorShape => Shape.ArrayOf(Shape.IsNone ? Shape.Any : Shape);
 
         internal static ValidationRangeBounds Between(object lowerBound, object upperBound, Shape shape) =>
             new ValidationRangeBounds(lowerBound, upperBound, shape);
 
+        internal static ValidationRangeBounds FromProjection<TValue>(TValue lowerBound, TValue upperBound)
+        {
+            if (lowerBound == null) throw new System.ArgumentNullException(nameof(lowerBound));
+            if (upperBound == null) throw new System.ArgumentNullException(nameof(upperBound));
+            if (TryFromProjection(lowerBound, upperBound, out var bounds)) return bounds;
+
+            var lowerShape = ClientValidationProjectionLiteral.From(lowerBound).Shape;
+            var upperShape = ClientValidationProjectionLiteral.From(upperBound).Shape;
+            throw new System.ArgumentException(
+                "Client validation range bounds must have the same shape. " +
+                $"Lower bound is '{lowerShape.Kind}', upper bound is '{upperShape.Kind}'.");
+        }
+
+        internal static bool TryFromProjection(
+            object? lowerBound,
+            object? upperBound,
+            [NotNullWhen(true)] out ValidationRangeBounds? bounds)
+        {
+            bounds = null;
+            if (lowerBound == null || upperBound == null) return false;
+
+            var lowerLiteral = ClientValidationProjectionLiteral.From(lowerBound);
+            var upperLiteral = ClientValidationProjectionLiteral.From(upperBound);
+            if (!lowerLiteral.Shape.Equals(upperLiteral.Shape)) return false;
+            if (lowerLiteral.Value == null || upperLiteral.Value == null) return false;
+
+            bounds = Between(
+                lowerLiteral.Value,
+                upperLiteral.Value,
+                lowerLiteral.Shape);
+            return true;
+        }
+
         internal object[] ToDescriptorArray() =>
             new[] { _lowerBound, _upperBound };
-    }
-
-    internal static class ValidationRangeDescriptorShape
-    {
-        internal static Shape FromEndpointShape(Shape endpointShape)
-        {
-            if (endpointShape == null) throw new System.ArgumentNullException(nameof(endpointShape));
-            if (endpointShape.IsNone) return Shape.ArrayOf(Shape.Any);
-
-            return Shape.ArrayOf(endpointShape);
-        }
     }
 
     internal sealed class ValidationPlanBinding

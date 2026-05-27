@@ -3,8 +3,8 @@ using System.Runtime.CompilerServices;
 using FluentValidation;
 using FluentValidation.Internal;
 using FluentValidation.Validators;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
+using Shape = Alis.Reactive.PlanModel.Shape;
 
 namespace Alis.Reactive.FluentValidator
 {
@@ -100,7 +100,7 @@ namespace Alis.Reactive.FluentValidator
             Peer(ValidationRuleName.Max, peerField, name => $"'{name}' must be at most '{Humanize(peerField)}'.");
 
         private static ClientValidationRule NoOperand(ValidationRuleName rule, Func<string, string> message) =>
-            new ClientValidationRule(rule, message, condition => ValidationRuleDetails.NoOperand(condition));
+            new ClientValidationRule(rule, message, _ => ValidationRuleOperand.None, Shape.None);
 
         private static ClientValidationRule Literal(
             ValidationRuleName rule,
@@ -117,14 +117,12 @@ namespace Alis.Reactive.FluentValidator
             TProperty upperBound,
             Func<string, string> message)
         {
-            var bounds = ClientValidationProjectionRangeBounds.From(lowerBound, upperBound);
+            var bounds = ValidationRangeBounds.FromProjection(lowerBound, upperBound);
             return new ClientValidationRule(
                 rule,
                 message,
-                condition => ValidationRuleDetails.WithConstraint(
-                    ValidationRuleTarget.Range(bounds.ToValidationRangeBounds()),
-                    condition,
-                    bounds.EndpointShape));
+                _ => ValidationRuleOperand.Range(bounds),
+                bounds.Shape);
         }
 
         private static ClientValidationRule Peer(
@@ -139,7 +137,8 @@ namespace Alis.Reactive.FluentValidator
             return new ClientValidationRule(
                 rule,
                 message,
-                condition => ValidationRuleDetails.WithPeerField(field, condition, shape));
+                prefix => ValidationRuleOperand.PeerField(prefix.Append(field), shape),
+                shape);
         }
 
         private static string Humanize(System.Linq.Expressions.Expression<Func<TModel, TProperty>> peerField)
@@ -152,16 +151,19 @@ namespace Alis.Reactive.FluentValidator
     public sealed class ClientValidationRule
     {
         private readonly Func<string, string> _message;
-        private readonly Func<ValidationRuleCondition, ValidationRuleDetails> _details;
+        private readonly Func<ValidationFieldPath, ValidationRuleOperand> _operand;
+        private readonly Shape _shape;
 
         internal ClientValidationRule(
             ValidationRuleName name,
             Func<string, string> message,
-            Func<ValidationRuleCondition, ValidationRuleDetails> details)
+            Func<ValidationFieldPath, ValidationRuleOperand> operand,
+            Shape shape)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             _message = message ?? throw new ArgumentNullException(nameof(message));
-            _details = details ?? throw new ArgumentNullException(nameof(details));
+            _operand = operand ?? throw new ArgumentNullException(nameof(operand));
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
         internal ValidationRuleName Name { get; }
@@ -174,7 +176,8 @@ namespace Alis.Reactive.FluentValidator
             new ClientValidationRule(
                 rule,
                 message,
-                condition => ValidationRuleDetails.WithConstraint(value, condition, shape));
+                _ => ValidationRuleOperand.Literal(value, shape),
+                shape);
 
         internal ValidationMessage MessageFor(string displayName)
         {
@@ -182,13 +185,20 @@ namespace Alis.Reactive.FluentValidator
             return ValidationMessage.Of(_message(displayName));
         }
 
-        internal ValidationRuleDetails DetailsFor(
-            ValidationRuleCondition condition,
+        internal ValidationRule ToValidationRule(
+            ValidationMessage message,
+            ValidationRuleActivation activation,
             ValidationFieldPath fieldPrefix)
         {
-            if (condition == null) throw new ArgumentNullException(nameof(condition));
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            if (activation == null) throw new ArgumentNullException(nameof(activation));
             if (fieldPrefix == null) throw new ArgumentNullException(nameof(fieldPrefix));
-            return _details(condition).PrefixPeerFieldWith(fieldPrefix);
+            return new ValidationRule(
+                Name,
+                message,
+                _operand(fieldPrefix),
+                activation,
+                _shape);
         }
     }
 

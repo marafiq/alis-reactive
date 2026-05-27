@@ -12,16 +12,16 @@ namespace Alis.Reactive.Validation
     {
         private readonly ClientValidationProjectionDraft _projection;
         private readonly ClientValidationFieldToken<TModel, TValue> _field;
-        private readonly ValidationRuleCondition _condition;
+        private readonly ValidationRuleActivation _activation;
 
         internal ClientValidationFieldRuleBuilder(
             ClientValidationProjectionDraft projection,
             ClientValidationFieldToken<TModel, TValue> field,
-            ValidationRuleCondition condition)
+            ValidationRuleActivation activation)
         {
             _projection = projection ?? throw new ArgumentNullException(nameof(projection));
             _field = field ?? throw new ArgumentNullException(nameof(field));
-            _condition = condition ?? throw new ArgumentNullException(nameof(condition));
+            _activation = activation ?? throw new ArgumentNullException(nameof(activation));
         }
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> Required(string message) =>
@@ -80,6 +80,12 @@ namespace Alis.Reactive.Validation
         public ClientValidationFieldRuleBuilder<TModel, TValue> Max(TValue maximum, string message) =>
             AddLiteralComparison(ValidationRuleName.Max, maximum, message);
 
+        public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThanOrEqualTo(TValue minimum, string message) =>
+            AddLiteralComparison(ValidationRuleName.Min, minimum, message);
+
+        public ClientValidationFieldRuleBuilder<TModel, TValue> LessThanOrEqualTo(TValue maximum, string message) =>
+            AddLiteralComparison(ValidationRuleName.Max, maximum, message);
+
         public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThan(TValue value, string message) =>
             AddLiteralComparison(ValidationRuleName.Gt, value, message);
 
@@ -112,13 +118,54 @@ namespace Alis.Reactive.Validation
             string message) =>
             AddPeerComparison(ValidationRuleName.NotEqualTo, peerField, message);
 
+        public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThan(
+            Expression<Func<TModel, TValue>> peerField,
+            string message) =>
+            GreaterThan(ClientValidationFieldToken<TModel, TValue>.For(peerField), message);
+
+        public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThan(
+            ClientValidationFieldToken<TModel, TValue> peerField,
+            string message) =>
+            AddPeerComparison(ValidationRuleName.Gt, peerField, message);
+
+        public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThanOrEqualTo(
+            Expression<Func<TModel, TValue>> peerField,
+            string message) =>
+            GreaterThanOrEqualTo(ClientValidationFieldToken<TModel, TValue>.For(peerField), message);
+
+        public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThanOrEqualTo(
+            ClientValidationFieldToken<TModel, TValue> peerField,
+            string message) =>
+            AddPeerComparison(ValidationRuleName.Min, peerField, message);
+
+        public ClientValidationFieldRuleBuilder<TModel, TValue> LessThan(
+            Expression<Func<TModel, TValue>> peerField,
+            string message) =>
+            LessThan(ClientValidationFieldToken<TModel, TValue>.For(peerField), message);
+
+        public ClientValidationFieldRuleBuilder<TModel, TValue> LessThan(
+            ClientValidationFieldToken<TModel, TValue> peerField,
+            string message) =>
+            AddPeerComparison(ValidationRuleName.Lt, peerField, message);
+
+        public ClientValidationFieldRuleBuilder<TModel, TValue> LessThanOrEqualTo(
+            Expression<Func<TModel, TValue>> peerField,
+            string message) =>
+            LessThanOrEqualTo(ClientValidationFieldToken<TModel, TValue>.For(peerField), message);
+
+        public ClientValidationFieldRuleBuilder<TModel, TValue> LessThanOrEqualTo(
+            ClientValidationFieldToken<TModel, TValue> peerField,
+            string message) =>
+            AddPeerComparison(ValidationRuleName.Max, peerField, message);
+
         private ClientValidationFieldRuleBuilder<TModel, TValue> AddNoOperand(
             ValidationRuleName name,
             string message) =>
             AddRule(
                 name,
                 message,
-                ValidationRuleDetails.NoOperand(_condition));
+                ValidationRuleOperand.None,
+                Shape.None);
 
         private ClientValidationFieldRuleBuilder<TModel, TValue> AddLiteralComparison(
             ValidationRuleName name,
@@ -137,7 +184,8 @@ namespace Alis.Reactive.Validation
             AddRule(
                 name,
                 message,
-                ValidationRuleDetails.WithConstraint(value, _condition, shape));
+                ValidationRuleOperand.Literal(value, shape),
+                shape);
 
         private ClientValidationFieldRuleBuilder<TModel, TValue> AddRange(
             ValidationRuleName name,
@@ -145,11 +193,12 @@ namespace Alis.Reactive.Validation
             TValue upperBound,
             string message)
         {
-            var bounds = ClientValidationProjectionRangeBounds.From(lowerBound, upperBound);
+            var bounds = ValidationRangeBounds.FromProjection(lowerBound, upperBound);
             return AddRule(
                 name,
                 message,
-                ValidationRuleDetails.WithConstraint(bounds.ToValidationRangeBounds(), _condition, bounds.EndpointShape));
+                ValidationRuleOperand.Range(bounds),
+                bounds.Shape);
         }
 
         private ClientValidationFieldRuleBuilder<TModel, TValue> AddPeerComparison(
@@ -163,23 +212,25 @@ namespace Alis.Reactive.Validation
             return AddRule(
                 name,
                 message,
-                ValidationRuleDetails.WithPeerField(
+                ValidationRuleOperand.PeerField(
                     peerField.Reference.Path,
-                    _condition,
-                    peerField.Reference.Shape));
+                    peerField.Reference.Shape),
+                peerField.Reference.Shape);
         }
 
         private ClientValidationFieldRuleBuilder<TModel, TValue> AddRule(
             ValidationRuleName name,
             string message,
-            ValidationRuleDetails details)
+            ValidationRuleOperand operand,
+            Shape shape)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            if (details == null) throw new ArgumentNullException(nameof(details));
+            if (operand == null) throw new ArgumentNullException(nameof(operand));
+            if (shape == null) throw new ArgumentNullException(nameof(shape));
 
             _projection.AddRule(
                 _field.Reference,
-                new ValidationRule(name, ValidationMessage.Of(message), details));
+                new ValidationRule(name, ValidationMessage.Of(message), operand, _activation, shape));
             return this;
         }
     }

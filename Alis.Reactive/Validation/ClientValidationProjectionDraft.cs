@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Validation
 {
@@ -43,8 +44,10 @@ namespace Alis.Reactive.Validation
             ClientValidationFieldReference field,
             ValidationRuleName name,
             ValidationMessage message,
-            ValidationRuleDetails details) =>
-            AddRule(field, new ValidationRule(name, message, details));
+            ValidationRuleOperand operand,
+            ValidationRuleActivation activation,
+            Shape shape) =>
+            AddRule(field, new ValidationRule(name, message, operand, activation, shape));
 
         internal IReadOnlyList<ClientValidationField> ToFields() =>
             _fields.Values.Select(field => field.ToField()).ToArray();

@@ -277,7 +277,8 @@ public class ResidentConditionalValidator : ReactiveValidator<ResidentModel>
 
 ## Step 4: Handle Server Response
 
-The controller endpoint handles server-side validation (for `.Must()`, `.When()`, and other server-only rules):
+The controller endpoint handles normal FluentValidation execution, including
+rules such as `.Must()` and `.When()` that are not projected into the browser plan:
 
 ```csharp
 [HttpPost]
@@ -323,7 +324,7 @@ RuleFor(x => x.Score).IsExclusiveBetween(0m, 100m);
 ### DO NOT use `.When()` for client-side conditions
 
 ```csharp
-// WRONG — .When() is server-only, adapter skips it entirely
+// WRONG for client projection — .When() is not part of the browser projection language
 RuleFor(x => x.JobTitle).NotEmpty().When(x => x.IsEmployed);
 
 // CORRECT — use ReactiveValidator + WhenField

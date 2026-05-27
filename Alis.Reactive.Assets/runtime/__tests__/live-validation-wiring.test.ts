@@ -118,7 +118,7 @@ function validationContainer(id: string, validationRules: ComponentValidation[])
     id,
     vendor: "native",
     type: "native.form",
-    contribution: { kind: "validation-container" },
+    role: { kind: "validation-container" },
     binding: { kind: "none" },
     container: {
       kind: "validation-container",
@@ -137,9 +137,7 @@ function validationRule(componentKey: string): ComponentValidation {
         name: "required",
         message: "Care date is required",
         execution: {
-          target: "none",
-          constraint: { kind: "none" },
-          otherValue: { kind: "none" },
+          kind: "none",
           activation: { kind: "always" },
           comparisonShape: noneShape,
         },
@@ -153,7 +151,7 @@ function fusionField(id: string): ComponentObject {
     id,
     vendor: "fusion",
     type: "fusion.fake",
-    contribution: { kind: "object-target" },
+    role: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };

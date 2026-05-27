@@ -86,12 +86,12 @@ function wireFieldDomEvents(
   el: HTMLElement,
   events: LiveFieldEvents,
 ): boolean {
-  if (wiredFields.hasDomEvents(field.component.id)) return false;
+  if (fieldHasDomEvents(field.component.id)) return false;
 
   // DOM events are best-effort field events; vendor semantic change is tracked separately.
   el.addEventListener("input", events.clear, events.listenerOptions);
   el.addEventListener("blur", events.revalidate, events.listenerOptions);
-  wiredFields.rememberDomEvents(field.component.id);
+  wiredFieldDomEvents.add(field.component.id);
   return true;
 }
 
@@ -99,7 +99,7 @@ function wireComponentChangeEvent(
   field: LiveFieldWire,
   events: LiveFieldEvents,
 ): boolean {
-  if (wiredFields.hasComponentChangeEvent(field.component.id)) return false;
+  if (fieldHasComponentChangeEvent(field.component.id)) return false;
 
   // Semantic "change" goes through the vendor's event system (DOM or modelObserver).
   try {
@@ -109,7 +109,7 @@ function wireComponentChangeEvent(
     throw e;
   }
 
-  wiredFields.rememberComponentChangeEvent(field.component.id);
+  wiredFieldComponentChangeEvents.add(field.component.id);
   return true;
 }
 
@@ -119,12 +119,13 @@ function componentChangeEventCanBeDeferred(error: unknown): boolean {
 
 /** Remove a field's wired status so it can be re-wired after partial reload. */
 export function unwireField(domId: string): void {
-  wiredFields.forget(domId);
+  forgetFieldWiring(domId);
 }
 
 /** Reset for tests — clears the wired set so tests start clean. */
 export function resetLiveClearForTests(): void {
-  wiredFields.clear();
+  wiredFieldDomEvents.clear();
+  wiredFieldComponentChangeEvents.clear();
 }
 
 function listenerOptionsFor(signal: AbortSignal | undefined): AddEventListenerOptions | undefined {
@@ -133,46 +134,21 @@ function listenerOptionsFor(signal: AbortSignal | undefined): AddEventListenerOp
   return { signal };
 }
 
-class LiveValidationWireRegistry {
-  private readonly domEventFields = new Set<string>();
-  private readonly componentChangeEventFields = new Set<string>();
+const wiredFieldDomEvents = new Set<string>();
+const wiredFieldComponentChangeEvents = new Set<string>();
 
-  hasDomEvents(componentDomId: string): boolean {
-    return this.domEventFields.has(componentDomId);
-  }
-
-  rememberDomEvents(componentDomId: string): void {
-    this.domEventFields.add(componentDomId);
-  }
-
-  hasComponentChangeEvent(componentDomId: string): boolean {
-    return this.componentChangeEventFields.has(componentDomId);
-  }
-
-  rememberComponentChangeEvent(componentDomId: string): void {
-    this.componentChangeEventFields.add(componentDomId);
-  }
-
-  forgetDomEvents(componentDomId: string): void {
-    this.domEventFields.delete(componentDomId);
-  }
-
-  forgetComponentChangeEvent(componentDomId: string): void {
-    this.componentChangeEventFields.delete(componentDomId);
-  }
-
-  forget(componentDomId: string): void {
-    this.domEventFields.delete(componentDomId);
-    this.componentChangeEventFields.delete(componentDomId);
-  }
-
-  clear(): void {
-    this.domEventFields.clear();
-    this.componentChangeEventFields.clear();
-  }
+function fieldHasDomEvents(componentDomId: string): boolean {
+  return wiredFieldDomEvents.has(componentDomId);
 }
 
-const wiredFields = new LiveValidationWireRegistry();
+function fieldHasComponentChangeEvent(componentDomId: string): boolean {
+  return wiredFieldComponentChangeEvents.has(componentDomId);
+}
+
+function forgetFieldWiring(componentDomId: string): void {
+  wiredFieldDomEvents.delete(componentDomId);
+  wiredFieldComponentChangeEvents.delete(componentDomId);
+}
 
 interface LiveFieldWireKinds {
   readonly domEvents: boolean;
@@ -185,7 +161,7 @@ function forgetWiredFieldOnAbort(
   kinds: LiveFieldWireKinds,
 ): void {
   signal?.addEventListener("abort", () => {
-    if (kinds.domEvents) wiredFields.forgetDomEvents(componentDomId);
-    if (kinds.componentChangeEvent) wiredFields.forgetComponentChangeEvent(componentDomId);
+    if (kinds.domEvents) wiredFieldDomEvents.delete(componentDomId);
+    if (kinds.componentChangeEvent) wiredFieldComponentChangeEvents.delete(componentDomId);
   }, { once: true });
 }

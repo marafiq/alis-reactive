@@ -5,8 +5,6 @@ namespace Alis.Reactive.Validation
 {
     internal sealed class ValidationFieldPath : IEquatable<ValidationFieldPath>
     {
-        private readonly ValidationFieldPathSegments _segments;
-
         private ValidationFieldPath(string value, ValidationFieldPathPolicy policy)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
@@ -16,13 +14,13 @@ namespace Alis.Reactive.Validation
             if (namedFieldIsMissing)
                 throw new ArgumentException("Validation field path must not be empty.", nameof(value));
 
-            _segments = ValidationFieldPathSegments.From(value, policy);
+            Segments = ParseSegments(value, policy);
             Value = value;
         }
 
         internal string Value { get; }
         internal bool IsEmpty => Value.Length == 0;
-        internal IReadOnlyList<string> Segments => _segments.ForResolution;
+        internal IReadOnlyList<string> Segments { get; }
 
         internal static ValidationFieldPath Empty { get; } =
             new ValidationFieldPath("", ValidationFieldPathPolicy.AllowRootField);
@@ -41,18 +39,6 @@ namespace Alis.Reactive.Validation
             return Of(Value + "." + relativePath.Value);
         }
 
-        internal ValidationFieldPath Parent()
-        {
-            var segments = Segments;
-            if (segments.Count <= 1) return Empty;
-
-            var parentSegments = new string[segments.Count - 1];
-            for (var index = 0; index < parentSegments.Length; index++)
-                parentSegments[index] = segments[index];
-
-            return Of(string.Join(".", parentSegments));
-        }
-
         public bool Equals(ValidationFieldPath? other) =>
             other != null && string.Equals(Value, other.Value, StringComparison.Ordinal);
 
@@ -61,20 +47,8 @@ namespace Alis.Reactive.Validation
         public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value);
 
         public override string ToString() => Value;
-    }
 
-    internal sealed class ValidationFieldPathSegments
-    {
-        private readonly IReadOnlyList<string> _segments;
-
-        private ValidationFieldPathSegments(IReadOnlyList<string> segments)
-        {
-            _segments = segments;
-        }
-
-        internal IReadOnlyList<string> ForResolution => _segments;
-
-        internal static ValidationFieldPathSegments From(
+        private static IReadOnlyList<string> ParseSegments(
             string value,
             ValidationFieldPathPolicy policy)
         {
@@ -84,7 +58,7 @@ namespace Alis.Reactive.Validation
             if (pathTargetsRoot)
             {
                 if (policy == ValidationFieldPathPolicy.AllowRootField)
-                    return new ValidationFieldPathSegments(Array.Empty<string>());
+                    return Array.Empty<string>();
 
                 throw new ArgumentException("Validation field path must not be empty.", nameof(value));
             }
@@ -95,11 +69,11 @@ namespace Alis.Reactive.Validation
                 var segment = segments[index];
                 if (string.IsNullOrWhiteSpace(segment))
                     throw new ArgumentException(
-                        $"Validation field path '{value}' contains an empty segment at index {index}.",
+                    $"Validation field path '{value}' contains an empty segment at index {index}.",
                         nameof(value));
             }
 
-            return new ValidationFieldPathSegments(segments);
+            return segments;
         }
     }
 
@@ -140,31 +114,6 @@ namespace Alis.Reactive.Validation
         }
 
         internal string Value { get; }
-
-        internal ValidationRuleKind ToPublicKind()
-        {
-            if (Equals(Required)) return ValidationRuleKind.Required;
-            if (Equals(Empty)) return ValidationRuleKind.Empty;
-            if (Equals(MinLength)) return ValidationRuleKind.MinLength;
-            if (Equals(MaxLength)) return ValidationRuleKind.MaxLength;
-            if (Equals(Email)) return ValidationRuleKind.Email;
-            if (Equals(Regex)) return ValidationRuleKind.Regex;
-            if (Equals(Url)) return ValidationRuleKind.Url;
-            if (Equals(CreditCard)) return ValidationRuleKind.CreditCard;
-            if (Equals(Range)) return ValidationRuleKind.Range;
-            if (Equals(ExclusiveRange)) return ValidationRuleKind.ExclusiveRange;
-            if (Equals(Min)) return ValidationRuleKind.Min;
-            if (Equals(Max)) return ValidationRuleKind.Max;
-            if (Equals(Gt)) return ValidationRuleKind.GreaterThan;
-            if (Equals(Lt)) return ValidationRuleKind.LessThan;
-            if (Equals(EqualTo)) return ValidationRuleKind.EqualTo;
-            if (Equals(NotEqual)) return ValidationRuleKind.NotEqual;
-            if (Equals(NotEqualTo)) return ValidationRuleKind.NotEqualTo;
-            if (Equals(AtLeastOne)) return ValidationRuleKind.AtLeastOne;
-
-            throw new InvalidOperationException(
-                "Unknown validation rule name '" + Value + "'.");
-        }
 
         internal static ValidationRuleName Required => Known["required"];
         internal static ValidationRuleName Empty => Known["empty"];

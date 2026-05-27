@@ -3,9 +3,9 @@ import type { ConvertResult } from "../core/shape-convert";
 import { RuntimeShape } from "../domain/runtime-shape";
 import type {
   Shape,
-  LiteralValidationConstraintOperand,
-  NumericValidationConstraintOperand,
-  RangeValidationConstraintOperand,
+  LiteralProducer,
+  NumericLiteralProducer,
+  RangeLiteralProducer,
 } from "../types";
 
 export class ValidationSubject {
@@ -24,10 +24,10 @@ export class ValidationSubject {
   }
 
   get isEmpty(): boolean {
-    const valueIsMissing = MissingValidationValue.matches(this.raw);
+    const valueIsMissing = isMissingValidationValue(this.raw);
     const valueIsFalse = this.raw === false;
     const valueIsEmptyString = this.text === "";
-    const valueIsEmptyArray = EmptyValidationCollection.matches(this.raw);
+    const valueIsEmptyArray = isEmptyValidationCollection(this.raw);
     const valueCannotBeConvertedToText = !this.textConversion.ok;
     return valueIsMissing || valueIsFalse || valueIsEmptyString || valueCannotBeConvertedToText || valueIsEmptyArray;
   }
@@ -53,8 +53,8 @@ export class ValidationSubject {
 export class ValidationScalarTarget {
   private constructor(private readonly value: unknown) {}
 
-  static fromConstraintOperand(operand: LiteralValidationConstraintOperand): ValidationScalarTarget {
-    return ValidationScalarTarget.available(operand.value.value);
+  static fromLiteral(literal: LiteralProducer): ValidationScalarTarget {
+    return ValidationScalarTarget.available(literal.value);
   }
 
   static available(value: unknown): ValidationScalarTarget {
@@ -73,15 +73,15 @@ export class ValidationScalarTarget {
   }
 
   equalsSubject(subject: unknown, shape: Shape): boolean {
-    return ShapeAwareEquality.matches(subject, this.value, shape);
+    return valuesMatchShape(subject, this.value, shape);
   }
 }
 
 export class ValidationLengthConstraint {
   private constructor(private readonly expectedLength: number) {}
 
-  static fromOperand(operand: NumericValidationConstraintOperand): ValidationLengthConstraint {
-    return new ValidationLengthConstraint(operand.value.value);
+  static fromLiteral(literal: NumericLiteralProducer): ValidationLengthConstraint {
+    return new ValidationLengthConstraint(literal.value);
   }
 
   isGreaterThan(actualLength: number): boolean {
@@ -104,12 +104,12 @@ export class ShapedComparison {
     const comparisonShape = RuntimeShape.from(shape);
     if (!comparisonShape.isDeclared) return ShapedComparison.missing();
 
-    const leftValue = ComparableValidationValue.from(left, comparisonShape);
-    const rightValue = ComparableValidationValue.from(right, comparisonShape);
+    const leftValue = comparableValidationNumber(left, comparisonShape);
+    const rightValue = comparableValidationNumber(right, comparisonShape);
     const operandsAreComparable = leftValue !== undefined && rightValue !== undefined;
     if (!operandsAreComparable) return ShapedComparison.missing();
 
-    return new ShapedComparison(leftValue.differenceFrom(rightValue));
+    return new ShapedComparison(leftValue - rightValue);
   }
 
   get cannotCompare(): boolean {
@@ -129,57 +129,43 @@ export class ShapedComparison {
   }
 }
 
-class ComparableValidationValue {
-  private constructor(private readonly value: number) {}
+function comparableValidationNumber(raw: unknown, shape: RuntimeShape): number | undefined {
+  const converted = shape.convert(raw);
+  if (!converted.ok) return undefined;
+  if (typeof converted.value !== "number") return undefined;
+  if (!Number.isFinite(converted.value)) return undefined;
 
-  static from(raw: unknown, shape: RuntimeShape): ComparableValidationValue | undefined {
-    const converted = shape.convert(raw);
-    if (!converted.ok) return undefined;
-    if (typeof converted.value !== "number") return undefined;
-    if (!Number.isFinite(converted.value)) return undefined;
-
-    return new ComparableValidationValue(converted.value);
-  }
-
-  differenceFrom(target: ComparableValidationValue): number {
-    return this.value - target.value;
-  }
+  return converted.value;
 }
 
-class ShapeAwareEquality {
-  static matches(left: unknown, right: unknown, shape: Shape): boolean {
-    const comparisonShape = RuntimeShape.from(shape);
-    if (comparisonShape.isDeclared) {
-      return comparisonShape.apply(left) === comparisonShape.apply(right);
-    }
-
-    const normalizedLeft = ShapeAwareEquality.textOrEmpty(left);
-    const normalizedRight = ShapeAwareEquality.textOrEmpty(right);
-    return normalizedLeft === normalizedRight;
+function valuesMatchShape(left: unknown, right: unknown, shape: Shape): boolean {
+  const comparisonShape = RuntimeShape.from(shape);
+  if (comparisonShape.isDeclared) {
+    return comparisonShape.apply(left) === comparisonShape.apply(right);
   }
 
-  private static textOrEmpty(value: unknown): string {
-    const text = toString(value);
-    if (text.ok) return text.value;
-    return "";
-  }
+  const normalizedLeft = textOrEmpty(left);
+  const normalizedRight = textOrEmpty(right);
+  return normalizedLeft === normalizedRight;
 }
 
-class MissingValidationValue {
-  static matches(value: unknown): boolean {
-    const valueIsNull = value === null;
-    const valueIsUndefined = value === undefined;
-    return valueIsNull || valueIsUndefined;
-  }
+function textOrEmpty(value: unknown): string {
+  const text = toString(value);
+  if (text.ok) return text.value;
+  return "";
 }
 
-class EmptyValidationCollection {
-  static matches(value: unknown): boolean {
-    const valueIsCollection = Array.isArray(value);
-    if (!valueIsCollection) return false;
+function isMissingValidationValue(value: unknown): boolean {
+  const valueIsNull = value === null;
+  const valueIsUndefined = value === undefined;
+  return valueIsNull || valueIsUndefined;
+}
 
-    return value.length === 0;
-  }
+function isEmptyValidationCollection(value: unknown): boolean {
+  const valueIsCollection = Array.isArray(value);
+  if (!valueIsCollection) return false;
+
+  return value.length === 0;
 }
 
 export class ValidationRangeTarget {
@@ -188,8 +174,8 @@ export class ValidationRangeTarget {
     readonly upperBound: ValidationScalarTarget,
   ) {}
 
-  static fromOperand(operand: RangeValidationConstraintOperand): ValidationRangeTarget {
-    const [lower, upper] = operand.value.value;
+  static fromLiteral(literal: RangeLiteralProducer): ValidationRangeTarget {
+    const [lower, upper] = literal.value;
 
     return new ValidationRangeTarget(
       ValidationScalarTarget.available(lower),

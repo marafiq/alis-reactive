@@ -29,7 +29,7 @@ namespace Alis.Reactive.FluentValidator
                     throw new ArgumentException("Client condition projection must not be null.", nameof(conditions));
 
                 if (!condition.TryProject(out var fieldCondition, out var fields))
-                    return Unprojected();
+                    return ServerOnly();
 
                 projectedConditions.Add(fieldCondition);
                 projectedFields.AddRange(fields);
@@ -40,8 +40,8 @@ namespace Alis.Reactive.FluentValidator
                 ClientValidationGuardFields.From(projectedFields));
         }
 
-        internal static ClientConditionProjection Unprojected() =>
-            UnprojectedClientCondition.Instance;
+        internal static ClientConditionProjection ServerOnly() =>
+            ServerOnlyClientCondition.Instance;
 
         internal abstract bool TryProject(
             [NotNullWhen(true)] out FieldCondition? condition,
@@ -70,11 +70,11 @@ namespace Alis.Reactive.FluentValidator
             }
         }
 
-        private sealed class UnprojectedClientCondition : ClientConditionProjection
+        private sealed class ServerOnlyClientCondition : ClientConditionProjection
         {
-            internal static UnprojectedClientCondition Instance { get; } = new UnprojectedClientCondition();
+            internal static ServerOnlyClientCondition Instance { get; } = new ServerOnlyClientCondition();
 
-            private UnprojectedClientCondition() { }
+            private ServerOnlyClientCondition() { }
 
             internal override bool TryProject(
                 [NotNullWhen(true)] out FieldCondition? condition,

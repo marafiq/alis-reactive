@@ -11,7 +11,7 @@ namespace Alis.Reactive.Validation
     /// Resolved to <see cref="PlanModel.Condition"/> at render time when
     /// the component map is available.
     /// </summary>
-    public abstract class FieldCondition
+    internal abstract class FieldCondition
     {
         private protected FieldCondition() { }
 
@@ -28,10 +28,10 @@ namespace Alis.Reactive.Validation
             new FieldCompare(field, op, value);
 
         internal static FieldCondition All(params FieldCondition[] terms) =>
-            new FieldAll(FieldConditionTerms.From("all", terms));
+            new FieldAll(CompositeTerms("all", terms));
 
         internal static FieldCondition Any(params FieldCondition[] terms) =>
-            new FieldAny(FieldConditionTerms.From("any", terms));
+            new FieldAny(CompositeTerms("any", terms));
 
         internal static FieldCondition Not(FieldCondition term) =>
             new FieldNot(term);
@@ -39,20 +39,10 @@ namespace Alis.Reactive.Validation
         internal abstract Condition ToPlanCondition(FieldConditionPlanBinding binding);
 
         internal abstract FieldCondition PrefixWith(FieldConditionPrefixBinding binding);
-    }
 
-    internal sealed class FieldConditionTerms
-    {
-        private readonly IReadOnlyList<FieldCondition> _items;
-
-        private FieldConditionTerms(IReadOnlyList<FieldCondition> items)
-        {
-            _items = items ?? throw new ArgumentNullException(nameof(items));
-        }
-
-        internal IReadOnlyList<FieldCondition> Items => _items;
-
-        internal static FieldConditionTerms From(string composition, IEnumerable<FieldCondition> terms)
+        private static IReadOnlyList<FieldCondition> CompositeTerms(
+            string composition,
+            IEnumerable<FieldCondition> terms)
         {
             if (composition == null) throw new ArgumentNullException(nameof(composition));
             if (terms == null) throw new ArgumentNullException(nameof(terms));
@@ -69,51 +59,18 @@ namespace Alis.Reactive.Validation
                     $"Composite field condition '{composition}' requires at least one term.",
                     nameof(terms));
 
-            return new FieldConditionTerms(items);
-        }
-
-        internal Condition ToAllCondition(FieldConditionPlanBinding binding)
-        {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return Condition.All(_items.Select(term => term.ToPlanCondition(binding)).ToArray());
-        }
-
-        internal Condition ToAnyCondition(FieldConditionPlanBinding binding)
-        {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return Condition.Any(_items.Select(term => term.ToPlanCondition(binding)).ToArray());
-        }
-
-        internal FieldCondition PrefixAsAll(FieldConditionPrefixBinding binding)
-        {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return FieldCondition.All(_items.Select(term => term.PrefixWith(binding)).ToArray());
-        }
-
-        internal FieldCondition PrefixAsAny(FieldConditionPrefixBinding binding)
-        {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return FieldCondition.Any(_items.Select(term => term.PrefixWith(binding)).ToArray());
+            return items;
         }
     }
 
     /// <summary>
     /// A single field comparison: read field, apply operator, and optionally compare to a right operand.
     /// </summary>
-    public sealed class FieldCompare : FieldCondition
+    internal sealed class FieldCompare : FieldCondition
     {
         private readonly ValidationFieldPath _field;
         private readonly CompareOperator _op;
         private readonly FieldComparisonValue _value;
-
-        /// <summary>Property name to check (e.g. "IsEmployed").</summary>
-        public string Field => _field.Value;
-
-        /// <summary>Gets the comparison operator role.</summary>
-        public FieldComparisonOperator Op => FieldComparisonOperatorCatalog.From(_op);
-
-        /// <summary>Gets the comparison operand with an explicit kind.</summary>
-        public FieldComparisonOperand Operand => _value.ToOperand();
 
         internal FieldCompare(ValidationFieldPath field, CompareOperator op, FieldComparisonValue value)
         {
@@ -139,75 +96,12 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    public enum FieldComparisonOperator
-    {
-        Equal,
-        NotEqual,
-        GreaterThan,
-        GreaterThanOrEqual,
-        LessThan,
-        LessThanOrEqual,
-        Truthy,
-        Falsy,
-        IsNull,
-        NotNull,
-        IsEmpty,
-        NotEmpty,
-        In,
-        NotIn,
-        Between,
-        Contains,
-        StartsWith,
-        EndsWith,
-        Matches,
-        MinLength,
-        ArrayContains
-    }
-
-    internal static class FieldComparisonOperatorCatalog
-    {
-        internal static FieldComparisonOperator From(CompareOperator op)
-        {
-            if (op == null) throw new ArgumentNullException(nameof(op));
-
-            switch (op.Value)
-            {
-                case CompareOp.Eq: return FieldComparisonOperator.Equal;
-                case CompareOp.Neq: return FieldComparisonOperator.NotEqual;
-                case CompareOp.Gt: return FieldComparisonOperator.GreaterThan;
-                case CompareOp.Gte: return FieldComparisonOperator.GreaterThanOrEqual;
-                case CompareOp.Lt: return FieldComparisonOperator.LessThan;
-                case CompareOp.Lte: return FieldComparisonOperator.LessThanOrEqual;
-                case CompareOp.Truthy: return FieldComparisonOperator.Truthy;
-                case CompareOp.Falsy: return FieldComparisonOperator.Falsy;
-                case CompareOp.IsNull: return FieldComparisonOperator.IsNull;
-                case CompareOp.NotNull: return FieldComparisonOperator.NotNull;
-                case CompareOp.IsEmpty: return FieldComparisonOperator.IsEmpty;
-                case CompareOp.NotEmpty: return FieldComparisonOperator.NotEmpty;
-                case CompareOp.In: return FieldComparisonOperator.In;
-                case CompareOp.NotIn: return FieldComparisonOperator.NotIn;
-                case CompareOp.Between: return FieldComparisonOperator.Between;
-                case CompareOp.Contains: return FieldComparisonOperator.Contains;
-                case CompareOp.StartsWith: return FieldComparisonOperator.StartsWith;
-                case CompareOp.EndsWith: return FieldComparisonOperator.EndsWith;
-                case CompareOp.Matches: return FieldComparisonOperator.Matches;
-                case CompareOp.MinLength: return FieldComparisonOperator.MinLength;
-                case CompareOp.ArrayContains: return FieldComparisonOperator.ArrayContains;
-                default:
-                    throw new InvalidOperationException(
-                        "Unknown field comparison operator '" + op.Value + "'.");
-            }
-        }
-    }
-
     internal abstract class FieldComparisonValue
     {
         private FieldComparisonValue() { }
 
         internal static FieldComparisonValue None { get; } =
             new UnaryFieldComparisonValue();
-
-        internal abstract FieldComparisonOperand ToOperand();
 
         internal abstract ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape);
 
@@ -232,9 +126,6 @@ namespace Alis.Reactive.Validation
 
         private sealed class UnaryFieldComparisonValue : FieldComparisonValue
         {
-            internal override FieldComparisonOperand ToOperand() =>
-                FieldComparisonOperand.None;
-
             internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape) =>
                 ComparisonOperands.Unary(left, fieldShape);
         }
@@ -247,9 +138,6 @@ namespace Alis.Reactive.Validation
             {
                 _value = value;
             }
-
-            internal override FieldComparisonOperand ToOperand() =>
-                FieldComparisonOperand.Literal(_value);
 
             internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape) =>
                 ComparisonOperands.Binary(left, ValueProducer.LiteralRaw(_value, fieldShape), fieldShape);
@@ -266,9 +154,6 @@ namespace Alis.Reactive.Validation
                 _literalShape = literalShape ?? throw new ArgumentNullException(nameof(literalShape));
             }
 
-            internal override FieldComparisonOperand ToOperand() =>
-                FieldComparisonOperand.Literal(_value);
-
             internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape) =>
                 ComparisonOperands.Binary(left, ValueProducer.LiteralRaw(_value, _literalShape), fieldShape);
         }
@@ -283,9 +168,6 @@ namespace Alis.Reactive.Validation
                 _items = items.ToArray();
             }
 
-            internal override FieldComparisonOperand ToOperand() =>
-                FieldComparisonOperand.Array(_items);
-
             internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape)
             {
                 var values = new List<ValueProducer>(_items.Count);
@@ -293,7 +175,7 @@ namespace Alis.Reactive.Validation
                     values.Add(ValueProducer.LiteralRaw(item, fieldShape));
                 return ComparisonOperands.Binary(
                     left,
-                    ValueProducer.Array(values, FieldComparisonArrayOperandShape.FromComparedFieldShape(fieldShape)),
+                    ValueProducer.Array(values, Shape.ArrayOf(fieldShape.IsNone ? Shape.Any : fieldShape)),
                     fieldShape);
             }
         }
@@ -309,9 +191,6 @@ namespace Alis.Reactive.Validation
                 _itemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
             }
 
-            internal override FieldComparisonOperand ToOperand() =>
-                FieldComparisonOperand.Literal(_value);
-
             internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape) =>
                 ComparisonOperands.CollectionItem(
                     left,
@@ -321,89 +200,11 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    internal static class FieldComparisonArrayOperandShape
+    internal sealed class FieldAll : FieldCondition
     {
-        internal static Shape FromComparedFieldShape(Shape fieldShape)
-        {
-            if (fieldShape == null) throw new ArgumentNullException(nameof(fieldShape));
-            if (fieldShape.IsNone) return Shape.ArrayOf(Shape.Any);
+        private readonly IReadOnlyList<FieldCondition> _terms;
 
-            return Shape.ArrayOf(fieldShape);
-        }
-    }
-
-    /// <summary>
-    /// Describes the right-hand operand of a field comparison without using
-    /// <see langword="null"/> as the absence marker.
-    /// </summary>
-    public abstract class FieldComparisonOperand
-    {
-        private protected FieldComparisonOperand() { }
-
-        /// <summary>Gets the operand role in the comparison.</summary>
-        public abstract FieldComparisonOperandKind Kind { get; }
-
-        internal static FieldComparisonOperand None { get; } = new NoFieldComparisonOperand();
-
-        internal static FieldComparisonOperand Literal(object? value) =>
-            new LiteralFieldComparisonOperand(value);
-
-        internal static FieldComparisonOperand Array(IEnumerable<object?> values)
-        {
-            if (values == null) throw new ArgumentNullException(nameof(values));
-            return new ArrayFieldComparisonOperand(values);
-        }
-    }
-
-    public sealed class NoFieldComparisonOperand : FieldComparisonOperand
-    {
-        internal NoFieldComparisonOperand() { }
-
-        public override FieldComparisonOperandKind Kind => FieldComparisonOperandKind.None;
-    }
-
-    public sealed class LiteralFieldComparisonOperand : FieldComparisonOperand
-    {
-        internal LiteralFieldComparisonOperand(object? value)
-        {
-            Value = value;
-        }
-
-        public override FieldComparisonOperandKind Kind => FieldComparisonOperandKind.Literal;
-        public object? Value { get; }
-        public bool IsLiteralNull => Value == null;
-    }
-
-    public sealed class ArrayFieldComparisonOperand : FieldComparisonOperand
-    {
-        private readonly object?[] _values;
-
-        internal ArrayFieldComparisonOperand(IEnumerable<object?> values)
-        {
-            if (values == null) throw new ArgumentNullException(nameof(values));
-            _values = values.ToArray();
-        }
-
-        public override FieldComparisonOperandKind Kind => FieldComparisonOperandKind.Array;
-        public IReadOnlyList<object?> Values => _values;
-    }
-
-    public enum FieldComparisonOperandKind
-    {
-        None,
-        Literal,
-        Array
-    }
-
-    /// <summary>Logical AND — all terms must be true.</summary>
-    public sealed class FieldAll : FieldCondition
-    {
-        private readonly FieldConditionTerms _terms;
-
-        /// <summary>Gets the child conditions that must all be true.</summary>
-        public IReadOnlyList<FieldCondition> Terms => _terms.Items;
-
-        internal FieldAll(FieldConditionTerms terms)
+        internal FieldAll(IReadOnlyList<FieldCondition> terms)
         {
             _terms = terms ?? throw new ArgumentNullException(nameof(terms));
         }
@@ -411,25 +212,21 @@ namespace Alis.Reactive.Validation
         internal override Condition ToPlanCondition(FieldConditionPlanBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return _terms.ToAllCondition(binding);
+            return Condition.All(_terms.Select(term => term.ToPlanCondition(binding)).ToArray());
         }
 
         internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return _terms.PrefixAsAll(binding);
+            return FieldCondition.All(_terms.Select(term => term.PrefixWith(binding)).ToArray());
         }
     }
 
-    /// <summary>Logical OR — any term must be true.</summary>
-    public sealed class FieldAny : FieldCondition
+    internal sealed class FieldAny : FieldCondition
     {
-        private readonly FieldConditionTerms _terms;
+        private readonly IReadOnlyList<FieldCondition> _terms;
 
-        /// <summary>Gets the child conditions where at least one must be true.</summary>
-        public IReadOnlyList<FieldCondition> Terms => _terms.Items;
-
-        internal FieldAny(FieldConditionTerms terms)
+        internal FieldAny(IReadOnlyList<FieldCondition> terms)
         {
             _terms = terms ?? throw new ArgumentNullException(nameof(terms));
         }
@@ -437,37 +234,35 @@ namespace Alis.Reactive.Validation
         internal override Condition ToPlanCondition(FieldConditionPlanBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return _terms.ToAnyCondition(binding);
+            return Condition.Any(_terms.Select(term => term.ToPlanCondition(binding)).ToArray());
         }
 
         internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return _terms.PrefixAsAny(binding);
+            return FieldCondition.Any(_terms.Select(term => term.PrefixWith(binding)).ToArray());
         }
     }
 
-    /// <summary>Logical NOT — inverts the inner term.</summary>
-    public sealed class FieldNot : FieldCondition
+    internal sealed class FieldNot : FieldCondition
     {
-        /// <summary>Gets the inner condition to negate.</summary>
-        public FieldCondition Term { get; }
+        private readonly FieldCondition _term;
 
         internal FieldNot(FieldCondition term)
         {
-            Term = term ?? throw new ArgumentNullException(nameof(term));
+            _term = term ?? throw new ArgumentNullException(nameof(term));
         }
 
         internal override Condition ToPlanCondition(FieldConditionPlanBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return Condition.Not(Term.ToPlanCondition(binding));
+            return Condition.Not(_term.ToPlanCondition(binding));
         }
 
         internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return FieldCondition.Not(Term.PrefixWith(binding));
+            return FieldCondition.Not(_term.PrefixWith(binding));
         }
     }
 
