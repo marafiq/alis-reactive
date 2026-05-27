@@ -87,9 +87,7 @@ public sealed class WhenGatherDslBuildsRequestInput
             trigger.DomReady(pipeline =>
             {
                 pipeline.Post("/schedule/events", gather => gather
-                    .Include(
-                        pipeline.Component<FusionSchedule>("shift-schedule").GetEvents(),
-                        "events"));
+                    .Include(pipeline.Component<FusionSchedule>("shift-schedule").GetEvents()));
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
@@ -108,7 +106,7 @@ public sealed class WhenGatherDslBuildsRequestInput
 
         Assert.Multiple(() =>
         {
-            Assert.That(assignment.GetProperty("target").GetProperty("name").GetString(), Is.EqualTo("events"));
+            Assert.That(assignment.GetProperty("target").GetProperty("name").GetString(), Is.EqualTo("getEvents"));
             Assert.That(source.GetProperty("from").GetProperty("kind").GetString(), Is.EqualTo("component"));
             Assert.That(source.GetProperty("member").GetString(), Is.EqualTo("getEvents"));
             Assert.That(source.GetProperty("access").GetProperty("kind").GetString(), Is.EqualTo("method"));
