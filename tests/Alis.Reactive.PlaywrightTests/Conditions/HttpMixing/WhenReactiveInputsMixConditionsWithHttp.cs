@@ -149,7 +149,7 @@ public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
     }
 
     [Test]
-    public async Task changing_the_follow_up_label_recomputes_the_success_handler_branch_without_stale_text()
+    public async Task changing_the_follow_up_label_recomputes_the_success_route_branch_without_stale_text()
     {
         await NavigateAndBoot();
 
@@ -187,7 +187,7 @@ public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
     }
 
     [Test]
-    public async Task changing_the_error_category_recomputes_the_error_handler_branch_without_stale_messages()
+    public async Task changing_the_error_category_recomputes_the_error_route_branch_without_stale_messages()
     {
         await NavigateAndBoot();
 

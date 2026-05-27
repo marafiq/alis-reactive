@@ -374,7 +374,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     }
 
     // ════════════════════════════════════════════════════════════════════
-    // Section 7: Condition inside OnError handler
+    // Section 7: Condition inside OnError route
     // ════════════════════════════════════════════════════════════════════
 
     [Test]
@@ -384,9 +384,9 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
 
         await Page.Locator("#s7-btn-required").ClickAsync();
 
-        // OnError fires (400), inner condition: category="required" → Then branch
+        // OnError route fires (400), inner condition: category="required" → Then branch
         await Expect(Page.Locator("#s7-error-msg")).ToHaveTextAsync("missing required fields", new() { Timeout = 5000 });
-        // OnSuccess should NOT have fired
+        // OnSuccess route should not have fired
         await Expect(Page.Locator("#s7-status")).ToHaveTextAsync("\u2014");
 
         AssertNoConsoleErrorsExcept("400");
@@ -399,7 +399,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
 
         await Page.Locator("#s7-btn-other").ClickAsync();
 
-        // OnError fires, inner condition: category="format" ≠ "required" → Else branch
+        // OnError route fires, inner condition: category="format" ≠ "required" → Else branch
         await Expect(Page.Locator("#s7-error-msg")).ToHaveTextAsync("validation error", new() { Timeout = 5000 });
 
         AssertNoConsoleErrorsExcept("400");
@@ -493,7 +493,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     }
 
     [Test]
-    public async Task ordered_mixed_modules_after_http_run_after_response_handlers()
+    public async Task ordered_mixed_modules_after_http_run_after_response_routes()
     {
         await NavigateAndBoot();
 
@@ -509,7 +509,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     }
 
     [Test]
-    public async Task ordered_mixed_modules_after_parallel_wait_for_all_settled_handlers()
+    public async Task ordered_mixed_modules_after_parallel_wait_for_all_settled_reactions()
     {
         await NavigateAndBoot();
 

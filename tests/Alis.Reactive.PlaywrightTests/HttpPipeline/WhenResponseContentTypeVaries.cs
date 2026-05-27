@@ -1,7 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline;
 
 /// <summary>
-/// Proves that the framework's response handling pipeline works for all supported content types:
+/// Proves that the framework's response routing pipeline works for all supported content types:
 ///   1. Flat JSON — OnSuccess&lt;T&gt; with shallow property walking
 ///   2. Nested JSON — OnSuccess&lt;T&gt; with 3-level deep dot-path walking
 ///   3. HTML partial — Into() injects server-rendered HTML, native inputs work, SF components initialize
@@ -35,7 +35,7 @@ public class WhenResponseContentTypeVaries : PlaywrightTestBase
         await Expect(Page.Locator("#flat-message")).ToHaveTextAsync("Hello from server", new() { Timeout = 5000 });
         await Expect(Page.Locator("#flat-count")).ToHaveTextAsync("42", new() { Timeout = 5000 });
 
-        // Spinner must be hidden after success handler completes
+        // Spinner must be hidden after success route completes
         await Expect(Page.Locator("#flat-spinner")).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
@@ -61,7 +61,7 @@ public class WhenResponseContentTypeVaries : PlaywrightTestBase
         await Expect(Page.Locator("#nested-email")).ToHaveTextAsync("jane@example.com", new() { Timeout = 5000 });
         await Expect(Page.Locator("#nested-total")).ToHaveTextAsync("99.5", new() { Timeout = 5000 });
 
-        // Spinner must be hidden after success handler completes
+        // Spinner must be hidden after success route completes
         await Expect(Page.Locator("#nested-spinner")).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
@@ -97,7 +97,7 @@ public class WhenResponseContentTypeVaries : PlaywrightTestBase
         // the component constructor ran (not just raw HTML injection)
         await Expect(Page.Locator("#partial-container .e-numerictextbox")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        // Spinner must be hidden after success handler completes
+        // Spinner must be hidden after success route completes
         await Expect(Page.Locator("#partial-spinner")).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
