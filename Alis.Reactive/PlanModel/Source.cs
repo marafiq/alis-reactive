@@ -102,7 +102,7 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>Gets the kind. Always <c>"plugin"</c>.</summary>
         public string Kind => "plugin";
-        /// <summary>Gets the plugin registry name.</summary>
+        /// <summary>Gets the browser plugin name.</summary>
         public string Name => _name.Value;
         /// <summary>Gets the plugin object contract type key.</summary>
         public string Type => _type.Value;

@@ -9,7 +9,7 @@ namespace Alis.Reactive
     /// </summary>
     /// <remarks>
     /// Call <see cref="UseClientValidationProjectionSource"/> in <c>Program.cs</c> or <c>Startup.cs</c>
-    /// to enable client-side validation projection from validators, registries, or generated model metadata.
+        /// to enable client-side validation projection from validators, direct projections, or generated model metadata.
     /// Without this call, views that use <c>Validate&lt;TValidationSource&gt;()</c> will throw at render time.
     /// </remarks>
     public static class ReactivePlanConfig
@@ -26,7 +26,7 @@ namespace Alis.Reactive
         /// Must be called exactly once at app startup. Calling it a second time throws
         /// to prevent accidental double-registration that would silently replace the projection source.
         /// </remarks>
-        /// <param name="source">The projection source implementation, such as a core registry or the FluentValidation adapter.</param>
+        /// <param name="source">The projection source implementation, such as direct model rules or the FluentValidation adapter.</param>
         /// <exception cref="InvalidOperationException">Thrown if a projection source is already registered.</exception>
         public static void UseClientValidationProjectionSource(IClientValidationProjectionSource source)
         {

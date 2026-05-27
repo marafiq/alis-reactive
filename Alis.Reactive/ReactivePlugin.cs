@@ -20,7 +20,7 @@ namespace Alis.Reactive
             _name = PluginName.Of(name);
         }
 
-        /// <summary>Gets the plugin registry name used by the browser runtime.</summary>
+        /// <summary>Gets the browser plugin name used by the runtime.</summary>
         public string Name => _name.Value;
 
         /// <summary>Declares a plugin function that returns a value.</summary>
@@ -269,7 +269,7 @@ namespace Alis.Reactive
             _returns = returns ?? throw new ArgumentNullException(nameof(returns));
         }
 
-        /// <summary>Gets the plugin registry name.</summary>
+        /// <summary>Gets the browser plugin name.</summary>
         public string PluginName => _pluginName.Value;
 
         /// <summary>Gets the declared plugin target name; root functions report <c>root</c>.</summary>
@@ -319,7 +319,7 @@ namespace Alis.Reactive
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
-        /// <summary>Gets the plugin registry name.</summary>
+        /// <summary>Gets the browser plugin name.</summary>
         public string PluginName => _property.PluginNameValue;
 
         /// <summary>Gets the readable plugin property name.</summary>
