@@ -400,7 +400,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("RequestReaction")
                 .Requires("kind", Literal("request"))
-                .Requires("request", "Request"));
+                .Requires("request", "RequestPlan"));
 
             contract.Declare(Interface("DispatchReaction")
                 .Requires("kind", Literal("dispatch"))
@@ -439,7 +439,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(LiteralUnion("HttpMethod", HttpMethodName.Values));
 
-            contract.Declare(Interface("Request")
+            contract.Declare(Interface("RequestPlan")
                 .Requires("method", "HttpMethod")
                 .Requires("url", "string")
                 .Requires("validation", "RequestValidationTarget")
@@ -469,7 +469,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("FollowUpRequestChain")
                 .Requires("kind", Literal("follow-up"))
-                .Requires("next", "Request"));
+                .Requires("next", "RequestPlan"));
 
             contract.Declare(Union("RequestInput", "NoRequestInput", "RequestInputProjection"));
             contract.Declare(LiteralUnion("RequestBodyFormat", RequestBodyFormat.Values));

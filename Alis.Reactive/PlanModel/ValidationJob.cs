@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlanModel
     /// <para>
     /// Recorded when a request calls <c>.Validate&lt;T&gt;(formId)</c> and resolved once,
     /// at the end of <c>Render()</c>, when every component on the page is known. The job
-    /// carries the values resolution needs — never a <see cref="Request"/> reference, so
+    /// carries the values resolution needs — never a <see cref="RequestPlan"/> reference, so
     /// it cannot outlive or drift from the request instance it was declared on.
     /// </para>
     /// </summary>

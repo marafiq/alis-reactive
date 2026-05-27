@@ -3,7 +3,7 @@
 
 import { executeReaction } from "../../execution/execute";
 import { scope } from "../../core/trace";
-import type { Reaction, Plan, Request, ParallelCompletion } from "../../types";
+import type { Reaction, Plan, RequestPlan, ParallelCompletion } from "../../types";
 import { assertNever } from "../../core/assert-never";
 
 const log = scope("native-action-link");
@@ -66,8 +66,8 @@ function bindHrefToSingleRequest(reaction: Reaction, href: string): void {
   request.url = href;
 }
 
-function singleRequestFromActionLinkReaction(reaction: Reaction): Request {
-  const requests: Request[] = [];
+function singleRequestFromActionLinkReaction(reaction: Reaction): RequestPlan {
+  const requests: RequestPlan[] = [];
   collectDeclaredRequests(reaction, requests);
 
   const request = requests[0];
@@ -78,7 +78,7 @@ function singleRequestFromActionLinkReaction(reaction: Reaction): Request {
   return request;
 }
 
-function collectDeclaredRequests(reaction: Reaction, requests: Request[]): void {
+function collectDeclaredRequests(reaction: Reaction, requests: RequestPlan[]): void {
   switch (reaction.kind) {
     case "sequence":
       for (const step of reaction.steps) collectDeclaredRequests(step, requests);
@@ -111,7 +111,7 @@ function collectDeclaredRequests(reaction: Reaction, requests: Request[]): void 
 
 function collectRequestsFromParallelCompletion(
   completion: ParallelCompletion,
-  requests: Request[],
+  requests: RequestPlan[],
 ): void {
   switch (completion.kind) {
     case "none":
@@ -124,7 +124,7 @@ function collectRequestsFromParallelCompletion(
   }
 }
 
-function assertActionLinkRequestSupported(request: Request): void {
+function assertActionLinkRequestSupported(request: RequestPlan): void {
   const requestUsesChaining = request.chain.kind === "follow-up";
   if (requestUsesChaining) {
     throw new Error("NativeActionLink does not support chained requests.");

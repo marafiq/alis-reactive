@@ -9,7 +9,7 @@ import type {
   PayloadScope,
   Plan,
   Reaction,
-  Request,
+  RequestPlan,
   Shape,
   StructuredPath,
   ValueProducer,
@@ -26,13 +26,13 @@ function literal(value: string): ValueProducer {
   return { kind: "literal", value, shape: stringShape };
 }
 
-function gatherInput(sourcesByPayloadName: Record<string, ValueProducer>): Request["input"] {
+function gatherInput(sourcesByPayloadName: Record<string, ValueProducer>): RequestPlan["input"] {
   return requestInput(
     Object.entries(sourcesByPayloadName).map(([name, value]) => payloadAssignment(name, value))
   );
 }
 
-function requestInput(assignments: RequestInputAssignment[]): Request["input"] {
+function requestInput(assignments: RequestInputAssignment[]): RequestPlan["input"] {
   return {
     kind: "gather",
     assignments,
@@ -88,7 +88,7 @@ function setText(component: string, value: ValueProducer): Reaction {
   };
 }
 
-function request(overrides: Partial<Request>): Request {
+function request(overrides: Partial<RequestPlan>): RequestPlan {
   return {
     method: "POST",
     url: "/residents",

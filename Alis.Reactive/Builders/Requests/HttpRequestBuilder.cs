@@ -120,14 +120,14 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        internal Request BuildRequest()
+        internal RequestPlan BuildRequest()
         {
             var endpoint = _endpoint ?? throw new InvalidOperationException(
                 "HTTP request endpoint was not selected. Call Get, Post, Put, or Delete before the request is built.");
             var input = ResolveInput(endpoint.Url);
             var validation = _validation;
 
-            var request = Request.Create(
+            var request = RequestPlan.Create(
                 endpoint,
                 input,
                 Snapshot(_whileLoading),
@@ -195,7 +195,7 @@ namespace Alis.Reactive.Builders.Requests
         internal static ClientValidationBeforeRequest Using(Type sourceType, ComponentId container) =>
             new ClientValidationBeforeRequest(sourceType, container);
 
-        internal void Register(PlanBuildContext context, Request request)
+        internal void Register(PlanBuildContext context, RequestPlan request)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             context.RegisterValidationJob(request, _container, _sourceType);

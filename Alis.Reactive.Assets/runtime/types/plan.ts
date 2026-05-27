@@ -535,7 +535,7 @@ export interface CallReaction {
 
 export interface RequestReaction {
   kind: "request";
-  request: Request;
+  request: RequestPlan;
 }
 
 export interface DispatchReaction {
@@ -584,7 +584,7 @@ export type HttpMethod =
   | "DELETE"
   | "PATCH";
 
-export interface Request {
+export interface RequestPlan {
   method: HttpMethod;
   url: string;
   validation: RequestValidationTarget;
@@ -619,7 +619,7 @@ export interface TerminalRequestChain {
 
 export interface FollowUpRequestChain {
   kind: "follow-up";
-  next: Request;
+  next: RequestPlan;
 }
 
 export type RequestInput =

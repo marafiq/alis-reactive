@@ -5,7 +5,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>An HTTP request definition in the reactive plan.</summary>
-    public sealed class Request
+    public sealed class RequestPlan
     {
         private readonly RequestEndpoint _endpoint;
         private readonly RequestInput _input;
@@ -34,7 +34,7 @@ namespace Alis.Reactive.PlanModel
         public IReadOnlyList<Reaction> Complete => _complete;
         /// <summary>Gets the request chain: terminal or followed by another request.</summary>
         public RequestChain Chain => _chain;
-        private Request(
+        private RequestPlan(
             RequestEndpoint endpoint,
             RequestInput input,
             IReadOnlyList<Reaction> before,
@@ -54,7 +54,7 @@ namespace Alis.Reactive.PlanModel
             _validationTarget = validationTarget ?? throw new System.ArgumentNullException(nameof(validationTarget));
         }
 
-        internal static Request Create(
+        internal static RequestPlan Create(
             RequestEndpoint endpoint,
             RequestInput input,
             IReadOnlyList<Reaction> before,
@@ -63,7 +63,7 @@ namespace Alis.Reactive.PlanModel
             IReadOnlyList<Reaction> complete,
             RequestChain chain,
             RequestValidationTarget validationTarget) =>
-            new Request(
+            new RequestPlan(
                 endpoint,
                 input,
                 before,
@@ -107,9 +107,9 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the chain kind.</summary>
         public abstract string Kind { get; }
 
-        internal abstract RequestChain AttachFollowUp(Request next);
+        internal abstract RequestChain AttachFollowUp(RequestPlan next);
 
-        internal static RequestChain ContinueWith(Request next)
+        internal static RequestChain ContinueWith(RequestPlan next)
         {
             if (next == null) throw new System.ArgumentNullException(nameof(next));
             return new FollowUpRequestChain(next);
@@ -122,16 +122,16 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the kind. Always <c>"terminal"</c>.</summary>
         public override string Kind => "terminal";
 
-        internal override RequestChain AttachFollowUp(Request next) =>
+        internal override RequestChain AttachFollowUp(RequestPlan next) =>
             ContinueWith(next);
     }
 
     /// <summary>Represents a request followed by another request after successful completion.</summary>
     public sealed class FollowUpRequestChain : RequestChain
     {
-        private readonly Request _next;
+        private readonly RequestPlan _next;
 
-        internal FollowUpRequestChain(Request next)
+        internal FollowUpRequestChain(RequestPlan next)
         {
             _next = next ?? throw new System.ArgumentNullException(nameof(next));
         }
@@ -140,9 +140,9 @@ namespace Alis.Reactive.PlanModel
         public override string Kind => "follow-up";
 
         /// <summary>Gets the request to run after the current request succeeds.</summary>
-        public Request Next => _next;
+        public RequestPlan Next => _next;
 
-        internal override RequestChain AttachFollowUp(Request next)
+        internal override RequestChain AttachFollowUp(RequestPlan next)
         {
             throw new System.InvalidOperationException(
                 "A response can declare only one chained request. " +

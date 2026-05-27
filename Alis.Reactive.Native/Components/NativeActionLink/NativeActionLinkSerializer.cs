@@ -80,14 +80,14 @@ namespace Alis.Reactive.Native.Components
             }
         }
 
-        private static Request ProjectRequest(Request request)
+        private static RequestPlan ProjectRequest(RequestPlan request)
         {
             var requestHasFollowUp = request.Chain is FollowUpRequestChain;
             if (requestHasFollowUp)
                 throw new InvalidOperationException(
                     "NativeActionLink does not support chained requests.");
 
-            return Request.Create(
+            return RequestPlan.Create(
                 RequestEndpoint.To(HttpMethodName.From(request.Method), RequestUrl.Of(string.Empty)),
                 ProjectRequestInput(request.Input),
                 request.Before,

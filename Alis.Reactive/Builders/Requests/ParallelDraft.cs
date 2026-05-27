@@ -6,10 +6,10 @@ namespace Alis.Reactive.Builders.Requests
 {
     internal sealed class ParallelDraft
     {
-        private readonly List<Request> _branches = new List<Request>();
+        private readonly List<RequestPlan> _branches = new List<RequestPlan>();
         private ParallelCompletion _completion = ParallelCompletion.None;
 
-        internal void AddBranch(Request request)
+        internal void AddBranch(RequestPlan request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             _branches.Add(request);

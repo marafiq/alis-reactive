@@ -3,7 +3,7 @@ import {
   initNativeActionLinks,
   resetNativeActionLinksForTests,
 } from "../components/native/native-action-link";
-import type { Plan, Reaction, Request } from "../types";
+import type { Plan, Reaction, RequestPlan } from "../types";
 
 const emptyPlan: Plan = {
   version: 3,
@@ -20,7 +20,7 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
-function request(url: string, overrides: Partial<Request> = {}): Request {
+function request(url: string, overrides: Partial<RequestPlan> = {}): RequestPlan {
   return {
     method: "DELETE",
     url,
@@ -35,7 +35,7 @@ function request(url: string, overrides: Partial<Request> = {}): Request {
   };
 }
 
-function requestReaction(url: string, overrides: Partial<Request> = {}): Reaction {
+function requestReaction(url: string, overrides: Partial<RequestPlan> = {}): Reaction {
   return {
     kind: "request",
     request: request(url, overrides),

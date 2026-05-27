@@ -1,4 +1,4 @@
-import type { Request } from "../types";
+import type { RequestPlan } from "../types";
 import type { GatherResult } from "./gather";
 import { resolveRouteParams } from "../core/url-template";
 
@@ -8,7 +8,7 @@ export interface ResolvedFetch {
 }
 
 export function resolveFetch(
-  request: Request,
+  request: RequestPlan,
   gathered: GatherResult,
 ): ResolvedFetch {
   const url = buildRequestUrl(request, gathered);
@@ -17,7 +17,7 @@ export function resolveFetch(
 }
 
 function buildRequestUrl(
-  request: Request,
+  request: RequestPlan,
   gathered: GatherResult,
 ): string {
   const url = resolveRouteParams(request.url, gathered.routeParams);
@@ -31,7 +31,7 @@ function queryStringSeparator(url: string): "?" | "&" {
 }
 
 function buildRequestInit(
-  request: Request,
+  request: RequestPlan,
   gathered: GatherResult,
 ): RequestInit {
   const init: RequestInit = { method: request.method };
@@ -45,7 +45,7 @@ function buildRequestInit(
 }
 
 function applyRequestBody(
-  request: Request,
+  request: RequestPlan,
   gathered: GatherResult,
   init: RequestInit,
   headers: Record<string, string>,

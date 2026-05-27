@@ -44,7 +44,7 @@ namespace Alis.Reactive.PlanModel
         internal void SetComponent(ComponentKey key, ComponentObject component) => _components.Set(key, component);
 
         /// <summary>Records that a request declared a validation source, to be resolved during Render().</summary>
-        internal void RegisterValidationJob(Request request, ComponentId container, Type validationSourceType) =>
+        internal void RegisterValidationJob(RequestPlan request, ComponentId container, Type validationSourceType) =>
             _validationJobs.Add(new ValidationJob(request.Url, container, validationSourceType));
 
         /// <summary>The validation jobs declared during plan construction.</summary>

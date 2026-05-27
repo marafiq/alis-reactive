@@ -41,7 +41,7 @@ namespace Alis.Reactive.PlanModel
         internal static Reaction Call(Source on, string method, IReadOnlyList<ValueProducer> args) =>
             new CallReaction(on, method, args);
 
-        internal static Reaction Request(Request request) =>
+        internal static Reaction Request(RequestPlan request) =>
             new RequestReaction(request);
 
         internal static Reaction Dispatch(string eventName) =>
@@ -405,15 +405,15 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>Sends an HTTP request as defined by the enclosed <see cref="PlanModel.Request"/>.</summary>
+    /// <summary>Sends an HTTP request as defined by the enclosed <see cref="RequestPlan"/>.</summary>
     public sealed class RequestReaction : Reaction
     {
         /// <summary>Gets the kind. Always <c>"request"</c>.</summary>
         public string Kind => "request";
         /// <summary>Gets the HTTP request definition.</summary>
-        public new Request Request { get; }
+        public new RequestPlan Request { get; }
 
-        internal RequestReaction(Request request) { Request = request ?? throw new ArgumentNullException(nameof(request)); }
+        internal RequestReaction(RequestPlan request) { Request = request ?? throw new ArgumentNullException(nameof(request)); }
     }
 
     /// <summary>Dispatches a custom browser event.</summary>

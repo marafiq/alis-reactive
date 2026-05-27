@@ -1,7 +1,7 @@
-// http.ts - HTTP request execution using V3 Request type.
+// http.ts - HTTP request execution using V3 RequestPlan type.
 // Uses the shared value/gather/runtime concepts and keeps HTTP async isolated.
 
-import type { Request, ResponseRoute, Plan, ExecContext, Reaction } from "../types";
+import type { RequestPlan, ResponseRoute, Plan, ExecContext, Reaction } from "../types";
 import { resolveGather, type GatherResult } from "./gather";
 import { executeReaction } from "./execute";
 import { validateContainer } from "../validation";
@@ -30,11 +30,11 @@ type RequestOutcomeStatus =
   | { readonly kind: "client-failure"; readonly value: -1 };
 
 /** Execute a single HTTP request with gather, before, response routing, complete, and chaining. */
-export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
+export async function executeRequest(req: RequestPlan, plan: Plan, ctx?: ExecContext): Promise<void> {
   await runHttpRequest(req, plan, ExecutionContext.from(ctx));
 }
 
-async function runHttpRequest(request: Request, plan: Plan, context: ExecutionContext): Promise<void> {
+async function runHttpRequest(request: RequestPlan, plan: Plan, context: ExecutionContext): Promise<void> {
   if (!requestCanSend(request, plan, context)) return;
 
   await runRequestReactions(request.before, plan, context.asAvailable());
@@ -44,7 +44,7 @@ async function runHttpRequest(request: Request, plan: Plan, context: ExecutionCo
   await routeExchangeOutcome(outcome, request, plan, prepared.context);
 }
 
-function requestCanSend(request: Request, plan: Plan, context: ExecutionContext): boolean {
+function requestCanSend(request: RequestPlan, plan: Plan, context: ExecutionContext): boolean {
   const validation = request.validation;
   const requestRequiresClientValidation = validation.kind === "container";
   if (!requestRequiresClientValidation) return true;
@@ -60,7 +60,7 @@ interface PreparedHttpRequest {
   readonly context: ExecutionContext;
 }
 
-function prepareHttpRequest(request: Request, plan: Plan, context: ExecutionContext): PreparedHttpRequest {
+function prepareHttpRequest(request: RequestPlan, plan: Plan, context: ExecutionContext): PreparedHttpRequest {
   const currentContext = context.asAvailable();
   const gathered = resolveGather(request.input, request.method, plan, currentContext);
   const requestContext = context.withRequest(requestPayloadSnapshotFrom(gathered));
@@ -69,7 +69,7 @@ function prepareHttpRequest(request: Request, plan: Plan, context: ExecutionCont
   return { fetch, context: requestContext };
 }
 
-async function sendHttpRequest(request: Request, fetchRequest: ResolvedFetch): Promise<HttpExchangeOutcome> {
+async function sendHttpRequest(request: RequestPlan, fetchRequest: ResolvedFetch): Promise<HttpExchangeOutcome> {
   try {
     log.debug("fetch.send", { method: request.method, url: fetchRequest.url });
 
@@ -96,7 +96,7 @@ function exchangeOutcomeFromResponse(response: Response, body: HttpResponseBody)
     : { kind: "error", status, body };
 }
 
-function exchangeOutcomeFromClientFailure(request: Request, err: unknown): HttpExchangeOutcome {
+function exchangeOutcomeFromClientFailure(request: RequestPlan, err: unknown): HttpExchangeOutcome {
   const failure = clientRequestFailureFrom(err);
   log.error(failure.traceEvent, {
     method: request.method,
@@ -108,7 +108,7 @@ function exchangeOutcomeFromClientFailure(request: Request, err: unknown): HttpE
 
 async function routeExchangeOutcome(
   outcome: HttpExchangeOutcome,
-  request: Request,
+  request: RequestPlan,
   plan: Plan,
   context: ExecutionContext,
 ): Promise<void> {
@@ -160,7 +160,7 @@ function statusForLog(status: RequestOutcomeStatus): number {
 }
 
 async function routeSuccess(
-  request: Request,
+  request: RequestPlan,
   plan: Plan,
   context: ExecutionContext,
   status: RequestOutcomeStatus,
@@ -173,7 +173,7 @@ async function routeSuccess(
 }
 
 async function routeError(
-  request: Request,
+  request: RequestPlan,
   plan: Plan,
   context: ExecutionContext,
   status: RequestOutcomeStatus,
@@ -184,7 +184,7 @@ async function routeError(
 }
 
 async function routeResponseUnavailable(
-  request: Request,
+  request: RequestPlan,
   plan: Plan,
   context: ExecutionContext,
   status: RequestOutcomeStatus,
@@ -194,7 +194,7 @@ async function routeResponseUnavailable(
 }
 
 async function routeAndComplete(
-  request: Request,
+  request: RequestPlan,
   plan: Plan,
   context: ExecutionContext,
   routeStage: () => Promise<void>,
@@ -207,7 +207,7 @@ async function routeAndComplete(
 }
 
 async function runFollowUpRequest(
-  chain: Request["chain"],
+  chain: RequestPlan["chain"],
   plan: Plan,
   context: ExecutionContext,
 ): Promise<void> {

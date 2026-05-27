@@ -32,7 +32,7 @@ namespace Alis.Reactive.Builders.Requests
             _errorRoutes.Add(ResponseRoute.ForStatus(reaction, statusCode));
         }
 
-        internal void ContinueWith(Request request)
+        internal void ContinueWith(RequestPlan request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             _chain = _chain.AttachFollowUp(request);
