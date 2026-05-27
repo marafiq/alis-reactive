@@ -1,6 +1,6 @@
 // Boot — PlanDocument lifecycle: boot, partial slot load/unload, reset.
 // Single responsibility: wire behaviors (two-phase) and register plans.
-// Delegates applied plan state to merge-plan.ts.
+// Delegates browser plan state to browser-plans.ts.
 
 import type { PlanDocument, Behavior } from "../types";
 import { setLevel } from "../core/trace";
@@ -15,10 +15,10 @@ import {
   applyPartialSlotLoad,
   applyPartialSlotUnload,
   getBootedPlan as getTrackedBootedPlan,
-  type MergeHooks,
+  type PlanLifecycleHooks,
   registerBootedPlan,
-  resetMergePlanState,
-} from "./merge-plan";
+  resetBrowserPlansForTests,
+} from "./browser-plans";
 
 const log = scope("boot");
 const BOOTED_ATTR = "alisBooted";
@@ -76,7 +76,7 @@ function wireContainerValidation(plan: PlanDocument, signal?: AbortSignal): void
 }
 
 export function loadPartialSlot(slotId: string, incoming: PlanDocument[]): void {
-  const affectedPlanIds = applyPartialSlotLoad(slotId, incoming, mergeHooks());
+  const affectedPlanIds = applyPartialSlotLoad(slotId, incoming, planLifecycleHooks());
 
   for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
@@ -119,7 +119,7 @@ export function resetBootStateForTests(): void {
 
 export const trace = { setLevel };
 
-function mergeHooks(): MergeHooks {
+function planLifecycleHooks(): PlanLifecycleHooks {
   return {
     wireBehaviors,
     wireContainerValidation,
@@ -128,7 +128,7 @@ function mergeHooks(): MergeHooks {
 
 function resetRuntimeSingletonsForTests(): void {
   resetActivePlanForTests();
-  resetMergePlanState();
+  resetBrowserPlansForTests();
   resetLiveClearForTests();
   resetNativeActionLinksForTests();
   resetPluginCatalogForTests();

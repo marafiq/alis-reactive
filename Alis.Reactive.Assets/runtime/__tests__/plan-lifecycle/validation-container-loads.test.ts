@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
+import { BrowserPlanStore } from "../../lifecycle/browser-plans";
 import {
-  mergeHooks,
+  planLifecycleHooks,
   partialPlan,
   rootPlan,
   validationComponents,
@@ -11,8 +11,8 @@ import {
 
 describe("validation container loads", () => {
   it("accepts matching validated component ids while adding new partial rules", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
+    const browserPlans = new BrowserPlanStore();
+    const { hooks } = planLifecycleHooks();
     const planId = "Resident.Root";
 
     browserPlans.register({
@@ -50,8 +50,8 @@ describe("validation container loads", () => {
   });
 
   it("preserves root-owned validation containers when unloading a partial slot", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
+    const browserPlans = new BrowserPlanStore();
+    const { hooks } = planLifecycleHooks();
     const planId = "Resident.Root";
 
     browserPlans.register({
@@ -84,8 +84,8 @@ describe("validation container loads", () => {
   });
 
   it("unloading a validation extension keeps root rules for the same validated component", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
+    const browserPlans = new BrowserPlanStore();
+    const { hooks } = planLifecycleHooks();
     const planId = "Resident.Root";
 
     browserPlans.register({
@@ -130,8 +130,8 @@ describe("validation container loads", () => {
   });
 
   it("unloading one validation extension keeps sibling slot rules", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
+    const browserPlans = new BrowserPlanStore();
+    const { hooks } = planLifecycleHooks();
     const planId = "Resident.Root";
 
     browserPlans.register({
@@ -177,8 +177,8 @@ describe("validation container loads", () => {
   });
 
   it("unloading one validation extension keeps duplicate field rules from a later active slot", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
+    const browserPlans = new BrowserPlanStore();
+    const { hooks } = planLifecycleHooks();
     const planId = "Resident.Root";
 
     browserPlans.register({

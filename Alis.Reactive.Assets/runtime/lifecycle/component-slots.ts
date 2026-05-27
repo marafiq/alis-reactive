@@ -7,7 +7,7 @@ interface ComponentDeclaration {
   readonly component: ComponentObject;
 }
 
-export type ComponentLoad =
+export type LoadedComponent =
   | ComponentObjectLoad
   | LayoutObjectLoad
   | ValidationRulesLoad;
@@ -51,11 +51,11 @@ export function mergeBootComponent(target: PlanDocument, declaration: ComponentD
 export function mergeSlotComponent(
   target: PlanDocument,
   declaration: ComponentDeclaration,
-  rootOwnsComponent: boolean,
-): ComponentLoad[] {
+  componentWasBooted: boolean,
+): LoadedComponent[] {
   const existing = target.components[declaration.componentKey];
 
-  if (extendsRootValidationContainer(existing, declaration, rootOwnsComponent)) {
+  if (extendsRootValidationContainer(existing, declaration, componentWasBooted)) {
     const declaredRules = validationRulesOf(declaration.component) ?? [];
     appendRulesForNewValidatedComponents(existing, declaration.component);
     return declaredRules.length === 0
@@ -92,9 +92,9 @@ function mergeLayoutObject(target: PlanDocument, declaration: ComponentDeclarati
 function extendsRootValidationContainer(
   existing: ComponentObject | undefined,
   declaration: ComponentDeclaration,
-  rootOwnsComponent: boolean,
+  componentWasBooted: boolean,
 ): boolean {
-  return rootOwnsComponent
+  return componentWasBooted
     && isValidationContainer(existing)
     && isValidationContainer(declaration.component)
     && declaration.component.binding.kind === "none"

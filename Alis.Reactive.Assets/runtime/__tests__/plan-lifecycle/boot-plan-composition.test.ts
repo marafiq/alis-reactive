@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { composeInitialPlans } from "../../lifecycle/merge-plan";
+import { composeInitialPlans } from "../../lifecycle/browser-plans";
 import type { ComponentObject } from "../../types";
 import {
   behavior,

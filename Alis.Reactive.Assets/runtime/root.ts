@@ -7,7 +7,7 @@ import { init as initConfirm } from "./components/fusion/confirm";
 import { initNativeActionLinks } from "./components/native/native-action-link";
 import "./components/native/drawer";  // side-effect: wires close button + Escape key
 import "./components/native/loader";  // side-effect: handles target positioning + timeout
-import { composeInitialPlans } from "./lifecycle/merge-plan";
+import { composeInitialPlans } from "./lifecycle/browser-plans";
 import type { PlanDocument } from "./types";
 import type { TraceLevel } from "./core/trace";
 import { registerPlugin } from "./core/plugin-catalog";

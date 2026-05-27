@@ -1,17 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
+import { BrowserPlanStore } from "../../lifecycle/browser-plans";
 import {
   objectContractWithWritableProperty,
   layoutComponent,
-  mergeHooks,
+  planLifecycleHooks,
   partialPlan,
   rootPlan,
 } from "../support/plan-lifecycle-fixtures";
 
 describe("layout object slots", () => {
   it("lets multiple slots share one layout-owned app component", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
+    const browserPlans = new BrowserPlanStore();
+    const { hooks } = planLifecycleHooks();
     const planId = "Resident.Root";
     const toastTypeKey = "fusion.component.alisFusionToast";
 

@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { MergeHooks } from "../../lifecycle/merge-plan";
+import type { PlanLifecycleHooks } from "../../lifecycle/browser-plans";
 import type { Behavior, ComponentObject, ComponentValidation, BrowserObjectContract, PathSegment, PlanDocument, Shape, StructuredPath } from "../../types";
 
 export function objectContract(): BrowserObjectContract {
@@ -191,9 +191,9 @@ export function partialPlan(
   };
 }
 
-export function mergeHooks() {
+export function planLifecycleHooks() {
   const behaviorSignals: (AbortSignal | undefined)[] = [];
-  const hooks: MergeHooks = {
+  const hooks: PlanLifecycleHooks = {
     wireBehaviors: vi.fn((_behaviors, _plan, signal) => behaviorSignals.push(signal)),
     wireContainerValidation: vi.fn(),
   };

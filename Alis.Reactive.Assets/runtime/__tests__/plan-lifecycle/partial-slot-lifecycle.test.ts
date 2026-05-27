@@ -1,18 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
+import { BrowserPlanStore } from "../../lifecycle/browser-plans";
 import {
   behavior,
   component,
   objectContract,
-  mergeHooks,
+  planLifecycleHooks,
   partialPlan,
   rootPlan,
 } from "../support/plan-lifecycle-fixtures";
 
 describe("partial slot lifecycle", () => {
   it("replaces the previous load from the same slot", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks, behaviorSignals } = mergeHooks();
+    const browserPlans = new BrowserPlanStore();
+    const { hooks, behaviorSignals } = planLifecycleHooks();
     const planId = "Resident.Root";
 
     browserPlans.register(rootPlan(planId));
@@ -52,8 +52,8 @@ describe("partial slot lifecycle", () => {
   });
 
   it("unloads an active slot explicitly", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks, behaviorSignals } = mergeHooks();
+    const browserPlans = new BrowserPlanStore();
+    const { hooks, behaviorSignals } = planLifecycleHooks();
     const planId = "Resident.Root";
     const loadedBehavior = behavior();
 
@@ -76,8 +76,8 @@ describe("partial slot lifecycle", () => {
   });
 
   it("uses the browser slot handle as lifecycle identity regardless of serialized plan scope", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
+    const browserPlans = new BrowserPlanStore();
+    const { hooks } = planLifecycleHooks();
     const planId = "Resident.Root";
 
     browserPlans.register(rootPlan(planId));
@@ -97,8 +97,8 @@ describe("partial slot lifecycle", () => {
   });
 
   it("replaces a slot as one lifetime when it contains multiple plan documents", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks, behaviorSignals } = mergeHooks();
+    const browserPlans = new BrowserPlanStore();
+    const { hooks, behaviorSignals } = planLifecycleHooks();
     const residentPlanId = "Resident.Root";
     const billingPlanId = "Billing.Root";
     const residentBehavior = behavior();
@@ -130,8 +130,8 @@ describe("partial slot lifecycle", () => {
   });
 
   it("keeps a non-root merged plan alive while another slot still owns entries", () => {
-    const browserPlans = new AppliedBrowserPlans();
-    const { hooks } = mergeHooks();
+    const browserPlans = new BrowserPlanStore();
+    const { hooks } = planLifecycleHooks();
     const planId = "Resident.Dynamic";
 
     browserPlans.loadPartialSlot("type-slot", [
