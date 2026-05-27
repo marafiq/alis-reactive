@@ -17,7 +17,7 @@ namespace Alis.Reactive.Builders.Conditions
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
-            var source = new EventArgSource<TPayload, TProp>(path);
+            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
             return new ConditionSourceBuilder<TModel, TProp>(source);
         }
 

@@ -492,6 +492,87 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    [Test]
+    public async Task ordered_mixed_modules_after_http_run_after_response_handlers()
+    {
+        await NavigateAndBoot();
+
+        await Page.Locator("#s12-btn-run").ClickAsync();
+
+        await Expect(Page.Locator("#s12-http-done")).ToHaveTextAsync("done", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s12-plugin")).ToHaveTextAsync("after-http");
+        await Expect(Page.Locator("#s12-order")).ToHaveTextAsync("branch-after");
+        await Expect(Page.Locator("#s12-sequence")).ToHaveTextAsync(
+            "start>branch-before>http-success>dispatch>plugin>tail>branch-after");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task ordered_mixed_modules_after_parallel_wait_for_all_settled_handlers()
+    {
+        await NavigateAndBoot();
+
+        await Page.Locator("#s13-btn-run").ClickAsync();
+
+        await Expect(Page.Locator("#s13-a")).ToHaveTextAsync("Parallel A", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s13-b")).ToHaveTextAsync("audited:parallel-b", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s13-all")).ToHaveTextAsync("settled");
+        await Expect(Page.Locator("#s13-plugin")).ToHaveTextAsync("after-parallel");
+        await Expect(Page.Locator("#s13-order")).ToHaveTextAsync("branch-after");
+        await Expect(Page.Locator("#s13-sequence")).ToHaveTextAsync(
+            "start>branch-before>settled>dispatch>plugin>tail>branch-after");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task route_template_gather_reads_event_payload_and_reuses_plugin_source_in_chained_request()
+    {
+        await NavigateAndBoot();
+
+        await Page.Locator("#s14-btn-active-high").ClickAsync();
+
+        await Expect(Page.Locator("#s14-route-id")).ToHaveTextAsync("314", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s14-body-action")).ToHaveTextAsync("VIP Review");
+        await Expect(Page.Locator("#s14-header-category")).ToHaveTextAsync("VIP Review");
+        await Expect(Page.Locator("#s14-trail-id")).ToHaveTextAsync("314");
+        await Expect(Page.Locator("#s14-trail-slug")).ToHaveTextAsync("vip-review");
+        await Expect(Page.Locator("#s14-trail-step")).ToHaveTextAsync("chained");
+        await Expect(Page.Locator("#s14-plugin")).ToHaveTextAsync("vip-review");
+        await Expect(Page.Locator("#s14-order")).ToHaveTextAsync("branch-after");
+        await Expect(Page.Locator("#s14-sequence")).ToHaveTextAsync(
+            "start>branch-before>http-success>trail-success>dispatch>plugin>branch-after");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task route_template_gather_re_evaluates_event_payload_conditions_and_chained_route_params()
+    {
+        await NavigateAndBoot();
+
+        await Page.Locator("#s14-btn-active-high").ClickAsync();
+        await Expect(Page.Locator("#s14-trail-slug")).ToHaveTextAsync("vip-review", new() { Timeout = 5000 });
+
+        await Page.Locator("#s14-btn-inactive-low").ClickAsync();
+
+        await Expect(Page.Locator("#s14-route-id")).ToHaveTextAsync("271", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s14-body-action")).ToHaveTextAsync("Routine Check");
+        await Expect(Page.Locator("#s14-header-category")).ToHaveTextAsync("Routine Check");
+        await Expect(Page.Locator("#s14-trail-id")).ToHaveTextAsync("271");
+        await Expect(Page.Locator("#s14-trail-slug")).ToHaveTextAsync("routine-check");
+        await Expect(Page.Locator("#s14-trail-step")).ToHaveTextAsync("chained");
+        await Expect(Page.Locator("#s14-plugin")).ToHaveTextAsync("routine-check");
+        await Expect(Page.Locator("#s14-order")).ToHaveTextAsync("branch-after-else");
+
+        var sequence = await Page.Locator("#s14-sequence").TextContentAsync();
+        Assert.That(sequence, Does.EndWith(
+            "start>branch-before-else>http-success>trail-success>dispatch>plugin>branch-after-else"));
+
+        AssertNoConsoleErrors();
+    }
+
     // ════════════════════════════════════════════════════════════════════
     // Page-level checks
     // ════════════════════════════════════════════════════════════════════

@@ -23,7 +23,7 @@ namespace Alis.Reactive.Builders
 
         internal PipelineBuilder(PlanBuildContext context)
         {
-            Context = context;
+            Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         /// <inheritdoc />

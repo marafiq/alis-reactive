@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -8,20 +9,23 @@ namespace Alis.Reactive.PlanModel
     /// </summary>
     internal static class ShapeContractCompatibility
     {
-        internal static ShapeCompatibility MergeContracts(Shape existing, Shape incoming)
+        internal static bool TryMergeContracts(
+            Shape existing,
+            Shape incoming,
+            [NotNullWhen(true)] out Shape? merged)
         {
             if (existing == null) throw new System.ArgumentNullException(nameof(existing));
             if (incoming == null) throw new System.ArgumentNullException(nameof(incoming));
 
-            if (existing == incoming) return ShapeCompatibility.Compatible(existing);
-            if (existing == Shape.None || incoming == Shape.None) return ShapeCompatibility.Conflict;
-            if (existing == Shape.Any) return ShapeCompatibility.Compatible(incoming);
-            if (incoming == Shape.Any) return ShapeCompatibility.Compatible(existing);
-            if (existing.IsNullableOf(incoming)) return ShapeCompatibility.Compatible(existing);
-            if (incoming.IsNullableOf(existing)) return ShapeCompatibility.Compatible(incoming);
-            if (TryMergeArrayContracts(existing, incoming, out var arrayCompatibility)) return arrayCompatibility;
-            if (TryMergeObjectContracts(existing, incoming, out var objectCompatibility)) return objectCompatibility;
-            return ShapeCompatibility.Conflict;
+            if (existing == incoming) return Merge(existing, out merged);
+            if (existing == Shape.None || incoming == Shape.None) return Conflict(out merged);
+            if (existing == Shape.Any) return Merge(incoming, out merged);
+            if (incoming == Shape.Any) return Merge(existing, out merged);
+            if (existing.IsNullableOf(incoming)) return Merge(existing, out merged);
+            if (incoming.IsNullableOf(existing)) return Merge(incoming, out merged);
+            if (TryMergeArrayContracts(existing, incoming, out merged)) return true;
+            if (TryMergeObjectContracts(existing, incoming, out merged)) return true;
+            return Conflict(out merged);
         }
 
         internal static bool CanAccept(Shape expected, Shape actual)
@@ -41,41 +45,38 @@ namespace Alis.Reactive.PlanModel
         private static bool TryMergeArrayContracts(
             Shape existing,
             Shape incoming,
-            out ShapeCompatibility compatibility)
+            [NotNullWhen(true)] out Shape? merged)
         {
             if (!existing.TryGetArrayItemShape(out var existingItem) ||
                 !incoming.TryGetArrayItemShape(out var incomingItem))
             {
-                compatibility = ShapeCompatibility.Conflict;
-                return false;
+                return Conflict(out merged);
             }
 
-            var itemCompatibility = MergeContracts(existingItem, incomingItem);
-            compatibility = itemCompatibility.IsConflict
-                ? ShapeCompatibility.Conflict
-                : ShapeCompatibility.Compatible(Shape.ArrayOf(itemCompatibility.Shape));
-            return true;
+            if (!TryMergeContracts(existingItem, incomingItem, out var mergedItem))
+                return Conflict(out merged);
+
+            return Merge(Shape.ArrayOf(mergedItem), out merged);
         }
 
         private static bool TryMergeObjectContracts(
             Shape existing,
             Shape incoming,
-            out ShapeCompatibility compatibility)
+            [NotNullWhen(true)] out Shape? merged)
         {
             if (!existing.TryGetObjectContract(out var existingObject) ||
                 !incoming.TryGetObjectContract(out var incomingObject))
             {
-                compatibility = ShapeCompatibility.Conflict;
-                return false;
+                return Conflict(out merged);
             }
 
-            compatibility = MergeObjectContracts(existingObject, incomingObject);
-            return true;
+            return TryMergeObjectContracts(existingObject, incomingObject, out merged);
         }
 
-        private static ShapeCompatibility MergeObjectContracts(
+        private static bool TryMergeObjectContracts(
             ShapeObjectContract existing,
-            ShapeObjectContract incoming)
+            ShapeObjectContract incoming,
+            [NotNullWhen(true)] out Shape? merged)
         {
             var mergedFields = new Dictionary<string, Shape>(System.StringComparer.Ordinal);
             foreach (var field in existing.Fields)
@@ -89,18 +90,17 @@ namespace Alis.Reactive.PlanModel
                     continue;
                 }
 
-                var fieldCompatibility = MergeContracts(existingField, field.Value);
-                if (fieldCompatibility.IsConflict)
-                    return ShapeCompatibility.Conflict;
+                if (!TryMergeContracts(existingField, field.Value, out var mergedField))
+                    return Conflict(out merged);
 
-                mergedFields[field.Key] = fieldCompatibility.Shape;
+                mergedFields[field.Key] = mergedField;
             }
 
             var bothAllowAnyField = existing.AllowsAdditionalFields && incoming.AllowsAdditionalFields;
             if (bothAllowAnyField && mergedFields.Count == 0)
-                return ShapeCompatibility.Compatible(Shape.OpenObject());
+                return Merge(Shape.OpenObject(), out merged);
 
-            return ShapeCompatibility.Compatible(Shape.ObjectOf(mergedFields));
+            return Merge(Shape.ObjectOf(mergedFields), out merged);
         }
 
         private static bool CanAcceptArray(Shape expected, Shape actual)
@@ -136,43 +136,17 @@ namespace Alis.Reactive.PlanModel
 
             return true;
         }
-    }
 
-    internal abstract class ShapeCompatibility
-    {
-        private ShapeCompatibility() { }
-
-        internal static ShapeCompatibility Conflict { get; } =
-            new ConflictingShapes();
-
-        internal abstract bool IsConflict { get; }
-        internal abstract Shape Shape { get; }
-
-        internal static ShapeCompatibility Compatible(Shape shape)
+        private static bool Merge(Shape shape, [NotNullWhen(true)] out Shape? merged)
         {
-            if (shape == null) throw new System.ArgumentNullException(nameof(shape));
-            return new CompatibleShapes(shape);
+            merged = shape ?? throw new System.ArgumentNullException(nameof(shape));
+            return true;
         }
 
-        private sealed class CompatibleShapes : ShapeCompatibility
+        private static bool Conflict([NotNullWhen(true)] out Shape? merged)
         {
-            private readonly Shape _shape;
-
-            internal CompatibleShapes(Shape shape)
-            {
-                _shape = shape ?? throw new System.ArgumentNullException(nameof(shape));
-            }
-
-            internal override bool IsConflict => false;
-            internal override Shape Shape => _shape;
-        }
-
-        private sealed class ConflictingShapes : ShapeCompatibility
-        {
-            internal override bool IsConflict => true;
-
-            internal override Shape Shape =>
-                throw new System.InvalidOperationException("Conflicting shapes do not have a merged shape.");
+            merged = null;
+            return false;
         }
     }
 }

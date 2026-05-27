@@ -43,7 +43,7 @@ namespace Alis.Reactive.Builders.Conditions
         public ConditionSourceBuilder<TModel, TProp> And<TPayload, TProp>(
             TPayload payload, Expression<Func<TPayload, TProp>> path)
         {
-            var source = new EventArgSource<TPayload, TProp>(path);
+            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
             return new ConditionSourceBuilder<TModel, TProp>(
                 source, _continuation, ConditionComposition.All(Condition));
         }
@@ -62,7 +62,7 @@ namespace Alis.Reactive.Builders.Conditions
         public ConditionSourceBuilder<TModel, TProp> Or<TPayload, TProp>(
             TPayload payload, Expression<Func<TPayload, TProp>> path)
         {
-            var source = new EventArgSource<TPayload, TProp>(path);
+            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
             return new ConditionSourceBuilder<TModel, TProp>(
                 source, _continuation, ConditionComposition.Any(Condition));
         }

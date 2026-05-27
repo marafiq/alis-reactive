@@ -15,30 +15,30 @@ namespace Alis.Reactive.PlanModel
         private protected Reaction() { }
 
         internal static Reaction Sequence(params Reaction[] steps) =>
-            new SequenceReaction(ReactionSteps.From(steps));
+            new SequenceReaction(steps);
 
         internal static Reaction Sequence(List<Reaction> steps) =>
-            new SequenceReaction(ReactionSteps.From(steps));
+            new SequenceReaction(steps);
 
         internal static Reaction Parallel(List<Reaction> steps, ParallelCompletion completion) =>
-            new ParallelReaction(ReactionSteps.From(steps), completion);
+            new ParallelReaction(steps, completion);
 
         internal static Reaction Branch(params BranchCase[] cases) =>
-            new BranchReaction(BranchCases.From(cases));
+            new BranchReaction(cases);
 
         internal static Reaction Branch(List<BranchCase> cases) =>
-            new BranchReaction(BranchCases.From(cases));
+            new BranchReaction(cases);
 
         internal static Reaction Set(Source on, string property, ValueProducer value) =>
             new SetReaction(on, property, value);
 
         internal static Reaction Call(Source on, string method) =>
-            new CallReaction(on, method, CallArguments.None);
+            new CallReaction(on, method, Array.Empty<ValueProducer>());
 
         internal static Reaction Call(Source on, string method, List<ValueProducer> args) =>
-            new CallReaction(on, method, CallArguments.Of(args));
+            new CallReaction(on, method, args);
 
-        internal static Reaction Call(Source on, string method, CallArguments args) =>
+        internal static Reaction Call(Source on, string method, IReadOnlyList<ValueProducer> args) =>
             new CallReaction(on, method, args);
 
         internal static Reaction Request(Request request) =>
@@ -58,59 +58,8 @@ namespace Alis.Reactive.PlanModel
 
         internal static Reaction ShowValidationErrors(string container) =>
             new ShowValidationErrorsReaction(container);
-    }
 
-    /// <summary>Executes a list of reactions in declaration order.</summary>
-    public sealed class SequenceReaction : Reaction
-    {
-        private readonly ReactionSteps _steps;
-
-        /// <summary>Gets the kind. Always <c>"sequence"</c>.</summary>
-        public string Kind => "sequence";
-        /// <summary>Gets the ordered reactions to execute.</summary>
-        public IReadOnlyList<Reaction> Steps => _steps.ForJson;
-
-        internal SequenceReaction(ReactionSteps steps)
-        {
-            _steps = steps ?? throw new ArgumentNullException(nameof(steps));
-        }
-    }
-
-    /// <summary>Executes a list of reactions concurrently.</summary>
-    public sealed class ParallelReaction : Reaction
-    {
-        private readonly ReactionSteps _steps;
-        private readonly ParallelCompletion _completion;
-
-        /// <summary>Gets the kind. Always <c>"parallel"</c>.</summary>
-        public string Kind => "parallel";
-        /// <summary>Gets the reactions to execute concurrently.</summary>
-        public IReadOnlyList<Reaction> Steps => _steps.ForJson;
-        /// <summary>Gets the completion behavior to run after all steps settle.</summary>
-        public ParallelCompletion Completion => _completion;
-
-        internal ParallelReaction(ReactionSteps steps, ParallelCompletion completion)
-        {
-            _steps = steps ?? throw new ArgumentNullException(nameof(steps));
-            _completion = completion ?? throw new ArgumentNullException(nameof(completion));
-        }
-    }
-
-    internal sealed class ReactionSteps
-    {
-        private readonly IReadOnlyList<Reaction> _items;
-
-        private ReactionSteps(IReadOnlyList<Reaction> items)
-        {
-            _items = items ?? throw new ArgumentNullException(nameof(items));
-        }
-
-        internal IReadOnlyList<Reaction> ForJson => _items;
-
-        internal static ReactionSteps Empty { get; } =
-            new ReactionSteps(Array.Empty<Reaction>());
-
-        internal static ReactionSteps From(IEnumerable<Reaction> steps)
+        internal static IReadOnlyList<Reaction> OrderedSteps(IEnumerable<Reaction> steps)
         {
             if (steps == null) throw new ArgumentNullException(nameof(steps));
 
@@ -123,9 +72,45 @@ namespace Alis.Reactive.PlanModel
                 snapshot.Add(step);
             }
 
-            var hasNoSteps = snapshot.Count == 0;
-            if (hasNoSteps) return Empty;
-            return new ReactionSteps(snapshot);
+            return snapshot.Count == 0
+                ? Array.Empty<Reaction>()
+                : snapshot;
+        }
+    }
+
+    /// <summary>Executes a list of reactions in declaration order.</summary>
+    public sealed class SequenceReaction : Reaction
+    {
+        private readonly IReadOnlyList<Reaction> _steps;
+
+        /// <summary>Gets the kind. Always <c>"sequence"</c>.</summary>
+        public string Kind => "sequence";
+        /// <summary>Gets the ordered reactions to execute.</summary>
+        public IReadOnlyList<Reaction> Steps => _steps;
+
+        internal SequenceReaction(IEnumerable<Reaction> steps)
+        {
+            _steps = Reaction.OrderedSteps(steps);
+        }
+    }
+
+    /// <summary>Executes a list of reactions concurrently.</summary>
+    public sealed class ParallelReaction : Reaction
+    {
+        private readonly IReadOnlyList<Reaction> _steps;
+        private readonly ParallelCompletion _completion;
+
+        /// <summary>Gets the kind. Always <c>"parallel"</c>.</summary>
+        public string Kind => "parallel";
+        /// <summary>Gets the reactions to execute concurrently.</summary>
+        public IReadOnlyList<Reaction> Steps => _steps;
+        /// <summary>Gets the completion behavior to run after all steps settle.</summary>
+        public ParallelCompletion Completion => _completion;
+
+        internal ParallelReaction(IEnumerable<Reaction> steps, ParallelCompletion completion)
+        {
+            _steps = Reaction.OrderedSteps(steps);
+            _completion = completion ?? throw new ArgumentNullException(nameof(completion));
         }
     }
 
@@ -174,31 +159,19 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Evaluates conditions and executes the first matching case.</summary>
     public sealed class BranchReaction : Reaction
     {
-        private readonly BranchCases _cases;
+        private readonly IReadOnlyList<BranchCase> _cases;
 
         /// <summary>Gets the kind. Always <c>"branch"</c>.</summary>
         public string Kind => "branch";
         /// <summary>Gets the ordered cases to evaluate.</summary>
-        public IReadOnlyList<BranchCase> Cases => _cases.ForJson;
+        public IReadOnlyList<BranchCase> Cases => _cases;
 
-        internal BranchReaction(BranchCases cases)
+        internal BranchReaction(IEnumerable<BranchCase> cases)
         {
-            _cases = cases ?? throw new ArgumentNullException(nameof(cases));
-        }
-    }
-
-    internal sealed class BranchCases
-    {
-        private readonly IReadOnlyList<BranchCase> _items;
-
-        private BranchCases(IReadOnlyList<BranchCase> items)
-        {
-            _items = items ?? throw new ArgumentNullException(nameof(items));
+            _cases = OrderedCases(cases);
         }
 
-        internal IReadOnlyList<BranchCase> ForJson => _items;
-
-        internal static BranchCases From(IEnumerable<BranchCase> cases)
+        private static IReadOnlyList<BranchCase> OrderedCases(IEnumerable<BranchCase> cases)
         {
             if (cases == null) throw new ArgumentNullException(nameof(cases));
 
@@ -217,7 +190,7 @@ namespace Alis.Reactive.PlanModel
                     "Branch reaction requires at least one branch case.");
 
             EnsureDefaultCaseIsUniqueAndLast(snapshot);
-            return new BranchCases(snapshot);
+            return snapshot;
         }
 
         private static void EnsureDefaultCaseIsUniqueAndLast(IReadOnlyList<BranchCase> cases)
@@ -395,7 +368,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class CallReaction : Reaction
     {
         private readonly MemberName _method;
-        private readonly CallArguments _args;
+        private readonly IReadOnlyList<ValueProducer> _args;
 
         /// <summary>Gets the kind. Always <c>"call"</c>.</summary>
         public string Kind => "call";
@@ -404,35 +377,20 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the method name to call.</summary>
         public string Method => _method.Value;
         /// <summary>Gets the method arguments. Empty when the method takes no arguments.</summary>
-        public IReadOnlyList<ValueProducer> Args => _args.ItemsForJson;
+        public IReadOnlyList<ValueProducer> Args => _args;
 
-        internal CallReaction(Source on, string method, CallArguments args)
+        internal CallReaction(Source on, string method, IReadOnlyList<ValueProducer> args)
         {
             On = on ?? throw new ArgumentNullException(nameof(on));
             _method = MemberName.Of(method);
-            _args = args ?? throw new ArgumentNullException(nameof(args));
-        }
-    }
-
-    internal sealed class CallArguments
-    {
-        private readonly IReadOnlyList<ValueProducer> _items;
-
-        private CallArguments(IReadOnlyList<ValueProducer> items)
-        {
-            _items = items ?? throw new ArgumentNullException(nameof(items));
+            _args = OrderedArguments(args);
         }
 
-        internal static CallArguments None { get; } =
-            new CallArguments(System.Array.Empty<ValueProducer>());
-
-        internal IReadOnlyList<ValueProducer> ItemsForJson => _items;
-
-        internal static CallArguments Of(IReadOnlyList<ValueProducer> items)
+        private static IReadOnlyList<ValueProducer> OrderedArguments(IReadOnlyList<ValueProducer> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
             if (items.Count == 0)
-                return None;
+                return Array.Empty<ValueProducer>();
 
             var snapshot = new List<ValueProducer>();
             foreach (var item in items)
@@ -443,7 +401,7 @@ namespace Alis.Reactive.PlanModel
                 snapshot.Add(item);
             }
 
-            return new CallArguments(snapshot);
+            return snapshot;
         }
     }
 
@@ -602,7 +560,7 @@ namespace Alis.Reactive.PlanModel
             new PartialSlotInjectionTarget(ComponentKey.Of(component));
     }
 
-    /// <summary>Replaces a browser partial slot with injected HTML and embedded plan contributions.</summary>
+    /// <summary>Replaces a browser partial slot with injected HTML and embedded plans.</summary>
     public sealed class PartialSlotInjectionTarget : InjectionTarget
     {
         private readonly ComponentKey _component;

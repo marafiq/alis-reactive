@@ -16,13 +16,7 @@ namespace Alis.Reactive.Builders.Conditions
         internal TypedUrlSource(string paramName)
         {
             var urlParam = UrlParameterName.Of(paramName);
-            // URL params are single strings from URLSearchParams.get().
-            // Reject non-scalar types — arrays, objects, complex types are not supported.
-            var shape = Shape.FromClrType(typeof(TProp));
-            if (!shape.IsScalar)
-                throw new System.InvalidOperationException(
-                    $"FromUrl<{typeof(TProp).Name}>(\"{paramName}\") is not supported. " +
-                    "URL query parameters are single strings — use scalar types (string, int, bool, DateTime).");
+            RequestScalarTarget.UrlQueryParameter<TProp>(urlParam);
             _paramName = urlParam.Value;
         }
 

@@ -67,7 +67,7 @@ function applyObjectShape(value: unknown, shape: Extract<Shape, { kind: "object"
   const record = toPlainObject(value);
   if (!record.ok) return value;
 
-  return ObjectShapeProjection.from(record.value, shape).apply();
+  return applyObjectFields(record.value, shape);
 }
 
 /**
@@ -102,7 +102,7 @@ function convertArrayShape(value: unknown, shape: Extract<Shape, { kind: "array"
 function convertObjectShape(value: unknown, shape: Extract<Shape, { kind: "object" }>): ConvertResult<unknown> {
   const record = toPlainObject(value);
   if (!record.ok) return record;
-  return ok(ObjectShapeProjection.from(record.value, shape).apply());
+  return ok(applyObjectFields(record.value, shape));
 }
 
 function convertNullableShape(value: unknown, inner: Shape): ConvertResult<unknown> {
@@ -110,42 +110,20 @@ function convertNullableShape(value: unknown, inner: Shape): ConvertResult<unkno
   return convertByShape(value, inner);
 }
 
-class ObjectShapeProjection {
-  private constructor(
-    private readonly input: Record<string, unknown>,
-    private readonly shape: Extract<Shape, { kind: "object" }>,
-  ) {}
+function applyObjectFields(
+  input: Record<string, unknown>,
+  shape: Extract<Shape, { kind: "object" }>,
+): Record<string, unknown> {
+  const keepsInputAsDeclared = shape.additional && Object.keys(shape.fields).length === 0;
+  if (keepsInputAsDeclared) return input;
 
-  static from(
-    input: Record<string, unknown>,
-    shape: Extract<Shape, { kind: "object" }>,
-  ): ObjectShapeProjection {
-    return new ObjectShapeProjection(input, shape);
+  const output: Record<string, unknown> = {};
+  if (shape.additional) Object.assign(output, input);
+  for (const [field, fieldShape] of Object.entries(shape.fields)) {
+    if (!Object.prototype.hasOwnProperty.call(input, field)) continue;
+    output[field] = applyShape(input[field], fieldShape);
   }
-
-  apply(): Record<string, unknown> {
-    if (this.keepsInputAsDeclared()) return this.input;
-
-    const output: Record<string, unknown> = {};
-    if (this.shape.additional) this.copyAdditionalFieldsTo(output);
-    this.applyDeclaredFieldsTo(output);
-    return output;
-  }
-
-  private keepsInputAsDeclared(): boolean {
-    return this.shape.additional && Object.keys(this.shape.fields).length === 0;
-  }
-
-  private copyAdditionalFieldsTo(output: Record<string, unknown>): void {
-    Object.assign(output, this.input);
-  }
-
-  private applyDeclaredFieldsTo(output: Record<string, unknown>): void {
-    for (const [field, fieldShape] of Object.entries(this.shape.fields)) {
-      if (!Object.prototype.hasOwnProperty.call(this.input, field)) continue;
-      output[field] = applyShape(this.input[field], fieldShape);
-    }
-  }
+  return output;
 }
 
 // ── Conversion functions ──────────────────────────────────
@@ -188,38 +166,36 @@ export function toDate(value: unknown): ConvertResult<number> {
     // Date-only "YYYY-MM-DD" — parse as LOCAL midnight, not UTC
     const textIsDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(value);
     if (textIsDateOnly) {
-      const dateOnly = DateOnlyText.parse(value);
+      const dateOnly = parseDateOnlyText(value);
       if (dateOnly === undefined) return err(`toDate: invalid date-only text "${value}"`);
-      return ok(dateOnly.toLocalMidnightTimestamp());
+      return ok(localMidnightTimestamp(dateOnly));
     }
     return finiteNumber(new Date(value).getTime(), `date text "${value}"`);
   }
   return err(`toDate: received ${typeof value} — not a date or timestamp`);
 }
 
-class DateOnlyText {
-  private constructor(
-    private readonly year: number,
-    private readonly month: number,
-    private readonly day: number,
-  ) {}
+type DateOnlyParts = {
+  readonly year: number;
+  readonly month: number;
+  readonly day: number;
+};
 
-  static parse(value: string): DateOnlyText | undefined {
-    const [year, month, day] = value.split("-").map(Number);
-    if (year === undefined || month === undefined || day === undefined) return undefined;
-    const parsed = new Date(year, month - 1, day);
-    const parsedDateMatchesInput =
-      parsed.getFullYear() === year
-      && parsed.getMonth() === month - 1
-      && parsed.getDate() === day;
-    if (!parsedDateMatchesInput) return undefined;
+function parseDateOnlyText(value: string): DateOnlyParts | undefined {
+  const [year, month, day] = value.split("-").map(Number);
+  if (year === undefined || month === undefined || day === undefined) return undefined;
+  const parsed = new Date(year, month - 1, day);
+  const parsedDateMatchesInput =
+    parsed.getFullYear() === year
+    && parsed.getMonth() === month - 1
+    && parsed.getDate() === day;
+  if (!parsedDateMatchesInput) return undefined;
 
-    return new DateOnlyText(year, month, day);
-  }
+  return { year, month, day };
+}
 
-  toLocalMidnightTimestamp(): number {
-    return new Date(this.year, this.month - 1, this.day).getTime();
-  }
+function localMidnightTimestamp(value: DateOnlyParts): number {
+  return new Date(value.year, value.month - 1, value.day).getTime();
 }
 
 export function toArray(value: unknown): ConvertResult<unknown[]> {

@@ -1,5 +1,3 @@
-using System;
-using System.Linq.Expressions;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
@@ -16,16 +14,9 @@ namespace Alis.Reactive.Builders.Conditions
         internal abstract ValueProducer ToValueProducer();
 
         /// <summary>
-        /// Returns the ComponentSource for this typed source (for Set/Call reactions).
-        /// Only valid for component sources.
-        /// </summary>
-        internal virtual ComponentSource ToComponentSource() =>
-            throw new InvalidOperationException("Not a component source.");
-
-        /// <summary>
         /// The member name to read on the resolved source.
         /// </summary>
-        internal virtual string ReadMember => throw new InvalidOperationException("Not a component source.");
+        internal virtual string ReadMember => throw new System.InvalidOperationException("Not a component source.");
 
         /// <summary>
         /// Shape inferred from TProp.
@@ -36,24 +27,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// Element shape for array types (e.g., Shape.String for string[]).
         /// </summary>
         internal Shape ElementShape =>
-            CollectionElementShape.FromClrType(typeof(TProp)).ItemShapeOrNone;
-    }
-
-    /// <summary>
-    /// A typed source that reads from the event payload.
-    /// Delegates to <see cref="PayloadTypedSource{TPayload, TProp}"/> with event scope.
-    /// </summary>
-    public sealed class EventArgSource<TPayload, TProp> : TypedSource<TProp>
-    {
-        private readonly PayloadTypedSource<TPayload, TProp> _inner;
-
-        internal EventArgSource(Expression<Func<TPayload, TProp>> expression)
-        {
-            _inner = new PayloadTypedSource<TPayload, TProp>(
-                PayloadSource.Event(PayloadContract.ForPayload(typeof(TPayload))),
-                expression);
-        }
-
-        internal override ValueProducer ToValueProducer() => _inner.ToValueProducer();
+            Shape.CollectionItemShapeOrNone(typeof(TProp));
     }
 }

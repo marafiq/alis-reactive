@@ -4,20 +4,15 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
-    internal abstract class ConditionComposition
+    internal static class ConditionComposition
     {
-        private protected ConditionComposition() { }
+        internal static Condition None(Condition incoming) => incoming;
 
-        internal static ConditionComposition None { get; } =
-            new EmptyConditionComposition();
+        internal static Func<Condition, Condition> All(Condition existing) =>
+            incoming => ComposeAll(existing, incoming);
 
-        internal static ConditionComposition All(Condition existing) =>
-            new AllConditionComposition(existing);
-
-        internal static ConditionComposition Any(Condition existing) =>
-            new AnyConditionComposition(existing);
-
-        internal abstract Condition Compose(Condition incoming);
+        internal static Func<Condition, Condition> Any(Condition existing) =>
+            incoming => ComposeAny(existing, incoming);
 
         internal static void FlattenAll(Condition condition, List<Condition> target)
         {
@@ -44,60 +39,19 @@ namespace Alis.Reactive.Builders.Conditions
 
             target.Add(condition);
         }
-    }
 
-    internal sealed class EmptyConditionComposition : ConditionComposition
-    {
-        internal override Condition Compose(Condition incoming)
+        private static Condition ComposeAll(Condition existing, Condition incoming)
         {
-            if (incoming == null) throw new ArgumentNullException(nameof(incoming));
-            return incoming;
-        }
-    }
-
-    internal abstract class ExistingConditionComposition : ConditionComposition
-    {
-        private readonly Condition _existing;
-
-        private protected ExistingConditionComposition(Condition existing)
-        {
-            _existing = existing ?? throw new ArgumentNullException(nameof(existing));
-        }
-
-        protected Condition Existing => _existing;
-    }
-
-    internal sealed class AllConditionComposition : ExistingConditionComposition
-    {
-        internal AllConditionComposition(Condition existing)
-            : base(existing)
-        {
-        }
-
-        internal override Condition Compose(Condition incoming)
-        {
-            if (incoming == null) throw new ArgumentNullException(nameof(incoming));
-
             var terms = new List<Condition>();
-            FlattenAll(Existing, terms);
+            FlattenAll(existing, terms);
             terms.Add(incoming);
             return Condition.All(terms.ToArray());
         }
-    }
 
-    internal sealed class AnyConditionComposition : ExistingConditionComposition
-    {
-        internal AnyConditionComposition(Condition existing)
-            : base(existing)
+        private static Condition ComposeAny(Condition existing, Condition incoming)
         {
-        }
-
-        internal override Condition Compose(Condition incoming)
-        {
-            if (incoming == null) throw new ArgumentNullException(nameof(incoming));
-
             var terms = new List<Condition>();
-            FlattenAny(Existing, terms);
+            FlattenAny(existing, terms);
             terms.Add(incoming);
             return Condition.Any(terms.ToArray());
         }

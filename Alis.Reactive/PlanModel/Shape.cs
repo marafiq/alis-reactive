@@ -82,12 +82,16 @@ namespace Alis.Reactive.PlanModel
             if (IsStringSerializedType(type)) return String;
             if (type.IsEnum) return String;
 
-            var collection = CollectionElementShape.FromClrType(type);
-            if (collection.IsKnown)
-                return collection.ToArrayShape();
+            if (TryGetCollectionItemShape(type, out var itemShape))
+                return ArrayOf(itemShape);
 
             return Any;
         }
+
+        internal static Shape CollectionItemShapeOrNone(Type type) =>
+            TryGetCollectionItemShape(type, out var itemShape)
+                ? itemShape
+                : None;
 
         internal static Shape FromUnknownClrType(Type? type)
         {
@@ -120,6 +124,101 @@ namespace Alis.Reactive.PlanModel
                || type == typeof(TimeOnly)
 #endif
                ;
+
+        private static bool TryGetCollectionItemShape(Type type, out Shape itemShape)
+        {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+
+            if (type == typeof(string))
+            {
+                itemShape = None;
+                return false;
+            }
+
+            if (type.IsArray)
+                return TryGetArrayItemShape(type, out itemShape);
+
+            if (IsDictionaryLike(type))
+            {
+                itemShape = None;
+                return false;
+            }
+
+            if (TryGetElementTypeFromSupportedGeneric(type, out var directElementType))
+            {
+                itemShape = FromClrType(directElementType);
+                return true;
+            }
+
+            var candidates = type.GetInterfaces()
+                .Where(IsSupportedGenericCollection)
+                .Select(item => item.GetGenericArguments()[0])
+                .Distinct()
+                .ToArray();
+
+            if (candidates.Length == 1)
+            {
+                itemShape = FromClrType(candidates[0]);
+                return true;
+            }
+
+            itemShape = None;
+            return false;
+        }
+
+        private static bool TryGetArrayItemShape(Type arrayType, out Shape itemShape)
+        {
+            var arrayElementType = arrayType.GetElementType();
+            if (arrayElementType == null)
+            {
+                itemShape = None;
+                return false;
+            }
+
+            itemShape = FromClrType(arrayElementType);
+            return true;
+        }
+
+        private static bool TryGetElementTypeFromSupportedGeneric(Type type, out Type elementType)
+        {
+            if (type.IsGenericType && IsSupportedGenericCollection(type))
+            {
+                elementType = type.GetGenericArguments()[0];
+                return true;
+            }
+
+            elementType = typeof(object);
+            return false;
+        }
+
+        private static bool IsSupportedGenericCollection(Type type)
+        {
+            if (!type.IsGenericType) return false;
+
+            var definition = type.GetGenericTypeDefinition();
+            return definition == typeof(IEnumerable<>)
+                   || definition == typeof(IReadOnlyCollection<>)
+                   || definition == typeof(IReadOnlyList<>)
+                   || definition == typeof(ICollection<>)
+                   || definition == typeof(IList<>)
+                   || definition == typeof(List<>)
+                   || definition == typeof(HashSet<>)
+                   || definition == typeof(ISet<>);
+        }
+
+        private static bool IsDictionaryLike(Type type)
+        {
+            if (type.IsGenericType && IsDictionaryDefinition(type.GetGenericTypeDefinition()))
+                return true;
+
+            return type.GetInterfaces()
+                .Any(item => item.IsGenericType && IsDictionaryDefinition(item.GetGenericTypeDefinition()));
+        }
+
+        private static bool IsDictionaryDefinition(Type definition) =>
+            definition == typeof(Dictionary<,>)
+            || definition == typeof(IDictionary<,>)
+            || definition == typeof(IReadOnlyDictionary<,>);
 
         /// <summary>Gets the shape kind (string, number, boolean, date, array, object, nullable, raw, any, or none).</summary>
         public string Kind { get; }
@@ -228,106 +327,6 @@ namespace Alis.Reactive.PlanModel
         public static bool operator ==(Shape? left, Shape? right) => Equals(left, right);
         /// <summary>Returns <see langword="true"/> if the shapes are not structurally equal.</summary>
         public static bool operator !=(Shape? left, Shape? right) => !Equals(left, right);
-    }
-
-    internal sealed class CollectionElementShape
-    {
-        private readonly Shape _itemShape;
-        private readonly bool _isKnown;
-
-        private CollectionElementShape(Shape itemShape, bool isKnown)
-        {
-            _itemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
-            _isKnown = isKnown;
-        }
-
-        internal bool IsKnown => _isKnown;
-
-        internal Shape ItemShapeOrNone => _isKnown ? _itemShape : Shape.None;
-
-        internal Shape ToArrayShape()
-        {
-            if (!_isKnown)
-                throw new InvalidOperationException("Collection element shape is not known.");
-
-            return Shape.ArrayOf(_itemShape);
-        }
-
-        internal static CollectionElementShape FromClrType(Type type)
-        {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-
-            if (type == typeof(string)) return None;
-            if (type.IsArray)
-            {
-                var arrayElementType = type.GetElementType();
-                if (arrayElementType == null) return None;
-                return FromElementType(arrayElementType);
-            }
-            if (IsDictionaryLike(type)) return None;
-            if (TryGetElementTypeFromSupportedGeneric(type, out var directElementType))
-                return FromElementType(directElementType);
-
-            var candidates = type.GetInterfaces()
-                .Where(IsSupportedGenericCollection)
-                .Select(item => item.GetGenericArguments()[0])
-                .Distinct()
-                .ToArray();
-
-            return candidates.Length == 1
-                ? FromElementType(candidates[0])
-                : None;
-        }
-
-        private static CollectionElementShape Known(Shape itemShape) =>
-            new CollectionElementShape(itemShape, true);
-
-        private static CollectionElementShape None { get; } =
-            new CollectionElementShape(Shape.None, false);
-
-        private static CollectionElementShape FromElementType(Type elementType) =>
-            Known(Shape.FromClrType(elementType));
-
-        private static bool TryGetElementTypeFromSupportedGeneric(Type type, out Type elementType)
-        {
-            if (type.IsGenericType && IsSupportedGenericCollection(type))
-            {
-                elementType = type.GetGenericArguments()[0];
-                return true;
-            }
-
-            elementType = typeof(object);
-            return false;
-        }
-
-        private static bool IsSupportedGenericCollection(Type type)
-        {
-            if (!type.IsGenericType) return false;
-
-            var definition = type.GetGenericTypeDefinition();
-            return definition == typeof(IEnumerable<>)
-                   || definition == typeof(IReadOnlyCollection<>)
-                   || definition == typeof(IReadOnlyList<>)
-                   || definition == typeof(ICollection<>)
-                   || definition == typeof(IList<>)
-                   || definition == typeof(List<>)
-                   || definition == typeof(HashSet<>)
-                   || definition == typeof(ISet<>);
-        }
-
-        private static bool IsDictionaryLike(Type type)
-        {
-            if (type.IsGenericType && IsDictionaryDefinition(type.GetGenericTypeDefinition()))
-                return true;
-
-            return type.GetInterfaces()
-                .Any(item => item.IsGenericType && IsDictionaryDefinition(item.GetGenericTypeDefinition()));
-        }
-
-        private static bool IsDictionaryDefinition(Type definition) =>
-            definition == typeof(Dictionary<,>)
-            || definition == typeof(IDictionary<,>)
-            || definition == typeof(IReadOnlyDictionary<,>);
     }
 
     internal abstract class ShapeStructure

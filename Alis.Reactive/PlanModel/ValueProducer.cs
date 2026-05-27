@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Serialization;
 
@@ -87,25 +88,126 @@ namespace Alis.Reactive.PlanModel
             new ReadProducer(ValueRead.WholePayload(from, shape));
 
         internal static ValueProducer Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueProducer> args) =>
-            new ReadProducer(ValueRead.Method(from, method, returns, ValueArguments.Of(args)));
+            new ReadProducer(ValueRead.Method(from, method, returns, args));
 
         internal static ObjectProducer Object(IReadOnlyDictionary<string, ValueProducer> fields)
         {
-            var objectFields = ValueObjectFields.From(fields);
-            return new ObjectProducer(objectFields, objectFields.Shape);
+            var objectFields = ObjectFields(fields);
+            return new ObjectProducer(objectFields.Fields, objectFields.Shape);
         }
 
-        internal static ObjectProducer Object(IReadOnlyDictionary<string, ValueProducer> fields, Shape shape) =>
-            new ObjectProducer(ValueObjectFields.From(fields), shape);
+        internal static ObjectProducer Object(IReadOnlyDictionary<string, ValueProducer> fields, Shape shape)
+        {
+            var objectFields = ObjectFields(fields);
+            return new ObjectProducer(objectFields.Fields, shape);
+        }
 
         internal static ValueProducer Array(IReadOnlyList<ValueProducer> items)
         {
-            var arrayItems = ValueArrayItems.From(items);
-            return new ArrayProducer(arrayItems, arrayItems.Shape);
+            var arrayItems = ArrayItems(items);
+            return new ArrayProducer(arrayItems.Items, arrayItems.Shape);
         }
 
-        internal static ValueProducer Array(IReadOnlyList<ValueProducer> items, Shape shape) =>
-            new ArrayProducer(ValueArrayItems.From(items), shape);
+        internal static ValueProducer Array(IReadOnlyList<ValueProducer> items, Shape shape)
+        {
+            var arrayItems = ArrayItems(items);
+            return new ArrayProducer(arrayItems.Items, shape);
+        }
+
+        private static (IReadOnlyDictionary<string, ValueProducer> Fields, Shape Shape) ObjectFields(
+            IReadOnlyDictionary<string, ValueProducer> fields)
+        {
+            if (fields == null) throw new ArgumentNullException(nameof(fields));
+
+            var snapshot = new Dictionary<string, ValueProducer>(StringComparer.Ordinal);
+            var shapeFields = new Dictionary<string, Shape>(StringComparer.Ordinal);
+            foreach (var field in fields)
+            {
+                var fieldName = ObjectFieldName(field.Key);
+                var fieldValue = ObjectFieldValue(field.Value, fieldName);
+                snapshot[fieldName] = fieldValue;
+                shapeFields[fieldName] = fieldValue.OutputShape;
+            }
+
+            return (snapshot, Shape.ObjectOf(shapeFields));
+        }
+
+        private static string ObjectFieldName(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Object field name must not be null or whitespace.", nameof(value));
+
+            return value;
+        }
+
+        private static ValueProducer ObjectFieldValue(ValueProducer value, string fieldName)
+        {
+            if (value == null)
+                throw new ArgumentException(
+                    "Object field '" + fieldName + "' must have a value producer.",
+                    nameof(value));
+
+            return value;
+        }
+
+        private static (IReadOnlyList<ValueProducer> Items, Shape Shape) ArrayItems(
+            IReadOnlyList<ValueProducer> items)
+        {
+            if (items == null) throw new ArgumentNullException(nameof(items));
+            if (items.Count == 0)
+                return (System.Array.Empty<ValueProducer>(), Shape.ArrayOf(Shape.Any));
+
+            var snapshot = new List<ValueProducer>();
+            foreach (var item in items)
+            {
+                if (item == null)
+                    throw new ArgumentException("Array item must not be null.", nameof(items));
+
+                snapshot.Add(item);
+            }
+
+            return (snapshot, ArrayShape(snapshot));
+        }
+
+        private static Shape ArrayShape(IReadOnlyList<ValueProducer> items)
+        {
+            if (!TryFindSpecificArrayItemShape(items, out var itemShape))
+                return Shape.ArrayOf(Shape.Any);
+
+            return ArrayItemsShareShape(items, itemShape)
+                ? Shape.ArrayOf(itemShape)
+                : Shape.ArrayOf(Shape.Any);
+        }
+
+        private static bool TryFindSpecificArrayItemShape(
+            IReadOnlyList<ValueProducer> items,
+            [NotNullWhen(true)] out Shape? shape)
+        {
+            foreach (var item in items)
+            {
+                if (item.OutputShape.IsNone) continue;
+
+                shape = item.OutputShape;
+                return true;
+            }
+
+            shape = null;
+            return false;
+        }
+
+        private static bool ArrayItemsShareShape(IReadOnlyList<ValueProducer> items, Shape expected)
+        {
+            foreach (var item in items)
+            {
+                var itemShape = item.OutputShape;
+                if (itemShape.IsNone)
+                    return false;
+                if (!itemShape.Equals(expected))
+                    return false;
+            }
+
+            return true;
+        }
     }
 
     /// <summary>A constant value embedded in the plan.</summary>
@@ -192,7 +294,7 @@ namespace Alis.Reactive.PlanModel
                 shape,
                 ValueReadAccess.Property);
 
-        internal static ValueRead Method(RuntimeObjectSource from, string member, Shape shape, ValueArguments args) =>
+        internal static ValueRead Method(RuntimeObjectSource from, string member, Shape shape, IReadOnlyList<ValueProducer> args) =>
             new ValueRead(
                 ValueReadTarget.ForMember(from, member),
                 shape,
@@ -265,7 +367,7 @@ namespace Alis.Reactive.PlanModel
         internal static ValueReadAccess Property { get; } =
             new PropertyValueReadAccess();
 
-        internal static ValueReadAccess Method(ValueArguments args) =>
+        internal static ValueReadAccess Method(IReadOnlyList<ValueProducer> args) =>
             new MethodValueReadAccess(args);
 
         /// <summary>Gets the access kind.</summary>
@@ -282,39 +384,24 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Invokes a method and uses the returned value.</summary>
     public sealed class MethodValueReadAccess : ValueReadAccess
     {
-        private readonly ValueArguments _args;
+        private readonly IReadOnlyList<ValueProducer> _args;
 
-        internal MethodValueReadAccess(ValueArguments args)
+        internal MethodValueReadAccess(IReadOnlyList<ValueProducer> args)
         {
-            _args = args ?? throw new ArgumentNullException(nameof(args));
+            _args = OrderedArguments(args);
         }
 
         /// <summary>Gets the kind. Always <c>"method"</c>.</summary>
         public override string Kind => "method";
 
         /// <summary>Gets method arguments.</summary>
-        public IReadOnlyList<ValueProducer> Args => _args.ItemsForJson;
-    }
+        public IReadOnlyList<ValueProducer> Args => _args;
 
-    internal sealed class ValueArguments
-    {
-        private readonly IReadOnlyList<ValueProducer> _items;
-
-        private ValueArguments(IReadOnlyList<ValueProducer> items)
-        {
-            _items = items ?? throw new ArgumentNullException(nameof(items));
-        }
-
-        internal static ValueArguments None { get; } =
-            new ValueArguments(System.Array.Empty<ValueProducer>());
-
-        internal IReadOnlyList<ValueProducer> ItemsForJson => _items;
-
-        internal static ValueArguments Of(IReadOnlyList<ValueProducer> items)
+        private static IReadOnlyList<ValueProducer> OrderedArguments(IReadOnlyList<ValueProducer> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
             if (items.Count == 0)
-                return None;
+                return Array.Empty<ValueProducer>();
 
             var snapshot = new List<ValueProducer>();
             foreach (var item in items)
@@ -325,210 +412,23 @@ namespace Alis.Reactive.PlanModel
                 snapshot.Add(item);
             }
 
-            return new ValueArguments(snapshot);
+            return snapshot;
         }
-    }
-
-    internal sealed class ValueObjectFields
-    {
-        private readonly IReadOnlyDictionary<string, ValueProducer> _fields;
-        private readonly Shape _shape;
-
-        private ValueObjectFields(IReadOnlyDictionary<string, ValueProducer> fields, Shape shape)
-        {
-            _fields = fields ?? throw new ArgumentNullException(nameof(fields));
-            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
-        }
-
-        internal IReadOnlyDictionary<string, ValueProducer> ForJson => _fields;
-        internal Shape Shape => _shape;
-
-        internal static ValueObjectFields From(IReadOnlyDictionary<string, ValueProducer> fields)
-        {
-            if (fields == null) throw new ArgumentNullException(nameof(fields));
-
-            var snapshot = new Dictionary<string, ValueProducer>(StringComparer.Ordinal);
-            var shapeFields = new Dictionary<string, Shape>(StringComparer.Ordinal);
-            foreach (var field in fields)
-            {
-                var fieldName = ValueObjectFieldName.Of(field.Key);
-                var fieldValue = RequireFieldValue(field.Value, fieldName);
-                snapshot[fieldName.Value] = fieldValue;
-                shapeFields[fieldName.Value] = fieldValue.OutputShape;
-            }
-
-            return new ValueObjectFields(snapshot, Shape.ObjectOf(shapeFields));
-        }
-
-        private static ValueProducer RequireFieldValue(ValueProducer value, ValueObjectFieldName fieldName)
-        {
-            if (value == null)
-                throw new ArgumentException(
-                    "Object field '" + fieldName.Value + "' must have a value producer.",
-                    nameof(value));
-
-            return value;
-        }
-    }
-
-    internal sealed class ValueObjectFieldName
-    {
-        private ValueObjectFieldName(string value)
-        {
-            Value = value;
-        }
-
-        internal string Value { get; }
-
-        internal static ValueObjectFieldName Of(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Object field name must not be null or whitespace.", nameof(value));
-
-            return new ValueObjectFieldName(value);
-        }
-    }
-
-    internal sealed class ValueArrayItems
-    {
-        private readonly IReadOnlyList<ValueProducer> _items;
-        private readonly Shape _shape;
-
-        private ValueArrayItems(IReadOnlyList<ValueProducer> items, Shape shape)
-        {
-            _items = items ?? throw new ArgumentNullException(nameof(items));
-            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
-        }
-
-        internal IReadOnlyList<ValueProducer> ForJson => _items;
-        internal Shape Shape => _shape;
-
-        internal static ValueArrayItems From(IReadOnlyList<ValueProducer> items)
-        {
-            if (items == null) throw new ArgumentNullException(nameof(items));
-            if (items.Count == 0)
-                return Empty;
-
-            var snapshot = new List<ValueProducer>();
-            foreach (var item in items)
-            {
-                if (item == null)
-                    throw new ArgumentException("Array item must not be null.", nameof(items));
-
-                snapshot.Add(item);
-            }
-
-            return new ValueArrayItems(snapshot, ValueArrayOutputContract.From(snapshot).Shape);
-        }
-
-        private static ValueArrayItems Empty { get; } =
-            new ValueArrayItems(
-                System.Array.Empty<ValueProducer>(),
-                ValueArrayOutputContract.Empty.Shape);
-    }
-
-    internal sealed class ValueArrayOutputContract
-    {
-        private ValueArrayOutputContract(Shape shape)
-        {
-            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
-        }
-
-        internal Shape Shape { get; }
-
-        internal static ValueArrayOutputContract Empty { get; } =
-            new ValueArrayOutputContract(Shape.ArrayOf(Shape.Any));
-
-        internal static ValueArrayOutputContract From(IReadOnlyList<ValueProducer> items)
-        {
-            if (items == null) throw new ArgumentNullException(nameof(items));
-            if (items.Count == 0)
-                return Empty;
-
-            var observedItemShape = ObservedArrayItemShape.From(items);
-            if (!observedItemShape.HasSpecificShape)
-                return Unconstrained;
-
-            var itemShapeIsStable = ItemsShareShape(items, observedItemShape.SpecificShape);
-            return itemShapeIsStable
-                ? new ValueArrayOutputContract(Shape.ArrayOf(observedItemShape.SpecificShape))
-                : Unconstrained;
-        }
-
-        private static ValueArrayOutputContract Unconstrained { get; } =
-            new ValueArrayOutputContract(Shape.ArrayOf(Shape.Any));
-
-        private static bool ItemsShareShape(IReadOnlyList<ValueProducer> items, Shape expected)
-        {
-            foreach (var item in items)
-            {
-                var itemShape = item.OutputShape;
-                if (itemShape.IsNone)
-                    return false;
-                if (!itemShape.Equals(expected))
-                    return false;
-            }
-
-            return true;
-        }
-    }
-
-    internal sealed class ObservedArrayItemShape
-    {
-        private readonly Shape _specificShape;
-
-        private ObservedArrayItemShape(Shape specificShape, bool hasSpecificShape)
-        {
-            _specificShape = specificShape ?? throw new ArgumentNullException(nameof(specificShape));
-            HasSpecificShape = hasSpecificShape;
-        }
-
-        internal bool HasSpecificShape { get; }
-
-        internal Shape SpecificShape
-        {
-            get
-            {
-                if (!HasSpecificShape)
-                    throw new InvalidOperationException("No specific array item shape was observed.");
-
-                return _specificShape;
-            }
-        }
-
-        internal static ObservedArrayItemShape From(IReadOnlyList<ValueProducer> items)
-        {
-            if (items == null) throw new ArgumentNullException(nameof(items));
-
-            foreach (var item in items)
-            {
-                if (!item.OutputShape.IsNone)
-                    return Specific(item.OutputShape);
-            }
-
-            return None;
-        }
-
-        private static ObservedArrayItemShape Specific(Shape shape) =>
-            new ObservedArrayItemShape(shape, hasSpecificShape: true);
-
-        private static ObservedArrayItemShape None { get; } =
-            new ObservedArrayItemShape(Shape.Any, hasSpecificShape: false);
     }
 
     /// <summary>A composite value built from named field expressions.</summary>
     public sealed class ObjectProducer : ValueProducer
     {
-        private readonly ValueObjectFields _fields;
+        private readonly IReadOnlyDictionary<string, ValueProducer> _fields;
 
         /// <summary>Gets the kind. Always <c>"object"</c>.</summary>
         public string Kind => "object";
         /// <summary>Gets the named fields and their value expressions.</summary>
-        public IReadOnlyDictionary<string, ValueProducer> Fields => _fields.ForJson;
+        public IReadOnlyDictionary<string, ValueProducer> Fields => _fields;
         /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
         public Shape Shape { get; }
 
-        internal ObjectProducer(ValueObjectFields fields, Shape shape)
+        internal ObjectProducer(IReadOnlyDictionary<string, ValueProducer> fields, Shape shape)
         {
             _fields = fields ?? throw new ArgumentNullException(nameof(fields));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
@@ -540,16 +440,16 @@ namespace Alis.Reactive.PlanModel
     /// <summary>A composite value built from ordered item expressions.</summary>
     public sealed class ArrayProducer : ValueProducer
     {
-        private readonly ValueArrayItems _items;
+        private readonly IReadOnlyList<ValueProducer> _items;
 
         /// <summary>Gets the kind. Always <c>"array"</c>.</summary>
         public string Kind => "array";
         /// <summary>Gets the ordered item expressions.</summary>
-        public IReadOnlyList<ValueProducer> Items => _items.ForJson;
+        public IReadOnlyList<ValueProducer> Items => _items;
         /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
         public Shape Shape { get; }
 
-        internal ArrayProducer(ValueArrayItems items, Shape shape)
+        internal ArrayProducer(IReadOnlyList<ValueProducer> items, Shape shape)
         {
             _items = items ?? throw new ArgumentNullException(nameof(items));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));

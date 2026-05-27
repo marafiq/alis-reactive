@@ -31,6 +31,7 @@ public abstract class PlaywrightTestBase : PageTest
         Page.SetDefaultTimeout(60000);
         Page.SetDefaultNavigationTimeout(60000);
         await RouteExternalFontsToLocalFallback();
+        await RouteLocalSyncfusionRuntime();
 
         Page.Console += (_, msg) =>
         {
@@ -74,6 +75,20 @@ public abstract class PlaywrightTestBase : PageTest
 
         await Context.RouteAsync("https://fonts.gstatic.com/**", async route =>
             await route.FulfillAsync(new() { Status = 204 }));
+    }
+
+    private async Task RouteLocalSyncfusionRuntime()
+    {
+        var syncfusionRuntimePath = FindRequiredFile(
+            Path.Combine("node_modules", "@syncfusion", "ej2", "dist", "ej2.min.js"));
+
+        await Context.RouteAsync("**/vendor/syncfusion/dist/ej2.min.js", async route =>
+            await route.FulfillAsync(new()
+            {
+                Status = 200,
+                ContentType = "application/javascript",
+                Path = syncfusionRuntimePath
+            }));
     }
 
     [TearDown]
@@ -340,5 +355,20 @@ public abstract class PlaywrightTestBase : PageTest
         foreach (var message in messages)
             TestContext.Out.WriteLine(message);
         TestContext.Out.WriteLine("=== End Console Output ===");
+    }
+
+    private static string FindRequiredFile(string relativePath)
+    {
+        var dir = TestContext.CurrentContext.TestDirectory;
+        while (dir != null)
+        {
+            var candidate = Path.Combine(dir, relativePath);
+            if (File.Exists(candidate))
+                return candidate;
+
+            dir = Path.GetDirectoryName(dir);
+        }
+
+        throw new FileNotFoundException($"Required test asset '{relativePath}' was not found.");
     }
 }

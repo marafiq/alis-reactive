@@ -21,18 +21,13 @@ namespace Alis.Reactive.Builders.Requests
             _completion = ParallelCompletion.OnSettled(reaction);
         }
 
-        internal Reaction ToReaction(IReadOnlyList<Reaction> preFetch)
+        internal Reaction ToReaction()
         {
-            if (preFetch == null) throw new ArgumentNullException(nameof(preFetch));
             if (_branches.Count == 0)
                 throw new InvalidOperationException(
                     "Parallel requires at least one HTTP request branch.");
 
             var reactions = new List<Reaction>();
-            var hasPreFetchCommands = preFetch.Count > 0;
-            if (hasPreFetchCommands)
-                reactions.AddRange(preFetch);
-
             foreach (var branch in _branches)
                 reactions.Add(Reaction.Request(branch));
 

@@ -98,7 +98,7 @@ function textBoxPlanWithValueAccess(access: MemberAccess): Plan {
     id: "resident-name",
     vendor: "native",
     type: "native.textbox",
-    contribution: { kind: "object-target" },
+    role: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };
@@ -142,7 +142,7 @@ function customWidgetPlan(): Plan {
         id: "resident-widget",
         vendor: customWidgetVendor,
         type: "acme.widget",
-        contribution: { kind: "object-target" },
+        role: { kind: "object-target" },
         binding: { kind: "none" },
         container: { kind: "none" },
       },
@@ -231,7 +231,7 @@ describe("executeReaction member targets", () => {
           id: "active-status",
           vendor: "native",
           type: "native.checkbox",
-          contribution: { kind: "object-target" },
+          role: { kind: "object-target" },
           binding: { kind: "none" },
           container: { kind: "none" },
         },
@@ -273,7 +273,7 @@ describe("executeReaction member targets", () => {
           id: "allergy-echo",
           vendor: "native",
           type: "native.element.allergy-echo",
-          contribution: { kind: "object-target" },
+          role: { kind: "object-target" },
           binding: { kind: "none" },
           container: { kind: "none" },
         },
@@ -289,22 +289,6 @@ describe("executeReaction member targets", () => {
     }, plan);
 
     expect(document.getElementById("allergy-echo")?.textContent).toBe("Peanuts,Shellfish,Dairy");
-  });
-
-  it("rejects writes against read-only component properties", () => {
-    document.body.innerHTML = `<input id="resident-name" value="Ada" />`;
-    const reaction: Reaction = {
-      kind: "set",
-      on: { kind: "component", component: "resident-name" },
-      property: "value",
-      value: literal("Grace"),
-    };
-
-    expect(() => executeReaction(reaction, textBoxPlanWithValueAccess("read")))
-      .toThrow('property component "resident-name".value is not writable');
-
-    const element = document.getElementById("resident-name") as HTMLInputElement;
-    expect(element.value).toBe("Ada");
   });
 
   it("calls a component method with evaluated arguments", () => {

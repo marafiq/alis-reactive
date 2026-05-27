@@ -19,6 +19,12 @@ namespace Alis.Reactive.Builders.Conditions
             _expression = expression;
         }
 
+        internal static PayloadTypedSource<TPayload, TProp> FromEvent(
+            Expression<Func<TPayload, TProp>> expression) =>
+            new PayloadTypedSource<TPayload, TProp>(
+                PayloadSource.Event(PayloadContract.ForPayload(typeof(TPayload))),
+                expression);
+
         internal override ValueProducer ToValueProducer()
         {
             var payloadPath = ExpressionPathHelper.ToEventPath(_expression);

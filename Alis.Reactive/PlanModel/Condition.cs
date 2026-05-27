@@ -14,37 +14,22 @@ namespace Alis.Reactive.PlanModel
     {
         private protected Condition() { }
 
-        internal static Condition Compare(string op, ComparisonOperands operands) =>
-            new CompareCondition(CompareOperator.From(op), operands);
-
         internal static Condition Compare(CompareOperator op, ComparisonOperands operands) =>
             new CompareCondition(op, operands);
 
         internal static Condition All(params Condition[] terms) =>
-            new AllCondition(ConditionTerms.From("all", terms));
+            new AllCondition(CompositeTerms("all", terms));
 
         internal static Condition Any(params Condition[] terms) =>
-            new AnyCondition(ConditionTerms.From("any", terms));
+            new AnyCondition(CompositeTerms("any", terms));
 
         internal static Condition Not(Condition term) =>
             new NotCondition(term);
 
         internal static Condition Confirm(string message) =>
             new ConfirmCondition(message);
-    }
 
-    internal sealed class ConditionTerms
-    {
-        private readonly IReadOnlyList<Condition> _items;
-
-        private ConditionTerms(IReadOnlyList<Condition> items)
-        {
-            _items = items ?? throw new ArgumentNullException(nameof(items));
-        }
-
-        internal IReadOnlyList<Condition> Items => _items;
-
-        internal static ConditionTerms From(string composition, IEnumerable<Condition> terms)
+        private static IReadOnlyList<Condition> CompositeTerms(string composition, IEnumerable<Condition> terms)
         {
             if (composition == null) throw new ArgumentNullException(nameof(composition));
             if (terms == null) throw new ArgumentNullException(nameof(terms));
@@ -61,7 +46,7 @@ namespace Alis.Reactive.PlanModel
                     $"Composite condition '{composition}' requires at least one term.",
                     nameof(terms));
 
-            return new ConditionTerms(items);
+            return items;
         }
     }
 
@@ -256,14 +241,14 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Logical AND: all child conditions must be true.</summary>
     public sealed class AllCondition : Condition
     {
-        private readonly ConditionTerms _terms;
+        private readonly IReadOnlyList<Condition> _terms;
 
         /// <summary>Gets the kind. Always <c>"all"</c>.</summary>
         public string Kind => "all";
         /// <summary>Gets the child conditions that must all be true.</summary>
-        public IReadOnlyList<Condition> Terms => _terms.Items;
+        public IReadOnlyList<Condition> Terms => _terms;
 
-        internal AllCondition(ConditionTerms terms)
+        internal AllCondition(IReadOnlyList<Condition> terms)
         {
             _terms = terms ?? throw new ArgumentNullException(nameof(terms));
         }
@@ -272,14 +257,14 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Logical OR: at least one child condition must be true.</summary>
     public sealed class AnyCondition : Condition
     {
-        private readonly ConditionTerms _terms;
+        private readonly IReadOnlyList<Condition> _terms;
 
         /// <summary>Gets the kind. Always <c>"any"</c>.</summary>
         public string Kind => "any";
         /// <summary>Gets the child conditions where at least one must be true.</summary>
-        public IReadOnlyList<Condition> Terms => _terms.Items;
+        public IReadOnlyList<Condition> Terms => _terms;
 
-        internal AnyCondition(ConditionTerms terms)
+        internal AnyCondition(IReadOnlyList<Condition> terms)
         {
             _terms = terms ?? throw new ArgumentNullException(nameof(terms));
         }

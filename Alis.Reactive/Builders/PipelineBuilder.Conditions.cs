@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders
             FlushPendingConditionIfNeeded();
             _draft.BeginConditional();
 
-            var source = new EventArgSource<TPayload, TProp>(path);
+            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 

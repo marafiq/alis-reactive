@@ -29,6 +29,31 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions
             return Ok(new { result = $"audited:{request?.Action ?? "unknown"}" });
         }
 
+        [HttpPost("Resident/{residentId:int}/Audit")]
+        public IActionResult AuditResident(
+            int residentId,
+            [FromBody] AuditRequest? request,
+            [FromHeader(Name = "X-Category")] string? category)
+        {
+            return Ok(new
+            {
+                residentId,
+                action = request?.Action ?? "unknown",
+                headerCategory = category ?? ""
+            });
+        }
+
+        [HttpPost("Resident/{residentId:int}/AuditTrail/{categorySlug}")]
+        public IActionResult AuditResidentTrail(int residentId, string categorySlug)
+        {
+            return Ok(new
+            {
+                residentId,
+                categorySlug,
+                step = "chained"
+            });
+        }
+
         // ── Section 3: POST classify — returns tier based on count ──
 
         [HttpPost("Classify")]

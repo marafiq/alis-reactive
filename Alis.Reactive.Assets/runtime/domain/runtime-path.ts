@@ -4,90 +4,7 @@ import { isMissingRuntimeValue } from "./runtime-value";
 
 type MemberKey = string | number;
 type MemberOwner = { [key: string]: unknown; [key: number]: unknown };
-
-class RuntimeMemberOwner {
-  private constructor(private readonly value: MemberOwner) {}
-
-  static readable(source: unknown): RuntimeMemberOwner | undefined {
-    if (isMissingRuntimeValue(source)) return undefined;
-    return new RuntimeMemberOwner(source as MemberOwner);
-  }
-
-  static require(source: unknown, label: string): RuntimeMemberOwner {
-    if (isMissingRuntimeValue(source)) {
-      throw new Error(`[alis] runtime path owner is missing on ${label}`);
-    }
-
-    const sourceCanExposeMembers = typeof source === "object" || typeof source === "function";
-    if (!sourceCanExposeMembers) {
-      throw new Error(`[alis] runtime path owner is ${typeof source} on ${label}`);
-    }
-
-    return new RuntimeMemberOwner(source as MemberOwner);
-  }
-
-  read(key: MemberKey): unknown {
-    return this.value[key];
-  }
-
-  member(key: MemberKey): RuntimeMember {
-    return new RuntimeMember(this.value, key);
-  }
-
-  requireMember(key: MemberKey, label: string): RuntimeMember {
-    if (key in this.value) return this.member(key);
-
-    throw new Error(`[alis] runtime path member "${String(key)}" is missing on ${label}`);
-  }
-}
-
-class RuntimeMember {
-  constructor(
-    readonly owner: MemberOwner,
-    readonly key: MemberKey,
-  ) {}
-
-  get value(): unknown {
-    return this.owner[this.key];
-  }
-
-  set(value: unknown): void {
-    this.owner[this.key] = value;
-  }
-}
-
-class RuntimeCallable {
-  constructor(
-    private readonly member: RuntimeMember,
-    private readonly label: string,
-  ) {}
-
-  call(args: unknown[]): unknown {
-    const fn = this.member.value;
-    const memberIsCallable = typeof fn === "function";
-    if (!memberIsCallable) {
-      throw new Error(`[alis] resolveCallable: "${this.member.key}" is not a function on ${this.label}`);
-    }
-
-    return fn.apply(this.member.owner, args);
-  }
-}
-
-class RuntimeRootCallable {
-  constructor(
-    private readonly root: unknown,
-    private readonly label: string,
-  ) {}
-
-  call(args: unknown[]): unknown {
-    const rootIsCallable = typeof this.root === "function";
-    if (!rootIsCallable) {
-      throw new Error(`[alis] resolveCallable: root is not a function on ${this.label}`);
-    }
-
-    return this.root(...args);
-  }
-}
+type RuntimeMember = { readonly owner: MemberOwner; readonly key: MemberKey };
 
 export class RuntimePath {
   private constructor(private readonly segments: Path) {}
@@ -99,9 +16,7 @@ export class RuntimePath {
   read(root: unknown): unknown {
     let current = root;
     for (const segment of this.segments) {
-      const owner = RuntimeMemberOwner.readable(current);
-      if (owner === undefined) return undefined;
-      current = owner.read(segmentKey(segment));
+      current = readOptionalMember(current, segmentKey(segment));
     }
 
     return current;
@@ -111,23 +26,23 @@ export class RuntimePath {
     const pathTargetsRoot = this.segments.length === 0;
     if (pathTargetsRoot) return root;
 
-    return this.requireMember(root, label).value;
+    return memberValue(this.requirePathMember(root, label));
   }
 
   assign(root: unknown, value: unknown, label: string): void {
-    this.requireMember(root, label).set(value);
+    setMember(this.requirePathMember(root, label), value);
   }
 
   call(root: unknown, args: unknown[], label: string): unknown {
     const pathTargetsRoot = this.segments.length === 0;
     if (pathTargetsRoot) {
-      return new RuntimeRootCallable(root, label).call(args);
+      return callRoot(root, args, label);
     }
 
-    return new RuntimeCallable(this.requireMember(root, label), label).call(args);
+    return callMember(this.requirePathMember(root, label), args, label);
   }
 
-  private requireMember(root: unknown, label: string): RuntimeMember {
+  private requirePathMember(root: unknown, label: string): RuntimeMember {
     const pathHasNoMember = this.segments.length === 0;
     if (pathHasNoMember) {
       throw new Error(`[alis] runtime path is empty on ${label}`);
@@ -136,14 +51,14 @@ export class RuntimePath {
     let owner = root;
     const finalSegmentIndex = this.segments.length - 1;
     for (let i = 0; i < finalSegmentIndex; i++) {
-      owner = RuntimeMemberOwner
-        .require(owner, `${label} segment ${i}`)
-        .read(segmentKey(this.segmentAt(i, label)));
+      owner = requireMemberOwner(owner, `${label} segment ${i}`)[segmentKey(this.segmentAt(i, label))];
     }
 
-    return RuntimeMemberOwner
-      .require(owner, label)
-      .requireMember(segmentKey(this.segmentAt(finalSegmentIndex, label)), label);
+    return requireMember(
+      requireMemberOwner(owner, label),
+      segmentKey(this.segmentAt(finalSegmentIndex, label)),
+      label,
+    );
   }
 
   private segmentAt(index: number, label: string): PathSegment {
@@ -156,6 +71,39 @@ export class RuntimePath {
   }
 }
 
+function readOptionalMember(source: unknown, key: MemberKey): unknown {
+  if (isMissingRuntimeValue(source)) return undefined;
+
+  return (source as MemberOwner)[key];
+}
+
+function requireMemberOwner(source: unknown, label: string): MemberOwner {
+  if (isMissingRuntimeValue(source)) {
+    throw new Error(`[alis] runtime path owner is missing on ${label}`);
+  }
+
+  const sourceCanExposeMembers = typeof source === "object" || typeof source === "function";
+  if (!sourceCanExposeMembers) {
+    throw new Error(`[alis] runtime path owner is ${typeof source} on ${label}`);
+  }
+
+  return source as MemberOwner;
+}
+
+function requireMember(owner: MemberOwner, key: MemberKey, label: string): RuntimeMember {
+  if (key in owner) return { owner, key };
+
+  throw new Error(`[alis] runtime path member "${String(key)}" is missing on ${label}`);
+}
+
+function memberValue(member: RuntimeMember): unknown {
+  return member.owner[member.key];
+}
+
+function setMember(member: RuntimeMember, value: unknown): void {
+  member.owner[member.key] = value;
+}
+
 function segmentKey(segment: PathSegment): MemberKey {
   switch (segment.kind) {
     case "property":
@@ -165,4 +113,23 @@ function segmentKey(segment: PathSegment): MemberKey {
     default:
       return assertNever(segment, "path segment");
   }
+}
+
+function callRoot(root: unknown, args: unknown[], label: string): unknown {
+  const rootIsCallable = typeof root === "function";
+  if (!rootIsCallable) {
+    throw new Error(`[alis] resolveCallable: root is not a function on ${label}`);
+  }
+
+  return root(...args);
+}
+
+function callMember(member: RuntimeMember, args: unknown[], label: string): unknown {
+  const fn = memberValue(member);
+  const memberIsCallable = typeof fn === "function";
+  if (!memberIsCallable) {
+    throw new Error(`[alis] resolveCallable: "${member.key}" is not a function on ${label}`);
+  }
+
+  return fn.apply(member.owner, args);
 }

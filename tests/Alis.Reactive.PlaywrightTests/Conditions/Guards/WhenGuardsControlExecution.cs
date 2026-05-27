@@ -723,6 +723,29 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // ── Nested branch block — Then branch contains another When/Then/Else ──
+
+    [Test]
+    public async Task nested_branch_inside_then_executes_inner_branch_cases()
+    {
+        await NavigateAndBoot();
+        var result = Page.Locator("#nested-branch-result");
+
+        await Page.Locator("#btn-nested-branch-active").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Senior Active");
+
+        await Page.Locator("#btn-nested-branch-inactive").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Senior Inactive");
+
+        await Page.Locator("#btn-nested-branch-low").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Junior");
+
+        await Page.Locator("#btn-nested-branch-active").ClickAsync();
+        await Expect(result).ToHaveTextAsync("Senior Active");
+
+        AssertNoConsoleErrors();
+    }
+
     // ── Null leaf — missing address key entirely (not just city=null) ──
 
     [Test]

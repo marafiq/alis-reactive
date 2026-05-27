@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Conditions
     public sealed class BranchBuilder<TModel> where TModel : class
     {
         private readonly List<BranchCase> _cases;
-        private BranchChainState _chainState = BranchChainState.Open;
+        private bool _hasDefaultCase;
 
         internal PipelineBuilder<TModel> Pipeline { get; }
 
@@ -30,9 +30,9 @@ namespace Alis.Reactive.Builders.Conditions
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
-            _chainState.EnsureElseIfCanBeAdded();
+            EnsureElseIfCanBeAdded();
 
-            var source = new EventArgSource<TPayload, TProp>(path);
+            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
@@ -42,7 +42,7 @@ namespace Alis.Reactive.Builders.Conditions
             Expression<Func<TPayload, TProp>> path)
             where TPayload : class
         {
-            _chainState.EnsureElseIfCanBeAdded();
+            EnsureElseIfCanBeAdded();
 
             var source = responseBody.Read(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
@@ -51,7 +51,7 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>Adds an ElseIf branch from a typed source.</summary>
         public ConditionSourceBuilder<TModel, TProp> ElseIf<TProp>(TypedSource<TProp> source)
         {
-            _chainState.EnsureElseIfCanBeAdded();
+            EnsureElseIfCanBeAdded();
 
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
@@ -60,66 +60,36 @@ namespace Alis.Reactive.Builders.Conditions
         /// <param name="pipeline">Builds the commands for the default case.</param>
         public void Else(Action<PipelineBuilder<TModel>> pipeline)
         {
-            _chainState.EnsureDefaultCanBeAdded();
+            EnsureDefaultCanBeAdded();
 
             var pb = new PipelineBuilder<TModel>(Pipeline.Context);
             pipeline(pb);
             _cases.Add(BranchCase.Default(pb.BuildReaction()));
-            _chainState = BranchChainState.ClosedAfterDefault;
+            _hasDefaultCase = true;
         }
 
         internal void AddBranch(BranchCase branchCase)
         {
-            _chainState.EnsureBranchCanBeAdded();
+            EnsureBranchCanBeAdded();
             _cases.Add(branchCase);
         }
-    }
 
-    internal abstract class BranchChainState
-    {
-        internal static BranchChainState Open { get; } =
-            new OpenBranchChainState();
-
-        internal static BranchChainState ClosedAfterDefault { get; } =
-            new BranchChainClosedAfterDefault();
-
-        internal abstract void EnsureElseIfCanBeAdded();
-
-        internal abstract void EnsureDefaultCanBeAdded();
-
-        internal abstract void EnsureBranchCanBeAdded();
-    }
-
-    internal sealed class OpenBranchChainState : BranchChainState
-    {
-        internal override void EnsureElseIfCanBeAdded()
+        private void EnsureElseIfCanBeAdded()
         {
+            if (_hasDefaultCase)
+                throw new InvalidOperationException("Cannot add ElseIf after Else.");
         }
 
-        internal override void EnsureDefaultCanBeAdded()
+        private void EnsureDefaultCanBeAdded()
         {
+            if (_hasDefaultCase)
+                throw new InvalidOperationException("Else already called.");
         }
 
-        internal override void EnsureBranchCanBeAdded()
+        private void EnsureBranchCanBeAdded()
         {
-        }
-    }
-
-    internal sealed class BranchChainClosedAfterDefault : BranchChainState
-    {
-        internal override void EnsureElseIfCanBeAdded()
-        {
-            throw new InvalidOperationException("Cannot add ElseIf after Else.");
-        }
-
-        internal override void EnsureDefaultCanBeAdded()
-        {
-            throw new InvalidOperationException("Else already called.");
-        }
-
-        internal override void EnsureBranchCanBeAdded()
-        {
-            throw new InvalidOperationException("Cannot add branches after Else.");
+            if (_hasDefaultCase)
+                throw new InvalidOperationException("Cannot add branches after Else.");
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Conditions
     {
         private readonly TypedSource<TProp> _typedSource;
         private readonly Shape _shape;
-        private readonly ConditionComposition _composition;
+        private readonly System.Func<Condition, Condition> _composeCondition;
         private readonly ConditionContinuation<TModel> _continuation;
 
         internal ConditionSourceBuilder(TypedSource<TProp> source, PipelineBuilder<TModel> pipeline)
@@ -36,12 +36,12 @@ namespace Alis.Reactive.Builders.Conditions
         internal ConditionSourceBuilder(
             TypedSource<TProp> source,
             ConditionContinuation<TModel> continuation,
-            ConditionComposition composition)
+            System.Func<Condition, Condition> composeCondition)
         {
             _typedSource = source ?? throw new System.ArgumentNullException(nameof(source));
             _shape = source.Shape;
             _continuation = continuation ?? throw new System.ArgumentNullException(nameof(continuation));
-            _composition = composition ?? throw new System.ArgumentNullException(nameof(composition));
+            _composeCondition = composeCondition ?? throw new System.ArgumentNullException(nameof(composeCondition));
         }
 
         // Comparison operators (typed operand)
@@ -81,9 +81,7 @@ namespace Alis.Reactive.Builders.Conditions
         // Range
         /// <summary>True when the source value is between <paramref name="low"/> and <paramref name="high"/> inclusive.</summary>
         public GuardBuilder<TModel> Between(TProp low, TProp high) =>
-            Build(
-                CompareOperator.Between,
-                ConditionOperand.InclusiveRange(low, high));
+            Build(CompareOperator.Between, RangeOperands(low, high));
 
         // Text operators
         /// <summary>True when the source string contains the substring.</summary>
@@ -100,17 +98,13 @@ namespace Alis.Reactive.Builders.Conditions
             BuildTextLiteral(CompareOperator.Matches, pattern);
         /// <summary>True when the source string length is at least <paramref name="length"/>.</summary>
         public GuardBuilder<TModel> MinLength(int length) =>
-            Build(
-                CompareOperator.MinLength,
-                ConditionOperand.MinimumTextLength(length));
+            Build(CompareOperator.MinLength, MinimumLengthOperands(length));
 
         // Array
         /// <summary>True when the source array contains the specified item.</summary>
         public GuardBuilder<TModel> ArrayContains(object item)
         {
-            return Build(
-                CompareOperator.ArrayContains,
-                ConditionOperand.CollectionItem(item, _typedSource.ElementShape));
+            return Build(CompareOperator.ArrayContains, CollectionItemOperands(item));
         }
 
         // Source-vs-source comparison
@@ -130,204 +124,94 @@ namespace Alis.Reactive.Builders.Conditions
         private GuardBuilder<TModel> BuildVsSource(CompareOperator op, TypedSource<TProp> right)
         {
             if (right == null) throw new System.ArgumentNullException(nameof(right));
-            return Build(
-                op,
-                ConditionOperand.Source(right.ToValueProducer()));
+            return Build(op, SourceOperands(right));
         }
 
         private GuardBuilder<TModel> BuildLiteral(CompareOperator op, object? operand) =>
-            Build(
-                op,
-                ConditionOperand.Literal(operand));
+            Build(op, LiteralOperands(operand));
 
         private GuardBuilder<TModel> BuildTextLiteral(CompareOperator op, string operand) =>
-            Build(
-                op,
-                ConditionOperand.TextLiteral(operand));
+            Build(op, TextLiteralOperands(operand));
 
         private GuardBuilder<TModel> BuildUnary(CompareOperator op) =>
-            Build(
-                op,
-                ConditionOperand.Unary);
+            Build(op, UnaryOperands());
 
         private GuardBuilder<TModel> BuildArray(CompareOperator op, System.Array values) =>
-            Build(
-                op,
-                ConditionOperand.Array(values));
+            Build(op, ArrayOperands(values));
 
-        private GuardBuilder<TModel> Build(CompareOperator op, ConditionOperand operand)
+        private GuardBuilder<TModel> Build(CompareOperator op, ComparisonOperands operands)
         {
-            var condition = Condition.Compare(
-                op,
-                operand.ToComparisonOperands(_typedSource.ToValueProducer(), _shape));
+            var condition = Condition.Compare(op, operands);
             return ComposeAndWrap(condition);
         }
 
+        private ValueProducer LeftValue() => _typedSource.ToValueProducer();
+
+        private ComparisonOperands UnaryOperands() =>
+            ComparisonOperands.Unary(LeftValue(), _shape);
+
+        private ComparisonOperands LiteralOperands(object? operand) =>
+            ComparisonOperands.Binary(
+                LeftValue(),
+                ValueProducer.LiteralRaw(operand, _shape),
+                _shape);
+
+        private ComparisonOperands TextLiteralOperands(string operand) =>
+            ComparisonOperands.Binary(
+                LeftValue(),
+                ValueProducer.LiteralRaw(operand, Shape.String),
+                _shape);
+
+        private ComparisonOperands MinimumLengthOperands(int length)
+        {
+            var minimumLength = MinimumTextLength.From(length, nameof(length));
+            return ComparisonOperands.Binary(
+                LeftValue(),
+                ValueProducer.LiteralRaw(minimumLength.Value, Shape.Number),
+                _shape);
+        }
+
+        private ComparisonOperands ArrayOperands(System.Array values)
+        {
+            if (values == null) throw new System.ArgumentNullException(nameof(values));
+
+            var items = new System.Collections.Generic.List<ValueProducer>();
+            foreach (var item in values)
+                items.Add(ValueProducer.LiteralRaw(item, _shape));
+
+            return ComparisonOperands.Binary(
+                LeftValue(),
+                ValueProducer.Array(items, Shape.ArrayOf(_shape.IsNone ? Shape.Any : _shape)),
+                _shape);
+        }
+
+        private ComparisonOperands SourceOperands(TypedSource<TProp> right) =>
+            ComparisonOperands.Binary(LeftValue(), right.ToValueProducer(), _shape);
+
+        private ComparisonOperands CollectionItemOperands(object item) =>
+            ComparisonOperands.CollectionItem(
+                LeftValue(),
+                ValueProducer.LiteralRaw(item, _typedSource.ElementShape),
+                _shape,
+                _typedSource.ElementShape);
+
+        private ComparisonOperands RangeOperands(TProp low, TProp high)
+        {
+            var endpoints = new System.Collections.Generic.List<ValueProducer>
+            {
+                ValueProducer.LiteralRaw(low, _shape),
+                ValueProducer.LiteralRaw(high, _shape)
+            };
+
+            return ComparisonOperands.Binary(
+                LeftValue(),
+                ValueProducer.Array(endpoints, Shape.ArrayOf(_shape.IsNone ? Shape.Any : _shape)),
+                _shape);
+        }
 
         private GuardBuilder<TModel> ComposeAndWrap(Condition newCondition)
         {
-            return _continuation.Wrap(_composition.Compose(newCondition));
-        }
-    }
-
-    internal abstract class ConditionOperand
-    {
-        private ConditionOperand() { }
-
-        internal static ConditionOperand Unary { get; } =
-            new UnaryConditionOperand();
-
-        internal static ConditionOperand Literal(object? value) =>
-            ShapedLiteral(value, Shape.None);
-
-        internal static ConditionOperand TextLiteral(string value) =>
-            ShapedLiteral(value, Shape.String);
-
-        internal static ConditionOperand MinimumTextLength(int length)
-        {
-            var minimumLength = Alis.Reactive.PlanModel.MinimumTextLength.From(length, nameof(length));
-            return ShapedLiteral(minimumLength.Value, Shape.Number);
-        }
-
-        private static ConditionOperand ShapedLiteral(object? value, Shape shape) =>
-            new LiteralConditionOperand(value, shape);
-
-        internal static ConditionOperand Array(System.Array values) =>
-            new ArrayConditionOperand(values);
-
-        internal static ConditionOperand Source(ValueProducer value) =>
-            new SourceConditionOperand(value);
-
-        internal static ConditionOperand CollectionItem(object item, Shape itemShape) =>
-            new CollectionItemConditionOperand(item, itemShape);
-
-        internal static ConditionOperand InclusiveRange<T>(T low, T high) =>
-            new InclusiveRangeConditionOperand<T>(low, high);
-
-        internal abstract ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape);
-
-        private sealed class UnaryConditionOperand : ConditionOperand
-        {
-            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
-            {
-                return ComparisonOperands.Unary(left, leftShape);
-            }
-        }
-
-        private sealed class LiteralConditionOperand : ConditionOperand
-        {
-            private readonly object? _value;
-            private readonly Shape _shape;
-
-            internal LiteralConditionOperand(object? value, Shape shape)
-            {
-                _value = value;
-                _shape = shape ?? throw new System.ArgumentNullException(nameof(shape));
-            }
-
-            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
-            {
-                var literalShape = ShapeOrLeftShape(leftShape);
-                return ComparisonOperands.Binary(
-                    left,
-                    ValueProducer.LiteralRaw(_value, literalShape),
-                    leftShape);
-            }
-
-            private Shape ShapeOrLeftShape(Shape leftShape) =>
-                _shape.IsNone ? leftShape : _shape;
-        }
-
-        private sealed class ArrayConditionOperand : ConditionOperand
-        {
-            private readonly System.Array _values;
-
-            internal ArrayConditionOperand(System.Array values)
-            {
-                _values = values ?? throw new System.ArgumentNullException(nameof(values));
-            }
-
-            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
-            {
-                var items = new System.Collections.Generic.List<ValueProducer>();
-                foreach (var item in _values)
-                    items.Add(ValueProducer.LiteralRaw(item, leftShape));
-
-                return ComparisonOperands.Binary(
-                    left,
-                    ValueProducer.Array(items, ConditionCollectionShape.FromItemShape(leftShape)),
-                    leftShape);
-            }
-        }
-
-        private sealed class SourceConditionOperand : ConditionOperand
-        {
-            private readonly ValueProducer _value;
-
-            internal SourceConditionOperand(ValueProducer value)
-            {
-                _value = value ?? throw new System.ArgumentNullException(nameof(value));
-            }
-
-            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
-            {
-                return ComparisonOperands.Binary(left, _value, leftShape);
-            }
-        }
-
-        private sealed class CollectionItemConditionOperand : ConditionOperand
-        {
-            private readonly object? _item;
-            private readonly Shape _itemShape;
-
-            internal CollectionItemConditionOperand(object? item, Shape itemShape)
-            {
-                _item = item;
-                _itemShape = itemShape ?? throw new System.ArgumentNullException(nameof(itemShape));
-            }
-
-            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
-            {
-                var right = ValueProducer.LiteralRaw(_item, _itemShape);
-                return ComparisonOperands.CollectionItem(left, right, leftShape, _itemShape);
-            }
-        }
-
-        private sealed class InclusiveRangeConditionOperand<T> : ConditionOperand
-        {
-            private readonly T _low;
-            private readonly T _high;
-
-            internal InclusiveRangeConditionOperand(T low, T high)
-            {
-                _low = low;
-                _high = high;
-            }
-
-            internal override ComparisonOperands ToComparisonOperands(ValueProducer left, Shape leftShape)
-            {
-                var endpoints = new System.Collections.Generic.List<ValueProducer>
-                {
-                    ValueProducer.LiteralRaw(_low, leftShape),
-                    ValueProducer.LiteralRaw(_high, leftShape)
-                };
-
-                return ComparisonOperands.Binary(
-                    left,
-                    ValueProducer.Array(endpoints, ConditionCollectionShape.FromItemShape(leftShape)),
-                    leftShape);
-            }
-        }
-    }
-
-    internal static class ConditionCollectionShape
-    {
-        internal static Shape FromItemShape(Shape itemShape)
-        {
-            if (itemShape == null) throw new System.ArgumentNullException(nameof(itemShape));
-            if (itemShape.IsNone) return Shape.ArrayOf(Shape.Any);
-
-            return Shape.ArrayOf(itemShape);
+            return _continuation.Wrap(_composeCondition(newCondition));
         }
     }
 

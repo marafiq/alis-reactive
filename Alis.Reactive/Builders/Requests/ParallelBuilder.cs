@@ -36,9 +36,9 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        internal Reaction BuildReaction(List<Reaction> preFetch)
+        internal Reaction BuildReaction()
         {
-            return _draft.ToReaction(preFetch);
+            return _draft.ToReaction();
         }
     }
 }

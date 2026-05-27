@@ -19,7 +19,7 @@ import { assertNever } from "../core/assert-never";
 import { scope } from "../core/trace";
 import { isMissingRuntimeValue } from "../domain/runtime-value";
 import { ExecutionContext, type ServerValidationPayload } from "../domain/execution-context";
-import { PlainObjectRecord } from "../domain/object-record";
+import { plainObjectRecordFrom } from "../domain/object-record";
 
 const log = scope("execute");
 
@@ -172,7 +172,7 @@ function executeSet(reaction: SetReaction, plan: RuntimePlan, context: Execution
 
     case "payload":
       log.trace("set", { target: reaction.on.scope, property: reaction.property, value });
-      payloadTarget(reaction.on, context, "set property").set(reaction.property, value);
+      requireMutablePayload(reaction.on, context, "set property")[reaction.property] = value;
       return;
   }
 }
@@ -193,7 +193,12 @@ function executeCall(reaction: CallReaction, plan: RuntimePlan, context: Executi
 
     case "payload":
       log.trace("call", { target: reaction.on.scope, method: reaction.method, args });
-      payloadTarget(reaction.on, context, "call method").call(reaction.method, args);
+      callPayloadMethod(
+        requireMutablePayload(reaction.on, context, "call method"),
+        reaction.on.scope,
+        reaction.method,
+        args,
+      );
       return;
   }
 }
@@ -241,13 +246,39 @@ function reportParallelStepFailures(results: readonly PromiseSettledResult<void>
   }
 }
 
-function payloadTarget(
+function requireMutablePayload(
   source: PayloadSource,
   context: ExecutionContext,
   operation: string,
-): MutablePayloadObject {
+): Record<string, unknown> {
   const root = context.resolvePayload(source);
-  return MutablePayloadObject.require(root, source, operation);
+  const payloadWasProvided = !isMissingRuntimeValue(root);
+  if (!payloadWasProvided) {
+    throw new Error(`[alis] cannot ${operation} on null payload (scope: ${source.scope})`);
+  }
+
+  const payload = plainObjectRecordFrom(root);
+  const payloadCanHoldMembers = payload !== undefined;
+  if (!payloadCanHoldMembers) {
+    throw new Error(`[alis] cannot ${operation} on ${typeof root} payload (scope: ${source.scope})`);
+  }
+
+  return payload;
+}
+
+function callPayloadMethod(
+  payload: Record<string, unknown>,
+  scope: string,
+  method: string,
+  args: unknown[],
+): void {
+  const member = payload[method];
+  const memberIsCallable = typeof member === "function";
+  if (!memberIsCallable) {
+    throw new Error(`[alis] "${method}" is not a function on payload (scope: ${scope})`);
+  }
+
+  member.apply(payload, args);
 }
 
 export function catchAsyncReactionFailure(
@@ -273,42 +304,6 @@ function dispatchPayload(reaction: DispatchReaction, plan: Plan, context: Execut
   if (reaction.payload.kind === "none") return {};
 
   return evaluateValue(reaction.payload.data, plan, context.raw);
-}
-
-class MutablePayloadObject {
-  private constructor(
-    private readonly root: Record<string, unknown>,
-    private readonly scope: string,
-  ) {}
-
-  static require(root: unknown, source: PayloadSource, operation: string): MutablePayloadObject {
-    const payloadWasProvided = !isMissingRuntimeValue(root);
-    if (!payloadWasProvided) {
-      throw new Error(`[alis] cannot ${operation} on null payload (scope: ${source.scope})`);
-    }
-
-    const payload = PlainObjectRecord.tryFrom(root);
-    const payloadCanHoldMembers = payload !== undefined;
-    if (!payloadCanHoldMembers) {
-      throw new Error(`[alis] cannot ${operation} on ${typeof root} payload (scope: ${source.scope})`);
-    }
-
-    return new MutablePayloadObject(payload.raw, source.scope);
-  }
-
-  set(property: string, value: unknown): void {
-    this.root[property] = value;
-  }
-
-  call(method: string, args: unknown[]): void {
-    const member = this.root[method];
-    const memberIsCallable = typeof member === "function";
-    if (!memberIsCallable) {
-      throw new Error(`[alis] "${method}" is not a function on payload (scope: ${this.scope})`);
-    }
-
-    member.apply(this.root, args);
-  }
 }
 
 interface BranchExecutionContext {
