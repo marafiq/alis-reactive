@@ -26,6 +26,17 @@ helper code alone. A change is allowed only when it can be traced as
 execution`. If that trace is missing, stop and complete the blueprint before
 editing code.
 
+Drift guard: source DSL is the requirement, not samples, XML docs, old unit
+tests, the current runtime, or remembered clues. Before coding a
+surface, update `docs/reactive-plan-source-blueprint.md` with the actual source
+file, DSL input, rich domain output, JSON/TS term, and runtime output. If that
+row cannot be written from source, read more source instead of making local
+edits.
+
+Doubt rule: whenever there is even slight doubt about a behavior, name, edge
+case, or module boundary, stop inferring and go back to the actual DSL source.
+Add or correct the input/output matrix row before changing code.
+
 Rich domain model does not mean inventing names, wrappers, registries, lifecycles,
 or abstractions so the code looks modeled. It means the smallest set of terms
 that directly explain the DSL behavior and make the implementation simpler to
