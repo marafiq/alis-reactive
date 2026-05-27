@@ -1,5 +1,5 @@
 // server-push.ts — SSE (EventSource) trigger wiring.
-// Uses ServerPushTrigger from the plan schema.
+// Uses ServerPushTrigger from the generated plan contract.
 
 import type { ServerPushTrigger, Reaction, Plan } from "../types";
 import { catchAsyncReactionFailure, executeReaction } from "./execute";

@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlanModel
 {
     /// <summary>
     /// Authoritative TypeScript projection for the plan JSON contract executed by the browser runtime.
-    /// Kept next to the plan domain so runtime types are generated from the plan model, not from the stale schema.
+    /// Kept next to the plan domain so runtime types are generated from the plan model.
     /// </summary>
     internal static class PlanTypeScriptContract
     {

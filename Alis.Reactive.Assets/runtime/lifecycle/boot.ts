@@ -10,7 +10,7 @@ import { resetActivePlanForTests, setActivePlan } from "../execution/execute";
 import { resetLiveClearForTests, wireLiveValidation } from "../validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
 import { resetNativeActionLinksForTests } from "../components/native/native-action-link";
-import { resetPluginRegistryForTests } from "../core/plugin-registry";
+import { resetPluginCatalogForTests } from "../core/plugin-catalog";
 import {
   applyPartialSlotLoad,
   applyPartialSlotUnload,
@@ -131,7 +131,7 @@ function resetRuntimeSingletonsForTests(): void {
   resetMergePlanState();
   resetLiveClearForTests();
   resetNativeActionLinksForTests();
-  resetPluginRegistryForTests();
+  resetPluginCatalogForTests();
 }
 
 function clearSummaryForPlan(planId: string): void {

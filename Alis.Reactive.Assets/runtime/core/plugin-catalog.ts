@@ -1,7 +1,7 @@
-// plugin-registry.ts — Browser plugin instance storage.
+// plugin-catalog.ts — Browser plugin instance storage.
 // Plugins are an explicit bridge for browser functions that are outside the
 // deterministic plan DSL. The plan still declares the callable contract; this
-// registry only owns the browser-provided implementation objects.
+// catalog only owns the browser-provided implementation objects.
 
 type BrowserPluginFunction = (...args: unknown[]) => unknown;
 export type BrowserPluginRoot = object | BrowserPluginFunction;
@@ -38,7 +38,7 @@ export function resolvePlugin(name: string): BrowserPluginRoot {
   return browserPlugins.resolve(name);
 }
 
-export function resetPluginRegistryForTests(): void {
+export function resetPluginCatalogForTests(): void {
   browserPlugins.clear();
 }
 

@@ -4,7 +4,7 @@ import type {
   Plan,
   RuntimeObjectSource,
 } from "../types";
-import { browserPlugins, type BrowserPluginCatalog } from "../core/plugin-registry";
+import { browserPlugins, type BrowserPluginCatalog } from "../core/plugin-catalog";
 import { RuntimeObject } from "./runtime-object";
 import { ComponentRuntime } from "./component-runtime";
 

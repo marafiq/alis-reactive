@@ -1,5 +1,5 @@
 // signalr.ts — SignalR trigger wiring.
-// Uses SignalRTrigger from the plan schema.
+// Uses SignalRTrigger from the generated plan contract.
 
 import * as signalR from "@microsoft/signalr";
 import type { SignalRTrigger, Reaction, Plan } from "../types";

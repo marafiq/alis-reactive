@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { evaluateValue } from "../core/evaluate";
-import { registerPlugin } from "../core/plugin-registry";
+import { registerPlugin } from "../core/plugin-catalog";
 import { RuntimeResolutionError } from "../domain/runtime-plan";
 import type { ComponentObject, BrowserObjectContract, Plan, Shape, ValueProducer } from "../types";
 

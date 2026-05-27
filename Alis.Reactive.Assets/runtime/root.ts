@@ -10,7 +10,7 @@ import "./components/native/loader";  // side-effect: handles target positioning
 import { composeInitialPlans } from "./lifecycle/merge-plan";
 import type { Plan } from "./types";
 import type { TraceLevel } from "./core/trace";
-import { registerPlugin } from "./core/plugin-registry";
+import { registerPlugin } from "./core/plugin-catalog";
 
 interface PendingBrowserPlugin {
   readonly name: string;
