@@ -460,6 +460,40 @@ These are the rows that catch local-only refactors.
 | validation extension from partial | partial adds fields to root form validation container | rules are added for loaded fields and exact loaded rules are removed on unload |
 | action link request | `NativeActionLink(..., p => p.Get(url).Gather(...))` | inline payload carries one request and object contracts needed to execute it |
 
+## Graph Test Vectors
+
+These are executable design checks. Each vector starts with real DSL syntax and
+ends at the runtime behavior that must be proven. When implementation changes a
+module, at least the matching vectors must stay true.
+
+| Vector | DSL input | Expected C# domain output | Expected JSON/TS output | Runtime effect | Proof |
+| --- | --- | --- | --- | --- | --- |
+| T1 page trigger order | `t.DomReady(p => { p.Element("a").SetText("A"); p.Dispatch("ready"); })` | one `BehaviorGraph` with `page-ready` trigger and `Sequence(Set, Dispatch)` | `startsWhen.page-ready`, `reaction.sequence.steps=[set,dispatch]` | DOM text write happens before event dispatch | runtime execute test |
+| T2 typed custom event payload | `t.CustomEvent<Saved>("saved", (e,p)=> p.Element("name").SetText(e,x=>x.Name))` | document trigger with event payload contract; `Set` reads event scope path | event payload shape + payload read scope `event` | event detail path is written to DOM | core behavior Playwright |
+| T3 multiple condition blocks around request | `p.When(src).Eq(1).Then(...); p.Get(url)...; p.When(src).Eq(2).Then(...)` | `Sequence(Branch, Request, Branch)` | ordered sequence retains all three reactions | branches and request execute in authored order | conditions/http mixing Playwright |
+| T4 condition source matrix | `p.When(p.FromUrl<int>("age")).Gt(p.Component<...>(...).Value())` | compare condition with two `ValueExpression`s | compare operands are URL read and component read | resolves both sources then compares | conditions projection/runtime |
+| T5 confirm branch | `p.Confirm("Delete?").Then(p=>p.Delete(url))` | branch with `Confirm` condition and request reaction | `condition.confirm`, branch case reaction request | prompt gates request; request runs only when accepted | confirm Playwright/runtime |
+| T6 gather mixed sources | `g.Header("X", p.FromUrl("tab")).RouteParam("id", args,x=>x.Id).FromUrl<int>("facilityId","facility").Plugin(plugin,"count")` | `RequestInputProjection` assignments to header, route, payload, payload | ordered `assignments[]` with target kind and source kind | header written, route substituted, body/query filled | gather projection + runtime |
+| T7 gather component method | `g.Include(p.Component<FusionSchedule>("s").GetEvents(), "events")` | component method value expression with return shape array | assignment source component member access `method` | method called before request and value assigned | gather projection |
+| T8 success response drives follow-up request | `OnSuccess<Resident>((json,s)=> s.Get("/r/{id}").Gather(g=>g.RouteParam("id", json.Read(x=>x.Id))))` | success route reaction containing request; request input reads success payload | payload scope `success` read in nested request assignment | first response id becomes second route param | HTTP runtime + Playwright |
+| T9 response chained request | `Response(r=>r.OnSuccess(...).Chained(c=>c.Get(url)))` | `RequestPlan` with `ResponseRoute` and follow-up request | request chain/follow-up request JSON | follow-up request executes after response route | HTTP runtime/Playwright |
+| T10 parallel requests | `p.Parallel(a=>a.Get("/a"), b=>b.Get("/b")).OnAllSettled(p=>p.Dispatch("done"))` | `ParallelRequests` with two request reactions and completion graph | `parallel.steps[]`, `completion.on-settled` | both fetches start; completion runs after all settle | HTTP runtime/Playwright |
+| T11 validation client projection | `registry.For<V,M>(v=>v.Field(m=>m.Name).Required("Name"))` | validation projection field bound to model path and rule | validation-container rules include required rule | browser blocks request and displays rule | validation projection + Playwright |
+| T12 FluentValidation server-only guard | `WhenAsync(...); RuleFor(x=>x.Name).NotEmpty()` outside client guard | server validator remains normal; client projection omits unprojectable guard/rule path as required | no browser rule for async-only guarded behavior | server still validates; client does not invent condition | validation projection |
+| T13 partial SSR same model | root and partial both use `ReactivePlan/ResolvePlan<TModel>` | two `PlanDocument`s with same `planId` | root + partial docs share plan id | boot composes documents before wiring triggers | boot composition runtime |
+| T14 partial browser load/unload | success `p.Into("slot")` injects HTML containing `ResolvePlan<TModel>` | slot load merges loaded plan state by `planId` and slot id | partial plan document + slot load handle | load wires behavior; unload removes loaded behavior/rules/components | partial Playwright/runtime |
+| T15 app-level component | `p.Component<FusionToast>().SetContent("Saved").Show()` | fixed-id layout component object with property write and method call | component role `layout-object` | runtime joins fixed object and calls show | app-level Playwright |
+| T16 component callback sync mutation | Syncfusion callback DSL calls `args.PreventDefault()` / `args.UpdateData(...)` | event payload object method/property call in immediate lane | payload object method call reaction | mutation happens synchronously before vendor continues | fusion component Playwright |
+| T17 plugin read and command | `p.Plugin<int>(fn).Arg(p.FromUrl<int>("id"))` and `p.Plugin(cmd).Arg("x").Fire()` | plugin contract with typed args/return; read value expression and call reaction | plugin object contract + value/call entries | runtime resolves plugin, args, return/call | plugin runtime tests |
+| T18 action link inline request | `Html.NativeActionLink(..., p=>p.Post(url,g=>...))` | inline plan document carrying request graph and needed object contracts | action link data payload with request plan | click executes inline request without page trigger | native action link tests |
+
+### Coverage Rule
+
+The graph is not complete until every public DSL method family maps to at least
+one vector, and every vector maps to a behavior proof. If a later implementation
+step finds a missing vector, the graph was incomplete and must be fixed before
+more code is written.
+
 ## Closure Rules
 
 - No module is done from code inspection alone. The source row, C# domain,

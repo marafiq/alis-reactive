@@ -1,37 +1,137 @@
 # Agent Guidance
 
-Primary architecture rule: DSL -> Rich Plan Domain -> Generated Rich TS Contract -> Runtime Executioner.
+## Goal
 
-Blueprint-first rule: do not make plan-model or runtime refactor choices from the current helper code alone. Before editing a module, ground the change in the frozen DSL source and the source blueprint/matrix (`docs/reactive-plan-source-blueprint.md`, `docs/reactive-dsl-feature-atlas.md`). If the change cannot be traced as `DSL API -> developer intent -> domain concept -> JSON/TS term -> runtime execution`, do not make the edit.
+Build the framework around this fixed flow:
 
-The public DSL is frozen except plugin improvements. Read the DSL before changing the plan model or runtime. Do not infer missing behavior from runtime code when the DSL already expresses the intent.
+```text
+Frozen public DSL -> Rich C# Plan Domain -> Generated TS Contract -> Dumb Runtime Executor
+```
 
-Module closure rule: touching a module means closing that module, not leaving a local improvement surrounded by stale names, stale tests, or stale docs. A module is not done until the DSL row, C# domain terms, generated TypeScript contract, runtime executor vocabulary, behavior tests, and Playwright-facing behavior all use the same language and prove the same intent.
+The DSL source is the requirement. Existing PlanModel, runtime code, tests, docs,
+schema, and memory are evidence only after they are checked against the DSL.
 
-Drift guard: the source DSL is the requirement, not samples, XML docs, old unit tests, the current runtime, or remembered clues. Before coding a surface, update the blueprint row that proves its input/output path. The proof shape is `source file + DSL input -> rich domain output -> JSON/TS term -> runtime output`. If the row cannot be written from source, keep reading source instead of editing locally.
+## Required Process
 
-Stale-work guard: after every rename or concept change, audit the surrounding source, generated contract, runtime tests, Playwright tests, blueprint, and glossary for the old term. Do not let one corrected slice make another slice silently wrong.
+For any shared plan/runtime module change, follow this order:
 
-Doubt rule: whenever there is even slight doubt about a behavior, name, edge case, or module boundary, stop inferring and go back to the actual DSL source. Add or correct the input/output matrix row before changing code.
+1. Read the actual public DSL source files for that module.
+2. Build or update the DSL graph.
+3. Build or update the input/output matrix.
+4. Design the domain model from the graph and matrix.
+5. Delete code and tests that do not map to the design.
+6. Implement the C# domain, generated TS contract, and runtime executor.
+7. Prove behavior with tests that exercise DSL intent.
+8. Commit the closed module.
 
-Rich domain model is not permission to invent fluff. Add a concept only when it directly names a real DSL behavior and makes code simpler. Delete wrappers that only carry parameters, rename branches, or need explanation to justify their existence.
+Do not edit implementation first.
 
-Design-before-edit rule: if the current change depends on cross-module behavior such as conditions mixed with HTTP, gather sources, validation, component events, or partial load/unload, first walk the DSL input through the domain output, JSON/TS term, and runtime effect. Local edits without that walk are fake progress.
+## DSL Graph
 
-DSL graph process: before changing a shared plan/runtime module, build or update the actual graph from source DSL. Nodes are DSL entry points, builder contexts, value scopes, domain concepts, JSON/TS terms, and runtime executors. Edges are allowed transitions such as trigger -> pipeline, pipeline -> reaction, response -> success scope, gather target <- value source, partial load -> slot state, and component event -> payload scope. Use diagrams and input/output matrices; prose alone is not a design artifact.
+Use diagrams as design tools, not decoration.
 
-Required design artifacts for a shared module change:
-1. Source method inventory from actual `.cs` files.
-2. DSL graph or activity/sequence/state diagram for the module behavior.
-3. Input/output matrix covering representative and cross-module paths.
-4. Closure proof: source row, C# domain term, generated TypeScript term, runtime executor behavior, and behavior test.
+Graph nodes:
 
-Runtime code executes framework-generated plans. Do not add defensive preflight, rollback, fallback, or speculative recovery for impossible bad plans. Put invalid behavior in the C# PlanModel where it can be made unrepresentable. Runtime checks are for real external boundaries only: DOM lookup, browser API failure, network, and malformed non-framework input.
+- DSL entry points and builder contexts
+- value scopes: URL, event payload, success body, error body, request snapshot
+- domain concepts
+- JSON and generated TS terms
+- runtime executors
 
-Do not model normal execution bookkeeping as validation, claims, rejects, lifecycle gates, or registries. If the server-generated plan says source A is assigned to target B, the runtime reads A and writes B. Bookkeeping names should describe what is remembered for execution or unload, not imply the plan is suspicious.
+Graph edges:
 
-Tests are a thinking tool. Write behavior tests that prove DSL intent becomes deterministic plan/runtime behavior. Do not write tests around helper classes or invented abstractions.
+- trigger -> pipeline
+- pipeline -> reaction
+- condition -> branch
+- request -> gather
+- gather target <- value source
+- response -> success/error scope
+- response -> chained request
+- component event/callback -> payload scope
+- partial slot load -> merged plan state
+- partial slot unload -> remove loaded state
 
-Partial plans are simple: boot composes plan documents by `planId`; browser injection replaces or unloads the declared partial slot. Component ids and type keys remain runtime join keys. Slot identity is only the handle for removing the state loaded into that slot.
+If a behavior is not in the graph, do not implement it from inference.
 
-When in doubt, delete code before adding code. If a concept does not directly map to frozen DSL intent or a browser boundary the runtime must touch, it is probably noise.
+## Input/Output Matrix
+
+Every module needs a matrix row shaped like this:
+
+```text
+source file + DSL call
+  -> developer intent
+  -> C# domain term
+  -> JSON/generated TS term
+  -> runtime executor behavior
+  -> behavior proof
+```
+
+The matrix must cover cross-module cases such as:
+
+- conditions mixed with requests and other reactions
+- gather from URL, event, response, component, plugin, and literals
+- chained and parallel requests
+- validation field binding and partial load/unload
+- component events/callbacks with sync payload mutation
+- app-level components and action links
+
+## Domain Rules
+
+Rich domain model means the smallest clear set of concepts that names real DSL
+behavior. It does not mean wrappers, registries, fallback paths, claims,
+validators for generated plans, or impressive names around ordinary execution.
+
+Use these core concepts unless the DSL graph proves a better name:
+
+- `PlanDocument`
+- `Trigger`
+- `ReactionGraph`
+- `ValueExpression`
+- `ConditionGraph`
+- `RequestPlan`
+- `RequestInputProjection`
+- `ResponseRoute`
+- `ValidationProjection`
+- `BrowserObjectContract`
+- `ComponentObject`
+- `PluginContract`
+- `SlotLoad`
+
+## Runtime Rules
+
+Runtime executes framework-generated plans. It does not re-validate generated
+plan shape or infer missing behavior.
+
+Runtime checks are allowed only at real browser boundaries:
+
+- missing DOM object
+- missing component/plugin object
+- browser API or network failure
+- malformed external JSON not generated by the framework
+
+Sync behavior stays sync unless the DSL concept is async by nature. Async
+concepts are HTTP, parallel HTTP, remote triggers, partial injection, and
+confirm/user decision.
+
+## Component Rules
+
+Component vertical slices stay isolated and compile-time typed. Do not add
+stringly component APIs to make a test pass. Components expose browser object
+properties, methods, events/callbacks, and typed value sources.
+
+Controlled component IDs are absolute join keys for markup, plan, validation,
+gather, partial load/unload, and runtime lookup.
+
+## Test Rules
+
+Tests are production code.
+
+Keep tests that prove behavior from DSL intent. Delete or rewrite tests that
+only pin helper classes, old JSON shape, stale vocabulary, or internal syntax.
+
+A module is closed only when tests prove the matrix rows for that module.
+
+## Deletion Rule
+
+When code is confusing, first ask whether it maps to a DSL graph node or edge.
+If not, delete it. Do not preserve previous agent work as sunk cost.
