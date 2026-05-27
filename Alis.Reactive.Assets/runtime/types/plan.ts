@@ -624,7 +624,7 @@ export interface FollowUpRequestChain {
 
 export type RequestInput =
   | NoRequestInput
-  | RequestInputProjection;
+  | GatheredRequestInput;
 
 export type RequestBodyFormat =
   | "json"
@@ -634,22 +634,22 @@ export interface NoRequestInput {
   kind: "none";
 }
 
-export interface RequestInputProjection {
+export interface GatheredRequestInput {
   kind: "gather";
   assignments: RequestInputAssignment[];
   bodyFormat: RequestBodyFormat;
-  sourceSelection: RequestInputSourceSelection;
+  sourceSelection: RegisteredInputSelection;
 }
 
-export type RequestInputSourceSelection =
-  | ExplicitRequestInputSourceSelection
-  | AllRegisteredInputsRequestInputSourceSelection;
+export type RegisteredInputSelection =
+  | ExplicitRegisteredInputSelection
+  | AllRegisteredInputsSelection;
 
-export interface ExplicitRequestInputSourceSelection {
+export interface ExplicitRegisteredInputSelection {
   kind: "explicit";
 }
 
-export interface AllRegisteredInputsRequestInputSourceSelection {
+export interface AllRegisteredInputsSelection {
   kind: "all-registered-inputs";
 }
 

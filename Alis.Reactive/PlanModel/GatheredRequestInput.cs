@@ -5,48 +5,48 @@ using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
-    internal sealed class RequestInputProjection : RequestInput
+    internal sealed class GatheredRequestInput : RequestInput
     {
         public string Kind => "gather";
         public IReadOnlyList<RequestInputAssignment> Assignments { get; }
         public string BodyFormat => RequestBodyFormat.Value;
-        public RequestInputSourceSelection SourceSelection { get; }
+        public RegisteredInputSelection SourceSelection { get; }
 
         private RequestBodyFormat RequestBodyFormat { get; }
 
-        private RequestInputProjection(
+        private GatheredRequestInput(
             IReadOnlyList<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
-            RequestInputSourceSelection sourceSelection)
+            RegisteredInputSelection sourceSelection)
         {
             Assignments = assignments;
             RequestBodyFormat = bodyFormat;
             SourceSelection = sourceSelection;
         }
 
-        internal static RequestInputProjection From(
+        internal static GatheredRequestInput From(
             IEnumerable<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
-            RequestInputSourceSelection sourceSelection) =>
-            new RequestInputProjection(
+            RegisteredInputSelection sourceSelection) =>
+            new GatheredRequestInput(
                 assignments.ToList(),
                 bodyFormat,
                 sourceSelection);
     }
 
-    internal sealed class RequestInputSourceSelection
+    internal sealed class RegisteredInputSelection
     {
-        private RequestInputSourceSelection(string kind, bool selectsRegisteredInputs)
+        private RegisteredInputSelection(string kind, bool selectsRegisteredInputs)
         {
             Kind = kind;
             SelectsRegisteredInputs = selectsRegisteredInputs;
         }
 
-        internal static RequestInputSourceSelection ExplicitAssignments { get; } =
-            new RequestInputSourceSelection("explicit", false);
+        internal static RegisteredInputSelection ExplicitAssignments { get; } =
+            new RegisteredInputSelection("explicit", false);
 
-        internal static RequestInputSourceSelection AllRegisteredInputs { get; } =
-            new RequestInputSourceSelection("all-registered-inputs", true);
+        internal static RegisteredInputSelection AllRegisteredInputs { get; } =
+            new RegisteredInputSelection("all-registered-inputs", true);
 
         public string Kind { get; }
         internal bool SelectsRegisteredInputs { get; }

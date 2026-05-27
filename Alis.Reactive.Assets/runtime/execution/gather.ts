@@ -1,8 +1,8 @@
-// gather.ts — Resolve request input projections using the shared ValueExpression concept.
+// gather.ts — Resolve gathered request input using the shared ValueExpression concept.
 // Every payload assignment is evaluated by evaluateValue(); runtime selected
 // registered inputs use the same writer path after reading their component value member.
 
-import type { PlanDocument, RequestInputProjection, RequestInputAssignment, HttpMethod, RequestInput } from "../types";
+import type { PlanDocument, GatheredRequestInput, RequestInputAssignment, HttpMethod, RequestInput } from "../types";
 import type { ExecContext } from "../types";
 import { assertNever } from "../core/assert-never";
 import { evaluateValue } from "../core/evaluate";
@@ -13,7 +13,7 @@ import { isMissingRuntimeValue } from "../domain/runtime-value";
 
 export type { ResolvedRequestInput } from "./request-payload-writer";
 
-interface RequestInputRuntime {
+interface GatherExecution {
   readonly method: HttpMethod;
   readonly plan: PlanDocument;
   readonly runtimePlan: RuntimePlan;
@@ -29,29 +29,29 @@ export function resolveRequestInput(
   plan: PlanDocument,
   ctx: ExecContext,
 ): ResolvedRequestInput {
-  const runtime = { method, plan, runtimePlan: RuntimePlan.from(plan), ctx };
-  return resolveRequestInputPlan(input, runtime);
+  const execution = { method, plan, runtimePlan: RuntimePlan.from(plan), ctx };
+  return resolveRequestInputPlan(input, execution);
 }
 
-function resolveRequestInputPlan(input: RequestInput, runtime: RequestInputRuntime): ResolvedRequestInput {
+function resolveRequestInputPlan(input: RequestInput, execution: GatherExecution): ResolvedRequestInput {
   switch (input.kind) {
     case "none":
       return RequestInputResolution.empty();
     case "gather":
-      return resolveInputProjection(input, runtime);
+      return resolveGatheredInput(input, execution);
     default:
       return assertNever(input, "request input");
   }
 }
 
-function resolveInputProjection(input: RequestInputProjection, runtime: RequestInputRuntime): ResolvedRequestInput {
-  const resolved = RequestInputResolution.for(input.bodyFormat, runtime.method);
+function resolveGatheredInput(input: GatheredRequestInput, execution: GatherExecution): ResolvedRequestInput {
+  const resolved = RequestInputResolution.for(input.bodyFormat, execution.method);
 
   for (const assignment of input.assignments) {
-    writeRequestInputAssignment(assignment, resolved, runtime);
+    writeRequestInputAssignment(assignment, resolved, execution);
   }
 
-  writeSelectedRegisteredInputs(input.sourceSelection, runtime, resolved.writer);
+  writeSelectedRegisteredInputs(input.sourceSelection, execution, resolved.writer);
 
   return resolved.toResult();
 }
@@ -59,9 +59,9 @@ function resolveInputProjection(input: RequestInputProjection, runtime: RequestI
 function writeRequestInputAssignment(
   assignment: RequestInputAssignment,
   resolved: RequestInputResolution,
-  runtime: RequestInputRuntime,
+  execution: GatherExecution,
 ): void {
-  const raw = evaluateValue(assignment.source, runtime.plan, runtime.ctx);
+  const raw = evaluateValue(assignment.source, execution.plan, execution.ctx);
   const shape = RuntimeShape.declaredBy(assignment.source);
   switch (assignment.target.kind) {
     case "payload":
@@ -80,15 +80,15 @@ function writeRequestInputAssignment(
 }
 
 function writeSelectedRegisteredInputs(
-  sourceSelection: RequestInputProjection["sourceSelection"],
-  runtime: RequestInputRuntime,
+  sourceSelection: GatheredRequestInput["sourceSelection"],
+  execution: GatherExecution,
   writer: RequestPayloadWriter,
 ): void {
   switch (sourceSelection.kind) {
     case "explicit":
       return;
     case "all-registered-inputs":
-      for (const component of runtime.runtimePlan.components.entries()) {
+      for (const component of execution.runtimePlan.components.entries()) {
         writeSelectedRegisteredInput(component, writer);
       }
       return;

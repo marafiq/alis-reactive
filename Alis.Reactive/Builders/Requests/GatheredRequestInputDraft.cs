@@ -4,12 +4,12 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
-    internal sealed class RequestInputProjectionDraft
+    internal sealed class GatheredRequestInputDraft
     {
         private readonly List<RequestInputAssignment> _assignments = new List<RequestInputAssignment>();
 
-        internal RequestInputSourceSelection SourceSelection { get; private set; } =
-            RequestInputSourceSelection.ExplicitAssignments;
+        internal RegisteredInputSelection SourceSelection { get; private set; } =
+            RegisteredInputSelection.ExplicitAssignments;
 
         internal RequestInput BuildRequestInput(RequestBodyFormat bodyFormat, RequestUrl url)
         {
@@ -25,7 +25,7 @@ namespace Alis.Reactive.Builders.Requests
             if (!hasGatheredInput)
                 return RequestInput.None;
 
-            return RequestInputProjection.From(
+            return GatheredRequestInput.From(
                 _assignments,
                 bodyFormat,
                 SourceSelection);
@@ -33,7 +33,7 @@ namespace Alis.Reactive.Builders.Requests
 
         internal void IncludeAllRegisteredInputs()
         {
-            SourceSelection = RequestInputSourceSelection.AllRegisteredInputs;
+            SourceSelection = RegisteredInputSelection.AllRegisteredInputs;
         }
 
         internal void AddAssignment(RequestInputAssignment assignment)

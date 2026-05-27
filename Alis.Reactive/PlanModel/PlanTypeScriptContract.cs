@@ -471,27 +471,27 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("follow-up"))
                 .Requires("next", "RequestPlan"));
 
-            contract.Declare(Union("RequestInput", "NoRequestInput", "RequestInputProjection"));
+            contract.Declare(Union("RequestInput", "NoRequestInput", "GatheredRequestInput"));
             contract.Declare(LiteralUnion("RequestBodyFormat", RequestBodyFormat.Values));
 
             contract.Declare(Interface("NoRequestInput")
                 .Requires("kind", Literal("none")));
 
-            contract.Declare(Interface("RequestInputProjection")
+            contract.Declare(Interface("GatheredRequestInput")
                 .Requires("kind", Literal("gather"))
                 .Requires("assignments", "RequestInputAssignment[]")
                 .Requires("bodyFormat", "RequestBodyFormat")
-                .Requires("sourceSelection", "RequestInputSourceSelection"));
+                .Requires("sourceSelection", "RegisteredInputSelection"));
 
             contract.Declare(Union(
-                "RequestInputSourceSelection",
-                "ExplicitRequestInputSourceSelection",
-                "AllRegisteredInputsRequestInputSourceSelection"));
+                "RegisteredInputSelection",
+                "ExplicitRegisteredInputSelection",
+                "AllRegisteredInputsSelection"));
 
-            contract.Declare(Interface("ExplicitRequestInputSourceSelection")
+            contract.Declare(Interface("ExplicitRegisteredInputSelection")
                 .Requires("kind", Literal("explicit")));
 
-            contract.Declare(Interface("AllRegisteredInputsRequestInputSourceSelection")
+            contract.Declare(Interface("AllRegisteredInputsSelection")
                 .Requires("kind", Literal("all-registered-inputs")));
 
             contract.Declare(Interface("RequestInputAssignment")
