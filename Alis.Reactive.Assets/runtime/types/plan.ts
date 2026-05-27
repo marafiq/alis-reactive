@@ -638,18 +638,18 @@ export interface RequestInputProjection {
   kind: "gather";
   assignments: RequestInputAssignment[];
   bodyFormat: RequestBodyFormat;
-  sourceSelection: GatherSourceSelection;
+  sourceSelection: RequestInputSourceSelection;
 }
 
-export type GatherSourceSelection =
-  | ExplicitGatherSourceSelection
-  | AllRegisteredInputsGatherSourceSelection;
+export type RequestInputSourceSelection =
+  | ExplicitRequestInputSourceSelection
+  | AllRegisteredInputsRequestInputSourceSelection;
 
-export interface ExplicitGatherSourceSelection {
+export interface ExplicitRequestInputSourceSelection {
   kind: "explicit";
 }
 
-export interface AllRegisteredInputsGatherSourceSelection {
+export interface AllRegisteredInputsRequestInputSourceSelection {
   kind: "all-registered-inputs";
 }
 

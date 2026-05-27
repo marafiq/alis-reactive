@@ -8,8 +8,8 @@ namespace Alis.Reactive.Builders.Requests
     {
         private readonly List<RequestInputAssignment> _assignments = new List<RequestInputAssignment>();
 
-        internal GatherSourceSelection SourceSelection { get; private set; } =
-            GatherSourceSelection.ExplicitAssignments;
+        internal RequestInputSourceSelection SourceSelection { get; private set; } =
+            RequestInputSourceSelection.ExplicitAssignments;
 
         internal RequestInput BuildRequestInput(RequestBodyFormat bodyFormat, RequestUrl url)
         {
@@ -33,7 +33,7 @@ namespace Alis.Reactive.Builders.Requests
 
         internal void IncludeAllRegisteredInputs()
         {
-            SourceSelection = GatherSourceSelection.AllRegisteredInputs;
+            SourceSelection = RequestInputSourceSelection.AllRegisteredInputs;
         }
 
         internal void AddAssignment(RequestInputAssignment assignment)

@@ -10,14 +10,14 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "gather";
         public IReadOnlyList<RequestInputAssignment> Assignments { get; }
         public string BodyFormat => RequestBodyFormat.Value;
-        public GatherSourceSelection SourceSelection { get; }
+        public RequestInputSourceSelection SourceSelection { get; }
 
         private RequestBodyFormat RequestBodyFormat { get; }
 
         private RequestInputProjection(
             IReadOnlyList<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
-            GatherSourceSelection sourceSelection)
+            RequestInputSourceSelection sourceSelection)
         {
             Assignments = assignments;
             RequestBodyFormat = bodyFormat;
@@ -27,26 +27,26 @@ namespace Alis.Reactive.PlanModel
         internal static RequestInputProjection From(
             IEnumerable<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
-            GatherSourceSelection sourceSelection) =>
+            RequestInputSourceSelection sourceSelection) =>
             new RequestInputProjection(
                 assignments.ToList(),
                 bodyFormat,
                 sourceSelection);
     }
 
-    internal sealed class GatherSourceSelection
+    internal sealed class RequestInputSourceSelection
     {
-        private GatherSourceSelection(string kind, bool selectsRegisteredInputs)
+        private RequestInputSourceSelection(string kind, bool selectsRegisteredInputs)
         {
             Kind = kind;
             SelectsRegisteredInputs = selectsRegisteredInputs;
         }
 
-        internal static GatherSourceSelection ExplicitAssignments { get; } =
-            new GatherSourceSelection("explicit", false);
+        internal static RequestInputSourceSelection ExplicitAssignments { get; } =
+            new RequestInputSourceSelection("explicit", false);
 
-        internal static GatherSourceSelection AllRegisteredInputs { get; } =
-            new GatherSourceSelection("all-registered-inputs", true);
+        internal static RequestInputSourceSelection AllRegisteredInputs { get; } =
+            new RequestInputSourceSelection("all-registered-inputs", true);
 
         public string Kind { get; }
         internal bool SelectsRegisteredInputs { get; }
