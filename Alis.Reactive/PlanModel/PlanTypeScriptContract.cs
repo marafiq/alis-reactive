@@ -471,13 +471,13 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("follow-up"))
                 .Requires("next", "Request"));
 
-            contract.Declare(Union("RequestInput", "NoRequestInput", "GatherInput"));
+            contract.Declare(Union("RequestInput", "NoRequestInput", "RequestInputProjection"));
             contract.Declare(LiteralUnion("RequestBodyFormat", RequestBodyFormat.Values));
 
             contract.Declare(Interface("NoRequestInput")
                 .Requires("kind", Literal("none")));
 
-            contract.Declare(Interface("GatherInput")
+            contract.Declare(Interface("RequestInputProjection")
                 .Requires("kind", Literal("gather"))
                 .Requires("assignments", "RequestInputAssignment[]")
                 .Requires("bodyFormat", "RequestBodyFormat")

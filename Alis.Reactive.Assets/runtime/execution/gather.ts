@@ -2,7 +2,7 @@
 // Every payload assignment is evaluated by evaluateValue(); runtime registered
 // inputs use the same writer path after reading their component value member.
 
-import type { Plan, GatherInput, RequestInputAssignment, HttpMethod, RequestInput } from "../types";
+import type { Plan, RequestInputProjection, RequestInputAssignment, HttpMethod, RequestInput } from "../types";
 import type { ExecContext } from "../types";
 import { assertNever } from "../core/assert-never";
 import { evaluateValue } from "../core/evaluate";
@@ -44,7 +44,7 @@ function resolveRequestInput(input: RequestInput, runtime: GatherRuntime): Gathe
   }
 }
 
-function resolveGatherInput(input: GatherInput, runtime: GatherRuntime): GatherResult {
+function resolveGatherInput(input: RequestInputProjection, runtime: GatherRuntime): GatherResult {
   const gathered = GatheredRequestInput.for(input.bodyFormat, runtime.method);
 
   for (const assignment of input.assignments) {
@@ -80,7 +80,7 @@ function writeRequestInputAssignment(
 }
 
 function writeRuntimeSelectedInputs(
-  sourceSelection: GatherInput["sourceSelection"],
+  sourceSelection: RequestInputProjection["sourceSelection"],
   runtime: GatherRuntime,
   writer: RequestPayloadWriter,
 ): void {

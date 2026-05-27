@@ -25,7 +25,7 @@ namespace Alis.Reactive.Builders.Requests
             if (!hasGatheredInput)
                 return RequestInput.None;
 
-            return GatherInput.From(
+            return RequestInputProjection.From(
                 _assignments,
                 bodyFormat,
                 SourceSelection);

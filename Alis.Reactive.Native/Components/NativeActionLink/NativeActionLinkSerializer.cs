@@ -100,7 +100,7 @@ namespace Alis.Reactive.Native.Components
 
         private static RequestInput ProjectRequestInput(RequestInput input)
         {
-            if (input is not GatherInput gather)
+            if (input is not RequestInputProjection gather)
                 return input;
 
             var payloadAssignments = gather.Assignments
@@ -113,7 +113,7 @@ namespace Alis.Reactive.Native.Components
             if (hasNoProjectedInput)
                 return RequestInput.None;
 
-            return GatherInput.From(
+            return RequestInputProjection.From(
                 payloadAssignments,
                 RequestBodyFormat.From(gather.BodyFormat),
                 gather.SourceSelection);
