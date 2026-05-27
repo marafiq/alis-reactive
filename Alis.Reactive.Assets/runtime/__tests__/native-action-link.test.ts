@@ -24,8 +24,6 @@ function request(url: string, overrides: Partial<Request> = {}): Request {
   return {
     method: "DELETE",
     url,
-    headers: {},
-    routeParams: {},
     validation: { kind: "none" },
     input: { kind: "none" },
     before: [],

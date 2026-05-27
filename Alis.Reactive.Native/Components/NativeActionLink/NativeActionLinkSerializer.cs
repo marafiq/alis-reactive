@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Builders;
@@ -88,15 +89,34 @@ namespace Alis.Reactive.Native.Components
 
             return Request.Create(
                 RequestEndpoint.To(HttpMethodName.From(request.Method), RequestUrl.Of(string.Empty)),
-                request.Input,
+                ProjectRequestInput(request.Input),
                 request.Before,
                 request.Success,
                 request.Error,
                 Array.Empty<Reaction>(),
                 RequestChain.Terminal,
-                new Dictionary<string, ValueProducer>(),
-                new Dictionary<string, ValueProducer>(),
                 RequestValidationTarget.None);
+        }
+
+        private static RequestInput ProjectRequestInput(RequestInput input)
+        {
+            if (input is not GatherInput gather)
+                return input;
+
+            var payloadAssignments = gather.Assignments
+                .Where(assignment => assignment.Target is RequestPayloadTarget)
+                .ToList();
+
+            var hasNoProjectedInput =
+                payloadAssignments.Count == 0
+                && !gather.SourceSelection.SelectsRegisteredInputs;
+            if (hasNoProjectedInput)
+                return RequestInput.None;
+
+            return GatherInput.From(
+                payloadAssignments,
+                RequestBodyFormat.From(gather.BodyFormat),
+                gather.SourceSelection);
         }
 
         private sealed class RequestProjectionState
