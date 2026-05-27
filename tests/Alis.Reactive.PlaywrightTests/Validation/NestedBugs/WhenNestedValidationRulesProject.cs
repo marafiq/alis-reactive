@@ -1,19 +1,18 @@
 namespace Alis.Reactive.PlaywrightTests.Validation.NestedBugs;
 
 /// <summary>
-/// E2E tests proving the 4 Codex bug claims are fixed.
-/// Each test verifies that client-side validation matches server-side behavior.
+/// E2E tests proving nested client validation projection matches server-side behavior.
 /// </summary>
 [TestFixture]
-public class WhenNestedValidationBugsAreFixed : PlaywrightTestBase
+public class WhenNestedValidationRulesProject : PlaywrightTestBase
 {
-    // ── Claim 1: Nested condition field carries full path ───────────────
+    // ── Nested condition field carries full path ───────────────────────
 
     private const string NestedConditionPath = "/Sandbox/Validation/NestedBugs/NestedCondition";
     private const string R1 = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Validation_NestedBugs_NestedAddressModel__";
 
     [Test]
-    public async Task claim1_nested_condition_skips_rule_when_city_empty()
+    public async Task nested_condition_skips_rule_when_city_empty()
     {
         // City is empty → WhenFieldNotEmpty(City) is false → ConfirmCity NOT required
         await NavigateToAndWaitForBoot(NestedConditionPath);
@@ -29,7 +28,7 @@ public class WhenNestedValidationBugsAreFixed : PlaywrightTestBase
     }
 
     [Test]
-    public async Task claim1_nested_condition_fires_rule_when_city_filled()
+    public async Task nested_condition_fires_rule_when_city_filled()
     {
         // City is filled → WhenFieldNotEmpty(City) is true → ConfirmCity IS required
         await NavigateToAndWaitForBoot(NestedConditionPath);
@@ -45,13 +44,13 @@ public class WhenNestedValidationBugsAreFixed : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Claim 2: Parent + child conditions compose ─────────────────────
+    // ── Parent and child conditions compose ────────────────────────────
 
     private const string ParentChildPath = "/Sandbox/Validation/NestedBugs/ParentChild";
     private const string R2 = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Validation_NestedBugs_ParentChildModel__";
 
     [Test]
-    public async Task claim2_parent_false_child_true_skips_validation()
+    public async Task parent_false_child_true_skips_validation()
     {
         // ParentFlag=false, ChildFlag=true → rules should NOT fire (parent condition blocks)
         await NavigateToAndWaitForBoot(ParentChildPath);
@@ -68,7 +67,7 @@ public class WhenNestedValidationBugsAreFixed : PlaywrightTestBase
     }
 
     [Test]
-    public async Task claim2_parent_true_child_false_skips_validation()
+    public async Task parent_true_child_false_skips_validation()
     {
         // ParentFlag=true, ChildFlag=false → rules should NOT fire (child condition blocks)
         await NavigateToAndWaitForBoot(ParentChildPath);
@@ -84,7 +83,7 @@ public class WhenNestedValidationBugsAreFixed : PlaywrightTestBase
     }
 
     [Test]
-    public async Task claim2_both_flags_true_fires_validation()
+    public async Task both_flags_true_fires_validation()
     {
         // ParentFlag=true, ChildFlag=true → rules fire → ChildName required
         await NavigateToAndWaitForBoot(ParentChildPath);
@@ -100,10 +99,10 @@ public class WhenNestedValidationBugsAreFixed : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ���─ Claim 3: Nested peer field carries full path ───────────────────
+    // ── Nested peer field carries full path ────────────────────────────
 
     [Test]
-    public async Task claim3_nested_cross_property_validates_correct_peer()
+    public async Task nested_cross_property_validates_correct_peer()
     {
         // ConfirmCity must match City — the peer field reference must be "Address.City"
         await NavigateToAndWaitForBoot(NestedConditionPath);
@@ -120,7 +119,7 @@ public class WhenNestedValidationBugsAreFixed : PlaywrightTestBase
     }
 
     [Test]
-    public async Task claim3_nested_cross_property_passes_when_matching()
+    public async Task nested_cross_property_passes_when_matching()
     {
         await NavigateToAndWaitForBoot(NestedConditionPath);
 
@@ -137,13 +136,13 @@ public class WhenNestedValidationBugsAreFixed : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Claim 4: Include inside WhenField carries condition ────────────
+    // ── Include inside WhenField carries condition ─────────────────────
 
     private const string IncludePath = "/Sandbox/Validation/NestedBugs/IncludeConditional";
     private const string R4 = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Validation_NestedBugs_IncludeModel__";
 
     [Test]
-    public async Task claim4_not_employed_skips_included_rules()
+    public async Task not_employed_skips_included_rules()
     {
         // IsEmployed=false → Include(SharedEmploymentRules) should be skipped
         await NavigateToAndWaitForBoot(IncludePath);
@@ -162,7 +161,7 @@ public class WhenNestedValidationBugsAreFixed : PlaywrightTestBase
     }
 
     [Test]
-    public async Task claim4_employed_fires_included_rules()
+    public async Task employed_fires_included_rules()
     {
         // IsEmployed=true → Include(SharedEmploymentRules) fires → JobTitle + Department required
         await NavigateToAndWaitForBoot(IncludePath);
