@@ -10,6 +10,8 @@ Frozen public DSL -> Rich C# Plan Domain -> Generated TS Contract -> Dumb Runtim
 
 The DSL source is the requirement. Existing PlanModel, runtime code, tests, docs,
 schema, and memory are evidence only after they are checked against the DSL.
+Use complete facts grounded in actual DSL source; partial inventories, inferred
+facts, and approximate coverage are not enough for plan/runtime design.
 
 ## Required Process
 
