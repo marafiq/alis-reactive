@@ -37,7 +37,7 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeLoader, TModel> self, string targetId)
             where TModel : class
             => self.EmitCall(SetAttributeMethod,
-                   new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("data-target"), ValueProducer.Literal(targetId) });
+                   new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("data-target"), ValueExpression.Literal(targetId) });
 
         /// <summary>
         /// Sets an auto-hide timeout so the loader disappears after the specified duration.
@@ -50,7 +50,7 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeLoader, TModel> self, int ms)
             where TModel : class
             => self.EmitCall(SetAttributeMethod,
-                   new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("data-timeout"), ValueProducer.Literal(ms.ToString()) });
+                   new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("data-timeout"), ValueExpression.Literal(ms.ToString()) });
 
         /// <summary>
         /// Shows the loader overlay, making it visible and accessible.
@@ -62,9 +62,9 @@ namespace Alis.Reactive.Native.AppLevel
             where TModel : class
         {
             self.EmitCall(ClassAddMethod,
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("alis-loader--visible") });
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("alis-loader--visible") });
             self.EmitCall(RemoveAttributeMethod,
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden") });
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("aria-hidden") });
             return self;
         }
 
@@ -78,9 +78,9 @@ namespace Alis.Reactive.Native.AppLevel
             where TModel : class
         {
             self.EmitCall(ClassRemoveMethod,
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("alis-loader--visible") });
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("alis-loader--visible") });
             self.EmitCall(SetAttributeMethod,
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden"), ValueProducer.Literal("true") });
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("aria-hidden"), ValueExpression.Literal("true") });
             return self;
         }
 

@@ -142,7 +142,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("ComponentValidation")
                 .Requires("component", "string")
-                .Requires("value", "ValueProducer")
+                .Requires("value", "ValueExpression")
                 .Requires("serverFieldName", "string")
                 .Requires("rules", "ValidationRule[]"));
 
@@ -226,31 +226,31 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("ScalarConstraintValidationRuleExecution")
                 .Requires("kind", Literal("constraint"))
-                .Requires("value", "LiteralProducer")
+                .Requires("value", "LiteralExpression")
                 .Requires("activation", "ValidationRuleActivation")
                 .Requires("comparisonShape", "Shape"));
 
             contract.Declare(Interface("NumericConstraintValidationRuleExecution")
                 .Requires("kind", Literal("constraint"))
-                .Requires("value", "NumericLiteralProducer")
+                .Requires("value", "NumericLiteralExpression")
                 .Requires("activation", "ValidationRuleActivation")
                 .Requires("comparisonShape", "Shape"));
 
             contract.Declare(Interface("TextConstraintValidationRuleExecution")
                 .Requires("kind", Literal("constraint"))
-                .Requires("value", "TextLiteralProducer")
+                .Requires("value", "TextLiteralExpression")
                 .Requires("activation", "ValidationRuleActivation")
                 .Requires("comparisonShape", "Shape"));
 
             contract.Declare(Interface("RangeConstraintValidationRuleExecution")
                 .Requires("kind", Literal("constraint"))
-                .Requires("value", "RangeLiteralProducer")
+                .Requires("value", "RangeLiteralExpression")
                 .Requires("activation", "ValidationRuleActivation")
                 .Requires("comparisonShape", "Shape"));
 
             contract.Declare(Interface("PeerValidationRuleExecution")
                 .Requires("kind", Literal("peer"))
-                .Requires("value", "ReadProducer")
+                .Requires("value", "ReadExpression")
                 .Requires("activation", "ValidationRuleActivation")
                 .Requires("comparisonShape", "Shape"));
 
@@ -390,13 +390,13 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("set"))
                 .Requires("on", "SetTargetSource")
                 .Requires("property", "string")
-                .Requires("value", "ValueProducer"));
+                .Requires("value", "ValueExpression"));
 
             contract.Declare(Interface("CallReaction")
                 .Requires("kind", Literal("call"))
                 .Requires("on", "CallTargetSource")
                 .Requires("method", "string")
-                .Requires("args", "ValueProducer[]"));
+                .Requires("args", "ValueExpression[]"));
 
             contract.Declare(Interface("RequestReaction")
                 .Requires("kind", Literal("request"))
@@ -417,13 +417,13 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("PresentDispatchPayload")
                 .Requires("kind", Literal("value"))
-                .Requires("data", "ValueProducer")
+                .Requires("data", "ValueExpression")
                 .Requires("payloadType", "PayloadContract"));
 
             contract.Declare(Interface("InjectReaction")
                 .Requires("kind", Literal("inject"))
                 .Requires("target", "InjectionTarget")
-                .Requires("value", "ValueProducer"));
+                .Requires("value", "ValueExpression"));
 
             contract.Declare(Union(
                 "InjectionTarget",
@@ -496,7 +496,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("RequestInputAssignment")
                 .Requires("target", "RequestInputTarget")
-                .Requires("source", "ValueProducer"));
+                .Requires("source", "ValueExpression"));
 
             contract.Declare(Union(
                 "RequestInputTarget",
@@ -543,41 +543,41 @@ namespace Alis.Reactive.PlanModel
                 "{ [key: string]: JsonValue }"));
 
             contract.Declare(Union(
-                "ValueProducer",
-                "LiteralProducer",
-                "ReadProducer",
-                "ObjectProducer",
-                "ArrayProducer"));
+                "ValueExpression",
+                "LiteralExpression",
+                "ReadExpression",
+                "ObjectExpression",
+                "ArrayExpression"));
 
             contract.Declare(Union(
-                "ReadProducer",
-                "ObjectPropertyReadProducer",
-                "ObjectMethodReadProducer",
-                "UrlParameterReadProducer",
-                "PayloadPathReadProducer",
-                "WholePayloadReadProducer"));
+                "ReadExpression",
+                "ObjectPropertyReadExpression",
+                "ObjectMethodReadExpression",
+                "UrlParameterReadExpression",
+                "PayloadPathReadExpression",
+                "WholePayloadReadExpression"));
 
-            contract.Declare(Interface("LiteralProducer")
+            contract.Declare(Interface("LiteralExpression")
                 .Requires("kind", Literal("literal"))
                 .Requires("value", "JsonValue")
                 .Requires("shape", "Shape"));
 
-            contract.Declare(Interface("NumericLiteralProducer")
+            contract.Declare(Interface("NumericLiteralExpression")
                 .Requires("kind", Literal("literal"))
                 .Requires("value", "number")
                 .Requires("shape", "Shape"));
 
-            contract.Declare(Interface("TextLiteralProducer")
+            contract.Declare(Interface("TextLiteralExpression")
                 .Requires("kind", Literal("literal"))
                 .Requires("value", "string")
                 .Requires("shape", "Shape"));
 
-            contract.Declare(Interface("RangeLiteralProducer")
+            contract.Declare(Interface("RangeLiteralExpression")
                 .Requires("kind", Literal("literal"))
                 .Requires("value", "[JsonValue, JsonValue]")
                 .Requires("shape", "Shape"));
 
-            contract.Declare(Interface("ObjectPropertyReadProducer")
+            contract.Declare(Interface("ObjectPropertyReadExpression")
                 .Requires("kind", Literal("read"))
                 .Requires("from", "RuntimeObjectSource")
                 .Requires("member", "string")
@@ -585,7 +585,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("shape", "Shape")
                 .Requires("access", "PropertyValueReadAccess"));
 
-            contract.Declare(Interface("ObjectMethodReadProducer")
+            contract.Declare(Interface("ObjectMethodReadExpression")
                 .Requires("kind", Literal("read"))
                 .Requires("from", "RuntimeObjectSource")
                 .Requires("member", "string")
@@ -593,7 +593,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("shape", "Shape")
                 .Requires("access", "MethodValueReadAccess"));
 
-            contract.Declare(Interface("UrlParameterReadProducer")
+            contract.Declare(Interface("UrlParameterReadExpression")
                 .Requires("kind", Literal("read"))
                 .Requires("from", "UrlSource")
                 .Requires("member", "string")
@@ -601,7 +601,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("shape", "Shape")
                 .Requires("access", "PropertyValueReadAccess"));
 
-            contract.Declare(Interface("PayloadPathReadProducer")
+            contract.Declare(Interface("PayloadPathReadExpression")
                 .Requires("kind", Literal("read"))
                 .Requires("from", "PayloadSource")
                 .Requires("member", "string")
@@ -609,7 +609,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("shape", "Shape")
                 .Requires("access", "PropertyValueReadAccess"));
 
-            contract.Declare(Interface("WholePayloadReadProducer")
+            contract.Declare(Interface("WholePayloadReadExpression")
                 .Requires("kind", Literal("read"))
                 .Requires("from", "PayloadSource")
                 .Requires("member", Literal("responseBody"))
@@ -627,16 +627,16 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("MethodValueReadAccess")
                 .Requires("kind", Literal("method"))
-                .Requires("args", "ValueProducer[]"));
+                .Requires("args", "ValueExpression[]"));
 
-            contract.Declare(Interface("ObjectProducer")
+            contract.Declare(Interface("ObjectExpression")
                 .Requires("kind", Literal("object"))
-                .Requires("fields", "Record<string, ValueProducer>")
+                .Requires("fields", "Record<string, ValueExpression>")
                 .Requires("shape", "Shape"));
 
-            contract.Declare(Interface("ArrayProducer")
+            contract.Declare(Interface("ArrayExpression")
                 .Requires("kind", Literal("array"))
-                .Requires("items", "ValueProducer[]")
+                .Requires("items", "ValueExpression[]")
                 .Requires("shape", "Shape"));
 
             contract.Declare(Union(
@@ -692,7 +692,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("UnaryCompareCondition")
                 .Requires("kind", Literal("compare"))
-                .Requires("left", "ValueProducer")
+                .Requires("left", "ValueExpression")
                 .Requires("op", "UnaryCompareOp")
                 .Requires("right", "NoComparisonRightOperand")
                 .Requires("shape", "Shape")
@@ -700,7 +700,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("EqualityCompareCondition")
                 .Requires("kind", Literal("compare"))
-                .Requires("left", "ValueProducer")
+                .Requires("left", "ValueExpression")
                 .Requires("op", "EqualityCompareOp")
                 .Requires("right", "PresentComparisonRightOperand")
                 .Requires("shape", "Shape")
@@ -708,7 +708,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("OrderedCompareCondition")
                 .Requires("kind", Literal("compare"))
-                .Requires("left", "ValueProducer")
+                .Requires("left", "ValueExpression")
                 .Requires("op", "OrderedCompareOp")
                 .Requires("right", "PresentComparisonRightOperand")
                 .Requires("shape", "Shape")
@@ -716,7 +716,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("MembershipCompareCondition")
                 .Requires("kind", Literal("compare"))
-                .Requires("left", "ValueProducer")
+                .Requires("left", "ValueExpression")
                 .Requires("op", "MembershipCompareOp")
                 .Requires("right", "CollectionComparisonRightOperand")
                 .Requires("shape", "Shape")
@@ -724,7 +724,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("RangeCompareCondition")
                 .Requires("kind", Literal("compare"))
-                .Requires("left", "ValueProducer")
+                .Requires("left", "ValueExpression")
                 .Requires("op", "RangeCompareOp")
                 .Requires("right", "RangeComparisonRightOperand")
                 .Requires("shape", "Shape")
@@ -732,7 +732,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("TextCompareCondition")
                 .Requires("kind", Literal("compare"))
-                .Requires("left", "ValueProducer")
+                .Requires("left", "ValueExpression")
                 .Requires("op", "TextCompareOp")
                 .Requires("right", "TextComparisonRightOperand")
                 .Requires("shape", "Shape")
@@ -740,7 +740,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("RegexCompareCondition")
                 .Requires("kind", Literal("compare"))
-                .Requires("left", "ValueProducer")
+                .Requires("left", "ValueExpression")
                 .Requires("op", "RegexCompareOp")
                 .Requires("right", "TextComparisonRightOperand")
                 .Requires("shape", "Shape")
@@ -748,7 +748,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("TextLengthCompareCondition")
                 .Requires("kind", Literal("compare"))
-                .Requires("left", "ValueProducer")
+                .Requires("left", "ValueExpression")
                 .Requires("op", "TextLengthCompareOp")
                 .Requires("right", "NumericComparisonRightOperand")
                 .Requires("shape", "Shape")
@@ -756,7 +756,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("CollectionItemCompareCondition")
                 .Requires("kind", Literal("compare"))
-                .Requires("left", "ValueProducer")
+                .Requires("left", "ValueExpression")
                 .Requires("op", "CollectionItemCompareOp")
                 .Requires("right", "LiteralComparisonRightOperand")
                 .Requires("shape", "Shape")
@@ -777,31 +777,31 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("PresentComparisonRightOperand")
                 .Requires("kind", Literal("value"))
-                .Requires("value", "ValueProducer"));
+                .Requires("value", "ValueExpression"));
 
             contract.Declare(Interface("CollectionComparisonRightOperand")
                 .Requires("kind", Literal("value"))
-                .Requires("value", "ArrayProducer"));
+                .Requires("value", "ArrayExpression"));
 
             contract.Declare(Alias(
-                "RangeComparisonProducer",
-                "ArrayProducer & { items: [ValueProducer, ValueProducer] }"));
+                "RangeComparisonExpression",
+                "ArrayExpression & { items: [ValueExpression, ValueExpression] }"));
 
             contract.Declare(Interface("RangeComparisonRightOperand")
                 .Requires("kind", Literal("value"))
-                .Requires("value", "RangeComparisonProducer"));
+                .Requires("value", "RangeComparisonExpression"));
 
             contract.Declare(Interface("TextComparisonRightOperand")
                 .Requires("kind", Literal("value"))
-                .Requires("value", "TextLiteralProducer"));
+                .Requires("value", "TextLiteralExpression"));
 
             contract.Declare(Interface("NumericComparisonRightOperand")
                 .Requires("kind", Literal("value"))
-                .Requires("value", "NumericLiteralProducer"));
+                .Requires("value", "NumericLiteralExpression"));
 
             contract.Declare(Interface("LiteralComparisonRightOperand")
                 .Requires("kind", Literal("value"))
-                .Requires("value", "LiteralProducer"));
+                .Requires("value", "LiteralExpression"));
 
             contract.Declare(Interface("AllCondition")
                 .Requires("kind", Literal("all"))

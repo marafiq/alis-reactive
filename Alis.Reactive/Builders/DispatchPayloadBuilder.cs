@@ -32,7 +32,7 @@ namespace Alis.Reactive.Builders
             TypedSource<TProp> source)
         {
             var fieldName = ExpressionPathHelper.ToEventPath<TPayload, TProp>(field);
-            _payload.Set(fieldName, source.ToValueProducer());
+            _payload.Set(fieldName, source.ToValueExpression());
             return this;
         }
 
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Builders
             string value)
         {
             var fieldName = ExpressionPathHelper.ToEventPath<TPayload, string>(field);
-            _payload.Set(fieldName, ValueProducer.Literal(value));
+            _payload.Set(fieldName, ValueExpression.Literal(value));
             return this;
         }
 
@@ -58,7 +58,7 @@ namespace Alis.Reactive.Builders
             int value)
         {
             var fieldName = ExpressionPathHelper.ToEventPath<TPayload, int>(field);
-            _payload.Set(fieldName, ValueProducer.Literal(value));
+            _payload.Set(fieldName, ValueExpression.Literal(value));
             return this;
         }
 
@@ -71,30 +71,30 @@ namespace Alis.Reactive.Builders
             bool value)
         {
             var fieldName = ExpressionPathHelper.ToEventPath<TPayload, bool>(field);
-            _payload.Set(fieldName, ValueProducer.Literal(value));
+            _payload.Set(fieldName, ValueExpression.Literal(value));
             return this;
         }
 
-        internal ValueProducer Build()
+        internal ValueExpression Build()
         {
             if (!_payload.HasFields)
                 throw new InvalidOperationException(
                     "Dispatch payload must have at least one field. Use Dispatch(eventName) for no-payload dispatch.");
 
-            return _payload.ToValueProducer();
+            return _payload.ToValueExpression();
         }
     }
 
     internal sealed class DispatchPayloadDraft
     {
-        private readonly Dictionary<string, ValueProducer> _leaves =
-            new Dictionary<string, ValueProducer>(StringComparer.Ordinal);
+        private readonly Dictionary<string, ValueExpression> _leaves =
+            new Dictionary<string, ValueExpression>(StringComparer.Ordinal);
         private readonly Dictionary<string, DispatchPayloadDraft> _objects =
             new Dictionary<string, DispatchPayloadDraft>(StringComparer.Ordinal);
 
         internal bool HasFields => _leaves.Count > 0 || _objects.Count > 0;
 
-        internal void Set(string path, ValueProducer value)
+        internal void Set(string path, ValueExpression value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
 
@@ -103,8 +103,8 @@ namespace Alis.Reactive.Builders
             parent.SetLeaf(payloadPath.Leaf, value, payloadPath.Value);
         }
 
-        internal ValueProducer ToValueProducer() =>
-            ValueProducer.Object(ToFields());
+        internal ValueExpression ToValueExpression() =>
+            ValueExpression.Object(ToFields());
 
         private DispatchPayloadDraft GetOrCreateParent(DispatchPayloadPath path)
         {
@@ -132,7 +132,7 @@ namespace Alis.Reactive.Builders
             return child;
         }
 
-        private void SetLeaf(string leaf, ValueProducer value, string fullPath)
+        private void SetLeaf(string leaf, ValueExpression value, string fullPath)
         {
             EnsureLeafCanBeSet(leaf, fullPath);
 
@@ -152,13 +152,13 @@ namespace Alis.Reactive.Builders
                 "Set either the parent or the children, not both.");
         }
 
-        private Dictionary<string, ValueProducer> ToFields()
+        private Dictionary<string, ValueExpression> ToFields()
         {
-            var fields = new Dictionary<string, ValueProducer>(StringComparer.Ordinal);
+            var fields = new Dictionary<string, ValueExpression>(StringComparer.Ordinal);
             foreach (var leaf in _leaves)
                 fields[leaf.Key] = leaf.Value;
             foreach (var child in _objects)
-                fields[child.Key] = child.Value.ToValueProducer();
+                fields[child.Key] = child.Value.ToValueExpression();
 
             return fields;
         }

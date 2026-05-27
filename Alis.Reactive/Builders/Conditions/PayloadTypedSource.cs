@@ -25,10 +25,10 @@ namespace Alis.Reactive.Builders.Conditions
                 PayloadSource.Event(PayloadContract.ForPayload(typeof(TPayload))),
                 expression);
 
-        internal override ValueProducer ToValueProducer()
+        internal override ValueExpression ToValueExpression()
         {
             var payloadPath = ExpressionPathHelper.ToEventPath(_expression);
-            return ValueProducer.ReadPayload(_source, payloadPath, Shape);
+            return ValueExpression.ReadPayload(_source, payloadPath, Shape);
         }
     }
 }

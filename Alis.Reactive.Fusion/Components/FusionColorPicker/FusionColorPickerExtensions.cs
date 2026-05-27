@@ -29,7 +29,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionColorPicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, string? value)
             where TModel : class
-            => self.EmitSet(ValueProperty, ValueProducer.LiteralRaw(value, Shape.String));
+            => self.EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String));
 
         /// <summary>Toggles the ColorPicker popup open/closed.</summary>
         /// <returns>The component reference for method chaining.</returns>
@@ -44,7 +44,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionColorPicker, TModel> Disable<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, bool disabled = true)
             where TModel : class
-            => self.EmitSet(DisabledProperty, ValueProducer.Literal(disabled));
+            => self.EmitSet(DisabledProperty, ValueExpression.Literal(disabled));
 
         /// <summary>Reads the current color value for use in conditions or gather.</summary>
         /// <remarks>

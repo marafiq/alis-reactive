@@ -33,7 +33,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             return self.EmitSet(ValueProperty,
-                ValueProducer.LiteralRaw(value.ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture), Shape.Date));
+                ValueExpression.LiteralRaw(value.ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture), Shape.Date));
         }
 
         /// <summary>Moves focus into the date-time picker.</summary>

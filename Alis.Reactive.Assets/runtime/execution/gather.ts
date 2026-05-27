@@ -1,4 +1,4 @@
-// gather.ts — Resolve request input projections using the shared ValueProducer concept.
+// gather.ts — Resolve request input projections using the shared ValueExpression concept.
 // Every payload assignment is evaluated by evaluateValue(); runtime selected
 // registered inputs use the same writer path after reading their component value member.
 

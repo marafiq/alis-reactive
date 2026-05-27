@@ -3,9 +3,9 @@ import type { ConvertResult } from "../core/shape-convert";
 import { RuntimeShape } from "../domain/runtime-shape";
 import type {
   Shape,
-  LiteralProducer,
-  NumericLiteralProducer,
-  RangeLiteralProducer,
+  LiteralExpression,
+  NumericLiteralExpression,
+  RangeLiteralExpression,
 } from "../types";
 
 export class ValidationSubject {
@@ -53,7 +53,7 @@ export class ValidationSubject {
 export class ValidationScalarTarget {
   private constructor(private readonly value: unknown) {}
 
-  static fromLiteral(literal: LiteralProducer): ValidationScalarTarget {
+  static fromLiteral(literal: LiteralExpression): ValidationScalarTarget {
     return ValidationScalarTarget.available(literal.value);
   }
 
@@ -80,7 +80,7 @@ export class ValidationScalarTarget {
 export class ValidationLengthConstraint {
   private constructor(private readonly expectedLength: number) {}
 
-  static fromLiteral(literal: NumericLiteralProducer): ValidationLengthConstraint {
+  static fromLiteral(literal: NumericLiteralExpression): ValidationLengthConstraint {
     return new ValidationLengthConstraint(literal.value);
   }
 
@@ -174,7 +174,7 @@ export class ValidationRangeTarget {
     readonly upperBound: ValidationScalarTarget,
   ) {}
 
-  static fromLiteral(literal: RangeLiteralProducer): ValidationRangeTarget {
+  static fromLiteral(literal: RangeLiteralExpression): ValidationRangeTarget {
     const [lower, upper] = literal.value;
 
     return new ValidationRangeTarget(

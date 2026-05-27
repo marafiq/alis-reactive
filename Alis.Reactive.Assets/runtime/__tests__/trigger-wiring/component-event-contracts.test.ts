@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { boot, resetBootStateForTests } from "../../lifecycle/boot";
-import type { ComponentObject, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueProducer } from "../../types";
+import type { ComponentObject, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueExpression } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -104,7 +104,7 @@ function setText(componentKey: string, value: string): ReactionGraph {
   };
 }
 
-function literal(value: string): ValueProducer {
+function literal(value: string): ValueExpression {
   return { kind: "literal", value, shape: stringShape };
 }
 

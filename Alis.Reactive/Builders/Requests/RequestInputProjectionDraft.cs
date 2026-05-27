@@ -42,21 +42,21 @@ namespace Alis.Reactive.Builders.Requests
             _assignments.Add(assignment);
         }
 
-        internal void AddPayload(BindingPath path, ValueProducer value)
+        internal void AddPayload(BindingPath path, ValueExpression value)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
             if (value == null) throw new ArgumentNullException(nameof(value));
             _assignments.Add(RequestInputAssignment.Payload(path, value));
         }
 
-        internal void AddHeader(HeaderName name, ValueProducer value)
+        internal void AddHeader(HeaderName name, ValueExpression value)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (value == null) throw new ArgumentNullException(nameof(value));
             _assignments.Add(RequestInputAssignment.Header(name, value));
         }
 
-        internal void AddRouteParameter(RouteParameterName name, ValueProducer value)
+        internal void AddRouteParameter(RouteParameterName name, ValueExpression value)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (value == null) throw new ArgumentNullException(nameof(value));

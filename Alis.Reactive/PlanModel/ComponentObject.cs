@@ -385,7 +385,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Validation rules for a single component within a container scope.
-    /// The Value producer reads the component's current value via the shared evaluateValue path.</summary>
+    /// The Value expression reads the component's current value via the shared evaluateValue path.</summary>
     internal sealed class ComponentValidation
     {
         private readonly ComponentId _component;
@@ -395,7 +395,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Component ID — used for DOM error display and serverFieldName mapping.</summary>
         public string Component => _component.Value;
         /// <summary>How to read this component's value for validation. Evaluated via evaluateValue().</summary>
-        public ValueProducer Value { get; }
+        public ValueExpression Value { get; }
         public IReadOnlyList<ValidationRule> Rules => _rules.ForJson;
 
         [System.Text.Json.Serialization.JsonInclude]
@@ -403,7 +403,7 @@ namespace Alis.Reactive.PlanModel
 
         private ComponentValidation(
             ComponentId component,
-            ValueProducer value,
+            ValueExpression value,
             ComponentValidationRules rules,
             ValidationFieldPath serverFieldName)
         {
@@ -415,7 +415,7 @@ namespace Alis.Reactive.PlanModel
 
         internal static ComponentValidation ForServerField(
             string component,
-            ValueProducer value,
+            ValueExpression value,
             IReadOnlyList<ValidationRule> rules,
             string serverFieldName) =>
             new ComponentValidation(
@@ -550,11 +550,11 @@ namespace Alis.Reactive.PlanModel
                 comparisonShape);
 
         internal static ValidationRuleExecution WithConstraint(
-            ValueProducer constraint,
+            ValueExpression constraint,
             ValidationRuleActivation activation,
             Shape comparisonShape)
         {
-            if (constraint is not LiteralProducer literal)
+            if (constraint is not LiteralExpression literal)
                 throw new System.ArgumentException("Validation rule constraints must be literal values.", nameof(constraint));
 
             return new ConstraintValidationRuleExecution(
@@ -564,11 +564,11 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal static ValidationRuleExecution WithPeer(
-            ValueProducer peer,
+            ValueExpression peer,
             ValidationRuleActivation activation,
             Shape comparisonShape)
         {
-            if (peer is not ReadProducer read)
+            if (peer is not ReadExpression read)
                 throw new System.ArgumentException("Validation rule peer values must read another field value.", nameof(peer));
 
             return new PeerValidationRuleExecution(
@@ -605,10 +605,10 @@ namespace Alis.Reactive.PlanModel
 
         private sealed class ConstraintValidationRuleExecution : ValidationRuleExecution
         {
-            private readonly LiteralProducer _value;
+            private readonly LiteralExpression _value;
 
             internal ConstraintValidationRuleExecution(
-                LiteralProducer value,
+                LiteralExpression value,
                 ValidationRuleActivation activation,
                 Shape comparisonShape)
                 : base(activation, comparisonShape)
@@ -617,7 +617,7 @@ namespace Alis.Reactive.PlanModel
             }
 
             public override string Kind => "constraint";
-            public LiteralProducer Value => _value;
+            public LiteralExpression Value => _value;
 
             internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options) =>
                 WriteProperty(writer, options, "value", _value);
@@ -625,10 +625,10 @@ namespace Alis.Reactive.PlanModel
 
         private sealed class PeerValidationRuleExecution : ValidationRuleExecution
         {
-            private readonly ReadProducer _value;
+            private readonly ReadExpression _value;
 
             internal PeerValidationRuleExecution(
-                ReadProducer value,
+                ReadExpression value,
                 ValidationRuleActivation activation,
                 Shape comparisonShape)
                 : base(activation, comparisonShape)
@@ -637,7 +637,7 @@ namespace Alis.Reactive.PlanModel
             }
 
             public override string Kind => "peer";
-            public ReadProducer Value => _value;
+            public ReadExpression Value => _value;
 
             internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options) =>
                 WriteProperty(writer, options, "value", _value);

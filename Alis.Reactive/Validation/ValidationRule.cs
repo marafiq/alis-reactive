@@ -117,7 +117,7 @@ namespace Alis.Reactive.Validation
         {
             if (binding == null) throw new System.ArgumentNullException(nameof(binding));
             return ValidationRuleExecution.WithConstraint(
-                ValueProducer.LiteralRaw(_value, _shape),
+                ValueExpression.LiteralRaw(_value, _shape),
                 activation,
                 comparisonShape);
         }
@@ -145,7 +145,7 @@ namespace Alis.Reactive.Validation
         {
             if (binding == null) throw new System.ArgumentNullException(nameof(binding));
             return ValidationRuleExecution.WithConstraint(
-                ValueProducer.LiteralRaw(_bounds.ToDescriptorArray(), _bounds.DescriptorShape),
+                ValueExpression.LiteralRaw(_bounds.ToDescriptorArray(), _bounds.DescriptorShape),
                 activation,
                 comparisonShape);
         }
@@ -322,7 +322,7 @@ namespace Alis.Reactive.Validation
         internal static ValidationPlanBinding For(ValidationFieldBindingCatalog fieldBindings) =>
             new ValidationPlanBinding(fieldBindings);
 
-        internal ValueProducer ResolvePeerValue(ValidationFieldPath fieldPath)
+        internal ValueExpression ResolvePeerValue(ValidationFieldPath fieldPath)
         {
             if (fieldPath == null) throw new System.ArgumentNullException(nameof(fieldPath));
             return _fieldBindings.Resolve(fieldPath).ReadValue();

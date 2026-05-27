@@ -6,7 +6,7 @@ import type {
   BrowserObjectContract,
   PlanDocument,
   Shape,
-  ValueProducer,
+  ValueExpression,
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -157,7 +157,7 @@ function fusionField(id: string): ComponentObject {
   };
 }
 
-function literal(value: string, shape: Shape): ValueProducer {
+function literal(value: string, shape: Shape): ValueExpression {
   return { kind: "literal", value, shape };
 }
 

@@ -145,7 +145,7 @@ namespace Alis.Reactive.Builders.Conditions
             return ComposeAndWrap(condition);
         }
 
-        private ValueProducer LeftValue() => _typedSource.ToValueProducer();
+        private ValueExpression LeftValue() => _typedSource.ToValueExpression();
 
         private ComparisonOperands UnaryOperands() =>
             ComparisonOperands.Unary(LeftValue(), _shape);
@@ -153,13 +153,13 @@ namespace Alis.Reactive.Builders.Conditions
         private ComparisonOperands LiteralOperands(object? operand) =>
             ComparisonOperands.Binary(
                 LeftValue(),
-                ValueProducer.LiteralRaw(operand, _shape),
+                ValueExpression.LiteralRaw(operand, _shape),
                 _shape);
 
         private ComparisonOperands TextLiteralOperands(string operand) =>
             ComparisonOperands.Binary(
                 LeftValue(),
-                ValueProducer.LiteralRaw(operand, Shape.String),
+                ValueExpression.LiteralRaw(operand, Shape.String),
                 _shape);
 
         private ComparisonOperands MinimumLengthOperands(int length)
@@ -167,7 +167,7 @@ namespace Alis.Reactive.Builders.Conditions
             var minimumLength = MinimumTextLength.From(length, nameof(length));
             return ComparisonOperands.Binary(
                 LeftValue(),
-                ValueProducer.LiteralRaw(minimumLength.Value, Shape.Number),
+                ValueExpression.LiteralRaw(minimumLength.Value, Shape.Number),
                 _shape);
         }
 
@@ -175,37 +175,37 @@ namespace Alis.Reactive.Builders.Conditions
         {
             if (values == null) throw new System.ArgumentNullException(nameof(values));
 
-            var items = new System.Collections.Generic.List<ValueProducer>();
+            var items = new System.Collections.Generic.List<ValueExpression>();
             foreach (var item in values)
-                items.Add(ValueProducer.LiteralRaw(item, _shape));
+                items.Add(ValueExpression.LiteralRaw(item, _shape));
 
             return ComparisonOperands.Binary(
                 LeftValue(),
-                ValueProducer.Array(items, Shape.ArrayOf(_shape.IsNone ? Shape.Any : _shape)),
+                ValueExpression.Array(items, Shape.ArrayOf(_shape.IsNone ? Shape.Any : _shape)),
                 _shape);
         }
 
         private ComparisonOperands SourceOperands(TypedSource<TProp> right) =>
-            ComparisonOperands.Binary(LeftValue(), right.ToValueProducer(), _shape);
+            ComparisonOperands.Binary(LeftValue(), right.ToValueExpression(), _shape);
 
         private ComparisonOperands CollectionItemOperands(object item) =>
             ComparisonOperands.CollectionItem(
                 LeftValue(),
-                ValueProducer.LiteralRaw(item, _typedSource.ElementShape),
+                ValueExpression.LiteralRaw(item, _typedSource.ElementShape),
                 _shape,
                 _typedSource.ElementShape);
 
         private ComparisonOperands RangeOperands(TProp low, TProp high)
         {
-            var endpoints = new System.Collections.Generic.List<ValueProducer>
+            var endpoints = new System.Collections.Generic.List<ValueExpression>
             {
-                ValueProducer.LiteralRaw(low, _shape),
-                ValueProducer.LiteralRaw(high, _shape)
+                ValueExpression.LiteralRaw(low, _shape),
+                ValueExpression.LiteralRaw(high, _shape)
             };
 
             return ComparisonOperands.Binary(
                 LeftValue(),
-                ValueProducer.Array(endpoints, Shape.ArrayOf(_shape.IsNone ? Shape.Any : _shape)),
+                ValueExpression.Array(endpoints, Shape.ArrayOf(_shape.IsNone ? Shape.Any : _shape)),
                 _shape);
         }
 

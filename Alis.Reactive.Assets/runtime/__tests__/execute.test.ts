@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { registerComponentRuntime, type ComponentRuntimeDriver } from "../domain/component-runtime";
 import { executeReaction } from "../execution/execute";
 import type {
-  ComponentObject, ConditionGraph, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, ReactionGraph, Shape, ValueProducer,
+  ComponentObject, ConditionGraph, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, ReactionGraph, Shape, ValueExpression,
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -36,7 +36,7 @@ const customWidgetRuntime: ComponentRuntimeDriver = {
 
 registerComponentRuntime(customWidgetVendor, customWidgetRuntime);
 
-function literal(value: string): ValueProducer {
+function literal(value: string): ValueExpression {
   return { kind: "literal", value, shape: stringShape };
 }
 
@@ -51,7 +51,7 @@ function conditionResult(value: boolean): ConditionGraph {
   };
 }
 
-function shapedLiteral(value: JsonValue, shape: Shape): ValueProducer {
+function shapedLiteral(value: JsonValue, shape: Shape): ValueExpression {
   return { kind: "literal", value, shape };
 }
 
@@ -64,7 +64,7 @@ function setResidentName(value: string): ReactionGraph {
   };
 }
 
-function arrayLiteral(value: JsonValue[], item: Shape): ValueProducer {
+function arrayLiteral(value: JsonValue[], item: Shape): ValueExpression {
   return {
     kind: "literal",
     value,

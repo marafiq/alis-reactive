@@ -20,7 +20,7 @@ namespace Alis.Reactive.Builders.Conditions
             _paramName = urlParam.Value;
         }
 
-        internal override ValueProducer ToValueProducer() =>
-            ValueProducer.ReadUrl(_paramName, shape: Shape);
+        internal override ValueExpression ToValueExpression() =>
+            ValueExpression.ReadUrl(_paramName, shape: Shape);
     }
 }

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveRequestInput } from "../../execution/gather";
 import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
-import type { ComponentObject, RequestPayloadTarget, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath, ValueProducer } from "../../types";
+import type { ComponentObject, RequestPayloadTarget, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath, ValueExpression } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -195,6 +195,6 @@ function allRegisteredInputs(): Extract<RequestInput, { kind: "gather" }> {
   };
 }
 
-function literal(value: string, shape: Shape): ValueProducer {
+function literal(value: string, shape: Shape): ValueExpression {
   return { kind: "literal", value, shape };
 }

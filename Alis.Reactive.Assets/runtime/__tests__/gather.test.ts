@@ -9,7 +9,7 @@ import type {
   RequestPayloadTarget,
   Shape,
   StructuredPath,
-  ValueProducer,
+  ValueExpression,
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -27,11 +27,11 @@ const emptyPlan: PlanDocument = {
   behaviors: [],
 };
 
-function literal(value: JsonValue, shape: Shape): ValueProducer {
+function literal(value: JsonValue, shape: Shape): ValueExpression {
   return { kind: "literal", value, shape };
 }
 
-function readEventPayload(path: string, shape: Shape): ValueProducer {
+function readEventPayload(path: string, shape: Shape): ValueExpression {
   return {
     kind: "read",
     from: { kind: "payload", scope: "event", type: { kind: "untyped" } },
@@ -42,7 +42,7 @@ function readEventPayload(path: string, shape: Shape): ValueProducer {
   };
 }
 
-function readUrlParameter(name: string, shape: Shape): ValueProducer {
+function readUrlParameter(name: string, shape: Shape): ValueExpression {
   return {
     kind: "read",
     from: { kind: "url" },
@@ -53,7 +53,7 @@ function readUrlParameter(name: string, shape: Shape): ValueProducer {
   };
 }
 
-function browserValue(value: unknown, shape: Shape): ValueProducer {
+function browserValue(value: unknown, shape: Shape): ValueExpression {
   return { kind: "literal", value, shape };
 }
 
@@ -72,15 +72,15 @@ function pathSegment(part: string): PathSegment {
   return { kind: "property", name: part };
 }
 
-function assignment(name: string, source: ValueProducer): RequestInputAssignment {
+function assignment(name: string, source: ValueExpression): RequestInputAssignment {
   return { target: target(name), source };
 }
 
-function header(name: string, source: ValueProducer): RequestInputAssignment {
+function header(name: string, source: ValueExpression): RequestInputAssignment {
   return { target: { kind: "header", name }, source };
 }
 
-function routeParam(name: string, source: ValueProducer): RequestInputAssignment {
+function routeParam(name: string, source: ValueExpression): RequestInputAssignment {
   return { target: { kind: "route-param", name }, source };
 }
 
@@ -136,7 +136,7 @@ describe("resolveRequestInput", () => {
     });
   });
 
-  it("reads event payload values through the shared value producer path", () => {
+  it("reads event payload values through the shared value expression path", () => {
     const input = gatherInput([
       assignment("resident.name", readEventPayload("detail.name", stringShape)),
     ]);
@@ -148,7 +148,7 @@ describe("resolveRequestInput", () => {
     });
   });
 
-  it("reads URL query values through the shared value producer path", () => {
+  it("reads URL query values through the shared value expression path", () => {
     history.replaceState({}, "", "/residents?filter=fall%20risk");
     const input = gatherInput([
       assignment("filter", readUrlParameter("filter", stringShape)),
@@ -192,7 +192,7 @@ describe("resolveRequestInput", () => {
     });
   });
 
-  it("resolves route params from typed URL value producers", () => {
+  it("resolves route params from typed URL value expressions", () => {
     history.replaceState({}, "", "/residents?residentId=42");
     const input = gatherInput([
       routeParam("residentId", readUrlParameter("residentId", { kind: "number" })),

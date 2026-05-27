@@ -10,16 +10,16 @@ namespace Alis.Reactive.Builders.Conditions
     public sealed class TypedPluginSource<TProp> : TypedSource<TProp>
     {
         private readonly PluginOperationId _operation;
-        private readonly List<ValueProducer> _args;
+        private readonly List<ValueExpression> _args;
 
-        internal TypedPluginSource(PluginOperationId operation, List<ValueProducer> args)
+        internal TypedPluginSource(PluginOperationId operation, List<ValueExpression> args)
         {
             _operation = operation ?? throw new System.ArgumentNullException(nameof(operation));
             _args = args ?? throw new System.ArgumentNullException(nameof(args));
         }
 
-        internal override ValueProducer ToValueProducer() =>
-            ValueProducer.Invoke(
+        internal override ValueExpression ToValueExpression() =>
+            ValueExpression.Invoke(
                 PluginSource.Of(_operation.PluginNameValue),
                 _operation.PlanMethodNameValue,
                 Shape,
@@ -36,8 +36,8 @@ namespace Alis.Reactive.Builders.Conditions
             _property = property ?? throw new System.ArgumentNullException(nameof(property));
         }
 
-        internal override ValueProducer ToValueProducer() =>
-            ValueProducer.Read(
+        internal override ValueExpression ToValueExpression() =>
+            ValueExpression.Read(
                 PluginSource.Of(_property.PluginNameValue),
                 _property.PlanMemberNameValue,
                 Shape);

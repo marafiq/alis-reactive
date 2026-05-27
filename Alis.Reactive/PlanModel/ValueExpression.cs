@@ -9,117 +9,117 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// Base class for all value nodes in a reactive plan. Not constructed in application code.
     /// </summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ValueProducer>))]
-    public abstract class ValueProducer
+    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ValueExpression>))]
+    public abstract class ValueExpression
     {
-        private protected ValueProducer() { }
+        private protected ValueExpression() { }
 
         internal abstract Shape OutputShape { get; }
 
-        internal static ValueProducer Literal(bool value) =>
-            new LiteralProducer(value, Shape.Boolean);
+        internal static ValueExpression Literal(bool value) =>
+            new LiteralExpression(value, Shape.Boolean);
 
-        internal static ValueProducer Literal(string value) =>
-            new LiteralProducer(value, Shape.String);
+        internal static ValueExpression Literal(string value) =>
+            new LiteralExpression(value, Shape.String);
 
-        internal static ValueProducer Literal(int value) =>
-            new LiteralProducer(value, Shape.Number);
+        internal static ValueExpression Literal(int value) =>
+            new LiteralExpression(value, Shape.Number);
 
-        internal static ValueProducer Literal(long value) =>
-            new LiteralProducer(value, Shape.Number);
+        internal static ValueExpression Literal(long value) =>
+            new LiteralExpression(value, Shape.Number);
 
-        internal static ValueProducer Literal(decimal value) =>
-            new LiteralProducer(value, Shape.Number);
+        internal static ValueExpression Literal(decimal value) =>
+            new LiteralExpression(value, Shape.Number);
 
-        internal static ValueProducer Literal(double value) =>
-            new LiteralProducer(value, Shape.Number);
+        internal static ValueExpression Literal(double value) =>
+            new LiteralExpression(value, Shape.Number);
 
-        internal static ValueProducer Literal(DateTime value) =>
-            new LiteralProducer(value.ToString("O"), Shape.Date);
+        internal static ValueExpression Literal(DateTime value) =>
+            new LiteralExpression(value.ToString("O"), Shape.Date);
 
-        internal static ValueProducer Null() =>
-            new LiteralProducer(null, Shape.None);
+        internal static ValueExpression Null() =>
+            new LiteralExpression(null, Shape.None);
 
         /// <summary>
         /// Creates a literal with any JSON-serializable value.
         /// System.Text.Json handles serialization at Render time.
         /// No reflection. No type inspection. The serializer does the work.
         /// </summary>
-        internal static ValueProducer LiteralRaw(object? value, Shape shape) =>
-            new LiteralProducer(value, shape);
+        internal static ValueExpression LiteralRaw(object? value, Shape shape) =>
+            new LiteralExpression(value, shape);
 
-        internal static ValueProducer LiteralFromValue(object? value)
+        internal static ValueExpression LiteralFromValue(object? value)
         {
             if (value == null) return Null();
 
             return LiteralRaw(value, Shape.FromValue(value));
         }
 
-        /// <summary>Creates a ReadProducer that reads a URL query parameter by name.
+        /// <summary>Creates a ReadExpression that reads a URL query parameter by name.
         /// Default shape is String because URL params are inherently strings.</summary>
-        internal static ValueProducer ReadUrl(string paramName) =>
+        internal static ValueExpression ReadUrl(string paramName) =>
             Read(UrlSource.Instance, paramName, Shape.String);
 
-        internal static ValueProducer ReadUrl(string paramName, Shape shape) =>
+        internal static ValueExpression ReadUrl(string paramName, Shape shape) =>
             Read(UrlSource.Instance, paramName, shape);
 
-        internal static ValueProducer Read(Source from, string member) =>
-            new ReadProducer(ValueRead.Property(from, member, Shape.None));
+        internal static ValueExpression Read(Source from, string member) =>
+            new ReadExpression(ValueRead.Property(from, member, Shape.None));
 
-        internal static ValueProducer Read(Source from, string member, Path path) =>
-            new ReadProducer(ValueRead.Property(from, member, path, Shape.None));
+        internal static ValueExpression Read(Source from, string member, Path path) =>
+            new ReadExpression(ValueRead.Property(from, member, path, Shape.None));
 
-        internal static ValueProducer Read(Source from, string member, Shape shape) =>
-            new ReadProducer(ValueRead.Property(from, member, shape));
+        internal static ValueExpression Read(Source from, string member, Shape shape) =>
+            new ReadExpression(ValueRead.Property(from, member, shape));
 
-        internal static ValueProducer Read(Source from, string member, Path path, Shape shape) =>
-            new ReadProducer(ValueRead.Property(from, member, path, shape));
+        internal static ValueExpression Read(Source from, string member, Path path, Shape shape) =>
+            new ReadExpression(ValueRead.Property(from, member, path, shape));
 
-        internal static ValueProducer ReadPayload(PayloadSource from, string path) =>
+        internal static ValueExpression ReadPayload(PayloadSource from, string path) =>
             Read(from, path, Path.Parse(path));
 
-        internal static ValueProducer ReadPayload(PayloadSource from, string path, Shape shape) =>
+        internal static ValueExpression ReadPayload(PayloadSource from, string path, Shape shape) =>
             Read(from, path, Path.Parse(path), shape);
 
-        internal static ValueProducer ReadWholePayload(PayloadSource from) =>
-            new ReadProducer(ValueRead.WholePayload(from, Shape.None));
+        internal static ValueExpression ReadWholePayload(PayloadSource from) =>
+            new ReadExpression(ValueRead.WholePayload(from, Shape.None));
 
-        internal static ValueProducer ReadWholePayload(PayloadSource from, Shape shape) =>
-            new ReadProducer(ValueRead.WholePayload(from, shape));
+        internal static ValueExpression ReadWholePayload(PayloadSource from, Shape shape) =>
+            new ReadExpression(ValueRead.WholePayload(from, shape));
 
-        internal static ValueProducer Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueProducer> args) =>
-            new ReadProducer(ValueRead.Method(from, method, returns, args));
+        internal static ValueExpression Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueExpression> args) =>
+            new ReadExpression(ValueRead.Method(from, method, returns, args));
 
-        internal static ObjectProducer Object(IReadOnlyDictionary<string, ValueProducer> fields)
+        internal static ObjectExpression Object(IReadOnlyDictionary<string, ValueExpression> fields)
         {
             var objectFields = ObjectFields(fields);
-            return new ObjectProducer(objectFields.Fields, objectFields.Shape);
+            return new ObjectExpression(objectFields.Fields, objectFields.Shape);
         }
 
-        internal static ObjectProducer Object(IReadOnlyDictionary<string, ValueProducer> fields, Shape shape)
+        internal static ObjectExpression Object(IReadOnlyDictionary<string, ValueExpression> fields, Shape shape)
         {
             var objectFields = ObjectFields(fields);
-            return new ObjectProducer(objectFields.Fields, shape);
+            return new ObjectExpression(objectFields.Fields, shape);
         }
 
-        internal static ValueProducer Array(IReadOnlyList<ValueProducer> items)
+        internal static ValueExpression Array(IReadOnlyList<ValueExpression> items)
         {
             var arrayItems = ArrayItems(items);
-            return new ArrayProducer(arrayItems.Items, arrayItems.Shape);
+            return new ArrayExpression(arrayItems.Items, arrayItems.Shape);
         }
 
-        internal static ValueProducer Array(IReadOnlyList<ValueProducer> items, Shape shape)
+        internal static ValueExpression Array(IReadOnlyList<ValueExpression> items, Shape shape)
         {
             var arrayItems = ArrayItems(items);
-            return new ArrayProducer(arrayItems.Items, shape);
+            return new ArrayExpression(arrayItems.Items, shape);
         }
 
-        private static (IReadOnlyDictionary<string, ValueProducer> Fields, Shape Shape) ObjectFields(
-            IReadOnlyDictionary<string, ValueProducer> fields)
+        private static (IReadOnlyDictionary<string, ValueExpression> Fields, Shape Shape) ObjectFields(
+            IReadOnlyDictionary<string, ValueExpression> fields)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
 
-            var snapshot = new Dictionary<string, ValueProducer>(StringComparer.Ordinal);
+            var snapshot = new Dictionary<string, ValueExpression>(StringComparer.Ordinal);
             var shapeFields = new Dictionary<string, Shape>(StringComparer.Ordinal);
             foreach (var field in fields)
             {
@@ -140,24 +140,24 @@ namespace Alis.Reactive.PlanModel
             return value;
         }
 
-        private static ValueProducer ObjectFieldValue(ValueProducer value, string fieldName)
+        private static ValueExpression ObjectFieldValue(ValueExpression value, string fieldName)
         {
             if (value == null)
                 throw new ArgumentException(
-                    "Object field '" + fieldName + "' must have a value producer.",
+                    "Object field '" + fieldName + "' must have a value expression.",
                     nameof(value));
 
             return value;
         }
 
-        private static (IReadOnlyList<ValueProducer> Items, Shape Shape) ArrayItems(
-            IReadOnlyList<ValueProducer> items)
+        private static (IReadOnlyList<ValueExpression> Items, Shape Shape) ArrayItems(
+            IReadOnlyList<ValueExpression> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
             if (items.Count == 0)
-                return (System.Array.Empty<ValueProducer>(), Shape.ArrayOf(Shape.Any));
+                return (System.Array.Empty<ValueExpression>(), Shape.ArrayOf(Shape.Any));
 
-            var snapshot = new List<ValueProducer>();
+            var snapshot = new List<ValueExpression>();
             foreach (var item in items)
             {
                 if (item == null)
@@ -169,7 +169,7 @@ namespace Alis.Reactive.PlanModel
             return (snapshot, ArrayShape(snapshot));
         }
 
-        private static Shape ArrayShape(IReadOnlyList<ValueProducer> items)
+        private static Shape ArrayShape(IReadOnlyList<ValueExpression> items)
         {
             if (!TryFindSpecificArrayItemShape(items, out var itemShape))
                 return Shape.ArrayOf(Shape.Any);
@@ -180,7 +180,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         private static bool TryFindSpecificArrayItemShape(
-            IReadOnlyList<ValueProducer> items,
+            IReadOnlyList<ValueExpression> items,
             [NotNullWhen(true)] out Shape? shape)
         {
             foreach (var item in items)
@@ -195,7 +195,7 @@ namespace Alis.Reactive.PlanModel
             return false;
         }
 
-        private static bool ArrayItemsShareShape(IReadOnlyList<ValueProducer> items, Shape expected)
+        private static bool ArrayItemsShareShape(IReadOnlyList<ValueExpression> items, Shape expected)
         {
             foreach (var item in items)
             {
@@ -214,7 +214,7 @@ namespace Alis.Reactive.PlanModel
     /// <remarks>
     /// Created when a literal is passed to a builder such as <c>p.Element("id").SetText("hello")</c>.
     /// </remarks>
-    public sealed class LiteralProducer : ValueProducer
+    public sealed class LiteralExpression : ValueExpression
     {
         /// <summary>Gets the kind. Always <c>"literal"</c>.</summary>
         public string Kind => "literal";
@@ -224,7 +224,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the expected type shape. Defaults to <see cref="PlanModel.Shape.None"/> when not specified.</summary>
         public Shape Shape { get; }
 
-        internal LiteralProducer(object? value, Shape shape)
+        internal LiteralExpression(object? value, Shape shape)
         {
             Value = value;
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
@@ -237,7 +237,7 @@ namespace Alis.Reactive.PlanModel
     /// <remarks>
     /// Created by source-reading builders such as <c>p.Plugin&lt;int&gt;("array", "count").Arg(json, x =&gt; x.Items)</c>.
     /// </remarks>
-    public sealed class ReadProducer : ValueProducer
+    public sealed class ReadExpression : ValueExpression
     {
         private readonly ValueRead _read;
 
@@ -257,7 +257,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets whether the read accesses a property or invokes a method.</summary>
         public ValueReadAccess Access => _read.Access;
 
-        internal ReadProducer(ValueRead read)
+        internal ReadExpression(ValueRead read)
         {
             _read = read ?? throw new ArgumentNullException(nameof(read));
         }
@@ -294,7 +294,7 @@ namespace Alis.Reactive.PlanModel
                 shape,
                 ValueReadAccess.Property);
 
-        internal static ValueRead Method(RuntimeObjectSource from, string member, Shape shape, IReadOnlyList<ValueProducer> args) =>
+        internal static ValueRead Method(RuntimeObjectSource from, string member, Shape shape, IReadOnlyList<ValueExpression> args) =>
             new ValueRead(
                 ValueReadTarget.ForMember(from, member),
                 shape,
@@ -367,7 +367,7 @@ namespace Alis.Reactive.PlanModel
         internal static ValueReadAccess Property { get; } =
             new PropertyValueReadAccess();
 
-        internal static ValueReadAccess Method(IReadOnlyList<ValueProducer> args) =>
+        internal static ValueReadAccess Method(IReadOnlyList<ValueExpression> args) =>
             new MethodValueReadAccess(args);
 
         /// <summary>Gets the access kind.</summary>
@@ -384,9 +384,9 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Invokes a method and uses the returned value.</summary>
     public sealed class MethodValueReadAccess : ValueReadAccess
     {
-        private readonly IReadOnlyList<ValueProducer> _args;
+        private readonly IReadOnlyList<ValueExpression> _args;
 
-        internal MethodValueReadAccess(IReadOnlyList<ValueProducer> args)
+        internal MethodValueReadAccess(IReadOnlyList<ValueExpression> args)
         {
             _args = OrderedArguments(args);
         }
@@ -395,15 +395,15 @@ namespace Alis.Reactive.PlanModel
         public override string Kind => "method";
 
         /// <summary>Gets method arguments.</summary>
-        public IReadOnlyList<ValueProducer> Args => _args;
+        public IReadOnlyList<ValueExpression> Args => _args;
 
-        private static IReadOnlyList<ValueProducer> OrderedArguments(IReadOnlyList<ValueProducer> items)
+        private static IReadOnlyList<ValueExpression> OrderedArguments(IReadOnlyList<ValueExpression> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
             if (items.Count == 0)
-                return Array.Empty<ValueProducer>();
+                return Array.Empty<ValueExpression>();
 
-            var snapshot = new List<ValueProducer>();
+            var snapshot = new List<ValueExpression>();
             foreach (var item in items)
             {
                 if (item == null)
@@ -417,18 +417,18 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>A composite value built from named field expressions.</summary>
-    public sealed class ObjectProducer : ValueProducer
+    public sealed class ObjectExpression : ValueExpression
     {
-        private readonly IReadOnlyDictionary<string, ValueProducer> _fields;
+        private readonly IReadOnlyDictionary<string, ValueExpression> _fields;
 
         /// <summary>Gets the kind. Always <c>"object"</c>.</summary>
         public string Kind => "object";
         /// <summary>Gets the named fields and their value expressions.</summary>
-        public IReadOnlyDictionary<string, ValueProducer> Fields => _fields;
+        public IReadOnlyDictionary<string, ValueExpression> Fields => _fields;
         /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
         public Shape Shape { get; }
 
-        internal ObjectProducer(IReadOnlyDictionary<string, ValueProducer> fields, Shape shape)
+        internal ObjectExpression(IReadOnlyDictionary<string, ValueExpression> fields, Shape shape)
         {
             _fields = fields ?? throw new ArgumentNullException(nameof(fields));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
@@ -438,18 +438,18 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>A composite value built from ordered item expressions.</summary>
-    public sealed class ArrayProducer : ValueProducer
+    public sealed class ArrayExpression : ValueExpression
     {
-        private readonly IReadOnlyList<ValueProducer> _items;
+        private readonly IReadOnlyList<ValueExpression> _items;
 
         /// <summary>Gets the kind. Always <c>"array"</c>.</summary>
         public string Kind => "array";
         /// <summary>Gets the ordered item expressions.</summary>
-        public IReadOnlyList<ValueProducer> Items => _items;
+        public IReadOnlyList<ValueExpression> Items => _items;
         /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
         public Shape Shape { get; }
 
-        internal ArrayProducer(IReadOnlyList<ValueProducer> items, Shape shape)
+        internal ArrayExpression(IReadOnlyList<ValueExpression> items, Shape shape)
         {
             _items = items ?? throw new ArgumentNullException(nameof(items));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));

@@ -103,7 +103,7 @@ namespace Alis.Reactive.Validation
         internal static FieldComparisonValue None { get; } =
             new UnaryFieldComparisonValue();
 
-        internal abstract ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape);
+        internal abstract ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape);
 
         internal static FieldComparisonValue Literal(object? value)
         {
@@ -126,7 +126,7 @@ namespace Alis.Reactive.Validation
 
         private sealed class UnaryFieldComparisonValue : FieldComparisonValue
         {
-            internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape) =>
+            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
                 ComparisonOperands.Unary(left, fieldShape);
         }
 
@@ -139,8 +139,8 @@ namespace Alis.Reactive.Validation
                 _value = value;
             }
 
-            internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape) =>
-                ComparisonOperands.Binary(left, ValueProducer.LiteralRaw(_value, fieldShape), fieldShape);
+            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
+                ComparisonOperands.Binary(left, ValueExpression.LiteralRaw(_value, fieldShape), fieldShape);
         }
 
         private sealed class ShapedLiteralFieldComparisonValue : FieldComparisonValue
@@ -154,8 +154,8 @@ namespace Alis.Reactive.Validation
                 _literalShape = literalShape ?? throw new ArgumentNullException(nameof(literalShape));
             }
 
-            internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape) =>
-                ComparisonOperands.Binary(left, ValueProducer.LiteralRaw(_value, _literalShape), fieldShape);
+            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
+                ComparisonOperands.Binary(left, ValueExpression.LiteralRaw(_value, _literalShape), fieldShape);
         }
 
         private sealed class ArrayFieldComparisonValue : FieldComparisonValue
@@ -168,14 +168,14 @@ namespace Alis.Reactive.Validation
                 _items = items.ToArray();
             }
 
-            internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape)
+            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape)
             {
-                var values = new List<ValueProducer>(_items.Count);
+                var values = new List<ValueExpression>(_items.Count);
                 foreach (var item in _items)
-                    values.Add(ValueProducer.LiteralRaw(item, fieldShape));
+                    values.Add(ValueExpression.LiteralRaw(item, fieldShape));
                 return ComparisonOperands.Binary(
                     left,
-                    ValueProducer.Array(values, Shape.ArrayOf(fieldShape.IsNone ? Shape.Any : fieldShape)),
+                    ValueExpression.Array(values, Shape.ArrayOf(fieldShape.IsNone ? Shape.Any : fieldShape)),
                     fieldShape);
             }
         }
@@ -191,10 +191,10 @@ namespace Alis.Reactive.Validation
                 _itemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
             }
 
-            internal override ComparisonOperands BuildOperands(ValueProducer left, Shape fieldShape) =>
+            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
                 ComparisonOperands.CollectionItem(
                     left,
-                    ValueProducer.LiteralRaw(_value, _itemShape),
+                    ValueExpression.LiteralRaw(_value, _itemShape),
                     fieldShape,
                     _itemShape);
         }
@@ -319,16 +319,16 @@ namespace Alis.Reactive.Validation
 
     internal sealed class FieldComparisonTarget
     {
-        private readonly ValueProducer _left;
+        private readonly ValueExpression _left;
         private readonly Shape _shape;
 
-        private FieldComparisonTarget(ValueProducer left, Shape shape)
+        private FieldComparisonTarget(ValueExpression left, Shape shape)
         {
             _left = left ?? throw new ArgumentNullException(nameof(left));
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
-        internal static FieldComparisonTarget ForComponentValue(ValueProducer value, Shape shape) =>
+        internal static FieldComparisonTarget ForComponentValue(ValueExpression value, Shape shape) =>
             new FieldComparisonTarget(value, shape);
 
         internal ConditionGraph Compare(CompareOperator op, FieldComparisonValue value)

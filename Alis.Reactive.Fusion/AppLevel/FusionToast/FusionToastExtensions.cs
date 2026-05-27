@@ -41,49 +41,49 @@ namespace Alis.Reactive.Fusion.AppLevel
         public static ComponentRef<FusionToast, TModel> SetTitle<TModel>(
             this ComponentRef<FusionToast, TModel> self, string title)
             where TModel : class
-            => self.EmitSet(TitleProperty, ValueProducer.Literal(title));
+            => self.EmitSet(TitleProperty, ValueExpression.Literal(title));
 
         public static ComponentRef<FusionToast, TModel> SetContent<TModel>(
             this ComponentRef<FusionToast, TModel> self, string content)
             where TModel : class
-            => self.EmitSet(ContentProperty, ValueProducer.Literal(content));
+            => self.EmitSet(ContentProperty, ValueExpression.Literal(content));
 
         public static ComponentRef<FusionToast, TModel> SetTimeout<TModel>(
             this ComponentRef<FusionToast, TModel> self, int ms)
             where TModel : class
-            => self.EmitSet(TimeoutProperty, ValueProducer.Literal(ms));
+            => self.EmitSet(TimeoutProperty, ValueExpression.Literal(ms));
 
         public static ComponentRef<FusionToast, TModel> ShowCloseButton<TModel>(
             this ComponentRef<FusionToast, TModel> self)
             where TModel : class
-            => self.EmitSet(ShowCloseButtonProperty, ValueProducer.Literal(true));
+            => self.EmitSet(ShowCloseButtonProperty, ValueExpression.Literal(true));
 
         public static ComponentRef<FusionToast, TModel> ShowProgressBar<TModel>(
             this ComponentRef<FusionToast, TModel> self)
             where TModel : class
-            => self.EmitSet(ShowProgressBarProperty, ValueProducer.Literal(true));
+            => self.EmitSet(ShowProgressBarProperty, ValueExpression.Literal(true));
 
         // ── Type convenience methods ──
 
         public static ComponentRef<FusionToast, TModel> Success<TModel>(
             this ComponentRef<FusionToast, TModel> self)
             where TModel : class
-            => self.EmitSet(CssClassProperty, ValueProducer.Literal("e-toast-success"));
+            => self.EmitSet(CssClassProperty, ValueExpression.Literal("e-toast-success"));
 
         public static ComponentRef<FusionToast, TModel> Warning<TModel>(
             this ComponentRef<FusionToast, TModel> self)
             where TModel : class
-            => self.EmitSet(CssClassProperty, ValueProducer.Literal("e-toast-warning"));
+            => self.EmitSet(CssClassProperty, ValueExpression.Literal("e-toast-warning"));
 
         public static ComponentRef<FusionToast, TModel> Danger<TModel>(
             this ComponentRef<FusionToast, TModel> self)
             where TModel : class
-            => self.EmitSet(CssClassProperty, ValueProducer.Literal("e-toast-danger"));
+            => self.EmitSet(CssClassProperty, ValueExpression.Literal("e-toast-danger"));
 
         public static ComponentRef<FusionToast, TModel> Info<TModel>(
             this ComponentRef<FusionToast, TModel> self)
             where TModel : class
-            => self.EmitSet(CssClassProperty, ValueProducer.Literal("e-toast-info"));
+            => self.EmitSet(CssClassProperty, ValueExpression.Literal("e-toast-info"));
 
         // ── Actions ──
 

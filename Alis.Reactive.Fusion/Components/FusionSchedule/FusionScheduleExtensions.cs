@@ -100,7 +100,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            self.EmitSet(EventDataSourceProperty, ValueProducer.Read(source.Scope, sourcePath));
+            self.EmitSet(EventDataSourceProperty, ValueExpression.Read(source.Scope, sourcePath));
             return self.EmitCall(DataBindMethod);
         }
 
@@ -114,7 +114,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             where TResponse : class
         {
-            self.EmitSet(EventDataSourceProperty, ValueProducer.Read(source.Scope, "responseBody"));
+            self.EmitSet(EventDataSourceProperty, ValueExpression.Read(source.Scope, "responseBody"));
             return self.EmitCall(DataBindMethod);
         }
 
@@ -123,36 +123,36 @@ namespace Alis.Reactive.Fusion.Components
         /// Runtime: ej2.addEvent(data)
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> AddEvent<TModel>(
-            this ComponentRef<FusionSchedule, TModel> self, ValueProducer data)
+            this ComponentRef<FusionSchedule, TModel> self, ValueExpression data)
             where TModel : class
-            => self.EmitCall(AddEventMethod, new System.Collections.Generic.List<ValueProducer> { data });
+            => self.EmitCall(AddEventMethod, new System.Collections.Generic.List<ValueExpression> { data });
 
         /// <summary>
         /// Updates an existing event.
         /// Runtime: ej2.saveEvent(data)
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> SaveEvent<TModel>(
-            this ComponentRef<FusionSchedule, TModel> self, ValueProducer data)
+            this ComponentRef<FusionSchedule, TModel> self, ValueExpression data)
             where TModel : class
-            => self.EmitCall(SaveEventMethod, new System.Collections.Generic.List<ValueProducer> { data });
+            => self.EmitCall(SaveEventMethod, new System.Collections.Generic.List<ValueExpression> { data });
 
         /// <summary>
         /// Deletes an event by ID.
         /// Runtime: ej2.deleteEvent(id)
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> DeleteEvent<TModel>(
-            this ComponentRef<FusionSchedule, TModel> self, ValueProducer eventId)
+            this ComponentRef<FusionSchedule, TModel> self, ValueExpression eventId)
             where TModel : class
-            => self.EmitCall(DeleteEventMethod, new System.Collections.Generic.List<ValueProducer> { eventId });
+            => self.EmitCall(DeleteEventMethod, new System.Collections.Generic.List<ValueExpression> { eventId });
 
         /// <summary>
         /// Opens the built-in event editor programmatically.
         /// Runtime: ej2.openEditor(data, action)
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> OpenEditor<TModel>(
-            this ComponentRef<FusionSchedule, TModel> self, ValueProducer data, string action = "Add")
+            this ComponentRef<FusionSchedule, TModel> self, ValueExpression data, string action = "Add")
             where TModel : class
-            => self.EmitCall(OpenEditorMethod, new System.Collections.Generic.List<ValueProducer> { data, ValueProducer.Literal(action) });
+            => self.EmitCall(OpenEditorMethod, new System.Collections.Generic.List<ValueExpression> { data, ValueExpression.Literal(action) });
 
         /// <summary>
         /// Closes the event editor.
@@ -188,6 +188,6 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionSchedule, TModel> ScrollTo<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, string hour)
             where TModel : class
-            => self.EmitCall(ScrollToMethod, new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(hour) });
+            => self.EmitCall(ScrollToMethod, new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(hour) });
     }
 }

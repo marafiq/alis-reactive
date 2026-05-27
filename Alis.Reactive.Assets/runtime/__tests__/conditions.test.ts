@@ -11,25 +11,25 @@ import type {
   EqualityCompareOp,
   ExecContext,
   JsonValue,
-  LiteralProducer,
+  LiteralExpression,
   MembershipCompareCondition,
   MembershipCompareOp,
   OrderedCompareCondition,
   OrderedCompareOp,
-  PayloadPathReadProducer,
+  PayloadPathReadExpression,
   PlanDocument,
   RangeCompareCondition,
-  RangeComparisonProducer,
+  RangeComparisonExpression,
   RegexCompareCondition,
   Shape,
-  NumericLiteralProducer,
-  TextLiteralProducer,
+  NumericLiteralExpression,
+  TextLiteralExpression,
   TextCompareCondition,
   TextCompareOp,
   TextLengthCompareCondition,
   UnaryCompareCondition,
   UnaryCompareOp,
-  ValueProducer,
+  ValueExpression,
   ValidationCondition,
 } from "../types";
 
@@ -56,19 +56,19 @@ function plan(): PlanDocument {
   };
 }
 
-function literal(value: JsonValue, shape: Shape): LiteralProducer {
+function literal(value: JsonValue, shape: Shape): LiteralExpression {
   return { kind: "literal", value, shape };
 }
 
-function textLiteral(value: string): TextLiteralProducer {
+function textLiteral(value: string): TextLiteralExpression {
   return { kind: "literal", value, shape: stringShape };
 }
 
-function numericLiteral(value: number): NumericLiteralProducer {
+function numericLiteral(value: number): NumericLiteralExpression {
   return { kind: "literal", value, shape: numberShape };
 }
 
-function eventPayloadValue(member: string, shape: Shape): PayloadPathReadProducer {
+function eventPayloadValue(member: string, shape: Shape): PayloadPathReadExpression {
   return {
     kind: "read",
     from: { kind: "payload", scope: "event", type: { kind: "untyped" } },
@@ -79,7 +79,7 @@ function eventPayloadValue(member: string, shape: Shape): PayloadPathReadProduce
   };
 }
 
-function range(low: JsonValue, high: JsonValue, itemShape: Shape): RangeComparisonProducer {
+function range(low: JsonValue, high: JsonValue, itemShape: Shape): RangeComparisonExpression {
   return {
     kind: "array",
     items: [literal(low, itemShape), literal(high, itemShape)],
@@ -104,13 +104,13 @@ function equality(
   right: JsonValue,
   shape: Shape,
 ): EqualityCompareCondition {
-  return equalityFromProducers(op, literal(left, shape), literal(right, shape), shape);
+  return equalityFromExpressions(op, literal(left, shape), literal(right, shape), shape);
 }
 
-function equalityFromProducers(
+function equalityFromExpressions(
   op: EqualityCompareOp,
-  left: ValueProducer,
-  right: ValueProducer,
+  left: ValueExpression,
+  right: ValueExpression,
   shape: Shape,
 ): EqualityCompareCondition {
   return {
@@ -129,13 +129,13 @@ function ordered(
   right: JsonValue,
   shape: Shape,
 ): OrderedCompareCondition {
-  return orderedFromProducers(op, literal(left, shape), literal(right, shape), shape);
+  return orderedFromExpressions(op, literal(left, shape), literal(right, shape), shape);
 }
 
-function orderedFromProducers(
+function orderedFromExpressions(
   op: OrderedCompareOp,
-  left: ValueProducer,
-  right: ValueProducer,
+  left: ValueExpression,
+  right: ValueExpression,
   shape: Shape,
 ): OrderedCompareCondition {
   return {
@@ -267,13 +267,13 @@ describe("condition runtime", () => {
       expect(matches(ordered("gt", "72", 60, rawShape))).toBe(false);
     });
 
-    it("compares value producers on both sides of source-to-source conditions", () => {
+    it("compares value expressions on both sides of source-to-source conditions", () => {
       const left = eventPayloadValue("entered", numberShape);
       const right = eventPayloadValue("expected", numberShape);
       const context = { event: { entered: "72", expected: 70 } };
 
-      expect(matches(orderedFromProducers("gt", left, right, numberShape), context)).toBe(true);
-      expect(matches(equalityFromProducers("eq", left, right, numberShape), context)).toBe(false);
+      expect(matches(orderedFromExpressions("gt", left, right, numberShape), context)).toBe(true);
+      expect(matches(equalityFromExpressions("eq", left, right, numberShape), context)).toBe(false);
     });
   });
 

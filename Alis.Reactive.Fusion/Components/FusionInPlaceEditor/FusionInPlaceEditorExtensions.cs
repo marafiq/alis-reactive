@@ -39,7 +39,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> SetValue<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string? value)
             where TModel : class
-            => self.EmitSet(ValueProperty, value != null ? ValueProducer.Literal(value) : ValueProducer.Null());
+            => self.EmitSet(ValueProperty, value != null ? ValueExpression.Literal(value) : ValueExpression.Null());
 
         /// <summary>Enables the editor, restoring edit-mode entry.</summary>
         /// <remarks>
@@ -50,7 +50,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> Enable<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
-            => self.EmitCall(DisableMethod, new List<ValueProducer> { ValueProducer.Literal(false) });
+            => self.EmitCall(DisableMethod, new List<ValueExpression> { ValueExpression.Literal(false) });
 
         /// <summary>Disables the editor, blocking edit-mode entry.</summary>
         /// <remarks>Calls Syncfusion's <c>disable(true)</c> method. Applies the <c>.e-disable</c> CSS class.</remarks>
@@ -58,7 +58,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> Disable<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
-            => self.EmitCall(DisableMethod, new List<ValueProducer> { ValueProducer.Literal(true) });
+            => self.EmitCall(DisableMethod, new List<ValueExpression> { ValueExpression.Literal(true) });
 
         /// <summary>Programmatically commits the current edit.</summary>
         /// <remarks>
@@ -93,7 +93,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> AddClass<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string className)
             where TModel : class
-            => self.EmitCall(ClassAddMethod, new List<ValueProducer> { ValueProducer.Literal(className) });
+            => self.EmitCall(ClassAddMethod, new List<ValueExpression> { ValueExpression.Literal(className) });
 
         /// <summary>Removes a CSS class from the editor's outer wrapper.</summary>
         /// <remarks>Emits a call on Syncfusion's <c>element.classList.remove</c>.</remarks>
@@ -103,7 +103,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionInPlaceEditor, TModel> RemoveClass<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string className)
             where TModel : class
-            => self.EmitCall(ClassRemoveMethod, new List<ValueProducer> { ValueProducer.Literal(className) });
+            => self.EmitCall(ClassRemoveMethod, new List<ValueExpression> { ValueExpression.Literal(className) });
 
         /// <summary>Reads the current committed value for use in conditions or gather.</summary>
         /// <remarks>

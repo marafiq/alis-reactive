@@ -32,7 +32,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeRadioGroup, TModel> self, string value)
             where TModel : class
         {
-            return self.EmitSet(ValueProperty, ValueProducer.Literal(value));
+            return self.EmitSet(ValueProperty, ValueExpression.Literal(value));
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.EmitSet(ValueProperty, ValueProducer.Read(PayloadSource.Event(), "value", Path.Parse(sourcePath)));
+            return self.EmitSet(ValueProperty, ValueExpression.Read(PayloadSource.Event(), "value", Path.Parse(sourcePath)));
         }
 
         /// <summary>

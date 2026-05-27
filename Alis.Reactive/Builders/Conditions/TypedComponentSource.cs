@@ -9,34 +9,34 @@ namespace Alis.Reactive.Builders.Conditions
     /// <summary>A typed value source produced by a registered component member.</summary>
     public sealed class TypedComponentSource<TProp> : TypedSource<TProp>
     {
-        private readonly ValueProducer _value;
+        private readonly ValueExpression _value;
         private readonly string _readMember;
 
         internal TypedComponentSource(string componentId, string valueMember)
             : this(
                 valueMember,
-                ValueProducer.Read(PlanModel.ComponentSource.Of(componentId), valueMember, shape: Shape.FromClrType(typeof(TProp))))
+                ValueExpression.Read(PlanModel.ComponentSource.Of(componentId), valueMember, shape: Shape.FromClrType(typeof(TProp))))
         {
         }
 
-        private TypedComponentSource(string readMember, ValueProducer value)
+        private TypedComponentSource(string readMember, ValueExpression value)
         {
             _readMember = readMember;
             _value = value ?? throw new System.ArgumentNullException(nameof(value));
         }
 
-        internal override ValueProducer ToValueProducer() => _value;
+        internal override ValueExpression ToValueExpression() => _value;
 
         internal override string ReadMember => _readMember;
 
         internal static TypedComponentSource<TProp> FromMethod(
             PlanModel.ComponentSource component,
             string method,
-            System.Collections.Generic.IReadOnlyList<ValueProducer> args)
+            System.Collections.Generic.IReadOnlyList<ValueExpression> args)
         {
             return new TypedComponentSource<TProp>(
                 method,
-                ValueProducer.Invoke(
+                ValueExpression.Invoke(
                     component,
                     method,
                     Shape.FromClrType(typeof(TProp)),

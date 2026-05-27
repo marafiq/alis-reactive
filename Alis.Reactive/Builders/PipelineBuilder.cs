@@ -55,7 +55,7 @@ namespace Alis.Reactive.Builders
         {
             AddStep(ReactionGraph.Dispatch(
                 eventName,
-                ValueProducer.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload))),
+                ValueExpression.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload))),
                 PayloadContract.ForPayload(typeof(TPayload))));
             return this;
         }
@@ -274,7 +274,7 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> Into(string elementId)
         {
             Context.EnsureElement(elementId);
-            var responseBody = ValueProducer.ReadWholePayload(PayloadSource.Success());
+            var responseBody = ValueExpression.ReadWholePayload(PayloadSource.Success());
             AddStep(ReactionGraph.Inject(elementId, responseBody));
             return this;
         }

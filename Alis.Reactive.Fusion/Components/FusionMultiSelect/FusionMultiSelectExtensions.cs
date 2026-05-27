@@ -38,8 +38,8 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionMultiSelect, TModel> self, string[]? value)
             where TModel : class
             => self.EmitSet(ValueProperty, value == null
-                ? ValueProducer.Null()
-                : ValueProducer.LiteralRaw(value, Shape.ArrayOf(Shape.String)));
+                ? ValueExpression.Null()
+                : ValueExpression.LiteralRaw(value, Shape.ArrayOf(Shape.String)));
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
@@ -53,7 +53,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.EmitSet(DataSourceProperty, ValueProducer.Read(PayloadSource.Event(), sourcePath));
+            return self.EmitSet(DataSourceProperty, ValueExpression.Read(PayloadSource.Event(), sourcePath));
         }
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
@@ -69,7 +69,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.EmitSet(DataSourceProperty, ValueProducer.Read(source.Scope, sourcePath));
+            return self.EmitSet(DataSourceProperty, ValueExpression.Read(source.Scope, sourcePath));
         }
 
         /// <summary>Flushes pending property changes to the component in the browser.</summary>

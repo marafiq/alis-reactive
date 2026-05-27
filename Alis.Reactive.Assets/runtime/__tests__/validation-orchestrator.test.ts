@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { AppliedBrowserPlans } from "../lifecycle/merge-plan";
 import { showServerErrors, validateContainer } from "../validation/orchestrator";
-import type { ComponentObject, ComponentValidation, BrowserObjectContract, PlanDocument, ReadProducer, Shape, ValueProducer } from "../types";
+import type { ComponentObject, ComponentValidation, BrowserObjectContract, PlanDocument, ReadExpression, Shape, ValueExpression } from "../types";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };
@@ -137,7 +137,7 @@ function peerRuleWithMissingPeerSource(): ComponentValidation {
   };
 }
 
-function readComponentValue(component: string): ReadProducer {
+function readComponentValue(component: string): ReadExpression {
   return {
     kind: "read",
     from: { kind: "component", component },
@@ -148,7 +148,7 @@ function readComponentValue(component: string): ReadProducer {
   };
 }
 
-function literal(value: string): ValueProducer {
+function literal(value: string): ValueExpression {
   return {
     kind: "literal",
     value,
@@ -348,7 +348,7 @@ describe("validation orchestrator client rules", () => {
     expect(summaryTextFor(componentKey)).toBe("Name is required");
   });
 
-  it("does not hide a miswired validation value producer behind missing field behavior", () => {
+  it("does not hide a miswired validation value expression behind missing field behavior", () => {
     renderValidationDom();
     const runtimePlan = plan([
       requiredRule("resident-name-field", "Name", "missing-component"),

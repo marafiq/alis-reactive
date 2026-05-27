@@ -1,4 +1,4 @@
-import type { Shape, ValueProducer } from "../types";
+import type { Shape, ValueExpression } from "../types";
 import { applyShape, convertByShape, type ConvertResult } from "../core/shape-convert";
 
 const unshapedPlanShape: Shape = { kind: "none" };
@@ -14,7 +14,7 @@ export class RuntimeShape {
     return new RuntimeShape(unshapedPlanShape);
   }
 
-  static declaredBy(producer: ValueProducer): RuntimeShape {
+  static declaredBy(producer: ValueExpression): RuntimeShape {
     return RuntimeShape.from(producer.shape);
   }
 

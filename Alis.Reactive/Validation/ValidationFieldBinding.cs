@@ -81,15 +81,15 @@ namespace Alis.Reactive
 
         internal Shape ShapeForValidation => _valueContract.Shape;
 
-        internal ValueProducer ReadValue() =>
-            ValueProducer.Read(
+        internal ValueExpression ReadValue() =>
+            ValueExpression.Read(
                 ComponentSource.Of(ComponentId),
                 _valueContract.ValueMember,
                 shape: ShapeForValidation);
 
         internal FieldComparisonTarget ReadConditionTarget() =>
             FieldComparisonTarget.ForComponentValue(
-                ValueProducer.Read(ComponentSource.Of(ComponentId), _valueContract.ValueMember),
+                ValueExpression.Read(ComponentSource.Of(ComponentId), _valueContract.ValueMember),
                 ShapeForValidation);
 
         internal ComponentValidation ToComponentValidation(

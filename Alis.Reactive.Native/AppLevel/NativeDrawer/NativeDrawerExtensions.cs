@@ -35,7 +35,7 @@ namespace Alis.Reactive.Native.AppLevel
             // Remove all size classes, then add the requested one
             foreach (var cls in SizeClasses)
                 self.EmitCall(ClassRemoveMethod,
-                    new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(cls) });
+                    new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(cls) });
 
             var sizeClass = size switch
             {
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Native.AppLevel
                 _ => "alis-drawer--md"
             };
             self.EmitCall(ClassAddMethod,
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(sizeClass) });
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(sizeClass) });
             return self;
         }
 
@@ -59,9 +59,9 @@ namespace Alis.Reactive.Native.AppLevel
             where TModel : class
         {
             self.EmitCall(ClassAddMethod,
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("alis-drawer--visible") });
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("alis-drawer--visible") });
             self.EmitCall(RemoveAttributeMethod,
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden") });
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("aria-hidden") });
             return self;
         }
 
@@ -75,7 +75,7 @@ namespace Alis.Reactive.Native.AppLevel
             where TModel : class
         {
             self.EmitCall(ClassRemoveMethod,
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("alis-drawer--visible") });
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("alis-drawer--visible") });
             return self;
         }
 

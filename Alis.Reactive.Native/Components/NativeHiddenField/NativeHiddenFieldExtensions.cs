@@ -14,7 +14,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeHiddenField, TModel> self, string value)
             where TModel : class
         {
-            return self.EmitSet(ValueProperty, ValueProducer.Literal(value));
+            return self.EmitSet(ValueProperty, ValueExpression.Literal(value));
         }
 
         // -- Property Write (component source -- cross-plan value binding) --
@@ -23,7 +23,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeHiddenField, TModel> self, TypedComponentSource<string> source)
             where TModel : class
         {
-            return self.EmitSet(ValueProperty, source.ToValueProducer());
+            return self.EmitSet(ValueProperty, source.ToValueExpression());
         }
 
         // -- Property Write (response body) --
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Native.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.EmitSet(ValueProperty, ValueProducer.Read(source.Scope, "body", Path.Parse(sourcePath)));
+            return self.EmitSet(ValueProperty, ValueExpression.Read(source.Scope, "body", Path.Parse(sourcePath)));
         }
 
         public static TypedComponentSource<string> Value<TModel>(

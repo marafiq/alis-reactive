@@ -46,7 +46,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiColumnComboBox, TModel> SetValue<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self, string? value)
             where TModel : class
-            => self.EmitSet(ValueProperty, ValueProducer.LiteralRaw(value, Shape.String));
+            => self.EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String));
 
         /// <summary>Sets the displayed text without changing the underlying value.</summary>
         /// <param name="text">The text to display.</param>
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionMultiColumnComboBox, TModel> SetText<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self, string text)
             where TModel : class
-            => self.EmitSet(TextProperty, ValueProducer.Literal(text));
+            => self.EmitSet(TextProperty, ValueExpression.Literal(text));
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
@@ -68,7 +68,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.EmitSet(DataSourceProperty, ValueProducer.Read(PayloadSource.Event(), sourcePath));
+            return self.EmitSet(DataSourceProperty, ValueExpression.Read(PayloadSource.Event(), sourcePath));
         }
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
@@ -84,7 +84,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.EmitSet(DataSourceProperty, ValueProducer.Read(source.Scope, sourcePath));
+            return self.EmitSet(DataSourceProperty, ValueExpression.Read(source.Scope, sourcePath));
         }
 
         /// <summary>Flushes pending property changes to the component in the browser.</summary>

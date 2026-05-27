@@ -27,7 +27,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionInputMask, TModel> self, string value)
             where TModel : class
         {
-            return self.EmitSet(ValueProperty, ValueProducer.Literal(value));
+            return self.EmitSet(ValueProperty, ValueExpression.Literal(value));
         }
 
         /// <summary>Moves focus into the masked input.</summary>

@@ -39,7 +39,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self, decimal value)
             where TModel : class
         {
-            return self.EmitSet(ValueProperty, ValueProducer.Literal(value));
+            return self.EmitSet(ValueProperty, ValueExpression.Literal(value));
         }
 
         /// <summary>Sets the minimum allowed value.</summary>
@@ -49,7 +49,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionNumericTextBox, TModel> self, decimal min)
             where TModel : class
         {
-            return self.EmitSet(MinProperty, ValueProducer.Literal(min));
+            return self.EmitSet(MinProperty, ValueExpression.Literal(min));
         }
 
         /// <summary>Moves focus into the numeric input.</summary>

@@ -60,7 +60,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the kind. Always <c>"compare"</c>.</summary>
         public string Kind => "compare";
         /// <summary>Gets the left-hand operand.</summary>
-        public ValueProducer Left => _operands.Left;
+        public ValueExpression Left => _operands.Left;
         /// <summary>Gets the comparison operator (eq, neq, gt, gte, lt, lte, truthy, empty, contains, startsWith, endsWith).</summary>
         public string Op => _op.Value;
         /// <summary>Gets the expected type shape for comparison. <see cref="PlanModel.Shape.None"/> when not specified.</summary>
@@ -120,7 +120,7 @@ namespace Alis.Reactive.PlanModel
         private readonly ComparisonRightOperand _right;
 
         private ComparisonOperands(
-            ValueProducer left,
+            ValueExpression left,
             ComparisonRightOperand right,
             Shape shape,
             Shape itemShape)
@@ -131,20 +131,20 @@ namespace Alis.Reactive.PlanModel
             ItemShapeForJson = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
         }
 
-        internal ValueProducer Left { get; }
+        internal ValueExpression Left { get; }
         internal ComparisonRightOperand Right => _right;
         internal bool HasRightOperand => _right.HasValue;
         internal Shape ShapeForJson { get; }
         internal Shape ItemShapeForJson { get; }
 
-        internal static ComparisonOperands Unary(ValueProducer left, Shape shape) =>
+        internal static ComparisonOperands Unary(ValueExpression left, Shape shape) =>
             new ComparisonOperands(
                 left,
                 ComparisonRightOperand.Absent,
                 shape,
                 Shape.None);
 
-        internal static ComparisonOperands Binary(ValueProducer left, ValueProducer right, Shape shape) =>
+        internal static ComparisonOperands Binary(ValueExpression left, ValueExpression right, Shape shape) =>
             new ComparisonOperands(
                 left,
                 ComparisonRightOperand.Present(right),
@@ -152,8 +152,8 @@ namespace Alis.Reactive.PlanModel
                 Shape.None);
 
         internal static ComparisonOperands CollectionItem(
-            ValueProducer left,
-            ValueProducer right,
+            ValueExpression left,
+            ValueExpression right,
             Shape collectionShape,
             Shape itemShape) =>
             new ComparisonOperands(
@@ -169,7 +169,7 @@ namespace Alis.Reactive.PlanModel
         internal static ComparisonRightOperand Absent { get; } =
             new AbsentComparisonRightOperand();
 
-        internal static ComparisonRightOperand Present(ValueProducer value) =>
+        internal static ComparisonRightOperand Present(ValueExpression value) =>
             new PresentComparisonRightOperand(value);
 
         public abstract string Kind { get; }
@@ -180,14 +180,14 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class PresentComparisonRightOperand : ComparisonRightOperand
     {
-        private readonly ValueProducer _value;
+        private readonly ValueExpression _value;
 
-        internal PresentComparisonRightOperand(ValueProducer value)
+        internal PresentComparisonRightOperand(ValueExpression value)
         {
             _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        internal ValueProducer Value => _value;
+        internal ValueExpression Value => _value;
 
         public override string Kind => "value";
         internal override bool HasValue => true;

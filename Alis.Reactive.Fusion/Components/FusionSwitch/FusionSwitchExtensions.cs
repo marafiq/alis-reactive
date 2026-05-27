@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionSwitch, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.EmitSet(ValueProperty, ValueProducer.Literal(isChecked));
+            return self.EmitSet(ValueProperty, ValueExpression.Literal(isChecked));
         }
 
         /// <summary>Reads the current checked state for use in conditions or gather.</summary>

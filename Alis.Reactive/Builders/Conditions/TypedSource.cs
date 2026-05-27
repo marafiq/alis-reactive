@@ -9,9 +9,9 @@ namespace Alis.Reactive.Builders.Conditions
     public abstract class TypedSource<TProp>
     {
         /// <summary>
-        /// Produces a ValueProducer that reads this source's value.
+        /// Produces a ValueExpression that reads this source's value.
         /// </summary>
-        internal abstract ValueProducer ToValueProducer();
+        internal abstract ValueExpression ToValueExpression();
 
         /// <summary>
         /// The member name to read on the resolved source.

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { evaluateValue } from "../core/evaluate";
 import { registerPlugin } from "../core/plugin-catalog";
 import { RuntimeResolutionError } from "../domain/runtime-plan";
-import type { ComponentObject, BrowserObjectContract, PlanDocument, Shape, ValueProducer } from "../types";
+import type { ComponentObject, BrowserObjectContract, PlanDocument, Shape, ValueExpression } from "../types";
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
@@ -39,13 +39,13 @@ function plan(entries: {
   };
 }
 
-function literal(value: string, shape: Shape = stringShape): ValueProducer {
+function literal(value: string, shape: Shape = stringShape): ValueExpression {
   return { kind: "literal", value, shape };
 }
 
 describe("evaluateValue", () => {
   it("evaluates object and array producers through one evaluation context", () => {
-    const producer: ValueProducer = {
+    const producer: ValueExpression = {
       kind: "object",
       shape: objectShape,
       fields: {
@@ -64,8 +64,8 @@ describe("evaluateValue", () => {
     });
   });
 
-  it("prepares composite value producers through their declared output shape", () => {
-    const producer: ValueProducer = {
+  it("prepares composite value expressions through their declared output shape", () => {
+    const producer: ValueExpression = {
       kind: "array",
       shape: numberArrayShape,
       items: [
@@ -77,8 +77,8 @@ describe("evaluateValue", () => {
     expect(evaluateValue(producer, plan())).toEqual([41, 42]);
   });
 
-  it("projects object value producers through declared field shapes", () => {
-    const producer: ValueProducer = {
+  it("projects object value expressions through declared field shapes", () => {
+    const producer: ValueExpression = {
       kind: "object",
       shape: residentObjectShape,
       fields: {
@@ -104,7 +104,7 @@ describe("evaluateValue", () => {
   });
 
   it("reads payload values by structured path and applies the requested shape", () => {
-    const producer: ValueProducer = {
+    const producer: ValueExpression = {
       kind: "read",
       from: { kind: "payload", scope: "event", type: { kind: "untyped" } },
       member: "ignored-when-path-is-structured",
@@ -124,7 +124,7 @@ describe("evaluateValue", () => {
   });
 
   it("allows absent payload paths to evaluate as missing values", () => {
-    const producer: ValueProducer = {
+    const producer: ValueExpression = {
       kind: "read",
       from: { kind: "payload", scope: "event", type: { kind: "untyped" } },
       member: "address.zipCode",
@@ -158,7 +158,7 @@ describe("evaluateValue", () => {
   });
 
   it("reads the whole payload through the explicit responseBody member", () => {
-    const producer: ValueProducer = {
+    const producer: ValueExpression = {
       kind: "read",
       from: { kind: "payload", scope: "success", type: { kind: "untyped" } },
       member: "responseBody",
@@ -210,7 +210,7 @@ describe("evaluateValue", () => {
       components: { "resident-name": component },
     });
 
-    const readValue: ValueProducer = {
+    const readValue: ValueExpression = {
       kind: "read",
       from: { kind: "component", component: "resident-name" },
       member: "value",
@@ -218,7 +218,7 @@ describe("evaluateValue", () => {
       shape: stringShape,
       access: { kind: "property" },
     };
-    const callMethod: ValueProducer = {
+    const callMethod: ValueExpression = {
       kind: "read",
       from: { kind: "component", component: "resident-name" },
       member: "appendSuffix",
@@ -247,7 +247,7 @@ describe("evaluateValue", () => {
       methods: {},
       events: {},
     };
-    const producer: ValueProducer = {
+    const producer: ValueExpression = {
       kind: "read",
       from: { kind: "component", component: "resident-name" },
       member: "value",
@@ -272,7 +272,7 @@ describe("evaluateValue", () => {
   });
 
   it("throws typed runtime resolution errors for missing component reads", () => {
-    const producer: ValueProducer = {
+    const producer: ValueExpression = {
       kind: "read",
       from: { kind: "component", component: "missing-name" },
       member: "value",
@@ -304,7 +304,7 @@ describe("evaluateValue", () => {
       methods: {},
       events: {},
     };
-    const producer: ValueProducer = {
+    const producer: ValueExpression = {
       kind: "read",
       from: { kind: "component", component: "resident-name" },
       member: "value",
@@ -354,7 +354,7 @@ describe("evaluateValue", () => {
       },
       events: {},
     };
-    const producer: ValueProducer = {
+    const producer: ValueExpression = {
       kind: "read",
       from: { kind: "plugin", name: pluginName, type: "plugin." + pluginName },
       member: "$call",
@@ -386,7 +386,7 @@ describe("evaluateValue", () => {
       methods: {},
       events: {},
     };
-    const producer: ValueProducer = {
+    const producer: ValueExpression = {
       kind: "read",
       from: { kind: "plugin", name: pluginName, type: "plugin." + pluginName },
       member: "token",
@@ -421,7 +421,7 @@ describe("evaluateValue", () => {
       events: {},
     };
 
-    const producer: ValueProducer = {
+    const producer: ValueExpression = {
       kind: "read",
       from: { kind: "component", component: "save" },
       member: "describeAge",

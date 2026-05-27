@@ -173,7 +173,7 @@ export interface ValidationContainerScope {
 
 export interface ComponentValidation {
   component: string;
-  value: ValueProducer;
+  value: ValueExpression;
   serverFieldName: string;
   rules: ValidationRule[];
 }
@@ -311,35 +311,35 @@ export interface NoOperandValidationRuleExecution {
 
 export interface ScalarConstraintValidationRuleExecution {
   kind: "constraint";
-  value: LiteralProducer;
+  value: LiteralExpression;
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
 }
 
 export interface NumericConstraintValidationRuleExecution {
   kind: "constraint";
-  value: NumericLiteralProducer;
+  value: NumericLiteralExpression;
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
 }
 
 export interface TextConstraintValidationRuleExecution {
   kind: "constraint";
-  value: TextLiteralProducer;
+  value: TextLiteralExpression;
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
 }
 
 export interface RangeConstraintValidationRuleExecution {
   kind: "constraint";
-  value: RangeLiteralProducer;
+  value: RangeLiteralExpression;
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
 }
 
 export interface PeerValidationRuleExecution {
   kind: "peer";
-  value: ReadProducer;
+  value: ReadExpression;
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
 }
@@ -523,14 +523,14 @@ export interface SetReaction {
   kind: "set";
   on: SetTargetSource;
   property: string;
-  value: ValueProducer;
+  value: ValueExpression;
 }
 
 export interface CallReaction {
   kind: "call";
   on: CallTargetSource;
   method: string;
-  args: ValueProducer[];
+  args: ValueExpression[];
 }
 
 export interface RequestReaction {
@@ -554,14 +554,14 @@ export interface NoDispatchPayload {
 
 export interface PresentDispatchPayload {
   kind: "value";
-  data: ValueProducer;
+  data: ValueExpression;
   payloadType: PayloadContract;
 }
 
 export interface InjectReaction {
   kind: "inject";
   target: InjectionTarget;
-  value: ValueProducer;
+  value: ValueExpression;
 }
 
 export type InjectionTarget =
@@ -655,7 +655,7 @@ export interface AllRegisteredInputsRequestInputSourceSelection {
 
 export interface RequestInputAssignment {
   target: RequestInputTarget;
-  source: ValueProducer;
+  source: ValueExpression;
 }
 
 export type RequestInputTarget =
@@ -705,44 +705,44 @@ export type JsonValue =
   | JsonValue[]
   | { [key: string]: JsonValue };
 
-export type ValueProducer =
-  | LiteralProducer
-  | ReadProducer
-  | ObjectProducer
-  | ArrayProducer;
+export type ValueExpression =
+  | LiteralExpression
+  | ReadExpression
+  | ObjectExpression
+  | ArrayExpression;
 
-export type ReadProducer =
-  | ObjectPropertyReadProducer
-  | ObjectMethodReadProducer
-  | UrlParameterReadProducer
-  | PayloadPathReadProducer
-  | WholePayloadReadProducer;
+export type ReadExpression =
+  | ObjectPropertyReadExpression
+  | ObjectMethodReadExpression
+  | UrlParameterReadExpression
+  | PayloadPathReadExpression
+  | WholePayloadReadExpression;
 
-export interface LiteralProducer {
+export interface LiteralExpression {
   kind: "literal";
   value: JsonValue;
   shape: Shape;
 }
 
-export interface NumericLiteralProducer {
+export interface NumericLiteralExpression {
   kind: "literal";
   value: number;
   shape: Shape;
 }
 
-export interface TextLiteralProducer {
+export interface TextLiteralExpression {
   kind: "literal";
   value: string;
   shape: Shape;
 }
 
-export interface RangeLiteralProducer {
+export interface RangeLiteralExpression {
   kind: "literal";
   value: [JsonValue, JsonValue];
   shape: Shape;
 }
 
-export interface ObjectPropertyReadProducer {
+export interface ObjectPropertyReadExpression {
   kind: "read";
   from: RuntimeObjectSource;
   member: string;
@@ -751,7 +751,7 @@ export interface ObjectPropertyReadProducer {
   access: PropertyValueReadAccess;
 }
 
-export interface ObjectMethodReadProducer {
+export interface ObjectMethodReadExpression {
   kind: "read";
   from: RuntimeObjectSource;
   member: string;
@@ -760,7 +760,7 @@ export interface ObjectMethodReadProducer {
   access: MethodValueReadAccess;
 }
 
-export interface UrlParameterReadProducer {
+export interface UrlParameterReadExpression {
   kind: "read";
   from: UrlSource;
   member: string;
@@ -769,7 +769,7 @@ export interface UrlParameterReadProducer {
   access: PropertyValueReadAccess;
 }
 
-export interface PayloadPathReadProducer {
+export interface PayloadPathReadExpression {
   kind: "read";
   from: PayloadSource;
   member: string;
@@ -778,7 +778,7 @@ export interface PayloadPathReadProducer {
   access: PropertyValueReadAccess;
 }
 
-export interface WholePayloadReadProducer {
+export interface WholePayloadReadExpression {
   kind: "read";
   from: PayloadSource;
   member: "responseBody";
@@ -797,18 +797,18 @@ export interface PropertyValueReadAccess {
 
 export interface MethodValueReadAccess {
   kind: "method";
-  args: ValueProducer[];
+  args: ValueExpression[];
 }
 
-export interface ObjectProducer {
+export interface ObjectExpression {
   kind: "object";
-  fields: Record<string, ValueProducer>;
+  fields: Record<string, ValueExpression>;
   shape: Shape;
 }
 
-export interface ArrayProducer {
+export interface ArrayExpression {
   kind: "array";
-  items: ValueProducer[];
+  items: ValueExpression[];
   shape: Shape;
 }
 
@@ -915,7 +915,7 @@ export type CollectionItemCompareOp =
 
 export interface UnaryCompareCondition {
   kind: "compare";
-  left: ValueProducer;
+  left: ValueExpression;
   op: UnaryCompareOp;
   right: NoComparisonRightOperand;
   shape: Shape;
@@ -924,7 +924,7 @@ export interface UnaryCompareCondition {
 
 export interface EqualityCompareCondition {
   kind: "compare";
-  left: ValueProducer;
+  left: ValueExpression;
   op: EqualityCompareOp;
   right: PresentComparisonRightOperand;
   shape: Shape;
@@ -933,7 +933,7 @@ export interface EqualityCompareCondition {
 
 export interface OrderedCompareCondition {
   kind: "compare";
-  left: ValueProducer;
+  left: ValueExpression;
   op: OrderedCompareOp;
   right: PresentComparisonRightOperand;
   shape: Shape;
@@ -942,7 +942,7 @@ export interface OrderedCompareCondition {
 
 export interface MembershipCompareCondition {
   kind: "compare";
-  left: ValueProducer;
+  left: ValueExpression;
   op: MembershipCompareOp;
   right: CollectionComparisonRightOperand;
   shape: Shape;
@@ -951,7 +951,7 @@ export interface MembershipCompareCondition {
 
 export interface RangeCompareCondition {
   kind: "compare";
-  left: ValueProducer;
+  left: ValueExpression;
   op: RangeCompareOp;
   right: RangeComparisonRightOperand;
   shape: Shape;
@@ -960,7 +960,7 @@ export interface RangeCompareCondition {
 
 export interface TextCompareCondition {
   kind: "compare";
-  left: ValueProducer;
+  left: ValueExpression;
   op: TextCompareOp;
   right: TextComparisonRightOperand;
   shape: Shape;
@@ -969,7 +969,7 @@ export interface TextCompareCondition {
 
 export interface RegexCompareCondition {
   kind: "compare";
-  left: ValueProducer;
+  left: ValueExpression;
   op: RegexCompareOp;
   right: TextComparisonRightOperand;
   shape: Shape;
@@ -978,7 +978,7 @@ export interface RegexCompareCondition {
 
 export interface TextLengthCompareCondition {
   kind: "compare";
-  left: ValueProducer;
+  left: ValueExpression;
   op: TextLengthCompareOp;
   right: NumericComparisonRightOperand;
   shape: Shape;
@@ -987,7 +987,7 @@ export interface TextLengthCompareCondition {
 
 export interface CollectionItemCompareCondition {
   kind: "compare";
-  left: ValueProducer;
+  left: ValueExpression;
   op: CollectionItemCompareOp;
   right: LiteralComparisonRightOperand;
   shape: Shape;
@@ -1009,34 +1009,34 @@ export interface NoComparisonRightOperand {
 
 export interface PresentComparisonRightOperand {
   kind: "value";
-  value: ValueProducer;
+  value: ValueExpression;
 }
 
 export interface CollectionComparisonRightOperand {
   kind: "value";
-  value: ArrayProducer;
+  value: ArrayExpression;
 }
 
-export type RangeComparisonProducer = ArrayProducer & { items: [ValueProducer, ValueProducer] };
+export type RangeComparisonExpression = ArrayExpression & { items: [ValueExpression, ValueExpression] };
 
 export interface RangeComparisonRightOperand {
   kind: "value";
-  value: RangeComparisonProducer;
+  value: RangeComparisonExpression;
 }
 
 export interface TextComparisonRightOperand {
   kind: "value";
-  value: TextLiteralProducer;
+  value: TextLiteralExpression;
 }
 
 export interface NumericComparisonRightOperand {
   kind: "value";
-  value: NumericLiteralProducer;
+  value: NumericLiteralExpression;
 }
 
 export interface LiteralComparisonRightOperand {
   kind: "value";
-  value: LiteralProducer;
+  value: LiteralExpression;
 }
 
 export interface AllCondition {

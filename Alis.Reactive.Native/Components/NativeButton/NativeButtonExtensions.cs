@@ -14,7 +14,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeButton, TModel> self, string text)
             where TModel : class
         {
-            return self.EmitSet(TextContentProperty, ValueProducer.Literal(text));
+            return self.EmitSet(TextContentProperty, ValueExpression.Literal(text));
         }
 
         public static ComponentRef<NativeButton, TModel> FocusIn<TModel>(

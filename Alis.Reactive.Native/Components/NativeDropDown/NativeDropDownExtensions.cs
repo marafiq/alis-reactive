@@ -30,7 +30,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeDropDown, TModel> self, string value)
             where TModel : class
         {
-            return self.EmitSet(ValueProperty, ValueProducer.Literal(value));
+            return self.EmitSet(ValueProperty, ValueExpression.Literal(value));
         }
 
         /// <summary>

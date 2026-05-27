@@ -30,7 +30,7 @@ namespace Alis.Reactive
         }
 
         internal ComponentRef<TComponent, TModel> EmitSet<TValue>(
-            ComponentProperty<TValue> property, ValueProducer value)
+            ComponentProperty<TValue> property, ValueExpression value)
         {
             if (property == null) throw new System.ArgumentNullException(nameof(property));
             var componentKey = _target.EnsureIn(Pipeline.Context);
@@ -43,16 +43,16 @@ namespace Alis.Reactive
         }
 
         internal ComponentRef<TComponent, TModel> EmitCall(ComponentMethod method) =>
-            EmitCall(method, System.Array.Empty<ValueProducer>());
+            EmitCall(method, System.Array.Empty<ValueExpression>());
 
         internal ComponentRef<TComponent, TModel> EmitCall(
             ComponentMethod method,
-            System.Collections.Generic.List<ValueProducer> args) =>
-            EmitCall(method, (System.Collections.Generic.IReadOnlyList<ValueProducer>)args);
+            System.Collections.Generic.List<ValueExpression> args) =>
+            EmitCall(method, (System.Collections.Generic.IReadOnlyList<ValueExpression>)args);
 
         private ComponentRef<TComponent, TModel> EmitCall(
             ComponentMethod method,
-            System.Collections.Generic.IReadOnlyList<ValueProducer> args)
+            System.Collections.Generic.IReadOnlyList<ValueExpression> args)
         {
             if (method == null) throw new System.ArgumentNullException(nameof(method));
             if (args == null) throw new System.ArgumentNullException(nameof(args));
@@ -81,12 +81,12 @@ namespace Alis.Reactive
         internal Builders.Conditions.TypedComponentSource<TValue> Read<TValue>(
             ComponentMethod method)
         {
-            return Read<TValue>(method, System.Array.Empty<ValueProducer>());
+            return Read<TValue>(method, System.Array.Empty<ValueExpression>());
         }
 
         internal Builders.Conditions.TypedComponentSource<TValue> Read<TValue>(
             ComponentMethod method,
-            System.Collections.Generic.IReadOnlyList<ValueProducer> args)
+            System.Collections.Generic.IReadOnlyList<ValueExpression> args)
         {
             if (method == null) throw new System.ArgumentNullException(nameof(method));
             if (args == null) throw new System.ArgumentNullException(nameof(args));

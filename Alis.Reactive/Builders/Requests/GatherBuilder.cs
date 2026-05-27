@@ -40,7 +40,7 @@ namespace Alis.Reactive.Builders.Requests
             var payloadPath = BindingPath.Of(param);
             _draft.AddPayload(
                 payloadPath,
-                ValueProducer.LiteralFromValue(value));
+                ValueExpression.LiteralFromValue(value));
             return this;
         }
 
@@ -61,7 +61,7 @@ namespace Alis.Reactive.Builders.Requests
             var shape = Shape.FromClrType(typeof(TProp));
             _draft.AddPayload(
                 payloadPath,
-                ValueProducer.ReadPayload(PayloadSource.Event(), eventPath, shape));
+                ValueExpression.ReadPayload(PayloadSource.Event(), eventPath, shape));
             return this;
         }
 
@@ -73,7 +73,7 @@ namespace Alis.Reactive.Builders.Requests
                 throw new System.ArgumentNullException(nameof(value),
                     $"Header '{name}' value must not be null. Literal headers require a concrete value. " +
                     "Use the TypedSource<T> or event-arg overload for dynamic/nullable values.");
-            _draft.AddHeader(header, ValueProducer.Literal(value));
+            _draft.AddHeader(header, ValueExpression.Literal(value));
             return this;
         }
 
@@ -83,7 +83,7 @@ namespace Alis.Reactive.Builders.Requests
             var header = HeaderName.Of(name);
             if (source == null) throw new System.ArgumentNullException(nameof(source));
             RequestScalarTarget.Header<TProp>(header);
-            _draft.AddHeader(header, source.ToValueProducer());
+            _draft.AddHeader(header, source.ToValueExpression());
             return this;
         }
 
@@ -93,7 +93,7 @@ namespace Alis.Reactive.Builders.Requests
             var header = HeaderName.Of(name);
             var shape = RequestScalarTarget.Header<TProp>(header);
             var eventPath = ExpressionPathHelper.ToEventPath(path);
-            _draft.AddHeader(header, ValueProducer.ReadPayload(PayloadSource.Event(), eventPath, shape));
+            _draft.AddHeader(header, ValueExpression.ReadPayload(PayloadSource.Event(), eventPath, shape));
             return this;
         }
 
@@ -103,7 +103,7 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> RouteParam(string paramName, int value)
         {
             var routeParam = RouteParameterName.Of(paramName);
-            _draft.AddRouteParameter(routeParam, ValueProducer.Literal(value));
+            _draft.AddRouteParameter(routeParam, ValueExpression.Literal(value));
             return this;
         }
 
@@ -115,7 +115,7 @@ namespace Alis.Reactive.Builders.Requests
                 throw new System.ArgumentNullException(nameof(value),
                     $"Route param '{paramName}' value must not be null. Literal route params require a concrete value. " +
                     "Use the TypedSource<T> or event-arg overload for dynamic/nullable values.");
-            _draft.AddRouteParameter(routeParam, ValueProducer.Literal(value));
+            _draft.AddRouteParameter(routeParam, ValueExpression.Literal(value));
             return this;
         }
 
@@ -123,7 +123,7 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> RouteParam(string paramName, long value)
         {
             var routeParam = RouteParameterName.Of(paramName);
-            _draft.AddRouteParameter(routeParam, ValueProducer.Literal(value));
+            _draft.AddRouteParameter(routeParam, ValueExpression.Literal(value));
             return this;
         }
 
@@ -133,7 +133,7 @@ namespace Alis.Reactive.Builders.Requests
             var routeParam = RouteParameterName.Of(paramName);
             if (source == null) throw new System.ArgumentNullException(nameof(source));
             RequestScalarTarget.RouteParameter<TProp>(routeParam);
-            _draft.AddRouteParameter(routeParam, source.ToValueProducer());
+            _draft.AddRouteParameter(routeParam, source.ToValueExpression());
             return this;
         }
 
@@ -144,7 +144,7 @@ namespace Alis.Reactive.Builders.Requests
             var routeParam = RouteParameterName.Of(paramName);
             var shape = RequestScalarTarget.RouteParameter<TProp>(routeParam);
             var eventPath = ExpressionPathHelper.ToEventPath(path);
-            _draft.AddRouteParameter(routeParam, ValueProducer.ReadPayload(PayloadSource.Event(), eventPath, shape));
+            _draft.AddRouteParameter(routeParam, ValueExpression.ReadPayload(PayloadSource.Event(), eventPath, shape));
             return this;
         }
 
@@ -157,7 +157,7 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> FromUrl(string paramName)
         {
             var urlParam = UrlParameterName.Of(paramName);
-            var value = ValueProducer.ReadUrl(urlParam.Value);
+            var value = ValueExpression.ReadUrl(urlParam.Value);
             _draft.AddAssignment(RequestInputAssignment.Payload(urlParam.Value, value));
             return this;
         }
@@ -169,7 +169,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var urlParam = UrlParameterName.Of(paramName);
             var payloadPath = BindingPath.Of(asParam);
-            var value = ValueProducer.ReadUrl(urlParam.Value);
+            var value = ValueExpression.ReadUrl(urlParam.Value);
             _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, value));
             return this;
         }
@@ -181,7 +181,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var urlParam = UrlParameterName.Of(paramName);
             var shape = RequestScalarTarget.UrlQueryParameter<T>(urlParam);
-            var value = ValueProducer.ReadUrl(urlParam.Value, shape);
+            var value = ValueExpression.ReadUrl(urlParam.Value, shape);
             _draft.AddAssignment(RequestInputAssignment.Payload(urlParam.Value, value));
             return this;
         }
@@ -194,7 +194,7 @@ namespace Alis.Reactive.Builders.Requests
             var urlParam = UrlParameterName.Of(paramName);
             var payloadPath = BindingPath.Of(asParam);
             var shape = RequestScalarTarget.UrlQueryParameter<T>(urlParam);
-            var value = ValueProducer.ReadUrl(urlParam.Value, shape);
+            var value = ValueExpression.ReadUrl(urlParam.Value, shape);
             _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, value));
             return this;
         }
@@ -206,7 +206,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (source == null) throw new System.ArgumentNullException(nameof(source));
             var payloadPath = BindingPath.Of(paramName);
-            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, source.ToValueProducer()));
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, source.ToValueExpression()));
             return this;
         }
 
@@ -247,7 +247,7 @@ namespace Alis.Reactive.Builders.Requests
             if (valueContract == null) throw new System.ArgumentNullException(nameof(valueContract));
             var componentIdentity = RegisteredComponentIdentity.For(componentId, vendor);
             var planBindingPath = BindingPath.Of(propertyName);
-            var componentValue = ValueProducer.Read(
+            var componentValue = ValueExpression.Read(
                 ComponentSource.Of(componentIdentity.ComponentId.Value),
                 valueContract.ValueMember,
                 shape: valueContract.Shape);
@@ -267,7 +267,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (source == null) throw new System.ArgumentNullException(nameof(source));
             var payloadPath = BindingPath.Of(paramName);
-            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, source.ToValueProducer()));
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, source.ToValueExpression()));
             return this;
         }
 

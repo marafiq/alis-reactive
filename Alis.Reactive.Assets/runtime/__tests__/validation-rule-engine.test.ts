@@ -2,15 +2,15 @@ import { describe, expect, it } from "vitest";
 import { ruleFails } from "../validation/rule-engine";
 import type {
   LengthValidationRule,
-  LiteralProducer,
+  LiteralExpression,
   NoOperandValidationRule,
-  NumericLiteralProducer,
+  NumericLiteralExpression,
   OrderedComparisonValidationRule,
   PeerEqualityValidationRule,
   PeerOrderedComparisonValidationRule,
   RangeValidationRule,
-  RangeLiteralProducer,
-  ReadProducer,
+  RangeLiteralExpression,
+  ReadExpression,
   Shape,
 } from "../types";
 
@@ -19,15 +19,15 @@ const numberShape: Shape = { kind: "number" };
 const dateShape: Shape = { kind: "date" };
 const noneShape: Shape = { kind: "none" };
 
-function literal(value: string | number | boolean | null, shape: Shape = stringShape): LiteralProducer {
+function literal(value: string | number | boolean | null, shape: Shape = stringShape): LiteralExpression {
   return { kind: "literal", value, shape };
 }
 
-function numericLiteral(value: number): NumericLiteralProducer {
+function numericLiteral(value: number): NumericLiteralExpression {
   return { kind: "literal", value, shape: numberShape };
 }
 
-function rangeLiteral(bounds: [number, number]): RangeLiteralProducer {
+function rangeLiteral(bounds: [number, number]): RangeLiteralExpression {
   return {
     kind: "literal",
     value: bounds,
@@ -35,7 +35,7 @@ function rangeLiteral(bounds: [number, number]): RangeLiteralProducer {
   };
 }
 
-function componentValue(component: string, shape: Shape): ReadProducer {
+function componentValue(component: string, shape: Shape): ReadExpression {
   return {
     kind: "read",
     from: { kind: "component", component },

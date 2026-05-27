@@ -55,24 +55,24 @@ namespace Alis.Reactive.PlanModel
     internal sealed class RequestInputAssignment
     {
         public RequestInputTarget Target { get; }
-        public ValueProducer Source { get; }
+        public ValueExpression Source { get; }
 
-        private RequestInputAssignment(RequestInputTarget target, ValueProducer source)
+        private RequestInputAssignment(RequestInputTarget target, ValueExpression source)
         {
             Target = target;
             Source = source;
         }
 
-        internal static RequestInputAssignment Payload(string payloadPath, ValueProducer source)
+        internal static RequestInputAssignment Payload(string payloadPath, ValueExpression source)
             => Payload(BindingPath.Of(payloadPath), source);
 
-        internal static RequestInputAssignment Payload(BindingPath payloadPath, ValueProducer source)
+        internal static RequestInputAssignment Payload(BindingPath payloadPath, ValueExpression source)
             => new RequestInputAssignment(RequestPayloadTarget.For(payloadPath), source);
 
-        internal static RequestInputAssignment Header(HeaderName name, ValueProducer source)
+        internal static RequestInputAssignment Header(HeaderName name, ValueExpression source)
             => new RequestInputAssignment(RequestHeaderTarget.For(name), source);
 
-        internal static RequestInputAssignment RouteParameter(RouteParameterName name, ValueProducer source)
+        internal static RequestInputAssignment RouteParameter(RouteParameterName name, ValueExpression source)
             => new RequestInputAssignment(RequestRouteParameterTarget.For(name), source);
     }
 

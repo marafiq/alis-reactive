@@ -32,10 +32,10 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckList, TModel> self, string[] value)
             where TModel : class
         {
-            var items = new System.Collections.Generic.List<ValueProducer>();
+            var items = new System.Collections.Generic.List<ValueExpression>();
             foreach (var v in value)
-                items.Add(ValueProducer.Literal(v));
-            return self.EmitSet(ValueProperty, ValueProducer.Array(items));
+                items.Add(ValueExpression.Literal(v));
+            return self.EmitSet(ValueProperty, ValueExpression.Array(items));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.EmitSet(ValueProperty, ValueProducer.Read(PayloadSource.Event(), "value", Path.Parse(sourcePath)));
+            return self.EmitSet(ValueProperty, ValueExpression.Read(PayloadSource.Event(), "value", Path.Parse(sourcePath)));
         }
 
         /// <summary>

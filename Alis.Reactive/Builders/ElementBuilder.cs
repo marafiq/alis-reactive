@@ -30,7 +30,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> AddClass(string className)
         {
-            return Call(BrowserElementMembers.AddClass, ValueProducer.Literal(className));
+            return Call(BrowserElementMembers.AddClass, ValueExpression.Literal(className));
         }
 
         /// <summary>Removes a CSS class from the element.</summary>
@@ -38,7 +38,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> RemoveClass(string className)
         {
-            return Call(BrowserElementMembers.RemoveClass, ValueProducer.Literal(className));
+            return Call(BrowserElementMembers.RemoveClass, ValueExpression.Literal(className));
         }
 
         /// <summary>Toggles a CSS class on the element.</summary>
@@ -46,7 +46,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> ToggleClass(string className)
         {
-            return Call(BrowserElementMembers.ToggleClass, ValueProducer.Literal(className));
+            return Call(BrowserElementMembers.ToggleClass, ValueExpression.Literal(className));
         }
 
         /// <summary>Sets the text content of the element to a literal string.</summary>
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> SetText(string text)
         {
-            return Set(BrowserElementMembers.Text, ValueProducer.Literal(text));
+            return Set(BrowserElementMembers.Text, ValueExpression.Literal(text));
         }
 
         /// <summary>Sets the text content from an event payload property.</summary>
@@ -65,7 +65,7 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object>> path)
         {
             var eventPath = ExpressionPathHelper.ToEventPath<TSource, object>(path);
-            return Set(BrowserElementMembers.Text, ValueProducer.ReadPayload(PayloadSource.Event(), eventPath));
+            return Set(BrowserElementMembers.Text, ValueExpression.ReadPayload(PayloadSource.Event(), eventPath));
         }
 
         /// <summary>Sets the text content from an HTTP response body property.</summary>
@@ -77,7 +77,7 @@ namespace Alis.Reactive.Builders
             where TResponse : class
         {
             var responsePath = ExpressionPathHelper.ToResponsePath<TResponse, object>(path);
-            return Set(BrowserElementMembers.Text, ValueProducer.ReadPayload(source.Scope, responsePath));
+            return Set(BrowserElementMembers.Text, ValueExpression.ReadPayload(source.Scope, responsePath));
         }
 
         /// <summary>Sets the text content from a typed source (component, plugin, or URL value).</summary>
@@ -86,7 +86,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This element builder for chaining additional element mutations.</returns>
         public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
         {
-            Set(BrowserElementMembers.Text, source.ToValueProducer());
+            Set(BrowserElementMembers.Text, source.ToValueExpression());
             return this;
         }
 
@@ -95,7 +95,7 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> SetHtml(string html)
         {
-            return Set(BrowserElementMembers.Html, ValueProducer.Literal(html));
+            return Set(BrowserElementMembers.Html, ValueExpression.Literal(html));
         }
 
         /// <summary>Sets the inner HTML from an event payload property.</summary>
@@ -106,7 +106,7 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object>> path)
         {
             var eventPath = ExpressionPathHelper.ToEventPath<TSource, object>(path);
-            return Set(BrowserElementMembers.Html, ValueProducer.ReadPayload(PayloadSource.Event(), eventPath));
+            return Set(BrowserElementMembers.Html, ValueExpression.ReadPayload(PayloadSource.Event(), eventPath));
         }
 
         /// <summary>Sets the inner HTML from a typed source.</summary>
@@ -115,7 +115,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This element builder for chaining additional element mutations.</returns>
         public ElementBuilder<TModel> SetHtml<TProp>(TypedSource<TProp> source)
         {
-            Set(BrowserElementMembers.Html, source.ToValueProducer());
+            Set(BrowserElementMembers.Html, source.ToValueExpression());
             return this;
         }
 
@@ -123,17 +123,17 @@ namespace Alis.Reactive.Builders
         /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> Show()
         {
-            return Set(BrowserElementMembers.Hidden, ValueProducer.Literal(false));
+            return Set(BrowserElementMembers.Hidden, ValueExpression.Literal(false));
         }
 
         /// <summary>Hides the element by setting the hidden attribute.</summary>
         /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> Hide()
         {
-            return Set(BrowserElementMembers.Hidden, ValueProducer.Literal(true));
+            return Set(BrowserElementMembers.Hidden, ValueExpression.Literal(true));
         }
 
-        private PipelineBuilder<TModel> Set<TValue>(ComponentProperty<TValue> property, ValueProducer value)
+        private PipelineBuilder<TModel> Set<TValue>(ComponentProperty<TValue> property, ValueExpression value)
         {
             _pipeline.Context.EnsureProperty(
                 _componentKey,
@@ -143,7 +143,7 @@ namespace Alis.Reactive.Builders
             return _pipeline;
         }
 
-        private PipelineBuilder<TModel> Call(ComponentMethod method, ValueProducer arg)
+        private PipelineBuilder<TModel> Call(ComponentMethod method, ValueExpression arg)
         {
             _pipeline.Context.EnsureMethod(
                 _componentKey,
@@ -151,7 +151,7 @@ namespace Alis.Reactive.Builders
             _pipeline.AddStep(ReactionGraph.Call(
                 ComponentSource.Of(_componentKey),
                 method.Member,
-                new List<ValueProducer> { arg }));
+                new List<ValueExpression> { arg }));
             return _pipeline;
         }
     }

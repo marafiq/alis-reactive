@@ -53,7 +53,7 @@ namespace Alis.Reactive.Fusion.Components
             this FusionAutoCompleteFilteringArgs args,
             IReactionEmitter pipeline)
         {
-            pipeline.AddStep(ReactionGraph.Set(PayloadSource.Event(), "preventDefaultAction", ValueProducer.Literal(true)));
+            pipeline.AddStep(ReactionGraph.Set(PayloadSource.Event(), "preventDefaultAction", ValueExpression.Literal(true)));
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Fusion.Components
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
             pipeline.AddStep(ReactionGraph.Call(PayloadSource.Event(), "updateData",
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Read(source.Scope, sourcePath) }));
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Read(source.Scope, sourcePath) }));
         }
     }
 }

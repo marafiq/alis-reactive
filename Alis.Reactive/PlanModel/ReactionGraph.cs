@@ -29,16 +29,16 @@ namespace Alis.Reactive.PlanModel
         internal static ReactionGraph Branch(List<BranchCase> cases) =>
             new BranchReaction(cases);
 
-        internal static ReactionGraph Set(Source on, string property, ValueProducer value) =>
+        internal static ReactionGraph Set(Source on, string property, ValueExpression value) =>
             new SetReaction(on, property, value);
 
         internal static ReactionGraph Call(Source on, string method) =>
-            new CallReaction(on, method, Array.Empty<ValueProducer>());
+            new CallReaction(on, method, Array.Empty<ValueExpression>());
 
-        internal static ReactionGraph Call(Source on, string method, List<ValueProducer> args) =>
+        internal static ReactionGraph Call(Source on, string method, List<ValueExpression> args) =>
             new CallReaction(on, method, args);
 
-        internal static ReactionGraph Call(Source on, string method, IReadOnlyList<ValueProducer> args) =>
+        internal static ReactionGraph Call(Source on, string method, IReadOnlyList<ValueExpression> args) =>
             new CallReaction(on, method, args);
 
         internal static ReactionGraph Request(RequestPlan request) =>
@@ -47,13 +47,13 @@ namespace Alis.Reactive.PlanModel
         internal static ReactionGraph Dispatch(string eventName) =>
             new DispatchReaction(eventName, DispatchPayload.None);
 
-        internal static ReactionGraph Dispatch(string eventName, ValueProducer data) =>
+        internal static ReactionGraph Dispatch(string eventName, ValueExpression data) =>
             new DispatchReaction(eventName, DispatchPayload.Untyped(data));
 
-        internal static ReactionGraph Dispatch(string eventName, ValueProducer data, PayloadContract payloadType) =>
+        internal static ReactionGraph Dispatch(string eventName, ValueExpression data, PayloadContract payloadType) =>
             new DispatchReaction(eventName, DispatchPayload.Typed(data, payloadType));
 
-        internal static ReactionGraph Inject(string component, ValueProducer value) =>
+        internal static ReactionGraph Inject(string component, ValueExpression value) =>
             new InjectReaction(InjectionTarget.PartialSlot(component), value);
 
         internal static ReactionGraph ShowValidationErrors(string container) =>
@@ -353,9 +353,9 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the property name to set.</summary>
         public string Property => _property.Value;
         /// <summary>Gets the value to assign.</summary>
-        public ValueProducer Value { get; }
+        public ValueExpression Value { get; }
 
-        internal SetReaction(Source on, string property, ValueProducer value)
+        internal SetReaction(Source on, string property, ValueExpression value)
         {
             On = on ?? throw new ArgumentNullException(nameof(on));
             _property = MemberName.Of(property);
@@ -367,7 +367,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class CallReaction : ReactionGraph
     {
         private readonly MemberName _method;
-        private readonly IReadOnlyList<ValueProducer> _args;
+        private readonly IReadOnlyList<ValueExpression> _args;
 
         /// <summary>Gets the kind. Always <c>"call"</c>.</summary>
         public string Kind => "call";
@@ -376,22 +376,22 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the method name to call.</summary>
         public string Method => _method.Value;
         /// <summary>Gets the method arguments. Empty when the method takes no arguments.</summary>
-        public IReadOnlyList<ValueProducer> Args => _args;
+        public IReadOnlyList<ValueExpression> Args => _args;
 
-        internal CallReaction(Source on, string method, IReadOnlyList<ValueProducer> args)
+        internal CallReaction(Source on, string method, IReadOnlyList<ValueExpression> args)
         {
             On = on ?? throw new ArgumentNullException(nameof(on));
             _method = MemberName.Of(method);
             _args = OrderedArguments(args);
         }
 
-        private static IReadOnlyList<ValueProducer> OrderedArguments(IReadOnlyList<ValueProducer> items)
+        private static IReadOnlyList<ValueExpression> OrderedArguments(IReadOnlyList<ValueExpression> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
             if (items.Count == 0)
-                return Array.Empty<ValueProducer>();
+                return Array.Empty<ValueExpression>();
 
-            var snapshot = new List<ValueProducer>();
+            var snapshot = new List<ValueExpression>();
             foreach (var item in items)
             {
                 if (item == null)
@@ -478,10 +478,10 @@ namespace Alis.Reactive.PlanModel
 
         internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
-        internal static DispatchPayload Untyped(ValueProducer data) =>
+        internal static DispatchPayload Untyped(ValueExpression data) =>
             new PresentDispatchPayload(data, PayloadContract.Untyped);
 
-        internal static DispatchPayload Typed(ValueProducer data, PayloadContract payloadType) =>
+        internal static DispatchPayload Typed(ValueExpression data, PayloadContract payloadType) =>
             new PresentDispatchPayload(data, payloadType);
     }
 
@@ -496,10 +496,10 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class PresentDispatchPayload : DispatchPayload
     {
-        private readonly ValueProducer _data;
+        private readonly ValueExpression _data;
         private readonly PayloadContract _payloadType;
 
-        internal PresentDispatchPayload(ValueProducer data, PayloadContract payloadType)
+        internal PresentDispatchPayload(ValueExpression data, PayloadContract payloadType)
         {
             _data = data ?? throw new ArgumentNullException(nameof(data));
             _payloadType = payloadType ?? throw new ArgumentNullException(nameof(payloadType));
@@ -585,9 +585,9 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the target component and lifecycle semantics.</summary>
         public InjectionTarget Target => _target;
         /// <summary>Gets the value to inject.</summary>
-        public ValueProducer Value { get; }
+        public ValueExpression Value { get; }
 
-        internal InjectReaction(InjectionTarget target, ValueProducer value)
+        internal InjectReaction(InjectionTarget target, ValueExpression value)
         {
             _target = target ?? throw new ArgumentNullException(nameof(target));
             Value = value ?? throw new ArgumentNullException(nameof(value));

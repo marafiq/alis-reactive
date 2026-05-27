@@ -29,7 +29,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAccordion, TModel> ExpandItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, bool isExpand, int index)
             where TModel : class
-            => self.EmitCall(ExpandItemMethod, new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(isExpand), ValueProducer.Literal(index) });
+            => self.EmitCall(ExpandItemMethod, new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(isExpand), ValueExpression.Literal(index) });
 
         /// <summary>
         /// Enables or disables a panel by index.
@@ -38,6 +38,6 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionAccordion, TModel> EnableItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, int index, bool isEnable = true)
             where TModel : class
-            => self.EmitCall(EnableItemMethod, new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(index), ValueProducer.Literal(isEnable) });
+            => self.EmitCall(EnableItemMethod, new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(index), ValueExpression.Literal(isEnable) });
     }
 }

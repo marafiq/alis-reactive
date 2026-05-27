@@ -30,7 +30,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckBox, TModel> self, bool isChecked)
             where TModel : class
         {
-            return self.EmitSet(CheckedProperty, ValueProducer.Literal(isChecked));
+            return self.EmitSet(CheckedProperty, ValueExpression.Literal(isChecked));
         }
 
         /// <summary>

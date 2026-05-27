@@ -21,7 +21,7 @@ import type {
   TextCompareOp,
   TextCompareCondition,
   UnaryCompareOp,
-  ValueProducer,
+  ValueExpression,
   ValidationCondition,
 } from "../types";
 import type { ExecContext } from "../types";
@@ -328,7 +328,7 @@ function resolveRangeBounds(
 }
 
 function resolveShapedComparisonItem(
-  producer: ValueProducer,
+  producer: ValueExpression,
   plan: PlanDocument,
   context: ExecutionContext,
   shape: Shape,

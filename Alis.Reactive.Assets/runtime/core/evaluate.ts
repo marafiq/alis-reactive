@@ -3,9 +3,9 @@
 // Every module that needs a value calls evaluateValue(). No parallel paths.
 
 import type {
-  PlanDocument, ValueProducer, ExecContext, ReadProducer, RuntimeObjectSource,
-  ObjectPropertyReadProducer, ObjectMethodReadProducer,
-  UrlParameterReadProducer, PayloadPathReadProducer, WholePayloadReadProducer,
+  PlanDocument, ValueExpression, ExecContext, ReadExpression, RuntimeObjectSource,
+  ObjectPropertyReadExpression, ObjectMethodReadExpression,
+  UrlParameterReadExpression, PayloadPathReadExpression, WholePayloadReadExpression,
 } from "../types";
 import { RuntimePlan } from "../domain/runtime-plan";
 import { applyShape } from "./shape-convert";
@@ -15,11 +15,11 @@ import { RuntimePath } from "../domain/runtime-path";
 import { ExecutionContext } from "../domain/execution-context";
 import { RuntimeObject } from "../domain/runtime-object";
 
-type ObjectReadProducer = ObjectPropertyReadProducer | ObjectMethodReadProducer;
-type PayloadReadProducer = PayloadPathReadProducer | WholePayloadReadProducer;
+type ObjectReadExpression = ObjectPropertyReadExpression | ObjectMethodReadExpression;
+type PayloadReadExpression = PayloadPathReadExpression | WholePayloadReadExpression;
 
-export function evaluateValue(producer: ValueProducer, plan: PlanDocument, ctx?: ExecContext): unknown {
-  return ValueEvaluation.from(plan, ctx).evaluate(producer);
+export function evaluateValue(expression: ValueExpression, plan: PlanDocument, ctx?: ExecContext): unknown {
+  return ValueEvaluation.from(plan, ctx).evaluate(expression);
 }
 
 class ValueEvaluation {
@@ -32,68 +32,68 @@ class ValueEvaluation {
     return new ValueEvaluation(RuntimePlan.from(plan), ExecutionContext.from(ctx));
   }
 
-  evaluate(producer: ValueProducer): unknown {
-    switch (producer.kind) {
+  evaluate(expression: ValueExpression): unknown {
+    switch (expression.kind) {
       case "literal":
-        return applyShape(producer.value, producer.shape);
+        return applyShape(expression.value, expression.shape);
 
       case "read":
-        return this.evaluateRead(producer);
+        return this.evaluateRead(expression);
 
       case "object":
         return RuntimeValue
-          .declared(this.evaluateObject(producer.fields), producer.shape)
+          .declared(this.evaluateObject(expression.fields), expression.shape)
           .usingDeclaredShape();
 
       case "array":
         return RuntimeValue
-          .declared(producer.items.map(item => this.evaluate(item)), producer.shape)
+          .declared(expression.items.map(item => this.evaluate(item)), expression.shape)
           .usingDeclaredShape();
 
       default:
-        assertNever(producer, "value producer kind");
+        assertNever(expression, "value expression kind");
     }
   }
 
-  private evaluateRead(producer: ReadProducer): unknown {
-    if (isObjectRead(producer)) {
-      return this.readFromRuntimeObject(producer, producer.from);
+  private evaluateRead(expression: ReadExpression): unknown {
+    if (isObjectRead(expression)) {
+      return this.readFromRuntimeObject(expression, expression.from);
     }
-    if (isUrlRead(producer)) {
-      return readFromUrl(producer, this.plan.urlParameters());
+    if (isUrlRead(expression)) {
+      return readFromUrl(expression, this.plan.urlParameters());
     }
-    if (isPayloadRead(producer)) {
-      return readFromPayload(producer, this.context.resolvePayload(producer.from));
+    if (isPayloadRead(expression)) {
+      return readFromPayload(expression, this.context.resolvePayload(expression.from));
     }
 
-    return assertNever(producer, "read producer");
+    return assertNever(expression, "read expression");
   }
 
-  private readFromRuntimeObject(producer: ObjectReadProducer, source: RuntimeObjectSource): unknown {
+  private readFromRuntimeObject(expression: ObjectReadExpression, source: RuntimeObjectSource): unknown {
     const object = this.plan.objectForSource(source);
-    const value = this.resolveRuntimeObjectRead(producer, object);
-    return value.usingRequestedShape(producer.shape);
+    const value = this.resolveRuntimeObjectRead(expression, object);
+    return value.usingRequestedShape(expression.shape);
   }
 
   private resolveRuntimeObjectRead(
-    producer: ObjectReadProducer,
+    expression: ObjectReadExpression,
     object: RuntimeObject,
   ): RuntimeValue {
-    switch (producer.access.kind) {
+    switch (expression.access.kind) {
       case "property":
-        return object.read(producer.member);
+        return object.read(expression.member);
 
       case "method": {
-        const args = producer.access.args.map(arg => this.evaluate(arg));
-        return object.call(producer.member, args);
+        const args = expression.access.args.map(arg => this.evaluate(arg));
+        return object.call(expression.member, args);
       }
 
       default:
-        assertNever(producer.access, "value read access");
+        assertNever(expression.access, "value read access");
     }
   }
 
-  private evaluateObject(fields: Record<string, ValueProducer>): Record<string, unknown> {
+  private evaluateObject(fields: Record<string, ValueExpression>): Record<string, unknown> {
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(fields)) {
       result[key] = this.evaluate(value);
@@ -102,37 +102,37 @@ class ValueEvaluation {
   }
 }
 
-function isObjectRead(producer: ReadProducer): producer is ObjectReadProducer {
-  return producer.from.kind === "component" || producer.from.kind === "plugin";
+function isObjectRead(expression: ReadExpression): expression is ObjectReadExpression {
+  return expression.from.kind === "component" || expression.from.kind === "plugin";
 }
 
-function isUrlRead(producer: ReadProducer): producer is UrlParameterReadProducer {
-  return producer.from.kind === "url";
+function isUrlRead(expression: ReadExpression): expression is UrlParameterReadExpression {
+  return expression.from.kind === "url";
 }
 
-function isPayloadRead(producer: ReadProducer): producer is PayloadReadProducer {
-  return producer.from.kind === "payload";
+function isPayloadRead(expression: ReadExpression): expression is PayloadReadExpression {
+  return expression.from.kind === "payload";
 }
 
 /** Read a query parameter from URL source. */
 function readFromUrl(
-  producer: UrlParameterReadProducer, params: URLSearchParams,
+  expression: UrlParameterReadExpression, params: URLSearchParams,
 ): unknown {
-  const raw = params.get(producer.member);
-  return applyShapeWhenPresent(raw, producer.shape);
+  const raw = params.get(expression.member);
+  return applyShapeWhenPresent(raw, expression.shape);
 }
 
 /** Read from a payload source through its structured path or explicit whole-body member. */
 function readFromPayload(
-  producer: PayloadReadProducer, root: unknown,
+  expression: PayloadReadExpression, root: unknown,
 ): unknown {
-  const raw = readsWholePayload(producer)
+  const raw = readsWholePayload(expression)
     ? root
-    : RuntimePath.from(producer.path).read(root);
+    : RuntimePath.from(expression.path).read(root);
 
-  return applyShapeWhenPresent(raw, producer.shape);
+  return applyShapeWhenPresent(raw, expression.shape);
 }
 
-function readsWholePayload(producer: PayloadReadProducer): producer is WholePayloadReadProducer {
-  return producer.member === "responseBody";
+function readsWholePayload(expression: PayloadReadExpression): expression is WholePayloadReadExpression {
+  return expression.member === "responseBody";
 }

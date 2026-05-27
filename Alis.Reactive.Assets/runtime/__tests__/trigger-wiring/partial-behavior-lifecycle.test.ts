@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../lifecycle/boot";
-import type { BranchCase, ComponentObject, ConditionGraph, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueProducer } from "../../types";
+import type { BranchCase, ComponentObject, ConditionGraph, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueExpression } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 const booleanShape: Shape = { kind: "boolean" };
@@ -129,7 +129,7 @@ function branch(cases: BranchCase[]): ReactionGraph {
   return { kind: "branch", cases };
 }
 
-function literal(value: string | boolean, shape: Shape): ValueProducer {
+function literal(value: string | boolean, shape: Shape): ValueExpression {
   return { kind: "literal", value, shape };
 }
 

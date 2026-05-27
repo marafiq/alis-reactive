@@ -22,7 +22,7 @@ namespace Alis.Reactive.Fusion.AppLevel
             this ComponentRef<FusionConfirm, TModel> self, string message)
             where TModel : class
         {
-            return self.EmitSet(ContentProperty, ValueProducer.Literal(message))
+            return self.EmitSet(ContentProperty, ValueExpression.Literal(message))
                        .EmitCall(DataBindMethod);
         }
 

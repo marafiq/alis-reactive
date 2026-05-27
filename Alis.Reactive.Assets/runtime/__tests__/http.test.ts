@@ -12,7 +12,7 @@ import type {
   RequestPlan,
   Shape,
   StructuredPath,
-  ValueProducer,
+  ValueExpression,
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -22,11 +22,11 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
-function literal(value: string): ValueProducer {
+function literal(value: string): ValueExpression {
   return { kind: "literal", value, shape: stringShape };
 }
 
-function gatherInput(sourcesByPayloadName: Record<string, ValueProducer>): RequestPlan["input"] {
+function gatherInput(sourcesByPayloadName: Record<string, ValueExpression>): RequestPlan["input"] {
   return requestInput(
     Object.entries(sourcesByPayloadName).map(([name, value]) => payloadAssignment(name, value))
   );
@@ -45,15 +45,15 @@ function target(name: string): RequestPayloadTarget {
   return { kind: "payload", name, path: structuredPath(name) };
 }
 
-function payloadAssignment(name: string, source: ValueProducer): RequestInputAssignment {
+function payloadAssignment(name: string, source: ValueExpression): RequestInputAssignment {
   return { target: target(name), source };
 }
 
-function headerAssignment(name: string, source: ValueProducer): RequestInputAssignment {
+function headerAssignment(name: string, source: ValueExpression): RequestInputAssignment {
   return { target: { kind: "header", name }, source };
 }
 
-function routeParamAssignment(name: string, source: ValueProducer): RequestInputAssignment {
+function routeParamAssignment(name: string, source: ValueExpression): RequestInputAssignment {
   return { target: { kind: "route-param", name }, source };
 }
 
@@ -68,7 +68,7 @@ function pathSegment(part: string): PathSegment {
   return { kind: "property", name: part };
 }
 
-function payloadRead(scope: PayloadScope, member: string): ValueProducer {
+function payloadRead(scope: PayloadScope, member: string): ValueExpression {
   return {
     kind: "read",
     from: { kind: "payload", scope, type: { kind: "untyped" } },
@@ -79,7 +79,7 @@ function payloadRead(scope: PayloadScope, member: string): ValueProducer {
   };
 }
 
-function setText(component: string, value: ValueProducer): ReactionGraph {
+function setText(component: string, value: ValueExpression): ReactionGraph {
   return {
     kind: "set",
     on: { kind: "component", component },
