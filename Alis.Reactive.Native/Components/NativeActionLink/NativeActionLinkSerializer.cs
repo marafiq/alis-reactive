@@ -90,7 +90,7 @@ namespace Alis.Reactive.Native.Components
             return RequestPlan.Create(
                 RequestEndpoint.To(HttpMethodName.From(request.Method), RequestUrl.Of(string.Empty)),
                 ProjectRequestInput(request.Input),
-                request.Before,
+                request.WhileLoading,
                 request.Success,
                 request.Error,
                 Array.Empty<ReactionGraph>(),

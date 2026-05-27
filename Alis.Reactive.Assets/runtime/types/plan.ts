@@ -589,10 +589,10 @@ export interface RequestPlan {
   url: string;
   validation: RequestValidationTarget;
   input: RequestInput;
-  before: ReactionGraph[];
+  whileLoading: ReactionGraph[];
   success: ResponseRoute[];
   error: ResponseRoute[];
-  complete: ReactionGraph[];
+  finally: ReactionGraph[];
   chain: RequestChain;
 }
 

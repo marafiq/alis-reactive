@@ -32,7 +32,7 @@ namespace Alis.Reactive.Builders.Requests
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
             var reaction = pb.BuildReaction();
-            _draft.CompleteWhenAllSettled(reaction);
+            _draft.RunWhenAllSettled(reaction);
             return this;
         }
 

@@ -94,10 +94,10 @@ function request(overrides: Partial<RequestPlan>): RequestPlan {
     url: "/residents",
     validation: { kind: "none" },
     input: { kind: "none" },
-    before: [],
+    whileLoading: [],
     success: [],
     error: [],
-    complete: [],
+    finally: [],
     chain: { kind: "terminal" },
     ...overrides,
   };
@@ -174,11 +174,11 @@ describe("executeRequest HTTP lifecycle", () => {
         headerAssignment("X-Unit", literal("memory-care")),
         payloadAssignment("name", literal("Ada")),
       ]),
-      before: [setText("before", literal("Started"))],
+      whileLoading: [setText("before", literal("Started"))],
       success: [
         { match: { kind: "any" }, reaction: setText("success", payloadRead("success", "message")) },
       ],
-      complete: [setText("complete", payloadRead("request", "name"))],
+      finally: [setText("complete", payloadRead("request", "name"))],
     });
 
     await executeRequest(saveResident, nativeTextPlan(["before", "success", "complete"]));
@@ -314,7 +314,7 @@ describe("executeRequest HTTP lifecycle", () => {
       error: [
         { match: { kind: "status", status: 422 }, reaction: setText("error", payloadRead("error", "errorSummary")) },
       ],
-      complete: [setText("complete", payloadRead("request", "name"))],
+      finally: [setText("complete", payloadRead("request", "name"))],
       chain: { kind: "follow-up", next: followUp },
     });
 
@@ -403,7 +403,7 @@ describe("executeRequest HTTP lifecycle", () => {
       error: [
         { match: { kind: "any" }, reaction: setText("error", payloadRead("request", "name")) },
       ],
-      complete: [setText("complete", payloadRead("request", "name"))],
+      finally: [setText("complete", payloadRead("request", "name"))],
     });
 
     await executeRequest(failingSave, nativeTextPlan(["error", "complete"]));
@@ -420,11 +420,11 @@ describe("executeRequest HTTP lifecycle", () => {
     `;
     const fetchMock = mockFetch([responseJson({ message: "Saved" })]);
     const blockedSave = request({
-      before: [setText("missing-before-target", literal("Started"))],
+      whileLoading: [setText("missing-before-target", literal("Started"))],
       error: [
         { match: { kind: "any" }, reaction: setText("error", literal("wrong outcome")) },
       ],
-      complete: [setText("complete", literal("done"))],
+      finally: [setText("complete", literal("done"))],
     });
 
     await expect(executeRequest(blockedSave, nativeTextPlan(["error", "complete"])))
@@ -448,7 +448,7 @@ describe("executeRequest HTTP lifecycle", () => {
       error: [
         { match: { kind: "any" }, reaction: setText("error", literal("wrong outcome")) },
       ],
-      complete: [setText("complete", literal("done"))],
+      finally: [setText("complete", literal("done"))],
     });
 
     await expect(executeRequest(saveResident, nativeTextPlan(["error", "complete"])))

@@ -26,10 +26,10 @@ function request(url: string, overrides: Partial<RequestPlan> = {}): RequestPlan
     url,
     validation: { kind: "none" },
     input: { kind: "none" },
-    before: [],
+    whileLoading: [],
     success: [],
     error: [],
-    complete: [],
+    finally: [],
     chain: { kind: "terminal" },
     ...overrides,
   };

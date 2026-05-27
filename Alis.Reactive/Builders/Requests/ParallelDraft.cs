@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Requests
             _branches.Add(request);
         }
 
-        internal void CompleteWhenAllSettled(ReactionGraph reaction)
+        internal void RunWhenAllSettled(ReactionGraph reaction)
         {
             if (reaction == null) throw new ArgumentNullException(nameof(reaction));
             _completion = ParallelCompletion.OnSettled(reaction);

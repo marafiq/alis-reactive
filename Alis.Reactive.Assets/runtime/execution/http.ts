@@ -1,4 +1,4 @@
-// http.ts - HTTP request execution using V3 RequestPlan type.
+// http.ts - HTTP request execution using RequestPlan.
 // Uses the shared value/gather/runtime concepts and keeps HTTP async isolated.
 
 import type { RequestPlan, ResponseRoute, PlanDocument, ExecContext, ReactionGraph } from "../types";
@@ -29,7 +29,7 @@ type RequestOutcomeStatus =
   | { readonly kind: "network-failure"; readonly value: 0 }
   | { readonly kind: "client-failure"; readonly value: -1 };
 
-/** Execute a single HTTP request with gather, before, response routing, complete, and chaining. */
+/** Execute a single HTTP request with gather, while-loading, response routing, finally, and chaining. */
 export async function executeRequest(req: RequestPlan, plan: PlanDocument, ctx?: ExecContext): Promise<void> {
   await runHttpRequest(req, plan, ExecutionContext.from(ctx));
 }
@@ -37,7 +37,7 @@ export async function executeRequest(req: RequestPlan, plan: PlanDocument, ctx?:
 async function runHttpRequest(request: RequestPlan, plan: PlanDocument, context: ExecutionContext): Promise<void> {
   if (!requestCanSend(request, plan, context)) return;
 
-  await runRequestReactions(request.before, plan, context.asAvailable());
+  await runRequestReactions(request.whileLoading, plan, context.asAvailable());
 
   const prepared = prepareHttpRequest(request, plan, context);
   const outcome = await sendHttpRequest(request, prepared.fetch);
@@ -202,7 +202,7 @@ async function routeAndComplete(
   try {
     await routeStage();
   } finally {
-    await runRequestReactions(request.complete, plan, context.asAvailable());
+    await runRequestReactions(request.finally, plan, context.asAvailable());
   }
 }
 

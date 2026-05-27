@@ -9,10 +9,10 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly RequestEndpoint _endpoint;
         private readonly RequestInput _input;
-        private readonly IReadOnlyList<ReactionGraph> _before;
+        private readonly IReadOnlyList<ReactionGraph> _whileLoading;
         private readonly IReadOnlyList<ResponseRoute> _success;
         private readonly IReadOnlyList<ResponseRoute> _error;
-        private readonly IReadOnlyList<ReactionGraph> _complete;
+        private readonly IReadOnlyList<ReactionGraph> _finally;
         private readonly RequestChain _chain;
         private readonly RequestValidationTarget _validationTarget;
 
@@ -24,32 +24,32 @@ namespace Alis.Reactive.PlanModel
         public RequestValidationTarget Validation => _validationTarget;
         /// <summary>Gets the request body strategy. Bodiless requests use <see cref="NoRequestInput"/>.</summary>
         public RequestInput Input => _input;
-        /// <summary>Gets reactions to execute before the request is sent.</summary>
-        public IReadOnlyList<ReactionGraph> Before => _before;
+        /// <summary>Gets reactions to execute while the request is loading.</summary>
+        public IReadOnlyList<ReactionGraph> WhileLoading => _whileLoading;
         /// <summary>Gets the success response routes.</summary>
         public IReadOnlyList<ResponseRoute> Success => _success;
         /// <summary>Gets the error response routes.</summary>
         public IReadOnlyList<ResponseRoute> Error => _error;
-        /// <summary>Gets reactions to execute after the request completes regardless of outcome.</summary>
-        public IReadOnlyList<ReactionGraph> Complete => _complete;
+        /// <summary>Gets reactions to execute after the request settles regardless of outcome.</summary>
+        public IReadOnlyList<ReactionGraph> Finally => _finally;
         /// <summary>Gets the request chain: terminal or followed by another request.</summary>
         public RequestChain Chain => _chain;
         private RequestPlan(
             RequestEndpoint endpoint,
             RequestInput input,
-            IReadOnlyList<ReactionGraph> before,
+            IReadOnlyList<ReactionGraph> whileLoading,
             IReadOnlyList<ResponseRoute> success,
             IReadOnlyList<ResponseRoute> error,
-            IReadOnlyList<ReactionGraph> complete,
+            IReadOnlyList<ReactionGraph> finallyReactions,
             RequestChain chain,
             RequestValidationTarget validationTarget)
         {
             _endpoint = endpoint ?? throw new System.ArgumentNullException(nameof(endpoint));
             _input = input ?? throw new System.ArgumentNullException(nameof(input));
-            _before = Snapshot(before);
+            _whileLoading = Snapshot(whileLoading);
             _success = Snapshot(success);
             _error = Snapshot(error);
-            _complete = Snapshot(complete);
+            _finally = Snapshot(finallyReactions);
             _chain = chain ?? throw new System.ArgumentNullException(nameof(chain));
             _validationTarget = validationTarget ?? throw new System.ArgumentNullException(nameof(validationTarget));
         }
@@ -57,19 +57,19 @@ namespace Alis.Reactive.PlanModel
         internal static RequestPlan Create(
             RequestEndpoint endpoint,
             RequestInput input,
-            IReadOnlyList<ReactionGraph> before,
+            IReadOnlyList<ReactionGraph> whileLoading,
             IReadOnlyList<ResponseRoute> success,
             IReadOnlyList<ResponseRoute> error,
-            IReadOnlyList<ReactionGraph> complete,
+            IReadOnlyList<ReactionGraph> finallyReactions,
             RequestChain chain,
             RequestValidationTarget validationTarget) =>
             new RequestPlan(
                 endpoint,
                 input,
-                before,
+                whileLoading,
                 success,
                 error,
-                complete,
+                finallyReactions,
                 chain,
                 validationTarget);
 

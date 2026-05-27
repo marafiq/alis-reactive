@@ -444,10 +444,10 @@ namespace Alis.Reactive.PlanModel
                 .Requires("url", "string")
                 .Requires("validation", "RequestValidationTarget")
                 .Requires("input", "RequestInput")
-                .Requires("before", "ReactionGraph[]")
+                .Requires("whileLoading", "ReactionGraph[]")
                 .Requires("success", "ResponseRoute[]")
                 .Requires("error", "ResponseRoute[]")
-                .Requires("complete", "ReactionGraph[]")
+                .Requires("finally", "ReactionGraph[]")
                 .Requires("chain", "RequestChain"));
 
             contract.Declare(Union(
