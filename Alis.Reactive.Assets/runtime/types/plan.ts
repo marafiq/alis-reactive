@@ -81,7 +81,7 @@ export type Vendor = string;
 
 export type ComponentObject =
   | ObjectTargetComponent
-  | OwnedDefinitionComponent
+  | PlanInputComponent
   | ValidationContainerComponentDefinition
   | LayoutObjectComponent;
 
@@ -94,11 +94,11 @@ export interface ObjectTargetComponent {
   container: NoValidationContainer;
 }
 
-export interface OwnedDefinitionComponent {
+export interface PlanInputComponent {
   id: string;
   vendor: Vendor;
   type: string;
-  role: OwnedDefinitionComponentRole;
+  role: PlanInputComponentRole;
   binding: RegisteredInputBinding;
   container: NoValidationContainer;
 }
@@ -123,7 +123,7 @@ export interface LayoutObjectComponent {
 
 export type ComponentRole =
   | ObjectTargetComponentRole
-  | OwnedDefinitionComponentRole
+  | PlanInputComponentRole
   | ValidationContainerComponentRole
   | LayoutObjectComponentRole;
 
@@ -131,8 +131,8 @@ export interface ObjectTargetComponentRole {
   kind: "object-target";
 }
 
-export interface OwnedDefinitionComponentRole {
-  kind: "owned-definition";
+export interface PlanInputComponentRole {
+  kind: "plan-input";
 }
 
 export interface ValidationContainerComponentRole {

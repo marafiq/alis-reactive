@@ -56,7 +56,7 @@ namespace Alis.Reactive.PlanModel
                 InputBinding.None,
                 ValidationContainerBinding.None);
 
-        internal static ComponentObject Input(
+        internal static ComponentObject PlanInput(
             string id,
             string vendor,
             string type,
@@ -65,13 +65,13 @@ namespace Alis.Reactive.PlanModel
                 ComponentId.Of(id),
                 ComponentVendor.From(vendor),
                 TypeKey.Of(type),
-                ComponentRole.OwnedDefinition,
+                ComponentRole.PlanInput,
                 binding,
                 ValidationContainerBinding.None);
 
         /// <summary>Returns a copy with binding info filled where currently absent (first registration wins).</summary>
         internal ComponentObject WithBindingIfAbsent(InputBinding binding) =>
-            new ComponentObject(_id, _vendor, _type, ComponentRole.OwnedDefinition, _binding.FillIfAbsent(binding), _container);
+            new ComponentObject(_id, _vendor, _type, ComponentRole.PlanInput, _binding.FillIfAbsent(binding), _container);
 
         /// <summary>Returns a copy carrying the given container scope.</summary>
         internal ComponentObject WithContainer(ContainerScope container) =>
@@ -93,8 +93,8 @@ namespace Alis.Reactive.PlanModel
         internal static ComponentRole ObjectTarget { get; } =
             new ComponentRole("object-target");
 
-        internal static ComponentRole OwnedDefinition { get; } =
-            new ComponentRole("owned-definition");
+        internal static ComponentRole PlanInput { get; } =
+            new ComponentRole("plan-input");
 
         internal static ComponentRole ValidationContainer { get; } =
             new ComponentRole("validation-container");
@@ -239,7 +239,7 @@ namespace Alis.Reactive.PlanModel
             _valueContract.BindingFor(_bindingPath);
 
         internal ComponentObject CreateComponent() =>
-            ComponentObject.Input(
+            ComponentObject.PlanInput(
                 _componentId.Value,
                 _vendor.Value,
                 TypeKey.Value,

@@ -82,7 +82,7 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Union(
                 "ComponentObject",
                 "ObjectTargetComponent",
-                "OwnedDefinitionComponent",
+                "PlanInputComponent",
                 "ValidationContainerComponentDefinition",
                 "LayoutObjectComponent"));
             contract.Declare(ComponentVariant(
@@ -91,8 +91,8 @@ namespace Alis.Reactive.PlanModel
                 "NoInputBinding",
                 "NoValidationContainer"));
             contract.Declare(ComponentVariant(
-                "OwnedDefinitionComponent",
-                "OwnedDefinitionComponentRole",
+                "PlanInputComponent",
+                "PlanInputComponentRole",
                 "RegisteredInputBinding",
                 "NoValidationContainer"));
             contract.Declare(ComponentVariant(
@@ -109,13 +109,13 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Union(
                 "ComponentRole",
                 "ObjectTargetComponentRole",
-                "OwnedDefinitionComponentRole",
+                "PlanInputComponentRole",
                 "ValidationContainerComponentRole",
                 "LayoutObjectComponentRole"));
             contract.Declare(Interface("ObjectTargetComponentRole")
                 .Requires("kind", Literal("object-target")));
-            contract.Declare(Interface("OwnedDefinitionComponentRole")
-                .Requires("kind", Literal("owned-definition")));
+            contract.Declare(Interface("PlanInputComponentRole")
+                .Requires("kind", Literal("plan-input")));
             contract.Declare(Interface("ValidationContainerComponentRole")
                 .Requires("kind", Literal("validation-container")));
             contract.Declare(Interface("LayoutObjectComponentRole")

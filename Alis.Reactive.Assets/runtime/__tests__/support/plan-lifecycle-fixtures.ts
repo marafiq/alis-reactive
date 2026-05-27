@@ -89,7 +89,7 @@ export function registeredInputComponent(id: string, type = `native.component.${
     id,
     vendor: "native",
     type,
-    role: { kind: "owned-definition" },
+    role: { kind: "plan-input" },
     binding: {
       kind: "registered-input",
       bindingPath: "CareUnit",

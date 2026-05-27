@@ -160,7 +160,7 @@ function registeredInputComponent(id: string, bindingPath: string, valueMember: 
     id,
     vendor: "native",
     type: "native.input",
-    role: { kind: "owned-definition" },
+    role: { kind: "plan-input" },
     binding: {
       kind: "registered-input",
       bindingPath,

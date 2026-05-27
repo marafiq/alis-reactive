@@ -72,7 +72,7 @@ namespace Alis.Reactive
             if (vendor == null) throw new System.ArgumentNullException(nameof(vendor));
             if (typeKey == null) throw new System.ArgumentNullException(nameof(typeKey));
 
-            return ComponentObject.Input(
+            return ComponentObject.PlanInput(
                 componentId.Value,
                 vendor.Value,
                 typeKey.Value,
