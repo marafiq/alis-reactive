@@ -41,6 +41,34 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(data);
         }
 
+        [HttpGet("~/api/schedule/view/{currentView}/echo")]
+        public IActionResult EchoView(string currentView)
+        {
+            return Ok(new ScheduleViewRouteResponse
+            {
+                CurrentView = currentView
+            });
+        }
+
+        [HttpGet("~/api/schedule/view/{currentView}/summary")]
+        public IActionResult ViewSummary(string currentView)
+        {
+            return Ok(new ScheduleViewRouteResponse
+            {
+                CurrentView = currentView,
+                Summary = $"summary:{currentView}"
+            });
+        }
+
+        [HttpPost("~/api/schedule/events/audit")]
+        public IActionResult AuditEvents([FromBody] ScheduleEventsAuditRequest request)
+        {
+            return Ok(new ScheduleEventsAuditResponse
+            {
+                Count = request.Events.Count
+            });
+        }
+
         private static (DateTime start, DateTime end) CalculateDateRange(DateTime anchor, string view)
         {
             return view switch

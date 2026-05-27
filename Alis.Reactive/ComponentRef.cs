@@ -43,16 +43,16 @@ namespace Alis.Reactive
         }
 
         internal ComponentRef<TComponent, TModel> EmitCall(ComponentMethod method) =>
-            EmitCall(method, CallArguments.None);
+            EmitCall(method, System.Array.Empty<ValueProducer>());
 
         internal ComponentRef<TComponent, TModel> EmitCall(
             ComponentMethod method,
             System.Collections.Generic.List<ValueProducer> args) =>
-            EmitCall(method, CallArguments.Of(args));
+            EmitCall(method, (System.Collections.Generic.IReadOnlyList<ValueProducer>)args);
 
         private ComponentRef<TComponent, TModel> EmitCall(
             ComponentMethod method,
-            CallArguments args)
+            System.Collections.Generic.IReadOnlyList<ValueProducer> args)
         {
             if (method == null) throw new System.ArgumentNullException(nameof(method));
             if (args == null) throw new System.ArgumentNullException(nameof(args));
@@ -76,6 +76,31 @@ namespace Alis.Reactive
             return new Builders.Conditions.TypedComponentSource<TValue>(
                 componentKey.Value,
                 property.Member);
+        }
+
+        internal Builders.Conditions.TypedComponentSource<TValue> Read<TValue>(
+            ComponentMethod method)
+        {
+            return Read<TValue>(method, System.Array.Empty<ValueProducer>());
+        }
+
+        internal Builders.Conditions.TypedComponentSource<TValue> Read<TValue>(
+            ComponentMethod method,
+            System.Collections.Generic.IReadOnlyList<ValueProducer> args)
+        {
+            if (method == null) throw new System.ArgumentNullException(nameof(method));
+            if (args == null) throw new System.ArgumentNullException(nameof(args));
+
+            var componentKey = _target.EnsureIn(Pipeline.Context);
+            var returns = Shape.FromClrType(typeof(TValue));
+            Pipeline.Context.EnsureMethod(
+                componentKey,
+                method.ContractReturning(returns));
+            var source = ComponentSource.Of(componentKey);
+            return Builders.Conditions.TypedComponentSource<TValue>.FromMethod(
+                source,
+                method.Member,
+                args);
         }
 
         internal string Vendor => _target.Vendor.Value;

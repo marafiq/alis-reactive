@@ -134,6 +134,41 @@
                 {
                     p.Component<FusionSchedule>("shift-schedule").Print();
                 }))
+            @(Html.NativeButton("route-template-schedule-btn", "Audit View Route")
+                .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get("/api/schedule/view/{currentView}/echo")
+                     .Gather(g => g.RouteParam(
+                         "currentView",
+                         p.Component<FusionSchedule>("shift-schedule").CurrentView()))
+                     .Response(r => r.OnSuccess<ScheduleViewRouteResponse>((json, s) =>
+                     {
+                         s.Element("route-view").SetText(json, x => x.CurrentView);
+                     })
+                     .Chained(c => c
+                         .Get("/api/schedule/view/{currentView}/summary")
+                         .Gather(g => g.RouteParam(
+                             "currentView",
+                             p.Component<FusionSchedule>("shift-schedule").CurrentView()))
+                         .Response(r2 => r2.OnSuccess<ScheduleViewRouteResponse>((json, s) =>
+                         {
+                             s.Element("route-view-summary").SetText(json, x => x.Summary);
+                         }))));
+                }))
+            @(Html.NativeButton("audit-events-btn", "Audit Events")
+                .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/api/schedule/events/audit")
+                     .Gather(g => g.Include(
+                         p.Component<FusionSchedule>("shift-schedule").GetEvents(),
+                         "events"))
+                     .Response(r => r.OnSuccess<ScheduleEventsAuditResponse>((json, s) =>
+                     {
+                         s.Element("schedule-events-count").SetText(json, x => x.Count);
+                     }));
+                }))
         </native-hstack>
     </section>
 
@@ -320,6 +355,9 @@
         <native-vstack gap="Xs" class="font-mono text-xs">
             <p>Last cell click: <span id="event-trace" class="text-text-muted">--</span></p>
             <p>Shift group: <span id="event-shift" class="text-text-muted">--</span></p>
+            <p>Route view: <span id="route-view" class="text-text-muted">--</span></p>
+            <p>Route view summary: <span id="route-view-summary" class="text-text-muted">--</span></p>
+            <p>Schedule events: <span id="schedule-events-count" class="text-text-muted">--</span></p>
         </native-vstack>
     </section>
 
@@ -331,4 +369,3 @@
 </native-vstack>
 
 @Html.RenderPlan(plan)
-
