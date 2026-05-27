@@ -59,6 +59,29 @@ public sealed class WhenFluentValidationAdapterProjectsClientRules
     }
 
     [Test]
+    public void reactive_whenfields_projects_composed_client_activation()
+    {
+        using var doc = ValidationProjectionPlanHarness
+            .RenderPlan<AssessmentModel, ComposedAssessmentValidator>();
+        var rule = ValidationProjectionPlanHarness
+            .RulesFor(doc.RootElement, nameof(AssessmentModel.Notes))
+            .Single();
+        var condition = rule.GetProperty("execution")
+            .GetProperty("activation")
+            .GetProperty("condition");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(condition.GetProperty("kind").GetString(), Is.EqualTo("all"));
+            Assert.That(ValidationProjectionPlanHarness.ConditionLeftComponents(condition), Is.EqualTo(new[]
+            {
+                IdGenerator.For(typeof(AssessmentModel), nameof(AssessmentModel.IsVeteran)),
+                IdGenerator.For(typeof(AssessmentModel), nameof(AssessmentModel.Score))
+            }));
+        });
+    }
+
+    [Test]
     public void rules_under_regular_fluentvalidation_conditions_stay_server_only()
     {
         using var doc = ValidationProjectionPlanHarness

@@ -146,6 +146,26 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
     }
 
     [Test]
+    public async Task step3_blocks_severe_pain_without_location_on_the_client()
+    {
+        await NavigateAndBoot();
+        await CompleteStep1("Robert Miles", "88", "Other");
+        await CompleteStep2();
+
+        await ToggleSwitch<Step3FunctionalModel>(m => m.TakesPainMedication);
+        await Expect(Page.Locator("#pain-section")).ToBeVisibleAsync();
+        await FillAndBlur<Step3FunctionalModel>(m => m.PainLevel, "8");
+
+        await ClickWhenStable(Page.Locator("#next-3"));
+
+        await Expect(ErrorFor("step3-form", nameof(Step3FunctionalModel.PainLocation)))
+            .ToContainTextAsync("required for severe pain", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#step-3")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#step-4")).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task step4_blocks_submission_without_contact_and_succeeds_after_the_saved_steps_are_complete()
     {
         await NavigateAndBoot();

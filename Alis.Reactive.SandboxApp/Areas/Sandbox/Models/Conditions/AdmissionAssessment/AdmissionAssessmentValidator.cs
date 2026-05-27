@@ -73,9 +73,13 @@ public class AdmissionAssessmentValidator : ReactiveValidator<HealthScreeningMod
         {
             RuleFor(x => x.PainLevel).GreaterThan(0m);
         });
-
-        // NOTE: PainLocation required when PainLevel > 7 is handled server-side only.
-        // WhenField does not support numeric thresholds (only truthy/eq/neq).
-        // The conditions DSL shows the "required" indicator via When(comp.Value()).Gt(7m).
+        WhenFields(fields => fields
+            .Field(x => x.TakesPainMedication).Truthy()
+            .And(fields.Field(x => x.PainLevel).Gt(7m)), () =>
+            {
+                RuleFor(x => x.PainLocation)
+                    .NotEmpty()
+                    .WithMessage("'Pain Location' is required for severe pain.");
+            });
     }
 }

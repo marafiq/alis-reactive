@@ -125,6 +125,7 @@ internal static class ValidationProjectionPlanHarness
             typeof(AsyncOnlyValidator),
             typeof(ConfirmEmailValidator),
             typeof(ReactiveAssessmentValidator),
+            typeof(ComposedAssessmentValidator),
             typeof(MixedConditionValidator)
         ];
 
@@ -133,6 +134,7 @@ internal static class ValidationProjectionPlanHarness
             if (type == typeof(AsyncOnlyValidator)) return new AsyncOnlyValidator();
             if (type == typeof(ConfirmEmailValidator)) return new ConfirmEmailValidator();
             if (type == typeof(ReactiveAssessmentValidator)) return new ReactiveAssessmentValidator();
+            if (type == typeof(ComposedAssessmentValidator)) return new ComposedAssessmentValidator();
             if (type == typeof(MixedConditionValidator)) return new MixedConditionValidator();
             return null;
         }
@@ -202,6 +204,20 @@ internal sealed class ReactiveAssessmentValidator : ReactiveValidator<Assessment
     }
 }
 
+internal sealed class ComposedAssessmentValidator : ReactiveValidator<AssessmentModel>
+{
+    public ComposedAssessmentValidator()
+    {
+        WhenFields(fields => fields
+            .Field(model => model.IsVeteran).Truthy()
+            .And(fields.Field(model => model.Score).Gt(7)), () =>
+            {
+                RuleFor(model => model.Notes).NotEmpty()
+                    .WithMessage("Notes required for high scoring veterans.");
+            });
+    }
+}
+
 internal sealed class MixedConditionValidator : ReactiveValidator<AssessmentModel>
 {
     public MixedConditionValidator()
@@ -222,4 +238,5 @@ internal sealed class AssessmentModel
     public bool IsVeteran { get; set; }
     public bool ServerFlag { get; set; }
     public int? Score { get; set; }
+    public string? Notes { get; set; }
 }
