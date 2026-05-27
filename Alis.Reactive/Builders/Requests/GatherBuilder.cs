@@ -40,7 +40,7 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> Static(string param, object value)
         {
             var payloadPath = BindingPath.Of(param);
-            _draft.AddPayloadAssignment(
+            _draft.AddPayload(
                 payloadPath,
                 ValueProducer.LiteralFromValue(value));
             return this;
@@ -61,7 +61,7 @@ namespace Alis.Reactive.Builders.Requests
             var payloadPath = BindingPath.Of(param);
             var eventPath = ExpressionPathHelper.ToEventPath(path);
             var shape = Shape.FromClrType(typeof(TProp));
-            _draft.AddPayloadAssignment(
+            _draft.AddPayload(
                 payloadPath,
                 ValueProducer.ReadPayload(PayloadSource.Event(), eventPath, shape));
             return this;
@@ -84,7 +84,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var header = HeaderName.Of(name);
             if (source == null) throw new System.ArgumentNullException(nameof(source));
-            RequestScalarSlot.Header(header).RequireShape<TProp>();
+            RequestScalarTarget.Header<TProp>(header);
             _draft.AddHeader(header, source.ToValueProducer());
             return this;
         }
@@ -93,7 +93,7 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> Header<TArgs, TProp>(string name, TArgs args, Expression<Func<TArgs, TProp>> path)
         {
             var header = HeaderName.Of(name);
-            var shape = RequestScalarSlot.Header(header).RequireShape<TProp>();
+            var shape = RequestScalarTarget.Header<TProp>(header);
             var eventPath = ExpressionPathHelper.ToEventPath(path);
             _draft.AddHeader(header, ValueProducer.ReadPayload(PayloadSource.Event(), eventPath, shape));
             return this;
@@ -104,7 +104,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>Adds a route param from a static int.</summary>
         public GatherBuilder<TModel> RouteParam(string paramName, int value)
         {
-            var routeParam = _draft.RegisterRouteParameter(paramName);
+            var routeParam = RouteParameterName.Of(paramName);
             _draft.AddRouteParameter(routeParam, ValueProducer.Literal(value));
             return this;
         }
@@ -112,7 +112,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>Adds a route param from a static string. Value must not be null.</summary>
         public GatherBuilder<TModel> RouteParam(string paramName, string value)
         {
-            var routeParam = _draft.RegisterRouteParameter(paramName);
+            var routeParam = RouteParameterName.Of(paramName);
             if (value == null)
                 throw new System.ArgumentNullException(nameof(value),
                     $"Route param '{paramName}' value must not be null. Literal route params require a concrete value. " +
@@ -124,7 +124,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>Adds a route param from a static long.</summary>
         public GatherBuilder<TModel> RouteParam(string paramName, long value)
         {
-            var routeParam = _draft.RegisterRouteParameter(paramName);
+            var routeParam = RouteParameterName.Of(paramName);
             _draft.AddRouteParameter(routeParam, ValueProducer.Literal(value));
             return this;
         }
@@ -132,9 +132,9 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>Adds a route param from a typed source. Route params are scalar — arrays and objects are rejected at build time.</summary>
         public GatherBuilder<TModel> RouteParam<TProp>(string paramName, TypedSource<TProp> source)
         {
-            var routeParam = _draft.RegisterRouteParameter(paramName);
+            var routeParam = RouteParameterName.Of(paramName);
             if (source == null) throw new System.ArgumentNullException(nameof(source));
-            RequestScalarSlot.RouteParameter(routeParam).RequireShape<TProp>();
+            RequestScalarTarget.RouteParameter<TProp>(routeParam);
             _draft.AddRouteParameter(routeParam, source.ToValueProducer());
             return this;
         }
@@ -143,8 +143,8 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> RouteParam<TArgs, TProp>(
             string paramName, TArgs args, Expression<Func<TArgs, TProp>> path)
         {
-            var routeParam = _draft.RegisterRouteParameter(paramName);
-            var shape = RequestScalarSlot.RouteParameter(routeParam).RequireShape<TProp>();
+            var routeParam = RouteParameterName.Of(paramName);
+            var shape = RequestScalarTarget.RouteParameter<TProp>(routeParam);
             var eventPath = ExpressionPathHelper.ToEventPath(path);
             _draft.AddRouteParameter(routeParam, ValueProducer.ReadPayload(PayloadSource.Event(), eventPath, shape));
             return this;
@@ -160,7 +160,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var urlParam = UrlParameterName.Of(paramName);
             var value = ValueProducer.ReadUrl(urlParam.Value);
-            _draft.AddPayloadAssignment(RequestPayloadAssignment.Of(urlParam.Value, value));
+            _draft.AddAssignment(RequestInputAssignment.Payload(urlParam.Value, value));
             return this;
         }
 
@@ -172,7 +172,7 @@ namespace Alis.Reactive.Builders.Requests
             var urlParam = UrlParameterName.Of(paramName);
             var payloadPath = BindingPath.Of(asParam);
             var value = ValueProducer.ReadUrl(urlParam.Value);
-            _draft.AddPayloadAssignment(RequestPayloadAssignment.Of(payloadPath, value));
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, value));
             return this;
         }
 
@@ -182,9 +182,9 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> FromUrl<T>(string paramName)
         {
             var urlParam = UrlParameterName.Of(paramName);
-            var shape = RequestScalarSlot.UrlQueryParameter(urlParam).RequireShape<T>();
+            var shape = RequestScalarTarget.UrlQueryParameter<T>(urlParam);
             var value = ValueProducer.ReadUrl(urlParam.Value, shape);
-            _draft.AddPayloadAssignment(RequestPayloadAssignment.Of(urlParam.Value, value));
+            _draft.AddAssignment(RequestInputAssignment.Payload(urlParam.Value, value));
             return this;
         }
 
@@ -195,9 +195,9 @@ namespace Alis.Reactive.Builders.Requests
         {
             var urlParam = UrlParameterName.Of(paramName);
             var payloadPath = BindingPath.Of(asParam);
-            var shape = RequestScalarSlot.UrlQueryParameter(urlParam).RequireShape<T>();
+            var shape = RequestScalarTarget.UrlQueryParameter<T>(urlParam);
             var value = ValueProducer.ReadUrl(urlParam.Value, shape);
-            _draft.AddPayloadAssignment(RequestPayloadAssignment.Of(payloadPath, value));
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, value));
             return this;
         }
 
@@ -208,7 +208,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (source == null) throw new System.ArgumentNullException(nameof(source));
             var payloadPath = BindingPath.Of(paramName);
-            _draft.AddPayloadAssignment(RequestPayloadAssignment.Of(payloadPath, source.ToValueProducer()));
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, source.ToValueProducer()));
             return this;
         }
 
@@ -259,7 +259,7 @@ namespace Alis.Reactive.Builders.Requests
                 planBindingPath,
                 valueContract);
             _context.EnsureInputComponent(planBinding);
-            _draft.AddPayloadAssignment(RequestPayloadAssignment.Of(planBindingPath, componentValue));
+            _draft.AddAssignment(RequestInputAssignment.Payload(planBindingPath, componentValue));
             return this;
         }
 
@@ -269,9 +269,10 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (source == null) throw new System.ArgumentNullException(nameof(source));
             var payloadPath = BindingPath.Of(paramName);
-            _draft.AddPayloadAssignment(RequestPayloadAssignment.Of(payloadPath, source.ToValueProducer()));
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, source.ToValueProducer()));
             return this;
         }
+
     }
 
 }

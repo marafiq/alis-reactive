@@ -1,79 +1,90 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
+using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
     internal sealed class GatherInput : RequestInput
     {
         public string Kind => "gather";
-        public IReadOnlyList<RequestPayloadAssignment> PayloadAssignments { get; }
+        public IReadOnlyList<RequestInputAssignment> Assignments { get; }
         public string BodyFormat => RequestBodyFormat.Value;
         public GatherSourceSelection SourceSelection { get; }
 
         private RequestBodyFormat RequestBodyFormat { get; }
 
         private GatherInput(
-            IReadOnlyList<RequestPayloadAssignment> payloadAssignments,
+            IReadOnlyList<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
             GatherSourceSelection sourceSelection)
         {
-            PayloadAssignments = payloadAssignments;
+            Assignments = assignments;
             RequestBodyFormat = bodyFormat;
             SourceSelection = sourceSelection;
         }
 
         internal static GatherInput From(
-            IEnumerable<RequestPayloadAssignment> payloadAssignments,
+            IEnumerable<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
             GatherSourceSelection sourceSelection) =>
             new GatherInput(
-                payloadAssignments.ToList(),
+                assignments.ToList(),
                 bodyFormat,
                 sourceSelection);
     }
 
-    internal abstract class GatherSourceSelection
+    internal sealed class GatherSourceSelection
     {
-        private GatherSourceSelection() { }
-
-        internal static GatherSourceSelection ExplicitPayloadAssignments { get; } = new ExplicitGatherSourceSelection();
-        internal static GatherSourceSelection AllRegisteredInputs { get; } = new AllRegisteredInputsGatherSourceSelection();
-
-        public abstract string Kind { get; }
-        internal abstract bool SelectsRegisteredInputs { get; }
-
-        private sealed class ExplicitGatherSourceSelection : GatherSourceSelection
+        private GatherSourceSelection(string kind, bool selectsRegisteredInputs)
         {
-            public override string Kind => "explicit";
-            internal override bool SelectsRegisteredInputs => false;
+            Kind = kind;
+            SelectsRegisteredInputs = selectsRegisteredInputs;
         }
 
-        private sealed class AllRegisteredInputsGatherSourceSelection : GatherSourceSelection
-        {
-            public override string Kind => "all-registered-inputs";
-            internal override bool SelectsRegisteredInputs => true;
-        }
+        internal static GatherSourceSelection ExplicitAssignments { get; } =
+            new GatherSourceSelection("explicit", false);
+
+        internal static GatherSourceSelection AllRegisteredInputs { get; } =
+            new GatherSourceSelection("all-registered-inputs", true);
+
+        public string Kind { get; }
+        internal bool SelectsRegisteredInputs { get; }
     }
 
-    internal sealed class RequestPayloadAssignment
+    internal sealed class RequestInputAssignment
     {
-        public RequestPayloadTarget Target { get; }
+        public RequestInputTarget Target { get; }
         public ValueProducer Source { get; }
 
-        private RequestPayloadAssignment(RequestPayloadTarget target, ValueProducer source)
+        private RequestInputAssignment(RequestInputTarget target, ValueProducer source)
         {
             Target = target;
             Source = source;
         }
 
-        internal static RequestPayloadAssignment Of(string payloadPath, ValueProducer source)
-            => Of(BindingPath.Of(payloadPath), source);
+        internal static RequestInputAssignment Payload(string payloadPath, ValueProducer source)
+            => Payload(BindingPath.Of(payloadPath), source);
 
-        internal static RequestPayloadAssignment Of(BindingPath payloadPath, ValueProducer source)
-            => new RequestPayloadAssignment(RequestPayloadTarget.For(payloadPath), source);
+        internal static RequestInputAssignment Payload(BindingPath payloadPath, ValueProducer source)
+            => new RequestInputAssignment(RequestPayloadTarget.For(payloadPath), source);
+
+        internal static RequestInputAssignment Header(HeaderName name, ValueProducer source)
+            => new RequestInputAssignment(RequestHeaderTarget.For(name), source);
+
+        internal static RequestInputAssignment RouteParameter(RouteParameterName name, ValueProducer source)
+            => new RequestInputAssignment(RequestRouteParameterTarget.For(name), source);
     }
 
-    public sealed class RequestPayloadTarget
+    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<RequestInputTarget>))]
+    public abstract class RequestInputTarget
+    {
+        private protected RequestInputTarget() { }
+
+        public abstract string Kind { get; }
+    }
+
+    public sealed class RequestPayloadTarget : RequestInputTarget
     {
         private readonly BindingPath _path;
 
@@ -82,6 +93,7 @@ namespace Alis.Reactive.PlanModel
             _path = path;
         }
 
+        public override string Kind => "payload";
         public string Name => _path.Value;
         public Path Path => _path.Path;
 
@@ -90,5 +102,37 @@ namespace Alis.Reactive.PlanModel
 
         internal static RequestPayloadTarget For(BindingPath path) =>
             new RequestPayloadTarget(path);
+    }
+
+    public sealed class RequestHeaderTarget : RequestInputTarget
+    {
+        private readonly HeaderName _name;
+
+        private RequestHeaderTarget(HeaderName name)
+        {
+            _name = name;
+        }
+
+        public override string Kind => "header";
+        public string Name => _name.Value;
+
+        internal static RequestHeaderTarget For(HeaderName name) =>
+            new RequestHeaderTarget(name);
+    }
+
+    public sealed class RequestRouteParameterTarget : RequestInputTarget
+    {
+        private readonly RouteParameterName _name;
+
+        private RequestRouteParameterTarget(RouteParameterName name)
+        {
+            _name = name;
+        }
+
+        public override string Kind => "route-param";
+        public string Name => _name.Value;
+
+        internal static RequestRouteParameterTarget For(RouteParameterName name) =>
+            new RequestRouteParameterTarget(name);
     }
 }

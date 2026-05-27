@@ -5,7 +5,7 @@ import type {
   PathSegment,
   Plan,
   RequestInput,
-  RequestPayloadAssignment,
+  RequestInputAssignment,
   RequestPayloadTarget,
   Shape,
   StructuredPath,
@@ -58,7 +58,7 @@ function browserValue(value: unknown, shape: Shape): ValueProducer {
 }
 
 function target(name: string): RequestPayloadTarget {
-  return { name, path: structuredPath(name) };
+  return { kind: "payload", name, path: structuredPath(name) };
 }
 
 function structuredPath(name: string): StructuredPath {
@@ -72,17 +72,25 @@ function pathSegment(part: string): PathSegment {
   return { kind: "property", name: part };
 }
 
-function assignment(name: string, source: ValueProducer): RequestPayloadAssignment {
+function assignment(name: string, source: ValueProducer): RequestInputAssignment {
   return { target: target(name), source };
 }
 
+function header(name: string, source: ValueProducer): RequestInputAssignment {
+  return { target: { kind: "header", name }, source };
+}
+
+function routeParam(name: string, source: ValueProducer): RequestInputAssignment {
+  return { target: { kind: "route-param", name }, source };
+}
+
 function gatherInput(
-  payloadAssignments: RequestPayloadAssignment[],
+  assignments: RequestInputAssignment[],
   bodyFormat: Extract<RequestInput, { kind: "gather" }>["bodyFormat"] = "json",
 ): RequestInput {
   return {
     kind: "gather",
-    payloadAssignments,
+    assignments,
     bodyFormat,
     sourceSelection: { kind: "explicit" },
   };
@@ -104,6 +112,8 @@ describe("resolveGather", () => {
   it("returns an empty payload for requests without gathered input", () => {
     expect(resolveGather({ kind: "none" }, "POST", emptyPlan, {})).toEqual({
       urlParams: [],
+      routeParams: {},
+      headers: {},
       body: {},
     });
   });
@@ -161,6 +171,53 @@ describe("resolveGather", () => {
         "tags=fall%20risk",
         "tags=new",
       ],
+      routeParams: {},
+      headers: {},
+      body: {},
+    });
+  });
+
+  it("resolves headers and route params through the same request input projection", () => {
+    const input = gatherInput([
+      routeParam("residentId", literal("42", stringShape)),
+      header("X-Tenant", literal("memory-care", stringShape)),
+      assignment("name", literal("Ada", stringShape)),
+    ]);
+
+    expect(resolveGather(input, "POST", emptyPlan, {})).toEqual({
+      urlParams: [],
+      routeParams: { residentId: "42" },
+      headers: { "X-Tenant": "memory-care" },
+      body: { name: "Ada" },
+    });
+  });
+
+  it("resolves route params from typed URL value producers", () => {
+    history.replaceState({}, "", "/residents?residentId=42");
+    const input = gatherInput([
+      routeParam("residentId", readUrlParameter("residentId", { kind: "number" })),
+    ]);
+
+    expect(resolveGather(input, "GET", emptyPlan, {})).toEqual({
+      urlParams: [],
+      routeParams: { residentId: "42" },
+      headers: {},
+      body: {},
+    });
+  });
+
+  it("uses the last authored assignment when a scalar target is repeated", () => {
+    const input = gatherInput([
+      routeParam("residentId", literal("41", stringShape)),
+      routeParam("residentId", literal("42", stringShape)),
+      header("X-Tenant", literal("skilled", stringShape)),
+      header("X-Tenant", literal("memory-care", stringShape)),
+    ]);
+
+    expect(resolveGather(input, "POST", emptyPlan, {})).toEqual({
+      urlParams: [],
+      routeParams: { residentId: "42" },
+      headers: { "X-Tenant": "memory-care" },
       body: {},
     });
   });

@@ -2,7 +2,7 @@ import type { RequestPayloadTarget, HttpMethod, PathSegment, RequestBodyFormat }
 import { toString } from "../core/shape-convert";
 import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
-import { PlainObjectRecord } from "../domain/object-record";
+import { plainObjectRecordFrom } from "../domain/object-record";
 import { RuntimeShape } from "../domain/runtime-shape";
 
 const log = scope("gather");
@@ -13,6 +13,8 @@ type GatheredArrayItem =
 
 export interface GatherResult {
   urlParams: string[];
+  routeParams: Record<string, string>;
+  headers: Record<string, string>;
   body: Record<string, unknown> | FormData;
 }
 
@@ -25,36 +27,58 @@ export interface RequestPayloadWriter {
 export class GatheredRequestInput {
   private constructor(
     private readonly urlParams: string[],
+    private readonly routeParams: Record<string, string>,
+    private readonly headers: Record<string, string>,
     private readonly body: Record<string, unknown> | FormData,
     readonly writer: RequestPayloadWriter,
   ) {}
 
   static empty(): GatherResult {
-    return { urlParams: [], body: {} };
+    return { urlParams: [], routeParams: {}, headers: {}, body: {} };
   }
 
   static for(bodyFormat: RequestBodyFormat, method: HttpMethod): GatheredRequestInput {
     const urlParams: string[] = [];
+    const routeParams: Record<string, string> = {};
+    const headers: Record<string, string> = {};
     if (sendsInputInQueryString(method)) {
-      return new GatheredRequestInput(urlParams, {}, createQueryStringWriter(urlParams));
+      return new GatheredRequestInput(urlParams, routeParams, headers, {}, createQueryStringWriter(urlParams));
     }
 
     switch (bodyFormat) {
       case "form-data": {
         const formData = new FormData();
-        return new GatheredRequestInput(urlParams, formData, createFormDataWriter(formData));
+        return new GatheredRequestInput(urlParams, routeParams, headers, formData, createFormDataWriter(formData));
       }
       case "json": {
         const body: Record<string, unknown> = {};
-        return new GatheredRequestInput(urlParams, body, createJsonBodyWriter(body));
+        return new GatheredRequestInput(urlParams, routeParams, headers, body, createJsonBodyWriter(body));
       }
       default:
         return assertNever(bodyFormat, "request body format");
     }
   }
 
+  writeHeader(name: string, value: unknown, shape: RuntimeShape): void {
+    this.headers[name] = requestScalarWireValue("header", name, value, shape);
+  }
+
+  writeRouteParameter(name: string, value: unknown, shape: RuntimeShape): void {
+    const valueIsMissing = value === null || value === undefined;
+    if (valueIsMissing) {
+      throw new Error(`[alis] route param "${name}" evaluated to null; cannot build URL`);
+    }
+
+    this.routeParams[name] = requestScalarWireValue("route param", name, value, shape);
+  }
+
   toResult(): GatherResult {
-    return { urlParams: this.urlParams, body: this.body };
+    return {
+      urlParams: this.urlParams,
+      routeParams: this.routeParams,
+      headers: this.headers,
+      body: this.body,
+    };
   }
 }
 
@@ -151,9 +175,9 @@ function gatheredArrayItems(items: unknown[]): GatheredArrayItem[] {
 function gatheredArrayItem(item: unknown): GatheredArrayItem {
   if (item instanceof File) return { kind: "file", file: item };
 
-  const wrapper = PlainObjectRecord.tryFrom(item);
+  const wrapper = plainObjectRecordFrom(item);
   if (wrapper !== undefined) {
-    const rawFile = wrapper.get("rawFile");
+    const rawFile = wrapper["rawFile"];
     if (rawFile instanceof File) return { kind: "file", file: rawFile };
   }
 
@@ -225,6 +249,14 @@ function scalarWireValue(value: unknown, name: string): string {
   throw new Error(`[alis] gather value "${name}" cannot be serialized as a scalar: ${result.error}`);
 }
 
+function requestScalarWireValue(targetKind: "header" | "route param", name: string, value: unknown, shape: RuntimeShape): string {
+  const wire = shape.formatForWire(value);
+  const result = toString(wire);
+  if (result.ok) return result.value;
+
+  throw new Error(`[alis] ${targetKind} "${name}" cannot be serialized as a scalar: ${result.error}`);
+}
+
 function jsonBodyValue(wireValue: unknown): unknown {
   const emptyTextRepresentsClearedField = wireValue === "";
   if (emptyTextRepresentsClearedField) return null;
@@ -252,9 +284,9 @@ function assignJsonBodyValue(
   let parent = body;
   for (const segment of segments.slice(0, -1)) {
     const value = parent[segment];
-    const nestedObject = PlainObjectRecord.tryFrom(value);
+    const nestedObject = plainObjectRecordFrom(value);
     if (nestedObject !== undefined) {
-      parent = nestedObject.raw;
+      parent = nestedObject;
       continue;
     }
 

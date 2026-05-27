@@ -2,13 +2,14 @@
 // Every payload assignment is evaluated by evaluateValue(); runtime registered
 // inputs use the same writer path after reading their component value member.
 
-import type { Plan, GatherInput, RequestPayloadAssignment, HttpMethod, RequestInput } from "../types";
+import type { Plan, GatherInput, RequestInputAssignment, HttpMethod, RequestInput } from "../types";
 import type { ExecContext } from "../types";
 import { assertNever } from "../core/assert-never";
 import { evaluateValue } from "../core/evaluate";
 import { RuntimePlan, type RuntimeComponent } from "../domain/runtime-plan";
 import { RuntimeShape } from "../domain/runtime-shape";
 import { GatheredRequestInput, writeGatheredValue, type GatherResult, type RequestPayloadWriter } from "./request-payload-writer";
+import { isMissingRuntimeValue } from "../domain/runtime-value";
 
 export type { GatherResult } from "./request-payload-writer";
 
@@ -46,8 +47,8 @@ function resolveRequestInput(input: RequestInput, runtime: GatherRuntime): Gathe
 function resolveGatherInput(input: GatherInput, runtime: GatherRuntime): GatherResult {
   const gathered = GatheredRequestInput.for(input.bodyFormat, runtime.method);
 
-  for (const assignment of input.payloadAssignments) {
-    writePayloadAssignment(assignment, gathered.writer, runtime);
+  for (const assignment of input.assignments) {
+    writeRequestInputAssignment(assignment, gathered, runtime);
   }
 
   writeRuntimeSelectedInputs(input.sourceSelection, runtime, gathered.writer);
@@ -55,14 +56,27 @@ function resolveGatherInput(input: GatherInput, runtime: GatherRuntime): GatherR
   return gathered.toResult();
 }
 
-function writePayloadAssignment(
-  assignment: RequestPayloadAssignment,
-  writer: RequestPayloadWriter,
+function writeRequestInputAssignment(
+  assignment: RequestInputAssignment,
+  gathered: GatheredRequestInput,
   runtime: GatherRuntime,
 ): void {
   const raw = evaluateValue(assignment.source, runtime.plan, runtime.ctx);
   const shape = RuntimeShape.declaredBy(assignment.source);
-  writeGatheredValue(assignment.target, raw, shape, writer);
+  switch (assignment.target.kind) {
+    case "payload":
+      writeGatheredValue(assignment.target, raw, shape, gathered.writer);
+      return;
+    case "header":
+      if (isMissingRuntimeValue(raw)) return;
+      gathered.writeHeader(assignment.target.name, raw, shape);
+      return;
+    case "route-param":
+      gathered.writeRouteParameter(assignment.target.name, raw, shape);
+      return;
+    default:
+      return assertNever(assignment.target, "request input target");
+  }
 }
 
 function writeRuntimeSelectedInputs(
@@ -98,6 +112,7 @@ function writeRuntimeRegisteredInput(
 
   writeGatheredValue(
     {
+      kind: "payload",
       name: binding.bindingPath,
       path: binding.path,
     },

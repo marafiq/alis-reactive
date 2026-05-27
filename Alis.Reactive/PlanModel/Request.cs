@@ -14,8 +14,6 @@ namespace Alis.Reactive.PlanModel
         private readonly IReadOnlyList<ResponseHandler> _error;
         private readonly IReadOnlyList<Reaction> _complete;
         private readonly RequestChain _chain;
-        private readonly IReadOnlyDictionary<string, ValueProducer> _headers;
-        private readonly IReadOnlyDictionary<string, ValueProducer> _routeParams;
         private readonly RequestValidationTarget _validationTarget;
 
         /// <summary>Gets the HTTP method (GET, POST, PUT, DELETE, PATCH).</summary>
@@ -36,11 +34,6 @@ namespace Alis.Reactive.PlanModel
         public IReadOnlyList<Reaction> Complete => _complete;
         /// <summary>Gets the request chain: terminal or followed by another request.</summary>
         public RequestChain Chain => _chain;
-        /// <summary>Gets the custom HTTP headers. Each value is evaluated at request time.</summary>
-        public IReadOnlyDictionary<string, ValueProducer> Headers => _headers;
-        /// <summary>Gets the URL template parameters. Each value is evaluated and URI-encoded before replacing placeholders in the URL.</summary>
-        public IReadOnlyDictionary<string, ValueProducer> RouteParams => _routeParams;
-
         private Request(
             RequestEndpoint endpoint,
             RequestInput input,
@@ -49,8 +42,6 @@ namespace Alis.Reactive.PlanModel
             IReadOnlyList<ResponseHandler> error,
             IReadOnlyList<Reaction> complete,
             RequestChain chain,
-            IReadOnlyDictionary<string, ValueProducer> headers,
-            IReadOnlyDictionary<string, ValueProducer> routeParams,
             RequestValidationTarget validationTarget)
         {
             _endpoint = endpoint ?? throw new System.ArgumentNullException(nameof(endpoint));
@@ -60,8 +51,6 @@ namespace Alis.Reactive.PlanModel
             _error = Snapshot(error);
             _complete = Snapshot(complete);
             _chain = chain ?? throw new System.ArgumentNullException(nameof(chain));
-            _headers = Snapshot(headers);
-            _routeParams = Snapshot(routeParams);
             _validationTarget = validationTarget ?? throw new System.ArgumentNullException(nameof(validationTarget));
         }
 
@@ -73,8 +62,6 @@ namespace Alis.Reactive.PlanModel
             IReadOnlyList<ResponseHandler> error,
             IReadOnlyList<Reaction> complete,
             RequestChain chain,
-            IReadOnlyDictionary<string, ValueProducer> headers,
-            IReadOnlyDictionary<string, ValueProducer> routeParams,
             RequestValidationTarget validationTarget) =>
             new Request(
                 endpoint,
@@ -84,23 +71,7 @@ namespace Alis.Reactive.PlanModel
                 error,
                 complete,
                 chain,
-                headers,
-                routeParams,
                 validationTarget);
-
-        /// <summary>Returns a copy of this request with <see cref="Before"/> replaced.</summary>
-        internal Request WithBefore(IReadOnlyList<Reaction> before) =>
-            new Request(
-                _endpoint,
-                _input,
-                before,
-                _success,
-                _error,
-                _complete,
-                _chain,
-                _headers,
-                _routeParams,
-                _validationTarget);
 
         private static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items)
         {
@@ -109,14 +80,6 @@ namespace Alis.Reactive.PlanModel
             return new List<T>(items);
         }
 
-        private static IReadOnlyDictionary<string, ValueProducer> Snapshot(
-            IReadOnlyDictionary<string, ValueProducer> values)
-        {
-            if (values.Count == 0)
-                return new Dictionary<string, ValueProducer>();
-
-            return new Dictionary<string, ValueProducer>(values, System.StringComparer.Ordinal);
-        }
     }
 
     internal sealed class RequestEndpoint

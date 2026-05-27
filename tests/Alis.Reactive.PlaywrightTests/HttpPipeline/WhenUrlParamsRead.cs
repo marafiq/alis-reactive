@@ -9,7 +9,7 @@ public class WhenUrlParamsRead : PlaywrightTestBase
     /// <summary>Navigate WITH query params so FromUrl reads real values.</summary>
     private async Task NavigateWithParams()
     {
-        await NavigateTo("/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3");
+        await NavigateTo("/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3&residentId=42");
         await WaitForTraceMessage("booted", 10000);
         await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 15000 });
     }

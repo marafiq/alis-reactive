@@ -89,7 +89,7 @@ export interface ObjectTargetComponent {
   id: string;
   vendor: Vendor;
   type: string;
-  contribution: ObjectTargetComponentContribution;
+  role: ObjectTargetComponentRole;
   binding: NoInputBinding;
   container: NoValidationContainer;
 }
@@ -98,7 +98,7 @@ export interface OwnedDefinitionComponent {
   id: string;
   vendor: Vendor;
   type: string;
-  contribution: OwnedDefinitionComponentContribution;
+  role: OwnedDefinitionComponentRole;
   binding: RegisteredInputBinding;
   container: NoValidationContainer;
 }
@@ -107,7 +107,7 @@ export interface ValidationContainerComponentDefinition {
   id: string;
   vendor: Vendor;
   type: string;
-  contribution: ValidationContainerComponentContribution;
+  role: ValidationContainerComponentRole;
   binding: InputBinding;
   container: ValidationContainerScope;
 }
@@ -116,30 +116,30 @@ export interface LayoutObjectComponent {
   id: string;
   vendor: Vendor;
   type: string;
-  contribution: LayoutObjectComponentContribution;
+  role: LayoutObjectComponentRole;
   binding: NoInputBinding;
   container: NoValidationContainer;
 }
 
 export type ComponentRole =
-  | ObjectTargetComponentContribution
-  | OwnedDefinitionComponentContribution
-  | ValidationContainerComponentContribution
-  | LayoutObjectComponentContribution;
+  | ObjectTargetComponentRole
+  | OwnedDefinitionComponentRole
+  | ValidationContainerComponentRole
+  | LayoutObjectComponentRole;
 
-export interface ObjectTargetComponentContribution {
+export interface ObjectTargetComponentRole {
   kind: "object-target";
 }
 
-export interface OwnedDefinitionComponentContribution {
+export interface OwnedDefinitionComponentRole {
   kind: "owned-definition";
 }
 
-export interface ValidationContainerComponentContribution {
+export interface ValidationContainerComponentRole {
   kind: "validation-container";
 }
 
-export interface LayoutObjectComponentContribution {
+export interface LayoutObjectComponentRole {
   kind: "layout-object";
 }
 
@@ -304,105 +304,44 @@ export type ValidationRuleExecution =
   | PeerValidationRuleExecution;
 
 export interface NoOperandValidationRuleExecution {
-  target: "none";
-  constraint: NoValidationRuleOperand;
-  otherValue: NoValidationRuleOperand;
+  kind: "none";
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
 }
 
 export interface ScalarConstraintValidationRuleExecution {
-  target: "constraint";
-  constraint: ScalarValidationConstraintOperand;
-  otherValue: NoValidationRuleOperand;
+  kind: "constraint";
+  value: LiteralProducer;
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
 }
 
 export interface NumericConstraintValidationRuleExecution {
-  target: "constraint";
-  constraint: NumericValidationConstraintOperand;
-  otherValue: NoValidationRuleOperand;
+  kind: "constraint";
+  value: NumericLiteralProducer;
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
 }
 
 export interface TextConstraintValidationRuleExecution {
-  target: "constraint";
-  constraint: TextValidationConstraintOperand;
-  otherValue: NoValidationRuleOperand;
+  kind: "constraint";
+  value: TextLiteralProducer;
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
 }
 
 export interface RangeConstraintValidationRuleExecution {
-  target: "constraint";
-  constraint: RangeValidationConstraintOperand;
-  otherValue: NoValidationRuleOperand;
+  kind: "constraint";
+  value: RangeLiteralProducer;
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
 }
 
 export interface PeerValidationRuleExecution {
-  target: "peer";
-  constraint: NoValidationRuleOperand;
-  otherValue: PeerValidationRuleOperand;
+  kind: "peer";
+  value: ReadProducer;
   activation: ValidationRuleActivation;
   comparisonShape: Shape;
-}
-
-export type ValidationRuleOperand =
-  | NoValidationRuleOperand
-  | ScalarValidationConstraintOperand
-  | NumericValidationConstraintOperand
-  | TextValidationConstraintOperand
-  | RangeValidationConstraintOperand
-  | PeerValidationRuleOperand;
-
-export type ValidationConstraintOperand =
-  | NoValidationRuleOperand
-  | ScalarValidationConstraintOperand
-  | NumericValidationConstraintOperand
-  | TextValidationConstraintOperand
-  | RangeValidationConstraintOperand;
-
-export type ValidationPeerOperand =
-  | NoValidationRuleOperand
-  | PeerValidationRuleOperand;
-
-export interface NoValidationRuleOperand {
-  kind: "none";
-}
-
-export type LiteralValidationConstraintOperand =
-  | ScalarValidationConstraintOperand
-  | NumericValidationConstraintOperand
-  | TextValidationConstraintOperand
-  | RangeValidationConstraintOperand;
-
-export interface ScalarValidationConstraintOperand {
-  kind: "value";
-  value: LiteralProducer;
-}
-
-export interface NumericValidationConstraintOperand {
-  kind: "value";
-  value: NumericLiteralProducer;
-}
-
-export interface TextValidationConstraintOperand {
-  kind: "value";
-  value: TextLiteralProducer;
-}
-
-export interface RangeValidationConstraintOperand {
-  kind: "value";
-  value: RangeLiteralProducer;
-}
-
-export interface PeerValidationRuleOperand {
-  kind: "value";
-  value: ReadProducer;
 }
 
 export type ValidationRuleActivation =
@@ -648,8 +587,6 @@ export type HttpMethod =
 export interface Request {
   method: HttpMethod;
   url: string;
-  headers: Record<string, ValueProducer>;
-  routeParams: Record<string, ValueProducer>;
   validation: RequestValidationTarget;
   input: RequestInput;
   before: Reaction[];
@@ -699,7 +636,7 @@ export interface NoRequestInput {
 
 export interface GatherInput {
   kind: "gather";
-  payloadAssignments: RequestPayloadAssignment[];
+  assignments: RequestInputAssignment[];
   bodyFormat: RequestBodyFormat;
   sourceSelection: GatherSourceSelection;
 }
@@ -716,14 +653,30 @@ export interface AllRegisteredInputsGatherSourceSelection {
   kind: "all-registered-inputs";
 }
 
-export interface RequestPayloadAssignment {
-  target: RequestPayloadTarget;
+export interface RequestInputAssignment {
+  target: RequestInputTarget;
   source: ValueProducer;
 }
 
+export type RequestInputTarget =
+  | RequestPayloadTarget
+  | RequestHeaderTarget
+  | RequestRouteParameterTarget;
+
 export interface RequestPayloadTarget {
+  kind: "payload";
   name: string;
   path: StructuredPath;
+}
+
+export interface RequestHeaderTarget {
+  kind: "header";
+  name: string;
+}
+
+export interface RequestRouteParameterTarget {
+  kind: "route-param";
+  name: string;
 }
 
 export interface ResponseHandler {

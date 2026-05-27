@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { executeRequest, routeHandlers } from "../execution/http";
+import { executeRequest } from "../execution/http";
 import type {
   ComponentObject,
-  RequestPayloadAssignment,
+  RequestInputAssignment,
   RequestPayloadTarget,
   BrowserObjectContract,
   PathSegment,
@@ -27,19 +27,34 @@ function literal(value: string): ValueProducer {
 }
 
 function gatherInput(sourcesByPayloadName: Record<string, ValueProducer>): Request["input"] {
+  return requestInput(
+    Object.entries(sourcesByPayloadName).map(([name, value]) => payloadAssignment(name, value))
+  );
+}
+
+function requestInput(assignments: RequestInputAssignment[]): Request["input"] {
   return {
     kind: "gather",
-    payloadAssignments: Object.entries(sourcesByPayloadName).map(([name, value]): RequestPayloadAssignment => ({
-      target: target(name),
-      source: value,
-    })),
+    assignments,
     bodyFormat: "json",
     sourceSelection: { kind: "explicit" },
   };
 }
 
 function target(name: string): RequestPayloadTarget {
-  return { name, path: structuredPath(name) };
+  return { kind: "payload", name, path: structuredPath(name) };
+}
+
+function payloadAssignment(name: string, source: ValueProducer): RequestInputAssignment {
+  return { target: target(name), source };
+}
+
+function headerAssignment(name: string, source: ValueProducer): RequestInputAssignment {
+  return { target: { kind: "header", name }, source };
+}
+
+function routeParamAssignment(name: string, source: ValueProducer): RequestInputAssignment {
+  return { target: { kind: "route-param", name }, source };
 }
 
 function structuredPath(name: string): StructuredPath {
@@ -77,8 +92,6 @@ function request(overrides: Partial<Request>): Request {
   return {
     method: "POST",
     url: "/residents",
-    headers: {},
-    routeParams: {},
     validation: { kind: "none" },
     input: { kind: "none" },
     before: [],
@@ -121,7 +134,7 @@ function nativeComponent(id: string): ComponentObject {
     id,
     vendor: "native",
     type: "native.text",
-    contribution: { kind: "object-target" },
+    role: { kind: "object-target" },
     binding: { kind: "none" },
     container: { kind: "none" },
   };
@@ -156,9 +169,11 @@ describe("executeRequest HTTP lifecycle", () => {
     const fetchMock = mockFetch([responseJson({ message: "Saved" })]);
     const saveResident = request({
       url: "/residents/{residentId}",
-      routeParams: { residentId: literal("42") },
-      headers: { "X-Unit": literal("memory-care") },
-      input: gatherInput({ name: literal("Ada") }),
+      input: requestInput([
+        routeParamAssignment("residentId", literal("42")),
+        headerAssignment("X-Unit", literal("memory-care")),
+        payloadAssignment("name", literal("Ada")),
+      ]),
       before: [setText("before", literal("Started"))],
       success: [
         { match: { kind: "any" }, reaction: setText("success", payloadRead("success", "message")) },
@@ -195,8 +210,10 @@ describe("executeRequest HTTP lifecycle", () => {
     const loadFacility = request({
       method: "GET",
       url: "/facilities/{facilityId}",
-      routeParams: { facilityId: literal("west wing") },
-      headers: { "X-Hop": literal("second") },
+      input: requestInput([
+        routeParamAssignment("facilityId", literal("west wing")),
+        headerAssignment("X-Hop", literal("second")),
+      ]),
       success: [
         { match: { kind: "any" }, reaction: setText("facility", payloadRead("success", "name")) },
       ],
@@ -204,8 +221,10 @@ describe("executeRequest HTTP lifecycle", () => {
     const loadResident = request({
       method: "GET",
       url: "/residents/{residentId}",
-      routeParams: { residentId: literal("42") },
-      headers: { "X-Hop": literal("first") },
+      input: requestInput([
+        routeParamAssignment("residentId", literal("42")),
+        headerAssignment("X-Hop", literal("first")),
+      ]),
       success: [
         { match: { kind: "any" }, reaction: setText("resident", payloadRead("success", "name")) },
       ],
@@ -224,6 +243,56 @@ describe("executeRequest HTTP lifecycle", () => {
     expect(firstInit.headers).toMatchObject({ "X-Hop": "first" });
     expect(secondUrl).toBe("/facilities/west%20wing");
     expect(secondInit.headers).toMatchObject({ "X-Hop": "second" });
+  });
+
+  it("lets a request declared inside a success handler gather from the previous response", async () => {
+    document.body.innerHTML = `
+      <span id="resident"></span>
+      <span id="facility"></span>
+    `;
+    const fetchMock = mockFetch([
+      responseJson({ residentId: "42", name: "John Doe" }),
+      responseJson({ name: "Resident #42 at Facility #3" }),
+    ]);
+    const loadFacility = request({
+      method: "GET",
+      url: "/facilities/{facilityId}/residents/{residentId}",
+      input: requestInput([
+        routeParamAssignment("facilityId", literal("3")),
+        routeParamAssignment("residentId", payloadRead("success", "residentId")),
+      ]),
+      success: [
+        { match: { kind: "any" }, reaction: setText("facility", payloadRead("success", "name")) },
+      ],
+    });
+    const loadResident = request({
+      method: "GET",
+      url: "/residents/{residentId}",
+      input: requestInput([
+        routeParamAssignment("residentId", literal("42")),
+      ]),
+      success: [
+        {
+          match: { kind: "any" },
+          reaction: {
+            kind: "sequence",
+            steps: [
+              setText("resident", payloadRead("success", "name")),
+              { kind: "request", request: loadFacility },
+            ],
+          },
+        },
+      ],
+    });
+
+    await executeRequest(loadResident, nativeTextPlan(["resident", "facility"]));
+
+    expect(document.getElementById("resident")?.textContent).toBe("John Doe");
+    expect(document.getElementById("facility")?.textContent).toBe("Resident #42 at Facility #3");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    const [secondUrl] = fetchMock.mock.calls[1] as [string, RequestInit];
+    expect(secondUrl).toBe("/facilities/3/residents/42");
   });
 
   it("routes error responses, still completes, and does not run the follow-up request", async () => {

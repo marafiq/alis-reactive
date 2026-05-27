@@ -1,10 +1,6 @@
-import type { ExecContext, Plan, Request, ValueProducer } from "../types";
+import type { Request } from "../types";
 import type { GatherResult } from "./gather";
-import { evaluateValue } from "../core/evaluate";
-import { toString as convertToString } from "../core/shape-convert";
 import { resolveRouteParams } from "../core/url-template";
-import { isMissingRuntimeValue } from "../domain/runtime-value";
-import { RuntimeShape } from "../domain/runtime-shape";
 
 export interface ResolvedFetch {
   readonly url: string;
@@ -13,25 +9,21 @@ export interface ResolvedFetch {
 
 export function resolveFetch(
   request: Request,
-  plan: Plan,
-  context: ExecContext,
   gathered: GatherResult,
 ): ResolvedFetch {
-  const url = buildRequestUrl(request, plan, context, gathered.urlParams);
-  const init = buildRequestInit(request, plan, context, gathered);
+  const url = buildRequestUrl(request, gathered);
+  const init = buildRequestInit(request, gathered);
   return { url, init };
 }
 
 function buildRequestUrl(
   request: Request,
-  plan: Plan,
-  context: ExecContext,
-  urlParams: string[],
+  gathered: GatherResult,
 ): string {
-  const url = resolveRouteParams(request.url, request.routeParams, plan, context);
-  if (urlParams.length === 0) return url;
+  const url = resolveRouteParams(request.url, gathered.routeParams);
+  if (gathered.urlParams.length === 0) return url;
 
-  return url + queryStringSeparator(url) + urlParams.join("&");
+  return url + queryStringSeparator(url) + gathered.urlParams.join("&");
 }
 
 function queryStringSeparator(url: string): "?" | "&" {
@@ -40,15 +32,13 @@ function queryStringSeparator(url: string): "?" | "&" {
 
 function buildRequestInit(
   request: Request,
-  plan: Plan,
-  context: ExecContext,
   gathered: GatherResult,
 ): RequestInit {
   const init: RequestInit = { method: request.method };
   const headers: Record<string, string> = {};
 
   applyRequestBody(request, gathered, init, headers);
-  applyRequestHeaders(request, plan, context, headers);
+  applyRequestHeaders(gathered, headers);
 
   if (Object.keys(headers).length > 0) init.headers = headers;
   return init;
@@ -75,24 +65,6 @@ function applyRequestBody(
   init.body = JSON.stringify(gatheredBody);
 }
 
-function applyRequestHeaders(
-  request: Request,
-  plan: Plan,
-  context: ExecContext,
-  headers: Record<string, string>,
-): void {
-  for (const [name, producer] of Object.entries(request.headers)) {
-    const value = evaluateValue(producer, plan, context);
-    if (isMissingRuntimeValue(value)) continue;
-
-    headers[name] = requestHeaderWireValue(name, producer, value);
-  }
-}
-
-function requestHeaderWireValue(name: string, producer: ValueProducer, value: unknown): string {
-  const wireValue = RuntimeShape.declaredBy(producer).formatForWire(value);
-  const text = convertToString(wireValue);
-  if (text.ok) return text.value;
-
-  throw new Error(`[alis] header "${name}" cannot be serialized as a scalar: ${text.error}`);
+function applyRequestHeaders(gathered: GatherResult, headers: Record<string, string>): void {
+  Object.assign(headers, gathered.headers);
 }

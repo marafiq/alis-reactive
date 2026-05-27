@@ -50,10 +50,10 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Includes a typed component property read in the gather.
+        /// Includes a typed component member value in the gather.
         /// The member name becomes the HTTP parameter name.
-        /// Use with display component readable properties like
-        /// <c>schedule.CurrentView()</c> or <c>schedule.SelectedDate()</c>.
+        /// Use with component value sources like <c>schedule.CurrentView()</c>,
+        /// <c>schedule.SelectedDate()</c>, or method-return sources such as <c>schedule.GetEvents()</c>.
         /// </summary>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
             this GatherBuilder<TModel> self,
@@ -65,7 +65,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Includes a typed component property read with an explicit HTTP parameter name.
+        /// Includes a typed component member value with an explicit HTTP parameter name.
         /// Use when the parameter name differs from the component property name.
         /// </summary>
         public static GatherBuilder<TModel> Include<TModel, TProp>(

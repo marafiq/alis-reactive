@@ -21,41 +21,32 @@ namespace Alis.Reactive.Builders.Requests
         }
     }
 
-    internal sealed class RequestScalarSlot
+    internal static class RequestScalarTarget
     {
-        private readonly string _label;
-        private readonly string _name;
-
-        private RequestScalarSlot(string label, string name)
-        {
-            _label = label ?? throw new ArgumentNullException(nameof(label));
-            _name = name ?? throw new ArgumentNullException(nameof(name));
-        }
-
-        internal static RequestScalarSlot Header(HeaderName name)
+        internal static Shape Header<TProp>(HeaderName name)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new RequestScalarSlot("header", name.Value);
+            return RequireShape<TProp>("header", name.Value);
         }
 
-        internal static RequestScalarSlot RouteParameter(RouteParameterName name)
+        internal static Shape RouteParameter<TProp>(RouteParameterName name)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new RequestScalarSlot("route param", name.Value);
+            return RequireShape<TProp>("route param", name.Value);
         }
 
-        internal static RequestScalarSlot UrlQueryParameter(UrlParameterName name)
+        internal static Shape UrlQueryParameter<TProp>(UrlParameterName name)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new RequestScalarSlot("URL param", name.Value);
+            return RequireShape<TProp>("URL param", name.Value);
         }
 
-        internal Shape RequireShape<TProp>()
+        private static Shape RequireShape<TProp>(string label, string name)
         {
             var shape = Shape.FromClrType(typeof(TProp));
             if (!shape.IsScalar)
                 throw new InvalidOperationException(
-                    $"{_label} '{_name}' requires a scalar type, but got shape '{shape.DescribeContract()}'. " +
+                    $"{label} '{name}' requires a scalar type, but got shape '{shape.DescribeContract()}'. " +
                     "Use string, int, bool, DateTime, or their nullable variants.");
 
             return shape;

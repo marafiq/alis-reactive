@@ -24,6 +24,11 @@ type HttpExchangeOutcome =
   | { readonly kind: "error"; readonly status: RequestOutcomeStatus; readonly body: HttpResponseBody }
   | { readonly kind: "response-unavailable"; readonly status: RequestOutcomeStatus };
 
+type RequestOutcomeStatus =
+  | { readonly kind: "http"; readonly value: number }
+  | { readonly kind: "network-failure"; readonly value: 0 }
+  | { readonly kind: "client-failure"; readonly value: -1 };
+
 /** Execute a single HTTP request with gather, before, response routing, complete, and chaining. */
 export async function executeRequest(req: Request, plan: Plan, ctx?: ExecContext): Promise<void> {
   await runHttpRequest(req, plan, ExecutionContext.from(ctx));
@@ -59,7 +64,7 @@ function prepareHttpRequest(request: Request, plan: Plan, context: ExecutionCont
   const currentContext = context.asAvailable();
   const gathered = resolveGather(request.input, request.method, plan, currentContext);
   const requestContext = context.withRequest(requestPayloadSnapshotFrom(gathered));
-  const fetch = resolveFetch(request, plan, currentContext, gathered);
+  const fetch = resolveFetch(request, gathered);
 
   return { fetch, context: requestContext };
 }
@@ -84,7 +89,7 @@ async function sendHttpRequest(request: Request, fetchRequest: ResolvedFetch): P
 }
 
 function exchangeOutcomeFromResponse(response: Response, body: HttpResponseBody): HttpExchangeOutcome {
-  const status = RequestOutcomeStatus.http(response.status);
+  const status = httpOutcomeStatus(response.status);
   const statusIsSuccessful = response.ok;
   return statusIsSuccessful
     ? { kind: "success", status, body }
@@ -130,36 +135,28 @@ type ClientRequestFailure = {
 function clientRequestFailureFrom(error: unknown): ClientRequestFailure {
   const requestFailedBeforeResponse = error instanceof TypeError;
   return requestFailedBeforeResponse
-    ? { status: RequestOutcomeStatus.networkFailure(), traceEvent: "fetch.network-error" }
-    : { status: RequestOutcomeStatus.clientFailure(), traceEvent: "fetch.client-error" };
+    ? { status: networkFailureStatus(), traceEvent: "fetch.network-error" }
+    : { status: clientFailureStatus(), traceEvent: "fetch.client-error" };
 }
 
-class RequestOutcomeStatus {
-  private constructor(
-    private readonly kind: "http" | "network-failure" | "client-failure",
-    private readonly value: number,
-  ) {}
+function httpOutcomeStatus(value: number): RequestOutcomeStatus {
+  return { kind: "http", value };
+}
 
-  static http(value: number): RequestOutcomeStatus {
-    return new RequestOutcomeStatus("http", value);
-  }
+function networkFailureStatus(): RequestOutcomeStatus {
+  return { kind: "network-failure", value: 0 };
+}
 
-  static networkFailure(): RequestOutcomeStatus {
-    return new RequestOutcomeStatus("network-failure", 0);
-  }
+function clientFailureStatus(): RequestOutcomeStatus {
+  return { kind: "client-failure", value: -1 };
+}
 
-  static clientFailure(): RequestOutcomeStatus {
-    return new RequestOutcomeStatus("client-failure", -1);
-  }
+function statusMatchesExact(status: RequestOutcomeStatus, planStatus: number): boolean {
+  return status.kind === "http" && status.value === planStatus;
+}
 
-  matchesExact(planStatus: number): boolean {
-    const responseHasHttpStatusCode = this.kind === "http";
-    return responseHasHttpStatusCode && this.value === planStatus;
-  }
-
-  forLog(): number {
-    return this.value;
-  }
+function statusForLog(status: RequestOutcomeStatus): number {
+  return status.value;
 }
 
 async function routeSuccess(
@@ -169,9 +166,10 @@ async function routeSuccess(
   status: RequestOutcomeStatus,
   body: HttpResponseBody,
 ): Promise<void> {
+  const responseContext = contextWithResponseBody(context, body);
   await routeAndComplete(request, plan, context, () =>
-    routeResponseHandlers(request.success, status, plan, contextWithResponseBody(context, body).asAvailable()));
-  await runFollowUpRequest(request.chain, plan, context);
+    routeResponseHandlers(request.success, status, plan, responseContext.asAvailable()));
+  await runFollowUpRequest(request.chain, plan, responseContext);
 }
 
 async function routeError(
@@ -305,7 +303,7 @@ async function routeResponseHandlers(
   if (handlers.length === 0) return;
 
   log.warn("response.unhandled", {
-    status: status.forLog(),
+    status: statusForLog(status),
     handlerCount: handlers.length,
   });
 }
@@ -314,7 +312,7 @@ function handlerMatchesStatus(status: RequestOutcomeStatus): (handler: ResponseH
   return handler => {
     const match = handler.match;
     const handlerTargetsExactStatus = match.kind === "status";
-    return handlerTargetsExactStatus && status.matchesExact(match.status);
+    return handlerTargetsExactStatus && statusMatchesExact(status, match.status);
   };
 }
 
