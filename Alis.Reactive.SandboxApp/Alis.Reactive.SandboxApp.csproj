@@ -16,4 +16,6 @@
         <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
     </ItemGroup>
 
+    <Import Project="..\build\AlisReactiveBrowserAssets.targets" />
+
 </Project>
