@@ -494,6 +494,101 @@ one vector, and every vector maps to a behavior proof. If a later implementation
 step finds a missing vector, the graph was incomplete and must be fixed before
 more code is written.
 
+## Module Design: HTTP, Gather, Response
+
+Covered vectors: T6, T7, T8, T9, T10.
+
+### Source Method Inventory
+
+| Source file | Public DSL methods | Design node |
+| --- | --- | --- |
+| `PipelineBuilder.Http.cs` | `Get`, `Post`, `Post(url,gather)`, `Put(url,gather)`, `Delete`, `Parallel` | request reaction or parallel reaction |
+| `HttpRequestBuilder.cs` | `Get`, `Post`, `Put`, `Delete`, `Gather`, `AsJson`, `AsFormData`, `WhileLoading`, `Finally`, `Validate`, `Response` | `RequestPlan` |
+| `GatherBuilder.cs` | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, `Plugin`, vendor `Include` bridge | `RequestInputProjection` |
+| `GatherExtensions.cs` | typed component include overloads | component value source assignment |
+| `ResponseBuilder.cs` | `OnSuccess`, `OnSuccess<T>`, `OnError`, `OnError(status)`, `OnError<T>`, `Chained` | `ResponseRoute` and follow-up request |
+| `ParallelBuilder.cs` | `OnAllSettled` | parallel completion graph |
+| `ResponseBody.cs` | `Read(x => x.Prop)` | success/error payload value source |
+
+### Request Input Activity
+
+```mermaid
+flowchart TD
+    A[DSL: Gather call] --> B{Target DSL}
+    B -->|Static / FromEvent / FromUrl / Plugin / Include| C[Payload target]
+    B -->|Header| D[Header target]
+    B -->|RouteParam| E[Route target]
+    B -->|IncludeAll| F[All registered input source selection]
+
+    C --> G[RequestInputAssignment]
+    D --> G
+    E --> G
+    F --> H[RequestInputProjection.sourceSelection]
+
+    G --> I{Source DSL}
+    I -->|literal| J[Literal ValueExpression]
+    I -->|URL| K[UrlRead ValueExpression]
+    I -->|event args| L[PayloadRead event scope]
+    I -->|success/error body| M[PayloadRead success/error scope]
+    I -->|component property| N[ObjectPropertyRead]
+    I -->|component method| O[ObjectMethodCall]
+    I -->|plugin| P[PluginRead]
+
+    J --> Q[Runtime resolves projection]
+    K --> Q
+    L --> Q
+    M --> Q
+    N --> Q
+    O --> Q
+    P --> Q
+    H --> Q
+    Q --> R[Write route params, headers, body/query]
+```
+
+### Response And Follow-Up Sequence
+
+```mermaid
+sequenceDiagram
+    participant Runtime as HTTP executor
+    participant Request as RequestPlan
+    participant Gather as RequestInputProjection
+    participant Fetch as Browser fetch
+    participant Route as ResponseRoute
+    participant Follow as FollowUp RequestPlan
+
+    Runtime->>Request: execute request
+    Runtime->>Gather: resolve assignments from current context
+    Gather-->>Runtime: route params, headers, body/query
+    Runtime->>Fetch: send request
+    Fetch-->>Runtime: response body and status
+    Runtime->>Route: run matching success/error reaction with body scope
+    Route-->>Runtime: reaction complete
+    Runtime->>Follow: execute follow-up request with response scope available
+```
+
+### HTTP/Gather Input Output Matrix
+
+| Vector | DSL input | Domain output | JSON/TS output | Runtime proof |
+| --- | --- | --- | --- | --- |
+| T6 mixed source targets | `Header(url)`, `RouteParam(event)`, `FromUrl<T>`, `Plugin(source)` | `RequestInputProjection` with ordered `RequestInputAssignment`s | `assignments[]` target kinds `header`, `route-param`, `payload` with source kinds `url`, `payload:event`, `plugin` | projection test + `resolveGather` runtime test |
+| T7 component method source | `g.Include(p.Component<FusionSchedule>("s").GetEvents(), "events")` | assignment source is object method value expression | component source with `access.kind="method"` and return `array` | projection test |
+| T8 success response source in request | `OnSuccess<T>((json,s)=> s.Get(...).Gather(g=>g.RouteParam("id", json.Read(...))))` | success route contains nested request; nested gather reads success payload | nested request assignment source is payload scope `success` | runtime test + Playwright section 17 |
+| T9 chained request | `.Response(r => r.OnSuccess(...).Chained(c => c.Get(...)))` | request has follow-up request | request chain/follow-up in plan | runtime test + existing chain Playwright |
+| T10 parallel | `p.Parallel(a=>a.Get(...), b=>b.Get(...)).OnAllSettled(...)` | parallel reaction with request branches and completion graph | `parallel.steps`, `completion` | runtime test + Playwright section 4 |
+
+### Closure Criteria
+
+- The request domain uses `RequestPlan`, `RequestInputProjection`,
+  `RequestInputAssignment`, `RequestInputTarget`, `ResponseRoute`, and
+  `ParallelCompletion` language.
+- Headers, route params, and payload/body are one assignment model, not parallel
+  ad hoc dictionaries in the C# plan.
+- Success/error response bodies are payload scopes available to response route
+  graphs and success-declared follow-up requests.
+- Runtime request execution only resolves the declared projection and sends it.
+- Tests prove T6-T10; tests that only pin old helper fields are deleted or
+  rewritten.
+
 ## Closure Rules
 
 - No module is done from code inspection alone. The source row, C# domain,
