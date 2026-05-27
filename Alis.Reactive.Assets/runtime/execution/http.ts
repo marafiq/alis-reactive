@@ -1,7 +1,7 @@
 // http.ts - HTTP request execution using V3 Request type.
 // Uses the shared value/gather/runtime concepts and keeps HTTP async isolated.
 
-import type { Request, ResponseHandler, Plan, ExecContext, Reaction } from "../types";
+import type { Request, ResponseRoute, Plan, ExecContext, Reaction } from "../types";
 import { resolveGather, type GatherResult } from "./gather";
 import { executeReaction } from "./execute";
 import { validateContainer } from "../validation";
@@ -168,7 +168,7 @@ async function routeSuccess(
 ): Promise<void> {
   const responseContext = contextWithResponseBody(context, body);
   await routeAndComplete(request, plan, context, () =>
-    routeResponseHandlers(request.success, status, plan, responseContext.asAvailable()));
+    routeResponseRoutes(request.success, status, plan, responseContext.asAvailable()));
   await runFollowUpRequest(request.chain, plan, responseContext);
 }
 
@@ -180,7 +180,7 @@ async function routeError(
   body: HttpResponseBody,
 ): Promise<void> {
   await routeAndComplete(request, plan, context, () =>
-    routeResponseHandlers(request.error, status, plan, contextWithResponseBody(context, body).asAvailable()));
+    routeResponseRoutes(request.error, status, plan, contextWithResponseBody(context, body).asAvailable()));
 }
 
 async function routeResponseUnavailable(
@@ -190,7 +190,7 @@ async function routeResponseUnavailable(
   status: RequestOutcomeStatus,
 ): Promise<void> {
   await routeAndComplete(request, plan, context, () =>
-    routeResponseHandlers(request.error, status, plan, context.asAvailable()));
+    routeResponseRoutes(request.error, status, plan, context.asAvailable()));
 }
 
 async function routeAndComplete(
@@ -288,34 +288,34 @@ function responseBodyFrom(rawBody: unknown): HttpResponseBody {
   return { kind: "available", value: rawBody };
 }
 
-async function routeResponseHandlers(
-  handlers: ResponseHandler[],
+async function routeResponseRoutes(
+  routes: ResponseRoute[],
   status: RequestOutcomeStatus,
   plan: Plan,
   context: ExecContext,
 ): Promise<void> {
-  const handler = handlers.find(handlerMatchesStatus(status)) ?? handlers.find(handlerMatchesAnyStatus);
-  if (handler) {
-    await executeReaction(handler.reaction, plan, context);
+  const route = routes.find(routeMatchesStatus(status)) ?? routes.find(routeMatchesAnyStatus);
+  if (route) {
+    await executeReaction(route.reaction, plan, context);
     return;
   }
 
-  if (handlers.length === 0) return;
+  if (routes.length === 0) return;
 
   log.warn("response.unhandled", {
     status: statusForLog(status),
-    handlerCount: handlers.length,
+    routeCount: routes.length,
   });
 }
 
-function handlerMatchesStatus(status: RequestOutcomeStatus): (handler: ResponseHandler) => boolean {
-  return handler => {
-    const match = handler.match;
-    const handlerTargetsExactStatus = match.kind === "status";
-    return handlerTargetsExactStatus && statusMatchesExact(status, match.status);
+function routeMatchesStatus(status: RequestOutcomeStatus): (route: ResponseRoute) => boolean {
+  return route => {
+    const match = route.match;
+    const routeTargetsExactStatus = match.kind === "status";
+    return routeTargetsExactStatus && statusMatchesExact(status, match.status);
   };
 }
 
-function handlerMatchesAnyStatus(handler: ResponseHandler): boolean {
-  return handler.match.kind === "any";
+function routeMatchesAnyStatus(route: ResponseRoute): boolean {
+  return route.match.kind === "any";
 }

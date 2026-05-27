@@ -590,8 +590,8 @@ export interface Request {
   validation: RequestValidationTarget;
   input: RequestInput;
   before: Reaction[];
-  success: ResponseHandler[];
-  error: ResponseHandler[];
+  success: ResponseRoute[];
+  error: ResponseRoute[];
   complete: Reaction[];
   chain: RequestChain;
 }
@@ -679,7 +679,7 @@ export interface RequestRouteParameterTarget {
   name: string;
 }
 
-export interface ResponseHandler {
+export interface ResponseRoute {
   match: ResponseStatusMatch;
   reaction: Reaction;
 }

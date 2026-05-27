@@ -445,8 +445,8 @@ namespace Alis.Reactive.PlanModel
                 .Requires("validation", "RequestValidationTarget")
                 .Requires("input", "RequestInput")
                 .Requires("before", "Reaction[]")
-                .Requires("success", "ResponseHandler[]")
-                .Requires("error", "ResponseHandler[]")
+                .Requires("success", "ResponseRoute[]")
+                .Requires("error", "ResponseRoute[]")
                 .Requires("complete", "Reaction[]")
                 .Requires("chain", "RequestChain"));
 
@@ -517,7 +517,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("route-param"))
                 .Requires("name", "string"));
 
-            contract.Declare(Interface("ResponseHandler")
+            contract.Declare(Interface("ResponseRoute")
                 .Requires("match", "ResponseStatusMatch")
                 .Requires("reaction", "Reaction"));
 

@@ -10,8 +10,8 @@ namespace Alis.Reactive.PlanModel
         private readonly RequestEndpoint _endpoint;
         private readonly RequestInput _input;
         private readonly IReadOnlyList<Reaction> _before;
-        private readonly IReadOnlyList<ResponseHandler> _success;
-        private readonly IReadOnlyList<ResponseHandler> _error;
+        private readonly IReadOnlyList<ResponseRoute> _success;
+        private readonly IReadOnlyList<ResponseRoute> _error;
         private readonly IReadOnlyList<Reaction> _complete;
         private readonly RequestChain _chain;
         private readonly RequestValidationTarget _validationTarget;
@@ -26,10 +26,10 @@ namespace Alis.Reactive.PlanModel
         public RequestInput Input => _input;
         /// <summary>Gets reactions to execute before the request is sent.</summary>
         public IReadOnlyList<Reaction> Before => _before;
-        /// <summary>Gets the success response handlers.</summary>
-        public IReadOnlyList<ResponseHandler> Success => _success;
-        /// <summary>Gets the error response handlers.</summary>
-        public IReadOnlyList<ResponseHandler> Error => _error;
+        /// <summary>Gets the success response routes.</summary>
+        public IReadOnlyList<ResponseRoute> Success => _success;
+        /// <summary>Gets the error response routes.</summary>
+        public IReadOnlyList<ResponseRoute> Error => _error;
         /// <summary>Gets reactions to execute after the request completes regardless of outcome.</summary>
         public IReadOnlyList<Reaction> Complete => _complete;
         /// <summary>Gets the request chain: terminal or followed by another request.</summary>
@@ -38,8 +38,8 @@ namespace Alis.Reactive.PlanModel
             RequestEndpoint endpoint,
             RequestInput input,
             IReadOnlyList<Reaction> before,
-            IReadOnlyList<ResponseHandler> success,
-            IReadOnlyList<ResponseHandler> error,
+            IReadOnlyList<ResponseRoute> success,
+            IReadOnlyList<ResponseRoute> error,
             IReadOnlyList<Reaction> complete,
             RequestChain chain,
             RequestValidationTarget validationTarget)
@@ -58,8 +58,8 @@ namespace Alis.Reactive.PlanModel
             RequestEndpoint endpoint,
             RequestInput input,
             IReadOnlyList<Reaction> before,
-            IReadOnlyList<ResponseHandler> success,
-            IReadOnlyList<ResponseHandler> error,
+            IReadOnlyList<ResponseRoute> success,
+            IReadOnlyList<ResponseRoute> error,
             IReadOnlyList<Reaction> complete,
             RequestChain chain,
             RequestValidationTarget validationTarget) =>
@@ -193,25 +193,25 @@ namespace Alis.Reactive.PlanModel
         public string Container => _container.Value;
     }
 
-    /// <summary>Maps an HTTP response match to a reaction.</summary>
-    public sealed class ResponseHandler
+    /// <summary>Routes an HTTP response status match to a reaction.</summary>
+    public sealed class ResponseRoute
     {
-        /// <summary>Gets the response status match that selects this handler.</summary>
+        /// <summary>Gets the response status match that selects this route.</summary>
         public ResponseStatusMatch Match { get; }
         /// <summary>Gets the reaction to execute when the status matches.</summary>
         public Reaction Reaction { get; }
 
-        private ResponseHandler(Reaction reaction, ResponseStatusMatch match)
+        private ResponseRoute(Reaction reaction, ResponseStatusMatch match)
         {
             Reaction = reaction ?? throw new System.ArgumentNullException(nameof(reaction));
             Match = match ?? throw new System.ArgumentNullException(nameof(match));
         }
 
-        internal static ResponseHandler AnyStatus(Reaction reaction) =>
-            new ResponseHandler(reaction, ResponseStatusMatch.Any);
+        internal static ResponseRoute AnyStatus(Reaction reaction) =>
+            new ResponseRoute(reaction, ResponseStatusMatch.Any);
 
-        internal static ResponseHandler ForStatus(Reaction reaction, int statusCode) =>
-            new ResponseHandler(
+        internal static ResponseRoute ForStatus(Reaction reaction, int statusCode) =>
+            new ResponseRoute(
                 reaction,
                 ResponseStatusMatch.Exact(HttpResponseStatusCode.FromDeveloperStatus(statusCode)));
     }

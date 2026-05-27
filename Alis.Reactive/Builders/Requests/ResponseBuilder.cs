@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Builds response handlers for HTTP success, error, and chained requests.
+    /// Builds response routes for HTTP success, error, and chained requests.
     /// </summary>
     /// <remarks>
     /// Obtained via <c>.Response(r =&gt; r.OnSuccess(...).OnError(...))</c>.
@@ -13,14 +13,14 @@ namespace Alis.Reactive.Builders.Requests
     public class ResponseBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
-        private readonly ResponseDraft _draft = new ResponseDraft();
+        private readonly ResponseRoutingDraft _draft = new ResponseRoutingDraft();
 
         internal ResponseBuilder(PlanBuildContext context)
         {
             _context = context;
         }
 
-        internal ResponseDraft Draft => _draft;
+        internal ResponseRoutingDraft Draft => _draft;
 
         /// <summary>Handles a successful HTTP response.</summary>
         /// <param name="pipeline">Builds the commands to execute on success.</param>
@@ -29,7 +29,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
-            _draft.HandleSuccess(pb.BuildReaction());
+            _draft.AddSuccessRoute(pb.BuildReaction());
             return this;
         }
 
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Builders.Requests
             pipeline(
                 new ResponseBody<TResponse>(PayloadSource.Success(PayloadContract.ForPayload(typeof(TResponse)))),
                 pb);
-            _draft.HandleSuccess(pb.BuildReaction());
+            _draft.AddSuccessRoute(pb.BuildReaction());
             return this;
         }
 
@@ -56,7 +56,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
-            _draft.HandleError(pb.BuildReaction());
+            _draft.AddErrorRoute(pb.BuildReaction());
             return this;
         }
 
@@ -68,7 +68,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
-            _draft.HandleError(statusCode, pb.BuildReaction());
+            _draft.AddErrorRoute(statusCode, pb.BuildReaction());
             return this;
         }
 
@@ -84,7 +84,7 @@ namespace Alis.Reactive.Builders.Requests
             pipeline(
                 new ResponseBody<TError>(PayloadSource.Error(PayloadContract.ForPayload(typeof(TError)))),
                 pb);
-            _draft.HandleError(pb.BuildReaction());
+            _draft.AddErrorRoute(pb.BuildReaction());
             return this;
         }
 
@@ -101,7 +101,7 @@ namespace Alis.Reactive.Builders.Requests
             pipeline(
                 new ResponseBody<TError>(PayloadSource.Error(PayloadContract.ForPayload(typeof(TError)))),
                 pb);
-            _draft.HandleError(statusCode, pb.BuildReaction());
+            _draft.AddErrorRoute(statusCode, pb.BuildReaction());
             return this;
         }
 

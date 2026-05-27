@@ -6,7 +6,7 @@ namespace Alis.Reactive.PlaywrightTests.HttpPipeline;
 ///   2. Nested JSON — OnSuccess&lt;T&gt; with 3-level deep dot-path walking
 ///   3. HTML partial — Into() injects server-rendered HTML, native inputs work, SF components initialize
 ///
-/// Each test clicks a button (triggering dispatch -> HTTP GET -> response handler) and verifies
+/// Each test clicks a button (triggering dispatch -> HTTP GET -> response route) and verifies
 /// that the EXACT server values arrive in the DOM. This proves the full pipeline:
 ///   C# anonymous object -> JSON serialization -> fetch -> response body walking -> DOM mutation
 /// </summary>

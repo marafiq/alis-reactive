@@ -136,7 +136,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Load Chain");
 
-        // Spinner hides in the chained (second) response handler
+        // Spinner hides in the chained (second) response route
         await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
         await Expect(Page.Locator("#chain-spinner")).ToBeHiddenAsync();
         AssertNoConsoleErrors();

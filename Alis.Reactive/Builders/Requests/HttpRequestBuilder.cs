@@ -109,8 +109,8 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Configures response handlers for success and error outcomes.</summary>
-        /// <param name="response">Builds the response handlers: <c>r =&gt; r.OnSuccess(...).OnError(...)</c>.</param>
+        /// <summary>Configures response routes for success and error outcomes.</summary>
+        /// <param name="response">Builds the response routes: <c>r =&gt; r.OnSuccess(...).OnError(...)</c>.</param>
         /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> response)
         {
@@ -131,8 +131,8 @@ namespace Alis.Reactive.Builders.Requests
                 endpoint,
                 input,
                 Snapshot(_whileLoading),
-                Snapshot(_response.Draft.SuccessHandlers),
-                Snapshot(_response.Draft.ErrorHandlers),
+                Snapshot(_response.Draft.SuccessRoutes),
+                Snapshot(_response.Draft.ErrorRoutes),
                 Snapshot(_finally),
                 _response.Draft.Chain,
                 validation.HasValue
