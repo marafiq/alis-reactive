@@ -36,7 +36,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        internal Reaction BuildReaction()
+        internal ReactionGraph BuildReaction()
         {
             return _draft.ToReaction();
         }

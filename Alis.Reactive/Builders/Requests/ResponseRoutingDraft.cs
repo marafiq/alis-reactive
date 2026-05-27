@@ -14,19 +14,19 @@ namespace Alis.Reactive.Builders.Requests
         internal IReadOnlyList<ResponseRoute> ErrorRoutes => _errorRoutes;
         internal RequestChain Chain => _chain;
 
-        internal void AddSuccessRoute(Reaction reaction)
+        internal void AddSuccessRoute(ReactionGraph reaction)
         {
             if (reaction == null) throw new ArgumentNullException(nameof(reaction));
             _successRoutes.Add(ResponseRoute.AnyStatus(reaction));
         }
 
-        internal void AddErrorRoute(Reaction reaction)
+        internal void AddErrorRoute(ReactionGraph reaction)
         {
             if (reaction == null) throw new ArgumentNullException(nameof(reaction));
             _errorRoutes.Add(ResponseRoute.AnyStatus(reaction));
         }
 
-        internal void AddErrorRoute(int statusCode, Reaction reaction)
+        internal void AddErrorRoute(int statusCode, ReactionGraph reaction)
         {
             if (reaction == null) throw new ArgumentNullException(nameof(reaction));
             _errorRoutes.Add(ResponseRoute.ForStatus(reaction, statusCode));

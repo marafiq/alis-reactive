@@ -1,7 +1,7 @@
 // http.ts - HTTP request execution using V3 RequestPlan type.
 // Uses the shared value/gather/runtime concepts and keeps HTTP async isolated.
 
-import type { RequestPlan, ResponseRoute, PlanDocument, ExecContext, Reaction } from "../types";
+import type { RequestPlan, ResponseRoute, PlanDocument, ExecContext, ReactionGraph } from "../types";
 import { resolveRequestInput, type ResolvedRequestInput } from "./gather";
 import { executeReaction } from "./execute";
 import { validateContainer } from "../validation";
@@ -223,7 +223,7 @@ async function runFollowUpRequest(
 }
 
 async function runRequestReactions(
-  reactions: readonly Reaction[],
+  reactions: readonly ReactionGraph[],
   plan: PlanDocument,
   context: ExecContext,
 ): Promise<void> {

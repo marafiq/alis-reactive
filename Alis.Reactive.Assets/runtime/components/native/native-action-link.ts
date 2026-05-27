@@ -1,9 +1,9 @@
 // native-action-link.ts — Click handler for <a data-reactive-link> elements.
-// Uses PlanDocument + Reaction types for V3 plan-driven navigation.
+// Uses PlanDocument + ReactionGraph types for V3 plan-driven navigation.
 
 import { executeReaction } from "../../execution/execute";
 import { scope } from "../../core/trace";
-import type { Reaction, PlanDocument, RequestPlan, ParallelCompletion } from "../../types";
+import type { ReactionGraph, PlanDocument, RequestPlan, ParallelCompletion } from "../../types";
 import { assertNever } from "../../core/assert-never";
 
 const log = scope("native-action-link");
@@ -13,7 +13,7 @@ let initialized = false;
 
 interface NativeActionLinkPayload {
   plan: PlanDocument;
-  reaction: Reaction;
+  reaction: ReactionGraph;
 }
 
 export function initNativeActionLinks(): void {
@@ -60,13 +60,13 @@ function decodePayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
   }
 }
 
-function bindHrefToSingleRequest(reaction: Reaction, href: string): void {
+function bindHrefToSingleRequest(reaction: ReactionGraph, href: string): void {
   const request = singleRequestFromActionLinkReaction(reaction);
   assertActionLinkRequestSupported(request);
   request.url = href;
 }
 
-function singleRequestFromActionLinkReaction(reaction: Reaction): RequestPlan {
+function singleRequestFromActionLinkReaction(reaction: ReactionGraph): RequestPlan {
   const requests: RequestPlan[] = [];
   collectDeclaredRequests(reaction, requests);
 
@@ -78,7 +78,7 @@ function singleRequestFromActionLinkReaction(reaction: Reaction): RequestPlan {
   return request;
 }
 
-function collectDeclaredRequests(reaction: Reaction, requests: RequestPlan[]): void {
+function collectDeclaredRequests(reaction: ReactionGraph, requests: RequestPlan[]): void {
   switch (reaction.kind) {
     case "sequence":
       for (const step of reaction.steps) collectDeclaredRequests(step, requests);

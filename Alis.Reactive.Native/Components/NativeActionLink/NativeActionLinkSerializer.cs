@@ -48,18 +48,18 @@ namespace Alis.Reactive.Native.Components
             return new NativeActionLinkContract(payloadJson);
         }
 
-        private static Reaction ProjectReaction(Reaction reaction, string href, RequestProjectionState state)
+        private static ReactionGraph ProjectReaction(ReactionGraph reaction, string href, RequestProjectionState state)
         {
             switch (reaction)
             {
                 case SequenceReaction sequential:
-                    return Reaction.Sequence(new List<Reaction>(sequential.Steps));
+                    return ReactionGraph.Sequence(new List<ReactionGraph>(sequential.Steps));
 
                 case BranchReaction conditional:
                     var projectedCases = new List<BranchCase>();
                     foreach (var c in conditional.Cases)
                         projectedCases.Add(c.WithReaction(ProjectReaction(c.Reaction, href, state)));
-                    return Reaction.Branch(projectedCases);
+                    return ReactionGraph.Branch(projectedCases);
 
                 case RequestReaction http:
                     state.RequestCount++;
@@ -69,7 +69,7 @@ namespace Alis.Reactive.Native.Components
                     if (!string.Equals(href, http.Request.Url, StringComparison.Ordinal))
                         throw new InvalidOperationException(
                             "NativeActionLink href must match the request URL.");
-                    return Reaction.Request(ProjectRequest(http.Request));
+                    return ReactionGraph.Request(ProjectRequest(http.Request));
 
                 case ParallelReaction _:
                     throw new InvalidOperationException(
@@ -93,7 +93,7 @@ namespace Alis.Reactive.Native.Components
                 request.Before,
                 request.Success,
                 request.Error,
-                Array.Empty<Reaction>(),
+                Array.Empty<ReactionGraph>(),
                 RequestChain.Terminal,
                 RequestValidationTarget.None);
         }
@@ -133,12 +133,12 @@ namespace Alis.Reactive.Native.Components
 
     internal sealed class NativeActionLinkPayload
     {
-        public NativeActionLinkPayload(PlanDocument plan, Reaction reaction)
+        public NativeActionLinkPayload(PlanDocument plan, ReactionGraph reaction)
         {
             Plan = plan;
             Reaction = reaction;
         }
         public PlanDocument Plan { get; }
-        public Reaction Reaction { get; }
+        public ReactionGraph Reaction { get; }
     }
 }

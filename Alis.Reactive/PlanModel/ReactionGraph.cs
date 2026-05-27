@@ -9,107 +9,107 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// Base class for all executable actions in a reactive plan. Not constructed in application code.
     /// </summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<Reaction>))]
-    public abstract class Reaction
+    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ReactionGraph>))]
+    public abstract class ReactionGraph
     {
-        private protected Reaction() { }
+        private protected ReactionGraph() { }
 
-        internal static Reaction Sequence(params Reaction[] steps) =>
+        internal static ReactionGraph Sequence(params ReactionGraph[] steps) =>
             new SequenceReaction(steps);
 
-        internal static Reaction Sequence(List<Reaction> steps) =>
+        internal static ReactionGraph Sequence(List<ReactionGraph> steps) =>
             new SequenceReaction(steps);
 
-        internal static Reaction Parallel(List<Reaction> steps, ParallelCompletion completion) =>
+        internal static ReactionGraph Parallel(List<ReactionGraph> steps, ParallelCompletion completion) =>
             new ParallelReaction(steps, completion);
 
-        internal static Reaction Branch(params BranchCase[] cases) =>
+        internal static ReactionGraph Branch(params BranchCase[] cases) =>
             new BranchReaction(cases);
 
-        internal static Reaction Branch(List<BranchCase> cases) =>
+        internal static ReactionGraph Branch(List<BranchCase> cases) =>
             new BranchReaction(cases);
 
-        internal static Reaction Set(Source on, string property, ValueProducer value) =>
+        internal static ReactionGraph Set(Source on, string property, ValueProducer value) =>
             new SetReaction(on, property, value);
 
-        internal static Reaction Call(Source on, string method) =>
+        internal static ReactionGraph Call(Source on, string method) =>
             new CallReaction(on, method, Array.Empty<ValueProducer>());
 
-        internal static Reaction Call(Source on, string method, List<ValueProducer> args) =>
+        internal static ReactionGraph Call(Source on, string method, List<ValueProducer> args) =>
             new CallReaction(on, method, args);
 
-        internal static Reaction Call(Source on, string method, IReadOnlyList<ValueProducer> args) =>
+        internal static ReactionGraph Call(Source on, string method, IReadOnlyList<ValueProducer> args) =>
             new CallReaction(on, method, args);
 
-        internal static Reaction Request(RequestPlan request) =>
+        internal static ReactionGraph Request(RequestPlan request) =>
             new RequestReaction(request);
 
-        internal static Reaction Dispatch(string eventName) =>
+        internal static ReactionGraph Dispatch(string eventName) =>
             new DispatchReaction(eventName, DispatchPayload.None);
 
-        internal static Reaction Dispatch(string eventName, ValueProducer data) =>
+        internal static ReactionGraph Dispatch(string eventName, ValueProducer data) =>
             new DispatchReaction(eventName, DispatchPayload.Untyped(data));
 
-        internal static Reaction Dispatch(string eventName, ValueProducer data, PayloadContract payloadType) =>
+        internal static ReactionGraph Dispatch(string eventName, ValueProducer data, PayloadContract payloadType) =>
             new DispatchReaction(eventName, DispatchPayload.Typed(data, payloadType));
 
-        internal static Reaction Inject(string component, ValueProducer value) =>
+        internal static ReactionGraph Inject(string component, ValueProducer value) =>
             new InjectReaction(InjectionTarget.PartialSlot(component), value);
 
-        internal static Reaction ShowValidationErrors(string container) =>
+        internal static ReactionGraph ShowValidationErrors(string container) =>
             new ShowValidationErrorsReaction(container);
 
-        internal static IReadOnlyList<Reaction> OrderedSteps(IEnumerable<Reaction> steps)
+        internal static IReadOnlyList<ReactionGraph> OrderedSteps(IEnumerable<ReactionGraph> steps)
         {
             if (steps == null) throw new ArgumentNullException(nameof(steps));
 
-            var snapshot = new List<Reaction>();
+            var snapshot = new List<ReactionGraph>();
             foreach (var step in steps)
             {
                 if (step == null)
-                    throw new ArgumentException("Reaction step must not be null.", nameof(steps));
+                    throw new ArgumentException("ReactionGraph step must not be null.", nameof(steps));
 
                 snapshot.Add(step);
             }
 
             return snapshot.Count == 0
-                ? Array.Empty<Reaction>()
+                ? Array.Empty<ReactionGraph>()
                 : snapshot;
         }
     }
 
     /// <summary>Executes a list of reactions in declaration order.</summary>
-    public sealed class SequenceReaction : Reaction
+    public sealed class SequenceReaction : ReactionGraph
     {
-        private readonly IReadOnlyList<Reaction> _steps;
+        private readonly IReadOnlyList<ReactionGraph> _steps;
 
         /// <summary>Gets the kind. Always <c>"sequence"</c>.</summary>
         public string Kind => "sequence";
         /// <summary>Gets the ordered reactions to execute.</summary>
-        public IReadOnlyList<Reaction> Steps => _steps;
+        public IReadOnlyList<ReactionGraph> Steps => _steps;
 
-        internal SequenceReaction(IEnumerable<Reaction> steps)
+        internal SequenceReaction(IEnumerable<ReactionGraph> steps)
         {
-            _steps = Reaction.OrderedSteps(steps);
+            _steps = ReactionGraph.OrderedSteps(steps);
         }
     }
 
     /// <summary>Executes a list of reactions concurrently.</summary>
-    public sealed class ParallelReaction : Reaction
+    public sealed class ParallelReaction : ReactionGraph
     {
-        private readonly IReadOnlyList<Reaction> _steps;
+        private readonly IReadOnlyList<ReactionGraph> _steps;
         private readonly ParallelCompletion _completion;
 
         /// <summary>Gets the kind. Always <c>"parallel"</c>.</summary>
         public string Kind => "parallel";
         /// <summary>Gets the reactions to execute concurrently.</summary>
-        public IReadOnlyList<Reaction> Steps => _steps;
+        public IReadOnlyList<ReactionGraph> Steps => _steps;
         /// <summary>Gets the completion behavior to run after all steps settle.</summary>
         public ParallelCompletion Completion => _completion;
 
-        internal ParallelReaction(IEnumerable<Reaction> steps, ParallelCompletion completion)
+        internal ParallelReaction(IEnumerable<ReactionGraph> steps, ParallelCompletion completion)
         {
-            _steps = Reaction.OrderedSteps(steps);
+            _steps = ReactionGraph.OrderedSteps(steps);
             _completion = completion ?? throw new ArgumentNullException(nameof(completion));
         }
     }
@@ -125,7 +125,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the completion kind.</summary>
         public abstract string Kind { get; }
 
-        internal static ParallelCompletion OnSettled(Reaction reaction)
+        internal static ParallelCompletion OnSettled(ReactionGraph reaction)
         {
             if (reaction == null) throw new ArgumentNullException(nameof(reaction));
             return new SettledParallelCompletion(reaction);
@@ -142,9 +142,9 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Runs a reaction after every parallel branch has settled.</summary>
     public sealed class SettledParallelCompletion : ParallelCompletion
     {
-        private readonly Reaction _reaction;
+        private readonly ReactionGraph _reaction;
 
-        internal SettledParallelCompletion(Reaction reaction)
+        internal SettledParallelCompletion(ReactionGraph reaction)
         {
             _reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));
         }
@@ -153,11 +153,11 @@ namespace Alis.Reactive.PlanModel
         public override string Kind => "on-settled";
 
         /// <summary>Gets the reaction to run after all branches settle.</summary>
-        public Reaction Reaction => _reaction;
+        public ReactionGraph Reaction => _reaction;
     }
 
     /// <summary>Evaluates conditions and executes the first matching case.</summary>
-    public sealed class BranchReaction : Reaction
+    public sealed class BranchReaction : ReactionGraph
     {
         private readonly IReadOnlyList<BranchCase> _cases;
 
@@ -224,23 +224,23 @@ namespace Alis.Reactive.PlanModel
         private readonly BranchGuard _guard;
 
         /// <summary>Gets the reaction to execute when the condition is met.</summary>
-        public Reaction Reaction { get; }
+        public ReactionGraph Reaction { get; }
 
         internal BranchGuard GuardForJson => _guard;
 
-        private BranchCase(BranchGuard guard, Reaction reaction)
+        private BranchCase(BranchGuard guard, ReactionGraph reaction)
         {
             _guard = guard ?? throw new ArgumentNullException(nameof(guard));
             Reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));
         }
 
-        internal static BranchCase Of(ConditionGraph when, Reaction reaction) =>
+        internal static BranchCase Of(ConditionGraph when, ReactionGraph reaction) =>
             new BranchCase(BranchGuard.When(when), reaction);
 
-        internal static BranchCase Default(Reaction reaction) =>
+        internal static BranchCase Default(ReactionGraph reaction) =>
             new BranchCase(BranchGuard.Else, reaction);
 
-        internal BranchCase WithReaction(Reaction reaction) =>
+        internal BranchCase WithReaction(ReactionGraph reaction) =>
             new BranchCase(_guard, reaction);
     }
 
@@ -342,7 +342,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Sets a property value on a component or DOM element.</summary>
-    public sealed class SetReaction : Reaction
+    public sealed class SetReaction : ReactionGraph
     {
         private readonly MemberName _property;
 
@@ -364,7 +364,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Calls a method on a component or DOM element.</summary>
-    public sealed class CallReaction : Reaction
+    public sealed class CallReaction : ReactionGraph
     {
         private readonly MemberName _method;
         private readonly IReadOnlyList<ValueProducer> _args;
@@ -405,7 +405,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Sends an HTTP request as defined by the enclosed <see cref="RequestPlan"/>.</summary>
-    public sealed class RequestReaction : Reaction
+    public sealed class RequestReaction : ReactionGraph
     {
         /// <summary>Gets the kind. Always <c>"request"</c>.</summary>
         public string Kind => "request";
@@ -417,7 +417,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Dispatches a custom browser event.</summary>
     [JsonConverter(typeof(DispatchReactionJsonConverter))]
-    public sealed class DispatchReaction : Reaction
+    public sealed class DispatchReaction : ReactionGraph
     {
         private readonly EventName _event;
         private readonly DispatchPayload _payload;
@@ -576,7 +576,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Injects a value into a declared target.</summary>
-    public sealed class InjectReaction : Reaction
+    public sealed class InjectReaction : ReactionGraph
     {
         private readonly InjectionTarget _target;
 
@@ -595,7 +595,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Displays accumulated validation errors in the target container.</summary>
-    public sealed class ShowValidationErrorsReaction : Reaction
+    public sealed class ShowValidationErrorsReaction : ReactionGraph
     {
         private readonly ComponentId _container;
 

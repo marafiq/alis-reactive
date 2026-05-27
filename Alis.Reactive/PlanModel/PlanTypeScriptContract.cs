@@ -292,7 +292,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("Behavior")
                 .Requires("startsWhen", "StartsWhen")
-                .Requires("reaction", "Reaction"));
+                .Requires("reaction", "ReactionGraph"));
 
             contract.Declare(Union(
                 "StartsWhen",
@@ -339,7 +339,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("payloadType", "PayloadContract"));
 
             contract.Declare(Union(
-                "Reaction",
+                "ReactionGraph",
                 "SequenceReaction",
                 "ParallelReaction",
                 "BranchReaction",
@@ -352,11 +352,11 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("SequenceReaction")
                 .Requires("kind", Literal("sequence"))
-                .Requires("steps", "Reaction[]"));
+                .Requires("steps", "ReactionGraph[]"));
 
             contract.Declare(Interface("ParallelReaction")
                 .Requires("kind", Literal("parallel"))
-                .Requires("steps", "Reaction[]")
+                .Requires("steps", "ReactionGraph[]")
                 .Requires("completion", "ParallelCompletion"));
 
             contract.Declare(Union(
@@ -369,7 +369,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("SettledParallelCompletion")
                 .Requires("kind", Literal("on-settled"))
-                .Requires("reaction", "Reaction"));
+                .Requires("reaction", "ReactionGraph"));
 
             contract.Declare(Interface("BranchReaction")
                 .Requires("kind", Literal("branch"))
@@ -377,7 +377,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("BranchCase")
                 .Requires("guard", "BranchGuard")
-                .Requires("reaction", "Reaction"));
+                .Requires("reaction", "ReactionGraph"));
 
             contract.Declare(Union("BranchGuard", "DefaultBranchGuard", "ConditionalBranchGuard"));
             contract.Declare(Interface("DefaultBranchGuard")
@@ -444,10 +444,10 @@ namespace Alis.Reactive.PlanModel
                 .Requires("url", "string")
                 .Requires("validation", "RequestValidationTarget")
                 .Requires("input", "RequestInput")
-                .Requires("before", "Reaction[]")
+                .Requires("before", "ReactionGraph[]")
                 .Requires("success", "ResponseRoute[]")
                 .Requires("error", "ResponseRoute[]")
-                .Requires("complete", "Reaction[]")
+                .Requires("complete", "ReactionGraph[]")
                 .Requires("chain", "RequestChain"));
 
             contract.Declare(Union(
@@ -519,7 +519,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("ResponseRoute")
                 .Requires("match", "ResponseStatusMatch")
-                .Requires("reaction", "Reaction"));
+                .Requires("reaction", "ReactionGraph"));
 
             contract.Declare(Union(
                 "ResponseStatusMatch",

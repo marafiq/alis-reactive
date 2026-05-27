@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { registerComponentRuntime, type ComponentRuntimeDriver } from "../domain/component-runtime";
 import { executeReaction } from "../execution/execute";
 import type {
-  ComponentObject, ConditionGraph, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, Reaction, Shape, ValueProducer,
+  ComponentObject, ConditionGraph, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, ReactionGraph, Shape, ValueProducer,
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -55,7 +55,7 @@ function shapedLiteral(value: JsonValue, shape: Shape): ValueProducer {
   return { kind: "literal", value, shape };
 }
 
-function setResidentName(value: string): Reaction {
+function setResidentName(value: string): ReactionGraph {
   return {
     kind: "set",
     on: { kind: "component", component: "resident-name" },
@@ -154,7 +154,7 @@ function customWidgetPlan(): PlanDocument {
 describe("executeReaction member targets", () => {
   it("sets a component property through the declared JS object contract", () => {
     document.body.innerHTML = `<input id="resident-name" value="Ada" />`;
-    const reaction: Reaction = {
+    const reaction: ReactionGraph = {
       kind: "set",
       on: { kind: "component", component: "resident-name" },
       property: "value",
@@ -299,7 +299,7 @@ describe("executeReaction member targets", () => {
     element.setValue = function setValue(next: string): void {
       this.value = next;
     };
-    const reaction: Reaction = {
+    const reaction: ReactionGraph = {
       kind: "call",
       on: { kind: "component", component: "resident-name" },
       method: "setValue",
@@ -320,13 +320,13 @@ describe("executeReaction member targets", () => {
     };
     const context: ExecContext = { local };
     const source = { kind: "payload", scope: "local", type: { kind: "untyped" } } as const;
-    const setReaction: Reaction = {
+    const setReaction: ReactionGraph = {
       kind: "set",
       on: source,
       property: "status",
       value: literal("ready"),
     };
-    const callReaction: Reaction = {
+    const callReaction: ReactionGraph = {
       kind: "call",
       on: source,
       method: "setStatus",
@@ -347,7 +347,7 @@ describe("executeReaction member targets", () => {
     browserWindow.alis = { confirm };
 
     try {
-      const reaction: Reaction = {
+      const reaction: ReactionGraph = {
         kind: "branch",
         cases: [
           {
@@ -378,7 +378,7 @@ describe("executeReaction member targets", () => {
     browserWindow.alis = { confirm };
 
     try {
-      const reaction: Reaction = {
+      const reaction: ReactionGraph = {
         kind: "branch",
         cases: [{
           guard: {
@@ -412,7 +412,7 @@ describe("executeReaction member targets", () => {
     browserWindow.alis = { confirm };
 
     try {
-      const reaction: Reaction = {
+      const reaction: ReactionGraph = {
         kind: "branch",
         cases: [
           {
@@ -452,7 +452,7 @@ describe("executeReaction member targets", () => {
     browserWindow.alis = { confirm };
 
     try {
-      const reaction: Reaction = {
+      const reaction: ReactionGraph = {
         kind: "branch",
         cases: [{
           guard: {

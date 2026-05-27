@@ -15,23 +15,23 @@ namespace Alis.Reactive.Builders.Requests
             _branches.Add(request);
         }
 
-        internal void CompleteWhenAllSettled(Reaction reaction)
+        internal void CompleteWhenAllSettled(ReactionGraph reaction)
         {
             if (reaction == null) throw new ArgumentNullException(nameof(reaction));
             _completion = ParallelCompletion.OnSettled(reaction);
         }
 
-        internal Reaction ToReaction()
+        internal ReactionGraph ToReaction()
         {
             if (_branches.Count == 0)
                 throw new InvalidOperationException(
                     "Parallel requires at least one HTTP request branch.");
 
-            var reactions = new List<Reaction>();
+            var reactions = new List<ReactionGraph>();
             foreach (var branch in _branches)
-                reactions.Add(Reaction.Request(branch));
+                reactions.Add(ReactionGraph.Request(branch));
 
-            return Reaction.Parallel(reactions, _completion);
+            return ReactionGraph.Parallel(reactions, _completion);
         }
     }
 }

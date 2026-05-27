@@ -138,7 +138,7 @@ namespace Alis.Reactive.Builders
             _pipeline.Context.EnsureProperty(
                 _componentKey,
                 property.ContractFor(MemberAccess.Write));
-            _pipeline.AddStep(Reaction.Set(
+            _pipeline.AddStep(ReactionGraph.Set(
                 ComponentSource.Of(_componentKey), property.Member, value));
             return _pipeline;
         }
@@ -148,7 +148,7 @@ namespace Alis.Reactive.Builders
             _pipeline.Context.EnsureMethod(
                 _componentKey,
                 method.ContractReturning(Shape.None));
-            _pipeline.AddStep(Reaction.Call(
+            _pipeline.AddStep(ReactionGraph.Call(
                 ComponentSource.Of(_componentKey),
                 method.Member,
                 new List<ValueProducer> { arg }));

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../lifecycle/boot";
-import type { ComponentObject, BrowserObjectContract, PlanDocument, Reaction, Shape, ValueProducer } from "../../types";
+import type { ComponentObject, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -159,7 +159,7 @@ function fusionComponent(id: string): ComponentObject {
   };
 }
 
-function setText(component: string, value: string): Reaction {
+function setText(component: string, value: string): ReactionGraph {
   return {
     kind: "set",
     on: { kind: "component", component },

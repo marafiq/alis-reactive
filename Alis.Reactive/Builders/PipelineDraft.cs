@@ -6,8 +6,8 @@ namespace Alis.Reactive.Builders
 {
     internal sealed class PipelineDraft<TModel> where TModel : class
     {
-        private readonly List<Reaction> _segments = new List<Reaction>();
-        private readonly List<Reaction> _commands = new List<Reaction>();
+        private readonly List<ReactionGraph> _segments = new List<ReactionGraph>();
+        private readonly List<ReactionGraph> _commands = new List<ReactionGraph>();
         private List<BranchCase>? _branches;
         private int _branchCommandIndex;
         private HttpRequestBuilder<TModel>? _http;
@@ -52,20 +52,20 @@ namespace Alis.Reactive.Builders
             FlushCommands();
         }
 
-        internal Reaction BuildReaction()
+        internal ReactionGraph BuildReaction()
         {
             FlushSegment();
             return _segments.Count == 1
                 ? _segments[0]
-                : Reaction.Sequence(_segments);
+                : ReactionGraph.Sequence(_segments);
         }
 
-        internal List<Reaction> BuildReactions()
+        internal List<ReactionGraph> BuildReactions()
         {
-            return new List<Reaction> { BuildReaction() };
+            return new List<ReactionGraph> { BuildReaction() };
         }
 
-        internal void AddCommand(Reaction reaction)
+        internal void AddCommand(ReactionGraph reaction)
         {
             FlushActiveAsyncBlock();
             _commands.Add(reaction);
@@ -76,7 +76,7 @@ namespace Alis.Reactive.Builders
             if (_http is not null)
             {
                 FlushCommands();
-                _segments.Add(Reaction.Request(_http.BuildRequest()));
+                _segments.Add(ReactionGraph.Request(_http.BuildRequest()));
                 _http = null;
                 return;
             }
@@ -96,7 +96,7 @@ namespace Alis.Reactive.Builders
 
             var commands = ConsumeCommands();
             AddSequence(commands, start: 0, count: _branchCommandIndex);
-            _segments.Add(Reaction.Branch(_branches));
+            _segments.Add(ReactionGraph.Branch(_branches));
             AddSequence(commands, start: _branchCommandIndex, count: commands.Count - _branchCommandIndex);
 
             _branches = null;
@@ -108,20 +108,20 @@ namespace Alis.Reactive.Builders
             if (_commands.Count == 0)
                 return;
 
-            _segments.Add(Reaction.Sequence(ConsumeCommands()));
+            _segments.Add(ReactionGraph.Sequence(ConsumeCommands()));
         }
 
-        private List<Reaction> ConsumeCommands()
+        private List<ReactionGraph> ConsumeCommands()
         {
-            var commands = new List<Reaction>(_commands);
+            var commands = new List<ReactionGraph>(_commands);
             _commands.Clear();
             return commands;
         }
 
-        private void AddSequence(List<Reaction> commands, int start, int count)
+        private void AddSequence(List<ReactionGraph> commands, int start, int count)
         {
             if (count > 0)
-                _segments.Add(Reaction.Sequence(commands.GetRange(start, count)));
+                _segments.Add(ReactionGraph.Sequence(commands.GetRange(start, count)));
         }
     }
 }

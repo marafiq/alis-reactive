@@ -3,7 +3,7 @@ import {
   initNativeActionLinks,
   resetNativeActionLinksForTests,
 } from "../components/native/native-action-link";
-import type { PlanDocument, Reaction, RequestPlan } from "../types";
+import type { PlanDocument, ReactionGraph, RequestPlan } from "../types";
 
 const emptyPlan: PlanDocument = {
   version: 3,
@@ -35,14 +35,14 @@ function request(url: string, overrides: Partial<RequestPlan> = {}): RequestPlan
   };
 }
 
-function requestReaction(url: string, overrides: Partial<RequestPlan> = {}): Reaction {
+function requestReaction(url: string, overrides: Partial<RequestPlan> = {}): ReactionGraph {
   return {
     kind: "request",
     request: request(url, overrides),
   };
 }
 
-function renderActionLink(reaction: Reaction, href = "/residents/42/delete"): HTMLAnchorElement {
+function renderActionLink(reaction: ReactionGraph, href = "/residents/42/delete"): HTMLAnchorElement {
   const anchor = document.createElement("a");
   anchor.id = "delete-resident";
   anchor.href = href;

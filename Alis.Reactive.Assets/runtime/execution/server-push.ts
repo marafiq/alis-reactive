@@ -1,7 +1,7 @@
 // server-push.ts — SSE (EventSource) trigger wiring.
 // Uses ServerPushTrigger from the generated plan contract.
 
-import type { ServerPushTrigger, Reaction, PlanDocument } from "../types";
+import type { ServerPushTrigger, ReactionGraph, PlanDocument } from "../types";
 import { catchAsyncReactionFailure, executeReaction } from "./execute";
 import { showRetryIndicators, removeRetryIndicators } from "./retry-indicator";
 import { scope } from "../core/trace";
@@ -11,7 +11,7 @@ const log = scope("server-push");
 
 interface WiredBehavior {
   readonly trigger: ServerPushTrigger;
-  readonly reaction: Reaction;
+  readonly reaction: ReactionGraph;
   readonly plan: PlanDocument;
   readonly handler: EventListener;
 }
@@ -75,7 +75,7 @@ function getOrCreate(url: string): ManagedSource {
 
 export function wireServerPush(
   trigger: ServerPushTrigger,
-  reaction: Reaction,
+  reaction: ReactionGraph,
   plan: PlanDocument,
   signal?: AbortSignal,
 ): void {

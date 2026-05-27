@@ -117,7 +117,7 @@ namespace Alis.Reactive.PlanModel
         /// Wires a component event to a set of reactive behaviors.
         /// Ensures the component is registered, creates the trigger, and adds one behavior per reaction.
         /// </summary>
-        internal void WireComponentEvent(string componentId, string vendor, string eventName, List<Reaction> reactions)
+        internal void WireComponentEvent(string componentId, string vendor, string eventName, List<ReactionGraph> reactions)
         {
             EnsureComponent(componentId, vendor);
             var trigger = StartsWhen.ComponentEvent(componentId, eventName);

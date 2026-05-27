@@ -37,7 +37,7 @@ namespace Alis.Reactive
             Pipeline.Context.EnsureProperty(
                 componentKey,
                 property.ContractFor(MemberAccess.Write));
-            Pipeline.AddStep(Reaction.Set(
+            Pipeline.AddStep(ReactionGraph.Set(
                 ComponentSource.Of(componentKey), property.Member, value));
             return this;
         }
@@ -61,7 +61,7 @@ namespace Alis.Reactive
                 componentKey,
                 method.ContractReturning(Shape.None));
             var source = ComponentSource.Of(componentKey);
-            Pipeline.AddStep(Reaction.Call(source, method.Member, args));
+            Pipeline.AddStep(ReactionGraph.Call(source, method.Member, args));
             return this;
         }
 

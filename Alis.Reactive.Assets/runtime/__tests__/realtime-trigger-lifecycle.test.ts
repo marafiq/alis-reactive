@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../lifecycle/boot";
-import type { ComponentObject, BrowserObjectContract, PlanDocument, Reaction, Shape } from "../types";
+import type { ComponentObject, BrowserObjectContract, PlanDocument, ReactionGraph, Shape } from "../types";
 
 const signalR = vi.hoisted(() => {
   class FakeHubConnection {
@@ -151,7 +151,7 @@ function partialPlan(planId: string, behaviors: PlanDocument["behaviors"]): Plan
   };
 }
 
-function setText(component: string, value: string): Reaction {
+function setText(component: string, value: string): ReactionGraph {
   return {
     kind: "set",
     on: { kind: "component", component },

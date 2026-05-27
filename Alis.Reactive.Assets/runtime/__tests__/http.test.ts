@@ -8,7 +8,7 @@ import type {
   PathSegment,
   PayloadScope,
   PlanDocument,
-  Reaction,
+  ReactionGraph,
   RequestPlan,
   Shape,
   StructuredPath,
@@ -79,7 +79,7 @@ function payloadRead(scope: PayloadScope, member: string): ValueProducer {
   };
 }
 
-function setText(component: string, value: ValueProducer): Reaction {
+function setText(component: string, value: ValueProducer): ReactionGraph {
   return {
     kind: "set",
     on: { kind: "component", component },

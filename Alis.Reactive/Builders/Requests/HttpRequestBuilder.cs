@@ -17,8 +17,8 @@ namespace Alis.Reactive.Builders.Requests
         private RequestEndpoint? _endpoint;
         private RequestInputProjectionDraft _requestInput = new RequestInputProjectionDraft();
         private RequestBodyFormat _bodyFormat = RequestBodyFormat.Json;
-        private readonly List<Reaction> _whileLoading = new List<Reaction>();
-        private readonly List<Reaction> _finally = new List<Reaction>();
+        private readonly List<ReactionGraph> _whileLoading = new List<ReactionGraph>();
+        private readonly List<ReactionGraph> _finally = new List<ReactionGraph>();
         private ResponseBuilder<TModel> _response;
         private ClientValidationBeforeRequest? _validation;
 
@@ -162,7 +162,7 @@ namespace Alis.Reactive.Builders.Requests
             return new List<T>(items);
         }
 
-        private static void AddReactionGraph(List<Reaction> target, Reaction reaction)
+        private static void AddReactionGraph(List<ReactionGraph> target, ReactionGraph reaction)
         {
             if (target == null) throw new ArgumentNullException(nameof(target));
             if (reaction == null) throw new ArgumentNullException(nameof(reaction));

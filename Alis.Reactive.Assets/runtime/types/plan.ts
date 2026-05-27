@@ -407,7 +407,7 @@ export interface PayloadSource {
 
 export interface Behavior {
   startsWhen: StartsWhen;
-  reaction: Reaction;
+  reaction: ReactionGraph;
 }
 
 export type StartsWhen =
@@ -461,7 +461,7 @@ export interface SignalRTrigger {
   payloadType: PayloadContract;
 }
 
-export type Reaction =
+export type ReactionGraph =
   | SequenceReaction
   | ParallelReaction
   | BranchReaction
@@ -474,12 +474,12 @@ export type Reaction =
 
 export interface SequenceReaction {
   kind: "sequence";
-  steps: Reaction[];
+  steps: ReactionGraph[];
 }
 
 export interface ParallelReaction {
   kind: "parallel";
-  steps: Reaction[];
+  steps: ReactionGraph[];
   completion: ParallelCompletion;
 }
 
@@ -493,7 +493,7 @@ export interface NoParallelCompletion {
 
 export interface SettledParallelCompletion {
   kind: "on-settled";
-  reaction: Reaction;
+  reaction: ReactionGraph;
 }
 
 export interface BranchReaction {
@@ -503,7 +503,7 @@ export interface BranchReaction {
 
 export interface BranchCase {
   guard: BranchGuard;
-  reaction: Reaction;
+  reaction: ReactionGraph;
 }
 
 export type BranchGuard =
@@ -589,10 +589,10 @@ export interface RequestPlan {
   url: string;
   validation: RequestValidationTarget;
   input: RequestInput;
-  before: Reaction[];
+  before: ReactionGraph[];
   success: ResponseRoute[];
   error: ResponseRoute[];
-  complete: Reaction[];
+  complete: ReactionGraph[];
   chain: RequestChain;
 }
 
@@ -681,7 +681,7 @@ export interface RequestRouteParameterTarget {
 
 export interface ResponseRoute {
   match: ResponseStatusMatch;
-  reaction: Reaction;
+  reaction: ReactionGraph;
 }
 
 export type ResponseStatusMatch =

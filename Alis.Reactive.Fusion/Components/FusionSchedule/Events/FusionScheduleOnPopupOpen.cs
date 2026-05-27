@@ -52,7 +52,7 @@ namespace Alis.Reactive.Fusion.Components
             this FusionSchedulePopupOpenArgs args,
             IReactionEmitter pipeline)
         {
-            pipeline.AddStep(Reaction.Set(PayloadSource.Event(), "cancel", ValueProducer.Literal(true)));
+            pipeline.AddStep(ReactionGraph.Set(PayloadSource.Event(), "cancel", ValueProducer.Literal(true)));
         }
     }
 }

@@ -2,7 +2,7 @@
 // Uses SignalRTrigger from the generated plan contract.
 
 import * as signalR from "@microsoft/signalr";
-import type { SignalRTrigger, Reaction, PlanDocument } from "../types";
+import type { SignalRTrigger, ReactionGraph, PlanDocument } from "../types";
 import { catchAsyncReactionFailure, executeReaction } from "./execute";
 import { showRetryIndicators, removeRetryIndicators } from "./retry-indicator";
 import { scope } from "../core/trace";
@@ -109,7 +109,7 @@ function getOrCreate(hubUrl: string): ManagedConnection {
 
 export function wireSignalR(
   trigger: SignalRTrigger,
-  reaction: Reaction,
+  reaction: ReactionGraph,
   plan: PlanDocument,
   signal?: AbortSignal,
 ): void {

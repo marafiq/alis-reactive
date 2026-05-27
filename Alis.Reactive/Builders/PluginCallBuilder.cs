@@ -115,7 +115,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Emits the CallReaction into the pipeline. Terminal method.</summary>
         public void Fire()
         {
-            _emitter.AddStep(Reaction.Call(
+            _emitter.AddStep(ReactionGraph.Call(
                 PluginSource.Of(_operation.PluginNameValue), _operation.PlanMethodNameValue,
                 _args.Complete()));
         }

@@ -27,12 +27,12 @@ namespace Alis.Reactive.Builders
         }
 
         /// <inheritdoc />
-        void IReactionEmitter.AddStep(Reaction step) => AddStep(step);
+        void IReactionEmitter.AddStep(ReactionGraph step) => AddStep(step);
 
         /// <inheritdoc />
         PlanBuildContext IReactionEmitter.BuildContext => Context;
 
-        internal void AddStep(Reaction step)
+        internal void AddStep(ReactionGraph step)
         {
             _draft.AddCommand(step);
         }
@@ -42,7 +42,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {
-            AddStep(Reaction.Dispatch(eventName));
+            AddStep(ReactionGraph.Dispatch(eventName));
             return this;
         }
 
@@ -53,7 +53,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
-            AddStep(Reaction.Dispatch(
+            AddStep(ReactionGraph.Dispatch(
                 eventName,
                 ValueProducer.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload))),
                 PayloadContract.ForPayload(typeof(TPayload))));
@@ -79,7 +79,7 @@ namespace Alis.Reactive.Builders
         {
             var builder = new DispatchPayloadBuilder<TPayload, TModel>();
             configure(builder);
-            AddStep(Reaction.Dispatch(
+            AddStep(ReactionGraph.Dispatch(
                 eventName,
                 builder.Build(),
                 PayloadContract.ForPayload(typeof(TPayload))));
@@ -263,7 +263,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
-            AddStep(Reaction.ShowValidationErrors(formId));
+            AddStep(ReactionGraph.ShowValidationErrors(formId));
             return this;
         }
 
@@ -275,7 +275,7 @@ namespace Alis.Reactive.Builders
         {
             Context.EnsureElement(elementId);
             var responseBody = ValueProducer.ReadWholePayload(PayloadSource.Success());
-            AddStep(Reaction.Inject(elementId, responseBody));
+            AddStep(ReactionGraph.Inject(elementId, responseBody));
             return this;
         }
 
@@ -289,12 +289,12 @@ namespace Alis.Reactive.Builders
             _draft.FlushSegment();
         }
 
-        internal Reaction BuildReaction()
+        internal ReactionGraph BuildReaction()
         {
             return _draft.BuildReaction();
         }
 
-        internal List<Reaction> BuildReactions()
+        internal List<ReactionGraph> BuildReactions()
         {
             return _draft.BuildReactions();
         }

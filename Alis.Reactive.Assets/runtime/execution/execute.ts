@@ -1,9 +1,9 @@
-// execute.ts - Reaction executor. The dumb runtime.
+// execute.ts - ReactionGraph executor. The dumb runtime.
 // Dispatches on reaction.kind. Uses shared resolver for ALL component access.
 // No fallbacks. Every component reference must be in plan.components.
 
 import type {
-  PlanDocument, Reaction, SequenceReaction, ParallelReaction, BranchReaction,
+  PlanDocument, ReactionGraph, SequenceReaction, ParallelReaction, BranchReaction,
   BranchCase, SetReaction, CallReaction, DispatchReaction,
   InjectReaction, ShowValidationErrorsReaction,
   ExecContext, PayloadSource,
@@ -48,7 +48,7 @@ function runtimePlanFor(plan: PlanDocument | undefined): RuntimePlan {
 // args.preventDefaultAction) in the same browser tick as the event callback.
 
 export function executeReaction(
-  reaction: Reaction,
+  reaction: ReactionGraph,
   plan?: PlanDocument,
   ctx?: ExecContext,
 ): void | Promise<void> {
@@ -56,7 +56,7 @@ export function executeReaction(
 }
 
 function executeReactionWith(
-  reaction: Reaction,
+  reaction: ReactionGraph,
   plan: RuntimePlan,
   context: ExecutionContext,
 ): void | Promise<void> {
@@ -98,7 +98,7 @@ function executeReactionWith(
   }
 }
 
-type ReactionRunner = (reaction: Reaction) => void | Promise<void>;
+type ReactionRunner = (reaction: ReactionGraph) => void | Promise<void>;
 
 function executeSequence(
   reaction: SequenceReaction,
@@ -115,7 +115,7 @@ function executeSequence(
 }
 
 async function executeRemainingSequence(
-  steps: readonly Reaction[],
+  steps: readonly ReactionGraph[],
   plan: RuntimePlan,
   context: ExecutionContext,
 ): Promise<void> {
