@@ -4,8 +4,9 @@ This file is the source inventory used to prove the structured design is not
 based on memory. It classifies the public DSL method families from source into
 graph modules and test-vector sets.
 
-Current checkpoint: source inventory. Module diagrams and behavior matrices are
-the next checkpoint. Runtime and plan implementation do not drive this file.
+This is a source fact inventory. It is considered usable only when every public
+DSL family listed here maps to a domain diagram and an input/output matrix in
+`docs/design/reactive-plan-domain-design.md`.
 
 Core DSL inventory command:
 
@@ -42,13 +43,13 @@ across repeated vertical slices.
 
 ## Source-Derived Capability Inventory
 
-| Capability group | Actual public DSL inputs from source | Domain concept that must exist |
+| Capability group | Actual public DSL inputs from source | Required domain concept |
 | --- | --- | --- |
 | Plan lifetime | `Html.ReactivePlan<TModel>()`, `Html.ResolvePlan<TModel>()`, `Html.RenderPlan(plan)`, `plan.Render()`, `plan.RenderFormatted()` | Plan document, plan identity, root scope, partial scope, rendered plan artifact |
 | Plugin registration | `plan.RegisterPlugin(name, configure)`, `plan.RegisterPlugin(plugin)`, `plan.RegisterPlugin<TPlugin>()` | Browser plugin contract with typed properties, functions, commands |
 | Input field slot | `Html.InputField(plan, expr)`, `Html.InputField(plan, expr, configure)` | Model-bound component slot, controlled component id, validation display slot |
 | Trigger starts | `DomReady`, `CustomEvent`, `CustomEvent<TPayload>`, `ServerPush(url)`, `ServerPush(url,eventType)`, `ServerPush<TPayload>`, `SignalR`, `SignalR<TPayload>` | Trigger with optional event payload scope |
-| Component trigger starts | Every component `Reactive(...)` extension, wired through `ComponentEventOnboarding.Wire` | Component event/callback trigger with typed event payload scope |
+| Component trigger starts | Every component `Reactive` extension overload, wired through `ComponentEventOnboarding.Wire` | Component event/callback trigger with typed event payload scope |
 | Reaction sequence | Every pipeline call appends in authored order; `PipelineDraft` separates sync command segments from request/parallel/branch segments | Ordered reaction graph with sync lane and async request/parallel lane |
 | Dispatch | `Dispatch(name)`, `Dispatch<TPayload>(name,payload)`, `DispatchWith<TPayload>(name, configure)` | Custom event reaction with no payload, literal payload, or runtime-built payload |
 | Dispatch payload | `Set(field, TypedSource<T>)`, `Set(field,string)`, `Set(field,int)`, `Set(field,bool)` | Object value expression with typed leaves |
@@ -56,13 +57,13 @@ across repeated vertical slices.
 | Component object target | `Component<T>(expr)`, `Component<T,TOtherModel>(expr)`, `Component<T>(id)`, `Component<TApp>()` | Browser object target by controlled id, cross-model id, explicit id, layout/app-level id |
 | URL source | `FromUrl(name)`, `FromUrl<T>(name)` | URL query value expression |
 | Plugin read source | `Plugin<T>(plugin,member)`, `Plugin<T>(plugin)`, `Plugin<T>(PluginFunction<T>)`, `Plugin<T>(PluginProperty<T>)`, `PluginProperty<T>(plugin,member)` | Plugin property read and function value expression |
-| Plugin command | `Plugin(plugin,member)`, `Plugin(plugin)`, `Plugin(PluginCommand).Arg(...).Fire()` | Plugin command reaction |
+| Plugin command | `Plugin(plugin,member)`, `Plugin(plugin)`, `Plugin(PluginCommand)` followed by zero or more `Arg` overloads and `Fire()` | Plugin command reaction |
 | Plugin arguments | `Arg(response,path)`, `Arg(event,path)`, `Arg(TypedSource<T>)`, scalar literals, `ArgValue<T>` | Ordered invocation argument list from value expressions |
 | Validation display | `ValidationErrors(formId)` | Validation errors display reaction |
 | Partial injection | `Into(elementId)` | Inject success body into partial slot; partial plan artifact must be loadable/unloadable |
 | Conditions start | `When(event,path)`, `When(response,path)`, `When(TypedSource<T>)`, `Confirm(message)` | Condition graph with payload/object/url/plugin sources and confirm guard |
 | Condition operators | `Eq/NotEq/Gt/Gte/Lt/Lte`, `Truthy/Falsy`, `IsNull/NotNull`, `IsEmpty/NotEmpty`, `In/NotIn`, `Between`, `Contains/StartsWith/EndsWith/Matches/MinLength`, `ArrayContains`, source-vs-source comparisons | Compare condition with unary, literal, array/range, text, collection-item, or source right operand |
-| Condition composition | `And`, `Or`, nested `And(Func<ConditionStart,...>)`, nested `Or(...)`, `Not`, `Then`, `ElseIf`, `Else` | Branch graph preserving authored order and one default case |
+| Condition composition | `And`, `Or`, nested `And(Func<ConditionStart, GuardBuilder>)`, nested `Or(Func<ConditionStart, GuardBuilder>)`, `Not`, `Then`, `ElseIf`, `Else` | Branch graph preserving authored order and one default case |
 | Request start | `Get`, `Post`, `Post(url,gather)`, `Put(url,gather)`, `Delete`, request builder `Get/Post/Put/Delete` | HTTP request plan with method and URL template |
 | Request stages | `Gather`, `AsJson`, `AsFormData`, `WhileLoading`, `Finally`, `Validate<TValidationSource>`, `Response` | Request input projection, body format, before graph, complete graph, validation target, response routes |
 | Gather targets | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, `Plugin`, `Include(component)`, `Include(TypedComponentSource)`, `Include(source,param)` | Request input assignments to body/query payload, headers, and route params |
@@ -164,26 +165,26 @@ flowchart TD
 
 | Source family | Method families | Graph edge | Design artifact status |
 | --- | --- | --- | --- |
-| `PlanExtensions` | `ReactivePlan`, `ResolvePlan`, `RenderPlan` | plan DSL -> plan document -> JSON script | needs module design |
-| `HtmlExtensions` | `On` | plan -> trigger builder | needs module design |
-| `ReactivePlan` | plugin registration, render | plan -> plugin contract / JSON | needs module design |
-| `TriggerBuilder` | page, document event, SSE, SignalR | trigger -> pipeline, optional event scope | blueprint vectors present, module design pending |
-| component `.Reactive` | vendor events/callbacks | component event -> payload scope -> pipeline | component module design pending |
-| `PipelineBuilder` | dispatch, dispatch with payload, element, component, URL source, plugin read/call, validation display, inject | pipeline -> reaction/value/object/partial | module design pending |
-| `ElementBuilder` | class methods, text/html, show/hide | DOM object -> set/call reaction | module design pending |
-| `DispatchPayloadBuilder` | source/literal field assignment | dispatch payload object <- value source | module design pending |
-| `ConditionStart` / `PipelineBuilder.Conditions` | `When`, `Confirm` | pipeline -> condition graph | module design pending |
-| `ConditionSourceBuilder` | compare, presence, membership, text, range, source-vs-source | condition source -> compare operands | module design pending |
-| `GuardBuilder` / `BranchBuilder` | `And`, `Or`, `Not`, `Then`, `ElseIf`, `Else` | condition graph -> branch reaction | module design pending |
-| `PipelineBuilder.Http` | request starters, parallel | pipeline -> request/parallel reaction | HTTP design present |
-| `HttpRequestBuilder` | endpoint, gather, body format, validation, stages, response | request DSL -> request plan | HTTP design present |
-| `GatherBuilder` / `GatherExtensions` | target/source assignments and all registered inputs | gather target <- value source | HTTP design present |
-| `ResponseBuilder` / `ResponseBody` | success/error routes, response payload source, chained request | response -> payload scope/pipeline/follow-up | HTTP design present |
-| `ParallelBuilder` | all-settled graph | parallel -> completion graph | HTTP design present |
-| direct validation builders | field, rule, condition builders | validation DSL -> validation projection | needs module design |
-| FluentValidation adapter/builders | client rule projection and client-known guards | validator source -> validation projection | needs module design |
-| plugin builders | type registration, read args, call args | plugin DSL -> plugin contract/value/call | needs module design |
-| component extensions | typed property/method/value source/event/render | component slice -> browser object contract | needs module design |
+| `PlanExtensions` | `ReactivePlan`, `ResolvePlan`, `RenderPlan` | plan DSL -> plan document -> JSON script | covered by `Reactive Plan Domain Design / Plan, Fragment, Input Slot` |
+| `HtmlExtensions` | `On` | plan -> trigger builder | covered by `Trigger` matrix |
+| `ReactivePlan` | plugin registration, render | plan -> plugin contract / JSON | covered by `Plan` and `Plugin` matrices |
+| `TriggerBuilder` | page, document event, SSE, SignalR | trigger -> pipeline, optional event scope | covered by `Trigger` matrix |
+| component `.Reactive` | vendor events/callbacks | component event -> payload scope -> pipeline | covered by `Component Slice` matrix |
+| `PipelineBuilder` | dispatch, dispatch with payload, element, component, URL source, plugin read/call, validation display, inject | pipeline -> reaction/value/object/partial | covered by `Reaction And Value Consumers` matrix |
+| `ElementBuilder` | class methods, text/html, show/hide | DOM object -> set/call reaction | covered by `Reaction And Value Consumers` matrix |
+| `DispatchPayloadBuilder` | source/literal field assignment | dispatch payload object <- value source | covered by `Reaction And Value Consumers` matrix |
+| `ConditionStart` / `PipelineBuilder.Conditions` | `When`, `Confirm` | pipeline -> condition graph | covered by `Conditions` matrix |
+| `ConditionSourceBuilder` | compare, presence, membership, text, range, source-vs-source | condition source -> compare operands | covered by `Conditions` matrix |
+| `GuardBuilder` / `BranchBuilder` | `And`, `Or`, `Not`, `Then`, `ElseIf`, `Else` | condition graph -> branch reaction | covered by `Conditions` matrix |
+| `PipelineBuilder.Http` | request starters, parallel | pipeline -> request/parallel reaction | covered by `HTTP, Gather, Response, Parallel` matrix |
+| `HttpRequestBuilder` | endpoint, gather, body format, validation, stages, response | request DSL -> request plan | covered by `HTTP, Gather, Response, Parallel` matrix |
+| `GatherBuilder` / `GatherExtensions` | target/source assignments and all registered inputs | gather target <- value source | covered by `HTTP, Gather, Response, Parallel` matrix |
+| `ResponseBuilder` / `ResponseBody` | success/error routes, response payload source, chained request | response -> payload scope/pipeline/follow-up | covered by `HTTP, Gather, Response, Parallel` matrix |
+| `ParallelBuilder` | all-settled graph | parallel -> completion graph | covered by `HTTP, Gather, Response, Parallel` matrix |
+| direct validation builders | field, rule, condition builders | validation DSL -> validation projection | covered by `Validation` matrix |
+| FluentValidation adapter/builders | client rule projection and client-known guards | validator source -> validation projection | covered by `Validation` matrix |
+| plugin builders | type registration, read args, call args | plugin DSL -> plugin contract/value/call | covered by `Plugin` matrix |
+| component extensions | typed property/method/value source/event/render | component slice -> browser object contract | covered by `Component Slice` matrix |
 
 ## Completeness Gates
 
@@ -196,4 +197,5 @@ Before a module is called closed:
 4. Every graph edge must map to at least one test vector.
 5. Every test vector must have a behavior proof file and current test result.
 
-If any row says `needs module design`, the overall rich-model goal is not done.
+If any source family lacks a matching design row, the overall rich-model goal is
+not done.
