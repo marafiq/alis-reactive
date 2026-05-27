@@ -5,12 +5,12 @@ This document describes the current validation design. Keep it aligned with
 
 ## Boundary
 
-FluentValidation remains the server authority. Alis Reactive projects only the
-deterministic client-side projection that can be represented in the Reactive
-Plan and executed in the browser runtime.
+FluentValidation still executes normally on submit or HTTP endpoints. Alis
+Reactive projects only the deterministic client-side rules that can be
+represented in the Reactive Plan and executed in the browser runtime.
 
 Unsupported browser projections are not guessed or emitted into the plan. The
-server rule still runs normally on postback or HTTP submit.
+original FluentValidation rule still runs normally on postback or HTTP submit.
 
 ## Data Flow
 
@@ -46,7 +46,7 @@ Field binding has two deterministic paths:
 
 ## Core Projection Registry
 
-`ClientValidationProjectionRegistry` is the core-owned projection source for
+`ClientValidationProjections` is the core-owned projection source for
 deterministic browser validation rules that are authored directly, without
 FluentValidation inspection. It keys projections by the validation source type
 named by `Validate<TValidationSource>()`, but public authoring selects fields through
@@ -81,9 +81,9 @@ client projection methods such as `EqualTo(...)`, `NotEqualTo(...)`, and
 `GreaterThan(...)`.
 
 Conditions are projected only when the validator supplies a matching symbolic
-client guard through the ReactiveValidator `WhenField*` language. Server-only
-conditions are skipped for the browser projection instead of being inferred from
-FluentValidation internals.
+client guard through the ReactiveValidator `WhenField*` language. Other
+FluentValidation guards are skipped for the browser projection instead of being
+inferred from FluentValidation internals.
 
 Nested `WhenField*` scopes project as one active client condition. A single
 scope keeps its guard directly; multiple active scopes are composed with `all`
@@ -95,10 +95,10 @@ supports compare/all/any/not over declared value producers and excludes
 `Confirm`, which belongs to reactive branches because prompts cross into the
 async execution lane.
 
-If a rule is declared under both a `WhenField*` guard and a server-only
-FluentValidation `When`/`Unless` scope, the browser projection is skipped. The
-client guard would be only a partial activation, so the adapter omits the
-browser rule instead of guessing the missing predicate.
+If a rule is declared under both a `WhenField*` guard and a FluentValidation
+`When`/`Unless` guard outside the client projection language, the browser
+projection is skipped. The client guard would be only a partial activation, so
+the adapter omits the browser rule instead of guessing the missing predicate.
 
 ## Runtime Side
 
@@ -119,10 +119,9 @@ Server validation errors are displayed separately through
 
 ## Partial Lifecycle
 
-Partial load can contribute validation rules to a root-owned validation
-container. Partial unload removes only the exact rule objects contributed by
-that partial slot. It must not delete root validation rules or layout-owned app
-components.
+Partial load can add validation rules to a root-owned validation container.
+Partial unload removes only the exact rule objects loaded by that slot. It must
+not delete root validation rules or layout-owned app components.
 
 ## Key Types
 
@@ -130,14 +129,14 @@ components.
 | --- | --- |
 | Request gate | `RequestValidation`, `ValidationJob`, `RequestValidationTarget` |
 | Projection contract | `IClientValidationProjectionSource.ProjectClientRules(Type)` returning `IReadOnlyList<ClientValidationField>` |
-| Core projection source | `ClientValidationProjectionRegistry`, `ClientValidationProjectionBuilder<TModel>`, `ClientValidationFieldToken<TModel, TValue>` |
+| Core projection source | `ClientValidationProjections`, `ClientValidationProjectionBuilder<TModel>`, `ClientValidationFieldToken<TModel, TValue>` |
 | Projection binding | `ClientValidationProjectionBinder`, `ValidationFieldBindingCatalog`, `ValidationFieldBinding` |
 | Plan payload | `ComponentValidation`, `ValidationRuleExecution`, `ValidationRuleOperand`, `ValidationRuleActivation`, `ValidationCondition` |
 | Runtime execution | `validateContainer`, `showServerErrors`, `RuntimeValidationActivation`, `RuntimeValidationPeerOperand`, `rule-engine.ts` |
 
 ## Design Rules
 
-- Do not call client projection “server rules.”
+- Do not name projected browser rules as if they were the normal validator execution path.
 - Do not use null as behavior; `none`, missing component, and literal `null` are distinct cases.
 - Do not infer custom FluentValidation behavior from implementation details; require `ProjectToClient(...)`.
 - Do not create a separate validation read path in runtime; validation reads component values through the same declared object/member contract as gather and reactions.
