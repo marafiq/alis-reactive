@@ -18,6 +18,14 @@ Rich domain model is not permission to invent fluff. Add a concept only when it 
 
 Design-before-edit rule: if the current change depends on cross-module behavior such as conditions mixed with HTTP, gather sources, validation, component events, or partial load/unload, first walk the DSL input through the domain output, JSON/TS term, and runtime effect. Local edits without that walk are fake progress.
 
+DSL graph process: before changing a shared plan/runtime module, build or update the actual graph from source DSL. Nodes are DSL entry points, builder contexts, value scopes, domain concepts, JSON/TS terms, and runtime executors. Edges are allowed transitions such as trigger -> pipeline, pipeline -> reaction, response -> success scope, gather target <- value source, partial load -> slot state, and component event -> payload scope. Use diagrams and input/output matrices; prose alone is not a design artifact.
+
+Required design artifacts for a shared module change:
+1. Source method inventory from actual `.cs` files.
+2. DSL graph or activity/sequence/state diagram for the module behavior.
+3. Input/output matrix covering representative and cross-module paths.
+4. Closure proof: source row, C# domain term, generated TypeScript term, runtime executor behavior, and behavior test.
+
 Runtime code executes framework-generated plans. Do not add defensive preflight, rollback, fallback, or speculative recovery for impossible bad plans. Put invalid behavior in the C# PlanModel where it can be made unrepresentable. Runtime checks are for real external boundaries only: DOM lookup, browser API failure, network, and malformed non-framework input.
 
 Do not model normal execution bookkeeping as validation, claims, rejects, lifecycle gates, or registries. If the server-generated plan says source A is assigned to target B, the runtime reads A and writes B. Bookkeeping names should describe what is remembered for execution or unload, not imply the plan is suspicious.

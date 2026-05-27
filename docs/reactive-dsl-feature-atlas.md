@@ -35,7 +35,7 @@ Runtime should execute the declared object/member intent. It should not infer
 capability from live JavaScript objects except at integration boundaries where
 external script loading or corrupted JSON can break the contract.
 
-## Plan Lifecycle
+## Plan Load And Unload
 
 Source:
 
@@ -49,17 +49,17 @@ Domain terms:
 - `ReactivePlan<TModel>` owns plan identity, component registrations, behavior
   graph, plugin/type contracts, and validation work queue.
 - `ReactivePlanScope.RootView` emits a root plan and validation summary.
-- `ReactivePlanScope.PartialContribution` emits a partial contribution that
+- `ReactivePlanScope.PartialView` emits a partial plan document that
   merges into an existing browser plan.
-- `PlanIdentity` is the stable artifact identity used by merge/unmerge.
+- `PlanIdentity` is the stable model identity used by composition and slot load.
 
 Design consequence:
 
-Partial behavior is not "append this JSON". It is a plan contribution lifecycle:
-owned component definitions, object contract fragments, validation fragments,
-behaviors/listeners, and references must merge on load and unmerge on unload.
-There are two load paths, SSR and browser injection, but both should feed the
-same contribution policy.
+Partial behavior is not "append this JSON". It is browser plan load/unload:
+owned component definitions, object member declarations, validation rules,
+behaviors/listeners, and references must merge on load and be released on slot
+unload. There are two load paths, SSR and browser injection, but both should
+use the same plan document merge language.
 
 ## Trigger Surface
 
@@ -85,7 +85,7 @@ Domain terms:
 
 Runtime behavior:
 
-Triggers subscribe once per behavior contribution and execute a reaction graph
+Triggers subscribe once per loaded behavior graph and execute a reaction graph
 when the channel fires. Component `.Reactive` is not special runtime magic; it
 wires a component event channel to the same behavior graph model.
 
@@ -128,10 +128,10 @@ the current lane and only become async when a reached term needs async behavior.
 
 Design consequence:
 
-Lifecycle hooks such as request `WhileLoading`, request `Finally`, response
-handlers, chained requests, and parallel `OnAllSettled` are reaction graph
-slots. They are not "command list only" slots. If the DSL can express a branch,
-request, dispatch, or nested graph there, PlanModel/runtime must preserve it.
+Request stages such as `WhileLoading`, `Finally`, response handlers, chained
+requests, and parallel `OnAllSettled` are reaction graph slots. They are not
+"command list only" slots. If the DSL can express a branch, request, dispatch,
+or nested graph there, PlanModel/runtime must preserve it.
 
 ## Value Producer Surface
 
@@ -218,8 +218,8 @@ Domain terms:
 - `Request`
 - `RequestEndpoint`
 - `RequestInput`
-- `RequestParameters`
-- `RequestLifecycle`
+- `RequestInputProjection`
+- `RequestStages`
 - `RequestReactionStages`
 - `RequestValidation`
 - `ResponseDraft`
@@ -234,7 +234,7 @@ runs after request settlement.
 
 Design consequence:
 
-HTTP should read like a deterministic request plan with lifecycle stages. The
+HTTP should read like a deterministic request plan with named stages. The
 runtime should not reinterpret handler order or infer response shape; the plan
 already declares those scopes and follow-up graphs.
 
@@ -255,7 +255,8 @@ Source:
 Domain terms:
 
 - `GatherDraft`
-- `RequestPayloadAssignment`
+- `RequestInputAssignment`
+- `RequestInputTarget`
 - `RequestPayloadTarget`
 - `ValueProducer`
 - `RegisteredInputAssignment`
@@ -267,9 +268,9 @@ Domain terms:
 
 Runtime behavior:
 
-Gather is a declared request input. It is one ordered list of authored
-assignments: `target <- source`. A target is the HTTP payload name plus
-structured path. A source is any `ValueProducer`: literal, URL value,
+Gather is a declared request input projection. It is one ordered list of authored
+assignments: `target <- source`. A target is a payload path, header name, or
+route parameter name. A source is any `ValueProducer`: literal, URL value,
 event/response payload, component property read, plugin result, object, or
 array. Scalar destinations such as headers and route parameters stay scalar.
 `IncludeAll` is a selection policy over the current runtime plan, so registered
@@ -297,7 +298,8 @@ Source:
 - `WhenFields(c => c.Field(...).Truthy().And(...), ...)`
 - normal FluentValidation rules such as NotEmpty, Length, Email, Regex, ranges,
   comparisons, nested validators, Include
-- server-only FluentValidation `.When/.Unless/.WhenAsync/.UnlessAsync`
+- FluentValidation `.When/.Unless/.WhenAsync/.UnlessAsync` guards outside the
+  client projection language
 
 Domain terms:
 
@@ -313,18 +315,17 @@ Domain terms:
 
 Runtime behavior:
 
-FluentValidation always remains server validation. The framework projects only
+FluentValidation still executes normally. The framework projects only
 client-side projectable rules. `ReactiveValidator` gives explicit client
-condition intent while still applying the server predicate. Server-only
-FluentValidation conditions are skipped for client projection, not lost on the
-server.
+condition intent while still applying the normal predicate. FluentValidation
+guards outside that client language are skipped for client projection.
 
 Design consequence:
 
 Validation is a projection/binding problem, not a reflection trick. Client rules
 should be explicit, named, and bound to registered component value contracts at
 render. Core registry projections carry typed field tokens and field shapes;
-FluentValidation remains one adapter into the same projection contract. Peer-field
+FluentValidation is one adapter into the same projection contract. Peer-field
 comparisons and conditional activation must resolve through the same value
 producer and condition language as `.Reactive`.
 
@@ -351,7 +352,7 @@ Domain terms:
 - `MethodSignature`
 - `MemberAccess`
 - `InputValueContract`
-- `ComponentContributionIntent`
+- `ComponentRole`
 - `PluginContract`
 
 Runtime behavior:
@@ -454,11 +455,11 @@ must still reduce to object member method/property access in PlanModel.
 
 Behavior tests should be arranged around these domain modules:
 
-- plan lifecycle and partial contribution load/unload
+- plan load/unload and partial slot load/unload
 - object contract and component onboarding
 - value producers and path traversal
 - conditions and branch execution
-- request/gather/response/chained/parallel lifecycle
+- request/gather/response/chained/parallel stages
 - validation projection and field binding
 - plugin descriptors and invocation
 - runtime execution lanes
@@ -473,14 +474,14 @@ The next closed surfaces should be chosen by blast radius and domain clarity:
 
 1. Object/member contract kernel: property, method, event/callback, source,
    value read, path, shape.
-2. Reaction graph execution: sequence, branch, lifecycle graph slots, sync/async
+2. Reaction graph execution: sequence, branch, request graph slots, sync/async
    lane boundary.
-3. Partial contribution lifecycle: stable artifact ID, merge, unmerge, owned
+3. Partial slot load/unload: plan identity, slot load, slot unload, owned
    definitions, references, validation and listener removal.
 4. Validation projection/binding: client rule projection, field conditions,
-   peer fields, skipped server-only conditions.
+   peer fields, skipped unprojected guards.
 5. Gather/request: source-to-target payload assignments, scalar slots, route/header/url binding,
-   chained/parallel lifecycle.
+   chained/parallel stages.
 
 Delete-and-rewrite is acceptable for a surface only when this atlas identifies
 the DSL capability, the replacement PlanModel vocabulary, generated TS shape,
