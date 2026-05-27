@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Requests
     {
         private readonly PlanBuildContext _context;
         private RequestEndpoint? _endpoint;
-        private GatherDraft _gather = new GatherDraft();
+        private RequestInputProjectionDraft _gather = new RequestInputProjectionDraft();
         private RequestBodyFormat _bodyFormat = RequestBodyFormat.Json;
         private readonly List<Reaction> _whileLoading = new List<Reaction>();
         private readonly List<Reaction> _finally = new List<Reaction>();
@@ -50,7 +50,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
         {
-            var draft = new GatherDraft();
+            var draft = new RequestInputProjectionDraft();
             var builder = new GatherBuilder<TModel>(_context, draft);
             gather(builder);
             _gather = draft;
