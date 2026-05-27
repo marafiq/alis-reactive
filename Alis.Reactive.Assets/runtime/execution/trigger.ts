@@ -1,4 +1,4 @@
-import type { Plan, Reaction, StartsWhen } from "../types";
+import type { PlanDocument, Reaction, StartsWhen } from "../types";
 import { wireEvent } from "../resolution/resolver";
 import { RuntimePlan } from "../domain/runtime-plan";
 import { catchAsyncReactionFailure, executeReaction } from "./execute";
@@ -18,7 +18,7 @@ const log = scope("trigger");
  * (set, call, branch with compare conditions) — required so SF event
  * mutations like args.cancel are visible when SF checks them after return.
  */
-function runReaction(reaction: Reaction, plan: Plan, context: ExecutionContext, source: string): void {
+function runReaction(reaction: Reaction, plan: PlanDocument, context: ExecutionContext, source: string): void {
   try {
     catchAsyncReactionFailure(
       executeReaction(reaction, plan, context.raw),
@@ -32,7 +32,7 @@ function runReaction(reaction: Reaction, plan: Plan, context: ExecutionContext, 
 export function wireBehavior(
   trigger: StartsWhen,
   reaction: Reaction,
-  plan: Plan,
+  plan: PlanDocument,
   signal?: AbortSignal
 ): void {
   const opts = listenerOptions(signal);

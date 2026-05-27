@@ -1,9 +1,9 @@
 // native-action-link.ts — Click handler for <a data-reactive-link> elements.
-// Uses Plan + Reaction types for V3 plan-driven navigation.
+// Uses PlanDocument + Reaction types for V3 plan-driven navigation.
 
 import { executeReaction } from "../../execution/execute";
 import { scope } from "../../core/trace";
-import type { Reaction, Plan, RequestPlan, ParallelCompletion } from "../../types";
+import type { Reaction, PlanDocument, RequestPlan, ParallelCompletion } from "../../types";
 import { assertNever } from "../../core/assert-never";
 
 const log = scope("native-action-link");
@@ -12,7 +12,7 @@ const SELECTOR = "a[data-reactive-link]";
 let initialized = false;
 
 interface NativeActionLinkPayload {
-  plan: Plan;
+  plan: PlanDocument;
   reaction: Reaction;
 }
 

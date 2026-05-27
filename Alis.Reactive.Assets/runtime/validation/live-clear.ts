@@ -4,7 +4,7 @@
 // On blur/change: re-validates the single field (not just clears).
 // On input: clears only (typing should not show errors mid-keystroke).
 
-import type { Plan } from "../types";
+import type { PlanDocument } from "../types";
 import {
   RuntimeComponentReadinessError,
   RuntimePlan,
@@ -16,7 +16,7 @@ import { clearInline } from "./error-display";
 import { revalidateField } from "./orchestrator";
 
 interface LiveFieldWire {
-  readonly plan: Plan;
+  readonly plan: PlanDocument;
   readonly containerKey: string;
   readonly component: RuntimeComponent;
   readonly signal: AbortSignal | undefined;
@@ -32,7 +32,7 @@ interface LiveFieldEvents {
  * Wire live validation for all components in a container scope.
  * containerKey identifies the component that holds the ContainerScope.
  */
-export function wireLiveValidation(plan: Plan, containerKey: string, signal?: AbortSignal): void {
+export function wireLiveValidation(plan: PlanDocument, containerKey: string, signal?: AbortSignal): void {
   const runtime = RuntimePlan.from(plan);
   const containerComp = runtime.components.find(containerKey);
   const containerScope = containerComp?.containerScope;

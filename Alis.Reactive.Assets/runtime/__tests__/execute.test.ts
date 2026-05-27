@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { registerComponentRuntime, type ComponentRuntimeDriver } from "../domain/component-runtime";
 import { executeReaction } from "../execution/execute";
 import type {
-  ComponentObject, Condition, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, Plan, Reaction, Shape, ValueProducer,
+  ComponentObject, Condition, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, Reaction, Shape, ValueProducer,
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -72,11 +72,11 @@ function arrayLiteral(value: JsonValue[], item: Shape): ValueProducer {
   };
 }
 
-function textBoxPlan(): Plan {
+function textBoxPlan(): PlanDocument {
   return textBoxPlanWithValueAccess("readwrite");
 }
 
-function textBoxPlanWithValueAccess(access: MemberAccess): Plan {
+function textBoxPlanWithValueAccess(access: MemberAccess): PlanDocument {
   const type: BrowserObjectContract = {
     properties: {
       value: {
@@ -113,7 +113,7 @@ function textBoxPlanWithValueAccess(access: MemberAccess): Plan {
   };
 }
 
-function customWidgetPlan(): Plan {
+function customWidgetPlan(): PlanDocument {
   const type: BrowserObjectContract = {
     properties: {
       value: {
@@ -221,7 +221,7 @@ describe("executeReaction member targets", () => {
       methods: {},
       events: {},
     };
-    const plan: Plan = {
+    const plan: PlanDocument = {
       version: 3,
       planId: "Runtime.PropertyWriteShape",
       scope: { kind: "root" },
@@ -263,7 +263,7 @@ describe("executeReaction member targets", () => {
       methods: {},
       events: {},
     };
-    const plan: Plan = {
+    const plan: PlanDocument = {
       version: 3,
       planId: "Runtime.TextPropertyShape",
       scope: { kind: "root" },

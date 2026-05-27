@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { boot, resetBootStateForTests } from "../../lifecycle/boot";
-import type { ComponentObject, BrowserObjectContract, Plan, Reaction, Shape, ValueProducer } from "../../types";
+import type { ComponentObject, BrowserObjectContract, PlanDocument, Reaction, Shape, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -36,7 +36,7 @@ describe("component event trigger contracts", () => {
   });
 });
 
-function planWithComponentEvent(events: BrowserObjectContract["events"]): Plan {
+function planWithComponentEvent(events: BrowserObjectContract["events"]): PlanDocument {
   return {
     version: 3,
     planId: "Resident.EventContracts",

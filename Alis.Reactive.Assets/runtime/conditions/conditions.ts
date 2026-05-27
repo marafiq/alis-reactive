@@ -13,7 +13,7 @@ import type {
   MembershipCompareOp,
   OrderedCompareOp,
   OrderedCompareCondition,
-  Plan,
+  PlanDocument,
   RangeCompareCondition,
   RegexCompareCondition,
   Shape,
@@ -60,19 +60,19 @@ const missingOrderedConditionValue: OrderedConditionValue = { kind: "missing" };
 const noRightOperandTrace = { kind: "none" } as const;
 
 /** Sync condition evaluation for validation conditions. */
-export function evaluateCondition(condition: ValidationCondition, plan: Plan, ctx?: ExecContext): boolean {
+export function evaluateCondition(condition: ValidationCondition, plan: PlanDocument, ctx?: ExecContext): boolean {
   return evaluateConditionSync(condition, plan, ExecutionContext.from(ctx));
 }
 
 /** Async condition evaluation — required when conditions contain ConfirmCondition. */
-export async function evaluateConditionAsync(condition: Condition, plan: Plan, ctx?: ExecContext): Promise<boolean> {
+export async function evaluateConditionAsync(condition: Condition, plan: PlanDocument, ctx?: ExecContext): Promise<boolean> {
   return evaluateConditionAsyncCore(condition, plan, ExecutionContext.from(ctx));
 }
 
 /** Current-lane condition evaluation. Crosses to async only when a reached term requires it. */
 export function evaluateConditionInCurrentLane(
   condition: Condition,
-  plan: Plan,
+  plan: PlanDocument,
   ctx?: ExecContext,
 ): boolean | Promise<boolean> {
   return evaluateConditionInLane(condition, plan, ExecutionContext.from(ctx));
@@ -80,7 +80,7 @@ export function evaluateConditionInCurrentLane(
 
 function evaluateConditionSync(
   condition: ValidationCondition,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
 ): boolean {
   switch (condition.kind) {
@@ -99,7 +99,7 @@ function evaluateConditionSync(
 
 async function evaluateConditionAsyncCore(
   condition: Condition,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
 ): Promise<boolean> {
   switch (condition.kind) {
@@ -126,7 +126,7 @@ async function evaluateConditionAsyncCore(
 
 function evaluateConditionInLane(
   condition: Condition,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
 ): boolean | Promise<boolean> {
   switch (condition.kind) {
@@ -147,7 +147,7 @@ function evaluateConditionInLane(
 
 function evaluateAllInLane(
   terms: readonly Condition[],
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
   startIndex: number,
 ): boolean | Promise<boolean> {
@@ -166,7 +166,7 @@ function evaluateAllInLane(
 
 function evaluateAnyInLane(
   terms: readonly Condition[],
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
   startIndex: number,
 ): boolean | Promise<boolean> {
@@ -185,7 +185,7 @@ function evaluateAnyInLane(
 
 function negateConditionInLane(
   condition: Condition,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
 ): boolean | Promise<boolean> {
   const termMatches = evaluateConditionInLane(condition, plan, context);
@@ -208,7 +208,7 @@ async function evaluateConfirmCondition(message: string): Promise<boolean> {
 
 // -- Compare evaluation --
 
-function evaluateCompare(condition: CompareCondition, plan: Plan, context: ExecutionContext): boolean {
+function evaluateCompare(condition: CompareCondition, plan: PlanDocument, context: ExecutionContext): boolean {
   const left = resolveComparisonLeft(condition, plan, context);
 
   switch (condition.op) {
@@ -277,7 +277,7 @@ function evaluateCompare(condition: CompareCondition, plan: Plan, context: Execu
   }
 }
 
-function resolveComparisonLeft(condition: CompareCondition, plan: Plan, context: ExecutionContext): ComparisonLeft {
+function resolveComparisonLeft(condition: CompareCondition, plan: PlanDocument, context: ExecutionContext): ComparisonLeft {
   const raw = evaluateValue(condition.left, plan, context.raw);
   const shaped = applyShape(raw, condition.shape);
   return { raw, shaped };
@@ -298,7 +298,7 @@ function traceCompare(condition: CompareCondition, left: ComparisonLeft, right: 
 
 function resolveRightValue(
   condition: ScalarRightCondition,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
   shape: Shape,
 ): unknown {
@@ -308,7 +308,7 @@ function resolveRightValue(
 
 function resolveMembershipItems(
   condition: MembershipCompareCondition,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
 ): unknown[] {
   return condition.right.value.items.map(item =>
@@ -317,7 +317,7 @@ function resolveMembershipItems(
 
 function resolveRangeBounds(
   condition: RangeCompareCondition,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
 ): [unknown, unknown] {
   const [lower, upper] = condition.right.value.items;
@@ -329,7 +329,7 @@ function resolveRangeBounds(
 
 function resolveShapedComparisonItem(
   producer: ValueProducer,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
   shape: Shape,
 ): unknown {

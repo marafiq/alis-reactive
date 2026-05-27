@@ -7,7 +7,7 @@ import type {
   BrowserObjectContract,
   PathSegment,
   PayloadScope,
-  Plan,
+  PlanDocument,
   Reaction,
   RequestPlan,
   Shape,
@@ -103,7 +103,7 @@ function request(overrides: Partial<RequestPlan>): RequestPlan {
   };
 }
 
-function nativeTextPlan(componentKeys: string[]): Plan {
+function nativeTextPlan(componentKeys: string[]): PlanDocument {
   const textType: BrowserObjectContract = {
     properties: {
       textContent: {

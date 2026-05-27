@@ -1,7 +1,7 @@
 import type {
   BrowserObjectContract,
   ComponentObject,
-  Plan,
+  PlanDocument,
   RuntimeObjectSource,
 } from "../types";
 import { browserPlugins, type BrowserPluginCatalog } from "../core/plugin-catalog";
@@ -10,7 +10,7 @@ import { ComponentRuntime } from "./component-runtime";
 
 export { RuntimeComponentReadinessError } from "./component-runtime";
 
-const cache = new WeakMap<Plan, RuntimePlan>();
+const cache = new WeakMap<PlanDocument, RuntimePlan>();
 
 type RuntimeValidationContainer = Extract<ComponentObject["container"], { kind: "validation-container" }>;
 
@@ -48,13 +48,13 @@ export class RuntimePlan {
   readonly objectContracts: RuntimeObjectContractCatalog;
   readonly plugins: RuntimePluginCatalog;
 
-  private constructor(readonly document: Plan) {
+  private constructor(readonly document: PlanDocument) {
     this.objectContracts = new RuntimeObjectContractCatalog(document);
     this.components = new RuntimeComponentCatalog(document, this.objectContracts);
     this.plugins = new RuntimePluginCatalog(this.objectContracts, browserPlugins);
   }
 
-  static from(plan: Plan): RuntimePlan {
+  static from(plan: PlanDocument): RuntimePlan {
     const existing = cache.get(plan);
     if (existing) return existing;
 
@@ -82,7 +82,7 @@ export class RuntimePlan {
 }
 
 export class RuntimeObjectContractCatalog {
-  constructor(private readonly plan: Plan) {}
+  constructor(private readonly plan: PlanDocument) {}
 
   require(typeKey: string): BrowserObjectContract {
     const objectContract = this.plan.types[typeKey];
@@ -93,7 +93,7 @@ export class RuntimeObjectContractCatalog {
 
 export class RuntimeComponentCatalog {
   constructor(
-    private readonly plan: Plan,
+    private readonly plan: PlanDocument,
     private readonly objectContracts: RuntimeObjectContractCatalog,
   ) {}
 

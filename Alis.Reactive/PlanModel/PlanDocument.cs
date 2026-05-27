@@ -6,7 +6,7 @@ namespace Alis.Reactive.PlanModel
     /// Immutable plan document — the serialized contract between C# and the browser runtime.
     /// Produced by <see cref="PlanBuildContext.BuildPlan"/> once construction is complete.
     /// </summary>
-    internal sealed class Plan
+    internal sealed class PlanDocument
     {
         private readonly PlanIdentity _identity;
         private readonly IReadOnlyDictionary<string, BrowserObjectContract> _types;
@@ -20,7 +20,7 @@ namespace Alis.Reactive.PlanModel
         public IReadOnlyDictionary<string, ComponentObject> Components => _components;
         public IReadOnlyList<Behavior> Behaviors => _behaviors;
 
-        internal Plan(
+        internal PlanDocument(
             PlanIdentity identity,
             IReadOnlyDictionary<string, BrowserObjectContract> types,
             IReadOnlyDictionary<string, ComponentObject> components,

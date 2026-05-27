@@ -3,7 +3,7 @@
 // No fallbacks. Every component reference must be in plan.components.
 
 import type {
-  Plan, Reaction, SequenceReaction, ParallelReaction, BranchReaction,
+  PlanDocument, Reaction, SequenceReaction, ParallelReaction, BranchReaction,
   BranchCase, SetReaction, CallReaction, DispatchReaction,
   InjectReaction, ShowValidationErrorsReaction,
   ExecContext, PayloadSource,
@@ -25,7 +25,7 @@ const log = scope("execute");
 
 let activeRuntimePlan: RuntimePlan | undefined;
 
-export function setActivePlan(plan: Plan): void {
+export function setActivePlan(plan: PlanDocument): void {
   activeRuntimePlan = RuntimePlan.from(plan);
 }
 
@@ -33,7 +33,7 @@ export function resetActivePlanForTests(): void {
   activeRuntimePlan = undefined;
 }
 
-function runtimePlanFor(plan: Plan | undefined): RuntimePlan {
+function runtimePlanFor(plan: PlanDocument | undefined): RuntimePlan {
   if (plan) return RuntimePlan.from(plan);
   if (activeRuntimePlan) return activeRuntimePlan;
   throw new Error("[alis] no active plan");
@@ -49,7 +49,7 @@ function runtimePlanFor(plan: Plan | undefined): RuntimePlan {
 
 export function executeReaction(
   reaction: Reaction,
-  plan?: Plan,
+  plan?: PlanDocument,
   ctx?: ExecContext,
 ): void | Promise<void> {
   return executeReactionWith(reaction, runtimePlanFor(plan), ExecutionContext.from(ctx));
@@ -300,7 +300,7 @@ async function waitForReaction(result: void | Promise<void>): Promise<void> {
   if (reactionContinuesAsync(result)) await result;
 }
 
-function dispatchPayload(reaction: DispatchReaction, plan: Plan, context: ExecutionContext): unknown {
+function dispatchPayload(reaction: DispatchReaction, plan: PlanDocument, context: ExecutionContext): unknown {
   if (reaction.payload.kind === "none") return {};
 
   return evaluateValue(reaction.payload.data, plan, context.raw);
@@ -308,7 +308,7 @@ function dispatchPayload(reaction: DispatchReaction, plan: Plan, context: Execut
 
 interface BranchExecutionContext {
   readonly cases: readonly BranchCase[];
-  readonly plan: Plan;
+  readonly plan: PlanDocument;
   readonly context: ExecutionContext;
   readonly runReaction: ReactionRunner;
 }
@@ -351,7 +351,7 @@ async function executeAfterAsyncBranchGuard(
 
 function branchGuardMatches(
   branchCase: BranchCase,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
 ): boolean | Promise<boolean> {
   switch (branchCase.guard.kind) {

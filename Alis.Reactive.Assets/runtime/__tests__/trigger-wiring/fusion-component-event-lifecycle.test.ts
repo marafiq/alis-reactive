@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../lifecycle/boot";
-import type { ComponentObject, BrowserObjectContract, Plan, Reaction, Shape, ValueProducer } from "../../types";
+import type { ComponentObject, BrowserObjectContract, PlanDocument, Reaction, Shape, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -85,7 +85,7 @@ class FakeFusionRoot {
   }
 }
 
-function rootPlan(planId: string, components: Record<string, ComponentObject>): Plan {
+function rootPlan(planId: string, components: Record<string, ComponentObject>): PlanDocument {
   return {
     version: 3,
     planId,
@@ -98,8 +98,8 @@ function rootPlan(planId: string, components: Record<string, ComponentObject>): 
 
 function partialPlan(
   planId: string,
-  entries: Partial<Pick<Plan, "components" | "behaviors" | "types">>,
-): Plan {
+  entries: Partial<Pick<PlanDocument, "components" | "behaviors" | "types">>,
+): PlanDocument {
   return {
     version: 3,
     planId,

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { injectHtml } from "../execution/inject";
 import { getBootedPlan, resetBootStateForTests } from "../lifecycle/boot";
-import type { ComponentObject, InjectionTarget, BrowserObjectContract, Plan } from "../types";
+import type { ComponentObject, InjectionTarget, BrowserObjectContract, PlanDocument } from "../types";
 
 function objectContract(): BrowserObjectContract {
   return {
@@ -22,7 +22,7 @@ function component(id: string, type = `native.element.${id}`): ComponentObject {
   };
 }
 
-function partialPlan(planId: string): Plan {
+function partialPlan(planId: string): PlanDocument {
   return {
     version: 3,
     planId,

@@ -8,7 +8,7 @@ import { initNativeActionLinks } from "./components/native/native-action-link";
 import "./components/native/drawer";  // side-effect: wires close button + Escape key
 import "./components/native/loader";  // side-effect: handles target positioning + timeout
 import { composeInitialPlans } from "./lifecycle/merge-plan";
-import type { Plan } from "./types";
+import type { PlanDocument } from "./types";
 import type { TraceLevel } from "./core/trace";
 import { registerPlugin } from "./core/plugin-catalog";
 
@@ -55,9 +55,9 @@ function drainPluginQueue(): void {
   delete pluginQueue.__alisPlugins;
 }
 
-function discoverPlans(): Plan[] {
+function discoverPlans(): PlanDocument[] {
   const planEls = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
-  const plans: Plan[] = [];
+  const plans: PlanDocument[] = [];
 
   for (const el of planEls) {
     const traceLevel = el.dataset.trace as TraceLevel | undefined;

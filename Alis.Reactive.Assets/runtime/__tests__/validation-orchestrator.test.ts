@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { AppliedBrowserPlans } from "../lifecycle/merge-plan";
 import { showServerErrors, validateContainer } from "../validation/orchestrator";
-import type { ComponentObject, ComponentValidation, BrowserObjectContract, Plan, ReadProducer, Shape, ValueProducer } from "../types";
+import type { ComponentObject, ComponentValidation, BrowserObjectContract, PlanDocument, ReadProducer, Shape, ValueProducer } from "../types";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };
@@ -161,7 +161,7 @@ function plan(
   components: Record<string, ComponentObject> = {
     "resident-name-field": nativeComponent("resident-name-input"),
   },
-): Plan {
+): PlanDocument {
   return {
     version: 3,
     planId: "Runtime.ValidationServerErrors",

@@ -2,7 +2,7 @@
 //
 // getElementById is correct here. targetIds are raw DOM IDs collected during
 // SSE/SignalR behavior wiring — NOT component keys from plan.components.
-// This module has no Plan access and operates as a pure UI overlay for
+// This module has no PlanDocument access and operates as a pure UI overlay for
 // connection-lost indicators. It does not resolve components.
 
 import { scope } from "../core/trace";

@@ -2,7 +2,7 @@
 // Every payload assignment is evaluated by evaluateValue(); runtime registered
 // inputs use the same writer path after reading their component value member.
 
-import type { Plan, RequestInputProjection, RequestInputAssignment, HttpMethod, RequestInput } from "../types";
+import type { PlanDocument, RequestInputProjection, RequestInputAssignment, HttpMethod, RequestInput } from "../types";
 import type { ExecContext } from "../types";
 import { assertNever } from "../core/assert-never";
 import { evaluateValue } from "../core/evaluate";
@@ -15,7 +15,7 @@ export type { GatherResult } from "./request-payload-writer";
 
 interface GatherRuntime {
   readonly method: HttpMethod;
-  readonly plan: Plan;
+  readonly plan: PlanDocument;
   readonly runtimePlan: RuntimePlan;
   readonly ctx: ExecContext;
 }
@@ -26,7 +26,7 @@ interface GatherRuntime {
 export function resolveGather(
   input: RequestInput,
   method: HttpMethod,
-  plan: Plan,
+  plan: PlanDocument,
   ctx: ExecContext,
 ): GatherResult {
   const runtime = { method, plan, runtimePlan: RuntimePlan.from(plan), ctx };

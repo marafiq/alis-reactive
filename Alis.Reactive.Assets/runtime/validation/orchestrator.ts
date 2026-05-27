@@ -4,7 +4,7 @@
 // No parallel read path — same concept as pipeline and gather.
 
 import type {
-  Plan, ValidationContainerScope, ComponentValidation,
+  PlanDocument, ValidationContainerScope, ComponentValidation,
   ValidationRule,
   ValidationRuleActivation as PlanValidationRuleActivation,
   PeerEqualityValidationRule,
@@ -68,7 +68,7 @@ function clearAndHideSummary(summary: ValidationSummary): void {
 }
 
 interface ValidationSurface {
-  readonly plan: Plan;
+  readonly plan: PlanDocument;
   readonly runtime: RuntimePlan;
   readonly containerId: string;
   readonly containerScope: ValidationContainerScope;
@@ -85,7 +85,7 @@ interface FieldEvaluation {
 
 // -- Public API --
 
-export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecContext): boolean {
+export function validateContainer(plan: PlanDocument, containerKey: string, ctx?: ExecContext): boolean {
   const runtime = RuntimePlan.from(plan);
   const containerComp = runtime.components.find(containerKey);
   if (!containerComp) {
@@ -144,7 +144,7 @@ export function validateContainer(plan: Plan, containerKey: string, ctx?: ExecCo
   return valid;
 }
 
-export function showServerErrors(plan: Plan, containerKey: string, data: unknown): void {
+export function showServerErrors(plan: PlanDocument, containerKey: string, data: unknown): void {
   const runtime = RuntimePlan.from(plan);
   const containerComp = runtime.components.find(containerKey);
   const containerScope = containerComp?.containerScope;
@@ -207,7 +207,7 @@ function placeServerError(
  * Re-validate a single component within its container.
  * Called on blur/change by live-clear to give immediate field-level feedback.
  */
-export function revalidateField(plan: Plan, containerKey: string, componentKey: string): void {
+export function revalidateField(plan: PlanDocument, containerKey: string, componentKey: string): void {
   const runtime = RuntimePlan.from(plan);
   const containerComp = runtime.components.find(containerKey);
   const containerScope = containerComp?.containerScope;
@@ -244,7 +244,7 @@ export function revalidateField(plan: Plan, containerKey: string, componentKey: 
   evaluateComponentRules(cv, surface, container);
 }
 
-export function clearContainerValidation(plan: Plan, containerKey: string): void {
+export function clearContainerValidation(plan: PlanDocument, containerKey: string): void {
   const runtime = RuntimePlan.from(plan);
   const containerComp = runtime.components.find(containerKey);
   const containerScope = containerComp?.containerScope;
@@ -427,7 +427,7 @@ function isRuleInactiveWhenFieldIsUnmounted(
 function failsRule(
   rule: ValidationRule,
   value: unknown,
-  plan: Plan,
+  plan: PlanDocument,
 ): boolean {
   if (hasPeerTarget(rule)) {
     return ruleFails({
@@ -457,7 +457,7 @@ function clearContainerErrors(
 }
 
 function findComponentValidationByName(surface: ValidationSurface, name: string): ComponentValidation | undefined {
-  // Plan-driven: each ComponentValidation carries serverFieldName set at C# build time.
+  // PlanDocument-driven: each ComponentValidation carries serverFieldName set at C# build time.
   // No heuristics — the plan declares the mapping.
   return surface.containerScope.validationRules.find(cv => matchesServerErrorName(cv, name));
 }

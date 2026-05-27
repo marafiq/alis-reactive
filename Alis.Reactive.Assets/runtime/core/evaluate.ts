@@ -3,7 +3,7 @@
 // Every module that needs a value calls evaluateValue(). No parallel paths.
 
 import type {
-  Plan, ValueProducer, ExecContext, ReadProducer, RuntimeObjectSource,
+  PlanDocument, ValueProducer, ExecContext, ReadProducer, RuntimeObjectSource,
   ObjectPropertyReadProducer, ObjectMethodReadProducer,
   UrlParameterReadProducer, PayloadPathReadProducer, WholePayloadReadProducer,
 } from "../types";
@@ -18,7 +18,7 @@ import { RuntimeObject } from "../domain/runtime-object";
 type ObjectReadProducer = ObjectPropertyReadProducer | ObjectMethodReadProducer;
 type PayloadReadProducer = PayloadPathReadProducer | WholePayloadReadProducer;
 
-export function evaluateValue(producer: ValueProducer, plan: Plan, ctx?: ExecContext): unknown {
+export function evaluateValue(producer: ValueProducer, plan: PlanDocument, ctx?: ExecContext): unknown {
   return ValueEvaluation.from(plan, ctx).evaluate(producer);
 }
 
@@ -28,7 +28,7 @@ class ValueEvaluation {
     private readonly context: ExecutionContext,
   ) {}
 
-  static from(plan: Plan, ctx?: ExecContext): ValueEvaluation {
+  static from(plan: PlanDocument, ctx?: ExecContext): ValueEvaluation {
     return new ValueEvaluation(RuntimePlan.from(plan), ExecutionContext.from(ctx));
   }
 

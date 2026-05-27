@@ -3,7 +3,7 @@ import { resolveGather } from "../execution/gather";
 import type {
   JsonValue,
   PathSegment,
-  Plan,
+  PlanDocument,
   RequestInput,
   RequestInputAssignment,
   RequestPayloadTarget,
@@ -18,7 +18,7 @@ const rawShape: Shape = { kind: "raw" };
 const objectShape: Shape = { kind: "object", fields: {}, additional: true };
 const isoDate = "2026-01-02T03:04:05.000Z";
 
-const emptyPlan: Plan = {
+const emptyPlan: PlanDocument = {
   version: 3,
   planId: "Runtime.Gather",
   scope: { kind: "root" },

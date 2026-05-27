@@ -17,7 +17,7 @@ import type {
   OrderedCompareCondition,
   OrderedCompareOp,
   PayloadPathReadProducer,
-  Plan,
+  PlanDocument,
   RangeCompareCondition,
   RangeComparisonProducer,
   RegexCompareCondition,
@@ -45,7 +45,7 @@ type BrowserWindowWithConfirm = typeof window & {
   alis?: { confirm?: (message: string) => boolean | Promise<boolean> };
 };
 
-function plan(): Plan {
+function plan(): PlanDocument {
   return {
     version: 3,
     planId: "Condition.Runtime",

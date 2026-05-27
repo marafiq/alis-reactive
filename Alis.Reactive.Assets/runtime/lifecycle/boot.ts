@@ -1,8 +1,8 @@
-// Boot — Plan lifecycle: boot, partial slot load/unload, reset.
+// Boot — PlanDocument lifecycle: boot, partial slot load/unload, reset.
 // Single responsibility: wire behaviors (two-phase) and register plans.
 // Delegates applied plan state to merge-plan.ts.
 
-import type { Plan, Behavior } from "../types";
+import type { PlanDocument, Behavior } from "../types";
 import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
 import { wireBehavior } from "../execution/trigger";
@@ -34,7 +34,7 @@ interface ReactiveBootWindow extends Window {
   __alisReactiveBoot?: ReactiveBootState;
 }
 
-export function boot(plan: Plan): void {
+export function boot(plan: PlanDocument): void {
   log.info("booting", { planId: plan.planId, behaviors: plan.behaviors.length });
 
   // Wire validation live-clear for components with container scopes
@@ -53,7 +53,7 @@ export function boot(plan: Plan): void {
  * Two-phase wiring: wire all non-page-ready listeners first, then execute page-ready.
  * This ensures document-event listeners exist before page-ready dispatches into them.
  */
-function wireBehaviors(behaviors: Behavior[], plan: Plan, signal?: AbortSignal): void {
+function wireBehaviors(behaviors: Behavior[], plan: PlanDocument, signal?: AbortSignal): void {
   const deferred: Behavior[] = [];
   for (const behavior of behaviors) {
     if (behavior.startsWhen.kind === "page-ready") {
@@ -67,7 +67,7 @@ function wireBehaviors(behaviors: Behavior[], plan: Plan, signal?: AbortSignal):
   }
 }
 
-function wireContainerValidation(plan: Plan, signal?: AbortSignal): void {
+function wireContainerValidation(plan: PlanDocument, signal?: AbortSignal): void {
   for (const [componentKey, component] of Object.entries(plan.components)) {
     if (component.container.kind !== "none") {
       wireLiveValidation(plan, componentKey, signal);
@@ -75,7 +75,7 @@ function wireContainerValidation(plan: Plan, signal?: AbortSignal): void {
   }
 }
 
-export function loadPartialSlot(slotId: string, incoming: Plan[]): void {
+export function loadPartialSlot(slotId: string, incoming: PlanDocument[]): void {
   const affectedPlanIds = applyPartialSlotLoad(slotId, incoming, mergeHooks());
 
   for (const planId of affectedPlanIds) {
@@ -105,7 +105,7 @@ export function unloadPartialSlot(slotId: string): void {
   });
 }
 
-export function getBootedPlan(planId: string): Plan | undefined {
+export function getBootedPlan(planId: string): PlanDocument | undefined {
   return getTrackedBootedPlan(planId);
 }
 
@@ -142,7 +142,7 @@ function clearSummaryForPlan(planId: string): void {
   }
 }
 
-function markReactiveBooted(plan: Plan): void {
+function markReactiveBooted(plan: PlanDocument): void {
   document.documentElement.dataset[BOOTED_ATTR] = "true";
   (window as ReactiveBootWindow).__alisReactiveBoot = {
     booted: true,

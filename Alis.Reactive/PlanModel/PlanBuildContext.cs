@@ -27,8 +27,8 @@ namespace Alis.Reactive.PlanModel
         }
 
         /// <summary>Snapshots the accumulated draft into the serialized plan document.</summary>
-        internal Plan BuildPlan() =>
-            new Plan(
+        internal PlanDocument BuildPlan() =>
+            new PlanDocument(
                 _identity,
                 _objectContracts.Snapshot(),
                 _components.Snapshot(),

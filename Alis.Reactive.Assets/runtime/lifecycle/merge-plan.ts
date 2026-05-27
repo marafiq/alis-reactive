@@ -1,6 +1,6 @@
 // merge-plan.ts — applied browser plans and partial slot replacement.
 
-import type { Plan, Behavior, BrowserObjectContract, ComponentValidation } from "../types";
+import type { PlanDocument, Behavior, BrowserObjectContract, ComponentValidation } from "../types";
 import { unwireField } from "../validation/live-clear";
 import {
   mergeBootComponent,
@@ -14,8 +14,8 @@ import { mergeObjectContracts } from "./object-contracts";
 type PlanId = string;
 type SlotId = string;
 
-type WireBehaviors = (behaviors: Behavior[], plan: Plan, signal?: AbortSignal) => void;
-type WireContainerValidation = (plan: Plan, signal?: AbortSignal) => void;
+type WireBehaviors = (behaviors: Behavior[], plan: PlanDocument, signal?: AbortSignal) => void;
+type WireContainerValidation = (plan: PlanDocument, signal?: AbortSignal) => void;
 
 export interface MergeHooks {
   wireBehaviors: WireBehaviors;
@@ -40,20 +40,20 @@ interface SlotLoad {
 }
 
 export class AppliedBrowserPlans {
-  private readonly plans = new Map<PlanId, Plan>();
+  private readonly plans = new Map<PlanId, PlanDocument>();
   private readonly rootPlanIds = new Set<PlanId>();
   private readonly rootComponents = new Set<string>();
   private readonly rootTypes = new Map<string, BrowserObjectContract>();
   private readonly rootValidationRules = new Map<string, ComponentValidation[]>();
   private readonly slots = new Map<SlotId, SlotLoad>();
 
-  register(plan: Plan): void {
+  register(plan: PlanDocument): void {
     this.plans.set(plan.planId, plan);
     this.rootPlanIds.add(plan.planId);
     this.recordRootPlan(plan);
   }
 
-  loadPartialSlot(slotId: SlotId, plans: Plan[], hooks: MergeHooks): PlanId[] {
+  loadPartialSlot(slotId: SlotId, plans: PlanDocument[], hooks: MergeHooks): PlanId[] {
     const affectedPlanIds = new Set(this.removePartialSlot(slotId));
     if (plans.length === 0) return [...affectedPlanIds];
 
@@ -73,7 +73,7 @@ export class AppliedBrowserPlans {
     return this.removePartialSlot(slotId);
   }
 
-  get(planId: string): Plan | undefined {
+  get(planId: string): PlanDocument | undefined {
     return this.plans.get(planId);
   }
 
@@ -103,7 +103,7 @@ export class AppliedBrowserPlans {
 
   private applyPlanLoad(
     abortController: AbortController,
-    incoming: Plan,
+    incoming: PlanDocument,
     hooks: MergeHooks,
   ): SlotPlanLoad {
     const target = this.ensureTarget(incoming.planId);
@@ -133,7 +133,7 @@ export class AppliedBrowserPlans {
     }
   }
 
-  private ensureTarget(planId: PlanId): Plan {
+  private ensureTarget(planId: PlanId): PlanDocument {
     let target = this.plans.get(planId);
     if (target === undefined) {
       target = { version: 3, planId, scope: { kind: "root" }, types: {}, components: {}, behaviors: [] };
@@ -142,7 +142,7 @@ export class AppliedBrowserPlans {
     return target;
   }
 
-  private mergeObjectContractsFrom(incoming: Plan, target: Plan): ObjectContractLoad[] {
+  private mergeObjectContractsFrom(incoming: PlanDocument, target: PlanDocument): ObjectContractLoad[] {
     const objectContractLoads: ObjectContractLoad[] = [];
     for (const [typeKey, contract] of Object.entries(incoming.types)) {
       target.types[typeKey] = mergeObjectContracts(target.types[typeKey], contract);
@@ -152,7 +152,7 @@ export class AppliedBrowserPlans {
     return objectContractLoads;
   }
 
-  private mergeComponents(incoming: Plan, target: Plan): ComponentLoad[] {
+  private mergeComponents(incoming: PlanDocument, target: PlanDocument): ComponentLoad[] {
     const componentLoads: ComponentLoad[] = [];
     for (const [componentKey, component] of Object.entries(incoming.components)) {
       componentLoads.push(
@@ -167,7 +167,7 @@ export class AppliedBrowserPlans {
     return componentLoads;
   }
 
-  private recordRootPlan(plan: Plan): void {
+  private recordRootPlan(plan: PlanDocument): void {
     for (const [typeKey, contract] of Object.entries(plan.types)) {
       const key = planTypeKey(plan.planId, typeKey);
       this.rootTypes.set(key, mergeObjectContracts(this.rootTypes.get(key), contract));
@@ -183,12 +183,12 @@ export class AppliedBrowserPlans {
     }
   }
 
-  private removeBehaviors(plan: Plan, behaviors: Behavior[]): void {
+  private removeBehaviors(plan: PlanDocument, behaviors: Behavior[]): void {
     const removed = new Set(behaviors);
     plan.behaviors = plan.behaviors.filter(behavior => !removed.has(behavior));
   }
 
-  private removeComponentLoads(plan: Plan, planLoad: SlotPlanLoad): void {
+  private removeComponentLoads(plan: PlanDocument, planLoad: SlotPlanLoad): void {
     for (const load of planLoad.componentLoads) {
       if (load.kind === "validation-rules") {
         this.recomputeValidationRules(plan, planLoad.planId, load.containerKey);
@@ -204,7 +204,7 @@ export class AppliedBrowserPlans {
     }
   }
 
-  private recomputeValidationRules(plan: Plan, planId: PlanId, containerKey: string): void {
+  private recomputeValidationRules(plan: PlanDocument, planId: PlanId, containerKey: string): void {
     const container = plan.components[containerKey];
     if (container?.container.kind !== "validation-container") return;
 
@@ -216,7 +216,7 @@ export class AppliedBrowserPlans {
   }
 
   private removeMountedComponent(
-    plan: Plan,
+    plan: PlanDocument,
     load: Extract<ComponentLoad, { kind: "component" }>,
   ): void {
     const component = plan.components[load.componentKey];
@@ -227,7 +227,7 @@ export class AppliedBrowserPlans {
   }
 
   private removeLayoutObject(
-    plan: Plan,
+    plan: PlanDocument,
     planId: PlanId,
     load: Extract<ComponentLoad, { kind: "layout-object" }>,
   ): void {
@@ -241,14 +241,14 @@ export class AppliedBrowserPlans {
     delete plan.components[load.componentKey];
   }
 
-  private removeTypes(plan: Plan, planLoad: SlotPlanLoad): void {
+  private removeTypes(plan: PlanDocument, planLoad: SlotPlanLoad): void {
     const typeKeys = new Set(planLoad.objectContractLoads.map(contract => contract.typeKey));
     for (const typeKey of typeKeys) {
       this.recomputeType(plan, planLoad.planId, typeKey);
     }
   }
 
-  private recomputeType(plan: Plan, planId: PlanId, typeKey: string): void {
+  private recomputeType(plan: PlanDocument, planId: PlanId, typeKey: string): void {
     const rootContract = this.rootTypes.get(planTypeKey(planId, typeKey));
     let remaining = rootContract === undefined
       ? undefined
@@ -285,7 +285,7 @@ export class AppliedBrowserPlans {
     return this.rootComponents.has(planComponentKey(planId, componentKey));
   }
 
-  private canPruneMergedPlan(planId: PlanId, plan: Plan): boolean {
+  private canPruneMergedPlan(planId: PlanId, plan: PlanDocument): boolean {
     const planWasNotBootedAsRoot = !this.rootPlanIds.has(planId);
     const planHasNoBehaviors = plan.behaviors.length === 0;
     const planHasNoComponents = Object.keys(plan.components).length === 0;
@@ -329,8 +329,8 @@ export class AppliedBrowserPlans {
 
 const browserPlans = new AppliedBrowserPlans();
 
-export function composeInitialPlans(plans: Plan[]): Plan[] {
-  const assembledPlans = new Map<PlanId, Plan>();
+export function composeInitialPlans(plans: PlanDocument[]): PlanDocument[] {
+  const assembledPlans = new Map<PlanId, PlanDocument>();
   for (const plan of plans) {
     let assembled = assembledPlans.get(plan.planId);
     if (assembled === undefined) {
@@ -351,7 +351,7 @@ export function composeInitialPlans(plans: Plan[]): Plan[] {
   return Array.from(assembledPlans.values());
 }
 
-function acceptBootPlan(assembled: Plan, loadedPlan: Plan): void {
+function acceptBootPlan(assembled: PlanDocument, loadedPlan: PlanDocument): void {
   for (const [typeKey, contract] of Object.entries(loadedPlan.types)) {
     assembled.types[typeKey] = mergeObjectContracts(assembled.types[typeKey], contract);
   }
@@ -371,12 +371,12 @@ function planTypeKey(planId: PlanId, typeKey: string): string {
   return `${planId}:type:${typeKey}`;
 }
 
-export function registerBootedPlan(plan: Plan): void { browserPlans.register(plan); }
-export function applyPartialSlotLoad(slotId: SlotId, plans: Plan[], hooks: MergeHooks): PlanId[] {
+export function registerBootedPlan(plan: PlanDocument): void { browserPlans.register(plan); }
+export function applyPartialSlotLoad(slotId: SlotId, plans: PlanDocument[], hooks: MergeHooks): PlanId[] {
   return browserPlans.loadPartialSlot(slotId, plans, hooks);
 }
 export function applyPartialSlotUnload(slotId: SlotId): PlanId[] {
   return browserPlans.unloadPartialSlot(slotId);
 }
-export function getBootedPlan(planId: string): Plan | undefined { return browserPlans.get(planId); }
+export function getBootedPlan(planId: string): PlanDocument | undefined { return browserPlans.get(planId); }
 export function resetMergePlanState(): void { browserPlans.reset(); }

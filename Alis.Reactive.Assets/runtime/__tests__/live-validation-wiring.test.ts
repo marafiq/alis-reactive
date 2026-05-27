@@ -4,7 +4,7 @@ import type {
   ComponentObject,
   ComponentValidation,
   BrowserObjectContract,
-  Plan,
+  PlanDocument,
   Shape,
   ValueProducer,
 } from "../types";
@@ -97,7 +97,7 @@ function eventListenerCount(
     .length;
 }
 
-function planWithValidationField(component: ComponentObject): Plan {
+function planWithValidationField(component: ComponentObject): PlanDocument {
   return {
     version: 3,
     planId: "Runtime.LiveValidation",

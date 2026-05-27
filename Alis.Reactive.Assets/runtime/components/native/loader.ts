@@ -1,6 +1,6 @@
 // loader.ts — self-initializing side-effect module
 // Handles target positioning, timeout auto-hide, and cleanup.
-// Plan-driven show/hide uses existing native set reactions (AddClass/RemoveClass).
+// PlanDocument-driven show/hide uses existing native set reactions (AddClass/RemoveClass).
 //
 // All getElementById calls use hardcoded Layout singleton IDs ("alis-loader", etc.).
 // These are app-level infrastructure rendered by @Html.NativeLoader() — NOT plan components.

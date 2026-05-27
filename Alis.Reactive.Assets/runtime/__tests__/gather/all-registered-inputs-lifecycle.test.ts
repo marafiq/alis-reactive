@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveGather } from "../../execution/gather";
 import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
-import type { ComponentObject, RequestPayloadTarget, BrowserObjectContract, PathSegment, Plan, RequestInput, Shape, StructuredPath, ValueProducer } from "../../types";
+import type { ComponentObject, RequestPayloadTarget, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 
@@ -101,7 +101,7 @@ const silentLifecycleHooks = {
   wireContainerValidation: () => undefined,
 };
 
-function rootPlan(planId: string, components: Record<string, ComponentObject>): Plan {
+function rootPlan(planId: string, components: Record<string, ComponentObject>): PlanDocument {
   return {
     version: 3,
     planId,
@@ -114,8 +114,8 @@ function rootPlan(planId: string, components: Record<string, ComponentObject>): 
 
 function partialPlan(
   planId: string,
-  entries: Partial<Pick<Plan, "components" | "behaviors" | "types">>,
-): Plan {
+  entries: Partial<Pick<PlanDocument, "components" | "behaviors" | "types">>,
+): PlanDocument {
   return {
     version: 3,
     planId,

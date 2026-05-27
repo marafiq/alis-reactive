@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 import type { MergeHooks } from "../../lifecycle/merge-plan";
-import type { Behavior, ComponentObject, ComponentValidation, BrowserObjectContract, PathSegment, Plan, Shape, StructuredPath } from "../../types";
+import type { Behavior, ComponentObject, ComponentValidation, BrowserObjectContract, PathSegment, PlanDocument, Shape, StructuredPath } from "../../types";
 
 export function objectContract(): BrowserObjectContract {
   return {
@@ -162,7 +162,7 @@ export function behavior(): Behavior {
   };
 }
 
-export function rootPlan(planId: string): Plan {
+export function rootPlan(planId: string): PlanDocument {
   return {
     version: 3,
     planId,
@@ -180,7 +180,7 @@ export function partialPlan(
     readonly components?: Record<string, ComponentObject>;
     readonly behaviors?: Behavior[];
   },
-): Plan {
+): PlanDocument {
   return {
     version: 3,
     planId,
@@ -201,7 +201,7 @@ export function mergeHooks() {
   return { hooks, behaviorSignals };
 }
 
-export function validationComponents(plan: Plan, componentKey: string): string[] {
+export function validationComponents(plan: PlanDocument, componentKey: string): string[] {
   const container = plan.components[componentKey]?.container;
   if (container?.kind !== "validation-container") {
     throw new Error(`Expected component "${componentKey}" to be a validation container`);

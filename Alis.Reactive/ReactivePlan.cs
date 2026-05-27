@@ -7,7 +7,7 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// Collects reactive behavior for a view: triggers, reactions, and component registrations.
-    /// Renders the collected behavior as a Plan document for browser execution.
+    /// Renders the collected behavior as a plan document for browser execution.
     /// </summary>
     public sealed class ReactivePlan<TModel> where TModel : class
     {
@@ -158,7 +158,7 @@ namespace Alis.Reactive
             WriteIndented = true
         };
 
-        internal static string Serialize(Plan plan) => JsonSerializer.Serialize(plan, Compact);
-        internal static string SerializeFormatted(Plan plan) => JsonSerializer.Serialize(plan, Formatted);
+        internal static string Serialize(PlanDocument plan) => JsonSerializer.Serialize(plan, Compact);
+        internal static string SerializeFormatted(PlanDocument plan) => JsonSerializer.Serialize(plan, Formatted);
     }
 }

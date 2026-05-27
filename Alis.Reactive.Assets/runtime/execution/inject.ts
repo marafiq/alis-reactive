@@ -1,7 +1,7 @@
 // inject.ts — Inject HTML into a declared target.
 // Extracts any <script data-reactive-plan> elements and applies them by target lifecycle.
 
-import type { InjectionTarget, Plan } from "../types";
+import type { InjectionTarget, PlanDocument } from "../types";
 import { loadPartialSlot, unloadPartialSlot } from "../lifecycle/boot";
 
 interface SyncfusionBase {
@@ -25,7 +25,7 @@ export function injectHtml(container: HTMLElement, html: string, target: Injecti
 
   // Extract plan elements before injection (ej.base.append can't handle script tags with JSON)
   const planEls = temp.querySelectorAll<HTMLElement>("[data-reactive-plan]");
-  const plans: Plan[] = [];
+  const plans: PlanDocument[] = [];
   for (const el of planEls) {
     const text = el.textContent?.trim();
     if (!text) throw new Error("[alis] empty plan element in injected HTML");

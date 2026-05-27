@@ -133,12 +133,12 @@ namespace Alis.Reactive.Native.Components
 
     internal sealed class NativeActionLinkPayload
     {
-        public NativeActionLinkPayload(Plan plan, Reaction reaction)
+        public NativeActionLinkPayload(PlanDocument plan, Reaction reaction)
         {
             Plan = plan;
             Reaction = reaction;
         }
-        public Plan Plan { get; }
+        public PlanDocument Plan { get; }
         public Reaction Reaction { get; }
     }
 }

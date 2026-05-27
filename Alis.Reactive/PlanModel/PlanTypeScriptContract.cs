@@ -23,7 +23,7 @@ namespace Alis.Reactive.PlanModel
                 "Alis.Reactive.PlanModel.PlanTypeScriptContract",
                 "npm run generate:plan-types -w Alis.Reactive.Assets");
 
-            contract.Declare(Interface("Plan")
+            contract.Declare(Interface("PlanDocument")
                 .Requires("version", "3")
                 .Requires("planId", "string")
                 .Requires("scope", "PlanScope")

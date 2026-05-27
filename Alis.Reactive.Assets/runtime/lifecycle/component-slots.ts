@@ -1,4 +1,4 @@
-import type { ComponentObject, ComponentValidation, Plan } from "../types";
+import type { ComponentObject, ComponentValidation, PlanDocument } from "../types";
 
 type ValidationContainerComponent = Extract<ComponentObject["container"], { kind: "validation-container" }>;
 
@@ -30,7 +30,7 @@ export interface ValidationRulesLoad {
   readonly rules: ComponentValidation[];
 }
 
-export function mergeBootComponent(target: Plan, declaration: ComponentDeclaration): void {
+export function mergeBootComponent(target: PlanDocument, declaration: ComponentDeclaration): void {
   const existing = target.components[declaration.componentKey];
 
   if (isInitialValidationContainerMerge(existing, declaration.component)) {
@@ -49,7 +49,7 @@ export function mergeBootComponent(target: Plan, declaration: ComponentDeclarati
 }
 
 export function mergeSlotComponent(
-  target: Plan,
+  target: PlanDocument,
   declaration: ComponentDeclaration,
   rootOwnsComponent: boolean,
 ): ComponentLoad[] {
@@ -82,7 +82,7 @@ export function mergeSlotComponent(
   }];
 }
 
-function mergeLayoutObject(target: Plan, declaration: ComponentDeclaration): void {
+function mergeLayoutObject(target: PlanDocument, declaration: ComponentDeclaration): void {
   const existing = target.components[declaration.componentKey];
   if (sameRuntimeIdentity(existing, declaration.component)) return;
 
@@ -128,7 +128,7 @@ function isInitialValidationContainerMerge(existing: ComponentObject | undefined
     && sameRuntimeIdentity(existing, incoming);
 }
 
-function replaceComponent(target: Plan, componentKey: string, incoming: ComponentObject): void {
+function replaceComponent(target: PlanDocument, componentKey: string, incoming: ComponentObject): void {
   const existingRules = validationRulesOf(target.components[componentKey]);
   const incomingRules = validationRulesOf(incoming);
   if (existingRules !== undefined && incomingRules !== undefined) {

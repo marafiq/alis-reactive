@@ -3,9 +3,9 @@ import { initNativeActionLinks } from "../components/native/native-action-link";
 import { registerPlugin, resolvePlugin } from "../core/plugin-catalog";
 import { executeReaction } from "../execution/execute";
 import { boot, resetBootStateForTests } from "../lifecycle/boot";
-import type { Plan } from "../types";
+import type { PlanDocument } from "../types";
 
-function emptyPlan(planId: string): Plan {
+function emptyPlan(planId: string): PlanDocument {
   return {
     version: 3,
     planId,

@@ -3,9 +3,9 @@ import {
   initNativeActionLinks,
   resetNativeActionLinksForTests,
 } from "../components/native/native-action-link";
-import type { Plan, Reaction, RequestPlan } from "../types";
+import type { PlanDocument, Reaction, RequestPlan } from "../types";
 
-const emptyPlan: Plan = {
+const emptyPlan: PlanDocument = {
   version: 3,
   planId: "Runtime.NativeActionLink",
   scope: { kind: "root" },

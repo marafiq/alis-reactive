@@ -1,7 +1,7 @@
 // http.ts - HTTP request execution using V3 RequestPlan type.
 // Uses the shared value/gather/runtime concepts and keeps HTTP async isolated.
 
-import type { RequestPlan, ResponseRoute, Plan, ExecContext, Reaction } from "../types";
+import type { RequestPlan, ResponseRoute, PlanDocument, ExecContext, Reaction } from "../types";
 import { resolveGather, type GatherResult } from "./gather";
 import { executeReaction } from "./execute";
 import { validateContainer } from "../validation";
@@ -30,11 +30,11 @@ type RequestOutcomeStatus =
   | { readonly kind: "client-failure"; readonly value: -1 };
 
 /** Execute a single HTTP request with gather, before, response routing, complete, and chaining. */
-export async function executeRequest(req: RequestPlan, plan: Plan, ctx?: ExecContext): Promise<void> {
+export async function executeRequest(req: RequestPlan, plan: PlanDocument, ctx?: ExecContext): Promise<void> {
   await runHttpRequest(req, plan, ExecutionContext.from(ctx));
 }
 
-async function runHttpRequest(request: RequestPlan, plan: Plan, context: ExecutionContext): Promise<void> {
+async function runHttpRequest(request: RequestPlan, plan: PlanDocument, context: ExecutionContext): Promise<void> {
   if (!requestCanSend(request, plan, context)) return;
 
   await runRequestReactions(request.before, plan, context.asAvailable());
@@ -44,7 +44,7 @@ async function runHttpRequest(request: RequestPlan, plan: Plan, context: Executi
   await routeExchangeOutcome(outcome, request, plan, prepared.context);
 }
 
-function requestCanSend(request: RequestPlan, plan: Plan, context: ExecutionContext): boolean {
+function requestCanSend(request: RequestPlan, plan: PlanDocument, context: ExecutionContext): boolean {
   const validation = request.validation;
   const requestRequiresClientValidation = validation.kind === "container";
   if (!requestRequiresClientValidation) return true;
@@ -60,7 +60,7 @@ interface PreparedHttpRequest {
   readonly context: ExecutionContext;
 }
 
-function prepareHttpRequest(request: RequestPlan, plan: Plan, context: ExecutionContext): PreparedHttpRequest {
+function prepareHttpRequest(request: RequestPlan, plan: PlanDocument, context: ExecutionContext): PreparedHttpRequest {
   const currentContext = context.asAvailable();
   const gathered = resolveGather(request.input, request.method, plan, currentContext);
   const requestContext = context.withRequest(requestPayloadSnapshotFrom(gathered));
@@ -109,7 +109,7 @@ function exchangeOutcomeFromClientFailure(request: RequestPlan, err: unknown): H
 async function routeExchangeOutcome(
   outcome: HttpExchangeOutcome,
   request: RequestPlan,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
 ): Promise<void> {
   switch (outcome.kind) {
@@ -161,7 +161,7 @@ function statusForLog(status: RequestOutcomeStatus): number {
 
 async function routeSuccess(
   request: RequestPlan,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
   status: RequestOutcomeStatus,
   body: HttpResponseBody,
@@ -174,7 +174,7 @@ async function routeSuccess(
 
 async function routeError(
   request: RequestPlan,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
   status: RequestOutcomeStatus,
   body: HttpResponseBody,
@@ -185,7 +185,7 @@ async function routeError(
 
 async function routeResponseUnavailable(
   request: RequestPlan,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
   status: RequestOutcomeStatus,
 ): Promise<void> {
@@ -195,7 +195,7 @@ async function routeResponseUnavailable(
 
 async function routeAndComplete(
   request: RequestPlan,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
   routeStage: () => Promise<void>,
 ): Promise<void> {
@@ -208,7 +208,7 @@ async function routeAndComplete(
 
 async function runFollowUpRequest(
   chain: RequestPlan["chain"],
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecutionContext,
 ): Promise<void> {
   switch (chain.kind) {
@@ -224,7 +224,7 @@ async function runFollowUpRequest(
 
 async function runRequestReactions(
   reactions: readonly Reaction[],
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecContext,
 ): Promise<void> {
   for (const reaction of reactions) {
@@ -291,7 +291,7 @@ function responseBodyFrom(rawBody: unknown): HttpResponseBody {
 async function routeResponseRoutes(
   routes: ResponseRoute[],
   status: RequestOutcomeStatus,
-  plan: Plan,
+  plan: PlanDocument,
   context: ExecContext,
 ): Promise<void> {
   const route = routes.find(routeMatchesStatus(status)) ?? routes.find(routeMatchesAnyStatus);

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { evaluateValue } from "../core/evaluate";
 import { registerPlugin } from "../core/plugin-catalog";
 import { RuntimeResolutionError } from "../domain/runtime-plan";
-import type { ComponentObject, BrowserObjectContract, Plan, Shape, ValueProducer } from "../types";
+import type { ComponentObject, BrowserObjectContract, PlanDocument, Shape, ValueProducer } from "../types";
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
@@ -28,7 +28,7 @@ const rawShape: Shape = { kind: "raw" };
 function plan(entries: {
   readonly types?: Record<string, BrowserObjectContract>;
   readonly components?: Record<string, ComponentObject>;
-} = {}): Plan {
+} = {}): PlanDocument {
   return {
     version: 3,
     planId: "Runtime.ValueEvaluation",
