@@ -6,7 +6,7 @@ import {
 } from "../conditions/conditions";
 import type {
   CollectionItemCompareCondition,
-  Condition,
+  ConditionGraph,
   EqualityCompareCondition,
   EqualityCompareOp,
   ExecContext,
@@ -48,7 +48,7 @@ type BrowserWindowWithConfirm = typeof window & {
 function plan(): PlanDocument {
   return {
     version: 3,
-    planId: "Condition.Runtime",
+    planId: "ConditionGraph.Runtime",
     scope: { kind: "root" },
     types: {},
     components: {},
@@ -325,7 +325,7 @@ describe("condition runtime", () => {
     it("executes confirm only when the current lane reaches an async condition", async () => {
       const confirm = vi.fn(async () => true);
       (window as BrowserWindowWithConfirm).alis = { confirm };
-      const condition: Condition = {
+      const condition: ConditionGraph = {
         kind: "all",
         terms: [
           equality("eq", true, true, booleanShape),
@@ -343,7 +343,7 @@ describe("condition runtime", () => {
     it("stays synchronous when logical terms decide before confirm is reached", () => {
       const confirm = vi.fn(() => true);
       (window as BrowserWindowWithConfirm).alis = { confirm };
-      const condition: Condition = {
+      const condition: ConditionGraph = {
         kind: "any",
         terms: [
           equality("eq", true, true, booleanShape),

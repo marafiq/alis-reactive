@@ -328,7 +328,7 @@ namespace Alis.Reactive.Validation
             return _fieldBindings.Resolve(fieldPath).ReadValue();
         }
 
-        internal Condition ResolveActivationCondition(FieldCondition condition)
+        internal ConditionGraph ResolveActivationCondition(FieldCondition condition)
         {
             if (condition == null) throw new System.ArgumentNullException(nameof(condition));
             return condition.ToPlanCondition(_conditionBinding);

@@ -9,35 +9,35 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// Base class for conditional predicates evaluated when the plan executes. Not constructed in application code.
     /// </summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<Condition>))]
-    public abstract class Condition
+    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ConditionGraph>))]
+    public abstract class ConditionGraph
     {
-        private protected Condition() { }
+        private protected ConditionGraph() { }
 
-        internal static Condition Compare(CompareOperator op, ComparisonOperands operands) =>
+        internal static ConditionGraph Compare(CompareOperator op, ComparisonOperands operands) =>
             new CompareCondition(op, operands);
 
-        internal static Condition All(params Condition[] terms) =>
+        internal static ConditionGraph All(params ConditionGraph[] terms) =>
             new AllCondition(CompositeTerms("all", terms));
 
-        internal static Condition Any(params Condition[] terms) =>
+        internal static ConditionGraph Any(params ConditionGraph[] terms) =>
             new AnyCondition(CompositeTerms("any", terms));
 
-        internal static Condition Not(Condition term) =>
+        internal static ConditionGraph Not(ConditionGraph term) =>
             new NotCondition(term);
 
-        internal static Condition Confirm(string message) =>
+        internal static ConditionGraph Confirm(string message) =>
             new ConfirmCondition(message);
 
-        private static IReadOnlyList<Condition> CompositeTerms(string composition, IEnumerable<Condition> terms)
+        private static IReadOnlyList<ConditionGraph> CompositeTerms(string composition, IEnumerable<ConditionGraph> terms)
         {
             if (composition == null) throw new ArgumentNullException(nameof(composition));
             if (terms == null) throw new ArgumentNullException(nameof(terms));
 
-            var items = new List<Condition>();
+            var items = new List<ConditionGraph>();
             foreach (var term in terms)
             {
-                if (term == null) throw new ArgumentException("Condition term must not be null.", nameof(terms));
+                if (term == null) throw new ArgumentException("ConditionGraph term must not be null.", nameof(terms));
                 items.Add(term);
             }
 
@@ -52,7 +52,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Compares two values using a relational operator.</summary>
     [JsonConverter(typeof(CompareConditionJsonConverter))]
-    public sealed class CompareCondition : Condition
+    public sealed class CompareCondition : ConditionGraph
     {
         private readonly CompareOperator _op;
         private readonly ComparisonOperands _operands;
@@ -239,53 +239,53 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Logical AND: all child conditions must be true.</summary>
-    public sealed class AllCondition : Condition
+    public sealed class AllCondition : ConditionGraph
     {
-        private readonly IReadOnlyList<Condition> _terms;
+        private readonly IReadOnlyList<ConditionGraph> _terms;
 
         /// <summary>Gets the kind. Always <c>"all"</c>.</summary>
         public string Kind => "all";
         /// <summary>Gets the child conditions that must all be true.</summary>
-        public IReadOnlyList<Condition> Terms => _terms;
+        public IReadOnlyList<ConditionGraph> Terms => _terms;
 
-        internal AllCondition(IReadOnlyList<Condition> terms)
+        internal AllCondition(IReadOnlyList<ConditionGraph> terms)
         {
             _terms = terms ?? throw new ArgumentNullException(nameof(terms));
         }
     }
 
     /// <summary>Logical OR: at least one child condition must be true.</summary>
-    public sealed class AnyCondition : Condition
+    public sealed class AnyCondition : ConditionGraph
     {
-        private readonly IReadOnlyList<Condition> _terms;
+        private readonly IReadOnlyList<ConditionGraph> _terms;
 
         /// <summary>Gets the kind. Always <c>"any"</c>.</summary>
         public string Kind => "any";
         /// <summary>Gets the child conditions where at least one must be true.</summary>
-        public IReadOnlyList<Condition> Terms => _terms;
+        public IReadOnlyList<ConditionGraph> Terms => _terms;
 
-        internal AnyCondition(IReadOnlyList<Condition> terms)
+        internal AnyCondition(IReadOnlyList<ConditionGraph> terms)
         {
             _terms = terms ?? throw new ArgumentNullException(nameof(terms));
         }
     }
 
     /// <summary>Logical NOT: inverts a single child condition.</summary>
-    public sealed class NotCondition : Condition
+    public sealed class NotCondition : ConditionGraph
     {
         /// <summary>Gets the kind. Always <c>"not"</c>.</summary>
         public string Kind => "not";
         /// <summary>Gets the condition to invert.</summary>
-        public Condition Term { get; }
+        public ConditionGraph Term { get; }
 
-        internal NotCondition(Condition term)
+        internal NotCondition(ConditionGraph term)
         {
             Term = term ?? throw new ArgumentNullException(nameof(term));
         }
     }
 
     /// <summary>Prompts the user for confirmation before the reaction proceeds.</summary>
-    public sealed class ConfirmCondition : Condition
+    public sealed class ConfirmCondition : ConditionGraph
     {
         /// <summary>Gets the kind. Always <c>"confirm"</c>.</summary>
         public string Kind => "confirm";

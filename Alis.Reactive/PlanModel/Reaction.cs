@@ -234,7 +234,7 @@ namespace Alis.Reactive.PlanModel
             Reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));
         }
 
-        internal static BranchCase Of(Condition when, Reaction reaction) =>
+        internal static BranchCase Of(ConditionGraph when, Reaction reaction) =>
             new BranchCase(BranchGuard.When(when), reaction);
 
         internal static BranchCase Default(Reaction reaction) =>
@@ -284,7 +284,7 @@ namespace Alis.Reactive.PlanModel
         public abstract string Kind { get; }
         internal abstract void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options);
 
-        internal static BranchGuard When(Condition condition) =>
+        internal static BranchGuard When(ConditionGraph condition) =>
             new ConditionalBranchGuard(condition);
 
         private sealed class DefaultBranchGuard : BranchGuard
@@ -298,15 +298,14 @@ namespace Alis.Reactive.PlanModel
 
         private sealed class ConditionalBranchGuard : BranchGuard
         {
-            private readonly Condition _condition;
+            private readonly ConditionGraph _condition;
 
-            internal ConditionalBranchGuard(Condition condition)
+            internal ConditionalBranchGuard(ConditionGraph condition)
             {
                 _condition = condition ?? throw new ArgumentNullException(nameof(condition));
             }
 
             public override string Kind => "when";
-            public Condition Condition => _condition;
 
             internal override void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
                 BranchGuardJsonConverter.WriteProperty(writer, options, "condition", _condition);

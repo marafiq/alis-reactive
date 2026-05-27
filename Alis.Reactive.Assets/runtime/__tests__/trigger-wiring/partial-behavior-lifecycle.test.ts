@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../lifecycle/boot";
-import type { BranchCase, ComponentObject, Condition, BrowserObjectContract, PlanDocument, Reaction, Shape, ValueProducer } from "../../types";
+import type { BranchCase, ComponentObject, ConditionGraph, BrowserObjectContract, PlanDocument, Reaction, Shape, ValueProducer } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
 const booleanShape: Shape = { kind: "boolean" };
@@ -105,7 +105,7 @@ function displayComponent(id: string): ComponentObject {
   };
 }
 
-function falseCondition(): Condition {
+function falseCondition(): ConditionGraph {
   return {
     kind: "compare",
     left: literal(false, booleanShape),

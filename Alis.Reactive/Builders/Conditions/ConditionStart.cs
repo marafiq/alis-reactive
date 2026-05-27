@@ -41,7 +41,7 @@ namespace Alis.Reactive.Builders.Conditions
         /// <param name="message">The confirmation message shown to the user.</param>
         public GuardBuilder<TModel> Confirm(string message)
         {
-            return new GuardBuilder<TModel>(Condition.Confirm(message));
+            return new GuardBuilder<TModel>(ConditionGraph.Confirm(message));
         }
     }
 }

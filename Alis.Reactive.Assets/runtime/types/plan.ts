@@ -516,7 +516,7 @@ export interface DefaultBranchGuard {
 
 export interface ConditionalBranchGuard {
   kind: "when";
-  condition: Condition;
+  condition: ConditionGraph;
 }
 
 export interface SetReaction {
@@ -833,7 +833,7 @@ export interface ValidationNotCondition {
   term: ValidationCondition;
 }
 
-export type Condition =
+export type ConditionGraph =
   | CompareCondition
   | AllCondition
   | AnyCondition
@@ -1041,17 +1041,17 @@ export interface LiteralComparisonRightOperand {
 
 export interface AllCondition {
   kind: "all";
-  terms: Condition[];
+  terms: ConditionGraph[];
 }
 
 export interface AnyCondition {
   kind: "any";
-  terms: Condition[];
+  terms: ConditionGraph[];
 }
 
 export interface NotCondition {
   kind: "not";
-  term: Condition;
+  term: ConditionGraph;
 }
 
 export interface ConfirmCondition {

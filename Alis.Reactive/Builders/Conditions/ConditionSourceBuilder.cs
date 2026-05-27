@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Conditions
     {
         private readonly TypedSource<TProp> _typedSource;
         private readonly Shape _shape;
-        private readonly System.Func<Condition, Condition> _composeCondition;
+        private readonly System.Func<ConditionGraph, ConditionGraph> _composeCondition;
         private readonly ConditionContinuation<TModel> _continuation;
 
         internal ConditionSourceBuilder(TypedSource<TProp> source, PipelineBuilder<TModel> pipeline)
@@ -36,7 +36,7 @@ namespace Alis.Reactive.Builders.Conditions
         internal ConditionSourceBuilder(
             TypedSource<TProp> source,
             ConditionContinuation<TModel> continuation,
-            System.Func<Condition, Condition> composeCondition)
+            System.Func<ConditionGraph, ConditionGraph> composeCondition)
         {
             _typedSource = source ?? throw new System.ArgumentNullException(nameof(source));
             _shape = source.Shape;
@@ -141,7 +141,7 @@ namespace Alis.Reactive.Builders.Conditions
 
         private GuardBuilder<TModel> Build(CompareOperator op, ComparisonOperands operands)
         {
-            var condition = Condition.Compare(op, operands);
+            var condition = ConditionGraph.Compare(op, operands);
             return ComposeAndWrap(condition);
         }
 
@@ -209,7 +209,7 @@ namespace Alis.Reactive.Builders.Conditions
                 _shape);
         }
 
-        private GuardBuilder<TModel> ComposeAndWrap(Condition newCondition)
+        private GuardBuilder<TModel> ComposeAndWrap(ConditionGraph newCondition)
         {
             return _continuation.Wrap(_composeCondition(newCondition));
         }

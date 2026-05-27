@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { registerComponentRuntime, type ComponentRuntimeDriver } from "../domain/component-runtime";
 import { executeReaction } from "../execution/execute";
 import type {
-  ComponentObject, Condition, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, Reaction, Shape, ValueProducer,
+  ComponentObject, ConditionGraph, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, Reaction, Shape, ValueProducer,
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -40,7 +40,7 @@ function literal(value: string): ValueProducer {
   return { kind: "literal", value, shape: stringShape };
 }
 
-function conditionResult(value: boolean): Condition {
+function conditionResult(value: boolean): ConditionGraph {
   return {
     kind: "compare",
     left: shapedLiteral(value, booleanShape),

@@ -1,10 +1,10 @@
-// conditions.ts — V3 Condition evaluation.
+// conditions.ts — V3 ConditionGraph evaluation.
 // Uses SHARED resolver for value resolution.
-// Condition is a discriminated union: compare, all, any, not, confirm.
+// ConditionGraph is a discriminated union: compare, all, any, not, confirm.
 // ValidationCondition is the sync subset: compare, all, any, not.
 
 import type {
-  Condition,
+  ConditionGraph,
   CompareCondition,
   CollectionItemCompareCondition,
   EqualityCompareOp,
@@ -65,13 +65,13 @@ export function evaluateCondition(condition: ValidationCondition, plan: PlanDocu
 }
 
 /** Async condition evaluation — required when conditions contain ConfirmCondition. */
-export async function evaluateConditionAsync(condition: Condition, plan: PlanDocument, ctx?: ExecContext): Promise<boolean> {
+export async function evaluateConditionAsync(condition: ConditionGraph, plan: PlanDocument, ctx?: ExecContext): Promise<boolean> {
   return evaluateConditionAsyncCore(condition, plan, ExecutionContext.from(ctx));
 }
 
 /** Current-lane condition evaluation. Crosses to async only when a reached term requires it. */
 export function evaluateConditionInCurrentLane(
-  condition: Condition,
+  condition: ConditionGraph,
   plan: PlanDocument,
   ctx?: ExecContext,
 ): boolean | Promise<boolean> {
@@ -98,7 +98,7 @@ function evaluateConditionSync(
 }
 
 async function evaluateConditionAsyncCore(
-  condition: Condition,
+  condition: ConditionGraph,
   plan: PlanDocument,
   context: ExecutionContext,
 ): Promise<boolean> {
@@ -125,7 +125,7 @@ async function evaluateConditionAsyncCore(
 }
 
 function evaluateConditionInLane(
-  condition: Condition,
+  condition: ConditionGraph,
   plan: PlanDocument,
   context: ExecutionContext,
 ): boolean | Promise<boolean> {
@@ -146,7 +146,7 @@ function evaluateConditionInLane(
 }
 
 function evaluateAllInLane(
-  terms: readonly Condition[],
+  terms: readonly ConditionGraph[],
   plan: PlanDocument,
   context: ExecutionContext,
   startIndex: number,
@@ -165,7 +165,7 @@ function evaluateAllInLane(
 }
 
 function evaluateAnyInLane(
-  terms: readonly Condition[],
+  terms: readonly ConditionGraph[],
   plan: PlanDocument,
   context: ExecutionContext,
   startIndex: number,
@@ -184,7 +184,7 @@ function evaluateAnyInLane(
 }
 
 function negateConditionInLane(
-  condition: Condition,
+  condition: ConditionGraph,
   plan: PlanDocument,
   context: ExecutionContext,
 ): boolean | Promise<boolean> {

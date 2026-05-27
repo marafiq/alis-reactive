@@ -47,7 +47,7 @@ namespace Alis.Reactive.Builders
             FlushPendingConditionIfNeeded();
             _draft.BeginConditional();
 
-            return new GuardBuilder<TModel>(Condition.Confirm(message), this);
+            return new GuardBuilder<TModel>(ConditionGraph.Confirm(message), this);
         }
 
         private void FlushPendingConditionIfNeeded()

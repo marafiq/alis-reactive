@@ -6,15 +6,15 @@ namespace Alis.Reactive.Builders.Conditions
 {
     internal static class ConditionComposition
     {
-        internal static Condition None(Condition incoming) => incoming;
+        internal static ConditionGraph None(ConditionGraph incoming) => incoming;
 
-        internal static Func<Condition, Condition> All(Condition existing) =>
+        internal static Func<ConditionGraph, ConditionGraph> All(ConditionGraph existing) =>
             incoming => ComposeAll(existing, incoming);
 
-        internal static Func<Condition, Condition> Any(Condition existing) =>
+        internal static Func<ConditionGraph, ConditionGraph> Any(ConditionGraph existing) =>
             incoming => ComposeAny(existing, incoming);
 
-        internal static void FlattenAll(Condition condition, List<Condition> target)
+        internal static void FlattenAll(ConditionGraph condition, List<ConditionGraph> target)
         {
             var conditionAlreadyRepresentsAllTerms = condition is AllCondition;
             if (conditionAlreadyRepresentsAllTerms)
@@ -27,7 +27,7 @@ namespace Alis.Reactive.Builders.Conditions
             target.Add(condition);
         }
 
-        internal static void FlattenAny(Condition condition, List<Condition> target)
+        internal static void FlattenAny(ConditionGraph condition, List<ConditionGraph> target)
         {
             var conditionAlreadyRepresentsAnyTerms = condition is AnyCondition;
             if (conditionAlreadyRepresentsAnyTerms)
@@ -40,20 +40,20 @@ namespace Alis.Reactive.Builders.Conditions
             target.Add(condition);
         }
 
-        private static Condition ComposeAll(Condition existing, Condition incoming)
+        private static ConditionGraph ComposeAll(ConditionGraph existing, ConditionGraph incoming)
         {
-            var terms = new List<Condition>();
+            var terms = new List<ConditionGraph>();
             FlattenAll(existing, terms);
             terms.Add(incoming);
-            return Condition.All(terms.ToArray());
+            return ConditionGraph.All(terms.ToArray());
         }
 
-        private static Condition ComposeAny(Condition existing, Condition incoming)
+        private static ConditionGraph ComposeAny(ConditionGraph existing, ConditionGraph incoming)
         {
-            var terms = new List<Condition>();
+            var terms = new List<ConditionGraph>();
             FlattenAny(existing, terms);
             terms.Add(incoming);
-            return Condition.Any(terms.ToArray());
+            return ConditionGraph.Any(terms.ToArray());
         }
     }
 
@@ -68,10 +68,10 @@ namespace Alis.Reactive.Builders.Conditions
         internal static ConditionContinuation<TModel> ForBranch(BranchBuilder<TModel> branch) =>
             new BranchConditionContinuation<TModel>(branch);
 
-        internal abstract GuardBuilder<TModel> Wrap(Condition condition);
+        internal abstract GuardBuilder<TModel> Wrap(ConditionGraph condition);
 
         internal abstract BranchBuilder<TModel> Then(
-            Condition condition,
+            ConditionGraph condition,
             Action<PipelineBuilder<TModel>> pipeline);
     }
 
@@ -85,11 +85,11 @@ namespace Alis.Reactive.Builders.Conditions
             _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
         }
 
-        internal override GuardBuilder<TModel> Wrap(Condition condition) =>
+        internal override GuardBuilder<TModel> Wrap(ConditionGraph condition) =>
             new GuardBuilder<TModel>(condition, this);
 
         internal override BranchBuilder<TModel> Then(
-            Condition condition,
+            ConditionGraph condition,
             Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>(_pipeline.Context);
@@ -111,11 +111,11 @@ namespace Alis.Reactive.Builders.Conditions
             _branch = branch ?? throw new ArgumentNullException(nameof(branch));
         }
 
-        internal override GuardBuilder<TModel> Wrap(Condition condition) =>
+        internal override GuardBuilder<TModel> Wrap(ConditionGraph condition) =>
             new GuardBuilder<TModel>(condition, this);
 
         internal override BranchBuilder<TModel> Then(
-            Condition condition,
+            ConditionGraph condition,
             Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>(_branch.Pipeline.Context);
@@ -128,11 +128,11 @@ namespace Alis.Reactive.Builders.Conditions
     internal sealed class StandaloneConditionContinuation<TModel> : ConditionContinuation<TModel>
         where TModel : class
     {
-        internal override GuardBuilder<TModel> Wrap(Condition condition) =>
+        internal override GuardBuilder<TModel> Wrap(ConditionGraph condition) =>
             new GuardBuilder<TModel>(condition, this);
 
         internal override BranchBuilder<TModel> Then(
-            Condition condition,
+            ConditionGraph condition,
             Action<PipelineBuilder<TModel>> pipeline)
         {
             throw new InvalidOperationException(

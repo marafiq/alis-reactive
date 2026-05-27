@@ -8,7 +8,7 @@ namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// A symbolic condition tree built at projection time using validation field paths.
-    /// Resolved to <see cref="PlanModel.Condition"/> at render time when
+    /// Resolved to <see cref="PlanModel.ConditionGraph"/> at render time when
     /// the component map is available.
     /// </summary>
     internal abstract class FieldCondition
@@ -36,7 +36,7 @@ namespace Alis.Reactive.Validation
         internal static FieldCondition Not(FieldCondition term) =>
             new FieldNot(term);
 
-        internal abstract Condition ToPlanCondition(FieldConditionPlanBinding binding);
+        internal abstract ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding);
 
         internal abstract FieldCondition PrefixWith(FieldConditionPrefixBinding binding);
 
@@ -83,7 +83,7 @@ namespace Alis.Reactive.Validation
         internal CompareOperator Operator => _op;
         internal FieldComparisonValue ValueOperand => _value;
 
-        internal override Condition ToPlanCondition(FieldConditionPlanBinding binding)
+        internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             return binding.Compare(_field, _op, _value);
@@ -209,10 +209,10 @@ namespace Alis.Reactive.Validation
             _terms = terms ?? throw new ArgumentNullException(nameof(terms));
         }
 
-        internal override Condition ToPlanCondition(FieldConditionPlanBinding binding)
+        internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return Condition.All(_terms.Select(term => term.ToPlanCondition(binding)).ToArray());
+            return ConditionGraph.All(_terms.Select(term => term.ToPlanCondition(binding)).ToArray());
         }
 
         internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
@@ -231,10 +231,10 @@ namespace Alis.Reactive.Validation
             _terms = terms ?? throw new ArgumentNullException(nameof(terms));
         }
 
-        internal override Condition ToPlanCondition(FieldConditionPlanBinding binding)
+        internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return Condition.Any(_terms.Select(term => term.ToPlanCondition(binding)).ToArray());
+            return ConditionGraph.Any(_terms.Select(term => term.ToPlanCondition(binding)).ToArray());
         }
 
         internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
@@ -253,10 +253,10 @@ namespace Alis.Reactive.Validation
             _term = term ?? throw new ArgumentNullException(nameof(term));
         }
 
-        internal override Condition ToPlanCondition(FieldConditionPlanBinding binding)
+        internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return Condition.Not(_term.ToPlanCondition(binding));
+            return ConditionGraph.Not(_term.ToPlanCondition(binding));
         }
 
         internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
@@ -304,7 +304,7 @@ namespace Alis.Reactive.Validation
             return new FieldConditionPlanBinding(field => fieldBindings.Resolve(field).ReadConditionTarget());
         }
 
-        internal Condition Compare(
+        internal ConditionGraph Compare(
             ValidationFieldPath fieldPath,
             CompareOperator op,
             FieldComparisonValue value)
@@ -331,12 +331,12 @@ namespace Alis.Reactive.Validation
         internal static FieldComparisonTarget ForComponentValue(ValueProducer value, Shape shape) =>
             new FieldComparisonTarget(value, shape);
 
-        internal Condition Compare(CompareOperator op, FieldComparisonValue value)
+        internal ConditionGraph Compare(CompareOperator op, FieldComparisonValue value)
         {
             if (op == null) throw new ArgumentNullException(nameof(op));
             if (value == null) throw new ArgumentNullException(nameof(value));
 
-            return Condition.Compare(op, value.BuildOperands(_left, _shape));
+            return ConditionGraph.Compare(op, value.BuildOperands(_left, _shape));
         }
     }
 }

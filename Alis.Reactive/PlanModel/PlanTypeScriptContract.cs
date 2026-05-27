@@ -384,7 +384,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("default")));
             contract.Declare(Interface("ConditionalBranchGuard")
                 .Requires("kind", Literal("when"))
-                .Requires("condition", "Condition"));
+                .Requires("condition", "ConditionGraph"));
 
             contract.Declare(Interface("SetReaction")
                 .Requires("kind", Literal("set"))
@@ -659,7 +659,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("term", "ValidationCondition"));
 
             contract.Declare(Union(
-                "Condition",
+                "ConditionGraph",
                 "CompareCondition",
                 "AllCondition",
                 "AnyCondition",
@@ -805,15 +805,15 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("AllCondition")
                 .Requires("kind", Literal("all"))
-                .Requires("terms", "Condition[]"));
+                .Requires("terms", "ConditionGraph[]"));
 
             contract.Declare(Interface("AnyCondition")
                 .Requires("kind", Literal("any"))
-                .Requires("terms", "Condition[]"));
+                .Requires("terms", "ConditionGraph[]"));
 
             contract.Declare(Interface("NotCondition")
                 .Requires("kind", Literal("not"))
-                .Requires("term", "Condition"));
+                .Requires("term", "ConditionGraph"));
 
             contract.Declare(Interface("ConfirmCondition")
                 .Requires("kind", Literal("confirm"))
