@@ -1,6 +1,6 @@
-// gather.ts — Gather values for HTTP requests using the shared ValueProducer concept.
-// Every payload assignment is evaluated by evaluateValue(); runtime registered
-// inputs use the same writer path after reading their component value member.
+// gather.ts — Resolve request input projections using the shared ValueProducer concept.
+// Every payload assignment is evaluated by evaluateValue(); runtime selected
+// registered inputs use the same writer path after reading their component value member.
 
 import type { PlanDocument, RequestInputProjection, RequestInputAssignment, HttpMethod, RequestInput } from "../types";
 import type { ExecContext } from "../types";
@@ -8,12 +8,12 @@ import { assertNever } from "../core/assert-never";
 import { evaluateValue } from "../core/evaluate";
 import { RuntimePlan, type RuntimeComponent } from "../domain/runtime-plan";
 import { RuntimeShape } from "../domain/runtime-shape";
-import { GatheredRequestInput, writeGatheredValue, type GatherResult, type RequestPayloadWriter } from "./request-payload-writer";
+import { RequestInputResolution, writeRequestPayloadValue, type ResolvedRequestInput, type RequestPayloadWriter } from "./request-payload-writer";
 import { isMissingRuntimeValue } from "../domain/runtime-value";
 
-export type { GatherResult } from "./request-payload-writer";
+export type { ResolvedRequestInput } from "./request-payload-writer";
 
-interface GatherRuntime {
+interface RequestInputRuntime {
   readonly method: HttpMethod;
   readonly plan: PlanDocument;
   readonly runtimePlan: RuntimePlan;
@@ -21,67 +21,67 @@ interface GatherRuntime {
 }
 
 /**
- * Resolve gather input into GatherResult (urlParams + body/FormData).
+ * Resolve request input into URL params, route params, headers, and body/FormData.
  */
-export function resolveGather(
+export function resolveRequestInput(
   input: RequestInput,
   method: HttpMethod,
   plan: PlanDocument,
   ctx: ExecContext,
-): GatherResult {
+): ResolvedRequestInput {
   const runtime = { method, plan, runtimePlan: RuntimePlan.from(plan), ctx };
-  return resolveRequestInput(input, runtime);
+  return resolveRequestInputPlan(input, runtime);
 }
 
-function resolveRequestInput(input: RequestInput, runtime: GatherRuntime): GatherResult {
+function resolveRequestInputPlan(input: RequestInput, runtime: RequestInputRuntime): ResolvedRequestInput {
   switch (input.kind) {
     case "none":
-      return GatheredRequestInput.empty();
+      return RequestInputResolution.empty();
     case "gather":
-      return resolveGatherInput(input, runtime);
+      return resolveInputProjection(input, runtime);
     default:
       return assertNever(input, "request input");
   }
 }
 
-function resolveGatherInput(input: RequestInputProjection, runtime: GatherRuntime): GatherResult {
-  const gathered = GatheredRequestInput.for(input.bodyFormat, runtime.method);
+function resolveInputProjection(input: RequestInputProjection, runtime: RequestInputRuntime): ResolvedRequestInput {
+  const resolved = RequestInputResolution.for(input.bodyFormat, runtime.method);
 
   for (const assignment of input.assignments) {
-    writeRequestInputAssignment(assignment, gathered, runtime);
+    writeRequestInputAssignment(assignment, resolved, runtime);
   }
 
-  writeRuntimeSelectedInputs(input.sourceSelection, runtime, gathered.writer);
+  writeSelectedRegisteredInputs(input.sourceSelection, runtime, resolved.writer);
 
-  return gathered.toResult();
+  return resolved.toResult();
 }
 
 function writeRequestInputAssignment(
   assignment: RequestInputAssignment,
-  gathered: GatheredRequestInput,
-  runtime: GatherRuntime,
+  resolved: RequestInputResolution,
+  runtime: RequestInputRuntime,
 ): void {
   const raw = evaluateValue(assignment.source, runtime.plan, runtime.ctx);
   const shape = RuntimeShape.declaredBy(assignment.source);
   switch (assignment.target.kind) {
     case "payload":
-      writeGatheredValue(assignment.target, raw, shape, gathered.writer);
+      writeRequestPayloadValue(assignment.target, raw, shape, resolved.writer);
       return;
     case "header":
       if (isMissingRuntimeValue(raw)) return;
-      gathered.writeHeader(assignment.target.name, raw, shape);
+      resolved.writeHeader(assignment.target.name, raw, shape);
       return;
     case "route-param":
-      gathered.writeRouteParameter(assignment.target.name, raw, shape);
+      resolved.writeRouteParameter(assignment.target.name, raw, shape);
       return;
     default:
       return assertNever(assignment.target, "request input target");
   }
 }
 
-function writeRuntimeSelectedInputs(
+function writeSelectedRegisteredInputs(
   sourceSelection: RequestInputProjection["sourceSelection"],
-  runtime: GatherRuntime,
+  runtime: RequestInputRuntime,
   writer: RequestPayloadWriter,
 ): void {
   switch (sourceSelection.kind) {
@@ -89,7 +89,7 @@ function writeRuntimeSelectedInputs(
       return;
     case "all-registered-inputs":
       for (const component of runtime.runtimePlan.components.entries()) {
-        writeRuntimeRegisteredInput(component, writer);
+        writeSelectedRegisteredInput(component, writer);
       }
       return;
     default:
@@ -97,7 +97,7 @@ function writeRuntimeSelectedInputs(
   }
 }
 
-function writeRuntimeRegisteredInput(
+function writeSelectedRegisteredInput(
   component: RuntimeComponent,
   writer: RequestPayloadWriter,
 ): void {
@@ -110,7 +110,7 @@ function writeRuntimeRegisteredInput(
   const object = component.object();
   const runtimeValue = object.read(binding.valueMember);
 
-  writeGatheredValue(
+  writeRequestPayloadValue(
     {
       kind: "payload",
       name: binding.bindingPath,

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { resolveGather } from "../../execution/gather";
+import { resolveRequestInput } from "../../execution/gather";
 import { AppliedBrowserPlans } from "../../lifecycle/merge-plan";
 import type { ComponentObject, RequestPayloadTarget, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath, ValueProducer } from "../../types";
 
@@ -21,7 +21,7 @@ describe("all registered input gather lifecycle", () => {
       drawer: unboundComponent("drawer"),
     });
 
-    expect(resolveGather(allRegisteredInputs(), "POST", resident, {}).body).toEqual({
+    expect(resolveRequestInput(allRegisteredInputs(), "POST", resident, {}).body).toEqual({
       firstName: "Ada",
     });
   });
@@ -46,14 +46,14 @@ describe("all registered input gather lifecycle", () => {
       }),
     ], silentLifecycleHooks);
 
-    expect(resolveGather(allRegisteredInputs(), "POST", resident, {}).body).toEqual({
+    expect(resolveRequestInput(allRegisteredInputs(), "POST", resident, {}).body).toEqual({
       firstName: "Ada",
       addressLine: "12 Main",
     });
 
     browserPlans.unloadPartialSlot("address-slot");
 
-    expect(resolveGather(allRegisteredInputs(), "POST", resident, {}).body).toEqual({
+    expect(resolveRequestInput(allRegisteredInputs(), "POST", resident, {}).body).toEqual({
       firstName: "Ada",
     });
   });
@@ -78,7 +78,7 @@ describe("all registered input gather lifecycle", () => {
       }),
     ], silentLifecycleHooks);
 
-    expect(resolveGather({
+    expect(resolveRequestInput({
       ...allRegisteredInputs(),
       assignments: [{
         target: target("selected"),

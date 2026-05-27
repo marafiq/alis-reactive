@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Requests
     {
         private readonly PlanBuildContext _context;
         private RequestEndpoint? _endpoint;
-        private RequestInputProjectionDraft _gather = new RequestInputProjectionDraft();
+        private RequestInputProjectionDraft _requestInput = new RequestInputProjectionDraft();
         private RequestBodyFormat _bodyFormat = RequestBodyFormat.Json;
         private readonly List<Reaction> _whileLoading = new List<Reaction>();
         private readonly List<Reaction> _finally = new List<Reaction>();
@@ -53,7 +53,7 @@ namespace Alis.Reactive.Builders.Requests
             var draft = new RequestInputProjectionDraft();
             var builder = new GatherBuilder<TModel>(_context, draft);
             gather(builder);
-            _gather = draft;
+            _requestInput = draft;
             return this;
         }
 
@@ -152,7 +152,7 @@ namespace Alis.Reactive.Builders.Requests
 
         private RequestInput ResolveInput(RequestUrl url)
         {
-            return _gather.BuildRequestInput(_bodyFormat, url);
+            return _requestInput.BuildRequestInput(_bodyFormat, url);
         }
 
         private static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items)

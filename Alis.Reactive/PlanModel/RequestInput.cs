@@ -3,7 +3,7 @@ using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
-    /// <summary>Base class for request body strategies. Not constructed in application code.</summary>
+    /// <summary>Base class for request input strategies. Not constructed in application code.</summary>
     [JsonConverter(typeof(WriteOnlyPolymorphicConverter<RequestInput>))]
     public abstract class RequestInput
     {
@@ -12,7 +12,7 @@ namespace Alis.Reactive.PlanModel
         internal static RequestInput None { get; } = new NoRequestInput();
     }
 
-    /// <summary>Represents a request with no body or gathered input.</summary>
+    /// <summary>Represents a request with no projected input.</summary>
     public sealed class NoRequestInput : RequestInput
     {
         /// <summary>Gets the kind. Always <c>"none"</c>.</summary>

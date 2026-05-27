@@ -14,7 +14,7 @@ export interface ExecContext {
    */
   readonly response?: unknown;
   /**
-   * Outgoing request payload — the gathered values before HTTP fetch.
+   * Outgoing request payload — the resolved request input before HTTP fetch.
    * Resolved by PayloadSource with scope "request".
    */
   readonly request?: unknown;

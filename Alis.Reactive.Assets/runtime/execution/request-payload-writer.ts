@@ -7,24 +7,24 @@ import { RuntimeShape } from "../domain/runtime-shape";
 
 const log = scope("gather");
 
-type GatheredArrayItem =
+type RequestInputArrayItem =
   | { readonly kind: "file"; readonly file: File }
   | { readonly kind: "value"; readonly value: unknown };
 
-export interface GatherResult {
+export interface ResolvedRequestInput {
   urlParams: string[];
   routeParams: Record<string, string>;
   headers: Record<string, string>;
   body: Record<string, unknown> | FormData;
 }
 
-/** Writes gathered name/value pairs into query string, FormData, or JSON body. */
+/** Writes request payload values into query string, FormData, or JSON body. */
 export interface RequestPayloadWriter {
   emitScalar(target: RequestPayloadTarget, value: unknown, shape: RuntimeShape): void;
   emitArray(target: RequestPayloadTarget, items: unknown[], itemShape: RuntimeShape): void;
 }
 
-export class GatheredRequestInput {
+export class RequestInputResolution {
   private constructor(
     private readonly urlParams: string[],
     private readonly routeParams: Record<string, string>,
@@ -33,26 +33,26 @@ export class GatheredRequestInput {
     readonly writer: RequestPayloadWriter,
   ) {}
 
-  static empty(): GatherResult {
+  static empty(): ResolvedRequestInput {
     return { urlParams: [], routeParams: {}, headers: {}, body: {} };
   }
 
-  static for(bodyFormat: RequestBodyFormat, method: HttpMethod): GatheredRequestInput {
+  static for(bodyFormat: RequestBodyFormat, method: HttpMethod): RequestInputResolution {
     const urlParams: string[] = [];
     const routeParams: Record<string, string> = {};
     const headers: Record<string, string> = {};
     if (sendsInputInQueryString(method)) {
-      return new GatheredRequestInput(urlParams, routeParams, headers, {}, createQueryStringWriter(urlParams));
+      return new RequestInputResolution(urlParams, routeParams, headers, {}, createQueryStringWriter(urlParams));
     }
 
     switch (bodyFormat) {
       case "form-data": {
         const formData = new FormData();
-        return new GatheredRequestInput(urlParams, routeParams, headers, formData, createFormDataWriter(formData));
+        return new RequestInputResolution(urlParams, routeParams, headers, formData, createFormDataWriter(formData));
       }
       case "json": {
         const body: Record<string, unknown> = {};
-        return new GatheredRequestInput(urlParams, routeParams, headers, body, createJsonBodyWriter(body));
+        return new RequestInputResolution(urlParams, routeParams, headers, body, createJsonBodyWriter(body));
       }
       default:
         return assertNever(bodyFormat, "request body format");
@@ -72,7 +72,7 @@ export class GatheredRequestInput {
     this.routeParams[name] = requestScalarWireValue("route param", name, value, shape);
   }
 
-  toResult(): GatherResult {
+  toResult(): ResolvedRequestInput {
     return {
       urlParams: this.urlParams,
       routeParams: this.routeParams,
@@ -96,7 +96,7 @@ function sendsInputInQueryString(method: HttpMethod): boolean {
   }
 }
 
-export function writeGatheredValue(
+export function writeRequestPayloadValue(
   target: RequestPayloadTarget,
   raw: unknown,
   shape: RuntimeShape,
@@ -124,9 +124,9 @@ function createQueryStringWriter(urlParams: string[]): RequestPayloadWriter {
       urlParams.push(`${encodeURIComponent(target.name)}=${encodeURIComponent(scalarWireValue(wire, target.name))}`);
     },
     emitArray: (target, items, itemShape) => {
-      const gatheredItems = gatheredArrayItems(items);
-      if (arrayContainsFile(gatheredItems)) throw new Error("[alis] File objects cannot be sent via GET");
-      appendArrayItemsToQueryString(target.name, gatheredItems, itemShape, urlParams);
+      const inputItems = requestInputArrayItems(items);
+      if (arrayContainsFile(inputItems)) throw new Error("[alis] File objects cannot be sent via GET");
+      appendArrayItemsToQueryString(target.name, inputItems, itemShape, urlParams);
     },
   };
 }
@@ -138,7 +138,7 @@ function createFormDataWriter(formData: FormData): RequestPayloadWriter {
       formData.append(target.name, scalarWireValue(wire, target.name));
     },
     emitArray: (target, items, itemShape) => {
-      appendArrayItemsToFormData(target.name, gatheredArrayItems(items), itemShape, formData);
+      appendArrayItemsToFormData(target.name, requestInputArrayItems(items), itemShape, formData);
     },
   };
 }
@@ -150,9 +150,9 @@ function createJsonBodyWriter(body: Record<string, unknown>): RequestPayloadWrit
       assignJsonBodyValue(body, target, jsonBodyValue(wire));
     },
     emitArray: (target, items, itemShape) => {
-      const gatheredItems = gatheredArrayItems(items);
-      if (arrayContainsFile(gatheredItems)) throw new Error("[alis] File objects require form-data body format");
-      const wireItems = jsonArrayBodyValue(gatheredItems.map(rawArrayItemValue), itemShape);
+      const inputItems = requestInputArrayItems(items);
+      if (arrayContainsFile(inputItems)) throw new Error("[alis] File objects require form-data body format");
+      const wireItems = jsonArrayBodyValue(inputItems.map(rawArrayItemValue), itemShape);
       assignJsonBodyValue(body, target, wireItems);
     },
   };
@@ -168,11 +168,11 @@ function browserFiles(raw: unknown): File[] | undefined {
   return Array.from(raw);
 }
 
-function gatheredArrayItems(items: unknown[]): GatheredArrayItem[] {
-  return items.map(gatheredArrayItem);
+function requestInputArrayItems(items: unknown[]): RequestInputArrayItem[] {
+  return items.map(requestInputArrayItem);
 }
 
-function gatheredArrayItem(item: unknown): GatheredArrayItem {
+function requestInputArrayItem(item: unknown): RequestInputArrayItem {
   if (item instanceof File) return { kind: "file", file: item };
 
   const wrapper = plainObjectRecordFrom(item);
@@ -184,13 +184,13 @@ function gatheredArrayItem(item: unknown): GatheredArrayItem {
   return { kind: "value", value: item };
 }
 
-function arrayContainsFile(items: readonly GatheredArrayItem[]): boolean {
+function arrayContainsFile(items: readonly RequestInputArrayItem[]): boolean {
   return items.some(item => item.kind === "file");
 }
 
 function appendArrayItemsToQueryString(
   name: string,
-  items: readonly GatheredArrayItem[],
+  items: readonly RequestInputArrayItem[],
   itemShape: RuntimeShape,
   urlParams: string[],
 ): void {
@@ -202,7 +202,7 @@ function appendArrayItemsToQueryString(
 
 function appendArrayItemsToFormData(
   name: string,
-  items: readonly GatheredArrayItem[],
+  items: readonly RequestInputArrayItem[],
   itemShape: RuntimeShape,
   formData: FormData,
 ): void {
@@ -213,7 +213,7 @@ function appendArrayItemsToFormData(
 
 function appendArrayItemToFormData(
   name: string,
-  item: GatheredArrayItem,
+  item: RequestInputArrayItem,
   itemShape: RuntimeShape,
   formData: FormData,
 ): void {
@@ -227,18 +227,18 @@ function appendArrayItemToFormData(
       return;
     }
     default:
-      return assertNever(item, "gathered array item");
+      return assertNever(item, "request input array item");
   }
 }
 
-function rawArrayItemValue(item: GatheredArrayItem): unknown {
+function rawArrayItemValue(item: RequestInputArrayItem): unknown {
   switch (item.kind) {
     case "file":
       return item.file;
     case "value":
       return item.value;
     default:
-      return assertNever(item, "gathered array item");
+      return assertNever(item, "request input array item");
   }
 }
 

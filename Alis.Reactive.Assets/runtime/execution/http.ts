@@ -2,7 +2,7 @@
 // Uses the shared value/gather/runtime concepts and keeps HTTP async isolated.
 
 import type { RequestPlan, ResponseRoute, PlanDocument, ExecContext, Reaction } from "../types";
-import { resolveGather, type GatherResult } from "./gather";
+import { resolveRequestInput, type ResolvedRequestInput } from "./gather";
 import { executeReaction } from "./execute";
 import { validateContainer } from "../validation";
 import { scope } from "../core/trace";
@@ -62,9 +62,9 @@ interface PreparedHttpRequest {
 
 function prepareHttpRequest(request: RequestPlan, plan: PlanDocument, context: ExecutionContext): PreparedHttpRequest {
   const currentContext = context.asAvailable();
-  const gathered = resolveGather(request.input, request.method, plan, currentContext);
-  const requestContext = context.withRequest(requestPayloadSnapshotFrom(gathered));
-  const fetch = resolveFetch(request, gathered);
+  const resolvedInput = resolveRequestInput(request.input, request.method, plan, currentContext);
+  const requestContext = context.withRequest(requestPayloadSnapshotFrom(resolvedInput));
+  const fetch = resolveFetch(request, resolvedInput);
 
   return { fetch, context: requestContext };
 }
@@ -239,8 +239,8 @@ function contextWithResponseBody(context: ExecutionContext, body: HttpResponseBo
   return context.withResponse(body.value);
 }
 
-function requestPayloadSnapshotFrom(gathered: GatherResult): Record<string, unknown> {
-  const body = gathered.body;
+function requestPayloadSnapshotFrom(resolvedInput: ResolvedRequestInput): Record<string, unknown> {
+  const body = resolvedInput.body;
   const bodyIsFormData = body instanceof FormData;
   if (bodyIsFormData) return {};
 

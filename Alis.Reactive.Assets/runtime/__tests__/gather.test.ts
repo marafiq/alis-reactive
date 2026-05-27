@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { resolveGather } from "../execution/gather";
+import { resolveRequestInput } from "../execution/gather";
 import type {
   JsonValue,
   PathSegment,
@@ -101,16 +101,16 @@ function arrayShape(item: Shape): Shape {
 }
 
 function resolveBody(input: RequestInput, method: "GET" | "POST" = "POST"): Record<string, unknown> | FormData {
-  return resolveGather(input, method, emptyPlan, {}).body;
+  return resolveRequestInput(input, method, emptyPlan, {}).body;
 }
 
 afterEach(() => {
   history.replaceState({}, "", "/");
 });
 
-describe("resolveGather", () => {
+describe("resolveRequestInput", () => {
   it("returns an empty payload for requests without gathered input", () => {
-    expect(resolveGather({ kind: "none" }, "POST", emptyPlan, {})).toEqual({
+    expect(resolveRequestInput({ kind: "none" }, "POST", emptyPlan, {})).toEqual({
       urlParams: [],
       routeParams: {},
       headers: {},
@@ -141,7 +141,7 @@ describe("resolveGather", () => {
       assignment("resident.name", readEventPayload("detail.name", stringShape)),
     ]);
 
-    expect(resolveGather(input, "POST", emptyPlan, {
+    expect(resolveRequestInput(input, "POST", emptyPlan, {
       event: { detail: { name: "Ada" } },
     }).body).toEqual({
       resident: { name: "Ada" },
@@ -165,7 +165,7 @@ describe("resolveGather", () => {
       assignment("tags", literal(["fall risk", "new"], arrayShape(stringShape))),
     ]);
 
-    expect(resolveGather(input, "GET", emptyPlan, {})).toEqual({
+    expect(resolveRequestInput(input, "GET", emptyPlan, {})).toEqual({
       urlParams: [
         "search=Ada%20Lovelace",
         "tags=fall%20risk",
@@ -184,7 +184,7 @@ describe("resolveGather", () => {
       assignment("name", literal("Ada", stringShape)),
     ]);
 
-    expect(resolveGather(input, "POST", emptyPlan, {})).toEqual({
+    expect(resolveRequestInput(input, "POST", emptyPlan, {})).toEqual({
       urlParams: [],
       routeParams: { residentId: "42" },
       headers: { "X-Tenant": "memory-care" },
@@ -198,7 +198,7 @@ describe("resolveGather", () => {
       routeParam("residentId", readUrlParameter("residentId", { kind: "number" })),
     ]);
 
-    expect(resolveGather(input, "GET", emptyPlan, {})).toEqual({
+    expect(resolveRequestInput(input, "GET", emptyPlan, {})).toEqual({
       urlParams: [],
       routeParams: { residentId: "42" },
       headers: {},
@@ -214,7 +214,7 @@ describe("resolveGather", () => {
       header("X-Tenant", literal("memory-care", stringShape)),
     ]);
 
-    expect(resolveGather(input, "POST", emptyPlan, {})).toEqual({
+    expect(resolveRequestInput(input, "POST", emptyPlan, {})).toEqual({
       urlParams: [],
       routeParams: { residentId: "42" },
       headers: { "X-Tenant": "memory-care" },
