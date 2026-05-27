@@ -504,10 +504,32 @@
                     })
                  );
             }))
+        @(Html.NativeButton("url-chain-btn", "Chain URL Sources")
+            .CssClass("ml-2 rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface-hover transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Get("/Sandbox/HttpPipeline/Http/Residents/{id}")
+                 .Gather(g => g.RouteParam("id", p.FromUrl<int>("residentId")))
+                 .Response(r => r
+                    .OnSuccess<ResidentByIdResponse>((json, s) =>
+                    {
+                        s.Get("/Sandbox/HttpPipeline/Http/Facilities/{facilityId}/Residents/{residentId}")
+                         .Gather(g => g
+                            .RouteParam("facilityId", s.FromUrl<int>("facilityId"))
+                            .RouteParam("residentId", json.Read(x => x.ResidentId)))
+                         .Response(r2 => r2.OnSuccess<FacilityResidentResponse>((json2, s2) =>
+                         {
+                             s2.Element("url-chain-name").SetText(json2, x => x.Name);
+                             s2.Element("url-chain-result").AddClass("text-green-600");
+                         }));
+                    })
+                 );
+            }))
         <div id="url-compose-result" class="mt-3 space-y-2 font-mono text-sm text-text-muted">
             <p>Name: <span id="url-compose-name">—</span></p>
             <p>Tab Header: <span id="url-compose-tab">—</span></p>
             <p>Facility Gather: <span id="url-compose-facility">—</span></p>
+            <p id="url-chain-result">Chained Name: <span id="url-chain-name">—</span></p>
         </div>
     </native-card-body>
     </native-card>

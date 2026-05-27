@@ -128,6 +128,18 @@ public class WhenUrlParamsRead : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    [Test]
+    public async Task url_param_sources_work_inside_chained_request_route_params()
+    {
+        await NavigateWithParams();
+
+        await ClickButton("Chain URL Sources");
+
+        await Expect(Page.Locator("#url-chain-name"))
+            .ToHaveTextAsync("Resident #42 at Facility #7", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
     // ── Missing params ───────────────────────────────────────
 
     [Test]
