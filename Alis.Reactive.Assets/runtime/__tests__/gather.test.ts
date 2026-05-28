@@ -177,7 +177,7 @@ describe("resolveRequestInput", () => {
     });
   });
 
-  it("resolves headers and route params through the same request input projection", () => {
+  it("resolves headers and route params through the same request input path", () => {
     const input = gatherInput([
       routeParam("residentId", literal("42", stringShape)),
       header("X-Tenant", literal("memory-care", stringShape)),

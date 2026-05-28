@@ -12,7 +12,7 @@ namespace Alis.Reactive.PlanModel
         internal static RequestInput None { get; } = new NoRequestInput();
     }
 
-    /// <summary>Represents a request with no projected input.</summary>
+    /// <summary>Represents a request with no authored input.</summary>
     public sealed class NoRequestInput : RequestInput
     {
         /// <summary>Gets the kind. Always <c>"none"</c>.</summary>
