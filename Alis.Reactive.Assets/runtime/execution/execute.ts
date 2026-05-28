@@ -23,6 +23,8 @@ import { plainObjectRecordFrom } from "../domain/object-record";
 
 const log = scope("execute");
 
+export type ReactionCompletion = void | Promise<void>;
+
 let activeRuntimePlan: RuntimePlan | undefined;
 
 export function setActivePlan(plan: PlanDocument): void {
@@ -51,7 +53,7 @@ export function executeReaction(
   reaction: ReactionGraph,
   plan?: PlanDocument,
   ctx?: ExecContext,
-): void | Promise<void> {
+): ReactionCompletion {
   return executeReactionWith(reaction, runtimePlanFor(plan), ExecutionContext.from(ctx));
 }
 
@@ -59,7 +61,7 @@ function executeReactionWith(
   reaction: ReactionGraph,
   plan: RuntimePlan,
   context: ExecutionContext,
-): void | Promise<void> {
+): ReactionCompletion {
   switch (reaction.kind) {
     case "set":
       executeSet(reaction, plan, context);
@@ -102,7 +104,7 @@ function executeSequence(
   reaction: SequenceReaction,
   plan: RuntimePlan,
   context: ExecutionContext,
-): void | Promise<void> {
+): ReactionCompletion {
   for (const [index, step] of reaction.steps.entries()) {
     const result = executeReactionWith(step, plan, context);
     if (crossedAsyncBoundary(result)) {
@@ -127,7 +129,7 @@ function executeBranch(
   reaction: BranchReaction,
   plan: RuntimePlan,
   context: ExecutionContext,
-): void | Promise<void> {
+): ReactionCompletion {
   return executeBranchFrom(reaction.cases, plan, context, 0);
 }
 
@@ -275,21 +277,21 @@ function callPayloadMethod(
 }
 
 export function catchAsyncReactionFailure(
-  result: void | Promise<void>,
+  result: ReactionCompletion,
   onRejected: (error: unknown) => void,
 ): void {
   if (crossedAsyncBoundary(result)) result.catch(onRejected);
 }
 
-function crossedAsyncBoundary(result: void | Promise<void>): result is Promise<void> {
+function crossedAsyncBoundary(result: ReactionCompletion): result is Promise<void> {
   return result instanceof Promise;
 }
 
-function reactionCompletion(result: void | Promise<void>): Promise<void> {
+function reactionCompletion(result: ReactionCompletion): Promise<void> {
   return crossedAsyncBoundary(result) ? result : Promise.resolve();
 }
 
-async function waitForAsyncBoundary(result: void | Promise<void>): Promise<void> {
+async function waitForAsyncBoundary(result: ReactionCompletion): Promise<void> {
   if (crossedAsyncBoundary(result)) await result;
 }
 
@@ -304,7 +306,7 @@ function executeBranchFrom(
   plan: RuntimePlan,
   context: ExecutionContext,
   startIndex: number,
-): void | Promise<void> {
+): ReactionCompletion {
   for (let index = startIndex; index < cases.length; index++) {
     const branchCase = cases[index]!;
 
