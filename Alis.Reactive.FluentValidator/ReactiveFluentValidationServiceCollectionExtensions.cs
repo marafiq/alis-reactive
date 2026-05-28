@@ -24,10 +24,8 @@ namespace Alis.Reactive.FluentValidator
 
             configure(new ReactiveFluentValidationBuilder(services));
 
-            services.TryAddSingleton<IClientValidationMetadataProvider>(provider =>
-                new FluentValidationClientMetadataProvider(
-                    provider.GetRequiredService<IServiceScopeFactory>(),
-                    provider.GetServices<ReactiveFluentValidationSource>().Select(source => source.ValidatorType)));
+            services.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IClientValidationMetadataProvider, FluentValidationClientMetadataProvider>());
             return services;
         }
     }
@@ -98,12 +96,14 @@ namespace Alis.Reactive.FluentValidator
 
         public FluentValidationClientMetadataProvider(
             IServiceScopeFactory scopeFactory,
-            IEnumerable<Type> validationSourceTypes)
+            IEnumerable<ReactiveFluentValidationSource> validationSources)
         {
             if (scopeFactory == null) throw new ArgumentNullException(nameof(scopeFactory));
-            if (validationSourceTypes == null) throw new ArgumentNullException(nameof(validationSourceTypes));
+            if (validationSources == null) throw new ArgumentNullException(nameof(validationSources));
 
-            _clientRules = BuildClientRulesBySource(scopeFactory, validationSourceTypes);
+            _clientRules = BuildClientRulesBySource(
+                scopeFactory,
+                validationSources.Select(source => source.ValidatorType));
         }
 
         public bool TryGetClientRules(
