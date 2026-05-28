@@ -236,11 +236,9 @@
                 .CssClass("rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface-hover transition-colors")
                 .Reactive(plan, (NativeButtonEvents evt) => evt.Click, (args, p) =>
                 {
-                    p.Post("/Sandbox/Patterns/ComponentGather/EchoJson", g => g.Include(
+                    p.Post("/Sandbox/Patterns/ComponentGather/EchoJson", g => g.Include<NativeTextBox, ComponentGatherModel>(
                             IdGenerator.For<ComponentGatherModel>(m => m.ResidentName),
-                            "native",
-                            nameof(ComponentGatherModel.ResidentName),
-                            "value"))
+                            nameof(ComponentGatherModel.ResidentName)))
                      .Response(r => r.OnSuccess<GatherEchoResponse>((json, s) =>
                      {
                          s.Element("submit-mode").SetText("ExplicitId");
