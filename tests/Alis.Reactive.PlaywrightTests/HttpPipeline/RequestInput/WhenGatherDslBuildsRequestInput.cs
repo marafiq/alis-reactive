@@ -79,37 +79,51 @@ public sealed class WhenGatherDslBuildsRequestInput
     }
 
     [Test]
-    public void component_method_sources_become_method_value_reads()
+    public void component_member_sources_preserve_property_and_method_access()
     {
         var plan = PlanExtensions.ReactivePlan(Html);
 
         HtmlExtensions.On(Html, plan, trigger =>
             trigger.DomReady(pipeline =>
             {
+                var schedule = pipeline.Component<FusionSchedule>("shift-schedule");
                 pipeline.Post("/schedule/events", gather => gather
-                    .Include(pipeline.Component<FusionSchedule>("shift-schedule").GetEvents()));
+                    .Include(schedule.CurrentView())
+                    .Include(schedule.GetEvents()));
             }));
 
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
         var input = SingleGatherInput(doc.RootElement);
-        var assignment = input
+        var assignments = input
             .GetProperty("assignments")
             .EnumerateArray()
-            .Single();
-        var source = assignment.GetProperty("source");
+            .ToArray();
+        var propertySource = assignments[0].GetProperty("source");
+        var methodSource = assignments[1].GetProperty("source");
         var type = doc.RootElement
             .GetProperty("types")
             .GetProperty("fusion.component.shift-schedule");
+        var property = type
+            .GetProperty("properties")
+            .GetProperty("currentView");
         var method = type
             .GetProperty("methods")
             .GetProperty("getEvents");
 
         Assert.Multiple(() =>
         {
-            Assert.That(assignment.GetProperty("target").GetProperty("name").GetString(), Is.EqualTo("getEvents"));
-            Assert.That(source.GetProperty("from").GetProperty("kind").GetString(), Is.EqualTo("component"));
-            Assert.That(source.GetProperty("member").GetString(), Is.EqualTo("getEvents"));
-            Assert.That(source.GetProperty("access").GetProperty("kind").GetString(), Is.EqualTo("method"));
+            Assert.That(assignments.Select(x => x.GetProperty("target").GetProperty("name").GetString()), Is.EqualTo(new[]
+            {
+                "currentView",
+                "getEvents"
+            }));
+            Assert.That(propertySource.GetProperty("from").GetProperty("kind").GetString(), Is.EqualTo("component"));
+            Assert.That(propertySource.GetProperty("member").GetString(), Is.EqualTo("currentView"));
+            Assert.That(propertySource.GetProperty("access").GetProperty("kind").GetString(), Is.EqualTo("property"));
+            Assert.That(methodSource.GetProperty("from").GetProperty("kind").GetString(), Is.EqualTo("component"));
+            Assert.That(methodSource.GetProperty("member").GetString(), Is.EqualTo("getEvents"));
+            Assert.That(methodSource.GetProperty("access").GetProperty("kind").GetString(), Is.EqualTo("method"));
+            Assert.That(property.GetProperty("shape").GetProperty("kind").GetString(), Is.EqualTo("string"));
             Assert.That(method.GetProperty("returns").GetProperty("kind").GetString(), Is.EqualTo("array"));
         });
     }
