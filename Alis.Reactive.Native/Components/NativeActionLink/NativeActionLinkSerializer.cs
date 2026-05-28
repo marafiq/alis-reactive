@@ -31,9 +31,9 @@ namespace Alis.Reactive.Native.Components
                     "NativeActionLink does not support validation.");
 
             var reaction = pb.BuildReaction();
-            var requestUse = new ActionLinkRequestUse();
-            var actionLinkReaction = BuildActionLinkReaction(reaction, href, requestUse);
-            if (requestUse.RequestCount != 1)
+            var requestCount = 0;
+            var actionLinkReaction = BuildActionLinkReaction(reaction, href, ref requestCount);
+            if (requestCount != 1)
             {
                 throw new InvalidOperationException(
                     "NativeActionLink supports exactly one request in its click reaction tree.");
@@ -48,22 +48,25 @@ namespace Alis.Reactive.Native.Components
             return new NativeActionLinkContract(payloadJson);
         }
 
-        private static ReactionGraph BuildActionLinkReaction(ReactionGraph reaction, string href, ActionLinkRequestUse requestUse)
+        private static ReactionGraph BuildActionLinkReaction(ReactionGraph reaction, string href, ref int requestCount)
         {
             switch (reaction)
             {
                 case SequenceReaction sequential:
-                    return ReactionGraph.Sequence(new List<ReactionGraph>(sequential.Steps));
+                    var actionLinkSteps = new List<ReactionGraph>();
+                    foreach (var step in sequential.Steps)
+                        actionLinkSteps.Add(BuildActionLinkReaction(step, href, ref requestCount));
+                    return ReactionGraph.Sequence(actionLinkSteps);
 
                 case BranchReaction conditional:
                     var actionLinkCases = new List<BranchCase>();
                     foreach (var c in conditional.Cases)
-                        actionLinkCases.Add(c.WithReaction(BuildActionLinkReaction(c.Reaction, href, requestUse)));
+                        actionLinkCases.Add(c.WithReaction(BuildActionLinkReaction(c.Reaction, href, ref requestCount)));
                     return ReactionGraph.Branch(actionLinkCases);
 
                 case RequestReaction http:
-                    requestUse.RequestCount++;
-                    if (requestUse.RequestCount > 1)
+                    requestCount++;
+                    if (requestCount > 1)
                         throw new InvalidOperationException(
                             "NativeActionLink supports exactly one request.");
                     if (!string.Equals(href, http.Request.Url, StringComparison.Ordinal))
@@ -117,11 +120,6 @@ namespace Alis.Reactive.Native.Components
                 payloadAssignments,
                 RequestBodyFormat.From(gather.BodyFormat),
                 gather.RegisteredInputs);
-        }
-
-        private sealed class ActionLinkRequestUse
-        {
-            public int RequestCount { get; set; }
         }
     }
 

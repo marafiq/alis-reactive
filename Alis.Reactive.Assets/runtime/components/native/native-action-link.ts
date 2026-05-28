@@ -3,7 +3,7 @@
 
 import { executeReaction } from "../../execution/execute";
 import { scope } from "../../core/trace";
-import type { ReactionGraph, PlanDocument, RequestPlan, ParallelCompletion } from "../../types";
+import type { ReactionGraph, PlanDocument, RequestPlan } from "../../types";
 import { assertNever } from "../../core/assert-never";
 
 const log = scope("native-action-link");
@@ -39,7 +39,7 @@ function handleClick(event: MouseEvent): void {
   event.preventDefault();
 
   const payload = decodePayload(anchor);
-  bindHrefToSingleRequest(payload.reaction, anchor.getAttribute("href") ?? anchor.href);
+  bindHrefToClickRequest(payload.reaction, anchor.getAttribute("href") ?? anchor.href);
   log.debug("activated", { id: anchor.id, href: anchor.href });
   const result = executeReaction(payload.reaction, payload.plan);
   if (result instanceof Promise) {
@@ -60,78 +60,47 @@ function decodePayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
   }
 }
 
-function bindHrefToSingleRequest(reaction: ReactionGraph, href: string): void {
-  const request = singleRequestFromActionLinkReaction(reaction);
-  assertActionLinkRequestSupported(request);
-  request.url = href;
+function bindHrefToClickRequest(reaction: ReactionGraph, href: string): void {
+  firstDeclaredRequest(reaction)!.url = href;
 }
 
-function singleRequestFromActionLinkReaction(reaction: ReactionGraph): RequestPlan {
-  const requests: RequestPlan[] = [];
-  collectDeclaredRequests(reaction, requests);
-
-  const request = requests[0];
-  if (requests.length !== 1 || request === undefined) {
-    throw new Error("NativeActionLink requires exactly one request.");
-  }
-
-  return request;
-}
-
-function collectDeclaredRequests(reaction: ReactionGraph, requests: RequestPlan[]): void {
+function firstDeclaredRequest(reaction: ReactionGraph): RequestPlan | undefined {
   switch (reaction.kind) {
     case "sequence":
-      for (const step of reaction.steps) collectDeclaredRequests(step, requests);
-      return;
+      return firstRequestIn(reaction.steps);
 
     case "parallel":
-      for (const step of reaction.steps) collectDeclaredRequests(step, requests);
-      collectRequestsFromParallelCompletion(reaction.completion, requests);
-      return;
+      return firstRequestIn(reaction.steps)
+        ?? (reaction.completion.kind === "on-settled"
+          ? firstDeclaredRequest(reaction.completion.reaction)
+          : undefined);
 
     case "branch":
-      for (const branchCase of reaction.cases) collectDeclaredRequests(branchCase.reaction, requests);
-      return;
+      for (const branchCase of reaction.cases) {
+        const request = firstDeclaredRequest(branchCase.reaction);
+        if (request) return request;
+      }
+      return undefined;
 
     case "request":
-      requests.push(reaction.request);
-      return;
+      return reaction.request;
 
     case "set":
     case "call":
     case "dispatch":
     case "inject":
     case "show-validation-errors":
-      return;
+      return undefined;
 
     default:
       assertNever(reaction, "reaction kind");
   }
 }
 
-function collectRequestsFromParallelCompletion(
-  completion: ParallelCompletion,
-  requests: RequestPlan[],
-): void {
-  switch (completion.kind) {
-    case "none":
-      return;
-    case "on-settled":
-      collectDeclaredRequests(completion.reaction, requests);
-      return;
-    default:
-      assertNever(completion, "parallel completion");
+function firstRequestIn(reactions: readonly ReactionGraph[]): RequestPlan | undefined {
+  for (const reaction of reactions) {
+    const request = firstDeclaredRequest(reaction);
+    if (request) return request;
   }
-}
-
-function assertActionLinkRequestSupported(request: RequestPlan): void {
-  const requestUsesChaining = request.chain.kind === "follow-up";
-  if (requestUsesChaining) {
-    throw new Error("NativeActionLink does not support chained requests.");
-  }
-
-  const requestRunsClientValidation = request.validation.kind === "container";
-  if (requestRunsClientValidation) {
-    throw new Error("NativeActionLink does not support validation.");
-  }
+  return undefined;
 }
