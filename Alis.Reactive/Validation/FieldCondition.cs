@@ -28,10 +28,10 @@ namespace Alis.Reactive.Validation
             new FieldCompare(field, op, value);
 
         internal static FieldCondition All(params FieldCondition[] terms) =>
-            new FieldAll(CompositeTerms("all", terms));
+            new FieldAll(OrderedTerms(terms));
 
         internal static FieldCondition Any(params FieldCondition[] terms) =>
-            new FieldAny(CompositeTerms("any", terms));
+            new FieldAny(OrderedTerms(terms));
 
         internal static FieldCondition Not(FieldCondition term) =>
             new FieldNot(term);
@@ -40,26 +40,9 @@ namespace Alis.Reactive.Validation
 
         internal abstract FieldCondition PrefixWith(FieldConditionPrefixBinding binding);
 
-        private static IReadOnlyList<FieldCondition> CompositeTerms(
-            string composition,
-            IEnumerable<FieldCondition> terms)
+        private static IReadOnlyList<FieldCondition> OrderedTerms(IEnumerable<FieldCondition> terms)
         {
-            if (composition == null) throw new ArgumentNullException(nameof(composition));
-            if (terms == null) throw new ArgumentNullException(nameof(terms));
-
-            var items = new List<FieldCondition>();
-            foreach (var term in terms)
-            {
-                if (term == null) throw new ArgumentException("Field condition term must not be null.", nameof(terms));
-                items.Add(term);
-            }
-
-            if (items.Count == 0)
-                throw new ArgumentException(
-                    $"Composite field condition '{composition}' requires at least one term.",
-                    nameof(terms));
-
-            return items;
+            return new List<FieldCondition>(terms);
         }
     }
 
@@ -74,9 +57,9 @@ namespace Alis.Reactive.Validation
 
         internal FieldCompare(ValidationFieldPath field, CompareOperator op, FieldComparisonValue value)
         {
-            _field = field ?? throw new ArgumentNullException(nameof(field));
-            _op = op ?? throw new ArgumentNullException(nameof(op));
-            _value = value ?? throw new ArgumentNullException(nameof(value));
+            _field = field;
+            _op = op;
+            _value = value;
         }
 
         internal ValidationFieldPath FieldPath => _field;
@@ -85,13 +68,11 @@ namespace Alis.Reactive.Validation
 
         internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
         {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
             return binding.Compare(_field, _op, _value);
         }
 
         internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
         {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
             return binding.Compare(_field, _op, _value);
         }
     }
@@ -151,7 +132,7 @@ namespace Alis.Reactive.Validation
             internal ShapedLiteralFieldComparisonValue(object? value, Shape literalShape)
             {
                 _value = value;
-                _literalShape = literalShape ?? throw new ArgumentNullException(nameof(literalShape));
+                _literalShape = literalShape;
             }
 
             internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
@@ -164,7 +145,6 @@ namespace Alis.Reactive.Validation
 
             internal ArrayFieldComparisonValue(IEnumerable<object?> items)
             {
-                if (items == null) throw new ArgumentNullException(nameof(items));
                 _items = items.ToArray();
             }
 
@@ -188,7 +168,7 @@ namespace Alis.Reactive.Validation
             internal CollectionItemFieldComparisonValue(object? value, Shape itemShape)
             {
                 _value = value;
-                _itemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
+                _itemShape = itemShape;
             }
 
             internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
@@ -206,18 +186,16 @@ namespace Alis.Reactive.Validation
 
         internal FieldAll(IReadOnlyList<FieldCondition> terms)
         {
-            _terms = terms ?? throw new ArgumentNullException(nameof(terms));
+            _terms = terms;
         }
 
         internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
         {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
             return ConditionGraph.All(_terms.Select(term => term.ToPlanCondition(binding)).ToArray());
         }
 
         internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
         {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
             return FieldCondition.All(_terms.Select(term => term.PrefixWith(binding)).ToArray());
         }
     }
@@ -228,18 +206,16 @@ namespace Alis.Reactive.Validation
 
         internal FieldAny(IReadOnlyList<FieldCondition> terms)
         {
-            _terms = terms ?? throw new ArgumentNullException(nameof(terms));
+            _terms = terms;
         }
 
         internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
         {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
             return ConditionGraph.Any(_terms.Select(term => term.ToPlanCondition(binding)).ToArray());
         }
 
         internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
         {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
             return FieldCondition.Any(_terms.Select(term => term.PrefixWith(binding)).ToArray());
         }
     }
@@ -250,18 +226,16 @@ namespace Alis.Reactive.Validation
 
         internal FieldNot(FieldCondition term)
         {
-            _term = term ?? throw new ArgumentNullException(nameof(term));
+            _term = term;
         }
 
         internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
         {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
             return ConditionGraph.Not(_term.ToPlanCondition(binding));
         }
 
         internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
         {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
             return FieldCondition.Not(_term.PrefixWith(binding));
         }
     }
@@ -272,7 +246,7 @@ namespace Alis.Reactive.Validation
 
         internal FieldConditionPrefixBinding(ValidationFieldPath prefix)
         {
-            _prefix = prefix ?? throw new ArgumentNullException(nameof(prefix));
+            _prefix = prefix;
         }
 
         internal FieldCondition Compare(
@@ -280,10 +254,6 @@ namespace Alis.Reactive.Validation
             CompareOperator op,
             FieldComparisonValue value)
         {
-            if (field == null) throw new ArgumentNullException(nameof(field));
-            if (op == null) throw new ArgumentNullException(nameof(op));
-            if (value == null) throw new ArgumentNullException(nameof(value));
-
             var fullField = _prefix.Append(field);
             return FieldCondition.Compare(fullField, op, value);
         }
@@ -295,7 +265,7 @@ namespace Alis.Reactive.Validation
 
         internal FieldConditionPlanBinding(Func<ValidationFieldPath, FieldComparisonTarget> target)
         {
-            _target = target ?? throw new ArgumentNullException(nameof(target));
+            _target = target;
         }
 
         internal static FieldConditionPlanBinding For(ClientValidationFieldBinder fieldBindings)
@@ -308,10 +278,6 @@ namespace Alis.Reactive.Validation
             CompareOperator op,
             FieldComparisonValue value)
         {
-            if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
-            if (op == null) throw new ArgumentNullException(nameof(op));
-            if (value == null) throw new ArgumentNullException(nameof(value));
-
             return _target(fieldPath).Compare(op, value);
         }
     }
@@ -323,8 +289,8 @@ namespace Alis.Reactive.Validation
 
         private FieldComparisonTarget(ValueExpression left, Shape shape)
         {
-            _left = left ?? throw new ArgumentNullException(nameof(left));
-            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            _left = left;
+            _shape = shape;
         }
 
         internal static FieldComparisonTarget ForComponentValue(ValueExpression value, Shape shape) =>
@@ -332,9 +298,6 @@ namespace Alis.Reactive.Validation
 
         internal ConditionGraph Compare(CompareOperator op, FieldComparisonValue value)
         {
-            if (op == null) throw new ArgumentNullException(nameof(op));
-            if (value == null) throw new ArgumentNullException(nameof(value));
-
             return ConditionGraph.Compare(op, value.BuildOperands(_left, _shape));
         }
     }
