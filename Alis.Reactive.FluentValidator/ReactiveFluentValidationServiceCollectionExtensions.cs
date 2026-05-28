@@ -28,7 +28,7 @@ namespace Alis.Reactive.FluentValidator
             if (clientMetadataTypes.Length != 0)
             {
                 services.AddSingleton<IClientValidationMetadataProvider>(provider =>
-                    new FluentValidationClientMetadataProvider(
+                    new ReactiveValidatorClientMetadataProvider(
                         provider.GetRequiredService<IServiceScopeFactory>(),
                         clientMetadataTypes));
             }
@@ -109,11 +109,11 @@ namespace Alis.Reactive.FluentValidator
                 .Where(type => type.GetGenericTypeDefinition() == typeof(IValidator<>));
     }
 
-    internal sealed class FluentValidationClientMetadataProvider : IClientValidationMetadataProvider
+    internal sealed class ReactiveValidatorClientMetadataProvider : IClientValidationMetadataProvider
     {
         private readonly FrozenDictionary<Type, IReadOnlyList<ClientValidationField>> _clientRules;
 
-        public FluentValidationClientMetadataProvider(
+        public ReactiveValidatorClientMetadataProvider(
             IServiceScopeFactory scopeFactory,
             IEnumerable<Type> validationSourceTypes)
         {
@@ -141,23 +141,12 @@ namespace Alis.Reactive.FluentValidator
             using var scope = scopeFactory.CreateScope();
             var rulesBySource = new Dictionary<Type, IReadOnlyList<ClientValidationField>>();
             foreach (var validationSourceType in validationSourceTypes.Distinct())
-                rulesBySource.Add(validationSourceType, BuildClientRules(scope.ServiceProvider, validationSourceType));
+            {
+                var metadata = (IClientValidationMetadataSource)scope.ServiceProvider.GetRequiredService(validationSourceType);
+                rulesBySource.Add(validationSourceType, metadata.GetClientRules());
+            }
 
             return rulesBySource.ToFrozenDictionary();
-        }
-
-        private static IReadOnlyList<ClientValidationField> BuildClientRules(
-            IServiceProvider services,
-            Type validationSourceType)
-        {
-            var validator = services.GetRequiredService(validationSourceType);
-            if (validator is IClientValidationMetadataSource metadata)
-                return metadata.GetClientRules();
-
-            throw new InvalidOperationException(
-                $"Validator '{validationSourceType.FullName}' does not declare browser validation metadata. " +
-                "Derive it from ReactiveValidator<TModel> and use ClientRule(...) for rules that run in the browser. " +
-                "Use RuleFor, Must, When, and async rules for server-only validation.");
         }
     }
 }
