@@ -81,7 +81,7 @@ npm test                 # ~944 tests, runs in seconds
 
 ### C# unit tests
 
-NUnit + Verify.NUnit + JsonSchema.Net. Tests plan rendering, schema conformance, component vertical slices.
+NUnit + Verify.NUnit. Tests plan rendering, generated-contract behavior, and component vertical slices.
 
 ```bash
 dotnet test tests/Alis.Reactive.UnitTests                   # Core
@@ -160,7 +160,7 @@ dotnet test tests/Alis.Reactive.Fusion.UnitTests
 dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
 ```
 
-Catches serialization regressions and schema violations.
+Catches serialization regressions and plan-domain drift.
 
 ### 4. Build all C# projects
 

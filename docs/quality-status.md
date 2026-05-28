@@ -11,8 +11,8 @@ Single source of truth for quality work. Updated after each quality session.
 - XML docs on builders — PRs #95, #97 (Builder APIs, PlanModel contract types)
 - Design system cleanup — PR #96 (unused builders removed, enums moved, TagMode fix)
 - Schema drift detection — removed empty `tests/Alis.Reactive.DriftDetection.Tests/` project
-  (infrastructure only, zero executable tests, never ran). Schema validation is covered by
-  70 `AssertSchemaValid()` calls across 9 test files (UnitTests, Fusion, Native).
+  (infrastructure only, zero executable tests, never ran). The schema layer is now retired;
+  the plan contract is the C# domain plus generated `plan.ts`.
 - Plugin Source vertical slice — 4 source kinds: `component`, `payload`, `url`, `plugin`
   (discriminated union at `Scripts/types/plan.ts` Source type)
 - HTTP Headers, URL Templates, URL Query Source — all landed

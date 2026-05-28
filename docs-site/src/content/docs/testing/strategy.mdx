@@ -49,19 +49,19 @@ layer2 -> layer3: "Runtime logic works.\nDoes it work in a real browser?" {
 
 The C# DSL builds intent objects and serializes them to a JSON plan. These tests verify that the rendered JSON is correct.
 
-**Tools:** NUnit + Verify.NUnit + JsonSchema.Net
+**Tools:** NUnit + Verify.NUnit
 
 Two patterns:
 - **Snapshot verification** -- `VerifyJson(plan.Render())` locks down exact JSON output.
-- **Schema validation** -- `AssertSchemaValid(plan.Render())` confirms the plan conforms to `reactive-plan.schema.json`.
+- **Generated contract verification** -- `npm run typecheck` regenerates `runtime/types/plan.ts` from the C# plan domain and compiles the runtime against it.
 
-**Catches:** Serialization regressions, missing `camelCase` mappings, schema violations after adding new kinds, builder methods producing wrong output after refactoring.
+**Catches:** Serialization regressions, missing `camelCase` mappings, generated type drift after adding new kinds, builder methods producing wrong output after refactoring.
 
 **Projects:**
 
 | Project | Covers |
 |---------|--------|
-| `Alis.Reactive.UnitTests` | Core plan rendering and schema validation |
+| `Alis.Reactive.UnitTests` | Core plan rendering and generated contract behavior |
 | `Alis.Reactive.Native.UnitTests` | Native component vertical slices |
 | `Alis.Reactive.Fusion.UnitTests` | Syncfusion component vertical slices |
 | `Alis.Reactive.FluentValidator.UnitTests` | Validation rule extraction |

@@ -90,7 +90,7 @@ plan -> runtime: boot {
 
 1. **C# fluent builders** express your intent. You write C# in your `.cshtml` views -- `Element("panel").Show()`, `Component<NativeCheckBox>(m => m.IsActive).SetChecked(true)` -- and the builders capture what must happen.
 
-2. **The JSON plan** is the contract. `plan.Render()` serializes your intent to JSON. This plan is schema-validated and carries every trigger, every condition, every mutation.
+2. **The JSON plan** is the contract. `plan.Render()` serializes your intent to JSON. The C# plan domain generates the TypeScript contract the runtime compiles against.
 
 3. **The JS runtime** executes the plan. A 2kb ESM module reads the JSON and executes the intents as expressed.
 

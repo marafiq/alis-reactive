@@ -772,7 +772,7 @@ Segments { get; }  // Gets the ordered path segments.
 ### PathJsonConverter
 
 Serializes Path as a bare JSON array of PathSegments.
-            Schema expects: [{ "kind": "property", "name": "value" }]
+            Generated plan types expect: [{ "kind": "property", "name": "value" }]
 
 ### PathSegment
 

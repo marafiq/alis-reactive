@@ -277,7 +277,7 @@ Every `Html.InputField` call registers here. The runtime uses this for gather (`
 
 ## Why structure matters
 
-Every plan is checked against a JSON Schema in unit tests. If a builder produces a shape the schema doesn't allow — wrong `kind`, missing field, invalid combination — the test fails before any browser is involved.
+Every plan shape is owned by the C# plan domain and mirrored into generated TypeScript. If a builder adds a new `kind` without updating the generated contract and runtime executor, `npm run typecheck` fails before any browser is involved.
 
 | Concept | Valid kinds |
 |---------|-----------|
@@ -288,7 +288,7 @@ Every plan is checked against a JSON Schema in unit tests. If a builder produces
 | Sources | `event`, `component`, `url`, `plugin` |
 | Gather | `all`, `static`, `component`, `event`, `url`, `plugin`, `header`, `route-param` |
 
-If you need a new capability — say a new mutation kind — it goes into the schema first. The schema is the gatekeeper. The plan is the contract. Both sides (C# and JS) agree on its shape, and neither reaches beyond it.
+If you need a new capability — say a new reaction kind — it starts in the C# plan domain, regenerates `plan.ts`, and then gets a focused runtime executor. The generated contract is the gatekeeper. Both sides agree on the shape, and neither reaches beyond it.
 
 Now that you know what the plan looks like, the next question is: how do you add new things to it?
 

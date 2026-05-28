@@ -19,7 +19,6 @@ All core unit tests extend `PlanTestBase`, which provides:
 |--------|---------|
 | `CreatePlan()` | Creates a `ReactivePlan<TestModel>` |
 | `Trigger(plan)` | Returns a `TriggerBuilder` to wire triggers on the plan |
-| `AssertSchemaValid(json)` | Validates rendered JSON against `reactive-plan.schema.json` |
 
 A typical test class defines a private `Build` helper that wires a dom-ready trigger:
 
@@ -53,23 +52,11 @@ public class WhenDispatchingAnEvent : PlanTestBase
 
 **Co-location:** `.verified.txt` files live next to their test class. Move both together.
 
-### Schema validation
+### Generated contract verification
 
-`AssertSchemaValid()` loads `reactive-plan.schema.json`, evaluates the JSON, and fails with structured errors if any constraint is violated:
-
-```csharp
-[Test]
-public void rendered_plan_validates_against_schema()
-{
-    var json = Build(p =>
-    {
-        p.Element("status").AddClass("active");
-        p.Dispatch("ready");
-    }).Render();
-
-    AssertSchemaValid(json);
-}
-```
+The plan contract is generated from the C# plan domain into `runtime/types/plan.ts`.
+Run `npm run typecheck` after plan-domain changes so TypeScript compilation proves
+the runtime still matches the generated contract.
 
 ### Test naming
 
@@ -328,10 +315,10 @@ When adding a new command kind, trigger kind, component, or validation rule:
 
 1. C# intent class with `[JsonDerivedType]`
 2. Builder method on the appropriate builder
-3. JSON schema update in `reactive-plan.schema.json`
+3. C# plan-domain update
 4. Runtime handler in the appropriate execution module
 5. TS types in `types/`
-6. C# unit test -- snapshot + schema validation
+6. C# unit test -- behavior snapshot when it adds useful signal
 7. TS unit test -- runtime behavior in jsdom
 8. Playwright test -- browser behavior verification
 9. Sandbox view -- usage demonstration in the SandboxApp
