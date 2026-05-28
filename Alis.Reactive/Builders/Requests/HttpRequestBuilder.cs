@@ -130,10 +130,10 @@ namespace Alis.Reactive.Builders.Requests
             var request = RequestPlan.Create(
                 endpoint,
                 input,
-                Snapshot(_whileLoading),
-                Snapshot(_response.Draft.SuccessRoutes),
-                Snapshot(_response.Draft.ErrorRoutes),
-                Snapshot(_finally),
+                _whileLoading,
+                _response.Draft.SuccessRoutes,
+                _response.Draft.ErrorRoutes,
+                _finally,
                 _response.Draft.Chain,
                 validation.HasValue
                     ? validation.Value.Target
@@ -153,13 +153,6 @@ namespace Alis.Reactive.Builders.Requests
         private RequestInput ResolveInput(RequestUrl url)
         {
             return _requestInput.BuildRequestInput(_bodyFormat, url);
-        }
-
-        private static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items)
-        {
-            var hasNoItems = items.Count == 0;
-            if (hasNoItems) return Array.Empty<T>();
-            return new List<T>(items);
         }
 
     }
