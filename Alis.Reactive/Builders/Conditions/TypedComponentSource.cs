@@ -23,7 +23,7 @@ namespace Alis.Reactive.Builders.Conditions
 
         internal override ValueExpression ToValueExpression() => _value;
 
-        internal override string ReadMember => _readMember;
+        internal string DefaultPayloadName => _readMember;
 
         internal static TypedComponentSource<TProp> FromMethod(
             PlanModel.ComponentSource component,

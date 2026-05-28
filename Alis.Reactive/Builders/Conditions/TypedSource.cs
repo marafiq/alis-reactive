@@ -14,11 +14,6 @@ namespace Alis.Reactive.Builders.Conditions
         internal abstract ValueExpression ToValueExpression();
 
         /// <summary>
-        /// The member name to read on the resolved source.
-        /// </summary>
-        internal virtual string ReadMember => throw new System.InvalidOperationException("Not a component source.");
-
-        /// <summary>
         /// Shape inferred from TProp.
         /// </summary>
         internal Shape Shape => Shape.FromClrType(typeof(TProp));
