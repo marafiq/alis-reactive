@@ -1,10 +1,10 @@
 namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
 
 [TestFixture]
-public sealed class WhenFluentValidationAdapterExtractsClientRules
+public sealed class WhenReactiveValidatorsDeclareClientRules
 {
     [Test]
-    public void built_in_fluentvalidation_rules_extract_as_client_rules()
+    public void declared_client_rules_emit_browser_rules()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<BuiltInClientRulesModel, BuiltInClientRulesValidator>();
@@ -44,7 +44,7 @@ public sealed class WhenFluentValidationAdapterExtractsClientRules
     }
 
     [Test]
-    public void custom_rules_extract_only_through_the_typed_client_bridge()
+    public void peer_rules_emit_typed_peer_value_reads()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<ConfirmEmailModel, ConfirmEmailValidator>();
@@ -67,7 +67,7 @@ public sealed class WhenFluentValidationAdapterExtractsClientRules
     }
 
     [Test]
-    public void built_in_peer_comparison_rules_extract_as_peer_value_reads()
+    public void peer_comparison_rules_emit_peer_value_reads()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<StayWindow, BuiltInPeerComparisonValidator>();
@@ -99,7 +99,7 @@ public sealed class WhenFluentValidationAdapterExtractsClientRules
     }
 
     [Test]
-    public void reactive_whenfield_extracts_client_activation_and_declares_guard_fields()
+    public void whenfield_declares_client_activation_and_guard_fields()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AssessmentModel, ReactiveAssessmentValidator>();
@@ -122,7 +122,7 @@ public sealed class WhenFluentValidationAdapterExtractsClientRules
     }
 
     [Test]
-    public void reactive_whenfields_extract_composed_client_activation()
+    public void whenfields_declares_composed_client_activation()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AssessmentModel, ComposedAssessmentValidator>();

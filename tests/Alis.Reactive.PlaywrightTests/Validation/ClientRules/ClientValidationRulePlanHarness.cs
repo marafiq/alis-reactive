@@ -4,6 +4,7 @@ using Alis.Reactive.FluentValidator.Validators;
 using Alis.Reactive.Native.Extensions;
 using Alis.Reactive.Validation;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
@@ -11,15 +12,12 @@ namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
 internal static class ClientValidationRulePlanHarness
 {
     private const string FormId = "validation-form";
-    private static readonly object ConfigGate = new();
-    private static bool _configured;
+    private static readonly IServiceProvider Services = BuildServices();
 
     internal static JsonDocument RenderPlan<TModel, TValidationSource>()
         where TModel : class
         where TValidationSource : class
     {
-        EnsureRuleSource();
-
         var html = default(IHtmlHelper<TModel>)!;
         var plan = PlanExtensions.ReactivePlan(html);
         HtmlExtensions.On(html, plan, trigger =>
@@ -27,7 +25,7 @@ internal static class ClientValidationRulePlanHarness
                 pipeline.Post("/validate")
                     .Validate<TValidationSource>(FormId)));
 
-        return JsonDocument.Parse(plan.RenderFormatted());
+        return JsonDocument.Parse(plan.RenderFormatted(Services));
     }
 
     internal static JsonElement[] RulesFor(JsonElement root, string serverFieldName) =>
@@ -74,18 +72,28 @@ internal static class ClientValidationRulePlanHarness
             rule.GetProperty("serverFieldName").GetString() == serverFieldName);
     }
 
-    private static void EnsureRuleSource()
+    private static IServiceProvider BuildServices() =>
+        new ServiceCollection()
+            .AddSingleton<IClientValidationRuleSource>(_ => new ClientValidationRuleSource(BuildFluentSource()))
+            .BuildServiceProvider();
+
+    private static IClientValidationRuleSource BuildFluentSource()
     {
-        if (_configured) return;
-
-        lock (ConfigGate)
+        var services = new ServiceCollection();
+        services.AddReactiveFluentValidation(rules =>
         {
-            if (_configured) return;
+            rules.Add<AsyncOnlyValidator>();
+            rules.Add<BuiltInPeerComparisonValidator>();
+            rules.Add<BuiltInClientRulesValidator>();
+            rules.Add<ConfirmEmailValidator>();
+            rules.Add<ReactiveAssessmentValidator>();
+            rules.Add<ComposedAssessmentValidator>();
+            rules.Add<MixedConditionValidator>();
+        });
 
-            ReactivePlanConfig.UseClientValidationRuleSource(
-                new ClientValidationRuleSource());
-            _configured = true;
-        }
+        return services
+            .BuildServiceProvider()
+            .GetRequiredService<IClientValidationRuleSource>();
     }
 
     private sealed class ClientValidationRuleSource : IClientValidationRuleSource
@@ -110,13 +118,17 @@ internal static class ClientValidationRulePlanHarness
                             .Required("Memory assessment score is required."));
                 }));
 
-        private static readonly FluentValidationAdapter Fluent =
-            new(CreateValidator);
+        private readonly IClientValidationRuleSource _fluent;
+
+        internal ClientValidationRuleSource(IClientValidationRuleSource fluent)
+        {
+            _fluent = fluent;
+        }
 
         public IReadOnlyList<ClientValidationField> GetClientRules(Type validationSourceType)
         {
             if (FluentValidatorTypes.Contains(validationSourceType))
-                return Fluent.GetClientRules(validationSourceType);
+                return _fluent.GetClientRules(validationSourceType);
 
             return Core.GetClientRules(validationSourceType);
         }
@@ -131,18 +143,6 @@ internal static class ClientValidationRulePlanHarness
             typeof(ComposedAssessmentValidator),
             typeof(MixedConditionValidator)
         ];
-
-        private static IValidator? CreateValidator(Type type)
-        {
-            if (type == typeof(AsyncOnlyValidator)) return new AsyncOnlyValidator();
-            if (type == typeof(BuiltInPeerComparisonValidator)) return new BuiltInPeerComparisonValidator();
-            if (type == typeof(BuiltInClientRulesValidator)) return new BuiltInClientRulesValidator();
-            if (type == typeof(ConfirmEmailValidator)) return new ConfirmEmailValidator();
-            if (type == typeof(ReactiveAssessmentValidator)) return new ReactiveAssessmentValidator();
-            if (type == typeof(ComposedAssessmentValidator)) return new ComposedAssessmentValidator();
-            if (type == typeof(MixedConditionValidator)) return new MixedConditionValidator();
-            return null;
-        }
     }
 }
 
@@ -164,14 +164,13 @@ internal sealed class ResidentAssessment
     public int? MemoryAssessmentScore { get; set; }
 }
 
-internal sealed class AsyncOnlyValidator : AbstractValidator<AsyncOnlyModel>
+internal sealed class AsyncOnlyValidator : ReactiveValidator<AsyncOnlyModel>
 {
     public AsyncOnlyValidator()
     {
         RuleFor(model => model.Code)
             .MustAsync((_, _, _) => Task.FromResult(false))
-            .WithMessage("Code is checked on the server.")
-            .ClientRule(rule => rule.Required());
+            .WithMessage("Code is checked on the server.");
     }
 }
 
@@ -180,7 +179,7 @@ internal sealed class AsyncOnlyModel
     public string? Code { get; set; }
 }
 
-internal sealed class BuiltInClientRulesValidator : AbstractValidator<BuiltInClientRulesModel>
+internal sealed class BuiltInClientRulesValidator : ReactiveValidator<BuiltInClientRulesModel>
 {
     public BuiltInClientRulesValidator()
     {
@@ -188,15 +187,26 @@ internal sealed class BuiltInClientRulesValidator : AbstractValidator<BuiltInCli
             .NotEmpty()
             .Length(2, 10)
             .Matches("^[A-Z]+$");
+        ClientRule(model => model.Name)
+            .Required("'Name' is required.")
+            .MinLength(2, "'Name' must be at least 2 characters.")
+            .MaxLength(10, "'Name' must be at most 10 characters.")
+            .Regex("^[A-Z]+$", "'Name' format is invalid.");
 
         RuleFor(model => model.Email)
             .EmailAddress();
+        ClientRule(model => model.Email)
+            .Email("'Email' must be a valid email address.");
 
         RuleFor(model => model.Card)
             .CreditCard();
+        ClientRule(model => model.Card)
+            .CreditCard("'Card' must be a valid credit card number.");
 
         RuleFor(model => model.EmptyCode)
             .IsEmpty();
+        ClientRule(model => model.EmptyCode)
+            .Empty("'Empty Code' must be empty.");
 
         RuleFor(model => model.Score)
             .InclusiveBetween(1, 5)
@@ -207,6 +217,15 @@ internal sealed class BuiltInClientRulesValidator : AbstractValidator<BuiltInCli
             .LessThan(9)
             .Equal(5)
             .NotEqual(3);
+        ClientRule(model => model.Score)
+            .Range(1, 5, "'Score' must be between 1 and 5.")
+            .ExclusiveRange(0, 10, "'Score' must be between 0 and 10 (exclusive).")
+            .GreaterThanOrEqualTo(2, "'Score' must be at least 2.")
+            .LessThanOrEqualTo(8, "'Score' must be at most 8.")
+            .GreaterThan(1, "'Score' must be greater than 1.")
+            .LessThan(9, "'Score' must be less than 9.")
+            .EqualTo(5, "'Score' must equal 5.")
+            .NotEqual(3, "'Score' must not equal 3.");
     }
 }
 
@@ -219,7 +238,7 @@ internal sealed class BuiltInClientRulesModel
     public int Score { get; set; }
 }
 
-internal sealed class BuiltInPeerComparisonValidator : AbstractValidator<StayWindow>
+internal sealed class BuiltInPeerComparisonValidator : ReactiveValidator<StayWindow>
 {
     public BuiltInPeerComparisonValidator()
     {
@@ -230,17 +249,25 @@ internal sealed class BuiltInPeerComparisonValidator : AbstractValidator<StayWin
             .LessThanOrEqualTo(model => model.ReviewDate)
             .Equal(model => model.AdmissionDate)
             .NotEqual(model => model.ReviewDate);
+        ClientRule(model => model.DischargeDate)
+            .GreaterThan(model => model.AdmissionDate, "Discharge must be after admission.")
+            .GreaterThanOrEqualTo(model => model.AdmissionDate, "Discharge must not be before admission.")
+            .LessThan(model => model.ReviewDate, "Discharge must be before review.")
+            .LessThanOrEqualTo(model => model.ReviewDate, "Discharge must not be after review.")
+            .EqualTo(model => model.AdmissionDate, "Discharge must match admission.")
+            .NotEqualTo(model => model.ReviewDate, "Discharge must differ from review.");
     }
 }
 
-internal sealed class ConfirmEmailValidator : AbstractValidator<ConfirmEmailModel>
+internal sealed class ConfirmEmailValidator : ReactiveValidator<ConfirmEmailModel>
 {
     public ConfirmEmailValidator()
     {
         RuleFor(model => model.ConfirmEmail)
             .Must((model, confirmEmail) => confirmEmail == model.Email)
-            .WithMessage("Emails must match.")
-            .ClientRule(rule => rule.EqualTo(model => model.Email));
+            .WithMessage("Emails must match.");
+        ClientRule(model => model.ConfirmEmail)
+            .EqualTo(model => model.Email, "Emails must match.");
     }
 }
 
@@ -258,6 +285,8 @@ internal sealed class ReactiveAssessmentValidator : ReactiveValidator<Assessment
         {
             RuleFor(model => model.Score).NotEmpty()
                 .WithMessage("Score required for veterans.");
+            ClientRule(model => model.Score)
+                .Required("Score required for veterans.");
         });
     }
 }
@@ -272,6 +301,8 @@ internal sealed class ComposedAssessmentValidator : ReactiveValidator<Assessment
             {
                 RuleFor(model => model.Notes).NotEmpty()
                     .WithMessage("Notes required for high scoring veterans.");
+                ClientRule(model => model.Notes)
+                    .Required("Notes required for high scoring veterans.");
             });
     }
 }

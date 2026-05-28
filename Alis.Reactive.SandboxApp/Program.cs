@@ -22,13 +22,12 @@ if (!string.IsNullOrEmpty(sfLicense))
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
+builder.Services.AddReactiveFluentValidation(validation =>
+    validation.AddFromAssemblyContaining<Program>());
 
 // Broadcast service pushes updates every 2s for demo — disabled during Playwright tests
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ALIS_NO_BROADCAST")))
     builder.Services.AddHostedService<RealTimeBroadcastService>();
-
-ReactivePlanConfig.UseClientValidationRuleSource(
-    new FluentValidationAdapter(type => (FluentValidation.IValidator?)Activator.CreateInstance(type)));
 
 var app = builder.Build();
 

@@ -44,6 +44,21 @@ namespace Alis.Reactive.Validation
                     _shape));
         }
 
+        internal ValidationRule PrefixedBy(
+            ValidationFieldPath prefix,
+            ClientRuleActivation parentActivation)
+        {
+            if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
+            if (parentActivation == null) throw new System.ArgumentNullException(nameof(parentActivation));
+
+            return new ValidationRule(
+                _rule,
+                _message,
+                _operand.PrefixedBy(prefix),
+                parentActivation.Combine(_activation.PrefixedBy(prefix)),
+                _shape);
+        }
+
         internal System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences =>
             _operand.PeerFieldReferences;
     }
@@ -69,6 +84,8 @@ namespace Alis.Reactive.Validation
 
         internal abstract System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences { get; }
 
+        internal abstract ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix);
+
         internal abstract ValidationRuleExecution ToPlanExecution(
             Alis.Reactive.PlanModel.ValidationRuleActivation activation,
             ValidationPlanBinding binding,
@@ -82,6 +99,12 @@ namespace Alis.Reactive.Validation
         internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
             get { yield break; }
+        }
+
+        internal override ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix)
+        {
+            if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
+            return this;
         }
 
         internal override ValidationRuleExecution ToPlanExecution(
@@ -108,6 +131,12 @@ namespace Alis.Reactive.Validation
         internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
             get { yield break; }
+        }
+
+        internal override ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix)
+        {
+            if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
+            return this;
         }
 
         internal override ValidationRuleExecution ToPlanExecution(
@@ -138,6 +167,12 @@ namespace Alis.Reactive.Validation
             get { yield break; }
         }
 
+        internal override ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix)
+        {
+            if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
+            return this;
+        }
+
         internal override ValidationRuleExecution ToPlanExecution(
             Alis.Reactive.PlanModel.ValidationRuleActivation activation,
             ValidationPlanBinding binding,
@@ -164,6 +199,12 @@ namespace Alis.Reactive.Validation
         internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
             get { yield return _field; }
+        }
+
+        internal override ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix)
+        {
+            if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
+            return PeerField(prefix.Append(_field.Path), _field.Shape);
         }
 
         internal override ValidationRuleExecution ToPlanExecution(
@@ -197,6 +238,8 @@ namespace Alis.Reactive.Validation
         internal abstract ClientRuleActivation Combine(ClientRuleActivation incoming);
 
         internal abstract ClientRuleActivation AppendTo(FieldCondition existingCondition);
+
+        internal abstract ClientRuleActivation PrefixedBy(ValidationFieldPath prefix);
     }
 
     internal sealed class AlwaysClientRuleActivation : ClientRuleActivation
@@ -219,6 +262,12 @@ namespace Alis.Reactive.Validation
         {
             if (existingCondition == null) throw new System.ArgumentNullException(nameof(existingCondition));
             return When(existingCondition);
+        }
+
+        internal override ClientRuleActivation PrefixedBy(ValidationFieldPath prefix)
+        {
+            if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
+            return this;
         }
     }
 
@@ -247,6 +296,12 @@ namespace Alis.Reactive.Validation
         {
             if (existingCondition == null) throw new System.ArgumentNullException(nameof(existingCondition));
             return When(FieldCondition.All(existingCondition, _condition));
+        }
+
+        internal override ClientRuleActivation PrefixedBy(ValidationFieldPath prefix)
+        {
+            if (prefix == null) throw new System.ArgumentNullException(nameof(prefix));
+            return When(_condition.PrefixWith(new FieldConditionPrefixBinding(prefix)));
         }
     }
 

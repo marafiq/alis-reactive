@@ -33,7 +33,9 @@ namespace Alis.Reactive.Native.Extensions
         public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
             where TModel : class
         {
-            return new ReactivePlan<TModel>();
+            return new ReactivePlan<TModel>(
+                ReactivePlanScope.RootView,
+                html?.ViewContext.HttpContext.RequestServices);
         }
 
         /// <summary>
@@ -56,7 +58,9 @@ namespace Alis.Reactive.Native.Extensions
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
             where TModel : class
         {
-            return new ReactivePlan<TModel>(ReactivePlanScope.PartialView);
+            return new ReactivePlan<TModel>(
+                ReactivePlanScope.PartialView,
+                html?.ViewContext.HttpContext.RequestServices);
         }
 
         /// <summary>

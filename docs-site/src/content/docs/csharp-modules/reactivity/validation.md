@@ -35,7 +35,7 @@ public class ResidentIntakeValidator : ReactiveValidator<ResidentIntakeModel>
 }
 ```
 
-`ReactiveValidator<T>` extends `AbstractValidator<T>` — all standard FluentValidation methods work. The difference is that `ReactiveValidator<T>` also implements `IClientConditionSource`, which enables conditional rule extraction via `WhenField()`.
+`ReactiveValidator<T>` extends `AbstractValidator<T>` — all standard FluentValidation methods work. Browser validation is explicit metadata declared with `ClientRule(...)`. Use `WhenField(...)` when the same rule needs a deterministic browser condition; regular `When`, `Unless`, and async rules stay server-only.
 
 ## How do I attach validation to a form?
 

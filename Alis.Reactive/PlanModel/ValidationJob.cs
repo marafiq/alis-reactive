@@ -22,7 +22,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>The form element id whose components this validation source covers.</summary>
         public string Container => _container.Value;
 
-        /// <summary>The source type used to extract deterministic browser validation rules.</summary>
+        /// <summary>The source type whose metadata declares deterministic browser validation rules.</summary>
         public Type ValidationSourceType { get; }
 
         internal ValidationJob(string requestUrl, ComponentId container, Type validationSourceType)

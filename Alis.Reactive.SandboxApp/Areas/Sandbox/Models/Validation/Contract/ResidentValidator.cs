@@ -10,48 +10,64 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             // Unconditional
             RuleFor(x => x.Name).NotEmpty().WithMessage("'Name' is required.")
                 .MinimumLength(2).WithMessage("'Name' must have a minimum length of 2.");
+            ClientRule(x => x.Name)
+                .Required("'Name' is required.")
+                .MinLength(2, "'Name' must have a minimum length of 2.");
             RuleFor(x => x.Email).NotEmpty().WithMessage("'Email' is required.")
                 .EmailAddress().WithMessage("'Email' must be a valid email address.");
+            ClientRule(x => x.Email)
+                .Required("'Email' is required.")
+                .Email("'Email' must be a valid email address.");
             RuleFor(x => x.CareLevel).NotEmpty().WithMessage("'Care Level' is required.");
+            ClientRule(x => x.CareLevel)
+                .Required("'Care Level' is required.");
 
-            // equalTo
             RuleFor(x => x.ConfirmEmail).NotEmpty().WithMessage("'Confirm Email' is required.")
-                .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.")
-                .ClientRule(rule => rule.EqualTo(x => x.Email));
+                .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.");
+            ClientRule(x => x.ConfirmEmail)
+                .Required("'Confirm Email' is required.")
+                .EqualTo(x => x.Email, "'Confirm Email' must match 'Email'.");
 
-            // truthy
             WhenField(x => x.IsVeteran, () =>
             {
                 RuleFor(x => x.VeteranId).NotEmpty().WithMessage("'Veteran ID' is required when veteran.");
+                ClientRule(x => x.VeteranId)
+                    .Required("'Veteran ID' is required when veteran.");
             });
 
-            // eq
             WhenField(x => x.CareLevel, "Memory Care", () =>
             {
                 RuleFor(x => x.MemoryAssessmentScore).NotEmpty().WithMessage("'Memory Assessment' is required for Memory Care.");
+                ClientRule(x => x.MemoryAssessmentScore)
+                    .Required("'Memory Assessment' is required for Memory Care.");
             });
 
-            // neq
             WhenFieldNot(x => x.CareLevel, "Independent", () =>
             {
                 RuleFor(x => x.PhysicianName).NotEmpty().WithMessage("'Physician' is required unless Independent.");
+                ClientRule(x => x.PhysicianName)
+                    .Required("'Physician' is required unless Independent.");
             });
 
-            // truthy
             WhenField(x => x.HasEmergencyContact, () =>
             {
                 RuleFor(x => x.EmergencyName).NotEmpty().WithMessage("'Emergency Name' is required.");
                 RuleFor(x => x.EmergencyPhone).NotEmpty().WithMessage("'Emergency Phone' is required.");
+                ClientRule(x => x.EmergencyName)
+                    .Required("'Emergency Name' is required.");
+                ClientRule(x => x.EmergencyPhone)
+                    .Required("'Emergency Phone' is required.");
             });
 
-            // falsy
             WhenFieldNot(x => x.HasEmergencyContact, () =>
             {
                 RuleFor(x => x.ReasonForNoContact).NotEmpty().WithMessage("'Reason' is required when no emergency contact.");
+                ClientRule(x => x.ReasonForNoContact)
+                    .Required("'Reason' is required when no emergency contact.");
             });
 
-            // Address (unconditional)
             RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
+            ClientRule(x => x.Address, new ResidentAddressValidator());
         }
     }
 
@@ -65,43 +81,53 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         {
             RuleFor(x => x.Name).NotEmpty().WithMessage("'Name' is required.")
                 .MinimumLength(2).WithMessage("'Name' must have a minimum length of 2.");
+            ClientRule(x => x.Name)
+                .Required("'Name' is required.")
+                .MinLength(2, "'Name' must have a minimum length of 2.");
             RuleFor(x => x.Email).NotEmpty().WithMessage("'Email' is required.")
                 .EmailAddress().WithMessage("'Email' must be a valid email address.");
+            ClientRule(x => x.Email)
+                .Required("'Email' is required.")
+                .Email("'Email' must be a valid email address.");
             RuleFor(x => x.CareLevel).NotEmpty().WithMessage("'Care Level' is required.");
+            ClientRule(x => x.CareLevel)
+                .Required("'Care Level' is required.");
 
             RuleFor(x => x.ConfirmEmail).NotEmpty().WithMessage("'Confirm Email' is required.")
-                .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.")
-                .ClientRule(rule => rule.EqualTo(x => x.Email));
+                .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.");
+            ClientRule(x => x.ConfirmEmail)
+                .Required("'Confirm Email' is required.")
+                .EqualTo(x => x.Email, "'Confirm Email' must match 'Email'.");
 
             WhenField(x => x.IsVeteran, () =>
             {
                 RuleFor(x => x.VeteranId).NotEmpty().WithMessage("'Veteran ID' is required when veteran.");
+                ClientRule(x => x.VeteranId)
+                    .Required("'Veteran ID' is required when veteran.");
             });
 
             WhenField(x => x.HasEmergencyContact, () =>
             {
                 RuleFor(x => x.EmergencyName).NotEmpty().WithMessage("'Emergency Name' is required.");
                 RuleFor(x => x.EmergencyPhone).NotEmpty().WithMessage("'Emergency Phone' is required.");
+                ClientRule(x => x.EmergencyName)
+                    .Required("'Emergency Name' is required.");
+                ClientRule(x => x.EmergencyPhone)
+                    .Required("'Emergency Phone' is required.");
             });
 
             WhenFieldNot(x => x.HasEmergencyContact, () =>
             {
                 RuleFor(x => x.ReasonForNoContact).NotEmpty().WithMessage("'Reason' is required when no emergency contact.");
+                ClientRule(x => x.ReasonForNoContact)
+                    .Required("'Reason' is required when no emergency contact.");
             });
 
             RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
+            ClientRule(x => x.Address, new ResidentAddressValidator());
         }
     }
 
-    /// <summary>
-    /// Scoped validator for the AjaxPartial page — only Name, Email, ConfirmEmail + Address.
-    /// </summary>
-    /// <summary>
-    /// Scoped validator for the AjaxPartial page.
-    /// Address rules included — they're unenriched before partial loads,
-    /// but allRulesConditionallySkipped handles that gracefully.
-    /// After partial merges, address fields enrich and validate inline.
-    /// </summary>
     /// <summary>
     /// Scoped validator for AjaxPartial — parent fields + address.
     /// Address fields are unenriched at boot (partial not loaded yet) → skipped.
@@ -113,12 +139,20 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         {
             RuleFor(x => x.Name).NotEmpty().WithMessage("'Name' is required.")
                 .MinimumLength(2).WithMessage("'Name' must have a minimum length of 2.");
+            ClientRule(x => x.Name)
+                .Required("'Name' is required.")
+                .MinLength(2, "'Name' must have a minimum length of 2.");
             RuleFor(x => x.Email).NotEmpty().WithMessage("'Email' is required.")
                 .EmailAddress().WithMessage("'Email' must be a valid email address.");
+            ClientRule(x => x.Email)
+                .Required("'Email' is required.")
+                .Email("'Email' must be a valid email address.");
 
             RuleFor(x => x.ConfirmEmail).NotEmpty().WithMessage("'Confirm Email' is required.")
-                .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.")
-                .ClientRule(rule => rule.EqualTo(x => x.Email));
+                .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.");
+            ClientRule(x => x.ConfirmEmail)
+                .Required("'Confirm Email' is required.")
+                .EqualTo(x => x.Email, "'Confirm Email' must match 'Email'.");
 
             // Address rules conditional on user selecting "Custom Address".
             // When Facility Address or nothing selected → rules skipped.
@@ -127,18 +161,26 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             WhenField(x => x.AddressType, "Custom Address", () =>
             {
                 RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());
+                ClientRule(x => x.Address, new ResidentAddressValidator());
             });
         }
     }
 
-    public class ResidentAddressValidator : AbstractValidator<ResidentAddress>
+    public class ResidentAddressValidator : ReactiveValidator<ResidentAddress>
     {
         public ResidentAddressValidator()
         {
             RuleFor(x => x.Street).NotEmpty().WithMessage("'Street' is required.");
+            ClientRule(x => x.Street)
+                .Required("'Street' is required.");
             RuleFor(x => x.City).NotEmpty().WithMessage("'City' is required.");
+            ClientRule(x => x.City)
+                .Required("'City' is required.");
             RuleFor(x => x.ZipCode).NotEmpty().WithMessage("'Zip Code' is required.")
                 .Matches(@"^\d{5}$").WithMessage("'Zip Code' must be 5 digits.");
+            ClientRule(x => x.ZipCode)
+                .Required("'Zip Code' is required.")
+                .Regex(@"^\d{5}$", "'Zip Code' must be 5 digits.");
         }
     }
 }

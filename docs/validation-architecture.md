@@ -60,34 +60,21 @@ Peer fields and condition fields are also entered into the projection so their
 component value contracts can be resolved by the same binding path as ordinary
 rules.
 
-## FluentValidation Adapter
+## ReactiveValidator Metadata
 
-`FluentValidationAdapter` translates supported FluentValidation validators into
-client validation projections. The adapter builds a `ClientValidationProjectionDraft`
-while walking a validator: projected rules are attached to a field path, and
-unproven browser rules are omitted from the browser projection.
+`ReactiveValidator<T>` records browser validation metadata explicitly through
+`ClientRule(...)`. FluentValidation remains the server authority: `RuleFor`,
+`Must`, regular `When`/`Unless`, and async rules still run on the server as normal.
 
-For projected fields, the adapter uses FluentValidation's rule metadata
-(`IValidationRule.PropertyName` and `IValidationRule.TypeToValidate`) to create
-the `ClientValidationFieldReference`. It does not look up the model member again
-to rediscover field shape, which keeps override-property-name scenarios and
-deferred partial binding deterministic.
+Browser rules are emitted only when the validator declares `ClientRule(...)`.
+Peer comparisons are declared through typed expressions such as `EqualTo(...)`,
+`NotEqualTo(...)`, and `GreaterThan(...)`; the framework does not infer peer
+paths from FluentValidation internals.
 
-Custom validators and peer-field comparisons opt in through
-`ProjectToClient(...)`, which attaches an explicit browser rule projection to the
-FluentValidation rule component. The adapter does not reconstruct peer paths
-from FluentValidation `MemberInfo`; peer fields must be declared through typed
-client projection methods such as `EqualTo(...)`, `NotEqualTo(...)`, and
-`GreaterThan(...)`.
-
-Conditions are projected only when the validator supplies a matching symbolic
-client guard through the ReactiveValidator `WhenField*` language. Other
-FluentValidation guards are skipped for the browser projection instead of being
-inferred from FluentValidation internals.
-
-Nested `WhenField*` scopes project as one active client condition. A single
-scope keeps its guard directly; multiple active scopes are composed with `all`
-in the same outer-to-inner order the server predicates use.
+Conditions are browser-visible only through the ReactiveValidator `WhenField*`
+language. Regular FluentValidation guards are server-only. Nested `WhenField*`
+scopes emit one active client condition; multiple active scopes compose with
+`all` in the same outer-to-inner order the server predicates use.
 
 After render-time field binding, client guards become `ValidationCondition`,
 the deterministic plan condition subset used by validation activation. It

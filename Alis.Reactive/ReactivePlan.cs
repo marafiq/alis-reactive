@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive
 {
@@ -16,19 +17,26 @@ namespace Alis.Reactive
 
         private readonly PlanId _planId = Alis.Reactive.PlanModel.PlanId.ForModel(typeof(TModel));
         private readonly PlanBuildContext _context;
+        private readonly IServiceProvider? _services;
 
         private readonly ReactivePlanScope _scope;
 
         internal ReactivePlan()
-            : this(ReactivePlanScope.RootView)
+            : this(ReactivePlanScope.RootView, services: null)
         {
         }
 
         internal ReactivePlan(ReactivePlanScope scope)
+            : this(scope, services: null)
+        {
+        }
+
+        internal ReactivePlan(ReactivePlanScope scope, IServiceProvider? services)
         {
             if (scope == null) throw new ArgumentNullException(nameof(scope));
 
             _scope = scope;
+            _services = services;
             var planIdentity = _scope.CreateIdentity(_planId);
             _context = new PlanBuildContext(planIdentity, _registeredInputComponents);
         }
@@ -82,25 +90,58 @@ namespace Alis.Reactive
         /// <summary>Registers all components and resolves validation, then serializes the plan as compact JSON.</summary>
         public string Render()
         {
-            ResolveAll();
+            ResolveAll(_services);
+            return ReactivePlanSerializer.Serialize(_context.BuildPlan());
+        }
+
+        public string Render(IServiceProvider services)
+        {
+            ResolveAll(services);
             return ReactivePlanSerializer.Serialize(_context.BuildPlan());
         }
 
         /// <summary>Registers all components and resolves validation, then serializes the plan as indented JSON for debugging.</summary>
         public string RenderFormatted()
         {
-            ResolveAll();
+            ResolveAll(_services);
             return ReactivePlanSerializer.SerializeFormatted(_context.BuildPlan());
         }
 
-        private void ResolveAll()
+        public string RenderFormatted(IServiceProvider services)
+        {
+            ResolveAll(services);
+            return ReactivePlanSerializer.SerializeFormatted(_context.BuildPlan());
+        }
+
+        private void ResolveAll(IServiceProvider? services)
         {
             _context.RegisterInputComponents();
+
+            if (_context.ValidationJobs.Count == 0)
+                return;
+
             new ClientValidationRuleBinder(
                     _context,
                     _registeredInputComponents.Snapshot(),
-                    typeof(TModel))
+                    typeof(TModel),
+                    RequireClientValidationRuleSource(services, _context.ValidationJobs[0]))
                 .BindQueuedJobs();
+        }
+
+        private static IClientValidationRuleSource RequireClientValidationRuleSource(
+            IServiceProvider? services,
+            ValidationJob job)
+        {
+            if (job == null) throw new ArgumentNullException(nameof(job));
+
+            var source = services?.GetService(typeof(IClientValidationRuleSource)) as IClientValidationRuleSource;
+            if (source != null) return source;
+
+            throw new InvalidOperationException(
+                $"Request at '{job.RequestUrl}' specifies validation source '{job.ValidationSourceType.Name}', " +
+                "but no IClientValidationRuleSource is registered in DI. " +
+                "Register the FluentValidation integration with services.AddReactiveFluentValidation(...), " +
+                "or register your own IClientValidationRuleSource.");
         }
     }
 

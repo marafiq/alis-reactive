@@ -5,16 +5,10 @@ using FluentValidation.Validators;
 namespace Alis.Reactive.FluentValidator.Validators
 {
     /// <summary>
-    /// Marker interface for client-extractable Empty rule.
-    /// FluentValidation's EmptyValidator has no public interface.
-    /// </summary>
-    public interface IEmptyValidator : IPropertyValidator { }
-
-    /// <summary>
     /// Validates that a value IS empty (null, default, or empty string).
     /// Inverse of NotEmpty — used for conditional fields (e.g. "salary must be empty when not employed").
     /// </summary>
-    public class EmptyValidator<T, TProperty> : PropertyValidator<T, TProperty>, IEmptyValidator
+    public class EmptyValidator<T, TProperty> : PropertyValidator<T, TProperty>
     {
         public override string Name => "EmptyValidator";
 

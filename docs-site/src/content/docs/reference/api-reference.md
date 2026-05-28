@@ -116,18 +116,12 @@ RenderFormatted()
 WalkRequestReactions()
 ```
 
-### ReactivePlanConfig
+### ReactiveFluentValidationServiceCollectionExtensions
 
-One-time startup configuration for the reactive framework.
-
-```csharp
-// Properties
-Extractor { get; }  // Gets the registered validation extractor, or `null` if none is registered.
-```
+Registers explicit browser validation metadata through Microsoft DI.
 
 ```csharp
-Reset()
-UseValidationExtractor(extractor)
+AddReactiveFluentValidation(configure)
 ```
 
 ### ResponseBody<T>
@@ -1054,10 +1048,10 @@ Logical NOT — inverts the inner term.
 Term { get; }  // Gets the inner condition to negate.
 ```
 
-### IValidationExtractor
+### IClientValidationRuleSource
 
-Extracts client-side validation rules from a validator type.
-            Implemented by FluentValidationAdapter.
+Provides explicitly declared browser validation rules for a validation source type.
+            Registered by `AddReactiveFluentValidation(...)` for `ReactiveValidator<T>`.
 
 ### ValidationField
 
@@ -1066,7 +1060,7 @@ Describes a single field's validation rules within a form.
 
 ### ValidationRule
 
-A single validation rule extracted from FluentValidation.
+A single browser validation rule declared by the validation metadata source.
 
 ---
 

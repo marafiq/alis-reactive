@@ -10,20 +10,65 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
 {
-    public abstract class ReactiveValidator<T> : AbstractValidator<T>, IClientConditionSource
+    public abstract class ReactiveValidator<T> :
+        AbstractValidator<T>,
+        IClientValidationMetadataSource
         where T : class
     {
-        private readonly Dictionary<IValidationRule, ClientRuleCondition> _clientConditions =
-            new Dictionary<IValidationRule, ClientRuleCondition>();
+        private readonly ClientValidationRuleSet _clientRules = new ClientValidationRuleSet();
         private readonly ClientConditionScope _scope = new ClientConditionScope();
 
-        IReadOnlyDictionary<IValidationRule, ClientRuleCondition> IClientConditionSource.ClientConditions =>
-            _clientConditions;
+        IReadOnlyList<ClientValidationField> IClientValidationMetadataSource.GetClientRules() =>
+            _clientRules.ToFields();
 
-        protected override void OnRuleAdded(IValidationRule<T> rule)
+        protected ClientValidationFieldRuleBuilder<T, TValue> ClientRule<TValue>(
+            Expression<Func<T, TValue>> field)
         {
-            base.OnRuleAdded(rule);
-            _scope.Register(rule, _clientConditions);
+            if (field == null) throw new ArgumentNullException(nameof(field));
+
+            var token = ClientValidationFieldToken<T, TValue>.For(field);
+            var activation = _scope.ActiveClientRuleActivation(_clientRules);
+            _clientRules.EnsureField(token.Reference);
+            return new ClientValidationFieldRuleBuilder<T, TValue>(
+                _clientRules,
+                token,
+                activation);
+        }
+
+        protected void ClientRule<TChild>(
+            Expression<Func<T, TChild>> field,
+            ReactiveValidator<TChild> validator)
+            where TChild : class
+        {
+            if (field == null) throw new ArgumentNullException(nameof(field));
+            if (validator == null) throw new ArgumentNullException(nameof(validator));
+
+            var prefix = ValidationFieldPath.Of(ExpressionPathHelper.ToPropertyName(field));
+            _clientRules.AddRulesFrom(
+                ((IClientValidationMetadataSource)validator).GetClientRules(),
+                prefix,
+                _scope.ActiveClientRuleActivation(_clientRules));
+        }
+
+        protected void ClientRulesFrom(ReactiveValidator<T> validator)
+        {
+            if (validator == null) throw new ArgumentNullException(nameof(validator));
+
+            _clientRules.AddRulesFrom(
+                ((IClientValidationMetadataSource)validator).GetClientRules(),
+                ValidationFieldPath.Empty,
+                _scope.ActiveClientRuleActivation(_clientRules));
+        }
+
+        protected void ClientRulesFrom<TSource>(ReactiveValidator<TSource> validator)
+            where TSource : class
+        {
+            if (validator == null) throw new ArgumentNullException(nameof(validator));
+
+            _clientRules.AddRulesFrom(
+                ((IClientValidationMetadataSource)validator).GetClientRules(),
+                ValidationFieldPath.Empty,
+                _scope.ActiveClientRuleActivation(_clientRules));
         }
 
         protected void WhenField(Expression<Func<T, bool>> field, Action defineRules) =>
@@ -186,17 +231,30 @@ namespace Alis.Reactive.FluentValidator
                 return new Exit(this, scope => scope.ExitServerOnlyCondition());
             }
 
-            internal void Register(
-                IValidationRule rule,
-                Dictionary<IValidationRule, ClientRuleCondition> clientConditions)
+            internal ClientRuleActivation ActiveClientRuleActivation(ClientValidationRuleSet rules)
             {
-                if (rule == null) throw new ArgumentNullException(nameof(rule));
-                if (clientConditions == null) throw new ArgumentNullException(nameof(clientConditions));
-                if (_clientConditions.Count == 0) return;
+                if (rules == null) throw new ArgumentNullException(nameof(rules));
 
-                clientConditions[rule] = _serverOnlyDepth > 0
-                    ? ClientRuleCondition.ServerOnly()
-                    : ActiveClientCondition();
+                if (_serverOnlyDepth > 0)
+                {
+                    throw new InvalidOperationException(
+                        "ClientRule cannot be declared inside FluentValidation When, Unless, WhenAsync, or UnlessAsync. " +
+                        "Use WhenField for a browser condition, or keep the rule server-only with RuleFor.");
+                }
+
+                if (_clientConditions.Count == 0)
+                    return ClientRuleActivation.Always;
+
+                var condition = ActiveClientCondition();
+                if (!condition.TryUseOnClient(out var fieldCondition, out var fields))
+                {
+                    throw new InvalidOperationException(
+                        "ClientRule is inside a server-only validation condition. " +
+                        "Use WhenField for browser-side conditions.");
+                }
+
+                rules.EnsureFields(fields);
+                return ClientRuleActivation.When(fieldCondition);
             }
 
             private ClientRuleCondition ActiveClientCondition() =>

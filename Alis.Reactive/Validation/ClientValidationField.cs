@@ -24,6 +24,8 @@ namespace Alis.Reactive.Validation
             Rules = SnapshotRules(rules);
         }
 
+        internal ClientValidationFieldReference Reference => _field;
+
         internal ValidationFieldPath FieldPath => _field.Path;
 
         internal DeferredModelBoundClientValidationField ToDeferredField(Type modelType) =>

@@ -49,6 +49,27 @@ namespace Alis.Reactive.Validation
             Shape shape) =>
             AddRule(field, new ValidationRule(name, message, operand, activation, shape));
 
+        internal void AddRulesFrom(
+            IEnumerable<ClientValidationField> fields,
+            ValidationFieldPath prefix,
+            ClientRuleActivation activation)
+        {
+            if (fields == null) throw new ArgumentNullException(nameof(fields));
+            if (prefix == null) throw new ArgumentNullException(nameof(prefix));
+            if (activation == null) throw new ArgumentNullException(nameof(activation));
+
+            foreach (var field in fields)
+            {
+                if (field == null)
+                    throw new ArgumentException("Client validation field must not be null.", nameof(fields));
+
+                var target = field.Reference.PrefixedBy(prefix);
+                EnsureField(target);
+                foreach (var rule in field.Rules)
+                    AddRule(target, rule.PrefixedBy(prefix, activation));
+            }
+        }
+
         internal IReadOnlyList<ClientValidationField> ToFields() =>
             _fields.Values.Select(field => field.ToField()).ToArray();
     }

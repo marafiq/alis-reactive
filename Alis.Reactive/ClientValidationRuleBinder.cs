@@ -24,15 +24,18 @@ namespace Alis.Reactive
         private readonly PlanBuildContext _context;
         private readonly IReadOnlyDictionary<string, ComponentRegistration> _registeredInputs;
         private readonly Type _modelType;
+        private readonly IClientValidationRuleSource _ruleSource;
 
         internal ClientValidationRuleBinder(
             PlanBuildContext context,
             IReadOnlyDictionary<string, ComponentRegistration> registeredInputs,
-            Type modelType)
+            Type modelType,
+            IClientValidationRuleSource ruleSource)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _registeredInputs = registeredInputs ?? throw new ArgumentNullException(nameof(registeredInputs));
             _modelType = modelType ?? throw new ArgumentNullException(nameof(modelType));
+            _ruleSource = ruleSource ?? throw new ArgumentNullException(nameof(ruleSource));
         }
 
         /// <summary>Binds every validation rule job declared during plan construction.</summary>
@@ -44,10 +47,9 @@ namespace Alis.Reactive
 
         private void BindJob(ValidationJob job)
         {
-            var source = ReactivePlanConfig.ClientValidationRuleSource.RequireFor(job);
             var container = job.Container;
 
-            var fields = source.GetClientRules(job.ValidationSourceType);
+            var fields = _ruleSource.GetClientRules(job.ValidationSourceType);
             var bindings = new ValidationFieldBindingCatalog(_registeredInputs, _modelType, fields);
             var ruleBinding = ValidationPlanBinding.For(bindings);
 
