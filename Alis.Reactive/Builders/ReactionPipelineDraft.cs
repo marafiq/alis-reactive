@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders
 {
-    internal sealed class ReactionSequenceDraft<TModel> where TModel : class
+    internal sealed class ReactionPipelineDraft<TModel> where TModel : class
     {
         private readonly List<ReactionGraph> _orderedBlocks = new List<ReactionGraph>();
         private readonly List<ReactionGraph> _pendingSyncReactions = new List<ReactionGraph>();
@@ -17,7 +17,7 @@ namespace Alis.Reactive.Builders
 
         internal HttpRequestBuilder<TModel> BeginHttp(PlanBuildContext context)
         {
-            FlushPendingAsyncReaction();
+            FlushPendingRequestOrParallel();
             FlushPendingBranch();
             var builder = new HttpRequestBuilder<TModel>(context);
             _pendingRequest = builder;
@@ -26,7 +26,7 @@ namespace Alis.Reactive.Builders
 
         internal ParallelBuilder<TModel> BeginParallel(PlanBuildContext context)
         {
-            FlushPendingAsyncReaction();
+            FlushPendingRequestOrParallel();
             FlushPendingBranch();
             var builder = new ParallelBuilder<TModel>(context);
             _pendingParallelRequests = builder;
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Builders
 
         internal void BeginBranch()
         {
-            FlushPendingAsyncReaction();
+            FlushPendingRequestOrParallel();
             FlushPendingBranch();
         }
 
@@ -47,7 +47,7 @@ namespace Alis.Reactive.Builders
 
         internal void FlushSegment()
         {
-            FlushPendingAsyncReaction();
+            FlushPendingRequestOrParallel();
             FlushPendingBranch();
             FlushPendingSyncReactions();
         }
@@ -62,11 +62,11 @@ namespace Alis.Reactive.Builders
 
         internal void AddCommand(ReactionGraph reaction)
         {
-            FlushPendingAsyncReaction();
+            FlushPendingRequestOrParallel();
             _pendingSyncReactions.Add(reaction);
         }
 
-        private void FlushPendingAsyncReaction()
+        private void FlushPendingRequestOrParallel()
         {
             if (_pendingRequest is not null)
             {
