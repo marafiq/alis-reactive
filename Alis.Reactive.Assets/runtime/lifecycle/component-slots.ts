@@ -7,12 +7,12 @@ interface ComponentDeclaration {
   readonly component: ComponentObject;
 }
 
-export type LoadedComponent =
-  | ComponentObjectLoad
+export type ComponentSlotLoad =
+  | MountedComponentLoad
   | LayoutObjectLoad
   | ValidationRulesLoad;
 
-export interface ComponentObjectLoad {
+export interface MountedComponentLoad {
   readonly kind: "component";
   readonly componentKey: string;
   readonly componentId: string;
@@ -52,7 +52,7 @@ export function mergeSlotComponent(
   target: PlanDocument,
   declaration: ComponentDeclaration,
   componentWasBooted: boolean,
-): LoadedComponent[] {
+): ComponentSlotLoad[] {
   const existing = target.components[declaration.componentKey];
 
   if (extendsRootValidationContainer(existing, declaration, componentWasBooted)) {
