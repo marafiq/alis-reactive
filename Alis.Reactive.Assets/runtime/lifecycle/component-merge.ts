@@ -75,10 +75,7 @@ function replaceComponent(target: PlanDocument, componentKey: string, incoming: 
   const existingRules = validationRulesOf(target.components[componentKey]);
   const nextContainer = validationContainerOf(next);
   if (existingRules !== undefined && nextContainer !== undefined) {
-    replaceValidationRules(
-      nextContainer,
-      replaceRulesForSameValidatedComponent(existingRules, nextContainer.validationRules),
-    );
+    nextContainer.validationRules = mergeRulesByValidatedComponent(existingRules, nextContainer.validationRules);
   }
 
   target.components[componentKey] = next;
@@ -112,11 +109,7 @@ function validationRulesOf(component: ComponentObject | undefined): ComponentVal
   return validationContainerOf(component)?.validationRules;
 }
 
-function replaceValidationRules(container: ValidationContainerComponent, validationRules: ComponentValidation[]): void {
-  container.validationRules = validationRules;
-}
-
-function replaceRulesForSameValidatedComponent(
+function mergeRulesByValidatedComponent(
   existingRules: ComponentValidation[],
   incomingRules: ComponentValidation[],
 ): ComponentValidation[] {
