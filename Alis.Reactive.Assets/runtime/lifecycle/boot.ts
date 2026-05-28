@@ -14,8 +14,8 @@ import { resetPluginCatalogForTests } from "../core/plugin-catalog";
 import {
   applyPartialSlotLoad,
   applyPartialSlotUnload,
+  type BrowserPlanWiring,
   getBootedPlan as getTrackedBootedPlan,
-  type PlanLifecycleHooks,
   registerBootedPlan,
   resetBrowserPlansForTests,
 } from "./browser-plans";
@@ -76,7 +76,7 @@ function wireContainerValidation(plan: PlanDocument, signal?: AbortSignal): void
 }
 
 export function loadPartialSlot(slotId: string, incoming: PlanDocument[]): void {
-  const affectedPlanIds = applyPartialSlotLoad(slotId, incoming, planLifecycleHooks());
+  const affectedPlanIds = applyPartialSlotLoad(slotId, incoming, browserPlanWiring());
 
   for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
@@ -119,7 +119,7 @@ export function resetBootStateForTests(): void {
 
 export const trace = { setLevel };
 
-function planLifecycleHooks(): PlanLifecycleHooks {
+function browserPlanWiring(): BrowserPlanWiring {
   return {
     wireBehaviors,
     wireContainerValidation,

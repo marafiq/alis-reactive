@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { BrowserPlanStore } from "../../lifecycle/browser-plans";
 import {
-  planLifecycleHooks,
+  browserPlanWiring,
   partialPlan,
   rootPlan,
   validationComponents,
@@ -12,7 +12,7 @@ import {
 describe("validation container loads", () => {
   it("accepts matching validated component ids while adding new partial rules", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 
     browserPlans.register({
@@ -34,7 +34,7 @@ describe("validation container loads", () => {
           ]),
         },
       }),
-    ], hooks);
+    ], wiring);
 
     const merged = browserPlans.get(planId)!;
     const container = merged.components["resident-form"].container;
@@ -51,7 +51,7 @@ describe("validation container loads", () => {
 
   it("preserves root-owned validation containers when unloading a partial slot", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 
     browserPlans.register({
@@ -71,7 +71,7 @@ describe("validation container loads", () => {
           ]),
         },
       }),
-    ], hooks);
+    ], wiring);
 
     expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual([
       "first-name",
@@ -85,7 +85,7 @@ describe("validation container loads", () => {
 
   it("unloading a validation extension keeps root rules for the same validated component", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 
     browserPlans.register({
@@ -107,7 +107,7 @@ describe("validation container loads", () => {
           ]),
         },
       }),
-    ], hooks);
+    ], wiring);
 
     const extendedContainer = expectValidationContainer(browserPlans.get(planId)!.components["resident-form"].container);
     expect(extendedContainer.validationRules.map(rule => rule.component)).toEqual([
@@ -131,7 +131,7 @@ describe("validation container loads", () => {
 
   it("unloading one validation extension keeps sibling slot rules", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 
     browserPlans.register({
@@ -151,7 +151,7 @@ describe("validation container loads", () => {
           ]),
         },
       }),
-    ], hooks);
+    ], wiring);
     browserPlans.loadPartialSlot("contact-slot", [
       partialPlan(planId, {
         components: {
@@ -160,7 +160,7 @@ describe("validation container loads", () => {
           ]),
         },
       }),
-    ], hooks);
+    ], wiring);
 
     expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual([
       "first-name",
@@ -178,7 +178,7 @@ describe("validation container loads", () => {
 
   it("unloading one validation extension keeps duplicate field rules from a later active slot", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 
     browserPlans.register({
@@ -198,7 +198,7 @@ describe("validation container loads", () => {
           ]),
         },
       }),
-    ], hooks);
+    ], wiring);
     browserPlans.loadPartialSlot("contact-slot", [
       partialPlan(planId, {
         components: {
@@ -207,7 +207,7 @@ describe("validation container loads", () => {
           ]),
         },
       }),
-    ], hooks);
+    ], wiring);
 
     const beforeUnload = expectValidationContainer(browserPlans.get(planId)!.components["resident-form"].container);
     expect(beforeUnload.validationRules.map(rule => rule.component)).toEqual(["first-name", "city"]);

@@ -17,26 +17,26 @@ type PartialSlotId = string;
 type WireBehaviors = (behaviors: Behavior[], plan: PlanDocument, signal?: AbortSignal) => void;
 type WireContainerValidation = (plan: PlanDocument, signal?: AbortSignal) => void;
 
-export interface PlanLifecycleHooks {
+export interface BrowserPlanWiring {
   wireBehaviors: WireBehaviors;
   wireContainerValidation: WireContainerValidation;
 }
 
-interface SlotTypeLoad {
+interface LoadedTypeContract {
   readonly typeKey: string;
   readonly contract: BrowserObjectContract;
 }
 
-interface SlotPlanLoad {
+interface LoadedPartialPlan {
   readonly planId: PlanId;
   readonly behaviors: Behavior[];
   readonly components: ComponentSlotLoad[];
-  readonly typeContracts: SlotTypeLoad[];
+  readonly typeContracts: LoadedTypeContract[];
 }
 
-interface SlotLoad {
+interface PartialSlotLoad {
   readonly abortController: AbortController;
-  readonly plans: SlotPlanLoad[];
+  readonly plans: LoadedPartialPlan[];
 }
 
 export class BrowserPlanStore {
@@ -45,7 +45,7 @@ export class BrowserPlanStore {
   private readonly bootedComponents = new Set<string>();
   private readonly bootedTypes = new Map<string, BrowserObjectContract>();
   private readonly bootedValidationRules = new Map<string, ComponentValidation[]>();
-  private readonly slots = new Map<PartialSlotId, SlotLoad>();
+  private readonly slots = new Map<PartialSlotId, PartialSlotLoad>();
 
   register(plan: PlanDocument): void {
     this.plans.set(plan.planId, plan);
@@ -53,14 +53,14 @@ export class BrowserPlanStore {
     this.recordBootPlan(plan);
   }
 
-  loadPartialSlot(slotId: PartialSlotId, plans: PlanDocument[], hooks: PlanLifecycleHooks): PlanId[] {
+  loadPartialSlot(slotId: PartialSlotId, plans: PlanDocument[], wiring: BrowserPlanWiring): PlanId[] {
     const affectedPlanIds = new Set(this.removePartialSlot(slotId));
     if (plans.length === 0) return [...affectedPlanIds];
 
     const abortController = new AbortController();
-    const slotPlans: SlotPlanLoad[] = [];
+    const slotPlans: LoadedPartialPlan[] = [];
     for (const plan of plans) {
-      const slotPlan = this.loadPartialPlan(abortController, plan, hooks);
+      const slotPlan = this.mergePartialPlan(abortController, plan, wiring);
       slotPlans.push(slotPlan);
       affectedPlanIds.add(slotPlan.planId);
     }
@@ -95,24 +95,24 @@ export class BrowserPlanStore {
     slotLoad.abortController.abort();
     for (const slotPlan of slotLoad.plans) {
       affectedPlanIds.add(slotPlan.planId);
-      this.unloadPartialPlan(slotPlan);
+      this.removePartialPlanEntries(slotPlan);
     }
 
     return [...affectedPlanIds];
   }
 
-  private loadPartialPlan(
+  private mergePartialPlan(
     abortController: AbortController,
     incoming: PlanDocument,
-    hooks: PlanLifecycleHooks,
-  ): SlotPlanLoad {
+    wiring: BrowserPlanWiring,
+  ): LoadedPartialPlan {
     const target = this.ensureTarget(incoming.planId);
     const typeContracts = this.mergeTypeContractsFrom(incoming, target);
     const components = this.mergeComponents(incoming, target);
 
-    hooks.wireBehaviors(incoming.behaviors, target, abortController.signal);
+    wiring.wireBehaviors(incoming.behaviors, target, abortController.signal);
     target.behaviors.push(...incoming.behaviors);
-    hooks.wireContainerValidation(target, abortController.signal);
+    wiring.wireContainerValidation(target, abortController.signal);
 
     return {
       planId: incoming.planId,
@@ -122,7 +122,7 @@ export class BrowserPlanStore {
     };
   }
 
-  private unloadPartialPlan(slotPlan: SlotPlanLoad): void {
+  private removePartialPlanEntries(slotPlan: LoadedPartialPlan): void {
     const plan = this.plans.get(slotPlan.planId)!;
     this.removeBehaviors(plan, slotPlan.behaviors);
     this.removeComponentSlotLoads(plan, slotPlan);
@@ -142,8 +142,8 @@ export class BrowserPlanStore {
     return target;
   }
 
-  private mergeTypeContractsFrom(incoming: PlanDocument, target: PlanDocument): SlotTypeLoad[] {
-    const typeContracts: SlotTypeLoad[] = [];
+  private mergeTypeContractsFrom(incoming: PlanDocument, target: PlanDocument): LoadedTypeContract[] {
+    const typeContracts: LoadedTypeContract[] = [];
     for (const [typeKey, contract] of Object.entries(incoming.types)) {
       target.types[typeKey] = mergeObjectContracts(target.types[typeKey], contract);
       typeContracts.push({ typeKey, contract });
@@ -188,7 +188,7 @@ export class BrowserPlanStore {
     plan.behaviors = plan.behaviors.filter(behavior => !removed.has(behavior));
   }
 
-  private removeComponentSlotLoads(plan: PlanDocument, slotPlan: SlotPlanLoad): void {
+  private removeComponentSlotLoads(plan: PlanDocument, slotPlan: LoadedPartialPlan): void {
     for (const load of slotPlan.components) {
       if (load.kind === "validation-rules") {
         this.recomputeValidationRules(plan, slotPlan.planId, load.containerKey);
@@ -241,7 +241,7 @@ export class BrowserPlanStore {
     delete plan.components[load.componentKey];
   }
 
-  private removeTypes(plan: PlanDocument, slotPlan: SlotPlanLoad): void {
+  private removeTypes(plan: PlanDocument, slotPlan: LoadedPartialPlan): void {
     const typeKeys = new Set(slotPlan.typeContracts.map(contract => contract.typeKey));
     for (const typeKey of typeKeys) {
       this.recomputeType(plan, slotPlan.planId, typeKey);
@@ -294,13 +294,13 @@ export class BrowserPlanStore {
     return planWasNotBooted && planHasNoBehaviors && planHasNoComponents && planHasNoTypes;
   }
 
-  private takeSlotLoad(slotId: PartialSlotId): SlotLoad | undefined {
+  private takeSlotLoad(slotId: PartialSlotId): PartialSlotLoad | undefined {
     const slotLoad = this.slots.get(slotId);
     this.slots.delete(slotId);
     return slotLoad;
   }
 
-  private *activeSlotPlans(): Iterable<SlotPlanLoad> {
+  private *activeSlotPlans(): Iterable<LoadedPartialPlan> {
     for (const slotLoad of this.slots.values()) {
       yield* slotLoad.plans;
     }
@@ -372,8 +372,8 @@ function planTypeKey(planId: PlanId, typeKey: string): string {
 }
 
 export function registerBootedPlan(plan: PlanDocument): void { browserPlans.register(plan); }
-export function applyPartialSlotLoad(slotId: PartialSlotId, plans: PlanDocument[], hooks: PlanLifecycleHooks): PlanId[] {
-  return browserPlans.loadPartialSlot(slotId, plans, hooks);
+export function applyPartialSlotLoad(slotId: PartialSlotId, plans: PlanDocument[], wiring: BrowserPlanWiring): PlanId[] {
+  return browserPlans.loadPartialSlot(slotId, plans, wiring);
 }
 export function applyPartialSlotUnload(slotId: PartialSlotId): PlanId[] {
   return browserPlans.unloadPartialSlot(slotId);

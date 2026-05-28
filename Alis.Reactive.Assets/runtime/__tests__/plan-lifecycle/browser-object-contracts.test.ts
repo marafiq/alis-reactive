@@ -8,7 +8,7 @@ import {
   objectContractWithPropertyShape,
   objectContractWithReadableProperty,
   objectContractWithWritableProperty,
-  planLifecycleHooks,
+  browserPlanWiring,
   partialPlan,
   rootPlan,
 } from "../support/plan-lifecycle-fixtures";
@@ -16,7 +16,7 @@ import {
 describe("browser object contract merging", () => {
   it("shares an identical type contract across slots until the last owner unloads", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.address";
 
@@ -24,12 +24,12 @@ describe("browser object contract merging", () => {
       partialPlan(planId, {
         types: { [sharedTypeKey]: objectContractWithReadableProperty("token") },
       }),
-    ], hooks);
+    ], wiring);
     browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, {
         types: { [sharedTypeKey]: objectContractWithReadableProperty("token") },
       }),
-    ], hooks);
+    ], wiring);
 
     browserPlans.unloadPartialSlot("first-slot");
 
@@ -43,7 +43,7 @@ describe("browser object contract merging", () => {
 
   it("removes only the unloaded slot contract from a shared type key", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "native.component.shared-drawer";
 
@@ -51,12 +51,12 @@ describe("browser object contract merging", () => {
       partialPlan(planId, {
         types: { [sharedTypeKey]: objectContractWithWritableProperty("classRemove") },
       }),
-    ], hooks);
+    ], wiring);
     browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, {
         types: { [sharedTypeKey]: objectContractWithWritableProperty("classToggle") },
       }),
-    ], hooks);
+    ], wiring);
 
     expect(Object.keys(browserPlans.get(planId)?.types[sharedTypeKey].properties ?? {}))
       .toEqual(["classRemove", "classToggle"]);
@@ -73,7 +73,7 @@ describe("browser object contract merging", () => {
 
   it("refines compatible property shapes when object contracts merge", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.address";
 
@@ -81,12 +81,12 @@ describe("browser object contract merging", () => {
       partialPlan(planId, {
         types: { [sharedTypeKey]: objectContractWithPropertyShape("token", { kind: "any" }) },
       }),
-    ], hooks);
+    ], wiring);
     browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, {
         types: { [sharedTypeKey]: objectContractWithPropertyShape("token", { kind: "string" }) },
       }),
-    ], hooks);
+    ], wiring);
 
     expect(browserPlans.get(planId)?.types[sharedTypeKey].properties.token.shape)
       .toEqual({ kind: "string" });
@@ -99,7 +99,7 @@ describe("browser object contract merging", () => {
 
   it("merges compatible object property fields from separate slot contracts", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.resident";
 
@@ -113,7 +113,7 @@ describe("browser object contract merging", () => {
           }),
         },
       }),
-    ], hooks);
+    ], wiring);
     browserPlans.loadPartialSlot("age-slot", [
       partialPlan(planId, {
         types: {
@@ -124,7 +124,7 @@ describe("browser object contract merging", () => {
           }),
         },
       }),
-    ], hooks);
+    ], wiring);
 
     expect(browserPlans.get(planId)?.types[sharedTypeKey].properties.profile.shape)
       .toEqual({
@@ -139,7 +139,7 @@ describe("browser object contract merging", () => {
 
   it("merges compatible method argument and return shapes", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.address";
 
@@ -147,12 +147,12 @@ describe("browser object contract merging", () => {
       partialPlan(planId, {
         types: { [sharedTypeKey]: objectContractWithMethodShape("normalize", { kind: "any" }, { kind: "any" }) },
       }),
-    ], hooks);
+    ], wiring);
     browserPlans.loadPartialSlot("second-slot", [
       partialPlan(planId, {
         types: { [sharedTypeKey]: objectContractWithMethodShape("normalize", { kind: "string" }, { kind: "string" }) },
       }),
-    ], hooks);
+    ], wiring);
 
     const method = browserPlans.get(planId)?.types[sharedTypeKey].methods.normalize;
     expect(method?.arguments).toEqual({ kind: "exact", shapes: [{ kind: "string" }] });
@@ -161,7 +161,7 @@ describe("browser object contract merging", () => {
 
   it("lets a later slot reuse a member differently after the previous contract unloads", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "native.component.shared-drawer";
 
@@ -169,7 +169,7 @@ describe("browser object contract merging", () => {
       partialPlan(planId, {
         types: { [sharedTypeKey]: objectContractWithReadableProperty("token") },
       }),
-    ], hooks);
+    ], wiring);
 
     browserPlans.unloadPartialSlot("first-slot");
 
@@ -177,7 +177,7 @@ describe("browser object contract merging", () => {
       partialPlan(planId, {
         types: { [sharedTypeKey]: objectContractWithPropertyShape("token", { kind: "number" }) },
       }),
-    ], hooks);
+    ], wiring);
 
     expect(browserPlans.get(planId)?.types[sharedTypeKey].properties.token.shape)
       .toEqual({ kind: "number" });
@@ -185,7 +185,7 @@ describe("browser object contract merging", () => {
 
   it("merges compatible contracts for a root-owned app-level component reference", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const drawerTypeKey = "native.component.alis-drawer";
 
@@ -209,7 +209,7 @@ describe("browser object contract merging", () => {
         },
         behaviors: [behavior()],
       }),
-    ], hooks);
+    ], wiring);
 
     const merged = browserPlans.get(planId)!;
     expect(merged.components["alis-drawer"]).toBeDefined();
@@ -224,7 +224,7 @@ describe("browser object contract merging", () => {
 
   it("removes one partial contract from a root-owned app-level component reference", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const drawerTypeKey = "native.component.alis-drawer";
 
@@ -247,7 +247,7 @@ describe("browser object contract merging", () => {
           "alis-drawer": component("alis-drawer", drawerTypeKey),
         },
       }),
-    ], hooks);
+    ], wiring);
     browserPlans.loadPartialSlot("second-drawer-content", [
       partialPlan(planId, {
         types: {
@@ -257,7 +257,7 @@ describe("browser object contract merging", () => {
           "alis-drawer": component("alis-drawer", drawerTypeKey),
         },
       }),
-    ], hooks);
+    ], wiring);
 
     expect(Object.keys(browserPlans.get(planId)?.types[drawerTypeKey].properties ?? {}))
       .toEqual(["classAdd", "classRemove", "classToggle"]);
@@ -276,7 +276,7 @@ describe("browser object contract merging", () => {
 
   it("recomputes merged property access when a partial contract unloads", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const typeKey = "native.component.care-unit";
 
@@ -299,7 +299,7 @@ describe("browser object contract merging", () => {
           "care-unit": component("care-unit", typeKey),
         },
       }),
-    ], hooks);
+    ], wiring);
 
     expect(browserPlans.get(planId)?.types[typeKey].properties.value.access).toBe("readwrite");
 
@@ -310,7 +310,7 @@ describe("browser object contract merging", () => {
 
   it("allows a partial behavior to reference a root-owned injection host element", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const hostTypeKey = "native.element.step-container";
 
@@ -334,7 +334,7 @@ describe("browser object contract merging", () => {
         },
         behaviors: [behavior()],
       }),
-    ], hooks);
+    ], wiring);
 
     expect(Object.keys(browserPlans.get(planId)?.types[hostTypeKey].properties ?? {}))
       .toEqual(["html", "hidden"]);
@@ -348,7 +348,7 @@ describe("browser object contract merging", () => {
 
   it("scopes component and type loads to the runtime plan document", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const rootPlanId = "Drawer.Root";
     const partialPlanId = "DrawerResident.Partial";
     const drawerTypeKey = "native.component.alis-drawer";
@@ -373,7 +373,7 @@ describe("browser object contract merging", () => {
         },
         behaviors: [behavior()],
       }),
-    ], hooks);
+    ], wiring);
 
     const loaded = browserPlans.get(partialPlanId)!;
     expect(loaded.planId).toBe(partialPlanId);

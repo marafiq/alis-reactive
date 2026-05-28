@@ -3,7 +3,7 @@ import { BrowserPlanStore } from "../../lifecycle/browser-plans";
 import {
   objectContractWithWritableProperty,
   layoutComponent,
-  planLifecycleHooks,
+  browserPlanWiring,
   partialPlan,
   rootPlan,
 } from "../support/plan-lifecycle-fixtures";
@@ -11,7 +11,7 @@ import {
 describe("layout object slots", () => {
   it("lets multiple slots share one layout-owned app component", () => {
     const browserPlans = new BrowserPlanStore();
-    const { hooks } = planLifecycleHooks();
+    const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const toastTypeKey = "fusion.component.alisFusionToast";
 
@@ -26,7 +26,7 @@ describe("layout object slots", () => {
           alisFusionToast: layoutComponent("alisFusionToast", toastTypeKey),
         },
       }),
-    ], hooks);
+    ], wiring);
     browserPlans.loadPartialSlot("second-toast-slot", [
       partialPlan(planId, {
         types: {
@@ -36,7 +36,7 @@ describe("layout object slots", () => {
           alisFusionToast: layoutComponent("alisFusionToast", toastTypeKey),
         },
       }),
-    ], hooks);
+    ], wiring);
 
     expect(browserPlans.get(planId)?.components.alisFusionToast).toBeDefined();
     expect(Object.keys(browserPlans.get(planId)?.types[toastTypeKey].properties ?? {}))
