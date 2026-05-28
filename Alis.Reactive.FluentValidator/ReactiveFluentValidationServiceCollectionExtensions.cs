@@ -22,14 +22,12 @@ namespace Alis.Reactive.FluentValidator
 
             services.TryAddSingleton<IClientValidationRuleSource, ClientValidationRuleSource>();
 
-            var validatorTypes = new HashSet<Type>();
-            configure(new ReactiveFluentValidationBuilder(services, validatorTypes));
+            configure(new ReactiveFluentValidationBuilder(services));
 
-            var validationSources = validatorTypes.ToArray();
-            services.AddSingleton<IClientValidationMetadataProvider>(provider =>
+            services.TryAddSingleton<IClientValidationMetadataProvider>(provider =>
                 new FluentValidationClientMetadataProvider(
                     provider.GetRequiredService<IServiceScopeFactory>(),
-                    validationSources));
+                    provider.GetServices<ReactiveFluentValidationSource>().Select(source => source.ValidatorType)));
             return services;
         }
     }
@@ -37,14 +35,10 @@ namespace Alis.Reactive.FluentValidator
     public sealed class ReactiveFluentValidationBuilder
     {
         private readonly IServiceCollection _services;
-        private readonly ISet<Type> _validatorTypes;
 
-        internal ReactiveFluentValidationBuilder(
-            IServiceCollection services,
-            ISet<Type> validatorTypes)
+        internal ReactiveFluentValidationBuilder(IServiceCollection services)
         {
             _services = services ?? throw new ArgumentNullException(nameof(services));
-            _validatorTypes = validatorTypes ?? throw new ArgumentNullException(nameof(validatorTypes));
         }
 
         public ReactiveFluentValidationBuilder Add<TValidator>()
@@ -69,7 +63,7 @@ namespace Alis.Reactive.FluentValidator
 
         private void Add(Type validatorType)
         {
-            _validatorTypes.Add(validatorType);
+            _services.AddSingleton(new ReactiveFluentValidationSource(validatorType));
             _services.AddTransient(validatorType);
 
             foreach (var serviceType in ValidatorServiceTypes(validatorType))
@@ -86,6 +80,16 @@ namespace Alis.Reactive.FluentValidator
             validatorType.GetInterfaces()
                 .Where(type => type.IsGenericType)
                 .Where(type => type.GetGenericTypeDefinition() == typeof(IValidator<>));
+    }
+
+    internal sealed class ReactiveFluentValidationSource
+    {
+        internal ReactiveFluentValidationSource(Type validatorType)
+        {
+            ValidatorType = validatorType ?? throw new ArgumentNullException(nameof(validatorType));
+        }
+
+        internal Type ValidatorType { get; }
     }
 
     internal sealed class FluentValidationClientMetadataProvider : IClientValidationMetadataProvider

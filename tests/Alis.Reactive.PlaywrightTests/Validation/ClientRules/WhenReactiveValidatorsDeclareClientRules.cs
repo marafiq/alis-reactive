@@ -1,5 +1,8 @@
 namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
 
+using Alis.Reactive.FluentValidator;
+using Microsoft.Extensions.DependencyInjection;
+
 [TestFixture]
 public sealed class WhenReactiveValidatorsDeclareClientRules
 {
@@ -151,6 +154,36 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
             .RenderPlan<AssessmentModel, MixedConditionValidator>();
 
         Assert.That(ValidationRuleCount(doc.RootElement), Is.Zero);
+    }
+
+    [Test]
+    public void fluent_validation_registrations_merge_across_service_modules()
+    {
+        var services = new ServiceCollection();
+        services.AddReactiveFluentValidation(rules => rules.Add<BuiltInClientRulesValidator>());
+        services.AddReactiveFluentValidation(rules => rules.Add<ConfirmEmailValidator>());
+
+        using var provider = services.BuildServiceProvider();
+        using var builtInRules = ClientValidationRulePlanHarness
+            .RenderPlan<BuiltInClientRulesModel, BuiltInClientRulesValidator>(provider);
+        using var confirmEmailRules = ClientValidationRulePlanHarness
+            .RenderPlan<ConfirmEmailModel, ConfirmEmailValidator>(provider);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                ClientValidationRulePlanHarness.RuleNames(
+                    ClientValidationRulePlanHarness.RulesFor(
+                        builtInRules.RootElement,
+                        nameof(BuiltInClientRulesModel.Email))),
+                Is.EqualTo(new[] { "email" }));
+            Assert.That(
+                ClientValidationRulePlanHarness.RuleNames(
+                    ClientValidationRulePlanHarness.RulesFor(
+                        confirmEmailRules.RootElement,
+                        nameof(ConfirmEmailModel.ConfirmEmail))),
+                Is.EqualTo(new[] { "equalTo" }));
+        });
     }
 
     private static int ValidationRuleCount(System.Text.Json.JsonElement root)

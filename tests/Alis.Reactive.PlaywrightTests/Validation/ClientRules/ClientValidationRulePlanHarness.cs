@@ -18,6 +18,13 @@ internal static class ClientValidationRulePlanHarness
         where TModel : class
         where TValidationSource : class
     {
+        return RenderPlan<TModel, TValidationSource>(Services);
+    }
+
+    internal static JsonDocument RenderPlan<TModel, TValidationSource>(IServiceProvider services)
+        where TModel : class
+        where TValidationSource : class
+    {
         var html = default(IHtmlHelper<TModel>)!;
         var plan = PlanExtensions.ReactivePlan(html);
         HtmlExtensions.On(html, plan, trigger =>
@@ -25,7 +32,7 @@ internal static class ClientValidationRulePlanHarness
                 pipeline.Post("/validate")
                     .Validate<TValidationSource>(FormId)));
 
-        return JsonDocument.Parse(plan.RenderFormatted(Services));
+        return JsonDocument.Parse(plan.RenderFormatted(services));
     }
 
     internal static JsonElement[] RulesFor(JsonElement root, string serverFieldName) =>
