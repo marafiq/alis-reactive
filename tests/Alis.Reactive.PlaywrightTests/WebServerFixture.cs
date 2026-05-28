@@ -35,6 +35,7 @@ public class WebServerFixture
         BaseUrl = $"http://localhost:{port}";
 
         var projectDir = FindProjectDir();
+        var sandboxAssembly = FindSandboxAssembly();
         var output = new ServerOutputBuffer(CapturedServerOutputLines);
 
         _server = new Process
@@ -42,7 +43,8 @@ public class WebServerFixture
             StartInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"run --project \"{projectDir}\" --no-launch-profile --urls {BaseUrl}",
+                Arguments = $"\"{sandboxAssembly}\" --urls {BaseUrl}",
+                WorkingDirectory = projectDir,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -55,6 +57,7 @@ public class WebServerFixture
             }
         };
 
+        TestContext.Out.WriteLine($"Starting sandbox at {BaseUrl}");
         _server.OutputDataReceived += (_, e) => output.Capture("out", e.Data);
         _server.ErrorDataReceived += (_, e) => output.Capture("err", e.Data);
         _server.Start();
@@ -63,7 +66,10 @@ public class WebServerFixture
 
         using var http = new HttpClient();
         if (await WaitForSandboxReadiness(http, output))
+        {
+            TestContext.Out.WriteLine($"Sandbox ready at {BaseUrl}");
             return;
+        }
 
         StopServer();
         throw new Exception(
@@ -156,6 +162,18 @@ public class WebServerFixture
         // Fallback: relative from repo root
         var repoRoot = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", "..", ".."));
         return Path.Combine(repoRoot, "Alis.Reactive.SandboxApp");
+    }
+
+    private static string FindSandboxAssembly()
+    {
+        var candidate = Path.Combine(TestContext.CurrentContext.TestDirectory, "Alis.Reactive.SandboxApp.dll");
+        if (File.Exists(candidate))
+            return candidate;
+
+        throw new FileNotFoundException(
+            "The Playwright test output is missing Alis.Reactive.SandboxApp.dll. " +
+            "Build tests/Alis.Reactive.PlaywrightTests before running Playwright tests.",
+            candidate);
     }
 }
 
