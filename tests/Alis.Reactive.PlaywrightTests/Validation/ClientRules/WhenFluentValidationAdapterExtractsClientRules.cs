@@ -67,6 +67,38 @@ public sealed class WhenFluentValidationAdapterExtractsClientRules
     }
 
     [Test]
+    public void built_in_peer_comparison_rules_extract_as_peer_value_reads()
+    {
+        using var doc = ClientValidationRulePlanHarness
+            .RenderPlan<StayWindow, BuiltInPeerComparisonValidator>();
+        var rules = ClientValidationRulePlanHarness.RulesFor(
+            doc.RootElement,
+            nameof(StayWindow.DischargeDate));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ClientValidationRulePlanHarness.RuleNames(rules), Is.EqualTo(new[]
+            {
+                "gt",
+                "min",
+                "lt",
+                "max",
+                "equalTo",
+                "notEqualTo"
+            }));
+            Assert.That(ClientValidationRulePlanHarness.PeerComponents(rules), Is.EqualTo(new[]
+            {
+                IdGenerator.For(typeof(StayWindow), nameof(StayWindow.AdmissionDate)),
+                IdGenerator.For(typeof(StayWindow), nameof(StayWindow.AdmissionDate)),
+                IdGenerator.For(typeof(StayWindow), nameof(StayWindow.ReviewDate)),
+                IdGenerator.For(typeof(StayWindow), nameof(StayWindow.ReviewDate)),
+                IdGenerator.For(typeof(StayWindow), nameof(StayWindow.AdmissionDate)),
+                IdGenerator.For(typeof(StayWindow), nameof(StayWindow.ReviewDate))
+            }));
+        });
+    }
+
+    [Test]
     public void reactive_whenfield_extracts_client_activation_and_declares_guard_fields()
     {
         using var doc = ClientValidationRulePlanHarness

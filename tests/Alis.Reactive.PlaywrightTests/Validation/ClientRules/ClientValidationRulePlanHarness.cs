@@ -124,6 +124,7 @@ internal static class ClientValidationRulePlanHarness
         private static readonly Type[] FluentValidatorTypes =
         [
             typeof(AsyncOnlyValidator),
+            typeof(BuiltInPeerComparisonValidator),
             typeof(BuiltInClientRulesValidator),
             typeof(ConfirmEmailValidator),
             typeof(ReactiveAssessmentValidator),
@@ -134,6 +135,7 @@ internal static class ClientValidationRulePlanHarness
         private static IValidator? CreateValidator(Type type)
         {
             if (type == typeof(AsyncOnlyValidator)) return new AsyncOnlyValidator();
+            if (type == typeof(BuiltInPeerComparisonValidator)) return new BuiltInPeerComparisonValidator();
             if (type == typeof(BuiltInClientRulesValidator)) return new BuiltInClientRulesValidator();
             if (type == typeof(ConfirmEmailValidator)) return new ConfirmEmailValidator();
             if (type == typeof(ReactiveAssessmentValidator)) return new ReactiveAssessmentValidator();
@@ -215,6 +217,20 @@ internal sealed class BuiltInClientRulesModel
     public string? Card { get; set; }
     public string? EmptyCode { get; set; }
     public int Score { get; set; }
+}
+
+internal sealed class BuiltInPeerComparisonValidator : AbstractValidator<StayWindow>
+{
+    public BuiltInPeerComparisonValidator()
+    {
+        RuleFor(model => model.DischargeDate)
+            .GreaterThan(model => model.AdmissionDate)
+            .GreaterThanOrEqualTo(model => model.AdmissionDate)
+            .LessThan(model => model.ReviewDate)
+            .LessThanOrEqualTo(model => model.ReviewDate)
+            .Equal(model => model.AdmissionDate)
+            .NotEqual(model => model.ReviewDate);
+    }
 }
 
 internal sealed class ConfirmEmailValidator : AbstractValidator<ConfirmEmailModel>

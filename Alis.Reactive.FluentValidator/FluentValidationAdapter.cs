@@ -109,11 +109,12 @@ namespace Alis.Reactive.FluentValidator
                 return;
             }
 
-            ExtractBuiltInRule(component, field, condition, rules);
+            ExtractBuiltInRule(component, prefix, field, condition, rules);
         }
 
         private static void ExtractBuiltInRule(
             IRuleComponent component,
+            ValidationFieldPath prefix,
             ClientRuleField field,
             ClientRuleActivation condition,
             ClientValidationRuleSet rules)
@@ -160,7 +161,7 @@ namespace Alis.Reactive.FluentValidator
                     return;
 
                 case IComparisonValidator comparison:
-                    ExtractComparisonRule(component, comparison, field, condition, rules);
+                    ExtractComparisonRule(component, comparison, prefix, field, condition, rules);
                     return;
 
                 default:
@@ -225,16 +226,19 @@ namespace Alis.Reactive.FluentValidator
         private static void ExtractComparisonRule(
             IRuleComponent component,
             IComparisonValidator comparison,
+            ValidationFieldPath prefix,
             ClientRuleField field,
             ClientRuleActivation condition,
             ClientValidationRuleSet rules)
         {
-            if (comparison.MemberToCompare != null)
+            var peerField = comparison.MemberToCompare;
+            if (peerField != null)
             {
+                ExtractPeerComparisonRule(component, comparison, prefix, peerField.Name, field, condition, rules);
                 return;
             }
 
-            var ruleName = RuleNameFor(comparison.Comparison);
+            var ruleName = LiteralRuleNameFor(comparison.Comparison);
             if (ruleName == null)
             {
                 return;
@@ -248,6 +252,31 @@ namespace Alis.Reactive.FluentValidator
                 ValidationRuleOperand.Literal(literal.Value, literal.Shape),
                 condition,
                 literal.Shape);
+        }
+
+        private static void ExtractPeerComparisonRule(
+            IRuleComponent component,
+            IComparisonValidator comparison,
+            ValidationFieldPath prefix,
+            string peerFieldName,
+            ClientRuleField field,
+            ClientRuleActivation condition,
+            ClientValidationRuleSet rules)
+        {
+            var ruleName = PeerRuleNameFor(comparison.Comparison);
+            if (ruleName == null)
+            {
+                return;
+            }
+
+            var peerPath = prefix.Append(peerFieldName);
+            rules.AddRule(
+                field.Reference,
+                ruleName,
+                Message(component, PeerComparisonMessage(comparison.Comparison, field.DisplayName, peerFieldName)),
+                ValidationRuleOperand.PeerField(peerPath, field.Reference.Shape),
+                condition,
+                field.Reference.Shape);
         }
 
         private static bool TryResolveClientRuleCondition(
@@ -335,7 +364,7 @@ namespace Alis.Reactive.FluentValidator
                 : defaultMessage;
         }
 
-        private static ValidationRuleName? RuleNameFor(Comparison comparison)
+        private static ValidationRuleName? LiteralRuleNameFor(Comparison comparison)
         {
             return comparison switch
             {
@@ -349,6 +378,11 @@ namespace Alis.Reactive.FluentValidator
             };
         }
 
+        private static ValidationRuleName? PeerRuleNameFor(Comparison comparison) =>
+            comparison == Comparison.NotEqual
+                ? ValidationRuleName.NotEqualTo
+                : LiteralRuleNameFor(comparison);
+
         private static string LiteralComparisonMessage(Comparison comparison, string fieldName, object? value)
         {
             return comparison switch
@@ -359,6 +393,21 @@ namespace Alis.Reactive.FluentValidator
                 Comparison.LessThanOrEqual => $"'{fieldName}' must be at most {value}.",
                 Comparison.GreaterThan => $"'{fieldName}' must be greater than {value}.",
                 Comparison.LessThan => $"'{fieldName}' must be less than {value}.",
+                _ => $"'{fieldName}' is invalid."
+            };
+        }
+
+        private static string PeerComparisonMessage(Comparison comparison, string fieldName, string peerFieldName)
+        {
+            var peer = Humanize(peerFieldName);
+            return comparison switch
+            {
+                Comparison.Equal => $"'{fieldName}' must equal '{peer}'.",
+                Comparison.NotEqual => $"'{fieldName}' must not equal '{peer}'.",
+                Comparison.GreaterThanOrEqual => $"'{fieldName}' must be at least '{peer}'.",
+                Comparison.LessThanOrEqual => $"'{fieldName}' must be at most '{peer}'.",
+                Comparison.GreaterThan => $"'{fieldName}' must be greater than '{peer}'.",
+                Comparison.LessThan => $"'{fieldName}' must be less than '{peer}'.",
                 _ => $"'{fieldName}' is invalid."
             };
         }
