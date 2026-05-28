@@ -19,7 +19,7 @@ pipeline.Post(url)
 
 ## How do I write a validator?
 
-Extend `ReactiveValidator<T>`. Use standard FluentValidation rules for server validation, and add matching `ClientRule(...)` metadata for rules that should run in the browser:
+Extend `ReactiveValidator<T>`. Use standard FluentValidation rules for server validation, and add matching `ClientRule(...)` metadata for rules that must run in the browser:
 
 ```csharp
 public class ResidentIntakeValidator : ReactiveValidator<ResidentIntakeModel>

@@ -15,7 +15,7 @@ be made unrepresentable. Runtime checks are for true external boundaries only:
 DOM lookup, browser API failure, network, and malformed non-framework input.
 Do not model normal execution bookkeeping as validation, claims, rejects,
 lifecycle gates, or registries. If the server-generated plan says source A is
-assigned to target B, the runtime reads A and writes B. Bookkeeping names should
+assigned to target B, the runtime reads A and writes B. Bookkeeping names must
 describe what is remembered for execution or unload, not imply the plan is
 suspicious.
 
@@ -58,7 +58,7 @@ consumer's package version baked into the filename.
 ## Architecture — 4 Layers, 3 Boundaries
 
 Each boundary is guarded by behavior evidence. Tests are production code: they
-should protect DSL behavior and domain language, not mirror implementation
+must protect DSL behavior and domain language, not mirror implementation
 indirection.
 
 ```
@@ -131,7 +131,7 @@ which becomes the discriminator in the JSON, matched by TypeScript discriminated
 
 Generated TypeScript types come from the C# plan domain via `PlanTypeGenerator`.
 The runtime trusts framework-produced plan JSON as domain output. If external or
-corrupted JSON reaches the browser, runtime failures should expose the domain
+corrupted JSON reaches the browser, runtime failures must expose the domain
 drift with context rather than become normal control flow.
 
 ## Build & Run
@@ -479,12 +479,12 @@ Load the `bdd-testing` skill before writing any Playwright test. The 5 BDD rules
 Known weaknesses tracked for improvement:
 
 - **DDD depth**: Domain model uses `null` where Value Objects with constructor invariants
-  should enforce valid state. Association and aggregation boundaries are implicit.
+  must enforce valid state. Association and aggregation boundaries are implicit.
   Screaming names (types that express domain intent) are underused.
 - **Serialization**: `[JsonIgnore(Condition = WhenWritingNull)]` attributes scattered
   across plan model classes instead of explicit serialization contracts.
 - **TS tracing**: `core/trace.ts` is 38 lines using `console.error`/`warn`/`log` dispatched
-  by level. Should aspire to OTel-style structured tracing — explicit data flowing through
+  by level. It must move toward OTel-style structured tracing — explicit data flowing through
   modules, correlation IDs, proper span context, actionable error messages.
 
 ### 12. Git Worktrees for Feature Work
