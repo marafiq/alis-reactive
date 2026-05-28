@@ -179,9 +179,9 @@ namespace Alis.Reactive.PlanModel
 
         internal abstract bool IsSameExactContract(IReadOnlyList<Shape> shapes);
 
-        internal abstract void ValidateInvocationArgument(string invocationLabel, int index, Shape actual);
+        internal abstract void AcceptInvocationArgument(string invocationLabel, int index, Shape actual);
 
-        internal abstract void ValidateInvocationComplete(string invocationLabel, int actualCount);
+        internal abstract void AcceptInvocationComplete(string invocationLabel, int actualCount);
 
         internal abstract MethodArgumentContract MergeIntoExact(
             MemberName name,
@@ -216,11 +216,11 @@ namespace Alis.Reactive.PlanModel
 
         internal override bool IsSameExactContract(IReadOnlyList<Shape> shapes) => false;
 
-        internal override void ValidateInvocationArgument(string invocationLabel, int index, Shape actual)
+        internal override void AcceptInvocationArgument(string invocationLabel, int index, Shape actual)
         {
         }
 
-        internal override void ValidateInvocationComplete(string invocationLabel, int actualCount)
+        internal override void AcceptInvocationComplete(string invocationLabel, int actualCount)
         {
         }
     }
@@ -300,7 +300,7 @@ namespace Alis.Reactive.PlanModel
             return true;
         }
 
-        internal override void ValidateInvocationArgument(string invocationLabel, int index, Shape actual)
+        internal override void AcceptInvocationArgument(string invocationLabel, int index, Shape actual)
         {
             if (actual == null) throw new System.ArgumentNullException(nameof(actual));
             if (index >= _shapes.Count)
@@ -315,7 +315,7 @@ namespace Alis.Reactive.PlanModel
                     $"but received '{actual.DescribeContract()}'.");
         }
 
-        internal override void ValidateInvocationComplete(string invocationLabel, int actualCount)
+        internal override void AcceptInvocationComplete(string invocationLabel, int actualCount)
         {
             var argumentCountMatchesContract = actualCount == _shapes.Count;
             if (!argumentCountMatchesContract)

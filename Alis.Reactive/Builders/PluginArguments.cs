@@ -80,13 +80,13 @@ namespace Alis.Reactive.Builders
         {
             if (argument == null) throw new ArgumentNullException(nameof(argument));
 
-            _contract.ValidateInvocationArgument(_operation.Label, _values.Count, argument.Shape);
+            _contract.AcceptInvocationArgument(_operation.Label, _values.Count, argument.Shape);
             _values.Add(argument.Value);
         }
 
         internal List<ValueExpression> Complete()
         {
-            _contract.ValidateInvocationComplete(_operation.Label, _values.Count);
+            _contract.AcceptInvocationComplete(_operation.Label, _values.Count);
             return new List<ValueExpression>(_values);
         }
     }
