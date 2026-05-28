@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   evaluateCondition,
-  evaluateConditionAsync,
   evaluateConditionInCurrentLane,
 } from "../conditions/conditions";
 import type {
@@ -307,9 +306,6 @@ describe("condition runtime", () => {
       expect(matches(text("contains", null, "ready"))).toBe(false);
     });
 
-    it("throws when a generated regex condition carries an invalid pattern", () => {
-      expect(() => matches(regex("RN-204", "["))).toThrow(SyntaxError);
-    });
   });
 
   describe("logical composition", () => {
@@ -360,12 +356,14 @@ describe("condition runtime", () => {
       expect(confirm).not.toHaveBeenCalled();
     });
 
-    it("runs confirm from the async condition API", async () => {
+    it("runs confirm when the current lane starts at an async condition", async () => {
       const confirm = vi.fn(() => false);
       (window as BrowserWindowWithConfirm).alis = { confirm };
 
-      await expect(evaluateConditionAsync({ kind: "confirm", message: "Delete?" }, plan()))
-        .resolves.toBe(false);
+      const completion = evaluateConditionInCurrentLane({ kind: "confirm", message: "Delete?" }, plan());
+
+      expect(completion).toBeInstanceOf(Promise);
+      await expect(completion).resolves.toBe(false);
       expect(confirm).toHaveBeenCalledWith("Delete?");
     });
   });

@@ -64,11 +64,6 @@ export function evaluateCondition(condition: ValidationCondition, plan: PlanDocu
   return evaluateConditionSync(condition, plan, ExecutionContext.from(ctx));
 }
 
-/** Async condition evaluation — required when conditions contain ConfirmCondition. */
-export async function evaluateConditionAsync(condition: ConditionGraph, plan: PlanDocument, ctx?: ExecContext): Promise<boolean> {
-  return evaluateConditionAsyncCore(condition, plan, ExecutionContext.from(ctx));
-}
-
 /** Current-lane condition evaluation. Crosses to async only when a reached term requires it. */
 export function evaluateConditionInCurrentLane(
   condition: ConditionGraph,
@@ -92,33 +87,6 @@ function evaluateConditionSync(
       return condition.terms.some(term => evaluateConditionSync(term, plan, context));
     case "not":
       return !evaluateConditionSync(condition.term, plan, context);
-    default:
-      return assertNever(condition, "condition kind");
-  }
-}
-
-async function evaluateConditionAsyncCore(
-  condition: ConditionGraph,
-  plan: PlanDocument,
-  context: ExecutionContext,
-): Promise<boolean> {
-  switch (condition.kind) {
-    case "compare":
-      return evaluateCompare(condition, plan, context);
-    case "all":
-      for (const term of condition.terms) {
-        if (!await evaluateConditionAsyncCore(term, plan, context)) return false;
-      }
-      return true;
-    case "any":
-      for (const term of condition.terms) {
-        if (await evaluateConditionAsyncCore(term, plan, context)) return true;
-      }
-      return false;
-    case "not":
-      return !(await evaluateConditionAsyncCore(condition.term, plan, context));
-    case "confirm":
-      return evaluateConfirmCondition(condition.message);
     default:
       return assertNever(condition, "condition kind");
   }

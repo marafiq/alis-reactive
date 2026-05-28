@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Alis.Reactive.Validation
@@ -8,6 +9,7 @@ namespace Alis.Reactive.Validation
     {
         bool TryGetClientRules(
             Type validationSourceType,
+            [NotNullWhen(true)]
             out IReadOnlyList<ClientValidationField>? fields);
     }
 
@@ -54,6 +56,7 @@ namespace Alis.Reactive.Validation
 
         public bool TryGetClientRules(
             Type validationSourceType,
+            [NotNullWhen(true)]
             out IReadOnlyList<ClientValidationField>? fields)
         {
             if (validationSourceType == null) throw new ArgumentNullException(nameof(validationSourceType));

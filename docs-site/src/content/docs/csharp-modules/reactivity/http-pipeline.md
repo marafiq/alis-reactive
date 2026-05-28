@@ -186,7 +186,7 @@ pipeline.Post("/api/residents", g => g.IncludeAll())
     }));
 ```
 
-WhileLoading accepts sequential commands only -- no conditions, HTTP requests, or parallel branches inside it. It is designed for simple visual state changes: show/hide spinners, disable buttons, dim sections.
+WhileLoading accepts the same reaction pipeline shape as other request slots. It can run element commands, component commands, dispatches, guarded branches, HTTP requests, and parallel reactions before the primary request is sent. Keep it focused on prerequisites and visible loading state so the request sequence stays readable.
 
 ## How do I guarantee cleanup regardless of the outcome?
 

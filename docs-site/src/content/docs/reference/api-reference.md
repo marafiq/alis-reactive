@@ -351,10 +351,9 @@ When<T>()
 When<T>()
 ```
 
-### EventArgSource<T>
+### PayloadTypedSource<T>
 
-A typed source that reads from the event payload.
-            Delegates to `PayloadTypedSource<T>` with event scope.
+A typed source that reads from a declared payload scope such as event, success, error, or dispatch.
 
 ### GuardBuilder<T>
 
@@ -402,7 +401,7 @@ Shape { get; }  // Shape inferred from TProp.
 
 ```csharp
 ToComponentSource()
-ToValueProducer()
+ToValueExpression()
 ```
 
 ### TypedUrlSource<T>
@@ -628,12 +627,12 @@ Compares two values using a relational operator.
 
 ```csharp
 // Properties
-ItemShape { get; }  // Gets the element type shape used by collection operators such as `contains`, or `null` for non-collection comparisons.
+ItemShape { get; }  // Gets the element type shape used by collection operators, or `none` for non-collection comparisons.
 Kind { get; }  // Gets the kind. Always `"compare"`.
 Left { get; }  // Gets the left-hand operand.
-Op { get; }  // Gets the comparison operator (eq, neq, gt, gte, lt, lte, truthy, empty, contains, startsWith, endsWith).
-Right { get; }  // Gets the right-hand operand, or `null` for unary operators.
-Shape { get; }  // Gets the expected type shape for comparison, or `null` when inferred.
+Op { get; }  // Gets the comparison operator (eq, neq, gt, gte, lt, lte, truthy, is-empty, contains, starts-with, ends-with).
+RightOperand { get; }  // Gets the right-hand operand object, or `none` for unary operators.
+Shape { get; }  // Gets the expected type shape for comparison.
 ```
 
 ### CompareOp

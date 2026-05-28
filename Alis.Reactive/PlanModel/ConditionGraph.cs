@@ -61,7 +61,7 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "compare";
         /// <summary>Gets the left-hand operand.</summary>
         public ValueExpression Left => _operands.Left;
-        /// <summary>Gets the comparison operator (eq, neq, gt, gte, lt, lte, truthy, empty, contains, startsWith, endsWith).</summary>
+        /// <summary>Gets the comparison operator (eq, neq, gt, gte, lt, lte, truthy, is-empty, contains, starts-with, ends-with).</summary>
         public string Op => _op.Value;
         /// <summary>Gets the expected type shape for comparison. <see cref="PlanModel.Shape.None"/> when not specified.</summary>
         public Shape Shape => _operands.ShapeForJson;

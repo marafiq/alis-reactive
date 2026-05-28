@@ -98,8 +98,6 @@ function executeReactionWith(
   }
 }
 
-type ReactionRunner = (reaction: ReactionGraph) => void | Promise<void>;
-
 function executeSequence(
   reaction: SequenceReaction,
   plan: RuntimePlan,
@@ -130,12 +128,7 @@ function executeBranch(
   plan: RuntimePlan,
   context: ExecutionContext,
 ): void | Promise<void> {
-  return executeBranchReaction({
-    cases: reaction.cases,
-    plan: plan.document,
-    context,
-    runReaction: child => executeReactionWith(child, plan, context),
-  });
+  return executeBranchFrom(reaction.cases, plan, context, 0);
 }
 
 async function executeParallel(
@@ -306,47 +299,40 @@ function dispatchPayload(reaction: DispatchReaction, plan: PlanDocument, context
   return evaluateValue(reaction.payload.data, plan, context.raw);
 }
 
-interface BranchExecutionContext {
-  readonly cases: readonly BranchCase[];
-  readonly plan: PlanDocument;
-  readonly context: ExecutionContext;
-  readonly runReaction: ReactionRunner;
-}
-
-function executeBranchReaction(branch: BranchExecutionContext): void | Promise<void> {
-  return executeBranchFrom(branch, 0);
-}
-
 function executeBranchFrom(
-  branch: BranchExecutionContext,
+  cases: readonly BranchCase[],
+  plan: RuntimePlan,
+  context: ExecutionContext,
   startIndex: number,
 ): void | Promise<void> {
-  for (let index = startIndex; index < branch.cases.length; index++) {
-    const branchCase = branch.cases[index]!;
+  for (let index = startIndex; index < cases.length; index++) {
+    const branchCase = cases[index]!;
 
-    const guardMatches = branchGuardMatches(branchCase, branch.plan, branch.context);
+    const guardMatches = branchGuardMatches(branchCase, plan.document, context);
     if (guardMatches instanceof Promise) {
-      return executeAfterAsyncBranchGuard(branch, index, branchCase, guardMatches);
+      return executeAfterAsyncBranchGuard(cases, plan, context, index, branchCase, guardMatches);
     }
 
-    if (guardMatches) return branch.runReaction(branchCase.reaction);
+    if (guardMatches) return executeReactionWith(branchCase.reaction, plan, context);
   }
 
-  log.trace("branch.no-match", { caseCount: branch.cases.length });
+  log.trace("branch.no-match", { caseCount: cases.length });
 }
 
 async function executeAfterAsyncBranchGuard(
-  branch: BranchExecutionContext,
+  cases: readonly BranchCase[],
+  plan: RuntimePlan,
+  context: ExecutionContext,
   index: number,
   branchCase: BranchCase,
   guardMatches: Promise<boolean>,
 ): Promise<void> {
   if (await guardMatches) {
-    await waitForReaction(branch.runReaction(branchCase.reaction));
+    await waitForReaction(executeReactionWith(branchCase.reaction, plan, context));
     return;
   }
 
-  await waitForReaction(executeBranchFrom(branch, index + 1));
+  await waitForReaction(executeBranchFrom(cases, plan, context, index + 1));
 }
 
 function branchGuardMatches(
