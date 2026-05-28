@@ -1,17 +1,17 @@
 ---
 title: Validation
-description: Client-side validation with FluentValidation projection — deterministic rule extraction, explicit peer comparisons, 21 conditional operators, and fail-closed orchestration.
+description: Client-side validation with explicit ReactiveValidator metadata, peer comparisons, conditional operators, and fail-closed orchestration.
 sidebar:
   order: 8
 ---
 
-Validation lives inside the HTTP pipeline. You write a FluentValidation validator in C#, attach it to a request with `.Validate<T>()`, and the framework extracts rules to the JSON plan. The runtime evaluates those rules in the browser before the request fires.
+Validation lives inside the HTTP pipeline. You write a `ReactiveValidator<T>` in C#, attach it to a request with `.Validate<T>()`, and declare browser rules explicitly with `ClientRule(...)`. FluentValidation still runs normally on the server. The runtime evaluates the declared browser rules before the request fires.
 
 From the [Grammar Tree](../../mental-model/#the-grammar-tree) — the validation subset:
 
 ```
 pipeline.Post(url)
-├── .Validate<TValidator>("formId")        § extract rules from FluentValidation
+├── .Validate<TValidator>("formId")        § bind declared browser rules
 ├── .Gather(g => { })                      § collect request data
 ├── .Response(r => { })                    § handle response
 │   └── r.OnError(400, e => e.ValidationErrors("formId"))  § server errors
@@ -19,7 +19,7 @@ pipeline.Post(url)
 
 ## How do I write a validator?
 
-Extend `ReactiveValidator<T>` and use standard FluentValidation rules:
+Extend `ReactiveValidator<T>`. Use standard FluentValidation rules for server validation, and add matching `ClientRule(...)` metadata for rules that should run in the browser:
 
 ```csharp
 public class ResidentIntakeValidator : ReactiveValidator<ResidentIntakeModel>
@@ -27,10 +27,25 @@ public class ResidentIntakeValidator : ReactiveValidator<ResidentIntakeModel>
     public ResidentIntakeValidator()
     {
         RuleFor(x => x.ResidentName).NotEmpty().MaximumLength(100);
+        ClientRule(x => x.ResidentName)
+            .Required("Resident name is required.")
+            .MaxLength(100, "Resident name must be at most 100 characters.");
+
         RuleFor(x => x.AdmissionDate).NotEmpty();
+        ClientRule(x => x.AdmissionDate)
+            .Required("Admission date is required.");
+
         RuleFor(x => x.CareLevel).NotEmpty();
+        ClientRule(x => x.CareLevel)
+            .Required("Care level is required.");
+
         RuleFor(x => x.Age).InclusiveBetween(18, 120);
+        ClientRule(x => x.Age)
+            .Range(18, 120, "Age must be between 18 and 120.");
+
         RuleFor(x => x.Email).EmailAddress();
+        ClientRule(x => x.Email)
+            .Email("Email must be valid.");
     }
 }
 ```
@@ -63,7 +78,7 @@ Inside a pipeline, call `.Validate<TValidator>("formId")` on the HTTP request:
     }))
 ```
 
-At render time, the framework extracts rules from `ResidentIntakeValidator` and embeds them in the plan JSON. At runtime, the browser evaluates those rules before sending the request. If validation fails, the request is aborted and errors appear at each field.
+At render time, the framework reads browser metadata from `ResidentIntakeValidator` and embeds it in the plan JSON. At runtime, the browser evaluates those rules before sending the request. If validation fails, the request is aborted and errors appear at each field.
 
 The `"intake-form"` string is the form ID — it must match the `id` attribute on the form container element. Errors display in each field's validation slot (rendered by `Html.InputField`).
 
@@ -71,92 +86,106 @@ The `"intake-form"` string is the form ID — it must match the `id` attribute o
 
 ## What rule types are available?
 
-Deterministic literal rules are extracted from FluentValidation. Peer-field comparisons use `ProjectToClient(...)` so the browser rule names the peer field explicitly. One additional type (`atLeastOne`) is supported by the runtime but must be added manually via `ValidationDescriptor`.
+Browser rules are declared with `ClientRule(...)`. Peer-field comparisons use typed expressions so the browser rule names the peer field explicitly.
 
 ### Presence rules
 
-| FluentValidation | Plan rule | Description |
+| ClientRule method | Plan rule | Description |
 |------------------|-----------|-------------|
-| `NotEmpty()` / `NotNull()` | `required` | Field must not be empty, null, or false |
-| `Empty()` | `empty` | Field must be empty |
+| `Required(message)` | `required` | Field must not be empty, null, or false |
+| `Empty(message)` | `empty` | Field must be empty |
 
 ```csharp
 RuleFor(x => x.ResidentName).NotEmpty();
+ClientRule(x => x.ResidentName).Required("Resident name is required.");
 ```
 
 ### Length rules
 
-| FluentValidation | Plan rule | Constraint |
+| ClientRule method | Plan rule | Constraint |
 |------------------|-----------|-----------|
-| `MinimumLength(n)` | `minLength` | Minimum character count |
-| `MaximumLength(n)` | `maxLength` | Maximum character count |
+| `MinLength(n, message)` | `minLength` | Minimum character count |
+| `MaxLength(n, message)` | `maxLength` | Maximum character count |
 
 ```csharp
 RuleFor(x => x.ResidentName).MinimumLength(2).MaximumLength(100);
+ClientRule(x => x.ResidentName)
+    .MinLength(2, "Resident name must be at least 2 characters.")
+    .MaxLength(100, "Resident name must be at most 100 characters.");
 ```
 
 ### Pattern rules
 
-| FluentValidation | Plan rule | Description |
+| ClientRule method | Plan rule | Description |
 |------------------|-----------|-------------|
-| `EmailAddress()` | `email` | Must match email format |
-| `Matches(regex)` | `regex` | Must match the regular expression |
-| `CreditCard()` | `creditCard` | Must pass Luhn check |
+| `Email(message)` | `email` | Must match email format |
+| `Regex(regex, message)` | `regex` | Must match the regular expression |
+| `CreditCard(message)` | `creditCard` | Must pass Luhn check |
 
 ```csharp
 RuleFor(x => x.Email).EmailAddress();
 RuleFor(x => x.PhoneNumber).Matches(@"^\(\d{3}\) \d{3}-\d{4}$");
+ClientRule(x => x.Email).Email("Email must be valid.");
+ClientRule(x => x.PhoneNumber).Regex(@"^\(\d{3}\) \d{3}-\d{4}$", "Phone number is invalid.");
 ```
 
 ### Comparison rules
 
-| FluentValidation | Plan rule | Description |
+| ClientRule method | Plan rule | Description |
 |------------------|-----------|-------------|
-| `GreaterThanOrEqualTo(n)` | `min` | Value >= n (inclusive) |
-| `LessThanOrEqualTo(n)` | `max` | Value <= n (inclusive) |
-| `GreaterThan(n)` | `gt` | Value > n (exclusive) |
-| `LessThan(n)` | `lt` | Value < n (exclusive) |
+| `GreaterThanOrEqualTo(n, message)` | `min` | Value >= n (inclusive) |
+| `LessThanOrEqualTo(n, message)` | `max` | Value <= n (inclusive) |
+| `GreaterThan(n, message)` | `gt` | Value > n (exclusive) |
+| `LessThan(n, message)` | `lt` | Value < n (exclusive) |
 
 ```csharp
 RuleFor(x => x.Age).GreaterThanOrEqualTo(18).LessThanOrEqualTo(120);
 RuleFor(x => x.Temperature).GreaterThan(95.0m).LessThan(107.0m);
+ClientRule(x => x.Age)
+    .GreaterThanOrEqualTo(18, "Age must be at least 18.")
+    .LessThanOrEqualTo(120, "Age must be at most 120.");
 ```
 
 ### Range rules
 
-| FluentValidation | Plan rule | Constraint |
+| ClientRule method | Plan rule | Constraint |
 |------------------|-----------|-----------|
-| `InclusiveBetween(a, b)` | `range` | [min, max] inclusive |
-| `ExclusiveBetween(a, b)` | `exclusiveRange` | (min, max) exclusive |
+| `Range(a, b, message)` | `range` | [min, max] inclusive |
+| `ExclusiveRange(a, b, message)` | `exclusiveRange` | (min, max) exclusive |
 
 ```csharp
 RuleFor(x => x.Age).InclusiveBetween(18, 120);
 RuleFor(x => x.Score).ExclusiveBetween(0, 100);
+ClientRule(x => x.Age).Range(18, 120, "Age must be between 18 and 120.");
+ClientRule(x => x.Score).ExclusiveRange(0, 100, "Score must be between 0 and 100.");
 ```
 
 ### Equality rules
 
-| FluentValidation | Plan rule | Description |
+| ClientRule method | Plan rule | Description |
 |------------------|-----------|-------------|
-| `Equal(value)` | `equalTo` | Must equal a literal value |
-| `Equal(x => x.Other).ProjectToClient(rule => rule.EqualTo(x => x.Other))` | `equalTo` | Must equal another field's value |
-| `NotEqual(value)` | `notEqual` | Must not equal a literal value |
-| `NotEqual(x => x.Other).ProjectToClient(rule => rule.NotEqualTo(x => x.Other))` | `notEqualTo` | Must not equal another field's value |
+| `EqualTo(value, message)` | `equalTo` | Must equal a literal value |
+| `EqualTo(x => x.Other, message)` | `equalTo` | Must equal another field's value |
+| `NotEqual(value, message)` | `notEqual` | Must not equal a literal value |
+| `NotEqualTo(x => x.Other, message)` | `notEqualTo` | Must not equal another field's value |
 
 ```csharp
 RuleFor(x => x.PasswordConfirm)
-    .Equal(x => x.Password)
-    .ProjectToClient(rule => rule.EqualTo(x => x.Password));
+    .Equal(x => x.Password);
+ClientRule(x => x.PasswordConfirm)
+    .EqualTo(x => x.Password, "Passwords must match.");
 RuleFor(x => x.Status).NotEqual("Discharged");
+ClientRule(x => x.Status)
+    .NotEqual("Discharged", "Status is not allowed.");
 ```
 
 ### Array rules
 
 | Rule | Plan rule | Description |
 |------|-----------|-------------|
-| (manual) | `atLeastOne` | Array must have at least one element |
+| `AtLeastOne(message)` | `atLeastOne` | Array must have at least one element |
 
-The `atLeastOne` rule is not extracted from FluentValidation — add it manually when constructing a `ValidationDescriptor`. Used for multi-select fields like `NativeCheckList` or `FusionMultiSelect`.
+Use `AtLeastOne(...)` for multi-select fields like `NativeCheckList` or `FusionMultiSelect`.
 
 ## How do I add conditional rules?
 
@@ -168,6 +197,7 @@ Use `WhenField()` and `WhenFieldNot()` inside `ReactiveValidator<T>` to make rul
 WhenField(x => x.IsEmployed, () =>
 {
     RuleFor(x => x.EmployerId).NotEmpty();
+    ClientRule(x => x.EmployerId).Required("Employer is required.");
 });
 ```
 
@@ -177,6 +207,9 @@ WhenField(x => x.IsEmployed, () =>
 WhenField(x => x.CareLevel, "Memory Care", () =>
 {
     RuleFor(x => x.CognitiveScore).NotEmpty().InclusiveBetween(0, 30);
+    ClientRule(x => x.CognitiveScore)
+        .Required("Cognitive score is required.")
+        .Range(0, 30, "Cognitive score must be between 0 and 30.");
 });
 ```
 
@@ -186,6 +219,7 @@ WhenField(x => x.CareLevel, "Memory Care", () =>
 WhenFieldNot(x => x.HasInsurance, () =>
 {
     RuleFor(x => x.SelfPayAgreement).NotEmpty();
+    ClientRule(x => x.SelfPayAgreement).Required("Self-pay agreement is required.");
 });
 ```
 
@@ -347,12 +381,13 @@ public class InsuranceValidator : ReactiveValidator<InsuranceInfo>
         WhenField(x => x.IsMedicare, () =>
         {
             RuleFor(x => x.MedicareId).NotEmpty();
+            ClientRule(x => x.MedicareId).Required("Medicare ID is required.");
         });
     }
 }
 ```
 
-The extracted rules behave as follows:
+The declared browser rules behave as follows:
 
 - **Condition composition:** The `Insurance.Provider` rule gets the parent's condition (`HasInsurance` is truthy). The `Insurance.MedicareId` rule gets both conditions composed with AND: `HasInsurance` is truthy AND `Insurance.IsMedicare` is truthy.
 - **Prefix carrying:** Condition fields and explicit peer fields inside the nested validator are prefixed. `IsMedicare` in the nested validator becomes `Insurance.IsMedicare` in the plan, so the browser reads the correct field.
@@ -360,18 +395,20 @@ The extracted rules behave as follows:
 
 ## How do cross-property rules work?
 
-When a comparison rule references another property instead of a literal value, add an explicit client projection. The FluentValidation rule still runs on the server; `ProjectToClient(...)` declares the deterministic browser peer comparison:
+When a comparison rule references another property instead of a literal value, declare the browser peer comparison with `ClientRule(...)`. The FluentValidation rule still runs on the server:
 
 ```csharp
 // Password confirmation must match
 RuleFor(x => x.PasswordConfirm)
-    .Equal(x => x.Password)
-    .ProjectToClient(rule => rule.EqualTo(x => x.Password));
+    .Equal(x => x.Password);
+ClientRule(x => x.PasswordConfirm)
+    .EqualTo(x => x.Password, "Passwords must match.");
 
 // Discharge date must be after admission
 RuleFor(x => x.DischargeDate)
-    .GreaterThan(x => x.AdmissionDate)
-    .ProjectToClient(rule => rule.GreaterThan(x => x.AdmissionDate));
+    .GreaterThan(x => x.AdmissionDate);
+ClientRule(x => x.DischargeDate)
+    .GreaterThan(x => x.AdmissionDate, "Discharge must be after admission.");
 ```
 
 The plan carries a `field` property pointing to the peer field name. At runtime, the peer field's current value is read from the form and compared against the source field.

@@ -297,6 +297,7 @@ Source:
 - `WhenFieldNot(...)`
 - order/presence/text/membership condition helpers
 - `WhenFields(c => c.Field(...).Truthy().And(...), ...)`
+- explicit `ClientRule(...)` metadata for browser rules
 - normal FluentValidation rules such as NotEmpty, Length, Email, Regex, ranges,
   comparisons, nested validators, Include
 - FluentValidation `.When/.Unless/.WhenAsync/.UnlessAsync` guards outside the
@@ -304,31 +305,29 @@ Source:
 
 Domain terms:
 
-- `IClientValidationProjectionSource.ProjectClientRules`
-- `ClientValidationProjections`
+- `IClientValidationRuleSource.GetClientRules`
+- `ClientValidationRules`
 - `ClientValidationFieldToken`
 - `ClientValidationField`
 - `ValidationRule`
 - `FieldCondition`
 - `ValidationRuleActivation`
-- `ClientConditionProjection`
-- `SkippedClientRule`
+- `ClientRuleActivation`
 
 Runtime behavior:
 
-FluentValidation still executes normally. The framework projects only
-client-side projectable rules. `ReactiveValidator` gives explicit client
-condition intent while still applying the normal predicate. FluentValidation
-guards outside that client language are skipped for client projection.
+FluentValidation still executes normally. The framework emits only explicit
+browser metadata declared by `ReactiveValidator<T>.ClientRule(...)`.
+`ReactiveValidator` gives explicit client condition intent while still applying
+the normal predicate. FluentValidation guards outside that client language stay
+server-only.
 
 Design consequence:
 
-Validation is a projection/binding problem, not a reflection trick. Client rules
-should be explicit, named, and bound to registered component value contracts at
-render. Core registry projections carry typed field tokens and field shapes;
-FluentValidation is one adapter into the same projection contract. Peer-field
-comparisons and conditional activation must resolve through the same value
-producer and condition language as `.Reactive`.
+Validation is a metadata/binding problem, not a reflection trick. Client rules
+are explicit, named, and bound to registered component value contracts at
+render. Peer-field comparisons and conditional activation resolve through the
+same value producer and condition language as `.Reactive`.
 
 ## Browser Object Contracts
 

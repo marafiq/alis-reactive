@@ -71,7 +71,7 @@ across repeated vertical slices.
 | Parallel requests | `Parallel(branches).OnAllSettled(pipeline)` | Concurrent request graph with all-settled completion graph |
 | Response payload source | `ResponseBody<T>.Read(expr)` plus direct `SetText(response,path)` | Success/error payload value expression |
 | Direct validation projection | `Field`, field rule methods, projection `When`, validation condition builders | Client validation projection with fields, rules, peer fields, and activation conditions |
-| FluentValidation client projection | `ProjectToClient`, `ReactiveValidator.WhenField*`, `WhenFields`, server-only `When/Unless/WhenAsync/UnlessAsync` | Adapter that extracts only client-declared rules and client-declared conditions; async/server-only conditions stay server-only |
+| FluentValidation client metadata | `ReactiveValidator.ClientRule`, `ReactiveValidator.WhenField*`, `WhenFields`, server-only `When/Unless/WhenAsync/UnlessAsync` | Explicit browser rule metadata and client-declared conditions; async/server-only conditions stay server-only |
 | App-level objects | `FusionToast`, `FusionConfirm`, `NativeDrawer`, `NativeLoader`, app-level `Component<TApp>()` | Layout browser object with fixed id and typed commands/properties |
 | Native ActionLink | `NativeActionLinkBuilder`, serializer, HTML extension | Inline plan payload carried in attributes for behavior that starts from a rendered link |
 | Fusion templates | `FusionTemplate`, `FusionTemplateBuilder`, `FusionConditionalBuilder`, `EventButton`, `ShowIf`, template expression helpers | Vendor template authoring; does not change runtime plan graph except event/action hook payloads |

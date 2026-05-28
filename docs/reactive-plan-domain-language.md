@@ -84,7 +84,7 @@ probing live objects.
 | Branch Cases | Ordered branch cases with at most one default case and default last. Multiple branch blocks can appear in a reaction sequence; nested branch blocks are represented only where DSL allows them. | `BranchCase`, conditions builders |
 | Request Plan | HTTP request intent: method, URL template, route/header/body assignments, validation gate, response routes, lifecycle reaction slots, chain, and parallel grouping. | request builders, `Request` |
 | Request Input Projection | Explicit mapping from readable sources to route values, query/body payload, headers, or all registered inputs. | gather/request payload model |
-| Validation Projection | Deterministic client-side validation rules extracted from typed validation DSL or supported FluentValidation client projections. Rules outside that client language are omitted from the browser plan. | validation projection model |
+| Validation Projection | Deterministic browser validation rules declared through typed validation metadata. FluentValidation server rules still run normally; only explicit `ClientRule(...)` metadata enters the browser plan. | validation projection model |
 | Validation Container | Component role that owns browser validation rules for a form/container. Partials can add rules to a root container and slot unload removes the exact loaded rule objects. | `validation-container` role, runtime validation |
 | Plugin Contract | Declared browser plugin object/function contract for behavior outside deterministic first-class DSL primitives. Public plugin compatibility may use strings; internal plan/runtime terms stay typed. | `ReactivePlugin`, `PluginContract` |
 
@@ -142,9 +142,10 @@ path dedupe or source ownership policy.
 Validation projection means browser-executable client rules only.
 
 - FluentValidation rules still execute normally on submit or HTTP endpoints.
-- Supported synchronous FluentValidation rules may project client equivalents.
-- Async rules and guards outside the client projection language are omitted from browser projection.
-- Custom client projection must be explicit and typed.
+- Browser rules enter the plan only through explicit typed metadata such as
+  `ReactiveValidator<T>.ClientRule(...)`.
+- Async rules and regular FluentValidation guards stay server-only.
+- Client metadata must be explicit and typed.
 - Runtime validation executes the projected rule contract; it does not reflect
   over validators or infer missing rules.
 

@@ -93,16 +93,17 @@ public class ResidentValidator : AbstractValidator<ResidentModel>
 
         // ── Cross-property text rules ─────────────────────────
 
-        // Equal(x => x.OtherProp): value must match another field (skips empty)
-        // ProjectToClient declares the deterministic browser peer comparison.
+        // Equal(x => x.OtherProp): server rule; ClientRule declares the browser peer comparison.
         RuleFor(x => x.ConfirmEmail).Equal(x => x.Email)
-            .WithMessage("Emails must match.")
-            .ProjectToClient(rule => rule.EqualTo(x => x.Email));
+            .WithMessage("Emails must match.");
+        ClientRule(x => x.ConfirmEmail)
+            .EqualTo(x => x.Email, "Emails must match.");
 
         // NotEqual(x => x.OtherProp): value must differ from another field (skips empty)
         RuleFor(x => x.AlternateEmail).NotEqual(x => x.Email)
-            .WithMessage("Alternate email must differ from primary.")
-            .ProjectToClient(rule => rule.NotEqualTo(x => x.Email));
+            .WithMessage("Alternate email must differ from primary.");
+        ClientRule(x => x.AlternateEmail)
+            .NotEqualTo(x => x.Email, "Alternate email must differ from primary.");
 
         // NotEqual("value"): value must not be a specific string (skips empty)
         RuleFor(x => x.Status).NotEqual("deleted")
@@ -148,8 +149,9 @@ public class ResidentValidator : AbstractValidator<ResidentModel>
 
         // GreaterThan(x => x.OtherDate): discharge must be AFTER admission (cross-property)
         RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)
-            .WithMessage("Discharge must be after admission date.")
-            .ProjectToClient(rule => rule.GreaterThan(x => x.AdmissionDate));
+            .WithMessage("Discharge must be after admission date.");
+        ClientRule(x => x.DischargeDate)
+            .GreaterThan(x => x.AdmissionDate, "Discharge must be after admission date.");
 
 
         // ── Empty rule ────────────────────────────────────────
@@ -249,7 +251,7 @@ public class ResidentConditionalValidator : ReactiveValidator<ResidentModel>
     .Reactive(plan, evt => evt.Click, (args, p) =>
     {
         p.Post("/Residents/Save")
-         .Validate<ResidentValidator>("resident-form")    @* ← extracts rules into plan *@
+         .Validate<ResidentValidator>("resident-form")    @* uses declared browser rules *@
          .Response(r => r.OnSuccess(s =>
          {
              s.Element("result").SetText("Saved!");
@@ -337,12 +339,12 @@ WhenField(x => x.IsEmployed, () =>
 ### DO NOT forget `Html.InputField()` for peer fields
 
 ```csharp
-// If ConfirmEmail has .ProjectToClient(rule => rule.EqualTo(x => x.Email)),
+// If ConfirmEmail has ClientRule(...).EqualTo(x => x.Email),
 // then BOTH fields must be
 // registered via Html.InputField(). If Email is not in the form,
 // the equalTo rule fails closed (blocks the form).
 
-// The explicit projection includes peer fields in the descriptor,
+// The explicit metadata includes peer fields in the descriptor,
 // and the component must be registered via InputField in the view.
 ```
 
@@ -357,14 +359,15 @@ Html.InputField(plan, m => m.Name, o => o.Label("Name"))
     .NativeTextBox(b => b.Placeholder("Name"));
 ```
 
-### DO NOT build manual ValidationDescriptors without Shape
+### DO NOT rely on server rules becoming browser rules
 
 ```csharp
-// WRONG — comparison rules without Shape throw at runtime
-new ValidationRule("min", "Too low", constraint: 0)
+// Server only
+RuleFor(x => x.Age).GreaterThan(0);
 
-// CORRECT — always specify shape for comparison rules
-new ValidationRule("min", "Too low", constraint: 0, shape: Shape.Number)
+// Browser + server
+RuleFor(x => x.Age).GreaterThan(0);
+ClientRule(x => x.Age).GreaterThan(0, "Age must be greater than zero.");
 ```
 
 ---
@@ -388,12 +391,12 @@ new ValidationRule("min", "Too low", constraint: 0, shape: Shape.Number)
 
 | Rule | C# DSL (fixed value) | C# DSL (cross-property) | When empty |
 |------|---------------------|------------------------|-----------|
-| `min` | `.GreaterThanOrEqualTo(val)` | `.GreaterThanOrEqualTo(x => x.Prop).ProjectToClient(rule => rule.GreaterThanOrEqualTo(x => x.Prop))` | Skips |
-| `max` | `.LessThanOrEqualTo(val)` | `.LessThanOrEqualTo(x => x.Prop).ProjectToClient(rule => rule.LessThanOrEqualTo(x => x.Prop))` | Skips |
-| `gt` | `.GreaterThan(val)` | `.GreaterThan(x => x.Prop).ProjectToClient(rule => rule.GreaterThan(x => x.Prop))` | **Fails** |
-| `lt` | `.LessThan(val)` | `.LessThan(x => x.Prop).ProjectToClient(rule => rule.LessThan(x => x.Prop))` | Skips |
-| `equalTo` | `.Equal(val)` | `.Equal(x => x.Prop).ProjectToClient(rule => rule.EqualTo(x => x.Prop))` | Skips |
-| `notEqualTo` | — | `.NotEqual(x => x.Prop).ProjectToClient(rule => rule.NotEqualTo(x => x.Prop))` | Skips |
+| `min` | `ClientRule(...).GreaterThanOrEqualTo(val, msg)` | `ClientRule(...).GreaterThanOrEqualTo(x => x.Prop, msg)` | Skips |
+| `max` | `ClientRule(...).LessThanOrEqualTo(val, msg)` | `ClientRule(...).LessThanOrEqualTo(x => x.Prop, msg)` | Skips |
+| `gt` | `ClientRule(...).GreaterThan(val, msg)` | `ClientRule(...).GreaterThan(x => x.Prop, msg)` | **Fails** |
+| `lt` | `ClientRule(...).LessThan(val, msg)` | `ClientRule(...).LessThan(x => x.Prop, msg)` | Skips |
+| `equalTo` | `ClientRule(...).EqualTo(val, msg)` | `ClientRule(...).EqualTo(x => x.Prop, msg)` | Skips |
+| `notEqualTo` | `ClientRule(...).NotEqual(val, msg)` | `ClientRule(...).NotEqualTo(x => x.Prop, msg)` | Skips |
 
 ### Range Rules (shape set automatically)
 
@@ -406,7 +409,7 @@ new ValidationRule("min", "Too low", constraint: 0, shape: Shape.Number)
 
 ## What the Plan Looks Like
 
-For `RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate).ProjectToClient(rule => rule.GreaterThan(x => x.AdmissionDate))`:
+For `ClientRule(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate, "Discharge must be after admission date.")`:
 
 ```json
 {

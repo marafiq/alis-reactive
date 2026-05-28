@@ -224,7 +224,7 @@ sequenceDiagram
 flowchart TD
     A[Validation source DSL] --> B{Source type}
     B -->|direct projection| C[Field rules and field conditions]
-    B -->|FluentValidation| D[Explicit ProjectToClient rules]
+    B -->|ReactiveValidator| D[Explicit ClientRule metadata]
     D --> E[Attach client-known WhenField/WhenFields conditions]
     D --> F[Ignore async/server-only rules for client projection]
     C --> G[ValidationProjection]
@@ -390,7 +390,7 @@ conditions, and response handlers.
 | direct projection `When(condition, rules)` | rule activation condition | run enclosed rules only when condition true |
 | validation condition `Field(expr)` plus typed condition operator | field condition | read mounted field component |
 | validation condition `And/Or/Not` | composite condition | evaluate condition graph |
-| Fluent `ProjectToClient(rule projection)` | explicit client rule projection | emit only declared client rule |
+| `ReactiveValidator.ClientRule(...)` | explicit browser rule metadata | emit only declared client rule |
 | Fluent `WhenField*` / `WhenFields` | client-known condition | emit activation condition |
 | Fluent `When/Unless/WhenAsync/UnlessAsync` | server-only condition | server still runs; client projection skips or marks server-only |
 | request `.Validate<TSource>(formId)` | validation job for source/container | validate container before request |

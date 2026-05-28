@@ -28,7 +28,7 @@ does not validate impossible framework-generated shapes.
 | `Alis.Reactive/Builders/DispatchPayloadBuilder.cs` | custom event payload object |
 | `Alis.Reactive/ReactivePlugin.cs`, `Alis.Reactive/Builders/Plugin*.cs` | plugin contract and plugin invocation |
 | `Alis.Reactive/Validation/*.cs` | direct deterministic client validation projection |
-| `Alis.Reactive.FluentValidator/*.cs` | FluentValidation client-rule projection adapter |
+| `Alis.Reactive.FluentValidator/*.cs` | ReactiveValidator client-rule metadata and DI-backed rule source |
 | `Alis.Reactive/ComponentRef.cs`, `Alis.Reactive/ComponentMember.cs` | browser object property/method contract emission |
 | `Alis.Reactive/ComponentOnboarding/*.cs` | component identity, event onboarding, model-bound slots |
 | `Alis.Reactive.Native/**` | Native vertical slices, app-level objects, native gather, action link |
@@ -434,13 +434,12 @@ tests match the row language.
 | `p.Parallel(...)` | concurrent request branches | parallel request reaction | `reaction.kind="parallel"` | execute requests concurrently |
 | `Parallel.OnAllSettled` | post-parallel reaction graph | completion reaction | parallel completion | execute after every branch settles |
 | `p.Into(elementId)` | inject success body into host | inject reaction with success payload body | `reaction.kind="inject"` | write HTML, discover plans, load slot |
-| direct client validation `ClientValidationProjections.For(...).Field(...)` | field rule projection | `ClientValidationField` with rules | validation rules in plan | browser validation runtime |
+| direct client validation `ClientValidationRules.For(...).Field(...)` | field rule metadata | `ClientValidationField` with rules | validation rules in plan | browser validation runtime |
 | direct validation `When(...)` | conditional client rules | validation rule activation condition | validation condition | run rule only when condition passes |
 | direct validation field rules | `Required`, `Empty`, `Email`, `Url`, `CreditCard`, `AtLeastOne`, length/range/compare/peer rules | deterministic client validation rule | validation rule name + operand | rule engine evaluation |
-| `ReactiveValidator.WhenField*` | FluentValidation client-known condition | client condition projection | validation activation condition | browser evaluates same guard |
-| FluentValidation `When/Unless/Async` outside `WhenField*` | unprojected guard | omitted client projection for guarded rules | no browser rule | normal validator execution still runs |
-| built-in FluentValidation rules | supported sync validators | client validation rules | validation rules | browser executes projected subset |
-| custom `ProjectToClient` rules | explicit client primitive | explicit deterministic client rule | validation rule | browser executes declared primitive |
+| `ReactiveValidator.ClientRule(...)` | explicit browser rule metadata | client validation rule | validation rule | browser executes declared primitive |
+| `ReactiveValidator.WhenField*` | browser-known condition | client rule activation | validation activation condition | browser evaluates same guard |
+| FluentValidation `When/Unless/Async` outside `WhenField*` | server-only guard | no client metadata | no browser rule | normal validator execution still runs |
 | `NativeActionLink` | link with one request reaction tree | inline plan payload + projected request | `data-reactive-link` payload | click executes inline request plan |
 | Fusion template DSL | render-only templates | no reactive plan behavior unless event button dispatches | HTML template text | vendor template rendering |
 
@@ -479,7 +478,7 @@ module, at least the matching vectors must stay true.
 | T8 success response drives follow-up request | `OnSuccess<Resident>((json,s)=> s.Get("/r/{id}").Gather(g=>g.RouteParam("id", json.Read(x=>x.Id))))` | success route reaction containing request; request input reads success payload | payload scope `success` read in nested request assignment | first response id becomes second route param | HTTP runtime + Playwright |
 | T9 response chained request | `Response(r=>r.OnSuccess(...).Chained(c=>c.Get(url)))` | `RequestPlan` with `ResponseRoute` and follow-up request | request chain/follow-up request JSON | follow-up request executes after response route | HTTP runtime/Playwright |
 | T10 parallel requests | `p.Parallel(a=>a.Get("/a"), b=>b.Get("/b")).OnAllSettled(p=>p.Dispatch("done"))` | `ParallelRequests` with two request reactions and completion graph | `parallel.steps[]`, `completion.on-settled` | both fetches start; completion runs after all settle | HTTP runtime/Playwright |
-| T11 validation client projection | `ClientValidationProjections.For<V,M>(v=>v.Field(m=>m.Name).Required("Name"))` | validation projection field bound to model path and rule | validation-container rules include required rule | browser blocks request and displays rule | validation projection + Playwright |
+| T11 validation client metadata | `ClientValidationRules.For<V,M>(v=>v.Field(m=>m.Name).Required("Name"))` | validation field metadata bound to model path and rule | validation-container rules include required rule | browser blocks request and displays rule | validation metadata + Playwright |
 | T12 FluentValidation server-only guard | `WhenAsync(...); RuleFor(x=>x.Name).NotEmpty()` outside client guard | server validator remains normal; client projection omits unprojectable guard/rule path as required | no browser rule for async-only guarded behavior | server still validates; client does not invent condition | validation projection |
 | T13 partial SSR same model | root and partial both use `ReactivePlan/ResolvePlan<TModel>` | two `PlanDocument`s with same `planId` | root + partial docs share plan id | boot composes documents before wiring triggers | boot composition runtime |
 | T14 partial browser load/unload | success `p.Into("slot")` injects HTML containing `ResolvePlan<TModel>` | slot load merges loaded plan state by `planId` and slot id | partial plan document + slot load handle | load wires behavior; unload removes loaded behavior/rules/components | partial Playwright/runtime |
