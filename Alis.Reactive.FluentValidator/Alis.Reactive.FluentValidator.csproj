@@ -6,7 +6,7 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <PackageId>AlisReactive.FluentValidator</PackageId>
         <IsPackable>true</IsPackable>
-        <PackageDescription>FluentValidation integration for Alis.Reactive that projects deterministic validation rules into browser validation.</PackageDescription>
+        <PackageDescription>FluentValidation integration for Alis.Reactive that declares deterministic browser validation metadata.</PackageDescription>
         <PackageTags>reactive;aspnetcore;fluentvalidation;validation</PackageTags>
     </PropertyGroup>
 

@@ -27,7 +27,7 @@ does not validate impossible framework-generated shapes.
 | `Alis.Reactive/Builders/Requests/*.cs` | request endpoint, gather, validation gate, response routing, chain, parallel |
 | `Alis.Reactive/Builders/DispatchPayloadBuilder.cs` | custom event payload object |
 | `Alis.Reactive/ReactivePlugin.cs`, `Alis.Reactive/Builders/Plugin*.cs` | plugin contract and plugin invocation |
-| `Alis.Reactive/Validation/*.cs` | direct deterministic client validation projection |
+| `Alis.Reactive/Validation/*.cs` | deterministic client validation metadata |
 | `Alis.Reactive.FluentValidator/*.cs` | ReactiveValidator client-rule metadata and DI-backed rule source |
 | `Alis.Reactive/ComponentRef.cs`, `Alis.Reactive/ComponentMember.cs` | browser object property/method contract emission |
 | `Alis.Reactive/ComponentOnboarding/*.cs` | component identity, event onboarding, model-bound slots |
@@ -42,7 +42,7 @@ flowchart LR
     Plan --> Types[Browser Object Contracts]
     Plan --> Components[Component Objects with Roles]
     Plan --> Behaviors[Behavior Graphs]
-    Plan --> Validation[Validation Projection]
+    Plan --> Validation[Validation Metadata]
     Plan --> Json[Plan JSON]
     Plan --> Ts[Generated plan.ts]
     Json --> Runtime[Runtime Executor]
@@ -239,7 +239,7 @@ flowchart TD
     InjectDsl --> PartialSlot[Partial slot load/unload]
     PartialSlot --> PlanDocument
 
-    ValidationDsl[Validation projection DSL / FluentValidation adapter] --> ValidationProjection
+    ValidationDsl[Validation metadata DSL / FluentValidation metadata] --> ValidationMetadata
     ValidationProjection --> ValidationContainer
     ValidationContainer --> ComponentDsl
 ```
@@ -295,7 +295,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     A[Request reaction] --> B{Validation target?}
-    B -->|yes| C[Run projected client validation]
+    B -->|yes| C[Run client validation metadata]
     B -->|no| D[Resolve request input]
     C -->|valid| D
     C -->|invalid| Z[Stop before fetch]
@@ -347,7 +347,7 @@ Core domain terms:
 | Condition Graph | `Condition` union | condition evaluator |
 | Request Plan | `Request` | HTTP executor |
 | Request Input Projection | `GatherInput` / request input | request payload writer |
-| Validation Projection | validation-container component rules | validation orchestrator |
+| Validation Metadata | validation-container component rules | validation orchestrator |
 | Plugin Contract | plugin object contract | plugin resolver/invoker |
 | Partial Slot | partial plans loaded into an `Into(...)` host | slot source for active plan recomposition |
 
@@ -422,7 +422,7 @@ tests match the row language.
 | explicit component gather include | `g.Include(componentId, vendor, propertyName, valueMember)` | old-app controlled-id escape hatch; component value assignment resolved through registered input contract | component object read using declared member | read component value for request without runtime guessing |
 | typed component gather include | `g.Include<Component,TModel>(...)`, native shorthand, or `g.Include(TypedComponentSource<T>)` | component value assignment + input/member contract | component property or method read | read component member value for request |
 | `HttpRequestBuilder.AsJson/AsFormData` | request content type | request body format | `bodyFormat` | JSON or FormData writer |
-| `HttpRequestBuilder.Validate<T>` | form validation gate | validation target for request | request validation target | run projected client rules before fetch |
+| `HttpRequestBuilder.Validate<T>` | form validation gate | validation target for request | request validation target | run declared client metadata before fetch |
 | `HttpRequestBuilder.WhileLoading` | pre-request reaction graph | request before reactions | `before[]` | execute before fetch |
 | `HttpRequestBuilder.Finally` | settle reaction graph | request finally reactions | `finally[]` | execute after success/error/network failure |
 | `Response.OnSuccess` | success handler | success reaction graph | `success[]` | execute on 2xx response |
@@ -434,8 +434,8 @@ tests match the row language.
 | `p.Parallel(...)` | concurrent request branches | parallel request reaction | `reaction.kind="parallel"` | execute requests concurrently |
 | `Parallel.OnAllSettled` | post-parallel reaction graph | completion reaction | parallel completion | execute after every branch settles |
 | `p.Into(elementId)` | inject success body into host | inject reaction with success payload body | `reaction.kind="inject"` | write HTML, discover plans, load slot |
-| direct client validation `ClientValidationRules.For(...).Field(...)` | field rule metadata | `ClientValidationField` with rules | validation rules in plan | browser validation runtime |
-| direct validation `When(...)` | conditional client rules | validation rule activation condition | validation condition | run rule only when condition passes |
+| app-level client validation `services.AddReactiveClientValidation(r=>r.Add<V,M>(v=>v.Field(...)))` | field rule metadata | `ClientValidationField` with rules | validation rules in plan | browser validation runtime |
+| app-level validation `When(...)` | conditional client rules | validation rule activation condition | validation condition | run rule only when condition passes |
 | direct validation field rules | `Required`, `Empty`, `Email`, `Url`, `CreditCard`, `AtLeastOne`, length/range/compare/peer rules | deterministic client validation rule | validation rule name + operand | rule engine evaluation |
 | `ReactiveValidator.ClientRule(...)` | explicit browser rule metadata | client validation rule | validation rule | browser executes declared primitive |
 | `ReactiveValidator.WhenField*` | browser-known condition | client rule activation | validation activation condition | browser evaluates same guard |
@@ -478,8 +478,8 @@ module, at least the matching vectors must stay true.
 | T8 success response drives follow-up request | `OnSuccess<Resident>((json,s)=> s.Get("/r/{id}").Gather(g=>g.RouteParam("id", json.Read(x=>x.Id))))` | success route reaction containing request; request input reads success payload | payload scope `success` read in nested request assignment | first response id becomes second route param | HTTP runtime + Playwright |
 | T9 response chained request | `Response(r=>r.OnSuccess(...).Chained(c=>c.Get(url)))` | `RequestPlan` with `ResponseRoute` and follow-up request | request chain/follow-up request JSON | follow-up request executes after response route | HTTP runtime/Playwright |
 | T10 parallel requests | `p.Parallel(a=>a.Get("/a"), b=>b.Get("/b")).OnAllSettled(p=>p.Dispatch("done"))` | `ParallelRequests` with two request reactions and completion graph | `parallel.steps[]`, `completion.on-settled` | both fetches start; completion runs after all settle | HTTP runtime/Playwright |
-| T11 validation client metadata | `ClientValidationRules.For<V,M>(v=>v.Field(m=>m.Name).Required("Name"))` | validation field metadata bound to model path and rule | validation-container rules include required rule | browser blocks request and displays rule | validation metadata + Playwright |
-| T12 FluentValidation server-only guard | `WhenAsync(...); RuleFor(x=>x.Name).NotEmpty()` outside client guard | server validator remains normal; client projection omits unprojectable guard/rule path as required | no browser rule for async-only guarded behavior | server still validates; client does not invent condition | validation projection |
+| T11 validation client metadata | `services.AddReactiveClientValidation(r=>r.Add<V,M>(v=>v.Field(m=>m.Name).Required("Name")))` | validation field metadata bound to model path and rule | validation-container rules include required rule | browser blocks request and displays rule | validation metadata + Playwright |
+| T12 FluentValidation server-only guard | `WhenAsync(...); RuleFor(x=>x.Name).NotEmpty()` outside client guard | server validator remains normal; client metadata omits unprojectable guard/rule path as required | no browser rule for async-only guarded behavior | server still validates; client does not invent condition | validation metadata |
 | T13 partial SSR same model | root and partial both use `ReactivePlan/ResolvePlan<TModel>` | two `PlanDocument`s with same `planId` | root + partial docs share plan id | boot composes documents before wiring triggers | boot composition runtime |
 | T14 partial browser load/unload | success `p.Into("slot")` injects HTML containing `ResolvePlan<TModel>` | slot load records returned plans under target slot id | partial plan documents + partial slot | load wires slot behavior; unload aborts slot wiring and recomposes behavior/rules/components from boot plus remaining slots | partial Playwright/runtime |
 | T15 app-level component | `p.Component<FusionToast>().SetContent("Saved").Show()` | fixed-id layout component object with property write and method call | component role `layout-object` | runtime joins fixed object and calls show | app-level Playwright |

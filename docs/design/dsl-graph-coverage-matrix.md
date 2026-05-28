@@ -25,7 +25,7 @@ rg -n "^\s*public .*\(" \
 ```
 
 The current source scan returns 302 public method lines across the core DSL,
-validation projection, plugin DSL, and plan/rendering DSL. Component vertical
+validation metadata, plugin DSL, and plan/rendering DSL. Component vertical
 slices are classified separately because they follow a repeated pattern:
 render, typed property/method/value source, typed event/callback.
 
@@ -70,7 +70,7 @@ across repeated vertical slices.
 | Response routes | `OnSuccess`, `OnSuccess<T>`, `OnError`, `OnError(status)`, `OnError<T>`, `OnError<T>(status)`, `Chained` | Response match with success/error payload scope and optional follow-up request |
 | Parallel requests | `Parallel(branches).OnAllSettled(pipeline)` | Concurrent request graph with all-settled completion graph |
 | Response payload source | `ResponseBody<T>.Read(expr)` plus direct `SetText(response,path)` | Success/error payload value expression |
-| Direct validation projection | `Field`, field rule methods, projection `When`, validation condition builders | Client validation projection with fields, rules, peer fields, and activation conditions |
+| App-level validation metadata | `AddReactiveClientValidation`, `Field`, field rule methods, metadata `When`, validation condition builders | Client validation metadata with fields, rules, peer fields, and activation conditions |
 | FluentValidation client metadata | `ReactiveValidator.ClientRule`, `ReactiveValidator.WhenField*`, `WhenFields`, server-only `When/Unless/WhenAsync/UnlessAsync` | Explicit browser rule metadata and client-declared conditions; async/server-only conditions stay server-only |
 | App-level objects | `FusionToast`, `FusionConfirm`, `NativeDrawer`, `NativeLoader`, app-level `Component<TApp>()` | Layout browser object with fixed id and typed commands/properties |
 | Native ActionLink | `NativeActionLinkBuilder`, serializer, HTML extension | Inline plan payload carried in attributes for behavior that starts from a rendered link |
@@ -136,7 +136,7 @@ they produce vendor template markup, not plan behavior, except where
 | Pipeline/reaction | `PipelineBuilder.cs`, `ElementBuilder.cs`, `DispatchPayloadBuilder.cs` | 36 | ReactionGraph, ValueExpression, BrowserObjectContract | T1, T2, T3, T15, T17 |
 | Conditions | `PipelineBuilder.Conditions.cs`, `Builders/Conditions/*.cs` | 72 | ConditionGraph, BranchReaction, ValueExpression | T3, T4, T5 |
 | HTTP/gather/response | `PipelineBuilder.Http.cs`, `Builders/Requests/*.cs`, `ResponseBody.cs` | 46+ | RequestPlan, RequestInputProjection, ResponseRoute, ParallelRequests | T6, T7, T8, T9, T10 |
-| Validation projection | `Alis.Reactive/Validation/*.cs`, `Alis.Reactive.FluentValidator/*.cs` | 126 | ValidationProjection, ValidationCondition, FieldRule | T11, T12, T14 |
+| Validation metadata | `Alis.Reactive/Validation/*.cs`, `Alis.Reactive.FluentValidator/*.cs` | 126 | ValidationMetadata, ValidationCondition, FieldRule | T11, T12, T14 |
 | Plugin | `ReactivePlugin.cs`, `PluginTypeBuilder.cs`, `PluginReadBuilder.cs`, `PluginCallBuilder.cs` | 52+ | PluginContract, PluginRead, PluginCall | T6, T17 |
 | Component object slices | `Alis.Reactive.Native/**`, `Alis.Reactive.Fusion/**` extension/event files | many repeated slice methods | BrowserObjectContract, ComponentObject, ObjectProperty, ObjectMethod, ObjectEvent | T7, T15, T16 |
 
@@ -181,8 +181,8 @@ flowchart TD
 | `GatherBuilder` / `GatherExtensions` | target/source assignments and all registered inputs | gather target <- value source | covered by `HTTP, Gather, Response, Parallel` matrix |
 | `ResponseBuilder` / `ResponseBody` | success/error routes, response payload source, chained request | response -> payload scope/pipeline/follow-up | covered by `HTTP, Gather, Response, Parallel` matrix |
 | `ParallelBuilder` | all-settled graph | parallel -> completion graph | covered by `HTTP, Gather, Response, Parallel` matrix |
-| direct validation builders | field, rule, condition builders | validation DSL -> validation projection | covered by `Validation` matrix |
-| FluentValidation adapter/builders | client rule projection and client-known guards | validator source -> validation projection | covered by `Validation` matrix |
+| app-level validation metadata builders | field, rule, condition builders | validation DSL -> validation metadata | covered by `Validation` matrix |
+| FluentValidation metadata builders | client rule metadata and client-known guards | validator source -> validation metadata | covered by `Validation` matrix |
 | plugin builders | type registration, read args, call args | plugin DSL -> plugin contract/value/call | covered by `Plugin` matrix |
 | component extensions | typed property/method/value source/event/render | component slice -> browser object contract | covered by `Component Slice` matrix |
 

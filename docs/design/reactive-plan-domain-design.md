@@ -30,7 +30,7 @@ whether the server generated a possible shape.
 | `RequestPlan` | One HTTP request, its input, stages, response routes, and follow-up | HTTP builders |
 | `RequestInput` | Ordered assignments to payload, headers, route params, or all registered inputs | gather builders |
 | `ResponseRoute` | Success or error handler with optional typed response body scope | response builders |
-| `ValidationProjection` | Deterministic client rules for mounted input components | validation builders and FluentValidation projection |
+| `ValidationMetadata` | Deterministic client rules for mounted input components | validation metadata builders and FluentValidation metadata |
 | `PluginContract` | Explicit browser bridge for behavior not worth modeling as first-class DSL | plugin builders |
 | `ComponentSlice` | One isolated Native/Fusion component onboarding surface | component folders |
 
@@ -47,7 +47,7 @@ rows, and implementation work is not allowed to skip one of these rows.
 | Pipeline/reaction | dispatch, dispatch payload, element mutation, component object target, URL source, plugin read/command, validation display, success-body injection | Reaction/value matrix |
 | Conditions | event/response/typed-source starts, confirm, unary/binary/text/range/membership/collection comparisons, nested all/any/not, then/elseif/else | Conditions matrix |
 | HTTP/gather/response | request starts, body format, validation before request, before/finally graphs, gather target/source assignments, response routes, follow-up request, parallel all-settled | HTTP matrix |
-| Validation | direct projection field rules, field conditions, rule activations, peer fields, FluentValidation explicit client projection, client-known guards, server-only guards | Validation matrix |
+| Validation | app-level field rules, field conditions, rule activations, peer fields, FluentValidation explicit client metadata, client-known guards, server-only guards | Validation matrix |
 | Plugin | string registration, descriptor registration, property/function/command/root function/root command, exact/open argument contracts, read args and command args from literals/event/response/sources | Plugin matrix |
 | Component slices | render, controlled ids, typed events/callbacks, typed property write/read, typed method call/read, app-level fixed ids, action-link inline plan | Component matrix |
 | Fusion templates | template markup builders and event buttons | Component matrix; template markup itself stays outside runtime plan behavior |
@@ -224,11 +224,11 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     A[Validation source DSL] --> B{Source type}
-    B -->|direct projection| C[Field rules and field conditions]
+    B -->|app-level metadata| C[Field rules and field conditions]
     B -->|ReactiveValidator| D[Explicit ClientRule metadata]
     D --> E[Attach client-known WhenField/WhenFields conditions]
-    D --> F[Ignore async/server-only rules for client projection]
-    C --> G[ValidationProjection]
+    D --> F[Ignore async/server-only rules for client metadata]
+    C --> G[ValidationMetadata]
     E --> G
     G --> H[Bind to mounted input components by controlled id]
     H --> I[Runtime validates current component values]
@@ -388,12 +388,12 @@ conditions, and response handlers.
 | direct `MinLength/MaxLength/Regex` | literal rule operand | validate scalar operand |
 | direct `Range/ExclusiveRange/Min/Max/Gt/Lt/EqualTo/NotEqual` | literal comparison rule | validate field against literal |
 | direct peer comparisons | peer field operand | read peer component by controlled id |
-| direct projection `When(condition, rules)` | rule activation condition | run enclosed rules only when condition true |
+| app-level metadata `When(condition, rules)` | rule activation condition | run enclosed rules only when condition true |
 | validation condition `Field(expr)` plus typed condition operator | field condition | read mounted field component |
 | validation condition `And/Or/Not` | composite condition | evaluate condition graph |
 | `ReactiveValidator.ClientRule(...)` | explicit browser rule metadata | emit only declared client rule |
 | Fluent `WhenField*` / `WhenFields` | client-known condition | emit activation condition |
-| Fluent `When/Unless/WhenAsync/UnlessAsync` | server-only condition | server still runs; client projection skips or marks server-only |
+| Fluent `When/Unless/WhenAsync/UnlessAsync` | server-only condition | server still runs; client metadata omits it |
 | request `.Validate<TSource>(formId)` | validation job for source/container | validate container before request |
 
 ### Plugin
@@ -453,7 +453,7 @@ These rows come from `*Extensions.cs`, `*HtmlExtensions.cs`,
 | Value | every DSL source has one value representation and every consumer accepts it where source allows |
 | Conditions | all source kinds, operators, compositions, else-if/default, and multiple mixed blocks work from the same condition graph |
 | HTTP/gather/response | target/source matrix works for payload/header/route, response body can feed follow-up requests, parallel and chain work |
-| Validation | direct and Fluent client projections produce same validation domain; server-only/async stays server-side |
+| Validation | app-level and Fluent client metadata produce same validation domain; server-only/async stays server-side |
 | Plugin | plugin contract, reads, commands, args, properties, root functions, descriptors map to object members |
 | Component slices | each slice only declares its own render/event/property/method surface; common plan primitives do the rest |
 | Runtime/TS | generated TS contract matches C# domain; runtime executes without plan-shape defensive fallback |

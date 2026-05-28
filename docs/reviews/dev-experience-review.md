@@ -241,8 +241,8 @@ descriptive enough. `formId` on `Validate<TValidator>` makes sense.
 
 3. **`Validate` has two overloads.** The first takes a `ValidationDescriptor` (how do
    I create one?), the second takes a `TValidator` type and `formId`. The second is
-   more discoverable but the doc says "Rules are projected automatically at Render()
-   time via IClientValidationProjectionSource" which assumes knowledge of the validation pipeline.
+   more discoverable but the doc says "Rules are declared as browser metadata at Render()
+   time via IClientValidationRuleSource" which assumes knowledge of the validation pipeline.
 
 4. **The four convenience verbs** (`Get`, `Post`, `Put`, `Delete`) on the builder
    itself have **no XML docs at all**. These appear to be used inside `Chained` and

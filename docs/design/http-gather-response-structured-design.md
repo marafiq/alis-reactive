@@ -148,7 +148,7 @@ flowchart TD
 flowchart TD
     A[Execute RequestPlan] --> B{Validation target}
     B -->|none| D[Run before graph]
-    B -->|container| C[Run client validation projection]
+    B -->|container| C[Run client validation metadata]
     C -->|invalid| Z[Stop before fetch]
     C -->|valid| D
     D --> E[Resolve RequestInputProjection]

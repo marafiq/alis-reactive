@@ -37,7 +37,7 @@ namespace YourApp.Models
 }
 ```
 
-**Key:** The property TYPE matters. `int` → numeric comparison. `DateTime` → date comparison. `string` → string comparison. This is determined at client projection time, not runtime.
+**Key:** The property TYPE matters. `int` → numeric comparison. `DateTime` → date comparison. `string` → string comparison. This is determined when client metadata is declared, not at runtime.
 
 ---
 
@@ -326,7 +326,7 @@ RuleFor(x => x.Score).IsExclusiveBetween(0m, 100m);
 ### DO NOT use `.When()` for client-side conditions
 
 ```csharp
-// WRONG for client projection — .When() is not part of the browser projection language
+// WRONG for client metadata — .When() is not part of the browser metadata language
 RuleFor(x => x.JobTitle).NotEmpty().When(x => x.IsEmployed);
 
 // CORRECT — use ReactiveValidator + WhenField

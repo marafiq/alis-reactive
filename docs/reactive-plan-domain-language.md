@@ -84,7 +84,7 @@ probing live objects.
 | Branch Cases | Ordered branch cases with at most one default case and default last. Multiple branch blocks can appear in a reaction sequence; nested branch blocks are represented only where DSL allows them. | `BranchCase`, conditions builders |
 | Request Plan | HTTP request intent: method, URL template, route/header/body assignments, validation gate, response routes, lifecycle reaction slots, chain, and parallel grouping. | request builders, `Request` |
 | Request Input Projection | Explicit mapping from readable sources to route values, query/body payload, headers, or all registered inputs. | gather/request payload model |
-| Validation Projection | Deterministic browser validation rules declared through typed validation metadata. FluentValidation server rules still run normally; only explicit `ClientRule(...)` metadata enters the browser plan. | validation projection model |
+| Validation Metadata | Deterministic browser validation rules declared through typed metadata. FluentValidation server rules still run normally; only explicit browser metadata enters the plan. | validation metadata model |
 | Validation Container | Component role that owns browser validation rules for a form/container. Partials can add rules to a root container; slot unload recomposes rules from boot plus remaining slots. | `validation-container` role, runtime validation |
 | Plugin Contract | Declared browser plugin object/function contract for behavior outside deterministic first-class DSL primitives. Public plugin compatibility may use strings; internal plan/runtime terms stay typed. | `ReactivePlugin`, `PluginContract` |
 
@@ -139,14 +139,14 @@ path dedupe or source ownership policy.
 
 ## Validation
 
-Validation projection means browser-executable client rules only.
+Validation metadata means browser-executable client rules only.
 
 - FluentValidation rules still execute normally on submit or HTTP endpoints.
 - Browser rules enter the plan only through explicit typed metadata such as
   `ReactiveValidator<T>.ClientRule(...)`.
 - Async rules and regular FluentValidation guards stay server-only.
 - Client metadata must be explicit and typed.
-- Runtime validation executes the projected rule contract; it does not reflect
+- Runtime validation executes the metadata rule contract; it does not reflect
   over validators or infer missing rules.
 
 ## Naming Guard

@@ -1,7 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
 
 [TestFixture]
-public sealed class WhenDirectClientValidationRulesBuildPlanRules
+public sealed class WhenAppLevelClientValidationRulesBuildPlanRules
 {
     [Test]
     public void peer_ordered_rules_are_expressed_as_peer_value_reads()

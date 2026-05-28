@@ -73,13 +73,31 @@ internal static class ClientValidationRulePlanHarness
     }
 
     private static IServiceProvider BuildServices() =>
-        new ServiceCollection()
-            .AddSingleton<IClientValidationRuleSource>(_ => new ClientValidationRuleSource(BuildFluentSource()))
-            .BuildServiceProvider();
+        BuildServices(new ServiceCollection()).BuildServiceProvider();
 
-    private static IClientValidationRuleSource BuildFluentSource()
+    private static ServiceCollection BuildServices(ServiceCollection services)
     {
-        var services = new ServiceCollection();
+        services.AddReactiveClientValidation(rules =>
+        {
+            rules.Add<StayWindowClientValidation, StayWindow>(rules =>
+            {
+                rules.Field(x => x.DischargeDate)
+                    .GreaterThan(x => x.AdmissionDate, "Discharge must be after admission.")
+                    .GreaterThanOrEqualTo(x => x.AdmissionDate, "Discharge must not be before admission.")
+                    .LessThan(x => x.ReviewDate, "Discharge must be before review.")
+                    .LessThanOrEqualTo(x => x.ReviewDate, "Discharge must not be after review.");
+            });
+
+            rules.Add<ResidentAssessmentClientValidation, ResidentAssessment>(rules =>
+            {
+                rules.When(
+                    fields => fields.Field(x => x.IsVeteran).Truthy()
+                        .And(fields.Field(x => x.CareLevel).In("Memory Care", "Skilled Nursing")),
+                    rules => rules.Field(x => x.MemoryAssessmentScore)
+                        .Required("Memory assessment score is required."));
+            });
+        });
+
         services.AddReactiveFluentValidation(rules =>
         {
             rules.Add<AsyncOnlyValidator>();
@@ -91,58 +109,7 @@ internal static class ClientValidationRulePlanHarness
             rules.Add<MixedConditionValidator>();
         });
 
-        return services
-            .BuildServiceProvider()
-            .GetRequiredService<IClientValidationRuleSource>();
-    }
-
-    private sealed class ClientValidationRuleSource : IClientValidationRuleSource
-    {
-        private static readonly IClientValidationRuleSource Core =
-            ClientValidationRules.Create(
-                ClientValidationRules.For<StayWindowClientValidation, StayWindow>(rules =>
-                {
-                    rules.Field(x => x.DischargeDate)
-                        .GreaterThan(x => x.AdmissionDate, "Discharge must be after admission.")
-                        .GreaterThanOrEqualTo(x => x.AdmissionDate, "Discharge must not be before admission.")
-                        .LessThan(x => x.ReviewDate, "Discharge must be before review.")
-                        .LessThanOrEqualTo(x => x.ReviewDate, "Discharge must not be after review.");
-                }),
-
-                ClientValidationRules.For<ResidentAssessmentClientValidation, ResidentAssessment>(rules =>
-                {
-                    rules.When(
-                        fields => fields.Field(x => x.IsVeteran).Truthy()
-                            .And(fields.Field(x => x.CareLevel).In("Memory Care", "Skilled Nursing")),
-                        rules => rules.Field(x => x.MemoryAssessmentScore)
-                            .Required("Memory assessment score is required."));
-                }));
-
-        private readonly IClientValidationRuleSource _fluent;
-
-        internal ClientValidationRuleSource(IClientValidationRuleSource fluent)
-        {
-            _fluent = fluent;
-        }
-
-        public IReadOnlyList<ClientValidationField> GetClientRules(Type validationSourceType)
-        {
-            if (FluentValidatorTypes.Contains(validationSourceType))
-                return _fluent.GetClientRules(validationSourceType);
-
-            return Core.GetClientRules(validationSourceType);
-        }
-
-        private static readonly Type[] FluentValidatorTypes =
-        [
-            typeof(AsyncOnlyValidator),
-            typeof(BuiltInPeerComparisonValidator),
-            typeof(BuiltInClientRulesValidator),
-            typeof(ConfirmEmailValidator),
-            typeof(ReactiveAssessmentValidator),
-            typeof(ComposedAssessmentValidator),
-            typeof(MixedConditionValidator)
-        ];
+        return services;
     }
 }
 

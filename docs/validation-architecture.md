@@ -42,14 +42,18 @@ Validate<TValidationSource>(containerId)
 Field binding has two deterministic paths:
 
 - Registered input fields use the rendered component id, value member, and shape from `ComponentRegistration`.
-- Deferred fields use the projection's declared field shape and the deterministic component id a partial will render later.
+- Deferred fields use the metadata's declared field shape and the deterministic component id a partial will render later.
 
-## Core Rule Source
+## Metadata Sources
 
-`ClientValidationRules` is the core-owned rule source for
-deterministic browser validation rules that are authored directly, without
-FluentValidation inspection. It keys rules by the validation source type
-named by `Validate<TValidationSource>()`, but public authoring selects fields through
+`IClientValidationRuleSource` is registered through DI. The built-in source
+combines metadata providers registered by:
+
+- `services.AddReactiveClientValidation(...)` for app-level browser rules;
+- `services.AddReactiveFluentValidation(...)` for `ReactiveValidator<T>` metadata.
+
+Both paths key rules by the validation source type named by
+`Validate<TValidationSource>()`, but public authoring selects fields through
 typed expressions and `ClientValidationFieldToken<TModel, TValue>`, not field
 name strings.
 
@@ -115,14 +119,14 @@ not delete root validation rules or layout-owned app components.
 | --- | --- |
 | Request gate | `RequestValidation`, `ValidationJob`, `RequestValidationTarget` |
 | Rule source contract | `IClientValidationRuleSource.GetClientRules(Type)` returning `IReadOnlyList<ClientValidationField>` |
-| Core rule source | `ClientValidationRules`, `ClientValidationRulesBuilder<TModel>`, `ClientValidationFieldToken<TModel, TValue>` |
+| Metadata registration | `AddReactiveClientValidation`, `AddReactiveFluentValidation`, `ClientValidationRulesBuilder<TModel>`, `ClientValidationFieldToken<TModel, TValue>` |
 | Rule binding | `ClientValidationRuleBinder`, `ValidationFieldBindingCatalog`, `ValidationFieldBinding` |
 | Plan payload | `ComponentValidation`, `ValidationRuleExecution`, `ValidationRuleOperand`, `ValidationRuleActivation`, `ValidationCondition` |
 | Runtime execution | `validateContainer`, `showServerErrors`, `RuntimeValidationActivation`, `RuntimeValidationPeerOperand`, `rule-engine.ts` |
 
 ## Design Rules
 
-- Do not name projected browser rules as if they were the normal validator execution path.
+- Do not name browser metadata rules as if they were the normal validator execution path.
 - Do not use null as behavior; `none`, missing component, and literal `null` are distinct cases.
 - Do not infer FluentValidation behavior from implementation details; require explicit `ClientRule(...)` metadata for browser rules.
 - Do not create a separate validation read path in runtime; validation reads component values through the same declared object/member contract as gather and reactions.

@@ -95,7 +95,7 @@ NativeButton, NativeHiddenField, NativeActionLink, FusionTab, FusionAccordion.
 - `Validation/ClientValidationField.cs` — 2
 - `TypedEventDescriptor.cs` — 4
 - `IComponent.cs` — 2
-- `Validation/IClientValidationProjectionSource.cs` — 2
+- `Validation/IClientValidationRuleSource.cs` — 2
 
 ## Approach
 

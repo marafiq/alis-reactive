@@ -303,12 +303,12 @@ Source:
 - normal FluentValidation rules such as NotEmpty, Length, Email, Regex, ranges,
   comparisons, nested validators, Include
 - FluentValidation `.When/.Unless/.WhenAsync/.UnlessAsync` guards outside the
-  client projection language
+  client metadata language
 
 Domain terms:
 
 - `IClientValidationRuleSource.GetClientRules`
-- `ClientValidationRules`
+- `AddReactiveClientValidation`
 - `ClientValidationFieldToken`
 - `ClientValidationField`
 - `ValidationRule`
@@ -462,7 +462,7 @@ Behavior tests should be arranged around these domain modules:
 - value producers and path traversal
 - conditions and branch execution
 - request/gather/response/chained/parallel stages
-- validation projection and field binding
+- validation metadata and field binding
 - plugin descriptors and invocation
 - runtime execution lanes
 - app-level components and action link behavior

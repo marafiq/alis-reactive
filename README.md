@@ -9,7 +9,7 @@ Plan-driven reactive framework for ASP.NET MVC. C# fluent builders produce JSON 
 | `Alis.Reactive` | Core plan model, builders, and serialization |
 | `Alis.Reactive.Native` | Native HTML components (TextBox, CheckBox, DropDown, Button, etc.) |
 | `Alis.Reactive.Fusion` | Syncfusion EJ2 component integration |
-| `Alis.Reactive.FluentValidator` | FluentValidation client-validation projection adapter |
+| `Alis.Reactive.FluentValidator` | FluentValidation client-validation metadata adapter |
 | `Alis.Reactive.DesignSystem` | Design-system tokens, layout helpers, and stylesheet |
 | `Alis.Reactive.NativeTagHelpers` | ASP.NET Core Tag Helpers for native components |
 
@@ -67,7 +67,7 @@ bundle output path is gitignored — `git status` stays clean after a build.
 Alis.Reactive/                    C# core library (packed as AlisReactive NuGet)
 Alis.Reactive.Native/             C# native-component library
 Alis.Reactive.Fusion/             C# Syncfusion-component library
-Alis.Reactive.FluentValidator/    C# client-validation projection adapter
+Alis.Reactive.FluentValidator/    C# client-validation metadata adapter
 Alis.Reactive.NativeTagHelpers/   C# tag helpers (net10 only)
 Alis.Reactive.Analyzers/          Roslyn analyzers (shipped inside AlisReactive)
 Alis.Reactive.DesignSystem/       C# design-system tokens + layout helpers
