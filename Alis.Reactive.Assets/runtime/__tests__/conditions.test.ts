@@ -303,9 +303,12 @@ describe("condition runtime", () => {
       expect(matches(minLength("Grace", 5))).toBe(true);
     });
 
-    it("treats missing text and invalid regex patterns as non-matching behavior", () => {
+    it("treats missing text as non-matching behavior", () => {
       expect(matches(text("contains", null, "ready"))).toBe(false);
-      expect(matches(regex("RN-204", "["))).toBe(false);
+    });
+
+    it("throws when a generated regex condition carries an invalid pattern", () => {
+      expect(() => matches(regex("RN-204", "["))).toThrow(SyntaxError);
     });
   });
 

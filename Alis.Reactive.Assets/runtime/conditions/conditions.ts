@@ -409,12 +409,7 @@ function evaluateRegexComparison(left: ComparisonLeft, pattern: string, conditio
   const leftText = asText(left.shaped);
   if (leftText.kind === "missing") return false;
 
-  try {
-    return new RegExp(pattern).test(leftText.value);
-  } catch {
-    log.warn("regex.invalid", { operand: pattern });
-    return false;
-  }
+  return new RegExp(pattern).test(leftText.value);
 }
 
 function evaluateMinimumLengthComparison(left: ComparisonLeft, minimumLength: number, condition: CompareCondition): boolean {
