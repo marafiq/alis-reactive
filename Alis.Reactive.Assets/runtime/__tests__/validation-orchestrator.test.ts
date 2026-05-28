@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { BrowserPlanStore } from "../lifecycle/browser-plans";
+import { AppliedBrowserPlans } from "../lifecycle/browser-plans";
 import { showServerErrors, validateContainer } from "../validation/orchestrator";
 import type { ComponentObject, ComponentValidation, BrowserObjectContract, PlanDocument, ReadExpression, Shape, ValueExpression } from "../types";
 
@@ -257,7 +257,7 @@ describe("validation orchestrator server errors", () => {
 
   it("routes server errors for unloaded partial fields to the summary", () => {
     renderValidationDom();
-    const browserPlans = new BrowserPlanStore();
+    const browserPlans = new AppliedBrowserPlans();
     const runtimePlan = plan([
       requiredRule("zip-code-field", "Address.ZipCode", "zip-code-field"),
     ], {});

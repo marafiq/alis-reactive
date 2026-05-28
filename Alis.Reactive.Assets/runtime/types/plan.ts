@@ -569,7 +569,7 @@ export type InjectionTarget =
 
 export interface PartialSlotInjectionTarget {
   kind: "partial-slot";
-  component: string;
+  slot: string;
 }
 
 export interface ShowValidationErrorsReaction {

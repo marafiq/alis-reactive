@@ -12,12 +12,8 @@ import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/
 import { resetNativeActionLinksForTests } from "../components/native/native-action-link";
 import { resetPluginCatalogForTests } from "../core/plugin-catalog";
 import {
-  applyPartialSlotLoad,
-  applyPartialSlotUnload,
+  appliedBrowserPlans,
   type BrowserPlanWiring,
-  getBootedPlan as getTrackedBootedPlan,
-  registerBootedPlan,
-  resetBrowserPlansForTests,
 } from "./browser-plans";
 
 const log = scope("boot");
@@ -44,7 +40,7 @@ export function boot(plan: PlanDocument): void {
   wireBehaviors(plan.behaviors, plan, bootAbort.signal);
 
   setActivePlan(plan);
-  registerBootedPlan(plan);
+  appliedBrowserPlans.register(plan);
   markReactiveBooted(plan);
   log.info("booted", { planId: plan.planId });
 }
@@ -76,7 +72,7 @@ function wireContainerValidation(plan: PlanDocument, signal?: AbortSignal): void
 }
 
 export function loadPartialSlot(slotId: string, incoming: PlanDocument[]): void {
-  const affectedPlanIds = applyPartialSlotLoad(slotId, incoming, browserPlanWiring());
+  const affectedPlanIds = appliedBrowserPlans.loadPartialSlot(slotId, incoming, browserPlanWiring());
 
   for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
@@ -93,7 +89,7 @@ export function loadPartialSlot(slotId: string, incoming: PlanDocument[]): void 
 }
 
 export function unloadPartialSlot(slotId: string): void {
-  const affectedPlanIds = applyPartialSlotUnload(slotId);
+  const affectedPlanIds = appliedBrowserPlans.unloadPartialSlot(slotId);
 
   for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
@@ -106,7 +102,7 @@ export function unloadPartialSlot(slotId: string): void {
 }
 
 export function getBootedPlan(planId: string): PlanDocument | undefined {
-  return getTrackedBootedPlan(planId);
+  return appliedBrowserPlans.get(planId);
 }
 
 export function resetBootStateForTests(): void {
@@ -128,7 +124,7 @@ function browserPlanWiring(): BrowserPlanWiring {
 
 function resetRuntimeSingletonsForTests(): void {
   resetActivePlanForTests();
-  resetBrowserPlansForTests();
+  appliedBrowserPlans.reset();
   resetLiveClearForTests();
   resetNativeActionLinksForTests();
   resetPluginCatalogForTests();

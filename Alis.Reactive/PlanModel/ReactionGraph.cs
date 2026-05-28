@@ -53,8 +53,8 @@ namespace Alis.Reactive.PlanModel
         internal static ReactionGraph Dispatch(string eventName, ValueExpression data, PayloadContract payloadType) =>
             new DispatchReaction(eventName, DispatchPayload.Typed(data, payloadType));
 
-        internal static ReactionGraph Inject(string component, ValueExpression value) =>
-            new InjectReaction(InjectionTarget.PartialSlot(component), value);
+        internal static ReactionGraph Inject(string slot, ValueExpression value) =>
+            new InjectReaction(InjectionTarget.PartialSlot(slot), value);
 
         internal static ReactionGraph ShowValidationErrors(string container) =>
             new ShowValidationErrorsReaction(container);
@@ -552,27 +552,27 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the target kind.</summary>
         public abstract string Kind { get; }
 
-        /// <summary>Gets the target component key.</summary>
-        public abstract string Component { get; }
+        /// <summary>Gets the browser slot that receives injected HTML.</summary>
+        public abstract string Slot { get; }
 
-        internal static InjectionTarget PartialSlot(string component) =>
-            new PartialSlotInjectionTarget(ComponentKey.Of(component));
+        internal static InjectionTarget PartialSlot(string slot) =>
+            new PartialSlotInjectionTarget(ComponentKey.Of(slot));
     }
 
     /// <summary>Replaces a browser partial slot with injected HTML and embedded plans.</summary>
     public sealed class PartialSlotInjectionTarget : InjectionTarget
     {
-        private readonly ComponentKey _component;
+        private readonly ComponentKey _slot;
 
-        internal PartialSlotInjectionTarget(ComponentKey component)
+        internal PartialSlotInjectionTarget(ComponentKey slot)
         {
-            _component = component ?? throw new ArgumentNullException(nameof(component));
+            _slot = slot ?? throw new ArgumentNullException(nameof(slot));
         }
 
         /// <summary>Gets the kind. Always <c>"partial-slot"</c>.</summary>
         public override string Kind => "partial-slot";
-        /// <summary>Gets the component whose HTML is replaced.</summary>
-        public override string Component => _component.Value;
+        /// <summary>Gets the slot whose HTML is replaced.</summary>
+        public override string Slot => _slot.Value;
     }
 
     /// <summary>Injects a value into a declared target.</summary>

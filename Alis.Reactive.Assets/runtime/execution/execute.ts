@@ -203,15 +203,15 @@ function executeDispatch(reaction: DispatchReaction, plan: RuntimePlan, context:
 }
 
 function executeInject(reaction: InjectReaction, plan: RuntimePlan, context: ExecutionContext): void {
-  const container = plan.components.element(reaction.target.component);
+  const container = plan.components.element(reaction.target.slot);
   const value = evaluateValue(reaction.value, plan.document, context.raw);
   if (typeof value === "string") {
     injectHtml(container, value, reaction.target);
-    log.trace("inject.applied", { component: reaction.target.component, target: reaction.target.kind, size: value.length });
+    log.trace("inject.applied", { slot: reaction.target.slot, target: reaction.target.kind, size: value.length });
     return;
   }
 
-  log.error("inject.wrong-type", { component: reaction.target.component, type: typeof value });
+  log.error("inject.wrong-type", { slot: reaction.target.slot, type: typeof value });
   throw new Error(`[alis] inject expects string HTML, got ${typeof value}`);
 }
 

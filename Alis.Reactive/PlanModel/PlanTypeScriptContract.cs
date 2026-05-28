@@ -431,7 +431,7 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("PartialSlotInjectionTarget")
                 .Requires("kind", Literal("partial-slot"))
-                .Requires("component", "string"));
+                .Requires("slot", "string"));
 
             contract.Declare(Interface("ShowValidationErrorsReaction")
                 .Requires("kind", Literal("show-validation-errors"))

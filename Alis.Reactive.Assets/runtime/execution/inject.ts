@@ -41,11 +41,9 @@ export function injectHtml(container: HTMLElement, html: string, target: Injecti
     container.append(...Array.from(temp.childNodes));
   }
 
-  if (target.kind === "partial-slot") {
-    if (plans.length === 0) {
-      unloadPartialSlot(target.component);
-    } else {
-      loadPartialSlot(target.component, plans);
-    }
+  if (plans.length === 0) {
+    unloadPartialSlot(target.slot);
+  } else {
+    loadPartialSlot(target.slot, plans);
   }
 }

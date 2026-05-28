@@ -58,7 +58,7 @@ rows, and implementation work is not allowed to skip one of these rows.
 flowchart TD
     PlanDsl[Plan DSL] --> PlanDocument
     PlanDocument --> Script[RenderedPlanScript]
-    Script --> Store[BrowserPlanStore]
+    Script --> Store[AppliedBrowserPlans]
     Store --> PartialSlot
 
     PlanDsl --> ComponentSlice

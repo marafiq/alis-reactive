@@ -243,7 +243,7 @@ sequenceDiagram
         end
     end
 
-    boot->>registry: registerBootedPlan(plan)
+    boot->>registry: appliedBrowserPlans.register(plan)
     boot->>boot: log.info("booted")
 </div>
 
@@ -256,7 +256,7 @@ sequenceDiagram
     participant errDisplay as error-display.ts
 
     Caller->>boot: loadPartialSlot(partId, plans)
-    boot->>registry: applyPartialSlotLoad(partId, plans, {wireBehaviors, wireContainerValidation})
+    boot->>registry: appliedBrowserPlans.loadPartialSlot(partId, plans, {wireBehaviors, wireContainerValidation})
     Note over registry: Replaces prior slot contribution,<br/>applies plan documents,<br/>wires with one AbortController
     registry-->>boot: affected plan ids
 
@@ -1744,9 +1744,9 @@ sequenceDiagram
     end
 
     alt extracted plans exist
-        inject->>boot: loadPartialSlot(target.component, plans)
+        inject->>boot: loadPartialSlot(target.slot, plans)
     else no extracted plans
-        inject->>boot: unloadPartialSlot(target.component)
+        inject->>boot: unloadPartialSlot(target.slot)
     end
 </div>
 </section>

@@ -3,8 +3,8 @@
 import type { PlanDocument, Behavior } from "../types";
 import {
   mergeBootComponent,
-  mergeLoadedComponent,
-} from "./component-slots";
+  mergeSlotComponent,
+} from "./component-merge";
 import { mergeObjectContracts } from "./object-contracts";
 
 type PlanId = string;
@@ -23,7 +23,7 @@ interface PartialSlot {
   readonly plans: PlanDocument[];
 }
 
-export class BrowserPlanStore {
+export class AppliedBrowserPlans {
   private readonly plans = new Map<PlanId, PlanDocument>();
   private readonly bootPlans = new Map<PlanId, PlanDocument>();
   private readonly slots = new Map<PartialSlotId, PartialSlot>();
@@ -35,10 +35,6 @@ export class BrowserPlanStore {
 
   loadPartialSlot(slotId: PartialSlotId, plans: PlanDocument[], wiring: BrowserPlanWiring): PlanId[] {
     const affectedPlanIds = new Set(this.removeSlot(slotId));
-    if (plans.length === 0) {
-      this.recomposePlans(affectedPlanIds);
-      return [...affectedPlanIds];
-    }
 
     const abortController = new AbortController();
     const slotPlans = plans.map(snapshotPlan);
@@ -92,7 +88,7 @@ export class BrowserPlanStore {
 
   private recomposePlan(planId: PlanId): void {
     const bootPlan = this.bootPlans.get(planId);
-    const slotPlans = this.activeSlotPlans(planId);
+    const slotPlans = this.plansLoadedBySlots(planId);
 
     if (bootPlan === undefined && slotPlans.length === 0) {
       this.plans.delete(planId);
@@ -121,7 +117,7 @@ export class BrowserPlanStore {
     return activePlan;
   }
 
-  private activeSlotPlans(planId: PlanId): PlanDocument[] {
+  private plansLoadedBySlots(planId: PlanId): PlanDocument[] {
     const plans: PlanDocument[] = [];
     for (const slot of this.slots.values()) {
       for (const plan of slot.plans) {
@@ -139,7 +135,7 @@ export class BrowserPlanStore {
   }
 }
 
-const browserPlans = new BrowserPlanStore();
+export const appliedBrowserPlans = new AppliedBrowserPlans();
 
 export function composeInitialPlans(plans: PlanDocument[]): PlanDocument[] {
   const assembledPlans = new Map<PlanId, PlanDocument>();
@@ -156,7 +152,7 @@ function composeBootPlanInto(target: PlanDocument, incoming: PlanDocument): void
   mergeTypeContracts(target, incoming);
 
   for (const [componentKey, component] of Object.entries(incoming.components)) {
-    mergeBootComponent(target, { componentKey, component });
+    mergeBootComponent(target, componentKey, component);
   }
 
   target.behaviors.push(...incoming.behaviors);
@@ -170,9 +166,10 @@ function composeSlotPlanInto(
   mergeTypeContracts(target, incoming);
 
   for (const [componentKey, component] of Object.entries(incoming.components)) {
-    mergeLoadedComponent(
+    mergeSlotComponent(
       target,
-      { componentKey, component },
+      componentKey,
+      component,
       bootPlan?.components[componentKey] !== undefined,
     );
   }
@@ -220,13 +217,3 @@ function snapshotPlan(plan: PlanDocument): PlanDocument {
 function planIdsIn(plans: PlanDocument[]): PlanId[] {
   return Array.from(new Set(plans.map(plan => plan.planId)));
 }
-
-export function registerBootedPlan(plan: PlanDocument): void { browserPlans.register(plan); }
-export function applyPartialSlotLoad(slotId: PartialSlotId, plans: PlanDocument[], wiring: BrowserPlanWiring): PlanId[] {
-  return browserPlans.loadPartialSlot(slotId, plans, wiring);
-}
-export function applyPartialSlotUnload(slotId: PartialSlotId): PlanId[] {
-  return browserPlans.unloadPartialSlot(slotId);
-}
-export function getBootedPlan(planId: string): PlanDocument | undefined { return browserPlans.get(planId); }
-export function resetBrowserPlansForTests(): void { browserPlans.reset(); }

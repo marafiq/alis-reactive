@@ -62,13 +62,13 @@ probing live objects.
 | Plan Document | Serialized browser-executable plan for one model identity. It may be root-scoped, partial-scoped, or inline for an action link. | `Plan`, `ReactivePlan<TModel>`, generated `Plan` in `plan.ts` |
 | Plan Identity | Stable model-derived key used to compose root and same-model partial plans. | `PlanId`, `PlanIdentity` |
 | Plan Scope | Root or partial scope carried in JSON. Boot discovery and injection slot decide where the document is applied. | `PlanScope`, `RootPlanScope`, `PartialPlanScope` |
-| Partial Slot | Browser lifetime for injected partial HTML. Loading a slot replaces the previous load; unloading aborts that slot and recomposes active plans from remaining sources. | `BrowserPlanStore.loadPartialSlot`, `unloadPartialSlot` |
-| Slot Id | Runtime handle for browser partial replacement/unload. It is not a component id and not a type key. | `PartialSlotId` |
+| Partial Slot | Browser lifetime for injected partial HTML. Loading a slot replaces the previous load; unloading aborts that slot and recomposes active plans from remaining sources. | `AppliedBrowserPlans.loadPartialSlot`, `unloadPartialSlot` |
+| Slot Id | Runtime handle for browser partial replacement/unload. It is not a component id and not a type key. | `PartialSlotId`, `PartialSlotInjectionTarget.slot` |
 | Browser Object Contract | Vendor-agnostic JS object contract: properties, methods, events, callback payloads, and value shapes. | `BrowserObjectContract`, `plan.ts` object contracts |
 | Object Contract Merge | Compatible object member declarations compose into the active runtime type from boot and active slot sources. | `object-contracts.ts` |
 | Component Object | Plan entry for a browser component object. It has id, vendor, type key, and role. | `ComponentObject` |
 | Component Role | Plan-declared meaning of a component entry: `object-target`, `plan-input`, `validation-container`, or `layout-object`. | `ComponentObject.Role`, generated component role unions |
-| Component Merge | Runtime rule for composing a component entry from boot and active slot plans. Component id remains the object lookup key. | `component-slots.ts` |
+| Component Merge | Runtime rule for composing a component entry from boot and active slot plans. Component id remains the object lookup key. | `component-merge.ts` |
 | Controlled Component ID | Absolute join key for a rendered component object. Model-bound input ids are generated from model type and expression and reused by markup, plan, validation, gather, and runtime lookup. | `IdGenerator`, `ComponentRegistration` |
 | Component Vertical Slice | Isolated onboarding path for one vendor/component API. It renders markup and exposes compile-time-correct properties, methods, events, and callbacks while sharing core plan primitives. | `Alis.Reactive.Native`, `Alis.Reactive.Fusion` |
 | App-Level Component | Fixed-id layout/page object such as drawer, loader, toast, confirm, or action link support. It is modeled as a layout object role, not a normal rendered input. | Native/Fusion app-level slices |
