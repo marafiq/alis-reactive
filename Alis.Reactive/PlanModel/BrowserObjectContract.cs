@@ -71,9 +71,6 @@ namespace Alis.Reactive.PlanModel
             Access = access ?? throw new System.ArgumentNullException(nameof(access));
         }
 
-        internal static ObjectPropertyContract Create(string name, Path path, Shape shape, string access) =>
-            new ObjectPropertyContract(MemberName.Of(name), path, shape, MemberAccess.From(access));
-
         internal static ObjectPropertyContract Create(MemberName name, Path path, Shape shape, MemberAccess access) =>
             new ObjectPropertyContract(name, path, shape, access);
     }
@@ -91,9 +88,6 @@ namespace Alis.Reactive.PlanModel
             Signature = signature ?? throw new System.ArgumentNullException(nameof(signature));
         }
 
-        internal static ObjectMethodContract Create(string name, Path path, MethodSignature signature) =>
-            new ObjectMethodContract(MemberName.Of(name), path, signature);
-
         internal static ObjectMethodContract Create(MemberName name, Path path, MethodSignature signature) =>
             new ObjectMethodContract(name, path, signature);
     }
@@ -110,12 +104,6 @@ namespace Alis.Reactive.PlanModel
             Channel = channel ?? throw new System.ArgumentNullException(nameof(channel));
             PayloadType = payloadType ?? throw new System.ArgumentNullException(nameof(payloadType));
         }
-
-        internal static ObjectEventContract Create(string name, string channel) =>
-            new ObjectEventContract(EventName.Of(name), EventName.Of(channel), PayloadContract.Untyped);
-
-        internal static ObjectEventContract Create(string name, string channel, PayloadContract payloadType) =>
-            new ObjectEventContract(EventName.Of(name), EventName.Of(channel), payloadType);
 
         internal static ObjectEventContract Create(EventName name, EventName channel, PayloadContract payloadType) =>
             new ObjectEventContract(name, channel, payloadType);
@@ -344,7 +332,6 @@ namespace Alis.Reactive.PlanModel
         public Path Path { get; }
         public Shape Shape { get; }
         public string Access => _access.Value;
-        internal MemberAccess AccessMode => _access;
 
         internal ObjectProperty(Path path, Shape shape, MemberAccess access)
         {
@@ -410,12 +397,6 @@ namespace Alis.Reactive.PlanModel
 
         public string Channel => _channel.Value;
         public PayloadContract PayloadType => _payloadType;
-
-        internal ObjectEvent(string channel, PayloadContract payloadType)
-        {
-            _channel = EventName.Of(channel);
-            _payloadType = payloadType ?? throw new System.ArgumentNullException(nameof(payloadType));
-        }
 
         private ObjectEvent(EventName channel, PayloadContract payloadType)
         {
