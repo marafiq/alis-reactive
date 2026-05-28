@@ -1,6 +1,6 @@
 // execute.ts - ReactionGraph executor. The dumb runtime.
 // Dispatches on reaction.kind. Uses shared resolver for ALL component access.
-// No fallbacks. Every component reference must be in plan.components.
+// Component references resolve through the currently active browser plan.
 
 import type {
   PlanDocument, ReactionGraph, SequenceReaction, ParallelReaction, BranchReaction,

@@ -488,16 +488,6 @@ namespace Alis.Reactive.PlanModel
             JsonSerializerOptions options) =>
             throw new System.NotSupportedException("Plan types are write-only.");
 
-        private static void WriteProperty<T>(
-            Utf8JsonWriter writer,
-            JsonSerializerOptions options,
-            string name,
-            T value)
-        {
-            writer.WritePropertyName(name);
-            JsonSerializer.Serialize(writer, value, options);
-        }
-
         private static void WriteExecution(
             Utf8JsonWriter writer,
             JsonSerializerOptions options,

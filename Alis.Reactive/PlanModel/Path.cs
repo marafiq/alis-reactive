@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlanModel
 {
     /// <summary>
     /// Serializes Path as a bare JSON array of PathSegments.
-    /// Schema expects: [{ "kind": "property", "name": "value" }]
+    /// Plan wire format: [{ "kind": "property", "name": "value" }]
     /// </summary>
     internal sealed class PathJsonConverter : JsonConverter<Path>
     {
