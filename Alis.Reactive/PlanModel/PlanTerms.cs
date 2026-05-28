@@ -327,7 +327,6 @@ namespace Alis.Reactive.PlanModel
                 { "POST", new HttpMethodName("POST") },
                 { "PUT", new HttpMethodName("PUT") },
                 { "DELETE", new HttpMethodName("DELETE") },
-                { "PATCH", new HttpMethodName("PATCH") },
             };
 
         private HttpMethodName(string value) : base(value, nameof(value)) { }
@@ -336,7 +335,6 @@ namespace Alis.Reactive.PlanModel
         internal static HttpMethodName Post => Known["POST"];
         internal static HttpMethodName Put => Known["PUT"];
         internal static HttpMethodName Delete => Known["DELETE"];
-        internal static HttpMethodName Patch => Known["PATCH"];
         internal static IReadOnlyCollection<string> Values => Known.Keys;
 
         internal static HttpMethodName From(string value)
@@ -344,7 +342,7 @@ namespace Alis.Reactive.PlanModel
             if (value == null) throw new ArgumentNullException(nameof(value));
             if (Known.TryGetValue(value, out var method)) return method;
             throw new ArgumentException(
-                "Unknown HTTP method '" + value + "'. Expected GET, POST, PUT, DELETE, or PATCH.",
+                "Unknown HTTP method '" + value + "'. Expected GET, POST, PUT, or DELETE.",
                 nameof(value));
         }
     }

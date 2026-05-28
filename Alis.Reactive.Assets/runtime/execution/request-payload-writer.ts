@@ -89,7 +89,6 @@ function sendsInputInQueryString(method: HttpMethod): boolean {
     case "POST":
     case "PUT":
     case "DELETE":
-    case "PATCH":
       return false;
     default:
       return assertNever(method, "HTTP method");

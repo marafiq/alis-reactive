@@ -581,8 +581,7 @@ export type HttpMethod =
   | "GET"
   | "POST"
   | "PUT"
-  | "DELETE"
-  | "PATCH";
+  | "DELETE";
 
 export interface RequestPlan {
   method: HttpMethod;

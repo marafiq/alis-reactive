@@ -16,7 +16,7 @@ namespace Alis.Reactive.PlanModel
         private readonly RequestChain _chain;
         private readonly RequestValidationTarget _validationTarget;
 
-        /// <summary>Gets the HTTP method (GET, POST, PUT, DELETE, PATCH).</summary>
+        /// <summary>Gets the HTTP method (GET, POST, PUT, DELETE).</summary>
         public string Method => _endpoint.Method.Value;
         /// <summary>Gets the request URL, which may contain template placeholders like <c>{id}</c>.</summary>
         public string Url => _endpoint.Url.Value;
