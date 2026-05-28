@@ -270,7 +270,7 @@ function evaluateComponentRules(
   container: HTMLElement,
 ): boolean {
   const comp = surface.runtime.components.find(cv.component);
-  if (!comp) return handleMissingComponent(cv, surface);
+  if (!comp) return handleInactiveValidationField(cv, surface);
 
   const resolved = resolveFieldElement(comp, cv, surface);
   if (resolved.done) return resolved.result;
@@ -292,12 +292,12 @@ function evaluateComponentRules(
   return evaluateRulesForField(field, surface);
 }
 
-/** When the component is not found in the plan, check if all rules are conditionally skipped. */
-function handleMissingComponent(
+/** An unloaded partial field is valid only when its active rules are skipped. */
+function handleInactiveValidationField(
   cv: ComponentValidation,
   surface: ValidationSurface,
 ): boolean {
-  log.trace("component.not-found", { component: cv.component });
+  log.trace("validation-field.inactive", { component: cv.component });
   if (allRulesInactiveForUnmountedField(cv.rules, surface)) return true;
   const message = firstRuleMessage(cv);
   if (message !== undefined) {
