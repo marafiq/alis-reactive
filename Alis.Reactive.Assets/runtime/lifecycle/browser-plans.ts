@@ -18,19 +18,19 @@ export interface BrowserPlanWiring {
   wireContainerValidation: WireContainerValidation;
 }
 
-interface SlotLoad {
+interface LoadedPartialSlot {
   readonly abortController: AbortController;
   readonly plans: PlanDocument[];
 }
 
 export class AppliedBrowserPlans {
-  private readonly plans = new Map<PlanId, PlanDocument>();
-  private readonly bootPlans = new Map<PlanId, PlanDocument>();
-  private readonly slotLoads = new Map<SlotId, SlotLoad>();
+  private readonly activePlans = new Map<PlanId, PlanDocument>();
+  private readonly bootSnapshots = new Map<PlanId, PlanDocument>();
+  private readonly loadedSlots = new Map<SlotId, LoadedPartialSlot>();
 
   register(plan: PlanDocument): void {
-    this.plans.set(plan.planId, plan);
-    this.bootPlans.set(plan.planId, snapshotPlan(plan));
+    this.activePlans.set(plan.planId, plan);
+    this.bootSnapshots.set(plan.planId, snapshotPlan(plan));
   }
 
   loadPartialSlot(slotId: SlotId, plans: PlanDocument[], wiring: BrowserPlanWiring): PlanId[] {
@@ -39,17 +39,17 @@ export class AppliedBrowserPlans {
     const abortController = new AbortController();
     const slotPlans = plans.map(snapshotPlan);
     const loadedPlanIds = planIdsIn(slotPlans);
-    this.slotLoads.set(slotId, { abortController, plans: slotPlans });
+    this.loadedSlots.set(slotId, { abortController, plans: slotPlans });
 
     for (const planId of loadedPlanIds) affectedPlanIds.add(planId);
 
     this.recomposePlans(affectedPlanIds);
     for (const plan of slotPlans) {
-      const activePlan = this.plans.get(plan.planId)!;
+      const activePlan = this.activePlans.get(plan.planId)!;
       wiring.wireBehaviors(plan.behaviors, activePlan, abortController.signal);
     }
     for (const planId of loadedPlanIds) {
-      const activePlan = this.plans.get(planId)!;
+      const activePlan = this.activePlans.get(planId)!;
       wiring.wireContainerValidation(activePlan, abortController.signal);
     }
 
@@ -63,23 +63,23 @@ export class AppliedBrowserPlans {
   }
 
   get(planId: string): PlanDocument | undefined {
-    return this.plans.get(planId);
+    return this.activePlans.get(planId);
   }
 
   reset(): void {
     this.abortSlots();
-    this.plans.clear();
-    this.bootPlans.clear();
-    this.slotLoads.clear();
+    this.activePlans.clear();
+    this.bootSnapshots.clear();
+    this.loadedSlots.clear();
   }
 
   private unloadSlot(slotId: SlotId): PlanId[] {
-    const slotLoad = this.slotLoads.get(slotId);
-    if (slotLoad === undefined) return [];
+    const loadedSlot = this.loadedSlots.get(slotId);
+    if (loadedSlot === undefined) return [];
 
-    this.slotLoads.delete(slotId);
-    slotLoad.abortController.abort();
-    return planIdsIn(slotLoad.plans);
+    this.loadedSlots.delete(slotId);
+    loadedSlot.abortController.abort();
+    return planIdsIn(loadedSlot.plans);
   }
 
   private recomposePlans(planIds: Iterable<PlanId>): void {
@@ -89,11 +89,11 @@ export class AppliedBrowserPlans {
   }
 
   private recomposePlan(planId: PlanId): void {
-    const bootPlan = this.bootPlans.get(planId);
-    const slotPlans = this.plansLoadedIntoSlots(planId);
+    const bootPlan = this.bootSnapshots.get(planId);
+    const slotPlans = this.slotPlansFor(planId);
 
     if (bootPlan === undefined && slotPlans.length === 0) {
-      this.plans.delete(planId);
+      this.activePlans.delete(planId);
       return;
     }
 
@@ -110,19 +110,19 @@ export class AppliedBrowserPlans {
   }
 
   private activePlanDocument(planId: PlanId): PlanDocument {
-    let activePlan = this.plans.get(planId);
+    let activePlan = this.activePlans.get(planId);
     if (activePlan === undefined) {
       activePlan = emptyPlan(planId);
-      this.plans.set(planId, activePlan);
+      this.activePlans.set(planId, activePlan);
     }
 
     return activePlan;
   }
 
-  private plansLoadedIntoSlots(planId: PlanId): PlanDocument[] {
+  private slotPlansFor(planId: PlanId): PlanDocument[] {
     const plans: PlanDocument[] = [];
-    for (const slotLoad of this.slotLoads.values()) {
-      for (const plan of slotLoad.plans) {
+    for (const loadedSlot of this.loadedSlots.values()) {
+      for (const plan of loadedSlot.plans) {
         if (plan.planId === planId) plans.push(plan);
       }
     }
@@ -131,8 +131,8 @@ export class AppliedBrowserPlans {
   }
 
   private abortSlots(): void {
-    for (const slotLoad of this.slotLoads.values()) {
-      slotLoad.abortController.abort();
+    for (const loadedSlot of this.loadedSlots.values()) {
+      loadedSlot.abortController.abort();
     }
   }
 }
