@@ -8,44 +8,43 @@ namespace Alis.Reactive.Builders
     {
         private readonly List<ReactionGraph> _orderedBlocks = new List<ReactionGraph>();
         private readonly List<ReactionGraph> _pendingSyncReactions = new List<ReactionGraph>();
-        private List<BranchCase>? _pendingBranchCases;
-        private int _branchStartsAfterReactionCount;
-        private HttpRequestBuilder<TModel>? _pendingRequest;
-        private ParallelBuilder<TModel>? _pendingParallelRequests;
+        private PendingBranch _pendingBranch = PendingBranch.None;
+        private PendingAsyncReaction<TModel> _pendingAsyncReaction = PendingAsyncReaction<TModel>.None;
 
         internal HttpRequestBuilder<TModel> BeginHttp(PlanBuildContext context)
         {
-            FlushPendingRequestOrParallel();
+            FlushPendingAsyncReaction();
             FlushPendingBranch();
             var builder = new HttpRequestBuilder<TModel>(context);
-            _pendingRequest = builder;
+            _pendingAsyncReaction = PendingAsyncReaction<TModel>.Request(builder);
             return builder;
         }
 
         internal ParallelBuilder<TModel> BeginParallel(PlanBuildContext context)
         {
-            FlushPendingRequestOrParallel();
+            FlushPendingAsyncReaction();
             FlushPendingBranch();
             var builder = new ParallelBuilder<TModel>(context);
-            _pendingParallelRequests = builder;
+            _pendingAsyncReaction = PendingAsyncReaction<TModel>.Parallel(builder);
             return builder;
         }
 
         internal void BeginBranch()
         {
-            FlushPendingRequestOrParallel();
+            FlushPendingAsyncReaction();
             FlushPendingBranch();
         }
 
         internal void SetConditionalBranches(List<BranchCase> branches)
         {
-            _pendingBranchCases = branches;
-            _branchStartsAfterReactionCount = _pendingSyncReactions.Count;
+            _pendingBranch = PendingBranch.Cases(
+                branches,
+                _pendingSyncReactions.Count);
         }
 
         internal void FlushSegment()
         {
-            FlushPendingRequestOrParallel();
+            FlushPendingAsyncReaction();
             FlushPendingBranch();
             FlushPendingSyncReactions();
         }
@@ -60,43 +59,28 @@ namespace Alis.Reactive.Builders
 
         internal void AddCommand(ReactionGraph reaction)
         {
-            FlushPendingRequestOrParallel();
+            FlushPendingAsyncReaction();
             _pendingSyncReactions.Add(reaction);
         }
 
-        private void FlushPendingRequestOrParallel()
+        private void FlushPendingAsyncReaction()
         {
-            if (_pendingRequest is not null)
-            {
-                FlushPendingSyncReactions();
-                _orderedBlocks.Add(ReactionGraph.Request(_pendingRequest.BuildRequest()));
-                _pendingRequest = null;
+            if (!_pendingAsyncReaction.HasReaction)
                 return;
-            }
 
-            if (_pendingParallelRequests is not null)
-            {
-                FlushPendingSyncReactions();
-                _orderedBlocks.Add(_pendingParallelRequests.BuildReaction());
-                _pendingParallelRequests = null;
-            }
+            FlushPendingSyncReactions();
+            _orderedBlocks.Add(_pendingAsyncReaction.BuildReaction());
+            _pendingAsyncReaction = PendingAsyncReaction<TModel>.None;
         }
 
         private void FlushPendingBranch()
         {
-            if (_pendingBranchCases is null)
+            if (!_pendingBranch.HasCases)
                 return;
 
             var pendingSyncReactions = TakePendingSyncReactions();
-            AppendSequence(pendingSyncReactions, start: 0, count: _branchStartsAfterReactionCount);
-            _orderedBlocks.Add(ReactionGraph.Branch(_pendingBranchCases));
-            AppendSequence(
-                pendingSyncReactions,
-                start: _branchStartsAfterReactionCount,
-                count: pendingSyncReactions.Count - _branchStartsAfterReactionCount);
-
-            _pendingBranchCases = null;
-            _branchStartsAfterReactionCount = 0;
+            _pendingBranch.AppendTo(_orderedBlocks, pendingSyncReactions);
+            _pendingBranch = PendingBranch.None;
         }
 
         private void FlushPendingSyncReactions()
@@ -114,10 +98,83 @@ namespace Alis.Reactive.Builders
             return reactions;
         }
 
-        private void AppendSequence(List<ReactionGraph> reactions, int start, int count)
+        private sealed class PendingAsyncReaction<T> where T : class
         {
-            if (count > 0)
-                _orderedBlocks.Add(ReactionGraph.Sequence(reactions.GetRange(start, count)));
+            private readonly System.Func<ReactionGraph> _buildReaction;
+
+            private PendingAsyncReaction(bool hasReaction, System.Func<ReactionGraph> buildReaction)
+            {
+                HasReaction = hasReaction;
+                _buildReaction = buildReaction;
+            }
+
+            internal static PendingAsyncReaction<T> None { get; } =
+                new PendingAsyncReaction<T>(
+                    hasReaction: false,
+                    buildReaction: () => throw new System.InvalidOperationException("No pending async reaction exists."));
+
+            internal static PendingAsyncReaction<T> Request(HttpRequestBuilder<T> request) =>
+                new PendingAsyncReaction<T>(
+                    hasReaction: true,
+                    buildReaction: () => ReactionGraph.Request(request.BuildRequest()));
+
+            internal static PendingAsyncReaction<T> Parallel(ParallelBuilder<T> parallelRequests) =>
+                new PendingAsyncReaction<T>(
+                    hasReaction: true,
+                    buildReaction: parallelRequests.BuildReaction);
+
+            internal bool HasReaction { get; }
+
+            internal ReactionGraph BuildReaction() => _buildReaction();
+        }
+
+        private sealed class PendingBranch
+        {
+            private readonly List<BranchCase> _cases;
+            private readonly int _startsAfterReactionCount;
+
+            private PendingBranch(List<BranchCase> cases, int startsAfterReactionCount)
+            {
+                _cases = cases;
+                _startsAfterReactionCount = startsAfterReactionCount;
+            }
+
+            internal static PendingBranch None { get; } =
+                new PendingBranch(new List<BranchCase>(), 0);
+
+            internal bool HasCases => _cases.Count > 0;
+
+            internal static PendingBranch Cases(
+                List<BranchCase> cases,
+                int startsAfterReactionCount) =>
+                new PendingBranch(cases, startsAfterReactionCount);
+
+            internal void AppendTo(
+                List<ReactionGraph> orderedBlocks,
+                List<ReactionGraph> pendingSyncReactions)
+            {
+                AppendSequence(
+                    orderedBlocks,
+                    pendingSyncReactions,
+                    start: 0,
+                    count: _startsAfterReactionCount);
+                orderedBlocks.Add(ReactionGraph.Branch(_cases));
+                AppendSequence(
+                    orderedBlocks,
+                    pendingSyncReactions,
+                    start: _startsAfterReactionCount,
+                    count: pendingSyncReactions.Count - _startsAfterReactionCount);
+            }
+
+            private static void AppendSequence(
+                List<ReactionGraph> orderedBlocks,
+                List<ReactionGraph> reactions,
+                int start,
+                int count)
+            {
+                if (count > 0)
+                    orderedBlocks.Add(ReactionGraph.Sequence(reactions.GetRange(start, count)));
+            }
         }
     }
 }
