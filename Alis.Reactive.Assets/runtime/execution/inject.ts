@@ -1,7 +1,7 @@
-// inject.ts — Inject HTML into a declared target.
-// Extracts any <script data-reactive-plan> elements and applies them by target lifecycle.
+// inject.ts — Inject HTML into a partial slot.
+// Extracts any <script data-reactive-plan> elements and applies them to the injected slot.
 
-import type { InjectionTarget, PlanDocument } from "../types";
+import type { PlanDocument } from "../types";
 import { loadPartialSlot, unloadPartialSlot } from "../lifecycle/boot";
 
 interface SyncfusionBase {
@@ -17,9 +17,9 @@ interface SyncfusionGlobal {
 /**
  * Inject HTML into a container, using ej.base.append when available (SF component init).
  * Extracts any <script data-reactive-plan> elements first and applies them using the
- * lifecycle declared by the reaction target.
+ * slot declared by the inject reaction.
  */
-export function injectHtml(container: HTMLElement, html: string, target: InjectionTarget): void {
+export function injectHtml(container: HTMLElement, html: string, slot: string): void {
   const temp = document.createElement("div");
   temp.innerHTML = html;
 
@@ -42,8 +42,8 @@ export function injectHtml(container: HTMLElement, html: string, target: Injecti
   }
 
   if (plans.length === 0) {
-    unloadPartialSlot(target.slot);
+    unloadPartialSlot(slot);
   } else {
-    loadPartialSlot(target.slot, plans);
+    loadPartialSlot(slot, plans);
   }
 }

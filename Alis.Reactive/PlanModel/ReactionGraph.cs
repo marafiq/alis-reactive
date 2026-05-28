@@ -54,7 +54,7 @@ namespace Alis.Reactive.PlanModel
             new DispatchReaction(eventName, DispatchPayload.Typed(data, payloadType));
 
         internal static ReactionGraph Inject(string slot, ValueExpression value) =>
-            new InjectReaction(InjectionTarget.PartialSlot(slot), value);
+            new InjectReaction(slot, value);
 
         internal static ReactionGraph ShowValidationErrors(string container) =>
             new ShowValidationErrorsReaction(container);
@@ -543,54 +543,22 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>Base class for HTML injection targets. Not constructed in application code.</summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<InjectionTarget>))]
-    public abstract class InjectionTarget
-    {
-        private protected InjectionTarget() { }
-
-        /// <summary>Gets the target kind.</summary>
-        public abstract string Kind { get; }
-
-        /// <summary>Gets the browser slot that receives injected HTML.</summary>
-        public abstract string Slot { get; }
-
-        internal static InjectionTarget PartialSlot(string slot) =>
-            new PartialSlotInjectionTarget(ComponentKey.Of(slot));
-    }
-
-    /// <summary>Replaces a browser partial slot with injected HTML and embedded plans.</summary>
-    public sealed class PartialSlotInjectionTarget : InjectionTarget
+    /// <summary>Injects HTML into a partial slot.</summary>
+    public sealed class InjectReaction : ReactionGraph
     {
         private readonly ComponentKey _slot;
 
-        internal PartialSlotInjectionTarget(ComponentKey slot)
-        {
-            _slot = slot ?? throw new ArgumentNullException(nameof(slot));
-        }
-
-        /// <summary>Gets the kind. Always <c>"partial-slot"</c>.</summary>
-        public override string Kind => "partial-slot";
-        /// <summary>Gets the slot whose HTML is replaced.</summary>
-        public override string Slot => _slot.Value;
-    }
-
-    /// <summary>Injects a value into a declared target.</summary>
-    public sealed class InjectReaction : ReactionGraph
-    {
-        private readonly InjectionTarget _target;
-
         /// <summary>Gets the kind. Always <c>"inject"</c>.</summary>
         public string Kind => "inject";
-        /// <summary>Gets the target component and lifecycle semantics.</summary>
-        public InjectionTarget Target => _target;
+        /// <summary>Gets the browser slot that receives injected HTML.</summary>
+        public string Slot => _slot.Value;
         /// <summary>Gets the value to inject.</summary>
         public ValueExpression Value { get; }
 
-        internal InjectReaction(InjectionTarget target, ValueExpression value)
+        internal InjectReaction(string slot, ValueExpression value)
         {
-            _target = target ?? throw new ArgumentNullException(nameof(target));
-            Value = value ?? throw new ArgumentNullException(nameof(value));
+            _slot = ComponentKey.Of(slot);
+            Value = value;
         }
     }
 

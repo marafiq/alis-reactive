@@ -560,16 +560,8 @@ export interface PresentDispatchPayload {
 
 export interface InjectReaction {
   kind: "inject";
-  target: InjectionTarget;
-  value: ValueExpression;
-}
-
-export type InjectionTarget =
-  | PartialSlotInjectionTarget;
-
-export interface PartialSlotInjectionTarget {
-  kind: "partial-slot";
   slot: string;
+  value: ValueExpression;
 }
 
 export interface ShowValidationErrorsReaction {
