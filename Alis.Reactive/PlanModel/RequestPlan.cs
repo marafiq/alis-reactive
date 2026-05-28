@@ -44,14 +44,14 @@ namespace Alis.Reactive.PlanModel
             RequestChain chain,
             RequestValidationTarget validationTarget)
         {
-            _endpoint = endpoint ?? throw new System.ArgumentNullException(nameof(endpoint));
-            _input = input ?? throw new System.ArgumentNullException(nameof(input));
+            _endpoint = endpoint;
+            _input = input;
             _whileLoading = Snapshot(whileLoading);
             _success = Snapshot(success);
             _error = Snapshot(error);
             _finally = Snapshot(finallyReactions);
-            _chain = chain ?? throw new System.ArgumentNullException(nameof(chain));
-            _validationTarget = validationTarget ?? throw new System.ArgumentNullException(nameof(validationTarget));
+            _chain = chain;
+            _validationTarget = validationTarget;
         }
 
         internal static RequestPlan Create(
@@ -86,8 +86,8 @@ namespace Alis.Reactive.PlanModel
     {
         private RequestEndpoint(HttpMethodName method, RequestUrl url)
         {
-            Method = method ?? throw new System.ArgumentNullException(nameof(method));
-            Url = url ?? throw new System.ArgumentNullException(nameof(url));
+            Method = method;
+            Url = url;
         }
 
         internal HttpMethodName Method { get; }
@@ -149,7 +149,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static RequestValidationTarget DisplayIn(ComponentId container)
         {
-            if (container == null) throw new System.ArgumentNullException(nameof(container));
             return new ContainerRequestValidationTarget(container);
         }
     }
@@ -168,7 +167,7 @@ namespace Alis.Reactive.PlanModel
 
         internal ContainerRequestValidationTarget(ComponentId container)
         {
-            _container = container ?? throw new System.ArgumentNullException(nameof(container));
+            _container = container;
         }
 
         /// <summary>Gets the kind. Always <c>"container"</c>.</summary>
@@ -188,8 +187,8 @@ namespace Alis.Reactive.PlanModel
 
         private ResponseRoute(ReactionGraph reaction, ResponseStatusMatch match)
         {
-            Reaction = reaction ?? throw new System.ArgumentNullException(nameof(reaction));
-            Match = match ?? throw new System.ArgumentNullException(nameof(match));
+            Reaction = reaction;
+            Match = match;
         }
 
         internal static ResponseRoute AnyStatus(ReactionGraph reaction) =>
@@ -231,7 +230,7 @@ namespace Alis.Reactive.PlanModel
 
         internal ExactResponseStatusMatch(HttpResponseStatusCode statusCode)
         {
-            _statusCode = statusCode ?? throw new System.ArgumentNullException(nameof(statusCode));
+            _statusCode = statusCode;
         }
 
         /// <summary>Gets the kind. Always <c>"status"</c>.</summary>
