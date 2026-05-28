@@ -7,7 +7,7 @@ import { wireSignalR } from "./signalr";
 import { assertNever } from "../core/assert-never";
 import { scope } from "../core/trace";
 import { ExecutionContext } from "../domain/execution-context";
-import { ComponentEventContract } from "../domain/component-event-contract";
+import { componentEventChannel } from "../domain/component-event-contract";
 
 const log = scope("trigger");
 
@@ -60,7 +60,7 @@ export function wireBehavior(
 
     case "component-event": {
       const component = RuntimePlan.from(plan).components.component(trigger.component);
-      const eventContract = ComponentEventContract.declaredBy(component, trigger.event);
+      const eventContract = componentEventChannel(component, trigger.event);
 
       const source = `component-event:${trigger.component}:${trigger.event}`;
 

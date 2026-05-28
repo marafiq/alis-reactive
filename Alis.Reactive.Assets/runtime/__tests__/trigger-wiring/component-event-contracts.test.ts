@@ -30,10 +30,6 @@ describe("component event trigger contracts", () => {
     expect(document.getElementById("status")?.textContent).toBe("changed");
   });
 
-  it("rejects component event triggers that are missing from the object contract", () => {
-    expect(() => boot(planWithComponentEvent({})))
-      .toThrow('[alis] event "changed" is not declared on component "source" (type: native.event-source; declared events: none)');
-  });
 });
 
 function planWithComponentEvent(events: BrowserObjectContract["events"]): PlanDocument {
