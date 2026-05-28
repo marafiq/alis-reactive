@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.FluentValidator.Validators;
 using Alis.Reactive.Validation;
 using FluentValidation;
 
@@ -91,7 +90,7 @@ namespace Alis.Reactive.FluentValidator
             this ReactiveClientRuleBuilder<TModel, TValue> rule,
             string message)
             where TModel : class =>
-            Add(rule, server => server.IsEmpty().WithMessage(message), client => client.Empty(message));
+            Add(rule, server => server.Empty().WithMessage(message), client => client.Empty(message));
 
         public static ReactiveClientRuleBuilder<TModel, string?> Email<TModel>(
             this ReactiveClientRuleBuilder<TModel, string?> rule,
@@ -163,7 +162,7 @@ namespace Alis.Reactive.FluentValidator
             string message)
             where TModel : class
             where TValue : IComparable<TValue>, IComparable =>
-            Add(rule, server => server.IsExclusiveBetween(lowerBound, upperBound).WithMessage(message), client => client.ExclusiveRange(lowerBound, upperBound, message));
+            Add(rule, server => server.ExclusiveBetween(lowerBound, upperBound).WithMessage(message), client => client.ExclusiveRange(lowerBound, upperBound, message));
 
         public static ReactiveClientRuleBuilder<TModel, TValue?> ExclusiveRange<TModel, TValue>(
             this ReactiveClientRuleBuilder<TModel, TValue?> rule,
