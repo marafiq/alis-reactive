@@ -34,9 +34,6 @@ namespace Alis.Reactive.PlanModel
                 _components.Snapshot(),
                 _behaviors.Snapshot());
 
-        /// <summary>Behaviors collected so far — a read-only view for mid-build inspection.</summary>
-        internal IReadOnlyList<Behavior> Behaviors => _behaviors.Behaviors;
-
         /// <summary>Gets a component already registered in the plan.</summary>
         internal ComponentObject GetComponent(ComponentKey key) => _components.Get(key);
 
@@ -101,10 +98,6 @@ namespace Alis.Reactive.PlanModel
         /// Called during Render().
         /// </summary>
         internal void RegisterInputComponents() => _components.RegisterInputComponents();
-
-        /// <summary>Returns all registered input components for IncludeAll expansion at build time.</summary>
-        internal IReadOnlyDictionary<string, ComponentRegistration> GetRegisteredComponents() =>
-            _components.RegisteredInputs;
 
         /// <summary>
         /// Wires a component event to the reactive behavior built by one DSL pipeline callback.

@@ -21,9 +21,6 @@ namespace Alis.Reactive.PlanModel
         internal IReadOnlyDictionary<string, ComponentObject> Snapshot() =>
             new Dictionary<string, ComponentObject>(_components);
 
-        internal IReadOnlyDictionary<string, ComponentRegistration> RegisteredInputs =>
-            _registrations.Snapshot();
-
         internal ComponentObject Get(ComponentKey componentKey) =>
             _components[componentKey.Value];
 

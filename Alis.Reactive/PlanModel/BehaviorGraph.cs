@@ -13,8 +13,6 @@ namespace Alis.Reactive.PlanModel
             _components = components;
         }
 
-        internal IReadOnlyList<Behavior> Behaviors => _behaviors;
-
         internal IReadOnlyList<Behavior> Snapshot() => new List<Behavior>(_behaviors);
 
         internal void Add(Behavior behavior)

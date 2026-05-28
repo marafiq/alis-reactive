@@ -10,9 +10,6 @@ namespace Alis.Reactive.PlanModel
         internal IReadOnlyDictionary<string, BrowserObjectContract> Snapshot() =>
             new Dictionary<string, BrowserObjectContract>(_byTypeKey);
 
-        internal bool Contains(TypeKey key) =>
-            _byTypeKey.ContainsKey(key.Value);
-
         internal BrowserObjectContract Require(TypeKey key)
         {
             if (!_byTypeKey.TryGetValue(key.Value, out var objectContract))
@@ -20,9 +17,6 @@ namespace Alis.Reactive.PlanModel
 
             return objectContract;
         }
-
-        internal void AddOrReplace(TypeKey key, BrowserObjectContract objectContract) =>
-            _byTypeKey[key.Value] = objectContract;
 
         internal void EnsureInputValueContract(TypeKey key, InputValueContract contract)
         {
@@ -47,17 +41,17 @@ namespace Alis.Reactive.PlanModel
 
         internal void RegisterPlugin(PluginContract contract)
         {
-            if (Contains(contract.TypeKey))
+            if (_byTypeKey.ContainsKey(contract.TypeKey.Value))
                 throw new InvalidOperationException($"Plugin '{contract.Name.Value}' is already registered.");
 
-            AddOrReplace(contract.TypeKey, contract.ToBrowserObjectContract());
+            _byTypeKey[contract.TypeKey.Value] = contract.ToBrowserObjectContract();
         }
 
         internal MethodSignature EnsurePluginMethod(PluginMethodRequirement methodRead)
         {
             var typeKey = TypeKey.Plugin(methodRead.PluginName);
 
-            if (!Contains(typeKey))
+            if (!_byTypeKey.ContainsKey(typeKey.Value))
                 throw new InvalidOperationException(
                     $"Plugin '{methodRead.PluginName.Value}' is not registered. " +
                     $"Call plan.RegisterPlugin(\"{methodRead.PluginName.Value}\", ...) first.");
@@ -73,7 +67,7 @@ namespace Alis.Reactive.PlanModel
         {
             var typeKey = TypeKey.Plugin(propertyRead.PluginName);
 
-            if (!Contains(typeKey))
+            if (!_byTypeKey.ContainsKey(typeKey.Value))
                 throw new InvalidOperationException(
                     $"Plugin '{propertyRead.PluginName.Value}' is not registered. " +
                     $"Call plan.RegisterPlugin(\"{propertyRead.PluginName.Value}\", ...) first.");
