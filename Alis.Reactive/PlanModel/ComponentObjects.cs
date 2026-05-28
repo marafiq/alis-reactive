@@ -45,10 +45,16 @@ namespace Alis.Reactive.PlanModel
             return ComponentKey.Of(id.Value);
         }
 
-        internal ComponentKey EnsureComponent(
+        internal ComponentKey EnsureObjectTarget(string componentId, string vendor) =>
+            EnsureComponentObject(componentId, vendor, ComponentObject.Element);
+
+        internal ComponentKey EnsureLayoutObject(string componentId, string vendor) =>
+            EnsureComponentObject(componentId, vendor, ComponentObject.LayoutObject);
+
+        private ComponentKey EnsureComponentObject(
             string componentId,
             string vendor,
-            ComponentRole role)
+            Func<string, string, string, ComponentObject> createUnregisteredComponent)
         {
             var id = ComponentId.Of(componentId);
             var componentVendor = ComponentVendor.From(vendor);
@@ -69,7 +75,7 @@ namespace Alis.Reactive.PlanModel
             else
             {
                 _objectContracts.EnsureEmpty(typeKey);
-                _components[id.Value] = CreateUnregisteredComponent(id, componentVendor, typeKey, role);
+                _components[id.Value] = createUnregisteredComponent(id.Value, componentVendor.Value, typeKey.Value);
             }
 
             return ComponentKey.Of(id.Value);
@@ -158,26 +164,5 @@ namespace Alis.Reactive.PlanModel
                 _objectContracts.Require(TypeKey.Of(existing.Type)));
         }
 
-        private static ComponentObject CreateUnregisteredComponent(
-            ComponentId componentId,
-            ComponentVendor vendor,
-            TypeKey typeKey,
-            ComponentRole role)
-        {
-            if (role == ComponentRole.ObjectTarget)
-                return ComponentObject.Element(
-                    componentId.Value,
-                    vendor.Value,
-                    typeKey.Value);
-
-            if (role == ComponentRole.LayoutObject)
-                return ComponentObject.LayoutObject(
-                    componentId.Value,
-                    vendor.Value,
-                    typeKey.Value);
-
-            throw new InvalidOperationException(
-                $"Component '{componentId.Value}' cannot be created as '{role.Kind}' without a render-time registration.");
-        }
     }
 }

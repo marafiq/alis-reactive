@@ -56,20 +56,13 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal ComponentKey EnsureElement(string elementId) => _components.EnsureElement(elementId);
 
-        /// <summary>
-        /// Ensures a component is registered with its vendor, type metadata, and any known input binding.
-        /// </summary>
-        internal ComponentKey EnsureComponent(string componentId, string vendor) =>
-            EnsureComponent(componentId, vendor, ComponentRole.ObjectTarget);
+        /// <summary>Ensures a component referenced by page behavior is registered as a browser object target.</summary>
+        internal ComponentKey EnsureObjectTarget(string componentId, string vendor) =>
+            _components.EnsureObjectTarget(componentId, vendor);
 
-        /// <summary>
-        /// Ensures a component is registered with the browser-object role that caused the reference.
-        /// </summary>
-        internal ComponentKey EnsureComponent(
-            string componentId,
-            string vendor,
-            ComponentRole role) =>
-            _components.EnsureComponent(componentId, vendor, role);
+        /// <summary>Ensures a layout-owned app component is registered by its fixed runtime object id.</summary>
+        internal ComponentKey EnsureLayoutObject(string componentId, string vendor) =>
+            _components.EnsureLayoutObject(componentId, vendor);
 
         /// <summary>Returns the render-time registration for a component value read.</summary>
         internal ComponentRegistration RequireRegistrationById(
@@ -118,7 +111,7 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal void WireComponentEvent(string componentId, string vendor, string eventName, ReactionGraph reaction)
         {
-            EnsureComponent(componentId, vendor);
+            EnsureObjectTarget(componentId, vendor);
             var trigger = StartsWhen.ComponentEvent(componentId, eventName);
             AddBehavior(Behavior.On(trigger, reaction));
         }
