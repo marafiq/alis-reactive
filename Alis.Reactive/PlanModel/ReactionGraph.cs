@@ -61,17 +61,7 @@ namespace Alis.Reactive.PlanModel
 
         internal static IReadOnlyList<ReactionGraph> OrderedSteps(IEnumerable<ReactionGraph> steps)
         {
-            if (steps == null) throw new ArgumentNullException(nameof(steps));
-
-            var snapshot = new List<ReactionGraph>();
-            foreach (var step in steps)
-            {
-                if (step == null)
-                    throw new ArgumentException("ReactionGraph step must not be null.", nameof(steps));
-
-                snapshot.Add(step);
-            }
-
+            var snapshot = new List<ReactionGraph>(steps);
             return snapshot.Count == 0
                 ? Array.Empty<ReactionGraph>()
                 : snapshot;
@@ -110,7 +100,7 @@ namespace Alis.Reactive.PlanModel
         internal ParallelReaction(IEnumerable<ReactionGraph> steps, ParallelCompletion completion)
         {
             _steps = ReactionGraph.OrderedSteps(steps);
-            _completion = completion ?? throw new ArgumentNullException(nameof(completion));
+            _completion = completion;
         }
     }
 
@@ -127,7 +117,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static ParallelCompletion OnSettled(ReactionGraph reaction)
         {
-            if (reaction == null) throw new ArgumentNullException(nameof(reaction));
             return new SettledParallelCompletion(reaction);
         }
     }
@@ -146,7 +135,7 @@ namespace Alis.Reactive.PlanModel
 
         internal SettledParallelCompletion(ReactionGraph reaction)
         {
-            _reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));
+            _reaction = reaction;
         }
 
         /// <summary>Gets the kind. Always <c>"on-settled"</c>.</summary>
@@ -173,47 +162,7 @@ namespace Alis.Reactive.PlanModel
 
         private static IReadOnlyList<BranchCase> OrderedCases(IEnumerable<BranchCase> cases)
         {
-            if (cases == null) throw new ArgumentNullException(nameof(cases));
-
-            var snapshot = new List<BranchCase>();
-            foreach (var branchCase in cases)
-            {
-                if (branchCase == null)
-                    throw new ArgumentException("Branch case must not be null.", nameof(cases));
-
-                snapshot.Add(branchCase);
-            }
-
-            var hasNoCases = snapshot.Count == 0;
-            if (hasNoCases)
-                throw new InvalidOperationException(
-                    "Branch reaction requires at least one branch case.");
-
-            EnsureDefaultCaseIsUniqueAndLast(snapshot);
-            return snapshot;
-        }
-
-        private static void EnsureDefaultCaseIsUniqueAndLast(IReadOnlyList<BranchCase> cases)
-        {
-            var defaultCaseIndex = -1;
-            for (var i = 0; i < cases.Count; i++)
-            {
-                var branchCase = cases[i];
-                var caseIsDefault = branchCase.Guard.Kind == "default";
-                if (!caseIsDefault) continue;
-
-                if (defaultCaseIndex >= 0)
-                    throw new InvalidOperationException(
-                        "Branch reaction can have only one default branch case.");
-
-                defaultCaseIndex = i;
-            }
-
-            var defaultCaseWasDeclared = defaultCaseIndex >= 0;
-            var defaultCaseIsLast = defaultCaseIndex == cases.Count - 1;
-            if (defaultCaseWasDeclared && !defaultCaseIsLast)
-                throw new InvalidOperationException(
-                    "Branch reaction default branch case must be last.");
+            return new List<BranchCase>(cases);
         }
     }
 
@@ -228,8 +177,8 @@ namespace Alis.Reactive.PlanModel
 
         private BranchCase(BranchGuard guard, ReactionGraph reaction)
         {
-            Guard = guard ?? throw new ArgumentNullException(nameof(guard));
-            Reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));
+            Guard = guard;
+            Reaction = reaction;
         }
 
         internal static BranchCase Of(ConditionGraph when, ReactionGraph reaction) =>
@@ -246,8 +195,6 @@ namespace Alis.Reactive.PlanModel
     {
         public override void Write(Utf8JsonWriter writer, BranchCase value, JsonSerializerOptions options)
         {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-
             writer.WriteStartObject();
             WriteProperty(writer, options, "guard", value.Guard);
             WriteProperty(writer, options, "reaction", value.Reaction);
@@ -300,7 +247,7 @@ namespace Alis.Reactive.PlanModel
 
             internal ConditionalBranchGuard(ConditionGraph condition)
             {
-                _condition = condition ?? throw new ArgumentNullException(nameof(condition));
+                _condition = condition;
             }
 
             public override string Kind => "when";
@@ -314,8 +261,6 @@ namespace Alis.Reactive.PlanModel
     {
         public override void Write(Utf8JsonWriter writer, BranchGuard value, JsonSerializerOptions options)
         {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-
             writer.WriteStartObject();
             writer.WriteString("kind", value.Kind);
             value.WriteGuardPayload(writer, options);
@@ -355,9 +300,9 @@ namespace Alis.Reactive.PlanModel
 
         internal SetReaction(Source on, string property, ValueExpression value)
         {
-            On = on ?? throw new ArgumentNullException(nameof(on));
+            On = on;
             _property = MemberName.Of(property);
-            Value = value ?? throw new ArgumentNullException(nameof(value));
+            Value = value;
         }
     }
 
@@ -378,27 +323,17 @@ namespace Alis.Reactive.PlanModel
 
         internal CallReaction(Source on, string method, IReadOnlyList<ValueExpression> args)
         {
-            On = on ?? throw new ArgumentNullException(nameof(on));
+            On = on;
             _method = MemberName.Of(method);
             _args = OrderedArguments(args);
         }
 
         private static IReadOnlyList<ValueExpression> OrderedArguments(IReadOnlyList<ValueExpression> items)
         {
-            if (items == null) throw new ArgumentNullException(nameof(items));
             if (items.Count == 0)
                 return Array.Empty<ValueExpression>();
 
-            var snapshot = new List<ValueExpression>();
-            foreach (var item in items)
-            {
-                if (item == null)
-                    throw new ArgumentException("Call argument must not be null.", nameof(items));
-
-                snapshot.Add(item);
-            }
-
-            return snapshot;
+            return new List<ValueExpression>(items);
         }
     }
 
@@ -410,7 +345,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the HTTP request definition.</summary>
         public new RequestPlan Request { get; }
 
-        internal RequestReaction(RequestPlan request) { Request = request ?? throw new ArgumentNullException(nameof(request)); }
+        internal RequestReaction(RequestPlan request) { Request = request; }
     }
 
     /// <summary>Dispatches a custom browser event.</summary>
@@ -430,7 +365,7 @@ namespace Alis.Reactive.PlanModel
         internal DispatchReaction(string eventName, DispatchPayload payload)
         {
             _event = EventName.Of(eventName);
-            _payload = payload ?? throw new ArgumentNullException(nameof(payload));
+            _payload = payload;
         }
     }
 
@@ -438,8 +373,6 @@ namespace Alis.Reactive.PlanModel
     {
         public override void Write(Utf8JsonWriter writer, DispatchReaction value, JsonSerializerOptions options)
         {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-
             writer.WriteStartObject();
             writer.WriteString("kind", value.Kind);
             writer.WriteString("event", value.Event);
@@ -499,8 +432,8 @@ namespace Alis.Reactive.PlanModel
 
         internal PresentDispatchPayload(ValueExpression data, PayloadContract payloadType)
         {
-            _data = data ?? throw new ArgumentNullException(nameof(data));
-            _payloadType = payloadType ?? throw new ArgumentNullException(nameof(payloadType));
+            _data = data;
+            _payloadType = payloadType;
         }
 
         public override string Kind => "value";
@@ -516,8 +449,6 @@ namespace Alis.Reactive.PlanModel
     {
         public override void Write(Utf8JsonWriter writer, DispatchPayload value, JsonSerializerOptions options)
         {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-
             writer.WriteStartObject();
             writer.WriteString("kind", value.Kind);
             value.WritePayload(writer, options);
