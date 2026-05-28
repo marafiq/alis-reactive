@@ -27,7 +27,7 @@ namespace Alis.Reactive
             if (_registeredInputs.TryGetValue(field.FieldName, out var registration))
                 return ValidationFieldBinding.Registered(registration);
 
-            return ValidationFieldBinding.Deferred(field.ToDeferredField(_modelType));
+            return ValidationFieldBinding.ModelField(field.ToModelFieldInput(_modelType));
         }
 
         internal IEnumerable<ComponentValidation> ResolveAll(
@@ -47,7 +47,7 @@ namespace Alis.Reactive
                 return ValidationFieldBinding.Registered(registration);
 
             if (_clientRuleFields.TryGetValue(fieldPath.Value, out var field))
-                return ValidationFieldBinding.Deferred(field.ToDeferredField(_modelType));
+                return ValidationFieldBinding.ModelField(field.ToModelFieldInput(_modelType));
 
             throw new InvalidOperationException(
                 $"Validation field '{fieldPath.Value}' was referenced by a client validation rule for model '{_modelType.FullName}', " +
@@ -188,15 +188,15 @@ namespace Alis.Reactive
                 registration.ValueContract);
         }
 
-        internal static ValidationFieldBinding Deferred(DeferredModelBoundClientValidationField field)
+        internal static ValidationFieldBinding ModelField(ModelFieldInput field)
         {
             return new ValidationFieldBinding(field.ComponentId, field.ValueContract);
         }
     }
 
-    internal sealed class DeferredModelBoundClientValidationField
+    internal sealed class ModelFieldInput
     {
-        private DeferredModelBoundClientValidationField(ComponentId componentId, Shape shape)
+        private ModelFieldInput(ComponentId componentId, Shape shape)
         {
             ComponentId = componentId;
             Shape = shape;
@@ -207,12 +207,12 @@ namespace Alis.Reactive
 
         internal InputValueContract ValueContract => InputValueContract.ForCanonicalValue(Shape);
 
-        internal static DeferredModelBoundClientValidationField ForClientRuleField(
+        internal static ModelFieldInput For(
             Type modelType,
             ValidationFieldPath fieldPath,
             Shape shape)
         {
-            return new DeferredModelBoundClientValidationField(
+            return new ModelFieldInput(
                 Alis.Reactive.PlanModel.ComponentId.Of(IdGenerator.For(modelType, fieldPath.Value)),
                 shape);
         }
