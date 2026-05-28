@@ -65,11 +65,7 @@ namespace Alis.Reactive.Builders
 
         private void FlushPendingAsyncReaction()
         {
-            if (!_pendingAsyncReaction.HasReaction)
-                return;
-
-            FlushPendingSyncReactions();
-            _orderedBlocks.Add(_pendingAsyncReaction.BuildReaction());
+            _pendingAsyncReaction.AppendTo(_orderedBlocks, FlushPendingSyncReactions);
             _pendingAsyncReaction = PendingAsyncReaction<TModel>.None;
         }
 
@@ -98,34 +94,57 @@ namespace Alis.Reactive.Builders
             return reactions;
         }
 
-        private sealed class PendingAsyncReaction<T> where T : class
+        private abstract class PendingAsyncReaction<T> where T : class
         {
-            private readonly System.Func<ReactionGraph> _buildReaction;
-
-            private PendingAsyncReaction(bool hasReaction, System.Func<ReactionGraph> buildReaction)
-            {
-                HasReaction = hasReaction;
-                _buildReaction = buildReaction;
-            }
-
             internal static PendingAsyncReaction<T> None { get; } =
-                new PendingAsyncReaction<T>(
-                    hasReaction: false,
-                    buildReaction: () => throw new System.InvalidOperationException("No pending async reaction exists."));
+                new NoPendingAsyncReaction();
 
             internal static PendingAsyncReaction<T> Request(HttpRequestBuilder<T> request) =>
-                new PendingAsyncReaction<T>(
-                    hasReaction: true,
-                    buildReaction: () => ReactionGraph.Request(request.BuildRequest()));
+                new PendingRequestReaction(request);
 
             internal static PendingAsyncReaction<T> Parallel(ParallelBuilder<T> parallelRequests) =>
-                new PendingAsyncReaction<T>(
-                    hasReaction: true,
-                    buildReaction: parallelRequests.BuildReaction);
+                new PendingParallelReaction(parallelRequests);
 
-            internal bool HasReaction { get; }
+            internal abstract void AppendTo(List<ReactionGraph> orderedBlocks, System.Action flushPendingSyncReactions);
 
-            internal ReactionGraph BuildReaction() => _buildReaction();
+            private sealed class NoPendingAsyncReaction : PendingAsyncReaction<T>
+            {
+                internal override void AppendTo(List<ReactionGraph> orderedBlocks, System.Action flushPendingSyncReactions)
+                {
+                }
+            }
+
+            private sealed class PendingRequestReaction : PendingAsyncReaction<T>
+            {
+                private readonly HttpRequestBuilder<T> _request;
+
+                internal PendingRequestReaction(HttpRequestBuilder<T> request)
+                {
+                    _request = request;
+                }
+
+                internal override void AppendTo(List<ReactionGraph> orderedBlocks, System.Action flushPendingSyncReactions)
+                {
+                    flushPendingSyncReactions();
+                    orderedBlocks.Add(ReactionGraph.Request(_request.BuildRequest()));
+                }
+            }
+
+            private sealed class PendingParallelReaction : PendingAsyncReaction<T>
+            {
+                private readonly ParallelBuilder<T> _parallelRequests;
+
+                internal PendingParallelReaction(ParallelBuilder<T> parallelRequests)
+                {
+                    _parallelRequests = parallelRequests;
+                }
+
+                internal override void AppendTo(List<ReactionGraph> orderedBlocks, System.Action flushPendingSyncReactions)
+                {
+                    flushPendingSyncReactions();
+                    orderedBlocks.Add(_parallelRequests.BuildReaction());
+                }
+            }
         }
 
         private sealed class PendingBranch
