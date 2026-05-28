@@ -8,18 +8,17 @@ namespace Alis.Reactive.Builders
 {
     internal sealed class PluginInvocationArgument
     {
-        private PluginInvocationArgument(ValueExpression value, Shape shape)
+        private PluginInvocationArgument(ValueExpression value)
         {
             Value = value ?? throw new ArgumentNullException(nameof(value));
-            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
         internal ValueExpression Value { get; }
 
-        internal Shape Shape { get; }
+        internal Shape Shape => Value.OutputShape;
 
-        internal static PluginInvocationArgument From(ValueExpression value, Shape shape) =>
-            new PluginInvocationArgument(value, shape);
+        internal static PluginInvocationArgument From(ValueExpression value) =>
+            new PluginInvocationArgument(value);
 
         internal static PluginInvocationArgument FromResponse<TResponse, TProp>(
             ResponseBody<TResponse> body,
@@ -31,7 +30,7 @@ namespace Alis.Reactive.Builders
 
             var responsePath = ExpressionPathHelper.ToResponsePath(path);
             var shape = Shape.FromClrType(typeof(TProp));
-            return From(ValueExpression.ReadPayload(body.Scope, responsePath, shape), shape);
+            return From(ValueExpression.ReadPayload(body.Scope, responsePath, shape));
         }
 
         internal static PluginInvocationArgument FromEvent<TArgs, TProp>(
@@ -41,19 +40,19 @@ namespace Alis.Reactive.Builders
 
             var eventPath = ExpressionPathHelper.ToEventPath(path);
             var shape = Shape.FromClrType(typeof(TProp));
-            return From(ValueExpression.ReadPayload(PayloadSource.Event(), eventPath, shape), shape);
+            return From(ValueExpression.ReadPayload(PayloadSource.Event(), eventPath, shape));
         }
 
         internal static PluginInvocationArgument FromSource<TArg>(TypedSource<TArg> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            return From(source.ToValueExpression(), source.Shape);
+            return From(source.ToValueExpression());
         }
 
         internal static PluginInvocationArgument Literal<TValue>(TValue value)
         {
             var shape = Shape.FromClrType(typeof(TValue));
-            return From(LiteralExpressionFor(value, shape), shape);
+            return From(LiteralExpressionFor(value, shape));
         }
 
         private static ValueExpression LiteralExpressionFor<TValue>(TValue value, Shape shape)
