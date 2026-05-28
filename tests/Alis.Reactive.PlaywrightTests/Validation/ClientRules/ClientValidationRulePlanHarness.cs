@@ -113,6 +113,7 @@ internal static class ClientValidationRulePlanHarness
             rules.Add<ReactiveAssessmentValidator>();
             rules.Add<ComposedAssessmentValidator>();
             rules.Add<MixedConditionValidator>();
+            rules.Add<TaggedAssessmentValidator>();
         });
 
         return services;
@@ -268,4 +269,22 @@ internal sealed class AssessmentModel
     public bool ServerFlag { get; set; }
     public int? Score { get; set; }
     public string? Notes { get; set; }
+}
+
+internal sealed class TaggedAssessmentValidator : ReactiveValidator<TaggedAssessmentModel>
+{
+    public TaggedAssessmentValidator()
+    {
+        WhenFieldArrayContains(model => model.Tags, "fall-risk", () =>
+        {
+            ClientRule(model => model.ReviewNote)
+                .Required("Review note is required for fall-risk residents.");
+        });
+    }
+}
+
+internal sealed class TaggedAssessmentModel
+{
+    public string[] Tags { get; set; } = Array.Empty<string>();
+    public string? ReviewNote { get; set; }
 }

@@ -149,6 +149,37 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
     }
 
     [Test]
+    public void whenfield_array_contains_declares_collection_item_activation()
+    {
+        using var doc = ClientValidationRulePlanHarness
+            .RenderPlan<TaggedAssessmentModel, TaggedAssessmentValidator>();
+        var rule = ClientValidationRulePlanHarness
+            .RulesFor(doc.RootElement, nameof(TaggedAssessmentModel.ReviewNote))
+            .Single();
+        var condition = rule.GetProperty("execution")
+            .GetProperty("activation")
+            .GetProperty("condition");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(condition.GetProperty("kind").GetString(), Is.EqualTo("compare"));
+            Assert.That(condition.GetProperty("op").GetString(), Is.EqualTo("arrayContains"));
+            Assert.That(condition
+                .GetProperty("left")
+                .GetProperty("from")
+                .GetProperty("component")
+                .GetString(), Is.EqualTo(IdGenerator.For(typeof(TaggedAssessmentModel), nameof(TaggedAssessmentModel.Tags))));
+            Assert.That(condition.GetProperty("shape").GetProperty("kind").GetString(), Is.EqualTo("array"));
+            Assert.That(condition.GetProperty("itemShape").GetProperty("kind").GetString(), Is.EqualTo("string"));
+            Assert.That(condition
+                .GetProperty("right")
+                .GetProperty("value")
+                .GetProperty("value")
+                .GetString(), Is.EqualTo("fall-risk"));
+        });
+    }
+
+    [Test]
     public void rules_under_regular_fluentvalidation_conditions_stay_server_only()
     {
         using var doc = ClientValidationRulePlanHarness
