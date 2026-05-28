@@ -73,7 +73,7 @@ namespace Alis.Reactive.Builders.Requests
             pipeline(pb);
             var reaction = pb.BuildReaction();
             _whileLoading.Clear();
-            AddReactionGraph(_whileLoading, reaction);
+            _whileLoading.Add(reaction);
             return this;
         }
 
@@ -92,7 +92,7 @@ namespace Alis.Reactive.Builders.Requests
             pipeline(pb);
             var reaction = pb.BuildReaction();
             _finally.Clear();
-            AddReactionGraph(_finally, reaction);
+            _finally.Add(reaction);
             return this;
         }
 
@@ -160,20 +160,6 @@ namespace Alis.Reactive.Builders.Requests
             var hasNoItems = items.Count == 0;
             if (hasNoItems) return Array.Empty<T>();
             return new List<T>(items);
-        }
-
-        private static void AddReactionGraph(List<ReactionGraph> target, ReactionGraph reaction)
-        {
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            if (reaction == null) throw new ArgumentNullException(nameof(reaction));
-
-            if (reaction is SequenceReaction sequence)
-            {
-                target.AddRange(sequence.Steps);
-                return;
-            }
-
-            target.Add(reaction);
         }
 
     }
