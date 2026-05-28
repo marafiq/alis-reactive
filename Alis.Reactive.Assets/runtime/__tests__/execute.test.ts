@@ -74,19 +74,32 @@ function markLocal(value: string): ReactionGraph {
 }
 
 function requestWithSuccess(reaction: ReactionGraph): ReactionGraph {
+  const request = requestPlan("/residents/42", {
+    success: [{ match: { kind: "any" }, reaction }],
+  });
+
+  return { kind: "request", request };
+}
+
+function requestTo(url: string): ReactionGraph {
+  return { kind: "request", request: requestPlan(url) };
+}
+
+function requestPlan(url: string, overrides: Partial<RequestPlan> = {}): RequestPlan {
   const request: RequestPlan = {
     method: "GET",
-    url: "/residents/42",
+    url,
     validation: { kind: "none" },
     input: { kind: "none" },
     whileLoading: [],
-    success: [{ match: { kind: "any" }, reaction }],
+    success: [],
     error: [],
     finally: [],
     chain: { kind: "terminal" },
+    ...overrides,
   };
 
-  return { kind: "request", request };
+  return request;
 }
 
 function responseJson(body: unknown, status = 200): Response {
@@ -563,6 +576,58 @@ describe("executeReaction member targets", () => {
       await completion;
 
       expect(marks).toEqual(["start", "branch", "success", "after"]);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("starts every parallel request before waiting and runs completion after all settle", async () => {
+    const releases: Array<() => void> = [];
+    const fetchMock = vi.fn(() => new Promise<Response>(resolve => {
+      releases.push(() => resolve(responseJson({ ok: true })));
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const marks: string[] = [];
+    const context: ExecContext = {
+      local: {
+        mark(value: string): void {
+          marks.push(value);
+        },
+      },
+    };
+    const reaction: ReactionGraph = {
+      kind: "parallel",
+      steps: [
+        requestTo("/residents/first"),
+        requestTo("/residents/second"),
+      ],
+      completion: {
+        kind: "on-settled",
+        reaction: markLocal("settled"),
+      },
+    };
+
+    try {
+      const completion = executeReaction(reaction, textBoxPlan(), context);
+
+      expect(completion).toBeInstanceOf(Promise);
+      await Promise.resolve();
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+        "/residents/first",
+        "/residents/second",
+      ]);
+      expect(marks).toEqual([]);
+
+      releases[0]!();
+      await Promise.resolve();
+      expect(marks).toEqual([]);
+
+      releases[1]!();
+      await completion;
+      expect(marks).toEqual(["settled"]);
     } finally {
       vi.unstubAllGlobals();
     }
