@@ -199,7 +199,7 @@ namespace Alis.Reactive.PlanModel
             for (var i = 0; i < cases.Count; i++)
             {
                 var branchCase = cases[i];
-                var caseIsDefault = branchCase.GuardForJson.Kind == "default";
+                var caseIsDefault = branchCase.Guard.Kind == "default";
                 if (!caseIsDefault) continue;
 
                 if (defaultCaseIndex >= 0)
@@ -221,16 +221,14 @@ namespace Alis.Reactive.PlanModel
     [JsonConverter(typeof(BranchCaseJsonConverter))]
     public sealed class BranchCase
     {
-        private readonly BranchGuard _guard;
-
+        /// <summary>Gets the guard that decides whether this branch case runs.</summary>
+        public BranchGuard Guard { get; }
         /// <summary>Gets the reaction to execute when the condition is met.</summary>
         public ReactionGraph Reaction { get; }
 
-        internal BranchGuard GuardForJson => _guard;
-
         private BranchCase(BranchGuard guard, ReactionGraph reaction)
         {
-            _guard = guard ?? throw new ArgumentNullException(nameof(guard));
+            Guard = guard ?? throw new ArgumentNullException(nameof(guard));
             Reaction = reaction ?? throw new ArgumentNullException(nameof(reaction));
         }
 
@@ -241,7 +239,7 @@ namespace Alis.Reactive.PlanModel
             new BranchCase(BranchGuard.Else, reaction);
 
         internal BranchCase WithReaction(ReactionGraph reaction) =>
-            new BranchCase(_guard, reaction);
+            new BranchCase(Guard, reaction);
     }
 
     internal sealed class BranchCaseJsonConverter : JsonConverter<BranchCase>
@@ -251,7 +249,7 @@ namespace Alis.Reactive.PlanModel
             if (value == null) throw new ArgumentNullException(nameof(value));
 
             writer.WriteStartObject();
-            WriteProperty(writer, options, "guard", value.GuardForJson);
+            WriteProperty(writer, options, "guard", value.Guard);
             WriteProperty(writer, options, "reaction", value.Reaction);
             writer.WriteEndObject();
         }
@@ -274,7 +272,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     [JsonConverter(typeof(BranchGuardJsonConverter))]
-    internal abstract class BranchGuard
+    public abstract class BranchGuard
     {
         private protected BranchGuard() { }
 
