@@ -44,14 +44,14 @@ export class RuntimeResolutionError extends Error {
 }
 
 export class RuntimePlan {
-  readonly components: RuntimeComponentCatalog;
+  readonly components: RuntimeComponents;
   readonly objectContracts: RuntimeObjectContracts;
-  readonly plugins: RuntimePluginCatalog;
+  readonly plugins: RuntimePlugins;
 
   private constructor(readonly document: PlanDocument) {
     this.objectContracts = new RuntimeObjectContracts(document);
-    this.components = new RuntimeComponentCatalog(document, this.objectContracts);
-    this.plugins = new RuntimePluginCatalog(this.objectContracts, browserPlugins);
+    this.components = new RuntimeComponents(document, this.objectContracts);
+    this.plugins = new RuntimePlugins(this.objectContracts, browserPlugins);
   }
 
   static from(plan: PlanDocument): RuntimePlan {
@@ -89,7 +89,7 @@ export class RuntimeObjectContracts {
   }
 }
 
-export class RuntimeComponentCatalog {
+export class RuntimeComponents {
   constructor(
     private readonly plan: PlanDocument,
     private readonly objectContracts: RuntimeObjectContracts,
@@ -167,7 +167,7 @@ export class RuntimeComponent {
   }
 }
 
-export class RuntimePluginCatalog {
+export class RuntimePlugins {
   constructor(
     private readonly objectContracts: RuntimeObjectContracts,
     private readonly instances: BrowserPluginCatalog,
