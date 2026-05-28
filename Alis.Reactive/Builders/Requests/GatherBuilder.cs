@@ -258,7 +258,7 @@ namespace Alis.Reactive.Builders.Requests
                 componentIdentity.Vendor,
                 planBindingPath,
                 valueContract);
-            _context.EnsureInputComponent(planBinding);
+            _context.DeclareInputComponent(planBinding);
             _draft.AddAssignment(RequestInputAssignment.Payload(planBindingPath, componentValue));
             return this;
         }

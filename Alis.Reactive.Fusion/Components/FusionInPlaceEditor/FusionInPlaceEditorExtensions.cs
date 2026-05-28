@@ -123,7 +123,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
         {
-            self.Pipeline.Context.EnsureObjectTarget(self.TargetId, Component.Vendor);
+            self.Pipeline.Context.DeclareObjectTarget(self.TargetId, Component.Vendor);
 
             var valueRead = RegisteredInputValueRead.ForFusionInPlaceEditorValueRead(self.TargetId);
             var registration = self.Pipeline.Context.RequireRegistrationById(self.TargetId, valueRead);

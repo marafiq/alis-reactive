@@ -22,7 +22,7 @@ namespace Alis.Reactive.Builders
         internal ElementBuilder(PipelineBuilder<TModel> pipeline, string elementId)
         {
             _pipeline = pipeline;
-            _componentKey = pipeline.Context.EnsureElement(elementId);
+            _componentKey = pipeline.Context.DeclareElement(elementId);
         }
 
         /// <summary>Adds a CSS class to the element.</summary>
@@ -135,7 +135,7 @@ namespace Alis.Reactive.Builders
 
         private PipelineBuilder<TModel> Set<TValue>(ComponentProperty<TValue> property, ValueExpression value)
         {
-            _pipeline.Context.EnsureProperty(
+            _pipeline.Context.DeclareProperty(
                 _componentKey,
                 property.ContractFor(MemberAccess.Write));
             _pipeline.AddStep(ReactionGraph.Set(
@@ -145,7 +145,7 @@ namespace Alis.Reactive.Builders
 
         private PipelineBuilder<TModel> Call(ComponentMethod method, ValueExpression arg)
         {
-            _pipeline.Context.EnsureMethod(
+            _pipeline.Context.DeclareMethod(
                 _componentKey,
                 method.ContractReturning(Shape.None));
             _pipeline.AddStep(ReactionGraph.Call(

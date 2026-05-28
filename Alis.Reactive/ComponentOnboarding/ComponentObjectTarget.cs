@@ -24,7 +24,7 @@ namespace Alis.Reactive
 
         internal string IdForJson => ComponentId.Value;
 
-        internal abstract ComponentKey EnsureIn(PlanBuildContext context);
+        internal abstract ComponentKey DeclareIn(PlanBuildContext context);
 
         internal static ComponentObjectTarget For<TComponent>(string componentId)
             where TComponent : IComponent, new()
@@ -61,9 +61,9 @@ namespace Alis.Reactive
             {
             }
 
-            internal override ComponentKey EnsureIn(PlanBuildContext context)
+            internal override ComponentKey DeclareIn(PlanBuildContext context)
             {
-                return context.EnsureObjectTarget(ComponentId.Value, Vendor.Value);
+                return context.DeclareObjectTarget(ComponentId.Value, Vendor.Value);
             }
         }
 
@@ -74,9 +74,9 @@ namespace Alis.Reactive
             {
             }
 
-            internal override ComponentKey EnsureIn(PlanBuildContext context)
+            internal override ComponentKey DeclareIn(PlanBuildContext context)
             {
-                return context.EnsureLayoutObject(ComponentId.Value, Vendor.Value);
+                return context.DeclareLayoutObject(ComponentId.Value, Vendor.Value);
             }
         }
     }

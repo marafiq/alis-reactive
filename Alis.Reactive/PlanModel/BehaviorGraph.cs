@@ -25,7 +25,7 @@ namespace Alis.Reactive.PlanModel
         {
             if (trigger is ComponentEventTrigger componentEvent)
             {
-                _components.EnsureEvent(
+                _components.DeclareEvent(
                     componentEvent.ComponentKey,
                     ObjectEventContract.ForComponentEvent(componentEvent.EventName));
             }

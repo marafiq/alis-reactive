@@ -166,7 +166,7 @@ namespace Alis.Reactive.Builders
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
             if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
             var operation = PluginOperationId.Of(pluginName, member);
-            var signature = Context.EnsurePluginMethod(PluginMethodRequirement.Function(
+            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Function(
                 operation,
                 PlanModel.Shape.FromClrType(typeof(T))));
             return new PluginReadBuilder<T, TModel>(
@@ -180,7 +180,7 @@ namespace Alis.Reactive.Builders
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
             var operation = PluginOperationId.Root(pluginName);
-            var signature = Context.EnsurePluginMethod(PluginMethodRequirement.Function(
+            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Function(
                 operation,
                 PlanModel.Shape.FromClrType(typeof(T))));
             return new PluginReadBuilder<T, TModel>(
@@ -197,7 +197,7 @@ namespace Alis.Reactive.Builders
             if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
 
             var property = PluginPropertyId.Of(pluginName, member);
-            Context.EnsurePluginProperty(PluginPropertyRequirement.Read(property, PlanModel.Shape.FromClrType(typeof(T))));
+            Context.DeclarePluginProperty(PluginPropertyRequirement.Read(property, PlanModel.Shape.FromClrType(typeof(T))));
             return new Conditions.TypedPluginPropertySource<T>(property);
         }
 
@@ -206,7 +206,7 @@ namespace Alis.Reactive.Builders
         public PluginReadBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
         {
             if (function == null) throw new System.ArgumentNullException(nameof(function));
-            Context.EnsurePluginMethod(PluginMethodRequirement.Function(function));
+            Context.DeclarePluginMethod(PluginMethodRequirement.Function(function));
             return new PluginReadBuilder<T, TModel>(function);
         }
 
@@ -215,7 +215,7 @@ namespace Alis.Reactive.Builders
         public Conditions.TypedPluginPropertySource<T> Plugin<T>(PluginProperty<T> property)
         {
             if (property == null) throw new System.ArgumentNullException(nameof(property));
-            Context.EnsurePluginProperty(PluginPropertyRequirement.Read(property));
+            Context.DeclarePluginProperty(PluginPropertyRequirement.Read(property));
             return new Conditions.TypedPluginPropertySource<T>(property.PropertyId);
         }
 
@@ -228,7 +228,7 @@ namespace Alis.Reactive.Builders
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
             if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
             var operation = PluginOperationId.Of(pluginName, member);
-            var signature = Context.EnsurePluginMethod(PluginMethodRequirement.Command(operation));
+            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Command(operation));
             return new PluginCallBuilder<TModel>(
                 operation,
                 this,
@@ -241,7 +241,7 @@ namespace Alis.Reactive.Builders
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
             var operation = PluginOperationId.Root(pluginName);
-            var signature = Context.EnsurePluginMethod(PluginMethodRequirement.Command(operation));
+            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Command(operation));
             return new PluginCallBuilder<TModel>(
                 operation,
                 this,
@@ -253,7 +253,7 @@ namespace Alis.Reactive.Builders
         public PluginCallBuilder<TModel> Plugin(PluginCommand command)
         {
             if (command == null) throw new System.ArgumentNullException(nameof(command));
-            Context.EnsurePluginMethod(PluginMethodRequirement.Command(command));
+            Context.DeclarePluginMethod(PluginMethodRequirement.Command(command));
             return new PluginCallBuilder<TModel>(command, this);
         }
 
@@ -272,7 +272,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This builder for chaining.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
         {
-            Context.EnsureElement(elementId);
+            Context.DeclareElement(elementId);
             var responseBody = ValueExpression.ReadWholePayload(PayloadSource.Success());
             AddStep(ReactionGraph.Inject(elementId, responseBody));
             return this;

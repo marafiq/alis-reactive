@@ -33,8 +33,8 @@ namespace Alis.Reactive
             ComponentProperty<TValue> property, ValueExpression value)
         {
             if (property == null) throw new System.ArgumentNullException(nameof(property));
-            var componentKey = _target.EnsureIn(Pipeline.Context);
-            Pipeline.Context.EnsureProperty(
+            var componentKey = _target.DeclareIn(Pipeline.Context);
+            Pipeline.Context.DeclareProperty(
                 componentKey,
                 property.ContractFor(MemberAccess.Write));
             Pipeline.AddStep(ReactionGraph.Set(
@@ -56,8 +56,8 @@ namespace Alis.Reactive
         {
             if (method == null) throw new System.ArgumentNullException(nameof(method));
             if (args == null) throw new System.ArgumentNullException(nameof(args));
-            var componentKey = _target.EnsureIn(Pipeline.Context);
-            Pipeline.Context.EnsureMethod(
+            var componentKey = _target.DeclareIn(Pipeline.Context);
+            Pipeline.Context.DeclareMethod(
                 componentKey,
                 method.ContractReturning(Shape.None));
             var source = ComponentSource.Of(componentKey);
@@ -69,8 +69,8 @@ namespace Alis.Reactive
             ComponentProperty<TValue> property)
         {
             if (property == null) throw new System.ArgumentNullException(nameof(property));
-            var componentKey = _target.EnsureIn(Pipeline.Context);
-            Pipeline.Context.EnsureProperty(
+            var componentKey = _target.DeclareIn(Pipeline.Context);
+            Pipeline.Context.DeclareProperty(
                 componentKey,
                 property.ContractFor(MemberAccess.Read));
             return new Builders.Conditions.TypedComponentSource<TValue>(
@@ -91,9 +91,9 @@ namespace Alis.Reactive
             if (method == null) throw new System.ArgumentNullException(nameof(method));
             if (args == null) throw new System.ArgumentNullException(nameof(args));
 
-            var componentKey = _target.EnsureIn(Pipeline.Context);
+            var componentKey = _target.DeclareIn(Pipeline.Context);
             var returns = Shape.FromClrType(typeof(TValue));
-            Pipeline.Context.EnsureMethod(
+            Pipeline.Context.DeclareMethod(
                 componentKey,
                 method.ContractReturning(returns));
             var source = ComponentSource.Of(componentKey);

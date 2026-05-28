@@ -63,7 +63,7 @@ namespace Alis.Reactive
             if (contracts == null) throw new System.ArgumentNullException(nameof(contracts));
             if (typeKey == null) throw new System.ArgumentNullException(nameof(typeKey));
 
-            contracts.EnsureInputValueContract(typeKey, ValueContract);
+            contracts.DeclareInputValueContract(typeKey, ValueContract);
         }
 
         internal ComponentObject CreateComponent(ComponentId componentId, ComponentVendor vendor, TypeKey typeKey)

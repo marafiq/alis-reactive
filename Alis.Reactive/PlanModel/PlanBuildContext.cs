@@ -48,18 +48,18 @@ namespace Alis.Reactive.PlanModel
         internal IReadOnlyList<ValidationJob> ValidationJobs => _validationJobs;
 
         /// <summary>
-        /// Ensures a DOM element is registered as a native component with a BrowserObjectContract.
+        /// Declares a DOM element as a native browser object in the plan.
         /// Returns the component key for use in source references.
         /// </summary>
-        internal ComponentKey EnsureElement(string elementId) => _components.EnsureElement(elementId);
+        internal ComponentKey DeclareElement(string elementId) => _components.DeclareElement(elementId);
 
-        /// <summary>Ensures a component referenced by page behavior is registered as a browser object target.</summary>
-        internal ComponentKey EnsureObjectTarget(string componentId, string vendor) =>
-            _components.EnsureObjectTarget(componentId, vendor);
+        /// <summary>Declares a component referenced by page behavior as a browser object target.</summary>
+        internal ComponentKey DeclareObjectTarget(string componentId, string vendor) =>
+            _components.DeclareObjectTarget(componentId, vendor);
 
-        /// <summary>Ensures a layout-owned app component is registered by its fixed runtime object id.</summary>
-        internal ComponentKey EnsureLayoutObject(string componentId, string vendor) =>
-            _components.EnsureLayoutObject(componentId, vendor);
+        /// <summary>Declares a layout-owned app component by its fixed runtime object id.</summary>
+        internal ComponentKey DeclareLayoutObject(string componentId, string vendor) =>
+            _components.DeclareLayoutObject(componentId, vendor);
 
         /// <summary>Returns the render-time registration for a component value read.</summary>
         internal ComponentRegistration RequireRegistrationById(
@@ -68,30 +68,30 @@ namespace Alis.Reactive.PlanModel
             _components.RequireRegistrationById(componentId, valueRead);
 
         /// <summary>
-        /// Ensures a registered input component exists in the plan with readable value metadata.
+        /// Declares a registered input component in the plan with readable value metadata.
         /// </summary>
-        internal ComponentKey EnsureInputComponent(InputComponentPlanBinding binding) =>
-            _components.EnsureInputComponent(binding);
+        internal ComponentKey DeclareInputComponent(InputComponentPlanBinding binding) =>
+            _components.DeclareInputComponent(binding);
 
-        /// <summary>Ensures a property member exists on a component's BrowserObjectContract.</summary>
-        internal void EnsureProperty(ComponentKey componentKey, ObjectPropertyContract contract) =>
-            _components.EnsureProperty(componentKey, contract);
+        /// <summary>Declares a property member on a component's browser object contract.</summary>
+        internal void DeclareProperty(ComponentKey componentKey, ObjectPropertyContract contract) =>
+            _components.DeclareProperty(componentKey, contract);
 
-        /// <summary>Ensures a method member exists on a component's BrowserObjectContract.</summary>
-        internal ObjectMethod EnsureMethod(ComponentKey componentKey, ObjectMethodContract contract) =>
-            _components.EnsureMethod(componentKey, contract);
+        /// <summary>Declares a method member on a component's browser object contract.</summary>
+        internal ObjectMethod DeclareMethod(ComponentKey componentKey, ObjectMethodContract contract) =>
+            _components.DeclareMethod(componentKey, contract);
 
         /// <summary>Registers a plugin contract. Throws on duplicate registration.</summary>
         internal void RegisterPlugin(PluginContract contract) =>
             _objectContracts.RegisterPlugin(contract);
 
-        /// <summary>Ensures a plugin method exists in the browser object contracts.</summary>
-        internal MethodSignature EnsurePluginMethod(PluginMethodRequirement requirement) =>
-            _objectContracts.EnsurePluginMethod(requirement);
+        /// <summary>Declares a plugin method in the browser object contracts.</summary>
+        internal MethodSignature DeclarePluginMethod(PluginMethodRequirement requirement) =>
+            _objectContracts.DeclarePluginMethod(requirement);
 
-        /// <summary>Ensures a plugin property exists in the browser object contracts.</summary>
-        internal void EnsurePluginProperty(PluginPropertyRequirement requirement) =>
-            _objectContracts.EnsurePluginProperty(requirement);
+        /// <summary>Declares a plugin property in the browser object contracts.</summary>
+        internal void DeclarePluginProperty(PluginPropertyRequirement requirement) =>
+            _objectContracts.DeclarePluginProperty(requirement);
 
         /// <summary>
         /// Registers all input components from the ReactivePlan's input component onboarding catalog into the plan.
@@ -104,7 +104,7 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal void WireComponentEvent(string componentId, string vendor, string eventName, ReactionGraph reaction)
         {
-            EnsureObjectTarget(componentId, vendor);
+            DeclareObjectTarget(componentId, vendor);
             var trigger = StartsWhen.ComponentEvent(componentId, eventName);
             AddBehavior(Behavior.On(trigger, reaction));
         }

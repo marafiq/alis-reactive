@@ -18,25 +18,25 @@ namespace Alis.Reactive.PlanModel
             return objectContract;
         }
 
-        internal void EnsureInputValueContract(TypeKey key, InputValueContract contract)
+        internal void DeclareInputValueContract(TypeKey key, InputValueContract contract)
         {
-            EnsureEmpty(key);
+            DeclareObject(key);
             contract.Enrich(Require(key));
         }
 
-        internal void EnsureEmpty(TypeKey key)
+        internal void DeclareObject(TypeKey key)
         {
             if (!_byTypeKey.ContainsKey(key.Value))
                 _byTypeKey[key.Value] = new BrowserObjectContract();
         }
 
-        internal void EnsureProperty(TypeKey typeKey, ObjectPropertyContract contract) =>
+        internal void DeclareProperty(TypeKey typeKey, ObjectPropertyContract contract) =>
             Require(typeKey).Declare(contract);
 
-        internal ObjectMethod EnsureMethod(TypeKey typeKey, ObjectMethodContract contract) =>
+        internal ObjectMethod DeclareMethod(TypeKey typeKey, ObjectMethodContract contract) =>
             Require(typeKey).Declare(contract);
 
-        internal void EnsureEvent(TypeKey typeKey, ObjectEventContract contract) =>
+        internal void DeclareEvent(TypeKey typeKey, ObjectEventContract contract) =>
             Require(typeKey).Declare(contract);
 
         internal void RegisterPlugin(PluginContract contract)
@@ -47,7 +47,7 @@ namespace Alis.Reactive.PlanModel
             _byTypeKey[contract.TypeKey.Value] = contract.ToBrowserObjectContract();
         }
 
-        internal MethodSignature EnsurePluginMethod(PluginMethodRequirement methodRead)
+        internal MethodSignature DeclarePluginMethod(PluginMethodRequirement methodRead)
         {
             var typeKey = TypeKey.Plugin(methodRead.PluginName);
 
@@ -56,14 +56,14 @@ namespace Alis.Reactive.PlanModel
                     $"Plugin '{methodRead.PluginName.Value}' is not registered. " +
                     $"Call plan.RegisterPlugin(\"{methodRead.PluginName.Value}\", ...) first.");
 
-            var method = EnsureMethod(
+            var method = DeclareMethod(
                 typeKey,
                 methodRead.ToObjectMethodContract());
 
             return method.Signature;
         }
 
-        internal void EnsurePluginProperty(PluginPropertyRequirement propertyRead)
+        internal void DeclarePluginProperty(PluginPropertyRequirement propertyRead)
         {
             var typeKey = TypeKey.Plugin(propertyRead.PluginName);
 
@@ -72,7 +72,7 @@ namespace Alis.Reactive.PlanModel
                     $"Plugin '{propertyRead.PluginName.Value}' is not registered. " +
                     $"Call plan.RegisterPlugin(\"{propertyRead.PluginName.Value}\", ...) first.");
 
-            EnsureProperty(typeKey, propertyRead.ToObjectPropertyContract());
+            DeclareProperty(typeKey, propertyRead.ToObjectPropertyContract());
         }
     }
 }

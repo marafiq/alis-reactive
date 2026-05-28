@@ -57,9 +57,9 @@ namespace Alis.Reactive
                 .SelectMany(field => bindings.ResolveAll(field, ruleBinding))
                 .ToList();
 
-            // EnsureElement is idempotent — it returns the existing component when the
-            // container id is already registered, or creates a native element when not.
-            var containerKey = _context.EnsureElement(container);
+            // Validation metadata belongs on the same runtime object contract declared
+            // by p.Element(...), not on a validation-only component concept.
+            var containerKey = _context.DeclareElement(container);
             var comp = _context.GetComponent(containerKey);
             _context.SetComponent(containerKey, comp.WithValidationRulesMerged(componentValidations));
         }

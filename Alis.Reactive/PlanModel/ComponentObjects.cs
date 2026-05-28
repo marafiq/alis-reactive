@@ -27,25 +27,25 @@ namespace Alis.Reactive.PlanModel
         internal void Set(ComponentKey componentKey, ComponentObject component) =>
             _components[componentKey.Value] = component;
 
-        internal ComponentKey EnsureElement(string elementId)
+        internal ComponentKey DeclareElement(string elementId)
         {
             var id = ComponentId.Of(elementId);
             if (_components.ContainsKey(id.Value))
                 return ComponentKey.Of(id.Value);
 
             var typeKey = TypeKey.NativeElement(id);
-            _objectContracts.EnsureEmpty(typeKey);
+            _objectContracts.DeclareObject(typeKey);
             _components[id.Value] = ComponentObject.Element(id, ComponentVendor.Native, typeKey);
             return ComponentKey.Of(id.Value);
         }
 
-        internal ComponentKey EnsureObjectTarget(string componentId, string vendor) =>
-            EnsureComponentObject(componentId, vendor, ComponentObject.Element);
+        internal ComponentKey DeclareObjectTarget(string componentId, string vendor) =>
+            DeclareComponentObject(componentId, vendor, ComponentObject.Element);
 
-        internal ComponentKey EnsureLayoutObject(string componentId, string vendor) =>
-            EnsureComponentObject(componentId, vendor, ComponentObject.LayoutObject);
+        internal ComponentKey DeclareLayoutObject(string componentId, string vendor) =>
+            DeclareComponentObject(componentId, vendor, ComponentObject.LayoutObject);
 
-        private ComponentKey EnsureComponentObject(
+        private ComponentKey DeclareComponentObject(
             string componentId,
             string vendor,
             Func<ComponentId, ComponentVendor, TypeKey, ComponentObject> createUnregisteredComponent)
@@ -55,7 +55,7 @@ namespace Alis.Reactive.PlanModel
 
             if (_components.TryGetValue(id.Value, out var existing))
             {
-                EnsureSameVendor(existing, id, componentVendor);
+                RequireSameVendor(existing, id, componentVendor);
                 EnrichExistingComponent(existing, id);
                 return ComponentKey.Of(id.Value);
             }
@@ -68,14 +68,14 @@ namespace Alis.Reactive.PlanModel
             }
             else
             {
-                _objectContracts.EnsureEmpty(typeKey);
+                _objectContracts.DeclareObject(typeKey);
                 _components[id.Value] = createUnregisteredComponent(id, componentVendor, typeKey);
             }
 
             return ComponentKey.Of(id.Value);
         }
 
-        internal ComponentKey EnsureInputComponent(InputComponentPlanBinding input)
+        internal ComponentKey DeclareInputComponent(InputComponentPlanBinding input)
         {
             var id = input.ComponentId;
             var componentVendor = input.Vendor;
@@ -84,41 +84,41 @@ namespace Alis.Reactive.PlanModel
 
             if (_components.TryGetValue(id.Value, out var existing))
             {
-                EnsureSameVendor(existing, id, componentVendor);
-                _objectContracts.EnsureInputValueContract(TypeKey.Of(existing.Type), valueContract);
+                RequireSameVendor(existing, id, componentVendor);
+                _objectContracts.DeclareInputValueContract(TypeKey.Of(existing.Type), valueContract);
                 _components[id.Value] = existing.WithBindingIfAbsent(binding);
                 return ComponentKey.Of(id.Value);
             }
 
             var typeKey = input.TypeKey;
-            _objectContracts.EnsureInputValueContract(typeKey, valueContract);
+            _objectContracts.DeclareInputValueContract(typeKey, valueContract);
             _components[id.Value] = input.CreateComponent();
 
             return ComponentKey.Of(id.Value);
         }
 
-        internal void EnsureProperty(ComponentKey componentKey, ObjectPropertyContract contract)
+        internal void DeclareProperty(ComponentKey componentKey, ObjectPropertyContract contract)
         {
             var component = Get(componentKey);
-            _objectContracts.EnsureProperty(TypeKey.Of(component.Type), contract);
+            _objectContracts.DeclareProperty(TypeKey.Of(component.Type), contract);
         }
 
-        internal ObjectMethod EnsureMethod(ComponentKey componentKey, ObjectMethodContract contract)
+        internal ObjectMethod DeclareMethod(ComponentKey componentKey, ObjectMethodContract contract)
         {
             var component = Get(componentKey);
-            return _objectContracts.EnsureMethod(TypeKey.Of(component.Type), contract);
+            return _objectContracts.DeclareMethod(TypeKey.Of(component.Type), contract);
         }
 
-        internal void EnsureEvent(ComponentKey componentKey, ObjectEventContract contract)
+        internal void DeclareEvent(ComponentKey componentKey, ObjectEventContract contract)
         {
             var component = Get(componentKey);
-            _objectContracts.EnsureEvent(TypeKey.Of(component.Type), contract);
+            _objectContracts.DeclareEvent(TypeKey.Of(component.Type), contract);
         }
 
         internal void RegisterInputComponents()
         {
             foreach (var kvp in _registrations.Entries)
-                EnsureInputComponent(kvp.Value.PlanBinding);
+                DeclareInputComponent(kvp.Value.PlanBinding);
         }
 
         internal ComponentRegistration RequireRegistrationById(
@@ -140,7 +140,7 @@ namespace Alis.Reactive.PlanModel
             throw valueRead.MissingRegistrationException();
         }
 
-        private static void EnsureSameVendor(ComponentObject existing, ComponentId componentId, ComponentVendor vendor)
+        private static void RequireSameVendor(ComponentObject existing, ComponentId componentId, ComponentVendor vendor)
         {
             if (existing.Vendor != vendor.Value)
                 throw new InvalidOperationException(
