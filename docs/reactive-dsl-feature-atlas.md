@@ -58,9 +58,11 @@ Design consequence:
 
 Partial behavior is not "append this JSON". It is browser plan load/unload:
 owned component definitions, object member declarations, validation rules,
-behaviors/listeners, and references must merge on load and be released on slot
-unload. There are two load paths, SSR and browser injection, but both should
-use the same plan document merge language.
+behaviors/listeners, and references must merge on load and leave on slot
+unload. Runtime keeps boot plans and active partial slots as the source of
+truth, then recomposes the active plan document from those sources. There are
+two load paths, SSR and browser injection, but both use the same plan document
+merge language.
 
 ## Trigger Surface
 
@@ -476,8 +478,8 @@ The next closed surfaces should be chosen by blast radius and domain clarity:
    value read, path, shape.
 2. Reaction graph execution: sequence, branch, request graph slots, sync/async
    lane boundary.
-3. Partial slot load/unload: plan identity, slot load, slot unload, owned
-   definitions, references, validation and listener removal.
+3. Partial slot load/unload: plan identity, slot load, slot unload, active plan
+   recomposition, validation, and listener abort.
 4. Validation projection/binding: client rule projection, field conditions,
    peer fields, skipped unprojected guards.
 5. Gather/request: source-to-target payload assignments, scalar slots, route/header/url binding,

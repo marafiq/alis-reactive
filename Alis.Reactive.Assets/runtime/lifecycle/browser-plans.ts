@@ -1,13 +1,9 @@
 // browser-plans.ts - boot plan composition and partial slot lifetimes.
 
-import type { PlanDocument, Behavior, BrowserObjectContract, ComponentValidation } from "../types";
-import { unwireField } from "../validation/live-clear";
+import type { PlanDocument, Behavior } from "../types";
 import {
   mergeBootComponent,
-  mergeSlotComponent,
-  mergeValidationRules,
-  replaceValidationRules,
-  type ComponentSlotLoad,
+  mergeLoadedComponent,
 } from "./component-slots";
 import { mergeObjectContracts } from "./object-contracts";
 
@@ -22,55 +18,50 @@ export interface BrowserPlanWiring {
   wireContainerValidation: WireContainerValidation;
 }
 
-interface LoadedTypeContract {
-  readonly typeKey: string;
-  readonly contract: BrowserObjectContract;
-}
-
-interface LoadedPartialPlan {
-  readonly planId: PlanId;
-  readonly behaviors: Behavior[];
-  readonly components: ComponentSlotLoad[];
-  readonly typeContracts: LoadedTypeContract[];
-}
-
-interface PartialSlotLoad {
+interface PartialSlot {
   readonly abortController: AbortController;
-  readonly plans: LoadedPartialPlan[];
+  readonly plans: PlanDocument[];
 }
 
 export class BrowserPlanStore {
   private readonly plans = new Map<PlanId, PlanDocument>();
-  private readonly bootedPlanIds = new Set<PlanId>();
-  private readonly bootedComponents = new Set<string>();
-  private readonly bootedTypes = new Map<string, BrowserObjectContract>();
-  private readonly bootedValidationRules = new Map<string, ComponentValidation[]>();
-  private readonly slots = new Map<PartialSlotId, PartialSlotLoad>();
+  private readonly bootPlans = new Map<PlanId, PlanDocument>();
+  private readonly slots = new Map<PartialSlotId, PartialSlot>();
 
   register(plan: PlanDocument): void {
     this.plans.set(plan.planId, plan);
-    this.bootedPlanIds.add(plan.planId);
-    this.recordBootPlan(plan);
+    this.bootPlans.set(plan.planId, snapshotPlan(plan));
   }
 
   loadPartialSlot(slotId: PartialSlotId, plans: PlanDocument[], wiring: BrowserPlanWiring): PlanId[] {
-    const affectedPlanIds = new Set(this.removePartialSlot(slotId));
-    if (plans.length === 0) return [...affectedPlanIds];
-
-    const abortController = new AbortController();
-    const slotPlans: LoadedPartialPlan[] = [];
-    for (const plan of plans) {
-      const slotPlan = this.mergePartialPlan(abortController, plan, wiring);
-      slotPlans.push(slotPlan);
-      affectedPlanIds.add(slotPlan.planId);
+    const affectedPlanIds = new Set(this.removeSlot(slotId));
+    if (plans.length === 0) {
+      this.recomposePlans(affectedPlanIds);
+      return [...affectedPlanIds];
     }
 
+    const abortController = new AbortController();
+    const slotPlans = plans.map(snapshotPlan);
     this.slots.set(slotId, { abortController, plans: slotPlans });
+
+    for (const plan of slotPlans) {
+      affectedPlanIds.add(plan.planId);
+    }
+
+    this.recomposePlans(affectedPlanIds);
+    for (const plan of slotPlans) {
+      const activePlan = this.plans.get(plan.planId)!;
+      wiring.wireBehaviors(plan.behaviors, activePlan, abortController.signal);
+      wiring.wireContainerValidation(activePlan, abortController.signal);
+    }
+
     return [...affectedPlanIds];
   }
 
   unloadPartialSlot(slotId: PartialSlotId): PlanId[] {
-    return this.removePartialSlot(slotId);
+    const affectedPlanIds = new Set(this.removeSlot(slotId));
+    this.recomposePlans(affectedPlanIds);
+    return [...affectedPlanIds];
   }
 
   get(planId: string): PlanDocument | undefined {
@@ -78,251 +69,72 @@ export class BrowserPlanStore {
   }
 
   reset(): void {
-    this.abortSlotLoads();
+    this.abortSlots();
     this.plans.clear();
-    this.bootedPlanIds.clear();
-    this.bootedComponents.clear();
-    this.bootedTypes.clear();
-    this.bootedValidationRules.clear();
+    this.bootPlans.clear();
     this.slots.clear();
   }
 
-  private removePartialSlot(slotId: PartialSlotId): PlanId[] {
-    const slotLoad = this.takeSlotLoad(slotId);
-    const affectedPlanIds = new Set<PlanId>();
-    if (slotLoad === undefined) return [];
+  private removeSlot(slotId: PartialSlotId): PlanId[] {
+    const slot = this.slots.get(slotId);
+    if (slot === undefined) return [];
 
-    slotLoad.abortController.abort();
-    for (const slotPlan of slotLoad.plans) {
-      affectedPlanIds.add(slotPlan.planId);
-      this.removePartialPlanEntries(slotPlan);
-    }
-
-    return [...affectedPlanIds];
+    this.slots.delete(slotId);
+    slot.abortController.abort();
+    return planIdsIn(slot.plans);
   }
 
-  private mergePartialPlan(
-    abortController: AbortController,
-    incoming: PlanDocument,
-    wiring: BrowserPlanWiring,
-  ): LoadedPartialPlan {
-    const target = this.ensureTarget(incoming.planId);
-    const typeContracts = this.mergeTypeContractsFrom(incoming, target);
-    const components = this.mergeComponents(incoming, target);
-
-    wiring.wireBehaviors(incoming.behaviors, target, abortController.signal);
-    target.behaviors.push(...incoming.behaviors);
-    wiring.wireContainerValidation(target, abortController.signal);
-
-    return {
-      planId: incoming.planId,
-      behaviors: [...incoming.behaviors],
-      components,
-      typeContracts,
-    };
-  }
-
-  private removePartialPlanEntries(slotPlan: LoadedPartialPlan): void {
-    const plan = this.plans.get(slotPlan.planId)!;
-    this.removeBehaviors(plan, slotPlan.behaviors);
-    this.removeComponentSlotLoads(plan, slotPlan);
-    this.removeTypes(plan, slotPlan);
-
-    if (this.canRemovePlanDocument(slotPlan.planId, plan)) {
-      this.plans.delete(slotPlan.planId);
+  private recomposePlans(planIds: Iterable<PlanId>): void {
+    for (const planId of planIds) {
+      this.recomposePlan(planId);
     }
   }
 
-  private ensureTarget(planId: PlanId): PlanDocument {
-    let target = this.plans.get(planId);
-    if (target === undefined) {
-      target = { version: 3, planId, scope: { kind: "root" }, types: {}, components: {}, behaviors: [] };
-      this.plans.set(planId, target);
-    }
-    return target;
-  }
+  private recomposePlan(planId: PlanId): void {
+    const bootPlan = this.bootPlans.get(planId);
+    const slotPlans = this.activeSlotPlans(planId);
 
-  private mergeTypeContractsFrom(incoming: PlanDocument, target: PlanDocument): LoadedTypeContract[] {
-    const typeContracts: LoadedTypeContract[] = [];
-    for (const [typeKey, contract] of Object.entries(incoming.types)) {
-      target.types[typeKey] = mergeObjectContracts(target.types[typeKey], contract);
-      typeContracts.push({ typeKey, contract });
-    }
-
-    return typeContracts;
-  }
-
-  private mergeComponents(incoming: PlanDocument, target: PlanDocument): ComponentSlotLoad[] {
-    const components: ComponentSlotLoad[] = [];
-    for (const [componentKey, component] of Object.entries(incoming.components)) {
-      components.push(
-        ...mergeSlotComponent(
-          target,
-          { componentKey, component },
-          this.componentWasBooted(incoming.planId, componentKey),
-        ),
-      );
-    }
-
-    return components;
-  }
-
-  private recordBootPlan(plan: PlanDocument): void {
-    for (const [typeKey, contract] of Object.entries(plan.types)) {
-      const key = planTypeKey(plan.planId, typeKey);
-      this.bootedTypes.set(key, mergeObjectContracts(this.bootedTypes.get(key), contract));
-    }
-    for (const [componentKey, component] of Object.entries(plan.components)) {
-      this.bootedComponents.add(planComponentKey(plan.planId, componentKey));
-      if (component.container.kind === "validation-container") {
-        this.bootedValidationRules.set(
-          planComponentKey(plan.planId, componentKey),
-          [...component.container.validationRules],
-        );
-      }
-    }
-  }
-
-  private removeBehaviors(plan: PlanDocument, behaviors: Behavior[]): void {
-    const removed = new Set(behaviors);
-    plan.behaviors = plan.behaviors.filter(behavior => !removed.has(behavior));
-  }
-
-  private removeComponentSlotLoads(plan: PlanDocument, slotPlan: LoadedPartialPlan): void {
-    for (const load of slotPlan.components) {
-      if (load.kind === "validation-rules") {
-        this.recomputeValidationRules(plan, slotPlan.planId, load.containerKey);
-        continue;
-      }
-
-      if (load.kind === "layout-object") {
-        this.removeLayoutObject(plan, slotPlan.planId, load);
-        continue;
-      }
-
-      this.removeMountedComponent(plan, load);
-    }
-  }
-
-  private recomputeValidationRules(plan: PlanDocument, planId: PlanId, containerKey: string): void {
-    const container = plan.components[containerKey];
-    if (container?.container.kind !== "validation-container") return;
-
-    const ruleSets = [
-      this.bootedValidationRules.get(planComponentKey(planId, containerKey)) ?? [],
-      ...this.activeValidationRuleSets(planId, containerKey),
-    ];
-    replaceValidationRules(container, mergeValidationRules(ruleSets));
-  }
-
-  private removeMountedComponent(
-    plan: PlanDocument,
-    load: Extract<ComponentSlotLoad, { kind: "component" }>,
-  ): void {
-    const component = plan.components[load.componentKey];
-    if (component?.id !== load.componentId) return;
-
-    unwireField(component.id);
-    delete plan.components[load.componentKey];
-  }
-
-  private removeLayoutObject(
-    plan: PlanDocument,
-    planId: PlanId,
-    load: Extract<ComponentSlotLoad, { kind: "layout-object" }>,
-  ): void {
-    if (this.componentWasBooted(planId, load.componentKey)) return;
-    if (this.activeSlotsReferenceLayoutObject(planId, load.componentKey)) return;
-
-    const component = plan.components[load.componentKey];
-    if (component?.id !== load.componentId) return;
-
-    unwireField(component.id);
-    delete plan.components[load.componentKey];
-  }
-
-  private removeTypes(plan: PlanDocument, slotPlan: LoadedPartialPlan): void {
-    const typeKeys = new Set(slotPlan.typeContracts.map(contract => contract.typeKey));
-    for (const typeKey of typeKeys) {
-      this.recomputeType(plan, slotPlan.planId, typeKey);
-    }
-  }
-
-  private recomputeType(plan: PlanDocument, planId: PlanId, typeKey: string): void {
-    const rootContract = this.bootedTypes.get(planTypeKey(planId, typeKey));
-    let remaining = rootContract === undefined
-      ? undefined
-      : mergeObjectContracts(undefined, rootContract);
-
-    for (const slotPlan of this.activeSlotPlans()) {
-      if (slotPlan.planId !== planId) continue;
-      for (const contract of slotPlan.typeContracts) {
-        if (contract.typeKey !== typeKey) continue;
-        remaining = mergeObjectContracts(remaining, contract.contract);
-      }
-    }
-
-    if (remaining === undefined) {
-      delete plan.types[typeKey];
+    if (bootPlan === undefined && slotPlans.length === 0) {
+      this.plans.delete(planId);
       return;
     }
 
-    plan.types[typeKey] = remaining;
+    const target = this.activePlanDocument(planId);
+    resetPlanDocument(target, planId);
+
+    if (bootPlan !== undefined) {
+      composeBootPlanInto(target, bootPlan);
+    }
+
+    for (const slotPlan of slotPlans) {
+      composeSlotPlanInto(target, slotPlan, bootPlan);
+    }
   }
 
-  private activeSlotsReferenceLayoutObject(planId: PlanId, componentKey: string): boolean {
-    for (const slotPlan of this.activeSlotPlans()) {
-      if (slotPlan.planId !== planId) continue;
-      if (slotPlan.components.some(load => load.kind === "layout-object" && load.componentKey === componentKey)) {
-        return true;
+  private activePlanDocument(planId: PlanId): PlanDocument {
+    let activePlan = this.plans.get(planId);
+    if (activePlan === undefined) {
+      activePlan = emptyPlan(planId);
+      this.plans.set(planId, activePlan);
+    }
+
+    return activePlan;
+  }
+
+  private activeSlotPlans(planId: PlanId): PlanDocument[] {
+    const plans: PlanDocument[] = [];
+    for (const slot of this.slots.values()) {
+      for (const plan of slot.plans) {
+        if (plan.planId === planId) plans.push(plan);
       }
     }
 
-    return false;
+    return plans;
   }
 
-  private componentWasBooted(planId: PlanId, componentKey: string): boolean {
-    return this.bootedComponents.has(planComponentKey(planId, componentKey));
-  }
-
-  private canRemovePlanDocument(planId: PlanId, plan: PlanDocument): boolean {
-    const planWasNotBooted = !this.bootedPlanIds.has(planId);
-    const planHasNoBehaviors = plan.behaviors.length === 0;
-    const planHasNoComponents = Object.keys(plan.components).length === 0;
-    const planHasNoTypes = Object.keys(plan.types).length === 0;
-
-    return planWasNotBooted && planHasNoBehaviors && planHasNoComponents && planHasNoTypes;
-  }
-
-  private takeSlotLoad(slotId: PartialSlotId): PartialSlotLoad | undefined {
-    const slotLoad = this.slots.get(slotId);
-    this.slots.delete(slotId);
-    return slotLoad;
-  }
-
-  private *activeSlotPlans(): Iterable<LoadedPartialPlan> {
-    for (const slotLoad of this.slots.values()) {
-      yield* slotLoad.plans;
-    }
-  }
-
-  private *activeValidationRuleSets(
-    planId: PlanId,
-    containerKey: string,
-  ): Iterable<ComponentValidation[]> {
-    for (const slotPlan of this.activeSlotPlans()) {
-      if (slotPlan.planId !== planId) continue;
-      for (const load of slotPlan.components) {
-        if (load.kind !== "validation-rules") continue;
-        if (load.containerKey !== containerKey) continue;
-        yield load.rules;
-      }
-    }
-  }
-
-  private abortSlotLoads(): void {
-    for (const slotLoad of this.slots.values()) {
-      slotLoad.abortController.abort();
+  private abortSlots(): void {
+    for (const slot of this.slots.values()) {
+      slot.abortController.abort();
     }
   }
 }
@@ -332,43 +144,81 @@ const browserPlans = new BrowserPlanStore();
 export function composeInitialPlans(plans: PlanDocument[]): PlanDocument[] {
   const assembledPlans = new Map<PlanId, PlanDocument>();
   for (const plan of plans) {
-    let assembled = assembledPlans.get(plan.planId);
-    if (assembled === undefined) {
-      assembled = {
-        version: 3,
-        planId: plan.planId,
-        scope: { kind: "root" },
-        types: {},
-        components: {},
-        behaviors: [],
-      };
-      assembledPlans.set(plan.planId, assembled);
-    }
-
+    const assembled = assembledPlans.get(plan.planId) ?? emptyPlan(plan.planId);
+    assembledPlans.set(plan.planId, assembled);
     composeBootPlanInto(assembled, plan);
   }
 
   return Array.from(assembledPlans.values());
 }
 
-function composeBootPlanInto(assembled: PlanDocument, incoming: PlanDocument): void {
-  for (const [typeKey, contract] of Object.entries(incoming.types)) {
-    assembled.types[typeKey] = mergeObjectContracts(assembled.types[typeKey], contract);
-  }
+function composeBootPlanInto(target: PlanDocument, incoming: PlanDocument): void {
+  mergeTypeContracts(target, incoming);
 
   for (const [componentKey, component] of Object.entries(incoming.components)) {
-    mergeBootComponent(assembled, { componentKey, component });
+    mergeBootComponent(target, { componentKey, component });
   }
 
-  assembled.behaviors.push(...incoming.behaviors);
+  target.behaviors.push(...incoming.behaviors);
 }
 
-function planComponentKey(planId: PlanId, componentKey: string): string {
-  return `${planId}:component:${componentKey}`;
+function composeSlotPlanInto(
+  target: PlanDocument,
+  incoming: PlanDocument,
+  bootPlan: PlanDocument | undefined,
+): void {
+  mergeTypeContracts(target, incoming);
+
+  for (const [componentKey, component] of Object.entries(incoming.components)) {
+    mergeLoadedComponent(
+      target,
+      { componentKey, component },
+      bootPlan?.components[componentKey] !== undefined,
+    );
+  }
+
+  target.behaviors.push(...incoming.behaviors);
 }
 
-function planTypeKey(planId: PlanId, typeKey: string): string {
-  return `${planId}:type:${typeKey}`;
+function mergeTypeContracts(target: PlanDocument, incoming: PlanDocument): void {
+  for (const [typeKey, contract] of Object.entries(incoming.types)) {
+    target.types[typeKey] = mergeObjectContracts(target.types[typeKey], contract);
+  }
+}
+
+function resetPlanDocument(plan: PlanDocument, planId: PlanId): void {
+  plan.version = 3;
+  plan.planId = planId;
+  plan.scope = { kind: "root" };
+  plan.types = {};
+  plan.components = {};
+  plan.behaviors = [];
+}
+
+function emptyPlan(planId: PlanId): PlanDocument {
+  return {
+    version: 3,
+    planId,
+    scope: { kind: "root" },
+    types: {},
+    components: {},
+    behaviors: [],
+  };
+}
+
+function snapshotPlan(plan: PlanDocument): PlanDocument {
+  return {
+    version: plan.version,
+    planId: plan.planId,
+    scope: { ...plan.scope },
+    types: { ...plan.types },
+    components: { ...plan.components },
+    behaviors: [...plan.behaviors],
+  };
+}
+
+function planIdsIn(plans: PlanDocument[]): PlanId[] {
+  return Array.from(new Set(plans.map(plan => plan.planId)));
 }
 
 export function registerBootedPlan(plan: PlanDocument): void { browserPlans.register(plan); }

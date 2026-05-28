@@ -349,7 +349,7 @@ Core domain terms:
 | Request Input Projection | `GatherInput` / request input | request payload writer |
 | Validation Projection | validation-container component rules | validation orchestrator |
 | Plugin Contract | plugin object contract | plugin resolver/invoker |
-| Slot Load | partial plan loaded into `Into(...)` host | load/unload handle |
+| Partial Slot | partial plans loaded into an `Into(...)` host | slot source for active plan recomposition |
 
 ## Source Matrix
 
@@ -455,9 +455,9 @@ These are the rows that catch local-only refactors.
 | parallel plus completion graph | `Parallel(a,b).OnAllSettled(p => p.Dispatch(...))` | requests run concurrently; completion graph executes after all settle |
 | gather from mixed sources | `Header(source)`, `RouteParam(event)`, `FromUrl<T>`, `Plugin(source)`, `IncludeAll` | request input projection preserves source and target kind |
 | component event to HTTP | component `.Reactive(events => events.Changed, (args,p)=> p.Post(...))` | event payload is available to gather/conditions/plugin args in the HTTP graph |
-| partial load and unload | request success `Into("slot")` returns HTML with same-model `ResolvePlan` | runtime merges by `planId`, wires new behavior, and slot unload removes only slot-loaded state |
+| partial load and unload | request success `Into("slot")` returns HTML with same-model `ResolvePlan` | runtime loads returned plans into the target slot, wires slot behavior, and slot unload recomposes from boot plus remaining slots |
 | app-level object from partial | partial references drawer/toast/confirm | layout object role joins fixed object and survives slot unload unless slot created it |
-| validation extension from partial | partial adds fields to root form validation container | rules are added for loaded fields and exact loaded rules are removed on unload |
+| validation extension from partial | partial adds fields to root form validation container | rules are composed from boot plus active slots; unload removes rules by recomposition |
 | action link request | `NativeActionLink(..., p => p.Get(url).Gather(...))` | inline payload carries one request and object contracts needed to execute it |
 
 ## Graph Test Vectors
@@ -481,7 +481,7 @@ module, at least the matching vectors must stay true.
 | T11 validation client metadata | `ClientValidationRules.For<V,M>(v=>v.Field(m=>m.Name).Required("Name"))` | validation field metadata bound to model path and rule | validation-container rules include required rule | browser blocks request and displays rule | validation metadata + Playwright |
 | T12 FluentValidation server-only guard | `WhenAsync(...); RuleFor(x=>x.Name).NotEmpty()` outside client guard | server validator remains normal; client projection omits unprojectable guard/rule path as required | no browser rule for async-only guarded behavior | server still validates; client does not invent condition | validation projection |
 | T13 partial SSR same model | root and partial both use `ReactivePlan/ResolvePlan<TModel>` | two `PlanDocument`s with same `planId` | root + partial docs share plan id | boot composes documents before wiring triggers | boot composition runtime |
-| T14 partial browser load/unload | success `p.Into("slot")` injects HTML containing `ResolvePlan<TModel>` | slot load merges loaded plan state by `planId` and slot id | partial plan document + slot load handle | load wires behavior; unload removes loaded behavior/rules/components | partial Playwright/runtime |
+| T14 partial browser load/unload | success `p.Into("slot")` injects HTML containing `ResolvePlan<TModel>` | slot load records returned plans under target slot id | partial plan documents + partial slot | load wires slot behavior; unload aborts slot wiring and recomposes behavior/rules/components from boot plus remaining slots | partial Playwright/runtime |
 | T15 app-level component | `p.Component<FusionToast>().SetContent("Saved").Show()` | fixed-id layout component object with property write and method call | component role `layout-object` | runtime joins fixed object and calls show | app-level Playwright |
 | T16 component callback sync mutation | Syncfusion callback DSL calls `args.PreventDefault()` / `args.UpdateData(...)` | event payload object method/property call in immediate lane | payload object method call reaction | mutation happens synchronously before vendor continues | fusion component Playwright |
 | T17 plugin read and command | `p.Plugin<int>(fn).Arg(p.FromUrl<int>("id"))` and `p.Plugin(cmd).Arg("x").Fire()` | plugin contract with typed args/return; read value expression and call reaction | plugin object contract + value/call entries | runtime resolves plugin, args, return/call | plugin runtime tests |

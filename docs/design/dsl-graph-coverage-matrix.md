@@ -165,7 +165,7 @@ flowchart TD
 
 | Source family | Method families | Graph edge | Design evidence status |
 | --- | --- | --- | --- |
-| `PlanExtensions` | `ReactivePlan`, `ResolvePlan`, `RenderPlan` | plan DSL -> plan document -> JSON script | covered by `Reactive Plan Domain Design / Plan, Fragment, Input Slot` |
+| `PlanExtensions` | `ReactivePlan`, `ResolvePlan`, `RenderPlan` | plan DSL -> plan document -> JSON script | covered by `Reactive Plan Domain Design / Plan, Script, Slot` |
 | `HtmlExtensions` | `On` | plan -> trigger builder | covered by `Trigger` matrix |
 | `ReactivePlan` | plugin registration, render | plan -> plugin contract / JSON | covered by `Plan` and `Plugin` matrices |
 | `TriggerBuilder` | page, document event, SSE, SignalR | trigger -> pipeline, optional event scope | covered by `Trigger` matrix |

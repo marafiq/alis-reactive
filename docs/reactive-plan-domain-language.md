@@ -61,14 +61,14 @@ probing live objects.
 | Plan Draft | Mutable build-time state used while DSL builders assemble deterministic intent. | `PlanBuildContext`, builder drafts |
 | Plan Document | Serialized browser-executable plan for one model identity. It may be root-scoped, partial-scoped, or inline for an action link. | `Plan`, `ReactivePlan<TModel>`, generated `Plan` in `plan.ts` |
 | Plan Identity | Stable model-derived key used to compose root and same-model partial plans. | `PlanId`, `PlanIdentity` |
-| Plan Scope | Root or partial scope carried in JSON. It tells runtime whether the document boots a page plan or merges into an existing plan. | `PlanScope`, `RootPlanScope`, `PartialPlanScope` |
-| Slot Load | Browser lifetime for injected partial HTML. Loading a slot replaces the previous load; unloading removes the state loaded by that slot. | `AppliedBrowserPlans.loadPartialSlot`, `unloadPartialSlot` |
-| Slot Id | Runtime handle for browser partial replacement/unload. It is not a component id and not a type key. | `SlotId` |
+| Plan Scope | Root or partial scope carried in JSON. Boot discovery and injection slot decide where the document is applied. | `PlanScope`, `RootPlanScope`, `PartialPlanScope` |
+| Partial Slot | Browser lifetime for injected partial HTML. Loading a slot replaces the previous load; unloading aborts that slot and recomposes active plans from remaining sources. | `BrowserPlanStore.loadPartialSlot`, `unloadPartialSlot` |
+| Slot Id | Runtime handle for browser partial replacement/unload. It is not a component id and not a type key. | `PartialSlotId` |
 | Browser Object Contract | Vendor-agnostic JS object contract: properties, methods, events, callback payloads, and value shapes. | `BrowserObjectContract`, `plan.ts` object contracts |
-| Object Contract Load | Root or slot-loaded object member declarations. Compatible declarations merge into the active runtime type; unloading a slot releases only declarations loaded by that slot. | `object-contracts.ts` |
+| Object Contract Merge | Compatible object member declarations compose into the active runtime type from boot and active slot sources. | `object-contracts.ts` |
 | Component Object | Plan entry for a browser component object. It has id, vendor, type key, and role. | `ComponentObject` |
-| Component Role | Plan-declared meaning of a component entry: `object-target`, `owned-definition`, `validation-container`, or `layout-object`. | `ComponentObject.Role`, generated component role unions |
-| Component Load | Runtime memory of which root or slot load owns component definitions and layout object references. | `component-slots.ts` |
+| Component Role | Plan-declared meaning of a component entry: `object-target`, `plan-input`, `validation-container`, or `layout-object`. | `ComponentObject.Role`, generated component role unions |
+| Component Merge | Runtime rule for composing a component entry from boot and active slot plans. Component id remains the object lookup key. | `component-slots.ts` |
 | Controlled Component ID | Absolute join key for a rendered component object. Model-bound input ids are generated from model type and expression and reused by markup, plan, validation, gather, and runtime lookup. | `IdGenerator`, `ComponentRegistration` |
 | Component Vertical Slice | Isolated onboarding path for one vendor/component API. It renders markup and exposes compile-time-correct properties, methods, events, and callbacks while sharing core plan primitives. | `Alis.Reactive.Native`, `Alis.Reactive.Fusion` |
 | App-Level Component | Fixed-id layout/page object such as drawer, loader, toast, confirm, or action link support. It is modeled as a layout object role, not a normal rendered input. | Native/Fusion app-level slices |
@@ -85,17 +85,17 @@ probing live objects.
 | Request Plan | HTTP request intent: method, URL template, route/header/body assignments, validation gate, response routes, lifecycle reaction slots, chain, and parallel grouping. | request builders, `Request` |
 | Request Input Projection | Explicit mapping from readable sources to route values, query/body payload, headers, or all registered inputs. | gather/request payload model |
 | Validation Projection | Deterministic browser validation rules declared through typed validation metadata. FluentValidation server rules still run normally; only explicit `ClientRule(...)` metadata enters the browser plan. | validation projection model |
-| Validation Container | Component role that owns browser validation rules for a form/container. Partials can add rules to a root container and slot unload removes the exact loaded rule objects. | `validation-container` role, runtime validation |
+| Validation Container | Component role that owns browser validation rules for a form/container. Partials can add rules to a root container; slot unload recomposes rules from boot plus remaining slots. | `validation-container` role, runtime validation |
 | Plugin Contract | Declared browser plugin object/function contract for behavior outside deterministic first-class DSL primitives. Public plugin compatibility may use strings; internal plan/runtime terms stay typed. | `ReactivePlugin`, `PluginContract` |
 
 ## Component Roles
 
 | Role | Meaning | Runtime behavior |
 | --- | --- | --- |
-| `owned-definition` | The plan renders or owns the component object definition. | Add/update the component and remember root or slot ownership. Slot unload removes it only if the slot owns it. |
+| `plan-input` | The plan renders a model-bound component with a readable value member. | Compose it into the active plan; slot unload removes it by recomposition when no remaining source declares it. |
 | `object-target` | The plan needs a deterministic handle to an existing or declared browser object. | Join by component id/vendor/type key, or materialize when the plan owns no rendered definition yet. |
-| `validation-container` | The plan carries validation rules for a container. | Merge root rules at boot; for slot load, append/replace rules by validated component and remove exact loaded rules on unload. |
-| `layout-object` | The plan references a fixed app-level object owned by layout/page lifetime. | Join existing layout object or create a temporary one when needed for partial behavior; unload only slot-created layout references. |
+| `validation-container` | The plan carries validation rules for a container. | Compose root and active-slot rules by validated component. Slot unload recomposes from remaining sources. |
+| `layout-object` | The plan references a fixed app-level object owned by layout/page lifetime. | Join existing layout object or compose a slot-only layout reference for partial behavior. |
 
 ## Partial Plan Flow
 
@@ -122,7 +122,7 @@ Rules:
 - Component ids and type keys are runtime join keys.
 - Slot id is only the browser load/unload handle.
 - The runtime does not validate whether framework-generated JSON is plausible.
-  It records what must be removed when a slot unloads.
+  It recomposes the active plan from boot plans and active slots.
 
 ## Request And Gather
 
@@ -164,11 +164,11 @@ Avoid these as general-purpose domain words:
 Preferred current terms:
 
 - `PlanDocument`
-- `SlotLoad`
+- `PartialSlot`
 - `SlotId`
 - `ComponentRole`
-- `ComponentLoad`
-- `ObjectContractLoad`
+- `ComponentMerge`
+- `ObjectContractMerge`
 - `ValidationProjection`
 - `RequestInputProjection`
 

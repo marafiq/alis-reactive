@@ -7,29 +7,6 @@ interface ComponentDeclaration {
   readonly component: ComponentObject;
 }
 
-export type ComponentSlotLoad =
-  | MountedComponentLoad
-  | LayoutObjectLoad
-  | ValidationRulesLoad;
-
-export interface MountedComponentLoad {
-  readonly kind: "component";
-  readonly componentKey: string;
-  readonly componentId: string;
-}
-
-export interface LayoutObjectLoad {
-  readonly kind: "layout-object";
-  readonly componentKey: string;
-  readonly componentId: string;
-}
-
-export interface ValidationRulesLoad {
-  readonly kind: "validation-rules";
-  readonly containerKey: string;
-  readonly rules: ComponentValidation[];
-}
-
 export function mergeBootComponent(target: PlanDocument, declaration: ComponentDeclaration): void {
   const existing = target.components[declaration.componentKey];
 
@@ -48,38 +25,26 @@ export function mergeBootComponent(target: PlanDocument, declaration: ComponentD
   replaceComponent(target, declaration.componentKey, declaration.component);
 }
 
-export function mergeSlotComponent(
+export function mergeLoadedComponent(
   target: PlanDocument,
   declaration: ComponentDeclaration,
-  componentWasBooted: boolean,
-): ComponentSlotLoad[] {
+  bootHasComponent: boolean,
+): void {
   const existing = target.components[declaration.componentKey];
 
-  if (extendsRootValidationContainer(existing, declaration, componentWasBooted)) {
-    const declaredRules = validationRulesOf(declaration.component) ?? [];
+  if (extendsRootValidationContainer(existing, declaration, bootHasComponent)) {
     appendRulesForNewValidatedComponents(existing, declaration.component);
-    return declaredRules.length === 0
-      ? []
-      : [{ kind: "validation-rules", containerKey: declaration.componentKey, rules: declaredRules }];
+    return;
   }
 
   if (isLayoutObject(declaration.component)) {
     mergeLayoutObject(target, declaration);
-    return [{
-      kind: "layout-object",
-      componentKey: declaration.componentKey,
-      componentId: declaration.component.id,
-    }];
+    return;
   }
 
-  if (joinsExistingRuntimeObject(existing, declaration.component)) return [];
+  if (joinsExistingRuntimeObject(existing, declaration.component)) return;
 
   replaceComponent(target, declaration.componentKey, declaration.component);
-  return [{
-    kind: "component",
-    componentKey: declaration.componentKey,
-    componentId: declaration.component.id,
-  }];
 }
 
 function mergeLayoutObject(target: PlanDocument, declaration: ComponentDeclaration): void {
@@ -92,9 +57,9 @@ function mergeLayoutObject(target: PlanDocument, declaration: ComponentDeclarati
 function extendsRootValidationContainer(
   existing: ComponentObject | undefined,
   declaration: ComponentDeclaration,
-  componentWasBooted: boolean,
+  bootHasComponent: boolean,
 ): boolean {
-  return componentWasBooted
+  return bootHasComponent
     && isValidationContainer(existing)
     && isValidationContainer(declaration.component)
     && declaration.component.binding.kind === "none"
@@ -129,27 +94,29 @@ function isInitialValidationContainerMerge(existing: ComponentObject | undefined
 }
 
 function replaceComponent(target: PlanDocument, componentKey: string, incoming: ComponentObject): void {
+  const next = cloneComponent(incoming);
   const existingRules = validationRulesOf(target.components[componentKey]);
-  const incomingRules = validationRulesOf(incoming);
+  const incomingRules = validationRulesOf(next);
   if (existingRules !== undefined && incomingRules !== undefined) {
     replaceValidationRules(
-      incoming,
+      next,
       replaceRulesForSameValidatedComponent(existingRules, incomingRules),
     );
   }
 
-  target.components[componentKey] = incoming;
+  target.components[componentKey] = next;
 }
 
 function appendRulesForNewValidatedComponents(
   existing: ComponentObject | undefined,
   incoming: ComponentObject,
-): ComponentValidation[] {
+): void {
   const existingRules = validationRulesOf(existing);
   const incomingRules = validationRulesOf(incoming);
-  if (existingRules === undefined || incomingRules === undefined) return [];
+  if (existingRules === undefined || incomingRules === undefined) return;
 
-  return appendOnlyNewValidatedComponents(existingRules, incomingRules);
+  const existingComponents = new Set(existingRules.map(rule => rule.component));
+  appendRulesForNewComponents(existingRules, existingComponents, incomingRules);
 }
 
 function validationContainerOf(component: ComponentObject | undefined): ValidationContainerComponent | undefined {
@@ -168,21 +135,11 @@ function validationRulesOf(component: ComponentObject | undefined): ComponentVal
   return validationContainerOf(component)?.validationRules;
 }
 
-export function replaceValidationRules(component: ComponentObject, validationRules: ComponentValidation[]): void {
+function replaceValidationRules(component: ComponentObject, validationRules: ComponentValidation[]): void {
   const container = validationContainerOf(component);
   if (container === undefined) return;
 
   container.validationRules = validationRules;
-}
-
-export function mergeValidationRules(ruleSets: Iterable<ComponentValidation[]>): ComponentValidation[] {
-  const merged: ComponentValidation[] = [];
-  const seenComponents = new Set<string>();
-  for (const rules of ruleSets) {
-    appendRulesForNewComponents(merged, seenComponents, rules);
-  }
-
-  return merged;
 }
 
 function replaceRulesForSameValidatedComponent(
@@ -197,27 +154,18 @@ function replaceRulesForSameValidatedComponent(
   return [...rulesByComponent.values()];
 }
 
-function appendOnlyNewValidatedComponents(
-  existingRules: ComponentValidation[],
-  incomingRules: ComponentValidation[],
-): ComponentValidation[] {
-  const existingComponents = new Set(existingRules.map(rule => rule.component));
-  const appendedRules: ComponentValidation[] = [];
-  appendRulesForNewComponents(existingRules, existingComponents, incomingRules, appendedRules);
-
-  return appendedRules;
-}
-
 function appendRulesForNewComponents(
   target: ComponentValidation[],
   seenComponents: Set<string>,
   incomingRules: ComponentValidation[],
-  appendedRules?: ComponentValidation[],
 ): void {
   for (const rule of incomingRules) {
     if (seenComponents.has(rule.component)) continue;
     target.push(rule);
-    appendedRules?.push(rule);
     seenComponents.add(rule.component);
   }
+}
+
+function cloneComponent(component: ComponentObject): ComponentObject {
+  return structuredClone(component);
 }

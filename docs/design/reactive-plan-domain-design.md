@@ -18,8 +18,8 @@ whether the server generated a possible shape.
 | Term | Meaning | Source driver |
 | --- | --- | --- |
 | `PlanDocument` | The deterministic behavior document emitted by a view or partial | `ReactivePlan`, `ResolvePlan`, `RenderPlan` |
-| `PlanFragment` | A root, partial, or inline action-link plan script that can be mounted in the browser | root view, partial view, action link |
-| `MountedPlanFragment` | A plan fragment currently active in the browser, keyed by stable fragment id | partial load/unload |
+| `RenderedPlanScript` | The JSON script emitted by `RenderPlan` and discovered during boot or injection | root view, partial view |
+| `PartialSlot` | Browser lifetime for an `Into(...)` host; replacing or emptying the host unloads the previous slot plans | partial load/unload |
 | `BehaviorGraph` | A trigger plus the reaction graph it starts | `Html.On`, trigger builders |
 | `Trigger` | Browser start point, optionally with payload scope | page, custom event, SSE, SignalR, component event |
 | `ReactionGraph` | Ordered deterministic work to perform | pipeline builders |
@@ -42,7 +42,7 @@ rows, and implementation work is not allowed to skip one of these rows.
 
 | Source family | Public DSL facts from source | Required design rows |
 | --- | --- | --- |
-| Plan/render/input | root plan, partial plan, render plan, validation summary only for root, model-bound input field slots | Plan/fragment matrix, fragment lifecycle |
+| Plan/render/input | root plan, partial plan, render plan, validation summary only for root, model-bound input field slots | Plan/script/slot matrix |
 | Trigger | page ready, document event, typed document event, SSE, typed SSE, SignalR, typed SignalR, component event/callback | Trigger matrix |
 | Pipeline/reaction | dispatch, dispatch payload, element mutation, component object target, URL source, plugin read/command, validation display, success-body injection | Reaction/value matrix |
 | Conditions | event/response/typed-source starts, confirm, unary/binary/text/range/membership/collection comparisons, nested all/any/not, then/elseif/else | Conditions matrix |
@@ -57,8 +57,9 @@ rows, and implementation work is not allowed to skip one of these rows.
 ```mermaid
 flowchart TD
     PlanDsl[Plan DSL] --> PlanDocument
-    PlanDocument --> Fragment[PlanFragment]
-    Fragment --> Mount[MountedPlanFragment]
+    PlanDocument --> Script[RenderedPlanScript]
+    Script --> Store[BrowserPlanStore]
+    Store --> PartialSlot
 
     PlanDsl --> ComponentSlice
     ComponentSlice --> BrowserObject
@@ -94,17 +95,16 @@ classDiagram
     class PlanDocument {
         PlanIdentity identity
         PlanScope scope
-        PlanFragment fragment
         BrowserObject[] objects
         BehaviorGraph[] behaviors
         ValidationProjection[] validations
         PluginContract[] plugins
     }
 
-    class PlanFragment {
-        FragmentId id
-        FragmentScope scope
-        PlanId planId
+    class PartialSlot {
+        SlotId id
+        PlanDocument[] plans
+        AbortController lifetime
     }
 
     class BrowserObject {
@@ -141,7 +141,7 @@ classDiagram
         ValidationCondition[] activations
     }
 
-    PlanDocument --> PlanFragment
+    PartialSlot --> PlanDocument
     PlanDocument --> BrowserObject
     PlanDocument --> BehaviorGraph
     PlanDocument --> ValidationProjection
@@ -150,7 +150,7 @@ classDiagram
     ReactionGraph --> RequestPlan
 ```
 
-## Plan Fragment Lifecycle
+## Plan Slot Lifecycle
 
 ```mermaid
 sequenceDiagram
@@ -158,19 +158,20 @@ sequenceDiagram
     participant Browser
     participant Runtime
 
-    Server->>Browser: root RenderPlan emits PlanFragment(root)
-    Browser->>Runtime: mount root fragment
-    Runtime->>Runtime: register browser object contracts by id/vendor
-    Runtime->>Runtime: wire triggers declared by fragment
+    Server->>Browser: root RenderPlan emits rendered plan script
+    Browser->>Runtime: discover boot plan scripts
+    Runtime->>Runtime: compose boot plans by planId
+    Runtime->>Runtime: wire boot triggers
 
-    Server->>Browser: partial RenderPlan emits PlanFragment(partial)
-    Browser->>Runtime: mount partial fragment
-    Runtime->>Runtime: add partial objects, validation fields, triggers, behaviors
+    Server->>Browser: Into response includes partial rendered plan scripts
+    Browser->>Runtime: load partial slot with returned plans
+    Runtime->>Runtime: recompose active plan from boot plan + active slots
+    Runtime->>Runtime: wire slot triggers and validation using slot abort signal
 
-    Browser->>Runtime: partial host unloads or replaces fragment
-    Runtime->>Runtime: unwire triggers for fragment id
-    Runtime->>Runtime: remove objects and validation fields owned by fragment id
-    Runtime->>Runtime: keep root/app-level objects mounted
+    Browser->>Runtime: partial host unloads or replaces slot
+    Runtime->>Runtime: abort slot signal
+    Runtime->>Runtime: recompose active plan from remaining sources
+    Runtime->>Runtime: keep boot/app-level objects mounted
 ```
 
 Fragment id is for load/unload ownership. Component id and vendor remain the
@@ -189,7 +190,7 @@ flowchart TD
     D -->|branch| H[Evaluate conditions, run first matching branch]
     D -->|request| I[Run request lane]
     D -->|parallel| J[Run request branches concurrently]
-    D -->|inject| K[Inject success body into target and mount returned fragment]
+    D -->|inject| K[Inject success body into target partial slot]
     D -->|validation| L[Display current validation errors]
 ```
 
@@ -289,10 +290,10 @@ conditions, and response handlers.
 
 | DSL input | Domain output | Runtime output |
 | --- | --- | --- |
-| `ReactivePlan<T>()` | `PlanDocument(scope=root, model id)` | root fragment mounts and owns validation summary |
-| `ResolvePlan<T>()` | `PlanDocument(scope=partial, model id)` | partial fragment mounts into existing plan |
-| `RenderPlan(plan)` | `PlanFragment` JSON script | runtime mounts fragment by stable fragment id |
-| partial replacement/unload | `MountedPlanFragment` ownership ends | runtime unwires only that fragment's triggers, objects, validations |
+| `ReactivePlan<T>()` | `PlanDocument(scope=root, model id)` | root plan joins boot composition and owns validation summary |
+| `ResolvePlan<T>()` | `PlanDocument(scope=partial, model id)` | partial plan joins SSR composition or a browser partial slot |
+| `RenderPlan(plan)` | `RenderedPlanScript` JSON script | runtime discovers the plan during boot or injection |
+| partial replacement/unload | `PartialSlot` source changes | runtime aborts slot wiring and recomposes from boot plan + active slots |
 | `InputField(plan, expr)` | controlled model-bound component slot | component id binds validation and gather reads |
 | `InputField(plan, expr, options)` | same plus label/required marker metadata | rendering concern, same plan slot |
 
@@ -326,7 +327,7 @@ conditions, and response handlers.
 | `Dispatch<T>(name,payload)` | literal object | typed dispatch reaction | dispatch event detail |
 | `DispatchWith<T>.Set` literal and typed-source overloads | literal/source fields | object value payload | dispatch built detail |
 | `ValidationErrors(formId)` | validation state | validation display reaction | show current errors |
-| `Into(elementId)` | whole success payload | inject reaction | set HTML and mount returned fragment |
+| `Into(elementId)` | whole success payload | inject reaction | set HTML and load returned plans into the target partial slot |
 
 ### Conditions
 
@@ -420,7 +421,7 @@ conditions, and response handlers.
 | component value extension | typed component property source | read JS object property |
 | component method-return extension | typed component method source | call JS object method and use return value |
 | app-level component extension | layout object target with fixed id | call/read layout object |
-| action link extension | inline plan fragment in attributes | runtime executes the link click behavior |
+| action link extension | inline plan payload in attributes | runtime executes the link click behavior |
 
 ### Component Source Facts
 
@@ -447,7 +448,7 @@ These rows come from `*Extensions.cs`, `*HtmlExtensions.cs`,
 
 | Module | Closed when |
 | --- | --- |
-| Plan/fragment | root, partial, action-link fragments mount and unload with stable fragment id; component ids remain object lookup keys |
+| Plan/script/slot | root and SSR partial scripts compose by `planId`; browser partial slots load/unload by host id; component ids remain object lookup keys |
 | Trigger/reaction | every trigger creates a behavior graph; authored order is preserved across sync commands, branches, requests, parallel, and injection |
 | Value | every DSL source has one value representation and every consumer accepts it where source allows |
 | Conditions | all source kinds, operators, compositions, else-if/default, and multiple mixed blocks work from the same condition graph |
