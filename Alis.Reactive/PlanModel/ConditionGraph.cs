@@ -18,10 +18,10 @@ namespace Alis.Reactive.PlanModel
             new CompareCondition(op, operands);
 
         internal static ConditionGraph All(params ConditionGraph[] terms) =>
-            new AllCondition(CompositeTerms("all", terms));
+            new AllCondition(OrderedTerms(terms));
 
         internal static ConditionGraph Any(params ConditionGraph[] terms) =>
-            new AnyCondition(CompositeTerms("any", terms));
+            new AnyCondition(OrderedTerms(terms));
 
         internal static ConditionGraph Not(ConditionGraph term) =>
             new NotCondition(term);
@@ -29,24 +29,9 @@ namespace Alis.Reactive.PlanModel
         internal static ConditionGraph Confirm(string message) =>
             new ConfirmCondition(message);
 
-        private static IReadOnlyList<ConditionGraph> CompositeTerms(string composition, IEnumerable<ConditionGraph> terms)
+        private static IReadOnlyList<ConditionGraph> OrderedTerms(IEnumerable<ConditionGraph> terms)
         {
-            if (composition == null) throw new ArgumentNullException(nameof(composition));
-            if (terms == null) throw new ArgumentNullException(nameof(terms));
-
-            var items = new List<ConditionGraph>();
-            foreach (var term in terms)
-            {
-                if (term == null) throw new ArgumentException("ConditionGraph term must not be null.", nameof(terms));
-                items.Add(term);
-            }
-
-            if (items.Count == 0)
-                throw new ArgumentException(
-                    $"Composite condition '{composition}' requires at least one term.",
-                    nameof(terms));
-
-            return items;
+            return new List<ConditionGraph>(terms);
         }
     }
 
@@ -72,13 +57,8 @@ namespace Alis.Reactive.PlanModel
 
         internal CompareCondition(CompareOperator op, ComparisonOperands operands)
         {
-            _op = op ?? throw new ArgumentNullException(nameof(op));
-            _operands = operands ?? throw new ArgumentNullException(nameof(operands));
-            if (_op.RequiresRightOperand != _operands.HasRightOperand)
-                throw new ArgumentException(
-                    "Comparison operator '" + _op.Value + "' requires " +
-                    (_op.RequiresRightOperand ? "a right operand." : "no right operand."),
-                    nameof(operands));
+            _op = op;
+            _operands = operands;
         }
     }
 
@@ -86,8 +66,6 @@ namespace Alis.Reactive.PlanModel
     {
         public override void Write(Utf8JsonWriter writer, CompareCondition value, JsonSerializerOptions options)
         {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-
             writer.WriteStartObject();
             writer.WriteString("kind", value.Kind);
             WriteProperty(writer, options, "left", value.Left);
@@ -125,10 +103,10 @@ namespace Alis.Reactive.PlanModel
             Shape shape,
             Shape itemShape)
         {
-            Left = left ?? throw new ArgumentNullException(nameof(left));
-            _right = right ?? throw new ArgumentNullException(nameof(right));
-            ShapeForJson = shape ?? throw new ArgumentNullException(nameof(shape));
-            ItemShapeForJson = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
+            Left = left;
+            _right = right;
+            ShapeForJson = shape;
+            ItemShapeForJson = itemShape;
         }
 
         internal ValueExpression Left { get; }
@@ -184,7 +162,7 @@ namespace Alis.Reactive.PlanModel
 
         internal PresentComparisonRightOperand(ValueExpression value)
         {
-            _value = value ?? throw new ArgumentNullException(nameof(value));
+            _value = value;
         }
 
         internal ValueExpression Value => _value;
@@ -213,8 +191,6 @@ namespace Alis.Reactive.PlanModel
             ComparisonRightOperand value,
             JsonSerializerOptions options)
         {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-
             writer.WriteStartObject();
             writer.WriteString("kind", value.Kind);
             value.WritePayload(writer, options);
@@ -250,7 +226,7 @@ namespace Alis.Reactive.PlanModel
 
         internal AllCondition(IReadOnlyList<ConditionGraph> terms)
         {
-            _terms = terms ?? throw new ArgumentNullException(nameof(terms));
+            _terms = terms;
         }
     }
 
@@ -266,7 +242,7 @@ namespace Alis.Reactive.PlanModel
 
         internal AnyCondition(IReadOnlyList<ConditionGraph> terms)
         {
-            _terms = terms ?? throw new ArgumentNullException(nameof(terms));
+            _terms = terms;
         }
     }
 
@@ -280,7 +256,7 @@ namespace Alis.Reactive.PlanModel
 
         internal NotCondition(ConditionGraph term)
         {
-            Term = term ?? throw new ArgumentNullException(nameof(term));
+            Term = term;
         }
     }
 
@@ -294,7 +270,7 @@ namespace Alis.Reactive.PlanModel
 
         internal ConfirmCondition(string message)
         {
-            Message = message ?? throw new ArgumentNullException(nameof(message));
+            Message = message;
         }
     }
 
