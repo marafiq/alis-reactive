@@ -12,12 +12,12 @@ namespace Alis.Reactive.Validation
     {
         private readonly ClientValidationRuleSet _rules;
         private readonly ClientValidationFieldToken<TModel, TValue> _field;
-        private readonly ValidationRuleActivation _activation;
+        private readonly ClientRuleActivation _activation;
 
         internal ClientValidationFieldRuleBuilder(
             ClientValidationRuleSet rules,
             ClientValidationFieldToken<TModel, TValue> field,
-            ValidationRuleActivation activation)
+            ClientRuleActivation activation)
         {
             _rules = rules ?? throw new ArgumentNullException(nameof(rules));
             _field = field ?? throw new ArgumentNullException(nameof(field));

@@ -187,7 +187,7 @@ namespace Alis.Reactive.FluentValidator
 
         internal ValidationRule ToValidationRule(
             ValidationMessage message,
-            ValidationRuleActivation activation,
+            ClientRuleActivation activation,
             ValidationFieldPath fieldPrefix)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));

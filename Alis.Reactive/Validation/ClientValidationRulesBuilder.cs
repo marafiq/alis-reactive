@@ -11,7 +11,7 @@ namespace Alis.Reactive.Validation
         where TModel : class
     {
         private readonly ClientValidationRuleSet _rules = new ClientValidationRuleSet();
-        private ValidationRuleActivation _activeActivation = ValidationRuleActivation.Always;
+        private ClientRuleActivation _activeActivation = ClientRuleActivation.Always;
 
         internal ClientValidationRulesBuilder() { }
 
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Validation
             _rules.EnsureFields(activeCondition.Fields);
 
             var previousActivation = _activeActivation;
-            _activeActivation = previousActivation.Combine(ValidationRuleActivation.When(activeCondition.Condition));
+            _activeActivation = previousActivation.Combine(ClientRuleActivation.When(activeCondition.Condition));
             try
             {
                 define(this);

@@ -45,7 +45,7 @@ namespace Alis.Reactive.Validation
             ValidationRuleName name,
             ValidationMessage message,
             ValidationRuleOperand operand,
-            ValidationRuleActivation activation,
+            ClientRuleActivation activation,
             Shape shape) =>
             AddRule(field, new ValidationRule(name, message, operand, activation, shape));
 

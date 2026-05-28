@@ -12,7 +12,7 @@ namespace Alis.Reactive.Validation
         private readonly ValidationRuleName _rule;
         private readonly ValidationMessage _message;
         private readonly ValidationRuleOperand _operand;
-        private readonly ValidationRuleActivation _activation;
+        private readonly ClientRuleActivation _activation;
         private readonly Shape _shape;
 
         public string Message => _message.Value;
@@ -22,7 +22,7 @@ namespace Alis.Reactive.Validation
             ValidationRuleName rule,
             ValidationMessage message,
             ValidationRuleOperand operand,
-            ValidationRuleActivation activation,
+            ClientRuleActivation activation,
             Shape shape)
         {
             _rule = rule ?? throw new System.ArgumentNullException(nameof(rule));
@@ -179,29 +179,29 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    internal abstract class ValidationRuleActivation
+    internal abstract class ClientRuleActivation
     {
-        private protected ValidationRuleActivation() { }
+        private protected ClientRuleActivation() { }
 
-        internal static ValidationRuleActivation Always { get; } =
-            new AlwaysValidationRuleActivation();
+        internal static ClientRuleActivation Always { get; } =
+            new AlwaysClientRuleActivation();
 
-        internal static ValidationRuleActivation When(FieldCondition condition)
+        internal static ClientRuleActivation When(FieldCondition condition)
         {
             if (condition == null) throw new System.ArgumentNullException(nameof(condition));
-            return new ConditionalValidationRuleActivation(condition);
+            return new ConditionalClientRuleActivation(condition);
         }
 
         internal abstract Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding);
 
-        internal abstract ValidationRuleActivation Combine(ValidationRuleActivation incoming);
+        internal abstract ClientRuleActivation Combine(ClientRuleActivation incoming);
 
-        internal abstract ValidationRuleActivation AppendTo(FieldCondition existingCondition);
+        internal abstract ClientRuleActivation AppendTo(FieldCondition existingCondition);
     }
 
-    internal sealed class AlwaysValidationRuleActivation : ValidationRuleActivation
+    internal sealed class AlwaysClientRuleActivation : ClientRuleActivation
     {
-        internal AlwaysValidationRuleActivation() { }
+        internal AlwaysClientRuleActivation() { }
 
         internal override Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
         {
@@ -209,24 +209,24 @@ namespace Alis.Reactive.Validation
             return Alis.Reactive.PlanModel.ValidationRuleActivation.Always;
         }
 
-        internal override ValidationRuleActivation Combine(ValidationRuleActivation incoming)
+        internal override ClientRuleActivation Combine(ClientRuleActivation incoming)
         {
             if (incoming == null) throw new System.ArgumentNullException(nameof(incoming));
             return incoming;
         }
 
-        internal override ValidationRuleActivation AppendTo(FieldCondition existingCondition)
+        internal override ClientRuleActivation AppendTo(FieldCondition existingCondition)
         {
             if (existingCondition == null) throw new System.ArgumentNullException(nameof(existingCondition));
             return When(existingCondition);
         }
     }
 
-    internal sealed class ConditionalValidationRuleActivation : ValidationRuleActivation
+    internal sealed class ConditionalClientRuleActivation : ClientRuleActivation
     {
         private readonly FieldCondition _condition;
 
-        internal ConditionalValidationRuleActivation(FieldCondition condition)
+        internal ConditionalClientRuleActivation(FieldCondition condition)
         {
             _condition = condition ?? throw new System.ArgumentNullException(nameof(condition));
         }
@@ -237,13 +237,13 @@ namespace Alis.Reactive.Validation
             return Alis.Reactive.PlanModel.ValidationRuleActivation.When(binding.ResolveActivationCondition(_condition));
         }
 
-        internal override ValidationRuleActivation Combine(ValidationRuleActivation incoming)
+        internal override ClientRuleActivation Combine(ClientRuleActivation incoming)
         {
             if (incoming == null) throw new System.ArgumentNullException(nameof(incoming));
             return incoming.AppendTo(_condition);
         }
 
-        internal override ValidationRuleActivation AppendTo(FieldCondition existingCondition)
+        internal override ClientRuleActivation AppendTo(FieldCondition existingCondition)
         {
             if (existingCondition == null) throw new System.ArgumentNullException(nameof(existingCondition));
             return When(FieldCondition.All(existingCondition, _condition));

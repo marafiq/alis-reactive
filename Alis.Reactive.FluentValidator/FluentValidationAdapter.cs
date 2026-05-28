@@ -39,7 +39,7 @@ namespace Alis.Reactive.FluentValidator
                 "Ensure it is registered in the validator factory passed to FluentValidationAdapter.");
             var rules = new ClientValidationRuleSet();
 
-            ExtractValidatorRules(root, ValidationFieldPath.Empty, ValidationRuleActivation.Always, rules);
+            ExtractValidatorRules(root, ValidationFieldPath.Empty, ClientRuleActivation.Always, rules);
 
             return rules.ToFields();
         }
@@ -47,7 +47,7 @@ namespace Alis.Reactive.FluentValidator
         private void ExtractValidatorRules(
             IValidator validator,
             ValidationFieldPath prefix,
-            ValidationRuleActivation parentCondition,
+            ClientRuleActivation parentCondition,
             ClientValidationRuleSet rules)
         {
             if (!(validator is IEnumerable<IValidationRule> validatorRules)) return;
@@ -60,7 +60,7 @@ namespace Alis.Reactive.FluentValidator
         private void ExtractRule(
             IValidationRule rule,
             ValidationFieldPath prefix,
-            ValidationRuleActivation parentCondition,
+            ClientRuleActivation parentCondition,
             ClientValidationRuleSet rules,
             IReadOnlyDictionary<IValidationRule, ClientRuleCondition> clientConditions)
         {
@@ -83,7 +83,7 @@ namespace Alis.Reactive.FluentValidator
             IRuleComponent component,
             ValidationFieldPath prefix,
             ClientRuleField field,
-            ValidationRuleActivation condition,
+            ClientRuleActivation condition,
             ClientValidationRuleSet rules)
         {
             if (component.HasCondition || component.HasAsyncCondition)
@@ -115,7 +115,7 @@ namespace Alis.Reactive.FluentValidator
         private static void ExtractBuiltInRule(
             IRuleComponent component,
             ClientRuleField field,
-            ValidationRuleActivation condition,
+            ClientRuleActivation condition,
             ClientValidationRuleSet rules)
         {
             var validator = component.Validator;
@@ -172,7 +172,7 @@ namespace Alis.Reactive.FluentValidator
             IRuleComponent component,
             ILengthValidator length,
             ClientRuleField field,
-            ValidationRuleActivation condition,
+            ClientRuleActivation condition,
             ClientValidationRuleSet rules)
         {
             if (length.Min > 0)
@@ -205,7 +205,7 @@ namespace Alis.Reactive.FluentValidator
             object? upper,
             string defaultMessage,
             ClientRuleField field,
-            ValidationRuleActivation condition,
+            ClientRuleActivation condition,
             ClientValidationRuleSet rules)
         {
             if (!ValidationRangeBounds.TryFromClientLiteral(lower, upper, out var bounds))
@@ -226,7 +226,7 @@ namespace Alis.Reactive.FluentValidator
             IRuleComponent component,
             IComparisonValidator comparison,
             ClientRuleField field,
-            ValidationRuleActivation condition,
+            ClientRuleActivation condition,
             ClientValidationRuleSet rules)
         {
             if (comparison.MemberToCompare != null)
@@ -255,9 +255,9 @@ namespace Alis.Reactive.FluentValidator
             ValidationFieldPath prefix,
             ClientValidationRuleSet rules,
             IReadOnlyDictionary<IValidationRule, ClientRuleCondition> clientConditions,
-            out ValidationRuleActivation condition)
+            out ClientRuleActivation condition)
         {
-            condition = ValidationRuleActivation.Always;
+            condition = ClientRuleActivation.Always;
 
             if (!rule.HasCondition && !rule.HasAsyncCondition)
                 return true;
@@ -272,14 +272,14 @@ namespace Alis.Reactive.FluentValidator
                 rules.EnsureField(field.PrefixedBy(prefix));
 
             var binding = new FieldConditionPrefixBinding(prefix);
-            condition = ValidationRuleActivation.When(fieldCondition.PrefixWith(binding));
+            condition = ClientRuleActivation.When(fieldCondition.PrefixWith(binding));
             return true;
         }
 
         private void ExtractChildValidatorRules(
             IValidationRule rule,
             ValidationFieldPath prefix,
-            ValidationRuleActivation condition,
+            ClientRuleActivation condition,
             ClientValidationRuleSet rules)
         {
             foreach (var component in rule.Components)
