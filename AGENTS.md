@@ -28,6 +28,41 @@ For any shared plan/runtime module change, follow this order:
 
 Do not edit implementation first.
 
+## Pass Protocol
+
+Start every pass by writing one clear pass goal in this shape:
+
+```text
+Close matrix row: <DSL source call> -> <domain term> -> <runtime behavior>
+```
+
+Each pass must name:
+
+- DSL source files being used as requirements
+- sync/async lane expectation for the row
+- code to delete or simplify
+- behavior proof to run before commit
+- exact commit boundary
+
+Approaches that worked and must be reused:
+
+- source-grounded input/output matrix before implementation
+- one closed behavior row per commit
+- deletion-first cleanup of wrappers, stale names, and impossible-plan checks
+- focused runtime tests before broader build gates
+- generated TS typecheck after C# domain or plan JSON changes
+- runtime asset build before Playwright
+- glossary/process updates in the same commit when vocabulary changes
+
+Approaches that failed and must not be repeated:
+
+- local edits before reading the DSL source
+- progress claims from uncommitted work
+- broad “module improvement” passes without a named matrix row
+- preserving old helper code because tests reference it
+- adding fallback, registry, validation, or lifecycle concepts without a DSL graph node
+- treating docs/schema/current runtime as requirements before checking DSL source
+
 ## Commit Discipline
 
 Every commit must move the primary goal forward in a way that can be audited
