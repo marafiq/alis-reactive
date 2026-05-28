@@ -8,18 +8,13 @@ namespace Alis.Reactive.Builders.Requests
     {
         private readonly List<ResponseRoute> _successRoutes = new List<ResponseRoute>();
         private readonly List<ResponseRoute> _errorRoutes = new List<ResponseRoute>();
-        private RequestPlan? _followUpRequest;
-
-        private RequestChain Chain =>
-            _followUpRequest is null
-                ? RequestChain.Terminal
-                : RequestChain.ContinueWith(_followUpRequest);
+        private RequestChain _chain = RequestChain.Terminal;
 
         internal ResponseRouting BuildRouting() =>
             ResponseRouting.From(
                 _successRoutes,
                 _errorRoutes,
-                Chain);
+                _chain);
 
         internal void AddSuccessRoute(ReactionGraph reaction)
         {
@@ -38,13 +33,13 @@ namespace Alis.Reactive.Builders.Requests
 
         internal void ContinueWith(RequestPlan request)
         {
-            var responseAlreadyHasFollowUpRequest = _followUpRequest is not null;
+            var responseAlreadyHasFollowUpRequest = !_chain.CanContinue;
             if (responseAlreadyHasFollowUpRequest)
                 throw new InvalidOperationException(
                     "A response can declare only one chained request. " +
                     "To continue the sequence, attach the next Chained request to the existing follow-up request.");
 
-            _followUpRequest = request;
+            _chain = RequestChain.ContinueWith(request);
         }
     }
 }
