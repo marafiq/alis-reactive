@@ -62,7 +62,6 @@ classDiagram
         BrowserObjectContract[] objectContracts
         ComponentObject[] components
         BehaviorGraph[] behaviors
-        ValidationProjection[] validations
     }
 
     class BehaviorGraph {
@@ -95,7 +94,7 @@ classDiagram
 
     class RequestPlan {
         HttpEndpoint endpoint
-        RequestInputProjection input
+        GatherRequestInput input
         RequestValidation validation
         ReactionGraph before
         ResponseRoute[] success
@@ -104,9 +103,9 @@ classDiagram
         RequestPlan followUp
     }
 
-    class RequestInputProjection {
+    class GatherRequestInput {
         RequestInputAssignment[] assignments
-        SourceSelection sourceSelection
+        RegisteredInputSelection registeredInputs
         BodyFormat bodyFormat
     }
 
@@ -129,7 +128,7 @@ classDiagram
         ObjectEvent[] events
     }
 
-    class ValidationProjection {
+    class ValidationContainer {
         FieldRule[] fields
         ValidationCondition activation
     }
@@ -137,13 +136,13 @@ classDiagram
     PlanDocument "1" --> "*" BrowserObjectContract
     PlanDocument "1" --> "*" ComponentObject
     PlanDocument "1" --> "*" BehaviorGraph
-    PlanDocument "1" --> "*" ValidationProjection
+    ComponentObject --> ValidationContainer
     BehaviorGraph --> ReactionGraph
     ReactionGraph --> ValueExpression
     ReactionGraph --> ConditionGraph
     ReactionGraph --> RequestPlan
-    RequestPlan --> RequestInputProjection
-    RequestInputProjection --> RequestInputAssignment
+    RequestPlan --> GatherRequestInput
+    GatherRequestInput --> RequestInputAssignment
     RequestInputAssignment --> RequestTarget
     RequestInputAssignment --> ValueExpression
     ConditionGraph --> ValueExpression
@@ -225,9 +224,9 @@ flowchart TD
     ParallelDsl --> AllSettled[OnAllSettled]
     AllSettled --> Pipeline
 
-    GatherDsl --> RequestInputProjection
-    RequestInputProjection --> RequestTarget[Payload / header / route target]
-    RequestInputProjection --> ValueSource
+    GatherDsl --> GatherRequestInput
+    GatherRequestInput --> RequestTarget[Payload / header / route target]
+    GatherRequestInput --> ValueSource
 
     ValueSource --> Literal[Literal]
     ValueSource --> UrlRead[URL read]
@@ -239,8 +238,7 @@ flowchart TD
     InjectDsl --> PartialSlot[Partial slot load/unload]
     PartialSlot --> PlanDocument
 
-    ValidationDsl[Validation metadata DSL / FluentValidation metadata] --> ValidationMetadata
-    ValidationProjection --> ValidationContainer
+    ValidationDsl[Validation metadata DSL / FluentValidation metadata] --> ValidationContainer
     ValidationContainer --> ComponentDsl
 ```
 
@@ -265,7 +263,7 @@ flowchart LR
     ValueExpression --> SetReaction
     ValueExpression --> CallReaction
     ValueExpression --> ConditionGraph
-    ValueExpression --> RequestInputProjection
+    ValueExpression --> GatherRequestInput
     ValueExpression --> DispatchPayload
     ValueExpression --> ValidationCondition
 ```
@@ -346,7 +344,7 @@ Core domain terms:
 | Value Expression | `ValueProducer` union | value resolver |
 | Condition Graph | `Condition` union | condition evaluator |
 | Request Plan | `Request` | HTTP executor |
-| Request Input Projection | `GatherInput` / request input | request payload writer |
+| Gather Request Input | `GatherRequestInput` / request input | request payload writer |
 | Validation Metadata | validation-container component rules | validation orchestrator |
 | Plugin Contract | plugin object contract | plugin resolver/invoker |
 | Partial Slot | partial plans loaded into an `Into(...)` host | slot source for active plan recomposition |
@@ -410,8 +408,8 @@ tests match the row language.
 | multiple `p.When(...).Then(...)` blocks | branch, then later request/dispatch/branch | sequence containing multiple branch reactions | `sequence` with branch/request/etc. in order | preserve declaration order |
 | `p.Confirm(message).Then(...)` | confirmation guard | confirm condition + branch | `condition.kind="confirm"` | prompt/user decision async boundary |
 | `p.Get/Post/Put/Delete` | request start | request reaction draft | `reaction.kind="request"` | HTTP executor |
-| `HttpRequestBuilder.Gather` | ordered request source-to-target mapping | request input projection | `GatherInput.assignments` | write route/header/body/query payload in declaration order |
-| `Gather.IncludeAll` | all registered inputs | source selection for registered inputs | `sourceSelection.kind="all-registered-inputs"` | read mounted registered input values |
+| `HttpRequestBuilder.Gather` | ordered request source-to-target mapping | gather request input | `GatherRequestInput.assignments` | write route/header/body/query payload in declaration order |
+| `Gather.IncludeAll` | all registered inputs | registered input selection | `registeredInputs.kind="all-registered-inputs"` | read mounted registered input values |
 | `Gather.Static` | literal payload assignment | payload assignment | request payload target + literal | write request body/query |
 | `Gather.FromEvent` | event payload into request | payload assignment from event scope | event payload `ValueProducer` | read event detail path |
 | `Gather.Header` | literal/source/event header | header assignment | header target | write request header |
@@ -453,7 +451,7 @@ These are the rows that catch local-only refactors.
 | branch inside request lifecycle | `Get(...).WhileLoading(p => p.When(...).Then(...)).Finally(...)` | lifecycle slots carry reaction graphs, not command-only lists |
 | typed response chain | `OnSuccess<T>((body,p)=> p.When(body,x=>x.Flag)... Response.Chained(...))` | success payload remains readable by response handlers; chained request is separate request plan |
 | parallel plus completion graph | `Parallel(a,b).OnAllSettled(p => p.Dispatch(...))` | requests run concurrently; completion graph executes after all settle |
-| gather from mixed sources | `Header(source)`, `RouteParam(event)`, `FromUrl<T>`, `Plugin(source)`, `IncludeAll` | request input projection preserves source and target kind |
+| gather from mixed sources | `Header(source)`, `RouteParam(event)`, `FromUrl<T>`, `Plugin(source)`, `IncludeAll` | gather request input preserves source and target kind |
 | component event to HTTP | component `.Reactive(events => events.Changed, (args,p)=> p.Post(...))` | event payload is available to gather/conditions/plugin args in the HTTP graph |
 | partial load and unload | request success `Into("slot")` returns HTML with same-model `ResolvePlan` | runtime loads returned plans into the target slot, wires slot behavior, and slot unload recomposes from boot plus remaining slots |
 | app-level object from partial | partial references drawer/toast/confirm | layout object role joins fixed object and survives slot unload unless slot created it |
@@ -473,7 +471,7 @@ module, at least the matching vectors must stay true.
 | T3 multiple condition blocks around request | `p.When(src).Eq(1).Then(...); p.Get(url)...; p.When(src).Eq(2).Then(...)` | `Sequence(Branch, Request, Branch)` | ordered sequence retains all three reactions | branches and request execute in authored order | conditions/http mixing Playwright |
 | T4 condition source matrix | `p.When(p.FromUrl<int>("age")).Gt(p.Component<...>(...).Value())` | compare condition with two `ValueExpression`s | compare operands are URL read and component read | resolves both sources then compares | conditions projection/runtime |
 | T5 confirm branch | `p.Confirm("Delete?").Then(p=>p.Delete(url))` | branch with `Confirm` condition and request reaction | `condition.confirm`, branch case reaction request | prompt gates request; request runs only when accepted | confirm Playwright/runtime |
-| T6 gather mixed sources | `g.Header("X", p.FromUrl("tab")).RouteParam("id", args,x=>x.Id).FromUrl<int>("facilityId","facility").Plugin(plugin,"count")` | `RequestInputProjection` assignments to header, route, payload, payload | ordered `assignments[]` with target kind and source kind | header written, route substituted, body/query filled | gather projection + runtime |
+| T6 gather mixed sources | `g.Header("X", p.FromUrl("tab")).RouteParam("id", args,x=>x.Id).FromUrl<int>("facilityId","facility").Plugin(plugin,"count")` | `GatherRequestInput` assignments to header, route, payload, payload | ordered `assignments[]` with target kind and source kind | header written, route substituted, body/query filled | gather projection + runtime |
 | T7 gather component method | `g.Include(p.Component<FusionSchedule>("s").GetEvents(), "events")` | component method value expression with return shape array | assignment source component member access `method` | method called before request and value assigned | gather projection |
 | T8 success response drives follow-up request | `OnSuccess<Resident>((json,s)=> s.Get("/r/{id}").Gather(g=>g.RouteParam("id", json.Read(x=>x.Id))))` | success route reaction containing request; request input reads success payload | payload scope `success` read in nested request assignment | first response id becomes second route param | HTTP runtime + Playwright |
 | T9 response chained request | `Response(r=>r.OnSuccess(...).Chained(c=>c.Get(url)))` | `RequestPlan` with `ResponseRoute` and follow-up request | request chain/follow-up request JSON | follow-up request executes after response route | HTTP runtime/Playwright |
@@ -504,7 +502,7 @@ Covered vectors: T6, T7, T8, T9, T10.
 | --- | --- | --- |
 | `PipelineBuilder.Http.cs` | `Get`, `Post`, `Post(url,gather)`, `Put(url,gather)`, `Delete`, `Parallel` | request reaction or parallel reaction |
 | `HttpRequestBuilder.cs` | `Get`, `Post`, `Put`, `Delete`, `Gather`, `AsJson`, `AsFormData`, `WhileLoading`, `Finally`, `Validate`, `Response` | `RequestPlan` |
-| `GatherBuilder.cs` | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, `Plugin`, vendor `Include` bridge | `RequestInputProjection` |
+| `GatherBuilder.cs` | `IncludeAll`, `Static`, `FromEvent`, `Header`, `RouteParam`, `FromUrl`, `Plugin`, vendor `Include` bridge | `GatherRequestInput` |
 | `GatherExtensions.cs` | typed component include overloads | component value source assignment |
 | `ResponseBuilder.cs` | `OnSuccess`, `OnSuccess<T>`, `OnError`, `OnError(status)`, `OnError<T>`, `Chained` | `ResponseRoute` and follow-up request |
 | `ParallelBuilder.cs` | `OnAllSettled` | parallel completion graph |
@@ -523,7 +521,7 @@ flowchart TD
     C --> G[RequestInputAssignment]
     D --> G
     E --> G
-    F --> H[RequestInputProjection.sourceSelection]
+    F --> H[GatherRequestInput.registeredInputs]
 
     G --> I{Source DSL}
     I -->|literal| J[Literal ValueExpression]
@@ -551,7 +549,7 @@ flowchart TD
 sequenceDiagram
     participant Runtime as HTTP executor
     participant Request as RequestPlan
-    participant Gather as RequestInputProjection
+    participant Gather as GatherRequestInput
     participant Fetch as Browser fetch
     participant Route as ResponseRoute
     participant Follow as FollowUp RequestPlan
@@ -570,7 +568,7 @@ sequenceDiagram
 
 | Vector | DSL input | Domain output | JSON/TS output | Runtime proof |
 | --- | --- | --- | --- | --- |
-| T6 mixed source targets | `Header(url)`, `RouteParam(event)`, `FromUrl<T>`, `Plugin(source)` | `RequestInputProjection` with ordered `RequestInputAssignment`s | `assignments[]` target kinds `header`, `route-param`, `payload` with source kinds `url`, `payload:event`, `plugin` | projection test + `resolveGather` runtime test |
+| T6 mixed source targets | `Header(url)`, `RouteParam(event)`, `FromUrl<T>`, `Plugin(source)` | `GatherRequestInput` with ordered `RequestInputAssignment`s | `assignments[]` target kinds `header`, `route-param`, `payload` with source kinds `url`, `payload:event`, `plugin` | projection test + `resolveGather` runtime test |
 | T7 component method source | `g.Include(p.Component<FusionSchedule>("s").GetEvents(), "events")` | assignment source is object method value expression | component source with `access.kind="method"` and return `array` | projection test |
 | T8 success response source in request | `OnSuccess<T>((json,s)=> s.Get(...).Gather(g=>g.RouteParam("id", json.Read(...))))` | success route contains nested request; nested gather reads success payload | nested request assignment source is payload scope `success` | runtime test + Playwright section 17 |
 | T9 chained request | `.Response(r => r.OnSuccess(...).Chained(c => c.Get(...)))` | request has follow-up request | request chain/follow-up in plan | runtime test + existing chain Playwright |
@@ -578,7 +576,7 @@ sequenceDiagram
 
 ### Closure Criteria
 
-- The request domain uses `RequestPlan`, `RequestInputProjection`,
+- The request domain uses `RequestPlan`, `GatherRequestInput`,
   `RequestInputAssignment`, `RequestInputTarget`, `ResponseRoute`, and
   `ParallelCompletion` language.
 - Headers, route params, and payload/body are one assignment model, not parallel

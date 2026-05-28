@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlanModel
     internal abstract class PlanString : IEquatable<PlanString>
     {
         protected PlanString(string value, string parameterName)
-            : this(value, parameterName, EmptyPlanStringPolicy.Reject)
+            : this(value, parameterName, EmptyPlanStringPolicy.Disallow)
         {
         }
 
@@ -16,7 +16,7 @@ namespace Alis.Reactive.PlanModel
         {
             if (value == null)
                 throw new ArgumentNullException(parameterName);
-            if (emptyPolicy == EmptyPlanStringPolicy.Reject && string.IsNullOrWhiteSpace(value))
+            if (emptyPolicy == EmptyPlanStringPolicy.Disallow && string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException(parameterName + " must not be empty.", parameterName);
 
             Value = value;
@@ -42,7 +42,7 @@ namespace Alis.Reactive.PlanModel
 
     internal enum EmptyPlanStringPolicy
     {
-        Reject,
+        Disallow,
         Allow
     }
 

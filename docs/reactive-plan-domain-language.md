@@ -83,7 +83,7 @@ probing live objects.
 | Condition Graph | Deterministic predicate graph: compare, all, any, not, and confirm where the DSL allows confirm. | `Condition`, runtime conditions |
 | Branch Cases | Ordered branch cases with at most one default case and default last. Multiple branch blocks can appear in a reaction sequence; nested branch blocks are represented only where DSL allows them. | `BranchCase`, conditions builders |
 | Request Plan | HTTP request intent: method, URL template, route/header/body assignments, validation gate, response routes, lifecycle reaction slots, chain, and parallel grouping. | request builders, `Request` |
-| Request Input Projection | Explicit mapping from readable sources to route values, query/body payload, headers, or all registered inputs. | gather/request payload model |
+| Gather Request Input | Explicit mapping from readable sources to route values, query/body payload, headers, or all registered inputs. | gather/request payload model |
 | Validation Metadata | Deterministic browser validation rules declared through typed metadata. FluentValidation server rules still run normally; only explicit browser metadata enters the plan. | validation metadata model |
 | Validation Container | Component role that owns browser validation rules for a form/container. Partials can add rules to a root container; slot unload recomposes rules from boot plus remaining slots. | `validation-container` role, runtime validation |
 | Plugin Contract | Declared browser plugin object/function contract for behavior outside deterministic first-class DSL primitives. Public plugin compatibility may use strings; internal plan/runtime terms stay typed. | `ReactivePlugin`, `PluginContract` |
@@ -169,8 +169,8 @@ Preferred current terms:
 - `ComponentRole`
 - `ComponentMerge`
 - `ObjectContractMerge`
-- `ValidationProjection`
-- `RequestInputProjection`
+- `ValidationMetadata`
+- `GatherRequestInput`
 
 ## Module Closure Checklist
 
