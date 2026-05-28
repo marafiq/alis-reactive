@@ -194,7 +194,7 @@ namespace Alis.Reactive.FluentValidator
             if (guard == null) throw new ArgumentNullException(nameof(guard));
             if (defineRules == null) throw new ArgumentNullException(nameof(defineRules));
 
-            using (_scope.Enter(ClientRuleCondition.FromGuard(guard)))
+            using (_scope.Enter(guard))
             {
                 base.When(guard.ServerPredicate, defineRules);
             }
@@ -215,10 +215,10 @@ namespace Alis.Reactive.FluentValidator
 
         private sealed class ClientConditionScope
         {
-            private readonly Stack<ClientRuleCondition> _clientConditions = new Stack<ClientRuleCondition>();
+            private readonly Stack<FieldGuard<T>> _clientConditions = new Stack<FieldGuard<T>>();
             private int _serverOnlyDepth;
 
-            internal IDisposable Enter(ClientRuleCondition condition)
+            internal IDisposable Enter(FieldGuard<T> condition)
             {
                 if (condition == null) throw new ArgumentNullException(nameof(condition));
                 _clientConditions.Push(condition);
@@ -245,22 +245,17 @@ namespace Alis.Reactive.FluentValidator
                 if (_clientConditions.Count == 0)
                     return ClientRuleActivation.Always;
 
-                var condition = ActiveClientCondition();
-                if (!condition.TryUseOnClient(out var fieldCondition, out var fields))
-                {
-                    throw new InvalidOperationException(
-                        "ClientRule is inside a server-only validation condition. " +
-                        "Use WhenField for browser-side conditions.");
-                }
-
+                var conditions = _clientConditions.Reverse().ToArray();
+                var fieldCondition = ActiveClientCondition(conditions);
+                var fields = ClientValidationGuardFields.From(conditions.SelectMany(condition => condition.Fields));
                 rules.EnsureFields(fields);
                 return ClientRuleActivation.When(fieldCondition);
             }
 
-            private ClientRuleCondition ActiveClientCondition() =>
-                _clientConditions.Count == 1
-                    ? _clientConditions.Peek()
-                    : ClientRuleCondition.All(_clientConditions.Reverse().ToArray());
+            private static FieldCondition ActiveClientCondition(IReadOnlyList<FieldGuard<T>> conditions) =>
+                conditions.Count == 1
+                    ? conditions[0].Condition
+                    : FieldCondition.All(conditions.Select(condition => condition.Condition).ToArray());
 
             private void ExitClient()
             {
