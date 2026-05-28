@@ -114,15 +114,13 @@ namespace Alis.Reactive.PlanModel
             _components.RegisteredInputs;
 
         /// <summary>
-        /// Wires a component event to a set of reactive behaviors.
-        /// Ensures the component is registered, creates the trigger, and adds one behavior per reaction.
+        /// Wires a component event to the reactive behavior built by one DSL pipeline callback.
         /// </summary>
-        internal void WireComponentEvent(string componentId, string vendor, string eventName, List<ReactionGraph> reactions)
+        internal void WireComponentEvent(string componentId, string vendor, string eventName, ReactionGraph reaction)
         {
             EnsureComponent(componentId, vendor);
             var trigger = StartsWhen.ComponentEvent(componentId, eventName);
-            foreach (var reaction in reactions)
-                AddBehavior(Behavior.On(trigger, reaction));
+            AddBehavior(Behavior.On(trigger, reaction));
         }
 
         internal void AddBehavior(Behavior behavior) => _behaviors.Add(behavior);

@@ -31,7 +31,7 @@ namespace Alis.Reactive
                 target.IdForJson,
                 target.Vendor.Value,
                 descriptor.ObjectEvent,
-                pipelineBuilder.BuildReactions());
+                pipelineBuilder.BuildReaction());
         }
     }
 }

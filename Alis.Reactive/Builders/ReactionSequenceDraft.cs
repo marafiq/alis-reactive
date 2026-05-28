@@ -60,11 +60,6 @@ namespace Alis.Reactive.Builders
                 : ReactionGraph.Sequence(_orderedBlocks);
         }
 
-        internal List<ReactionGraph> BuildReactions()
-        {
-            return new List<ReactionGraph> { BuildReaction() };
-        }
-
         internal void AddCommand(ReactionGraph reaction)
         {
             FlushPendingAsyncReaction();

@@ -137,8 +137,7 @@ namespace Alis.Reactive.Builders
 
         private void AddBehaviors(StartsWhen trigger, PipelineBuilder<TModel> pb)
         {
-            foreach (var reaction in pb.BuildReactions())
-                _context.AddBehavior(Behavior.On(trigger, reaction));
+            _context.AddBehavior(Behavior.On(trigger, pb.BuildReaction()));
         }
     }
 }

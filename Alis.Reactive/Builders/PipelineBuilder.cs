@@ -294,9 +294,5 @@ namespace Alis.Reactive.Builders
             return _draft.BuildReaction();
         }
 
-        internal List<ReactionGraph> BuildReactions()
-        {
-            return _draft.BuildReactions();
-        }
     }
 }
