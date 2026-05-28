@@ -27,27 +27,24 @@ Tracked as GitHub issues or in `docs/issues.md`:
 
 | Item | Location | GH Issue |
 |------|----------|----------|
-| SonarQube CRITICALs: evaluateCompare (19-case switch) + ruleFails (20-case switch) | `Alis.Reactive.Assets/Scripts/conditions/conditions.ts`, `Scripts/validation/rule-engine.ts` | #54 |
-| Invalid trace level enables all logging (unsafe `as TraceLevel` cast) | `Scripts/root.ts:29` | #73 |
+| SonarQube CRITICALs: evaluateCompare (19-case switch) + ruleFails (20-case switch) | `Alis.Reactive.Assets/runtime/conditions/conditions.ts`, `runtime/validation/rule-engine.ts` | #54 |
+| Invalid trace level enables all logging (unsafe `as TraceLevel` cast) | `runtime/root.ts:29` | #73 |
 | HTTP Finally stage (prevents permanent WhileLoading spinners) | Feature request | #88 |
 | FlushSegment bundles commands across condition boundaries | `Alis.Reactive/Builders/PipelineBuilder.cs:184` | #90 |
 | ElementBuilder.Show()/Hide() return type | `Alis.Reactive/Builders/ElementBuilder.cs:161,171` | issues.md #1 |
-| itemShape no fail-fast on non-array | `Scripts/conditions/conditions.ts:122-127` | issues.md #2 |
-| Unknown vendor error missing element ID | `Scripts/resolution/resolver.ts:72` | issues.md #3 |
-| ForTests functions exported from production modules | `Scripts/lifecycle/boot.ts:81`, `Scripts/validation/live-clear.ts:72`, `Scripts/components/native/native-action-link.ts:25` | — |
+| itemShape no fail-fast on non-array | `runtime/conditions/conditions.ts:122-127` | issues.md #2 |
+| Unknown vendor error missing element ID | `runtime/resolution/resolver.ts:72` | issues.md #3 |
+| ForTests functions exported from production modules | `runtime/lifecycle/boot.ts:81`, `runtime/validation/live-clear.ts:72`, `runtime/components/native/native-action-link.ts:25` | — |
 
 SonarQube minor issues (#43, #45, #47) are open but may be partially resolved — verify against current code before acting.
 
 ## Open — Documentation
 
-- CS1591 XML docs: count needs recount after recent PRs #95, #97
-  - Per-module breakdown in `docs/cs1591-xml-docs-remaining.md`
 - Dev experience gaps: 6 items from review
   - Details in `docs/reviews/dev-experience-review.md`
 
 ## Open — Skills & Process
 
-- modern-csharp skill rewrite (1,272 lines, promotes C# 12+ but repo enforces C# 8.0 in libraries)
 - A/B testing incomplete for all 8 skills
 
 ## Deferred

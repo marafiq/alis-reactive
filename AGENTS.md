@@ -28,6 +28,20 @@ For any shared plan/runtime module change, follow this order:
 
 Do not edit implementation first.
 
+## Commit Discipline
+
+Every commit must move the primary goal forward in a way that can be audited
+from history. Before committing, name the matrix row being closed and verify the
+patch does all of this:
+
+- deletes stale indirection instead of preserving it under new names
+- keeps C# domain terms, generated TS terms, runtime names, and glossary terms aligned
+- proves behavior at the DSL boundary or browser-visible runtime boundary
+- leaves no half-renamed vocabulary or dead helper path behind
+
+If a commit cannot be described as a closed matrix row, keep cutting scope until
+it can. Do not report module progress from uncommitted local edits.
+
 ## DSL Graph
 
 Use diagrams as design tools, not decoration.
@@ -82,6 +96,11 @@ The matrix must cover cross-module cases such as:
 Rich domain model means the smallest clear set of concepts that names real DSL
 behavior. It does not mean wrappers, registries, fallback paths, claims,
 validators for generated plans, or impressive names around ordinary execution.
+
+C# implementation uses the repository's current language level: C# 14. Prefer
+small value objects, discriminated unions/pattern matching where they simplify
+the actual DSL graph, collection expressions, and primary constructors when
+they improve clarity. Do not use modern syntax to hide weak concepts.
 
 Use these core concepts unless the DSL graph proves a better name:
 

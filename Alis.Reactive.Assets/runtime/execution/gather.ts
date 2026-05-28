@@ -8,7 +8,15 @@ import { assertNever } from "../core/assert-never";
 import { evaluateValue } from "../core/evaluate";
 import { RuntimePlan, type RuntimeComponent } from "../domain/runtime-plan";
 import { RuntimeShape } from "../domain/runtime-shape";
-import { RequestInputResolution, writeRequestPayloadValue, type ResolvedRequestInput, type RequestPayloadWriter } from "./request-payload-writer";
+import {
+  emptyRequestInput,
+  requestPayloadWriterFor,
+  writeRequestHeader,
+  writeRequestPayloadValue,
+  writeRequestRouteParam,
+  type ResolvedRequestInput,
+  type RequestPayloadWriter,
+} from "./request-payload-writer";
 import { isMissingRuntimeValue } from "../domain/runtime-value";
 
 export type { ResolvedRequestInput } from "./request-payload-writer";
@@ -30,13 +38,9 @@ export function resolveRequestInput(
   ctx: ExecContext,
 ): ResolvedRequestInput {
   const execution = { method, plan, runtimePlan: RuntimePlan.from(plan), ctx };
-  return resolveRequestInputPlan(input, execution);
-}
-
-function resolveRequestInputPlan(input: RequestInput, execution: GatherExecution): ResolvedRequestInput {
   switch (input.kind) {
     case "none":
-      return RequestInputResolution.empty();
+      return emptyRequestInput();
     case "gather":
       return resolveGatherRequestInput(input, execution);
     default:
@@ -45,34 +49,36 @@ function resolveRequestInputPlan(input: RequestInput, execution: GatherExecution
 }
 
 function resolveGatherRequestInput(input: GatherRequestInput, execution: GatherExecution): ResolvedRequestInput {
-  const resolved = RequestInputResolution.for(input.bodyFormat, execution.method);
+  const requestInput = emptyRequestInput();
+  const writer = requestPayloadWriterFor(requestInput, input.bodyFormat, execution.method);
 
   for (const assignment of input.assignments) {
-    writeRequestInputAssignment(assignment, resolved, execution);
+    writeRequestInputAssignment(assignment, requestInput, writer, execution);
   }
 
-  writeRegisteredInputs(input.registeredInputs, execution, resolved.writer);
+  writeRegisteredInputs(input.registeredInputs, execution, writer);
 
-  return resolved.toResult();
+  return requestInput;
 }
 
 function writeRequestInputAssignment(
   assignment: RequestInputAssignment,
-  resolved: RequestInputResolution,
+  requestInput: ResolvedRequestInput,
+  writer: RequestPayloadWriter,
   execution: GatherExecution,
 ): void {
   const raw = evaluateValue(assignment.source, execution.plan, execution.ctx);
   const shape = RuntimeShape.declaredBy(assignment.source);
   switch (assignment.target.kind) {
     case "payload":
-      writeRequestPayloadValue(assignment.target, raw, shape, resolved.writer);
+      writeRequestPayloadValue(assignment.target, raw, shape, writer);
       return;
     case "header":
       if (isMissingRuntimeValue(raw)) return;
-      resolved.writeHeader(assignment.target.name, raw, shape);
+      writeRequestHeader(requestInput, assignment.target.name, raw, shape);
       return;
     case "route-param":
-      resolved.writeRouteParameter(assignment.target.name, raw, shape);
+      writeRequestRouteParam(requestInput, assignment.target.name, raw, shape);
       return;
     default:
       return assertNever(assignment.target, "request input target");

@@ -24,62 +24,52 @@ export interface RequestPayloadWriter {
   emitArray(target: RequestPayloadTarget, items: unknown[], itemShape: RuntimeShape): void;
 }
 
-export class RequestInputResolution {
-  private constructor(
-    private readonly urlParams: string[],
-    private readonly routeParams: Record<string, string>,
-    private readonly headers: Record<string, string>,
-    private readonly body: Record<string, unknown> | FormData,
-    readonly writer: RequestPayloadWriter,
-  ) {}
+export function emptyRequestInput(): ResolvedRequestInput {
+  return { urlParams: [], routeParams: {}, headers: {}, body: {} };
+}
 
-  static empty(): ResolvedRequestInput {
-    return { urlParams: [], routeParams: {}, headers: {}, body: {} };
+export function requestPayloadWriterFor(
+  requestInput: ResolvedRequestInput,
+  bodyFormat: RequestBodyFormat,
+  method: HttpMethod,
+): RequestPayloadWriter {
+  if (sendsInputInQueryString(method)) {
+    return createQueryStringWriter(requestInput.urlParams);
   }
 
-  static for(bodyFormat: RequestBodyFormat, method: HttpMethod): RequestInputResolution {
-    const urlParams: string[] = [];
-    const routeParams: Record<string, string> = {};
-    const headers: Record<string, string> = {};
-    if (sendsInputInQueryString(method)) {
-      return new RequestInputResolution(urlParams, routeParams, headers, {}, createQueryStringWriter(urlParams));
-    }
+  switch (bodyFormat) {
+    case "form-data":
+      requestInput.body = new FormData();
+      return createFormDataWriter(requestInput.body);
+    case "json":
+      requestInput.body = {};
+      return createJsonBodyWriter(requestInput.body);
+    default:
+      return assertNever(bodyFormat, "request body format");
+  }
+}
 
-    switch (bodyFormat) {
-      case "form-data": {
-        const formData = new FormData();
-        return new RequestInputResolution(urlParams, routeParams, headers, formData, createFormDataWriter(formData));
-      }
-      case "json": {
-        const body: Record<string, unknown> = {};
-        return new RequestInputResolution(urlParams, routeParams, headers, body, createJsonBodyWriter(body));
-      }
-      default:
-        return assertNever(bodyFormat, "request body format");
-    }
+export function writeRequestHeader(
+  requestInput: ResolvedRequestInput,
+  name: string,
+  value: unknown,
+  shape: RuntimeShape,
+): void {
+  requestInput.headers[name] = requestScalarWireValue("header", name, value, shape);
+}
+
+export function writeRequestRouteParam(
+  requestInput: ResolvedRequestInput,
+  name: string,
+  value: unknown,
+  shape: RuntimeShape,
+): void {
+  const valueIsMissing = value === null || value === undefined;
+  if (valueIsMissing) {
+    throw new Error(`[alis] route param "${name}" evaluated to null; cannot build URL`);
   }
 
-  writeHeader(name: string, value: unknown, shape: RuntimeShape): void {
-    this.headers[name] = requestScalarWireValue("header", name, value, shape);
-  }
-
-  writeRouteParameter(name: string, value: unknown, shape: RuntimeShape): void {
-    const valueIsMissing = value === null || value === undefined;
-    if (valueIsMissing) {
-      throw new Error(`[alis] route param "${name}" evaluated to null; cannot build URL`);
-    }
-
-    this.routeParams[name] = requestScalarWireValue("route param", name, value, shape);
-  }
-
-  toResult(): ResolvedRequestInput {
-    return {
-      urlParams: this.urlParams,
-      routeParams: this.routeParams,
-      headers: this.headers,
-      body: this.body,
-    };
-  }
+  requestInput.routeParams[name] = requestScalarWireValue("route param", name, value, shape);
 }
 
 function sendsInputInQueryString(method: HttpMethod): boolean {

@@ -205,7 +205,7 @@ sequenceDiagram
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <section id="boot">
 <h2>2. boot.ts &mdash; boot() + Partial Slot Wiring</h2>
-<p class="path">Scripts/lifecycle/boot.ts</p>
+<p class="path">runtime/lifecycle/boot.ts</p>
 <p>Orchestrates live validation wiring, two-phase trigger wiring, and plan registration.
 <code>loadPartialSlot()</code> handles browser-loaded partial replacement. <code>wireBehaviors()</code> guarantees custom-event listeners
 exist before page-ready reactions fire.</p>
@@ -217,7 +217,7 @@ sequenceDiagram
     participant boot as boot.ts
     participant liveClear as live-clear.ts
     participant trigger as trigger.ts
-    participant registry as merge-plan.ts
+    participant appliedPlans as AppliedBrowserPlans
 
     Caller->>boot: boot(plan)
     boot->>boot: log.info("booting", {planId, behaviors})
@@ -243,7 +243,7 @@ sequenceDiagram
         end
     end
 
-    boot->>registry: appliedBrowserPlans.register(plan)
+    boot->>appliedPlans: register(plan)
     boot->>boot: log.info("booted")
 </div>
 
@@ -252,13 +252,13 @@ sequenceDiagram
 sequenceDiagram
     participant Caller
     participant boot as boot.ts
-    participant registry as merge-plan.ts
+    participant appliedPlans as AppliedBrowserPlans
     participant errDisplay as error-display.ts
 
     Caller->>boot: loadPartialSlot(partId, plans)
-    boot->>registry: appliedBrowserPlans.loadPartialSlot(partId, plans, {wireBehaviors, wireContainerValidation})
-    Note over registry: Replaces prior slot contribution,<br/>applies plan documents,<br/>wires with one AbortController
-    registry-->>boot: affected plan ids
+    boot->>appliedPlans: loadPartialSlot(partId, plans, {wireBehaviors, wireContainerValidation})
+    Note over appliedPlans: Replaces the prior slot load,<br/>applies plan documents,<br/>wires with one AbortController
+    appliedPlans-->>boot: affected plan ids
 
     loop Each affected plan id
         boot->>errDisplay: findSummaryElement(planId)
@@ -276,13 +276,13 @@ sequenceDiagram
 sequenceDiagram
     participant Test
     participant boot as boot.ts
-    participant registry as merge-plan.ts
+    participant appliedPlans as AppliedBrowserPlans
 
     Test->>boot: resetBootStateForTests()
     boot->>boot: bootAbort.abort()
     Note over boot: Cancels all event listeners<br/>registered with this signal
     boot->>boot: bootAbort = new AbortController()
-    boot->>registry: resetMergePlanState()
+    boot->>appliedPlans: reset()
 </div>
 </section>
 
@@ -1618,8 +1618,8 @@ sequenceDiagram
 <!-- 15. merge-plan.ts                                               -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <section id="merge-plan">
-<h2>15. merge-plan.ts &mdash; Applied Browser Plans</h2>
-<p class="path">Scripts/lifecycle/merge-plan.ts</p>
+<h2>15. browser-plans.ts &mdash; Applied Browser Plans</h2>
+<p class="path">runtime/lifecycle/browser-plans.ts</p>
 <p>Owns the browser-applied plan documents. Initial SSR plans are composed by <code>planId</code>.
 Browser-loaded partials are applied through explicit slot replacement; the slot id is the unload handle,
 while component ids and type keys remain runtime join keys.</p>
@@ -1652,7 +1652,7 @@ sequenceDiagram
     Caller->>plans: register(plan)
     plans->>plans: plans.set(plan.planId, plan)
     plans->>plans: rootPlanIds.add(plan.planId)
-    plans->>plans: claim root component/type keys
+    plans->>plans: remember root component/type keys
 </div>
 
 <h3>AppliedBrowserPlans.loadPartialSlot()</h3>
@@ -1663,14 +1663,14 @@ sequenceDiagram
     participant hooks as MergeHooks
 
     Caller->>plans: loadPartialSlot(partId, planDocuments, hooks)
-    plans->>plans: unload previous contributions for partId
+    plans->>plans: unload previous slot load for partId
     plans->>plans: create one AbortController for this slot load
     loop Each plan document
-        plans->>plans: use partId as contribution handle
+        plans->>plans: use partId as slot load key
         plans->>plans: merge type/component fragments
         plans->>hooks: wireBehaviors(behaviors, target, signal)
         plans->>hooks: wireContainerValidation(target, signal)
-        plans->>plans: record applied contribution for partId
+        plans->>plans: remember loaded plan state for partId
     end
     plans-->>Caller: affected plan ids
 </div>
@@ -1681,12 +1681,12 @@ sequenceDiagram
     participant plans as AppliedBrowserPlans
 
     Note over plans: unloadPartialSlot(partId)
-    plans->>plans: release applied contributions for partId
-    loop Each contribution
+    plans->>plans: find loaded plan state for partId
+    loop Each loaded plan
         plans->>plans: abort slot load listeners
         plans->>plans: remove behaviors/components/types/validation rules
     end
-    alt non-root plan has no remaining artifacts
+    alt non-root plan has no remaining slot state
         plans->>plans: delete plan
     end
 </div>
