@@ -7,7 +7,7 @@ namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// Describes a single field's validation rules within a form.
-    /// The projection declares the field path and shape before render-time binding.
+    /// The rule source declares the field path and shape before render-time binding.
     /// </summary>
     public sealed class ClientValidationField
     {
@@ -27,7 +27,7 @@ namespace Alis.Reactive.Validation
         internal ValidationFieldPath FieldPath => _field.Path;
 
         internal DeferredModelBoundClientValidationField ToDeferredField(Type modelType) =>
-            DeferredModelBoundClientValidationField.ForProjectedField(modelType, _field.Path, _field.Shape);
+            DeferredModelBoundClientValidationField.ForClientRuleField(modelType, _field.Path, _field.Shape);
 
         private static IReadOnlyList<ValidationRule> SnapshotRules(IEnumerable<ValidationRule> rules)
         {

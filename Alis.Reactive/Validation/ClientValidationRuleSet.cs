@@ -5,10 +5,10 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Validation
 {
-    internal sealed class ClientValidationProjectionDraft
+    internal sealed class ClientValidationRuleSet
     {
-        private readonly Dictionary<string, ClientValidationProjectedField> _fields =
-            new Dictionary<string, ClientValidationProjectedField>(StringComparer.Ordinal);
+        private readonly Dictionary<string, ClientValidationRuleSetField> _fields =
+            new Dictionary<string, ClientValidationRuleSetField>(StringComparer.Ordinal);
 
         internal void EnsureFields(IEnumerable<ClientValidationFieldReference> fields)
         {
@@ -27,7 +27,7 @@ namespace Alis.Reactive.Validation
                 return;
             }
 
-            _fields.Add(field.Path.Value, new ClientValidationProjectedField(field));
+            _fields.Add(field.Path.Value, new ClientValidationRuleSetField(field));
         }
 
         internal void AddRule(ClientValidationFieldReference field, ValidationRule rule)
@@ -53,12 +53,12 @@ namespace Alis.Reactive.Validation
             _fields.Values.Select(field => field.ToField()).ToArray();
     }
 
-    internal sealed class ClientValidationProjectedField
+    internal sealed class ClientValidationRuleSetField
     {
         private readonly ClientValidationFieldReference _field;
         private readonly List<ValidationRule> _rules = new List<ValidationRule>();
 
-        internal ClientValidationProjectedField(ClientValidationFieldReference field)
+        internal ClientValidationRuleSetField(ClientValidationFieldReference field)
         {
             _field = field ?? throw new ArgumentNullException(nameof(field));
         }

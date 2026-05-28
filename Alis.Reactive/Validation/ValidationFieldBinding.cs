@@ -9,17 +9,17 @@ namespace Alis.Reactive
     internal sealed class ValidationFieldBindingCatalog
     {
         private readonly IReadOnlyDictionary<string, ComponentRegistration> _registeredInputs;
-        private readonly IReadOnlyDictionary<string, ClientValidationField> _projectedFields;
+        private readonly IReadOnlyDictionary<string, ClientValidationField> _clientRuleFields;
         private readonly Type _modelType;
 
         internal ValidationFieldBindingCatalog(
             IReadOnlyDictionary<string, ComponentRegistration> registeredInputs,
             Type modelType,
-            IReadOnlyList<ClientValidationField> projectedFields)
+            IReadOnlyList<ClientValidationField> clientRuleFields)
         {
             _registeredInputs = registeredInputs ?? throw new ArgumentNullException(nameof(registeredInputs));
             _modelType = modelType ?? throw new ArgumentNullException(nameof(modelType));
-            _projectedFields = IndexProjectedFields(projectedFields);
+            _clientRuleFields = IndexClientRuleFields(clientRuleFields);
         }
 
         internal ValidationFieldBinding Resolve(ClientValidationField field)
@@ -39,16 +39,16 @@ namespace Alis.Reactive
             if (_registeredInputs.TryGetValue(fieldPath.Value, out var registration))
                 return ValidationFieldBinding.Registered(registration);
 
-            if (_projectedFields.TryGetValue(fieldPath.Value, out var field))
+            if (_clientRuleFields.TryGetValue(fieldPath.Value, out var field))
                 return ValidationFieldBinding.Deferred(field.ToDeferredField(_modelType));
 
             throw new InvalidOperationException(
-                $"Validation field '{fieldPath.Value}' was referenced by a projected validation rule for model '{_modelType.FullName}', " +
-                "but that field was not included in the client validation projection. " +
-                "Declare peer fields and condition fields through the same typed client projection so their shape is known before render-time binding.");
+                $"Validation field '{fieldPath.Value}' was referenced by a client validation rule for model '{_modelType.FullName}', " +
+                "but that field was not included in the client validation rule set. " +
+                "Declare peer fields and condition fields through the same typed client rules so their shape is known before render-time binding.");
         }
 
-        private static IReadOnlyDictionary<string, ClientValidationField> IndexProjectedFields(
+        private static IReadOnlyDictionary<string, ClientValidationField> IndexClientRuleFields(
             IReadOnlyList<ClientValidationField> fields)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
@@ -57,7 +57,7 @@ namespace Alis.Reactive
             foreach (var field in fields)
             {
                 if (field == null)
-                    throw new ArgumentException("Projected validation field must not be null.", nameof(fields));
+                    throw new ArgumentException("Client validation field must not be null.", nameof(fields));
 
                 catalog[field.FieldName] = field;
             }
@@ -139,7 +139,7 @@ namespace Alis.Reactive
 
         internal InputValueContract ValueContract => InputValueContract.ForCanonicalValue(Shape);
 
-        internal static DeferredModelBoundClientValidationField ForProjectedField(
+        internal static DeferredModelBoundClientValidationField ForClientRuleField(
             Type modelType,
             ValidationFieldPath fieldPath,
             Shape shape)

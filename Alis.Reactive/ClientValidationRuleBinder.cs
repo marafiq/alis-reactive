@@ -7,25 +7,25 @@ using Alis.Reactive.Validation;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Binds client-side validation projections declared by request validation gates
+    /// Binds client-side validation rules declared by request validation gates
     /// into the plan's component-level validation rules.
     /// <para>
     /// Each <see cref="ValidationJob"/> names a form and a validation source type. The registered
-    /// <see cref="IClientValidationProjectionSource"/> returns the deterministic browser projection for
-    /// that source. This binder maps each projected model field to the component that
+    /// <see cref="IClientValidationRuleSource"/> returns the deterministic browser rules for
+    /// that source. This binder maps each model field to the component that
     /// renders it, or to the deterministic component id a partial will render later, and
     /// attaches the resulting <see cref="ComponentValidation"/> rules to the form's
     /// <see cref="ContainerScope"/>. Normal validator execution is separate; this binder
-    /// handles only the browser projection.
+    /// handles only the browser rules.
     /// </para>
     /// </summary>
-    internal sealed class ClientValidationProjectionBinder
+    internal sealed class ClientValidationRuleBinder
     {
         private readonly PlanBuildContext _context;
         private readonly IReadOnlyDictionary<string, ComponentRegistration> _registeredInputs;
         private readonly Type _modelType;
 
-        internal ClientValidationProjectionBinder(
+        internal ClientValidationRuleBinder(
             PlanBuildContext context,
             IReadOnlyDictionary<string, ComponentRegistration> registeredInputs,
             Type modelType)
@@ -35,7 +35,7 @@ namespace Alis.Reactive
             _modelType = modelType ?? throw new ArgumentNullException(nameof(modelType));
         }
 
-        /// <summary>Binds every validation projection job declared during plan construction.</summary>
+        /// <summary>Binds every validation rule job declared during plan construction.</summary>
         internal void BindQueuedJobs()
         {
             foreach (var job in _context.ValidationJobs)
@@ -44,10 +44,10 @@ namespace Alis.Reactive
 
         private void BindJob(ValidationJob job)
         {
-            var source = ReactivePlanConfig.ClientValidationProjectionSource.RequireFor(job);
+            var source = ReactivePlanConfig.ClientValidationRuleSource.RequireFor(job);
             var container = job.Container;
 
-            var fields = source.ProjectClientRules(job.ValidationSourceType);
+            var fields = source.GetClientRules(job.ValidationSourceType);
             var bindings = new ValidationFieldBindingCatalog(_registeredInputs, _modelType, fields);
             var ruleBinding = ValidationPlanBinding.For(bindings);
 

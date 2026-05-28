@@ -5,9 +5,9 @@ using Alis.Reactive.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Alis.Reactive.PlaywrightTests.Validation.Projection;
+namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
 
-internal static class ValidationProjectionPlanHarness
+internal static class ClientValidationRulePlanHarness
 {
     private const string FormId = "validation-form";
     private static readonly object ConfigGate = new();
@@ -17,7 +17,7 @@ internal static class ValidationProjectionPlanHarness
         where TModel : class
         where TValidationSource : class
     {
-        EnsureProjectionSource();
+        EnsureRuleSource();
 
         var html = default(IHtmlHelper<TModel>)!;
         var plan = PlanExtensions.ReactivePlan(html);
@@ -73,7 +73,7 @@ internal static class ValidationProjectionPlanHarness
             rule.GetProperty("serverFieldName").GetString() == serverFieldName);
     }
 
-    private static void EnsureProjectionSource()
+    private static void EnsureRuleSource()
     {
         if (_configured) return;
 
@@ -81,28 +81,28 @@ internal static class ValidationProjectionPlanHarness
         {
             if (_configured) return;
 
-            ReactivePlanConfig.UseClientValidationProjectionSource(
-                new ValidationProjectionSource());
+            ReactivePlanConfig.UseClientValidationRuleSource(
+                new ClientValidationRuleSource());
             _configured = true;
         }
     }
 
-    private sealed class ValidationProjectionSource : IClientValidationProjectionSource
+    private sealed class ClientValidationRuleSource : IClientValidationRuleSource
     {
-        private static readonly IClientValidationProjectionSource Core =
-            ClientValidationProjections.Create(
-                ClientValidationProjections.For<StayWindowClientValidation, StayWindow>(projection =>
+        private static readonly IClientValidationRuleSource Core =
+            ClientValidationRules.Create(
+                ClientValidationRules.For<StayWindowClientValidation, StayWindow>(rules =>
                 {
-                    projection.Field(x => x.DischargeDate)
+                    rules.Field(x => x.DischargeDate)
                         .GreaterThan(x => x.AdmissionDate, "Discharge must be after admission.")
                         .GreaterThanOrEqualTo(x => x.AdmissionDate, "Discharge must not be before admission.")
                         .LessThan(x => x.ReviewDate, "Discharge must be before review.")
                         .LessThanOrEqualTo(x => x.ReviewDate, "Discharge must not be after review.");
                 }),
 
-                ClientValidationProjections.For<ResidentAssessmentClientValidation, ResidentAssessment>(projection =>
+                ClientValidationRules.For<ResidentAssessmentClientValidation, ResidentAssessment>(rules =>
                 {
-                    projection.When(
+                    rules.When(
                         fields => fields.Field(x => x.IsVeteran).Truthy()
                             .And(fields.Field(x => x.CareLevel).In("Memory Care", "Skilled Nursing")),
                         rules => rules.Field(x => x.MemoryAssessmentScore)
@@ -112,12 +112,12 @@ internal static class ValidationProjectionPlanHarness
         private static readonly FluentValidationAdapter Fluent =
             new(CreateValidator);
 
-        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType)
+        public IReadOnlyList<ClientValidationField> GetClientRules(Type validationSourceType)
         {
             if (FluentValidatorTypes.Contains(validationSourceType))
-                return Fluent.ProjectClientRules(validationSourceType);
+                return Fluent.GetClientRules(validationSourceType);
 
-            return Core.ProjectClientRules(validationSourceType);
+            return Core.GetClientRules(validationSourceType);
         }
 
         private static readonly Type[] FluentValidatorTypes =
@@ -166,7 +166,7 @@ internal sealed class AsyncOnlyValidator : AbstractValidator<AsyncOnlyModel>
         RuleFor(model => model.Code)
             .MustAsync((_, _, _) => Task.FromResult(false))
             .WithMessage("Code is checked on the server.")
-            .ProjectToClient(rule => rule.Required());
+            .ClientRule(rule => rule.Required());
     }
 }
 
@@ -182,7 +182,7 @@ internal sealed class ConfirmEmailValidator : AbstractValidator<ConfirmEmailMode
         RuleFor(model => model.ConfirmEmail)
             .Must((model, confirmEmail) => confirmEmail == model.Email)
             .WithMessage("Emails must match.")
-            .ProjectToClient(rule => rule.EqualTo(model => model.Email));
+            .ClientRule(rule => rule.EqualTo(model => model.Email));
     }
 }
 

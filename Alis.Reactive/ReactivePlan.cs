@@ -96,7 +96,7 @@ namespace Alis.Reactive
         private void ResolveAll()
         {
             _context.RegisterInputComponents();
-            new ClientValidationProjectionBinder(
+            new ClientValidationRuleBinder(
                     _context,
                     _registeredInputComponents.Snapshot(),
                     typeof(TModel))

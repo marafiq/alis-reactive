@@ -5,21 +5,21 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// Writes rules for one projected client validation field.
+    /// Writes rules for one client validation field.
     /// </summary>
     public sealed class ClientValidationFieldRuleBuilder<TModel, TValue>
         where TModel : class
     {
-        private readonly ClientValidationProjectionDraft _projection;
+        private readonly ClientValidationRuleSet _rules;
         private readonly ClientValidationFieldToken<TModel, TValue> _field;
         private readonly ValidationRuleActivation _activation;
 
         internal ClientValidationFieldRuleBuilder(
-            ClientValidationProjectionDraft projection,
+            ClientValidationRuleSet rules,
             ClientValidationFieldToken<TModel, TValue> field,
             ValidationRuleActivation activation)
         {
-            _projection = projection ?? throw new ArgumentNullException(nameof(projection));
+            _rules = rules ?? throw new ArgumentNullException(nameof(rules));
             _field = field ?? throw new ArgumentNullException(nameof(field));
             _activation = activation ?? throw new ArgumentNullException(nameof(activation));
         }
@@ -57,7 +57,7 @@ namespace Alis.Reactive.Validation
         public ClientValidationFieldRuleBuilder<TModel, TValue> Regex(string pattern, string message)
         {
             if (string.IsNullOrEmpty(pattern))
-                throw new ArgumentException("A regex pattern is required for client validation projection.", nameof(pattern));
+                throw new ArgumentException("A regex pattern is required for a client validation rule.", nameof(pattern));
 
             return AddLiteral(ValidationRuleName.Regex, pattern, Shape.None, message);
         }
@@ -172,7 +172,7 @@ namespace Alis.Reactive.Validation
             TValue value,
             string message)
         {
-            var literal = ClientValidationProjectionLiteral.From(value);
+            var literal = ClientValidationLiteral.From(value);
             return AddLiteral(name, literal.Value, literal.Shape, message);
         }
 
@@ -193,7 +193,7 @@ namespace Alis.Reactive.Validation
             TValue upperBound,
             string message)
         {
-            var bounds = ValidationRangeBounds.FromProjection(lowerBound, upperBound);
+            var bounds = ValidationRangeBounds.FromClientLiteral(lowerBound, upperBound);
             return AddRule(
                 name,
                 message,
@@ -208,7 +208,7 @@ namespace Alis.Reactive.Validation
         {
             if (peerField == null) throw new ArgumentNullException(nameof(peerField));
 
-            _projection.EnsureField(peerField.Reference);
+            _rules.EnsureField(peerField.Reference);
             return AddRule(
                 name,
                 message,
@@ -228,7 +228,7 @@ namespace Alis.Reactive.Validation
             if (operand == null) throw new ArgumentNullException(nameof(operand));
             if (shape == null) throw new ArgumentNullException(nameof(shape));
 
-            _projection.AddRule(
+            _rules.AddRule(
                 _field.Reference,
                 new ValidationRule(name, ValidationMessage.Of(message), operand, _activation, shape));
             return this;

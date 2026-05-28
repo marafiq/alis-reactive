@@ -15,7 +15,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .WithMessage("Discharge date is required.");
             RuleFor(x => x.DischargeDate).GreaterThan(x => x.AdmissionDate)
                 .WithMessage("Discharge date must be after admission date.")
-                .ProjectToClient(rule => rule.GreaterThan(x => x.AdmissionDate));
+                .ClientRule(rule => rule.GreaterThan(x => x.AdmissionDate));
         }
     }
 }

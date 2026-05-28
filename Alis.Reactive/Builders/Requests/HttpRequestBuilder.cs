@@ -97,7 +97,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Validates the form before sending the request using the specified validation source.</summary>
-        /// <typeparam name="TValidationSource">The validation source type used by the configured client projection source.</typeparam>
+        /// <typeparam name="TValidationSource">The validation source type used by the configured client rule source.</typeparam>
         /// <param name="formId">The DOM element ID of the form container for error display.</param>
         /// <returns>This builder for chaining.</returns>
         public HttpRequestBuilder<TModel> Validate<TValidationSource>(string formId)

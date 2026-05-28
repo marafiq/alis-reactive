@@ -8,81 +8,81 @@ namespace Alis.Reactive
     /// One-time startup configuration for the reactive framework.
     /// </summary>
     /// <remarks>
-    /// Call <see cref="UseClientValidationProjectionSource"/> in <c>Program.cs</c> or <c>Startup.cs</c>
-        /// to enable client-side validation projection from validators, direct projections, or generated model metadata.
+    /// Call <see cref="UseClientValidationRuleSource"/> in <c>Program.cs</c> or <c>Startup.cs</c>
+    /// to enable client-side validation rules from validators, direct rules, or generated model metadata.
     /// Without this call, views that use <c>Validate&lt;TValidationSource&gt;()</c> will throw at render time.
     /// </remarks>
     public static class ReactivePlanConfig
     {
-        private static ClientValidationProjectionSourceRegistration _projectionSource =
-            ClientValidationProjectionSourceRegistration.Missing;
+        private static ClientValidationRuleSourceRegistration _ruleSource =
+            ClientValidationRuleSourceRegistration.Missing;
 
-        internal static ClientValidationProjectionSourceRegistration ClientValidationProjectionSource => _projectionSource;
+        internal static ClientValidationRuleSourceRegistration ClientValidationRuleSource => _ruleSource;
 
         /// <summary>
-        /// Registers the source that projects deterministic browser validation rules.
+        /// Registers the source that provides deterministic browser validation rules.
         /// </summary>
         /// <remarks>
         /// Must be called exactly once at app startup. Calling it a second time throws
-        /// to prevent accidental double-registration that would silently replace the projection source.
+        /// to prevent accidental double-registration that would silently replace the rule source.
         /// </remarks>
-        /// <param name="source">The projection source implementation, such as direct model rules or the FluentValidation adapter.</param>
-        /// <exception cref="InvalidOperationException">Thrown if a projection source is already registered.</exception>
-        public static void UseClientValidationProjectionSource(IClientValidationProjectionSource source)
+        /// <param name="source">The rule source implementation, such as direct model rules or the FluentValidation adapter.</param>
+        /// <exception cref="InvalidOperationException">Thrown if a rule source is already registered.</exception>
+        public static void UseClientValidationRuleSource(IClientValidationRuleSource source)
         {
-            _projectionSource = _projectionSource.Register(source);
+            _ruleSource = _ruleSource.Register(source);
         }
 
-        /// <summary>Test-only: resets static state so UseClientValidationProjectionSource can be called again.</summary>
-        internal static void Reset() => _projectionSource = ClientValidationProjectionSourceRegistration.Missing;
+        /// <summary>Test-only: resets static state so UseClientValidationRuleSource can be called again.</summary>
+        internal static void Reset() => _ruleSource = ClientValidationRuleSourceRegistration.Missing;
     }
 
-    internal abstract class ClientValidationProjectionSourceRegistration
+    internal abstract class ClientValidationRuleSourceRegistration
     {
-        internal static ClientValidationProjectionSourceRegistration Missing { get; } =
-            new MissingClientValidationProjectionSourceRegistration();
+        internal static ClientValidationRuleSourceRegistration Missing { get; } =
+            new MissingClientValidationRuleSourceRegistration();
 
-        internal abstract ClientValidationProjectionSourceRegistration Register(IClientValidationProjectionSource source);
+        internal abstract ClientValidationRuleSourceRegistration Register(IClientValidationRuleSource source);
 
-        internal abstract IClientValidationProjectionSource RequireFor(ValidationJob job);
+        internal abstract IClientValidationRuleSource RequireFor(ValidationJob job);
     }
 
-    internal sealed class MissingClientValidationProjectionSourceRegistration : ClientValidationProjectionSourceRegistration
+    internal sealed class MissingClientValidationRuleSourceRegistration : ClientValidationRuleSourceRegistration
     {
-        internal override ClientValidationProjectionSourceRegistration Register(IClientValidationProjectionSource source)
+        internal override ClientValidationRuleSourceRegistration Register(IClientValidationRuleSource source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            return new RegisteredClientValidationProjectionSource(source);
+            return new RegisteredClientValidationRuleSource(source);
         }
 
-        internal override IClientValidationProjectionSource RequireFor(ValidationJob job)
+        internal override IClientValidationRuleSource RequireFor(ValidationJob job)
         {
             if (job == null) throw new ArgumentNullException(nameof(job));
             throw new InvalidOperationException(
                 $"Request at '{job.RequestUrl}' specifies validation source '{job.ValidationSourceType.Name}' " +
-                "but no IClientValidationProjectionSource is registered. " +
-                "Call ReactivePlanConfig.UseClientValidationProjectionSource() at app startup.");
+                "but no IClientValidationRuleSource is registered. " +
+                "Call ReactivePlanConfig.UseClientValidationRuleSource() at app startup.");
         }
     }
 
-    internal sealed class RegisteredClientValidationProjectionSource : ClientValidationProjectionSourceRegistration
+    internal sealed class RegisteredClientValidationRuleSource : ClientValidationRuleSourceRegistration
     {
-        private readonly IClientValidationProjectionSource _source;
+        private readonly IClientValidationRuleSource _source;
 
-        internal RegisteredClientValidationProjectionSource(IClientValidationProjectionSource source)
+        internal RegisteredClientValidationRuleSource(IClientValidationRuleSource source)
         {
             _source = source ?? throw new ArgumentNullException(nameof(source));
         }
 
-        internal override ClientValidationProjectionSourceRegistration Register(IClientValidationProjectionSource source)
+        internal override ClientValidationRuleSourceRegistration Register(IClientValidationRuleSource source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             throw new InvalidOperationException(
-                "Client validation projection source is already registered. " +
-                "UseClientValidationProjectionSource must be called exactly once at app startup.");
+                "Client validation rule source is already registered. " +
+                "UseClientValidationRuleSource must be called exactly once at app startup.");
         }
 
-        internal override IClientValidationProjectionSource RequireFor(ValidationJob job)
+        internal override IClientValidationRuleSource RequireFor(ValidationJob job)
         {
             if (job == null) throw new ArgumentNullException(nameof(job));
             return _source;

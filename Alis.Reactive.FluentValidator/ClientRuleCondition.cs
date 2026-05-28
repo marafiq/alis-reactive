@@ -5,54 +5,54 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
 {
-    internal abstract class ClientConditionProjection
+    internal abstract class ClientRuleCondition
     {
-        private protected ClientConditionProjection() { }
+        private protected ClientRuleCondition() { }
 
-        internal static ClientConditionProjection Project<TModel>(FieldGuard<TModel> guard)
+        internal static ClientRuleCondition FromGuard<TModel>(FieldGuard<TModel> guard)
             where TModel : class
         {
             if (guard == null) throw new ArgumentNullException(nameof(guard));
-            return new ProjectedClientCondition(guard.Condition, guard.Fields);
+            return new BrowserClientRuleCondition(guard.Condition, guard.Fields);
         }
 
-        internal static ClientConditionProjection All(IEnumerable<ClientConditionProjection> conditions)
+        internal static ClientRuleCondition All(IEnumerable<ClientRuleCondition> conditions)
         {
             if (conditions == null) throw new ArgumentNullException(nameof(conditions));
 
-            var projectedConditions = new List<FieldCondition>();
-            var projectedFields = new List<ClientValidationFieldReference>();
+            var conditionsForClient = new List<FieldCondition>();
+            var fieldsReadByConditions = new List<ClientValidationFieldReference>();
 
             foreach (var condition in conditions)
             {
                 if (condition == null)
-                    throw new ArgumentException("Client condition projection must not be null.", nameof(conditions));
+                    throw new ArgumentException("Client rule condition must not be null.", nameof(conditions));
 
-                if (!condition.TryProject(out var fieldCondition, out var fields))
+                if (!condition.TryUseOnClient(out var fieldCondition, out var fields))
                     return ServerOnly();
 
-                projectedConditions.Add(fieldCondition);
-                projectedFields.AddRange(fields);
+                conditionsForClient.Add(fieldCondition);
+                fieldsReadByConditions.AddRange(fields);
             }
 
-            return new ProjectedClientCondition(
-                FieldCondition.All(projectedConditions.ToArray()),
-                ClientValidationGuardFields.From(projectedFields));
+            return new BrowserClientRuleCondition(
+                FieldCondition.All(conditionsForClient.ToArray()),
+                ClientValidationGuardFields.From(fieldsReadByConditions));
         }
 
-        internal static ClientConditionProjection ServerOnly() =>
+        internal static ClientRuleCondition ServerOnly() =>
             ServerOnlyClientCondition.Instance;
 
-        internal abstract bool TryProject(
+        internal abstract bool TryUseOnClient(
             [NotNullWhen(true)] out FieldCondition? condition,
             out IReadOnlyList<ClientValidationFieldReference> fields);
 
-        private sealed class ProjectedClientCondition : ClientConditionProjection
+        private sealed class BrowserClientRuleCondition : ClientRuleCondition
         {
             private readonly FieldCondition _condition;
             private readonly IReadOnlyList<ClientValidationFieldReference> _fields;
 
-            internal ProjectedClientCondition(
+            internal BrowserClientRuleCondition(
                 FieldCondition condition,
                 IReadOnlyList<ClientValidationFieldReference> fields)
             {
@@ -60,7 +60,7 @@ namespace Alis.Reactive.FluentValidator
                 _fields = ClientValidationGuardFields.From(fields);
             }
 
-            internal override bool TryProject(
+            internal override bool TryUseOnClient(
                 [NotNullWhen(true)] out FieldCondition? condition,
                 out IReadOnlyList<ClientValidationFieldReference> fields)
             {
@@ -70,13 +70,13 @@ namespace Alis.Reactive.FluentValidator
             }
         }
 
-        private sealed class ServerOnlyClientCondition : ClientConditionProjection
+        private sealed class ServerOnlyClientCondition : ClientRuleCondition
         {
             internal static ServerOnlyClientCondition Instance { get; } = new ServerOnlyClientCondition();
 
             private ServerOnlyClientCondition() { }
 
-            internal override bool TryProject(
+            internal override bool TryUseOnClient(
                 [NotNullWhen(true)] out FieldCondition? condition,
                 out IReadOnlyList<ClientValidationFieldReference> fields)
             {

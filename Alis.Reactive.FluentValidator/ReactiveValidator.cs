@@ -13,11 +13,11 @@ namespace Alis.Reactive.FluentValidator
     public abstract class ReactiveValidator<T> : AbstractValidator<T>, IClientConditionSource
         where T : class
     {
-        private readonly Dictionary<IValidationRule, ClientConditionProjection> _clientConditions =
-            new Dictionary<IValidationRule, ClientConditionProjection>();
+        private readonly Dictionary<IValidationRule, ClientRuleCondition> _clientConditions =
+            new Dictionary<IValidationRule, ClientRuleCondition>();
         private readonly ClientConditionScope _scope = new ClientConditionScope();
 
-        IReadOnlyDictionary<IValidationRule, ClientConditionProjection> IClientConditionSource.ClientConditions =>
+        IReadOnlyDictionary<IValidationRule, ClientRuleCondition> IClientConditionSource.ClientConditions =>
             _clientConditions;
 
         protected override void OnRuleAdded(IValidationRule<T> rule)
@@ -149,7 +149,7 @@ namespace Alis.Reactive.FluentValidator
             if (guard == null) throw new ArgumentNullException(nameof(guard));
             if (defineRules == null) throw new ArgumentNullException(nameof(defineRules));
 
-            using (_scope.Enter(ClientConditionProjection.Project(guard)))
+            using (_scope.Enter(ClientRuleCondition.FromGuard(guard)))
             {
                 base.When(guard.ServerPredicate, defineRules);
             }
@@ -170,10 +170,10 @@ namespace Alis.Reactive.FluentValidator
 
         private sealed class ClientConditionScope
         {
-            private readonly Stack<ClientConditionProjection> _clientConditions = new Stack<ClientConditionProjection>();
+            private readonly Stack<ClientRuleCondition> _clientConditions = new Stack<ClientRuleCondition>();
             private int _serverOnlyDepth;
 
-            internal IDisposable Enter(ClientConditionProjection condition)
+            internal IDisposable Enter(ClientRuleCondition condition)
             {
                 if (condition == null) throw new ArgumentNullException(nameof(condition));
                 _clientConditions.Push(condition);
@@ -188,21 +188,21 @@ namespace Alis.Reactive.FluentValidator
 
             internal void Register(
                 IValidationRule rule,
-                Dictionary<IValidationRule, ClientConditionProjection> clientConditions)
+                Dictionary<IValidationRule, ClientRuleCondition> clientConditions)
             {
                 if (rule == null) throw new ArgumentNullException(nameof(rule));
                 if (clientConditions == null) throw new ArgumentNullException(nameof(clientConditions));
                 if (_clientConditions.Count == 0) return;
 
                 clientConditions[rule] = _serverOnlyDepth > 0
-                    ? ClientConditionProjection.ServerOnly()
+                    ? ClientRuleCondition.ServerOnly()
                     : ActiveClientCondition();
             }
 
-            private ClientConditionProjection ActiveClientCondition() =>
+            private ClientRuleCondition ActiveClientCondition() =>
                 _clientConditions.Count == 1
                     ? _clientConditions.Peek()
-                    : ClientConditionProjection.All(_clientConditions.Reverse().ToArray());
+                    : ClientRuleCondition.All(_clientConditions.Reverse().ToArray());
 
             private void ExitClient()
             {

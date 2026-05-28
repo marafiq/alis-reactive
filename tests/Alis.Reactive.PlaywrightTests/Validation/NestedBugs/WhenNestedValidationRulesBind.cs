@@ -1,10 +1,10 @@
 namespace Alis.Reactive.PlaywrightTests.Validation.NestedBugs;
 
 /// <summary>
-/// E2E tests proving nested client validation projection matches server-side behavior.
+/// E2E tests proving nested client validation rules match server-side behavior.
 /// </summary>
 [TestFixture]
-public class WhenNestedValidationRulesProject : PlaywrightTestBase
+public class WhenNestedValidationRulesBind : PlaywrightTestBase
 {
     // ── Nested condition field carries full path ───────────────────────
 

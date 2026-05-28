@@ -17,7 +17,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             // equalTo
             RuleFor(x => x.ConfirmEmail).NotEmpty().WithMessage("'Confirm Email' is required.")
                 .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.")
-                .ProjectToClient(rule => rule.EqualTo(x => x.Email));
+                .ClientRule(rule => rule.EqualTo(x => x.Email));
 
             // truthy
             WhenField(x => x.IsVeteran, () =>
@@ -71,7 +71,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
             RuleFor(x => x.ConfirmEmail).NotEmpty().WithMessage("'Confirm Email' is required.")
                 .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.")
-                .ProjectToClient(rule => rule.EqualTo(x => x.Email));
+                .ClientRule(rule => rule.EqualTo(x => x.Email));
 
             WhenField(x => x.IsVeteran, () =>
             {
@@ -118,7 +118,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
             RuleFor(x => x.ConfirmEmail).NotEmpty().WithMessage("'Confirm Email' is required.")
                 .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.")
-                .ProjectToClient(rule => rule.EqualTo(x => x.Email));
+                .ClientRule(rule => rule.EqualTo(x => x.Email));
 
             // Address rules conditional on user selecting "Custom Address".
             // When Facility Address or nothing selected → rules skipped.

@@ -5,15 +5,15 @@ using System.Linq.Expressions;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// Builds one model's deterministic browser validation projection.
+    /// Builds one model's deterministic browser validation rules.
     /// </summary>
-    public sealed class ClientValidationProjectionBuilder<TModel>
+    public sealed class ClientValidationRulesBuilder<TModel>
         where TModel : class
     {
-        private readonly ClientValidationProjectionDraft _projection = new ClientValidationProjectionDraft();
+        private readonly ClientValidationRuleSet _rules = new ClientValidationRuleSet();
         private ValidationRuleActivation _activeActivation = ValidationRuleActivation.Always;
 
-        internal ClientValidationProjectionBuilder() { }
+        internal ClientValidationRulesBuilder() { }
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> Field<TValue>(
             Expression<Func<TModel, TValue>> field) =>
@@ -24,28 +24,28 @@ namespace Alis.Reactive.Validation
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
 
-            _projection.EnsureField(field.Reference);
+            _rules.EnsureField(field.Reference);
             return new ClientValidationFieldRuleBuilder<TModel, TValue>(
-                _projection,
+                _rules,
                 field,
                 _activeActivation);
         }
 
         public void When(
             Func<ClientValidationConditionBuilder<TModel>, ClientValidationCondition<TModel>> condition,
-            Action<ClientValidationProjectionBuilder<TModel>> define)
+            Action<ClientValidationRulesBuilder<TModel>> define)
         {
             if (condition == null) throw new ArgumentNullException(nameof(condition));
             if (define == null) throw new ArgumentNullException(nameof(define));
 
-            var projectedCondition = condition(new ClientValidationConditionBuilder<TModel>());
-            if (projectedCondition == null)
+            var activeCondition = condition(new ClientValidationConditionBuilder<TModel>());
+            if (activeCondition == null)
                 throw new ArgumentException("A client validation condition is required.", nameof(condition));
 
-            _projection.EnsureFields(projectedCondition.Fields);
+            _rules.EnsureFields(activeCondition.Fields);
 
             var previousActivation = _activeActivation;
-            _activeActivation = previousActivation.Combine(ValidationRuleActivation.When(projectedCondition.Condition));
+            _activeActivation = previousActivation.Combine(ValidationRuleActivation.When(activeCondition.Condition));
             try
             {
                 define(this);
@@ -57,6 +57,6 @@ namespace Alis.Reactive.Validation
         }
 
         internal IReadOnlyList<ClientValidationField> ToFields() =>
-            _projection.ToFields();
+            _rules.ToFields();
     }
 }

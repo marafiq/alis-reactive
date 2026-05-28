@@ -1,12 +1,12 @@
-namespace Alis.Reactive.PlaywrightTests.Validation.Projection;
+namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
 
 [TestFixture]
-public sealed class WhenFluentValidationAdapterProjectsClientRules
+public sealed class WhenFluentValidationAdapterExtractsClientRules
 {
     [Test]
-    public void async_rules_are_server_only_even_when_a_client_projection_is_declared()
+    public void async_rules_are_server_only_even_when_a_client_rule_is_declared()
     {
-        using var doc = ValidationProjectionPlanHarness
+        using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AsyncOnlyModel, AsyncOnlyValidator>();
 
         Assert.That(ValidationRuleCount(doc.RootElement), Is.Zero);
@@ -15,9 +15,9 @@ public sealed class WhenFluentValidationAdapterProjectsClientRules
     [Test]
     public void custom_rules_project_only_through_the_typed_client_bridge()
     {
-        using var doc = ValidationProjectionPlanHarness
+        using var doc = ClientValidationRulePlanHarness
             .RenderPlan<ConfirmEmailModel, ConfirmEmailValidator>();
-        var rule = ValidationProjectionPlanHarness
+        var rule = ClientValidationRulePlanHarness
             .RulesFor(doc.RootElement, nameof(ConfirmEmailModel.ConfirmEmail))
             .Single();
         var execution = rule.GetProperty("execution");
@@ -38,9 +38,9 @@ public sealed class WhenFluentValidationAdapterProjectsClientRules
     [Test]
     public void reactive_whenfield_projects_client_activation_and_declares_guard_fields()
     {
-        using var doc = ValidationProjectionPlanHarness
+        using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AssessmentModel, ReactiveAssessmentValidator>();
-        var rule = ValidationProjectionPlanHarness
+        var rule = ClientValidationRulePlanHarness
             .RulesFor(doc.RootElement, nameof(AssessmentModel.Score))
             .Single();
         var activation = rule.GetProperty("execution").GetProperty("activation");
@@ -61,9 +61,9 @@ public sealed class WhenFluentValidationAdapterProjectsClientRules
     [Test]
     public void reactive_whenfields_projects_composed_client_activation()
     {
-        using var doc = ValidationProjectionPlanHarness
+        using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AssessmentModel, ComposedAssessmentValidator>();
-        var rule = ValidationProjectionPlanHarness
+        var rule = ClientValidationRulePlanHarness
             .RulesFor(doc.RootElement, nameof(AssessmentModel.Notes))
             .Single();
         var condition = rule.GetProperty("execution")
@@ -73,7 +73,7 @@ public sealed class WhenFluentValidationAdapterProjectsClientRules
         Assert.Multiple(() =>
         {
             Assert.That(condition.GetProperty("kind").GetString(), Is.EqualTo("all"));
-            Assert.That(ValidationProjectionPlanHarness.ConditionLeftComponents(condition), Is.EqualTo(new[]
+            Assert.That(ClientValidationRulePlanHarness.ConditionLeftComponents(condition), Is.EqualTo(new[]
             {
                 IdGenerator.For(typeof(AssessmentModel), nameof(AssessmentModel.IsVeteran)),
                 IdGenerator.For(typeof(AssessmentModel), nameof(AssessmentModel.Score))
@@ -84,7 +84,7 @@ public sealed class WhenFluentValidationAdapterProjectsClientRules
     [Test]
     public void rules_under_regular_fluentvalidation_conditions_stay_server_only()
     {
-        using var doc = ValidationProjectionPlanHarness
+        using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AssessmentModel, MixedConditionValidator>();
 
         Assert.That(ValidationRuleCount(doc.RootElement), Is.Zero);

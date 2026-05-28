@@ -5,7 +5,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// Opaque typed reference to a model field used by client validation projection.
+    /// Opaque typed reference to a model field used by client validation rules.
     /// </summary>
     public sealed class ClientValidationFieldToken<TModel, TValue>
         where TModel : class

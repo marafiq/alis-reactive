@@ -11,14 +11,14 @@ using Shape = Alis.Reactive.PlanModel.Shape;
 namespace Alis.Reactive.FluentValidator
 {
     /// <summary>
-    /// Projects only deterministic browser validation rules from FluentValidation validators.
+    /// Extracts only deterministic browser validation rules from FluentValidation validators.
     /// FluentValidation still executes normally; rules that cannot be represented in the
-    /// browser plan are omitted from the client projection.
+    /// browser plan are omitted from the client rule set.
     /// </summary>
-    public sealed class FluentValidationAdapter : IClientValidationProjectionSource
+    public sealed class FluentValidationAdapter : IClientValidationRuleSource
     {
-        private static readonly IReadOnlyDictionary<IValidationRule, ClientConditionProjection> NoClientConditions =
-            new Dictionary<IValidationRule, ClientConditionProjection>();
+        private static readonly IReadOnlyDictionary<IValidationRule, ClientRuleCondition> NoClientConditions =
+            new Dictionary<IValidationRule, ClientRuleCondition>();
 
         private readonly Func<Type, IValidator?> _factory;
 
@@ -29,7 +29,7 @@ namespace Alis.Reactive.FluentValidator
                 nameof(factory));
         }
 
-        public IReadOnlyList<ClientValidationField> ProjectClientRules(Type validationSourceType)
+        public IReadOnlyList<ClientValidationField> GetClientRules(Type validationSourceType)
         {
             if (validationSourceType == null) throw new ArgumentNullException(nameof(validationSourceType));
 
@@ -37,54 +37,54 @@ namespace Alis.Reactive.FluentValidator
                 validationSourceType,
                 "validator",
                 "Ensure it is registered in the validator factory passed to FluentValidationAdapter.");
-            var projection = new ClientValidationProjectionDraft();
+            var rules = new ClientValidationRuleSet();
 
-            ProjectValidator(root, ValidationFieldPath.Empty, ValidationRuleActivation.Always, projection);
+            ExtractValidatorRules(root, ValidationFieldPath.Empty, ValidationRuleActivation.Always, rules);
 
-            return projection.ToFields();
+            return rules.ToFields();
         }
 
-        private void ProjectValidator(
+        private void ExtractValidatorRules(
             IValidator validator,
             ValidationFieldPath prefix,
             ValidationRuleActivation parentCondition,
-            ClientValidationProjectionDraft projection)
+            ClientValidationRuleSet rules)
         {
-            if (!(validator is IEnumerable<IValidationRule> rules)) return;
+            if (!(validator is IEnumerable<IValidationRule> validatorRules)) return;
 
             var clientConditions = ClientConditionsFrom(validator);
-            foreach (var rule in rules)
-                ProjectRule(rule, prefix, parentCondition, projection, clientConditions);
+            foreach (var rule in validatorRules)
+                ExtractRule(rule, prefix, parentCondition, rules, clientConditions);
         }
 
-        private void ProjectRule(
+        private void ExtractRule(
             IValidationRule rule,
             ValidationFieldPath prefix,
             ValidationRuleActivation parentCondition,
-            ClientValidationProjectionDraft projection,
-            IReadOnlyDictionary<IValidationRule, ClientConditionProjection> clientConditions)
+            ClientValidationRuleSet rules,
+            IReadOnlyDictionary<IValidationRule, ClientRuleCondition> clientConditions)
         {
-            if (!TryResolveRuleCondition(rule, prefix, projection, clientConditions, out var ruleCondition))
+            if (!TryResolveClientRuleCondition(rule, prefix, rules, clientConditions, out var ruleCondition))
                 return;
 
             var inheritedCondition = parentCondition.Combine(ruleCondition);
             if (IsIncludeRule(rule))
             {
-                ProjectChildValidators(rule, prefix, inheritedCondition, projection);
+                ExtractChildValidatorRules(rule, prefix, inheritedCondition, rules);
                 return;
             }
 
-            var field = ProjectedField.From(prefix, rule);
+            var field = ClientRuleField.From(prefix, rule);
             foreach (var component in rule.Components)
-                ProjectComponent(component, prefix, field, inheritedCondition, projection);
+                ExtractComponentRule(component, prefix, field, inheritedCondition, rules);
         }
 
-        private void ProjectComponent(
+        private void ExtractComponentRule(
             IRuleComponent component,
             ValidationFieldPath prefix,
-            ProjectedField field,
+            ClientRuleField field,
             ValidationRuleActivation condition,
-            ClientValidationProjectionDraft projection)
+            ClientValidationRuleSet rules)
         {
             if (component.HasCondition || component.HasAsyncCondition)
             {
@@ -94,13 +94,13 @@ namespace Alis.Reactive.FluentValidator
             if (component.Validator is IChildValidatorAdaptor child)
             {
                 var nested = ResolveNestedValidator(_factory, child.ValidatorType);
-                ProjectValidator(nested, field.Path, condition, projection);
+                ExtractValidatorRules(nested, field.Path, condition, rules);
                 return;
             }
 
-            if (ClientValidationRuleProjectionCatalog.TryFind(component, out var explicitRule))
+            if (ClientValidationRuleBridge.TryFind(component, out var explicitRule))
             {
-                projection.AddRule(
+                rules.AddRule(
                     field.Reference,
                     explicitRule.ToValidationRule(
                         Message(component, explicitRule.MessageFor(field.DisplayName)),
@@ -109,14 +109,14 @@ namespace Alis.Reactive.FluentValidator
                 return;
             }
 
-            ProjectBuiltInRule(component, field, condition, projection);
+            ExtractBuiltInRule(component, field, condition, rules);
         }
 
-        private static void ProjectBuiltInRule(
+        private static void ExtractBuiltInRule(
             IRuleComponent component,
-            ProjectedField field,
+            ClientRuleField field,
             ValidationRuleActivation condition,
-            ClientValidationProjectionDraft projection)
+            ClientValidationRuleSet rules)
         {
             var validator = component.Validator;
             var displayName = field.DisplayName;
@@ -125,42 +125,42 @@ namespace Alis.Reactive.FluentValidator
             {
                 case INotEmptyValidator _:
                 case INotNullValidator _:
-                    projection.AddRule(field.Reference, ValidationRuleName.Required, Message(component, $"'{displayName}' is required."), ValidationRuleOperand.None, condition, Shape.None);
+                    rules.AddRule(field.Reference, ValidationRuleName.Required, Message(component, $"'{displayName}' is required."), ValidationRuleOperand.None, condition, Shape.None);
                     return;
 
                 case IEmptyValidator _:
-                    projection.AddRule(field.Reference, ValidationRuleName.Empty, Message(component, $"'{displayName}' must be empty."), ValidationRuleOperand.None, condition, Shape.None);
+                    rules.AddRule(field.Reference, ValidationRuleName.Empty, Message(component, $"'{displayName}' must be empty."), ValidationRuleOperand.None, condition, Shape.None);
                     return;
 
                 case ILengthValidator length:
-                    ProjectLength(component, length, field, condition, projection);
+                    ExtractLengthRule(component, length, field, condition, rules);
                     return;
 
                 case IEmailValidator _:
-                    projection.AddRule(field.Reference, ValidationRuleName.Email, Message(component, $"'{displayName}' must be a valid email address."), ValidationRuleOperand.None, condition, Shape.None);
+                    rules.AddRule(field.Reference, ValidationRuleName.Email, Message(component, $"'{displayName}' must be a valid email address."), ValidationRuleOperand.None, condition, Shape.None);
                     return;
 
                 case IRegularExpressionValidator regex:
                     if (string.IsNullOrEmpty(regex.Expression))
                         return;
                     else
-                        projection.AddRule(field.Reference, ValidationRuleName.Regex, Message(component, $"'{displayName}' format is invalid."), ValidationRuleOperand.Literal(regex.Expression, Shape.None), condition, Shape.None);
+                        rules.AddRule(field.Reference, ValidationRuleName.Regex, Message(component, $"'{displayName}' format is invalid."), ValidationRuleOperand.Literal(regex.Expression, Shape.None), condition, Shape.None);
                     return;
 
                 case ICreditCardValidator _:
-                    projection.AddRule(field.Reference, ValidationRuleName.CreditCard, Message(component, $"'{displayName}' must be a valid credit card number."), ValidationRuleOperand.None, condition, Shape.None);
+                    rules.AddRule(field.Reference, ValidationRuleName.CreditCard, Message(component, $"'{displayName}' must be a valid credit card number."), ValidationRuleOperand.None, condition, Shape.None);
                     return;
 
                 case IExclusiveBetweenValidator range:
-                    ProjectRange(component, ValidationRuleName.ExclusiveRange, range.From, range.To, $"'{displayName}' must be between {range.From} and {range.To} (exclusive).", field, condition, projection);
+                    ExtractRangeRule(component, ValidationRuleName.ExclusiveRange, range.From, range.To, $"'{displayName}' must be between {range.From} and {range.To} (exclusive).", field, condition, rules);
                     return;
 
                 case IBetweenValidator range:
-                    ProjectRange(component, ValidationRuleName.Range, range.From, range.To, $"'{displayName}' must be between {range.From} and {range.To}.", field, condition, projection);
+                    ExtractRangeRule(component, ValidationRuleName.Range, range.From, range.To, $"'{displayName}' must be between {range.From} and {range.To}.", field, condition, rules);
                     return;
 
                 case IComparisonValidator comparison:
-                    ProjectComparison(component, comparison, field, condition, projection);
+                    ExtractComparisonRule(component, comparison, field, condition, rules);
                     return;
 
                 default:
@@ -168,16 +168,16 @@ namespace Alis.Reactive.FluentValidator
             }
         }
 
-        private static void ProjectLength(
+        private static void ExtractLengthRule(
             IRuleComponent component,
             ILengthValidator length,
-            ProjectedField field,
+            ClientRuleField field,
             ValidationRuleActivation condition,
-            ClientValidationProjectionDraft projection)
+            ClientValidationRuleSet rules)
         {
             if (length.Min > 0)
             {
-                projection.AddRule(
+                rules.AddRule(
                     field.Reference,
                     ValidationRuleName.MinLength,
                     Message(component, $"'{field.DisplayName}' must be at least {length.Min} characters."),
@@ -188,7 +188,7 @@ namespace Alis.Reactive.FluentValidator
 
             if (length.Max > 0)
             {
-                projection.AddRule(
+                rules.AddRule(
                     field.Reference,
                     ValidationRuleName.MaxLength,
                     Message(component, $"'{field.DisplayName}' must be at most {length.Max} characters."),
@@ -198,22 +198,22 @@ namespace Alis.Reactive.FluentValidator
             }
         }
 
-        private static void ProjectRange(
+        private static void ExtractRangeRule(
             IRuleComponent component,
             ValidationRuleName ruleName,
             object? lower,
             object? upper,
             string defaultMessage,
-            ProjectedField field,
+            ClientRuleField field,
             ValidationRuleActivation condition,
-            ClientValidationProjectionDraft projection)
+            ClientValidationRuleSet rules)
         {
-            if (!ValidationRangeBounds.TryFromProjection(lower, upper, out var bounds))
+            if (!ValidationRangeBounds.TryFromClientLiteral(lower, upper, out var bounds))
             {
                 return;
             }
 
-            projection.AddRule(
+            rules.AddRule(
                 field.Reference,
                 ruleName,
                 Message(component, defaultMessage),
@@ -222,12 +222,12 @@ namespace Alis.Reactive.FluentValidator
                 bounds.Shape);
         }
 
-        private static void ProjectComparison(
+        private static void ExtractComparisonRule(
             IRuleComponent component,
             IComparisonValidator comparison,
-            ProjectedField field,
+            ClientRuleField field,
             ValidationRuleActivation condition,
-            ClientValidationProjectionDraft projection)
+            ClientValidationRuleSet rules)
         {
             if (comparison.MemberToCompare != null)
             {
@@ -240,8 +240,8 @@ namespace Alis.Reactive.FluentValidator
                 return;
             }
 
-            var literal = ClientValidationProjectionLiteral.From(comparison.ValueToCompare);
-            projection.AddRule(
+            var literal = ClientValidationLiteral.From(comparison.ValueToCompare);
+            rules.AddRule(
                 field.Reference,
                 ruleName,
                 Message(component, LiteralComparisonMessage(comparison.Comparison, field.DisplayName, literal.Value)),
@@ -250,11 +250,11 @@ namespace Alis.Reactive.FluentValidator
                 literal.Shape);
         }
 
-        private static bool TryResolveRuleCondition(
+        private static bool TryResolveClientRuleCondition(
             IValidationRule rule,
             ValidationFieldPath prefix,
-            ClientValidationProjectionDraft projection,
-            IReadOnlyDictionary<IValidationRule, ClientConditionProjection> clientConditions,
+            ClientValidationRuleSet rules,
+            IReadOnlyDictionary<IValidationRule, ClientRuleCondition> clientConditions,
             out ValidationRuleActivation condition)
         {
             condition = ValidationRuleActivation.Always;
@@ -265,29 +265,29 @@ namespace Alis.Reactive.FluentValidator
             if (!clientConditions.TryGetValue(rule, out var clientCondition))
                 return false;
 
-            if (!clientCondition.TryProject(out var fieldCondition, out var fields))
+            if (!clientCondition.TryUseOnClient(out var fieldCondition, out var fields))
                 return false;
 
             foreach (var field in fields)
-                projection.EnsureField(field.PrefixedBy(prefix));
+                rules.EnsureField(field.PrefixedBy(prefix));
 
             var binding = new FieldConditionPrefixBinding(prefix);
             condition = ValidationRuleActivation.When(fieldCondition.PrefixWith(binding));
             return true;
         }
 
-        private void ProjectChildValidators(
+        private void ExtractChildValidatorRules(
             IValidationRule rule,
             ValidationFieldPath prefix,
             ValidationRuleActivation condition,
-            ClientValidationProjectionDraft projection)
+            ClientValidationRuleSet rules)
         {
             foreach (var component in rule.Components)
             {
                 if (component.Validator is not IChildValidatorAdaptor child) continue;
 
                 var nested = ResolveNestedValidator(_factory, child.ValidatorType);
-                ProjectValidator(nested, prefix, condition, projection);
+                ExtractValidatorRules(nested, prefix, condition, rules);
             }
         }
 
@@ -319,7 +319,7 @@ namespace Alis.Reactive.FluentValidator
         private static bool IsIncludeRule(IValidationRule rule) =>
             string.IsNullOrEmpty(rule.PropertyName);
 
-        private static IReadOnlyDictionary<IValidationRule, ClientConditionProjection> ClientConditionsFrom(IValidator validator) =>
+        private static IReadOnlyDictionary<IValidationRule, ClientRuleCondition> ClientConditionsFrom(IValidator validator) =>
             validator is IClientConditionSource source
                 ? source.ClientConditions
                 : NoClientConditions;
@@ -379,9 +379,9 @@ namespace Alis.Reactive.FluentValidator
             return result.ToString();
         }
 
-        private sealed class ProjectedField
+        private sealed class ClientRuleField
         {
-            private ProjectedField(
+            private ClientRuleField(
                 string displayName,
                 ValidationFieldPath path,
                 ClientValidationFieldReference reference)
@@ -395,10 +395,10 @@ namespace Alis.Reactive.FluentValidator
             internal ClientValidationFieldReference Reference { get; }
             internal string DisplayName { get; }
 
-            internal static ProjectedField From(ValidationFieldPath prefix, IValidationRule rule)
+            internal static ClientRuleField From(ValidationFieldPath prefix, IValidationRule rule)
             {
                 var path = prefix.Append(rule.PropertyName);
-                return new ProjectedField(
+                return new ClientRuleField(
                     rule.PropertyName,
                     path,
                     ClientValidationFieldReference.Of(path, Shape.FromClrType(rule.TypeToValidate)));

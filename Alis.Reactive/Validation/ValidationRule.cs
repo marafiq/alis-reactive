@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// A single validation rule projected for browser execution.
+    /// A single validation rule for browser execution.
     /// </summary>
     public sealed class ValidationRule
     {
@@ -271,20 +271,20 @@ namespace Alis.Reactive.Validation
         internal static ValidationRangeBounds Between(object lowerBound, object upperBound, Shape shape) =>
             new ValidationRangeBounds(lowerBound, upperBound, shape);
 
-        internal static ValidationRangeBounds FromProjection<TValue>(TValue lowerBound, TValue upperBound)
+        internal static ValidationRangeBounds FromClientLiteral<TValue>(TValue lowerBound, TValue upperBound)
         {
             if (lowerBound == null) throw new System.ArgumentNullException(nameof(lowerBound));
             if (upperBound == null) throw new System.ArgumentNullException(nameof(upperBound));
-            if (TryFromProjection(lowerBound, upperBound, out var bounds)) return bounds;
+            if (TryFromClientLiteral(lowerBound, upperBound, out var bounds)) return bounds;
 
-            var lowerShape = ClientValidationProjectionLiteral.From(lowerBound).Shape;
-            var upperShape = ClientValidationProjectionLiteral.From(upperBound).Shape;
+            var lowerShape = ClientValidationLiteral.From(lowerBound).Shape;
+            var upperShape = ClientValidationLiteral.From(upperBound).Shape;
             throw new System.ArgumentException(
                 "Client validation range bounds must have the same shape. " +
                 $"Lower bound is '{lowerShape.Kind}', upper bound is '{upperShape.Kind}'.");
         }
 
-        internal static bool TryFromProjection(
+        internal static bool TryFromClientLiteral(
             object? lowerBound,
             object? upperBound,
             [NotNullWhen(true)] out ValidationRangeBounds? bounds)
@@ -292,8 +292,8 @@ namespace Alis.Reactive.Validation
             bounds = null;
             if (lowerBound == null || upperBound == null) return false;
 
-            var lowerLiteral = ClientValidationProjectionLiteral.From(lowerBound);
-            var upperLiteral = ClientValidationProjectionLiteral.From(upperBound);
+            var lowerLiteral = ClientValidationLiteral.From(lowerBound);
+            var upperLiteral = ClientValidationLiteral.From(upperBound);
             if (!lowerLiteral.Shape.Equals(upperLiteral.Shape)) return false;
             if (lowerLiteral.Value == null || upperLiteral.Value == null) return false;
 

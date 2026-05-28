@@ -19,7 +19,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
             // Claim 3: Cross-property comparison — peer field must be "Address.City"
             RuleFor(x => x.ConfirmCity).Equal(x => x.City)
                 .WithMessage("Confirm city must match city.")
-                .ProjectToClient(rule => rule.EqualTo(x => x.City));
+                .ClientRule(rule => rule.EqualTo(x => x.City));
         }
     }
 

@@ -10,7 +10,7 @@ namespace Alis.Reactive.FluentValidator
 {
     public static class ClientValidationRuleExtensions
     {
-        public static IRuleBuilderOptions<TModel, TProperty> ProjectToClient<TModel, TProperty>(
+        public static IRuleBuilderOptions<TModel, TProperty> ClientRule<TModel, TProperty>(
             this IRuleBuilderOptions<TModel, TProperty> ruleBuilder,
             Func<ClientValidationRuleWriter<TModel, TProperty>, ClientValidationRule> writeRule)
         {
@@ -18,7 +18,7 @@ namespace Alis.Reactive.FluentValidator
             if (writeRule == null) throw new ArgumentNullException(nameof(writeRule));
 
             var clientRule = writeRule(new ClientValidationRuleWriter<TModel, TProperty>());
-            if (clientRule == null) throw new ArgumentException("A client validation rule projection is required.", nameof(writeRule));
+            if (clientRule == null) throw new ArgumentException("A client validation rule is required.", nameof(writeRule));
 
             return ruleBuilder.Configure(rule =>
             {
@@ -26,14 +26,14 @@ namespace Alis.Reactive.FluentValidator
                 if (component == null)
                 {
                     throw new InvalidOperationException(
-                        "ProjectToClient must be called after a FluentValidation property validator, " +
-                        "for example RuleFor(x => x.Code).Must(...).ProjectToClient(rule => rule.Regex(...)).");
+                        "ClientRule must be called after a FluentValidation property validator, " +
+                        "for example RuleFor(x => x.Code).Must(...).ClientRule(rule => rule.Regex(...)).");
                 }
 
                 if (component.Validator is IAsyncPropertyValidator<TModel, TProperty>)
                     return;
 
-                ClientValidationRuleProjectionCatalog.Register(component, clientRule);
+                ClientValidationRuleBridge.Register(component, clientRule);
             });
         }
     }
@@ -70,7 +70,7 @@ namespace Alis.Reactive.FluentValidator
         public ClientValidationRule Regex(string pattern)
         {
             if (string.IsNullOrEmpty(pattern))
-                throw new ArgumentException("A regex pattern is required for client validation projection.", nameof(pattern));
+                throw new ArgumentException("A regex pattern is required for a client validation rule.", nameof(pattern));
 
             return ClientValidationRule.Literal(ValidationRuleName.Regex, pattern, Shape.None, name => $"'{name}' format is invalid.");
         }
@@ -107,7 +107,7 @@ namespace Alis.Reactive.FluentValidator
             TProperty value,
             Func<string, string> message)
         {
-            var literal = ClientValidationProjectionLiteral.From(value);
+            var literal = ClientValidationLiteral.From(value);
             return ClientValidationRule.Literal(rule, literal.Value, literal.Shape, message);
         }
 
@@ -117,7 +117,7 @@ namespace Alis.Reactive.FluentValidator
             TProperty upperBound,
             Func<string, string> message)
         {
-            var bounds = ValidationRangeBounds.FromProjection(lowerBound, upperBound);
+            var bounds = ValidationRangeBounds.FromClientLiteral(lowerBound, upperBound);
             return new ClientValidationRule(
                 rule,
                 message,
@@ -202,7 +202,7 @@ namespace Alis.Reactive.FluentValidator
         }
     }
 
-    internal static class ClientValidationRuleProjectionCatalog
+    internal static class ClientValidationRuleBridge
     {
         private static readonly ConditionalWeakTable<IRuleComponent, ClientValidationRule> Rules =
             new ConditionalWeakTable<IRuleComponent, ClientValidationRule>();

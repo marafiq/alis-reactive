@@ -7,7 +7,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// Builds typed field conditions for client validation projection.
+    /// Builds typed field conditions for client validation rules.
     /// </summary>
     public sealed class ClientValidationConditionBuilder<TModel>
         where TModel : class
@@ -118,7 +118,7 @@ namespace Alis.Reactive.Validation
 
         public ClientValidationCondition<TModel> ArrayContains<TItem>(TItem item)
         {
-            var literal = ClientValidationProjectionLiteral.From(item);
+            var literal = ClientValidationLiteral.From(item);
             return Build(FieldCondition.Compare(
                 _field.Reference.Path,
                 CompareOperator.ArrayContains,
@@ -137,7 +137,7 @@ namespace Alis.Reactive.Validation
         {
             if (op == null) throw new ArgumentNullException(nameof(op));
 
-            var literal = ClientValidationProjectionLiteral.From(value);
+            var literal = ClientValidationLiteral.From(value);
             return Build(FieldCondition.Compare(_field.Reference.Path, op, literal.Value));
         }
 
@@ -157,7 +157,7 @@ namespace Alis.Reactive.Validation
             if (values == null) throw new ArgumentNullException(nameof(values));
 
             var literals = values
-                .Select(value => ClientValidationProjectionLiteral.From(value).Value)
+                .Select(value => ClientValidationLiteral.From(value).Value)
                 .ToArray();
             return Build(FieldCondition.Compare(
                 _field.Reference.Path,

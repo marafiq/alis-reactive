@@ -13,8 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-// Register FluentValidation as the client validation projection source.
-ReactivePlanConfig.UseClientValidationProjectionSource(
+// Register FluentValidation as the client validation rule source.
+ReactivePlanConfig.UseClientValidationRuleSource(
     new FluentValidationAdapter(type =>
         (FluentValidation.IValidator?)Activator.CreateInstance(type)));
 
