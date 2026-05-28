@@ -105,7 +105,7 @@ function executeSequence(
 ): void | Promise<void> {
   for (const [index, step] of reaction.steps.entries()) {
     const result = executeReactionWith(step, plan, context);
-    if (reactionContinuesAsync(result)) {
+    if (crossedAsyncBoundary(result)) {
       const remaining = reaction.steps.slice(index + 1);
       return result.then(() => executeRemainingSequence(remaining, plan, context));
     }
@@ -119,7 +119,7 @@ async function executeRemainingSequence(
 ): Promise<void> {
   for (const step of steps) {
     const result = executeReactionWith(step, plan, context);
-    if (reactionContinuesAsync(result)) await result;
+    if (crossedAsyncBoundary(result)) await result;
   }
 }
 
@@ -137,7 +137,7 @@ async function executeParallel(
   context: ExecutionContext,
 ): Promise<void> {
   const settledSteps = await Promise.allSettled(
-    reaction.steps.map(step => reactionAsPromise(executeReactionWith(step, plan, context))),
+    reaction.steps.map(step => reactionCompletion(executeReactionWith(step, plan, context))),
   );
   reportParallelStepFailures(settledSteps);
 
@@ -146,7 +146,7 @@ async function executeParallel(
       return;
 
     case "on-settled":
-      await waitForReaction(executeReactionWith(reaction.completion.reaction, plan, context));
+      await waitForAsyncBoundary(executeReactionWith(reaction.completion.reaction, plan, context));
       return;
 
     default:
@@ -278,19 +278,19 @@ export function catchAsyncReactionFailure(
   result: void | Promise<void>,
   onRejected: (error: unknown) => void,
 ): void {
-  if (reactionContinuesAsync(result)) result.catch(onRejected);
+  if (crossedAsyncBoundary(result)) result.catch(onRejected);
 }
 
-function reactionContinuesAsync(result: void | Promise<void>): result is Promise<void> {
+function crossedAsyncBoundary(result: void | Promise<void>): result is Promise<void> {
   return result instanceof Promise;
 }
 
-function reactionAsPromise(result: void | Promise<void>): Promise<void> {
-  return reactionContinuesAsync(result) ? result : Promise.resolve();
+function reactionCompletion(result: void | Promise<void>): Promise<void> {
+  return crossedAsyncBoundary(result) ? result : Promise.resolve();
 }
 
-async function waitForReaction(result: void | Promise<void>): Promise<void> {
-  if (reactionContinuesAsync(result)) await result;
+async function waitForAsyncBoundary(result: void | Promise<void>): Promise<void> {
+  if (crossedAsyncBoundary(result)) await result;
 }
 
 function dispatchPayload(reaction: DispatchReaction, plan: PlanDocument, context: ExecutionContext): unknown {
@@ -328,11 +328,11 @@ async function executeAfterAsyncBranchGuard(
   guardMatches: Promise<boolean>,
 ): Promise<void> {
   if (await guardMatches) {
-    await waitForReaction(executeReactionWith(branchCase.reaction, plan, context));
+    await waitForAsyncBoundary(executeReactionWith(branchCase.reaction, plan, context));
     return;
   }
 
-  await waitForReaction(executeBranchFrom(cases, plan, context, index + 1));
+  await waitForAsyncBoundary(executeBranchFrom(cases, plan, context, index + 1));
 }
 
 function branchGuardMatches(
