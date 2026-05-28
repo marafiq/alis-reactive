@@ -1,6 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
 
 using Alis.Reactive.FluentValidator;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 [TestFixture]
@@ -186,6 +187,33 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
         });
     }
 
+    [Test]
+    public void assembly_scan_registers_client_metadata_validators_and_leaves_server_validators_server_only()
+    {
+        AssemblyScanServerOnlyValidator.InstanceCount = 0;
+        var services = new ServiceCollection();
+        services.AddSingleton(new AssemblyScanMessages("Client name is required."));
+        services.AddReactiveFluentValidation(rules =>
+            rules.AddFromAssemblyContaining<AssemblyScanClientValidator>());
+
+        using var provider = services.BuildServiceProvider();
+        using var doc = ClientValidationRulePlanHarness
+            .RenderPlan<AssemblyScanModel, AssemblyScanClientValidator>(provider);
+        var rule = ClientValidationRulePlanHarness
+            .RulesFor(doc.RootElement, nameof(AssemblyScanModel.Name))
+            .Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(rule.GetProperty("name").GetString(), Is.EqualTo("required"));
+            Assert.That(rule.GetProperty("message").GetString(), Is.EqualTo("Client name is required."));
+            Assert.That(AssemblyScanServerOnlyValidator.InstanceCount, Is.Zero);
+        });
+
+        _ = provider.GetRequiredService<IValidator<AssemblyScanServerOnlyModel>>();
+        Assert.That(AssemblyScanServerOnlyValidator.InstanceCount, Is.EqualTo(1));
+    }
+
     private static int ValidationRuleCount(System.Text.Json.JsonElement root)
     {
         return root
@@ -194,5 +222,40 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
             .GetProperty("container")
             .GetProperty("validationRules")
             .GetArrayLength();
+    }
+}
+
+internal sealed class AssemblyScanMessages(string requiredNameMessage)
+{
+    internal string RequiredNameMessage { get; } = requiredNameMessage;
+}
+
+internal sealed class AssemblyScanModel
+{
+    public string? Name { get; set; }
+}
+
+internal sealed class AssemblyScanClientValidator : ReactiveValidator<AssemblyScanModel>
+{
+    public AssemblyScanClientValidator(AssemblyScanMessages messages)
+    {
+        ClientRule(model => model.Name)
+            .Required(messages.RequiredNameMessage);
+    }
+}
+
+internal sealed class AssemblyScanServerOnlyModel
+{
+    public string? ServerOnly { get; set; }
+}
+
+internal sealed class AssemblyScanServerOnlyValidator : AbstractValidator<AssemblyScanServerOnlyModel>
+{
+    internal static int InstanceCount { get; set; }
+
+    public AssemblyScanServerOnlyValidator()
+    {
+        InstanceCount++;
+        RuleFor(model => model.ServerOnly).NotEmpty();
     }
 }

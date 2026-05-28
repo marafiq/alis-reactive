@@ -54,18 +54,19 @@ namespace Alis.Reactive.FluentValidator
             if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 
             foreach (var validatorType in ValidatorTypesIn(assembly))
-                Add(validatorType);
+            {
+                AddValidatorServices(validatorType);
+                if (DeclaresClientMetadata(validatorType))
+                    AddClientMetadataSource(validatorType);
+            }
 
             return this;
         }
 
         private void Add(Type validatorType)
         {
-            _services.AddSingleton(new ReactiveFluentValidationSource(validatorType));
-            _services.AddTransient(validatorType);
-
-            foreach (var serviceType in ValidatorServiceTypes(validatorType))
-                _services.AddTransient(serviceType, validatorType);
+            AddClientMetadataSource(validatorType);
+            AddValidatorServices(validatorType);
         }
 
         private static IEnumerable<Type> ValidatorTypesIn(Assembly assembly) =>
@@ -73,6 +74,22 @@ namespace Alis.Reactive.FluentValidator
                 .Where(type => !type.IsAbstract)
                 .Where(type => !type.IsGenericTypeDefinition)
                 .Where(type => typeof(IValidator).IsAssignableFrom(type));
+
+        private void AddClientMetadataSource(Type validatorType)
+        {
+            _services.AddSingleton(new ReactiveFluentValidationSource(validatorType));
+        }
+
+        private void AddValidatorServices(Type validatorType)
+        {
+            _services.AddTransient(validatorType);
+
+            foreach (var serviceType in ValidatorServiceTypes(validatorType))
+                _services.AddTransient(serviceType, validatorType);
+        }
+
+        private static bool DeclaresClientMetadata(Type validatorType) =>
+            typeof(IClientValidationMetadataSource).IsAssignableFrom(validatorType);
 
         private static IEnumerable<Type> ValidatorServiceTypes(Type validatorType) =>
             validatorType.GetInterfaces()
@@ -84,7 +101,7 @@ namespace Alis.Reactive.FluentValidator
     {
         internal ReactiveFluentValidationSource(Type validatorType)
         {
-            ValidatorType = validatorType ?? throw new ArgumentNullException(nameof(validatorType));
+            ValidatorType = validatorType;
         }
 
         internal Type ValidatorType { get; }
@@ -131,15 +148,7 @@ namespace Alis.Reactive.FluentValidator
             IServiceProvider services,
             Type validationSourceType)
         {
-            var validator = services.GetService(validationSourceType) as IValidator;
-            if (validator == null)
-            {
-                throw new InvalidOperationException(
-                    $"Validation source '{validationSourceType.FullName}' is not registered as a FluentValidation validator. " +
-                    "Register it with services.AddReactiveFluentValidation(rules => rules.Add<TValidator>()) " +
-                    "or rules.AddFromAssemblyContaining<TMarker>().");
-            }
-
+            var validator = services.GetRequiredService(validationSourceType);
             if (validator is IClientValidationMetadataSource metadata)
                 return metadata.GetClientRules();
 
