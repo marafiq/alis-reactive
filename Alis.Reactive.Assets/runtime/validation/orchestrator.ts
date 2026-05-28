@@ -104,7 +104,7 @@ export function validateContainer(plan: PlanDocument, containerKey: string, ctx?
   try {
     container = containerComp.element();
   } catch (e) {
-    if (!isResolutionError(e)) throw e;
+    if (!RuntimeResolutionError.is(e)) throw e;
     if (containerScope.validationRules.length > 0) {
       log.warn("form.missing", { id: containerId });
       return false;
@@ -227,7 +227,7 @@ export function revalidateField(plan: PlanDocument, containerKey: string, compon
   try {
     container = containerComp.element();
   } catch (e) {
-    if (!isResolutionError(e)) throw e;
+    if (!RuntimeResolutionError.is(e)) throw e;
     return;
   }
 
@@ -317,7 +317,7 @@ function resolveFieldElement(
   try {
     return { done: false, element: component.element() };
   } catch (e) {
-    if (!isResolutionError(e)) throw e;
+    if (!RuntimeResolutionError.is(e)) throw e;
     if (allRulesInactiveForUnmountedField(cv.rules, surface)) return { done: true, result: true };
     const message = firstRuleMessage(cv);
     if (message !== undefined) {
@@ -381,11 +381,6 @@ function reportRuleFailure(
   }
 }
 
-/** Only suppress errors from component/element resolution — not contract bugs. */
-function isResolutionError(e: unknown): boolean {
-  return RuntimeResolutionError.is(e);
-}
-
 // -- Helpers --
 
 function allRulesInactiveForUnmountedField(rules: ValidationRule[], surface: ValidationSurface): boolean {
@@ -417,7 +412,7 @@ function isRuleInactiveWhenFieldIsUnmounted(
       try {
         return !evaluateCondition(activation.condition, surface.plan, surface.context.raw);
       } catch (e) {
-        if (isResolutionError(e)) return true;
+        if (RuntimeResolutionError.is(e)) return true;
         throw e;
       }
     default: return assertNever(activation, "validation rule activation");
