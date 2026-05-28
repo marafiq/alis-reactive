@@ -23,9 +23,9 @@ namespace Alis.Reactive.Validation
             IEnumerable<ValidationRule> rules,
             IEnumerable<ClientValidationField>? itemFields = null)
         {
-            _field = field ?? throw new ArgumentNullException(nameof(field));
-            Rules = SnapshotRules(rules);
-            ItemFields = SnapshotItemFields(itemFields ?? Array.Empty<ClientValidationField>());
+            _field = field;
+            Rules = rules.ToArray();
+            ItemFields = (itemFields ?? Enumerable.Empty<ClientValidationField>()).ToArray();
         }
 
         internal ClientValidationFieldReference Reference => _field;
@@ -39,9 +39,6 @@ namespace Alis.Reactive.Validation
 
         internal ClientValidationField PrefixedBy(ValidationFieldPath prefix, ClientRuleActivation activation)
         {
-            if (prefix == null) throw new ArgumentNullException(nameof(prefix));
-            if (activation == null) throw new ArgumentNullException(nameof(activation));
-
             return new ClientValidationField(
                 _field.PrefixedBy(prefix),
                 Rules.Select(rule => rule.PrefixedBy(prefix, activation)),
@@ -50,44 +47,10 @@ namespace Alis.Reactive.Validation
 
         private ClientValidationField ActivatedBy(ClientRuleActivation activation)
         {
-            if (activation == null) throw new ArgumentNullException(nameof(activation));
-
             return new ClientValidationField(
                 _field,
                 Rules.Select(rule => rule.PrefixedBy(ValidationFieldPath.Empty, activation)),
                 ItemFields.Select(field => field.ActivatedBy(activation)));
-        }
-
-        private static IReadOnlyList<ValidationRule> SnapshotRules(IEnumerable<ValidationRule> rules)
-        {
-            if (rules == null) throw new ArgumentNullException(nameof(rules));
-
-            var snapshot = new List<ValidationRule>();
-            foreach (var rule in rules)
-            {
-                if (rule == null)
-                    throw new ArgumentException("Validation rule must not be null.", nameof(rules));
-
-                snapshot.Add(rule);
-            }
-
-            return snapshot.AsReadOnly();
-        }
-
-        private static IReadOnlyList<ClientValidationField> SnapshotItemFields(IEnumerable<ClientValidationField> fields)
-        {
-            if (fields == null) throw new ArgumentNullException(nameof(fields));
-
-            var snapshot = new List<ClientValidationField>();
-            foreach (var field in fields)
-            {
-                if (field == null)
-                    throw new ArgumentException("Client validation item field must not be null.", nameof(fields));
-
-                snapshot.Add(field);
-            }
-
-            return snapshot.AsReadOnly();
         }
     }
 }

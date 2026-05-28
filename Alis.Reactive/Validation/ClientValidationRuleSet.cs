@@ -12,15 +12,12 @@ namespace Alis.Reactive.Validation
 
         internal void EnsureFields(IEnumerable<ClientValidationFieldReference> fields)
         {
-            if (fields == null) throw new ArgumentNullException(nameof(fields));
             foreach (var field in fields)
                 EnsureField(field);
         }
 
         internal void EnsureField(ClientValidationFieldReference field)
         {
-            if (field == null) throw new ArgumentNullException(nameof(field));
-
             if (_fields.TryGetValue(field.Path.Value, out var existing))
             {
                 existing.AssertSameShape(field);
@@ -32,9 +29,6 @@ namespace Alis.Reactive.Validation
 
         internal void AddRule(ClientValidationFieldReference field, ValidationRule rule)
         {
-            if (field == null) throw new ArgumentNullException(nameof(field));
-            if (rule == null) throw new ArgumentNullException(nameof(rule));
-
             EnsureFields(rule.PeerFieldReferences);
             EnsureField(field);
             _fields[field.Path.Value].AddRule(rule);
@@ -54,10 +48,6 @@ namespace Alis.Reactive.Validation
             IEnumerable<ClientValidationField> itemFields,
             ClientRuleActivation activation)
         {
-            if (collection == null) throw new ArgumentNullException(nameof(collection));
-            if (itemFields == null) throw new ArgumentNullException(nameof(itemFields));
-            if (activation == null) throw new ArgumentNullException(nameof(activation));
-
             EnsureField(collection);
             foreach (var itemField in itemFields)
                 _fields[collection.Path.Value].AddItemField(
@@ -69,15 +59,8 @@ namespace Alis.Reactive.Validation
             ValidationFieldPath prefix,
             ClientRuleActivation activation)
         {
-            if (fields == null) throw new ArgumentNullException(nameof(fields));
-            if (prefix == null) throw new ArgumentNullException(nameof(prefix));
-            if (activation == null) throw new ArgumentNullException(nameof(activation));
-
             foreach (var field in fields)
             {
-                if (field == null)
-                    throw new ArgumentException("Client validation field must not be null.", nameof(fields));
-
                 var target = field.PrefixedBy(prefix, activation);
                 EnsureField(target.Reference);
                 foreach (var rule in target.Rules)
@@ -99,13 +82,11 @@ namespace Alis.Reactive.Validation
 
         internal ClientValidationRuleSetField(ClientValidationFieldReference field)
         {
-            _field = field ?? throw new ArgumentNullException(nameof(field));
+            _field = field;
         }
 
         internal void AssertSameShape(ClientValidationFieldReference field)
         {
-            if (field == null) throw new ArgumentNullException(nameof(field));
-
             if (!_field.Shape.Equals(field.Shape))
             {
                 throw new InvalidOperationException(
@@ -116,13 +97,11 @@ namespace Alis.Reactive.Validation
 
         internal void AddRule(ValidationRule rule)
         {
-            if (rule == null) throw new ArgumentNullException(nameof(rule));
             _rules.Add(rule);
         }
 
         internal void AddItemField(ClientValidationField field)
         {
-            if (field == null) throw new ArgumentNullException(nameof(field));
             _itemFields.Add(field);
         }
 
