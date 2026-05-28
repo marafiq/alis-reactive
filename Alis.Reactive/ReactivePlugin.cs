@@ -138,12 +138,12 @@ namespace Alis.Reactive
 
         private void Add(PluginOperation operation)
         {
-            _members.Add(_name, operation);
+            _members.Add(operation);
         }
 
         private void Add<TValue>(PluginProperty<TValue> property)
         {
-            _members.Add(_name, property);
+            _members.Add(property);
         }
     }
 
@@ -152,37 +152,28 @@ namespace Alis.Reactive
         private readonly List<Func<PluginOperationContract>> _operations = new List<Func<PluginOperationContract>>();
         private readonly List<PluginPropertyContract> _properties = new List<PluginPropertyContract>();
 
-        internal void Add(PluginName pluginName, PluginOperation operation)
+        internal void Add(PluginOperation operation)
         {
-            if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
-            if (operation == null) throw new ArgumentNullException(nameof(operation));
             _operations.Add(operation.ToContract);
         }
 
-        internal void Add(PluginName pluginName, PluginOperationContract operation)
+        internal void Add(PluginOperationContract operation)
         {
-            if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
-            if (operation == null) throw new ArgumentNullException(nameof(operation));
             _operations.Add(() => operation);
         }
 
-        internal void Add<TValue>(PluginName pluginName, PluginProperty<TValue> property)
+        internal void Add<TValue>(PluginProperty<TValue> property)
         {
-            if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
-            if (property == null) throw new ArgumentNullException(nameof(property));
             _properties.Add(property.ToContract());
         }
 
-        internal void Add(PluginName pluginName, PluginPropertyContract property)
+        internal void Add(PluginPropertyContract property)
         {
-            if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
-            if (property == null) throw new ArgumentNullException(nameof(property));
             _properties.Add(property);
         }
 
         internal PluginContract ToContract(PluginName pluginName)
         {
-            if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             return PluginContract.Create(
                 pluginName,
                 ToPropertyContracts(),

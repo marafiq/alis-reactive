@@ -27,7 +27,7 @@ namespace Alis.Reactive.Builders
         public PluginTypeBuilder Property<T>(string name)
         {
             EnsureName(name);
-            _members.Add(_pluginName, PluginPropertyContract.Create(
+            _members.Add(PluginPropertyContract.Create(
                 PluginPropertyId.Of(_pluginName, MemberName.Of(name)),
                 Shape.FromClrType(typeof(T))));
             return this;
@@ -227,10 +227,8 @@ namespace Alis.Reactive.Builders
 
         private PluginTypeBuilder AddMethod<TReturn>(PluginOperationId operation, MethodArgumentContract arguments)
         {
-            if (operation == null) throw new System.ArgumentNullException(nameof(operation));
-            if (arguments == null) throw new System.ArgumentNullException(nameof(arguments));
             var returns = Shape.FromClrType(typeof(TReturn));
-            _members.Add(_pluginName, PluginOperationContract.Create(
+            _members.Add(PluginOperationContract.Create(
                 operation,
                 MethodSignature.WithArguments(arguments, returns)));
             return this;
@@ -246,9 +244,7 @@ namespace Alis.Reactive.Builders
 
         private PluginTypeBuilder AddVoid(PluginOperationId operation, MethodArgumentContract arguments)
         {
-            if (operation == null) throw new System.ArgumentNullException(nameof(operation));
-            if (arguments == null) throw new System.ArgumentNullException(nameof(arguments));
-            _members.Add(_pluginName, PluginOperationContract.Create(
+            _members.Add(PluginOperationContract.Create(
                 operation,
                 MethodSignature.WithArguments(arguments, Shape.None)));
             return this;
@@ -270,7 +266,6 @@ namespace Alis.Reactive.Builders
 
         private static MethodArgumentContract ExactArguments(params Shape[] args)
         {
-            if (args == null) throw new System.ArgumentNullException(nameof(args));
             return MethodArgumentContract.Exact(args);
         }
     }
