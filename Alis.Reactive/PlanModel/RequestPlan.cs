@@ -107,13 +107,8 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the chain kind.</summary>
         public abstract string Kind { get; }
 
-        internal abstract RequestChain AttachFollowUp(RequestPlan next);
-
-        internal static RequestChain ContinueWith(RequestPlan next)
-        {
-            if (next == null) throw new System.ArgumentNullException(nameof(next));
-            return new FollowUpRequestChain(next);
-        }
+        internal static RequestChain ContinueWith(RequestPlan next) =>
+            new FollowUpRequestChain(next);
     }
 
     /// <summary>Represents a request with no chained follow-up request.</summary>
@@ -121,9 +116,6 @@ namespace Alis.Reactive.PlanModel
     {
         /// <summary>Gets the kind. Always <c>"terminal"</c>.</summary>
         public override string Kind => "terminal";
-
-        internal override RequestChain AttachFollowUp(RequestPlan next) =>
-            ContinueWith(next);
     }
 
     /// <summary>Represents a request followed by another request after successful completion.</summary>
@@ -133,7 +125,7 @@ namespace Alis.Reactive.PlanModel
 
         internal FollowUpRequestChain(RequestPlan next)
         {
-            _next = next ?? throw new System.ArgumentNullException(nameof(next));
+            _next = next;
         }
 
         /// <summary>Gets the kind. Always <c>"follow-up"</c>.</summary>
@@ -141,13 +133,6 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>Gets the request to run after the current request succeeds.</summary>
         public RequestPlan Next => _next;
-
-        internal override RequestChain AttachFollowUp(RequestPlan next)
-        {
-            throw new System.InvalidOperationException(
-                "A response can declare only one chained request. " +
-                "To continue the sequence, attach the next Chained request to the existing follow-up request.");
-        }
     }
 
     /// <summary>Base class for request validation targets. Not constructed in application code.</summary>

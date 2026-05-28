@@ -8,34 +8,39 @@ namespace Alis.Reactive.Builders.Requests
     {
         private readonly List<ResponseRoute> _successRoutes = new List<ResponseRoute>();
         private readonly List<ResponseRoute> _errorRoutes = new List<ResponseRoute>();
-        private RequestChain _chain = RequestChain.Terminal;
+        private RequestPlan? _followUpRequest;
 
         internal IReadOnlyList<ResponseRoute> SuccessRoutes => _successRoutes;
         internal IReadOnlyList<ResponseRoute> ErrorRoutes => _errorRoutes;
-        internal RequestChain Chain => _chain;
+        internal RequestChain Chain =>
+            _followUpRequest is null
+                ? RequestChain.Terminal
+                : RequestChain.ContinueWith(_followUpRequest);
 
         internal void AddSuccessRoute(ReactionGraph reaction)
         {
-            if (reaction == null) throw new ArgumentNullException(nameof(reaction));
             _successRoutes.Add(ResponseRoute.AnyStatus(reaction));
         }
 
         internal void AddErrorRoute(ReactionGraph reaction)
         {
-            if (reaction == null) throw new ArgumentNullException(nameof(reaction));
             _errorRoutes.Add(ResponseRoute.AnyStatus(reaction));
         }
 
         internal void AddErrorRoute(int statusCode, ReactionGraph reaction)
         {
-            if (reaction == null) throw new ArgumentNullException(nameof(reaction));
             _errorRoutes.Add(ResponseRoute.ForStatus(reaction, statusCode));
         }
 
         internal void ContinueWith(RequestPlan request)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            _chain = _chain.AttachFollowUp(request);
+            var responseAlreadyHasFollowUpRequest = _followUpRequest is not null;
+            if (responseAlreadyHasFollowUpRequest)
+                throw new InvalidOperationException(
+                    "A response can declare only one chained request. " +
+                    "To continue the sequence, attach the next Chained request to the existing follow-up request.");
+
+            _followUpRequest = request;
         }
     }
 }
