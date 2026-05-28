@@ -93,14 +93,6 @@ namespace Alis.Reactive.PlanModel
                 ? itemShape
                 : None;
 
-        internal static Shape FromUnknownClrType(Type? type)
-        {
-            if (type == null)
-                return Any;
-
-            return FromClrType(type);
-        }
-
         internal static Shape FromValue(object? value) =>
             value == null ? None : FromClrType(value.GetType());
 
@@ -224,8 +216,6 @@ namespace Alis.Reactive.PlanModel
         public string Kind { get; }
 
         internal bool IsNone => Kind == "none";
-        internal bool IsAny => Kind == "any";
-
         internal bool TryGetArrayItemShape(out Shape itemShape) =>
             _structure.TryGetArrayItemShape(out itemShape);
 

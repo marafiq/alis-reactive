@@ -296,15 +296,6 @@ namespace Alis.Reactive.PlanModel
         internal static MemberAccess ReadWrite => Known["readwrite"];
         internal static IReadOnlyCollection<string> Values => Known.Keys;
 
-        internal static MemberAccess From(string value)
-        {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            if (Known.TryGetValue(value, out var access)) return access;
-            throw new ArgumentException(
-                "Unknown member access '" + value + "'. Expected read, write, or readwrite.",
-                nameof(value));
-        }
-
         internal MemberAccess Widen(MemberAccess incoming)
         {
             if (incoming == null) throw new ArgumentNullException(nameof(incoming));
@@ -337,14 +328,6 @@ namespace Alis.Reactive.PlanModel
         internal static HttpMethodName Delete => Known["DELETE"];
         internal static IReadOnlyCollection<string> Values => Known.Keys;
 
-        internal static HttpMethodName From(string value)
-        {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            if (Known.TryGetValue(value, out var method)) return method;
-            throw new ArgumentException(
-                "Unknown HTTP method '" + value + "'. Expected GET, POST, PUT, or DELETE.",
-                nameof(value));
-        }
     }
 
     internal sealed class RequestBodyFormat : PlanString
@@ -362,14 +345,6 @@ namespace Alis.Reactive.PlanModel
         internal static RequestBodyFormat FormData => Known["form-data"];
         internal static IReadOnlyCollection<string> Values => Known.Keys;
 
-        internal static RequestBodyFormat From(string value)
-        {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            if (Known.TryGetValue(value, out var bodyFormat)) return bodyFormat;
-            throw new ArgumentException(
-                "Unknown request body format '" + value + "'. Expected json or form-data.",
-                nameof(value));
-        }
     }
 
     internal sealed class HttpResponseStatusCode
