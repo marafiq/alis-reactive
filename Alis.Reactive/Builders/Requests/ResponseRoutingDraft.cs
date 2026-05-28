@@ -17,6 +17,12 @@ namespace Alis.Reactive.Builders.Requests
                 ? RequestChain.Terminal
                 : RequestChain.ContinueWith(_followUpRequest);
 
+        internal ResponseRouting BuildRouting() =>
+            ResponseRouting.From(
+                _successRoutes,
+                _errorRoutes,
+                Chain);
+
         internal void AddSuccessRoute(ReactionGraph reaction)
         {
             _successRoutes.Add(ResponseRoute.AnyStatus(reaction));

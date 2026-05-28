@@ -93,11 +93,8 @@ namespace Alis.Reactive.Native.Components
             return RequestPlan.Create(
                 RequestEndpoint.To(HttpMethodName.From(request.Method), RequestUrl.Of(string.Empty)),
                 BuildActionLinkInput(request.Input),
-                request.WhileLoading,
-                request.Success,
-                request.Error,
-                Array.Empty<ReactionGraph>(),
-                RequestChain.Terminal,
+                RequestReactions.From(request.WhileLoading, Array.Empty<ReactionGraph>()),
+                ResponseRouting.From(request.Success, request.Error, RequestChain.Terminal),
                 RequestValidationTarget.None);
         }
 

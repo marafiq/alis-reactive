@@ -9,11 +9,8 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly RequestEndpoint _endpoint;
         private readonly RequestInput _input;
-        private readonly IReadOnlyList<ReactionGraph> _whileLoading;
-        private readonly IReadOnlyList<ResponseRoute> _success;
-        private readonly IReadOnlyList<ResponseRoute> _error;
-        private readonly IReadOnlyList<ReactionGraph> _finally;
-        private readonly RequestChain _chain;
+        private readonly RequestReactions _reactions;
+        private readonly ResponseRouting _responseRouting;
         private readonly RequestValidationTarget _validationTarget;
 
         /// <summary>Gets the HTTP method (GET, POST, PUT, DELETE).</summary>
@@ -25,61 +22,94 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the request body strategy. Bodiless requests use <see cref="NoRequestInput"/>.</summary>
         public RequestInput Input => _input;
         /// <summary>Gets reactions to execute while the request is loading.</summary>
-        public IReadOnlyList<ReactionGraph> WhileLoading => _whileLoading;
+        public IReadOnlyList<ReactionGraph> WhileLoading => _reactions.WhileLoading;
         /// <summary>Gets the success response routes.</summary>
-        public IReadOnlyList<ResponseRoute> Success => _success;
+        public IReadOnlyList<ResponseRoute> Success => _responseRouting.Success;
         /// <summary>Gets the error response routes.</summary>
-        public IReadOnlyList<ResponseRoute> Error => _error;
+        public IReadOnlyList<ResponseRoute> Error => _responseRouting.Error;
         /// <summary>Gets reactions to execute after the request settles regardless of outcome.</summary>
-        public IReadOnlyList<ReactionGraph> Finally => _finally;
+        public IReadOnlyList<ReactionGraph> Finally => _reactions.Finally;
         /// <summary>Gets the request chain: terminal or followed by another request.</summary>
-        public RequestChain Chain => _chain;
+        public RequestChain Chain => _responseRouting.Chain;
         private RequestPlan(
             RequestEndpoint endpoint,
             RequestInput input,
-            IReadOnlyList<ReactionGraph> whileLoading,
-            IReadOnlyList<ResponseRoute> success,
-            IReadOnlyList<ResponseRoute> error,
-            IReadOnlyList<ReactionGraph> finallyReactions,
-            RequestChain chain,
+            RequestReactions reactions,
+            ResponseRouting responseRouting,
             RequestValidationTarget validationTarget)
         {
             _endpoint = endpoint;
             _input = input;
-            _whileLoading = Snapshot(whileLoading);
-            _success = Snapshot(success);
-            _error = Snapshot(error);
-            _finally = Snapshot(finallyReactions);
-            _chain = chain;
+            _reactions = reactions;
+            _responseRouting = responseRouting;
             _validationTarget = validationTarget;
         }
 
         internal static RequestPlan Create(
             RequestEndpoint endpoint,
             RequestInput input,
-            IReadOnlyList<ReactionGraph> whileLoading,
-            IReadOnlyList<ResponseRoute> success,
-            IReadOnlyList<ResponseRoute> error,
-            IReadOnlyList<ReactionGraph> finallyReactions,
-            RequestChain chain,
+            RequestReactions reactions,
+            ResponseRouting responseRouting,
             RequestValidationTarget validationTarget) =>
             new RequestPlan(
                 endpoint,
                 input,
-                whileLoading,
-                success,
-                error,
-                finallyReactions,
-                chain,
+                reactions,
+                responseRouting,
                 validationTarget);
 
-        private static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items)
+    }
+
+    internal sealed class RequestReactions
+    {
+        private RequestReactions(
+            IReadOnlyList<ReactionGraph> whileLoading,
+            IReadOnlyList<ReactionGraph> finallyReactions)
+        {
+            WhileLoading = OrderedPlanItems.Snapshot(whileLoading);
+            Finally = OrderedPlanItems.Snapshot(finallyReactions);
+        }
+
+        internal IReadOnlyList<ReactionGraph> WhileLoading { get; }
+        internal IReadOnlyList<ReactionGraph> Finally { get; }
+
+        internal static RequestReactions From(
+            IReadOnlyList<ReactionGraph> whileLoading,
+            IReadOnlyList<ReactionGraph> finallyReactions) =>
+            new RequestReactions(whileLoading, finallyReactions);
+    }
+
+    internal sealed class ResponseRouting
+    {
+        private ResponseRouting(
+            IReadOnlyList<ResponseRoute> success,
+            IReadOnlyList<ResponseRoute> error,
+            RequestChain chain)
+        {
+            Success = OrderedPlanItems.Snapshot(success);
+            Error = OrderedPlanItems.Snapshot(error);
+            Chain = chain;
+        }
+
+        internal IReadOnlyList<ResponseRoute> Success { get; }
+        internal IReadOnlyList<ResponseRoute> Error { get; }
+        internal RequestChain Chain { get; }
+
+        internal static ResponseRouting From(
+            IReadOnlyList<ResponseRoute> success,
+            IReadOnlyList<ResponseRoute> error,
+            RequestChain chain) =>
+            new ResponseRouting(success, error, chain);
+    }
+
+    internal static class OrderedPlanItems
+    {
+        internal static IReadOnlyList<T> Snapshot<T>(IReadOnlyList<T> items)
         {
             var hasNoItems = items.Count == 0;
             if (hasNoItems) return System.Array.Empty<T>();
             return new List<T>(items);
         }
-
     }
 
     internal sealed class RequestEndpoint

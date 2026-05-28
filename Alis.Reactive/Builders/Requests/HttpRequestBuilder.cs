@@ -130,11 +130,8 @@ namespace Alis.Reactive.Builders.Requests
             var request = RequestPlan.Create(
                 endpoint,
                 input,
-                _whileLoading,
-                _response.Draft.SuccessRoutes,
-                _response.Draft.ErrorRoutes,
-                _finally,
-                _response.Draft.Chain,
+                RequestReactions.From(_whileLoading, _finally),
+                _response.Draft.BuildRouting(),
                 validation.HasValue
                     ? validation.Value.Target
                     : RequestValidationTarget.None);
