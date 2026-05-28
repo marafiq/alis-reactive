@@ -3,6 +3,7 @@ import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from
 import type { ComponentObject, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueExpression } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
+const booleanShape: Shape = { kind: "boolean" };
 
 afterEach(() => {
   resetBootStateForTests();
@@ -53,6 +54,45 @@ describe("fusion component event lifecycle", () => {
 
     expect(textFor("status")).toBe("");
   });
+
+  it("mutates callback args synchronously before the vendor event returns", () => {
+    document.body.innerHTML = `<div id="fusion-source"></div>`;
+    const fusionRoot = new FakeFusionRoot();
+    const fusionElement = elementById("fusion-source") as FusionHostElement;
+    fusionElement.ej2_instances = [fusionRoot];
+
+    boot({
+      version: 3,
+      planId: "Resident.SyncCallbackMutation",
+      scope: { kind: "root" },
+      types: {
+        "fusion.fake": fusionEventType({
+          beginEdit: {
+            channel: "beginEdit",
+            payloadType: { kind: "untyped" },
+          },
+        }),
+      },
+      components: {
+        source: fusionComponent("fusion-source"),
+      },
+      behaviors: [
+        {
+          startsWhen: {
+            kind: "component-event",
+            component: "source",
+            event: "beginEdit",
+          },
+          reaction: setEventCancel(),
+        },
+      ],
+    });
+
+    const args = { cancel: false };
+    fusionRoot.emit("beginEdit", args);
+
+    expect(args.cancel).toBe(true);
+  });
 });
 
 interface FusionHostElement extends HTMLElement {
@@ -70,8 +110,8 @@ class FakeFusionRoot {
     this.handlers.get(channel)?.delete(handler);
   }
 
-  emit(channel: string): void {
-    for (const handler of this.handlersFor(channel)) handler({});
+  emit(channel: string, args: unknown = {}): void {
+    for (const handler of this.handlersFor(channel)) handler(args);
   }
 
   private handlersFor(channel: string): Set<(args: unknown) => void> {
@@ -124,16 +164,16 @@ function nativeTextType(): BrowserObjectContract {
   };
 }
 
-function fusionEventType(): BrowserObjectContract {
+function fusionEventType(events: BrowserObjectContract["events"] = {
+  changed: {
+    channel: "change",
+    payloadType: { kind: "untyped" },
+  },
+}): BrowserObjectContract {
   return {
     properties: {},
     methods: {},
-    events: {
-      changed: {
-        channel: "change",
-        payloadType: { kind: "untyped" },
-      },
-    },
+    events,
   };
 }
 
@@ -165,6 +205,15 @@ function setText(component: string, value: string): ReactionGraph {
     on: { kind: "component", component },
     property: "textContent",
     value: literal(value),
+  };
+}
+
+function setEventCancel(): ReactionGraph {
+  return {
+    kind: "set",
+    on: { kind: "payload", scope: "event", type: { kind: "untyped" } },
+    property: "cancel",
+    value: { kind: "literal", value: true, shape: booleanShape },
   };
 }
 
