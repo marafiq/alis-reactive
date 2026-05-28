@@ -5,12 +5,12 @@ using Alis.Reactive.Fusion.Components;
 using Alis.Reactive.Native.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Alis.Reactive.PlaywrightTests.HttpPipeline.Projection;
+namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RequestInput;
 
 [TestFixture]
 public sealed class WhenGatherDslBuildsRequestInput
 {
-    private static readonly IHtmlHelper<GatherProjectionModel> Html = null!;
+    private static readonly IHtmlHelper<GatherRequestInputModel> Html = null!;
 
     [Test]
     public void assignments_keep_the_authored_source_to_target_order()
@@ -19,7 +19,7 @@ public sealed class WhenGatherDslBuildsRequestInput
         plan.RegisterPlugin("metrics", plugin => plugin.Method<int, string>("count"));
 
         HtmlExtensions.On(Html, plan, trigger =>
-            trigger.CustomEvent<GatherProjectionEvent>("save", (args, pipeline) =>
+            trigger.CustomEvent<GatherRequestInputEvent>("save", (args, pipeline) =>
             {
                 TypedPluginSource<int> count =
                     pipeline.Plugin<int>("metrics", "count")
@@ -79,7 +79,7 @@ public sealed class WhenGatherDslBuildsRequestInput
     }
 
     [Test]
-    public void component_method_sources_are_projected_as_method_value_reads()
+    public void component_method_sources_become_method_value_reads()
     {
         var plan = PlanExtensions.ReactivePlan(Html);
 
@@ -124,7 +124,7 @@ public sealed class WhenGatherDslBuildsRequestInput
             {
                 pipeline.Get("/residents/{residentId}")
                     .Gather(gather => gather.RouteParam("residentId", 42))
-                    .Response(response => response.OnSuccess<GatherProjectionResidentResponse>((json, success) =>
+                    .Response(response => response.OnSuccess<GatherRequestInputResidentResponse>((json, success) =>
                     {
                         success.Get("/facilities/{facilityId}/residents/{residentId}")
                             .Gather(gather => gather
@@ -163,20 +163,20 @@ public sealed class WhenGatherDslBuildsRequestInput
     }
 
     [Test]
-    public void typed_plugin_descriptors_project_to_the_shared_browser_object_contract()
+    public void typed_plugin_members_use_the_shared_browser_object_contract()
     {
         var plan = PlanExtensions.ReactivePlan(Html);
-        var plugin = plan.RegisterPlugin<GatherProjectionPlugin>();
+        var plugin = plan.RegisterPlugin<GatherRequestInputPlugin>();
 
         HtmlExtensions.On(Html, plan, trigger =>
-            trigger.CustomEvent<GatherProjectionEvent>("plugin", (args, pipeline) =>
+            trigger.CustomEvent<GatherRequestInputEvent>("plugin", (args, pipeline) =>
             {
                 TypedPluginSource<string> slug =
                     pipeline.Plugin(plugin.Slugify)
                         .Arg(args, x => x.Filter);
                 var token = pipeline.Plugin(plugin.Token);
 
-                pipeline.DispatchWith<GatherProjectionPluginPayload>("plugin-projected", payload => payload
+                pipeline.DispatchWith<GatherRequestInputPluginPayload>("plugin-request-input", payload => payload
                     .Set(x => x.Slug, slug)
                     .Set(x => x.Token, token));
 
@@ -188,7 +188,7 @@ public sealed class WhenGatherDslBuildsRequestInput
         using var doc = JsonDocument.Parse(plan.RenderFormatted());
         var pluginType = doc.RootElement
             .GetProperty("types")
-            .GetProperty("plugin.gatherProjection");
+            .GetProperty("plugin.gatherRequestInput");
         var dispatchSourceKinds = AllValueSources(doc.RootElement)
             .Select(SourceKindFor)
             .Where(x => x == "plugin")
@@ -307,31 +307,31 @@ public sealed class WhenGatherDslBuildsRequestInput
         }
     }
 
-    private sealed class GatherProjectionModel
+    private sealed class GatherRequestInputModel
     {
     }
 
-    private sealed class GatherProjectionEvent
+    private sealed class GatherRequestInputEvent
     {
         public int ResidentId { get; set; }
         public string Filter { get; set; } = "";
     }
 
-    private sealed class GatherProjectionResidentResponse
+    private sealed class GatherRequestInputResidentResponse
     {
         public int ResidentId { get; set; }
     }
 
-    private sealed class GatherProjectionPluginPayload
+    private sealed class GatherRequestInputPluginPayload
     {
         public string Slug { get; set; } = "";
         public string Token { get; set; } = "";
     }
 
-    private sealed class GatherProjectionPlugin : ReactivePlugin
+    private sealed class GatherRequestInputPlugin : ReactivePlugin
     {
-        public GatherProjectionPlugin()
-            : base("gatherProjection")
+        public GatherRequestInputPlugin()
+            : base("gatherRequestInput")
         {
             Token = Property<string>("token");
             Slugify = Function<string, string>("slugify");
