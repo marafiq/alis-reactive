@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Alis.Reactive.FluentValidator;
+using Alis.Reactive.FluentValidator.Validators;
 using Alis.Reactive.Native.Extensions;
 using Alis.Reactive.Validation;
 using FluentValidation;
@@ -123,6 +124,7 @@ internal static class ClientValidationRulePlanHarness
         private static readonly Type[] FluentValidatorTypes =
         [
             typeof(AsyncOnlyValidator),
+            typeof(BuiltInClientRulesValidator),
             typeof(ConfirmEmailValidator),
             typeof(ReactiveAssessmentValidator),
             typeof(ComposedAssessmentValidator),
@@ -132,6 +134,7 @@ internal static class ClientValidationRulePlanHarness
         private static IValidator? CreateValidator(Type type)
         {
             if (type == typeof(AsyncOnlyValidator)) return new AsyncOnlyValidator();
+            if (type == typeof(BuiltInClientRulesValidator)) return new BuiltInClientRulesValidator();
             if (type == typeof(ConfirmEmailValidator)) return new ConfirmEmailValidator();
             if (type == typeof(ReactiveAssessmentValidator)) return new ReactiveAssessmentValidator();
             if (type == typeof(ComposedAssessmentValidator)) return new ComposedAssessmentValidator();
@@ -173,6 +176,45 @@ internal sealed class AsyncOnlyValidator : AbstractValidator<AsyncOnlyModel>
 internal sealed class AsyncOnlyModel
 {
     public string? Code { get; set; }
+}
+
+internal sealed class BuiltInClientRulesValidator : AbstractValidator<BuiltInClientRulesModel>
+{
+    public BuiltInClientRulesValidator()
+    {
+        RuleFor(model => model.Name)
+            .NotEmpty()
+            .Length(2, 10)
+            .Matches("^[A-Z]+$");
+
+        RuleFor(model => model.Email)
+            .EmailAddress();
+
+        RuleFor(model => model.Card)
+            .CreditCard();
+
+        RuleFor(model => model.EmptyCode)
+            .IsEmpty();
+
+        RuleFor(model => model.Score)
+            .InclusiveBetween(1, 5)
+            .IsExclusiveBetween(0, 10)
+            .GreaterThanOrEqualTo(2)
+            .LessThanOrEqualTo(8)
+            .GreaterThan(1)
+            .LessThan(9)
+            .Equal(5)
+            .NotEqual(3);
+    }
+}
+
+internal sealed class BuiltInClientRulesModel
+{
+    public string? Name { get; set; }
+    public string? Email { get; set; }
+    public string? Card { get; set; }
+    public string? EmptyCode { get; set; }
+    public int Score { get; set; }
 }
 
 internal sealed class ConfirmEmailValidator : AbstractValidator<ConfirmEmailModel>

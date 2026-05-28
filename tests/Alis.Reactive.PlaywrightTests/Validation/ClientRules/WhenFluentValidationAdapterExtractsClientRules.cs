@@ -4,6 +4,37 @@ namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
 public sealed class WhenFluentValidationAdapterExtractsClientRules
 {
     [Test]
+    public void built_in_fluentvalidation_rules_extract_as_client_rules()
+    {
+        using var doc = ClientValidationRulePlanHarness
+            .RenderPlan<BuiltInClientRulesModel, BuiltInClientRulesValidator>();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                ClientValidationRulePlanHarness.RuleNames(
+                    ClientValidationRulePlanHarness.RulesFor(doc.RootElement, nameof(BuiltInClientRulesModel.Name))),
+                Is.EqualTo(new[] { "required", "minLength", "maxLength", "regex" }));
+            Assert.That(
+                ClientValidationRulePlanHarness.RuleNames(
+                    ClientValidationRulePlanHarness.RulesFor(doc.RootElement, nameof(BuiltInClientRulesModel.Email))),
+                Is.EqualTo(new[] { "email" }));
+            Assert.That(
+                ClientValidationRulePlanHarness.RuleNames(
+                    ClientValidationRulePlanHarness.RulesFor(doc.RootElement, nameof(BuiltInClientRulesModel.Card))),
+                Is.EqualTo(new[] { "creditCard" }));
+            Assert.That(
+                ClientValidationRulePlanHarness.RuleNames(
+                    ClientValidationRulePlanHarness.RulesFor(doc.RootElement, nameof(BuiltInClientRulesModel.EmptyCode))),
+                Is.EqualTo(new[] { "empty" }));
+            Assert.That(
+                ClientValidationRulePlanHarness.RuleNames(
+                    ClientValidationRulePlanHarness.RulesFor(doc.RootElement, nameof(BuiltInClientRulesModel.Score))),
+                Is.EqualTo(new[] { "range", "exclusiveRange", "min", "max", "gt", "lt", "equalTo", "notEqual" }));
+        });
+    }
+
+    [Test]
     public void async_rules_are_server_only_even_when_a_client_rule_is_declared()
     {
         using var doc = ClientValidationRulePlanHarness
