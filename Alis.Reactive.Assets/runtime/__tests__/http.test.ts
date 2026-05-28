@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { executeRequest } from "../execution/http";
 import type {
   ComponentObject,
+  ConditionGraph,
   RequestInputAssignment,
   RequestPayloadTarget,
   BrowserObjectContract,
@@ -16,6 +17,7 @@ import type {
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
+const noneShape: Shape = { kind: "none" };
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -85,6 +87,17 @@ function setText(component: string, value: ValueExpression): ReactionGraph {
     on: { kind: "component", component },
     property: "textContent",
     value,
+  };
+}
+
+function responseFieldEquals(member: string, value: string): ConditionGraph {
+  return {
+    kind: "compare",
+    left: payloadRead("success", member),
+    op: "eq",
+    right: { kind: "value", value: literal(value) },
+    shape: stringShape,
+    itemShape: noneShape,
   };
 }
 
@@ -293,6 +306,58 @@ describe("executeRequest HTTP lifecycle", () => {
 
     const [secondUrl] = fetchMock.mock.calls[1] as [string, RequestInit];
     expect(secondUrl).toBe("/facilities/3/residents/42");
+  });
+
+  it("lets success routes read a response before a chained request gathers from that response", async () => {
+    document.body.innerHTML = `
+      <span id="tier"></span>
+      <span id="facility"></span>
+    `;
+    const fetchMock = mockFetch([
+      responseJson({ tier: "premium", facilityId: "7" }),
+      responseJson({ name: "Memory Wing" }),
+    ]);
+    const loadFacility = request({
+      method: "GET",
+      url: "/facilities/{facilityId}",
+      input: requestInput([
+        routeParamAssignment("facilityId", payloadRead("success", "facilityId")),
+      ]),
+      success: [
+        { match: { kind: "any" }, reaction: setText("facility", payloadRead("success", "name")) },
+      ],
+    });
+    const loadResident = request({
+      method: "GET",
+      url: "/residents/{residentId}",
+      input: requestInput([
+        routeParamAssignment("residentId", literal("42")),
+      ]),
+      success: [
+        {
+          match: { kind: "any" },
+          reaction: {
+            kind: "branch",
+            cases: [
+              {
+                guard: { kind: "when", condition: responseFieldEquals("tier", "premium") },
+                reaction: setText("tier", payloadRead("success", "tier")),
+              },
+            ],
+          },
+        },
+      ],
+      chain: { kind: "follow-up", next: loadFacility },
+    });
+
+    await executeRequest(loadResident, nativeTextPlan(["tier", "facility"]));
+
+    expect(document.getElementById("tier")?.textContent).toBe("premium");
+    expect(document.getElementById("facility")?.textContent).toBe("Memory Wing");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    const [secondUrl] = fetchMock.mock.calls[1] as [string, RequestInit];
+    expect(secondUrl).toBe("/facilities/7");
   });
 
   it("routes error responses, still completes, and does not run the follow-up request", async () => {
