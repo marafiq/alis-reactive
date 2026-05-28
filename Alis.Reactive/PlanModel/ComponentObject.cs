@@ -115,9 +115,6 @@ namespace Alis.Reactive.PlanModel
 
         public abstract string Kind { get; }
 
-        internal static InputBinding RegisteredInput(string bindingPath, string valueMember) =>
-            RegisteredInput(BindingPath.Of(bindingPath), MemberName.Of(valueMember));
-
         internal static InputBinding RegisteredInput(BindingPath bindingPath, MemberName valueMember) =>
             new RegisteredInputBinding(
                 bindingPath,
@@ -183,9 +180,6 @@ namespace Alis.Reactive.PlanModel
 
         internal static InputValueContract ForCanonicalValue(Shape shape) =>
             For(CanonicalValueMember, shape);
-
-        internal InputBinding BindingFor(string bindingPath) =>
-            BindingFor(BindingPath.Of(bindingPath));
 
         internal InputBinding BindingFor(BindingPath bindingPath) =>
             InputBinding.RegisteredInput(bindingPath, _valueMember);
