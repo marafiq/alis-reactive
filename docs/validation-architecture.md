@@ -57,6 +57,11 @@ Both paths key rules by the validation source type named by
 typed expressions and `ClientValidationFieldToken<TModel, TValue>`, not field
 name strings.
 
+FluentValidation metadata is snapshotted once by the singleton metadata
+provider. Validators still run normally through FluentValidation for server
+validation; the snapshot is only the deterministic browser-rule metadata used
+when rendering a plan.
+
 Rule-source fields carry their declared shape into render-time binding.
 That lets deferred partial fields bind through the same deterministic component
 id policy without reflecting over the model just to rediscover the field type.

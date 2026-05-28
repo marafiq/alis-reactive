@@ -1,6 +1,7 @@
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using FluentValidation;
@@ -89,43 +90,44 @@ namespace Alis.Reactive.FluentValidator
 
     internal sealed class FluentValidationClientMetadataProvider : IClientValidationMetadataProvider
     {
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly ISet<Type> _validationSourceTypes;
-        private readonly ConcurrentDictionary<Type, Lazy<IReadOnlyList<ClientValidationField>>> _clientRules =
-            new ConcurrentDictionary<Type, Lazy<IReadOnlyList<ClientValidationField>>>();
+        private readonly FrozenDictionary<Type, IReadOnlyList<ClientValidationField>> _clientRules;
 
         public FluentValidationClientMetadataProvider(
             IServiceScopeFactory scopeFactory,
             IEnumerable<Type> validationSourceTypes)
         {
-            _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
+            if (scopeFactory == null) throw new ArgumentNullException(nameof(scopeFactory));
             if (validationSourceTypes == null) throw new ArgumentNullException(nameof(validationSourceTypes));
-            _validationSourceTypes = new HashSet<Type>(validationSourceTypes);
+
+            _clientRules = BuildClientRulesBySource(scopeFactory, validationSourceTypes);
         }
 
         public bool TryGetClientRules(
             Type validationSourceType,
+            [NotNullWhen(true)]
             out IReadOnlyList<ClientValidationField>? fields)
         {
             if (validationSourceType == null) throw new ArgumentNullException(nameof(validationSourceType));
-            if (!_validationSourceTypes.Contains(validationSourceType))
-            {
-                fields = null;
-                return false;
-            }
-
-            fields = _clientRules
-                .GetOrAdd(validationSourceType, type => new Lazy<IReadOnlyList<ClientValidationField>>(
-                    () => BuildClientRules(type),
-                    isThreadSafe: true))
-                .Value;
-            return true;
+            return _clientRules.TryGetValue(validationSourceType, out fields);
         }
 
-        private IReadOnlyList<ClientValidationField> BuildClientRules(Type validationSourceType)
+        private static FrozenDictionary<Type, IReadOnlyList<ClientValidationField>> BuildClientRulesBySource(
+            IServiceScopeFactory scopeFactory,
+            IEnumerable<Type> validationSourceTypes)
         {
-            using var scope = _scopeFactory.CreateScope();
-            var validator = scope.ServiceProvider.GetService(validationSourceType) as IValidator;
+            using var scope = scopeFactory.CreateScope();
+            var rulesBySource = new Dictionary<Type, IReadOnlyList<ClientValidationField>>();
+            foreach (var validationSourceType in validationSourceTypes.Distinct())
+                rulesBySource.Add(validationSourceType, BuildClientRules(scope.ServiceProvider, validationSourceType));
+
+            return rulesBySource.ToFrozenDictionary();
+        }
+
+        private static IReadOnlyList<ClientValidationField> BuildClientRules(
+            IServiceProvider services,
+            Type validationSourceType)
+        {
+            var validator = services.GetService(validationSourceType) as IValidator;
             if (validator == null)
             {
                 throw new InvalidOperationException(
