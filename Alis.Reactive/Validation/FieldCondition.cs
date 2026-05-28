@@ -298,9 +298,8 @@ namespace Alis.Reactive.Validation
             _target = target ?? throw new ArgumentNullException(nameof(target));
         }
 
-        internal static FieldConditionPlanBinding For(ValidationFieldBindingCatalog fieldBindings)
+        internal static FieldConditionPlanBinding For(ClientValidationFieldBinder fieldBindings)
         {
-            if (fieldBindings == null) throw new ArgumentNullException(nameof(fieldBindings));
             return new FieldConditionPlanBinding(field => fieldBindings.Resolve(field).ReadConditionTarget());
         }
 

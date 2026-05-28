@@ -6,26 +6,24 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive
 {
-    internal sealed class ValidationFieldBindingCatalog
+    internal sealed class ClientValidationFieldBinder
     {
         private readonly IReadOnlyDictionary<string, ComponentRegistration> _registeredInputs;
         private readonly IReadOnlyDictionary<string, ClientValidationField> _clientRuleFields;
         private readonly Type _modelType;
 
-        internal ValidationFieldBindingCatalog(
+        internal ClientValidationFieldBinder(
             IReadOnlyDictionary<string, ComponentRegistration> registeredInputs,
             Type modelType,
             IReadOnlyList<ClientValidationField> clientRuleFields)
         {
-            _registeredInputs = registeredInputs ?? throw new ArgumentNullException(nameof(registeredInputs));
-            _modelType = modelType ?? throw new ArgumentNullException(nameof(modelType));
+            _registeredInputs = registeredInputs;
+            _modelType = modelType;
             _clientRuleFields = IndexClientRuleFields(clientRuleFields);
         }
 
         internal ValidationFieldBinding Resolve(ClientValidationField field)
         {
-            if (field == null) throw new ArgumentNullException(nameof(field));
-
             if (_registeredInputs.TryGetValue(field.FieldName, out var registration))
                 return ValidationFieldBinding.Registered(registration);
 
@@ -36,9 +34,6 @@ namespace Alis.Reactive
             ClientValidationField field,
             ValidationPlanBinding ruleBinding)
         {
-            if (field == null) throw new ArgumentNullException(nameof(field));
-            if (ruleBinding == null) throw new ArgumentNullException(nameof(ruleBinding));
-
             if (field.HasRules)
                 yield return Resolve(field).ToComponentValidation(field, ruleBinding);
 
@@ -48,8 +43,6 @@ namespace Alis.Reactive
 
         internal ValidationFieldBinding Resolve(ValidationFieldPath fieldPath)
         {
-            if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
-
             if (_registeredInputs.TryGetValue(fieldPath.Value, out var registration))
                 return ValidationFieldBinding.Registered(registration);
 
@@ -139,18 +132,11 @@ namespace Alis.Reactive
         private static IReadOnlyDictionary<string, ClientValidationField> IndexClientRuleFields(
             IReadOnlyList<ClientValidationField> fields)
         {
-            if (fields == null) throw new ArgumentNullException(nameof(fields));
-
-            var catalog = new Dictionary<string, ClientValidationField>(StringComparer.Ordinal);
+            var fieldsByPath = new Dictionary<string, ClientValidationField>(StringComparer.Ordinal);
             foreach (var field in fields)
-            {
-                if (field == null)
-                    throw new ArgumentException("Client validation field must not be null.", nameof(fields));
+                fieldsByPath[field.FieldName] = field;
 
-                catalog[field.FieldName] = field;
-            }
-
-            return catalog;
+            return fieldsByPath;
         }
     }
 
@@ -161,8 +147,8 @@ namespace Alis.Reactive
 
         private ValidationFieldBinding(ComponentId componentId, InputValueContract valueContract)
         {
-            _componentId = componentId ?? throw new ArgumentNullException(nameof(componentId));
-            _valueContract = valueContract ?? throw new ArgumentNullException(nameof(valueContract));
+            _componentId = componentId;
+            _valueContract = valueContract;
         }
 
         internal string ComponentId => _componentId.Value;
@@ -184,9 +170,6 @@ namespace Alis.Reactive
             ClientValidationField field,
             ValidationPlanBinding ruleBinding)
         {
-            if (field == null) throw new ArgumentNullException(nameof(field));
-            if (ruleBinding == null) throw new ArgumentNullException(nameof(ruleBinding));
-
             var planRules = field.Rules
                 .Select(rule => rule.ToPlanRule(ruleBinding))
                 .ToList();
@@ -200,7 +183,6 @@ namespace Alis.Reactive
 
         internal static ValidationFieldBinding Registered(ComponentRegistration registration)
         {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
             return new ValidationFieldBinding(
                 Alis.Reactive.PlanModel.ComponentId.Of(registration.ComponentId),
                 registration.ValueContract);
@@ -208,8 +190,6 @@ namespace Alis.Reactive
 
         internal static ValidationFieldBinding Deferred(DeferredModelBoundClientValidationField field)
         {
-            if (field == null) throw new ArgumentNullException(nameof(field));
-
             return new ValidationFieldBinding(field.ComponentId, field.ValueContract);
         }
     }
@@ -218,8 +198,8 @@ namespace Alis.Reactive
     {
         private DeferredModelBoundClientValidationField(ComponentId componentId, Shape shape)
         {
-            ComponentId = componentId ?? throw new ArgumentNullException(nameof(componentId));
-            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            ComponentId = componentId;
+            Shape = shape;
         }
 
         internal ComponentId ComponentId { get; }
@@ -232,10 +212,6 @@ namespace Alis.Reactive
             ValidationFieldPath fieldPath,
             Shape shape)
         {
-            if (modelType == null) throw new ArgumentNullException(nameof(modelType));
-            if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
-            if (shape == null) throw new ArgumentNullException(nameof(shape));
-
             return new DeferredModelBoundClientValidationField(
                 Alis.Reactive.PlanModel.ComponentId.Of(IdGenerator.For(modelType, fieldPath.Value)),
                 shape);

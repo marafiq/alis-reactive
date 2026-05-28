@@ -36,7 +36,7 @@ Validate<TValidationSource>(containerId)
 
 1. Requires a registered `IClientValidationRuleSource`.
 2. Calls `GetClientRules(validationSourceType)`.
-3. Binds each `ClientValidationField` through `ValidationFieldBindingCatalog`.
+3. Binds each `ClientValidationField` through `ClientValidationFieldBinder`.
 4. Merges the resulting `ComponentValidation` rules onto the validation-container component.
 
 Field binding has two deterministic paths:
@@ -125,7 +125,7 @@ not delete root validation rules or layout-owned app components.
 | Request gate | `RequestValidation`, `ValidationJob`, `RequestValidationTarget` |
 | Rule source contract | `IClientValidationRuleSource.GetClientRules(Type)` returning `IReadOnlyList<ClientValidationField>` |
 | Metadata registration | `AddReactiveClientValidation`, `AddReactiveFluentValidation`, `ClientValidationRulesBuilder<TModel>`, `ClientValidationFieldToken<TModel, TValue>` |
-| Rule binding | `ClientValidationRuleBinder`, `ValidationFieldBindingCatalog`, `ValidationFieldBinding` |
+| Rule binding | `ClientValidationRuleBinder`, `ClientValidationFieldBinder`, `ValidationFieldBinding` |
 | Plan payload | `ComponentValidation`, `ValidationRuleExecution`, `ValidationRuleOperand`, `ValidationRuleActivation`, `ValidationCondition` |
 | Runtime execution | `validateContainer`, `showServerErrors`, `RuntimeValidationActivation`, `RuntimeValidationPeerOperand`, `rule-engine.ts` |
 

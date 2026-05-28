@@ -50,7 +50,7 @@ namespace Alis.Reactive
             var container = job.Container;
 
             var fields = _ruleSource.GetClientRules(job.ValidationSourceType);
-            var bindings = new ValidationFieldBindingCatalog(_registeredInputs, _modelType, fields);
+            var bindings = new ClientValidationFieldBinder(_registeredInputs, _modelType, fields);
             var ruleBinding = ValidationPlanBinding.For(bindings);
 
             var componentValidations = fields

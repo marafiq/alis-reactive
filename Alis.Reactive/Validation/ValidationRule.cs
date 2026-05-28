@@ -365,27 +365,25 @@ namespace Alis.Reactive.Validation
 
     internal sealed class ValidationPlanBinding
     {
-        private readonly ValidationFieldBindingCatalog _fieldBindings;
+        private readonly ClientValidationFieldBinder _fieldBindings;
         private readonly FieldConditionPlanBinding _conditionBinding;
 
-        private ValidationPlanBinding(ValidationFieldBindingCatalog fieldBindings)
+        private ValidationPlanBinding(ClientValidationFieldBinder fieldBindings)
         {
-            _fieldBindings = fieldBindings ?? throw new System.ArgumentNullException(nameof(fieldBindings));
+            _fieldBindings = fieldBindings;
             _conditionBinding = FieldConditionPlanBinding.For(_fieldBindings);
         }
 
-        internal static ValidationPlanBinding For(ValidationFieldBindingCatalog fieldBindings) =>
+        internal static ValidationPlanBinding For(ClientValidationFieldBinder fieldBindings) =>
             new ValidationPlanBinding(fieldBindings);
 
         internal ValueExpression ResolvePeerValue(ValidationFieldPath fieldPath)
         {
-            if (fieldPath == null) throw new System.ArgumentNullException(nameof(fieldPath));
             return _fieldBindings.Resolve(fieldPath).ReadValue();
         }
 
         internal ConditionGraph ResolveActivationCondition(FieldCondition condition)
         {
-            if (condition == null) throw new System.ArgumentNullException(nameof(condition));
             return condition.ToPlanCondition(_conditionBinding);
         }
     }
