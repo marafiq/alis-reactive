@@ -293,8 +293,6 @@ namespace Alis.Reactive.Validation
         }
 
         internal Shape Shape { get; }
-        internal object LowerBound => _lowerBound;
-        internal object UpperBound => _upperBound;
 
         internal Shape DescriptorShape => Shape.ArrayOf(Shape.IsNone ? Shape.Any : Shape);
 

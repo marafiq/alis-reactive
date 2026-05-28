@@ -30,8 +30,6 @@ namespace Alis.Reactive.Validation
 
         internal ClientValidationFieldReference Reference => _field;
 
-        internal ValidationFieldPath FieldPath => _field.Path;
-
         internal DeferredModelBoundClientValidationField ToDeferredField(Type modelType) =>
             DeferredModelBoundClientValidationField.ForClientRuleField(modelType, _field.Path, _field.Shape);
 

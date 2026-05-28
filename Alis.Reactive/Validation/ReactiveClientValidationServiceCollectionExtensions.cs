@@ -31,7 +31,8 @@ namespace Alis.Reactive.Validation
     /// </summary>
     public sealed class ReactiveClientValidationBuilder
     {
-        private readonly List<ClientValidationRuleSetDefinition> _ruleSets = new List<ClientValidationRuleSetDefinition>();
+        private readonly Dictionary<Type, IReadOnlyList<ClientValidationField>> _rulesBySource =
+            new Dictionary<Type, IReadOnlyList<ClientValidationField>>();
 
         internal ReactiveClientValidationBuilder() { }
 
@@ -41,11 +42,20 @@ namespace Alis.Reactive.Validation
         {
             if (define == null) throw new ArgumentNullException(nameof(define));
 
-            _ruleSets.Add(ClientValidationRuleSetDefinition.For<TValidationSource, TModel>(define));
+            var sourceType = typeof(TValidationSource);
+            if (_rulesBySource.ContainsKey(sourceType))
+            {
+                throw new InvalidOperationException(
+                    $"Client validation rules for '{sourceType.FullName}' are already defined.");
+            }
+
+            var rules = new ClientValidationRulesBuilder<TModel>();
+            define(rules);
+            _rulesBySource.Add(sourceType, rules.ToFields());
             return this;
         }
 
         internal IClientValidationMetadataProvider Build() =>
-            new ConfiguredClientValidationMetadataProvider(_ruleSets);
+            new ConfiguredClientValidationMetadataProvider(_rulesBySource);
     }
 }
