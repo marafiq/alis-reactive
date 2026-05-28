@@ -21,7 +21,7 @@ namespace Alis.Reactive
     public static class IdGenerator
     {
         /// <summary>
-        /// Generates an element ID from a model expression using untyped <c>object?</c> projection.
+        /// Generates an element ID from a model expression using an untyped <c>object?</c> lambda.
         /// </summary>
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <param name="expression">The model property expression (e.g. <c>m =&gt; m.Address.City</c>).</param>

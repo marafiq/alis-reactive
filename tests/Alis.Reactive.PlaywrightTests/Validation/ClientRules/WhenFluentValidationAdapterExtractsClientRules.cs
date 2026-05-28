@@ -13,7 +13,7 @@ public sealed class WhenFluentValidationAdapterExtractsClientRules
     }
 
     [Test]
-    public void custom_rules_project_only_through_the_typed_client_bridge()
+    public void custom_rules_extract_only_through_the_typed_client_bridge()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<ConfirmEmailModel, ConfirmEmailValidator>();
@@ -36,7 +36,7 @@ public sealed class WhenFluentValidationAdapterExtractsClientRules
     }
 
     [Test]
-    public void reactive_whenfield_projects_client_activation_and_declares_guard_fields()
+    public void reactive_whenfield_extracts_client_activation_and_declares_guard_fields()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AssessmentModel, ReactiveAssessmentValidator>();
@@ -59,7 +59,7 @@ public sealed class WhenFluentValidationAdapterExtractsClientRules
     }
 
     [Test]
-    public void reactive_whenfields_projects_composed_client_activation()
+    public void reactive_whenfields_extract_composed_client_activation()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<AssessmentModel, ComposedAssessmentValidator>();
