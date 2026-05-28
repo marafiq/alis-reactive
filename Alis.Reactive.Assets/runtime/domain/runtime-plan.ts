@@ -45,11 +45,11 @@ export class RuntimeResolutionError extends Error {
 
 export class RuntimePlan {
   readonly components: RuntimeComponentCatalog;
-  readonly objectContracts: RuntimeObjectContractCatalog;
+  readonly objectContracts: RuntimeObjectContracts;
   readonly plugins: RuntimePluginCatalog;
 
   private constructor(readonly document: PlanDocument) {
-    this.objectContracts = new RuntimeObjectContractCatalog(document);
+    this.objectContracts = new RuntimeObjectContracts(document);
     this.components = new RuntimeComponentCatalog(document, this.objectContracts);
     this.plugins = new RuntimePluginCatalog(this.objectContracts, browserPlugins);
   }
@@ -81,20 +81,18 @@ export class RuntimePlan {
   }
 }
 
-export class RuntimeObjectContractCatalog {
+export class RuntimeObjectContracts {
   constructor(private readonly plan: PlanDocument) {}
 
-  require(typeKey: string): BrowserObjectContract {
-    const objectContract = this.plan.types[typeKey];
-    if (!objectContract) throw new Error(`[alis] object contract not found: ${typeKey}`);
-    return objectContract;
+  contract(typeKey: string): BrowserObjectContract {
+    return this.plan.types[typeKey]!;
   }
 }
 
 export class RuntimeComponentCatalog {
   constructor(
     private readonly plan: PlanDocument,
-    private readonly objectContracts: RuntimeObjectContractCatalog,
+    private readonly objectContracts: RuntimeObjectContracts,
   ) {}
 
   find(componentKey: string): RuntimeComponent | undefined {
@@ -124,7 +122,7 @@ export class RuntimeComponent {
   constructor(
     readonly key: string,
     readonly definition: ComponentObject,
-    private readonly objectContracts: RuntimeObjectContractCatalog,
+    private readonly objectContracts: RuntimeObjectContracts,
   ) {}
 
   get id(): string {
@@ -153,7 +151,7 @@ export class RuntimeComponent {
   }
 
   objectContract(): BrowserObjectContract {
-    return this.objectContracts.require(this.definition.type);
+    return this.objectContracts.contract(this.definition.type);
   }
 
   object(): RuntimeObject {
@@ -171,12 +169,12 @@ export class RuntimeComponent {
 
 export class RuntimePluginCatalog {
   constructor(
-    private readonly objectContracts: RuntimeObjectContractCatalog,
+    private readonly objectContracts: RuntimeObjectContracts,
     private readonly instances: BrowserPluginCatalog,
   ) {}
 
   objectContract(typeKey: string): BrowserObjectContract {
-    return this.objectContracts.require(typeKey);
+    return this.objectContracts.contract(typeKey);
   }
 
   object(pluginName: string, typeKey: string): RuntimeObject {
