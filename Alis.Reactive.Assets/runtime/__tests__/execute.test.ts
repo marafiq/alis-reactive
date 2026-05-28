@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { registerComponentRuntime, type ComponentRuntimeDriver } from "../domain/component-runtime";
 import { executeReaction } from "../execution/execute";
 import type {
-  ComponentObject, ConditionGraph, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, ReactionGraph, Shape, ValueExpression,
+  ComponentObject, ConditionGraph, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, ReactionGraph, RequestPlan, Shape, ValueExpression,
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -62,6 +62,38 @@ function setResidentName(value: string): ReactionGraph {
     property: "value",
     value: literal(value),
   };
+}
+
+function markLocal(value: string): ReactionGraph {
+  return {
+    kind: "call",
+    on: { kind: "payload", scope: "local", type: { kind: "untyped" } },
+    method: "mark",
+    args: [literal(value)],
+  };
+}
+
+function requestWithSuccess(reaction: ReactionGraph): ReactionGraph {
+  const request: RequestPlan = {
+    method: "GET",
+    url: "/residents/42",
+    validation: { kind: "none" },
+    input: { kind: "none" },
+    whileLoading: [],
+    success: [{ match: { kind: "any" }, reaction }],
+    error: [],
+    finally: [],
+    chain: { kind: "terminal" },
+  };
+
+  return { kind: "request", request };
+}
+
+function responseJson(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 function arrayLiteral(value: JsonValue[], item: Shape): ValueExpression {
@@ -477,6 +509,62 @@ describe("executeReaction member targets", () => {
       expect((document.getElementById("resident-name") as HTMLInputElement).value).toBe("confirmed");
     } finally {
       delete browserWindow.alis;
+    }
+  });
+
+  it("keeps sequence steps synchronous until an authored request is reached", async () => {
+    let releaseResponse!: () => void;
+    const response = new Promise<Response>(resolve => {
+      releaseResponse = () => resolve(responseJson({ saved: true }));
+    });
+    const fetchMock = vi.fn(() => response);
+    vi.stubGlobal("fetch", fetchMock);
+    const marks: string[] = [];
+    const context: ExecContext = {
+      local: {
+        mark(value: string): void {
+          marks.push(value);
+        },
+      },
+    };
+    const reaction: ReactionGraph = {
+      kind: "sequence",
+      steps: [
+        markLocal("start"),
+        {
+          kind: "branch",
+          cases: [
+            {
+              guard: { kind: "when", condition: conditionResult(true) },
+              reaction: markLocal("branch"),
+            },
+            {
+              guard: { kind: "default" },
+              reaction: markLocal("default"),
+            },
+          ],
+        },
+        requestWithSuccess(markLocal("success")),
+        markLocal("after"),
+      ],
+    };
+
+    try {
+      const completion = executeReaction(reaction, textBoxPlan(), context);
+
+      expect(completion).toBeInstanceOf(Promise);
+      expect(marks).toEqual(["start", "branch"]);
+
+      await Promise.resolve();
+      expect(fetchMock).toHaveBeenCalledOnce();
+      expect(marks).toEqual(["start", "branch"]);
+
+      releaseResponse();
+      await completion;
+
+      expect(marks).toEqual(["start", "branch", "success", "after"]);
+    } finally {
+      vi.unstubAllGlobals();
     }
   });
 
