@@ -52,13 +52,21 @@ function resolveGatherRequestInput(input: GatherRequestInput, execution: GatherE
   const requestInput = emptyRequestInput();
   const writer = requestPayloadWriterFor(requestInput, input.bodyFormat, execution.method);
 
-  for (const assignment of input.assignments) {
-    writeRequestInputAssignment(assignment, requestInput, writer, execution);
-  }
-
-  writeRegisteredInputs(input.registeredInputs, execution, writer);
+  writeAuthoredAssignments(input.assignments, requestInput, writer, execution);
+  writeRuntimeSelectedInputs(input.registeredInputs, execution, writer);
 
   return requestInput;
+}
+
+function writeAuthoredAssignments(
+  assignments: RequestInputAssignment[],
+  requestInput: ResolvedRequestInput,
+  writer: RequestPayloadWriter,
+  execution: GatherExecution,
+): void {
+  for (const assignment of assignments) {
+    writeRequestInputAssignment(assignment, requestInput, writer, execution);
+  }
 }
 
 function writeRequestInputAssignment(
@@ -85,7 +93,7 @@ function writeRequestInputAssignment(
   }
 }
 
-function writeRegisteredInputs(
+function writeRuntimeSelectedInputs(
   registeredInputs: GatherRequestInput["registeredInputs"],
   execution: GatherExecution,
   writer: RequestPayloadWriter,
@@ -95,7 +103,7 @@ function writeRegisteredInputs(
       return;
     case "all-registered-inputs":
       for (const component of execution.runtimePlan.components.entries()) {
-        writeSelectedRegisteredInput(component, writer);
+        writeMountedRegisteredInput(component, writer);
       }
       return;
     default:
@@ -103,7 +111,7 @@ function writeRegisteredInputs(
   }
 }
 
-function writeSelectedRegisteredInput(
+function writeMountedRegisteredInput(
   component: RuntimeComponent,
   writer: RequestPayloadWriter,
 ): void {
