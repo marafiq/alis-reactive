@@ -22,10 +22,17 @@ namespace Alis.Reactive.FluentValidator
 
             services.TryAddSingleton<IClientValidationRuleSource, ClientValidationRuleSource>();
 
-            configure(new ReactiveFluentValidationBuilder(services));
+            var builder = new ReactiveFluentValidationBuilder(services);
+            configure(builder);
+            var clientMetadataTypes = builder.ClientMetadataTypes.ToArray();
+            if (clientMetadataTypes.Length != 0)
+            {
+                services.AddSingleton<IClientValidationMetadataProvider>(provider =>
+                    new FluentValidationClientMetadataProvider(
+                        provider.GetRequiredService<IServiceScopeFactory>(),
+                        clientMetadataTypes));
+            }
 
-            services.TryAddEnumerable(
-                ServiceDescriptor.Singleton<IClientValidationMetadataProvider, FluentValidationClientMetadataProvider>());
             return services;
         }
     }
@@ -33,11 +40,14 @@ namespace Alis.Reactive.FluentValidator
     public sealed class ReactiveFluentValidationBuilder
     {
         private readonly IServiceCollection _services;
+        private readonly List<Type> _clientMetadataTypes = new List<Type>();
 
         internal ReactiveFluentValidationBuilder(IServiceCollection services)
         {
             _services = services ?? throw new ArgumentNullException(nameof(services));
         }
+
+        internal IReadOnlyList<Type> ClientMetadataTypes => _clientMetadataTypes;
 
         public ReactiveFluentValidationBuilder Add<TValidator>()
             where TValidator : class, IValidator
@@ -65,8 +75,9 @@ namespace Alis.Reactive.FluentValidator
 
         private void Add(Type validatorType)
         {
-            AddClientMetadataSource(validatorType);
             AddValidatorServices(validatorType);
+            if (DeclaresClientMetadata(validatorType))
+                AddClientMetadataSource(validatorType);
         }
 
         private static IEnumerable<Type> ValidatorTypesIn(Assembly assembly) =>
@@ -77,7 +88,8 @@ namespace Alis.Reactive.FluentValidator
 
         private void AddClientMetadataSource(Type validatorType)
         {
-            _services.AddSingleton(new ReactiveFluentValidationSource(validatorType));
+            if (!_clientMetadataTypes.Contains(validatorType))
+                _clientMetadataTypes.Add(validatorType);
         }
 
         private void AddValidatorServices(Type validatorType)
@@ -97,30 +109,20 @@ namespace Alis.Reactive.FluentValidator
                 .Where(type => type.GetGenericTypeDefinition() == typeof(IValidator<>));
     }
 
-    internal sealed class ReactiveFluentValidationSource
-    {
-        internal ReactiveFluentValidationSource(Type validatorType)
-        {
-            ValidatorType = validatorType;
-        }
-
-        internal Type ValidatorType { get; }
-    }
-
     internal sealed class FluentValidationClientMetadataProvider : IClientValidationMetadataProvider
     {
         private readonly FrozenDictionary<Type, IReadOnlyList<ClientValidationField>> _clientRules;
 
         public FluentValidationClientMetadataProvider(
             IServiceScopeFactory scopeFactory,
-            IEnumerable<ReactiveFluentValidationSource> validationSources)
+            IEnumerable<Type> validationSourceTypes)
         {
             if (scopeFactory == null) throw new ArgumentNullException(nameof(scopeFactory));
-            if (validationSources == null) throw new ArgumentNullException(nameof(validationSources));
+            if (validationSourceTypes == null) throw new ArgumentNullException(nameof(validationSourceTypes));
 
             _clientRules = BuildClientRulesBySource(
                 scopeFactory,
-                validationSources.Select(source => source.ValidatorType));
+                validationSourceTypes);
         }
 
         public bool TryGetClientRules(
