@@ -10,9 +10,7 @@ namespace Alis.Reactive.Builders.Requests
         private readonly List<ResponseRoute> _errorRoutes = new List<ResponseRoute>();
         private RequestPlan? _followUpRequest;
 
-        internal IReadOnlyList<ResponseRoute> SuccessRoutes => _successRoutes;
-        internal IReadOnlyList<ResponseRoute> ErrorRoutes => _errorRoutes;
-        internal RequestChain Chain =>
+        private RequestChain Chain =>
             _followUpRequest is null
                 ? RequestChain.Terminal
                 : RequestChain.ContinueWith(_followUpRequest);
