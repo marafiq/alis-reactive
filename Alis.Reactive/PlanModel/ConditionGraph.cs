@@ -111,7 +111,6 @@ namespace Alis.Reactive.PlanModel
 
         internal ValueExpression Left { get; }
         internal ComparisonRightOperand Right => _right;
-        internal bool HasRightOperand => _right.HasValue;
         internal Shape ShapeForJson { get; }
         internal Shape ItemShapeForJson { get; }
 
@@ -151,7 +150,6 @@ namespace Alis.Reactive.PlanModel
             new PresentComparisonRightOperand(value);
 
         public abstract string Kind { get; }
-        internal abstract bool HasValue { get; }
 
         internal abstract void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options);
     }
@@ -168,7 +166,6 @@ namespace Alis.Reactive.PlanModel
         internal ValueExpression Value => _value;
 
         public override string Kind => "value";
-        internal override bool HasValue => true;
 
         internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
             ComparisonRightOperandJsonConverter.WriteProperty(writer, options, "value", _value);
@@ -177,7 +174,6 @@ namespace Alis.Reactive.PlanModel
     internal sealed class AbsentComparisonRightOperand : ComparisonRightOperand
     {
         public override string Kind => "none";
-        internal override bool HasValue => false;
 
         internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
