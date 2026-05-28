@@ -54,7 +54,7 @@ namespace Alis.Reactive
             var ruleBinding = ValidationPlanBinding.For(bindings);
 
             var componentValidations = fields
-                .Select(field => bindings.Resolve(field).ToComponentValidation(field, ruleBinding))
+                .SelectMany(field => bindings.ResolveAll(field, ruleBinding))
                 .ToList();
 
             // EnsureElement is idempotent — it returns the existing component when the

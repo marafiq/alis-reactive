@@ -49,6 +49,21 @@ namespace Alis.Reactive.Validation
             Shape shape) =>
             AddRule(field, new ValidationRule(name, message, operand, activation, shape));
 
+        internal void AddItemFields(
+            ClientValidationFieldReference collection,
+            IEnumerable<ClientValidationField> itemFields,
+            ClientRuleActivation activation)
+        {
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
+            if (itemFields == null) throw new ArgumentNullException(nameof(itemFields));
+            if (activation == null) throw new ArgumentNullException(nameof(activation));
+
+            EnsureField(collection);
+            foreach (var itemField in itemFields)
+                _fields[collection.Path.Value].AddItemField(
+                    itemField.PrefixedBy(ValidationFieldPath.Empty, activation));
+        }
+
         internal void AddRulesFrom(
             IEnumerable<ClientValidationField> fields,
             ValidationFieldPath prefix,
@@ -63,10 +78,12 @@ namespace Alis.Reactive.Validation
                 if (field == null)
                     throw new ArgumentException("Client validation field must not be null.", nameof(fields));
 
-                var target = field.Reference.PrefixedBy(prefix);
-                EnsureField(target);
-                foreach (var rule in field.Rules)
-                    AddRule(target, rule.PrefixedBy(prefix, activation));
+                var target = field.PrefixedBy(prefix, activation);
+                EnsureField(target.Reference);
+                foreach (var rule in target.Rules)
+                    AddRule(target.Reference, rule);
+                foreach (var itemField in target.ItemFields)
+                    _fields[target.FieldName].AddItemField(itemField);
             }
         }
 
@@ -78,6 +95,7 @@ namespace Alis.Reactive.Validation
     {
         private readonly ClientValidationFieldReference _field;
         private readonly List<ValidationRule> _rules = new List<ValidationRule>();
+        private readonly List<ClientValidationField> _itemFields = new List<ClientValidationField>();
 
         internal ClientValidationRuleSetField(ClientValidationFieldReference field)
         {
@@ -102,9 +120,16 @@ namespace Alis.Reactive.Validation
             _rules.Add(rule);
         }
 
+        internal void AddItemField(ClientValidationField field)
+        {
+            if (field == null) throw new ArgumentNullException(nameof(field));
+            _itemFields.Add(field);
+        }
+
         internal ClientValidationField ToField() =>
             new ClientValidationField(
                 _field,
-                _rules);
+                _rules,
+                _itemFields);
     }
 }

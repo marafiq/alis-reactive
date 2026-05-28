@@ -32,6 +32,20 @@ namespace Alis.Reactive
             return ValidationFieldBinding.Deferred(field.ToDeferredField(_modelType));
         }
 
+        internal IEnumerable<ComponentValidation> ResolveAll(
+            ClientValidationField field,
+            ValidationPlanBinding ruleBinding)
+        {
+            if (field == null) throw new ArgumentNullException(nameof(field));
+            if (ruleBinding == null) throw new ArgumentNullException(nameof(ruleBinding));
+
+            if (field.HasRules)
+                yield return Resolve(field).ToComponentValidation(field, ruleBinding);
+
+            foreach (var itemField in ExpandRenderedItemFields(field))
+                yield return Resolve(itemField).ToComponentValidation(itemField, ruleBinding);
+        }
+
         internal ValidationFieldBinding Resolve(ValidationFieldPath fieldPath)
         {
             if (fieldPath == null) throw new ArgumentNullException(nameof(fieldPath));
@@ -46,6 +60,80 @@ namespace Alis.Reactive
                 $"Validation field '{fieldPath.Value}' was referenced by a client validation rule for model '{_modelType.FullName}', " +
                 "but that field was not included in the client validation rule set. " +
                 "Declare peer fields and condition fields through the same typed client rules so their shape is known before render-time binding.");
+        }
+
+        private IEnumerable<ClientValidationField> ExpandRenderedItemFields(ClientValidationField collectionField)
+        {
+            if (collectionField.ItemFields.Count == 0) yield break;
+
+            foreach (var registeredPath in _registeredInputs.Keys)
+                foreach (var itemField in ExpandRenderedItemFields(
+                             collectionField.FieldName,
+                             collectionField.ItemFields,
+                             registeredPath))
+                    yield return itemField;
+        }
+
+        private static IEnumerable<ClientValidationField> ExpandRenderedItemFields(
+            string collectionPath,
+            IReadOnlyList<ClientValidationField> itemFields,
+            string registeredPath)
+        {
+            foreach (var itemField in itemFields)
+            {
+                if (!TryMatchCollectionItemMember(
+                        collectionPath,
+                        itemField.FieldName,
+                        registeredPath,
+                        out var itemPrefix,
+                        out var directMatch))
+                    continue;
+
+                var renderedField = itemField.PrefixedBy(
+                    ValidationFieldPath.Of(itemPrefix),
+                    ClientRuleActivation.Always);
+
+                if (directMatch && renderedField.HasRules)
+                    yield return renderedField;
+
+                foreach (var nestedItemField in ExpandRenderedItemFields(
+                             renderedField.FieldName,
+                             renderedField.ItemFields,
+                             registeredPath))
+                    yield return nestedItemField;
+            }
+        }
+
+        private static bool TryMatchCollectionItemMember(
+            string collectionPath,
+            string itemFieldPath,
+            string registeredPath,
+            out string itemPrefix,
+            out bool directMatch)
+        {
+            itemPrefix = string.Empty;
+            directMatch = false;
+
+            var openingBracket = collectionPath.Length;
+            if (!registeredPath.StartsWith(collectionPath + "[", StringComparison.Ordinal))
+                return false;
+
+            var closingBracket = registeredPath.IndexOf(']', openingBracket + 1);
+            if (closingBracket < 0)
+                return false;
+
+            itemPrefix = registeredPath.Substring(0, closingBracket + 1);
+
+            var renderedItemFieldPath = itemPrefix + "." + itemFieldPath;
+            directMatch = string.Equals(registeredPath, renderedItemFieldPath, StringComparison.Ordinal);
+            if (directMatch)
+                return true;
+
+            if (!registeredPath.StartsWith(renderedItemFieldPath + ".", StringComparison.Ordinal) &&
+                !registeredPath.StartsWith(renderedItemFieldPath + "[", StringComparison.Ordinal))
+                return false;
+
+            return true;
         }
 
         private static IReadOnlyDictionary<string, ClientValidationField> IndexClientRuleFields(

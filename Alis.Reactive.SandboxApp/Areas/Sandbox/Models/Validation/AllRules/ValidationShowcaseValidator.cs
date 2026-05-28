@@ -1,4 +1,3 @@
-using FluentValidation;
 using Alis.Reactive.FluentValidator;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
@@ -7,22 +6,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public ValidationShowcaseValidator()
         {
-            RuleFor(x => x.AllRules).SetValidator(new AllRulesSectionValidator());
             ClientRule(x => x.AllRules, new AllRulesSectionValidator());
-            RuleFor(x => x.Server).SetValidator(new BasicSectionValidator());
             ClientRule(x => x.Server, new BasicSectionValidator());
-            RuleFor(x => x.Live).SetValidator(new BasicSectionValidator());
             ClientRule(x => x.Live, new BasicSectionValidator());
-            RuleFor(x => x.Db).SetValidator(new BasicSectionValidator());
             ClientRule(x => x.Db, new BasicSectionValidator());
-            RuleFor(x => x.Combined).SetValidator(new CombinedSectionValidator());
             ClientRule(x => x.Combined, new CombinedSectionValidator());
-            RuleFor(x => x.Hidden).SetValidator(new HiddenFieldsSectionValidator());
             ClientRule(x => x.Hidden, new HiddenFieldsSectionValidator());
-            RuleFor(x => x.Conditional).SetValidator(new ConditionalSectionValidator());
             ClientRule(x => x.Conditional, new ConditionalSectionValidator());
-            RuleFor(x => x.Nested).SetValidator(new NestedSectionValidator());
             ClientRule(x => x.Nested, new NestedSectionValidator());
+            ClientRuleEach(x => x.Lines)
+                .SetValidator(new ValidationOrderLineValidator());
         }
     }
 
@@ -30,16 +23,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public BasicSectionValidator()
         {
-            RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Name is required.")
-                .MaximumLength(100).WithMessage("Name must be at most 100 characters.");
             ClientRule(x => x.Name)
                 .Required("Name is required.")
                 .MaxLength(100, "Name must be at most 100 characters.");
 
-            RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Email must be a valid email address.");
             ClientRule(x => x.Email)
                 .Required("Email is required.")
                 .Email("Email must be a valid email address.");
@@ -50,28 +37,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public AllRulesSectionValidator()
         {
-            Include(new BasicSectionValidator());
             ClientRulesFrom(new BasicSectionValidator());
 
-            RuleFor(x => x.Age)
-                .InclusiveBetween(0, 120).WithMessage("Age must be between 0 and 120.");
             ClientRule(x => x.Age)
                 .Range(0, 120, "Age must be between 0 and 120.");
 
-            RuleFor(x => x.Phone)
-                .Matches(@"^\d{3}-\d{3}-\d{4}$").WithMessage("Phone must match format 123-456-7890.");
             ClientRule(x => x.Phone)
                 .Regex(@"^\d{3}-\d{3}-\d{4}$", "Phone must match format 123-456-7890.");
 
-            RuleFor(x => x.Salary)
-                .GreaterThanOrEqualTo(0m).WithMessage("Salary must be at least 0.")
-                .LessThanOrEqualTo(500000m).WithMessage("Salary must be at most 500,000.");
             ClientRule(x => x.Salary)
                 .GreaterThanOrEqualTo(0m, "Salary must be at least 0.")
                 .LessThanOrEqualTo(500000m, "Salary must be at most 500,000.");
 
-            RuleFor(x => x.Password)
-                .MinimumLength(8).WithMessage("Password must be at least 8 characters.");
             ClientRule(x => x.Password)
                 .MinLength(8, "Password must be at least 8 characters.");
         }
@@ -81,16 +58,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public CombinedSectionValidator()
         {
-            Include(new BasicSectionValidator());
             ClientRulesFrom(new BasicSectionValidator());
 
-            RuleFor(x => x.Age)
-                .InclusiveBetween(0, 120).WithMessage("Age must be between 0 and 120.");
             ClientRule(x => x.Age)
                 .Range(0, 120, "Age must be between 0 and 120.");
 
-            RuleFor(x => x.Phone)
-                .Matches(@"^\d{3}-\d{3}-\d{4}$").WithMessage("Phone must match format 123-456-7890.");
             ClientRule(x => x.Phone)
                 .Regex(@"^\d{3}-\d{3}-\d{4}$", "Phone must match format 123-456-7890.");
         }
@@ -100,21 +72,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public HiddenFieldsSectionValidator()
         {
-            RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Name is required.")
-                .MaximumLength(100).WithMessage("Name must be at most 100 characters.");
             ClientRule(x => x.Name)
                 .Required("Name is required.")
                 .MaxLength(100, "Name must be at most 100 characters.");
 
-            RuleFor(x => x.Phone)
-                .Matches(@"^\d{3}-\d{3}-\d{4}$").WithMessage("Phone must match format 123-456-7890.");
             ClientRule(x => x.Phone)
                 .Regex(@"^\d{3}-\d{3}-\d{4}$", "Phone must match format 123-456-7890.");
 
-            RuleFor(x => x.Salary)
-                .GreaterThanOrEqualTo(0m).WithMessage("Salary must be at least 0.")
-                .LessThanOrEqualTo(500000m).WithMessage("Salary must be at most 500,000.");
             ClientRule(x => x.Salary)
                 .GreaterThanOrEqualTo(0m, "Salary must be at least 0.")
                 .LessThanOrEqualTo(500000m, "Salary must be at most 500,000.");
@@ -127,8 +91,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         {
             WhenField(x => x.IsEmployed, () =>
             {
-                RuleFor(x => x.JobTitle)
-                    .NotEmpty().WithMessage("Job title is required when employed.");
                 ClientRule(x => x.JobTitle)
                     .Required("Job title is required when employed.");
             });
@@ -139,9 +101,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public NestedSectionValidator()
         {
-            RuleFor(x => x.Address!).SetValidator(new ValidationAddressValidator());
             ClientRule(x => x.Address!, new ValidationAddressValidator());
-            RuleFor(x => x.Delivery!).SetValidator(new DeliveryNoteValidator());
             ClientRule(x => x.Delivery!, new DeliveryNoteValidator());
         }
     }
@@ -150,13 +110,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public DeliveryNoteValidator()
         {
-            RuleFor(x => x.Instructions)
-                .NotEmpty().WithMessage("Delivery instructions are required.");
             ClientRule(x => x.Instructions)
                 .Required("Delivery instructions are required.");
 
-            RuleFor(x => x.ContactPhone)
-                .Matches(@"^\d{3}-\d{3}-\d{4}$").WithMessage("Phone must match format 123-456-7890.");
             ClientRule(x => x.ContactPhone)
                 .Regex(@"^\d{3}-\d{3}-\d{4}$", "Phone must match format 123-456-7890.");
         }
@@ -166,20 +122,23 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public ValidationAddressValidator()
         {
-            RuleFor(x => x.Street)
-                .NotEmpty().WithMessage("Street is required.");
             ClientRule(x => x.Street)
                 .Required("Street is required.");
 
-            RuleFor(x => x.City)
-                .NotEmpty().WithMessage("City is required.");
             ClientRule(x => x.City)
                 .Required("City is required.");
 
-            RuleFor(x => x.ZipCode)
-                .MinimumLength(5).WithMessage("Zip code must be at least 5 characters.");
             ClientRule(x => x.ZipCode)
                 .MinLength(5, "Zip code must be at least 5 characters.");
+        }
+    }
+
+    public class ValidationOrderLineValidator : ReactiveValidator<ValidationOrderLine>
+    {
+        public ValidationOrderLineValidator()
+        {
+            ClientRule(x => x.Sku)
+                .Required("Line SKU is required.");
         }
     }
 
@@ -189,7 +148,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public AllRulesFormValidator()
         {
-            RuleFor(x => x.AllRules).SetValidator(new AllRulesSectionValidator());
             ClientRule(x => x.AllRules, new AllRulesSectionValidator());
         }
     }
@@ -198,7 +156,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public ServerFormValidator()
         {
-            RuleFor(x => x.Server).SetValidator(new BasicSectionValidator());
             ClientRule(x => x.Server, new BasicSectionValidator());
         }
     }
@@ -207,7 +164,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public LiveFormValidator()
         {
-            RuleFor(x => x.Live).SetValidator(new BasicSectionValidator());
             ClientRule(x => x.Live, new BasicSectionValidator());
         }
     }
@@ -216,7 +172,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public CombinedFormValidator()
         {
-            RuleFor(x => x.Combined).SetValidator(new CombinedSectionValidator());
             ClientRule(x => x.Combined, new CombinedSectionValidator());
         }
     }
@@ -225,7 +180,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public HiddenFieldsFormValidator()
         {
-            RuleFor(x => x.Hidden).SetValidator(new HiddenFieldsSectionValidator());
             ClientRule(x => x.Hidden, new HiddenFieldsSectionValidator());
         }
     }
@@ -234,7 +188,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public ConditionalFormValidator()
         {
-            RuleFor(x => x.Conditional).SetValidator(new ConditionalSectionValidator());
             ClientRule(x => x.Conditional, new ConditionalSectionValidator());
         }
     }
@@ -243,7 +196,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public DbFormValidator()
         {
-            RuleFor(x => x.Db).SetValidator(new BasicSectionValidator());
             ClientRule(x => x.Db, new BasicSectionValidator());
         }
     }
@@ -252,8 +204,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public NestedAddressFormValidator()
         {
-            RuleFor(x => x.Nested!).SetValidator(new NestedSectionValidator());
             ClientRule(x => x.Nested!, new NestedSectionValidator());
+        }
+    }
+
+    public class OrderLinesFormValidator : ReactiveValidator<ValidationShowcaseModel>
+    {
+        public OrderLinesFormValidator()
+        {
+            ClientRuleEach(x => x.Lines)
+                .SetValidator(new ValidationOrderLineValidator());
         }
     }
 }

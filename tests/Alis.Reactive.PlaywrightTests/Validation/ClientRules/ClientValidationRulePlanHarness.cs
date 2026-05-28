@@ -150,40 +150,21 @@ internal sealed class BuiltInClientRulesValidator : ReactiveValidator<BuiltInCli
 {
     public BuiltInClientRulesValidator()
     {
-        RuleFor(model => model.Name)
-            .NotEmpty()
-            .Length(2, 10)
-            .Matches("^[A-Z]+$");
         ClientRule(model => model.Name)
             .Required("'Name' is required.")
             .MinLength(2, "'Name' must be at least 2 characters.")
             .MaxLength(10, "'Name' must be at most 10 characters.")
             .Regex("^[A-Z]+$", "'Name' format is invalid.");
 
-        RuleFor(model => model.Email)
-            .EmailAddress();
         ClientRule(model => model.Email)
             .Email("'Email' must be a valid email address.");
 
-        RuleFor(model => model.Card)
-            .CreditCard();
         ClientRule(model => model.Card)
             .CreditCard("'Card' must be a valid credit card number.");
 
-        RuleFor(model => model.EmptyCode)
-            .IsEmpty();
         ClientRule(model => model.EmptyCode)
             .Empty("'Empty Code' must be empty.");
 
-        RuleFor(model => model.Score)
-            .InclusiveBetween(1, 5)
-            .IsExclusiveBetween(0, 10)
-            .GreaterThanOrEqualTo(2)
-            .LessThanOrEqualTo(8)
-            .GreaterThan(1)
-            .LessThan(9)
-            .Equal(5)
-            .NotEqual(3);
         ClientRule(model => model.Score)
             .Range(1, 5, "'Score' must be between 1 and 5.")
             .ExclusiveRange(0, 10, "'Score' must be between 0 and 10 (exclusive).")
@@ -209,13 +190,6 @@ internal sealed class BuiltInPeerComparisonValidator : ReactiveValidator<StayWin
 {
     public BuiltInPeerComparisonValidator()
     {
-        RuleFor(model => model.DischargeDate)
-            .GreaterThan(model => model.AdmissionDate)
-            .GreaterThanOrEqualTo(model => model.AdmissionDate)
-            .LessThan(model => model.ReviewDate)
-            .LessThanOrEqualTo(model => model.ReviewDate)
-            .Equal(model => model.AdmissionDate)
-            .NotEqual(model => model.ReviewDate);
         ClientRule(model => model.DischargeDate)
             .GreaterThan(model => model.AdmissionDate, "Discharge must be after admission.")
             .GreaterThanOrEqualTo(model => model.AdmissionDate, "Discharge must not be before admission.")
@@ -230,9 +204,6 @@ internal sealed class ConfirmEmailValidator : ReactiveValidator<ConfirmEmailMode
 {
     public ConfirmEmailValidator()
     {
-        RuleFor(model => model.ConfirmEmail)
-            .Must((model, confirmEmail) => confirmEmail == model.Email)
-            .WithMessage("Emails must match.");
         ClientRule(model => model.ConfirmEmail)
             .EqualTo(model => model.Email, "Emails must match.");
     }
@@ -250,8 +221,6 @@ internal sealed class ReactiveAssessmentValidator : ReactiveValidator<Assessment
     {
         WhenField(model => model.IsVeteran, () =>
         {
-            RuleFor(model => model.Score).NotEmpty()
-                .WithMessage("Score required for veterans.");
             ClientRule(model => model.Score)
                 .Required("Score required for veterans.");
         });
@@ -266,8 +235,6 @@ internal sealed class ComposedAssessmentValidator : ReactiveValidator<Assessment
             .Field(model => model.IsVeteran).Truthy()
             .And(fields.Field(model => model.Score).Gt(7)), () =>
             {
-                RuleFor(model => model.Notes).NotEmpty()
-                    .WithMessage("Notes required for high scoring veterans.");
                 ClientRule(model => model.Notes)
                     .Required("Notes required for high scoring veterans.");
             });

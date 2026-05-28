@@ -234,6 +234,37 @@
     </native-card-body>
     </native-card>
 
+    <!-- Section 6: Complex Array Item Rules -->
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">6. Complex Array Item Rules</native-heading>
+        <form id="order-lines-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            @for (var i = 0; i < Model.Lines.Count; i++)
+            {
+                var lineIndex = i;
+                var lineNumber = i + 1;
+                Html.InputField(plan, m => m.Lines[lineIndex].Sku, o => o.Required().Label($"Line {lineNumber} SKU"))
+                    .NativeTextBox(b => b
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("Required"));
+            }
+        </form>
+        @(Html.NativeButton("order-lines-validate-btn", "Validate Lines")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post("/Sandbox/Validation/AllRules/ValidateClient")
+                 .Validate<OrderLinesFormValidator>("order-lines-form")
+                 .Response(r => r.OnSuccess(s =>
+                 {
+                     s.Element("order-lines-result").SetText("Line validation passed!");
+                     s.Element("order-lines-result").AddClass("text-green-600");
+                 }));
+            }))
+        <p id="order-lines-result" class="mt-3 text-sm text-text-muted">Click to validate</p>
+    </native-card-body>
+    </native-card>
+
     <!-- Plan JSON -->
     <native-card>
     <native-card-body>

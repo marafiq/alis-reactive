@@ -60,7 +60,7 @@ namespace Alis.Reactive
         public static string For(Type modelType, string propertyPath)
         {
             var scope = TypeScope(modelType);
-            return scope + "__" + propertyPath.Replace(".", "_");
+            return scope + "__" + ExpressionPathHelper.ToMvcElementId(propertyPath);
         }
 
         /// <summary>

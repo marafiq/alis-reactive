@@ -21,7 +21,7 @@ namespace Alis.Reactive.FluentValidator
         IReadOnlyList<ClientValidationField> IClientValidationMetadataSource.GetClientRules() =>
             _clientRules.ToFields();
 
-        protected ClientValidationFieldRuleBuilder<T, TValue> ClientRule<TValue>(
+        protected ReactiveClientRuleBuilder<T, TValue> ClientRule<TValue>(
             Expression<Func<T, TValue>> field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
@@ -29,9 +29,34 @@ namespace Alis.Reactive.FluentValidator
             var token = ClientValidationFieldToken<T, TValue>.For(field);
             var activation = _scope.ActiveClientRuleActivation(_clientRules);
             _clientRules.EnsureField(token.Reference);
-            return new ClientValidationFieldRuleBuilder<T, TValue>(
+            var clientRule = new ClientValidationFieldRuleBuilder<T, TValue>(
                 _clientRules,
                 token,
+                activation);
+            return new ReactiveClientRuleBuilder<T, TValue>(
+                RuleFor(field),
+                clientRule);
+        }
+
+        protected ReactiveClientCollectionRuleBuilder<T, TItem> ClientRuleEach<TItem>(
+            Expression<Func<T, IEnumerable<TItem>>> field)
+            where TItem : class
+        {
+            if (field == null) throw new ArgumentNullException(nameof(field));
+
+            var token = ClientValidationFieldToken<T, IEnumerable<TItem>>.For(field);
+            var activation = _scope.ActiveClientRuleActivation(_clientRules);
+            _clientRules.EnsureField(token.Reference);
+            var clientRule = new ClientValidationFieldRuleBuilder<T, IEnumerable<TItem>>(
+                _clientRules,
+                token,
+                activation);
+            return new ReactiveClientCollectionRuleBuilder<T, TItem>(
+                RuleFor(field),
+                RuleForEach(field),
+                clientRule,
+                _clientRules,
+                token.Reference,
                 activation);
         }
 
@@ -43,6 +68,8 @@ namespace Alis.Reactive.FluentValidator
             if (field == null) throw new ArgumentNullException(nameof(field));
             if (validator == null) throw new ArgumentNullException(nameof(validator));
 
+            RuleFor(field).SetValidator(validator);
+
             var prefix = ValidationFieldPath.Of(ExpressionPathHelper.ToPropertyName(field));
             _clientRules.AddRulesFrom(
                 ((IClientValidationMetadataSource)validator).GetClientRules(),
@@ -53,6 +80,8 @@ namespace Alis.Reactive.FluentValidator
         protected void ClientRulesFrom(ReactiveValidator<T> validator)
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
+
+            Include(validator);
 
             _clientRules.AddRulesFrom(
                 ((IClientValidationMetadataSource)validator).GetClientRules(),
