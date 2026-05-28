@@ -43,13 +43,11 @@ namespace Alis.Reactive
             return For(componentId, component.Vendor, ComponentRole.ObjectTarget);
         }
 
-        internal static ComponentObjectTarget ForLayout<TComponent>(string componentId)
+        internal static ComponentObjectTarget ForLayout<TComponent>()
             where TComponent : IAppLevelComponent, new()
         {
-            if (componentId == null) throw new ArgumentNullException(nameof(componentId));
-
             var component = new TComponent();
-            return For(componentId, component.Vendor, ComponentRole.LayoutObject);
+            return For(component.DefaultId, component.Vendor, ComponentRole.LayoutObject);
         }
 
         internal static ComponentObjectTarget For(string componentId, string vendor)

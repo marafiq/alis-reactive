@@ -136,9 +136,8 @@ namespace Alis.Reactive.Builders
         public ComponentRef<TComponent, TModel> Component<TComponent>()
             where TComponent : IAppLevelComponent, new()
         {
-            var comp = new TComponent();
             return new ComponentRef<TComponent, TModel>(
-                ComponentObjectTarget.ForLayout<TComponent>(comp.DefaultId),
+                ComponentObjectTarget.ForLayout<TComponent>(),
                 this);
         }
 
