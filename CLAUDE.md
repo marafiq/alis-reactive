@@ -370,11 +370,16 @@ New component = C# vertical slice with `IInputComponent`. Zero TS runtime change
 vendor-specific events (`wireEvent`). Adding a third vendor must only touch `resolver.ts` and
 add a `resolution/event-{vendor}.ts` file. Vendor checks in other modules violate this rule.
 
-### 5. Fail Fast — Fallbacks Are Exceptions
+### 5. Trust Generated Plans — Boundary Errors Only
 
-Default thinking is throw, not fallback. When something is missing or unknown, surface
-the error immediately. Fallbacks hide bugs for hours because wrong values propagate silently.
-A fallback is a rare, deliberate, justified exception — never the default response to uncertainty.
+The runtime and plan domain trust framework-generated plans. Do not add defensive
+throws, validators, rejects, claims, or fallback paths for shapes the typed DSL
+already controls. Errors belong at real boundaries: developer-authored DSL misuse,
+DOM/component/plugin lookup, browser APIs, network, and external JSON. Inside the
+generated plan graph, prefer direct domain state over proof-by-exception.
+
+A fallback is a rare, deliberate, justified exception — never the default response
+to uncertainty.
 
 **Null escape hatches require justification.** Every NEW per-property `[JsonIgnore(WhenWritingNull)]`,
 nullable property declaration, or `?? fallback` you add must be PROVEN necessary by answering

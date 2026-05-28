@@ -9,7 +9,7 @@ Frozen public DSL -> Rich C# Plan Domain -> Generated TS Contract -> Dumb Runtim
 ```
 
 The DSL source is the requirement. Existing PlanModel, runtime code, tests, docs,
-schema, and memory are evidence only after they are checked against the DSL.
+and memory are evidence only after they are checked against the DSL.
 Use complete facts grounded in actual DSL source; partial inventories, inferred
 facts, and approximate coverage are not enough for plan/runtime design.
 
@@ -61,7 +61,7 @@ Approaches that failed and must not be repeated:
 - broad “module improvement” passes without a named matrix row
 - preserving old helper code because tests reference it
 - adding fallback, registry, validation, or lifecycle concepts without a DSL graph node
-- treating docs/schema/current runtime as requirements before checking DSL source
+- treating docs/current runtime as requirements before checking DSL source
 
 ## Commit Discipline
 
