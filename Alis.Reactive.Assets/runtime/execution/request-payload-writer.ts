@@ -275,11 +275,6 @@ function assignJsonBodyValue(
   value: unknown,
 ): void {
   const segments = target.path.map(bodySegment);
-  const first = segments[0];
-  if (first === undefined) {
-    throw new Error(`[alis] gather key "${target.name}" contains no path segments`);
-  }
-
   let parent = body;
   for (const segment of segments.slice(0, -1)) {
     const value = parent[segment];

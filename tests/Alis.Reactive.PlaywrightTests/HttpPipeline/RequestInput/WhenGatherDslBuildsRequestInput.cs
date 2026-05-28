@@ -79,6 +79,28 @@ public sealed class WhenGatherDslBuildsRequestInput
     }
 
     [Test]
+    public void include_all_selects_all_registered_inputs()
+    {
+        var plan = PlanExtensions.ReactivePlan(Html);
+
+        HtmlExtensions.On(Html, plan, trigger =>
+            trigger.DomReady(pipeline =>
+            {
+                pipeline.Post("/residents", gather => gather.IncludeAll());
+            }));
+
+        using var doc = JsonDocument.Parse(plan.RenderFormatted());
+        var input = SingleGatherInput(doc.RootElement);
+        var registeredInputs = input.GetProperty("registeredInputs");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(registeredInputs.GetProperty("kind").GetString(), Is.EqualTo("all-registered-inputs"));
+            Assert.That(input.GetProperty("assignments").EnumerateArray().ToArray(), Is.Empty);
+        });
+    }
+
+    [Test]
     public void component_member_sources_preserve_property_and_method_access()
     {
         var plan = PlanExtensions.ReactivePlan(Html);
