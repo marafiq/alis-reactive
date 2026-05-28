@@ -8,8 +8,8 @@
     ViewData["Title"] = "Conditions + HTTP Mixing";
 
     var plan = Html.ReactivePlan<HttpMixingModel>();
-    plan.RegisterPlugin("slugify", p => p.Function<string, string>());
-    plan.RegisterPlugin("order", p => p.Function<string, string, string>());
+    var slugify = plan.RegisterPlugin<HttpMixingSlugifyPlugin>();
+    var order = plan.RegisterPlugin<HttpMixingOrderPlugin>();
 
     var saveUrl = Url.Action("Save", "HttpMixing", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve HttpMixing.Save.");
@@ -155,26 +155,26 @@
     // Section 12: Ordered mixed modules after an HTTP request
     Html.On(plan, t => t.CustomEvent("s12-dispatched", p =>
     {
-        TypedPluginSource<string> mark = p.Plugin<string>("order").Arg("s12").Arg("dispatch");
+        TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s12").Arg("dispatch");
         p.Element("s12-sequence").SetText(mark);
         p.Element("s12-order").SetText("dispatch");
     }));
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s12-ordered-mixed-modules", (args, p) =>
     {
-        TypedPluginSource<string> markStart = p.Plugin<string>("order").Arg("s12").Arg("start");
+        TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s12").Arg("start");
         p.Element("s12-sequence").SetText(markStart);
         p.Element("s12-order").SetText("start");
         p.When(args, x => x.Active).Truthy()
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin<string>("order").Arg("s12").Arg("branch-before");
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s12").Arg("branch-before");
                 then.Element("s12-sequence").SetText(mark);
                 then.Element("s12-order").SetText("branch-before");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin<string>("order").Arg("s12").Arg("branch-before-else");
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s12").Arg("branch-before-else");
                 else_.Element("s12-sequence").SetText(mark);
                 else_.Element("s12-order").SetText("branch-before-else");
             });
@@ -182,28 +182,28 @@
          .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
          {
              s.Element("s12-http-done").SetText("done");
-             TypedPluginSource<string> mark = s.Plugin<string>("order").Arg("s12").Arg("http-success");
+             TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s12").Arg("http-success");
              s.Element("s12-sequence").SetText(mark);
              s.Element("s12-order").SetText("http-success");
         }));
         p.Dispatch("s12-dispatched");
-        TypedPluginSource<string> slug = p.Plugin<string>("slugify").Arg("After Http");
+        TypedPluginSource<string> slug = p.Plugin(slugify.Slug).Arg("After Http");
         p.Element("s12-plugin").SetText(slug);
-        TypedPluginSource<string> markPlugin = p.Plugin<string>("order").Arg("s12").Arg("plugin");
+        TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s12").Arg("plugin");
         p.Element("s12-sequence").SetText(markPlugin);
         p.Element("s12-order").SetText("tail");
-        TypedPluginSource<string> markTail = p.Plugin<string>("order").Arg("s12").Arg("tail");
+        TypedPluginSource<string> markTail = p.Plugin(order.Mark).Arg("s12").Arg("tail");
         p.Element("s12-sequence").SetText(markTail);
         p.When(args, x => x.Category).Eq("premium")
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin<string>("order").Arg("s12").Arg("branch-after");
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s12").Arg("branch-after");
                 then.Element("s12-sequence").SetText(mark);
                 then.Element("s12-order").SetText("branch-after");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin<string>("order").Arg("s12").Arg("branch-after-else");
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s12").Arg("branch-after-else");
                 else_.Element("s12-sequence").SetText(mark);
                 else_.Element("s12-order").SetText("branch-after-else");
             });
@@ -212,26 +212,26 @@
     // Section 13: Ordered mixed modules around parallel HTTP requests
     Html.On(plan, t => t.CustomEvent("s13-dispatched", p =>
     {
-        TypedPluginSource<string> mark = p.Plugin<string>("order").Arg("s13").Arg("dispatch");
+        TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s13").Arg("dispatch");
         p.Element("s13-sequence").SetText(mark);
         p.Element("s13-order").SetText("dispatch");
     }));
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s13-ordered-parallel-mix", (args, p) =>
     {
-        TypedPluginSource<string> markStart = p.Plugin<string>("order").Arg("s13").Arg("start");
+        TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s13").Arg("start");
         p.Element("s13-sequence").SetText(markStart);
         p.Element("s13-order").SetText("start");
         p.When(args, x => x.Active).Truthy()
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin<string>("order").Arg("s13").Arg("branch-before");
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s13").Arg("branch-before");
                 then.Element("s13-sequence").SetText(mark);
                 then.Element("s13-order").SetText("branch-before");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin<string>("order").Arg("s13").Arg("branch-before-else");
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s13").Arg("branch-before-else");
                 else_.Element("s13-sequence").SetText(mark);
                 else_.Element("s13-order").SetText("branch-before-else");
             });
@@ -251,28 +251,28 @@
          .OnAllSettled(s =>
          {
              s.Element("s13-all").SetText("settled");
-             TypedPluginSource<string> mark = s.Plugin<string>("order").Arg("s13").Arg("settled");
+             TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s13").Arg("settled");
              s.Element("s13-sequence").SetText(mark);
              s.Element("s13-order").SetText("settled");
          });
         p.Dispatch("s13-dispatched");
-        TypedPluginSource<string> slug = p.Plugin<string>("slugify").Arg("After Parallel");
+        TypedPluginSource<string> slug = p.Plugin(slugify.Slug).Arg("After Parallel");
         p.Element("s13-plugin").SetText(slug);
-        TypedPluginSource<string> markPlugin = p.Plugin<string>("order").Arg("s13").Arg("plugin");
+        TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s13").Arg("plugin");
         p.Element("s13-sequence").SetText(markPlugin);
         p.Element("s13-order").SetText("tail");
-        TypedPluginSource<string> markTail = p.Plugin<string>("order").Arg("s13").Arg("tail");
+        TypedPluginSource<string> markTail = p.Plugin(order.Mark).Arg("s13").Arg("tail");
         p.Element("s13-sequence").SetText(markTail);
         p.When(args, x => x.Count).Gt(0)
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin<string>("order").Arg("s13").Arg("branch-after");
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s13").Arg("branch-after");
                 then.Element("s13-sequence").SetText(mark);
                 then.Element("s13-order").SetText("branch-after");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin<string>("order").Arg("s13").Arg("branch-after-else");
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s13").Arg("branch-after-else");
                 else_.Element("s13-sequence").SetText(mark);
                 else_.Element("s13-order").SetText("branch-after-else");
             });
@@ -281,27 +281,27 @@
     // Section 14: Route-template gather from the reactive event payload in a mixed pipeline
     Html.On(plan, t => t.CustomEvent("s14-dispatched", p =>
     {
-        TypedPluginSource<string> mark = p.Plugin<string>("order").Arg("s14").Arg("dispatch");
+        TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s14").Arg("dispatch");
         p.Element("s14-sequence").SetText(mark);
         p.Element("s14-order").SetText("dispatch");
     }));
 
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s14-route-template-from-event", (args, p) =>
     {
-        TypedPluginSource<string> categorySlug = p.Plugin<string>("slugify").Arg(args, x => x.Category);
-        TypedPluginSource<string> markStart = p.Plugin<string>("order").Arg("s14").Arg("start");
+        TypedPluginSource<string> categorySlug = p.Plugin(slugify.Slug).Arg(args, x => x.Category);
+        TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s14").Arg("start");
         p.Element("s14-sequence").SetText(markStart);
         p.Element("s14-order").SetText("start");
         p.When(args, x => x.Active).Truthy()
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin<string>("order").Arg("s14").Arg("branch-before");
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s14").Arg("branch-before");
                 then.Element("s14-sequence").SetText(mark);
                 then.Element("s14-order").SetText("branch-before");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin<string>("order").Arg("s14").Arg("branch-before-else");
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s14").Arg("branch-before-else");
                 else_.Element("s14-sequence").SetText(mark);
                 else_.Element("s14-order").SetText("branch-before-else");
             });
@@ -314,7 +314,7 @@
              s.Element("s14-route-id").SetText(json, x => x.ResidentId);
              s.Element("s14-body-action").SetText(json, x => x.Action);
              s.Element("s14-header-category").SetText(json, x => x.HeaderCategory);
-             TypedPluginSource<string> mark = s.Plugin<string>("order").Arg("s14").Arg("http-success");
+             TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s14").Arg("http-success");
              s.Element("s14-sequence").SetText(mark);
              s.Element("s14-order").SetText("http-success");
          })
@@ -328,25 +328,25 @@
                  s.Element("s14-trail-id").SetText(json, x => x.ResidentId);
                  s.Element("s14-trail-slug").SetText(json, x => x.CategorySlug);
                  s.Element("s14-trail-step").SetText(json, x => x.Step);
-                 TypedPluginSource<string> mark = s.Plugin<string>("order").Arg("s14").Arg("trail-success");
+                 TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s14").Arg("trail-success");
                  s.Element("s14-sequence").SetText(mark);
                  s.Element("s14-order").SetText("trail-success");
              }))));
         p.Dispatch("s14-dispatched");
         p.Element("s14-plugin").SetText(categorySlug);
-        TypedPluginSource<string> markPlugin = p.Plugin<string>("order").Arg("s14").Arg("plugin");
+        TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s14").Arg("plugin");
         p.Element("s14-sequence").SetText(markPlugin);
         p.Element("s14-order").SetText("tail");
         p.When(args, x => x.Count).Gt(300)
             .Then(then =>
             {
-                TypedPluginSource<string> mark = then.Plugin<string>("order").Arg("s14").Arg("branch-after");
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s14").Arg("branch-after");
                 then.Element("s14-sequence").SetText(mark);
                 then.Element("s14-order").SetText("branch-after");
             })
             .Else(else_ =>
             {
-                TypedPluginSource<string> mark = else_.Plugin<string>("order").Arg("s14").Arg("branch-after-else");
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s14").Arg("branch-after-else");
                 else_.Element("s14-sequence").SetText(mark);
                 else_.Element("s14-order").SetText("branch-after-else");
             });
@@ -765,3 +765,27 @@
 </native-vstack>
 
 @Html.RenderPlan(plan)
+
+@functions {
+    private sealed class HttpMixingSlugifyPlugin : ReactivePlugin
+    {
+        public HttpMixingSlugifyPlugin()
+            : base("slugify")
+        {
+            Slug = Function<string, string>();
+        }
+
+        public PluginFunction<string> Slug { get; }
+    }
+
+    private sealed class HttpMixingOrderPlugin : ReactivePlugin
+    {
+        public HttpMixingOrderPlugin()
+            : base("order")
+        {
+            Mark = Function<string, string, string>();
+        }
+
+        public PluginFunction<string> Mark { get; }
+    }
+}
