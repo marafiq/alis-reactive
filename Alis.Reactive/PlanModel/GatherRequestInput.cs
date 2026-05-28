@@ -63,9 +63,6 @@ namespace Alis.Reactive.PlanModel
             Source = source;
         }
 
-        internal static RequestInputAssignment Payload(string payloadPath, ValueExpression source)
-            => Payload(BindingPath.Of(payloadPath), source);
-
         internal static RequestInputAssignment Payload(BindingPath payloadPath, ValueExpression source)
             => new RequestInputAssignment(RequestPayloadTarget.For(payloadPath), source);
 
@@ -96,9 +93,6 @@ namespace Alis.Reactive.PlanModel
         public override string Kind => "payload";
         public string Name => _path.Value;
         public Path Path => _path.Path;
-
-        internal static RequestPayloadTarget For(string path) =>
-            For(BindingPath.Of(path));
 
         internal static RequestPayloadTarget For(BindingPath path) =>
             new RequestPayloadTarget(path);

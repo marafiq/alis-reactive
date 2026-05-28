@@ -157,8 +157,9 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> FromUrl(string paramName)
         {
             var urlParam = UrlParameterName.Of(paramName);
+            var payloadPath = BindingPath.Of(urlParam.Value);
             var value = ValueExpression.ReadUrl(urlParam.Value);
-            _draft.AddAssignment(RequestInputAssignment.Payload(urlParam.Value, value));
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, value));
             return this;
         }
 
@@ -180,9 +181,10 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TModel> FromUrl<T>(string paramName)
         {
             var urlParam = UrlParameterName.Of(paramName);
+            var payloadPath = BindingPath.Of(urlParam.Value);
             var shape = RequestScalarTarget.UrlQueryParameter<T>(urlParam);
             var value = ValueExpression.ReadUrl(urlParam.Value, shape);
-            _draft.AddAssignment(RequestInputAssignment.Payload(urlParam.Value, value));
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, value));
             return this;
         }
 
