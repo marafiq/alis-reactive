@@ -163,7 +163,7 @@ public sealed class WhenReactiveValidatorsDeclareClientRules
         Assert.Multiple(() =>
         {
             Assert.That(condition.GetProperty("kind").GetString(), Is.EqualTo("compare"));
-            Assert.That(condition.GetProperty("op").GetString(), Is.EqualTo("arrayContains"));
+            Assert.That(condition.GetProperty("op").GetString(), Is.EqualTo("array-contains"));
             Assert.That(condition
                 .GetProperty("left")
                 .GetProperty("from")
