@@ -129,6 +129,26 @@ describe("partial slot lifecycle", () => {
     expect(browserPlans.get(billingPlanId)).toBeUndefined();
   });
 
+  it("wires validation once per active plan when one slot contains multiple fragments for the same plan", () => {
+    const browserPlans = new AppliedBrowserPlans();
+    const { wiring } = browserPlanWiring();
+    const planId = "Resident.Root";
+
+    browserPlans.register(rootPlan(planId));
+    browserPlans.loadPartialSlot("address-slot", [
+      partialPlan(planId, {
+        components: { "address-line": component("address-line") },
+      }),
+      partialPlan(planId, {
+        components: { "zip-code": component("zip-code") },
+      }),
+    ], wiring);
+
+    expect(browserPlans.get(planId)?.components["address-line"]).toBeDefined();
+    expect(browserPlans.get(planId)?.components["zip-code"]).toBeDefined();
+    expect(wiring.wireContainerValidation).toHaveBeenCalledTimes(1);
+  });
+
   it("keeps a non-root merged plan alive while another slot still owns entries", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { wiring } = browserPlanWiring();
