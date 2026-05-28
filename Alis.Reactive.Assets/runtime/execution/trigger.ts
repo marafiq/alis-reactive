@@ -59,7 +59,7 @@ export function wireBehavior(
     }
 
     case "component-event": {
-      const component = RuntimePlan.from(plan).components.requireComponent(trigger.component);
+      const component = RuntimePlan.from(plan).components.component(trigger.component);
       const eventContract = ComponentEventContract.declaredBy(component, trigger.event);
 
       const source = `component-event:${trigger.component}:${trigger.event}`;

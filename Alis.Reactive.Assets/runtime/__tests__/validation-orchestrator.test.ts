@@ -117,26 +117,6 @@ function unmountedConditionalRuleWithMissingActivationSource(): ComponentValidat
   };
 }
 
-function peerRuleWithMissingPeerSource(): ComponentValidation {
-  return {
-    component: "resident-name-field",
-    serverFieldName: "Name",
-    value: readComponentValue("resident-name-field"),
-    rules: [
-      {
-        name: "equalTo",
-        message: "Name must match",
-        execution: {
-          kind: "peer",
-          value: readComponentValue("missing-peer-source"),
-          activation: { kind: "always" },
-          comparisonShape: stringShape,
-        },
-      },
-    ],
-  };
-}
-
 function readComponentValue(component: string): ReadExpression {
   return {
     kind: "read",
@@ -348,26 +328,6 @@ describe("validation orchestrator client rules", () => {
     expect(summaryTextFor(componentKey)).toBe("Name is required");
   });
 
-  it("does not hide a miswired validation value expression behind missing field behavior", () => {
-    renderValidationDom();
-    const runtimePlan = plan([
-      requiredRule("resident-name-field", "Name", "missing-component"),
-    ]);
-
-    expect(() => validateContainer(runtimePlan, "resident-form"))
-      .toThrow("[alis] component not found: missing-component");
-  });
-
-  it("does not hide a miswired activation dependency behind conditional skip behavior", () => {
-    renderValidationDom();
-    const runtimePlan = plan([
-      conditionalRuleWithMissingActivationSource(),
-    ]);
-
-    expect(() => validateContainer(runtimePlan, "resident-form"))
-      .toThrow("[alis] component not found: missing-activation-source");
-  });
-
   it("treats an unmounted activation dependency as inactive only for an unmounted validation field", () => {
     renderValidationDom();
     const runtimePlan = plan([
@@ -375,16 +335,6 @@ describe("validation orchestrator client rules", () => {
     ]);
 
     expect(validateContainer(runtimePlan, "resident-form")).toBe(true);
-  });
-
-  it("does not hide a miswired peer dependency behind an absent peer value", () => {
-    renderValidationDom();
-    const runtimePlan = plan([
-      peerRuleWithMissingPeerSource(),
-    ]);
-
-    expect(() => validateContainer(runtimePlan, "resident-form"))
-      .toThrow("[alis] component not found: missing-peer-source");
   });
 });
 

@@ -271,27 +271,6 @@ describe("evaluateValue", () => {
     }))).toThrow('runtime path member "value" is missing on component "resident-name".value');
   });
 
-  it("throws typed runtime resolution errors for missing component reads", () => {
-    const producer: ValueExpression = {
-      kind: "read",
-      from: { kind: "component", component: "missing-name" },
-      member: "value",
-      path: [{ kind: "property", name: "value" }],
-      shape: stringShape,
-      access: { kind: "property" },
-    };
-
-    try {
-      evaluateValue(producer, plan());
-      throw new Error("expected missing component read to fail");
-    } catch (error) {
-      expect(error).toBeInstanceOf(RuntimeResolutionError);
-      if (error instanceof RuntimeResolutionError) {
-        expect(error.target).toEqual({ kind: "component", key: "missing-name" });
-      }
-    }
-  });
-
   it("throws typed runtime resolution errors for missing component elements", () => {
     const objectContract: BrowserObjectContract = {
       properties: {

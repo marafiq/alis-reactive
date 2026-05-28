@@ -15,7 +15,7 @@ export function wireEvent(
   opts?: AddEventListenerOptions,
 ): void {
   const runtimePlan = RuntimePlan.from(plan);
-  const component = runtimePlan.components.requireComponent(componentKey);
+  const component = runtimePlan.components.component(componentKey);
   component.runtime().wireEvent(
     component.root(),
     channel,

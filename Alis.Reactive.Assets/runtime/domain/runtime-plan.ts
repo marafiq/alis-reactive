@@ -15,7 +15,7 @@ const cache = new WeakMap<PlanDocument, RuntimePlan>();
 type RuntimeValidationContainer = Extract<ComponentObject["container"], { kind: "validation-container" }>;
 
 type RuntimeResolutionTarget =
-  | { readonly kind: "component"; readonly key: string }
+  | { readonly kind: "active-component"; readonly key: string }
   | { readonly kind: "element"; readonly id: string };
 
 export class RuntimeResolutionError extends Error {
@@ -24,10 +24,10 @@ export class RuntimeResolutionError extends Error {
     this.name = "RuntimeResolutionError";
   }
 
-  static componentNotFound(componentKey: string): RuntimeResolutionError {
+  static componentNotActive(componentKey: string): RuntimeResolutionError {
     return new RuntimeResolutionError(
-      { kind: "component", key: componentKey },
-      `[alis] component not found: ${componentKey}`,
+      { kind: "active-component", key: componentKey },
+      `[alis] component not active in browser plan: ${componentKey}`,
     );
   }
 
@@ -70,7 +70,7 @@ export class RuntimePlan {
   objectForSource(source: RuntimeObjectSource): RuntimeObject {
     switch (source.kind) {
       case "component":
-        return this.components.object(source.component);
+        return this.components.component(source.component).object();
       case "plugin":
         return this.plugins.object(source.name, source.type);
     }
@@ -108,18 +108,15 @@ export class RuntimeComponentCatalog {
       .map(([key, component]) => new RuntimeComponent(key, component, this.objectContracts));
   }
 
-  requireComponent(componentKey: string): RuntimeComponent {
+  component(componentKey: string): RuntimeComponent {
     const component = this.find(componentKey);
-    if (!component) throw RuntimeResolutionError.componentNotFound(componentKey);
+    if (component === undefined) throw RuntimeResolutionError.componentNotActive(componentKey);
+
     return component;
   }
 
   element(componentKey: string): HTMLElement {
-    return this.requireComponent(componentKey).element();
-  }
-
-  object(componentKey: string): RuntimeObject {
-    return this.requireComponent(componentKey).object();
+    return this.component(componentKey).element();
   }
 }
 
