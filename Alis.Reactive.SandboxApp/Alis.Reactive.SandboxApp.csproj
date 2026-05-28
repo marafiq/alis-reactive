@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>alis-sandbox-secrets</UserSecretsId>
+        <NoWarn>$(NoWarn);CS8603;CS8618;MVC1000</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
