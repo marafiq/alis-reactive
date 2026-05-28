@@ -247,6 +247,20 @@
                     .NativeTextBox(b => b
                         .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
                         .Placeholder("Required"));
+
+                Html.InputField(plan, m => m.Lines[lineIndex].ConfirmSku, o => o.Label($"Line {lineNumber} Confirm SKU"))
+                    .NativeTextBox(b => b
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("Must match SKU"));
+
+                Html.InputField(plan, m => m.Lines[lineIndex].GiftWrapped, o => o.Label($"Line {lineNumber} Gift Wrapped"))
+                    .NativeCheckBox(b => b
+                        .CssClass("h-4 w-4 rounded border-border text-accent"));
+
+                Html.InputField(plan, m => m.Lines[lineIndex].GiftNote, o => o.Label($"Line {lineNumber} Gift Note"))
+                    .NativeTextBox(b => b
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("Required when gift wrapped"));
             }
         </form>
         @(Html.NativeButton("order-lines-validate-btn", "Validate Lines")

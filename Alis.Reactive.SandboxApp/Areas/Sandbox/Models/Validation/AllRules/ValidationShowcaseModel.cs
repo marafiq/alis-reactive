@@ -69,5 +69,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public class ValidationOrderLine
     {
         public string? Sku { get; set; }
+        public string? ConfirmSku { get; set; }
+        public bool GiftWrapped { get; set; }
+        public string? GiftNote { get; set; }
     }
 }

@@ -139,6 +139,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         {
             ClientRule(x => x.Sku)
                 .Required("Line SKU is required.");
+
+            ClientRule(x => x.ConfirmSku)
+                .EqualTo(x => x.Sku, "Line SKU confirmation must match.");
+
+            WhenField(x => x.GiftWrapped, () =>
+            {
+                ClientRule(x => x.GiftNote)
+                    .Required("Gift note is required when gift wrapped.");
+            });
         }
     }
 
