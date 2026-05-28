@@ -19,11 +19,11 @@ export function mergeSlotComponent(
   target: PlanDocument,
   componentKey: string,
   incoming: ComponentObject,
-  rootOwnsComponent: boolean,
+  componentExistsInBootPlan: boolean,
 ): void {
   const existing = target.components[componentKey];
 
-  if (rootOwnsComponent
+  if (componentExistsInBootPlan
     && isValidationContainer(existing)
     && isValidationContainer(incoming)
     && incoming.binding.kind === "none"
