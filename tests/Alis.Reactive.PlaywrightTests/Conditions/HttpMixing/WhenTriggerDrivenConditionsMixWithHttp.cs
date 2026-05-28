@@ -509,6 +509,23 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     }
 
     [Test]
+    public async Task ordered_mixed_modules_after_http_runs_else_branches_in_order()
+    {
+        await NavigateAndBoot();
+
+        await Page.EvaluateAsync(
+            "() => document.dispatchEvent(new CustomEvent('s12-ordered-mixed-modules', { detail: { Active: false, Category: 'standard', Count: 0 } }))");
+
+        await Expect(Page.Locator("#s12-http-done")).ToHaveTextAsync("done", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s12-plugin")).ToHaveTextAsync("after-http");
+        await Expect(Page.Locator("#s12-order")).ToHaveTextAsync("branch-after-else");
+        await Expect(Page.Locator("#s12-sequence")).ToHaveTextAsync(
+            "start>branch-before-else>http-success>dispatch>plugin>tail>branch-after-else");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task ordered_mixed_modules_after_parallel_wait_for_all_settled_reactions()
     {
         await NavigateAndBoot();
@@ -522,6 +539,25 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
         await Expect(Page.Locator("#s13-order")).ToHaveTextAsync("branch-after");
         await Expect(Page.Locator("#s13-sequence")).ToHaveTextAsync(
             "start>branch-before>settled>dispatch>plugin>tail>branch-after");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task ordered_mixed_modules_after_parallel_runs_else_branches_in_order()
+    {
+        await NavigateAndBoot();
+
+        await Page.EvaluateAsync(
+            "() => document.dispatchEvent(new CustomEvent('s13-ordered-parallel-mix', { detail: { Active: false, Category: 'standard', Count: 0 } }))");
+
+        await Expect(Page.Locator("#s13-a")).ToHaveTextAsync("Parallel A", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s13-b")).ToHaveTextAsync("audited:parallel-b", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s13-all")).ToHaveTextAsync("settled");
+        await Expect(Page.Locator("#s13-plugin")).ToHaveTextAsync("after-parallel");
+        await Expect(Page.Locator("#s13-order")).ToHaveTextAsync("branch-after-else");
+        await Expect(Page.Locator("#s13-sequence")).ToHaveTextAsync(
+            "start>branch-before-else>settled>dispatch>plugin>tail>branch-after-else");
 
         AssertNoConsoleErrors();
     }
