@@ -51,23 +51,18 @@ export class RuntimePath {
     let owner = root;
     const finalSegmentIndex = this.segments.length - 1;
     for (let i = 0; i < finalSegmentIndex; i++) {
-      owner = requireMemberOwner(owner, `${label} segment ${i}`)[segmentKey(this.segmentAt(i, label))];
+      owner = requireMemberOwner(owner, `${label} segment ${i}`)[segmentKey(this.segmentAt(i))];
     }
 
     return requireMember(
       requireMemberOwner(owner, label),
-      segmentKey(this.segmentAt(finalSegmentIndex, label)),
+      segmentKey(this.segmentAt(finalSegmentIndex)),
       label,
     );
   }
 
-  private segmentAt(index: number, label: string): PathSegment {
-    const segment = this.segments[index];
-    if (segment === undefined) {
-      throw new Error(`[alis] runtime path segment ${index} is missing on ${label}`);
-    }
-
-    return segment;
+  private segmentAt(index: number): PathSegment {
+    return this.segments[index]!;
   }
 }
 

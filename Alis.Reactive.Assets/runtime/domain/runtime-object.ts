@@ -51,7 +51,6 @@ function prepareMethodArguments(contract: MethodArgumentContract, args: unknown[
 
 function prepareExactMethodArguments(shapes: Shape[], args: unknown[]): unknown[] {
   return args.map((arg, index) => {
-    const shape = shapes[index];
-    return shape === undefined ? arg : RuntimeShape.from(shape).apply(arg);
+    return RuntimeShape.from(shapes[index]!).apply(arg);
   });
 }
