@@ -2,10 +2,6 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
-    /// <summary>
-    /// A typed source that reads the current value of a component in the browser.
-    /// Returned by each component's Value() extension method.
-    /// </summary>
     /// <summary>A typed value source produced by a registered component member.</summary>
     public sealed class TypedComponentSource<TProp> : TypedSource<TProp>
     {
@@ -22,7 +18,7 @@ namespace Alis.Reactive.Builders.Conditions
         private TypedComponentSource(string readMember, ValueExpression value)
         {
             _readMember = readMember;
-            _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            _value = value;
         }
 
         internal override ValueExpression ToValueExpression() => _value;
