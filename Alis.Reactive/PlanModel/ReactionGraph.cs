@@ -14,29 +14,17 @@ namespace Alis.Reactive.PlanModel
     {
         private protected ReactionGraph() { }
 
-        internal static ReactionGraph Sequence(params ReactionGraph[] steps) =>
-            new SequenceReaction(steps);
-
         internal static ReactionGraph Sequence(List<ReactionGraph> steps) =>
             new SequenceReaction(steps);
 
         internal static ReactionGraph Parallel(List<ReactionGraph> steps, ParallelCompletion completion) =>
             new ParallelReaction(steps, completion);
 
-        internal static ReactionGraph Branch(params BranchCase[] cases) =>
-            new BranchReaction(cases);
-
         internal static ReactionGraph Branch(List<BranchCase> cases) =>
             new BranchReaction(cases);
 
         internal static ReactionGraph Set(Source on, string property, ValueExpression value) =>
             new SetReaction(on, property, value);
-
-        internal static ReactionGraph Call(Source on, string method) =>
-            new CallReaction(on, method, Array.Empty<ValueExpression>());
-
-        internal static ReactionGraph Call(Source on, string method, List<ValueExpression> args) =>
-            new CallReaction(on, method, args);
 
         internal static ReactionGraph Call(Source on, string method, IReadOnlyList<ValueExpression> args) =>
             new CallReaction(on, method, args);
