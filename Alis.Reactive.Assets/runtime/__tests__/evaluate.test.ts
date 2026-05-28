@@ -77,7 +77,7 @@ describe("evaluateValue", () => {
     expect(evaluateValue(producer, plan())).toEqual([41, 42]);
   });
 
-  it("projects object value expressions through declared field shapes", () => {
+  it("applies declared field shapes to object value expressions", () => {
     const producer: ValueExpression = {
       kind: "object",
       shape: residentObjectShape,

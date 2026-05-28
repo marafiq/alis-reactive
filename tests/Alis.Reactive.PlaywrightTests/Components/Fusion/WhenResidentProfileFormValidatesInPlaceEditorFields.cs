@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
 /// §A mixed form: commit an overlong Nickname (>50 chars, ResidentProfileValidator.MaximumLength(50))
-/// through the InPlaceEditor, then click Save Profile. FluentValidation client projection should block
+/// through the InPlaceEditor, then click Save Profile. Client validation rules should block
 /// the outbound POST. Proves InPlaceEditor participates in validation like any other input.
 /// </summary>
 [TestFixture]
