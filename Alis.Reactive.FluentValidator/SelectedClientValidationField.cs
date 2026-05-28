@@ -15,8 +15,8 @@ namespace Alis.Reactive.FluentValidator
             ClientValidationFieldReference reference,
             Func<TModel, TValue> readValue)
         {
-            _reference = reference ?? throw new ArgumentNullException(nameof(reference));
-            _readValue = readValue ?? throw new ArgumentNullException(nameof(readValue));
+            _reference = reference;
+            _readValue = readValue;
         }
 
         private ValidationFieldPath Path => _reference.Path;
@@ -26,9 +26,9 @@ namespace Alis.Reactive.FluentValidator
         internal static SelectedClientValidationField<TModel, TValue> From(
             Expression<Func<TModel, TValue>> expression)
         {
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            var token = ClientValidationFieldToken<TModel, TValue>.For(expression);
             return new SelectedClientValidationField<TModel, TValue>(
-                FieldReferenceFrom(expression),
+                token.Reference,
                 expression.Compile());
         }
 
@@ -62,10 +62,6 @@ namespace Alis.Reactive.FluentValidator
             FieldComparisonValue operand,
             Func<TValue, bool> acceptsValue)
         {
-            if (op == null) throw new ArgumentNullException(nameof(op));
-            if (operand == null) throw new ArgumentNullException(nameof(operand));
-            if (acceptsValue == null) throw new ArgumentNullException(nameof(acceptsValue));
-
             bool FieldSatisfiesGuard(TModel model)
             {
                 var value = _readValue(model);
@@ -76,13 +72,6 @@ namespace Alis.Reactive.FluentValidator
                 FieldCondition.Compare(Path, op, operand),
                 new[] { Reference },
                 FieldSatisfiesGuard);
-        }
-
-        private static ClientValidationFieldReference FieldReferenceFrom(Expression<Func<TModel, TValue>> expression)
-        {
-            return ClientValidationFieldReference.Of(
-                ValidationFieldPath.Of(ExpressionPathHelper.ToPropertyName(expression)),
-                Shape.FromClrType(ExpressionPathHelper.ToPropertyType(expression)));
         }
     }
 
