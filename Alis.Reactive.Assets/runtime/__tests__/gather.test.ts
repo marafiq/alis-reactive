@@ -92,7 +92,7 @@ function gatherInput(
     kind: "gather",
     assignments,
     bodyFormat,
-    sourceSelection: { kind: "explicit" },
+    registeredInputs: { kind: "explicit" },
   };
 }
 

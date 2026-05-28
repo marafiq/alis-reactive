@@ -481,7 +481,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("gather"))
                 .Requires("assignments", "RequestInputAssignment[]")
                 .Requires("bodyFormat", "RequestBodyFormat")
-                .Requires("sourceSelection", "RegisteredInputSelection"));
+                .Requires("registeredInputs", "RegisteredInputSelection"));
 
             contract.Declare(Union(
                 "RegisteredInputSelection",

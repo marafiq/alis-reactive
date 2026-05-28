@@ -10,28 +10,28 @@ namespace Alis.Reactive.PlanModel
         public string Kind => "gather";
         public IReadOnlyList<RequestInputAssignment> Assignments { get; }
         public string BodyFormat => RequestBodyFormat.Value;
-        public RegisteredInputSelection SourceSelection { get; }
+        public RegisteredInputSelection RegisteredInputs { get; }
 
         private RequestBodyFormat RequestBodyFormat { get; }
 
         private GatheredRequestInput(
             IReadOnlyList<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
-            RegisteredInputSelection sourceSelection)
+            RegisteredInputSelection registeredInputs)
         {
             Assignments = assignments;
             RequestBodyFormat = bodyFormat;
-            SourceSelection = sourceSelection;
+            RegisteredInputs = registeredInputs;
         }
 
         internal static GatheredRequestInput From(
             IEnumerable<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
-            RegisteredInputSelection sourceSelection) =>
+            RegisteredInputSelection registeredInputs) =>
             new GatheredRequestInput(
                 assignments.ToList(),
                 bodyFormat,
-                sourceSelection);
+                registeredInputs);
     }
 
     internal sealed class RegisteredInputSelection

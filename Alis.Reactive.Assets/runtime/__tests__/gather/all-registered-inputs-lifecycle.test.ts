@@ -191,7 +191,7 @@ function allRegisteredInputs(): Extract<RequestInput, { kind: "gather" }> {
     kind: "gather",
     assignments: [],
     bodyFormat: "json",
-    sourceSelection: { kind: "all-registered-inputs" },
+    registeredInputs: { kind: "all-registered-inputs" },
   };
 }
 

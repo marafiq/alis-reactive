@@ -31,9 +31,9 @@ namespace Alis.Reactive.Native.Components
                     "NativeActionLink does not support validation.");
 
             var reaction = pb.BuildReaction();
-            var state = new RequestProjectionState();
-            var projectedReaction = ProjectReaction(reaction, href, state);
-            if (state.RequestCount != 1)
+            var requestUse = new ActionLinkRequestUse();
+            var actionLinkReaction = BuildActionLinkReaction(reaction, href, requestUse);
+            if (requestUse.RequestCount != 1)
             {
                 throw new InvalidOperationException(
                     "NativeActionLink supports exactly one request in its click reaction tree.");
@@ -42,13 +42,13 @@ namespace Alis.Reactive.Native.Components
             // Carry the full plan context so the runtime can resolve
             // all component references in the reaction tree.
             var payloadJson = JsonSerializer.Serialize(
-                new NativeActionLinkPayload(context.BuildPlan(), projectedReaction),
+                new NativeActionLinkPayload(context.BuildPlan(), actionLinkReaction),
                 CompactOptions);
 
             return new NativeActionLinkContract(payloadJson);
         }
 
-        private static ReactionGraph ProjectReaction(ReactionGraph reaction, string href, RequestProjectionState state)
+        private static ReactionGraph BuildActionLinkReaction(ReactionGraph reaction, string href, ActionLinkRequestUse requestUse)
         {
             switch (reaction)
             {
@@ -56,20 +56,20 @@ namespace Alis.Reactive.Native.Components
                     return ReactionGraph.Sequence(new List<ReactionGraph>(sequential.Steps));
 
                 case BranchReaction conditional:
-                    var projectedCases = new List<BranchCase>();
+                    var actionLinkCases = new List<BranchCase>();
                     foreach (var c in conditional.Cases)
-                        projectedCases.Add(c.WithReaction(ProjectReaction(c.Reaction, href, state)));
-                    return ReactionGraph.Branch(projectedCases);
+                        actionLinkCases.Add(c.WithReaction(BuildActionLinkReaction(c.Reaction, href, requestUse)));
+                    return ReactionGraph.Branch(actionLinkCases);
 
                 case RequestReaction http:
-                    state.RequestCount++;
-                    if (state.RequestCount > 1)
+                    requestUse.RequestCount++;
+                    if (requestUse.RequestCount > 1)
                         throw new InvalidOperationException(
                             "NativeActionLink supports exactly one request.");
                     if (!string.Equals(href, http.Request.Url, StringComparison.Ordinal))
                         throw new InvalidOperationException(
                             "NativeActionLink href must match the request URL.");
-                    return ReactionGraph.Request(ProjectRequest(http.Request));
+                    return ReactionGraph.Request(BuildActionLinkRequest(http.Request));
 
                 case ParallelReaction _:
                     throw new InvalidOperationException(
@@ -80,7 +80,7 @@ namespace Alis.Reactive.Native.Components
             }
         }
 
-        private static RequestPlan ProjectRequest(RequestPlan request)
+        private static RequestPlan BuildActionLinkRequest(RequestPlan request)
         {
             var requestHasFollowUp = request.Chain is FollowUpRequestChain;
             if (requestHasFollowUp)
@@ -89,7 +89,7 @@ namespace Alis.Reactive.Native.Components
 
             return RequestPlan.Create(
                 RequestEndpoint.To(HttpMethodName.From(request.Method), RequestUrl.Of(string.Empty)),
-                ProjectRequestInput(request.Input),
+                BuildActionLinkInput(request.Input),
                 request.WhileLoading,
                 request.Success,
                 request.Error,
@@ -98,7 +98,7 @@ namespace Alis.Reactive.Native.Components
                 RequestValidationTarget.None);
         }
 
-        private static RequestInput ProjectRequestInput(RequestInput input)
+        private static RequestInput BuildActionLinkInput(RequestInput input)
         {
             if (input is not GatheredRequestInput gather)
                 return input;
@@ -107,19 +107,19 @@ namespace Alis.Reactive.Native.Components
                 .Where(assignment => assignment.Target is RequestPayloadTarget)
                 .ToList();
 
-            var hasNoProjectedInput =
+            var hasNoActionLinkInput =
                 payloadAssignments.Count == 0
-                && !gather.SourceSelection.SelectsRegisteredInputs;
-            if (hasNoProjectedInput)
+                && !gather.RegisteredInputs.SelectsRegisteredInputs;
+            if (hasNoActionLinkInput)
                 return RequestInput.None;
 
             return GatheredRequestInput.From(
                 payloadAssignments,
                 RequestBodyFormat.From(gather.BodyFormat),
-                gather.SourceSelection);
+                gather.RegisteredInputs);
         }
 
-        private sealed class RequestProjectionState
+        private sealed class ActionLinkRequestUse
         {
             public int RequestCount { get; set; }
         }

@@ -37,7 +37,7 @@ function requestInput(assignments: RequestInputAssignment[]): RequestPlan["input
     kind: "gather",
     assignments,
     bodyFormat: "json",
-    sourceSelection: { kind: "explicit" },
+    registeredInputs: { kind: "explicit" },
   };
 }
 

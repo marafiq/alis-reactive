@@ -637,7 +637,7 @@ export interface GatheredRequestInput {
   kind: "gather";
   assignments: RequestInputAssignment[];
   bodyFormat: RequestBodyFormat;
-  sourceSelection: RegisteredInputSelection;
+  registeredInputs: RegisteredInputSelection;
 }
 
 export type RegisteredInputSelection =

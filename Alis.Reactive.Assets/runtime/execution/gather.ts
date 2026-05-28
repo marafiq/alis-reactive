@@ -51,7 +51,7 @@ function resolveGatheredInput(input: GatheredRequestInput, execution: GatherExec
     writeRequestInputAssignment(assignment, resolved, execution);
   }
 
-  writeSelectedRegisteredInputs(input.sourceSelection, execution, resolved.writer);
+  writeRegisteredInputs(input.registeredInputs, execution, resolved.writer);
 
   return resolved.toResult();
 }
@@ -79,12 +79,12 @@ function writeRequestInputAssignment(
   }
 }
 
-function writeSelectedRegisteredInputs(
-  sourceSelection: GatheredRequestInput["sourceSelection"],
+function writeRegisteredInputs(
+  registeredInputs: GatheredRequestInput["registeredInputs"],
   execution: GatherExecution,
   writer: RequestPayloadWriter,
 ): void {
-  switch (sourceSelection.kind) {
+  switch (registeredInputs.kind) {
     case "explicit":
       return;
     case "all-registered-inputs":
@@ -93,7 +93,7 @@ function writeSelectedRegisteredInputs(
       }
       return;
     default:
-      return assertNever(sourceSelection, "gather source selection");
+      return assertNever(registeredInputs, "registered input selection");
   }
 }
 
