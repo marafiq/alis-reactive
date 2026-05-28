@@ -5,7 +5,7 @@ using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
-    internal sealed class GatheredRequestInput : RequestInput
+    internal sealed class RequestInputProjection : RequestInput
     {
         public string Kind => "gather";
         public IReadOnlyList<RequestInputAssignment> Assignments { get; }
@@ -14,7 +14,7 @@ namespace Alis.Reactive.PlanModel
 
         private RequestBodyFormat RequestBodyFormat { get; }
 
-        private GatheredRequestInput(
+        private RequestInputProjection(
             IReadOnlyList<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
             RegisteredInputSelection registeredInputs)
@@ -24,11 +24,11 @@ namespace Alis.Reactive.PlanModel
             RegisteredInputs = registeredInputs;
         }
 
-        internal static GatheredRequestInput From(
+        internal static RequestInputProjection From(
             IEnumerable<RequestInputAssignment> assignments,
             RequestBodyFormat bodyFormat,
             RegisteredInputSelection registeredInputs) =>
-            new GatheredRequestInput(
+            new RequestInputProjection(
                 assignments.ToList(),
                 bodyFormat,
                 registeredInputs);

@@ -15,9 +15,9 @@ namespace Alis.Reactive.Builders.Requests
     public class GatherBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
-        private readonly GatheredRequestInputDraft _draft;
+        private readonly RequestInputProjectionDraft _draft;
 
-        internal GatherBuilder(PlanBuildContext context, GatheredRequestInputDraft draft)
+        internal GatherBuilder(PlanBuildContext context, RequestInputProjectionDraft draft)
         {
             _context = context;
             _draft = draft;

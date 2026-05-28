@@ -623,7 +623,7 @@ export interface FollowUpRequestChain {
 
 export type RequestInput =
   | NoRequestInput
-  | GatheredRequestInput;
+  | RequestInputProjection;
 
 export type RequestBodyFormat =
   | "json"
@@ -633,7 +633,7 @@ export interface NoRequestInput {
   kind: "none";
 }
 
-export interface GatheredRequestInput {
+export interface RequestInputProjection {
   kind: "gather";
   assignments: RequestInputAssignment[];
   bodyFormat: RequestBodyFormat;
