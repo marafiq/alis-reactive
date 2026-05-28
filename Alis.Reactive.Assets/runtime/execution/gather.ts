@@ -2,7 +2,7 @@
 // Every payload assignment is evaluated by evaluateValue(); runtime selected
 // registered inputs use the same writer path after reading their component value member.
 
-import type { PlanDocument, RequestInputProjection, RequestInputAssignment, HttpMethod, RequestInput } from "../types";
+import type { PlanDocument, GatherRequestInput, RequestInputAssignment, HttpMethod, RequestInput } from "../types";
 import type { ExecContext } from "../types";
 import { assertNever } from "../core/assert-never";
 import { evaluateValue } from "../core/evaluate";
@@ -38,13 +38,13 @@ function resolveRequestInputPlan(input: RequestInput, execution: GatherExecution
     case "none":
       return RequestInputResolution.empty();
     case "gather":
-      return resolveRequestInputProjection(input, execution);
+      return resolveGatherRequestInput(input, execution);
     default:
       return assertNever(input, "request input");
   }
 }
 
-function resolveRequestInputProjection(input: RequestInputProjection, execution: GatherExecution): ResolvedRequestInput {
+function resolveGatherRequestInput(input: GatherRequestInput, execution: GatherExecution): ResolvedRequestInput {
   const resolved = RequestInputResolution.for(input.bodyFormat, execution.method);
 
   for (const assignment of input.assignments) {
@@ -80,7 +80,7 @@ function writeRequestInputAssignment(
 }
 
 function writeRegisteredInputs(
-  registeredInputs: RequestInputProjection["registeredInputs"],
+  registeredInputs: GatherRequestInput["registeredInputs"],
   execution: GatherExecution,
   writer: RequestPayloadWriter,
 ): void {

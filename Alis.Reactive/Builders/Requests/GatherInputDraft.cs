@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
-    internal sealed class RequestInputProjectionDraft
+    internal sealed class GatherInputDraft
     {
         private readonly List<RequestInputAssignment> _assignments = new List<RequestInputAssignment>();
 
@@ -25,7 +25,7 @@ namespace Alis.Reactive.Builders.Requests
             if (!hasGatheredInput)
                 return RequestInput.None;
 
-            return RequestInputProjection.From(
+            return GatherRequestInput.From(
                 _assignments,
                 bodyFormat,
                 RegisteredInputs);

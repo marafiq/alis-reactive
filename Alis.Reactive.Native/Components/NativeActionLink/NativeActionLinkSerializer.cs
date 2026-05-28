@@ -100,7 +100,7 @@ namespace Alis.Reactive.Native.Components
 
         private static RequestInput BuildActionLinkInput(RequestInput input)
         {
-            if (input is not RequestInputProjection gather)
+            if (input is not GatherRequestInput gather)
                 return input;
 
             var payloadAssignments = gather.Assignments
@@ -113,7 +113,7 @@ namespace Alis.Reactive.Native.Components
             if (hasNoActionLinkInput)
                 return RequestInput.None;
 
-            return RequestInputProjection.From(
+            return GatherRequestInput.From(
                 payloadAssignments,
                 RequestBodyFormat.From(gather.BodyFormat),
                 gather.RegisteredInputs);

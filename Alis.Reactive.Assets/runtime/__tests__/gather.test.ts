@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { resolveRequestInput } from "../execution/gather";
 import type {
   JsonValue,
+  BrowserObjectContract,
+  ComponentObject,
   PathSegment,
   PlanDocument,
   RequestInput,
@@ -156,6 +158,52 @@ describe("resolveRequestInput", () => {
 
     expect(resolveBody(input)).toEqual({
       filter: "fall risk",
+    });
+  });
+
+  it("reads component method return values through the shared value expression path", () => {
+    document.body.innerHTML = `<div id="shift-schedule"></div>`;
+    const schedule = document.getElementById("shift-schedule") as HTMLElement & {
+      getEvents(): unknown[];
+    };
+    schedule.getEvents = () => [{ id: 1, subject: "Rounds" }];
+    const scheduleContract: BrowserObjectContract = {
+      properties: {},
+      methods: {
+        getEvents: {
+          path: [{ kind: "property", name: "getEvents" }],
+          arguments: { kind: "exact", shapes: [] },
+          returns: arrayShape(objectShape),
+        },
+      },
+      events: {},
+    };
+    const scheduleComponent: ComponentObject = {
+      id: "shift-schedule",
+      vendor: "native",
+      type: "fusion.schedule",
+      role: { kind: "object-target" },
+      binding: { kind: "none" },
+      container: { kind: "none" },
+    };
+    const input = gatherInput([
+      assignment("events", {
+        kind: "read",
+        from: { kind: "component", component: "shift-schedule" },
+        member: "getEvents",
+        path: [],
+        shape: arrayShape(objectShape),
+        access: { kind: "method", args: [] },
+      }),
+    ]);
+    const plan: PlanDocument = {
+      ...emptyPlan,
+      types: { "fusion.schedule": scheduleContract },
+      components: { "shift-schedule": scheduleComponent },
+    };
+
+    expect(resolveRequestInput(input, "POST", plan, {}).body).toEqual({
+      events: [{ id: 1, subject: "Rounds" }],
     });
   });
 
