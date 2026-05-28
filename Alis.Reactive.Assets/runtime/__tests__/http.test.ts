@@ -17,6 +17,7 @@ import type {
 } from "../types";
 
 const stringShape: Shape = { kind: "string" };
+const booleanShape: Shape = { kind: "boolean" };
 const noneShape: Shape = { kind: "none" };
 
 afterEach(() => {
@@ -97,6 +98,17 @@ function responseFieldEquals(member: string, value: string): ConditionGraph {
     op: "eq",
     right: { kind: "value", value: literal(value) },
     shape: stringShape,
+    itemShape: noneShape,
+  };
+}
+
+function booleanIs(value: boolean): ConditionGraph {
+  return {
+    kind: "compare",
+    left: { kind: "literal", value, shape: booleanShape },
+    op: "eq",
+    right: { kind: "value", value: { kind: "literal", value: true, shape: booleanShape } },
+    shape: booleanShape,
     itemShape: noneShape,
   };
 }
@@ -209,6 +221,45 @@ describe("executeRequest HTTP lifecycle", () => {
       "X-Unit": "memory-care",
     });
     expect(init.body).toBe(JSON.stringify({ name: "Ada" }));
+  });
+
+  it("runs branch reactions inside request lifecycle slots around the HTTP send", async () => {
+    document.body.innerHTML = `
+      <span id="before"></span>
+      <span id="complete"></span>
+    `;
+    const fetchMock = vi.fn(async () => {
+      expect(document.getElementById("before")?.textContent).toBe("loading");
+      expect(document.getElementById("complete")?.textContent).toBe("");
+      return responseJson({ saved: true });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const saveResident = request({
+      whileLoading: [{
+        kind: "branch",
+        cases: [
+          {
+            guard: { kind: "when", condition: booleanIs(true) },
+            reaction: setText("before", literal("loading")),
+          },
+        ],
+      }],
+      finally: [{
+        kind: "branch",
+        cases: [
+          {
+            guard: { kind: "when", condition: booleanIs(true) },
+            reaction: setText("complete", literal("done")),
+          },
+        ],
+      }],
+    });
+
+    await executeRequest(saveResident, nativeTextPlan(["before", "complete"]));
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(document.getElementById("before")?.textContent).toBe("loading");
+    expect(document.getElementById("complete")?.textContent).toBe("done");
   });
 
   it("runs a follow-up request only after the first request succeeds", async () => {
