@@ -38,7 +38,7 @@ namespace Alis.Reactive.PlanModel
 
             var typeKey = TypeKey.NativeElement(id);
             _objectContracts.EnsureEmpty(typeKey);
-            _components[id.Value] = ComponentObject.Element(id.Value, ComponentVendor.Native.Value, typeKey.Value);
+            _components[id.Value] = ComponentObject.Element(id, ComponentVendor.Native, typeKey);
             return ComponentKey.Of(id.Value);
         }
 
@@ -51,7 +51,7 @@ namespace Alis.Reactive.PlanModel
         private ComponentKey EnsureComponentObject(
             string componentId,
             string vendor,
-            Func<string, string, string, ComponentObject> createUnregisteredComponent)
+            Func<ComponentId, ComponentVendor, TypeKey, ComponentObject> createUnregisteredComponent)
         {
             var id = ComponentId.Of(componentId);
             var componentVendor = ComponentVendor.From(vendor);
@@ -72,7 +72,7 @@ namespace Alis.Reactive.PlanModel
             else
             {
                 _objectContracts.EnsureEmpty(typeKey);
-                _components[id.Value] = createUnregisteredComponent(id.Value, componentVendor.Value, typeKey.Value);
+                _components[id.Value] = createUnregisteredComponent(id, componentVendor, typeKey);
             }
 
             return ComponentKey.Of(id.Value);

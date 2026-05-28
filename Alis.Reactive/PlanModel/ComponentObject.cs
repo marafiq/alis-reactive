@@ -38,33 +38,33 @@ namespace Alis.Reactive.PlanModel
             _container = container ?? throw new System.ArgumentNullException(nameof(container));
         }
 
-        internal static ComponentObject Element(string id, string vendor, string type) =>
+        internal static ComponentObject Element(ComponentId id, ComponentVendor vendor, TypeKey type) =>
             new ComponentObject(
-                ComponentId.Of(id),
-                ComponentVendor.From(vendor),
-                TypeKey.Of(type),
+                id,
+                vendor,
+                type,
                 ComponentRole.ObjectTarget,
                 InputBinding.None,
                 ValidationContainerBinding.None);
 
-        internal static ComponentObject LayoutObject(string id, string vendor, string type) =>
+        internal static ComponentObject LayoutObject(ComponentId id, ComponentVendor vendor, TypeKey type) =>
             new ComponentObject(
-                ComponentId.Of(id),
-                ComponentVendor.From(vendor),
-                TypeKey.Of(type),
+                id,
+                vendor,
+                type,
                 ComponentRole.LayoutObject,
                 InputBinding.None,
                 ValidationContainerBinding.None);
 
         internal static ComponentObject PlanInput(
-            string id,
-            string vendor,
-            string type,
+            ComponentId id,
+            ComponentVendor vendor,
+            TypeKey type,
             InputBinding binding) =>
             new ComponentObject(
-                ComponentId.Of(id),
-                ComponentVendor.From(vendor),
-                TypeKey.Of(type),
+                id,
+                vendor,
+                type,
                 ComponentRole.PlanInput,
                 binding,
                 ValidationContainerBinding.None);
@@ -240,9 +240,9 @@ namespace Alis.Reactive.PlanModel
 
         internal ComponentObject CreateComponent() =>
             ComponentObject.PlanInput(
-                _componentId.Value,
-                _vendor.Value,
-                TypeKey.Value,
+                _componentId,
+                _vendor,
+                TypeKey,
                 InputBinding);
 
         internal static InputComponentPlanBinding For(

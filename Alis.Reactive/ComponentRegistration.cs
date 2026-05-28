@@ -73,9 +73,9 @@ namespace Alis.Reactive
             if (typeKey == null) throw new System.ArgumentNullException(nameof(typeKey));
 
             return ComponentObject.PlanInput(
-                componentId.Value,
-                vendor.Value,
-                typeKey.Value,
+                componentId,
+                vendor,
+                typeKey,
                 ValueContract.BindingFor(RegisteredBindingPath));
         }
 
