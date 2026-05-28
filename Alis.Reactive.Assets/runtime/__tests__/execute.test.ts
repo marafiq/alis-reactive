@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { registerPlugin } from "../core/plugin-catalog";
 import { registerComponentRuntime, type ComponentRuntimeDriver } from "../domain/component-runtime";
 import { executeReaction } from "../execution/execute";
 import type {
@@ -354,6 +355,46 @@ describe("executeReaction member targets", () => {
     executeReaction(reaction, textBoxPlan());
 
     expect(element.value).toBe("Katherine");
+  });
+
+  it("calls a plugin command through the declared JS object contract", () => {
+    const calls: string[] = [];
+    const pluginName = "runtimeCommandTarget";
+    const typeKey = `plugin.${pluginName}`;
+    registerPlugin(pluginName, {
+      track(label: string): void {
+        calls.push(label);
+      },
+    });
+
+    const type: BrowserObjectContract = {
+      properties: {},
+      methods: {
+        track: {
+          path: [{ kind: "property", name: "track" }],
+          arguments: { kind: "exact", shapes: [stringShape] },
+          returns: noneShape,
+        },
+      },
+      events: {},
+    };
+    const plan: PlanDocument = {
+      version: 3,
+      planId: "Runtime.PluginCommandExecution",
+      scope: { kind: "root" },
+      types: { [typeKey]: type },
+      components: {},
+      behaviors: [],
+    };
+
+    executeReaction({
+      kind: "call",
+      on: { kind: "plugin", name: pluginName, type: typeKey },
+      method: "track",
+      args: [literal("opened")],
+    }, plan);
+
+    expect(calls).toEqual(["opened"]);
   });
 
   it("sets and calls payload members inside the active execution context", () => {

@@ -175,12 +175,12 @@ function executeCall(reaction: CallReaction, plan: RuntimePlan, context: Executi
 
   switch (reaction.on.kind) {
     case "component":
-      log.trace("call", { target: reaction.on.component, method: reaction.method, args });
-      plan.objectForSource(reaction.on).call(reaction.method, args);
-      return;
-
     case "plugin":
-      log.trace("call", { target: reaction.on.name, method: reaction.method, args });
+      log.trace("call", {
+        target: reaction.on.kind === "component" ? reaction.on.component : reaction.on.name,
+        method: reaction.method,
+        args,
+      });
       plan.objectForSource(reaction.on).call(reaction.method, args);
       return;
 
