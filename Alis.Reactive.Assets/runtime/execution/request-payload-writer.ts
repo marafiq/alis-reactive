@@ -19,13 +19,9 @@ export interface ResolvedRequestInput {
 }
 
 /** Writes request payload values into query string, FormData, or JSON body. */
-export interface RequestPayloadWriter {
+interface RequestPayloadWriter {
   emitScalar(target: RequestPayloadTarget, value: unknown, shape: RuntimeShape): void;
   emitArray(target: RequestPayloadTarget, items: unknown[], itemShape: RuntimeShape): void;
-}
-
-export function emptyRequestInput(): ResolvedRequestInput {
-  return { urlParams: [], routeParams: {}, headers: {}, body: {} };
 }
 
 export function requestPayloadWriterFor(
@@ -47,29 +43,6 @@ export function requestPayloadWriterFor(
     default:
       return assertNever(bodyFormat, "request body format");
   }
-}
-
-export function writeRequestHeader(
-  requestInput: ResolvedRequestInput,
-  name: string,
-  value: unknown,
-  shape: RuntimeShape,
-): void {
-  requestInput.headers[name] = requestScalarWireValue("header", name, value, shape);
-}
-
-export function writeRequestRouteParam(
-  requestInput: ResolvedRequestInput,
-  name: string,
-  value: unknown,
-  shape: RuntimeShape,
-): void {
-  const valueIsMissing = value === null || value === undefined;
-  if (valueIsMissing) {
-    throw new Error(`[alis] route param "${name}" evaluated to null; cannot build URL`);
-  }
-
-  requestInput.routeParams[name] = requestScalarWireValue("route param", name, value, shape);
 }
 
 function sendsInputInQueryString(method: HttpMethod): boolean {
@@ -236,14 +209,6 @@ function scalarWireValue(value: unknown, name: string): string {
   if (result.ok) return result.value;
 
   throw new Error(`[alis] gather value "${name}" cannot be serialized as a scalar: ${result.error}`);
-}
-
-function requestScalarWireValue(targetKind: "header" | "route param", name: string, value: unknown, shape: RuntimeShape): string {
-  const wire = shape.formatForWire(value);
-  const result = toString(wire);
-  if (result.ok) return result.value;
-
-  throw new Error(`[alis] ${targetKind} "${name}" cannot be serialized as a scalar: ${result.error}`);
 }
 
 function jsonBodyValue(wireValue: unknown): unknown {

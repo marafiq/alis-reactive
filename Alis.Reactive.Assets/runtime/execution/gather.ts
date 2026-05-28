@@ -6,16 +6,13 @@ import type { PlanDocument, GatherRequestInput, RequestInputAssignment, HttpMeth
 import type { ExecContext } from "../types";
 import { assertNever } from "../core/assert-never";
 import { evaluateValue } from "../core/evaluate";
+import { toString } from "../core/shape-convert";
 import { RuntimePlan, type RuntimeComponent } from "../domain/runtime-plan";
 import { RuntimeShape } from "../domain/runtime-shape";
 import {
-  emptyRequestInput,
   requestPayloadWriterFor,
-  writeRequestHeader,
   writeRequestPayloadValue,
-  writeRequestRouteParam,
   type ResolvedRequestInput,
-  type RequestPayloadWriter,
 } from "./request-payload-writer";
 import { isMissingRuntimeValue } from "../domain/runtime-value";
 
@@ -26,6 +23,12 @@ interface GatherExecution {
   readonly plan: PlanDocument;
   readonly runtimePlan: RuntimePlan;
   readonly ctx: ExecContext;
+}
+
+type RequestPayloadWriter = ReturnType<typeof requestPayloadWriterFor>;
+
+function emptyRequestInput(): ResolvedRequestInput {
+  return { urlParams: [], routeParams: {}, headers: {}, body: {} };
 }
 
 /**
@@ -91,6 +94,42 @@ function writeRequestInputAssignment(
     default:
       return assertNever(assignment.target, "request input target");
   }
+}
+
+function writeRequestHeader(
+  requestInput: ResolvedRequestInput,
+  name: string,
+  value: unknown,
+  shape: RuntimeShape,
+): void {
+  requestInput.headers[name] = requestScalarWireValue("header", name, value, shape);
+}
+
+function writeRequestRouteParam(
+  requestInput: ResolvedRequestInput,
+  name: string,
+  value: unknown,
+  shape: RuntimeShape,
+): void {
+  const valueIsMissing = value === null || value === undefined;
+  if (valueIsMissing) {
+    throw new Error(`[alis] route param "${name}" evaluated to null; cannot build URL`);
+  }
+
+  requestInput.routeParams[name] = requestScalarWireValue("route param", name, value, shape);
+}
+
+function requestScalarWireValue(
+  targetKind: "header" | "route param",
+  name: string,
+  value: unknown,
+  shape: RuntimeShape,
+): string {
+  const wire = shape.formatForWire(value);
+  const result = toString(wire);
+  if (result.ok) return result.value;
+
+  throw new Error(`[alis] ${targetKind} "${name}" cannot be serialized as a scalar: ${result.error}`);
 }
 
 function writeRuntimeSelectedInputs(
