@@ -12,7 +12,6 @@ namespace Alis.Reactive.Builders
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
-            FlushPendingBranchIfNeeded();
             _draft.BeginBranch();
 
             var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
@@ -25,7 +24,6 @@ namespace Alis.Reactive.Builders
             Expression<Func<TPayload, TProp>> path)
             where TPayload : class
         {
-            FlushPendingBranchIfNeeded();
             _draft.BeginBranch();
 
             var source = responseBody.Read(path);
@@ -35,7 +33,6 @@ namespace Alis.Reactive.Builders
         /// <summary>Starts a conditional branch from a typed source (component, plugin, or URL value).</summary>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
-            FlushPendingBranchIfNeeded();
             _draft.BeginBranch();
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
@@ -44,16 +41,9 @@ namespace Alis.Reactive.Builders
         /// <param name="message">The confirmation message shown to the user.</param>
         public GuardBuilder<TModel> Confirm(string message)
         {
-            FlushPendingBranchIfNeeded();
             _draft.BeginBranch();
 
             return new GuardBuilder<TModel>(ConditionGraph.Confirm(message), this);
-        }
-
-        private void FlushPendingBranchIfNeeded()
-        {
-            if (_draft.HasPendingBranch)
-                FlushSegment();
         }
     }
 }

@@ -13,8 +13,6 @@ namespace Alis.Reactive.Builders
         private HttpRequestBuilder<TModel>? _pendingRequest;
         private ParallelBuilder<TModel>? _pendingParallelRequests;
 
-        internal bool HasPendingBranch => _pendingBranchCases is not null;
-
         internal HttpRequestBuilder<TModel> BeginHttp(PlanBuildContext context)
         {
             FlushPendingRequestOrParallel();
