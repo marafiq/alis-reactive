@@ -27,10 +27,6 @@ namespace Alis.Reactive.PlanModel
         {
             if (trigger is ComponentEventTrigger componentEvent)
             {
-                var componentIsAlreadyInPlan = _components.Contains(componentEvent.ComponentKey);
-                if (!componentIsAlreadyInPlan)
-                    return;
-
                 _components.EnsureEvent(
                     componentEvent.ComponentKey,
                     ObjectEventContract.ForComponentEvent(componentEvent.EventName));

@@ -24,9 +24,6 @@ namespace Alis.Reactive.PlanModel
         internal IReadOnlyDictionary<string, ComponentRegistration> RegisteredInputs =>
             _registrations.Snapshot();
 
-        internal bool Contains(ComponentKey componentKey) =>
-            _components.ContainsKey(componentKey.Value);
-
         internal ComponentObject Get(ComponentKey componentKey) =>
             _components[componentKey.Value];
 
