@@ -74,19 +74,18 @@ namespace Alis.Reactive
         {
             foreach (var itemField in itemFields)
             {
-                if (!TryMatchCollectionItemMember(
-                        collectionPath,
-                        itemField.FieldName,
-                        registeredPath,
-                        out var itemPrefix,
-                        out var directMatch))
+                var renderedItem = RenderedItemFieldMatch.Find(
+                    collectionPath,
+                    itemField.FieldName,
+                    registeredPath);
+                if (renderedItem == null)
                     continue;
 
                 var renderedField = itemField.PrefixedBy(
-                    ValidationFieldPath.Of(itemPrefix),
+                    renderedItem.ItemPrefix,
                     ClientRuleActivation.Always);
 
-                if (directMatch && renderedField.HasRules)
+                if (renderedItem.IsDirectField && renderedField.HasRules)
                     yield return renderedField;
 
                 foreach (var nestedItemField in ExpandRenderedItemFields(
@@ -97,36 +96,44 @@ namespace Alis.Reactive
             }
         }
 
-        private static bool TryMatchCollectionItemMember(
-            string collectionPath,
-            string itemFieldPath,
-            string registeredPath,
-            out string itemPrefix,
-            out bool directMatch)
+        private sealed class RenderedItemFieldMatch
         {
-            itemPrefix = string.Empty;
-            directMatch = false;
+            private RenderedItemFieldMatch(ValidationFieldPath itemPrefix, bool isDirectField)
+            {
+                ItemPrefix = itemPrefix;
+                IsDirectField = isDirectField;
+            }
 
-            var openingBracket = collectionPath.Length;
-            if (!registeredPath.StartsWith(collectionPath + "[", StringComparison.Ordinal))
-                return false;
+            internal ValidationFieldPath ItemPrefix { get; }
+            internal bool IsDirectField { get; }
 
-            var closingBracket = registeredPath.IndexOf(']', openingBracket + 1);
-            if (closingBracket < 0)
-                return false;
+            internal static RenderedItemFieldMatch? Find(
+                string collectionPath,
+                string itemFieldPath,
+                string registeredPath)
+            {
+                var openingBracket = collectionPath.Length;
+                if (!registeredPath.StartsWith(collectionPath + "[", StringComparison.Ordinal))
+                    return null;
 
-            itemPrefix = registeredPath.Substring(0, closingBracket + 1);
+                var closingBracket = registeredPath.IndexOf(']', openingBracket + 1);
+                if (closingBracket < 0)
+                    return null;
 
-            var renderedItemFieldPath = itemPrefix + "." + itemFieldPath;
-            directMatch = string.Equals(registeredPath, renderedItemFieldPath, StringComparison.Ordinal);
-            if (directMatch)
-                return true;
+                var itemPrefix = registeredPath.Substring(0, closingBracket + 1);
+                var renderedItemFieldPath = itemPrefix + "." + itemFieldPath;
+                var directField = string.Equals(registeredPath, renderedItemFieldPath, StringComparison.Ordinal);
+                if (directField)
+                    return new RenderedItemFieldMatch(ValidationFieldPath.Of(itemPrefix), true);
 
-            if (!registeredPath.StartsWith(renderedItemFieldPath + ".", StringComparison.Ordinal) &&
-                !registeredPath.StartsWith(renderedItemFieldPath + "[", StringComparison.Ordinal))
-                return false;
+                var nestedField =
+                    registeredPath.StartsWith(renderedItemFieldPath + ".", StringComparison.Ordinal) ||
+                    registeredPath.StartsWith(renderedItemFieldPath + "[", StringComparison.Ordinal);
+                if (!nestedField)
+                    return null;
 
-            return true;
+                return new RenderedItemFieldMatch(ValidationFieldPath.Of(itemPrefix), false);
+            }
         }
 
         private static IReadOnlyDictionary<string, ClientValidationField> IndexClientRuleFields(
