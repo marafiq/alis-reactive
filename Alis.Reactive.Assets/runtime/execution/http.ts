@@ -20,14 +20,9 @@ type HttpResponseBody =
 const missingResponseBody: HttpResponseBody = { kind: "missing" };
 
 type HttpExchangeOutcome =
-  | { readonly kind: "success"; readonly status: RequestOutcomeStatus; readonly body: HttpResponseBody }
-  | { readonly kind: "error"; readonly status: RequestOutcomeStatus; readonly body: HttpResponseBody }
-  | { readonly kind: "response-unavailable"; readonly status: RequestOutcomeStatus };
-
-type RequestOutcomeStatus =
-  | { readonly kind: "http"; readonly value: number }
-  | { readonly kind: "network-failure"; readonly value: 0 }
-  | { readonly kind: "client-failure"; readonly value: -1 };
+  | { readonly kind: "success"; readonly status: number; readonly body: HttpResponseBody }
+  | { readonly kind: "error"; readonly status: number; readonly body: HttpResponseBody }
+  | { readonly kind: "response-unavailable" };
 
 /** Execute a single HTTP request with gather, while-loading, response routing, finally, and chaining. */
 export async function executeRequest(req: RequestPlan, plan: PlanDocument, ctx?: ExecContext): Promise<void> {
@@ -89,21 +84,20 @@ async function sendHttpRequest(request: RequestPlan, fetchRequest: ResolvedFetch
 }
 
 function exchangeOutcomeFromResponse(response: Response, body: HttpResponseBody): HttpExchangeOutcome {
-  const status = httpOutcomeStatus(response.status);
   const statusIsSuccessful = response.ok;
   return statusIsSuccessful
-    ? { kind: "success", status, body }
-    : { kind: "error", status, body };
+    ? { kind: "success", status: response.status, body }
+    : { kind: "error", status: response.status, body };
 }
 
 function exchangeOutcomeFromClientFailure(request: RequestPlan, err: unknown): HttpExchangeOutcome {
-  const failure = clientRequestFailureFrom(err);
-  log.error(failure.traceEvent, {
+  const traceEvent = clientRequestFailureTraceEvent(err);
+  log.error(traceEvent, {
     method: request.method,
     url: request.url,
     error: String(err),
   });
-  return { kind: "response-unavailable", status: failure.status };
+  return { kind: "response-unavailable" };
 }
 
 async function routeExchangeOutcome(
@@ -120,50 +114,23 @@ async function routeExchangeOutcome(
       await routeError(request, plan, context, outcome.status, outcome.body);
       return;
     case "response-unavailable":
-      await routeResponseUnavailable(request, plan, context, outcome.status);
+      await routeResponseUnavailable(request, plan, context);
       return;
     default:
       return assertNever(outcome, "HTTP exchange outcome");
   }
 }
 
-type ClientRequestFailure = {
-  readonly status: RequestOutcomeStatus;
-  readonly traceEvent: "fetch.network-error" | "fetch.client-error";
-};
-
-function clientRequestFailureFrom(error: unknown): ClientRequestFailure {
+function clientRequestFailureTraceEvent(error: unknown): "fetch.network-error" | "fetch.client-error" {
   const requestFailedBeforeResponse = error instanceof TypeError;
-  return requestFailedBeforeResponse
-    ? { status: networkFailureStatus(), traceEvent: "fetch.network-error" }
-    : { status: clientFailureStatus(), traceEvent: "fetch.client-error" };
-}
-
-function httpOutcomeStatus(value: number): RequestOutcomeStatus {
-  return { kind: "http", value };
-}
-
-function networkFailureStatus(): RequestOutcomeStatus {
-  return { kind: "network-failure", value: 0 };
-}
-
-function clientFailureStatus(): RequestOutcomeStatus {
-  return { kind: "client-failure", value: -1 };
-}
-
-function statusMatchesExact(status: RequestOutcomeStatus, planStatus: number): boolean {
-  return status.kind === "http" && status.value === planStatus;
-}
-
-function statusForLog(status: RequestOutcomeStatus): number {
-  return status.value;
+  return requestFailedBeforeResponse ? "fetch.network-error" : "fetch.client-error";
 }
 
 async function routeSuccess(
   request: RequestPlan,
   plan: PlanDocument,
   context: ExecutionContext,
-  status: RequestOutcomeStatus,
+  status: number,
   body: HttpResponseBody,
 ): Promise<void> {
   const responseContext = contextWithResponseBody(context, body);
@@ -176,7 +143,7 @@ async function routeError(
   request: RequestPlan,
   plan: PlanDocument,
   context: ExecutionContext,
-  status: RequestOutcomeStatus,
+  status: number,
   body: HttpResponseBody,
 ): Promise<void> {
   await routeAndComplete(request, plan, context, () =>
@@ -187,10 +154,9 @@ async function routeResponseUnavailable(
   request: RequestPlan,
   plan: PlanDocument,
   context: ExecutionContext,
-  status: RequestOutcomeStatus,
 ): Promise<void> {
   await routeAndComplete(request, plan, context, () =>
-    routeResponseRoutes(request.error, status, plan, context.asAvailable()));
+    routeAnyResponseRoute(request.error, plan, context.asAvailable()));
 }
 
 async function routeAndComplete(
@@ -290,7 +256,7 @@ function responseBodyFrom(rawBody: unknown): HttpResponseBody {
 
 async function routeResponseRoutes(
   routes: ResponseRoute[],
-  status: RequestOutcomeStatus,
+  status: number,
   plan: PlanDocument,
   context: ExecContext,
 ): Promise<void> {
@@ -303,16 +269,35 @@ async function routeResponseRoutes(
   if (routes.length === 0) return;
 
   log.warn("response.unhandled", {
-    status: statusForLog(status),
+    status,
     routeCount: routes.length,
   });
 }
 
-function routeMatchesStatus(status: RequestOutcomeStatus): (route: ResponseRoute) => boolean {
+async function routeAnyResponseRoute(
+  routes: ResponseRoute[],
+  plan: PlanDocument,
+  context: ExecContext,
+): Promise<void> {
+  const route = routes.find(routeMatchesAnyStatus);
+  if (route) {
+    await executeReaction(route.reaction, plan, context);
+    return;
+  }
+
+  if (routes.length === 0) return;
+
+  log.warn("response.unhandled", {
+    outcome: "response-unavailable",
+    routeCount: routes.length,
+  });
+}
+
+function routeMatchesStatus(status: number): (route: ResponseRoute) => boolean {
   return route => {
     const match = route.match;
     const routeTargetsExactStatus = match.kind === "status";
-    return routeTargetsExactStatus && statusMatchesExact(status, match.status);
+    return routeTargetsExactStatus && status === match.status;
   };
 }
 
