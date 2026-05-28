@@ -91,9 +91,9 @@ Use these core concepts unless the DSL graph proves a better name:
 - `ValueExpression`
 - `ConditionGraph`
 - `RequestPlan`
-- `RequestInputProjection`
+- `RequestInput`
 - `ResponseRoute`
-- `ValidationProjection`
+- `ClientValidationRule`
 - `BrowserObjectContract`
 - `ComponentObject`
 - `PluginContract`

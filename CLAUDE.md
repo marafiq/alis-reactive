@@ -315,7 +315,7 @@ dotnet pack Alis.Reactive/Alis.Reactive.csproj \
 | C# | .NET 10, C# 14. Use modern C# where it improves the domain model without weakening the DSL contract. |
 | TS | TypeScript 5.8, esbuild ESM, Tailwind CSS v4 |
 | Components | Syncfusion EJ2 32.x (Fusion) + Native HTML. Always through DSL: `Html.InputField(plan, m => m.Name).NativeTextBox(build: b => ...)` |
-| Validation | FluentValidation 12.x remains server authority; `FluentValidationAdapter` projects deterministic client validation rules |
+| Validation | FluentValidation 12.x remains server authority; `FluentValidationAdapter` extracts deterministic client validation rules |
 | Tests | NUnit 4.3-4.5, Vitest 3.x + jsdom (configured, no tests yet), Playwright 1.52 |
 
 ## Skills
