@@ -2,20 +2,20 @@ using System.Text.Json;
 using Alis.Reactive.Native.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Alis.Reactive.PlaywrightTests.Conditions.Projection;
+namespace Alis.Reactive.PlaywrightTests.Conditions.BehaviorGraph;
 
 [TestFixture]
 public sealed class WhenConditionDslBuildsBehaviorGraph
 {
-    private static readonly IHtmlHelper<ConditionProjectionModel> Html = null!;
+    private static readonly IHtmlHelper<ConditionBehaviorModel> Html = null!;
 
     [Test]
-    public void mixed_conditions_requests_and_commands_keep_declaration_order()
+    public void repeated_branch_blocks_mixed_with_requests_keep_declaration_order()
     {
         var plan = PlanExtensions.ReactivePlan(Html);
 
         HtmlExtensions.On(Html, plan, trigger =>
-            trigger.CustomEvent<ConditionProjectionEvent>("score-changed", (args, pipeline) =>
+            trigger.CustomEvent<ConditionBehaviorEvent>("score-changed", (args, pipeline) =>
             {
                 pipeline.Element("start").SetText("start");
 
@@ -28,7 +28,8 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
                 pipeline.Post("/audit", gather => gather.FromEvent(args, x => x.Score, "score"));
 
                 pipeline.When(args, x => x.IsReady).Truthy()
-                    .Then(ready => ready.Dispatch("ready"));
+                    .Then(ready => ready.Dispatch("ready"))
+                    .Else(notReady => notReady.Dispatch("not-ready"));
 
                 pipeline.Element("done").SetText("done");
             }));
@@ -62,7 +63,8 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
 
             Assert.That(BranchGuardKinds(steps[3]), Is.EqualTo(new[]
             {
-                "when"
+                "when",
+                "default"
             }));
 
             Assert.That(steps[2]
@@ -88,11 +90,11 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
             .ToArray();
     }
 
-    private sealed class ConditionProjectionModel
+    private sealed class ConditionBehaviorModel
     {
     }
 
-    private sealed class ConditionProjectionEvent
+    private sealed class ConditionBehaviorEvent
     {
         public int Score { get; set; }
         public bool IsReady { get; set; }
