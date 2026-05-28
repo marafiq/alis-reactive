@@ -6,7 +6,6 @@ namespace Alis.Reactive.PlanModel
     internal sealed class BrowserObjectContracts
     {
         private readonly Dictionary<string, BrowserObjectContract> _byTypeKey = new Dictionary<string, BrowserObjectContract>();
-        private readonly HashSet<string> _declaredPlugins = new HashSet<string>();
 
         internal IReadOnlyDictionary<string, BrowserObjectContract> Snapshot() =>
             new Dictionary<string, BrowserObjectContract>(_byTypeKey);
@@ -48,9 +47,8 @@ namespace Alis.Reactive.PlanModel
 
         internal void RegisterPlugin(PluginContract contract)
         {
-            var name = contract.Name;
-            if (!_declaredPlugins.Add(name.Value))
-                throw new InvalidOperationException($"Plugin '{name.Value}' is already registered.");
+            if (Contains(contract.TypeKey))
+                throw new InvalidOperationException($"Plugin '{contract.Name.Value}' is already registered.");
 
             AddOrReplace(contract.TypeKey, contract.ToBrowserObjectContract());
         }

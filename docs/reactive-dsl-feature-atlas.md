@@ -6,7 +6,7 @@ a separate specification. When in doubt, the source builders and real cshtml
 usage win.
 
 The reason this document exists: broad refactors must start from DSL capability,
-not from current helper classes or JSON shape. Each row below should pressure
+not from current helper classes or JSON shape. Each row below must pressure
 test the same path:
 
 `DSL capability -> PlanModel concept -> generated TypeScript term -> runtime execution behavior -> behavior proof`
@@ -29,10 +29,10 @@ Everything else is a source scope or a reaction over those objects:
 - Event args, HTTP success/error bodies, outgoing request payload, and dispatch
   payloads are payload scopes.
 - JSON walking is structured `Path` traversal over a value, not string magic.
-- Plugins are explicit browser objects/functions for behavior that should not
+- Plugins are explicit browser objects/functions for behavior that does not need to
   become a first-class deterministic DSL primitive.
 
-Runtime should execute the declared object/member intent. It should not infer
+Runtime must execute the declared object/member intent. It must not infer
 capability from live JavaScript objects except at integration boundaries where
 external script loading or corrupted JSON can break the contract.
 
@@ -237,8 +237,8 @@ runs after request settlement.
 
 Design consequence:
 
-HTTP should read like a deterministic request plan with named stages. The
-runtime should not reinterpret handler order or infer response shape; the plan
+HTTP must read like a deterministic request plan with named stages. The
+runtime must not reinterpret handler order or infer response shape; the plan
 already declares those scopes and follow-up graphs.
 
 ## Gather Surface
@@ -366,7 +366,7 @@ into the same object/member contract.
 
 Design consequence:
 
-Component onboarding should be a vertical slice:
+Component onboarding must be a vertical slice:
 
 - render HTML with controlled ID
 - register input value contract when model-bound
@@ -443,19 +443,19 @@ Runtime behavior:
 
 Plugins are named browser objects/functions. They bridge behavior difficult to
 express deterministically in the core DSL, such as complex array work, URL/DOM
-APIs, or vendor-specific browser logic. They should remain explicit contracts;
+APIs, or vendor-specific browser logic. They remain explicit contracts;
 string-based plugin calls are compatibility surface, not the preferred rich
 model.
 
 Design direction:
 
-The richer plugin API should favor typed descriptors and exact argument/return
+The richer plugin API favors typed descriptors and exact argument/return
 contracts while preserving existing DSL compatibility. Plugin calls and reads
 must still reduce to object member method/property access in PlanModel.
 
 ## Test Organization Target
 
-Behavior tests should be arranged around these domain modules:
+Behavior tests must be arranged around these domain modules:
 
 - plan load/unload and partial slot load/unload
 - object contract and component onboarding
@@ -467,12 +467,12 @@ Behavior tests should be arranged around these domain modules:
 - runtime execution lanes
 - app-level components and action link behavior
 
-Tests that only mirror helper class internals are a smell. They should prove
+Tests that only mirror helper class internals are a smell. They must prove
 DSL behavior or PlanModel invariants that developers rely on.
 
 ## Refactor Direction
 
-The next closed surfaces should be chosen by blast radius and domain clarity:
+The next closed surfaces must be chosen by blast radius and domain clarity:
 
 1. Object/member contract kernel: property, method, event/callback, source,
    value read, path, shape.

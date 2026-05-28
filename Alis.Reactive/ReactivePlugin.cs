@@ -7,7 +7,7 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// Describes a browser plugin as a named set of callable JavaScript functions.
-    /// Plugins are the explicit bridge for browser behavior that should not become a
+    /// Plugins are the explicit bridge for browser behavior that does not need a
     /// first-class deterministic DSL primitive.
     /// </summary>
     public abstract class ReactivePlugin
@@ -151,15 +151,11 @@ namespace Alis.Reactive
     {
         private readonly List<Func<PluginOperationContract>> _operations = new List<Func<PluginOperationContract>>();
         private readonly List<PluginPropertyContract> _properties = new List<PluginPropertyContract>();
-        private readonly HashSet<ObjectMemberKey> _members = new HashSet<ObjectMemberKey>();
 
         internal void Add(PluginName pluginName, PluginOperation operation)
         {
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (operation == null) throw new ArgumentNullException(nameof(operation));
-            EnsurePluginMatches(pluginName, operation.OperationId.PluginName, operation.Label);
-            DeclareMember(pluginName, operation.MemberKey, operation.Label);
-
             _operations.Add(operation.ToContract);
         }
 
@@ -167,9 +163,6 @@ namespace Alis.Reactive
         {
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (operation == null) throw new ArgumentNullException(nameof(operation));
-            EnsurePluginMatches(pluginName, operation.PluginName, operation.Label);
-            DeclareMember(pluginName, operation.Member, operation.Label);
-
             _operations.Add(() => operation);
         }
 
@@ -177,9 +170,6 @@ namespace Alis.Reactive
         {
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (property == null) throw new ArgumentNullException(nameof(property));
-            EnsurePluginMatches(pluginName, property.PropertyId.PluginName, property.Label);
-            DeclareMember(pluginName, property.MemberKey, property.Label);
-
             _properties.Add(property.ToContract());
         }
 
@@ -187,9 +177,6 @@ namespace Alis.Reactive
         {
             if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
             if (property == null) throw new ArgumentNullException(nameof(property));
-            EnsurePluginMatches(pluginName, property.PluginName, property.Label);
-            DeclareMember(pluginName, property.Member, property.Label);
-
             _properties.Add(property);
         }
 
@@ -213,34 +200,6 @@ namespace Alis.Reactive
         private IReadOnlyList<PluginPropertyContract> ToPropertyContracts()
         {
             return new List<PluginPropertyContract>(_properties);
-        }
-
-        private void DeclareMember(
-            PluginName pluginName,
-            ObjectMemberKey member,
-            string label)
-        {
-            if (pluginName == null) throw new ArgumentNullException(nameof(pluginName));
-            if (member == null) throw new ArgumentNullException(nameof(member));
-            if (label == null) throw new ArgumentNullException(nameof(label));
-
-            if (!_members.Add(member))
-                throw new InvalidOperationException(
-                    $"Plugin '{pluginName.Value}' already declares member '{label}'.");
-        }
-
-        private static void EnsurePluginMatches(
-            PluginName expected,
-            PluginName actual,
-            string label)
-        {
-            if (expected == null) throw new ArgumentNullException(nameof(expected));
-            if (actual == null) throw new ArgumentNullException(nameof(actual));
-            if (label == null) throw new ArgumentNullException(nameof(label));
-
-            if (!actual.Equals(expected))
-                throw new InvalidOperationException(
-                    $"Plugin '{expected.Value}' cannot declare member '{label}' for plugin '{actual.Value}'.");
         }
     }
 
