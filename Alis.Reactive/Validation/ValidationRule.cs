@@ -1,6 +1,5 @@
 using Alis.Reactive;
 using Alis.Reactive.PlanModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Alis.Reactive.Validation
 {
@@ -296,40 +295,26 @@ namespace Alis.Reactive.Validation
 
         internal Shape DescriptorShape => Shape.ArrayOf(Shape.IsNone ? Shape.Any : Shape);
 
-        internal static ValidationRangeBounds Between(object lowerBound, object upperBound, Shape shape) =>
-            new ValidationRangeBounds(lowerBound, upperBound, shape);
-
         internal static ValidationRangeBounds FromClientLiteral<TValue>(TValue lowerBound, TValue upperBound)
         {
             if (lowerBound == null) throw new System.ArgumentNullException(nameof(lowerBound));
             if (upperBound == null) throw new System.ArgumentNullException(nameof(upperBound));
-            if (TryFromClientLiteral(lowerBound, upperBound, out var bounds)) return bounds;
-
-            var lowerShape = ClientValidationLiteral.From(lowerBound).Shape;
-            var upperShape = ClientValidationLiteral.From(upperBound).Shape;
-            throw new System.ArgumentException(
-                "Client validation range bounds must have the same shape. " +
-                $"Lower bound is '{lowerShape.Kind}', upper bound is '{upperShape.Kind}'.");
-        }
-
-        internal static bool TryFromClientLiteral(
-            object? lowerBound,
-            object? upperBound,
-            [NotNullWhen(true)] out ValidationRangeBounds? bounds)
-        {
-            bounds = null;
-            if (lowerBound == null || upperBound == null) return false;
 
             var lowerLiteral = ClientValidationLiteral.From(lowerBound);
             var upperLiteral = ClientValidationLiteral.From(upperBound);
-            if (!lowerLiteral.Shape.Equals(upperLiteral.Shape)) return false;
-            if (lowerLiteral.Value == null || upperLiteral.Value == null) return false;
+            if (lowerLiteral.Shape.Equals(upperLiteral.Shape) &&
+                lowerLiteral.Value != null &&
+                upperLiteral.Value != null)
+            {
+                return new ValidationRangeBounds(
+                    lowerLiteral.Value,
+                    upperLiteral.Value,
+                    lowerLiteral.Shape);
+            }
 
-            bounds = Between(
-                lowerLiteral.Value,
-                upperLiteral.Value,
-                lowerLiteral.Shape);
-            return true;
+            throw new System.ArgumentException(
+                "Client validation range bounds must have the same shape. " +
+                $"Lower bound is '{lowerLiteral.Shape.Kind}', upper bound is '{upperLiteral.Shape.Kind}'.");
         }
 
         internal object[] ToDescriptorArray() =>
