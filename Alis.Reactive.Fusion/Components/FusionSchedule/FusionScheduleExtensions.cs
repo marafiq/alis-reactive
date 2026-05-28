@@ -84,10 +84,10 @@ namespace Alis.Reactive.Fusion.Components
         /// Reads the current schedule event collection.
         /// Runtime: calls ej2.getEvents() and uses the returned array as a typed source.
         /// </summary>
-        public static TypedComponentSource<object[]> GetEvents<TModel>(
+        public static TypedComponentSource<FusionScheduleEventData[]> GetEvents<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
             where TModel : class
-            => self.Read<object[]>(GetEventsMethod);
+            => self.Read<FusionScheduleEventData[]>(GetEventsMethod);
 
         /// <summary>
         /// Replaces the schedule event data from an HTTP response body with a path selector.

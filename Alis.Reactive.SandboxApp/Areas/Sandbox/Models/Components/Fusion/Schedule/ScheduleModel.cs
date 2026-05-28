@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
+using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
@@ -90,7 +90,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     public class ScheduleEventsAuditRequest
     {
-        public List<JsonElement> Events { get; set; } = new();
+        public List<FusionScheduleEventData> Events { get; set; } = new();
     }
 
     public class ScheduleEventsAuditResponse
