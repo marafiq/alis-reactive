@@ -261,6 +261,25 @@
                     .NativeTextBox(b => b
                         .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
                         .Placeholder("Required when gift wrapped"));
+
+                @for (var j = 0; j < Model.Lines[lineIndex].Deliveries.Count; j++)
+                {
+                    var deliveryIndex = j;
+                    var deliveryNumber = j + 1;
+                    Html.InputField(plan, m => m.Lines[lineIndex].Deliveries[deliveryIndex].LocationCode, o => o.Label($"Line {lineNumber} Delivery {deliveryNumber} Location"))
+                        .NativeTextBox(b => b
+                            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                            .Placeholder("Required"));
+
+                    Html.InputField(plan, m => m.Lines[lineIndex].Deliveries[deliveryIndex].RequiresAccessCode, o => o.Label($"Line {lineNumber} Delivery {deliveryNumber} Needs Access Code"))
+                        .NativeCheckBox(b => b
+                            .CssClass("h-4 w-4 rounded border-border text-accent"));
+
+                    Html.InputField(plan, m => m.Lines[lineIndex].Deliveries[deliveryIndex].AccessCode, o => o.Label($"Line {lineNumber} Delivery {deliveryNumber} Access Code"))
+                        .NativeTextBox(b => b
+                            .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                            .Placeholder("Required when checked"));
+                }
             }
         </form>
         @(Html.NativeButton("order-lines-validate-btn", "Validate Lines")

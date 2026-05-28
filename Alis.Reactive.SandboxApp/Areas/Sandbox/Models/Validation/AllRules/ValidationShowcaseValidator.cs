@@ -148,6 +148,24 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 ClientRule(x => x.GiftNote)
                     .Required("Gift note is required when gift wrapped.");
             });
+
+            ClientRuleEach(x => x.Deliveries)
+                .SetValidator(new ValidationLineDeliveryValidator());
+        }
+    }
+
+    public class ValidationLineDeliveryValidator : ReactiveValidator<ValidationLineDelivery>
+    {
+        public ValidationLineDeliveryValidator()
+        {
+            ClientRule(x => x.LocationCode)
+                .Required("Delivery location is required.");
+
+            WhenField(x => x.RequiresAccessCode, () =>
+            {
+                ClientRule(x => x.AccessCode)
+                    .Required("Access code is required when delivery requires it.");
+            });
         }
     }
 

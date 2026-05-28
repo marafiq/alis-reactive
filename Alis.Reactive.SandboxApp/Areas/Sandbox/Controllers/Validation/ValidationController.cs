@@ -13,7 +13,17 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         {
             return View("~/Areas/Sandbox/Views/Validation/AllRules/Index.cshtml", new ValidationShowcaseModel
             {
-                Lines = { new ValidationOrderLine(), new ValidationOrderLine() }
+                Lines =
+                {
+                    new ValidationOrderLine
+                    {
+                        Deliveries = { new ValidationLineDelivery() }
+                    },
+                    new ValidationOrderLine
+                    {
+                        Deliveries = { new ValidationLineDelivery() }
+                    }
+                }
             });
         }
 
