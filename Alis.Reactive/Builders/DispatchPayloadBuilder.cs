@@ -18,7 +18,7 @@ namespace Alis.Reactive.Builders
         where TPayload : class
         where TModel : class
     {
-        private readonly Dictionary<string, ValueProducer> _fields = new Dictionary<string, ValueProducer>();
+        private readonly DispatchPayloadDraft _payload = new DispatchPayloadDraft();
 
         internal DispatchPayloadBuilder() { }
 
@@ -32,7 +32,7 @@ namespace Alis.Reactive.Builders
             TypedSource<TProp> source)
         {
             var fieldName = ExpressionPathHelper.ToEventPath<TPayload, TProp>(field);
-            _fields[fieldName] = source.ToValueProducer();
+            _payload.Set(fieldName, source.ToValueExpression());
             return this;
         }
 
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Builders
             string value)
         {
             var fieldName = ExpressionPathHelper.ToEventPath<TPayload, string>(field);
-            _fields[fieldName] = ValueProducer.Literal(value);
+            _payload.Set(fieldName, ValueExpression.Literal(value));
             return this;
         }
 
@@ -58,7 +58,7 @@ namespace Alis.Reactive.Builders
             int value)
         {
             var fieldName = ExpressionPathHelper.ToEventPath<TPayload, int>(field);
-            _fields[fieldName] = ValueProducer.Literal(value);
+            _payload.Set(fieldName, ValueExpression.Literal(value));
             return this;
         }
 
@@ -71,75 +71,137 @@ namespace Alis.Reactive.Builders
             bool value)
         {
             var fieldName = ExpressionPathHelper.ToEventPath<TPayload, bool>(field);
-            _fields[fieldName] = ValueProducer.Literal(value);
+            _payload.Set(fieldName, ValueExpression.Literal(value));
             return this;
         }
 
-        internal ValueProducer Build()
+        internal ValueExpression Build()
         {
-            if (_fields.Count == 0)
+            if (!_payload.HasFields)
                 throw new InvalidOperationException(
                     "Dispatch payload must have at least one field. Use Dispatch(eventName) for no-payload dispatch.");
 
-            return ValueProducer.Object(ExpandNestedPaths(_fields));
-        }
-
-        /// <summary>
-        /// Expands dotted keys like <c>"address.city"</c> into nested ObjectProducers
-        /// so the dispatched event carries <c>{ address: { city: value } }</c> instead
-        /// of <c>{ "address.city": value }</c>. Matches how typed payload listeners
-        /// resolve nested properties.
-        /// </summary>
-        private static Dictionary<string, ValueProducer> ExpandNestedPaths(
-            Dictionary<string, ValueProducer> flat)
-        {
-            var root = new Dictionary<string, ValueProducer>();
-
-            foreach (var kvp in flat)
-            {
-                var segments = kvp.Key.Split('.');
-                var isTopLevel = segments.Length == 1;
-                if (isTopLevel)
-                {
-                    if (root.ContainsKey(kvp.Key) && root[kvp.Key] is ObjectProducer)
-                        throw new InvalidOperationException(
-                            $"Dispatch payload conflict: '{kvp.Key}' has nested children " +
-                            $"but is also set as a leaf value. " +
-                            $"Set either the parent or the children, not both.");
-                    root[kvp.Key] = kvp.Value;
-                    continue;
-                }
-
-                // Walk/create nested dictionaries for each intermediate segment
-                var current = root;
-                for (var i = 0; i < segments.Length - 1; i++)
-                {
-                    var needsNesting = !current.ContainsKey(segments[i]);
-                    if (needsNesting)
-                    {
-                        current[segments[i]] = ValueProducer.Object(new Dictionary<string, ValueProducer>());
-                    }
-                    else if (!(current[segments[i]] is ObjectProducer))
-                    {
-                        throw new InvalidOperationException(
-                            $"Dispatch payload conflict: '{segments[i]}' is set as a leaf value " +
-                            $"but also used as a parent for '{kvp.Key}'. " +
-                            $"Set either the parent or the children, not both.");
-                    }
-
-                    current = ((ObjectProducer)current[segments[i]]).WritableFields;
-                }
-
-                var leafKey = segments[segments.Length - 1];
-                if (current.ContainsKey(leafKey) && current[leafKey] is ObjectProducer)
-                    throw new InvalidOperationException(
-                        $"Dispatch payload conflict: '{kvp.Key}' has nested children " +
-                        $"but is also set as a leaf value. " +
-                        $"Set either the parent or the children, not both.");
-                current[leafKey] = kvp.Value;
-            }
-
-            return root;
+            return _payload.ToValueExpression();
         }
     }
+
+    internal sealed class DispatchPayloadDraft
+    {
+        private readonly Dictionary<string, ValueExpression> _leaves =
+            new Dictionary<string, ValueExpression>(StringComparer.Ordinal);
+        private readonly Dictionary<string, DispatchPayloadDraft> _objects =
+            new Dictionary<string, DispatchPayloadDraft>(StringComparer.Ordinal);
+
+        internal bool HasFields => _leaves.Count > 0 || _objects.Count > 0;
+
+        internal void Set(string path, ValueExpression value)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            var payloadPath = DispatchPayloadPath.Of(path);
+            var parent = GetOrCreateParent(payloadPath);
+            parent.SetLeaf(payloadPath.Leaf, value, payloadPath.Value);
+        }
+
+        internal ValueExpression ToValueExpression() =>
+            ValueExpression.Object(ToFields());
+
+        private DispatchPayloadDraft GetOrCreateParent(DispatchPayloadPath path)
+        {
+            var current = this;
+            foreach (var segment in path.ParentSegments)
+                current = current.GetOrCreateObject(segment, path.Value);
+
+            return current;
+        }
+
+        private DispatchPayloadDraft GetOrCreateObject(string segment, string fullPath)
+        {
+            if (_leaves.ContainsKey(segment))
+                throw new InvalidOperationException(
+                    $"Dispatch payload conflict: '{segment}' is set as a leaf value " +
+                    $"but also used as a parent for '{fullPath}'. " +
+                    "Set either the parent or the children, not both.");
+
+            if (!_objects.TryGetValue(segment, out var child))
+            {
+                child = new DispatchPayloadDraft();
+                _objects[segment] = child;
+            }
+
+            return child;
+        }
+
+        private void SetLeaf(string leaf, ValueExpression value, string fullPath)
+        {
+            EnsureLeafCanBeSet(leaf, fullPath);
+
+            _leaves[leaf] = value;
+        }
+
+        private void EnsureLeafCanBeSet(string leaf, string fullPath)
+        {
+            if (string.IsNullOrWhiteSpace(leaf))
+                throw new ArgumentException("Dispatch payload leaf must not be empty.", nameof(leaf));
+
+            if (!_objects.ContainsKey(leaf)) return;
+
+            throw new InvalidOperationException(
+                $"Dispatch payload conflict: '{fullPath}' has nested children " +
+                "but is also set as a leaf value. " +
+                "Set either the parent or the children, not both.");
+        }
+
+        private Dictionary<string, ValueExpression> ToFields()
+        {
+            var fields = new Dictionary<string, ValueExpression>(StringComparer.Ordinal);
+            foreach (var leaf in _leaves)
+                fields[leaf.Key] = leaf.Value;
+            foreach (var child in _objects)
+                fields[child.Key] = child.Value.ToValueExpression();
+
+            return fields;
+        }
+    }
+
+    internal sealed class DispatchPayloadPath
+    {
+        private readonly IReadOnlyList<string> _segments;
+
+        private DispatchPayloadPath(string value, IReadOnlyList<string> segments)
+        {
+            Value = value;
+            _segments = segments;
+        }
+
+        internal string Value { get; }
+        internal string Leaf => _segments[_segments.Count - 1];
+
+        internal IEnumerable<string> ParentSegments
+        {
+            get
+            {
+                for (var index = 0; index < _segments.Count - 1; index++)
+                    yield return _segments[index];
+            }
+        }
+
+        internal static DispatchPayloadPath Of(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Dispatch payload path must not be empty.", nameof(value));
+
+            var segments = value.Split('.');
+            foreach (var segment in segments)
+            {
+                if (string.IsNullOrWhiteSpace(segment))
+                    throw new ArgumentException(
+                        "Dispatch payload path '" + value + "' contains an empty segment.",
+                        nameof(value));
+            }
+
+            return new DispatchPayloadPath(value, segments);
+        }
+    }
+
 }

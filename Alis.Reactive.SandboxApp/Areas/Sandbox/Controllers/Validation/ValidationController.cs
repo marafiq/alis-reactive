@@ -11,7 +11,20 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         [HttpGet("")]
         public IActionResult Index()
         {
-            return View("~/Areas/Sandbox/Views/Validation/AllRules/Index.cshtml", new ValidationShowcaseModel());
+            return View("~/Areas/Sandbox/Views/Validation/AllRules/Index.cshtml", new ValidationShowcaseModel
+            {
+                Lines =
+                {
+                    new ValidationOrderLine
+                    {
+                        Deliveries = { new ValidationLineDelivery() }
+                    },
+                    new ValidationOrderLine
+                    {
+                        Deliveries = { new ValidationLineDelivery() }
+                    }
+                }
+            });
         }
 
         [HttpPost("Save")]

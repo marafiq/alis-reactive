@@ -1,12 +1,7 @@
 using Alis.Reactive;
 using Alis.Reactive.PlanModel;
-#if NET48
-using System.Web;
-using System.Web.Mvc;
-#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-#endif
 
 namespace Alis.Reactive.Native.AppLevel
 {
@@ -16,6 +11,15 @@ namespace Alis.Reactive.Native.AppLevel
     public static class NativeDrawerExtensions
     {
         private static readonly string[] SizeClasses = { "alis-drawer--sm", "alis-drawer--md", "alis-drawer--lg" };
+
+        private static readonly ComponentMethod RemoveAttributeMethod =
+            ComponentMethod.Named("removeAttribute").WithArgs<string>();
+
+        private static readonly ComponentMethod ClassAddMethod =
+            ComponentMethod.Mapped("classAdd", "classList.add").WithArgs<string>();
+
+        private static readonly ComponentMethod ClassRemoveMethod =
+            ComponentMethod.Mapped("classRemove", "classList.remove").WithArgs<string>();
 
         /// <summary>
         /// Sets the drawer panel width.
@@ -30,7 +34,8 @@ namespace Alis.Reactive.Native.AppLevel
         {
             // Remove all size classes, then add the requested one
             foreach (var cls in SizeClasses)
-                EmitClassListCall(self, "classRemove", "classList.remove", cls);
+                self.EmitCall(ClassRemoveMethod,
+                    new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(cls) });
 
             var sizeClass = size switch
             {
@@ -39,7 +44,8 @@ namespace Alis.Reactive.Native.AppLevel
                 DrawerSize.Lg => "alis-drawer--lg",
                 _ => "alis-drawer--md"
             };
-            EmitClassListCall(self, "classAdd", "classList.add", sizeClass);
+            self.EmitCall(ClassAddMethod,
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(sizeClass) });
             return self;
         }
 
@@ -52,9 +58,10 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
         {
-            EmitClassListCall(self, "classAdd", "classList.add", "alis-drawer--visible");
-            self.EmitCall("removeAttribute",
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden") });
+            self.EmitCall(ClassAddMethod,
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("alis-drawer--visible") });
+            self.EmitCall(RemoveAttributeMethod,
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("aria-hidden") });
             return self;
         }
 
@@ -67,24 +74,9 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
         {
-            EmitClassListCall(self, "classRemove", "classList.remove", "alis-drawer--visible");
+            self.EmitCall(ClassRemoveMethod,
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("alis-drawer--visible") });
             return self;
-        }
-
-        /// <summary>
-        /// Emits a classList call reaction with the correct path (classList.add / classList.remove).
-        /// Mirrors <see cref="Alis.Reactive.Builders.ElementBuilder{TModel}.AddClass"/> to avoid
-        /// the wrong path that EmitCall("add") would produce (el.add vs el.classList.add).
-        /// </summary>
-        private static void EmitClassListCall<TModel>(
-            ComponentRef<NativeDrawer, TModel> self, string memberName, string pathExpr, string className)
-            where TModel : class
-        {
-            var componentKey = self.Pipeline.Context.EnsureComponent(self.TargetId, self.Vendor);
-            self.Pipeline.Context.EnsureMethod(componentKey, memberName, pathExpr);
-            self.Pipeline.Steps.Add(
-                Reaction.Call(ComponentSource.Of(componentKey), memberName,
-                    new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(className) }));
         }
 
         /// <summary>
@@ -95,15 +87,9 @@ namespace Alis.Reactive.Native.AppLevel
         /// and opened via <see cref="Open{TModel}"/> in a reactive pipeline.
         /// </remarks>
         /// <returns>The drawer HTML element.</returns>
-#if NET48
-        public static IHtmlString NativeDrawer(this HtmlHelper html)
-        {
-            return new MvcHtmlString(
-#else
         public static IHtmlContent NativeDrawer(this IHtmlHelper html)
         {
             return new HtmlString(
-#endif
                 "<aside id=\"" + AppLevel.NativeDrawer.ElementId + "\" class=\"alis-drawer\" aria-hidden=\"true\">\n" +
                 "  <div class=\"alis-drawer__panel\">\n" +
                 "    <div class=\"alis-drawer__header\">\n" +

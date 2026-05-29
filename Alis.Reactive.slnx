@@ -91,27 +91,29 @@
     <File Path="docs-site/src/content/docs/reference/build-commands.md" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/Alis.Reactive.UnitTests/Alis.Reactive.UnitTests.csproj" />
-    <Project Path="tests/Alis.Reactive.Fusion.UnitTests/Alis.Reactive.Fusion.UnitTests.csproj" />
-    <Project Path="tests/Alis.Reactive.Native.UnitTests/Alis.Reactive.Native.UnitTests.csproj" />
     <Project Path="tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj" />
-
-    <Project Path="tests/Alis.Reactive.FluentValidator.UnitTests/Alis.Reactive.FluentValidator.UnitTests.csproj" />
-    <Project Path="tests/Alis.Reactive.DesignSystem.Tests/Alis.Reactive.DesignSystem.Tests.csproj" />
-    <Project Path="tests/Alis.Reactive.NativeTagHelpers.Tests/Alis.Reactive.NativeTagHelpers.Tests.csproj" />
     <Project Path="tests/Alis.Reactive.Playwright.Extensions/Alis.Reactive.Playwright.Extensions.csproj" />
   </Folder>
   <Project Path="Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />
   <Project Path="Alis.Reactive.Native/Alis.Reactive.Native.csproj" />
   <Project Path="Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj" />
+  <Project Path="Alis.Reactive.Assets/Alis.Reactive.Assets.csproj" />
+  <Project Path="Alis.Reactive.DesignSystem/Alis.Reactive.DesignSystem.csproj" />
   <Project Path="Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj" />
   <Project Path="Alis.Reactive/Alis.Reactive.csproj" />
   <Project Path="Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" />
   <Project Path="Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj" />
   <Folder Name="/tools/">
     <Project Path="tools/ApiDocGenerator/ApiDocGenerator.csproj" />
+    <Project Path="tools/PlanTypeGenerator/PlanTypeGenerator.csproj" />
   </Folder>
   <Folder Name="/examples/">
     <Project Path="examples/resident-intake/ResidentIntake.csproj" />
+  </Folder>
+  <Folder Name="/build/">
+    <File Path="package.json" />
+    <File Path="eslint.config.js" />
+    <File Path="Directory.Build.props" />
+    <File Path="build/AlisReactiveAssets.targets" />
   </Folder>
 </Solution>

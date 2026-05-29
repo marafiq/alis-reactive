@@ -1,9 +1,5 @@
 using System;
-#if NET48
-using System.Web.Mvc;
-#else
 using Microsoft.AspNetCore.Mvc.Rendering;
-#endif
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Grids;
 
@@ -11,7 +7,7 @@ namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
     /// Factory extension for creating a <see cref="FusionGridBuilder{TModel}"/>.
-    /// Non-input component: no InputField wrapper, no ComponentsMap registration.
+    /// Non-input component: no InputField wrapper, no input component registration.
     /// </summary>
     public static class FusionGridHtmlExtensions
     {
@@ -26,17 +22,13 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="build">Callback to configure columns, paging, sorting, etc.</param>
         /// <returns>A builder for chaining <c>.Reactive()</c>.</returns>
         public static FusionGridBuilder<TModel> FusionGrid<TModel>(
-#if NET48
-            this HtmlHelper<TModel> html,
-#else
             this IHtmlHelper<TModel> html,
-#endif
             ReactivePlan<TModel> plan,
             string elementId,
             Action<GridBuilder<object>> build)
             where TModel : class
         {
-            // NO ComponentsMap registration — this is NOT an input component
+            // NO input component registration — this is NOT an input component
 
             var builder = html.EJS().Grid<object>(elementId);
             build(builder);

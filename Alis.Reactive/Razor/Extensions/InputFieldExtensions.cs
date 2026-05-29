@@ -1,0 +1,112 @@
+using System;
+using System.Linq.Expressions;
+using Alis.Reactive.InputField;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace Alis.Reactive.Native.Extensions
+{
+    /// <summary>
+    /// Razor view extension for starting a model-bound input field.
+    /// </summary>
+    public static class InputFieldExtensions
+    {
+        /// <summary>
+        /// Starts a model-bound input field for <paramref name="expression"/>, with optional
+        /// label and required marker.
+        /// </summary>
+        /// <remarks>
+        /// Chain a component extension on the result to choose what renders inside the field —
+        /// e.g. <c>.NativeTextBox()</c>, <c>.FusionDropDownList()</c>. The field wrapper handles
+        /// label display and validation error placement automatically.
+        /// </remarks>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The plan this field belongs to.</param>
+        /// <param name="expression">The model property to bind the field to.</param>
+        /// <returns>A bound field ready to receive a component extension.</returns>
+        public static InputBoundField<TModel, TProp> InputField<TModel, TProp>(
+            this IHtmlHelper<TModel> html,
+            ReactivePlan<TModel> plan,
+            Expression<Func<TModel, TProp>> expression)
+            where TModel : class
+            => CreateInputField(html, plan, expression, InputFieldConfiguration.Default);
+
+        /// <summary>
+        /// Starts a model-bound input field for <paramref name="expression"/>, with label
+        /// and required marker configuration.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The plan this field belongs to.</param>
+        /// <param name="expression">The model property to bind the field to.</param>
+        /// <param name="configure">Configures label text and required marker.</param>
+        /// <returns>A bound field ready to receive a component extension.</returns>
+        public static InputBoundField<TModel, TProp> InputField<TModel, TProp>(
+            this IHtmlHelper<TModel> html,
+            ReactivePlan<TModel> plan,
+            Expression<Func<TModel, TProp>> expression,
+            Action<InputFieldOptions> configure)
+            where TModel : class
+            => CreateInputField(html, plan, expression, InputFieldConfiguration.Configured(configure));
+
+        private static InputBoundField<TModel, TProp> CreateInputField<TModel, TProp>(
+            IHtmlHelper<TModel> html,
+            ReactivePlan<TModel> plan,
+            Expression<Func<TModel, TProp>> expression,
+            InputFieldConfiguration configuration)
+            where TModel : class
+        {
+            var opts = configuration.CreateOptions();
+            var componentSlot = ModelBoundInputComponentSlot.For<TModel, TProp>(
+                expression,
+                html.NameFor(expression));
+            var boundField = BoundInputField<TModel, TProp>.Create(
+                plan,
+                expression,
+                opts,
+                componentSlot);
+
+            return new InputBoundField<TModel, TProp>(
+                html,
+                boundField,
+                html.ViewContext.Writer);
+        }
+    }
+
+    internal abstract class InputFieldConfiguration
+    {
+        private protected InputFieldConfiguration() { }
+
+        internal static InputFieldConfiguration Default { get; } =
+            new DefaultInputFieldConfiguration();
+
+        internal static InputFieldConfiguration Configured(Action<InputFieldOptions> configure) =>
+            new ConfiguredInputFieldConfiguration(configure);
+
+        internal abstract InputFieldOptions CreateOptions();
+    }
+
+    internal sealed class DefaultInputFieldConfiguration : InputFieldConfiguration
+    {
+        internal override InputFieldOptions CreateOptions() => new InputFieldOptions();
+    }
+
+    internal sealed class ConfiguredInputFieldConfiguration : InputFieldConfiguration
+    {
+        private readonly Action<InputFieldOptions> _configure;
+
+        internal ConfiguredInputFieldConfiguration(Action<InputFieldOptions> configure)
+        {
+            _configure = configure ?? throw new ArgumentNullException(nameof(configure));
+        }
+
+        internal override InputFieldOptions CreateOptions()
+        {
+            var options = new InputFieldOptions();
+            _configure(options);
+            return options;
+        }
+    }
+}

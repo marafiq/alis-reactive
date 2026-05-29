@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
@@ -79,6 +80,22 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public List<ShiftAssignment> Assignments { get; set; } = new();
         public List<ShiftResource> Shifts { get; set; } = new();
         public int UnassignedCount { get; set; }
+    }
+
+    public class ScheduleViewRouteResponse
+    {
+        public string CurrentView { get; set; } = "";
+        public string Summary { get; set; } = "";
+    }
+
+    public class ScheduleEventsAuditRequest
+    {
+        public List<FusionScheduleEventData> Events { get; set; } = new();
+    }
+
+    public class ScheduleEventsAuditResponse
+    {
+        public int Count { get; set; }
     }
 
     /// <summary>

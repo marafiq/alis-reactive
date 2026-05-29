@@ -105,7 +105,6 @@ export default defineConfig({
 								{ label: 'The Vertical Slice', slug: 'architecture/vertical-slice' },
 							],
 						},
-						{ label: 'JSON Plan Schema', slug: 'architecture/json-plan-schema' },
 						{
 							label: 'Runtime',
 							items: [

@@ -4,7 +4,7 @@ set -euo pipefail
 # ──────────────────────────────────────────────────────────────────────
 # sonar-analyze.sh — One-command SonarQube analysis for Alis.Reactive
 #
-# Analyzes C# (all projects) + TypeScript (Scripts/) using a single
+# Analyzes C# (all projects) + TypeScript (Assets runtime/, Sandbox Scripts/) using a single
 # dotnet-sonarscanner invocation. Polls quality gate and exits 0/1.
 #
 # Prerequisites:
@@ -95,7 +95,7 @@ run_analysis() {
     log "Starting SonarQube analysis..."
     log "  Project: ${PROJECT_KEY}"
     log "  C#: all projects (excluding examples/)"
-    log "  TS: Alis.Reactive.Assets/Scripts/ + Alis.Reactive.SandboxApp/Scripts/"
+    log "  TS: Alis.Reactive.Assets/runtime/ + Alis.Reactive.SandboxApp/Scripts/"
 
     # Clean previous coverage results
     rm -rf TestResults/coverage 2>/dev/null

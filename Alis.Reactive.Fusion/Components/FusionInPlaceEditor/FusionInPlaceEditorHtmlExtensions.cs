@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
@@ -19,8 +18,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionInPlaceEditorHtmlExtensions
     {
-        private static readonly FusionInPlaceEditor Component = new FusionInPlaceEditor();
-
         /// <summary>
         /// Renders a FusionInPlaceEditor bound to the field's model property.
         /// </summary>
@@ -33,32 +30,68 @@ namespace Alis.Reactive.Fusion.Components
             Action<InPlaceEditorBuilder> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ValueMember, "inplace-editor",
-                Shape.FromClrType(typeof(TProp))));
+            var registration = global::Alis.Reactive.Fusion.Components.FusionInPlaceEditor.Registration;
+            setup.RegisterInputComponent(registration);
 
-            object? initialValue = null;
-            try
-            {
-                var compiled = setup.Expression.Compile();
-                initialValue = compiled(setup.Helper.ViewData.Model);
-            }
-            catch
-            {
-                // No initial model value; editor starts empty.
-            }
+            var initialValue = InitialEditorValue.FromModel(
+                setup.Expression,
+                setup.Helper.ViewData.Model);
 
             var builder = setup.Helper.EJS().InPlaceEditor(setup.ElementId)
                 .Name(setup.BindingPath)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId });
 
-            if (initialValue != null)
-            {
-                builder = builder.Value(initialValue);
-            }
+            builder = initialValue.ApplyTo(builder);
 
             build(builder);
             setup.Render(builder.Render());
         }
+    }
+
+    internal abstract class InitialEditorValue
+    {
+        private protected InitialEditorValue() { }
+
+        internal static InitialEditorValue FromModel<TModel, TProp>(
+            System.Linq.Expressions.Expression<Func<TModel, TProp>> expression,
+            TModel model)
+            where TModel : class
+        {
+            try
+            {
+                var compiled = expression.Compile();
+                var value = compiled(model);
+                return value == null
+                    ? Missing
+                    : new PresentInitialEditorValue(value);
+            }
+            catch
+            {
+                return Missing;
+            }
+        }
+
+        private static InitialEditorValue Missing { get; } =
+            new MissingInitialEditorValue();
+
+        internal abstract InPlaceEditorBuilder ApplyTo(InPlaceEditorBuilder builder);
+    }
+
+    internal sealed class MissingInitialEditorValue : InitialEditorValue
+    {
+        internal override InPlaceEditorBuilder ApplyTo(InPlaceEditorBuilder builder) => builder;
+    }
+
+    internal sealed class PresentInitialEditorValue : InitialEditorValue
+    {
+        private readonly object _value;
+
+        internal PresentInitialEditorValue(object value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        internal override InPlaceEditorBuilder ApplyTo(InPlaceEditorBuilder builder) =>
+            builder.Value(_value);
     }
 }

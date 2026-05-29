@@ -12,10 +12,9 @@ namespace Alis.Reactive.Builders
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
-            FlushPendingConditionIfNeeded();
-            SetMode(PipelineMode.Conditional);
+            _draft.BeginBranch();
 
-            var source = new EventArgSource<TPayload, TProp>(path);
+            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
@@ -25,8 +24,7 @@ namespace Alis.Reactive.Builders
             Expression<Func<TPayload, TProp>> path)
             where TPayload : class
         {
-            FlushPendingConditionIfNeeded();
-            SetMode(PipelineMode.Conditional);
+            _draft.BeginBranch();
 
             var source = responseBody.Read(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
@@ -35,8 +33,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Starts a conditional branch from a typed source (component, plugin, or URL value).</summary>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
-            FlushPendingConditionIfNeeded();
-            SetMode(PipelineMode.Conditional);
+            _draft.BeginBranch();
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
@@ -44,17 +41,9 @@ namespace Alis.Reactive.Builders
         /// <param name="message">The confirmation message shown to the user.</param>
         public GuardBuilder<TModel> Confirm(string message)
         {
-            FlushPendingConditionIfNeeded();
-            SetMode(PipelineMode.Conditional);
+            _draft.BeginBranch();
 
-            return new GuardBuilder<TModel>(Condition.Confirm(message), this);
-        }
-
-        private void FlushPendingConditionIfNeeded()
-        {
-            var hasPendingCondition = ConditionalBranches != null && ConditionalBranches.Count > 0;
-            if (hasPendingCondition)
-                FlushSegment();
+            return new GuardBuilder<TModel>(ConditionGraph.Confirm(message), this);
         }
     }
 }

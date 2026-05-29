@@ -109,26 +109,26 @@ public class WhenRouteParamsResolve : PlaywrightTestBase
     }
 
     [Test]
-    public async Task chained_second_hop_resolves_different_route_params()
+    public async Task chained_second_hop_uses_previous_response_route_param()
     {
         await NavigateAndWaitForBoot();
 
         await ClickButton("Chain with Route Params");
 
         await Expect(Page.Locator("#route-chain-second-name"))
-            .ToHaveTextAsync("Resident #77 at Facility #3", new() { Timeout = 5000 });
+            .ToHaveTextAsync("Resident #42 at Facility #3", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task chained_route_params_spinner_hides_after_both()
+    public async Task chained_response_route_param_spinner_hides_after_both()
     {
         await NavigateAndWaitForBoot();
 
         await ClickButton("Chain with Route Params");
 
         await Expect(Page.Locator("#route-chain-second-name"))
-            .ToHaveTextAsync("Resident #77 at Facility #3", new() { Timeout = 5000 });
+            .ToHaveTextAsync("Resident #42 at Facility #3", new() { Timeout = 5000 });
         await Expect(Page.Locator("#route-chain-spinner")).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }

@@ -9,7 +9,7 @@ public class WhenUrlParamsRead : PlaywrightTestBase
     /// <summary>Navigate WITH query params so FromUrl reads real values.</summary>
     private async Task NavigateWithParams()
     {
-        await NavigateTo("/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3");
+        await NavigateTo("/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3&residentId=42");
         await WaitForTraceMessage("booted", 10000);
         await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 15000 });
     }
@@ -125,6 +125,18 @@ public class WhenUrlParamsRead : PlaywrightTestBase
 
         await Expect(Page.Locator("#url-compose-facility"))
             .ToHaveTextAsync("7", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task url_param_sources_work_inside_chained_request_route_params()
+    {
+        await NavigateWithParams();
+
+        await ClickButton("Chain URL Sources");
+
+        await Expect(Page.Locator("#url-chain-name"))
+            .ToHaveTextAsync("Resident #42 at Facility #7", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 

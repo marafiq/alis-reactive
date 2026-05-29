@@ -19,6 +19,9 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionFileUpload Component = new FusionFileUpload();
 
+        private static readonly ComponentProperty<string> ValueProperty =
+            ComponentProperty<string>.Named(Component.ValueMember);
+
         /// <summary>Reads the current file data for use in conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
@@ -28,6 +31,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionFileUpload, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.String, "read"); return new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ValueMember); }
+            => self.Read(ValueProperty);
     }
 }

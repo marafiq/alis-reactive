@@ -3,7 +3,7 @@ namespace Alis.Reactive.PlaywrightTests.Conditions.HttpMixing;
 /// <summary>
 /// Browser-level verification that conditions compose freely with HTTP blocks.
 /// Each section mirrors a unit test scenario from WhenMixingConditionsWithHttp,
-/// WhenMixingCommandsAndConditions, and WhenUsingConditionsInsideResponseHandlers.
+/// WhenMixingCommandsAndConditions, and response routes.
 /// </summary>
 [TestFixture]
 public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
@@ -174,7 +174,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     }
 
     // ════════════════════════════════════════════════════════════════════
-    // Section 4: Condition INSIDE OnSuccess response handler
+    // Section 4: Condition inside OnSuccess response route
     // ════════════════════════════════════════════════════════════════════
 
     [Test]
@@ -374,7 +374,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     }
 
     // ════════════════════════════════════════════════════════════════════
-    // Section 7: Condition inside OnError handler
+    // Section 7: Condition inside OnError route
     // ════════════════════════════════════════════════════════════════════
 
     [Test]
@@ -384,9 +384,9 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
 
         await Page.Locator("#s7-btn-required").ClickAsync();
 
-        // OnError fires (400), inner condition: category="required" → Then branch
+        // OnError route fires (400), inner condition: category="required" → Then branch
         await Expect(Page.Locator("#s7-error-msg")).ToHaveTextAsync("missing required fields", new() { Timeout = 5000 });
-        // OnSuccess should NOT have fired
+        // OnSuccess route should not have fired
         await Expect(Page.Locator("#s7-status")).ToHaveTextAsync("\u2014");
 
         AssertNoConsoleErrorsExcept("400");
@@ -399,7 +399,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
 
         await Page.Locator("#s7-btn-other").ClickAsync();
 
-        // OnError fires, inner condition: category="format" ≠ "required" → Else branch
+        // OnError route fires, inner condition: category="format" ≠ "required" → Else branch
         await Expect(Page.Locator("#s7-error-msg")).ToHaveTextAsync("validation error", new() { Timeout = 5000 });
 
         AssertNoConsoleErrorsExcept("400");
@@ -488,6 +488,123 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
         // Qualified again
         await Page.Locator("#s8-btn-qualified").ClickAsync();
         await Expect(Page.Locator("#s8-qualified")).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task ordered_mixed_modules_after_http_run_after_response_routes()
+    {
+        await NavigateAndBoot();
+
+        await Page.Locator("#s12-btn-run").ClickAsync();
+
+        await Expect(Page.Locator("#s12-http-done")).ToHaveTextAsync("done", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s12-plugin")).ToHaveTextAsync("after-http");
+        await Expect(Page.Locator("#s12-order")).ToHaveTextAsync("branch-after");
+        await Expect(Page.Locator("#s12-sequence")).ToHaveTextAsync(
+            "start>branch-before>http-success>dispatch>plugin>tail>branch-after");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task ordered_mixed_modules_after_http_runs_else_branches_in_order()
+    {
+        await NavigateAndBoot();
+
+        await Page.EvaluateAsync(
+            "() => document.dispatchEvent(new CustomEvent('s12-ordered-mixed-modules', { detail: { Active: false, Category: 'standard', Count: 0 } }))");
+
+        await Expect(Page.Locator("#s12-http-done")).ToHaveTextAsync("done", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s12-plugin")).ToHaveTextAsync("after-http");
+        await Expect(Page.Locator("#s12-order")).ToHaveTextAsync("branch-after-else");
+        await Expect(Page.Locator("#s12-sequence")).ToHaveTextAsync(
+            "start>branch-before-else>http-success>dispatch>plugin>tail>branch-after-else");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task ordered_mixed_modules_after_parallel_wait_for_all_settled_reactions()
+    {
+        await NavigateAndBoot();
+
+        await Page.Locator("#s13-btn-run").ClickAsync();
+
+        await Expect(Page.Locator("#s13-a")).ToHaveTextAsync("Parallel A", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s13-b")).ToHaveTextAsync("audited:parallel-b", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s13-all")).ToHaveTextAsync("settled");
+        await Expect(Page.Locator("#s13-plugin")).ToHaveTextAsync("after-parallel");
+        await Expect(Page.Locator("#s13-order")).ToHaveTextAsync("branch-after");
+        await Expect(Page.Locator("#s13-sequence")).ToHaveTextAsync(
+            "start>branch-before>settled>dispatch>plugin>tail>branch-after");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task ordered_mixed_modules_after_parallel_runs_else_branches_in_order()
+    {
+        await NavigateAndBoot();
+
+        await Page.EvaluateAsync(
+            "() => document.dispatchEvent(new CustomEvent('s13-ordered-parallel-mix', { detail: { Active: false, Category: 'standard', Count: 0 } }))");
+
+        await Expect(Page.Locator("#s13-a")).ToHaveTextAsync("Parallel A", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s13-b")).ToHaveTextAsync("audited:parallel-b", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s13-all")).ToHaveTextAsync("settled");
+        await Expect(Page.Locator("#s13-plugin")).ToHaveTextAsync("after-parallel");
+        await Expect(Page.Locator("#s13-order")).ToHaveTextAsync("branch-after-else");
+        await Expect(Page.Locator("#s13-sequence")).ToHaveTextAsync(
+            "start>branch-before-else>settled>dispatch>plugin>tail>branch-after-else");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task route_template_gather_reads_event_payload_and_reuses_plugin_source_in_chained_request()
+    {
+        await NavigateAndBoot();
+
+        await Page.Locator("#s14-btn-active-high").ClickAsync();
+
+        await Expect(Page.Locator("#s14-route-id")).ToHaveTextAsync("314", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s14-body-action")).ToHaveTextAsync("VIP Review");
+        await Expect(Page.Locator("#s14-header-category")).ToHaveTextAsync("VIP Review");
+        await Expect(Page.Locator("#s14-trail-id")).ToHaveTextAsync("314");
+        await Expect(Page.Locator("#s14-trail-slug")).ToHaveTextAsync("vip-review");
+        await Expect(Page.Locator("#s14-trail-step")).ToHaveTextAsync("chained");
+        await Expect(Page.Locator("#s14-plugin")).ToHaveTextAsync("vip-review");
+        await Expect(Page.Locator("#s14-order")).ToHaveTextAsync("branch-after");
+        await Expect(Page.Locator("#s14-sequence")).ToHaveTextAsync(
+            "start>branch-before>http-success>trail-success>dispatch>plugin>branch-after");
+
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task route_template_gather_re_evaluates_event_payload_conditions_and_chained_route_params()
+    {
+        await NavigateAndBoot();
+
+        await Page.Locator("#s14-btn-active-high").ClickAsync();
+        await Expect(Page.Locator("#s14-trail-slug")).ToHaveTextAsync("vip-review", new() { Timeout = 5000 });
+
+        await Page.Locator("#s14-btn-inactive-low").ClickAsync();
+
+        await Expect(Page.Locator("#s14-route-id")).ToHaveTextAsync("271", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#s14-body-action")).ToHaveTextAsync("Routine Check");
+        await Expect(Page.Locator("#s14-header-category")).ToHaveTextAsync("Routine Check");
+        await Expect(Page.Locator("#s14-trail-id")).ToHaveTextAsync("271");
+        await Expect(Page.Locator("#s14-trail-slug")).ToHaveTextAsync("routine-check");
+        await Expect(Page.Locator("#s14-trail-step")).ToHaveTextAsync("chained");
+        await Expect(Page.Locator("#s14-plugin")).ToHaveTextAsync("routine-check");
+        await Expect(Page.Locator("#s14-order")).ToHaveTextAsync("branch-after-else");
+
+        var sequence = await Page.Locator("#s14-sequence").TextContentAsync();
+        Assert.That(sequence, Does.EndWith(
+            "start>branch-before-else>http-success>trail-success>dispatch>plugin>branch-after-else"));
 
         AssertNoConsoleErrors();
     }

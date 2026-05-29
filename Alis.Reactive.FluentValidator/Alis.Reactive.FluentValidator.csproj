@@ -1,23 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net48;net10.0</TargetFrameworks>
-        <LangVersion>8</LangVersion>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <PackageId>AlisReactive.FluentValidator</PackageId>
         <IsPackable>true</IsPackable>
-        <PackageDescription>FluentValidation integration for Alis.Reactive — server-side rules that automatically extract to client-side validation.</PackageDescription>
+        <PackageDescription>FluentValidation integration for Alis.Reactive that declares deterministic browser validation metadata.</PackageDescription>
         <PackageTags>reactive;aspnetcore;fluentvalidation;validation</PackageTags>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <ItemGroup>
         <PackageReference Include="FluentValidation" Version="12.*" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-        <PackageReference Include="FluentValidation" Version="11.*" />
-        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.*" />
     </ItemGroup>
 
     <ItemGroup>

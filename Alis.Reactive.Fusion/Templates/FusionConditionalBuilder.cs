@@ -15,7 +15,16 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Add a span element with property binding
         /// </summary>
-        public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, string css = null)
+        public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property) =>
+            Span(property, TemplateCss.None);
+
+        /// <summary>
+        /// Add a span element with property binding and CSS class
+        /// </summary>
+        public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, string css) =>
+            Span(property, TemplateCss.Class(css));
+
+        private FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, TemplateCss css)
         {
             _children.Add(() => TemplateElements.Span(FusionTemplateExpression.ToBinding(property), css));
             return this;
@@ -24,7 +33,16 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Add a span with static text
         /// </summary>
-        public FusionConditionalBuilder<TModel> Span(string text, string css = null)
+        public FusionConditionalBuilder<TModel> Span(string text) =>
+            Span(text, TemplateCss.None);
+
+        /// <summary>
+        /// Add a span with static text and CSS class
+        /// </summary>
+        public FusionConditionalBuilder<TModel> Span(string text, string css) =>
+            Span(text, TemplateCss.Class(css));
+
+        private FusionConditionalBuilder<TModel> Span(string text, TemplateCss css)
         {
             _children.Add(() => TemplateElements.Span(text, css));
             return this;
@@ -51,7 +69,16 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Add a Syncfusion icon
         /// </summary>
-        public FusionConditionalBuilder<TModel> Icon(string iconName, string css = null)
+        public FusionConditionalBuilder<TModel> Icon(string iconName) =>
+            Icon(iconName, TemplateCss.None);
+
+        /// <summary>
+        /// Add a Syncfusion icon with CSS class
+        /// </summary>
+        public FusionConditionalBuilder<TModel> Icon(string iconName, string css) =>
+            Icon(iconName, TemplateCss.Class(css));
+
+        private FusionConditionalBuilder<TModel> Icon(string iconName, TemplateCss css)
         {
             _children.Add(() => TemplateElements.Icon(iconName, css));
             return this;
@@ -71,9 +98,21 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Add an image element bound to a property
         /// </summary>
-        public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css = null)
+        public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty) =>
+            Img(srcProperty, TemplateCss.None);
+
+        /// <summary>
+        /// Add an image element bound to a property with CSS class
+        /// </summary>
+        public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css) =>
+            Img(srcProperty, TemplateCss.Class(css));
+
+        private FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, TemplateCss css)
         {
-            _children.Add(() => TemplateElements.Img(FusionTemplateExpression.ToBinding(srcProperty), css, null));
+            _children.Add(() => TemplateElements.Img(
+                FusionTemplateExpression.ToBinding(srcProperty),
+                css,
+                TemplateAltText.None));
             return this;
         }
 
@@ -82,7 +121,16 @@ namespace Alis.Reactive.Fusion.Templates
         /// The <paramref name="onClick"/> value is injected directly into the onclick
         /// attribute — do not pass untrusted input.
         /// </summary>
-        public FusionConditionalBuilder<TModel> Button(string text, string onClick, string css = null)
+        public FusionConditionalBuilder<TModel> Button(string text, string onClick) =>
+            Button(text, onClick, TemplateCss.None);
+
+        /// <summary>
+        /// Add a button element with CSS class.
+        /// </summary>
+        public FusionConditionalBuilder<TModel> Button(string text, string onClick, string css) =>
+            Button(text, onClick, TemplateCss.Class(css));
+
+        private FusionConditionalBuilder<TModel> Button(string text, string onClick, TemplateCss css)
         {
             _children.Add(() => TemplateElements.Button(text, onClick, css));
             return this;
@@ -93,7 +141,27 @@ namespace Alis.Reactive.Fusion.Templates
         /// Uses <c>&amp;quot;</c> for event name quoting to survive SF template engine
         /// single-to-double quote conversion.
         /// </summary>
-        public FusionConditionalBuilder<TModel> EventButton<TProperty>(string text, string eventName, Expression<Func<TModel, TProperty>> idProperty, string css = null)
+        public FusionConditionalBuilder<TModel> EventButton<TProperty>(
+            string text,
+            string eventName,
+            Expression<Func<TModel, TProperty>> idProperty) =>
+            EventButton(text, eventName, idProperty, TemplateCss.None);
+
+        /// <summary>
+        /// Add a button that dispatches a custom event with the row ID and CSS class.
+        /// </summary>
+        public FusionConditionalBuilder<TModel> EventButton<TProperty>(
+            string text,
+            string eventName,
+            Expression<Func<TModel, TProperty>> idProperty,
+            string css) =>
+            EventButton(text, eventName, idProperty, TemplateCss.Class(css));
+
+        private FusionConditionalBuilder<TModel> EventButton<TProperty>(
+            string text,
+            string eventName,
+            Expression<Func<TModel, TProperty>> idProperty,
+            TemplateCss css)
         {
             _children.Add(() => TemplateElements.EventButton(text, eventName, FusionTemplateExpression.ToBinding(idProperty), css));
             return this;

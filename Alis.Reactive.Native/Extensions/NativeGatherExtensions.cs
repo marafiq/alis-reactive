@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Requests;
 using Alis.Reactive.Native.Components;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Native.Extensions
 {
@@ -44,7 +45,8 @@ namespace Alis.Reactive.Native.Extensions
         {
             var elementId = IdGenerator.For(expr);
             var propertyName = ExpressionPathHelper.ToPropertyName(expr);
-            return self.Include(elementId, DefaultComponent.Vendor, propertyName, DefaultComponent.ValueMember);
+            var shape = Shape.FromClrType(ExpressionPathHelper.ToPropertyType(expr));
+            return self.Include(elementId, DefaultComponent.Vendor, propertyName, DefaultComponent.ValueMember, shape);
         }
     }
 }

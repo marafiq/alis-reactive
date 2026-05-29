@@ -315,7 +315,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
     {
         // Section 2 demonstrates server-side 400 validation. When client validation passes
         // (Name + Email filled), the POST goes to the server which validates the FULL model
-        // and returns 400 with server-side errors. The OnError(400) handler routes those errors
+        // and returns 400 with server-side errors. The OnError(400) route maps those errors
         // back to the inline error slots.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);

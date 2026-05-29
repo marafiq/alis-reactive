@@ -126,7 +126,7 @@ Html.On(plan, t => t
 
 Both use the same URL — one `EventSource`, two event listeners.
 
-## When should I use SSE vs SignalR?
+## When do I use SSE vs SignalR?
 
 | | SSE (`ServerPush`) | SignalR |
 |---|---|---|

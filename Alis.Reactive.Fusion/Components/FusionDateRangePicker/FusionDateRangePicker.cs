@@ -15,6 +15,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionDateRangePicker : FusionComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new FusionDateRangePicker(), "daterangepicker");
+
         /// <inheritdoc />
         public string ValueMember => "value";
     }

@@ -10,6 +10,9 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeCheckBox : NativeComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new NativeCheckBox(), "checkbox");
+
         /// <inheritdoc />
         public string ValueMember => "checked";
     }

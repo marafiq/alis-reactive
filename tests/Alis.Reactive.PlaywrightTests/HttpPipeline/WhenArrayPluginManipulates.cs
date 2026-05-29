@@ -72,6 +72,15 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
     }
 
     [Test]
+    public async Task root_function_plugin_shows_slug()
+    {
+        await NavigateAndWaitForDomReady();
+        await Expect(Page.Locator("#arr-root-slug"))
+            .ToHaveTextAsync("john-doe", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task dom_ready_applies_success_class()
     {
         await NavigateAndWaitForDomReady();

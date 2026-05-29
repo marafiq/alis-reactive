@@ -1,0 +1,78 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+    Shared Alis.Reactive asset-delivery mechanism.
+
+    Authored once; packed verbatim into every asset-bearing Alis.Reactive
+    package (AlisReactive, AlisReactive.DesignSystem, AlisReactive.Fusion) as
+    build\{PackageId}.targets and buildTransitive\{PackageId}.targets. NuGet
+    auto-imports it into the consumer's build by package-id name.
+
+    Each package ships its static assets under assets\js\ and assets\css\.
+    This file copies them into the consumer's web root with the owning
+    package's version baked into the filename:
+      .NETFramework : Content\alisreactive\{name}.{version}.{ext}
+      .NETCoreApp   : wwwroot\scripts\{name}.{version}.js
+                      wwwroot\css\{name}.{version}.css
+
+    When a consumer references several Alis.Reactive packages this file is
+    imported once per package. CopyAlisReactiveAssets collides by name (last
+    definition wins, runs once) — that is intentional: every import contributes
+    its own files to the @(AlisReactiveAsset) item, so the single surviving
+    target copies the assets of all referenced packages, each with the version
+    of the package that shipped it.
+
+    Override the destinations in the consumer csproj:
+      <AlisReactiveJsPath>my\js</AlisReactiveJsPath>
+      <AlisReactiveCssPath>my\css</AlisReactiveCssPath>
+  -->
+
+  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <AlisReactiveJsPath Condition="'$(AlisReactiveJsPath)' == ''">Content\alisreactive</AlisReactiveJsPath>
+    <AlisReactiveCssPath Condition="'$(AlisReactiveCssPath)' == ''">Content\alisreactive</AlisReactiveCssPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
+    <AlisReactiveJsPath Condition="'$(AlisReactiveJsPath)' == ''">wwwroot\scripts</AlisReactiveJsPath>
+    <AlisReactiveCssPath Condition="'$(AlisReactiveCssPath)' == ''">wwwroot\css</AlisReactiveCssPath>
+  </PropertyGroup>
+
+  <!--
+    Version of the package THIS import belongs to. The package folder is
+    '{Version}' (PackageReference) or '{PackageId}.{Version}' (packages.config);
+    the regex takes the trailing MAJOR.MINOR.PATCH[-prerelease] segment so no
+    package-id prefix is hardcoded. The property is recomputed per import and
+    frozen into PkgVersion item metadata below before the next import runs.
+  -->
+  <PropertyGroup>
+    <_AlisReactiveAssetsPkgFolder>$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(MSBuildThisFileDirectory.TrimEnd('\/'))))))</_AlisReactiveAssetsPkgFolder>
+    <_AlisReactiveAssetsVersion>$([System.Text.RegularExpressions.Regex]::Match($(_AlisReactiveAssetsPkgFolder), `[0-9]+\.[0-9]+\.[0-9][-0-9A-Za-z.]*`).Value)</_AlisReactiveAssetsVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AlisReactiveAsset Include="$(MSBuildThisFileDirectory)assets\**\*.*">
+      <PkgVersion>$(_AlisReactiveAssetsVersion)</PkgVersion>
+    </AlisReactiveAsset>
+  </ItemGroup>
+
+  <Target Name="CopyAlisReactiveAssets" AfterTargets="Build"
+          Condition="'@(AlisReactiveAsset)' != ''">
+
+    <MakeDir Directories="$(AlisReactiveJsPath)"
+             Condition="'@(AlisReactiveAsset->WithMetadataValue('Extension','.js'))' != '' and !Exists('$(AlisReactiveJsPath)')" />
+    <MakeDir Directories="$(AlisReactiveCssPath)"
+             Condition="'@(AlisReactiveAsset->WithMetadataValue('Extension','.css'))' != '' and !Exists('$(AlisReactiveCssPath)')" />
+
+    <Copy Condition="'@(AlisReactiveAsset->WithMetadataValue('Extension','.js'))' != ''"
+          SourceFiles="@(AlisReactiveAsset->WithMetadataValue('Extension','.js'))"
+          DestinationFiles="@(AlisReactiveAsset->WithMetadataValue('Extension','.js')->'$(AlisReactiveJsPath)\%(Filename).%(PkgVersion)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+    <Copy Condition="'@(AlisReactiveAsset->WithMetadataValue('Extension','.css'))' != ''"
+          SourceFiles="@(AlisReactiveAsset->WithMetadataValue('Extension','.css'))"
+          DestinationFiles="@(AlisReactiveAsset->WithMetadataValue('Extension','.css')->'$(AlisReactiveCssPath)\%(Filename).%(PkgVersion)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+  </Target>
+
+</Project>

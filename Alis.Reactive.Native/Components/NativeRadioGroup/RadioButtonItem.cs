@@ -10,6 +10,8 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public class RadioButtonItem
     {
+        private readonly OptionDescription _description;
+
         /// <summary>
         /// Gets the option value submitted in the form.
         /// </summary>
@@ -23,19 +25,65 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Gets the optional secondary description shown below the display text.
         /// </summary>
-        public string? Description { get; }
+        public string? Description => _description.ValueForRender;
 
         /// <summary>
-        /// Creates a new option.
+        /// Creates a new option without secondary description text.
         /// </summary>
         /// <param name="value">The option value submitted in the form.</param>
         /// <param name="text">The display text shown to the user.</param>
-        /// <param name="description">Optional secondary description text.</param>
-        public RadioButtonItem(string value, string text, string? description = null)
+        public RadioButtonItem(string value, string text)
+            : this(value, text, OptionDescription.None)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new option with secondary description text.
+        /// </summary>
+        /// <param name="value">The option value submitted in the form.</param>
+        /// <param name="text">The display text shown to the user.</param>
+        /// <param name="description">Secondary description text.</param>
+        public RadioButtonItem(string value, string text, string description)
+            : this(value, text, OptionDescription.Text(description))
+        {
+        }
+
+        private RadioButtonItem(string value, string text, OptionDescription description)
         {
             Value = value;
             Text = text;
-            Description = description;
+            _description = description;
         }
+    }
+
+    internal abstract class OptionDescription
+    {
+        private protected OptionDescription() { }
+
+        internal static OptionDescription None { get; } =
+            new MissingOptionDescription();
+
+        internal static OptionDescription Text(string value) =>
+            new TextOptionDescription(value);
+
+        internal abstract string? ValueForRender { get; }
+    }
+
+    internal sealed class MissingOptionDescription : OptionDescription
+    {
+        internal override string? ValueForRender => null;
+    }
+
+    internal sealed class TextOptionDescription : OptionDescription
+    {
+        private readonly string _value;
+
+        internal TextOptionDescription(string value)
+        {
+            if (value == null) throw new System.ArgumentNullException(nameof(value));
+            _value = value;
+        }
+
+        internal override string ValueForRender => _value;
     }
 }

@@ -50,7 +50,7 @@ Every piece of client-side behavior in a view boils down to three things:
 2. **Talk to the server.** Post a form, fetch filtered data, validate against server rules -- HTTP over the wire, then update the UI with the response.
 3. **Orchestrate components.** Read a value from one component, write it to another, show or hide a section based on state -- coordinate across the page.
 
-If every behavior is one of these three, you do not need to hand-write the execution. You need to **describe** what should happen, and let a runtime execute it.
+If every behavior is one of these three, you do not need to hand-write the execution. You need to **describe** what must happen, and let a runtime execute it.
 
 ## The Solution
 
@@ -88,9 +88,9 @@ plan -> runtime: boot {
 }
 ```
 
-1. **C# fluent builders** express your intent. You write C# in your `.cshtml` views -- `Element("panel").Show()`, `Component<NativeCheckBox>(m => m.IsActive).SetChecked(true)` -- and the builders capture what should happen.
+1. **C# fluent builders** express your intent. You write C# in your `.cshtml` views -- `Element("panel").Show()`, `Component<NativeCheckBox>(m => m.IsActive).SetChecked(true)` -- and the builders capture what must happen.
 
-2. **The JSON plan** is the contract. `plan.Render()` serializes your intent to JSON. This plan is schema-validated and carries every trigger, every condition, every mutation.
+2. **The JSON plan** is the contract. `plan.Render()` serializes your intent to JSON. The C# plan domain generates the TypeScript contract the runtime compiles against.
 
 3. **The JS runtime** executes the plan. A 2kb ESM module reads the JSON and executes the intents as expressed.
 

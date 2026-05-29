@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.Build.NoTargets/3.7.0">
+
+  <!--
+    This project compiles nothing. It exists so the framework browser assets -
+    the TypeScript runtime, the design-system CSS, and the Syncfusion CSS - are
+    a first-class, navigable node in the solution instead of a loose folder.
+
+    The bundles are built by esbuild/vite via npm (see CLAUDE.md "Build & Run").
+    MSBuild never touches these files - they are <None> items so Rider shows the
+    full tree and new files appear automatically with no .sln or .csproj edits.
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Source areas + workspace config. dist/ is gitignored build output. -->
+    <None Include="runtime/**/*" />
+    <None Include="design-system/**/*" />
+    <None Include="fusion/**/*" />
+    <None Include="*.json" />
+    <None Include="*.mjs" />
+    <None Include="*.config.ts" />
+    <None Include="*.md" />
+  </ItemGroup>
+
+</Project>

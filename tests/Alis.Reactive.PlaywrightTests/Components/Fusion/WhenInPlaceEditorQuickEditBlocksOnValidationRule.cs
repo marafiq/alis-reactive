@@ -42,9 +42,9 @@ public class WhenInPlaceEditorQuickEditBlocksOnValidationRule : PlaywrightTestBa
         await Expect(errorSlot).Not.ToBeEmptyAsync(new() { Timeout = 3000 });
     }
 
-    // Server-only Must() rule: client extracts GreaterThan/LessThanOrEqualTo but not Must, so
-    // a value that trips only the simulated "already assigned" DB check passes the client
-    // adapter, reaches the server, and the server returns { errors: { Value: [msg] } }. The
+    // Server-only Must() rule: the client declares GreaterThan/LessThanOrEqualTo but not Must, so
+    // a value that trips only the simulated "already assigned" DB check passes browser
+    // validation, reaches the server, and the server returns { errors: { Value: [msg] } }. The
     // framework's .OnError(400, e => e.ValidationErrors(formId)) writes it into the same
     // per-field slot that client-side rule failures use — identical UX, no card-specific glue.
     [Test]
@@ -64,10 +64,10 @@ public class WhenInPlaceEditorQuickEditBlocksOnValidationRule : PlaywrightTestBa
 
         await inner.PressAsync("Enter");
 
-        // POST fires: client-extractable rules passed; server rejects via the Must() rule.
+        // POST fires: browser-declared rules passed; server rejects via the Must() rule.
         var request = await requestTask;
         Assert.That(request.PostData ?? "", Does.Contain("7777"),
-            "Client-extractable rules must pass so the commit reaches the server.");
+            "Browser-declared rules must pass so the commit reaches the server.");
 
         // Server's framework-standard { errors: { Value: [msg] } } renders in the per-field slot.
         var errorSlot = Page.Locator($"#{RateEditorId}_error");

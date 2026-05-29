@@ -9,10 +9,11 @@ Plan-driven reactive framework for ASP.NET MVC. C# fluent builders produce JSON 
 | `Alis.Reactive` | Core plan model, builders, and serialization |
 | `Alis.Reactive.Native` | Native HTML components (TextBox, CheckBox, DropDown, Button, etc.) |
 | `Alis.Reactive.Fusion` | Syncfusion EJ2 component integration |
-| `Alis.Reactive.FluentValidator` | FluentValidation rule extraction to client-side validation |
+| `Alis.Reactive.FluentValidator` | FluentValidation client-validation metadata adapter |
+| `Alis.Reactive.DesignSystem` | Design-system tokens, layout helpers, and stylesheet |
 | `Alis.Reactive.NativeTagHelpers` | ASP.NET Core Tag Helpers for native components |
 
-All library packages target `net48` and `net10.0` (NativeTagHelpers is `net10.0` only).
+All library packages target `net10.0`.
 
 ## Getting Started
 
@@ -38,8 +39,8 @@ message telling you to run `npm run build:all`.
 Three terminals give a live edit/refresh loop:
 
 ```bash
-npm run watch                                    # framework JS  — rebuild on .ts edit
-npm run watch:css                                # framework CSS — rebuild on .css edit
+npm run watch:runtime                            # framework JS  — rebuild on .ts edit
+npm run watch:design-system                      # framework CSS — rebuild on .css edit
 dotnet watch --project Alis.Reactive.SandboxApp  # Razor + C# hot reload
 ```
 
@@ -57,8 +58,8 @@ bundle output path is gitignored — `git status` stays clean after a build.
 | Consumer | How it gets the bundles |
 |----------|-------------------------|
 | **Sandbox** | `SandboxApp/Program.cs` serves `Alis.Reactive.Assets/dist/` directly via a `CompositeFileProvider` — no copy into `wwwroot/` |
-| **NuGet** | `Alis.Reactive.csproj` packs the core `dist/` bundles into `AlisReactive`; `Alis.Reactive.Fusion.csproj` packs `syncfusion.dev.css` into `AlisReactive.Fusion`. `dotnet pack` never runs npm |
-| **Example app** (`examples/resident-intake/`) | Consumes the published NuGet; `AlisReactive.targets` copies the bundles into `wwwroot/` on build |
+| **NuGet** | Each asset-bearing csproj packs its bundle from `Alis.Reactive.Assets/dist/` — `AlisReactive` the runtime JS, `AlisReactive.DesignSystem` the design-system CSS, `AlisReactive.Fusion` the Syncfusion CSS. `dotnet pack` never runs npm |
+| **Example app** (`examples/resident-intake/`) | Uses local project references so solution builds exercise the current source contract |
 
 ## Repo Layout
 
@@ -66,19 +67,21 @@ bundle output path is gitignored — `git status` stays clean after a build.
 Alis.Reactive/                    C# core library (packed as AlisReactive NuGet)
 Alis.Reactive.Native/             C# native-component library
 Alis.Reactive.Fusion/             C# Syncfusion-component library
-Alis.Reactive.FluentValidator/    C# validator-extraction library
+Alis.Reactive.FluentValidator/    C# client-validation metadata adapter
 Alis.Reactive.NativeTagHelpers/   C# tag helpers (net10 only)
-Alis.Reactive.Analyzers/          Roslyn analyzers (shipped with AlisReactive)
-Alis.Reactive.Assets/             Framework JS + CSS source — pure npm package, no csproj
+Alis.Reactive.Analyzers/          Roslyn analyzers (shipped inside AlisReactive)
+Alis.Reactive.DesignSystem/       C# design-system tokens + layout helpers
+Alis.Reactive.Assets/             Framework browser assets — npm workspace (runtime, design-system, Fusion)
 Alis.Reactive.SandboxApp/         Dev harness + live component demos
-examples/resident-intake/         Published-NuGet consumer example
+examples/resident-intake/         Source-referenced consumer example
 tests/                            Test projects (NUnit + vitest + Playwright)
 ```
 
-The framework's JS runtime lives in `Alis.Reactive.Assets/` — a sibling folder
-with its own `package.json`, no csproj, no MSBuild orchestration of npm. This
-mirrors how `dotnet/aspnetcore` ships Blazor's `Web.JS` and SignalR's
-TypeScript client.
+`Alis.Reactive.Assets/` is the single home for all framework browser assets — an
+npm workspace holding the runtime TypeScript, the design-system CSS, and the
+Syncfusion CSS. esbuild and vite build each into `dist/`; the C# packages ship
+those bundles but never build them. A `NoTargets` `.csproj` makes the workspace
+visible in the solution and compiles nothing.
 
 ## License
 

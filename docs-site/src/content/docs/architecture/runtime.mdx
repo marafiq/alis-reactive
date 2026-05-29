@@ -13,19 +13,20 @@ The runtime is a plan interpreter. It reads the JSON plan that C# builders produ
 Scripts/
 ├── root.ts                          entry point — discovers [data-reactive-plan], calls boot()
 ├── lifecycle/
-│   ├── boot.ts                      two-phase boot — wire listeners, then execute DomReady
-│   ├── enrichment.ts                fills validation field metadata from ComponentsMap
-│   ├── merge-plan.ts                composes partial plans (ResolvePlan merges into parent)
-│   └── walk-reactions.ts            traverses reaction tree for validation + live-clear wiring
+│   ├── boot.ts                      live validation wiring, two-phase behavior wiring, slot load/unload
+│   ├── merge-plan.ts                applied browser plans, initial composition, partial slot replacement
+│   ├── component-contribution.ts     component ownership and contribution intent
+│   ├── partial-slot.ts              applied slot contribution records
+│   └── object-contract-fragment.ts  type fragment ownership and recomposition
 ├── execution/
 │   ├── execute.ts                   reaction dispatcher — sequential, conditional, http, parallel
 │   ├── commands.ts                  command dispatcher — dispatch, mutate-element, mutate-event, into
 │   ├── element.ts                   bracket notation — root[prop] = val, root[method](args)
-│   ├── trigger.ts                   wires dom-ready, custom-event, component-event listeners
+│   ├── trigger.ts                   wires page-ready, custom-event, component-event listeners
 │   ├── gather.ts                    collects component + event values for HTTP requests
 │   ├── http.ts                      builds and executes fetch(), routes responses
 │   ├── pipeline.ts                  orchestrates: pre-fetch → validate → request → parallel
-│   └── inject.ts                    injects HTML into containers, merges embedded plans
+│   └── inject.ts                    injects HTML into containers, loads or unloads embedded partial plans
 ├── resolution/
 │   ├── resolver.ts                  walks BindSource — event paths or component reads
 │   └── component.ts                 vendor root resolution (see Component Model)
@@ -33,43 +34,37 @@ Scripts/
 ├── validation/                      client-side validation from plan models
 ├── components/                      component-specific side effects (drawer, loader, confirm)
 ├── core/                            walk.ts, coerce.ts, trace.ts, assert-never.ts
-└── types/                           TypeScript interfaces mirroring the JSON plan schema
+└── types/                           generated TypeScript interfaces from the C# plan domain
 ```
 
 ## Boot — `root.ts` → `boot.ts`
 
-`root.ts` runs on every page load. It finds all `[data-reactive-plan]` elements, parses their JSON, composes partial plans via `composeInitialPlans()`, and calls `boot()` for each. No global state. No `window.alis` (one exception: `window.alis.confirm` for the confirm guard dialog).
+`root.ts` runs on every page load. It finds all `[data-reactive-plan]` elements, parses their JSON, composes first-DOM plan documents by `planId` via `composeInitialPlans()`, and calls `boot()` for each. No global state. No `window.alis` (one exception: `window.alis.confirm` for the confirm guard dialog).
 
-`boot()` orchestrates three steps:
+`boot()` wires the already-declared plan:
 
 ```d2
 direction: right
 
-enrich: "enrichment.ts\nFill validation fields\nfrom ComponentsMap" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 16
-}
-validation: "walk-reactions.ts\nFind validation rules\nWire live-clear listeners" {
+validation: "wireContainerValidation()\nWire live validation\nfor container scopes" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 16
 }
-wire: "wireEntries()\nTwo-phase trigger wiring" {
+wire: "wireBehaviors()\nTwo-phase behavior wiring" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
   style.font-size: 16
 }
 
-enrich -> validation -> wire
+validation -> wire
 ```
 
-**Enrichment** walks validation rules and fills in `fieldId`, `vendor`, `readExpr`, and `shape` on each field from the ComponentsMap. The `shape` carries the type contract inferred from `typeof(TProp)` via `Shape.FromClrType()` at C# registration time — used by the condition reader for typed comparison (e.g., Unix ms for dates). This is the only runtime enrichment — gather placeholders and component trigger refs are already resolved at C# render time.
+Validation metadata is already in the plan. `wireContainerValidation()` only attaches live validation callbacks for components that declare a validation container scope.
 
-**Two-phase boot** guarantees event chains work regardless of declaration order. Phase 1 wires all CustomEvent and component-event listeners. Phase 2 runs DomReady reactions — which may dispatch events that Phase 1 listeners catch. Without this, a DomReady dispatch would fire before the listener exists and vanish silently.
+**Two-phase boot** guarantees event chains work regardless of declaration order. Phase 1 wires all CustomEvent and component-event listeners. Phase 2 runs page-ready reactions — which may dispatch events that Phase 1 listeners catch. Without this, a page-ready dispatch would fire before the listener exists and vanish silently.
 
 At this point, the page is live. Listeners are attached. The runtime is waiting.
 
@@ -120,7 +115,7 @@ Attaches listeners based on `trigger.kind`. Each creates an execution context an
 
 | Trigger kind | What it wires | Context |
 |-------------|---------------|---------|
-| `dom-ready` | Immediate execution (or `DOMContentLoaded`) | `{ components }` |
+| `page-ready` | Immediate execution (or `DOMContentLoaded`) | `{ components }` |
 | `custom-event` | `document.addEventListener(eventName)` | `{ evt: detail, components }` |
 | `component-event` | `resolveRoot(el, vendor).addEventListener(jsEvent)` | `{ evt: payload, components }` |
 | `server-push` | `new EventSource(url)` — SSE stream listener | `{ evt: parsed data, components }` |
@@ -149,7 +144,7 @@ The tree is recursive — a conditional branch can contain an HTTP reaction, and
 | `mutate-element` | `element.ts` | Bracket notation on DOM element or component root |
 | `mutate-event` | inline | Modifies `ctx.evt` (e.g., `preventDefaultAction = true`) |
 | `validation-errors` | `validation/` | Routes server-side errors to form fields |
-| `into` | `inject.ts` | Injects response HTML, merges any embedded plans |
+| `into` | `inject.ts` | Injects response HTML, replaces or unloads the target partial slot |
 
 Each command can carry an optional `when` guard — if it fails, the command is skipped but the pipeline continues.
 

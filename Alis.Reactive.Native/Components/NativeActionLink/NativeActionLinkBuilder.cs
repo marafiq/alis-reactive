@@ -2,20 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Encodings.Web;
-#if NET48
-using System.Web;
-#else
 using Microsoft.AspNetCore.Html;
-#endif
 
 namespace Alis.Reactive.Native.Components
 {
     public sealed class NativeActionLinkBuilder<TModel> :
-#if NET48
-        IHtmlString
-#else
         IHtmlContent
-#endif
         where TModel : class
     {
         private readonly string _elementId;
@@ -27,15 +19,15 @@ namespace Alis.Reactive.Native.Components
 
         internal NativeActionLinkBuilder(string elementId, string text, string href, string payloadJson)
         {
-            _elementId = elementId;
-            _text = text;
-            _href = href;
-            _payloadJson = payloadJson;
+            _elementId = elementId ?? throw new ArgumentNullException(nameof(elementId));
+            _text = text ?? throw new ArgumentNullException(nameof(text));
+            _href = href ?? throw new ArgumentNullException(nameof(href));
+            _payloadJson = payloadJson ?? throw new ArgumentNullException(nameof(payloadJson));
         }
 
         public NativeActionLinkBuilder<TModel> CssClass(string css)
         {
-            _cssClass = css;
+            _cssClass = css ?? throw new ArgumentNullException(nameof(css));
             return this;
         }
 
@@ -53,18 +45,10 @@ namespace Alis.Reactive.Native.Components
                 throw new InvalidOperationException(
                     $"Attribute '{name}' is reserved by NativeActionLink and cannot be overridden.");
 
-            _attributes[name] = value;
+            _attributes[name] = value ?? throw new ArgumentNullException(nameof(value));
             return this;
         }
 
-#if NET48
-        public string ToHtmlString()
-        {
-            var sw = new StringWriter();
-            WriteTo(sw, HtmlEncoder.Default);
-            return sw.ToString();
-        }
-#endif
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
@@ -79,10 +63,10 @@ namespace Alis.Reactive.Native.Components
             writer.Write(encoder.Encode(_payloadJson));
             writer.Write("\"");
 
-            if (!string.IsNullOrWhiteSpace(_cssClass))
+            if (HasCssClass(out var cssClass))
             {
                 writer.Write(" class=\"");
-                writer.Write(encoder.Encode(_cssClass));
+                writer.Write(encoder.Encode(cssClass));
                 writer.Write("\"");
             }
 
@@ -105,6 +89,12 @@ namespace Alis.Reactive.Native.Components
             return string.Equals(name, "id", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(name, "href", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(name, "data-reactive-link", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool HasCssClass(out string cssClass)
+        {
+            cssClass = _cssClass ?? string.Empty;
+            return !string.IsNullOrWhiteSpace(cssClass);
         }
     }
 }

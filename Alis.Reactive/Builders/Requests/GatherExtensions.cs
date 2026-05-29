@@ -21,9 +21,10 @@ namespace Alis.Reactive.Builders.Requests
             where TModel : class
         {
             var component = new TComponent();
-            var elementId = IdGenerator.For<TModel>(expr);
-            var propertyName = ExpressionPathHelper.ToPropertyName(expr);
-            self.Include(elementId, component.Vendor, propertyName, component.ValueMember);
+            var elementId = IdGenerator.For<TModel, object>(expr);
+            var propertyName = ExpressionPathHelper.ToPropertyName<TModel, object>(expr);
+            var shape = Shape.FromClrType(ExpressionPathHelper.ToPropertyType(expr));
+            self.Include(elementId, component.Vendor, propertyName, component.ValueMember, shape);
             return self;
         }
 
@@ -40,28 +41,31 @@ namespace Alis.Reactive.Builders.Requests
             where TModel : class
         {
             var component = new TComponent();
-            var valueMember = component is IInputComponent input ? input.ValueMember : name;
+            var valueMember = name;
+            if (component is IInputComponent input)
+                valueMember = input.ValueMember;
+
             self.Include(refId, component.Vendor, name, valueMember);
             return self;
         }
 
         /// <summary>
-        /// Includes a typed component property read in the gather.
+        /// Includes a typed component member value in the gather.
         /// The member name becomes the HTTP parameter name.
-        /// Use with display component readable properties like
-        /// <c>schedule.CurrentView()</c> or <c>schedule.SelectedDate()</c>.
+        /// Use with component value sources like <c>schedule.CurrentView()</c>,
+        /// <c>schedule.SelectedDate()</c>, or method-return sources such as <c>schedule.GetEvents()</c>.
         /// </summary>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
             this GatherBuilder<TModel> self,
             TypedComponentSource<TProp> source)
             where TModel : class
         {
-            self.Include(source.ComponentId, source.Vendor, source.ReadMember, source.ReadMember);
+            self.Include(source, source.DefaultPayloadName);
             return self;
         }
 
         /// <summary>
-        /// Includes a typed component property read with an explicit HTTP parameter name.
+        /// Includes a typed component member value with an explicit HTTP parameter name.
         /// Use when the parameter name differs from the component property name.
         /// </summary>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
@@ -70,7 +74,7 @@ namespace Alis.Reactive.Builders.Requests
             string paramName)
             where TModel : class
         {
-            self.Include(source.ComponentId, source.Vendor, paramName, source.ReadMember);
+            self.Include(source, paramName);
             return self;
         }
     }

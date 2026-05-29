@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
@@ -17,8 +16,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionDatePickerHtmlExtensions
     {
-        private static readonly FusionDatePicker Component = new FusionDatePicker();
-
         /// <summary>
         /// Renders a FusionDatePicker bound to the field's model property.
         /// </summary>
@@ -31,9 +28,8 @@ namespace Alis.Reactive.Fusion.Components
             Action<DatePickerBuilder> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ValueMember, "datepicker",
-                Shape.FromClrType(typeof(TProp))));
+            var registration = global::Alis.Reactive.Fusion.Components.FusionDatePicker.Registration;
+            setup.RegisterInputComponent(registration);
 
             var builder = setup.Helper.EJS().DatePickerFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });

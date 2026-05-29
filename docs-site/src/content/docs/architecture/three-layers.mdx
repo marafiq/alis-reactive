@@ -41,7 +41,7 @@ layer2 -> layer3: boot {
 
 ## Layer 1 — C# Fluent Builders
 
-The developer writes fluent C# in `.cshtml` views. Every call builds a plan model — a data structure that captures what should happen. Nothing executes. The builders are the API surface: triggers, mutations, conditions, HTTP, components.
+The developer writes fluent C# in `.cshtml` views. Every call builds a plan model — a data structure that captures what must happen. Nothing executes. The builders are the API surface: triggers, mutations, conditions, HTTP, components.
 
 The compiler checks model bindings, event arg types, and response types at build time. Rename a property → compiler error.
 
@@ -187,7 +187,7 @@ One idea, five features, zero JavaScript in your views.
 
 **Why not Blazor?** Blazor replaces the entire rendering pipeline. Reactive works *with* MVC — same controllers, same Razor views, same model binding. Teams keep their existing investment and add interactivity incrementally.
 
-**Why not generate JavaScript directly?** Generated JS is opaque — you can't validate it, schema-test it, or inspect it. A JSON plan is structured data: schema-validated in unit tests, inspectable in the browser, and the same shape regardless of which C# builder produced it.
+**Why not generate JavaScript directly?** Generated JS is opaque and hard to inspect. A JSON plan is structured data: generated from the C# domain, compiled into TypeScript types, inspectable in the browser, and the same shape regardless of which C# builder produced it.
 
 **Why not a signals/reactivity library?** Signals solve state propagation. Reactive solves a different problem: expressing server-aware UI behavior (HTTP orchestration, validation, component cascading) without writing JavaScript. The plan carries the full behavior description — the runtime is a dumb interpreter, not a state manager.
 

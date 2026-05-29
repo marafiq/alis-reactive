@@ -7,12 +7,12 @@
 
 <native-grid cols="C3" gap="Base">
     <a asp-area="Sandbox" asp-controller="Validation" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
                 All Rules
             </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
             Interactive form with every rule type: required, min/max length, range, regex, comparison (equalTo, greaterThan) — submit to see errors, fix fields to see live-clear
@@ -20,25 +20,25 @@
     </a>
 
     <a asp-area="Sandbox" asp-controller="ValidationContract" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
                 Contract
             </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-            Full resident admission form: FluentValidation rules extracted to client-side, server-side error merge on submit, conditional field visibility tied to validation
+            Full resident admission form: FluentValidation rules projected to client-side, server-side error merge on submit, conditional field visibility tied to validation
         </p>
     </a>
 
     <a asp-area="Sandbox" asp-controller="DateValidation" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
                 Date Rules
             </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
             Date picker fields with past/future constraints, date range validation, and relative date rules — pick dates to see validation fire in real time
@@ -46,12 +46,12 @@
     </a>
 
     <a asp-area="Sandbox" asp-controller="NewRuleTypes" asp-action="Index"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
                 Specialized Rules
             </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
             Specialized input validation: email format, phone pattern, credit card (Luhn), URL format — type invalid values to see immediate feedback
@@ -62,12 +62,12 @@
 <h2 class="text-lg font-semibold text-text-primary mt-10 mb-4">Nested &amp; Conditional</h2>
 <native-grid cols="C3" gap="Base">
     <a asp-area="Sandbox" asp-controller="NestedBugs" asp-action="NestedCondition"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
                 Nested Condition
             </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
             Nested model validation with SetValidator — address fields under a parent model with conditional visibility
@@ -75,12 +75,12 @@
     </a>
 
     <a asp-area="Sandbox" asp-controller="NestedBugs" asp-action="ParentChild"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
                 Parent Child
             </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
             Parent-child form with nested property validation — tests field correlation across model hierarchies
@@ -88,12 +88,12 @@
     </a>
 
     <a asp-area="Sandbox" asp-controller="NestedBugs" asp-action="IncludeConditional"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
                 Include Conditional
             </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
             Conditional Include — gather specific fields based on condition state, not the entire form
@@ -101,12 +101,12 @@
     </a>
 
     <a asp-area="Sandbox" asp-controller="NestedBugs" asp-action="OperatorConditions"
-       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-[#7A2E3B]/20 hover:-translate-y-0.5 transition-all duration-200">
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
-            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-[#7A2E3B] transition-colors">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
                 Operator Conditions
             </h3>
-            <span class="text-text-muted group-hover:text-[#7A2E3B] transition-colors text-sm">&rarr;</span>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
         </native-hstack>
         <p class="mt-2 text-sm text-text-secondary leading-relaxed">
             Validation rules that activate based on condition operators — WhenField toggles rule enforcement dynamically

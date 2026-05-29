@@ -1,3 +1,4 @@
+using Alis.Reactive.FluentValidator;
 using FluentValidation;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
@@ -18,13 +19,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Text { get; set; } = "";
     }
 
-    public class BddExperimentValidator : AbstractValidator<BddExperimentModel>
+    public class BddExperimentValidator : ReactiveValidator<BddExperimentModel>
     {
         public BddExperimentValidator()
         {
             RuleFor(x => x.ResidentName).NotEmpty().WithMessage("Resident name is required.");
+            ClientRule(x => x.ResidentName).Required("Resident name is required.");
             RuleFor(x => x.Physician).NotEmpty().WithMessage("Physician is required.");
+            ClientRule(x => x.Physician).Required("Physician is required.");
             RuleFor(x => x.MonthlyRate).NotNull().WithMessage("Monthly rate is required.");
+            ClientRule(x => x.MonthlyRate).Required("Monthly rate is required.");
         }
     }
 

@@ -1,0 +1,23 @@
+{
+  "name": "alis-reactive-sandbox",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sandbox app — its own browser assets (plugins JS, sandbox CSS). Not shipped.",
+  "scripts": {
+    "build": "npm run build:plugins && npm run build:css",
+    "build:plugins": "node esbuild.config.mjs",
+    "build:css": "node build-css.mjs",
+    "watch:plugins": "node esbuild.config.mjs --watch",
+    "watch:css": "vite build --config vite.config.ts --watch",
+    "typecheck": "tsc --project Scripts/tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.4",
+    "esbuild": "^0.28.0",
+    "tailwindcss": "^4.2.1",
+    "vite": "^8.0.9",
+    "vitest": "^3.2.4"
+  }
+}

@@ -92,10 +92,10 @@ NativeButton, NativeHiddenField, NativeActionLink, FusionTab, FusionAccordion.
 
 - `Serialization/WriteOnlyPolymorphicConverter.cs` — 6
 - `Validation/ValidationDescriptor.cs` — 4
-- `Validation/ValidationField.cs` — 2
+- `Validation/ClientValidationField.cs` — 2
 - `TypedEventDescriptor.cs` — 4
 - `IComponent.cs` — 2
-- `Validation/IValidationExtractor.cs` — 2
+- `Validation/IClientValidationRuleSource.cs` — 2
 
 ## Approach
 

@@ -42,8 +42,6 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var descriptor = eventSelector(FusionRichTextEditorEvents.Instance);
-            var pb = new PipelineBuilder<TModel>(plan.Context);
-            pipeline(descriptor.Args, pb);
 
             // RTE uses model.Id (set by FusionRichTextEditorHtmlExtensions) instead
             // of HtmlAttributes["id"] because SF RTE Render() uses model.Id for the
@@ -51,7 +49,7 @@ namespace Alis.Reactive.Fusion.Components
             var componentId = builder.model.Id;
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
 
-            plan.Context.WireComponentEvent(componentId, Component.Vendor, descriptor.JsEvent, pb.BuildReactions());
+            ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, descriptor, pipeline);
 
             return builder;
         }

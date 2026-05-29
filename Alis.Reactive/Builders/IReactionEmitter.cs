@@ -9,7 +9,7 @@ namespace Alis.Reactive.Builders
     public interface IReactionEmitter
     {
         /// <summary>Adds a reaction step to the current pipeline.</summary>
-        void AddStep(Reaction step);
+        void AddStep(ReactionGraph step);
         /// <summary>Gets the plan build context for component registration.</summary>
         PlanBuildContext BuildContext { get; }
     }

@@ -6,7 +6,7 @@ action: block
 conditions:
   - field: file_path
     operator: regex_match
-    pattern: (Alis\.Reactive/|Alis\.Reactive\.Native/|Alis\.Reactive\.Fusion/|Alis\.Reactive\.FluentValidator/)Alis\.Reactive.*\.csproj$
+    pattern: (Alis\.Reactive/|Alis\.Reactive\.Native/|Alis\.Reactive\.Fusion/|Alis\.Reactive\.FluentValidator/|Alis\.Reactive\.DesignSystem/)Alis\.Reactive.*\.csproj$
   - field: new_text
     operator: regex_match
     pattern: <LangVersion>[^8]

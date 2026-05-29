@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AlisReactive" Version="1.0.0-preview.2" />
-    <PackageReference Include="AlisReactive.Native" Version="1.0.0-preview.2" />
-    <PackageReference Include="AlisReactive.Fusion" Version="1.0.0-preview.2" />
-    <PackageReference Include="AlisReactive.FluentValidator" Version="1.0.0-preview.2" />
-    <PackageReference Include="AlisReactive.NativeTagHelpers" Version="1.0.0-preview.2" />
+    <ProjectReference Include="..\..\Alis.Reactive\Alis.Reactive.csproj" />
+    <ProjectReference Include="..\..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />
+    <ProjectReference Include="..\..\Alis.Reactive.Fusion\Alis.Reactive.Fusion.csproj" />
+    <ProjectReference Include="..\..\Alis.Reactive.FluentValidator\Alis.Reactive.FluentValidator.csproj" />
+    <ProjectReference Include="..\..\Alis.Reactive.NativeTagHelpers\Alis.Reactive.NativeTagHelpers.csproj" />
     <PackageReference Include="Newtonsoft.Json" Version="13.*" />
   </ItemGroup>
 

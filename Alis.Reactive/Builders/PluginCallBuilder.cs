@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.PlanModel;
@@ -12,16 +11,24 @@ namespace Alis.Reactive.Builders
     /// </summary>
     public sealed class PluginCallBuilder<TModel> where TModel : class
     {
-        private readonly string _pluginName;
-        private readonly string _method;
+        private readonly PluginOperationId _operation;
         private readonly IReactionEmitter _emitter;
-        private readonly List<ValueProducer> _args = new List<ValueProducer>();
+        private readonly PluginArguments _args;
 
-        internal PluginCallBuilder(string pluginName, string method, IReactionEmitter emitter)
+        internal PluginCallBuilder(
+            PluginOperationId operation,
+            IReactionEmitter emitter,
+            MethodArgumentContract arguments)
         {
-            _pluginName = pluginName;
-            _method = method;
-            _emitter = emitter;
+            _operation = operation ?? throw new ArgumentNullException(nameof(operation));
+            _emitter = emitter ?? throw new ArgumentNullException(nameof(emitter));
+            if (arguments == null) throw new ArgumentNullException(nameof(arguments));
+            _args = new PluginArguments(operation, arguments);
+        }
+
+        internal PluginCallBuilder(PluginCommand command, IReactionEmitter emitter)
+            : this(PluginOperationId.Of(command), emitter, command.ArgumentContract)
+        {
         }
 
         /// <summary>Adds a response body expression as an argument.</summary>
@@ -29,8 +36,7 @@ namespace Alis.Reactive.Builders
             ResponseBody<TResponse> body, Expression<Func<TResponse, TProp>> path)
             where TResponse : class
         {
-            var responsePath = ExpressionPathHelper.ToResponsePath(path);
-            _args.Add(ValueProducer.Read(body.Scope, responsePath, shape: Shape.FromClrType(typeof(TProp))));
+            AddArg(PluginInvocationArgument.FromResponse(body, path));
             return this;
         }
 
@@ -38,16 +44,14 @@ namespace Alis.Reactive.Builders
         public PluginCallBuilder<TModel> Arg<TArgs, TProp>(
             TArgs args, Expression<Func<TArgs, TProp>> path)
         {
-            var eventPath = ExpressionPathHelper.ToEventPath(path);
-            _args.Add(ValueProducer.Read(PayloadSource.Event(), eventPath, shape: Shape.FromClrType(typeof(TProp))));
+            AddArg(PluginInvocationArgument.FromEvent(path));
             return this;
         }
 
         /// <summary>Adds a typed source as an argument.</summary>
         public PluginCallBuilder<TModel> Arg<TArg>(TypedSource<TArg> source)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            _args.Add(source.ToValueProducer());
+            AddArg(PluginInvocationArgument.FromSource(source));
             return this;
         }
 
@@ -55,27 +59,70 @@ namespace Alis.Reactive.Builders
         public PluginCallBuilder<TModel> Arg(string value)
         {
             if (value == null) throw new System.ArgumentNullException(nameof(value));
-            _args.Add(ValueProducer.Literal(value)); return this;
+            AddArg(PluginInvocationArgument.Literal(value));
+            return this;
         }
 
         /// <summary>Adds an int literal argument.</summary>
         public PluginCallBuilder<TModel> Arg(int value)
-        { _args.Add(ValueProducer.Literal(value)); return this; }
+        {
+            AddArg(PluginInvocationArgument.Literal(value));
+            return this;
+        }
 
         /// <summary>Adds a bool literal argument.</summary>
         public PluginCallBuilder<TModel> Arg(bool value)
-        { _args.Add(ValueProducer.Literal(value)); return this; }
+        {
+            AddArg(PluginInvocationArgument.Literal(value));
+            return this;
+        }
 
         /// <summary>Adds a long literal argument.</summary>
         public PluginCallBuilder<TModel> Arg(long value)
-        { _args.Add(ValueProducer.Literal(value)); return this; }
+        {
+            AddArg(PluginInvocationArgument.Literal(value));
+            return this;
+        }
+
+        /// <summary>Adds a decimal literal argument.</summary>
+        public PluginCallBuilder<TModel> Arg(decimal value)
+        {
+            AddArg(PluginInvocationArgument.Literal(value));
+            return this;
+        }
+
+        /// <summary>Adds a double literal argument.</summary>
+        public PluginCallBuilder<TModel> Arg(double value)
+        {
+            AddArg(PluginInvocationArgument.Literal(value));
+            return this;
+        }
+
+        /// <summary>Adds a DateTime literal argument formatted for browser date comparison.</summary>
+        public PluginCallBuilder<TModel> Arg(DateTime value)
+        {
+            AddArg(PluginInvocationArgument.Literal(value));
+            return this;
+        }
+
+        /// <summary>Adds a literal argument whose plan shape is derived from <typeparamref name="TValue"/>.</summary>
+        public PluginCallBuilder<TModel> ArgValue<TValue>(TValue value)
+        {
+            AddArg(PluginInvocationArgument.Literal(value));
+            return this;
+        }
 
         /// <summary>Emits the CallReaction into the pipeline. Terminal method.</summary>
         public void Fire()
         {
-            _emitter.AddStep(Reaction.Call(
-                PluginSource.Of(_pluginName), _method,
-                _args));
+            _emitter.AddStep(ReactionGraph.Call(
+                PluginSource.Of(_operation.PluginNameValue), _operation.PlanMethodNameValue,
+                _args.Complete()));
+        }
+
+        private void AddArg(PluginInvocationArgument argument)
+        {
+            _args.Add(argument);
         }
     }
 }

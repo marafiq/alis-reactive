@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
@@ -18,8 +17,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionDropDownListHtmlExtensions
     {
-        private static readonly FusionDropDownList Component = new FusionDropDownList();
-
         /// <summary>
         /// Configures text and value field mappings using typed expressions.
         /// </summary>
@@ -83,9 +80,8 @@ namespace Alis.Reactive.Fusion.Components
             Action<DropDownListBuilder> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ValueMember, "dropdownlist",
-                Shape.FromClrType(typeof(TProp))));
+            var registration = global::Alis.Reactive.Fusion.Components.FusionDropDownList.Registration;
+            setup.RegisterInputComponent(registration);
 
             var builder = setup.Helper.EJS().DropDownListFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });

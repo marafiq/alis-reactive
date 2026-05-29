@@ -1,4 +1,3 @@
-using Alis.Reactive;
 using Alis.Reactive.FluentValidator;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -12,11 +11,8 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-
-// Register FluentValidation extraction for client-side validation
-ReactivePlanConfig.UseValidationExtractor(
-    new FluentValidationAdapter(type =>
-        (FluentValidation.IValidator?)Activator.CreateInstance(type)));
+builder.Services.AddReactiveFluentValidation(validation =>
+    validation.AddFromAssemblyContaining<Program>());
 
 var app = builder.Build();
 

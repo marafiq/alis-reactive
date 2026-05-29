@@ -360,7 +360,7 @@ Playwright tests assert on the same echo spans you just verified manually. If th
 | Modify any file in `Alis.Reactive/` | Core framework is off-limits | File a bug if something doesn't work |
 | Modify any file in `Alis.Reactive.Fusion/` | Component vertical slices are separate work | Use the onboarding guide for that |
 | Modify `Scripts/*.ts` | Runtime is a dumb executor | Plan carries all behavior |
-| Modify `reactive-plan.schema.json` | Schema is the contract | Existing primitives cover all cases |
+| Modify generated plan types by hand | C# plan domain is the contract source | Existing primitives cover all cases |
 | Add inline `<script>` to views | Framework boots from plan JSON only | Use `Html.On()` and `.Reactive()` |
 | Assert on plan JSON structure | Implementation detail | Assert on visible DOM state |
 

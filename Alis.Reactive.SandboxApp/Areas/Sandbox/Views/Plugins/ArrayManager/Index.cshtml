@@ -8,20 +8,9 @@
 
     var plan = Html.ReactivePlan<ArrayManagerModel>();
 
-    // Register plugin type metadata
-    plan.RegisterPlugin("array", p =>
-    {
-        p.Method<int>("count");
-        p.Method<object>("pluck");
-        p.Method<object>("filter");
-        p.Method<int>("sum");
-        p.Method<bool>("some");
-    });
-
-    plan.RegisterPlugin("analytics", p =>
-    {
-        p.Void("track");
-    });
+    var array = plan.RegisterPlugin<ArrayPlugin>();
+    var analytics = plan.RegisterPlugin<AnalyticsPlugin>();
+    var slugify = plan.RegisterPlugin<SlugifyPlugin>();
 
     // DomReady: GET residents → use array plugin on response
     Html.On(plan, t => t.DomReady(p =>
@@ -29,31 +18,34 @@
          .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
          {
              // array.count(items)
-             TypedPluginSource<int> countSrc = p.Plugin<int>("array", "count").Arg(json, x => x.Items);
+             TypedPluginSource<int> countSrc = p.Plugin(array.Count).Arg(json, x => x.Items);
              s.Element("arr-total").SetText(countSrc);
 
              // array.pluck(items, 0, "name")
-             TypedPluginSource<string> pluckSrc = p.Plugin<string>("array", "pluck")
+             TypedPluginSource<object> pluckSrc = p.Plugin(array.Pluck)
                  .Arg(json, x => x.Items).Arg(0).Arg("name");
              s.Element("arr-first-name").SetText(pluckSrc);
 
              // array.count(array.filter(items, "status", "active")) — nested
-             TypedPluginSource<object> filtered = p.Plugin<object>("array", "filter")
+             TypedPluginSource<object> filtered = p.Plugin(array.Filter)
                  .Arg(json, x => x.Items).Arg("status").Arg("active");
-             TypedPluginSource<int> activeCount = p.Plugin<int>("array", "count").Arg(filtered);
+             TypedPluginSource<int> activeCount = p.Plugin(array.Count).Arg(filtered);
              s.Element("arr-active-count").SetText(activeCount);
 
              // array.sum(items, "age")
-             TypedPluginSource<int> sumSrc = p.Plugin<int>("array", "sum")
+             TypedPluginSource<int> sumSrc = p.Plugin(array.Sum)
                  .Arg(json, x => x.Items).Arg("age");
              s.Element("arr-total-age").SetText(sumSrc);
 
              // array.some(items, "status", "critical") → condition
-             TypedPluginSource<bool> someSrc = p.Plugin<bool>("array", "some")
+             TypedPluginSource<bool> someSrc = p.Plugin(array.Some)
                  .Arg(json, x => x.Items).Arg("status").Arg("critical");
              s.When(someSrc).Truthy()
               .Then(then => then.Element("arr-has-critical").Show())
               .Else(els => els.Element("arr-no-critical").Show());
+
+             TypedPluginSource<string> slugSrc = p.Plugin(slugify.Slug).Arg("John Doe");
+             s.Element("arr-root-slug").SetText(slugSrc);
 
              s.Element("arr-results").AddClass("text-green-600");
          }))));
@@ -62,7 +54,7 @@
     Html.NativeButton("arr-send-btn", "Send to Server")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            TypedPluginSource<int> countForGather = p.Plugin<int>("array", "count").Arg("items");
+            TypedPluginSource<int> countForGather = p.Plugin(array.Count).Arg("items");
             p.Get("/Sandbox/Plugins/ArrayManager/PluginEcho")
              .Gather(g => g
                  .Header("X-Array-Count", countForGather)
@@ -74,7 +66,7 @@
                     s.Element("arr-echo-header").SetText(json, x => x.ReceivedHeader);
                     s.Element("arr-echo-result").AddClass("text-green-600");
                     // Void call after success
-                    s.Plugin("analytics", "track").Arg("array-sent").Fire();
+                    s.Plugin(analytics.Track).Arg("array-sent").Fire();
                 }));
         });
 
@@ -86,31 +78,31 @@
              .Response(r => r.OnSuccess<ResidentsListResponse>((json, s) =>
              {
                  // 1. filter: get active residents only
-                 TypedPluginSource<object> active = p.Plugin<object>("array", "filter")
+                 TypedPluginSource<object> active = p.Plugin(array.Filter)
                      .Arg(json, x => x.Items).Arg("status").Arg("active");
 
                  // 2. count: how many active
-                 TypedPluginSource<int> activeCount = p.Plugin<int>("array", "count").Arg(active);
+                 TypedPluginSource<int> activeCount = p.Plugin(array.Count).Arg(active);
                  s.Element("arr-f-count").SetText(activeCount);
 
                  // 3. sum: total age of active residents
-                 TypedPluginSource<int> activeAgeSum = p.Plugin<int>("array", "sum").Arg(active).Arg("age");
+                 TypedPluginSource<int> activeAgeSum = p.Plugin(array.Sum).Arg(active).Arg("age");
                  s.Element("arr-f-age-sum").SetText(activeAgeSum);
 
                  // 4. pluck: name of first active resident
-                 TypedPluginSource<string> firstName = p.Plugin<string>("array", "pluck")
+                 TypedPluginSource<object> firstName = p.Plugin(array.Pluck)
                      .Arg(active).Arg(0).Arg("name");
                  s.Element("arr-f-first").SetText(firstName);
 
                  // 5. some: display as text (true/false)
-                 TypedPluginSource<bool> allActive = p.Plugin<bool>("array", "some")
+                 TypedPluginSource<bool> allActive = p.Plugin(array.Some)
                      .Arg(active).Arg("status").Arg("active");
                  s.Element("arr-f-some").SetText(allActive);
 
                  s.Element("arr-f-result").AddClass("text-green-600");
 
                  // Void: track the filter action
-                 s.Plugin("analytics", "track").Arg("filter-inspect").Fire();
+                 s.Plugin(analytics.Track).Arg("filter-inspect").Fire();
              }));
         });
 
@@ -119,7 +111,7 @@
 <native-vstack gap="Lg">
     <native-heading level="H1">Array Plugin</native-heading>
     <native-text color="Secondary">
-        Native JS array methods exposed to the DSL via plugin. Proves all 4 method patterns.
+        Native JS array methods exposed to the DSL via plugin. Proves typed method, command, nested read, and root function patterns.
     </native-text>
 
     <native-card>
@@ -130,6 +122,7 @@
             <p>First Name: <span id="arr-first-name">—</span></p>
             <p>Active Count: <span id="arr-active-count">—</span></p>
             <p>Total Age: <span id="arr-total-age">—</span></p>
+            <p>Root Function: <span id="arr-root-slug">—</span></p>
             <p id="arr-has-critical" hidden class="text-red-600">Critical residents found!</p>
             <p id="arr-no-critical" hidden class="text-green-600">No critical residents ✓</p>
         </native-vstack>
@@ -172,3 +165,46 @@
 </native-vstack>
 
 @Html.RenderPlan(plan)
+
+@functions {
+    private sealed class ArrayPlugin : ReactivePlugin
+    {
+        public ArrayPlugin()
+            : base("array")
+        {
+            Count = Function<int, object>("count");
+            Pluck = Function<object, object, int, string>("pluck");
+            Filter = Function<object, object, string, string>("filter");
+            Sum = Function<int, object, string>("sum");
+            Some = Function<bool, object, string, string>("some");
+        }
+
+        public PluginFunction<int> Count { get; }
+        public PluginFunction<object> Pluck { get; }
+        public PluginFunction<object> Filter { get; }
+        public PluginFunction<int> Sum { get; }
+        public PluginFunction<bool> Some { get; }
+    }
+
+    private sealed class AnalyticsPlugin : ReactivePlugin
+    {
+        public AnalyticsPlugin()
+            : base("analytics")
+        {
+            Track = Command<string>("track");
+        }
+
+        public PluginCommand Track { get; }
+    }
+
+    private sealed class SlugifyPlugin : ReactivePlugin
+    {
+        public SlugifyPlugin()
+            : base("slugify")
+        {
+            Slug = Function<string, string>();
+        }
+
+        public PluginFunction<string> Slug { get; }
+    }
+}

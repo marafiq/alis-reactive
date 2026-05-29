@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>alis-sandbox-secrets</UserSecretsId>
+        <NoWarn>$(NoWarn);CS8603;CS8618;MVC1000</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,5 +16,7 @@
         <ProjectReference Include="..\Alis.Reactive.NativeTagHelpers\Alis.Reactive.NativeTagHelpers.csproj" />
         <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
     </ItemGroup>
+
+    <Import Project="..\build\AlisReactiveBrowserAssets.targets" />
 
 </Project>

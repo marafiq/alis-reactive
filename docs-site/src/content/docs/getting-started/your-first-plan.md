@@ -16,14 +16,13 @@ Add the framework packages to your ASP.NET MVC project:
 <PackageReference Include="Alis.Reactive.FluentValidator" />
 ```
 
-In `Program.cs`, register the validation extractor:
+In `Program.cs`, register reactive validation:
 
 ```csharp
-using Alis.Reactive;
 using Alis.Reactive.FluentValidator;
 
-ReactivePlanConfig.UseValidationExtractor(
-    new FluentValidationAdapter(type => (IValidator?)Activator.CreateInstance(type)));
+builder.Services.AddReactiveFluentValidation(validation =>
+    validation.AddFromAssemblyContaining<Program>());
 ```
 
 In `_Layout.cshtml`, load the runtime (once, for all pages). `AlisReactive.targets`

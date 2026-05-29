@@ -18,6 +18,12 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionGridExtensions
     {
+        private static readonly ComponentProperty<object> DataSourceProperty =
+            ComponentProperty<object>.Named("dataSource");
+
+        private static readonly ComponentMethod RefreshMethod =
+            ComponentMethod.Named("refresh");
+
         /// <summary>
         /// Replaces the grid data source with items from an HTTP response body.
         /// Typically used in custom binding to push server-filtered/sorted data.
@@ -35,7 +41,7 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            return self.EmitSet("dataSource", ValueProducer.Read(source.Scope, sourcePath));
+            return self.EmitSet(DataSourceProperty, ValueExpression.Read(source.Scope, sourcePath));
         }
 
         /// <summary>
@@ -53,7 +59,7 @@ namespace Alis.Reactive.Fusion.Components
             ResponseBody<TResponse> source)
             where TModel : class
             where TResponse : class
-            => self.EmitSet("dataSource", ValueProducer.Read(source.Scope, "responseBody"));
+            => self.EmitSet(DataSourceProperty, ValueExpression.Read(source.Scope, "responseBody"));
 
         /// <summary>
         /// Replaces the grid data source with items from an event payload.
@@ -70,7 +76,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.EmitSet("dataSource", ValueProducer.Read(PayloadSource.Event(), sourcePath));
+            return self.EmitSet(DataSourceProperty, ValueExpression.Read(PayloadSource.Event(), sourcePath));
         }
 
         /// <summary>
@@ -81,6 +87,6 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionGrid, TModel> Refresh<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
             where TModel : class
-            => self.EmitCall("refresh");
+            => self.EmitCall(RefreshMethod);
     }
 }

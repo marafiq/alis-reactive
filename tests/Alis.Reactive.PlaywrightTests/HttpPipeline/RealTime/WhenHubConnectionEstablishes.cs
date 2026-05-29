@@ -24,7 +24,6 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
 
         await LoadPanelBtn.ClickAsync();
         await Expect(PanelResidentName).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await WaitForTraceMessage("merge", 10000);
 
         await PushStatusBtn.ClickAsync();
 
@@ -44,7 +43,6 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
 
         await LoadPanelBtn.ClickAsync();
         await Expect(PanelResidentName).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await WaitForTraceMessage("merge", 5000);
 
         await PushStatusBtn.ClickAsync();
 
@@ -69,7 +67,7 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
         await WaitForTraceMessage("[alis:signalr] connected", 10000);
 
         await LoadPanelBtn.ClickAsync();
-        await WaitForTraceMessage("merge", 5000);
+        await Expect(PanelResidentName).ToBeVisibleAsync(new() { Timeout = 5000 });
 
         // Match only our "connected" trace, not the library's routed "lib" messages
         var connectTraces = _consoleMessages

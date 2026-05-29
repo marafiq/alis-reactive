@@ -12,9 +12,9 @@
 <section id="card-monthly-rate" class="rounded-lg border border-border bg-white p-6 shadow-sm mb-4">
     <h3 class="text-sm font-semibold mb-3">Quick-edit: Monthly Rate — FluentValidation both sides</h3>
     <p class="text-xs text-text-secondary mb-2">
-        One <code>MonthlyRateQuickEditValidator</code> drives both sides. Client extracts the
+        One <code>MonthlyRateQuickEditValidator</code> drives both sides. Client metadata declares the
         <code>GreaterThan/LessThanOrEqualTo</code> rules and blocks the POST on invalid input.
-        A <code>Must()</code> rule that simulates a DB lookup is not extractable by the adapter and runs
+        A <code>Must()</code> rule that simulates a DB lookup is server-only and runs
         server-only: enter <strong>7777</strong> to watch the client pass, the server reject with
         <code>{ errors: { Value: [...] } }</code>, and <code>.OnError(400, e => e.ValidationErrors(formId))</code>
         render the message into the per-field validation slot.

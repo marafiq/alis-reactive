@@ -11,10 +11,10 @@ All commands run from the repository root.
 
 ## How do I build the JS runtime?
 
-The runtime is bundled as a single IIFE via esbuild. Entry point: `Alis.Reactive.Assets/Scripts/root.ts`.
+The runtime is bundled as a single IIFE via esbuild. Entry point: `Alis.Reactive.Assets/runtime/root.ts`.
 
 ```bash
-npm run build            # Bundle -> Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js
+npm run build:runtime    # Bundle -> Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js
 ```
 
 The sandbox serves this file at `/scripts/alis-reactive.dev.js` — the same URL
@@ -25,22 +25,25 @@ shape a net10 NuGet consumer sees (with their package version in place of `dev`)
 Tailwind v4, compiled via `@tailwindcss/cli`:
 
 ```bash
-npm run build:css        # Compile -> Alis.Reactive.Assets/dist/css/design-system.dev.css
+npm run build:design-system   # Compile -> Alis.Reactive.Assets/dist/css/design-system.dev.css
+npm run build:fusion          # Compile -> Alis.Reactive.Assets/dist/css/syncfusion.dev.css
 ```
 
 ## How do I build everything?
 
 ```bash
-npm run build:all        # framework JS + framework CSS + sandbox-plugins + sandbox.css
+npm run build:all        # framework JS + CSS (runtime, design-system, Fusion) + sandbox
 ```
 
-This runs `build`, `build:css`, `build:sandbox-plugins`, and `build:sandbox-css` in sequence.
+This builds the two npm workspaces in order: `Alis.Reactive.Assets` (`build:runtime`,
+`build:design-system`, `build:fusion`) then `Alis.Reactive.SandboxApp` (sandbox plugins + CSS).
 
 ## How do I watch for changes?
 
 ```bash
-npm run watch                  # Rebuild framework JS on file change
-npm run watch:css              # Rebuild framework CSS on file change
+npm run watch:runtime          # Rebuild framework JS on file change
+npm run watch:design-system    # Rebuild design-system CSS on file change
+npm run watch:fusion           # Rebuild Syncfusion CSS on file change
 npm run watch:sandbox-plugins  # Rebuild sandbox-plugins on change
 npm run watch:sandbox-css      # Rebuild sandbox.css on change
 ```
@@ -78,7 +81,7 @@ npm test                 # ~944 tests, runs in seconds
 
 ### C# unit tests
 
-NUnit + Verify.NUnit + JsonSchema.Net. Tests plan rendering, schema conformance, component vertical slices.
+NUnit + Verify.NUnit. Tests plan rendering, generated-contract behavior, and component vertical slices.
 
 ```bash
 dotnet test tests/Alis.Reactive.UnitTests                   # Core
@@ -157,7 +160,7 @@ dotnet test tests/Alis.Reactive.Fusion.UnitTests
 dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
 ```
 
-Catches serialization regressions and schema violations.
+Catches serialization regressions and plan-domain drift.
 
 ### 4. Build all C# projects
 
@@ -197,11 +200,11 @@ If you skip `npm run build:all`, the browser loads old JS. If you skip `dotnet b
 
 | Task | Command |
 |------|---------|
-| Bundle JS | `npm run build` |
-| Compile CSS | `npm run build:css` |
-| Bundle JS + CSS | `npm run build:all` |
-| Watch JS | `npm run watch` |
-| Watch CSS | `npm run watch:css` |
+| Bundle JS | `npm run build:runtime` |
+| Compile CSS | `npm run build:design-system`, `npm run build:fusion` |
+| Build everything | `npm run build:all` |
+| Watch JS | `npm run watch:runtime` |
+| Watch CSS | `npm run watch:design-system` |
 | TypeScript typecheck | `npm run typecheck` |
 | Lint | `npm run lint` |
 | TS unit tests | `npm test` |

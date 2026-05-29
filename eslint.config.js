@@ -22,9 +22,9 @@ export default tseslint.config(
 
   // Framework TS (Alis.Reactive.Assets)
   {
-    files: ["Alis.Reactive.Assets/Scripts/**/*.ts"],
+    files: ["Alis.Reactive.Assets/runtime/**/*.ts"],
     ignores: [
-      "Alis.Reactive.Assets/Scripts/__tests__/**", // test files relaxed below
+      "Alis.Reactive.Assets/runtime/__tests__/**", // test files relaxed below
     ],
     rules: {
       // -- Bug catchers (errors) --
@@ -75,7 +75,7 @@ export default tseslint.config(
   // Test files: relax some rules
   {
     files: [
-      "Alis.Reactive.Assets/Scripts/__tests__/**/*.ts",
+      "Alis.Reactive.Assets/runtime/__tests__/**/*.ts",
       "Alis.Reactive.SandboxApp/Scripts/__tests__/**/*.ts",
     ],
     rules: {

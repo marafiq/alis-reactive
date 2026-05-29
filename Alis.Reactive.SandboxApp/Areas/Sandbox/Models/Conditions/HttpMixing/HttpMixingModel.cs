@@ -35,4 +35,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing
     {
         public string Tier { get; set; } = "";
     }
+
+    public class HttpMixingResidentAuditResponse
+    {
+        public int ResidentId { get; set; }
+        public string Action { get; set; } = "";
+        public string HeaderCategory { get; set; } = "";
+    }
+
+    public class HttpMixingAuditTrailResponse
+    {
+        public int ResidentId { get; set; }
+        public string CategorySlug { get; set; } = "";
+        public string Step { get; set; } = "";
+    }
 }

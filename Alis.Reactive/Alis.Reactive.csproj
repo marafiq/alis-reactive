@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net48;net10.0</TargetFrameworks>
-        <LangVersion>8</LangVersion>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -12,50 +11,38 @@
         <PackageTags>reactive;aspnetcore;mvc;fluent-api;plan-driven</PackageTags>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-        <PackageReference Include="System.Text.Json" Version="9.*" />
-    </ItemGroup>
-
     <ItemGroup>
-        <Content Include="Schemas\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <!-- Ship JS/CSS (built by npm in the sibling Alis.Reactive.Assets project)
-         as NuGet content files. Assets and the targets file are packed under
+    <!-- Ship the runtime JS bundle (built by npm in the sibling
+         Alis.Reactive.Assets tree). The design-system CSS is shipped separately
+         by the AlisReactive.DesignSystem package. The asset is packed under
          BOTH build\ and buildTransitive\:
-           build\          : required by packages.config consumers (net48 classic).
-                             Classic NuGet auto-imports build\*.targets and resolves
-                             $(MSBuildThisFileDirectory)assets\* relative to it.
-           buildTransitive\: required so PackageReference consumers flow the targets
-                             + assets through transitive dependencies.
-         PackagePath uses explicit file paths (no trailing separator) — a trailing
-         backslash produces ZIP entries with an empty segment that macOS/Linux
-         normalize on extraction but Windows does not. -->
+           build\          : required when this package is referenced directly.
+           buildTransitive\: required so PackageReference consumers flow the
+                             targets + assets through transitive dependencies.
+         The copy mechanism is the shared build\AlisReactiveAssets.targets,
+         packed under this package's id name so NuGet auto-imports it. -->
     <ItemGroup>
-        <!-- npm emits bundles under dist\ with a literal "dev" version token so
-             the sandbox serves them at the same URL pattern a net10 consumer
-             uses (~/scripts/alis-reactive.{version}.js). PackagePath here
-             strips the "dev" token so the NuGet ships the unversioned name;
-             AlisReactive.targets then writes the consumer's real version on
-             copy-to-wwwroot. Identical surface end-to-end. -->
-        <None Include="..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="build\assets\js\alis-reactive.js" />
-        <None Include="..\Alis.Reactive.Assets\dist\css\design-system.dev.css"      Pack="true" PackagePath="build\assets\css\design-system.css" />
-        <None Include="..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="buildTransitive\assets\js\alis-reactive.js" />
-        <None Include="..\Alis.Reactive.Assets\dist\css\design-system.dev.css"      Pack="true" PackagePath="buildTransitive\assets\css\design-system.css" />
-        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="build\AlisReactive.targets" />
-        <None Include="build\AlisReactive.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.targets" />
+        <!-- npm emits the bundle under dist\ with a literal "dev" version token so
+             the sandbox serves it at the same URL pattern a net10 consumer uses
+             (~/scripts/alis-reactive.{version}.js). PackagePath strips the "dev"
+             token so the NuGet ships the unversioned name; the shared targets
+             then writes the consumer's real version on copy-to-wwwroot. -->
+        <None Include="$(AlisAssetsDist)\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="build\assets\js\alis-reactive.js" />
+        <None Include="$(AlisAssetsDist)\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="buildTransitive\assets\js\alis-reactive.js" />
+        <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="build\AlisReactive.targets" />
+        <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.targets" />
     </ItemGroup>
 
-    <!-- Verify JS/CSS bundles exist before Pack. The bundles are produced by
+    <!-- Verify the JS bundle exists before Pack. The bundle is produced by
          'npm run build:all' from the repo root. Pack does NOT invoke npm;
          consumers do not need Node.js for `dotnet pack`. CI orchestrates
          npm + dotnet as separate steps. -->
     <Target Name="VerifyBundlesExistBeforePack" BeforeTargets="GenerateNuspec">
-        <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js')"
+        <Error Condition="!Exists('$(AlisAssetsDist)\scripts\alis-reactive.dev.js')"
                Text="alis-reactive.dev.js bundle not found. Run 'npm run build:all' from the repo root before packing." />
-        <Error Condition="!Exists('$(MSBuildThisFileDirectory)..\Alis.Reactive.Assets\dist\css\design-system.dev.css')"
-               Text="design-system.dev.css bundle not found. Run 'npm run build:all' from the repo root before packing." />
     </Target>
 
     <!-- Bundle Roslyn analyzers so consumers get compile-time DSL checks (ALIS001-ALIS008) -->
@@ -69,11 +56,8 @@
     <ItemGroup>
         <InternalsVisibleTo Include="Alis.Reactive.Fusion" />
         <InternalsVisibleTo Include="Alis.Reactive.Native" />
-        <InternalsVisibleTo Include="Alis.Reactive.UnitTests" />
         <InternalsVisibleTo Include="Alis.Reactive.FluentValidator" />
-        <InternalsVisibleTo Include="Alis.Reactive.FluentValidator.UnitTests" />
-        <InternalsVisibleTo Include="Alis.Reactive.Native.UnitTests" />
-        <InternalsVisibleTo Include="Alis.Reactive.Fusion.UnitTests" />
+        <InternalsVisibleTo Include="Alis.Reactive.PlanTypeGenerator" />
     </ItemGroup>
 
 </Project>
