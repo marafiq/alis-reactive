@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF RadioButton API Probe</title>
+    <link rel="stylesheet" href="/vendor/syncfusion/material.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>SF RadioButton API Probe</h1>
+    <p>This page is temporary. Use it to discover the exact JS object API before onboarding typed C# members.</p>
+    <div id="host">
+        <input id="radio-button-a" type="radio" />
+        <input id="radio-button-b" type="radio" />
+        <button id="outside-button" type="button">Outside focus target</button>
+        <p>Active element: <span id="active-element"></span></p>
+    </div>
+
+    <h2>Candidate Matrix</h2>
+    <p>Every row must be proven here before it becomes typed Fusion API.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Kind</th>
+                <th>Builder</th>
+                <th>Args</th>
+                <th>Return/Payload</th>
+                <th>Proof</th>
+                <th>Proposed C#</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody id="proposal-body"></tbody>
+    </table>
+
+    <button id="dump">Dump Keys</button>
+    <button id="clear">Clear Trace</button>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const proposalRows = [];
+        const target = document.getElementById("radio-button-a");
+        const secondTarget = document.getElementById("radio-button-b");
+
+        function safeJson(key, value) {
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (typeof value === "function") return "[Function]";
+            return value;
+        }
+
+        function clean(value, seen, depth) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).slice(0, 80).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") {
+                        names.add(name);
+                    }
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return {
+                    ownKeys: [],
+                    functions: [],
+                    properties: {}
+                };
+            }
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item, new WeakSet(), 0)
+                };
+            });
+            return {
+                ownKeys: own,
+                functions: functionNames(args),
+                properties
+            };
+        }
+
+        function record(label, value) {
+            trace.push({
+                at: new Date().toISOString(),
+                label,
+                value: clean(value, new WeakSet(), 0)
+            });
+            renderTrace();
+        }
+
+        function renderTrace() {
+            document.getElementById("trace").textContent =
+                JSON.stringify(trace, safeJson, 2);
+        }
+
+        function renderProposal() {
+            const body = document.getElementById("proposal-body");
+            body.innerHTML = "";
+            proposalRows.forEach(row => {
+                const tr = document.createElement("tr");
+                [
+                    row.candidate,
+                    row.kind,
+                    row.builder,
+                    row.args,
+                    row.returnOrPayload,
+                    row.proof,
+                    row.csharp,
+                    row.outcome
+                ].forEach(value => {
+                    const td = document.createElement("td");
+                    td.textContent = value || "";
+                    tr.appendChild(td);
+                });
+                body.appendChild(tr);
+            });
+        }
+
+        function proposal(row) {
+            proposalRows.push(row);
+            renderProposal();
+            return row;
+        }
+
+        const probe = {
+            target,
+            trace,
+            proposalRows,
+            proposal,
+            record,
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke()),
+            event: (label, args) => record(label, describePayload(args)),
+            eventCall: (label, args, method, call) => {
+                const before = describePayload(args);
+                const result = call();
+                record(label, {
+                    method,
+                    before,
+                    result: clean(result, new WeakSet(), 0),
+                    after: describePayload(args)
+                });
+            }
+        };
+
+        window.__sfProbe = probe;
+
+        function wrapper(input) {
+            return input.closest(".e-radio-wrapper");
+        }
+
+        function label(input) {
+            return wrapper(input)?.querySelector("label");
+        }
+
+        function snapshot(labelText) {
+            record(labelText, {
+                first: {
+                    checked: first.checked,
+                    disabled: first.disabled,
+                    value: first.value,
+                    selectedValue: first.getSelectedValue(),
+                    inputChecked: target.checked,
+                    inputDisabled: target.disabled,
+                    inputValue: target.value,
+                    wrapperClass: wrapper(target)?.className || null,
+                    focused: document.activeElement === target
+                },
+                second: {
+                    checked: second.checked,
+                    disabled: second.disabled,
+                    value: second.value,
+                    selectedValue: second.getSelectedValue(),
+                    inputChecked: secondTarget.checked,
+                    inputDisabled: secondTarget.disabled,
+                    inputValue: secondTarget.value,
+                    wrapperClass: wrapper(secondTarget)?.className || null,
+                    focused: document.activeElement === secondTarget
+                }
+            });
+        }
+
+        const first = new ej.buttons.RadioButton({
+            label: "Private room",
+            name: "roomType",
+            value: "Private",
+            checked: false,
+            change: args => probe.event("first change", args),
+            created: args => probe.event("first created", args)
+        });
+        first.appendTo(target);
+
+        const second = new ej.buttons.RadioButton({
+            label: "Shared room",
+            name: "roomType",
+            value: "Shared",
+            checked: false,
+            change: args => probe.event("second change", args),
+            created: args => probe.event("second created", args)
+        });
+        second.appendTo(secondTarget);
+
+        probe.ej2 = first;
+        probe.first = first;
+        probe.second = second;
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("own keys", Object.keys(first).sort());
+            const proto = Object.getPrototypeOf(first);
+            record("prototype methods", Object.getOwnPropertyNames(proto).sort());
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            renderTrace();
+        });
+
+        record("ready", {
+            component: "radio-button",
+            namespace: "ej.buttons",
+            className: "RadioButton",
+            id: "radio-button-a"
+        });
+        snapshot("initial");
+
+        function runValueTrace() {
+            first.checked = true;
+            first.disabled = true;
+            snapshot("direct set before dataBind");
+
+            const dataBindResult = first.dataBind();
+            record("first dataBind return", dataBindResult);
+            snapshot("direct set after dataBind");
+
+            const disabledClickResult = first.click();
+            record("first click while disabled return", disabledClickResult);
+            snapshot("after disabled click");
+
+            first.disabled = false;
+            first.checked = false;
+            first.dataBind();
+            snapshot("reset after dataBind");
+
+            const secondClickResult = second.click();
+            record("second click return", secondClickResult);
+            snapshot("after second click");
+
+            const firstClickResult = first.click();
+            record("first click return", firstClickResult);
+            snapshot("after first click");
+
+            document.getElementById("outside-button").focus();
+            const focusResult = first.focusIn();
+            record("first focusIn return", focusResult);
+            snapshot("after focusIn");
+
+            document.getElementById("active-element").textContent =
+                document.activeElement?.id || "";
+        }
+
+        proposal({
+            candidate: "checked + dataBind()",
+            kind: "prop-read/write + public flush method",
+            builder: "checked covers initial render",
+            args: "bool",
+            returnOrPayload: "bool; input checked update and group uncheck after dataBind",
+            proof: "direct set after dataBind",
+            csharp: "SetChecked(bool), Checked()",
+            outcome: "implement if stable"
+        });
+        proposal({
+            candidate: "disabled + dataBind()",
+            kind: "prop-read/write + public flush method",
+            builder: "Disabled() covers initial render",
+            args: "bool",
+            returnOrPayload: "bool; disabled attribute updates after dataBind",
+            proof: "direct set after dataBind",
+            csharp: "SetDisabled(bool), Disabled()",
+            outcome: "implement if stable"
+        });
+        proposal({
+            candidate: "getSelectedValue()",
+            kind: "method-return source",
+            builder: "not covered",
+            args: "none",
+            returnOrPayload: "string selected value for radio group",
+            proof: "after second click, after first click",
+            csharp: "SelectedValue()",
+            outcome: "implement if stable"
+        });
+        proposal({
+            candidate: "click()",
+            kind: "method",
+            builder: "not covered",
+            args: "none",
+            returnOrPayload: "void; selects radio and fires change when enabled",
+            proof: "first click return, after first click, first change",
+            csharp: "Click()",
+            outcome: "implement if stable"
+        });
+        proposal({
+            candidate: "focusIn()",
+            kind: "method",
+            builder: "not covered",
+            args: "none",
+            returnOrPayload: "void; input receives focus",
+            proof: "after focusIn",
+            csharp: "FocusIn()",
+            outcome: "implement if stable"
+        });
+        proposal({
+            candidate: "change.value",
+            kind: "event payload-read",
+            builder: "Change(string) wires a static handler",
+            args: "ChangeArgs",
+            returnOrPayload: "value string; event object excluded",
+            proof: "first change, second change",
+            csharp: "Changed with FusionRadioButtonChangeArgs.Value",
+            outcome: "implement if stable"
+        });
+
+        if (new URLSearchParams(location.search).has("autorun")) {
+            setTimeout(runValueTrace, 100);
+        }
+    </script>
+</body>
+</html>
