@@ -1,0 +1,129 @@
+@model AIAssistViewModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "FusionAIAssistView";
+
+    var plan = Html.ReactivePlan<AIAssistViewModel>();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionAIAssistView</native-heading>
+    <native-text color="Secondary">
+        Syncfusion builder owns initial chat configuration. Reactive owns runtime prompt execution,
+        response updates, scroll behavior, and typed event payloads.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Runtime Commands</native-heading>
+        <native-hstack gap="Sm" class="mt-4">
+            @(Html.NativeButton("execute-prompt-btn", "Run Typed Prompt")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionAIAssistView>("care-ai")
+                        .ExecutePrompt("Summarize the medication changes");
+                    p.Element("command-status").SetText("executePrompt called");
+                }))
+
+            @(Html.NativeButton("append-object-response-btn", "Append Object Response")
+                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionAIAssistView>("care-ai")
+                        .AddPromptResponse(
+                            "Care plan follow up",
+                            "Schedule hydration checks and confirm the updated medication list with the nurse.",
+                            true);
+                    p.Element("object-response-status").SetText("object response added");
+                }))
+
+            @(Html.NativeButton("set-prompt-btn", "Set Prompt")
+                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var assist = p.Component<FusionAIAssistView>("care-ai");
+                    assist.SetPrompt("Prepare discharge summary");
+                    p.Element("current-prompt").SetText(assist.Prompt());
+                }))
+
+            @(Html.NativeButton("read-active-view-btn", "Read Active View")
+                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Element("active-view").SetText(
+                        p.Component<FusionAIAssistView>("care-ai").ActiveView());
+                }))
+
+            @(Html.NativeButton("scroll-bottom-btn", "Scroll Bottom")
+                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionAIAssistView>("care-ai").ScrollToBottom();
+                    p.Element("scroll-status").SetText("scrollToBottom called");
+                }))
+        </native-hstack>
+
+        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
+            <p>Command: <span id="command-status" class="text-text-muted">-</span></p>
+            <p>Object response: <span id="object-response-status" class="text-text-muted">-</span></p>
+            <p>Current prompt: <span id="current-prompt" class="text-text-muted">-</span></p>
+            <p>Active view: <span id="active-view" class="text-text-muted">-</span></p>
+            <p>Scroll: <span id="scroll-status" class="text-text-muted">-</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">AIAssistView Component</native-heading>
+
+        @(Html.FusionAIAssistView(plan, "care-ai", b =>
+        {
+            b.Height("420px");
+            b.Width("100%");
+            b.PromptPlaceholder("Ask about care coordination");
+            b.PromptSuggestions(new[]
+            {
+                "Summarize today notes",
+                "Draft family update",
+                "List fall-risk interventions"
+            });
+            b.PromptSuggestionsHeader("Care prompts");
+            b.ShowClearButton(true);
+        })
+        .Reactive(evt => evt.PromptChanged, (args, p) =>
+        {
+            p.Element("prompt-changed-value").SetText(args, x => x.Value);
+        })
+        .Reactive(evt => evt.PromptRequest, (args, p) =>
+        {
+            p.Element("request-prompt").SetText(args, x => x.Prompt);
+            p.Element("request-status").SetText("promptRequest fired");
+            p.Component<FusionAIAssistView>("care-ai")
+                .AddPromptResponse("Reactive response added from promptRequest.", true);
+        })
+        .Reactive(evt => evt.StopRespondingClick, (args, p) =>
+        {
+            p.Element("stop-prompt").SetText(args, x => x.Prompt);
+            p.Element("stop-index").SetText(args, x => x.DataIndex);
+        }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Event Signals</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
+            <p>Prompt changed: <span id="prompt-changed-value" class="text-text-muted">-</span></p>
+            <p>Request status: <span id="request-status" class="text-text-muted">-</span></p>
+            <p>Request prompt: <span id="request-prompt" class="text-text-muted">-</span></p>
+            <p>Stop prompt: <span id="stop-prompt" class="text-text-muted">-</span></p>
+            <p>Stop index: <span id="stop-index" class="text-text-muted">-</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
