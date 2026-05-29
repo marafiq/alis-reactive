@@ -1,6 +1,6 @@
-// Boot — PlanDocument lifecycle: boot, partial slot load/unload, reset.
-// Single responsibility: wire behaviors (two-phase) and register plans.
-// Delegates browser plan state to browser-plans.ts.
+// Boot — PlanDocument composition: boot, partial slot load/unload, reset.
+// Single responsibility: wire behaviors and validation for active plans.
+// Delegates plan composition state to browser-plans.ts.
 
 import type { PlanDocument, Behavior } from "../types";
 import { setLevel } from "../core/trace";

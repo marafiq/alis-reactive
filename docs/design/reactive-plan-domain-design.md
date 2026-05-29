@@ -150,7 +150,7 @@ classDiagram
     ReactionGraph --> RequestPlan
 ```
 
-## Plan Slot Lifecycle
+## Partial Slot Composition
 
 ```mermaid
 sequenceDiagram
@@ -164,18 +164,19 @@ sequenceDiagram
     Runtime->>Runtime: wire boot triggers
 
     Server->>Browser: Into response includes partial rendered plan scripts
-    Browser->>Runtime: load partial slot with returned plans
+    Browser->>Runtime: load partial slot by slotId with returned plans
     Runtime->>Runtime: recompose active plan from boot plan + active slots
     Runtime->>Runtime: wire slot triggers and validation using slot abort signal
 
-    Browser->>Runtime: partial host unloads or replaces slot
+    Browser->>Runtime: partial host unloads or replaces slotId
     Runtime->>Runtime: abort slot signal
     Runtime->>Runtime: recompose active plan from remaining sources
     Runtime->>Runtime: keep boot/app-level objects mounted
 ```
 
-Fragment id is for load/unload ownership. Component id and vendor remain the
-runtime join keys for JS object lookup.
+`SlotId` is the browser load/unload handle. `PlanId` is the plan document join
+key for recomposition. Component id, vendor, and type remain the runtime join
+keys for JS object lookup.
 
 ## Reaction Flow
 

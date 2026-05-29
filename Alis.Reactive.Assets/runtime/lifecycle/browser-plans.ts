@@ -1,4 +1,4 @@
-// browser-plans.ts - boot plan composition and partial slot lifetimes.
+// browser-plans.ts - boot plan composition and browser partial slot composition.
 
 import type { PlanDocument, Behavior } from "../types";
 import {
@@ -18,7 +18,7 @@ export interface BrowserPlanWiring {
   wireContainerValidation: WireContainerValidation;
 }
 
-interface LoadedPartialSlot {
+interface PartialSlotLoad {
   readonly abortController: AbortController;
   readonly plans: PlanDocument[];
 }
@@ -26,7 +26,7 @@ interface LoadedPartialSlot {
 export class AppliedBrowserPlans {
   private readonly activePlans = new Map<PlanId, PlanDocument>();
   private readonly bootSnapshots = new Map<PlanId, PlanDocument>();
-  private readonly loadedSlots = new Map<SlotId, LoadedPartialSlot>();
+  private readonly partialSlotLoads = new Map<SlotId, PartialSlotLoad>();
 
   register(plan: PlanDocument): void {
     this.activePlans.set(plan.planId, plan);
@@ -39,7 +39,7 @@ export class AppliedBrowserPlans {
     const abortController = new AbortController();
     const slotPlans = plans.map(snapshotPlan);
     const loadedPlanIds = planIdsIn(slotPlans);
-    this.loadedSlots.set(slotId, { abortController, plans: slotPlans });
+    this.partialSlotLoads.set(slotId, { abortController, plans: slotPlans });
 
     for (const planId of loadedPlanIds) affectedPlanIds.add(planId);
 
@@ -70,16 +70,16 @@ export class AppliedBrowserPlans {
     this.abortSlots();
     this.activePlans.clear();
     this.bootSnapshots.clear();
-    this.loadedSlots.clear();
+    this.partialSlotLoads.clear();
   }
 
   private unloadSlot(slotId: SlotId): PlanId[] {
-    const loadedSlot = this.loadedSlots.get(slotId);
-    if (loadedSlot === undefined) return [];
+    const slotLoad = this.partialSlotLoads.get(slotId);
+    if (slotLoad === undefined) return [];
 
-    this.loadedSlots.delete(slotId);
-    loadedSlot.abortController.abort();
-    return planIdsIn(loadedSlot.plans);
+    this.partialSlotLoads.delete(slotId);
+    slotLoad.abortController.abort();
+    return planIdsIn(slotLoad.plans);
   }
 
   private recomposePlans(planIds: Iterable<PlanId>): void {
@@ -121,8 +121,8 @@ export class AppliedBrowserPlans {
 
   private slotPlansFor(planId: PlanId): PlanDocument[] {
     const plans: PlanDocument[] = [];
-    for (const loadedSlot of this.loadedSlots.values()) {
-      for (const plan of loadedSlot.plans) {
+    for (const slotLoad of this.partialSlotLoads.values()) {
+      for (const plan of slotLoad.plans) {
         if (plan.planId === planId) plans.push(plan);
       }
     }
@@ -131,8 +131,8 @@ export class AppliedBrowserPlans {
   }
 
   private abortSlots(): void {
-    for (const loadedSlot of this.loadedSlots.values()) {
-      loadedSlot.abortController.abort();
+    for (const slotLoad of this.partialSlotLoads.values()) {
+      slotLoad.abortController.abort();
     }
   }
 }

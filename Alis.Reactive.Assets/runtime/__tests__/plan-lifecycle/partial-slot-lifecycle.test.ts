@@ -9,7 +9,7 @@ import {
   rootPlan,
 } from "../support/plan-lifecycle-fixtures";
 
-describe("partial slot lifecycle", () => {
+describe("partial slot composition", () => {
   it("replaces the previous load from the same slot", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { wiring, behaviorSignals } = browserPlanWiring();
@@ -75,7 +75,7 @@ describe("partial slot lifecycle", () => {
     expect(browserPlans.get(planId)).toBeUndefined();
   });
 
-  it("uses the browser slot handle as lifecycle identity regardless of serialized plan scope", () => {
+  it("uses the browser slot id as the unload handle regardless of serialized plan scope", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
@@ -96,7 +96,7 @@ describe("partial slot lifecycle", () => {
     expect(browserPlans.get(planId)?.components["address-line"]).toBeUndefined();
   });
 
-  it("replaces a slot as one lifetime when it contains multiple plan documents", () => {
+  it("replaces every plan document loaded by the same slot id together", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { wiring, behaviorSignals } = browserPlanWiring();
     const residentPlanId = "Resident.Root";
@@ -149,7 +149,7 @@ describe("partial slot lifecycle", () => {
     expect(wiring.wireContainerValidation).toHaveBeenCalledTimes(1);
   });
 
-  it("keeps a non-root merged plan alive while another slot still owns entries", () => {
+  it("keeps a browser-only active plan while another slot still owns entries", () => {
     const browserPlans = new AppliedBrowserPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Dynamic";
