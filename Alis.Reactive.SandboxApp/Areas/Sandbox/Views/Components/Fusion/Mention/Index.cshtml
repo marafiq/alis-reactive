@@ -1,0 +1,113 @@
+@model MentionModel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@{
+    ViewData["Title"] = "Mention";
+
+    var plan = Html.ReactivePlan<MentionModel>();
+    var careTeam = (List<MentionPerson>)ViewBag.CareTeam;
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionMention</native-heading>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <native-vstack gap="Base">
+            <label for="care-note" class="text-sm font-medium text-text-primary">Care note target</label>
+            <textarea id="care-note" rows="4" class="w-full rounded-md border border-border p-3 text-sm">No</textarea>
+
+            @(Html.FusionMention(plan, "care-mention", b => b
+                .Target("#care-note")
+                .DataSource(careTeam)
+                .Fields<MentionPerson>(x => x.Name, x => x.Id)
+                .MentionChar('@')
+                .MinLength(0)
+                .RequireLeadingSpace(false)
+                .ShowMentionChar(true)
+                .Highlight(true)
+                .PopupWidth("280px"))
+                .Reactive(evt => evt.Opened, (args, p) =>
+                {
+                    p.Element("mention-popup-status").SetText("opened");
+                })
+                .Reactive(evt => evt.Closed, (args, p) =>
+                {
+                    p.Element("mention-popup-status").SetText("closed");
+                })
+                .Reactive(evt => evt.Changed, (args, p) =>
+                {
+                    p.Element("mention-value").SetHtml(args, x => x.Value);
+                }))
+
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("mention-search-btn", "Search Nora")
+                    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionMention>("care-mention").Search("No", 96, 160);
+                        p.Element("mention-command-status").SetText("search called");
+                    }))
+                @(Html.NativeButton("mention-show-btn", "Show")
+                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionMention>("care-mention").ShowPopup();
+                        p.Element("mention-command-status").SetText("show called");
+                    }))
+            </native-hstack>
+
+            <native-vstack gap="Xs" class="font-mono text-sm">
+                <p>Command: <span id="mention-command-status">idle</span></p>
+                <p>Popup: <span id="mention-popup-status">idle</span></p>
+                <p>Value: <span id="mention-value">none</span></p>
+            </native-vstack>
+        </native-vstack>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <native-vstack gap="Base">
+            <label for="auto-hide-note" class="text-sm font-medium text-text-primary">Auto-hide target</label>
+            <textarea id="auto-hide-note" rows="2" class="w-full rounded-md border border-border p-3 text-sm">No</textarea>
+
+            @(Html.FusionMention(plan, "auto-hide-mention", b => b
+                .Target("#auto-hide-note")
+                .DataSource(careTeam)
+                .Fields<MentionPerson>(x => x.Name, x => x.Id)
+                .MentionChar('@')
+                .MinLength(0)
+                .RequireLeadingSpace(false)
+                .ShowMentionChar(true)
+                .PopupWidth("280px"))
+                .Reactive(evt => evt.Opened, (args, p) =>
+                {
+                    p.Component<FusionMention>("auto-hide-mention").HidePopup();
+                    p.Element("mention-hide-status").SetText("hide called");
+                })
+                .Reactive(evt => evt.Closed, (args, p) =>
+                {
+                    p.Element("mention-auto-hide-popup-status").SetText("closed");
+                }))
+
+            @(Html.NativeButton("mention-auto-hide-btn", "Open And Hide")
+                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionMention>("auto-hide-mention").Search("No", 96, 160);
+                    p.Element("mention-auto-hide-command-status").SetText("search called");
+                }))
+
+            <native-vstack gap="Xs" class="font-mono text-sm">
+                <p>Auto-hide command: <span id="mention-auto-hide-command-status">idle</span></p>
+                <p>Hide: <span id="mention-hide-status">idle</span></p>
+                <p>Auto-hide popup: <span id="mention-auto-hide-popup-status">idle</span></p>
+            </native-vstack>
+        </native-vstack>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

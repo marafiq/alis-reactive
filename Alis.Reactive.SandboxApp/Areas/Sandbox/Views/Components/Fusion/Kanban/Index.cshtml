@@ -1,0 +1,336 @@
+@model KanbanModel
+@using Alis.Reactive
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Templates
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Syncfusion.EJ2.Kanban
+@{
+    ViewData["Title"] = "Kanban";
+
+    var plan = Html.ReactivePlan<KanbanModel>();
+
+    var cardTemplate = FusionTemplate.Create<KanbanTaskCard>()
+        .Class("kanban-task-card space-y-2 text-sm")
+        .Div(row => row.Class("flex items-start justify-between gap-2")
+            .Span(m => m.Summary, "font-semibold text-slate-900")
+            .Badge(m => m.Priority, "rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700"))
+        .Div(row => row.Class("text-xs text-slate-600")
+            .Span("Resident: ", "font-medium text-slate-500")
+            .Span(m => m.Resident))
+        .Div(row => row.Class("flex items-center justify-between text-xs")
+            .Span(m => m.Assignee, "text-slate-700")
+            .Span(m => m.Due, "font-medium text-slate-500"))
+        .When(m => m.IsEscalated,
+            then: t => t.Badge("ESCALATED", "rounded bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700"),
+            @else: e => e.Badge(m => m.FacilityName, "rounded bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700"))
+        .Render();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Get("/api/kanban/board")
+         .Gather(g => g.Static("selectedFacilityId", "AL"))
+         .Response(r => r.OnSuccess<KanbanBoardResponse>((json, s) =>
+         {
+             s.Component<FusionKanban>("care-kanban").SetDataSource(json, x => x.Cards);
+             s.Element("kanban-status").SetText(json, x => x.Message);
+             s.Element("kanban-open-count").SetText(json, x => x.OpenCount);
+             s.Element("kanban-review-count").SetText(json, x => x.ReviewCount);
+             s.Element("kanban-al-count").SetText(json, x => x.AssistedLivingCount);
+         }));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionKanban</native-heading>
+
+    <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
+        <native-hstack gap="Base" wrap="true" align="End">
+            @{ Html.InputField(plan, m => m.SelectedFacilityId, o => o.Label("Facility"))
+                    .FusionDropDownList(b => b
+                        .Placeholder("Select facility")
+                        .DataSource(KanbanSeedData.Facilities)
+                        .Fields<KanbanFacility>(t => t.Name, v => v.Id)
+                        .Value("AL")
+                        .Reactive(plan, evt => evt.Changed, (args, p) =>
+                        {
+                            p.Element("kanban-status").SetText("loading");
+                            p.Get("/api/kanban/board")
+                             .Gather(g => g.Include<FusionDropDownList, KanbanModel>(m => m.SelectedFacilityId))
+                             .Response(r => r.OnSuccess<KanbanBoardResponse>((json, s) =>
+                             {
+                                 s.Component<FusionKanban>("care-kanban").SetDataSource(json, x => x.Cards);
+                                 s.Element("kanban-status").SetText(json, x => x.Message);
+                                 s.Element("kanban-open-count").SetText(json, x => x.OpenCount);
+                                 s.Element("kanban-review-count").SetText(json, x => x.ReviewCount);
+                                 s.Element("kanban-al-count").SetText(json, x => x.AssistedLivingCount);
+                             }));
+                        })); }
+
+            <native-hstack gap="Sm" class="ml-auto text-sm">
+                <span>Status: <span id="kanban-status" class="font-medium">booting</span></span>
+                <span>Open: <span id="kanban-open-count" class="font-medium">0</span></span>
+                <span>Review: <span id="kanban-review-count" class="font-medium">0</span></span>
+                <span>AL: <span id="kanban-al-count" class="font-medium">0</span></span>
+            </native-hstack>
+        </native-hstack>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
+        <native-hstack gap="Sm" class="flex-wrap">
+            @(Html.NativeButton("kanban-add-card-btn", "Add Remote Card")
+                .CssClass("rounded-md bg-primary px-3 py-2 text-sm font-medium text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/api/kanban/cards")
+                     .Response(r => r.OnSuccess<KanbanCardMutationResponse>((json, s) =>
+                     {
+                         s.Component<FusionKanban>("care-kanban").AddCard(json, x => x.Card, 0);
+                         s.Element("kanban-command-status").SetText(json, x => x.Message);
+                     }));
+                }))
+            @(Html.NativeButton("kanban-update-card-btn", "Update Remote Card")
+                .CssClass("rounded-md bg-secondary px-3 py-2 text-sm font-medium text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Put("/api/kanban/cards/102", g => g.Static("source", "button"))
+                     .Response(r => r.OnSuccess<KanbanCardMutationResponse>((json, s) =>
+                     {
+                         s.Component<FusionKanban>("care-kanban").UpdateCard(json, x => x.Card);
+                         s.Element("kanban-command-status").SetText(json, x => x.Message);
+                     }));
+                }))
+            @(Html.NativeButton("kanban-delete-card-btn", "Delete Remote Card")
+                .CssClass("rounded-md bg-rose-600 px-3 py-2 text-sm font-medium text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Delete("/api/kanban/cards/101")
+                     .Response(r => r.OnSuccess<KanbanCardMutationResponse>((json, s) =>
+                     {
+                         s.Component<FusionKanban>("care-kanban").DeleteCard(json, x => x.CardId);
+                         s.Element("kanban-command-status").SetText(json, x => x.Message);
+                     }));
+                }))
+            @(Html.NativeButton("kanban-hide-done-btn", "Hide Done")
+                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionKanban>("care-kanban").HideColumn("Done");
+                    p.Element("kanban-column-status").SetText("done hidden");
+                }))
+            @(Html.NativeButton("kanban-show-done-btn", "Show Done")
+                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionKanban>("care-kanban").ShowColumn("Done");
+                    p.Element("kanban-column-status").SetText("done shown");
+                }))
+            @(Html.NativeButton("kanban-add-column-btn", "Add Blocked")
+                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionKanban>("care-kanban").AddColumn(
+                        new FusionKanbanColumn { HeaderText = "Blocked", KeyField = "Blocked" },
+                        2);
+                    p.Element("kanban-column-status").SetText("blocked added");
+                }))
+            @(Html.NativeButton("kanban-delete-column-btn", "Delete Blocked")
+                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionKanban>("care-kanban").DeleteColumn(2);
+                    p.Element("kanban-column-status").SetText("blocked deleted");
+                }))
+            @(Html.NativeButton("kanban-spinner-btn", "Spinner")
+                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionKanban>("care-kanban").ShowSpinner();
+                    p.Component<FusionKanban>("care-kanban").HideSpinner();
+                    p.Element("kanban-spinner-status").SetText("spinner toggled");
+                }))
+            @(Html.NativeButton("kanban-open-dialog-btn", "Open Dialog")
+                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionKanban>("care-kanban").OpenAddDialog(KanbanSeedData.NewCard(950, "AL"));
+                }))
+            @(Html.NativeButton("kanban-open-edit-dialog-btn", "Open Edit Dialog")
+                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionKanban>("care-kanban").OpenEditDialog(KanbanSeedData.UpdatedCard());
+                }))
+            @(Html.NativeButton("kanban-open-close-dialog-btn", "Open + Close Dialog")
+                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionKanban>("care-kanban").OpenAddDialog(KanbanSeedData.NewCard(951, "AL"));
+                    p.Component<FusionKanban>("care-kanban").CloseDialog();
+                    p.Element("kanban-dialog-status").SetText("open close requested");
+                }))
+            @(Html.NativeButton("kanban-audit-btn", "Audit Board")
+                .CssClass("rounded-md bg-accent px-3 py-2 text-sm font-medium text-white")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var board = p.Component<FusionKanban>("care-kanban");
+                    p.Post("/api/kanban/audit")
+                     .Gather(g => g
+                         .Include(board.Cards<KanbanModel, KanbanTaskCard>(), "cards")
+                         .Include(board.ColumnData<KanbanModel, KanbanTaskCard>("Open"), "openCards")
+                         .Include(board.SwimlaneData<KanbanModel, KanbanTaskCard>("AL"), "assistedLivingCards"))
+                     .Response(r => r.OnSuccess<KanbanAuditResponse>((json, s) =>
+                     {
+                         s.Element("kanban-audit-summary").SetText(json, x => x.Summary);
+                         s.Element("kanban-audit-total").SetText(json, x => x.TotalCards);
+                         s.Element("kanban-audit-open").SetText(json, x => x.OpenCards);
+                         s.Element("kanban-audit-al").SetText(json, x => x.AssistedLivingCards);
+                     }));
+                }))
+        </native-hstack>
+
+        <native-vstack gap="Xs" class="mt-4 font-mono text-sm">
+            <p>Command: <span id="kanban-command-status">idle</span></p>
+            <p>Column: <span id="kanban-column-status">idle</span></p>
+            <p>Spinner: <span id="kanban-spinner-status">idle</span></p>
+            <p>Dialog: <span id="kanban-dialog-status">idle</span></p>
+            <p>Dialog close: <span id="kanban-dialog-close-status">none</span></p>
+            <p>Action begin: <span id="kanban-action-begin">none</span></p>
+            <p>Action: <span id="kanban-action-request">none</span></p>
+            <p>Data: <span id="kanban-data-binding-status">none</span>/<span id="kanban-data-bound-status">none</span></p>
+            <p>Query cell: <span id="kanban-query-cell-status">none</span></p>
+            <p>Drag start: <span id="kanban-drag-start-summary">none</span></p>
+            <p>Dragging: <span id="kanban-drag-status">none</span></p>
+            <p>Commit: <span id="kanban-commit-status">none</span></p>
+            <p>Move: <span id="kanban-move-status">none</span></p>
+            <p>Clicked: <span id="kanban-clicked-summary">none</span></p>
+            <p>Double clicked: <span id="kanban-double-clicked-summary">none</span></p>
+            <p>Rendered: <span id="kanban-rendered-summary">none</span></p>
+            <p>Route summary: <span id="kanban-route-summary">none</span></p>
+            <p>Audit: <span id="kanban-audit-summary">none</span></p>
+            <p>Audit counts: <span id="kanban-audit-total">0</span>/<span id="kanban-audit-open">0</span>/<span id="kanban-audit-al">0</span></p>
+        </native-vstack>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-4 shadow-sm" style="height: 640px;">
+        @(Html.FusionKanban(plan, "care-kanban", b =>
+            {
+                b.Width("100%");
+                b.Height("100%");
+                b.KeyField("status");
+                b.DataSource(new List<KanbanTaskCard>());
+                b.AllowDragAndDrop(true);
+                b.AllowColumnDragAndDrop(true);
+                b.ShowEmptyColumn(true);
+                b.EnableTooltip(true);
+                b.CardSettings(new KanbanCardSettings
+                {
+                    HeaderField = "cardId",
+                    ContentField = "summary",
+                    TagsField = "tags",
+                    GrabberField = "cardColor",
+                    SelectionType = SelectionType.Multiple,
+                    Template = cardTemplate
+                });
+                b.SwimlaneSettings(new KanbanSwimlaneSettings
+                {
+                    KeyField = "facilityId",
+                    TextField = "facilityName",
+                    ShowEmptyRow = true,
+                    ShowItemCount = true
+                });
+                b.Columns(new List<KanbanColumn>
+                {
+                    new KanbanColumn { HeaderText = "Open", KeyField = "Open", ShowAddButton = true },
+                    new KanbanColumn { HeaderText = "In Progress", KeyField = "InProgress" },
+                    new KanbanColumn { HeaderText = "Review", KeyField = "Review" },
+                    new KanbanColumn { HeaderText = "Done", KeyField = "Done" }
+                });
+            })
+            .Reactive(evt => evt.DataBinding<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Element("kanban-data-binding-status").SetText(args, x => x.Result[0].Summary);
+            })
+            .Reactive(evt => evt.DataBound, (args, p) =>
+            {
+                p.Element("kanban-data-bound-status").SetText("bound");
+            })
+            .Reactive(evt => evt.CardClick<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Element("kanban-clicked-summary").SetText(args, x => x.Data.Summary);
+                p.Get("/api/kanban/card/{cardId}/summary")
+                 .Gather(g => g.RouteParam("cardId", args, x => x.Data.Id))
+                 .Response(r => r.OnSuccess<KanbanCardSummaryResponse>((json, s) =>
+                 {
+                     s.Element("kanban-route-summary").SetText(json, x => x.Summary);
+                 }));
+            })
+            .Reactive(evt => evt.CardDoubleClick<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Element("kanban-double-clicked-summary").SetText(args, x => x.Data.Summary);
+            })
+            .Reactive(evt => evt.QueryCellInfo, (args, p) =>
+            {
+                p.Element("kanban-query-cell-status").SetText(args, x => x.RequestType);
+            })
+            .Reactive(evt => evt.CardRendered<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Element("kanban-rendered-summary").SetText(args, x => x.Data.Summary);
+            })
+            .Reactive(evt => evt.DragStart<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Element("kanban-drag-start-summary").SetText(args, x => x.Data[0].Summary);
+            })
+            .Reactive(evt => evt.Drag<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Element("kanban-drag-status").SetText(args, x => x.Data[0].Summary);
+            })
+            .Reactive(evt => evt.ActionBegin<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Element("kanban-action-begin").SetText(args, x => x.RequestType);
+            })
+            .Reactive(evt => evt.ActionComplete<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Element("kanban-action-request").SetText(args, x => x.RequestType);
+            })
+            .Reactive(evt => evt.DataSourceChanged<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Post("/api/kanban/cards/commit")
+                 .Gather(g => g
+                     .FromEvent(args, x => x.RequestType, "requestType")
+                     .FromEvent(args, x => x.AddedRecords, "addedRecords")
+                     .FromEvent(args, x => x.ChangedRecords, "changedRecords")
+                     .FromEvent(args, x => x.DeletedRecords, "deletedRecords"))
+                 .Response(r => r.OnSuccess<KanbanCommitResponse>((json, s) =>
+                 {
+                     args.EndEdit(s);
+                     s.Element("kanban-commit-status").SetText(json, x => x.Message);
+                 }));
+            })
+            .Reactive(evt => evt.DragStop<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Put("/api/kanban/cards/move", g => g
+                     .FromEvent(args, x => x.Data, "cards")
+                     .FromEvent(args, x => x.DropIndex, "dropIndex"))
+                 .Response(r => r.OnSuccess<KanbanMoveResponse>((json, s) =>
+                 {
+                     s.Component<FusionKanban>("care-kanban").UpdateCard(json, x => x.Card);
+                     s.Element("kanban-move-status").SetText(json, x => x.Message);
+                 }));
+            })
+            .Reactive(evt => evt.DialogOpen<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Element("kanban-dialog-status").SetText(args, x => x.RequestType);
+            })
+            .Reactive(evt => evt.DialogClose<KanbanTaskCard>(), (args, p) =>
+            {
+                p.Element("kanban-dialog-close-status").SetText(args, x => x.RequestType);
+            }))
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -31,7 +31,7 @@ namespace Alis.Reactive
         public static string ToPath<TSource>(string prefix, Expression<Func<TSource, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return prefix + "." + string.Join(".", members);
+            return prefix + "." + ToRuntimePath(members);
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Alis.Reactive
         public static string ToPath<TSource, TProp>(string prefix, Expression<Func<TSource, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return prefix + "." + string.Join(".", members);
+            return prefix + "." + ToRuntimePath(members);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Alis.Reactive
         public static string ToEventPath<TSource>(Expression<Func<TSource, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members);
+            return ToRuntimePath(members);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Alis.Reactive
         public static string ToEventPath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members);
+            return ToRuntimePath(members);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Alis.Reactive
         public static string ToResponsePath<TSource>(Expression<Func<TSource, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members);
+            return ToRuntimePath(members);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Alis.Reactive
         public static string ToResponsePath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members);
+            return ToRuntimePath(members);
         }
 
         private static List<string> ExtractMemberChain(Expression expr)
@@ -111,7 +111,11 @@ namespace Alis.Reactive
             if (TryIndexAccess(expr, out var collection, out var index))
             {
                 var members = ExtractMemberChain(collection);
-                members[members.Count - 1] += "[" + index + "]";
+                var suffix = "[" + index.ToString(System.Globalization.CultureInfo.InvariantCulture) + "]";
+                if (members.Count == 0)
+                    members.Add(suffix);
+                else
+                    members[members.Count - 1] += suffix;
                 return members;
             }
 
@@ -187,6 +191,36 @@ namespace Alis.Reactive
                 .Replace(".", "_")
                 .Replace("[", "_")
                 .Replace("]", "_");
+
+        private static string ToRuntimePath(List<string> members)
+        {
+            var segments = new List<string>();
+            foreach (var member in members)
+                AddRuntimePathSegments(member, segments);
+
+            return string.Join(".", segments);
+        }
+
+        private static void AddRuntimePathSegments(string member, List<string> segments)
+        {
+            var position = 0;
+            while (position < member.Length)
+            {
+                var bracket = member.IndexOf('[', position);
+                if (bracket < 0)
+                {
+                    segments.Add(member.Substring(position));
+                    return;
+                }
+
+                if (bracket > position)
+                    segments.Add(member.Substring(position, bracket - position));
+
+                var close = member.IndexOf(']', bracket + 1);
+                segments.Add(member.Substring(bracket + 1, close - bracket - 1));
+                position = close + 1;
+            }
+        }
 
         private static bool TryIndexAccess(
             Expression expr,

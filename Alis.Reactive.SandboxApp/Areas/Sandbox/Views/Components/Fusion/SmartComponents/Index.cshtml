@@ -1,0 +1,138 @@
+@model SmartComponentsModel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@{
+    ViewData["Title"] = "Smart Components";
+
+    var plan = Html.ReactivePlan<SmartComponentsModel>();
+
+    plan.Reactive(m => m.CareNote, evt => evt.BeforeSuggestionInsert, (args, p) =>
+    {
+        p.Element("before-suggestion").SetText(args, x => x.Text);
+    });
+
+    plan.Reactive(m => m.CareNote, evt => evt.AfterSuggestionInsert, (args, p) =>
+    {
+        p.Element("after-suggestion").SetText(args, x => x.InsertedText);
+    });
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var note = p.Component<FusionSmartTextArea>(m => m.CareNote);
+        note.SetValue("Resident is");
+        p.Element("smart-note-value").SetText(note.Value());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Fusion Smart Components</native-heading>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <native-vstack gap="Base">
+            @{ Html.InputField(plan, m => m.CareNote, o => o.Label("Smart care note"))
+                .FusionSmartTextArea(o =>
+                {
+                    o.Value = Model.CareNote;
+                    o.UserRole = "Care coordinator writing concise senior living notes";
+                    o.UserPhrases = new[] { "hydrating well", "fall precautions reviewed" };
+                    o.SuggestionEndpoint = "/api/smart-components/suggest";
+                    o.SuggestionMode = FusionSmartSuggestionMode.Inline;
+                    o.Rows = 4;
+                    o.CssClass = "w-full rounded-md border border-border p-3 text-sm";
+                }); }
+
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("set-smart-note-btn", "Set Note")
+                    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var note = p.Component<FusionSmartTextArea>(m => m.CareNote);
+                        note.SetValue("Resident prefers morning therapy");
+                        p.Element("smart-note-value").SetText(note.Value());
+                    }))
+                @(Html.NativeButton("focus-smart-note-btn", "Focus Note")
+                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionSmartTextArea>(m => m.CareNote).FocusIn();
+                        p.Element("smart-note-focus-status").SetText("focus called");
+                    }))
+            </native-hstack>
+
+            <native-vstack gap="Xs" class="font-mono text-sm">
+                <p>Value: <span id="smart-note-value">none</span></p>
+                <p>Before: <span id="before-suggestion">none</span></p>
+                <p>After: <span id="after-suggestion">none</span></p>
+                <p>Focus: <span id="smart-note-focus-status">idle</span></p>
+            </native-vstack>
+        </native-vstack>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <native-vstack gap="Base">
+            <textarea id="custom-clipboard" class="sr-only">Resident Nora is moving to room 212B. Hydration rounds complete.</textarea>
+
+            <form id="smart-paste-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="Resident" class="block text-sm font-medium text-text-primary mb-1">Resident</label>
+                    <input id="Resident" name="Resident" class="w-full rounded-md border border-border p-2 text-sm" />
+                </div>
+                <div>
+                    <label for="Room" class="block text-sm font-medium text-text-primary mb-1">Room</label>
+                    <input id="Room" name="Room" class="w-full rounded-md border border-border p-2 text-sm" />
+                </div>
+                <div>
+                    <label for="Notes" class="block text-sm font-medium text-text-primary mb-1">Notes</label>
+                    <input id="Notes" name="Notes" class="w-full rounded-md border border-border p-2 text-sm" />
+                </div>
+                <div class="md:col-span-3">
+                    @Html.FusionSmartPasteButton("smart-paste", o =>
+                    {
+                        o.Content = "Smart Paste";
+                        o.AiAssistEndpoint = "/api/smart-components/paste";
+                        o.IsPrimary = true;
+                        o.CssClass = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white";
+                    })
+                </div>
+            </form>
+
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("run-smart-paste-btn", "Run Smart Paste")
+                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionSmartPasteButton>("smart-paste").Click();
+                        p.Element("paste-command-status").SetText("click called");
+                    }))
+                @(Html.NativeButton("focus-smart-paste-btn", "Focus Paste")
+                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionSmartPasteButton>("smart-paste").FocusIn();
+                        p.Element("paste-focus-status").SetText("focus called");
+                    }))
+                @(Html.NativeButton("disable-smart-paste-btn", "Disable Paste")
+                    .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var paste = p.Component<FusionSmartPasteButton>("smart-paste");
+                        paste.SetDisabled(true);
+                        p.Element("paste-disabled-value").SetText(paste.Disabled());
+                    }))
+            </native-hstack>
+
+            <native-vstack gap="Xs" class="font-mono text-sm">
+                <p>Command: <span id="paste-command-status">idle</span></p>
+                <p>Focus: <span id="paste-focus-status">idle</span></p>
+                <p>Disabled: <span id="paste-disabled-value">false</span></p>
+            </native-vstack>
+        </native-vstack>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)
