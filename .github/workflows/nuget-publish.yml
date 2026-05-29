@@ -57,19 +57,31 @@ jobs:
       - name: Build all C# projects
         run: dotnet build --configuration Release
 
-      - name: Run unit tests
+      - name: Run non-Playwright .NET tests
+        shell: bash
         run: |
-          dotnet test tests/Alis.Reactive.UnitTests --configuration Release --no-build
-          dotnet test tests/Alis.Reactive.Native.UnitTests --configuration Release --no-build
-          dotnet test tests/Alis.Reactive.Fusion.UnitTests --configuration Release --no-build
-          dotnet test tests/Alis.Reactive.FluentValidator.UnitTests --configuration Release --no-build
-          dotnet test tests/Alis.Reactive.DesignSystem.Tests --configuration Release --no-build
-          dotnet test tests/Alis.Reactive.NativeTagHelpers.Tests --configuration Release --no-build
-          dotnet test tests/Alis.Reactive.Analyzers.Tests --configuration Release --no-build
+          projects=()
+          while IFS= read -r project; do
+            if [[ "$project" == *Playwright* ]]; then
+              continue
+            fi
+
+            if grep -q 'Microsoft.NET.Test.Sdk' "$project"; then
+              projects+=("$project")
+            fi
+          done < <(find tests -name '*.csproj' -print | sort)
+
+          if [ "${#projects[@]}" -eq 0 ]; then
+            echo "No non-Playwright .NET test projects found. Playwright tests run in the playwright job."
+            exit 0
+          fi
+
+          for project in "${projects[@]}"; do
+            dotnet test "$project" --configuration Release --no-build
+          done
 
   playwright:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -137,8 +149,22 @@ jobs:
             TestResults/retry-*-results.trx
           retention-days: 14
 
+      - name: Fail if Playwright failed after retry
+        if: always()
+        run: |
+          if [ "${{ steps.pw1.outcome }}" = "success" ]; then
+            exit 0
+          fi
+
+          if [ "${{ steps.pw2.outcome }}" = "success" ]; then
+            exit 0
+          fi
+
+          echo "Playwright tests failed after retry."
+          exit 1
+
   pack-and-publish:
-    needs: test
+    needs: [test, playwright]
     runs-on: ubuntu-latest
     permissions:
       packages: write
