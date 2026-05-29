@@ -1,0 +1,153 @@
+@model SliderModel
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Inputs
+@{
+    ViewData["Title"] = "FusionSlider";
+
+    var plan = Html.ReactivePlan<SliderModel>();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var pain = p.Component<FusionSlider>(m => m.PainScore);
+        pain.SetValue(35);
+        p.Element("value-echo").SetText(pain.Value());
+
+        var range = p.Component<FusionSlider>(m => m.PreferredRange);
+        range.SetRangeValue(15, 75);
+        p.Element("range-echo").SetText(range.RangeValue());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionSlider</native-heading>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Scalar Value and Events</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.PainScore, o => o.Label("Pain Score"))
+                .FusionSlider(b => b
+                    .Min(0)
+                    .Max(100)
+                    .Step(5)
+                    .Value(25)
+                    .Reactive(plan, evt => evt.Change, (args, p) =>
+                    {
+                        p.Element("change-value").SetText(args, x => x.Value);
+                        p.Element("change-previous").SetText(args, x => x.PreviousValue);
+                        p.Element("change-text").SetText(args, x => x.Text);
+                        p.Element("change-action").SetText(args, x => x.Action);
+                        p.Element("change-interacted").SetText(args, x => x.IsInteracted);
+                    })
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("changed-value").SetText(args, x => x.Value);
+                        p.Element("changed-previous").SetText(args, x => x.PreviousValue);
+                        p.Element("changed-text").SetText(args, x => x.Text);
+                        p.Element("changed-action").SetText(args, x => x.Action);
+                        p.When(args, x => x.Value).Gte(50d)
+                            .Then(t => t.Element("args-condition").SetText("at least 50"))
+                            .Else(e => e.Element("args-condition").SetText("below 50"));
+                    })); }
+        </native-grid>
+
+        <native-hstack gap="Sm" class="mt-4">
+            @(Html.NativeButton("set-score-btn", "Set Score")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var pain = p.Component<FusionSlider>(m => m.PainScore);
+                    pain.SetValue(65);
+                    p.Element("value-echo").SetText(pain.Value());
+                    p.Element("command-state").SetText("score set");
+                }))
+            @(Html.NativeButton("check-score-btn", "Check Score")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var pain = p.Component<FusionSlider>(m => m.PainScore);
+                    p.When(pain.Value()).Gte(50d)
+                        .Then(t => t.Element("score-state").SetText("high"))
+                        .Else(e => e.Element("score-state").SetText("low"));
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Range Value</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.PreferredRange, o => o.Label("Preferred Range"))
+                .FusionSlider(b => b
+                    .Min(0)
+                    .Max(100)
+                    .Step(5)
+                    .Type(SliderType.Range)
+                    .Value(new double[] { 20, 60 })); }
+        </native-grid>
+
+        <native-hstack gap="Sm" class="mt-4">
+            @(Html.NativeButton("set-range-btn", "Set Range")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var range = p.Component<FusionSlider>(m => m.PreferredRange);
+                    range.SetRangeValue(30, 90);
+                    p.Element("range-echo").SetText(range.RangeValue());
+                    p.Element("command-state").SetText("range set");
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Gather</native-heading>
+        @(Html.NativeButton("gather-btn", "Gather Values")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var pain = p.Component<FusionSlider>(m => m.PainScore);
+                var range = p.Component<FusionSlider>(m => m.PreferredRange);
+                p.Post("/Sandbox/Components/Slider/Echo")
+                    .Gather(g => g
+                        .Include(pain.Value(), "painScore")
+                        .Include(range.RangeValue(), "preferredRange"))
+                    .Response(r => r.OnSuccess<SliderEchoResponse>((json, s) =>
+                    {
+                        s.Element("gather-score").SetText(json, x => x.PainScore);
+                        s.Element("gather-range").SetText(json, x => x.PreferredRange);
+                        s.Element("gather-summary").SetText(json, x => x.Summary);
+                    }));
+            }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Command: <span id="command-state" class="text-text-muted">&mdash;</span></p>
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+            <p>Range echo: <span id="range-echo" class="text-text-muted">&mdash;</span></p>
+            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
+            <p>Change previous: <span id="change-previous" class="text-text-muted">&mdash;</span></p>
+            <p>Change text: <span id="change-text" class="text-text-muted">&mdash;</span></p>
+            <p>Change action: <span id="change-action" class="text-text-muted">&mdash;</span></p>
+            <p>Change interacted: <span id="change-interacted" class="text-text-muted">&mdash;</span></p>
+            <p>Changed value: <span id="changed-value" class="text-text-muted">&mdash;</span></p>
+            <p>Changed previous: <span id="changed-previous" class="text-text-muted">&mdash;</span></p>
+            <p>Changed text: <span id="changed-text" class="text-text-muted">&mdash;</span></p>
+            <p>Changed action: <span id="changed-action" class="text-text-muted">&mdash;</span></p>
+            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
+            <p>Score state: <span id="score-state" class="text-text-muted">&mdash;</span></p>
+            <p>Gather score: <span id="gather-score" class="text-text-muted">&mdash;</span></p>
+            <p>Gather range: <span id="gather-range" class="text-text-muted">&mdash;</span></p>
+            <p>Gather summary: <span id="gather-summary" class="text-text-muted">&mdash;</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
