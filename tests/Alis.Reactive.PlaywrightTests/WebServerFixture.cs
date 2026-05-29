@@ -159,7 +159,7 @@ public class WebServerFixture
             dir = Path.GetDirectoryName(dir);
         }
 
-        // Fallback: relative from repo root
+        // Running from the repo root keeps local Playwright runs working outside test output.
         var repoRoot = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", "..", ".."));
         return Path.Combine(repoRoot, "Alis.Reactive.SandboxApp");
     }

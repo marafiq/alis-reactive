@@ -232,9 +232,9 @@ flowchart TD
 | --- | --- | --- | --- |
 | HGR-01 / T6 mixed targets and sources | projection plus runtime gather | `WhenGatherDslBuildsRequestInput.assignments_keep_the_authored_source_to_target_order`, `runtime/__tests__/gather.test.ts` | present, must stay green |
 | HGR-02 / T7 component method gather | projection shows method access and return shape | `WhenGatherDslBuildsRequestInput.component_method_sources_are_projected_as_method_value_reads` | present, must stay green |
-| HGR-03 / T8 success response drives follow-up request | projection, runtime, Playwright | projection test added; runtime test added; Playwright sandbox/test being wired | incomplete until Playwright passes |
-| HGR-04 / T9 chained request | runtime plus Playwright for `Response.Chained` | `runtime/__tests__/http.test.ts`, HTTP section 3/13 Playwright | present, needs focused rerun |
-| HGR-05 / T10 parallel requests | runtime plus Playwright for concurrent branches and all-settled | HTTP section 4 Playwright; runtime parallel behavior | needs focused rerun |
+| HGR-03 / T8 success response drives follow-up request | projection, runtime, Playwright | `WhenGatherDslBuildsRequestInput.success_response_sources_can_drive_follow_up_request_inputs`, runtime gather/http tests, full Playwright gate 886/886 on 2026-05-28 | green |
+| HGR-04 / T9 chained request | runtime plus Playwright for `Response.Chained` | `runtime/__tests__/http.test.ts`, HTTP chained request and route-param Playwright cases, full Playwright gate 886/886 on 2026-05-28 | green |
+| HGR-05 / T10 parallel requests | runtime plus Playwright for concurrent branches and all-settled | HTTP parallel request Playwright cases, runtime parallel behavior, full Playwright gate 886/886 on 2026-05-28 | green |
 
 ## Closure Gate
 

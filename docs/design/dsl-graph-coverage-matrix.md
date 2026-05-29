@@ -11,7 +11,7 @@ DSL family listed here maps to a domain diagram and an input/output matrix in
 Core DSL inventory command:
 
 ```bash
-rg -n "^\s*public .*\(" \
+git grep -n -E '^[[:space:]]*public .*\(' -- \
   Alis.Reactive/Builders \
   Alis.Reactive/Validation \
   Alis.Reactive.FluentValidator \
@@ -20,11 +20,10 @@ rg -n "^\s*public .*\(" \
   Alis.Reactive/ReactivePlugin.cs \
   Alis.Reactive/ResponseBody.cs \
   Alis.Reactive/ComponentRef.cs \
-  Alis.Reactive/ComponentMember.cs \
-  -g '*.cs'
+  Alis.Reactive/ComponentMember.cs
 ```
 
-The current source scan returns 302 public method lines across the core DSL,
+The current source scan returns 364 public method lines across the core DSL,
 validation metadata, plugin DSL, and plan/rendering DSL. Component vertical
 slices are classified separately because they follow a repeated pattern:
 render, typed property/method/value source, typed event/callback.
@@ -32,13 +31,12 @@ render, typed property/method/value source, typed event/callback.
 Component inventory command:
 
 ```bash
-rg -n "^\s*public\s+[^=;]+\(" \
+git grep -n -E '^[[:space:]]*public[[:space:]]+[^=;]+\(' -- \
   Alis.Reactive.Native \
-  Alis.Reactive.Fusion \
-  -g '*.cs'
+  Alis.Reactive.Fusion
 ```
 
-Native/Fusion component and template source returns 347 public method lines
+Native/Fusion component and template source returns 395 public method lines
 across repeated vertical slices.
 
 ## Source-Derived Capability Inventory
