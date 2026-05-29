@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Alis.Reactive;
 using Alis.Reactive.PlanModel;
 
@@ -54,7 +56,7 @@ namespace Alis.Reactive.Validation
                 _shape);
         }
 
-        internal System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences =>
+        internal IEnumerable<ClientValidationFieldReference> PeerFieldReferences =>
             _operand.PeerFieldReferences;
     }
 
@@ -75,7 +77,7 @@ namespace Alis.Reactive.Validation
             return new PeerFieldValidationRuleOperand(ClientValidationFieldReference.Of(fieldPath, shape));
         }
 
-        internal abstract System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences { get; }
+        internal abstract IEnumerable<ClientValidationFieldReference> PeerFieldReferences { get; }
 
         internal abstract ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix);
 
@@ -89,7 +91,7 @@ namespace Alis.Reactive.Validation
     {
         internal NoValidationRuleOperand() { }
 
-        internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
+        internal override IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
             get { yield break; }
         }
@@ -119,7 +121,7 @@ namespace Alis.Reactive.Validation
             _shape = shape;
         }
 
-        internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
+        internal override IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
             get { yield break; }
         }
@@ -150,7 +152,7 @@ namespace Alis.Reactive.Validation
             _bounds = bounds;
         }
 
-        internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
+        internal override IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
             get { yield break; }
         }
@@ -181,7 +183,7 @@ namespace Alis.Reactive.Validation
             _field = field;
         }
 
-        internal override System.Collections.Generic.IEnumerable<ClientValidationFieldReference> PeerFieldReferences
+        internal override IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
             get { yield return _field; }
         }
@@ -297,8 +299,8 @@ namespace Alis.Reactive.Validation
 
         internal static ValidationRangeBounds FromClientLiteral<TValue>(TValue lowerBound, TValue upperBound)
         {
-            if (lowerBound == null) throw new System.ArgumentNullException(nameof(lowerBound));
-            if (upperBound == null) throw new System.ArgumentNullException(nameof(upperBound));
+            if (lowerBound == null) throw new ArgumentNullException(nameof(lowerBound));
+            if (upperBound == null) throw new ArgumentNullException(nameof(upperBound));
 
             var lowerLiteral = ClientValidationLiteral.From(lowerBound);
             var upperLiteral = ClientValidationLiteral.From(upperBound);
@@ -312,7 +314,7 @@ namespace Alis.Reactive.Validation
                     lowerLiteral.Shape);
             }
 
-            throw new System.ArgumentException(
+            throw new ArgumentException(
                 "Client validation range bounds must have the same shape. " +
                 $"Lower bound is '{lowerLiteral.Shape.Kind}', upper bound is '{upperLiteral.Shape.Kind}'.");
         }
