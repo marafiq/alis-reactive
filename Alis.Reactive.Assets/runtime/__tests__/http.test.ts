@@ -184,7 +184,7 @@ function mockFetch(responses: Response[]) {
   return fetchMock;
 }
 
-describe("executeRequest HTTP lifecycle", () => {
+describe("executeRequest HTTP request lane", () => {
   it("prepares request intent, exposes response scope, and completes with the request snapshot", async () => {
     document.body.innerHTML = `
       <span id="before"></span>
@@ -223,7 +223,7 @@ describe("executeRequest HTTP lifecycle", () => {
     expect(init.body).toBe(JSON.stringify({ name: "Ada" }));
   });
 
-  it("runs branch reactions inside request lifecycle slots around the HTTP send", async () => {
+  it("runs branch reactions before and after the HTTP send", async () => {
     document.body.innerHTML = `
       <span id="before"></span>
       <span id="complete"></span>
@@ -359,20 +359,27 @@ describe("executeRequest HTTP lifecycle", () => {
     expect(secondUrl).toBe("/facilities/3/residents/42");
   });
 
-  it("lets success routes read a response before a chained request gathers from that response", async () => {
+  it("lets success routes read a response before a chained request gathers route, header, and payload from that response", async () => {
     document.body.innerHTML = `
       <span id="tier"></span>
       <span id="facility"></span>
     `;
     const fetchMock = mockFetch([
-      responseJson({ tier: "premium", facilityId: "7" }),
+      responseJson({
+        tier: "premium",
+        facilityId: "7",
+        careUnit: "memory-care",
+        followUpReason: "fall risk",
+      }),
       responseJson({ name: "Memory Wing" }),
     ]);
     const loadFacility = request({
-      method: "GET",
-      url: "/facilities/{facilityId}",
+      method: "POST",
+      url: "/facilities/{facilityId}/follow-up",
       input: requestInput([
         routeParamAssignment("facilityId", payloadRead("success", "facilityId")),
+        headerAssignment("X-Care-Unit", payloadRead("success", "careUnit")),
+        payloadAssignment("reason", payloadRead("success", "followUpReason")),
       ]),
       success: [
         { match: { kind: "any" }, reaction: setText("facility", payloadRead("success", "name")) },
@@ -407,8 +414,14 @@ describe("executeRequest HTTP lifecycle", () => {
     expect(document.getElementById("facility")?.textContent).toBe("Memory Wing");
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
-    const [secondUrl] = fetchMock.mock.calls[1] as [string, RequestInit];
-    expect(secondUrl).toBe("/facilities/7");
+    const [secondUrl, secondInit] = fetchMock.mock.calls[1] as [string, RequestInit];
+    expect(secondUrl).toBe("/facilities/7/follow-up");
+    expect(secondInit.method).toBe("POST");
+    expect(secondInit.headers).toMatchObject({
+      "Content-Type": "application/json",
+      "X-Care-Unit": "memory-care",
+    });
+    expect(secondInit.body).toBe(JSON.stringify({ reason: "fall risk" }));
   });
 
   it("routes error responses, still completes, and does not run the follow-up request", async () => {

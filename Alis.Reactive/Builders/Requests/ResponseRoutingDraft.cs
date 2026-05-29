@@ -33,7 +33,7 @@ namespace Alis.Reactive.Builders.Requests
 
         internal void ContinueWith(RequestPlan request)
         {
-            var responseAlreadyHasFollowUpRequest = !_chain.CanContinue;
+            var responseAlreadyHasFollowUpRequest = _chain.HasFollowUp;
             if (responseAlreadyHasFollowUpRequest)
                 throw new InvalidOperationException(
                     "A response can declare only one chained request. " +

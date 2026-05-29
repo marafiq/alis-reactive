@@ -85,7 +85,7 @@ namespace Alis.Reactive.Native.Components
 
         private static RequestPlan BuildActionLinkRequest(RequestPlan request)
         {
-            var requestHasFollowUp = !request.Chain.CanContinue;
+            var requestHasFollowUp = request.Chain.HasFollowUp;
             if (requestHasFollowUp)
                 throw new InvalidOperationException(
                     "NativeActionLink does not support chained requests.");

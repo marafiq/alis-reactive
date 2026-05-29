@@ -136,7 +136,7 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>Gets the chain kind.</summary>
         public abstract string Kind { get; }
-        internal abstract bool CanContinue { get; }
+        internal abstract bool HasFollowUp { get; }
 
         internal static RequestChain ContinueWith(RequestPlan next) =>
             new FollowUpRequestChain(next);
@@ -147,7 +147,7 @@ namespace Alis.Reactive.PlanModel
     {
         /// <summary>Gets the kind. Always <c>"terminal"</c>.</summary>
         public override string Kind => "terminal";
-        internal override bool CanContinue => true;
+        internal override bool HasFollowUp => false;
     }
 
     /// <summary>Represents a request followed by another request after successful completion.</summary>
@@ -162,7 +162,7 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>Gets the kind. Always <c>"follow-up"</c>.</summary>
         public override string Kind => "follow-up";
-        internal override bool CanContinue => false;
+        internal override bool HasFollowUp => true;
 
         /// <summary>Gets the request to run after the current request succeeds.</summary>
         public RequestPlan Next => _next;
