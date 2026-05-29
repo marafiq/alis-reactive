@@ -1,0 +1,129 @@
+@model TextBoxModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "FusionTextBox";
+
+    var plan = Html.ReactivePlan<TextBoxModel>();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var name = p.Component<FusionTextBox>(m => m.ResidentName);
+        name.SetValue("Amina Patel");
+        name.AddAppendIcon("e-icons e-search");
+        p.Element("value-echo").SetText(name.Value());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionTextBox</native-heading>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Runtime Value, Icon, and Events</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Label("Resident Name"))
+                .FusionTextBox(b => b
+                    .Placeholder("Resident name")
+                    .ShowClearButton(true)
+                    .Reactive(plan, evt => evt.Input, (args, p) =>
+                    {
+                        p.Element("input-value").SetText(args, x => x.Value);
+                        p.Element("input-previous").SetText(args, x => x.PreviousValue);
+                    })
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("change-value").SetText(args, x => x.Value);
+                        p.Element("change-previous").SetText(args, x => x.PreviousValue);
+                        p.Element("change-interacted").SetText(args, x => x.IsInteracted);
+                        p.When(args, x => x.Value).NotEmpty()
+                            .Then(t => t.Element("args-condition").SetText("name entered"))
+                            .Else(e => e.Element("args-condition").SetText("no name"));
+                    })
+                    .Reactive(plan, evt => evt.Focus, (args, p) =>
+                    {
+                        p.Element("focus-state").SetText("focused");
+                        p.Element("focus-value").SetText(args, x => x.Value);
+                    })
+                    .Reactive(plan, evt => evt.Blur, (args, p) =>
+                    {
+                        p.Element("focus-state").SetText("blurred");
+                        p.Element("blur-value").SetText(args, x => x.Value);
+                    })); }
+        </native-grid>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Value Source</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>DomReady value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+            <p>Input value: <span id="input-value" class="text-text-muted">&mdash;</span></p>
+            <p>Input previous: <span id="input-previous" class="text-text-muted">&mdash;</span></p>
+            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
+            <p>Change previous: <span id="change-previous" class="text-text-muted">&mdash;</span></p>
+            <p>Change interacted: <span id="change-interacted" class="text-text-muted">&mdash;</span></p>
+            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Focus Methods</native-heading>
+        <native-hstack gap="Sm">
+            @(Html.NativeButton("focus-in-btn", "Focus Resident Name")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionTextBox>(m => m.ResidentName).FocusIn();
+                }))
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm mt-3">
+            <p>Focus state: <span id="focus-state" class="text-text-muted">&mdash;</span></p>
+            <p>Focus value: <span id="focus-value" class="text-text-muted">&mdash;</span></p>
+            <p>Blur value: <span id="blur-value" class="text-text-muted">&mdash;</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">FocusOut Method</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.AutoBlurNote, o => o.Label("Auto Blur Note"))
+                .FusionTextBox(b => b
+                    .Placeholder("Click here to trigger FocusOut")
+                    .Value("FocusOut proof")
+                    .Reactive(plan, evt => evt.Focus, (args, p) =>
+                    {
+                        p.Component<FusionTextBox>(m => m.AutoBlurNote).FocusOut();
+                        p.Element("focusout-method-state").SetText("focusout called");
+                    })
+                    .Reactive(plan, evt => evt.Blur, (args, p) =>
+                    {
+                        p.Element("autoblur-state").SetText("blurred");
+                    })); }
+        </native-grid>
+        <native-vstack gap="Xs" class="font-mono text-sm mt-3">
+            <p>FocusOut method: <span id="focusout-method-state" class="text-text-muted">&mdash;</span></p>
+            <p>Auto blur state: <span id="autoblur-state" class="text-text-muted">&mdash;</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Component Condition</native-heading>
+        @(Html.NativeButton("check-name-btn", "Check Resident Name")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var name = p.Component<FusionTextBox>(m => m.ResidentName);
+                p.When(name.Value()).NotEmpty()
+                    .Then(t => t.Element("name-warning").SetText("resident name set"))
+                    .Else(e => e.Element("name-warning").SetText("resident name required"));
+            }))
+        <p class="font-mono text-sm mt-2">Warning: <span id="name-warning" class="text-text-muted">&mdash;</span></p>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
