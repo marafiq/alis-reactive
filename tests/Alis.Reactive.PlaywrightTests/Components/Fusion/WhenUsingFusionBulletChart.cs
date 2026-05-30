@@ -76,6 +76,8 @@ public class WhenUsingFusionBulletChart : PlaywrightTestBase
         await Expect(Page.Locator("#tooltip-state")).ToHaveTextAsync("rendered", new() { Timeout = 5000 });
         await Expect(Page.Locator("#tooltip-value")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
         await Expect(Page.Locator("#tooltip-target")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#tooltip-name")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#tooltip-template")).ToHaveTextAsync("none", new() { Timeout = 5000 });
         await Expect(Page.Locator("#tooltip-text")).ToHaveTextAsync("Bullet tooltip rewritten", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();

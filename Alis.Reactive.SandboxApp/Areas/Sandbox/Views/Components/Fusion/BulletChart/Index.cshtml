@@ -31,6 +31,8 @@
         p.Element("tooltip-state").SetText("pending");
         p.Element("tooltip-value").SetText("pending");
         p.Element("tooltip-target").SetText("pending");
+        p.Element("tooltip-name").SetText("pending");
+        p.Element("tooltip-template").SetText("pending");
         p.Element("tooltip-text").SetText("pending");
         p.Element("mouse-click-state").SetText("pending");
         p.Element("mouse-click-target").SetText("pending");
@@ -77,8 +79,12 @@
             p.Element("tooltip-state").SetText("rendered");
             p.Element("tooltip-value").SetText(args, x => x.Value);
             p.Element("tooltip-target").SetText(args, x => x.Target[0]);
+            p.Element("tooltip-name").SetText(args, x => x.Name);
+            p.When(args, x => x.Template).NotEmpty()
+                .Then(t => t.Element("tooltip-template").SetText(args, x => x.Template))
+                .Else(e => e.Element("tooltip-template").SetText("none"));
             args.SetText(p, "Bullet tooltip rewritten");
-            p.Element("tooltip-text").SetText("Bullet tooltip rewritten");
+            p.Element("tooltip-text").SetText(args, x => x.Text);
         })
         .Reactive(evt => evt.BulletChartMouseClick, (args, p) =>
         {
@@ -95,6 +101,8 @@
             <p>Tooltip state: <span id="tooltip-state" class="text-text-muted">pending</span></p>
             <p>Tooltip value: <span id="tooltip-value" class="text-text-muted">pending</span></p>
             <p>Tooltip target: <span id="tooltip-target" class="text-text-muted">pending</span></p>
+            <p>Tooltip name: <span id="tooltip-name" class="text-text-muted">pending</span></p>
+            <p>Tooltip template: <span id="tooltip-template" class="text-text-muted">pending</span></p>
             <p>Tooltip text: <span id="tooltip-text" class="text-text-muted">pending</span></p>
             <p>Mouse click state: <span id="mouse-click-state" class="text-text-muted">pending</span></p>
             <p>Mouse click target: <span id="mouse-click-target" class="text-text-muted">pending</span></p>
