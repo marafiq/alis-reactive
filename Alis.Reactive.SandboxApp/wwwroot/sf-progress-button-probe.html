@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF ProgressButton API Probe</title>
+    <link rel="stylesheet" href="/vendor/syncfusion/material.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>SF ProgressButton API Probe</h1>
+    <p>This page is temporary. Use it to discover the exact JS object API before onboarding typed C# members.</p>
+    <div id="host">
+        <button id="progress-button-probe" type="button">Initial Save</button>
+        <button id="outside-button" type="button">Outside focus target</button>
+        <p>Active element: <span id="active-element"></span></p>
+    </div>
+
+    <h2>Candidate Matrix</h2>
+    <p>Every row must be proven here before it becomes typed Fusion API.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Kind</th>
+                <th>Builder</th>
+                <th>Args</th>
+                <th>Return/Payload</th>
+                <th>Proof</th>
+                <th>Proposed C#</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody id="proposal-body"></tbody>
+    </table>
+
+    <button id="dump">Dump Keys</button>
+    <button id="clear">Clear Trace</button>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const proposalRows = [];
+        const target = document.getElementById("progress-button-probe");
+
+        function safeJson(key, value) {
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (typeof value === "function") return "[Function]";
+            return value;
+        }
+
+        function clean(value, seen, depth) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).slice(0, 80).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") {
+                        names.add(name);
+                    }
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return {
+                    ownKeys: [],
+                    functions: [],
+                    properties: {}
+                };
+            }
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item, new WeakSet(), 0)
+                };
+            });
+            return {
+                ownKeys: own,
+                functions: functionNames(args),
+                properties
+            };
+        }
+
+        function record(label, value) {
+            trace.push({
+                at: new Date().toISOString(),
+                label,
+                value: clean(value, new WeakSet(), 0)
+            });
+            renderTrace();
+        }
+
+        function renderTrace() {
+            document.getElementById("trace").textContent =
+                JSON.stringify(trace, safeJson, 2);
+        }
+
+        function renderProposal() {
+            const body = document.getElementById("proposal-body");
+            body.innerHTML = "";
+            proposalRows.forEach(row => {
+                const tr = document.createElement("tr");
+                [
+                    row.candidate,
+                    row.kind,
+                    row.builder,
+                    row.args,
+                    row.returnOrPayload,
+                    row.proof,
+                    row.csharp,
+                    row.outcome
+                ].forEach(value => {
+                    const td = document.createElement("td");
+                    td.textContent = value || "";
+                    tr.appendChild(td);
+                });
+                body.appendChild(tr);
+            });
+        }
+
+        function proposal(row) {
+            proposalRows.push(row);
+            renderProposal();
+            return row;
+        }
+
+        const probe = {
+            target,
+            trace,
+            proposalRows,
+            proposal,
+            record,
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke()),
+            event: (label, args) => record(label, describePayload(args))
+        };
+
+        window.__sfProbe = probe;
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function progressElement() {
+            return target.querySelector(".e-progress");
+        }
+
+        function spinnerPane() {
+            return target.querySelector(".e-spinner-pane");
+        }
+
+        function snapshot(label) {
+            const progress = progressElement();
+            const spinner = spinnerPane();
+            record(label, {
+                content: ej2.content,
+                disabled: ej2.disabled,
+                cssClass: ej2.cssClass,
+                enableProgress: ej2.enableProgress,
+                duration: ej2.duration,
+                percent: ej2.percent,
+                progressTime: ej2.progressTime,
+                text: target.textContent.trim(),
+                html: target.innerHTML,
+                disabledAttribute: target.hasAttribute("disabled"),
+                className: target.className,
+                progressExists: !!progress,
+                progressWidth: progress?.style.width || null,
+                spinnerClass: spinner?.className || null,
+                active: target.classList.contains("e-progress-active"),
+                ariaValueNow: target.getAttribute("aria-valuenow"),
+                focused: document.activeElement === target
+            });
+        }
+
+        const ej2 = new ej.splitbuttons.ProgressButton({
+            content: "Initial Save",
+            cssClass: "care-progress",
+            duration: 300,
+            enableProgress: false,
+            animationSettings: { effect: "None" },
+            begin: args => probe.event("begin", args),
+            progress: args => probe.event("progress", args),
+            end: args => probe.event("end", args),
+            fail: args => probe.event("fail", args),
+            created: args => probe.event("created", args)
+        });
+        ej2.appendTo(target);
+        probe.ej2 = ej2;
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("own keys", Object.keys(ej2).sort());
+            const proto = Object.getPrototypeOf(ej2);
+            record("prototype methods", Object.getOwnPropertyNames(proto).sort());
+            record("host instance", {
+                hasEj2Instances: Array.isArray(target.ej2_instances),
+                firstInstanceIsProgressButton: target.ej2_instances && target.ej2_instances[0] === ej2
+            });
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            renderTrace();
+        });
+
+        record("ready", {
+            component: "progress-button",
+            namespace: "ej.splitbuttons",
+            className: "ProgressButton",
+            id: "progress-button-probe"
+        });
+        snapshot("initial");
+
+        async function runValueTrace() {
+            record("host instance", {
+                hasEj2Instances: Array.isArray(target.ej2_instances),
+                firstInstanceIsProgressButton: target.ej2_instances && target.ej2_instances[0] === ej2
+            });
+
+            ej2.content = "Queued Save";
+            ej2.disabled = true;
+            ej2.cssClass = "e-success extra-class";
+            ej2.enableProgress = true;
+            snapshot("direct set before dataBind");
+
+            const dataBindResult = ej2.dataBind();
+            record("dataBind return", dataBindResult);
+            snapshot("direct set after dataBind");
+
+            ej2.disabled = false;
+            ej2.dataBind();
+            snapshot("enabled after dataBind");
+
+            const startAtResult = ej2.start(60);
+            record("start at 60 return", startAtResult);
+            await delay(80);
+            snapshot("after start at 60");
+
+            const completeAfterStartAtResult = ej2.progressComplete();
+            record("progressComplete after start at 60 return", completeAfterStartAtResult);
+            await delay(80);
+            snapshot("after progressComplete from start at 60");
+
+            const startResult = ej2.start();
+            record("start return", startResult);
+            await delay(80);
+            snapshot("after start");
+
+            const completeResult = ej2.progressComplete();
+            record("progressComplete return", completeResult);
+            await delay(80);
+            snapshot("after progressComplete");
+
+            const focusResult = ej2.focusIn();
+            record("focusIn return", focusResult);
+            snapshot("after focusIn");
+
+            document.getElementById("outside-button").focus();
+            snapshot("after outside focus");
+
+            record("summary", {
+                finalContent: ej2.content,
+                finalDisabled: ej2.disabled,
+                finalCssClass: ej2.cssClass,
+                finalEnableProgress: ej2.enableProgress,
+                beginEventCount: trace.filter(entry => entry.label === "begin").length,
+                progressEventCount: trace.filter(entry => entry.label === "progress").length,
+                endEventCount: trace.filter(entry => entry.label === "end").length,
+                hostInstanceStored: target.ej2_instances && target.ej2_instances[0] === ej2
+            });
+        }
+
+        proposal({
+            candidate: "ej2.content",
+            kind: "property read/write",
+            builder: "Content",
+            args: "string + dataBind()",
+            returnOrPayload: "string",
+            proof: "Trace compares content span text before and after dataBind.",
+            csharp: "Content(), SetContent(string)",
+            outcome: "onboard if browser trace updates visible text"
+        });
+        proposal({
+            candidate: "ej2.disabled",
+            kind: "property read/write",
+            builder: "Disabled",
+            args: "bool + dataBind()",
+            returnOrPayload: "bool",
+            proof: "Trace compares disabled attribute before and after dataBind.",
+            csharp: "Disabled(), SetDisabled(bool)",
+            outcome: "onboard if browser trace updates native disabled state"
+        });
+        proposal({
+            candidate: "ej2.cssClass",
+            kind: "property read/write",
+            builder: "CssClass",
+            args: "string + dataBind()",
+            returnOrPayload: "string",
+            proof: "Trace compares button classes before and after dataBind.",
+            csharp: "CssClass(), SetCssClass(string)",
+            outcome: "onboard if browser trace updates rendered classes"
+        });
+        proposal({
+            candidate: "ej2.enableProgress",
+            kind: "property read/write",
+            builder: "EnableProgress",
+            args: "bool + dataBind()",
+            returnOrPayload: "bool",
+            proof: "Trace verifies progress span creation after dataBind.",
+            csharp: "ProgressEnabled(), SetProgressEnabled(bool)",
+            outcome: "onboard if browser trace creates progress filler"
+        });
+        proposal({
+            candidate: "ej2.start()",
+            kind: "method",
+            builder: "-",
+            args: "none",
+            returnOrPayload: "undefined; begin/progress events and progress-active class",
+            proof: "Trace captures begin event and active state after start.",
+            csharp: "Start()",
+            outcome: "onboard if browser trace starts progress"
+        });
+        proposal({
+            candidate: "ej2.start(60)",
+            kind: "method",
+            builder: "-",
+            args: "number",
+            returnOrPayload: "undefined; progress event starts from provided percent",
+            proof: "Trace captures progress event with percent near 60.",
+            csharp: "StartAt(double percent)",
+            outcome: "onboard as mapped overload if browser trace starts at percent"
+        });
+        proposal({
+            candidate: "ej2.progressComplete()",
+            kind: "method",
+            builder: "-",
+            args: "none",
+            returnOrPayload: "undefined; end event percent 100",
+            proof: "Trace captures end event and inactive state after completion.",
+            csharp: "ProgressComplete()",
+            outcome: "onboard if browser trace completes progress"
+        });
+        proposal({
+            candidate: "ej2.focusIn()",
+            kind: "method",
+            builder: "-",
+            args: "none",
+            returnOrPayload: "undefined",
+            proof: "Trace verifies document.activeElement is the button.",
+            csharp: "FocusIn()",
+            outcome: "onboard if browser trace focuses host"
+        });
+        proposal({
+            candidate: "begin/progress/end",
+            kind: "events",
+            builder: "Begin/Progress/End",
+            args: "ProgressEventArgs",
+            returnOrPayload: "percent, currentDuration, step",
+            proof: "Trace captures event payloads during start/startAt/progressComplete.",
+            csharp: "Began/Progressed/Ended(FusionProgressButtonProgressArgs)",
+            outcome: "onboard only typed numeric payload fields"
+        });
+
+        if (new URLSearchParams(window.location.search).has("autorun")) {
+            window.addEventListener("load", () => {
+                setTimeout(() => runValueTrace(), 250);
+            });
+        }
+    </script>
+</body>
+</html>
