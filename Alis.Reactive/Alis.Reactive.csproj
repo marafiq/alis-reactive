@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net48;net10.0</TargetFrameworks>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -11,8 +11,20 @@
         <PackageTags>reactive;aspnetcore;mvc;fluent-api;plan-driven</PackageTags>
     </PropertyGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <!-- net48 ships the pure plan domain (DSL builders, plan model, JSON serialization,
+         validation metadata). The Razor/Html authoring layer is ASP.NET Core only, so it
+         is excluded here; net48 apps build and serialize plans and render with their own
+         view layer. -->
+    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+        <PackageReference Include="System.Text.Json" Version="9.*" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.*" />
+        <PackageReference Include="PolySharp" Version="1.*" PrivateAssets="all" />
+        <Compile Remove="Razor\**\*.cs" />
     </ItemGroup>
 
     <!-- Ship the runtime JS bundle (built by npm in the sibling

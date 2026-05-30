@@ -31,7 +31,7 @@ namespace Alis.Reactive.Builders.Requests
             EnsureEveryPlaceholderHasRouteParameter(suppliedNames);
         }
 
-        private void EnsureEveryRouteParameterHasPlaceholder(IReadOnlySet<string> routeParameterNames)
+        private void EnsureEveryRouteParameterHasPlaceholder(ISet<string> routeParameterNames)
         {
             foreach (var paramName in routeParameterNames)
             {
@@ -43,7 +43,7 @@ namespace Alis.Reactive.Builders.Requests
             }
         }
 
-        private void EnsureEveryPlaceholderHasRouteParameter(IReadOnlySet<string> routeParameterNames)
+        private void EnsureEveryPlaceholderHasRouteParameter(ISet<string> routeParameterNames)
         {
             foreach (var placeholder in _placeholders)
             {

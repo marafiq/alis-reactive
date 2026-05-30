@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -111,7 +110,7 @@ namespace Alis.Reactive.FluentValidator
 
     internal sealed class ReactiveValidatorClientMetadataProvider : IClientValidationMetadataProvider
     {
-        private readonly FrozenDictionary<Type, IReadOnlyList<ClientValidationField>> _clientRules;
+        private readonly IReadOnlyDictionary<Type, IReadOnlyList<ClientValidationField>> _clientRules;
 
         public ReactiveValidatorClientMetadataProvider(
             IServiceScopeFactory scopeFactory,
@@ -134,7 +133,7 @@ namespace Alis.Reactive.FluentValidator
             return _clientRules.TryGetValue(validationSourceType, out fields);
         }
 
-        private static FrozenDictionary<Type, IReadOnlyList<ClientValidationField>> BuildClientRulesBySource(
+        private static IReadOnlyDictionary<Type, IReadOnlyList<ClientValidationField>> BuildClientRulesBySource(
             IServiceScopeFactory scopeFactory,
             IEnumerable<Type> validationSourceTypes)
         {
@@ -146,7 +145,7 @@ namespace Alis.Reactive.FluentValidator
                 rulesBySource.Add(validationSourceType, metadata.GetClientRules());
             }
 
-            return rulesBySource.ToFrozenDictionary();
+            return rulesBySource;
         }
     }
 }

@@ -47,7 +47,8 @@ namespace Alis.Reactive.Validation
         {
             if (fieldsBySource == null) throw new ArgumentNullException(nameof(fieldsBySource));
 
-            _fieldsBySource = new Dictionary<Type, IReadOnlyList<ClientValidationField>>(fieldsBySource);
+            // net48 has no Dictionary(IEnumerable<KeyValuePair>) ctor; project explicitly.
+            _fieldsBySource = fieldsBySource.ToDictionary(pair => pair.Key, pair => pair.Value);
         }
 
         public bool TryGetClientRules(
