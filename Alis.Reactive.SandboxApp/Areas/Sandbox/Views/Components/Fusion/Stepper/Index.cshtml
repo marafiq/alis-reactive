@@ -1,0 +1,186 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperModel
+@using System.Collections.Generic
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Syncfusion.EJ2.Navigations
+@{
+    ViewData["Title"] = "FusionStepper";
+
+    const string StepperId = "resident-stepper";
+
+    var plan = Html.ReactivePlan<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperModel>();
+    var steps = new List<Step>
+    {
+        new() { Text = "1", Label = "Intake", Status = StepStatus.InProgress },
+        new() { Text = "2", Label = "Review", Status = StepStatus.NotStarted },
+        new() { Text = "3", Label = "Complete", Status = StepStatus.NotStarted }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var stepper = p.Component<FusionStepper>(StepperId);
+        p.Element("active-step-echo").SetText(stepper.ActiveStep());
+        p.Element("current-step").SetText(stepper.ActiveStep());
+        p.Element("step-changing-state").SetText("pending");
+        p.Element("step-changing-active").SetText("pending");
+        p.Element("step-changing-previous").SetText("pending");
+        p.Element("step-changing-interacted").SetText("pending");
+        p.Element("step-changing-guard").SetText("pending");
+        p.Element("step-click-state").SetText("pending");
+        p.Element("step-click-active").SetText("pending");
+        p.Element("step-click-previous").SetText("pending");
+        p.Element("step-changed-state").SetText("pending");
+        p.Element("step-changed-active").SetText("pending");
+        p.Element("step-changed-previous").SetText("pending");
+        p.Element("step-changed-interacted").SetText("pending");
+        p.Element("progress-state").SetText("pending");
+        p.Element("command-state").SetText("idle");
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionStepper</native-heading>
+    <native-text color="Secondary">
+        Progress navigation component. Exercises typed method calls and step payloads.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Stepper</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            The stepper starts on step one. Use the commands or click steps to move through the sequence.
+        </p>
+
+        @(Html.FusionStepper(plan, StepperId, b =>
+        {
+            b.Steps(steps);
+            b.ActiveStep(0);
+            b.CssClass("rounded-md");
+            b.Orientation(StepperOrientation.Horizontal);
+            b.StepType(StepType.Default);
+            b.LabelPosition(StepLabelPosition.Bottom);
+        })
+        .Reactive(evt => evt.StepChanging, (args, p) =>
+        {
+            p.Element("step-changing-state").SetText("observed");
+            p.Element("step-changing-active").SetText(args, x => x.ActiveStep);
+            p.Element("step-changing-previous").SetText(args, x => x.PreviousStep);
+            p.Element("step-changing-interacted").SetText(args, x => x.IsInteracted);
+
+            p.When(args, x => x.ActiveStep).Eq(2)
+                .Then(t =>
+                {
+                    t.When(args, x => x.IsInteracted).Truthy()
+                        .Then(allowed => allowed.Element("step-changing-guard").SetText("allowed"))
+                        .Else(blocked =>
+                        {
+                            blocked.Element("step-changing-guard").SetText("blocked");
+                            args.PreventDefault(blocked);
+                        });
+                })
+                .Else(e => e.Element("step-changing-guard").SetText("allowed"));
+        })
+        .Reactive(evt => evt.StepClick, (args, p) =>
+        {
+            p.Element("active-step-echo").SetText(p.Component<FusionStepper>(StepperId).ActiveStep());
+            p.Element("step-click-state").SetText("clicked");
+            p.Element("step-click-active").SetText(args, x => x.ActiveStep);
+            p.Element("step-click-previous").SetText(args, x => x.PreviousStep);
+        })
+        .Reactive(evt => evt.StepChanged, (args, p) =>
+        {
+            var stepper = p.Component<FusionStepper>(StepperId);
+            p.Element("active-step-echo").SetText(stepper.ActiveStep());
+            p.Element("current-step").SetText(args, x => x.ActiveStep);
+            p.Element("step-changed-state").SetText("changed");
+            p.Element("step-changed-active").SetText(args, x => x.ActiveStep);
+            p.Element("step-changed-previous").SetText(args, x => x.PreviousStep);
+            p.Element("step-changed-interacted").SetText(args, x => x.IsInteracted);
+        }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Commands</native-heading>
+        <native-hstack gap="Sm" class="flex-wrap">
+            @(Html.NativeButton("set-review-step-btn", "Set Review")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionStepper>(StepperId).SetActiveStep(1);
+                    p.Element("command-state").SetText("set review");
+                }))
+            @(Html.NativeButton("set-complete-step-btn", "Set Complete")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionStepper>(StepperId).SetActiveStep(2);
+                    p.Element("command-state").SetText("set complete");
+                }))
+            @(Html.NativeButton("set-intake-step-btn", "Set Intake")
+                .CssClass("rounded-md bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionStepper>(StepperId).SetActiveStep(0);
+                    p.Element("command-state").SetText("set intake");
+                }))
+            @(Html.NativeButton("next-step-btn", "Next")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionStepper>(StepperId).NextStep();
+                    p.Element("command-state").SetText("next");
+                }))
+            @(Html.NativeButton("previous-step-btn", "Previous")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionStepper>(StepperId).PreviousStep();
+                    p.Element("command-state").SetText("previous");
+                }))
+            @(Html.NativeButton("reset-step-btn", "Reset")
+                .CssClass("rounded-md bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionStepper>(StepperId).Reset();
+                    p.Element("command-state").SetText("reset");
+                }))
+            @(Html.NativeButton("refresh-step-btn", "Refresh")
+                .CssClass("rounded-md bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionStepper>(StepperId).RefreshProgressbar();
+                    p.Element("progress-state").SetText("refreshed");
+                    p.Element("command-state").SetText("refresh");
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Active step echo: <span id="active-step-echo" class="text-text-muted">pending</span></p>
+            <p>Current step: <span id="current-step" class="text-text-muted">pending</span></p>
+            <p>Step changing state: <span id="step-changing-state" class="text-text-muted">pending</span></p>
+            <p>Step changing active: <span id="step-changing-active" class="text-text-muted">pending</span></p>
+            <p>Step changing previous: <span id="step-changing-previous" class="text-text-muted">pending</span></p>
+            <p>Step changing interacted: <span id="step-changing-interacted" class="text-text-muted">pending</span></p>
+            <p>Step changing guard: <span id="step-changing-guard" class="text-text-muted">pending</span></p>
+            <p>Step click state: <span id="step-click-state" class="text-text-muted">pending</span></p>
+            <p>Step click active: <span id="step-click-active" class="text-text-muted">pending</span></p>
+            <p>Step click previous: <span id="step-click-previous" class="text-text-muted">pending</span></p>
+            <p>Step changed state: <span id="step-changed-state" class="text-text-muted">pending</span></p>
+            <p>Step changed active: <span id="step-changed-active" class="text-text-muted">pending</span></p>
+            <p>Step changed previous: <span id="step-changed-previous" class="text-text-muted">pending</span></p>
+            <p>Step changed interacted: <span id="step-changed-interacted" class="text-text-muted">pending</span></p>
+            <p>Progress state: <span id="progress-state" class="text-text-muted">pending</span></p>
+            <p>Command state: <span id="command-state" class="text-text-muted">pending</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
