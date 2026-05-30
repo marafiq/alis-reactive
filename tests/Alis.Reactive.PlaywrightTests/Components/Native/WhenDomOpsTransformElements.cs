@@ -67,4 +67,14 @@ public class WhenDomOpsTransformElements : PlaywrightTestBase
         await Expect(Page.Locator("#dom-risk-count")).ToHaveTextAsync("3", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task counts_high_risk_children_by_calling_getAttribute_per_element()
+    {
+        // Per-element METHOD call: each child is a live DOM element; the plan calls
+        // x.GetAttribute("data-risk") on each and counts those == "high" (2 of 3).
+        await NavigateAndBoot();
+        await Expect(Page.Locator("#dom-high-risk-count")).ToHaveTextAsync("2", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
 }

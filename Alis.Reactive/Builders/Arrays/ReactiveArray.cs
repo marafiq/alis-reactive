@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Arrays
@@ -97,6 +98,14 @@ namespace Alis.Reactive.Builders.Arrays
                 ValueExpression.ArrayFind(_source, Predicate(predicate), Projection(selector), _elementShape, fieldShape));
         }
 
+        /// <summary>
+        /// Exposes the composed array as a typed source so the transformed array can bind to a
+        /// component data source wherever a <see cref="TypedSource{T}"/> is accepted (e.g. a
+        /// <c>SetDataSource(TypedSource&lt;T[]&gt;)</c> overload) — without an HTTP round-trip. The
+        /// underlying value is the same array-op expression the runtime already evaluates.
+        /// </summary>
+        public TypedSource<TElement[]> AsSource() => new ReactiveArraySource<TElement>(_source);
+
         private static ConditionGraph Predicate(Expression<Func<TElement, bool>> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -108,5 +117,18 @@ namespace Alis.Reactive.Builders.Arrays
             if (selector == null) throw new ArgumentNullException(nameof(selector));
             return ElementExpressionCompiler.CompileProjection(selector);
         }
+    }
+
+    /// <summary>An array-op result exposed as a typed source for component data-source binding.</summary>
+    internal sealed class ReactiveArraySource<TElement> : TypedSource<TElement[]>
+    {
+        private readonly ValueExpression _value;
+
+        internal ReactiveArraySource(ValueExpression value)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        internal override ValueExpression ToValueExpression() => _value;
     }
 }
