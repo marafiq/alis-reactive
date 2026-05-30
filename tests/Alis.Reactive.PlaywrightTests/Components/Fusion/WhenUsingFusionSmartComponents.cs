@@ -100,7 +100,10 @@ public class WhenUsingFusionSmartComponents : PlaywrightTestBase
     public async Task component_index_links_to_smart_components_sandbox()
     {
         await NavigateTo("/Sandbox/Components");
-        await Expect(Page.Locator("a[href='/Sandbox/Components/SmartComponents/Index']"))
+        // The index surfaces several discovery cards (SmartComponents, SmartPasteButton,
+        // SmartTextArea) that all link to the one shared smart-components sandbox page;
+        // any visible link satisfies the behavior.
+        await Expect(Page.Locator("a[href='/Sandbox/Components/SmartComponents/Index']").First)
             .ToBeVisibleAsync(new() { Timeout = 10000 });
 
         AssertNoConsoleErrors();
