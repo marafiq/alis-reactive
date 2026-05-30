@@ -361,7 +361,8 @@ export type Source =
   | ComponentSource
   | PayloadSource
   | UrlSource
-  | PluginSource;
+  | PluginSource
+  | DomSource;
 
 export type RuntimeObjectSource =
   | ComponentSource
@@ -385,6 +386,11 @@ export interface UrlSource {
   kind: "url";
 }
 
+export interface DomSource {
+  kind: "dom";
+  element: string;
+}
+
 export interface PluginSource {
   kind: "plugin";
   name: string;
@@ -397,7 +403,8 @@ export type PayloadScope =
   | "error"
   | "request"
   | "dispatch"
-  | "local";
+  | "local"
+  | "element";
 
 export interface PayloadSource {
   kind: "payload";
@@ -700,14 +707,18 @@ export type ValueExpression =
   | LiteralExpression
   | ReadExpression
   | ObjectExpression
-  | ArrayExpression;
+  | ArrayExpression
+  | ArrayOperationExpression;
 
 export type ReadExpression =
   | ObjectPropertyReadExpression
   | ObjectMethodReadExpression
   | UrlParameterReadExpression
   | PayloadPathReadExpression
-  | WholePayloadReadExpression;
+  | WholePayloadReadExpression
+  | WholeElementReadExpression
+  | DomPropertyReadExpression
+  | ElementMethodReadExpression;
 
 export interface LiteralExpression {
   kind: "literal";
@@ -778,6 +789,33 @@ export interface WholePayloadReadExpression {
   access: PropertyValueReadAccess;
 }
 
+export interface WholeElementReadExpression {
+  kind: "read";
+  from: PayloadSource;
+  member: "elementValue";
+  path: EmptyPath;
+  shape: Shape;
+  access: PropertyValueReadAccess;
+}
+
+export interface DomPropertyReadExpression {
+  kind: "read";
+  from: DomSource;
+  member: string;
+  path: StructuredPath;
+  shape: Shape;
+  access: PropertyValueReadAccess;
+}
+
+export interface ElementMethodReadExpression {
+  kind: "read";
+  from: PayloadSource;
+  member: string;
+  path: StructuredPath;
+  shape: Shape;
+  access: MethodValueReadAccess;
+}
+
 export type ValueReadAccess =
   | PropertyValueReadAccess
   | MethodValueReadAccess;
@@ -800,6 +838,27 @@ export interface ObjectExpression {
 export interface ArrayExpression {
   kind: "array";
   items: ValueExpression[];
+  shape: Shape;
+}
+
+export type ArrayOp =
+  | "count"
+  | "filter"
+  | "map"
+  | "sum"
+  | "any"
+  | "all"
+  | "find"
+  | "orderBy"
+  | "orderByDescending";
+
+export interface ArrayOperationExpression {
+  kind: "array-op";
+  op: ArrayOp;
+  source: ValueExpression;
+  predicate?: ValidationCondition;
+  projection?: ValueExpression;
+  itemShape: Shape;
   shape: Shape;
 }
 

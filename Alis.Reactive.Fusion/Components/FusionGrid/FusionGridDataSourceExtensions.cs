@@ -52,6 +52,30 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
+        /// Replaces the grid data source with a typed array source — including a client-side
+        /// <see cref="Alis.Reactive.Builders.Arrays.ReactiveArray{T}"/> transform exposed via
+        /// <c>AsSource()</c>. Routes any array value (component member, plugin, event payload,
+        /// or a filtered/sorted array) into the grid's data source with no HTTP round-trip.
+        /// </summary>
+        public static ComponentRef<FusionGrid, TModel> SetDataSource<TModel, TElement>(
+            this ComponentRef<FusionGrid, TModel> self,
+            TypedSource<TElement[]> source)
+            where TModel : class
+            => self.EmitSet(DataSourceProperty, source.ToValueExpression());
+
+        /// <summary>
+        /// Reads the grid's current rows as a typed array source — the read counterpart of the
+        /// typed-array <see cref="SetDataSource{TModel, TElement}(ComponentRef{FusionGrid, TModel}, TypedSource{TElement[]})"/>
+        /// overload. Feed it to <c>p.From(...)</c> to filter/sort/aggregate the rows already on
+        /// screen, then rebind, without re-fetching from the server.
+        /// </summary>
+        public static TypedComponentSource<TRow[]> Data<TModel, TRow>(
+            this ComponentRef<FusionGrid, TModel> self)
+            where TModel : class
+            where TRow : class
+            => self.Read(ComponentProperty<TRow[]>.Named("dataSource"));
+
+        /// <summary>
         /// Triggers a grid refresh through Syncfusion's public refresh method.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> Refresh<TModel>(

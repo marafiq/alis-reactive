@@ -23,4 +23,10 @@ export interface ExecContext {
    * Resolved by PayloadSource with scope "local". Not currently used.
    */
   readonly local?: Record<string, unknown>;
+  /**
+   * Element scope stack for array operations — the innermost (top) entry is the
+   * current element under iteration. Grown by ExecutionContext.withElement(item).
+   * Resolved by PayloadSource with scope "element" (reads top of stack).
+   */
+  readonly element?: readonly unknown[];
 }

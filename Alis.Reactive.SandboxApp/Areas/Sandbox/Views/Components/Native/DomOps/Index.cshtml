@@ -1,0 +1,70 @@
+@model DomOpsModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "DomOps";
+
+    var plan = Html.ReactivePlan<DomOpsModel>();
+
+    // The array DSL over native DOM: a DOM element resolved by getElementById is a JS object;
+    // classList (DOMTokenList) and children (HTMLCollection) are array-likes the runtime
+    // normalizes, so filter/count/any apply. No plugin, no hand-written JS.
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Element("dom-total-classes").SetText(p.FromDom("dom-card", "classList").Count());
+        p.Element("dom-risk-count").SetText(
+            p.FromDom("dom-card", "classList").Where(x => x.StartsWith("risk-")).Count());
+        p.Element("dom-child-count").SetText(p.FromDom("dom-list", "children").Count());
+
+        p.When(p.FromDom("dom-card", "classList").Any(x => x == "care-memory")).Truthy()
+         .Then(then => then.Element("dom-memory-yes").Show())
+         .Else(els => els.Element("dom-memory-no").Show());
+
+        // Per-element METHOD call: each list child is a live DOM element; call its getAttribute
+        // method per element and count those flagged high-risk. RuntimePath.call at the element scope.
+        p.Element("dom-high-risk-count").SetText(
+            p.FromDom<DomChild>("risk-list", "children").Count(x => x.GetAttribute("data-risk") == "high"));
+    }));
+
+    // Mutate the DOM, then re-run a DOM array op on the updated element — same tick.
+    Html.NativeButton("dom-add-risk-btn", "Add Risk Flag")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Element("dom-card").AddClass("risk-extra");
+            p.Element("dom-risk-count").SetText(
+                p.FromDom("dom-card", "classList").Where(x => x.StartsWith("risk-")).Count());
+        });
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">DomOps</native-heading>
+    <native-text color="Secondary">
+        The array DSL over native DOM. <code>p.FromDom("dom-card", "classList").Where(x =&gt; x.StartsWith("risk-")).Count()</code>
+        reads a DOM element by id, normalizes its DOMTokenList, and counts — deterministically, in the plan.
+    </native-text>
+
+    <native-card><native-card-body>
+        <div id="dom-card" class="risk-fall risk-oxygen care-memory"></div>
+        <ul id="dom-list" hidden><li>Physio</li><li>Dining</li><li>Social</li></ul>
+        <ul id="risk-list" hidden>
+            <li data-risk="high">Mrs. A</li>
+            <li data-risk="low">Mr. B</li>
+            <li data-risk="high">Ms. C</li>
+        </ul>
+
+        <native-vstack gap="Sm" class="font-mono text-sm">
+            <p>Total classes: <span id="dom-total-classes">&mdash;</span></p>
+            <p>Risk flags (class starts with "risk-"): <span id="dom-risk-count">&mdash;</span></p>
+            <p>List children: <span id="dom-child-count">&mdash;</span></p>
+            <p>High-risk children (per-element <code>getAttribute</code>): <span id="dom-high-risk-count">&mdash;</span></p>
+            <p id="dom-memory-yes" hidden class="text-amber-600">Memory-care class present</p>
+            <p id="dom-memory-no" hidden class="text-green-600">No memory-care class</p>
+        </native-vstack>
+
+        @(Html.NativeButton("dom-add-risk-btn", "Add Risk Flag")
+            .CssClass("mt-3 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
