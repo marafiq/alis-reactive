@@ -61,12 +61,20 @@ namespace Alis.Reactive.Builders.Arrays
                 return ConditionGraph.Not(CompileCondition(Unwrap(unary.Operand), element));
 
             if (body is MethodCallExpression call && call.Object != null && TryStringOperator(call, out var textOp))
+            {
+                var argument = Unwrap(call.Arguments[0]);
+                if (ReferencesParameter(argument, element))
+                    throw new InvalidOperationException(
+                        "String operation arguments (Contains/StartsWith/EndsWith) must be constants or captured " +
+                        "values, not element-scope reads — the runtime text operand requires a literal. Got: " + argument);
+
                 return ConditionGraph.Compare(
                     textOp,
                     ComparisonOperands.Binary(
                         CompileValue(Unwrap(call.Object), element),
-                        CompileValue(Unwrap(call.Arguments[0]), element),
+                        CompileValue(argument, element),
                         Shape.String));
+            }
 
             if (body.Type == typeof(bool))
                 return ConditionGraph.Compare(
@@ -167,7 +175,7 @@ namespace Alis.Reactive.Builders.Arrays
 
         private static bool TryStringOperator(MethodCallExpression call, out CompareOperator op)
         {
-            if (call.Object != null && call.Object.Type == typeof(string) && call.Arguments.Count == 1)
+            if (call.Object?.Type == typeof(string) && call.Arguments.Count == 1)
             {
                 switch (call.Method.Name)
                 {

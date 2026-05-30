@@ -21,8 +21,15 @@ function domRead(elementId: string, member: string): ValueExpression {
   } as ValueExpression;
 }
 
-function count(source: ValueExpression, predicate?: ValidationCondition): ValueExpression {
-  return { kind: "array-op", op: "count", source, predicate, itemShape: noneShape, shape: numberShape } as ValueExpression;
+function count(source: ValueExpression): ValueExpression {
+  return { kind: "array-op", op: "count", source, itemShape: noneShape, shape: numberShape } as ValueExpression;
+}
+
+function filterByPrefix(source: ValueExpression, prefix: string): ValueExpression {
+  return {
+    kind: "array-op", op: "filter", source, predicate: selfStartsWith(prefix),
+    itemShape: noneShape, shape: { kind: "array", item: stringShape },
+  } as ValueExpression;
 }
 
 function selfStartsWith(prefix: string): ValidationCondition {
@@ -42,9 +49,9 @@ describe("DOM element source — array ops over live DOM collections", () => {
     expect(evaluateValue(count(domRead("card", "classList")), plan())).toBe(3);
   });
 
-  it("filters classList tokens by prefix and counts (operate on DOM element members)", () => {
+  it("filters classList tokens by prefix and counts (filter -> count over DOM element members)", () => {
     document.body.innerHTML = `<div id="card" class="risk-fall risk-oxygen care-memory"></div>`;
-    expect(evaluateValue(count(domRead("card", "classList"), selfStartsWith("risk-")), plan())).toBe(2);
+    expect(evaluateValue(count(filterByPrefix(domRead("card", "classList"), "risk-")), plan())).toBe(2);
   });
 
   it("counts child elements (children HTMLCollection)", () => {

@@ -59,9 +59,41 @@ describe("array-op ops over an object array (element-member props)", () => {
     expect(evaluateValue(node, plan())).toBe(370);
   });
 
-  it("count with predicate counts matching elements", () => {
-    const node = arrayOp({ op: "count", predicate: compare("status", "eq", "active", stringShape), shape: numberShape });
+  it("counts a filtered array (filter -> count — the shape Count(predicate) emits)", () => {
+    const filtered = arrayOp({ op: "filter", predicate: compare("status", "eq", "active", stringShape), shape: { kind: "array", item: rawShape } });
+    const node: ValueExpression = { kind: "array-op", op: "count", source: filtered, itemShape: rawShape, shape: numberShape };
     expect(evaluateValue(node, plan())).toBe(2);
+  });
+
+  it("any without a predicate is a non-empty check (true here)", () => {
+    expect(evaluateValue(arrayOp({ op: "any", shape: { kind: "boolean" } }), plan())).toBe(true);
+  });
+
+  it("find returns the whole matching element when no projection is given", () => {
+    const node = arrayOp({ op: "find", predicate: compare("status", "eq", "active", stringShape), shape: rawShape });
+    expect(evaluateValue(node, plan())).toEqual({ name: "Ada", status: "active", age: 71, balance: 120 });
+  });
+
+  it("orderBy places elements with a missing (NaN) key last, deterministically", () => {
+    const withMissing = [{ name: "A", age: 30 }, { name: "B" }, { name: "C", age: 10 }];
+    const node: ValueExpression = {
+      kind: "array-op", op: "orderBy",
+      source: { kind: "literal", value: withMissing, shape: rawShape } as ValueExpression,
+      projection: memberRead("age", numberShape), itemShape: rawShape, shape: { kind: "array", item: rawShape },
+    };
+    const ordered = evaluateValue(node, plan()) as Array<{ name: string }>;
+    expect(ordered.map(r => r.name)).toEqual(["C", "A", "B"]); // 10, 30, missing-last
+  });
+
+  it("orderBy is stable for equal keys (preserves input order)", () => {
+    const ties = [{ name: "A", age: 50 }, { name: "B", age: 50 }, { name: "C", age: 50 }];
+    const node: ValueExpression = {
+      kind: "array-op", op: "orderBy",
+      source: { kind: "literal", value: ties, shape: rawShape } as ValueExpression,
+      projection: memberRead("age", numberShape), itemShape: rawShape, shape: { kind: "array", item: rawShape },
+    };
+    const ordered = evaluateValue(node, plan()) as Array<{ name: string }>;
+    expect(ordered.map(r => r.name)).toEqual(["A", "B", "C"]);
   });
 
   it("any returns true when an element matches", () => {
@@ -120,4 +152,22 @@ describe("array-op ops over an object array (element-member props)", () => {
     // Ada(120) + Cy(200) = 320
     expect(evaluateValue(node, plan())).toBe(320);
   });
+});
+
+describe("array-op ops over an empty source", () => {
+  const empty: ValueExpression = { kind: "literal", value: [], shape: rawShape } as ValueExpression;
+  const op = (node: Partial<ValueExpression> & { op: string }): ValueExpression =>
+    ({ kind: "array-op", source: empty, itemShape: rawShape, ...node } as ValueExpression);
+  const pred = compare("status", "eq", "x", stringShape);
+
+  it("count is 0", () => expect(evaluateValue(op({ op: "count", shape: numberShape }), plan())).toBe(0));
+  it("filter is []", () => expect(evaluateValue(op({ op: "filter", predicate: pred, shape: { kind: "array", item: rawShape } }), plan())).toEqual([]));
+  it("map is []", () => expect(evaluateValue(op({ op: "map", projection: memberRead("name", stringShape), shape: { kind: "array", item: stringShape } }), plan())).toEqual([]));
+  it("sum is 0", () => expect(evaluateValue(op({ op: "sum", projection: memberRead("balance", numberShape), shape: numberShape }), plan())).toBe(0));
+  it("any(predicate) is false", () => expect(evaluateValue(op({ op: "any", predicate: pred, shape: { kind: "boolean" } }), plan())).toBe(false));
+  it("any() is false", () => expect(evaluateValue(op({ op: "any", shape: { kind: "boolean" } }), plan())).toBe(false));
+  // Vacuous truth: All over an empty set is true (matches Array.every). Documented so authors aren't surprised.
+  it("all(predicate) is vacuously true", () => expect(evaluateValue(op({ op: "all", predicate: pred, shape: { kind: "boolean" } }), plan())).toBe(true));
+  it("find is null", () => expect(evaluateValue(op({ op: "find", predicate: pred, shape: rawShape }), plan())).toBeNull());
+  it("orderBy is []", () => expect(evaluateValue(op({ op: "orderBy", projection: memberRead("age", numberShape), shape: { kind: "array", item: rawShape } }), plan())).toEqual([]));
 });

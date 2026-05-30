@@ -114,9 +114,9 @@ class ValueEvaluation {
     const items = normalizeToArray(this.evaluate(expression.source), expression.op);
     switch (expression.op) {
       case "count":
-        return expression.predicate === undefined
-          ? items.length
-          : items.filter(item => this.elementMatches(expression.predicate, item)).length;
+        // Count is unconditional length; Count(predicate) compiles to filter -> count (ReactiveArray.cs),
+        // so the count node never carries a predicate.
+        return items.length;
       case "filter":
         return this.shapedArray(items.filter(item => this.elementMatches(expression.predicate, item)), expression);
       case "map":
@@ -142,9 +142,10 @@ class ValueEvaluation {
   }
 
   private findElement(expression: ArrayOperationExpression, items: unknown[]): unknown {
-    const found = expression.predicate === undefined
-      ? items[0]
-      : items.find(item => this.elementMatches(expression.predicate, item));
+    if (expression.predicate === undefined) {
+      throw new Error("[alis] array-op 'find' requires a predicate");
+    }
+    const found = items.find(item => this.elementMatches(expression.predicate, item));
     if (found === undefined) return null;
     return expression.projection === undefined ? found : this.project(expression.projection, found);
   }
@@ -210,7 +211,15 @@ function toNumber(value: unknown): number {
 
 /** Deterministic ordering of sort keys: numeric when both numbers, else lexicographic. */
 function compareKeys(a: unknown, b: unknown): number {
-  if (typeof a === "number" && typeof b === "number") return a - b;
+  if (typeof a === "number" && typeof b === "number") {
+    const aFinite = Number.isFinite(a);
+    const bFinite = Number.isFinite(b);
+    if (aFinite && bFinite) return a - b;
+    // Non-finite keys (NaN/Infinity from a missing or non-numeric field) sort last,
+    // deterministically — never feed NaN to Array.sort (engine-defined behavior).
+    if (aFinite === bFinite) return 0;
+    return aFinite ? -1 : 1;
+  }
   const left = String(a);
   const right = String(b);
   return left < right ? -1 : left > right ? 1 : 0;
