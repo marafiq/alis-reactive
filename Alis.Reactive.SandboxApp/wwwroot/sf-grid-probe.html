@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF Grid API Probe</title>
+    <link rel="stylesheet" href="/vendor/syncfusion/material.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>SF Grid API Probe</h1>
+    <p>This page is temporary. Use it to discover the exact JS object API before onboarding typed C# members.</p>
+    <div id="host">
+        <div id="grid-probe"></div>
+    </div>
+
+    <h2>Candidate Matrix</h2>
+    <p>Every row must be proven here before it becomes typed Fusion API.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Kind</th>
+                <th>Builder</th>
+                <th>Args</th>
+                <th>Return/Payload</th>
+                <th>Proof</th>
+                <th>Proposed C#</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody id="proposal-body"></tbody>
+    </table>
+
+    <button id="dump">Dump Keys</button>
+    <button id="method-page">goToPage(2)</button>
+    <button id="method-sort">sortColumn("residentName")</button>
+    <button id="method-search">search("Memory")</button>
+    <button id="method-filter">filterByColumn("wing")</button>
+    <button id="method-clear-filter">clearFiltering()</button>
+    <button id="method-group">groupColumn("careLevel")</button>
+    <button id="method-clear-group">clearGrouping()</button>
+    <button id="method-select">selectRow(1)</button>
+    <button id="method-clear-selection">clearSelection()</button>
+    <button id="clear">Clear Trace</button>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const proposalRows = [];
+        const target = document.getElementById("grid-probe");
+
+        function safeJson(key, value) {
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (typeof value === "function") return "[Function]";
+            return value;
+        }
+
+        function clean(value, seen, depth) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).slice(0, 80).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") {
+                        names.add(name);
+                    }
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item, new WeakSet(), 0)
+                };
+            });
+            return {
+                ownKeys: own,
+                functions: functionNames(args),
+                properties
+            };
+        }
+
+        function record(label, value) {
+            trace.push({
+                at: new Date().toISOString(),
+                label,
+                value: clean(value, new WeakSet(), 0)
+            });
+            renderTrace();
+        }
+
+        function renderTrace() {
+            document.getElementById("trace").textContent =
+                JSON.stringify(trace, safeJson, 2);
+        }
+
+        function renderProposal() {
+            const body = document.getElementById("proposal-body");
+            body.innerHTML = "";
+            proposalRows.forEach(row => {
+                const tr = document.createElement("tr");
+                [
+                    row.candidate,
+                    row.kind,
+                    row.builder,
+                    row.args,
+                    row.returnOrPayload,
+                    row.proof,
+                    row.csharp,
+                    row.outcome
+                ].forEach(value => {
+                    const td = document.createElement("td");
+                    td.textContent = value || "";
+                    tr.appendChild(td);
+                });
+                body.appendChild(tr);
+            });
+        }
+
+        function proposal(row) {
+            proposalRows.push(row);
+            renderProposal();
+            return row;
+        }
+
+        const probe = {
+            target,
+            trace,
+            proposalRows,
+            proposal,
+            record,
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke()),
+            event: (label, args) => record(label, describePayload(args)),
+            eventCall: (label, args, method, call) => {
+                const before = describePayload(args);
+                const result = call();
+                record(label, {
+                    method,
+                    before,
+                    result: clean(result, new WeakSet(), 0),
+                    after: describePayload(args)
+                });
+            }
+        };
+
+        window.__sfProbe = probe;
+
+        const residents = [
+            { residentId: 101, residentName: "Amina Patel", age: 82, careLevel: "Assisted Living", wing: "North", suite: "N-104", risk: "Moderate" },
+            { residentId: 102, residentName: "Grace Bennett", age: 91, careLevel: "Memory Care", wing: "East", suite: "E-211", risk: "High" },
+            { residentId: 103, residentName: "Henry Liu", age: 77, careLevel: "Independent", wing: "West", suite: "W-018", risk: "Low" },
+            { residentId: 104, residentName: "Irene Morgan", age: 88, careLevel: "Skilled Nursing", wing: "South", suite: "S-312", risk: "High" },
+            { residentId: 105, residentName: "Jonah Reed", age: 74, careLevel: "Assisted Living", wing: "North", suite: "N-112", risk: "Low" },
+            { residentId: 106, residentName: "Katherine Ortiz", age: 86, careLevel: "Memory Care", wing: "East", suite: "E-118", risk: "Moderate" },
+            { residentId: 107, residentName: "Leo Simmons", age: 93, careLevel: "Skilled Nursing", wing: "South", suite: "S-109", risk: "High" },
+            { residentId: 108, residentName: "Mara Thompson", age: 79, careLevel: "Independent", wing: "West", suite: "W-205", risk: "Low" },
+            { residentId: 109, residentName: "Noah Walsh", age: 84, careLevel: "Assisted Living", wing: "North", suite: "N-206", risk: "Moderate" },
+            { residentId: 110, residentName: "Priya Shah", age: 90, careLevel: "Memory Care", wing: "East", suite: "E-301", risk: "High" },
+            { residentId: 111, residentName: "Ruth Carter", age: 81, careLevel: "Independent", wing: "West", suite: "W-117", risk: "Low" },
+            { residentId: 112, residentName: "Samuel Diaz", age: 95, careLevel: "Skilled Nursing", wing: "South", suite: "S-201", risk: "High" }
+        ];
+
+        function sortRows(rows, sorted) {
+            if (!Array.isArray(sorted) || sorted.length === 0) return rows;
+            return rows.slice().sort((left, right) => {
+                for (const sort of sorted) {
+                    const field = sort.name;
+                    const direction = sort.direction === "descending" ? -1 : 1;
+                    const a = left[field];
+                    const b = right[field];
+                    if (a < b) return -1 * direction;
+                    if (a > b) return 1 * direction;
+                }
+                return 0;
+            });
+        }
+
+        function filterRows(rows, where) {
+            if (!Array.isArray(where) || where.length === 0) return rows;
+            return rows.filter(row => where.every(predicate => {
+                const field = predicate.field;
+                const value = predicate.value;
+                if (!field || value === undefined || value === null || value === "") return true;
+                const actual = row[field];
+                if (predicate.operator === "contains") {
+                    return String(actual).toLowerCase().includes(String(value).toLowerCase());
+                }
+                if (predicate.operator === "equal") {
+                    return String(actual).toLowerCase() === String(value).toLowerCase();
+                }
+                return String(actual).toLowerCase().includes(String(value).toLowerCase());
+            }));
+        }
+
+        function searchRows(rows, search) {
+            if (!Array.isArray(search) || search.length === 0) return rows;
+            const active = search.find(item => item && item.key);
+            if (!active) return rows;
+            const key = String(active.key).toLowerCase();
+            const fields = Array.isArray(active.fields) && active.fields.length
+                ? active.fields
+                : ["residentName", "careLevel", "wing", "suite", "risk"];
+            return rows.filter(row => fields.some(field =>
+                String(row[field] ?? "").toLowerCase().includes(key)));
+        }
+
+        function pageRows(rows, skip, take) {
+            const start = Number.isFinite(skip) ? skip : 0;
+            const length = Number.isFinite(take) && take > 0 ? take : 5;
+            return rows.slice(start, start + length);
+        }
+
+        function applyState(state) {
+            let rows = residents.slice();
+            rows = filterRows(rows, state.where);
+            rows = searchRows(rows, state.search);
+            rows = sortRows(rows, state.sorted);
+            const result = pageRows(rows, state.skip, state.take);
+            return { result, count: rows.length };
+        }
+
+        const initialState = { skip: 0, take: 5 };
+        const ej2 = new ej.grids.Grid({
+            dataSource: applyState(initialState),
+            allowPaging: true,
+            allowSorting: true,
+            allowMultiSorting: true,
+            allowGrouping: true,
+            allowSelection: true,
+            allowFiltering: true,
+            toolbar: ["Search"],
+            pageSettings: { pageSize: 5 },
+            searchSettings: { fields: ["residentName", "careLevel", "wing", "suite", "risk"] },
+            filterSettings: { type: "FilterBar" },
+            groupSettings: { showDropArea: true },
+            columns: [
+                { field: "residentId", headerText: "ID", isPrimaryKey: true, width: 80, textAlign: "Right" },
+                { field: "residentName", headerText: "Resident", width: 180 },
+                { field: "age", headerText: "Age", width: 90, textAlign: "Right" },
+                { field: "careLevel", headerText: "Care Level", width: 160 },
+                { field: "wing", headerText: "Wing", width: 110 },
+                { field: "suite", headerText: "Suite", width: 110 },
+                { field: "risk", headerText: "Risk", width: 120 }
+            ],
+            dataStateChange: args => {
+                probe.event("dataStateChange", args);
+                ej2.dataSource = applyState(args);
+            },
+            actionBegin: args => probe.event("actionBegin", args),
+            actionComplete: args => probe.event("actionComplete", args),
+            recordClick: args => probe.event("recordClick", args),
+            rowSelected: args => probe.event("rowSelected", args)
+        });
+        ej2.appendTo(target);
+        probe.ej2 = ej2;
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("own keys", Object.keys(ej2).sort());
+            const proto = Object.getPrototypeOf(ej2);
+            record("prototype methods", Object.getOwnPropertyNames(proto).sort());
+        });
+
+        document.getElementById("method-page").addEventListener("click", () => {
+            record("call goToPage before", { currentPage: ej2.pageSettings.currentPage });
+            ej2.goToPage(2);
+            record("call goToPage after", { currentPage: ej2.pageSettings.currentPage });
+        });
+
+        document.getElementById("method-sort").addEventListener("click", () => {
+            ej2.sortColumn("residentName", "Ascending", false);
+            record("call sortColumn after", ej2.sortSettings.columns);
+        });
+
+        document.getElementById("method-search").addEventListener("click", () => {
+            ej2.search("Memory");
+            record("call search after", ej2.searchSettings);
+        });
+
+        document.getElementById("method-filter").addEventListener("click", () => {
+            ej2.filterByColumn("wing", "equal", "North");
+            record("call filterByColumn after", ej2.filterSettings.columns);
+        });
+
+        document.getElementById("method-clear-filter").addEventListener("click", () => {
+            ej2.clearFiltering();
+            record("call clearFiltering after", ej2.filterSettings.columns);
+        });
+
+        document.getElementById("method-group").addEventListener("click", () => {
+            ej2.groupColumn("careLevel");
+            record("call groupColumn after", ej2.groupSettings.columns);
+        });
+
+        document.getElementById("method-clear-group").addEventListener("click", () => {
+            ej2.clearGrouping();
+            record("call clearGrouping after", ej2.groupSettings.columns);
+        });
+
+        document.getElementById("method-select").addEventListener("click", () => {
+            ej2.selectRow(1);
+            record("call selectRow after", {
+                indexes: ej2.getSelectedRowIndexes(),
+                records: ej2.getSelectedRecords()
+            });
+        });
+
+        document.getElementById("method-clear-selection").addEventListener("click", () => {
+            ej2.clearSelection();
+            record("call clearSelection after", {
+                indexes: ej2.getSelectedRowIndexes(),
+                records: ej2.getSelectedRecords()
+            });
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            renderTrace();
+        });
+
+        record("ready", {
+            component: "grid",
+            namespace: "ej.grids",
+            className: "Grid",
+            id: "grid-probe"
+        });
+        [
+            {
+                candidate: "dataStateChange.group",
+                kind: "event payload read",
+                builder: "event wiring only",
+                args: "grouping/search/filter/sort/page gestures",
+                returnOrPayload: "skip, take, where[], search[], sorted[], group[], action",
+                proof: "dataStateChange trace rows",
+                csharp: "FusionGridDataStateChangeArgs.Group/Search/Where",
+                outcome: "onboarded; covered by directory Playwright"
+            },
+            {
+                candidate: "goToPage(pageNo)",
+                kind: "method",
+                builder: "not static initial render",
+                args: "int pageNo",
+                returnOrPayload: "void; updates pageSettings.currentPage and dataStateChange",
+                proof: "method button + pager DOM",
+                csharp: "GoToPage(int pageNumber)",
+                outcome: "onboarded; covered by directory Playwright"
+            },
+            {
+                candidate: "sortColumn(columnName, direction, isMultiSort)",
+                kind: "method",
+                builder: "not static initial render",
+                args: "typed row field expression, enum direction, bool multiSort",
+                returnOrPayload: "void; updates sorted state",
+                proof: "method button + dataStateChange.sorted",
+                csharp: "SortBy<TRow, TField>(Expression<Func<TRow, TField>> field, FusionGridSortDirection direction, bool keepExistingSorts = false)",
+                outcome: "onboarded; covered by directory Playwright"
+            },
+            {
+                candidate: "search(searchString)",
+                kind: "method",
+                builder: "not static initial render",
+                args: "string searchString",
+                returnOrPayload: "void; updates searchSettings.key and dataStateChange.search[]",
+                proof: "method button + visible Memory Care rows",
+                csharp: "Search(string searchText)",
+                outcome: "onboarded; covered by directory Playwright"
+            },
+            {
+                candidate: "filterByColumn(columnName, operator, value) / clearFiltering()",
+                kind: "method",
+                builder: "not static initial render",
+                args: "typed row field expression, enum text operator, string value",
+                returnOrPayload: "void; updates filterSettings.columns and dataStateChange.where[]",
+                proof: "method button + visible North Wing rows",
+                csharp: "FilterTextBy<TRow, TField>(Expression<Func<TRow, TField>> field, FusionGridTextFilterOperator op, string value), ClearFiltering()",
+                outcome: "onboarded; covered by directory Playwright"
+            },
+            {
+                candidate: "groupColumn(columnName) / clearGrouping()",
+                kind: "method",
+                builder: "not static initial render",
+                args: "typed row field expression",
+                returnOrPayload: "void; updates groupSettings.columns and dataStateChange.group[]",
+                proof: "method button + grouped DOM",
+                csharp: "GroupBy<TRow, TField>(Expression<Func<TRow, TField>> field), ClearGrouping()",
+                outcome: "onboarded; covered by directory Playwright"
+            },
+            {
+                candidate: "selectRow(index) / clearSelection()",
+                kind: "method",
+                builder: "not static initial render",
+                args: "int rowIndex",
+                returnOrPayload: "void; selected index/records update; rowSelected payload",
+                proof: "method button + rowSelected trace",
+                csharp: "SelectRow(int rowIndex), ClearSelection()",
+                outcome: "onboarded; covered by directory Playwright"
+            },
+            {
+                candidate: "startEdit/endEdit/closeEdit/addRecord/deleteRecord/updateRow",
+                kind: "method",
+                builder: "editSettings owns static editing mode",
+                args: "typed row values or response-body row selector",
+                returnOrPayload: "void; edit DOM/events/dataSource mutate",
+                proof: "editing sandbox inline grid",
+                csharp: "StartEdit(), EndEdit(), CloseEdit(), AddRecord<TRow>(), DeleteSelectedRecord(), UpdateRow<TRow>()",
+                outcome: "onboarded; covered by editing Playwright"
+            },
+            {
+                candidate: "editCell/saveCell/updateCell/getBatchChanges",
+                kind: "method and method-return source",
+                builder: "editSettings mode Batch owns static editing mode",
+                args: "typed row field expressions and typed cell values",
+                returnOrPayload: "void or FusionGridBatchChanges<TRow>",
+                proof: "editing sandbox batch grid",
+                csharp: "EditCell<TRow, TField>(), SaveCell(), UpdateCell(...), BatchChanges<TRow>()",
+                outcome: "onboarded; covered by editing Playwright"
+            },
+            {
+                candidate: "beginEdit/actionBegin/actionComplete/cellSave/cellSaved/beforeBatchSave",
+                kind: "event payload read and payload mutation",
+                builder: "event wiring only",
+                args: "typed row/event payloads",
+                returnOrPayload: "typed args; cancel mutation on editable events",
+                proof: "editing sandbox inline, batch, and dialog grids",
+                csharp: "BeginEdit<TRow>(), ActionBegin<TRow>(), ActionComplete<TRow>(), CellSave<TRow, TValue>(), CellSaved<TRow, TValue>(), BeforeBatchSave<TRow>()",
+                outcome: "onboarded; covered by editing Playwright"
+            }
+        ].forEach(proposal);
+    </script>
+</body>
+</html>

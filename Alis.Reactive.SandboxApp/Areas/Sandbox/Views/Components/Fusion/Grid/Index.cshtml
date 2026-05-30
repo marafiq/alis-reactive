@@ -25,7 +25,13 @@
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionGrid &mdash; Server-Side Sort, Paging &amp; Filter</native-heading>
+    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
+        <native-heading level="H1">FusionGrid &mdash; Server-Side Sort, Paging &amp; Filter</native-heading>
+        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Directory"
+           class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+            Resident directory
+        </a>
+    </native-hstack>
     <native-text color="Secondary">
         200 residents in server memory. Grid shows 10 per page with server-side sort + paging.
         External Min Age filter sends the full state (skip, take, sorted, minAge) on every action.
@@ -65,7 +71,7 @@
             </native-grid>
         </div>
 
-        @(Html.FusionGrid(plan, "residents-grid", b => b
+        @(Html.FusionGrid<GridModel, ResidentGridItem>(plan, "residents-grid", b => b
             .AllowSorting(true)
             .AllowPaging(true)
             .PageSettings(new GridPageSettings { PageSize = 10 })

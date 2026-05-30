@@ -1,0 +1,425 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@using Alis.Reactive
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "FusionGrid Editing Workflows";
+
+    const string InlineGridId = "resident-inline-edit-grid";
+    const string BatchGridId = "resident-batch-edit-grid";
+    const string DialogGridId = "resident-dialog-edit-grid";
+    const string ValidationFormId = "grid-edit-validation-form";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md bg-secondary px-3 py-2 text-sm font-medium text-white hover:bg-secondary/90";
+    const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
+
+    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+    var riskLevels = (List<string>)ViewBag.RiskLevels;
+
+    List<GridColumn> EditColumns() => new List<GridColumn>
+    {
+        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
+        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "170" },
+        new GridColumn { Field = "age", HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
+        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
+        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "110" },
+        new GridColumn { Field = "suite", HeaderText = "Suite", Width = "110" },
+        new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "120" },
+        new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
+        new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "150" }
+    };
+
+    void LoadEditingGrids(PipelineBuilder<ResidentGridEditingModel> p)
+    {
+        p.Get("/Sandbox/Components/Grid/EditingRows")
+            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+            {
+                s.Component<FusionGrid>(InlineGridId).SetDataSource(json);
+                s.Component<FusionGrid>(BatchGridId).SetDataSource(json);
+                s.Component<FusionGrid>(DialogGridId).SetDataSource(json);
+                s.Element("editing-load-status").SetText("loaded editing rows");
+            }));
+    }
+
+    Html.On(plan, t => t.DomReady(p => LoadEditingGrids(p)));
+}
+
+<script id="resident-dialog-edit-template" type="text/x-template">
+    <div id="resident-dialog-template-marker" class="grid grid-cols-1 gap-3 p-2 text-sm">
+        <label class="grid gap-1">
+            <span class="font-medium text-text">Resident</span>
+            <input name="residentName" value="${residentName}" class="e-field e-input" />
+        </label>
+        <label class="grid gap-1">
+            <span class="font-medium text-text">Risk</span>
+            <input name="riskLevel" value="${riskLevel}" class="e-field e-input" />
+        </label>
+        <label class="grid gap-1">
+            <span class="font-medium text-text">Open tasks</span>
+            <input name="openTasks" value="${openTasks}" class="e-field e-input" />
+        </label>
+    </div>
+</script>
+
+<native-vstack gap="Lg">
+    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
+        <div>
+            <native-heading level="H1">FusionGrid Editing Workflows</native-heading>
+            <native-text color="Secondary">
+                Inline, batch, dialog-template, method-return, event payload, and validation-backed editing paths.
+            </native-text>
+        </div>
+        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Directory"
+           class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+            Directory grid
+        </a>
+    </native-hstack>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Editing Data</native-heading>
+        <p class="mt-2 font-mono text-sm">Load status: <span id="editing-load-status" class="text-text-muted">waiting</span></p>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Inline Editing</native-heading>
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("inline-select-first", "Select Row 1")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(InlineGridId).SelectRow(0);
+                    p.Element("inline-command-status").SetText("inline row selected");
+                }))
+            @(Html.NativeButton("inline-start-edit", "Start Edit")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(InlineGridId).StartEdit();
+                    p.Element("inline-command-status").SetText("startEdit called");
+                }))
+            @(Html.NativeButton("inline-end-edit", "End Edit")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(InlineGridId).EndEdit();
+                    p.Element("inline-command-status").SetText("endEdit called");
+                }))
+            @(Html.NativeButton("inline-close-edit", "Close Edit")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(InlineGridId).CloseEdit();
+                    p.Element("inline-command-status").SetText("closeEdit called");
+                }))
+            @(Html.NativeButton("inline-add-literal", "Add Literal Row")
+                .CssClass(ButtonAccent)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(InlineGridId).AddRecord(new ResidentDirectoryGridItem
+                    {
+                        ResidentId = 7100,
+                        ResidentName = "Zara Inline",
+                        Age = 81,
+                        CareLevel = "Memory Care",
+                        Wing = "North",
+                        Suite = "N-710",
+                        RiskLevel = "High",
+                        PrimaryNurse = "Nora Ellis",
+                        OpenTasks = 5,
+                        NextReviewDate = "2026-06-22"
+                    }, 0);
+                    p.Element("inline-command-status").SetText("literal addRecord called");
+                }))
+            @(Html.NativeButton("inline-add-server", "Add Server Row")
+                .CssClass(ButtonAccent)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/Components/Grid/CreateEditResident")
+                        .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(InlineGridId).AddRecord(json, x => x.Row, 0);
+                            s.Element("inline-command-status").SetText(json, x => x.Summary);
+                        }));
+                }))
+            @(Html.NativeButton("inline-update-row", "Update Row 1")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(InlineGridId).UpdateRow(0, new ResidentDirectoryGridItem
+                    {
+                        ResidentId = 6000,
+                        ResidentName = "Amina Updated",
+                        Age = 91,
+                        CareLevel = "Skilled Nursing",
+                        Wing = "West",
+                        Suite = "W-118",
+                        RiskLevel = "Moderate",
+                        PrimaryNurse = "Malik Stone",
+                        OpenTasks = 3,
+                        NextReviewDate = "2026-06-19"
+                    });
+                    p.Element("inline-command-status").SetText("updateRow called");
+                }))
+            @(Html.NativeButton("inline-delete-selected", "Delete Selected")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(InlineGridId).DeleteSelectedRecord();
+                    p.Element("inline-command-status").SetText("deleteRecord called");
+                }))
+        </native-hstack>
+
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, InlineGridId, b => b
+            .AllowSelection(true)
+            .Toolbar(new List<string> { "Add", "Edit", "Update", "Cancel", "Delete" })
+            .EditSettings(new GridEditSettings
+            {
+                AllowAdding = true,
+                AllowEditing = true,
+                AllowDeleting = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Normal,
+                ShowDeleteConfirmDialog = false
+            })
+            .Columns(EditColumns()))
+            .Reactive(evt => evt.BeginEdit<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("inline-begin-row").SetText(args, x => x.RowIndex);
+                p.Element("inline-begin-resident").SetText(args, x => x.RowData.ResidentName);
+            })
+            .Reactive(evt => evt.ActionBegin<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("inline-action-begin").SetText(args, x => x.RequestType);
+            })
+            .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("inline-action-complete").SetText(args, x => x.RequestType);
+                p.When(args, x => x.RequestType).Eq("save")
+                    .Then(t => t.Element("inline-complete-resident").SetText(args, x => x.Data.ResidentName));
+            }))
+
+        <native-grid cols="C4" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Status: <span id="inline-command-status" class="text-text-muted">waiting</span></p>
+            <p>Begin row: <span id="inline-begin-row" class="text-text-muted">waiting</span></p>
+            <p>Begin resident: <span id="inline-begin-resident" class="text-text-muted">waiting</span></p>
+            <p>Action begin: <span id="inline-action-begin" class="text-text-muted">waiting</span></p>
+            <p>Action complete: <span id="inline-action-complete" class="text-text-muted">waiting</span></p>
+            <p>Saved resident: <span id="inline-complete-resident" class="text-text-muted">waiting</span></p>
+        </native-grid>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Batch Editing</native-heading>
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("batch-edit-cell", "Edit Tasks Cell")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(BatchGridId)
+                        .EditCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks);
+                    p.Element("batch-command-status").SetText("editCell called");
+                }))
+            @(Html.NativeButton("batch-update-cell", "Set Tasks To 6")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(BatchGridId)
+                        .UpdateCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks, 6);
+                    p.Element("batch-command-status").SetText("updateCell called");
+                }))
+            @(Html.NativeButton("batch-save-cell", "Save Cell")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(BatchGridId).SaveCell();
+                    p.Element("batch-command-status").SetText("saveCell called");
+                }))
+            @(Html.NativeButton("batch-gather-changes", "Gather Changes")
+                .CssClass(ButtonAccent)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(BatchGridId);
+                    p.Post("/Sandbox/Components/Grid/BatchSummary")
+                        .Gather(g => g.Include(grid.BatchChanges<ResidentGridEditingModel, ResidentDirectoryGridItem>(), "batchChanges"))
+                        .Response(r => r.OnSuccess<ResidentGridBatchSummaryResponse>((json, s) =>
+                        {
+                            s.Element("batch-summary").SetText(json, x => x.Summary);
+                        }));
+                }))
+            @(Html.NativeButton("batch-end-edit", "Commit Batch")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(BatchGridId).EndEdit();
+                    p.Element("batch-command-status").SetText("endEdit called");
+                }))
+        </native-hstack>
+
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, BatchGridId, b => b
+            .AllowSelection(true)
+            .Toolbar(new List<string> { "Update", "Cancel" })
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Batch,
+                ShowConfirmDialog = false
+            })
+            .Columns(EditColumns()))
+            .Reactive(evt => evt.CellSave<ResidentDirectoryGridItem, int>(), (args, p) =>
+            {
+                p.Element("batch-cell-save-column").SetText(args, x => x.ColumnName);
+                p.Element("batch-cell-save-value").SetText(args, x => x.Value);
+            })
+            .Reactive(evt => evt.CellSaved<ResidentDirectoryGridItem, int>(), (args, p) =>
+            {
+                p.Element("batch-cell-saved-value").SetText(args, x => x.Value);
+            })
+            .Reactive(evt => evt.BeforeBatchSave<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("batch-before-save-resident").SetText(args, x => x.BatchChanges.ChangedRecords[0].ResidentName);
+                p.Element("batch-before-save-tasks").SetText(args, x => x.BatchChanges.ChangedRecords[0].OpenTasks);
+            })
+            .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("batch-action-complete").SetText(args, x => x.RequestType);
+            }))
+
+        <native-grid cols="C4" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Status: <span id="batch-command-status" class="text-text-muted">waiting</span></p>
+            <p>Cell column: <span id="batch-cell-save-column" class="text-text-muted">waiting</span></p>
+            <p>Cell value: <span id="batch-cell-save-value" class="text-text-muted">waiting</span></p>
+            <p>Cell saved: <span id="batch-cell-saved-value" class="text-text-muted">waiting</span></p>
+            <p>Batch resident: <span id="batch-before-save-resident" class="text-text-muted">waiting</span></p>
+            <p>Batch tasks: <span id="batch-before-save-tasks" class="text-text-muted">waiting</span></p>
+            <p>Batch action: <span id="batch-action-complete" class="text-text-muted">waiting</span></p>
+            <p>Batch summary: <span id="batch-summary" class="text-text-muted">not gathered</span></p>
+        </native-grid>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Dialog Template Editing</native-heading>
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("dialog-select-first", "Select Row 1")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(DialogGridId).SelectRow(0);
+                    p.Element("dialog-command-status").SetText("dialog row selected");
+                }))
+            @(Html.NativeButton("dialog-start-edit", "Open Dialog")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(DialogGridId).StartEdit();
+                    p.Element("dialog-command-status").SetText("dialog startEdit called");
+                }))
+            @(Html.NativeButton("dialog-end-edit", "Save Dialog")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(DialogGridId).EndEdit();
+                    p.Element("dialog-command-status").SetText("dialog endEdit called");
+                }))
+            @(Html.NativeButton("dialog-close-edit", "Close Dialog")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(DialogGridId).CloseEdit();
+                    p.Element("dialog-command-status").SetText("dialog closeEdit called");
+                }))
+        </native-hstack>
+
+        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, DialogGridId, b => b
+            .AllowSelection(true)
+            .Toolbar(new List<string> { "Edit", "Update", "Cancel" })
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                AllowEditOnDblClick = false,
+                Mode = EditMode.Dialog,
+                Template = "#resident-dialog-edit-template"
+            })
+            .Columns(EditColumns()))
+            .Reactive(evt => evt.BeginEdit<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("dialog-begin-resident").SetText(args, x => x.RowData.ResidentName);
+            })
+            .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("dialog-action-complete").SetText(args, x => x.RequestType);
+                p.When(args, x => x.RequestType).Eq("save")
+                    .Then(t => t.Element("dialog-saved-resident").SetText(args, x => x.Data.ResidentName));
+            }))
+
+        <native-grid cols="C4" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Status: <span id="dialog-command-status" class="text-text-muted">waiting</span></p>
+            <p>Begin resident: <span id="dialog-begin-resident" class="text-text-muted">waiting</span></p>
+            <p>Action complete: <span id="dialog-action-complete" class="text-text-muted">waiting</span></p>
+            <p>Saved resident: <span id="dialog-saved-resident" class="text-text-muted">waiting</span></p>
+        </native-grid>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Validation Backed Grid Update</native-heading>
+        <form id="@ValidationFormId" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident"))
+                .FusionTextBox(b => b
+                    .Placeholder("Resident name")
+                    .ShowClearButton(true)); }
+            @{ Html.InputField(plan, m => m.RiskLevel, o => o.Required().Label("Risk level"))
+                .FusionDropDownList(b => b
+                    .DataSource(riskLevels)
+                    .Placeholder("Select risk")); }
+            @{ Html.InputField(plan, m => m.OpenTasks, o => o.Required().Label("Open tasks"))
+                .FusionNumericTextBox(b => b
+                    .Format("n0")
+                    .Min(0)
+                    .Max(12)
+                    .Step(1)
+                    .Placeholder("0 to 7")); }
+        </form>
+
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("validation-save-grid-row", "Validate And Update Grid")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/Components/Grid/ValidateEditDraft", g =>
+                    {
+                        g.Include<FusionTextBox, ResidentGridEditingModel>(m => m.ResidentName);
+                        g.Include<FusionDropDownList, ResidentGridEditingModel>(m => m.RiskLevel);
+                        g.Include<FusionNumericTextBox, ResidentGridEditingModel>(m => m.OpenTasks);
+                    })
+                    .Validate<ResidentGridEditingValidator>(ValidationFormId)
+                    .Response(r => r
+                        .OnSuccess<ResidentGridEditResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(InlineGridId).UpdateRow(0, json, x => x.Row);
+                            s.Component<FusionGrid>(InlineGridId).Refresh();
+                            s.Element("validation-status").SetText(json, x => x.Summary);
+                            s.Element("validation-status").RemoveClass("text-red-600");
+                            s.Element("validation-status").AddClass("text-green-700");
+                        })
+                        .OnError(400, e =>
+                        {
+                            e.Element("validation-status").SetText("validation errors returned");
+                            e.Element("validation-status").RemoveClass("text-green-700");
+                            e.Element("validation-status").AddClass("text-red-600");
+                            e.ValidationErrors(ValidationFormId);
+                        }));
+                }))
+        </native-hstack>
+
+        <p class="mt-3 font-mono text-sm">Validation status: <span id="validation-status" class="text-text-muted">waiting</span></p>
+        <div data-reactive-validation-summary hidden
+             class="mt-3 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700"></div>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
