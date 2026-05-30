@@ -125,6 +125,10 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression ArrayCount(ValueExpression source, Shape itemShape) =>
             new ArrayOperationExpression("count", source, itemShape, Shape.Number);
 
+        /// <summary>Filters the elements of <paramref name="source"/> by a per-element sync predicate.</summary>
+        internal static ValueExpression ArrayFilter(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
+            new ArrayOperationExpression("filter", source, itemShape, Shape.ArrayOf(itemShape), predicate);
+
         private static (IReadOnlyDictionary<string, ValueExpression> Fields, Shape Shape) ObjectFields(
             IReadOnlyDictionary<string, ValueExpression> fields)
         {
@@ -490,21 +494,33 @@ namespace Alis.Reactive.PlanModel
     {
         /// <summary>Gets the kind. Always <c>"array-op"</c>.</summary>
         public string Kind => "array-op";
-        /// <summary>Gets the operation: <c>count</c> (and, as ops land, filter/map/sum/...).</summary>
+        /// <summary>Gets the operation: <c>count</c>, <c>filter</c> (and, as ops land, map/sum/...).</summary>
         public string Op { get; }
         /// <summary>Gets the value expression that produces the source array.</summary>
         public ValueExpression Source { get; }
+        /// <summary>Gets the per-element predicate for filtering ops, or null when the op takes no predicate.</summary>
+        /// <remarks>
+        /// Nullable by design: count/map carry no predicate while filter/any/all/find do. An
+        /// "always true" sentinel would conflate "no predicate" with "match all" and muddy count
+        /// semantics, so absence is modeled as null and omitted from the JSON. The predicate is the
+        /// SYNC condition subset (compare/all/any/not) — never a confirm — so per-element evaluation
+        /// stays on the immediate lane.
+        /// </remarks>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ConditionGraph? Predicate { get; }
         /// <summary>Gets the declared element shape of the source array.</summary>
         public Shape ItemShape { get; }
         /// <summary>Gets the declared output shape of the operation.</summary>
         public Shape Shape { get; }
 
-        internal ArrayOperationExpression(string op, ValueExpression source, Shape itemShape, Shape shape)
+        internal ArrayOperationExpression(
+            string op, ValueExpression source, Shape itemShape, Shape shape, ConditionGraph? predicate = null)
         {
             Op = op ?? throw new ArgumentNullException(nameof(op));
             Source = source ?? throw new ArgumentNullException(nameof(source));
             ItemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            Predicate = predicate;
         }
 
         internal override Shape OutputShape => Shape;

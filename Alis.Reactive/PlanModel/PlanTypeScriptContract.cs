@@ -641,12 +641,13 @@ namespace Alis.Reactive.PlanModel
                 .Requires("items", "ValueExpression[]")
                 .Requires("shape", "Shape"));
 
-            contract.Declare(LiteralUnion("ArrayOp", new[] { "count" }));
+            contract.Declare(LiteralUnion("ArrayOp", new[] { "count", "filter" }));
 
             contract.Declare(Interface("ArrayOperationExpression")
                 .Requires("kind", Literal("array-op"))
                 .Requires("op", "ArrayOp")
                 .Requires("source", "ValueExpression")
+                .Optional("predicate", "ValidationCondition")
                 .Requires("itemShape", "Shape")
                 .Requires("shape", "Shape"));
 
@@ -974,6 +975,12 @@ namespace Alis.Reactive.PlanModel
             return this;
         }
 
+        internal TypeScriptInterface Optional(string name, string type)
+        {
+            _properties.Add(TypeScriptProperty.Optional(name, type));
+            return this;
+        }
+
         internal override void Render(TypeScriptWriter writer)
         {
             writer.Line("export interface " + _name + " {");
@@ -989,8 +996,9 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly string _name;
         private readonly string _type;
+        private readonly bool _optional;
 
-        private TypeScriptProperty(string name, string type)
+        private TypeScriptProperty(string name, string type, bool optional)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Property name is required.", nameof(name));
@@ -999,14 +1007,18 @@ namespace Alis.Reactive.PlanModel
 
             _name = name;
             _type = type;
+            _optional = optional;
         }
 
         internal static TypeScriptProperty Required(string name, string type) =>
-            new TypeScriptProperty(name, type);
+            new TypeScriptProperty(name, type, false);
+
+        internal static TypeScriptProperty Optional(string name, string type) =>
+            new TypeScriptProperty(name, type, true);
 
         internal void Render(TypeScriptWriter writer)
         {
-            writer.Line(_name + ": " + _type + ";");
+            writer.Line(_name + (_optional ? "?" : string.Empty) + ": " + _type + ";");
         }
     }
 

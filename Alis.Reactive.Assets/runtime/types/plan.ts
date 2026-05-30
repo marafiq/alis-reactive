@@ -816,12 +816,14 @@ export interface ArrayExpression {
 }
 
 export type ArrayOp =
-  | "count";
+  | "count"
+  | "filter";
 
 export interface ArrayOperationExpression {
   kind: "array-op";
   op: ArrayOp;
   source: ValueExpression;
+  predicate?: ValidationCondition;
   itemShape: Shape;
   shape: Shape;
 }

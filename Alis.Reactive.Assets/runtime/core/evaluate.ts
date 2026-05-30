@@ -15,6 +15,7 @@ import { RuntimeValue, applyShapeWhenPresent } from "../domain/runtime-value";
 import { RuntimePath } from "../domain/runtime-path";
 import { ExecutionContext } from "../domain/execution-context";
 import { RuntimeObject } from "../domain/runtime-object";
+import { evaluateSyncCondition } from "../conditions/sync-condition";
 
 type ObjectReadExpression = ObjectPropertyReadExpression | ObjectMethodReadExpression;
 type PayloadReadExpression = PayloadPathReadExpression | WholePayloadReadExpression | WholeElementReadExpression;
@@ -25,12 +26,13 @@ export function evaluateValue(expression: ValueExpression, plan: PlanDocument, c
 
 class ValueEvaluation {
   private constructor(
+    private readonly document: PlanDocument,
     private readonly plan: RuntimePlan,
     private readonly context: ExecutionContext,
   ) {}
 
   static from(plan: PlanDocument, ctx?: ExecContext): ValueEvaluation {
-    return new ValueEvaluation(RuntimePlan.from(plan), ExecutionContext.from(ctx));
+    return new ValueEvaluation(plan, RuntimePlan.from(plan), ExecutionContext.from(ctx));
   }
 
   evaluate(expression: ValueExpression): unknown {
@@ -110,9 +112,21 @@ class ValueEvaluation {
     switch (expression.op) {
       case "count":
         return items.length;
+      case "filter": {
+        const matches = items.filter(item => this.elementMatches(expression.predicate, item));
+        return RuntimeValue.declared(matches, expression.shape).usingDeclaredShape();
+      }
       default:
         return assertNever(expression.op, "array-op kind");
     }
+  }
+
+  /** Evaluate a per-element predicate against the element scope (immediate lane, sync subset). */
+  private elementMatches(predicate: ArrayOperationExpression["predicate"], item: unknown): boolean {
+    if (predicate === undefined) {
+      throw new Error("[alis] array-op predicate is required for this operation");
+    }
+    return evaluateSyncCondition(predicate, this.document, this.context.withElement(item), evaluateValue);
   }
 }
 
