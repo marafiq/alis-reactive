@@ -55,13 +55,16 @@
         {
             p.Element("changing-current").SetText(args, x => x.CurrentIndex);
             p.Element("changing-next").SetText(args, x => x.NextIndex);
+            p.Element("changing-is-swiped").SetText(args, x => x.IsSwiped);
             p.Element("changing-direction").SetText(args, x => x.SlideDirection);
+            p.Element("changing-cancel").SetText(args, x => x.Cancel);
 
             p.When(args, x => x.NextIndex).Eq(0)
                 .Then(t =>
                 {
                     t.Element("cancel-state").SetText("cancelled");
                     args.PreventTransition(t);
+                    t.Element("changing-cancel").SetText(args, x => x.Cancel);
                 })
                 .Else(e => e.Element("cancel-state").SetText("allowed"));
         })
@@ -71,6 +74,7 @@
             p.Element("selected-index-echo").SetText(carousel.SelectedIndex());
             p.Element("changed-current").SetText(args, x => x.CurrentIndex);
             p.Element("changed-previous").SetText(args, x => x.PreviousIndex);
+            p.Element("changed-is-swiped").SetText(args, x => x.IsSwiped);
             p.Element("changed-direction").SetText(args, x => x.SlideDirection);
             p.Element("changed-state").SetText("changed");
         }))
@@ -101,10 +105,13 @@
             <p>Selected state: <span id="selected-state" class="text-text-muted">pending</span></p>
             <p>Changing current: <span id="changing-current" class="text-text-muted">pending</span></p>
             <p>Changing next: <span id="changing-next" class="text-text-muted">pending</span></p>
+            <p>Changing is swiped: <span id="changing-is-swiped" class="text-text-muted">pending</span></p>
             <p>Changing direction: <span id="changing-direction" class="text-text-muted">pending</span></p>
+            <p>Changing cancel: <span id="changing-cancel" class="text-text-muted">pending</span></p>
             <p>Cancel state: <span id="cancel-state" class="text-text-muted">pending</span></p>
             <p>Changed current: <span id="changed-current" class="text-text-muted">pending</span></p>
             <p>Changed previous: <span id="changed-previous" class="text-text-muted">pending</span></p>
+            <p>Changed is swiped: <span id="changed-is-swiped" class="text-text-muted">pending</span></p>
             <p>Changed direction: <span id="changed-direction" class="text-text-muted">pending</span></p>
             <p>Changed state: <span id="changed-state" class="text-text-muted">pending</span></p>
         </native-vstack>

@@ -57,15 +57,21 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
 
         await Page.Locator("#next-btn").ClickAsync();
         await Expect(Page.Locator("#selected-index-echo")).ToHaveTextAsync("2", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#changing-is-swiped")).ToHaveTextAsync("false", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#changing-cancel")).ToHaveTextAsync("false", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-current")).ToHaveTextAsync("2", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-previous")).ToHaveTextAsync("1", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#changed-is-swiped")).ToHaveTextAsync("false", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-direction")).ToHaveTextAsync("Next", new() { Timeout = 5000 });
         await Expect(Carousel.ActiveSlide).ToHaveTextAsync("Three", new() { Timeout = 5000 });
 
         await Page.Locator("#prev-btn").ClickAsync();
         await Expect(Page.Locator("#selected-index-echo")).ToHaveTextAsync("1", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#changing-is-swiped")).ToHaveTextAsync("false", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#changing-cancel")).ToHaveTextAsync("false", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-current")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-previous")).ToHaveTextAsync("2", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#changed-is-swiped")).ToHaveTextAsync("false", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-direction")).ToHaveTextAsync("Previous", new() { Timeout = 5000 });
         await Expect(Carousel.ActiveSlide).ToHaveTextAsync("Two", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -81,6 +87,8 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
         await Page.Locator("#prev-btn").ClickAsync();
 
         await Expect(Page.Locator("#cancel-state")).ToHaveTextAsync("cancelled", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#changing-is-swiped")).ToHaveTextAsync("false", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#changing-cancel")).ToHaveTextAsync("true", new() { Timeout = 5000 });
         await Expect(Page.Locator("#selected-index-echo")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-state")).ToHaveTextAsync("changed", new() { Timeout = 5000 });
         await Expect(Carousel.ActiveSlide).ToHaveTextAsync("Two", new() { Timeout = 5000 });
