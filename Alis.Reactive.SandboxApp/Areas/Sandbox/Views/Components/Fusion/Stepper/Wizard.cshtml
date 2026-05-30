@@ -1,0 +1,86 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperWizardShellModel
+@using System.Collections.Generic
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Syncfusion.EJ2.Navigations
+@{
+    ViewData["Title"] = "FusionStepper Lazy Wizard";
+
+    const string StepperId = "stepper-wizard";
+    const string StepContainerId = "stepper-wizard-step";
+    var wizardId = Model.WizardId ?? "";
+    var loadStepUrl = Url.Action("LoadWizardStep", "Stepper", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Stepper.LoadWizardStep.");
+
+    var plan = Html.ReactivePlan<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperWizardShellModel>();
+    var steps = new List<Step>
+    {
+        new() { Text = "1", Label = "Intake", Status = StepStatus.InProgress },
+        new() { Text = "2", Label = "Care", Status = StepStatus.NotStarted },
+        new() { Text = "3", Label = "Contacts", Status = StepStatus.NotStarted },
+        new() { Text = "4", Label = "Review", Status = StepStatus.NotStarted }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Post(loadStepUrl, g => g
+                .Static("wizardId", wizardId)
+                .Static("step", 1))
+            .Response(r => r.OnSuccess(s => s.Into(StepContainerId)));
+
+        p.Element("stepper-wizard-current").SetText(p.Component<FusionStepper>(StepperId).ActiveStep());
+        p.Element("stepper-wizard-status").SetText("loaded intake");
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
+        <native-vstack gap="Xs">
+            <native-heading level="H1">FusionStepper Lazy Wizard</native-heading>
+            <native-text color="Secondary">
+                Admission workflow with Syncfusion fields, per-step partial loading, framework validation, and server draft recovery.
+            </native-text>
+        </native-vstack>
+        <a asp-area="Sandbox" asp-controller="Stepper" asp-action="Index"
+           class="rounded-md bg-surface px-4 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors">
+            Component API
+        </a>
+    </native-hstack>
+
+    <native-card><native-card-body>
+        @(Html.FusionStepper(plan, StepperId, b =>
+        {
+            b.Steps(steps);
+            b.ActiveStep(0);
+            b.CssClass("rounded-md");
+            b.Linear(true);
+            b.ShowTooltip(true);
+            b.Orientation(StepperOrientation.Horizontal);
+            b.StepType(StepType.Default);
+            b.LabelPosition(StepLabelPosition.Bottom);
+        })
+        .Reactive(evt => evt.StepChanged, (args, p) =>
+        {
+            p.Element("stepper-wizard-current").SetText(args, x => x.ActiveStep);
+        }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-hstack justify="Between" align="Center" class="mb-4 flex-wrap gap-3">
+            <p class="font-mono text-sm">Active step: <span id="stepper-wizard-current" class="text-text-muted">pending</span></p>
+            <p class="font-mono text-sm">Status: <span id="stepper-wizard-status" class="text-text-muted">pending</span></p>
+        </native-hstack>
+
+        <div id="@StepContainerId">
+            <p class="text-sm text-text-muted p-4">Loading intake step...</p>
+        </div>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre id="stepper-wizard-plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

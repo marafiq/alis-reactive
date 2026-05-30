@@ -1,0 +1,106 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperWizardCareModel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
+@{
+    const string StepperId = "stepper-wizard";
+    const string ContainerId = "stepper-wizard-step";
+    const string FormId = "stepper-wizard-care-form";
+    var saveUrl = Url.Action("SaveCare", "Stepper", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Stepper.SaveCare.");
+    var loadStepUrl = Url.Action("LoadWizardStep", "Stepper", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Stepper.LoadWizardStep.");
+
+    var plan = Html.ReactivePlan<FusionStepperWizardCareModel>();
+    var careLevels = new[] { "Assisted Living", "Memory Care", "Skilled Nursing" };
+    var diagnoses = new[] { "Alzheimer's", "Parkinson's", "Stroke", "Heart Disease", "Diabetes", "Other" };
+}
+
+<native-card><native-card-body id="@FormId">
+    <native-heading level="H2">Step 2: Care Plan</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        Memory Care activates a conditional validation rule for the assessment summary.
+    </p>
+
+    @Html.HiddenFieldFor(plan, m => m.WizardId)
+
+    @if (!string.IsNullOrWhiteSpace(Model.ResidentName))
+    {
+        <p class="mb-4 text-sm text-text-secondary">Resident: <span class="font-semibold text-text">@Model.ResidentName</span></p>
+    }
+
+    <native-grid cols="C2" gap="Base" class="mb-4">
+        @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
+            .FusionDropDownList(b => b
+                .DataSource(careLevels)
+                .Placeholder("Select care level")
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    p.When(args, x => x.Value).Eq("Memory Care")
+                        .Then(t =>
+                        {
+                            t.Element("memory-assessment-panel").Show();
+                            t.Element("stepper-wizard-status").SetText("memory assessment required");
+                        })
+                        .Else(e =>
+                        {
+                            e.Element("memory-assessment-panel").Hide();
+                            e.Element("stepper-wizard-status").SetText("standard care path");
+                        });
+                })); }
+
+        @{ Html.InputField(plan, m => m.PrimaryDiagnosis, o => o.Required().Label("Primary Diagnosis"))
+            .FusionDropDownList(b => b.DataSource(diagnoses).Placeholder("Select diagnosis")); }
+    </native-grid>
+
+    <native-grid cols="C2" gap="Base" class="mb-4">
+        @{ Html.InputField(plan, m => m.FallRiskScore, o => o.Required().Label("Fall Risk Score"))
+            .FusionNumericTextBox(b => b.Min(0).Max(10).Step(1)); }
+    </native-grid>
+
+    <div id="memory-assessment-panel" @(Model.CareLevel == "Memory Care" ? "" : "hidden")>
+        @{ Html.InputField(plan, m => m.MemoryAssessment, o => o.Label("Memory Assessment"))
+            .FusionTextBox(b => b.Placeholder("Required for Memory Care").ShowClearButton(true)); }
+    </div>
+
+    <native-hstack gap="Sm" justify="Between" class="mt-6 flex-wrap">
+        @(Html.NativeButton("stepper-wizard-back-care", "Back: Intake")
+            .CssClass("rounded-md bg-surface px-5 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                p.Component<FusionStepper>(StepperId).SetActiveStep(0);
+                p.Element("stepper-wizard-status").SetText("returned to intake");
+                p.Post(loadStepUrl)
+                    .Gather(g => g
+                        .Include<NativeHiddenField, FusionStepperWizardCareModel>(m => m.WizardId)
+                        .Static("step", 1))
+                    .Response(r => r.OnSuccess(s => s.Into(ContainerId)));
+            }))
+
+        @(Html.NativeButton("stepper-wizard-next-care", "Next: Contacts")
+            .CssClass("rounded-md bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                p.Post(saveUrl, g => g.IncludeAll())
+                    .Validate<FusionStepperWizardCareValidator>(FormId)
+                    .Response(r => r
+                        .OnSuccess<FusionStepperWizardSaveResponse>((json, s) =>
+                        {
+                            s.Component<NativeHiddenField>(m => m.WizardId).SetValue(json, x => x.WizardId);
+                            s.Component<FusionStepper>(StepperId).SetActiveStep(2);
+                            s.Element("stepper-wizard-status").SetText(json, x => x.Message);
+                        })
+                        .OnError(400, e => e.ValidationErrors(FormId))
+                        .Chained(c => c
+                            .Post(loadStepUrl)
+                            .Gather(g => g
+                                .Include<NativeHiddenField, FusionStepperWizardCareModel>(m => m.WizardId)
+                                .Static("step", 3))
+                            .Response(r2 => r2.OnSuccess(s2 => s2.Into(ContainerId)))));
+            }))
+    </native-hstack>
+</native-card-body></native-card>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)

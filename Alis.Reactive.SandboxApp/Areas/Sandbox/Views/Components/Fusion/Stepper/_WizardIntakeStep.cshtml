@@ -1,0 +1,64 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperWizardIntakeModel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
+@{
+    const string StepperId = "stepper-wizard";
+    const string ContainerId = "stepper-wizard-step";
+    const string FormId = "stepper-wizard-intake-form";
+    var saveUrl = Url.Action("SaveIntake", "Stepper", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Stepper.SaveIntake.");
+    var loadStepUrl = Url.Action("LoadWizardStep", "Stepper", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Stepper.LoadWizardStep.");
+
+    var plan = Html.ReactivePlan<FusionStepperWizardIntakeModel>();
+    var admissionTypes = new[] { "Respite", "Assisted Living", "Memory Care Evaluation", "Skilled Nursing" };
+}
+
+<native-card><native-card-body id="@FormId">
+    <native-heading level="H2">Step 1: Intake</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        This partial is loaded after page boot. Leaving fields empty keeps the stepper on Intake and renders framework validation messages.
+    </p>
+
+    @Html.HiddenFieldFor(plan, m => m.WizardId)
+
+    <native-grid cols="C3" gap="Base" class="mb-4">
+        @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident Name"))
+            .FusionTextBox(b => b.Placeholder("Resident full name").ShowClearButton(true)); }
+
+        @{ Html.InputField(plan, m => m.Age, o => o.Required().Label("Age"))
+            .FusionNumericTextBox(b => b.Min(55).Max(120).Step(1)); }
+
+        @{ Html.InputField(plan, m => m.AdmissionType, o => o.Required().Label("Admission Type"))
+            .FusionDropDownList(b => b.DataSource(admissionTypes).Placeholder("Select admission type")); }
+    </native-grid>
+
+    <native-hstack gap="Sm" justify="End" class="mt-6 flex-wrap">
+        @(Html.NativeButton("stepper-wizard-next-intake", "Next: Care")
+            .CssClass("rounded-md bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                p.Post(saveUrl, g => g.IncludeAll())
+                    .Validate<FusionStepperWizardIntakeValidator>(FormId)
+                    .Response(r => r
+                        .OnSuccess<FusionStepperWizardSaveResponse>((json, s) =>
+                        {
+                            s.Component<NativeHiddenField>(m => m.WizardId).SetValue(json, x => x.WizardId);
+                            s.Component<FusionStepper>(StepperId).SetActiveStep(1);
+                            s.Element("stepper-wizard-status").SetText(json, x => x.Message);
+                        })
+                        .OnError(400, e => e.ValidationErrors(FormId))
+                        .Chained(c => c
+                            .Post(loadStepUrl)
+                            .Gather(g => g
+                                .Include<NativeHiddenField, FusionStepperWizardIntakeModel>(m => m.WizardId)
+                                .Static("step", 2))
+                            .Response(r2 => r2.OnSuccess(s2 => s2.Into(ContainerId)))));
+            }))
+    </native-hstack>
+</native-card-body></native-card>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)
