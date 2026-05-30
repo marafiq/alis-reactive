@@ -1,0 +1,94 @@
+@model ChipFilterModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@using Syncfusion.EJ2.Buttons
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "ChipFilter";
+
+    var plan = Html.ReactivePlan<ChipFilterModel>();
+
+    var careChips = new List<ChipCollection>
+    {
+        new() { Text = "Independent", Value = "independent" },
+        new() { Text = "Assisted", Value = "assisted" },
+        new() { Text = "Memory Care", Value = "memory" },
+        new() { Text = "Skilled Nursing", Value = "skilled" },
+    };
+
+    // The chip selection is broadcast as a custom event; p.From(payload, x => x.Selection.Data) yields
+    // a ReactiveArray of the selected chip OBJECTS, operated on by member (Count, Any-by-Value guard).
+    // The selected texts then gather into a POST that filters the grid server-side.
+    Html.On(plan, t => t.CustomEvent<ChipFilterPayload>("filters-applied", (payload, p) =>
+    {
+        var selected = p.From(payload, x => x.Selection.Data);
+
+        p.Element("filter-count").SetText(selected.Count());
+
+        p.When(selected.Any(c => c.Value == "memory")).Truthy()
+         .Then(then => then.Element("memory-on").Show())
+         .Else(els => els.Element("memory-off").Show());
+
+        p.Post("/Sandbox/Components/ChipFilter/Filter")
+         .Gather(g => g.FromEvent(payload, x => x.Selection.Texts, "careLevels"))
+         .Response(r => r.OnSuccess<CareResidentResponse>((json, s) =>
+         {
+             s.Component<FusionGrid>("care-grid").SetDataSource(json, x => x.Residents);
+             s.Element("filter-status").SetText("filtered");
+         }));
+    }));
+
+    // Initial load: all residents.
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get("/Sandbox/Components/ChipFilter/Residents")
+         .Response(r => r.OnSuccess<CareResidentResponse>((json, s) =>
+         {
+             s.Component<FusionGrid>("care-grid").SetDataSource(json, x => x.Residents);
+             s.Element("filter-status").SetText("all residents");
+         }))));
+
+    // Apply: read the chip selection and broadcast it.
+    Html.NativeButton("apply-filters-btn", "Apply Filters")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+            p.DispatchWith<ChipFilterPayload>("filters-applied", b =>
+                b.Set(x => x.Selection, p.Component<FusionChipList>("care-filters").SelectedChips())));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">ChipFilter &mdash; multi-select chips as a filter</native-heading>
+    <native-text color="Secondary">
+        Pick care levels, then <strong>Apply</strong>. The array DSL operates on the selected chip
+        <em>objects</em> &mdash; <code>p.From(payload, x =&gt; x.Selection.Data).Any(c =&gt; c.Value == "memory")</code>
+        &mdash; and the selected texts filter the grid server-side. No plugin, no hand-written JS.
+    </native-text>
+
+    <native-card><native-card-body>
+        @(Html.FusionChipList(plan, "care-filters", b => b
+            .Chips(careChips)
+            .Selection(Selection.Multiple)))
+
+        <div class="mt-4 flex items-center gap-3">
+            @(Html.NativeButton("apply-filters-btn", "Apply Filters")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
+        </div>
+
+        <native-vstack gap="Xs" class="font-mono text-sm my-3">
+            <p>Care levels selected: <span id="filter-count">&mdash;</span></p>
+            <p id="memory-on" hidden class="text-amber-600">&#9679; Memory Care included</p>
+            <p id="memory-off" hidden class="text-text-muted">&#9675; Memory Care not included</p>
+            <p>Status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
+        </native-vstack>
+
+        @(Html.FusionGrid(plan, "care-grid", b => b
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = "name", HeaderText = "Resident", Width = "160" },
+                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "180" },
+            })))
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
