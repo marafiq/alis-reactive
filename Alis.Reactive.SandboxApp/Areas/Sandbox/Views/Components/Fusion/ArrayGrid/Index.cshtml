@@ -1,0 +1,66 @@
+@model ArrayGridModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "ArrayGrid";
+
+    var plan = Html.ReactivePlan<ArrayGridModel>();
+
+    // First-class value routing: an array value flows into a component's dataSource member the
+    // same way any value flows to any member. The roster loads once over HTTP, then a client-side
+    // ReactiveArray transform (OrderBy over the Name element member) routes straight into the grid
+    // via SetDataSource(TypedSource<T[]>). No per-row plumbing, no hand-written JS.
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get("/Sandbox/Components/ArrayGrid/Residents")
+         .Response(r => r.OnSuccess<ResidentRosterResponse>((json, s) =>
+         {
+             var roster = p.From(json.Read(x => x.Residents));
+             s.Component<FusionGrid>("roster-grid")
+                 .SetDataSource(roster.OrderBy(x => x.Name).AsSource());
+             s.Element("grid-status").SetText("roster loaded");
+         }))));
+
+    // Re-filter the rows ALREADY on screen: read the grid's own dataSource member, keep the
+    // active residents, rebind. Entirely client-side over element members — no server call.
+    Html.NativeButton("show-active-btn", "Show Active Only")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            var current = p.From(p.Component<FusionGrid>("roster-grid").Data<ArrayGridModel, ResidentRow>());
+            p.Component<FusionGrid>("roster-grid")
+                .SetDataSource(current.Where(x => x.Status == "active").OrderBy(x => x.Name).AsSource())
+                .Refresh();
+            p.Element("grid-status").SetText("active only");
+        });
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">ArrayGrid &mdash; client-side transform into a grid data source</native-heading>
+    <native-text color="Secondary">
+        The array DSL is just value routing: <code>p.From(roster).Where(x =&gt; x.Status == "active").OrderBy(x =&gt; x.Name).AsSource()</code>
+        flows into the grid's <code>dataSource</code> member via <code>SetDataSource(TypedSource&lt;T[]&gt;)</code>.
+        The filter runs in the plan over element members &mdash; no HTTP round-trip, no per-row code.
+    </native-text>
+
+    <native-card><native-card-body>
+        @(Html.FusionGrid(plan, "roster-grid", b => b
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = "name", HeaderText = "Name", Width = "160" },
+                new GridColumn { Field = "status", HeaderText = "Status", Width = "130" },
+                new GridColumn { Field = "age", HeaderText = "Age", Width = "80" },
+                new GridColumn { Field = "balance", HeaderText = "Balance", Width = "110" },
+            })))
+
+        <div class="mt-4 flex items-center gap-3">
+            @(Html.NativeButton("show-active-btn", "Show Active Only")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
+            <span class="font-mono text-sm">Status: <span id="grid-status" class="text-text-muted">&mdash;</span></span>
+        </div>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

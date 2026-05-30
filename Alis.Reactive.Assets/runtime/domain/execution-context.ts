@@ -44,6 +44,12 @@ export class ExecutionContext {
     return new ExecutionContext({ ...this.asAvailable(), response });
   }
 
+  /** Push an array element onto the element scope stack for per-element evaluation. */
+  withElement(item: unknown): ExecutionContext {
+    const current = this.asAvailable();
+    return new ExecutionContext({ ...current, element: [...(current.element ?? []), item] });
+  }
+
   resolvePayload(source: PayloadSource): unknown {
     const values = this.requireValues(source);
     switch (source.scope) {
@@ -57,6 +63,10 @@ export class ExecutionContext {
         return values.request;
       case "local":
         return values.local;
+      case "element": {
+        const stack = values.element;
+        return stack === undefined ? undefined : stack[stack.length - 1];
+      }
       default: {
         const _: never = source.scope;
         throw new Error(`[alis] unknown payload scope: "${_}"`);

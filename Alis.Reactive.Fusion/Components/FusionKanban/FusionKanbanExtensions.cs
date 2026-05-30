@@ -94,6 +94,20 @@ namespace Alis.Reactive.Fusion.Components
             return self.EmitCall(DataBindMethod);
         }
 
+        /// <summary>
+        /// Replaces the board data source with a typed array source — including a client-side
+        /// <see cref="Alis.Reactive.Builders.Arrays.ReactiveArray{T}"/> transform via <c>AsSource()</c>.
+        /// Routes any card array into the board with no HTTP round-trip, then data-binds.
+        /// </summary>
+        public static ComponentRef<FusionKanban, TModel> SetDataSource<TModel, TElement>(
+            this ComponentRef<FusionKanban, TModel> self,
+            TypedSource<TElement[]> source)
+            where TModel : class
+        {
+            self.EmitSet(DataSourceProperty, source.ToValueExpression());
+            return self.EmitCall(DataBindMethod);
+        }
+
         public static ComponentRef<FusionKanban, TModel> AddCard<TModel, TResponse>(
             this ComponentRef<FusionKanban, TModel> self,
             ResponseBody<TResponse> source,

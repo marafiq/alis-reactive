@@ -1,0 +1,76 @@
+@model ShiftReportModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@{
+    ViewData["Title"] = "ShiftReport";
+
+    var plan = Html.ReactivePlan<ShiftReportModel>();
+
+    // A CUSTOM event whose payload carries an array of objects (ResidentAlert[]). The handler runs
+    // the array DSL over the payload's elements BY THEIR MEMBERS — count, filter, aggregate, find,
+    // and a guard — all compiled to plan nodes. No plugin, no hand-written JS.
+    Html.On(plan, t => t.CustomEvent<ShiftReportPayload>("shift-report", (payload, p) =>
+    {
+        var alerts = p.From(payload, x => x.Alerts);
+
+        p.Element("alert-total").SetText(alerts.Count());
+        p.Element("critical-count").SetText(alerts.Count(a => a.Severity == "critical"));
+        p.Element("critical-priority-sum").SetText(
+            alerts.Where(a => a.Severity == "critical").Sum(a => a.Priority));
+        p.Element("top-critical").SetText(
+            alerts.Where(a => a.Severity == "critical").OrderByDescending(a => a.Priority).Find(a => true, a => a.Resident));
+
+        p.When(alerts.Any(a => a.Severity == "critical" && !a.Acknowledged)).Truthy()
+         .Then(then => then.Element("unack-warning").Show())
+         .Else(els => els.Element("unack-clear").Show());
+    }));
+
+    // Load the alert roster, then broadcast it as the custom event payload — the array travels in
+    // the payload. A real app might broadcast on a SignalR push; here a button stands in.
+    Html.NativeButton("load-report-btn", "Generate Shift Report")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+            p.Get("/Sandbox/Components/ShiftReport/Alerts")
+             .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
+                 s.DispatchWith<ShiftReportPayload>("shift-report", b =>
+                     b.Set(x => x.Alerts, json.Read(x => x.Alerts))))));
+
+    // Same custom event, a roster where every critical alert is acknowledged — drives the Else guard.
+    Html.NativeButton("clear-report-btn", "Generate Clear Report")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+            p.Get("/Sandbox/Components/ShiftReport/AlertsAllClear")
+             .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
+                 s.DispatchWith<ShiftReportPayload>("shift-report", b =>
+                     b.Set(x => x.Alerts, json.Read(x => x.Alerts))))));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">ShiftReport &mdash; operate on a custom event payload array</native-heading>
+    <native-text color="Secondary">
+        The custom event <code>shift-report</code> carries <code>ResidentAlert[]</code>. Its handler runs the
+        array DSL over the payload's element members, e.g.
+        <code>alerts.Where(a =&gt; a.Severity == "critical").OrderByDescending(a =&gt; a.Priority).Find(...)</code>.
+        Deterministic, in the plan &mdash; no plugin, no JS.
+    </native-text>
+
+    <native-card><native-card-body>
+        <div class="flex items-center gap-3">
+            @(Html.NativeButton("load-report-btn", "Generate Shift Report")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
+            @(Html.NativeButton("clear-report-btn", "Generate Clear Report")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors"))
+        </div>
+
+        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
+            <p>Total alerts: <span id="alert-total">&mdash;</span></p>
+            <p>Critical: <span id="critical-count">&mdash;</span></p>
+            <p>Critical priority sum: <span id="critical-priority-sum">&mdash;</span></p>
+            <p>Top critical (by priority): <span id="top-critical">&mdash;</span></p>
+            <p id="unack-warning" hidden class="text-red-600">&#9888; Unacknowledged critical alert present</p>
+            <p id="unack-clear" hidden class="text-green-600">All critical alerts acknowledged</p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
