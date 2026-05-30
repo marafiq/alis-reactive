@@ -1,0 +1,233 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridOperationsModel
+@using Alis.Reactive
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Templates
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "FusionGrid Operations";
+
+    const string GridId = "resident-operations-grid";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
+
+    var plan = Html.ReactivePlan<GridOperationsModel>();
+    var riskLevels = (List<string>)ViewBag.RiskLevels;
+
+    var residentTemplate = FusionTemplate.Create<ResidentDirectoryGridItem>()
+        .Class("grid-resident-template space-y-1")
+        .Div(d => d.Class("font-semibold text-slate-900").Span(m => m.ResidentName))
+        .Div(d => d.Class("text-xs text-slate-600")
+            .Span("Suite ", "font-medium")
+            .Span(m => m.Suite)
+            .Span(" | ")
+            .Span(m => m.CareLevel))
+        .Render();
+
+    var riskTemplate = FusionTemplate.Create<ResidentDirectoryGridItem>()
+        .When(m => m.RiskLevel == "High",
+            then: t => t.Badge(m => m.RiskLevel, "rounded bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700"),
+            @else: e => e.Badge(m => m.RiskLevel, "rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700"))
+        .Render();
+
+    var actionTemplate = FusionTemplate.Create<ResidentDirectoryGridItem>()
+        .Class("grid-action-template")
+        .EventButton("Review", "grid:review-resident", m => m.ResidentId, "e-small e-primary")
+        .Render();
+
+    void LoadOperationsGrid(PipelineBuilder<GridOperationsModel> p)
+    {
+        p.Get("/Sandbox/Components/Grid/OperationRows")
+            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
+            {
+                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Element("operations-load-status").SetText("loaded operations rows");
+            }));
+    }
+
+    Html.On(plan, t => t.DomReady(p => LoadOperationsGrid(p)));
+
+    Html.On(plan, t => t.CustomEvent<GridTemplateActionPayload>("grid:review-resident", (payload, p) =>
+    {
+        p.Post("/Sandbox/Components/Grid/ReviewResident")
+            .Gather(g => g.FromEvent(payload, x => x.Id, "id"))
+            .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
+            {
+                s.Element("template-action-status").SetText(json, x => x.Summary);
+            }));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
+        <div>
+            <native-heading level="H1">FusionGrid Operations Board</native-heading>
+            <native-text color="Secondary">
+                Column personalization, keyed updates, current-view handoff, and typed template actions over resident operations data.
+            </native-text>
+        </div>
+        <native-hstack gap="Sm" class="flex-wrap">
+            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Directory"
+               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+                Directory grid
+            </a>
+            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Editing"
+               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+                Editing grid
+            </a>
+        </native-hstack>
+    </native-hstack>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <native-heading level="H2">Runtime Controls</native-heading>
+        <form id="operations-patch-form" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            @{ Html.InputField(plan, m => m.PatchRiskLevel, o => o.Label("Patch risk"))
+                .FusionDropDownList(b => b
+                    .DataSource(riskLevels)
+                    .Placeholder("Risk level")); }
+            @{ Html.InputField(plan, m => m.PatchOpenTasks, o => o.Label("Patch open tasks"))
+                .FusionNumericTextBox(b => b
+                    .Format("n0")
+                    .Min(0)
+                    .Max(12)
+                    .Step(1)
+                    .Placeholder("Task count")); }
+        </form>
+
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("ops-hide-care-columns", "Hide Care Columns")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    grid.HideColumn((ResidentDirectoryGridItem x) => x.PrimaryNurse);
+                    grid.HideColumn((ResidentDirectoryGridItem x) => x.NextReviewDate);
+                    p.Element("column-command-status").SetText("care columns hidden");
+                }))
+            @(Html.NativeButton("ops-show-care-columns", "Show Care Columns")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    grid.ShowColumn((ResidentDirectoryGridItem x) => x.PrimaryNurse);
+                    grid.ShowColumn((ResidentDirectoryGridItem x) => x.NextReviewDate);
+                    p.Element("column-command-status").SetText("care columns shown");
+                }))
+            @(Html.NativeButton("ops-reorder-risk", "Move Risk Before Resident")
+                .CssClass(ButtonAccent)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId)
+                        .ReorderColumnBefore(
+                            (ResidentDirectoryGridItem x) => x.RiskLevel,
+                            (ResidentDirectoryGridItem x) => x.ResidentName);
+                    p.Element("column-command-status").SetText("risk column moved before resident");
+                }))
+            @(Html.NativeButton("ops-select-range", "Select Review Range")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    grid.SelectRowsByRange(0, 2);
+                    p.Post("/Sandbox/Components/Grid/SelectionRecords")
+                        .Gather(g => g.Include(grid.SelectedRecords<GridOperationsModel, ResidentDirectoryGridItem>(), "selectedRecords"))
+                        .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
+                        {
+                            s.Element("selection-range-status").SetText(json, x => x.Summary);
+                        }));
+                }))
+            @(Html.NativeButton("ops-current-view", "Summarize Current View")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    p.Post("/Sandbox/Components/Grid/CurrentViewSummary")
+                        .Gather(g => g.Include(grid.CurrentViewRecords<GridOperationsModel, ResidentDirectoryGridItem>(), "records"))
+                        .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
+                        {
+                            s.Element("current-view-status").SetText(json, x => x.Summary);
+                        }));
+                }))
+            @(Html.NativeButton("ops-row-index", "Find Resident 6005")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    p.Post("/Sandbox/Components/Grid/RowIndexSummary")
+                        .Gather(g => g.Include(grid.RowIndexByPrimaryKey(6005), "rowIndex"))
+                        .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
+                        {
+                            s.Element("row-index-status").SetText(json, x => x.Summary);
+                        }));
+                }))
+            @(Html.NativeButton("ops-set-risk-cell", "Flag Resident 6002")
+                .CssClass(ButtonAccent)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId)
+                        .SetCellValue(6002, (ResidentDirectoryGridItem x) => x.RiskLevel, "Critical");
+                    p.Element("keyed-update-status").SetText("resident 6002 risk flagged");
+                }))
+            @(Html.NativeButton("ops-set-tasks-cell", "Set Tasks For 6003")
+                .CssClass(ButtonAccent)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId)
+                        .SetCellValue(6003, (ResidentDirectoryGridItem x) => x.OpenTasks, 7);
+                    p.Element("keyed-update-status").SetText("resident 6003 tasks updated");
+                }))
+            @(Html.NativeButton("ops-server-patch-row", "Apply Server Patch To 6005")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/Components/Grid/PatchResidentRow", g =>
+                    {
+                        g.Include<FusionDropDownList, GridOperationsModel>(m => m.PatchRiskLevel);
+                        g.Include<FusionNumericTextBox, GridOperationsModel>(m => m.PatchOpenTasks);
+                    })
+                    .Response(r => r.OnSuccess<ResidentGridOperationsResponse>((json, s) =>
+                    {
+                        s.Component<FusionGrid>(GridId).SetRowData(6005, json, x => x.Row);
+                        s.Element("keyed-update-status").SetText(json, x => x.Summary);
+                    }));
+                }))
+        </native-hstack>
+
+        <native-grid cols="C3" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Load: <span id="operations-load-status" class="text-text-muted">waiting</span></p>
+            <p>Columns: <span id="column-command-status" class="text-text-muted">waiting</span></p>
+            <p>Range: <span id="selection-range-status" class="text-text-muted">waiting</span></p>
+            <p>Current view: <span id="current-view-status" class="text-text-muted">waiting</span></p>
+            <p>Row index: <span id="row-index-status" class="text-text-muted">waiting</span></p>
+            <p>Keyed updates: <span id="keyed-update-status" class="text-text-muted">waiting</span></p>
+            <p>Template action: <span id="template-action-status" class="text-text-muted">waiting</span></p>
+        </native-grid>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
+        @(Html.FusionGrid<GridOperationsModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+            .AllowPaging(true)
+            .AllowReordering(true)
+            .AllowSelection(true)
+            .PageSettings(new GridPageSettings { PageSize = 12 })
+            .SelectionSettings(new GridSelectionSettings { Type = SelectionType.Multiple })
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
+                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "240", Template = residentTemplate },
+                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "130", Template = riskTemplate },
+                new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right },
+                new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "160" },
+                new GridColumn { Field = "nextReviewDate", HeaderText = "Next Review", Width = "130" },
+                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "100" },
+                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
+                new GridColumn { HeaderText = "Action", Width = "120", Template = actionTemplate }
+            })))
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

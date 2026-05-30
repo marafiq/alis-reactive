@@ -1,0 +1,163 @@
+@model FusionDropDownTreeModel
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.DropDowns
+@{
+    ViewData["Title"] = "FusionDropDownTree";
+
+    var plan = Html.ReactivePlan<FusionDropDownTreeModel>();
+    var residents = (List<DropDownTreeResidentNode>)ViewBag.Residents;
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
+        tree.SetValue(new[] { "alice" }).DataBind();
+        p.Element("text-echo").SetText(tree.Text());
+        p.When(tree.Value()).NotEmpty()
+            .Then(t => t.Element("value-state").SetText("has values"))
+            .Else(e => e.Element("value-state").SetText("empty"));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionDropDownTree</native-heading>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Resident Tree</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.ResidentIds, o => o.Label("Resident (SF DropDownTree)"))
+                .FusionDropDownTree(b => b
+                    .Fields(new DropDownTreeFields
+                    {
+                        DataSource = residents,
+                        Value = "value",
+                        Text = "text",
+                        ParentValue = "parentValue",
+                        HasChildren = "hasChildren",
+                        Expanded = "expanded"
+                    })
+                    .Placeholder("Select resident")
+                    .ChangeOnBlur(false)
+                    .PopupHeight("180px")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("change-interacted").SetText(args, x => x.IsInteracted);
+                        p.When(args, x => x.Value).NotEmpty()
+                            .Then(t => t.Element("change-value-state").SetText("has values"))
+                            .Else(e => e.Element("change-value-state").SetText("empty"));
+                        p.When(args, x => x.OldValue).NotEmpty()
+                            .Then(t => t.Element("change-old-value-state").SetText("had old values"))
+                            .Else(e => e.Element("change-old-value-state").SetText("no old values"));
+
+                        var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
+                        p.Element("event-text").SetText(tree.Text());
+                        p.When(tree.Value()).NotEmpty()
+                            .Then(t =>
+                            {
+                                t.Element("selected-indicator").Show();
+                                t.Element("selected-indicator").SetText("selected");
+                            })
+                            .Else(e => e.Element("selected-indicator").Hide());
+                    })); }
+        </native-grid>
+
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("set-value-btn", "Set Value")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
+                    tree.SetValue(new[] { "bennett" }).DataBind();
+                    p.Element("text-echo").SetText(tree.Text());
+                    p.When(tree.Value()).NotEmpty()
+                        .Then(t => t.Element("value-state").SetText("has values"))
+                        .Else(e => e.Element("value-state").SetText("empty"));
+                    p.Element("command-state").SetText("value set");
+                }))
+            @(Html.NativeButton("set-text-btn", "Set Text")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
+                    tree.SetText("Carey").DataBind();
+                    p.Element("text-echo").SetText(tree.Text());
+                    p.Element("command-state").SetText("text set");
+                }))
+            @(Html.NativeButton("show-popup-btn", "Show Popup")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionDropDownTree>(m => m.ResidentIds).ShowPopup();
+                }))
+            @(Html.NativeButton("hide-popup-btn", "Hide Popup")
+                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionDropDownTree>(m => m.ResidentIds).HidePopup();
+                }))
+            @(Html.NativeButton("clear-tree-btn", "Clear")
+                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
+                    tree.Clear();
+                    p.Element("command-state").SetText("cleared");
+                    p.Element("text-echo").SetText(tree.Text());
+                    p.When(tree.Value()).NotEmpty()
+                        .Then(t => t.Element("value-state").SetText("has values"))
+                        .Else(e => e.Element("value-state").SetText("empty"));
+                    p.When(tree.Value()).NotEmpty()
+                        .Then(t => t.Element("selected-indicator").Show())
+                        .Else(e => e.Element("selected-indicator").Hide());
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Gather</native-heading>
+        @(Html.NativeButton("gather-btn", "Gather DropDownTree")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var tree = p.Component<FusionDropDownTree>(m => m.ResidentIds);
+                p.Post("/Sandbox/Components/FusionDropDownTree/Echo")
+                    .Gather(g =>
+                    {
+                        g.Include(tree.Value(), "value");
+                        g.Include(tree.Text(), "text");
+                    })
+                    .Response(r => r.OnSuccess<FusionDropDownTreeEchoResponse>((json, s) =>
+                    {
+                        s.Element("gather-value").SetText(json, x => x.ValueSummary);
+                        s.Element("gather-text").SetText(json, x => x.Text);
+                        s.Element("gather-summary").SetText(json, x => x.Summary);
+                    }));
+            }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Command: <span id="command-state" class="text-text-muted">pending</span></p>
+            <p>Text echo: <span id="text-echo" class="text-text-muted">pending</span></p>
+            <p>Value state: <span id="value-state" class="text-text-muted">pending</span></p>
+            <p>Change interacted: <span id="change-interacted" class="text-text-muted">pending</span></p>
+            <p>Change value state: <span id="change-value-state" class="text-text-muted">pending</span></p>
+            <p>Change old value state: <span id="change-old-value-state" class="text-text-muted">pending</span></p>
+            <p>Event text: <span id="event-text" class="text-text-muted">pending</span></p>
+            <p>Selected: <span id="selected-indicator" hidden class="text-emerald-600">pending</span></p>
+            <p>Gather value: <span id="gather-value" class="text-text-muted">pending</span></p>
+            <p>Gather text: <span id="gather-text" class="text-text-muted">pending</span></p>
+            <p>Gather summary: <span id="gather-summary" class="text-text-muted">pending</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

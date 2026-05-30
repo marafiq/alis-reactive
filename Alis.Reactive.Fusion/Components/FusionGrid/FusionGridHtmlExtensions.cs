@@ -21,16 +21,17 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="elementId">The DOM element ID for the grid.</param>
         /// <param name="build">Callback to configure columns, paging, sorting, etc.</param>
         /// <returns>A builder for chaining <c>.Reactive()</c>.</returns>
-        public static FusionGridBuilder<TModel> FusionGrid<TModel>(
+        public static FusionGridBuilder<TModel> FusionGrid<TModel, TRow>(
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,
             string elementId,
-            Action<GridBuilder<object>> build)
+            Action<GridBuilder<TRow>> build)
             where TModel : class
+            where TRow : class
         {
             // NO input component registration — this is NOT an input component
 
-            var builder = html.EJS().Grid<object>(elementId);
+            var builder = html.EJS().Grid<TRow>(elementId);
             build(builder);
 
             return new FusionGridBuilder<TModel>(plan, elementId, builder.Render());

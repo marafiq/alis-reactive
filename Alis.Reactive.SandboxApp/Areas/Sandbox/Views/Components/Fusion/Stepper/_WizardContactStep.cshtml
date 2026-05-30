@@ -1,0 +1,63 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperWizardContactModel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
+@{
+    const string StepperId = "stepper-wizard";
+    const string FormId = "stepper-wizard-contact-form";
+    var saveUrl = Url.Action("SaveContact", "Stepper", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Stepper.SaveContact.");
+
+    var plan = Html.ReactivePlan<FusionStepperWizardContactModel>();
+}
+
+<native-card><native-card-body id="@FormId">
+    <native-heading level="H2">Step 3: Responsible Party</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        Contact fields use Syncfusion textbox primitives and framework regex/email validation.
+    </p>
+
+    @Html.HiddenFieldFor(plan, m => m.WizardId)
+
+    <native-grid cols="C3" gap="Base" class="mb-4">
+        @{ Html.InputField(plan, m => m.ResponsibleParty, o => o.Required().Label("Responsible Party"))
+            .FusionTextBox(b => b.Placeholder("Primary contact").ShowClearButton(true)); }
+
+        @{ Html.InputField(plan, m => m.Phone, o => o.Required().Label("Phone"))
+            .FusionTextBox(b => b.Placeholder("123-456-7890").ShowClearButton(true)); }
+
+        @{ Html.InputField(plan, m => m.Email, o => o.Required().Label("Email"))
+            .FusionTextBox(b => b.Placeholder("contact@example.com").ShowClearButton(true)); }
+    </native-grid>
+
+    <native-hstack gap="Sm" justify="Between" class="mt-6 flex-wrap">
+        @(Html.NativeButton("stepper-wizard-back-contact", "Back: Care")
+            .CssClass("rounded-md bg-surface px-5 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                p.Component<FusionStepper>(StepperId).SetActiveStep(1);
+                p.Element("stepper-wizard-status").SetText("returned to care");
+            }))
+
+        @(Html.NativeButton("stepper-wizard-next-contact", "Next: Review")
+            .CssClass("rounded-md bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                p.Post(saveUrl, g => g.IncludeAll())
+                    .Validate<FusionStepperWizardContactValidator>(FormId)
+                    .Response(r => r
+                        .OnSuccess<FusionStepperWizardSaveResponse>((json, s) =>
+                        {
+                            s.Component<NativeHiddenField>(m => m.WizardId).SetValue(json, x => x.WizardId);
+                            s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).SetValue("3");
+                            s.Component<FusionStepper>(StepperId).SetActiveStep(3);
+                            s.Element("stepper-wizard-status").SetText(json, x => x.Message);
+                        })
+                        .OnError(400, e => e.ValidationErrors(FormId)));
+            }))
+    </native-hstack>
+</native-card-body></native-card>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)

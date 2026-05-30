@@ -1,0 +1,161 @@
+@model FusionListBoxModel
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.DropDowns
+@{
+    ViewData["Title"] = "FusionListBox";
+
+    const string ListBoxId = "resident-list-box";
+
+    var plan = Html.ReactivePlan<FusionListBoxModel>();
+    var residents = (List<ListBoxResidentItem>)ViewBag.Residents;
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var listBox = p.Component<FusionListBox>(ListBoxId);
+        listBox.SetValue(new[] { "alice" }).DataBind();
+        p.Element("value-echo").SetText(listBox.Value());
+        p.When(listBox.Value()).NotEmpty()
+            .Then(t => t.Element("value-state").SetText("has values"))
+            .Else(e => e.Element("value-state").SetText("empty"));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionListBox</native-heading>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Resident ListBox</native-heading>
+        @(Html.FusionListBox(plan, ListBoxId, b => b
+            .DataSource(residents)
+            .Fields(new ListBoxFieldSettings { Text = "text", Value = "value" })
+            .Height("220px"))
+            .Reactive(evt => evt.Changed, (args, p) =>
+            {
+                p.Element("change-value").SetText(args, x => x.Value);
+                p.When(args, x => x.Value).NotEmpty()
+                    .Then(t => t.Element("change-state").SetText("has values"))
+                    .Else(e => e.Element("change-state").SetText("empty"));
+
+                var listBox = p.Component<FusionListBox>(ListBoxId);
+                p.When(listBox.Value()).NotEmpty()
+                    .Then(t =>
+                    {
+                        t.Element("selected-indicator").Show();
+                        t.Element("selected-indicator").SetText("selected");
+                    })
+                    .Else(e => e.Element("selected-indicator").Hide());
+            }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Commands</native-heading>
+        <native-hstack gap="Sm" class="flex-wrap">
+            @(Html.NativeButton("set-value-btn", "Set Values")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var listBox = p.Component<FusionListBox>(ListBoxId);
+                    listBox.SetValue(new[] { "bennett", "dawson" }).DataBind();
+                    p.Element("value-echo").SetText(listBox.Value());
+                    p.Element("command-state").SetText("value set");
+                }))
+            @(Html.NativeButton("select-carey-btn", "Select Carey")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var listBox = p.Component<FusionListBox>(ListBoxId);
+                    listBox.SelectValues("carey");
+                    p.Element("value-echo").SetText(listBox.Value());
+                    p.Element("command-state").SetText("carey selected");
+                }))
+            @(Html.NativeButton("unselect-carey-btn", "Unselect Carey")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var listBox = p.Component<FusionListBox>(ListBoxId);
+                    listBox.UnselectValues("carey");
+                    p.Element("value-echo").SetText(listBox.Value());
+                    p.Element("command-state").SetText("carey unselected");
+                }))
+            @(Html.NativeButton("select-all-btn", "Select All")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var listBox = p.Component<FusionListBox>(ListBoxId);
+                    listBox.SelectAll();
+                    p.Element("value-echo").SetText(listBox.Value());
+                    p.Element("command-state").SetText("all selected");
+                }))
+            @(Html.NativeButton("unselect-all-btn", "Unselect All")
+                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var listBox = p.Component<FusionListBox>(ListBoxId);
+                    listBox.UnselectAll();
+                    p.Element("value-echo").SetText(listBox.Value());
+                    p.Element("command-state").SetText("all unselected");
+                    p.When(listBox.Value()).NotEmpty()
+                        .Then(t => t.Element("value-state").SetText("has values"))
+                        .Else(e => e.Element("value-state").SetText("empty"));
+                }))
+            @(Html.NativeButton("disable-carey-btn", "Disable Carey")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionListBox>(ListBoxId).DisableValues("carey");
+                    p.Element("command-state").SetText("carey disabled");
+                }))
+            @(Html.NativeButton("enable-carey-btn", "Enable Carey")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionListBox>(ListBoxId).EnableValues("carey");
+                    p.Element("command-state").SetText("carey enabled");
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Gather</native-heading>
+        @(Html.NativeButton("gather-btn", "Gather ListBox")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var listBox = p.Component<FusionListBox>(ListBoxId);
+                p.Post("/Sandbox/Components/FusionListBox/Echo")
+                    .Gather(g =>
+                    {
+                        g.Include(listBox.Value(), "value");
+                    })
+                    .Response(r => r.OnSuccess<FusionListBoxEchoResponse>((json, s) =>
+                    {
+                        s.Element("gather-value").SetText(json, x => x.ValueSummary);
+                        s.Element("gather-count").SetText(json, x => x.CountSummary);
+                    }));
+            }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Command: <span id="command-state" class="text-text-muted">pending</span></p>
+            <p>Value echo: <span id="value-echo" class="text-text-muted">pending</span></p>
+            <p>Value state: <span id="value-state" class="text-text-muted">pending</span></p>
+            <p>Change value: <span id="change-value" class="text-text-muted">pending</span></p>
+            <p>Change state: <span id="change-state" class="text-text-muted">pending</span></p>
+            <p>Selected: <span id="selected-indicator" hidden class="text-emerald-600">pending</span></p>
+            <p>Gather value: <span id="gather-value" class="text-text-muted">pending</span></p>
+            <p>Gather count: <span id="gather-count" class="text-text-muted">pending</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

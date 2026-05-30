@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF ListBox API Probe</title>
+    <link rel="stylesheet" href="/vendor/syncfusion/material.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .panel { border: 1px solid #d0d7de; padding: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; max-height: 620px; }
+        button { margin: 4px 8px 4px 0; }
+    </style>
+</head>
+<body>
+    <h1>SF ListBox API Probe</h1>
+    <p>Temporary probe for source-grounded ListBox onboarding. Only rows proven here can become typed Fusion API.</p>
+
+    <div class="grid">
+        <div class="panel">
+            <h2>String Data Source</h2>
+            <input id="list-box-probe" />
+        </div>
+        <div class="panel">
+            <h2>Value/Text Data Source</h2>
+            <input id="list-box-value-probe" />
+        </div>
+    </div>
+
+    <h2>Candidate Matrix</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Kind</th>
+                <th>Builder</th>
+                <th>Args</th>
+                <th>Return/Payload</th>
+                <th>Proof</th>
+                <th>Proposed C#</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody id="proposal-body"></tbody>
+    </table>
+
+    <button id="dump" type="button">Dump Keys</button>
+    <button id="run-proof" type="button">Run Proof</button>
+    <button id="clear" type="button">Clear Trace</button>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const proposalRows = [];
+
+        function clean(value, seen, depth) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 30).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).slice(0, 80).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") {
+                        names.add(name);
+                    }
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return { ownKeys: [], functions: [], properties: {} };
+            }
+
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item, new WeakSet(), 0)
+                };
+            });
+            return {
+                ownKeys: own,
+                functions: functionNames(args),
+                properties
+            };
+        }
+
+        function record(label, value) {
+            trace.push({
+                at: new Date().toISOString(),
+                label,
+                value: clean(value, new WeakSet(), 0)
+            });
+            renderTrace();
+        }
+
+        function renderTrace() {
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        function proposal(row) {
+            proposalRows.push(row);
+            const tr = document.createElement("tr");
+            [
+                row.candidate,
+                row.kind,
+                row.builder,
+                row.args,
+                row.returnOrPayload,
+                row.proof,
+                row.csharp,
+                row.outcome
+            ].forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value || "";
+                tr.appendChild(td);
+            });
+            document.getElementById("proposal-body").appendChild(tr);
+        }
+
+        function itemTexts(list, selector) {
+            return Array.from((list.list || document).querySelectorAll(selector))
+                .map(item => item.textContent.trim());
+        }
+
+        function selectValues(list) {
+            return Array.from((list.list || document).querySelectorAll("select.e-hidden-select option:checked"))
+                .map(option => option.value);
+        }
+
+        function snapshot(list) {
+            const items = Array.from((list.list || document).querySelectorAll(".e-list-item"));
+            return {
+                value: list.value ? list.value.slice() : list.value,
+                listExists: !!list.list,
+                itemCount: items.length,
+                selectedValues: selectValues(list),
+                selectedByClass: itemTexts(list, ".e-list-item.e-active, .e-list-item.e-selected"),
+                selectedByAria: items
+                    .filter(item => item.getAttribute("aria-selected") === "true")
+                    .map(item => item.textContent.trim()),
+                classNames: items.map(item => ({
+                    text: item.textContent.trim(),
+                    value: item.getAttribute("data-value"),
+                    className: item.className,
+                    ariaSelected: item.getAttribute("aria-selected")
+                })),
+                disabled: itemTexts(list, ".e-list-item.e-disabled"),
+                checked: itemTexts(list, ".e-list-item .e-check").map(() => "[frame]")
+            };
+        }
+
+        const stringList = new ej.dropdowns.ListBox({
+            dataSource: ["Alice", "Bennett", "Carey", "Dawson"],
+            selectionSettings: { mode: "Multiple" },
+            change: args => record("string.change", describePayload(args))
+        });
+        stringList.appendTo("#list-box-probe");
+
+        const valueList = new ej.dropdowns.ListBox({
+            dataSource: [
+                { id: "a", name: "Alice" },
+                { id: "b", name: "Bennett" },
+                { id: "c", name: "Carey" },
+                { id: "d", name: "Dawson" }
+            ],
+            fields: { value: "id", text: "name" },
+            selectionSettings: { mode: "Multiple" },
+            change: args => record("value.change", describePayload(args))
+        });
+        valueList.appendTo("#list-box-value-probe");
+
+        window.__sfListBoxProbe = {
+            trace,
+            proposalRows,
+            stringList,
+            valueList,
+            record,
+            snapshot: () => ({
+                string: snapshot(stringList),
+                value: snapshot(valueList)
+            })
+        };
+
+        proposal({
+            candidate: "value property read/write + dataBind()",
+            kind: "property + method",
+            builder: "Value is builder-covered for initial render",
+            args: "string[]; empty array clears selection",
+            returnOrPayload: "string[] value after dataBind",
+            proof: "runProof sets value to Bennett/Dawson, then clears with []",
+            csharp: "SetValue(string[]), DataBind(), Value()",
+            outcome: "accept"
+        });
+        proposal({
+            candidate: "selectItems(items, state, isValue)",
+            kind: "method",
+            builder: "not builder-covered runtime method",
+            args: "string[] values, bool state, isValue: true",
+            returnOrPayload: "void; emits change.value",
+            proof: "runProof selects/unselects primitive and field-mapped values",
+            csharp: "SelectValues(string[]), UnselectValues(string[])",
+            outcome: "accept"
+        });
+        proposal({
+            candidate: "selectAll(state)",
+            kind: "method",
+            builder: "not builder-covered runtime method",
+            args: "bool state",
+            returnOrPayload: "void; emits change.value",
+            proof: "runProof selects and clears all string items",
+            csharp: "SelectAll(), UnselectAll()",
+            outcome: "accept"
+        });
+        proposal({
+            candidate: "enableItems(items, enable, isValue)",
+            kind: "method",
+            builder: "not builder-covered runtime method",
+            args: "string[] values, bool enable, isValue: true",
+            returnOrPayload: "void",
+            proof: "runProof disables/enables primitive and field-mapped values",
+            csharp: "DisableValues(string[]), EnableValues(string[])",
+            outcome: "accept"
+        });
+        proposal({
+            candidate: "selectItems/enableItems text mode",
+            kind: "method overload",
+            builder: "not builder-covered runtime method",
+            args: "string[] text, isValue: false",
+            returnOrPayload: "void",
+            proof: "source maps text through getValueByText",
+            csharp: "",
+            outcome: "reject: text is not a stable key when display text duplicates"
+        });
+        proposal({
+            candidate: "change event",
+            kind: "event",
+            builder: "Change builder-covered as callback hook only",
+            args: "ListBoxChangeEventArgs",
+            returnOrPayload: "value: string[]; elements/items/event are DOM/object",
+            proof: "runProof records event payload shape",
+            csharp: "Changed.Value only",
+            outcome: "accept value only; reject elements/items/event"
+        });
+        proposal({
+            candidate: "addItems/removeItems/drag/drop data APIs",
+            kind: "method/event",
+            builder: "mixed static/runtime",
+            args: "object item shapes and DOM events",
+            returnOrPayload: "loose object[]/Element payloads",
+            proof: "d.ts and source expose broad object/DOM shapes",
+            csharp: "",
+            outcome: "reject: violates typed public API invariant"
+        });
+
+        function dumpKeys() {
+            record("keys", {
+                namespace: !!ej.dropdowns,
+                ctor: typeof ej.dropdowns.ListBox,
+                stringFunctions: functionNames(stringList),
+                ownKeys: Object.keys(stringList).sort()
+            });
+        }
+
+        async function runProof() {
+            trace.length = 0;
+            dumpKeys();
+            record("initial", window.__sfListBoxProbe.snapshot());
+
+            stringList.value = ["Bennett", "Dawson"];
+            stringList.dataBind();
+            record("after.value.write", window.__sfListBoxProbe.snapshot());
+
+            stringList.value = [];
+            stringList.dataBind();
+            record("after.value.clear", window.__sfListBoxProbe.snapshot());
+
+            stringList.selectItems(["Alice", "Carey"], true, true);
+            record("after.select.string.values", window.__sfListBoxProbe.snapshot());
+
+            stringList.selectItems(["Carey"], false, true);
+            record("after.unselect.string.values", window.__sfListBoxProbe.snapshot());
+
+            stringList.selectAll(true);
+            record("after.select.all", window.__sfListBoxProbe.snapshot());
+
+            stringList.selectAll(false);
+            record("after.unselect.all", window.__sfListBoxProbe.snapshot());
+
+            stringList.enableItems(["Dawson"], false, true);
+            record("after.disable.string.values", window.__sfListBoxProbe.snapshot());
+
+            stringList.enableItems(["Dawson"], true, true);
+            record("after.enable.string.values", window.__sfListBoxProbe.snapshot());
+
+            valueList.selectItems(["b", "d"], true, true);
+            record("after.select.values", window.__sfListBoxProbe.snapshot());
+
+            valueList.selectItems(["d"], false, true);
+            record("after.unselect.values", window.__sfListBoxProbe.snapshot());
+
+            valueList.enableItems(["c"], false, true);
+            record("after.disable.values", window.__sfListBoxProbe.snapshot());
+
+            valueList.enableItems(["c"], true, true);
+            record("after.enable.values", window.__sfListBoxProbe.snapshot());
+        }
+
+        document.getElementById("dump").addEventListener("click", dumpKeys);
+        document.getElementById("run-proof").addEventListener("click", () => runProof().catch(error => record("error", {
+            message: error.message,
+            stack: error.stack
+        })));
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            renderTrace();
+        });
+
+        if (new URLSearchParams(window.location.search).get("autorun") === "1") {
+            setTimeout(() => runProof().catch(error => record("error", {
+                message: error.message,
+                stack: error.stack
+            })), 300);
+        }
+    </script>
+</body>
+</html>

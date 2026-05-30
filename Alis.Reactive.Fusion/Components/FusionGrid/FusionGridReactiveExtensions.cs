@@ -9,9 +9,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// <c>.Reactive()</c> is called on the builder returned by
-    /// <see cref="FusionGridHtmlExtensions.FusionGrid{TModel}"/>:
+    /// <see cref="FusionGridHtmlExtensions.FusionGrid{TModel, TRow}"/>:
     /// <code>
-    /// @(Html.FusionGrid(plan, "residents-grid", b =&gt; { /* columns */ })
+    /// @(Html.FusionGrid&lt;GridModel, ResidentGridItem&gt;(plan, "residents-grid", b =&gt; { /* columns */ })
     ///     .Reactive(evt =&gt; evt.DataStateChange, (args, p) =&gt; { /* commands */ }))
     /// </code>
     /// </remarks>

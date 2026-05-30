@@ -1,0 +1,109 @@
+@model FusionBreadcrumbModel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Syncfusion.EJ2.Navigations
+@{
+    ViewData["Title"] = "FusionBreadcrumb";
+
+    const string BreadcrumbId = "navigation-breadcrumb";
+    var routeUrl = Url.Action("Route", "Breadcrumb", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Breadcrumb.Route.");
+
+    var plan = Html.ReactivePlan<FusionBreadcrumbModel>();
+    var items = new List<BreadcrumbItem>
+    {
+        new() { Text = "Home", Id = "home", Url = "/home", IconCss = "e-icons e-home", Disabled = false },
+        new() { Text = "Docs", Id = "docs", Url = "/docs" },
+        new() { Text = "Guide", Id = "guide", Url = "/docs/guide" }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var breadcrumb = p.Component<FusionBreadcrumb>(BreadcrumbId);
+        p.Element("active-item-echo").SetText(breadcrumb.ActiveItem());
+
+        p.When(breadcrumb.ActiveItem()).NotEmpty()
+            .Then(t => t.Element("active-state").SetText("has active item"))
+            .Else(e => e.Element("active-state").SetText("empty"));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionBreadcrumb</native-heading>
+    <native-text color="Secondary">
+        Navigation component. Exercises the typed active-item source, active-item setter, and item-click payload reads.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Breadcrumb</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            The breadcrumb starts with Docs active. Click Home or Docs, or set Guide programmatically.
+        </p>
+
+        @(Html.FusionBreadcrumb(plan, BreadcrumbId, b =>
+        {
+            b.Items(items);
+            b.ActiveItem("/docs");
+            b.EnableNavigation(false);
+            b.OverflowMode(BreadcrumbOverflowMode.None);
+        })
+        .Reactive(evt => evt.ItemClick, (args, p) =>
+        {
+            p.Element("clicked-text").SetText(args, x => x.Item.Text);
+            p.Element("clicked-id").SetText(args, x => x.Item.Id);
+            p.Element("clicked-url").SetText(args, x => x.Item.Url);
+            p.Element("clicked-icon-css").SetText(args, x => x.Item.IconCss);
+            p.Element("clicked-disabled").SetText(args, x => x.Item.Disabled);
+            p.Post(routeUrl)
+                .Gather(g => g
+                    .FromEvent(args, x => x.Item.Text, "text")
+                    .FromEvent(args, x => x.Item.Id, "id")
+                    .FromEvent(args, x => x.Item.Url, "url")
+                    .FromEvent(args, x => x.Item.Disabled, "disabled"))
+                .Response(r => r.OnSuccess<FusionBreadcrumbRouteResponse>((json, s) =>
+                {
+                    s.Element("route-message").SetText(json, x => x.Message);
+                    s.Element("route-category").SetText(json, x => x.RouteCategory);
+                    s.Element("route-trail").SetText(json, x => x.Trail);
+                }));
+        }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Commands</native-heading>
+        <native-hstack gap="Sm" class="flex-wrap">
+            @(Html.NativeButton("set-guide-btn", "Set Guide Active")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var breadcrumb = p.Component<FusionBreadcrumb>(BreadcrumbId);
+                    breadcrumb.SetActiveItem("/docs/guide");
+                    p.Element("active-item-echo").SetText(breadcrumb.ActiveItem());
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Active item source: <span id="active-item-echo" class="text-text-muted">pending</span></p>
+            <p>Active item state: <span id="active-state" class="text-text-muted">pending</span></p>
+            <p>Clicked text: <span id="clicked-text" class="text-text-muted">pending</span></p>
+            <p>Clicked id: <span id="clicked-id" class="text-text-muted">pending</span></p>
+            <p>Clicked url: <span id="clicked-url" class="text-text-muted">pending</span></p>
+            <p>Clicked icon CSS: <span id="clicked-icon-css" class="text-text-muted">pending</span></p>
+            <p>Clicked disabled: <span id="clicked-disabled" class="text-text-muted">pending</span></p>
+            <p>Route message: <span id="route-message" class="text-text-muted">pending</span></p>
+            <p>Route category: <span id="route-category" class="text-text-muted">pending</span></p>
+            <p>Route trail: <span id="route-trail" class="text-text-muted">pending</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

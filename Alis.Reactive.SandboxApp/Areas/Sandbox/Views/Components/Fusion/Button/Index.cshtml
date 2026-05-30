@@ -1,0 +1,177 @@
+@model ButtonModel
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "FusionButton";
+
+    const string buttonId = "fusion-action-button";
+    var plan = Html.ReactivePlan<ButtonModel>();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var button = p.Component<FusionButton>(buttonId);
+        button.SetContent("Ready");
+        p.Element("content-echo").SetText(button.Content());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionButton</native-heading>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Button Runtime State</native-heading>
+        <native-hstack gap="Base" align="Center">
+            @(Html.FusionButton(plan, buttonId, b => b
+                .Type("button")
+                .Content("Initial")
+                .IconCss("e-icons e-search")
+                .IconPosition(Syncfusion.EJ2.Buttons.IconPosition.Left)
+                .IsToggle(true)))
+        </native-hstack>
+
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("set-content-btn", "Set Content")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var button = p.Component<FusionButton>(buttonId);
+                    button.SetContent("Queued");
+                    p.Element("content-echo").SetText(button.Content());
+                    p.Element("command-state").SetText("content set");
+                }))
+            @(Html.NativeButton("disable-btn", "Disable")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var button = p.Component<FusionButton>(buttonId);
+                    button.SetDisabled(true);
+                    p.Element("disabled-echo").SetText(button.Disabled());
+                    p.Element("command-state").SetText("disabled");
+                }))
+            @(Html.NativeButton("enable-btn", "Enable")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var button = p.Component<FusionButton>(buttonId);
+                    button.SetDisabled(false);
+                    p.Element("disabled-echo").SetText(button.Disabled());
+                    p.Element("command-state").SetText("enabled");
+                }))
+            @(Html.NativeButton("set-icon-btn", "Set Icon")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionButton>(buttonId).SetIcon("e-icons e-edit", FusionButtonIconPosition.Right);
+                    p.Element("command-state").SetText("icon set");
+                }))
+            @(Html.NativeButton("set-css-btn", "Set Css")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var button = p.Component<FusionButton>(buttonId);
+                    button.SetCssClass("e-success extra-class");
+                    p.Element("css-echo").SetText(button.CssClass());
+                    p.Element("command-state").SetText("css set");
+                }))
+            @(Html.NativeButton("set-primary-btn", "Set Primary")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var button = p.Component<FusionButton>(buttonId);
+                    button.SetPrimary(true);
+                    p.Element("primary-echo").SetText(button.IsPrimary());
+                    p.Element("command-state").SetText("primary set");
+                }))
+            @(Html.NativeButton("set-toggle-btn", "Disable Toggle")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var button = p.Component<FusionButton>(buttonId);
+                    button.SetToggle(false);
+                    p.Element("toggle-echo").SetText(button.IsToggle());
+                    p.Element("command-state").SetText("toggle disabled");
+                }))
+            @(Html.NativeButton("click-button-btn", "Click Button")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionButton>(buttonId).Click();
+                    p.Element("click-state").SetText("click called");
+                }))
+            @(Html.NativeButton("focus-button-btn", "Focus Button")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionButton>(buttonId).FocusIn();
+                    p.Element("focus-state").SetText("focus called");
+                }))
+            @(Html.NativeButton("check-button-btn", "Check Disabled")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var button = p.Component<FusionButton>(buttonId);
+                    p.When(button.Disabled()).Eq(true)
+                        .Then(t => t.Element("disabled-state").SetText("disabled"))
+                        .Else(e => e.Element("disabled-state").SetText("enabled"));
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Gather</native-heading>
+        @(Html.NativeButton("gather-btn", "Gather Button")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var button = p.Component<FusionButton>(buttonId);
+                p.Post("/Sandbox/Components/Button/Echo")
+                    .Gather(g =>
+                    {
+                        g.Include(button.Content(), "content");
+                        g.Include(button.Disabled(), "disabled");
+                        g.Include(button.CssClass(), "cssClass");
+                        g.Include(button.IsPrimary(), "isPrimary");
+                        g.Include(button.IsToggle(), "isToggle");
+                    })
+                    .Response(r => r.OnSuccess<ButtonEchoResponse>((json, s) =>
+                    {
+                        s.Element("gather-content").SetText(json, x => x.Content);
+                        s.Element("gather-disabled").SetText(json, x => x.Disabled);
+                        s.Element("gather-css").SetText(json, x => x.CssClass);
+                        s.Element("gather-primary").SetText(json, x => x.IsPrimary);
+                        s.Element("gather-toggle").SetText(json, x => x.IsToggle);
+                        s.Element("gather-summary").SetText(json, x => x.Summary);
+                    }));
+            }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Command: <span id="command-state" class="text-text-muted">pending</span></p>
+            <p>Content echo: <span id="content-echo" class="text-text-muted">pending</span></p>
+            <p>Disabled echo: <span id="disabled-echo" class="text-text-muted">pending</span></p>
+            <p>Css echo: <span id="css-echo" class="text-text-muted">pending</span></p>
+            <p>Primary echo: <span id="primary-echo" class="text-text-muted">pending</span></p>
+            <p>Toggle echo: <span id="toggle-echo" class="text-text-muted">pending</span></p>
+            <p>Click state: <span id="click-state" class="text-text-muted">pending</span></p>
+            <p>Focus state: <span id="focus-state" class="text-text-muted">pending</span></p>
+            <p>Disabled state: <span id="disabled-state" class="text-text-muted">pending</span></p>
+            <p>Gather content: <span id="gather-content" class="text-text-muted">pending</span></p>
+            <p>Gather disabled: <span id="gather-disabled" class="text-text-muted">pending</span></p>
+            <p>Gather css: <span id="gather-css" class="text-text-muted">pending</span></p>
+            <p>Gather primary: <span id="gather-primary" class="text-text-muted">pending</span></p>
+            <p>Gather toggle: <span id="gather-toggle" class="text-text-muted">pending</span></p>
+            <p>Gather summary: <span id="gather-summary" class="text-text-muted">pending</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

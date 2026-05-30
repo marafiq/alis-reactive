@@ -19,6 +19,14 @@ namespace Alis.Reactive.Validation
         public string Message => _message.Value;
         public Shape Shape => _shape;
 
+        // Projections for a vendor emitter that translates this rule into a native
+        // component validation shape (e.g. Syncfusion EJ2 column.validationRules).
+        // Internal so the public rule surface stays message + shape only.
+        internal ValidationRuleName Name => _rule;
+        internal bool IsUnconditional => _activation.IsAlways;
+        internal object? LiteralOperand => _operand.LiteralValue;
+        internal object[]? RangeOperand => _operand.RangeValues;
+
         internal ValidationRule(
             ValidationRuleName rule,
             ValidationMessage message,
@@ -77,6 +85,11 @@ namespace Alis.Reactive.Validation
             return new PeerFieldValidationRuleOperand(ClientValidationFieldReference.Of(fieldPath, shape));
         }
 
+        // Emit projections for a native-component validation emitter. The default is
+        // "no value"; operands that carry a literal or a range override these.
+        internal virtual object? LiteralValue => null;
+        internal virtual object[]? RangeValues => null;
+
         internal abstract IEnumerable<ClientValidationFieldReference> PeerFieldReferences { get; }
 
         internal abstract ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix);
@@ -121,6 +134,8 @@ namespace Alis.Reactive.Validation
             _shape = shape;
         }
 
+        internal override object? LiteralValue => _value;
+
         internal override IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
             get { yield break; }
@@ -151,6 +166,8 @@ namespace Alis.Reactive.Validation
         {
             _bounds = bounds;
         }
+
+        internal override object[]? RangeValues => _bounds.ToDescriptorArray();
 
         internal override IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
@@ -217,6 +234,10 @@ namespace Alis.Reactive.Validation
             return new ConditionalClientRuleActivation(condition);
         }
 
+        // True only for an unconditional rule. A native-component validation emitter
+        // skips conditional rules because EJ2 column rules are always-on.
+        internal abstract bool IsAlways { get; }
+
         internal abstract Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding);
 
         internal abstract ClientRuleActivation Combine(ClientRuleActivation incoming);
@@ -229,6 +250,8 @@ namespace Alis.Reactive.Validation
     internal sealed class AlwaysClientRuleActivation : ClientRuleActivation
     {
         internal AlwaysClientRuleActivation() { }
+
+        internal override bool IsAlways => true;
 
         internal override Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
         {
@@ -259,6 +282,8 @@ namespace Alis.Reactive.Validation
         {
             _condition = condition;
         }
+
+        internal override bool IsAlways => false;
 
         internal override Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
         {

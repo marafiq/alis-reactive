@@ -1,0 +1,125 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Sidebar.FusionSidebarModel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Sidebar
+@using Syncfusion.EJ2.Navigations
+@{
+    ViewData["Title"] = "FusionSidebar";
+
+    const string SidebarId = "resident-sidebar";
+    var openPanelUrl = Url.Action("OpenPanel", "Sidebar", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Sidebar.OpenPanel.");
+
+    var plan = Html.ReactivePlan<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Sidebar.FusionSidebarModel>();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var sidebar = p.Component<FusionSidebar>(SidebarId);
+
+        p.Element("is-open-echo").SetText(sidebar.IsOpen());
+        p.Element("open-state").SetText("pending");
+        p.Element("close-state").SetText("pending");
+        p.Element("open-interacted").SetText("pending");
+        p.Element("close-interacted").SetText("pending");
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionSidebar</native-heading>
+    <native-text color="Secondary">
+        Navigation component. Exercises open-state reads, show/hide/toggle methods, and cancelable transition events.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Sidebar</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            The sidebar starts closed. Show, hide, and toggle are exposed as typed runtime actions.
+        </p>
+
+        @(Html.FusionSidebar(plan, SidebarId, b =>
+        {
+            b.IsOpen(false);
+            b.Animate(false);
+            b.EnableGestures(false);
+            b.ShowBackdrop(false);
+            b.Type(SidebarType.Over);
+            b.Width("240px");
+        })
+        .Reactive(evt => evt.Opened, (args, p) =>
+        {
+            p.Element("open-state").SetText("opened");
+            p.Element("open-interacted").SetText(args, x => x.IsInteracted);
+            p.Post(openPanelUrl)
+                .Gather(g => g.FromEvent(args, x => x.IsInteracted, "isInteracted"))
+                .Response(r => r.OnSuccess<FusionSidebarOpenResponse>((json, s) =>
+                {
+                    s.Element("panel-title").SetText(json, x => x.PanelTitle);
+                    s.Element("panel-load-state").SetText(json, x => x.Message);
+                    s.Element("panel-open-mode").SetText(json, x => x.OpenMode);
+                }));
+        })
+        .Reactive(evt => evt.Closed, (args, p) =>
+        {
+            var sidebar = p.Component<FusionSidebar>(SidebarId);
+            p.Element("close-interacted").SetText(args, x => x.IsInteracted);
+            p.Element("close-state").SetText("closed");
+            p.Element("is-open-echo").SetText(sidebar.IsOpen());
+        }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Commands</native-heading>
+        <native-hstack gap="Sm" class="flex-wrap" style="position: relative; z-index: 2001;">
+            @(Html.NativeButton("show-btn", "Show")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var sidebar = p.Component<FusionSidebar>(SidebarId);
+                    sidebar.Show();
+                    p.Element("command-state").SetText("show");
+                    p.Element("is-open-echo").SetText(sidebar.IsOpen());
+                }))
+            @(Html.NativeButton("hide-btn", "Hide")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var sidebar = p.Component<FusionSidebar>(SidebarId);
+                    sidebar.Hide();
+                    p.Element("command-state").SetText("hide");
+                    p.Element("is-open-echo").SetText(sidebar.IsOpen());
+                }))
+            @(Html.NativeButton("toggle-btn", "Toggle")
+                .CssClass("rounded-md bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-600 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var sidebar = p.Component<FusionSidebar>(SidebarId);
+                    sidebar.Toggle();
+                    p.Element("command-state").SetText("toggle");
+                    p.Element("is-open-echo").SetText(sidebar.IsOpen());
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Open state: <span id="is-open-echo" class="text-text-muted">pending</span></p>
+            <p>Open state event: <span id="open-state" class="text-text-muted">pending</span></p>
+            <p>Open interacted: <span id="open-interacted" class="text-text-muted">pending</span></p>
+            <p>Close state: <span id="close-state" class="text-text-muted">pending</span></p>
+            <p>Close interacted: <span id="close-interacted" class="text-text-muted">pending</span></p>
+            <p>Command state: <span id="command-state" class="text-text-muted">pending</span></p>
+            <p>Panel title: <span id="panel-title" class="text-text-muted">pending</span></p>
+            <p>Panel load state: <span id="panel-load-state" class="text-text-muted">pending</span></p>
+            <p>Panel open mode: <span id="panel-open-mode" class="text-text-muted">pending</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

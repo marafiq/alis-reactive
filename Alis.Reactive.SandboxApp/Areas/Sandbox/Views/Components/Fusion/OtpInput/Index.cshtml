@@ -1,0 +1,170 @@
+@model OtpInputModel
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Inputs
+@{
+    ViewData["Title"] = "FusionOtpInput";
+
+    var plan = Html.ReactivePlan<OtpInputModel>();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
+        passcode.SetValue("1357");
+        p.Element("value-echo").SetText(passcode.Value());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionOtpInput</native-heading>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Value, Focus, and Events</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.Passcode, o => o.Label("Passcode"))
+                .FusionOtpInput(b => b
+                    .Length(4)
+                    .Value("1234")
+                    .Type(OtpInputType.Text)
+                    .Placeholder("0000")
+                    .Reactive(plan, evt => evt.Input, (args, p) =>
+                    {
+                        p.Element("input-value").SetText(args, x => x.Value);
+                        p.Element("input-previous").SetText(args, x => x.PreviousValue);
+                        p.Element("input-index").SetText(args, x => x.Index);
+                    })
+                    .Reactive(plan, evt => evt.ValueChanged, (args, p) =>
+                    {
+                        p.Element("changed-value").SetText(args, x => x.Value);
+                        p.Element("changed-previous").SetText(args, x => x.PreviousValue);
+                        p.Element("changed-interacted").SetText(args, x => x.IsInteracted);
+                        p.When(args, x => x.Value).Eq("2468")
+                            .Then(t => t.Element("args-condition").SetText("complete"))
+                            .Else(e => e.Element("args-condition").SetText("changed"));
+                    })
+                    .Reactive(plan, evt => evt.Focus, (args, p) =>
+                    {
+                        p.Element("focus-state").SetText("focused");
+                        p.Element("focus-value").SetText(args, x => x.Value);
+                        p.Element("focus-index").SetText(args, x => x.Index);
+                        p.Element("focus-interacted").SetText(args, x => x.IsInteracted);
+                    })
+                    .Reactive(plan, evt => evt.Blur, (args, p) =>
+                    {
+                        p.Element("focus-state").SetText("blurred");
+                        p.Element("blur-value").SetText(args, x => x.Value);
+                        p.Element("blur-index").SetText(args, x => x.Index);
+                        p.Element("blur-interacted").SetText(args, x => x.IsInteracted);
+                    })); }
+        </native-grid>
+
+        <native-hstack gap="Sm" class="mt-4">
+            @(Html.NativeButton("set-code-btn", "Set Code")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
+                    passcode.SetValue("9876");
+                    p.Element("value-echo").SetText(passcode.Value());
+                    p.Element("command-state").SetText("code set");
+                }))
+            @(Html.NativeButton("clear-code-btn", "Clear Code")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
+                    passcode.SetValue("");
+                    p.Element("value-echo").SetText(passcode.Value());
+                    p.Element("command-state").SetText("code cleared");
+                }))
+            @(Html.NativeButton("focus-code-btn", "Focus Code")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionOtpInput>(m => m.Passcode).FocusIn();
+                    p.Element("command-state").SetText("focus called");
+                }))
+            @(Html.NativeButton("check-code-btn", "Check Code")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
+                    p.When(passcode.Value()).Eq("9876")
+                        .Then(t => t.Element("code-state").SetText("verified"))
+                        .Else(e => e.Element("code-state").SetText("pending"));
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">FocusOut Method</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.AutoBlurCode, o => o.Label("Auto Blur Code"))
+                .FusionOtpInput(b => b
+                    .Length(4)
+                    .Type(OtpInputType.Text)
+                    .Reactive(plan, evt => evt.Focus, (args, p) =>
+                    {
+                        p.Component<FusionOtpInput>(m => m.AutoBlurCode).FocusOut();
+                        p.Element("focusout-method-state").SetText("focusout called");
+                    })
+                    .Reactive(plan, evt => evt.Blur, (args, p) =>
+                    {
+                        p.Element("autoblur-state").SetText("blurred");
+                    })); }
+        </native-grid>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Gather</native-heading>
+        @(Html.NativeButton("gather-btn", "Gather Code")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var passcode = p.Component<FusionOtpInput>(m => m.Passcode);
+                p.Post("/Sandbox/Components/OtpInput/Echo")
+                    .Gather(g => g.Include(passcode.Value(), "passcode"))
+                    .Response(r => r.OnSuccess<OtpInputEchoResponse>((json, s) =>
+                    {
+                        s.Element("gather-code").SetText(json, x => x.Passcode);
+                        s.Element("gather-summary").SetText(json, x => x.Summary);
+                    }));
+            }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Command: <span id="command-state" class="text-text-muted">&mdash;</span></p>
+            <p>Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
+            <p>Input value: <span id="input-value" class="text-text-muted">&mdash;</span></p>
+            <p>Input previous: <span id="input-previous" class="text-text-muted">&mdash;</span></p>
+            <p>Input index: <span id="input-index" class="text-text-muted">&mdash;</span></p>
+            <p>Changed value: <span id="changed-value" class="text-text-muted">&mdash;</span></p>
+            <p>Changed previous: <span id="changed-previous" class="text-text-muted">&mdash;</span></p>
+            <p>Changed interacted: <span id="changed-interacted" class="text-text-muted">&mdash;</span></p>
+            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
+            <p>Focus state: <span id="focus-state" class="text-text-muted">&mdash;</span></p>
+            <p>Focus value: <span id="focus-value" class="text-text-muted">&mdash;</span></p>
+            <p>Focus index: <span id="focus-index" class="text-text-muted">&mdash;</span></p>
+            <p>Focus interacted: <span id="focus-interacted" class="text-text-muted">&mdash;</span></p>
+            <p>Blur value: <span id="blur-value" class="text-text-muted">&mdash;</span></p>
+            <p>Blur index: <span id="blur-index" class="text-text-muted">&mdash;</span></p>
+            <p>Blur interacted: <span id="blur-interacted" class="text-text-muted">&mdash;</span></p>
+            <p>Code state: <span id="code-state" class="text-text-muted">&mdash;</span></p>
+            <p>FocusOut method: <span id="focusout-method-state" class="text-text-muted">&mdash;</span></p>
+            <p>Auto blur state: <span id="autoblur-state" class="text-text-muted">&mdash;</span></p>
+            <p>Gather code: <span id="gather-code" class="text-text-muted">&mdash;</span></p>
+            <p>Gather summary: <span id="gather-summary" class="text-text-muted">&mdash;</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -1,4 +1,4 @@
-namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
+namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
 /// <summary>
 /// Exercises FusionGrid server-side custom binding end-to-end:
