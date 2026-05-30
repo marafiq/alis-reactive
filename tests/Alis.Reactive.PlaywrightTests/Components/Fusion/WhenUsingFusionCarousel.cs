@@ -46,7 +46,7 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
 
         await Expect(Page.Locator("#selected-index-echo")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         await Expect(Page.Locator("#selected-state")).ToHaveTextAsync("second slide", new() { Timeout = 5000 });
-        await Expect(Carousel.ActiveSlide).ToHaveTextAsync("Two", new() { Timeout = 5000 });
+        await Expect(Carousel.ActiveSlide).ToContainTextAsync("Care Plan Review", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -63,7 +63,10 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
         await Expect(Page.Locator("#changed-previous")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-is-swiped")).ToHaveTextAsync("false", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-direction")).ToHaveTextAsync("Next", new() { Timeout = 5000 });
-        await Expect(Carousel.ActiveSlide).ToHaveTextAsync("Three", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#review-persisted")).ToHaveTextAsync("Saved review slide 2: discharge readiness", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#review-section")).ToHaveTextAsync("discharge readiness", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#review-direction")).ToHaveTextAsync("Next", new() { Timeout = 5000 });
+        await Expect(Carousel.ActiveSlide).ToContainTextAsync("Discharge Readiness", new() { Timeout = 5000 });
 
         await Page.Locator("#prev-btn").ClickAsync();
         await Expect(Page.Locator("#selected-index-echo")).ToHaveTextAsync("1", new() { Timeout = 5000 });
@@ -73,7 +76,10 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
         await Expect(Page.Locator("#changed-previous")).ToHaveTextAsync("2", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-is-swiped")).ToHaveTextAsync("false", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-direction")).ToHaveTextAsync("Previous", new() { Timeout = 5000 });
-        await Expect(Carousel.ActiveSlide).ToHaveTextAsync("Two", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#review-persisted")).ToHaveTextAsync("Saved review slide 1: care plan review", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#review-section")).ToHaveTextAsync("care plan review", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#review-direction")).ToHaveTextAsync("Previous", new() { Timeout = 5000 });
+        await Expect(Carousel.ActiveSlide).ToContainTextAsync("Care Plan Review", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -91,7 +97,8 @@ public class WhenUsingFusionCarousel : PlaywrightTestBase
         await Expect(Page.Locator("#changing-cancel")).ToHaveTextAsync("true", new() { Timeout = 5000 });
         await Expect(Page.Locator("#selected-index-echo")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         await Expect(Page.Locator("#changed-state")).ToHaveTextAsync("changed", new() { Timeout = 5000 });
-        await Expect(Carousel.ActiveSlide).ToHaveTextAsync("Two", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#review-persisted")).ToHaveTextAsync("Saved review slide 1: care plan review", new() { Timeout = 5000 });
+        await Expect(Carousel.ActiveSlide).ToContainTextAsync("Care Plan Review", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 }

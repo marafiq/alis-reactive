@@ -7,13 +7,15 @@
     ViewData["Title"] = "FusionCarousel";
 
     const string CarouselId = "resident-carousel";
+    var auditUrl = Url.Action("Audit", "Carousel", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Carousel.Audit.");
 
     var plan = Html.ReactivePlan<FusionCarouselModel>();
     var items = new List<CarouselItem>
     {
-        new() { Template = "<div class='carousel-slide carousel-slide-one'>One</div>" },
-        new() { Template = "<div class='carousel-slide carousel-slide-two'>Two</div>" },
-        new() { Template = "<div class='carousel-slide carousel-slide-three'>Three</div>" }
+        new() { Template = "<div class='carousel-slide carousel-slide-one'><strong>Vitals Snapshot</strong><span>Respiration, pain score, and overnight alerts.</span></div>" },
+        new() { Template = "<div class='carousel-slide carousel-slide-two'><strong>Care Plan Review</strong><span>Therapy notes and medication adjustments.</span></div>" },
+        new() { Template = "<div class='carousel-slide carousel-slide-three'><strong>Discharge Readiness</strong><span>Family teaching and follow-up tasks.</span></div>" }
     };
 
     Html.On(plan, t => t.DomReady(p =>
@@ -77,6 +79,17 @@
             p.Element("changed-is-swiped").SetText(args, x => x.IsSwiped);
             p.Element("changed-direction").SetText(args, x => x.SlideDirection);
             p.Element("changed-state").SetText("changed");
+            p.Post(auditUrl)
+                .Gather(g => g
+                    .FromEvent(args, x => x.CurrentIndex, "currentIndex")
+                    .FromEvent(args, x => x.PreviousIndex, "previousIndex")
+                    .FromEvent(args, x => x.SlideDirection, "slideDirection"))
+                .Response(r => r.OnSuccess<FusionCarouselAuditResponse>((json, s) =>
+                {
+                    s.Element("review-persisted").SetText(json, x => x.Message);
+                    s.Element("review-section").SetText(json, x => x.Section);
+                    s.Element("review-direction").SetText(json, x => x.Direction);
+                }));
         }))
     </native-card-body></native-card>
 
@@ -114,6 +127,9 @@
             <p>Changed is swiped: <span id="changed-is-swiped" class="text-text-muted">pending</span></p>
             <p>Changed direction: <span id="changed-direction" class="text-text-muted">pending</span></p>
             <p>Changed state: <span id="changed-state" class="text-text-muted">pending</span></p>
+            <p>Review persisted: <span id="review-persisted" class="text-text-muted">pending</span></p>
+            <p>Review section: <span id="review-section" class="text-text-muted">pending</span></p>
+            <p>Review direction: <span id="review-direction" class="text-text-muted">pending</span></p>
         </native-vstack>
     </native-card-body></native-card>
 
