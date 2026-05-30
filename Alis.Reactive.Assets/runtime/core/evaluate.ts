@@ -7,6 +7,7 @@ import type {
   ObjectPropertyReadExpression, ObjectMethodReadExpression,
   UrlParameterReadExpression, PayloadPathReadExpression, WholePayloadReadExpression,
   WholeElementReadExpression, ArrayOperationExpression, DomPropertyReadExpression,
+  ElementMethodReadExpression,
 } from "../types";
 import { RuntimePlan } from "../domain/runtime-plan";
 import { applyShape } from "./shape-convert";
@@ -18,7 +19,7 @@ import { RuntimeObject } from "../domain/runtime-object";
 import { evaluateSyncCondition } from "../conditions/sync-condition";
 
 type ObjectReadExpression = ObjectPropertyReadExpression | ObjectMethodReadExpression;
-type PayloadReadExpression = PayloadPathReadExpression | WholePayloadReadExpression | WholeElementReadExpression;
+type PayloadReadExpression = PayloadPathReadExpression | WholePayloadReadExpression | WholeElementReadExpression | ElementMethodReadExpression;
 
 export function evaluateValue(expression: ValueExpression, plan: PlanDocument, ctx?: ExecContext): unknown {
   return ValueEvaluation.from(plan, ctx).evaluate(expression);
@@ -69,6 +70,9 @@ class ValueEvaluation {
       return readFromUrl(expression, this.plan.urlParameters());
     }
     if (isPayloadRead(expression)) {
+      if (isElementMethodRead(expression)) {
+        return this.readElementMethod(expression);
+      }
       return readFromPayload(expression, this.context.resolvePayload(expression.from));
     }
     if (isDomRead(expression)) {
@@ -100,6 +104,19 @@ class ValueEvaluation {
       default:
         assertNever(expression.access, "value read access");
     }
+  }
+
+  /**
+   * Invoke a method on the current element (element scope) — the same RuntimePath.call engine
+   * (fn.apply(owner, args)) that component/plugin method reads use. Args are full value
+   * expressions evaluated in the current element context. A non-function member is a true
+   * external-boundary error, surfaced by RuntimePath.call.
+   */
+  private readElementMethod(expression: ElementMethodReadExpression): unknown {
+    const root = this.context.resolvePayload(expression.from);
+    const args = expression.access.args.map(arg => this.evaluate(arg));
+    const raw = RuntimePath.from(expression.path).call(root, args, `element method "${expression.member}"`);
+    return applyShapeWhenPresent(raw, expression.shape);
   }
 
   private evaluateObject(fields: Record<string, ValueExpression>): Record<string, unknown> {
@@ -235,6 +252,10 @@ function isUrlRead(expression: ReadExpression): expression is UrlParameterReadEx
 
 function isPayloadRead(expression: ReadExpression): expression is PayloadReadExpression {
   return expression.from.kind === "payload";
+}
+
+function isElementMethodRead(expression: PayloadReadExpression): expression is ElementMethodReadExpression {
+  return expression.access.kind === "method";
 }
 
 function isDomRead(expression: ReadExpression): expression is DomPropertyReadExpression {

@@ -717,7 +717,8 @@ export type ReadExpression =
   | PayloadPathReadExpression
   | WholePayloadReadExpression
   | WholeElementReadExpression
-  | DomPropertyReadExpression;
+  | DomPropertyReadExpression
+  | ElementMethodReadExpression;
 
 export interface LiteralExpression {
   kind: "literal";
@@ -804,6 +805,15 @@ export interface DomPropertyReadExpression {
   path: StructuredPath;
   shape: Shape;
   access: PropertyValueReadAccess;
+}
+
+export interface ElementMethodReadExpression {
+  kind: "read";
+  from: PayloadSource;
+  member: string;
+  path: StructuredPath;
+  shape: Shape;
+  access: MethodValueReadAccess;
 }
 
 export type ValueReadAccess =

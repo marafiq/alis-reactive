@@ -14,6 +14,16 @@ namespace Alis.Reactive.Builders.Arrays
     /// </summary>
     internal static class ElementExpressionCompiler
     {
+        // Pure, deterministic, side-effect-free element methods only. A per-element method call is a
+        // value projection, so it must not mutate; side-effecting methods (e.g. grid Row.setCellValue)
+        // belong in a per-element reaction (foreach), not a projection. Grow this set deliberately.
+        private static readonly HashSet<string> WhitelistedMethods = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "getDay", "getMonth", "getFullYear", "getDate", "getHours", "getMinutes", "getSeconds", "getTime",
+            "toUpperCase", "toLowerCase", "trim",
+            "getAttribute", "hasAttribute",
+        };
+
         internal static ConditionGraph CompilePredicate(LambdaExpression predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -107,6 +117,24 @@ namespace Alis.Reactive.Builders.Arrays
                 return path.Length == 0
                     ? ValueExpression.ReadWholeElement(shape)
                     : ValueExpression.ReadPayload(PayloadSource.Element(), path, shape);
+            }
+
+            // Per-element method call (x => x.GetDay(), x => x.Address.GetFormatted()) — the receiver must
+            // be rooted at the element; the method must be whitelisted (pure). Reuses the RuntimePath.call engine.
+            if (node is MethodCallExpression call && call.Object != null && TryElementPath(call.Object, element, out var receiverPath))
+            {
+                var methodName = CamelCase(call.Method.Name);
+                if (!WhitelistedMethods.Contains(methodName))
+                    throw new InvalidOperationException(
+                        "Element method '" + methodName + "' is not whitelisted for the array DSL. Whitelist a PURE, " +
+                        "deterministic method in ElementExpressionCompiler.WhitelistedMethods, or use a server-side " +
+                        "projection. Side-effecting per-element calls need a reaction, not a projection. Got: " + node);
+
+                var methodArgs = new List<ValueExpression>();
+                foreach (var arg in call.Arguments)
+                    methodArgs.Add(CompileValue(Unwrap(arg), element));
+
+                return ValueExpression.InvokeElement(receiverPath, methodName, Shape.FromClrType(node.Type), methodArgs);
             }
 
             if (ReferencesParameter(node, element))

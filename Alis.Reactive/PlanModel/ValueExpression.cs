@@ -102,6 +102,15 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueExpression> args) =>
             new ReadExpression(ValueRead.Method(from, method, returns, args));
 
+        /// <summary>Invokes a method on the current array element (element scope), reusing the same
+        /// RuntimePath.call engine as component/plugin method reads. The path carries the receiver
+        /// traversal plus the method name, so the runtime walks to the owner before calling.</summary>
+        internal static ValueExpression InvokeElement(string receiverPath, string method, Shape returns, IReadOnlyList<ValueExpression> args)
+        {
+            var fullPath = string.IsNullOrEmpty(receiverPath) ? method : receiverPath + "." + method;
+            return new ReadExpression(ValueRead.Method(PayloadSource.Element(), method, Path.Parse(fullPath), returns, args));
+        }
+
         internal static ObjectExpression Object(IReadOnlyDictionary<string, ValueExpression> fields)
         {
             var objectFields = ObjectFields(fields);
@@ -343,6 +352,12 @@ namespace Alis.Reactive.PlanModel
         internal static ValueRead Method(RuntimeObjectSource from, string member, Shape shape, IReadOnlyList<ValueExpression> args) =>
             new ValueRead(
                 ValueReadTarget.ForMember(from, member),
+                shape,
+                ValueReadAccess.Method(args));
+
+        internal static ValueRead Method(Source from, string member, Path path, Shape shape, IReadOnlyList<ValueExpression> args) =>
+            new ValueRead(
+                ValueReadTarget.ForMember(from, member, path),
                 shape,
                 ValueReadAccess.Method(args));
 

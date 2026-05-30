@@ -554,7 +554,8 @@ namespace Alis.Reactive.PlanModel
                 "PayloadPathReadExpression",
                 "WholePayloadReadExpression",
                 "WholeElementReadExpression",
-                "DomPropertyReadExpression"));
+                "DomPropertyReadExpression",
+                "ElementMethodReadExpression"));
 
             contract.Declare(Interface("LiteralExpression")
                 .Requires("kind", Literal("literal"))
@@ -631,6 +632,14 @@ namespace Alis.Reactive.PlanModel
                 .Requires("path", "StructuredPath")
                 .Requires("shape", "Shape")
                 .Requires("access", "PropertyValueReadAccess"));
+
+            contract.Declare(Interface("ElementMethodReadExpression")
+                .Requires("kind", Literal("read"))
+                .Requires("from", "PayloadSource")
+                .Requires("member", "string")
+                .Requires("path", "StructuredPath")
+                .Requires("shape", "Shape")
+                .Requires("access", "MethodValueReadAccess"));
 
             contract.Declare(Union(
                 "ValueReadAccess",
