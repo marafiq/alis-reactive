@@ -397,7 +397,8 @@ export type PayloadScope =
   | "error"
   | "request"
   | "dispatch"
-  | "local";
+  | "local"
+  | "element";
 
 export interface PayloadSource {
   kind: "payload";
@@ -707,7 +708,8 @@ export type ReadExpression =
   | ObjectMethodReadExpression
   | UrlParameterReadExpression
   | PayloadPathReadExpression
-  | WholePayloadReadExpression;
+  | WholePayloadReadExpression
+  | WholeElementReadExpression;
 
 export interface LiteralExpression {
   kind: "literal";
@@ -773,6 +775,15 @@ export interface WholePayloadReadExpression {
   kind: "read";
   from: PayloadSource;
   member: "responseBody";
+  path: EmptyPath;
+  shape: Shape;
+  access: PropertyValueReadAccess;
+}
+
+export interface WholeElementReadExpression {
+  kind: "read";
+  from: PayloadSource;
+  member: "elementValue";
   path: EmptyPath;
   shape: Shape;
   access: PropertyValueReadAccess;

@@ -87,6 +87,13 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression ReadWholePayload(PayloadSource from, Shape shape) =>
             new ReadExpression(ValueRead.WholePayload(from, shape));
 
+        /// <summary>Reads the current array element itself (identity, <c>x =&gt; x</c>) for primitive-element arrays.</summary>
+        internal static ValueExpression ReadWholeElement() =>
+            new ReadExpression(ValueRead.WholeElement(PayloadSource.Element(), Shape.None));
+
+        internal static ValueExpression ReadWholeElement(Shape shape) =>
+            new ReadExpression(ValueRead.WholeElement(PayloadSource.Element(), shape));
+
         internal static ValueExpression Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueExpression> args) =>
             new ReadExpression(ValueRead.Method(from, method, returns, args));
 
@@ -305,11 +312,18 @@ namespace Alis.Reactive.PlanModel
                 ValueReadTarget.ForWholePayload(from),
                 shape,
                 ValueReadAccess.Property);
+
+        internal static ValueRead WholeElement(PayloadSource from, Shape shape) =>
+            new ValueRead(
+                ValueReadTarget.ForWholeElement(from),
+                shape,
+                ValueReadAccess.Property);
     }
 
     internal sealed class ValueReadTarget
     {
         private const string WholePayloadMember = "responseBody";
+        private const string WholeElementMember = "elementValue";
 
         private ValueReadTarget(Source from, MemberName member, Path path)
         {
@@ -330,6 +344,9 @@ namespace Alis.Reactive.PlanModel
 
         internal static ValueReadTarget ForWholePayload(PayloadSource from) =>
             new ValueReadTarget(from, MemberName.Of(WholePayloadMember), Path.None);
+
+        internal static ValueReadTarget ForWholeElement(PayloadSource from) =>
+            new ValueReadTarget(from, MemberName.Of(WholeElementMember), Path.None);
 
         private static ValueReadTarget ForMember(Source from, MemberName member) =>
             new ValueReadTarget(from, member, ValueReadPath.For(from, member));

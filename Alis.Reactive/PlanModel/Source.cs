@@ -92,6 +92,9 @@ namespace Alis.Reactive.PlanModel
         internal static PayloadSource Dispatch(string type) => Dispatch(PayloadContract.Named(type));
 
         internal static PayloadSource Local() => new PayloadSource(PayloadScope.Local, PayloadContract.Untyped);
+
+        /// <summary>The current array element under an array operation (top of the element scope stack).</summary>
+        internal static PayloadSource Element() => new PayloadSource(PayloadScope.Element, PayloadContract.Untyped);
     }
 
     /// <summary>Reads a value from a named plugin object registered by the application.</summary>

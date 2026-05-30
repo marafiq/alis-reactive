@@ -6,6 +6,7 @@ import type {
   PlanDocument, ValueExpression, ExecContext, ReadExpression, RuntimeObjectSource,
   ObjectPropertyReadExpression, ObjectMethodReadExpression,
   UrlParameterReadExpression, PayloadPathReadExpression, WholePayloadReadExpression,
+  WholeElementReadExpression,
 } from "../types";
 import { RuntimePlan } from "../domain/runtime-plan";
 import { applyShape } from "./shape-convert";
@@ -16,7 +17,7 @@ import { ExecutionContext } from "../domain/execution-context";
 import { RuntimeObject } from "../domain/runtime-object";
 
 type ObjectReadExpression = ObjectPropertyReadExpression | ObjectMethodReadExpression;
-type PayloadReadExpression = PayloadPathReadExpression | WholePayloadReadExpression;
+type PayloadReadExpression = PayloadPathReadExpression | WholePayloadReadExpression | WholeElementReadExpression;
 
 export function evaluateValue(expression: ValueExpression, plan: PlanDocument, ctx?: ExecContext): unknown {
   return ValueEvaluation.from(plan, ctx).evaluate(expression);
@@ -126,7 +127,7 @@ function readFromUrl(
 function readFromPayload(
   expression: PayloadReadExpression, root: unknown,
 ): unknown {
-  const raw = readsWholePayload(expression)
+  const raw = readsWholePayload(expression) || readsWholeElement(expression)
     ? root
     : RuntimePath.from(expression.path).read(root);
 
@@ -135,4 +136,8 @@ function readFromPayload(
 
 function readsWholePayload(expression: PayloadReadExpression): expression is WholePayloadReadExpression {
   return expression.member === "responseBody";
+}
+
+function readsWholeElement(expression: PayloadReadExpression): expression is WholeElementReadExpression {
+  return expression.member === "elementValue";
 }
