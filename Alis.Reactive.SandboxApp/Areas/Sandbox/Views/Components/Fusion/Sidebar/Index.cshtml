@@ -2,11 +2,14 @@
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Sidebar
 @using Syncfusion.EJ2.Navigations
 @{
     ViewData["Title"] = "FusionSidebar";
 
     const string SidebarId = "resident-sidebar";
+    var openPanelUrl = Url.Action("OpenPanel", "Sidebar", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Sidebar.OpenPanel.");
 
     var plan = Html.ReactivePlan<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Sidebar.FusionSidebarModel>();
 
@@ -47,6 +50,14 @@
         {
             p.Element("open-state").SetText("opened");
             p.Element("open-interacted").SetText(args, x => x.IsInteracted);
+            p.Post(openPanelUrl)
+                .Gather(g => g.FromEvent(args, x => x.IsInteracted, "isInteracted"))
+                .Response(r => r.OnSuccess<FusionSidebarOpenResponse>((json, s) =>
+                {
+                    s.Element("panel-title").SetText(json, x => x.PanelTitle);
+                    s.Element("panel-load-state").SetText(json, x => x.Message);
+                    s.Element("panel-open-mode").SetText(json, x => x.OpenMode);
+                }));
         })
         .Reactive(evt => evt.Closed, (args, p) =>
         {
@@ -99,6 +110,9 @@
             <p>Close state: <span id="close-state" class="text-text-muted">pending</span></p>
             <p>Close interacted: <span id="close-interacted" class="text-text-muted">pending</span></p>
             <p>Command state: <span id="command-state" class="text-text-muted">pending</span></p>
+            <p>Panel title: <span id="panel-title" class="text-text-muted">pending</span></p>
+            <p>Panel load state: <span id="panel-load-state" class="text-text-muted">pending</span></p>
+            <p>Panel open mode: <span id="panel-open-mode" class="text-text-muted">pending</span></p>
         </native-vstack>
     </native-card-body></native-card>
 

@@ -58,6 +58,9 @@ public class WhenUsingFusionSidebar : PlaywrightTestBase
         await Page.Locator("#show-btn").ClickAsync();
         await Expect(Page.Locator("#open-state")).ToHaveTextAsync("opened", new() { Timeout = 5000 });
         await Expect(Page.Locator("#open-interacted")).ToHaveTextAsync("false", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#panel-title")).ToHaveTextAsync("Resident navigation", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#panel-load-state")).ToHaveTextAsync("workflow opened resident navigation panel", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#panel-open-mode")).ToHaveTextAsync("workflow opened", new() { Timeout = 5000 });
         await Expect(Page.Locator("#is-open-echo")).ToHaveTextAsync("true", new() { Timeout = 5000 });
         await Expect(Sidebar.OpenRoot).ToHaveCountAsync(1);
 

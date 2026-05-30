@@ -15,5 +15,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "~/Areas/Sandbox/Views/Components/Fusion/Sidebar/Index.cshtml",
                 new FusionSidebarModel());
         }
+
+        [HttpPost("OpenPanel")]
+        public IActionResult OpenPanel([FromBody] FusionSidebarOpenRequest request)
+        {
+            var openMode = request.IsInteracted ? "user opened" : "workflow opened";
+
+            return Ok(new FusionSidebarOpenResponse
+            {
+                OpenMode = openMode,
+                PanelTitle = "Resident navigation",
+                Message = $"{openMode} resident navigation panel"
+            });
+        }
     }
 }
