@@ -5,12 +5,9 @@
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
 @{
     const string StepperId = "stepper-wizard";
-    const string ContainerId = "stepper-wizard-step";
     const string FormId = "stepper-wizard-review-form";
     var submitUrl = Url.Action("SubmitWizard", "Stepper", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve Stepper.SubmitWizard.");
-    var loadStepUrl = Url.Action("LoadWizardStep", "Stepper", new { area = "Sandbox" })
-        ?? throw new InvalidOperationException("Could not resolve Stepper.LoadWizardStep.");
 
     var plan = Html.ReactivePlan<FusionStepperWizardReviewModel>();
 }
@@ -56,11 +53,6 @@
             {
                 p.Component<FusionStepper>(StepperId).SetActiveStep(2);
                 p.Element("stepper-wizard-status").SetText("returned to contacts");
-                p.Post(loadStepUrl)
-                    .Gather(g => g
-                        .Include<NativeHiddenField, FusionStepperWizardReviewModel>(m => m.WizardId)
-                        .Static("step", 3))
-                    .Response(r => r.OnSuccess(s => s.Into(ContainerId)));
             }))
 
         @(Html.NativeButton("stepper-wizard-submit", "Submit Admission")

@@ -5,12 +5,9 @@
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
 @{
     const string StepperId = "stepper-wizard";
-    const string ContainerId = "stepper-wizard-step";
     const string FormId = "stepper-wizard-care-form";
     var saveUrl = Url.Action("SaveCare", "Stepper", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve Stepper.SaveCare.");
-    var loadStepUrl = Url.Action("LoadWizardStep", "Stepper", new { area = "Sandbox" })
-        ?? throw new InvalidOperationException("Could not resolve Stepper.LoadWizardStep.");
 
     var plan = Html.ReactivePlan<FusionStepperWizardCareModel>();
     var careLevels = new[] { "Assisted Living", "Memory Care", "Skilled Nursing" };
@@ -71,11 +68,6 @@
             {
                 p.Component<FusionStepper>(StepperId).SetActiveStep(0);
                 p.Element("stepper-wizard-status").SetText("returned to intake");
-                p.Post(loadStepUrl)
-                    .Gather(g => g
-                        .Include<NativeHiddenField, FusionStepperWizardCareModel>(m => m.WizardId)
-                        .Static("step", 1))
-                    .Response(r => r.OnSuccess(s => s.Into(ContainerId)));
             }))
 
         @(Html.NativeButton("stepper-wizard-next-care", "Next: Contacts")
@@ -88,16 +80,11 @@
                         .OnSuccess<FusionStepperWizardSaveResponse>((json, s) =>
                         {
                             s.Component<NativeHiddenField>(m => m.WizardId).SetValue(json, x => x.WizardId);
+                            s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).SetValue("2");
                             s.Component<FusionStepper>(StepperId).SetActiveStep(2);
                             s.Element("stepper-wizard-status").SetText(json, x => x.Message);
                         })
-                        .OnError(400, e => e.ValidationErrors(FormId))
-                        .Chained(c => c
-                            .Post(loadStepUrl)
-                            .Gather(g => g
-                                .Include<NativeHiddenField, FusionStepperWizardCareModel>(m => m.WizardId)
-                                .Static("step", 3))
-                            .Response(r2 => r2.OnSuccess(s2 => s2.Into(ContainerId)))));
+                        .OnError(400, e => e.ValidationErrors(FormId)));
             }))
     </native-hstack>
 </native-card-body></native-card>

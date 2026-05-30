@@ -34,6 +34,9 @@ public class WhenUsingFusionStepperLazyWizard : PlaywrightTestBase
     private ILocator ErrorFor(string formId, string fieldName) =>
         Page.Locator($"#stepper-wizard-step #{formId} span[data-valmsg-for='{fieldName}']");
 
+    private ILocator StepNumber(int zeroBasedIndex) =>
+        Page.Locator("#stepper-wizard .e-step-container > .e-indicator").Nth(zeroBasedIndex);
+
     [Test]
     public async Task components_index_links_to_the_lazy_wizard()
     {
@@ -52,6 +55,11 @@ public class WhenUsingFusionStepperLazyWizard : PlaywrightTestBase
     public async Task lazy_loaded_steps_gate_navigation_with_framework_validation_and_recover_saved_drafts()
     {
         await NavigateAndLoadIntake();
+
+        await StepNumber(2).ClickAsync(new() { Force = true });
+        await Expect(Page.Locator("#stepper-wizard-step #stepper-wizard-intake-form")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#stepper-wizard-current")).ToHaveTextAsync("0", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#stepper-wizard-status")).ToHaveTextAsync("complete care before opening contacts", new() { Timeout = 5000 });
 
         await ClickWhenStable(Page.Locator("#stepper-wizard-next-intake"));
         await Expect(Page.Locator("#stepper-wizard-step #stepper-wizard-intake-form")).ToBeVisibleAsync();
@@ -112,6 +120,16 @@ public class WhenUsingFusionStepperLazyWizard : PlaywrightTestBase
         await Expect(Page.Locator("#stepper-wizard-summary-resident")).ToHaveTextAsync("Amina Patel");
         await Expect(Page.Locator("#stepper-wizard-summary-care")).ToHaveTextAsync("Memory Care");
         await Expect(Page.Locator("#stepper-wizard-summary-contact")).ToHaveTextAsync("Mina Patel");
+
+        await StepNumber(1).ClickAsync(new() { Force = true });
+        await Expect(Page.Locator("#stepper-wizard-step #stepper-wizard-care-form")).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Page.Locator("#stepper-wizard-current")).ToHaveTextAsync("1", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#memory-assessment-panel")).ToBeVisibleAsync(new() { Timeout = 5000 });
+
+        await ClickWhenStable(Page.Locator("#stepper-wizard-next-care"));
+        await Expect(Page.Locator("#stepper-wizard-step #stepper-wizard-contact-form")).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await ClickWhenStable(Page.Locator("#stepper-wizard-next-contact"));
+        await Expect(Page.Locator("#stepper-wizard-step #stepper-wizard-review-form")).ToBeVisibleAsync(new() { Timeout = 10000 });
 
         await ClickWhenStable(Page.Locator("#stepper-wizard-submit"));
         await Expect(ErrorFor("stepper-wizard-review-form", nameof(FusionStepperWizardReviewModel.AdmissionCoordinator)))

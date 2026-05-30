@@ -5,13 +5,9 @@
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
 @{
     const string StepperId = "stepper-wizard";
-    const string ContainerId = "stepper-wizard-step";
     const string FormId = "stepper-wizard-intake-form";
     var saveUrl = Url.Action("SaveIntake", "Stepper", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve Stepper.SaveIntake.");
-    var loadStepUrl = Url.Action("LoadWizardStep", "Stepper", new { area = "Sandbox" })
-        ?? throw new InvalidOperationException("Could not resolve Stepper.LoadWizardStep.");
-
     var plan = Html.ReactivePlan<FusionStepperWizardIntakeModel>();
     var admissionTypes = new[] { "Respite", "Assisted Living", "Memory Care Evaluation", "Skilled Nursing" };
 }
@@ -46,16 +42,11 @@
                         .OnSuccess<FusionStepperWizardSaveResponse>((json, s) =>
                         {
                             s.Component<NativeHiddenField>(m => m.WizardId).SetValue(json, x => x.WizardId);
+                            s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).SetValue("1");
                             s.Component<FusionStepper>(StepperId).SetActiveStep(1);
                             s.Element("stepper-wizard-status").SetText(json, x => x.Message);
                         })
-                        .OnError(400, e => e.ValidationErrors(FormId))
-                        .Chained(c => c
-                            .Post(loadStepUrl)
-                            .Gather(g => g
-                                .Include<NativeHiddenField, FusionStepperWizardIntakeModel>(m => m.WizardId)
-                                .Static("step", 2))
-                            .Response(r2 => r2.OnSuccess(s2 => s2.Into(ContainerId)))));
+                        .OnError(400, e => e.ValidationErrors(FormId)));
             }))
     </native-hstack>
 </native-card-body></native-card>

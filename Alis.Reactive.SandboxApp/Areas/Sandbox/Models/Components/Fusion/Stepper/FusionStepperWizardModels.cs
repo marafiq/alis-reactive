@@ -6,6 +6,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Steppe
     public sealed record FusionStepperWizardShellModel
     {
         public string? WizardId { get; init; }
+        public string MaxUnlockedStep { get; init; } = "0";
     }
 
     public sealed record FusionStepperWizardLoadStepRequest
