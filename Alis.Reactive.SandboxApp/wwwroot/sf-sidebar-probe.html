@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF Sidebar API Probe</title>
+    <link rel="stylesheet" href="/vendor/syncfusion/material.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #host { position: relative; width: 560px; min-height: 240px; border: 1px solid #d0d7de; margin-bottom: 16px; overflow: hidden; }
+        #content { padding: 16px; min-height: 240px; background: #f8fafc; }
+        #sidebar { background: #111827; color: #fff; height: 240px; padding: 16px; box-sizing: border-box; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>SF Sidebar API Probe</h1>
+    <p>Trace the runtime surface before onboarding typed Fusion API.</p>
+
+    <div id="host">
+        <aside id="sidebar">
+            <h2>Sidebar</h2>
+            <p>Probe content.</p>
+        </aside>
+        <main id="content">Main content</main>
+    </div>
+
+    <div>
+        <button id="show">Show</button>
+        <button id="hide">Hide</button>
+        <button id="toggle">Toggle</button>
+        <button id="cancel-next-close">Cancel next close</button>
+        <button id="clear">Clear Trace</button>
+    </div>
+
+    <h2>Trace Matrix</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Kind</th>
+                <th>Builder</th>
+                <th>Proof</th>
+                <th>Typed Fusion API</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody id="proposal-body"></tbody>
+    </table>
+
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const rows = [];
+        const target = document.getElementById("sidebar");
+        let cancelNextClose = false;
+        let sidebar;
+
+        function clean(value, seen, depth) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).slice(0, 80).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function describePayload(args) {
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item, new WeakSet(), 0)
+                };
+            });
+            return { ownKeys: own, properties };
+        }
+
+        function record(label, value) {
+            trace.push({
+                at: new Date().toISOString(),
+                label,
+                value: clean(value, new WeakSet(), 0)
+            });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        window.__sfProbe = {
+            trace,
+            record,
+            event: (label, args) => record(label, describePayload(args)),
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke())
+        };
+
+        function addRow(row) {
+            rows.push(row);
+            const tr = document.createElement("tr");
+            [row.candidate, row.kind, row.builder, row.proof, row.csharp, row.outcome].forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value;
+                tr.appendChild(td);
+            });
+            document.getElementById("proposal-body").appendChild(tr);
+        }
+
+        sidebar = new ej.navigations.Sidebar({
+            isOpen: false,
+            animate: false,
+            enableGestures: false,
+            showBackdrop: false,
+            type: "Over",
+            width: "240px",
+            open: args => {
+                record("open", describePayload(args));
+                record("isOpen.read", sidebar.isOpen);
+            },
+            close: args => {
+                record("close", describePayload(args));
+                if (cancelNextClose) {
+                    args.cancel = true;
+                    cancelNextClose = false;
+                    record("close.cancelled", {
+                        cancel: args.cancel,
+                        isOpen: sidebar.isOpen
+                    });
+                }
+                record("isOpen.read", sidebar.isOpen);
+            }
+        });
+
+        sidebar.appendTo(target);
+        record("ready", {
+            component: "sidebar",
+            namespace: "ej.navigations",
+            className: "Sidebar",
+            id: "sidebar",
+            isOpen: sidebar.isOpen,
+            methods: Object.getOwnPropertyNames(Object.getPrototypeOf(sidebar)).sort()
+        });
+
+        document.getElementById("show").addEventListener("click", () => {
+            sidebar.show();
+            record("after-show-call", {
+                isOpen: sidebar.isOpen,
+                className: target.className,
+                classes: Array.from(target.classList).sort()
+            });
+        });
+
+        document.getElementById("hide").addEventListener("click", () => {
+            sidebar.hide();
+            record("after-hide-call", {
+                isOpen: sidebar.isOpen,
+                className: target.className,
+                classes: Array.from(target.classList).sort()
+            });
+        });
+
+        document.getElementById("toggle").addEventListener("click", () => {
+            sidebar.toggle();
+            record("after-toggle-call", {
+                isOpen: sidebar.isOpen,
+                className: target.className,
+                classes: Array.from(target.classList).sort()
+            });
+        });
+
+        document.getElementById("cancel-next-close").addEventListener("click", () => {
+            cancelNextClose = true;
+            record("cancel-next-close", { cancelNextClose });
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            document.getElementById("trace").textContent = "";
+        });
+
+        addRow({
+            candidate: "isOpen read",
+            kind: "prop-read",
+            builder: "static-only",
+            proof: "sidebar.isOpen changes with show/hide/toggle",
+            csharp: "IsOpen()",
+            outcome: "implement"
+        });
+
+        addRow({
+            candidate: "show()",
+            kind: "method",
+            builder: "runtime",
+            proof: "Show button opens the sidebar and fires open",
+            csharp: "Show()",
+            outcome: "implement"
+        });
+
+        addRow({
+            candidate: "hide()",
+            kind: "method",
+            builder: "runtime",
+            proof: "Hide button closes the sidebar and fires close",
+            csharp: "Hide()",
+            outcome: "implement"
+        });
+
+        addRow({
+            candidate: "toggle()",
+            kind: "method",
+            builder: "runtime",
+            proof: "Toggle button alternates open and closed state",
+            csharp: "Toggle()",
+            outcome: "implement"
+        });
+
+        addRow({
+            candidate: "close.cancel",
+            kind: "payload-write",
+            builder: "runtime",
+            proof: "Cancel next close keeps isOpen true after hide()",
+            csharp: "PreventTransition()",
+            outcome: "implement"
+        });
+    </script>
+</body>
+</html>
