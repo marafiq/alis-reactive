@@ -63,6 +63,11 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression ReadUrl(string paramName, Shape shape) =>
             Read(UrlSource.Instance, paramName, shape);
 
+        /// <summary>Reads a member from a DOM element resolved via getElementById. The member path is
+        /// carried in the read so the runtime reaches it with RuntimePath — no contract needed.</summary>
+        internal static ValueExpression ReadDom(string elementId, string member, Shape shape) =>
+            Read(DomSource.Of(elementId), member, Path.Parse(member), shape);
+
         internal static ValueExpression Read(Source from, string member) =>
             new ReadExpression(ValueRead.Property(from, member, Shape.None));
 

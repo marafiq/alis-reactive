@@ -266,7 +266,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("kind", Literal("when"))
                 .Requires("condition", "ValidationCondition"));
 
-            contract.Declare(Union("Source", "ComponentSource", "PayloadSource", "UrlSource", "PluginSource"));
+            contract.Declare(Union("Source", "ComponentSource", "PayloadSource", "UrlSource", "PluginSource", "DomSource"));
             contract.Declare(Union("RuntimeObjectSource", "ComponentSource", "PluginSource"));
             contract.Declare(Union("SetTargetSource", "ComponentSource", "PayloadSource"));
             contract.Declare(Union("CallTargetSource", "ComponentSource", "PayloadSource", "PluginSource"));
@@ -277,6 +277,10 @@ namespace Alis.Reactive.PlanModel
 
             contract.Declare(Interface("UrlSource")
                 .Requires("kind", Literal("url")));
+
+            contract.Declare(Interface("DomSource")
+                .Requires("kind", Literal("dom"))
+                .Requires("element", "string"));
 
             contract.Declare(Interface("PluginSource")
                 .Requires("kind", Literal("plugin"))
@@ -549,7 +553,8 @@ namespace Alis.Reactive.PlanModel
                 "UrlParameterReadExpression",
                 "PayloadPathReadExpression",
                 "WholePayloadReadExpression",
-                "WholeElementReadExpression"));
+                "WholeElementReadExpression",
+                "DomPropertyReadExpression"));
 
             contract.Declare(Interface("LiteralExpression")
                 .Requires("kind", Literal("literal"))
@@ -616,6 +621,14 @@ namespace Alis.Reactive.PlanModel
                 .Requires("from", "PayloadSource")
                 .Requires("member", Literal("elementValue"))
                 .Requires("path", "EmptyPath")
+                .Requires("shape", "Shape")
+                .Requires("access", "PropertyValueReadAccess"));
+
+            contract.Declare(Interface("DomPropertyReadExpression")
+                .Requires("kind", Literal("read"))
+                .Requires("from", "DomSource")
+                .Requires("member", "string")
+                .Requires("path", "StructuredPath")
                 .Requires("shape", "Shape")
                 .Requires("access", "PropertyValueReadAccess"));
 

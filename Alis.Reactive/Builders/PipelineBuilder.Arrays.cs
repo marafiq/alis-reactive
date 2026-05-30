@@ -27,5 +27,18 @@ namespace Alis.Reactive.Builders
             var source = PayloadTypedSource<TArgs, TElement[]>.FromEvent(selector);
             return new ReactiveArray<TElement>(source.ToValueExpression(), Shape.FromClrType(typeof(TElement)));
         }
+
+        /// <summary>
+        /// Begins a typed array transform over a DOM element's array-like member (e.g.
+        /// <c>p.FromDom("resident-card", "classList")</c>). The element is resolved by
+        /// getElementById and the member read with RuntimePath; array-like collections
+        /// (DOMTokenList, HTMLCollection, NodeList) are normalized at the array-op boundary.
+        /// </summary>
+        public ReactiveArray<string> FromDom(string elementId, string member) =>
+            new ReactiveArray<string>(ValueExpression.ReadDom(elementId, member, Shape.None), Shape.String);
+
+        /// <summary>DOM array-like member of a declared element type (e.g. child elements).</summary>
+        public ReactiveArray<TElement> FromDom<TElement>(string elementId, string member) =>
+            new ReactiveArray<TElement>(ValueExpression.ReadDom(elementId, member, Shape.None), Shape.FromClrType(typeof(TElement)));
     }
 }

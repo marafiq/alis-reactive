@@ -6,7 +6,7 @@ import type {
   PlanDocument, ValueExpression, ExecContext, ReadExpression, RuntimeObjectSource,
   ObjectPropertyReadExpression, ObjectMethodReadExpression,
   UrlParameterReadExpression, PayloadPathReadExpression, WholePayloadReadExpression,
-  WholeElementReadExpression, ArrayOperationExpression,
+  WholeElementReadExpression, ArrayOperationExpression, DomPropertyReadExpression,
 } from "../types";
 import { RuntimePlan } from "../domain/runtime-plan";
 import { applyShape } from "./shape-convert";
@@ -70,6 +70,9 @@ class ValueEvaluation {
     }
     if (isPayloadRead(expression)) {
       return readFromPayload(expression, this.context.resolvePayload(expression.from));
+    }
+    if (isDomRead(expression)) {
+      return readFromDom(expression);
     }
 
     return assertNever(expression, "read expression");
@@ -223,6 +226,20 @@ function isUrlRead(expression: ReadExpression): expression is UrlParameterReadEx
 
 function isPayloadRead(expression: ReadExpression): expression is PayloadReadExpression {
   return expression.from.kind === "payload";
+}
+
+function isDomRead(expression: ReadExpression): expression is DomPropertyReadExpression {
+  return expression.from.kind === "dom";
+}
+
+/** Read a member off a DOM element resolved by id — same RuntimePath primitive, no contract. */
+function readFromDom(expression: DomPropertyReadExpression): unknown {
+  const element = document.getElementById(expression.from.element);
+  if (element === null) {
+    throw new Error(`[alis] dom source element "${expression.from.element}" not found`);
+  }
+  const raw = RuntimePath.from(expression.path).read(element);
+  return applyShapeWhenPresent(raw, expression.shape);
 }
 
 /** Read a query parameter from URL source. */

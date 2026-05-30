@@ -125,4 +125,28 @@ namespace Alis.Reactive.PlanModel
         private UrlSource() { }
         internal static UrlSource Instance { get; } = new UrlSource();
     }
+
+    /// <summary>Identifies a DOM element (by id) whose members are read directly via getElementById.</summary>
+    /// <remarks>
+    /// A DOM element is a JS object; its members are reached with the same RuntimePath primitive
+    /// that resolves component/plugin members — no BrowserObjectContract is required. Element ids
+    /// are plan-carried (Rule 7: getElementById only, no scanning). The member name is stringly at
+    /// this DOM boundary, like plugin names.
+    /// </remarks>
+    public sealed class DomSource : Source
+    {
+        private readonly string _element;
+
+        /// <summary>Gets the kind. Always <c>"dom"</c>.</summary>
+        public string Kind => "dom";
+        /// <summary>Gets the element id resolved via getElementById.</summary>
+        public string Element => _element;
+
+        private DomSource(string element)
+        {
+            _element = element ?? throw new ArgumentNullException(nameof(element));
+        }
+
+        internal static DomSource Of(string element) => new DomSource(element);
+    }
 }

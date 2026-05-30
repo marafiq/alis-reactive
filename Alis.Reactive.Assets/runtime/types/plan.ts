@@ -361,7 +361,8 @@ export type Source =
   | ComponentSource
   | PayloadSource
   | UrlSource
-  | PluginSource;
+  | PluginSource
+  | DomSource;
 
 export type RuntimeObjectSource =
   | ComponentSource
@@ -383,6 +384,11 @@ export interface ComponentSource {
 
 export interface UrlSource {
   kind: "url";
+}
+
+export interface DomSource {
+  kind: "dom";
+  element: string;
 }
 
 export interface PluginSource {
@@ -710,7 +716,8 @@ export type ReadExpression =
   | UrlParameterReadExpression
   | PayloadPathReadExpression
   | WholePayloadReadExpression
-  | WholeElementReadExpression;
+  | WholeElementReadExpression
+  | DomPropertyReadExpression;
 
 export interface LiteralExpression {
   kind: "literal";
@@ -786,6 +793,15 @@ export interface WholeElementReadExpression {
   from: PayloadSource;
   member: "elementValue";
   path: EmptyPath;
+  shape: Shape;
+  access: PropertyValueReadAccess;
+}
+
+export interface DomPropertyReadExpression {
+  kind: "read";
+  from: DomSource;
+  member: string;
+  path: StructuredPath;
   shape: Shape;
   access: PropertyValueReadAccess;
 }
