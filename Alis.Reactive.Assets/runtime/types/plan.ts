@@ -701,7 +701,8 @@ export type ValueExpression =
   | LiteralExpression
   | ReadExpression
   | ObjectExpression
-  | ArrayExpression;
+  | ArrayExpression
+  | ArrayOperationExpression;
 
 export type ReadExpression =
   | ObjectPropertyReadExpression
@@ -811,6 +812,17 @@ export interface ObjectExpression {
 export interface ArrayExpression {
   kind: "array";
   items: ValueExpression[];
+  shape: Shape;
+}
+
+export type ArrayOp =
+  | "count";
+
+export interface ArrayOperationExpression {
+  kind: "array-op";
+  op: ArrayOp;
+  source: ValueExpression;
+  itemShape: Shape;
   shape: Shape;
 }
 

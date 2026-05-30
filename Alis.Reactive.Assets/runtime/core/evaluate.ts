@@ -6,7 +6,7 @@ import type {
   PlanDocument, ValueExpression, ExecContext, ReadExpression, RuntimeObjectSource,
   ObjectPropertyReadExpression, ObjectMethodReadExpression,
   UrlParameterReadExpression, PayloadPathReadExpression, WholePayloadReadExpression,
-  WholeElementReadExpression,
+  WholeElementReadExpression, ArrayOperationExpression,
 } from "../types";
 import { RuntimePlan } from "../domain/runtime-plan";
 import { applyShape } from "./shape-convert";
@@ -50,6 +50,9 @@ class ValueEvaluation {
         return RuntimeValue
           .declared(expression.items.map(item => this.evaluate(item)), expression.shape)
           .usingDeclaredShape();
+
+      case "array-op":
+        return this.evaluateArrayOp(expression);
 
       default:
         assertNever(expression, "value expression kind");
@@ -101,6 +104,34 @@ class ValueEvaluation {
     }
     return result;
   }
+
+  private evaluateArrayOp(expression: ArrayOperationExpression): unknown {
+    const items = normalizeToArray(this.evaluate(expression.source), expression.op);
+    switch (expression.op) {
+      case "count":
+        return items.length;
+      default:
+        return assertNever(expression.op, "array-op kind");
+    }
+  }
+}
+
+/**
+ * Normalize an array-op source to a JS array at the input boundary.
+ * Browser/EJ2 JS APIs return an underdetermined union (Array | array-like | iterable
+ * | scalar | null) that the C# T[] type cannot constrain at authoring time. This is an
+ * external-boundary normalization — the same category as getElementById returning null —
+ * not a plan validator or fallback. DOMStringMap (dataset) has no Symbol.iterator and
+ * fails fast at the throw, keeping it in the plugin escape hatch's domain.
+ */
+function normalizeToArray(value: unknown, label: string): unknown[] {
+  if (Array.isArray(value)) return value;
+  if (value === null || value === undefined) return [];
+  if (typeof value === "number" || typeof value === "string") return [value];
+  if (typeof value === "object" && Symbol.iterator in (value as object)) {
+    return Array.from(value as Iterable<unknown>);
+  }
+  throw new Error(`[alis] array-op source is not iterable: ${label} (got ${typeof value})`);
 }
 
 function isObjectRead(expression: ReadExpression): expression is ObjectReadExpression {

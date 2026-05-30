@@ -539,7 +539,8 @@ namespace Alis.Reactive.PlanModel
                 "LiteralExpression",
                 "ReadExpression",
                 "ObjectExpression",
-                "ArrayExpression"));
+                "ArrayExpression",
+                "ArrayOperationExpression"));
 
             contract.Declare(Union(
                 "ReadExpression",
@@ -638,6 +639,15 @@ namespace Alis.Reactive.PlanModel
             contract.Declare(Interface("ArrayExpression")
                 .Requires("kind", Literal("array"))
                 .Requires("items", "ValueExpression[]")
+                .Requires("shape", "Shape"));
+
+            contract.Declare(LiteralUnion("ArrayOp", new[] { "count" }));
+
+            contract.Declare(Interface("ArrayOperationExpression")
+                .Requires("kind", Literal("array-op"))
+                .Requires("op", "ArrayOp")
+                .Requires("source", "ValueExpression")
+                .Requires("itemShape", "Shape")
                 .Requires("shape", "Shape"));
 
             contract.Declare(Union(

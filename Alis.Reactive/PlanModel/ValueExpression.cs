@@ -121,6 +121,10 @@ namespace Alis.Reactive.PlanModel
             return new ArrayExpression(arrayItems.Items, shape);
         }
 
+        /// <summary>Counts the elements produced by <paramref name="source"/> (a value of array shape).</summary>
+        internal static ValueExpression ArrayCount(ValueExpression source, Shape itemShape) =>
+            new ArrayOperationExpression("count", source, itemShape, Shape.Number);
+
         private static (IReadOnlyDictionary<string, ValueExpression> Fields, Shape Shape) ObjectFields(
             IReadOnlyDictionary<string, ValueExpression> fields)
         {
@@ -469,6 +473,37 @@ namespace Alis.Reactive.PlanModel
         internal ArrayExpression(IReadOnlyList<ValueExpression> items, Shape shape)
         {
             _items = items ?? throw new ArgumentNullException(nameof(items));
+            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
+        }
+
+        internal override Shape OutputShape => Shape;
+    }
+
+    /// <summary>A deterministic operation over the elements of an array-shaped value.</summary>
+    /// <remarks>
+    /// One node, op sub-discriminator (mirrors <c>CompareCondition</c>). The runtime
+    /// iterates the source array — normalizing array-like/iterable browser values at the
+    /// input boundary — and produces the declared output. Predicate and projection
+    /// operands are added by the ops that use them (filter/map/sum/find/...).
+    /// </remarks>
+    public sealed class ArrayOperationExpression : ValueExpression
+    {
+        /// <summary>Gets the kind. Always <c>"array-op"</c>.</summary>
+        public string Kind => "array-op";
+        /// <summary>Gets the operation: <c>count</c> (and, as ops land, filter/map/sum/...).</summary>
+        public string Op { get; }
+        /// <summary>Gets the value expression that produces the source array.</summary>
+        public ValueExpression Source { get; }
+        /// <summary>Gets the declared element shape of the source array.</summary>
+        public Shape ItemShape { get; }
+        /// <summary>Gets the declared output shape of the operation.</summary>
+        public Shape Shape { get; }
+
+        internal ArrayOperationExpression(string op, ValueExpression source, Shape itemShape, Shape shape)
+        {
+            Op = op ?? throw new ArgumentNullException(nameof(op));
+            Source = source ?? throw new ArgumentNullException(nameof(source));
+            ItemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
