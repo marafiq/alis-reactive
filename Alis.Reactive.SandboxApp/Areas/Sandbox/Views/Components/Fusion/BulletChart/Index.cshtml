@@ -1,0 +1,114 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart.FusionBulletChartModel
+@using System.Collections.Generic
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Syncfusion.EJ2.Charts
+@using BulletRange = Syncfusion.EJ2.Charts.Range
+@{
+    ViewData["Title"] = "FusionBulletChart";
+
+    const string BulletChartId = "resident-bullet-chart";
+
+    var plan = Html.ReactivePlan<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart.FusionBulletChartModel>();
+    var data = new List<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart.BulletChartPoint>
+    {
+        new() { Category = "North Wing", Value = 72, Target = 80 },
+        new() { Category = "South Wing", Value = 54, Target = 68 },
+        new() { Category = "Rehab", Value = 88, Target = 92 }
+    };
+
+    var ranges = new List<BulletRange>
+    {
+        new() { End = 40, Name = "Poor", Color = "#ef4444" },
+        new() { End = 70, Name = "Average", Color = "#f59e0b" },
+        new() { End = 100, Name = "Good", Color = "#10b981" }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var chart = p.Component<FusionBulletChart>(BulletChartId);
+        p.Element("tooltip-state").SetText("pending");
+        p.Element("tooltip-value").SetText("pending");
+        p.Element("tooltip-target").SetText("pending");
+        p.Element("tooltip-text").SetText("pending");
+        p.Element("mouse-click-state").SetText("pending");
+        p.Element("mouse-click-target").SetText("pending");
+        p.Element("mouse-click-x").SetText("pending");
+        p.Element("mouse-click-y").SetText("pending");
+        p.Element("actual-index-negative").SetText(chart.GetActualIndex(-1, 3));
+        p.Element("actual-index-overflow").SetText(chart.GetActualIndex(3, 3));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionBulletChart</native-heading>
+    <native-text color="Secondary">
+        Bullet chart slice. Exercises load and render lifecycle events, tooltip mutation, click payloads, and a wrapped index method read.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Bullet chart</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            Hover the feature bar to trigger tooltip rendering and click it to capture mouse metadata.
+        </p>
+
+        @(Html.FusionBulletChart(plan, BulletChartId, b =>
+        {
+            b.Width("100%");
+            b.Height("280px");
+            b.Title("Resident readiness");
+            b.Subtitle("Load, tooltip, click, and method reads");
+            b.Minimum(0);
+            b.Maximum(100);
+            b.Interval(20);
+            b.CategoryField("category");
+            b.ValueField("value");
+            b.TargetField("target");
+            b.DataSource(data);
+            b.Ranges(ranges);
+            b.Tooltip(new BulletChartBulletTooltipSettings
+            {
+                Enable = true
+            });
+        })
+        .Reactive(evt => evt.TooltipRender, (args, p) =>
+        {
+            p.Element("tooltip-state").SetText("rendered");
+            p.Element("tooltip-value").SetText(args, x => x.Value);
+            p.Element("tooltip-target").SetText(args, x => x.Target[0]);
+            args.SetText(p, "Bullet tooltip rewritten");
+            p.Element("tooltip-text").SetText("Bullet tooltip rewritten");
+        })
+        .Reactive(evt => evt.BulletChartMouseClick, (args, p) =>
+        {
+            p.Element("mouse-click-state").SetText("clicked");
+            p.Element("mouse-click-target").SetText(args, x => x.Target);
+            p.Element("mouse-click-x").SetText(args, x => x.X);
+            p.Element("mouse-click-y").SetText(args, x => x.Y);
+        }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Tooltip state: <span id="tooltip-state" class="text-text-muted">pending</span></p>
+            <p>Tooltip value: <span id="tooltip-value" class="text-text-muted">pending</span></p>
+            <p>Tooltip target: <span id="tooltip-target" class="text-text-muted">pending</span></p>
+            <p>Tooltip text: <span id="tooltip-text" class="text-text-muted">pending</span></p>
+            <p>Mouse click state: <span id="mouse-click-state" class="text-text-muted">pending</span></p>
+            <p>Mouse click target: <span id="mouse-click-target" class="text-text-muted">pending</span></p>
+            <p>Mouse click x: <span id="mouse-click-x" class="text-text-muted">pending</span></p>
+            <p>Mouse click y: <span id="mouse-click-y" class="text-text-muted">pending</span></p>
+            <p>Actual index -1: <span id="actual-index-negative" class="text-text-muted">pending</span></p>
+            <p>Actual index 3: <span id="actual-index-overflow" class="text-text-muted">pending</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)
