@@ -1,77 +1,86 @@
-# Array DSL — recorded follow-ups (broader-framework, NOT made here)
+# Array DSL as a first-class citizen — value-routing law, completion + follow-ups
 
 Date: 2026-05-30
-Status: RECORDED ONLY — these touch framework code outside the array-DSL slice. They were
-deliberately not implemented in the quality/extension pass (scope was "only change the array
-DSL; record broader wins"). Each is specified precisely so the owning layer can execute.
+Supersedes the earlier "recorded follow-ups" framing, which was a patch mentality. The array DSL
+is not a feature bolted on; it completes one law the framework already had.
 
-The array-DSL pass itself (quality fixes, per-element method calls, `AsSource()` adapter) is
-complete and verified: vitest green, typecheck clean, C# build clean, ArrayOps + DomOps
-Playwright slices green.
+## The one law
 
-## 1. Fusion `SetDataSource(TypedSource<T[]>)` overloads — HIGH confidence, clear win
+A browser object (component, plugin, app object, DOM node) has members. A member's value is a
+scalar, an object, or an **array**. The framework's whole job is:
 
-**Why a massive win:** `ReactiveArray<T>.AsSource()` already exposes a transformed array as a
-`TypedSource<T[]>` (shipped in this pass). The only missing half is a component-side overload to
-consume it, which unlocks binding a **client-side filtered/sorted/mapped** array straight to a
-component data source **without an HTTP round-trip** — e.g. filter a loaded roster by a dropdown
-selection and rebind the grid, entirely in the plan.
+> read any member of any browser object; route any value to any member of any browser object —
+> expressed in typed C#, compiled to a deterministic plan, generated into TS, executed by a dumb
+> runtime that keeps pure reads **sync** and only HTTP / confirm / inject **async**.
 
-**Why not made here:** the component extension files live in the Fusion layer (vendor scope), not
-the array-DSL scope.
+The array DSL completes that law for **array-typed members**: before it you could *read* an array
+member (`multiSelect.Value() : string[]`, `kanban.Cards() : Card[]`) but it was hard to express
+intent over the **elements' own members**. Now `x => x.Status == Active`, `x => x.Balance`,
+`x => x.GetDay()` are first-class — the full member graph of every element, deterministic and typed.
 
-**Exact change (one overload per file, identical structural pattern to the existing
-`SetDataSource(ResponseBody<T>, path)` overloads — a single `EmitSet`):**
+## What was already possible (no new code) — the honest correction
 
-```csharp
-public static ComponentRef<TComponent, TModel> SetDataSource<TModel, TElement>(
-    this ComponentRef<TComponent, TModel> self, TypedSource<TElement[]> source)
-    where TModel : class
-    => self.EmitSet(DataSourceProperty, source.ToValueExpression());
-```
+`TypedSource<T>` is the universal value intake and has **no array restriction**. So a
+DSL-transformed array (`ReactiveArray.AsSource()`) and a scalar result (`ReactiveValue<T>`) already
+flow today into:
 
-Files: `FusionGridExtensions.cs`, `FusionDropDownListExtensions.cs`, `FusionMultiSelectExtensions.cs`,
-`FusionAutoCompleteExtensions.cs`, `FusionMultiColumnComboBoxExtensions.cs`, `FusionKanbanExtensions.cs`
-(Kanban also calls `EmitCall(DataBindMethod)` to match its existing overloads). Do NOT auto-`Refresh()`
-— keep the explicit-refresh convention of the existing overloads. Schedule/PivotView are excluded
-(their dataSource semantics differ — a Fusion-layer judgement).
+- `p.When(...).NotEmpty()` / comparisons — `ConditionStart`/`GuardBuilder` take `TypedSource<TProp>`.
+- `Element.SetText(TypedSource<TProp>)` — `ElementBuilder.cs:87`.
+- `DispatchPayloadBuilder.Set(field, TypedSource<T>)`.
+- `gather.Include(...)` / `gather.Plugin(...)` — array members route into the HTTP payload.
 
-Enables: `p.Component<FusionGrid>("grid").SetDataSource(residents.Where(r => r.Active).OrderBy(r => r.LastName).AsSource()).Refresh();`
+And the read+transform half already spans components: `p.From(component.arrayMember())` seeds a
+`ReactiveArray<T>` from any `TypedSource<T[]>` (`PipelineBuilder.Arrays.cs:15`). No reinvention
+happened — `ObjectExpression`, `ArrayExpression`, the element scope, and `RuntimePath.call` were all
+reused, not duplicated.
 
-## 2. C# sync-condition marker for array-op predicates — MEDIUM confidence, defense-in-depth
+## What shipped in this pass (the missing edge — DONE)
 
-**Why a win:** `ArrayOperationExpression.Predicate` is typed `ConditionGraph?` (the broad base).
-The expression compiler only ever emits `compare/all/any/not` (never `Confirm`), so a Promise-in-
-filter bug is already prevented in practice — but the C# *type* doesn't enforce it. Narrowing the
-predicate type to a sync-only marker makes the compiler a hard gate (matches the generated TS
-`ValidationCondition` union and spec §14.2).
+The one asymmetry was the **sink**: a transformed array could reach `When`/`SetText`/`dispatch`/
+`gather`, but **not** a component's `dataSource` member — `SetDataSource` only accepted
+`ResponseBody`/event-payload. Completing it makes routing symmetric: *any value, including a
+transformed array, → any array-typed member sink.* Implemented:
 
-**Why not made here:** there is no sync-only C# condition base today; introducing one means adding a
-marker interface to the shared `ConditionGraph` hierarchy (`Compare/All/Any/Not` implement it) —
-a broader-framework edit. Low practical risk (compiler can't emit `Confirm`), so deferred.
+- `SetDataSource<TModel, TElement>(TypedSource<TElement[]>)` on **FusionGrid, FusionDropDownList,
+  FusionMultiSelect, FusionAutoComplete, FusionMultiColumnComboBox** (single `EmitSet`) and
+  **FusionKanban** (`EmitSet` + `EmitCall(dataBind)`, matching its established pattern). Pattern is
+  `ElementBuilder.SetText<TProp>(TypedSource<TProp>)` — the abstract base with a free type
+  parameter (NOT `TypedComponentSource<string>`). `EmitSet` + `ToValueExpression()` already existed;
+  `InternalsVisibleTo` already grants Fusion access. Zero plan-domain / TS / runtime change.
+- `FusionGrid.Data<TModel, TRow>()` — the read counterpart (mirrors `FusionKanban.Cards()`),
+  so the rows on screen can be re-filtered and rebound without re-fetching.
+- Comparison Shape in `ElementExpressionCompiler` is now **member-driven** (from the typed member
+  operand), matching `ConditionSourceBuilder` instead of taking the left operand positionally. The
+  runtime coerces both operands to one Shape before `===`, so the Shape must come from the member.
 
-**Change:** add `internal interface ISyncCondition` (or an abstract `SyncCondition` base) in
-`ConditionGraph.cs`; have `CompareCondition/AllCondition/AnyCondition/NotCondition` implement it
-(NOT `ConfirmCondition`); change `ArrayOperationExpression.Predicate`, the `Array*` factories, and
-`ElementExpressionCompiler.CompilePredicate` return type to that marker.
+Browser proof: `WhenBindingArrayToGrid` — roster loads once, `OrderBy` transform routes into the
+grid (`SetDataSource(TypedSource<T[]>)`), and "Show Active Only" re-filters the grid's own rows
+client-side (`Data()` → `Where` → rebind), no HTTP round-trip. Sandbox: `/Sandbox/Components/ArrayGrid`.
 
-## 3. Per-element side-effecting method calls (foreach reaction) — distinct concept, larger
+## Genuinely-remaining follow-ups (NOT made — broader framework)
 
-**Why recorded:** per-element method calls land in this pass as **value projections** and are
-intentionally restricted to PURE, deterministic methods (the `ElementExpressionCompiler` whitelist).
-Side-effecting per-element methods — e.g. EJ2 Grid `Row.setCellValue(field, value)` for each selected
-row — are NOT value projections; they are *iteration with side effects*. The value algebra is for
-reading/computing, so these do not belong as an `array-op` projection.
+### 1. C# sync-condition marker for array-op predicates — LOW priority, defense-in-depth
 
-**The right shape:** a new **per-element reaction** ("for-each") node — a reaction (not a value) that
-iterates an array source, binds each element to the element scope, and runs a sub-pipeline of
-reactions (set/call/dispatch) against it. This reuses the element-scope stack already in place
-(`ExecutionContext.withElement`) and the existing reaction executor. It is a Layer-1→3 primitive
-(new reaction kind + builder + runtime case), larger than the array-DSL value work, and belongs in
-its own slice. Until then, side-effecting per-element work stays in the plugin escape hatch.
+`ArrayOperationExpression.Predicate` is typed `ConditionGraph?` (the broad base). The expression
+compiler only ever emits `compare/all/any/not` — there is no path to `Confirm` — so the sync-only
+constraint is already enforced behaviorally at lambda-compile time. Narrowing the type to an
+`ISyncCondition` marker would make the compiler a hard gate, matching the generated TS
+`ValidationCondition` union. Add the marker to `ConditionGraph` only when that hierarchy is being
+touched for another reason; not standalone work.
 
-## Confirmed NON-changes (verified, for the record)
+### 2. Per-element side-effecting reaction (foreach) — distinct primitive, narrower than first thought
 
-Per-element method calls required **no** change to `runtime-path.ts` (`call()`/`fn.apply` already
-exists), `execution-context.ts` (`withElement` already exists), or `Source.cs` (`PayloadSource.Element()`
-already exists) — the capability was inherent in the existing primitives, exactly as established.
+The "update each row in a grid" case is **already solved** by the functional rebind shipped above:
+`grid.SetDataSource(roster.Where(...).Select(...).OrderBy(...).AsSource())` replaces the whole data
+source — which is how every existing sandbox view updates a grid. A `ForEach` reaction is needed
+ONLY for true imperative per-rendered-row mutation (e.g. EJ2 `Row.setCellValue` on an
+already-rendered row without replacing the dataSource). That is a genuinely new reaction kind
+(`ReactionGraph` has Sequence/Parallel/Branch/Set/Call/Request/Dispatch/Inject/ShowValidationErrors
+— no iteration). It reuses the element-scope stack already in place, is a Layer-1→3 primitive, and
+belongs in its own slice. Until then, imperative per-element mutation stays in the plugin escape hatch.
+
+A known DSL boundary worth recording: element predicates compare members to **literals/captured
+constants** only (the compiler evaluates the non-element side to a literal). Comparing an element
+member to a *runtime* value (e.g. a dropdown's current selection) is not yet expressible in a
+predicate — it would need the predicate's right operand to accept a `ValueExpression` source, not
+just a literal. Recorded as a future capability, not made here.

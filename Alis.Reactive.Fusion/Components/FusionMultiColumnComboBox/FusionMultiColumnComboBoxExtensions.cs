@@ -87,6 +87,21 @@ namespace Alis.Reactive.Fusion.Components
             return self.EmitSet(DataSourceProperty, ValueExpression.Read(source.Scope, sourcePath));
         }
 
+        /// <summary>
+        /// Replaces the data source with a typed array source — including a client-side
+        /// <see cref="Alis.Reactive.Builders.Arrays.ReactiveArray{T}"/> transform via <c>AsSource()</c>.
+        /// Routes any array value into the option list with no HTTP round-trip.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TElement">The item element type carried by the source.</typeparam>
+        /// <param name="source">The typed array source.</param>
+        /// <returns>The component reference for method chaining.</returns>
+        public static ComponentRef<FusionMultiColumnComboBox, TModel> SetDataSource<TModel, TElement>(
+            this ComponentRef<FusionMultiColumnComboBox, TModel> self,
+            TypedSource<TElement[]> source)
+            where TModel : class
+            => self.EmitSet(DataSourceProperty, source.ToValueExpression());
+
         /// <summary>Flushes pending property changes to the component in the browser.</summary>
         /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> DataBind<TModel>(

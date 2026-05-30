@@ -101,7 +101,19 @@ namespace Alis.Reactive.Builders.Arrays
         {
             var left = Unwrap(binary.Left);
             var right = Unwrap(binary.Right);
-            var shape = Shape.FromClrType(left.Type);
+
+            // The runtime coerces BOTH operands to one Shape before comparing (sync-condition
+            // applies condition.shape to each side, then ===), so the comparison Shape must come
+            // from the typed member operand — never positionally from whichever side is written
+            // first. This mirrors ConditionSourceBuilder, which derives its single shape from the
+            // member's declared type, not from a literal. C# already forbids cross-category
+            // comparisons, so this keeps a literal-on-left predicate (e.g. 65 < x.Age) shaped by
+            // the member, not the literal.
+            var memberOperand = ReferencesParameter(left, element) ? left
+                : ReferencesParameter(right, element) ? right
+                : left;
+            var shape = Shape.FromClrType(memberOperand.Type);
+
             return ConditionGraph.Compare(
                 CompareOperatorFor(binary.NodeType),
                 ComparisonOperands.Binary(CompileValue(left, element), CompileValue(right, element), shape));
