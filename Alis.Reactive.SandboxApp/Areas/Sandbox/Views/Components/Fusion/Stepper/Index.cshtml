@@ -28,6 +28,7 @@
         p.Element("step-changing-active").SetText("pending");
         p.Element("step-changing-previous").SetText("pending");
         p.Element("step-changing-interacted").SetText("pending");
+        p.Element("step-changing-cancel").SetText("pending");
         p.Element("step-changing-guard").SetText("pending");
         p.Element("step-click-state").SetText("pending");
         p.Element("step-click-active").SetText("pending");
@@ -82,6 +83,7 @@
             p.Element("step-changing-active").SetText(args, x => x.ActiveStep);
             p.Element("step-changing-previous").SetText(args, x => x.PreviousStep);
             p.Element("step-changing-interacted").SetText(args, x => x.IsInteracted);
+            p.Element("step-changing-cancel").SetText(args, x => x.Cancel);
 
             p.When(args, x => x.ActiveStep).Eq(2)
                 .Then(t =>
@@ -92,6 +94,7 @@
                         {
                             blocked.Element("step-changing-guard").SetText("blocked");
                             args.PreventDefault(blocked);
+                            blocked.Element("step-changing-cancel").SetText(args, x => x.Cancel);
                         });
                 })
                 .Else(e => e.Element("step-changing-guard").SetText("allowed"));
@@ -180,6 +183,7 @@
             <p>Step changing active: <span id="step-changing-active" class="text-text-muted">pending</span></p>
             <p>Step changing previous: <span id="step-changing-previous" class="text-text-muted">pending</span></p>
             <p>Step changing interacted: <span id="step-changing-interacted" class="text-text-muted">pending</span></p>
+            <p>Step changing cancel: <span id="step-changing-cancel" class="text-text-muted">pending</span></p>
             <p>Step changing guard: <span id="step-changing-guard" class="text-text-muted">pending</span></p>
             <p>Step click state: <span id="step-click-state" class="text-text-muted">pending</span></p>
             <p>Step click active: <span id="step-click-active" class="text-text-muted">pending</span></p>

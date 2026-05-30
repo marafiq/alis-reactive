@@ -74,6 +74,7 @@ public class WhenUsingFusionStepper : PlaywrightTestBase
         await Expect(Page.Locator("#step-changing-active")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         await Expect(Page.Locator("#step-changing-previous")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         await Expect(Page.Locator("#step-changing-interacted")).ToHaveTextAsync("true", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#step-changing-cancel")).ToHaveTextAsync("false", new() { Timeout = 5000 });
         await Expect(Page.Locator("#step-changed-state")).ToHaveTextAsync("changed", new() { Timeout = 5000 });
         await Expect(Page.Locator("#step-changed-active")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         await Expect(Page.Locator("#step-changed-previous")).ToHaveTextAsync("1", new() { Timeout = 5000 });
@@ -83,6 +84,7 @@ public class WhenUsingFusionStepper : PlaywrightTestBase
         await Expect(Page.Locator("#active-step-echo")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         await Expect(Page.Locator("#current-step")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         await Expect(Page.Locator("#step-changing-guard")).ToHaveTextAsync("blocked", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#step-changing-cancel")).ToHaveTextAsync("true", new() { Timeout = 5000 });
 
         await Stepper.CompleteStep.ClickAsync();
         await Expect(Page.Locator("#step-click-state")).ToHaveTextAsync("clicked", new() { Timeout = 5000 });
@@ -91,6 +93,7 @@ public class WhenUsingFusionStepper : PlaywrightTestBase
         await Expect(Page.Locator("#active-step-echo")).ToHaveTextAsync("2", new() { Timeout = 5000 });
         await Expect(Page.Locator("#current-step")).ToHaveTextAsync("2", new() { Timeout = 5000 });
         await Expect(Page.Locator("#step-changing-guard")).ToHaveTextAsync("allowed", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#step-changing-cancel")).ToHaveTextAsync("false", new() { Timeout = 5000 });
         await Expect(Page.Locator("#step-changed-active")).ToHaveTextAsync("2", new() { Timeout = 5000 });
         await Expect(Page.Locator("#step-changed-previous")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         await Expect(Page.Locator("#step-changed-interacted")).ToHaveTextAsync("true", new() { Timeout = 5000 });
