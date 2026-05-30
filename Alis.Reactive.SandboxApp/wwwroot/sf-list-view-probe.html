@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF ListView API Probe</title>
+    <link rel="stylesheet" href="/vendor/syncfusion/material.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .panel { border: 1px solid #d0d7de; padding: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; max-height: 540px; }
+        button { margin: 4px 8px 4px 0; }
+    </style>
+</head>
+<body>
+    <h1>SF ListView API Probe</h1>
+    <p>Temporary probe for source-grounded ListView onboarding. Only rows proven here can become typed Fusion API.</p>
+
+    <div class="grid">
+        <div class="panel">
+            <h2>Selection List</h2>
+            <div id="list-view-probe"></div>
+        </div>
+        <div class="panel">
+            <h2>Checkbox List</h2>
+            <div id="list-view-check-probe"></div>
+        </div>
+    </div>
+
+    <h2>Candidate Matrix</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Kind</th>
+                <th>Builder</th>
+                <th>Args</th>
+                <th>Return/Payload</th>
+                <th>Proof</th>
+                <th>Proposed C#</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody id="proposal-body"></tbody>
+    </table>
+
+    <button id="dump" type="button">Dump Keys</button>
+    <button id="run-proof" type="button">Run Proof</button>
+    <button id="clear" type="button">Clear Trace</button>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const proposalRows = [];
+
+        function clean(value, seen, depth) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 30).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).slice(0, 80).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") {
+                        names.add(name);
+                    }
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return { ownKeys: [], functions: [], properties: {} };
+            }
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item, new WeakSet(), 0)
+                };
+            });
+            return {
+                ownKeys: own,
+                functions: functionNames(args),
+                properties
+            };
+        }
+
+        function record(label, value) {
+            trace.push({
+                at: new Date().toISOString(),
+                label,
+                value: clean(value, new WeakSet(), 0)
+            });
+            renderTrace();
+        }
+
+        function renderTrace() {
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        function proposal(row) {
+            proposalRows.push(row);
+            const tr = document.createElement("tr");
+            [
+                row.candidate,
+                row.kind,
+                row.builder,
+                row.args,
+                row.returnOrPayload,
+                row.proof,
+                row.csharp,
+                row.outcome
+            ].forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value || "";
+                tr.appendChild(td);
+            });
+            document.getElementById("proposal-body").appendChild(tr);
+        }
+
+        function item(listId, text) {
+            return Array.from(document.querySelectorAll("#" + listId + " .e-list-item"))
+                .find(li => li.innerText.trim() === text);
+        }
+
+        function clickItem(listId, text) {
+            const li = item(listId, text);
+            if (!li) throw new Error("Missing item " + text + " in " + listId);
+            li.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+        }
+
+        function listSnapshot(listId, list) {
+            const items = Array.from(document.querySelectorAll("#" + listId + " .e-list-item"));
+            return {
+                selected: items.filter(li => li.classList.contains("e-active")).map(li => li.innerText.trim()),
+                checked: items
+                    .filter(li => li.querySelector(".e-check"))
+                    .map(li => li.innerText.trim()),
+                disabled: items.filter(li => li.classList.contains("e-disabled")).map(li => li.innerText.trim()),
+                hidden: items.filter(li => li.style.display === "none").map(li => li.innerText.trim()),
+                selectedItems: list.getSelectedItems()
+            };
+        }
+
+        let cancelCarey = false;
+
+        const selectionList = new ej.lists.ListView({
+            dataSource: ["Alice", "Bennett", "Carey", "Dawson"],
+            select: args => {
+                record("selection.select", describePayload(args));
+                if (args.text === "Carey" && cancelCarey) {
+                    args.cancel = true;
+                    record("selection.cancelled", { text: args.text, cancel: args.cancel });
+                }
+            }
+        });
+        selectionList.appendTo("#list-view-probe");
+
+        const checkboxList = new ej.lists.ListView({
+            dataSource: ["Hydration", "Mobility", "Dining"],
+            showCheckBox: true,
+            select: args => record("checkbox.select", describePayload(args))
+        });
+        checkboxList.appendTo("#list-view-check-probe");
+
+        window.__sfListViewProbe = {
+            trace,
+            proposalRows,
+            selectionList,
+            checkboxList,
+            record,
+            snapshot: () => ({
+                selection: listSnapshot("list-view-probe", selectionList),
+                checkbox: listSnapshot("list-view-check-probe", checkboxList)
+            })
+        };
+
+        proposal({
+            candidate: "selectItem(text)",
+            kind: "method",
+            builder: "not builder-covered runtime method",
+            args: "string text, primitive string dataSource",
+            returnOrPayload: "void",
+            proof: "runProof snapshots selected Bennett",
+            csharp: "SelectText(string text)",
+            outcome: "accept"
+        });
+        proposal({
+            candidate: "unselectItem(text)",
+            kind: "method",
+            builder: "not builder-covered runtime method",
+            args: "string text, primitive string dataSource",
+            returnOrPayload: "void",
+            proof: "runProof removes Bennett selection",
+            csharp: "UnselectText(string text)",
+            outcome: "accept"
+        });
+        proposal({
+            candidate: "checkItem/uncheckItem(text), checkAllItems/uncheckAllItems",
+            kind: "method",
+            builder: "ShowCheckBox is static builder config",
+            args: "string text for item methods; no args for all methods",
+            returnOrPayload: "void",
+            proof: "checkItem/uncheckItem text args throw; checkAllItems/uncheckAllItems toggle all",
+            csharp: "CheckAllItems/UncheckAllItems",
+            outcome: "accept all-item methods only; reject text item methods"
+        });
+        proposal({
+            candidate: "enableItem/disableItem/showItem/hideItem(text)",
+            kind: "method",
+            builder: "item initial state can be builder data",
+            args: "string text, primitive string dataSource",
+            returnOrPayload: "void",
+            proof: "source calls getItemData directly; raw proof with text argument stops",
+            csharp: "",
+            outcome: "reject: text argument is not stable; object/element overloads are loose"
+        });
+        proposal({
+            candidate: "select event",
+            kind: "event",
+            builder: "Select event builder-covered for initial wiring only",
+            args: "payload",
+            returnOrPayload: "text/index/isInteracted/isChecked/cancel proven; item/event/data omitted",
+            proof: "runProof user click and cancel snapshots",
+            csharp: "FusionListViewSelectArgs",
+            outcome: "accept narrowed scalar payload"
+        });
+        proposal({
+            candidate: "getSelectedItems/findItem/addItem/removeItem/object item overloads",
+            kind: "method",
+            builder: "not static config",
+            args: "loose object or HTMLElement",
+            returnOrPayload: "DOM/data object or {[key:string]: object}",
+            proof: "d.ts/source show loose object/element contracts",
+            csharp: "",
+            outcome: "reject: loose public shape"
+        });
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("selection.functions", functionNames(selectionList));
+            record("checkbox.functions", functionNames(checkboxList));
+            record("snapshot", window.__sfListViewProbe.snapshot());
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            renderTrace();
+        });
+
+        document.getElementById("run-proof").addEventListener("click", runProof);
+
+        function step(label, action) {
+            try {
+                action();
+            } catch (error) {
+                record(label + " error", {
+                    message: error && error.message ? error.message : String(error)
+                });
+            }
+        }
+
+        async function runProof() {
+            record("initial", window.__sfListViewProbe.snapshot());
+
+            step("selectItem Bennett", () => {
+                selectionList.selectItem("Bennett");
+                record("after selectItem Bennett", listSnapshot("list-view-probe", selectionList));
+            });
+
+            step("unselectItem Bennett", () => {
+                selectionList.unselectItem("Bennett");
+                record("after unselectItem Bennett", listSnapshot("list-view-probe", selectionList));
+            });
+
+            step("user click Alice", () => {
+                clickItem("list-view-probe", "Alice");
+                record("after user click Alice", listSnapshot("list-view-probe", selectionList));
+            });
+
+            step("cancelled user click Carey", () => {
+                cancelCarey = true;
+                clickItem("list-view-probe", "Carey");
+                cancelCarey = false;
+                record("after cancelled user click Carey", listSnapshot("list-view-probe", selectionList));
+            });
+
+            step("checkItem Hydration", () => {
+                checkboxList.checkItem("Hydration");
+                record("after checkItem Hydration", listSnapshot("list-view-check-probe", checkboxList));
+            });
+
+            step("uncheckItem Hydration", () => {
+                checkboxList.uncheckItem("Hydration");
+                record("after uncheckItem Hydration", listSnapshot("list-view-check-probe", checkboxList));
+            });
+
+            step("checkAllItems", () => {
+                checkboxList.checkAllItems();
+                record("after checkAllItems", listSnapshot("list-view-check-probe", checkboxList));
+            });
+
+            step("uncheckAllItems", () => {
+                checkboxList.uncheckAllItems();
+                record("after uncheckAllItems", listSnapshot("list-view-check-probe", checkboxList));
+            });
+        }
+
+        if (new URLSearchParams(window.location.search).get("autorun") === "1") {
+            setTimeout(runProof, 0);
+        }
+
+        renderTrace();
+    </script>
+</body>
+</html>
