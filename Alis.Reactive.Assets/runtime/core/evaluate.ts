@@ -111,14 +111,50 @@ class ValueEvaluation {
     const items = normalizeToArray(this.evaluate(expression.source), expression.op);
     switch (expression.op) {
       case "count":
-        return items.length;
-      case "filter": {
-        const matches = items.filter(item => this.elementMatches(expression.predicate, item));
-        return RuntimeValue.declared(matches, expression.shape).usingDeclaredShape();
-      }
+        return expression.predicate === undefined
+          ? items.length
+          : items.filter(item => this.elementMatches(expression.predicate, item)).length;
+      case "filter":
+        return this.shapedArray(items.filter(item => this.elementMatches(expression.predicate, item)), expression);
+      case "map":
+        return this.shapedArray(items.map(item => this.project(expression.projection, item)), expression);
+      case "sum":
+        return items.reduce<number>(
+          (total, item) => total + toNumber(this.projectedOrSelf(expression.projection, item)), 0);
+      case "any":
+        return expression.predicate === undefined
+          ? items.length > 0
+          : items.some(item => this.elementMatches(expression.predicate, item));
+      case "all":
+        return items.every(item => this.elementMatches(expression.predicate, item));
+      case "find":
+        return this.findElement(expression, items);
+      case "orderBy":
+        return this.shapedArray(this.ordered(items, expression.projection, false), expression);
+      case "orderByDescending":
+        return this.shapedArray(this.ordered(items, expression.projection, true), expression);
       default:
         return assertNever(expression.op, "array-op kind");
     }
+  }
+
+  private findElement(expression: ArrayOperationExpression, items: unknown[]): unknown {
+    const found = expression.predicate === undefined
+      ? items[0]
+      : items.find(item => this.elementMatches(expression.predicate, item));
+    if (found === undefined) return null;
+    return expression.projection === undefined ? found : this.project(expression.projection, found);
+  }
+
+  private ordered(items: unknown[], key: ArrayOperationExpression["projection"], descending: boolean): unknown[] {
+    if (key === undefined) throw new Error("[alis] array-op orderBy requires a key projection");
+    const decorated = items.map(item => ({ item, sortKey: this.inElement(item).evaluate(key) }));
+    decorated.sort((a, b) => compareKeys(a.sortKey, b.sortKey) * (descending ? -1 : 1));
+    return decorated.map(entry => entry.item);
+  }
+
+  private shapedArray(result: unknown[], expression: ArrayOperationExpression): unknown {
+    return RuntimeValue.declared(result, expression.shape).usingDeclaredShape();
   }
 
   /** Evaluate a per-element predicate against the element scope (immediate lane, sync subset). */
@@ -127,6 +163,21 @@ class ValueEvaluation {
       throw new Error("[alis] array-op predicate is required for this operation");
     }
     return evaluateSyncCondition(predicate, this.document, this.context.withElement(item), evaluateValue);
+  }
+
+  private project(projection: ArrayOperationExpression["projection"], item: unknown): unknown {
+    if (projection === undefined) {
+      throw new Error("[alis] array-op projection is required for this operation");
+    }
+    return this.inElement(item).evaluate(projection);
+  }
+
+  private projectedOrSelf(projection: ArrayOperationExpression["projection"], item: unknown): unknown {
+    return projection === undefined ? item : this.inElement(item).evaluate(projection);
+  }
+
+  private inElement(item: unknown): ValueEvaluation {
+    return new ValueEvaluation(this.document, this.plan, this.context.withElement(item));
   }
 }
 
@@ -146,6 +197,20 @@ function normalizeToArray(value: unknown, label: string): unknown[] {
     return Array.from(value as Iterable<unknown>);
   }
   throw new Error(`[alis] array-op source is not iterable: ${label} (got ${typeof value})`);
+}
+
+/** Coerce a projected value to a number for sum; non-finite contributes 0. */
+function toNumber(value: unknown): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+/** Deterministic ordering of sort keys: numeric when both numbers, else lexicographic. */
+function compareKeys(a: unknown, b: unknown): number {
+  if (typeof a === "number" && typeof b === "number") return a - b;
+  const left = String(a);
+  const right = String(b);
+  return left < right ? -1 : left > right ? 1 : 0;
 }
 
 function isObjectRead(expression: ReadExpression): expression is ObjectReadExpression {

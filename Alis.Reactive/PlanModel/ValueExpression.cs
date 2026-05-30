@@ -129,6 +129,32 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression ArrayFilter(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
             new ArrayOperationExpression("filter", source, itemShape, Shape.ArrayOf(itemShape), predicate);
 
+        /// <summary>Projects each element through a per-element value expression.</summary>
+        internal static ValueExpression ArrayMap(ValueExpression source, ValueExpression projection, Shape itemShape, Shape resultItemShape) =>
+            new ArrayOperationExpression("map", source, itemShape, Shape.ArrayOf(resultItemShape), predicate: null, projection: projection);
+
+        /// <summary>Sums a numeric per-element projection (or the elements themselves when projection is null).</summary>
+        internal static ValueExpression ArraySum(ValueExpression source, ValueExpression? projection, Shape itemShape) =>
+            new ArrayOperationExpression("sum", source, itemShape, Shape.Number, predicate: null, projection: projection);
+
+        /// <summary>True when any element matches the predicate (or the array is non-empty when predicate is null).</summary>
+        internal static ValueExpression ArrayAny(ValueExpression source, ConditionGraph? predicate, Shape itemShape) =>
+            new ArrayOperationExpression("any", source, itemShape, Shape.Boolean, predicate: predicate);
+
+        /// <summary>True when every element matches the predicate.</summary>
+        internal static ValueExpression ArrayAll(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
+            new ArrayOperationExpression("all", source, itemShape, Shape.Boolean, predicate: predicate);
+
+        /// <summary>Returns the first matching element (optionally projected), or null when none match.</summary>
+        internal static ValueExpression ArrayFind(
+            ValueExpression source, ConditionGraph? predicate, ValueExpression? projection, Shape itemShape, Shape resultShape) =>
+            new ArrayOperationExpression("find", source, itemShape, resultShape, predicate: predicate, projection: projection);
+
+        /// <summary>Orders elements by a per-element key projection (ascending or descending).</summary>
+        internal static ValueExpression ArrayOrderBy(ValueExpression source, ValueExpression key, Shape itemShape, bool descending) =>
+            new ArrayOperationExpression(
+                descending ? "orderByDescending" : "orderBy", source, itemShape, Shape.ArrayOf(itemShape), predicate: null, projection: key);
+
         private static (IReadOnlyDictionary<string, ValueExpression> Fields, Shape Shape) ObjectFields(
             IReadOnlyDictionary<string, ValueExpression> fields)
         {
@@ -508,19 +534,33 @@ namespace Alis.Reactive.PlanModel
         /// </remarks>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ConditionGraph? Predicate { get; }
+        /// <summary>Gets the per-element projection for map/sum/find/orderBy, or null when unused.</summary>
+        /// <remarks>
+        /// Nullable by design (Rule 6): absent for count/filter/any/all; present for map (the
+        /// projected shape), sum/orderBy (the numeric/key selector), and find (optional field
+        /// fold). It is a value expression evaluated against the element scope.
+        /// </remarks>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ValueExpression? Projection { get; }
         /// <summary>Gets the declared element shape of the source array.</summary>
         public Shape ItemShape { get; }
         /// <summary>Gets the declared output shape of the operation.</summary>
         public Shape Shape { get; }
 
         internal ArrayOperationExpression(
-            string op, ValueExpression source, Shape itemShape, Shape shape, ConditionGraph? predicate = null)
+            string op,
+            ValueExpression source,
+            Shape itemShape,
+            Shape shape,
+            ConditionGraph? predicate = null,
+            ValueExpression? projection = null)
         {
             Op = op ?? throw new ArgumentNullException(nameof(op));
             Source = source ?? throw new ArgumentNullException(nameof(source));
             ItemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
             Predicate = predicate;
+            Projection = projection;
         }
 
         internal override Shape OutputShape => Shape;

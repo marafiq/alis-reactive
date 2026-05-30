@@ -641,13 +641,17 @@ namespace Alis.Reactive.PlanModel
                 .Requires("items", "ValueExpression[]")
                 .Requires("shape", "Shape"));
 
-            contract.Declare(LiteralUnion("ArrayOp", new[] { "count", "filter" }));
+            contract.Declare(LiteralUnion("ArrayOp", new[]
+            {
+                "count", "filter", "map", "sum", "any", "all", "find", "orderBy", "orderByDescending",
+            }));
 
             contract.Declare(Interface("ArrayOperationExpression")
                 .Requires("kind", Literal("array-op"))
                 .Requires("op", "ArrayOp")
                 .Requires("source", "ValueExpression")
                 .Optional("predicate", "ValidationCondition")
+                .Optional("projection", "ValueExpression")
                 .Requires("itemShape", "Shape")
                 .Requires("shape", "Shape"));
 

@@ -817,13 +817,21 @@ export interface ArrayExpression {
 
 export type ArrayOp =
   | "count"
-  | "filter";
+  | "filter"
+  | "map"
+  | "sum"
+  | "any"
+  | "all"
+  | "find"
+  | "orderBy"
+  | "orderByDescending";
 
 export interface ArrayOperationExpression {
   kind: "array-op";
   op: ArrayOp;
   source: ValueExpression;
   predicate?: ValidationCondition;
+  projection?: ValueExpression;
   itemShape: Shape;
   shape: Shape;
 }
