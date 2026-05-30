@@ -19,6 +19,12 @@ public sealed class FusionStepperLocator
     /// <summary>The rendered stepper root element.</summary>
     public ILocator Root => _page.Locator($"#{_componentId}");
 
+    /// <summary>The validation stepper root element.</summary>
+    public ILocator ValidationRoot => _page.Locator("#resident-stepper-validation");
+
+    /// <summary>The validation stepper items.</summary>
+    public ILocator ValidationStepItems => ValidationRoot.Locator(".e-step-container");
+
     /// <summary>The next command button.</summary>
     public ILocator NextButton => _page.Locator("#next-step-btn");
 
@@ -45,4 +51,16 @@ public sealed class FusionStepperLocator
 
     /// <summary>The Complete step label.</summary>
     public ILocator CompleteStep => Root.GetByText("Complete");
+
+    /// <summary>The validation Intake step label.</summary>
+    public ILocator ValidationIntakeStep => ValidationStepItems.Nth(0);
+
+    /// <summary>The validation Review step label.</summary>
+    public ILocator ValidationReviewStep => ValidationStepItems.Nth(1);
+
+    /// <summary>The validation Complete step label.</summary>
+    public ILocator ValidationCompleteStep => ValidationStepItems.Nth(2);
+
+    /// <summary>The validation stepper tooltip.</summary>
+    public ILocator ValidationTooltip => _page.Locator(".e-tooltip-wrap.e-stepper-tooltip");
 }

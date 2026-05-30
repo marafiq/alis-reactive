@@ -8,6 +8,7 @@
     ViewData["Title"] = "FusionStepper";
 
     const string StepperId = "resident-stepper";
+    const string ValidationStepperId = "resident-stepper-validation";
 
     var plan = Html.ReactivePlan<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperModel>();
     var steps = new List<Step>
@@ -20,6 +21,7 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var stepper = p.Component<FusionStepper>(StepperId);
+        var validationStepper = p.Component<FusionStepper>(ValidationStepperId);
         p.Element("active-step-echo").SetText(stepper.ActiveStep());
         p.Element("current-step").SetText(stepper.ActiveStep());
         p.Element("step-changing-state").SetText("pending");
@@ -36,7 +38,21 @@
         p.Element("step-changed-interacted").SetText("pending");
         p.Element("progress-state").SetText("pending");
         p.Element("command-state").SetText("idle");
+        p.Element("validation-active-echo").SetText("pending");
+        p.Element("validation-current-step").SetText("pending");
+        p.Element("validation-step-click-state").SetText("pending");
+        p.Element("validation-step-click-active").SetText("pending");
+        p.Element("validation-step-click-previous").SetText("pending");
+        p.Element("validation-active-echo").SetText(validationStepper.ActiveStep());
+        p.Element("validation-current-step").SetText(validationStepper.ActiveStep());
     }));
+
+    var validationSteps = new List<Step>
+    {
+        new() { Text = "1", Label = "Intake", Status = StepStatus.InProgress, IsValid = true, Optional = true },
+        new() { Text = "2", Label = "Review", Status = StepStatus.NotStarted, IsValid = false },
+        new() { Text = "3", Label = "Complete", Status = StepStatus.NotStarted }
+    };
 }
 
 <native-vstack gap="Lg">
@@ -180,6 +196,50 @@
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Validation and Tooltips</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            This variant keeps the stepper linear and shows the built-in validation iconography. The first step is valid, the second is invalid, and the third has no validation state.
+        </p>
+
+        @(Html.FusionStepper(plan, ValidationStepperId, b =>
+        {
+            b.Steps(validationSteps);
+            b.ActiveStep(0);
+            b.CssClass("rounded-md");
+            b.Linear(true);
+            b.ShowTooltip(true);
+            b.Orientation(StepperOrientation.Horizontal);
+            b.StepType(StepType.Default);
+            b.LabelPosition(StepLabelPosition.Bottom);
+        })
+        .Reactive(evt => evt.StepClick, (args, p) =>
+        {
+            p.Element("validation-step-click-state").SetText("clicked");
+            p.Element("validation-step-click-active").SetText(args, x => x.ActiveStep);
+            p.Element("validation-step-click-previous").SetText(args, x => x.PreviousStep);
+        })
+        .Reactive(evt => evt.StepChanged, (args, p) =>
+        {
+            var stepper = p.Component<FusionStepper>(ValidationStepperId);
+            p.Element("validation-active-echo").SetText(stepper.ActiveStep());
+            p.Element("validation-current-step").SetText(args, x => x.ActiveStep);
+        }))
+
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            <span class="text-sm text-text-secondary">Hover a step to prove the tooltip.</span>
+            <span class="text-sm text-text-secondary">Click the steps directly to exercise linear navigation.</span>
+        </native-hstack>
+
+        <div class="mt-4 font-mono text-sm">
+            <p>Validation active step: <span id="validation-active-echo" class="text-text-muted">pending</span></p>
+            <p>Validation current step: <span id="validation-current-step" class="text-text-muted">pending</span></p>
+            <p>Validation click state: <span id="validation-step-click-state" class="text-text-muted">pending</span></p>
+            <p>Validation click active: <span id="validation-step-click-active" class="text-text-muted">pending</span></p>
+            <p>Validation click previous: <span id="validation-step-click-previous" class="text-text-muted">pending</span></p>
+        </div>
     </native-card-body></native-card>
 </native-vstack>
 

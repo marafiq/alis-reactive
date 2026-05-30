@@ -109,4 +109,44 @@ public class WhenUsingFusionStepper : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task validation_stepper_renders_validation_state_and_tooltips()
+    {
+        await NavigateAndBoot();
+
+        await Expect(Stepper.ValidationRoot).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Stepper.ValidationIntakeStep).ToBeVisibleAsync();
+        await Expect(Stepper.ValidationReviewStep).ToBeVisibleAsync();
+        await Expect(Stepper.ValidationCompleteStep).ToBeVisibleAsync();
+
+        var validationItems = Stepper.ValidationRoot.Locator(".e-step-container");
+        await Expect(validationItems.Nth(0)).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("e-step-valid"));
+        await Expect(validationItems.Nth(1)).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("e-step-error"));
+        await Expect(validationItems.Nth(2)).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("e-step-valid"));
+        await Expect(validationItems.Nth(2)).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("e-step-error"));
+
+        await Expect(Stepper.ValidationRoot.Locator(".e-step-label-optional")).ToBeVisibleAsync();
+
+        await Stepper.ValidationCompleteStep.ClickAsync(new() { Force = true });
+        await Expect(Page.Locator("#validation-active-echo")).ToHaveTextAsync("0", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#validation-step-click-state")).ToHaveTextAsync("pending", new() { Timeout = 2000 });
+
+        await Stepper.ValidationReviewStep.ClickAsync(new() { Force = true });
+        await Expect(Page.Locator("#validation-step-click-state")).ToHaveTextAsync("clicked", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#validation-step-click-active")).ToHaveTextAsync("1", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#validation-step-click-previous")).ToHaveTextAsync("0", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#validation-active-echo")).ToHaveTextAsync("1", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#validation-current-step")).ToHaveTextAsync("1", new() { Timeout = 5000 });
+
+        await Stepper.ValidationCompleteStep.ClickAsync(new() { Force = true });
+        await Expect(Page.Locator("#validation-active-echo")).ToHaveTextAsync("2", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#validation-current-step")).ToHaveTextAsync("2", new() { Timeout = 5000 });
+
+        await Stepper.ValidationCompleteStep.DispatchEventAsync("mouseover");
+        await Expect(Stepper.ValidationTooltip).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Stepper.ValidationTooltip).ToContainTextAsync("Complete", new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 }
