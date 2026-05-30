@@ -1,6 +1,6 @@
 using Alis.Reactive.Playwright.Extensions;
 
-namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
+namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
 [TestFixture]
 public class WhenUsingFusionGridEditing : PlaywrightTestBase
@@ -97,7 +97,10 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
         await ClickWhenStable(Page.Locator("#dialog-select-first"));
         await ClickWhenStable(Page.Locator("#dialog-start-edit"));
 
-        await Expect(Page.Locator("#resident-dialog-template-marker"))
+        // The typed DialogForm rendered its labeled fields (Resident / Risk / Open tasks).
+        await Expect(Page.Locator("input[name='residentName']"))
+            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Page.Locator("select[name='riskLevel']"))
             .ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Page.Locator("#dialog-begin-resident"))
             .Not.ToHaveTextAsync("waiting", new() { Timeout = 10000 });

@@ -22,6 +22,10 @@ if (!string.IsNullOrEmpty(sfLicense))
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
+// Per-session in-memory state so sandbox grid edits persist across saves and page
+// refreshes within a browser session, while each browser/test context stays isolated.
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(2));
 builder.Services.AddReactiveFluentValidation(validation =>
     validation.AddFromAssemblyContaining<Program>());
 
@@ -82,6 +86,7 @@ app.UseStaticFiles(new StaticFileOptions
 
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
 app.UseAuthorization();
 
 app.MapHub<NotificationHub>("/hubs/notifications");

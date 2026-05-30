@@ -15,7 +15,7 @@
     const string DialogGridId = "resident-dialog-edit-grid";
     const string ValidationFormId = "grid-edit-validation-form";
     const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
-    const string ButtonSecondary = "rounded-md bg-secondary px-3 py-2 text-sm font-medium text-white hover:bg-secondary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
     const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
 
     var plan = Html.ReactivePlan<ResidentGridEditingModel>();
@@ -48,23 +48,6 @@
 
     Html.On(plan, t => t.DomReady(p => LoadEditingGrids(p)));
 }
-
-<script id="resident-dialog-edit-template" type="text/x-template">
-    <div id="resident-dialog-template-marker" class="grid grid-cols-1 gap-3 p-2 text-sm">
-        <label class="grid gap-1">
-            <span class="font-medium text-text">Resident</span>
-            <input name="residentName" value="${residentName}" class="e-field e-input" />
-        </label>
-        <label class="grid gap-1">
-            <span class="font-medium text-text">Risk</span>
-            <input name="riskLevel" value="${riskLevel}" class="e-field e-input" />
-        </label>
-        <label class="grid gap-1">
-            <span class="font-medium text-text">Open tasks</span>
-            <input name="openTasks" value="${openTasks}" class="e-field e-input" />
-        </label>
-    </div>
-</script>
 
 <native-vstack gap="Lg">
     <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
@@ -343,7 +326,10 @@
                 AllowEditing = true,
                 AllowEditOnDblClick = false,
                 Mode = EditMode.Dialog,
-                Template = "#resident-dialog-edit-template"
+                Template = FusionGridEditTemplates.DialogForm<ResidentDirectoryGridItem>(d => d
+                    .Text(m => m.ResidentName, "Resident")
+                    .Select(m => m.RiskLevel, "Risk", riskLevels)
+                    .Number(m => m.OpenTasks, "Open tasks"))
             })
             .Columns(EditColumns()))
             .Reactive(evt => evt.BeginEdit<ResidentDirectoryGridItem>(), (args, p) =>

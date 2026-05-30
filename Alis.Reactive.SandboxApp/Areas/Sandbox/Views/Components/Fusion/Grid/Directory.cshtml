@@ -128,7 +128,7 @@
         <native-heading level="H2">Public Grid Method Controls</native-heading>
         <native-hstack gap="Sm" class="mt-4 flex-wrap">
             @(Html.NativeButton("grid-page-2", "Page 2")
-                .CssClass("rounded-md bg-secondary px-3 py-2 text-sm font-medium text-white hover:bg-secondary/90")
+                .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId).GoToPage(2);
@@ -150,7 +150,7 @@
                     p.Element("method-status").SetText("search called");
                 }))
             @(Html.NativeButton("grid-clear-search", "Clear Search")
-                .CssClass("rounded-md bg-secondary px-3 py-2 text-sm font-medium text-white hover:bg-secondary/90")
+                .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId).ClearSearch();
@@ -165,7 +165,7 @@
                     p.Element("method-status").SetText("filterByColumn called");
                 }))
             @(Html.NativeButton("grid-clear-filters", "Clear Filters")
-                .CssClass("rounded-md bg-secondary px-3 py-2 text-sm font-medium text-white hover:bg-secondary/90")
+                .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId).ClearFiltering();
@@ -181,7 +181,7 @@
                     p.Element("method-status").SetText("groupColumn called");
                 }))
             @(Html.NativeButton("grid-clear-grouping", "Clear Grouping")
-                .CssClass("rounded-md bg-secondary px-3 py-2 text-sm font-medium text-white hover:bg-secondary/90")
+                .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId).ClearGrouping();
@@ -195,7 +195,7 @@
                     p.Element("method-status").SetText("selectRow called");
                 }))
             @(Html.NativeButton("grid-clear-selection", "Clear Selection")
-                .CssClass("rounded-md bg-secondary px-3 py-2 text-sm font-medium text-white hover:bg-secondary/90")
+                .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
                     p.Component<FusionGrid>(GridId).ClearSelection();

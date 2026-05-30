@@ -1,6 +1,6 @@
 using Alis.Reactive.Playwright.Extensions;
 
-namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
+namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
 [TestFixture]
 public class WhenUsingFusionGridOperations : PlaywrightTestBase

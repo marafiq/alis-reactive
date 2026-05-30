@@ -10,7 +10,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     [Area("Sandbox")]
     [Route("Sandbox/Components/Grid")]
-    public class GridController : Controller
+    public partial class GridController : Controller
     {
         private static readonly List<ResidentGridItem> AllResidents = GenerateResidents();
         private static readonly List<ResidentDirectoryRecord> ResidentDirectory = GenerateResidentDirectory();

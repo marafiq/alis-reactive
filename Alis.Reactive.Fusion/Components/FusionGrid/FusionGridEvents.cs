@@ -22,6 +22,14 @@ namespace Alis.Reactive.Fusion.Components
                 "dataStateChange", new FusionGridDataStateChangeArgs());
 
         /// <summary>
+        /// Fires when any toolbar item is clicked, including custom toolbar buttons.
+        /// SF "toolbarClick" event. Branch on <c>args.Item.Id</c> to handle a specific button.
+        /// </summary>
+        public TypedEvent<FusionGridToolbarClickArgs> ToolbarClick =>
+            new TypedEvent<FusionGridToolbarClickArgs>(
+                "toolbarClick", new FusionGridToolbarClickArgs());
+
+        /// <summary>
         /// Fires when a data row is clicked.
         /// </summary>
         /// <typeparam name="TRow">The row DTO type bound to the grid.</typeparam>

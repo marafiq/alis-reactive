@@ -1,4 +1,4 @@
-namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
+namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
 [TestFixture]
 public class WhenUsingFusionGridDirectory : PlaywrightTestBase
@@ -104,8 +104,11 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         await Expect(Page.Locator("#resident-virtual-grid .e-row").First)
             .ToBeVisibleAsync(new() { Timeout = 10000 });
 
+        // Real wheel gesture over the virtual content — lets Syncfusion's own
+        // scroll handling fire the data-state fetch (no synthetic scroll event).
         var content = Page.Locator("#resident-virtual-grid .e-content").First;
-        await content.EvaluateAsync("el => { el.scrollTop = 1200; el.dispatchEvent(new Event('scroll')); }");
+        await content.HoverAsync();
+        await Page.Mouse.WheelAsync(0, 1200);
 
         await Expect(Page.Locator("#virtual-status"))
             .ToHaveTextAsync("virtual block refreshed", new() { Timeout = 10000 });
