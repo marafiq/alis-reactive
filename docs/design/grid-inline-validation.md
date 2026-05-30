@@ -1,6 +1,7 @@
 # Validation × Syncfusion Grid Inline Editing
 
-Status: research + evaluation (pick-up doc). No code change yet.
+Status: **implemented (v1)** — the metadata→EJ2 emitter ships and is proven in the
+browser. Sections 1–5 are the original research; section 7 records what shipped.
 Date: 2026-05-30.
 
 This captures (1) why `ReactiveValidator` client validation cannot bind to a
@@ -160,3 +161,53 @@ few exotic rules do **not** map — those stay server-authoritative.
    (`column.ValidationFrom<TValidator, TRow>(...)`) so the common single-field
    rules are generated from FluentValidation into SF-native column rules — single
    source, client-side free — with server-on-save as the authority for the gaps.
+
+## 7. Implemented (v1)
+
+The metadata→EJ2 emitter shipped. The flagged risk ("does EJ2 run
+`column.validationRules` under our custom server binding + EditTemplate cells?")
+was de-risked with a browser spike first: a numeric column with hand-written
+`{ min, max }` showed EJ2's native tooltip and blocked the cell, confirming EJ2's
+`FormValidator` fires under custom binding in batch mode. The typed emitter then
+replaced the hand-written rules.
+
+**API (no new public surface on the validation contract).**
+- `ValidationRule` gained four `internal` projections — `Name`, `IsUnconditional`,
+  `LiteralOperand`, `RangeOperand` — read by the Fusion emitter through the
+  existing `InternalsVisibleTo("Alis.Reactive.Fusion")`. The public rule surface
+  stays `Message` + `Shape`.
+- `FusionGridValidation.From<TValidator, TRow>(IClientValidationRuleSource)` →
+  `FusionGridFieldValidation<TRow>.Field(r => r.X)` returns the EJ2
+  `column.validationRules` object (or `null` when nothing maps client-side). The
+  validator metadata is read through the public DI `IClientValidationRuleSource`;
+  Fusion takes **no** dependency on `Alis.Reactive.FluentValidator`.
+
+**Mapping (v1).** `required`/`email`/`url` → `[true, msg]`; `minLength`/`maxLength`
+→ `[len, msg]`; `regex` → `[pattern, msg]`; `min`/`max` (numeric) → `[value, msg]`;
+`range` (numeric) → `[[lo, hi], msg]`. The rule key comes straight from
+`ValidationRuleName.Value`, which is already EJ2-shaped. Each EJ2 value carries the
+FluentValidation message as `[value, message]`, so the cell tooltip is the same
+text the form shows.
+
+**Honest gaps (deferred to server-on-save).** Conditional (`WhenField`),
+cross-field/peer (`equalTo` other field), and `gt`/`lt`/`exclusiveRange`/
+`notEqual`/`creditCard`/`atLeastOne`/`empty` have no EJ2 FormValidator equivalent
+and are skipped — they stay server-authoritative. Non-numeric `min`/`max`/`range`
+(e.g. dates) are skipped in v1.
+
+**Proof.**
+- Wiring: `CareOps.cshtml` `@inject IClientValidationRuleSource` +
+  `FusionGridValidation.From<ResidentCareItemValidator, ResidentCareItem>(...)`;
+  the `openTasks` column carries `ValidationRules = care.Field(r => r.OpenTasks)`
+  from `ResidentCareItemValidator.ClientRule(r => r.OpenTasks).Range(0, 7, ...)`.
+- Browser: editing `openTasks` to `99` shows EJ2's native tooltip with the exact
+  FluentValidation message *"Open tasks must be between 0 and 7."* and blocks the
+  cell — under custom server binding + batch mode.
+- Tests: 4 emitter-mapping unit tests
+  (`WhenAGridColumnGeneratesNativeValidationFromClientRules`, covering direct/
+  numeric/email/unmapped/conditional cases) + 1 Playwright behavior
+  (`an_out_of_range_open_tasks_edit_is_blocked_by_the_generated_care_rule`).
+
+**Next.** Pair the client emit with the server validate-on-save guard
+(section 4, row 1) so cross-field/conditional/async rules are enforced on commit;
+extend mapping to date `min`/`max`/`range` via EJ2 `date` rules.

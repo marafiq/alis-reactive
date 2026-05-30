@@ -131,4 +131,29 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task an_out_of_range_open_tasks_edit_is_blocked_by_the_generated_care_rule()
+    {
+        await NavigateCareOps();
+
+        // Open Tasks is the aria-colindex 8 column; edit the first row's cell.
+        var openTasksCells = Page.Locator($"#{GridId} td[aria-colindex='8']");
+        await openTasksCells.First.DblClickAsync();
+
+        var editor = Page.Locator("#careops-gridopenTasks");
+        await Expect(editor).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await editor.FillAsync("99");
+
+        // Leaving the cell runs EJ2's native cell validation. The rule was generated
+        // from ResidentCareItemValidator.ClientRule(r => r.OpenTasks).Range(0, 7, ...) —
+        // the same FluentValidation metadata that powers form validation. No second
+        // ruleset is authored: the message proves the single source reached the cell.
+        await openTasksCells.Nth(1).DblClickAsync();
+
+        await Expect(Page.GetByText("Open tasks must be between 0 and 7."))
+            .ToBeVisibleAsync(new() { Timeout = 10000 });
+
+        AssertNoConsoleErrors();
+    }
 }

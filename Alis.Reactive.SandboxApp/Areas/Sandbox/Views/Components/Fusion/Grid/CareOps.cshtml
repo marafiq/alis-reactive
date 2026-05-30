@@ -9,8 +9,13 @@
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 @using Syncfusion.EJ2.Buttons
 @using Syncfusion.EJ2.Grids
+@inject Alis.Reactive.Validation.IClientValidationRuleSource ClientRules
 @{
     ViewData["Title"] = "FusionGrid Care Operations";
+
+    // EJ2-native column validation generated from the SAME ResidentCareItemValidator
+    // ClientRule metadata — single source, client-side in-cell validation for free.
+    var careValidation = FusionGridValidation.From<ResidentCareItemValidator, ResidentCareItem>(ClientRules);
 
     const string GridId = "careops-grid";
     const string AdmitFormId = "careops-admit-form";
@@ -300,7 +305,7 @@
                 new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "180", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.CareLevel, careLevelEditOptions) },
                 new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "150", Template = riskTemplate, EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.RiskLevel, riskEditOptions) },
                 new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "200", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.PrimaryNurse, nurseEditOptions) },
-                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right, EditType = "numericedit" },
+                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right, EditType = "numericedit", ValidationRules = careValidation.Field(r => r.OpenTasks) },
                 new GridColumn { Field = "nextReview", HeaderText = "Next Review", Width = "150", EditTemplate = FusionGridEditTemplates.DateInput((ResidentCareItem r) => r.NextReview) }
             }))
             .Reactive(evt => evt.DataStateChange, (args, p) =>

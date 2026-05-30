@@ -87,4 +87,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .Range(0m, 12m, "Open tasks must be between 0 and 12.");
         }
     }
+
+    /// <summary>
+    /// Client + server validation for an in-cell care row edit. The same
+    /// <c>ClientRule</c> metadata drives EJ2-native column validation in the grid
+    /// (via <c>FusionGridValidation</c>) and a full server check on save.
+    /// </summary>
+    public class ResidentCareItemValidator : ReactiveValidator<ResidentCareItem>
+    {
+        public ResidentCareItemValidator()
+        {
+            ClientRule(r => r.OpenTasks)
+                .Range(0, 7, "Open tasks must be between 0 and 7.");
+        }
+    }
 }
