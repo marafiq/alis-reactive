@@ -72,6 +72,9 @@ public class WhenUsingFusionBreadcrumb : PlaywrightTestBase
         await Expect(Page.Locator("#clicked-url")).ToHaveTextAsync("/home", new() { Timeout = 5000 });
         await Expect(Page.Locator("#clicked-icon-css")).ToHaveTextAsync("e-icons e-home", new() { Timeout = 5000 });
         await Expect(Page.Locator("#clicked-disabled")).ToHaveTextAsync("false", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#route-message")).ToHaveTextAsync("Opening Home in workspace", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#route-category")).ToHaveTextAsync("workspace", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#route-trail")).ToHaveTextAsync("home:/home", new() { Timeout = 5000 });
         await Expect(Breadcrumb.CurrentItem).ToHaveTextAsync("Home", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
