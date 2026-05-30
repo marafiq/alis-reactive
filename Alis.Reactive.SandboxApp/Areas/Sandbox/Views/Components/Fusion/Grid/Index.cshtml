@@ -27,10 +27,16 @@
 <native-vstack gap="Lg">
     <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
         <native-heading level="H1">FusionGrid &mdash; Server-Side Sort, Paging &amp; Filter</native-heading>
-        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Directory"
-           class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
-            Resident directory
-        </a>
+        <native-hstack gap="Sm" class="flex-wrap">
+            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Directory"
+               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+                Resident directory
+            </a>
+            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Operations"
+               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+                Operations board
+            </a>
+        </native-hstack>
     </native-hstack>
     <native-text color="Secondary">
         200 residents in server memory. Grid shows 10 per page with server-side sort + paging.

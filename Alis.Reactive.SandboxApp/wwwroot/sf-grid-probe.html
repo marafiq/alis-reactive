@@ -49,7 +49,15 @@
     <button id="method-group">groupColumn("careLevel")</button>
     <button id="method-clear-group">clearGrouping()</button>
     <button id="method-select">selectRow(1)</button>
+    <button id="method-select-range">selectRowsByRange(0, 2)</button>
     <button id="method-clear-selection">clearSelection()</button>
+    <button id="method-hide-risk">hideColumns("risk")</button>
+    <button id="method-show-risk">showColumns("risk")</button>
+    <button id="method-reorder-risk">reorderColumns("risk", "residentName")</button>
+    <button id="method-current-view">getCurrentViewRecords()</button>
+    <button id="method-row-index">getRowIndexByPrimaryKey(103)</button>
+    <button id="method-set-cell">setCellValue(103, "risk", "Critical")</button>
+    <button id="method-set-row">setRowData(104, row)</button>
     <button id="clear">Clear Trace</button>
     <pre id="trace"></pre>
 
@@ -335,12 +343,61 @@
             });
         });
 
+        document.getElementById("method-select-range").addEventListener("click", () => {
+            ej2.selectRowsByRange(0, 2);
+            record("call selectRowsByRange after", {
+                indexes: ej2.getSelectedRowIndexes(),
+                records: ej2.getSelectedRecords()
+            });
+        });
+
         document.getElementById("method-clear-selection").addEventListener("click", () => {
             ej2.clearSelection();
             record("call clearSelection after", {
                 indexes: ej2.getSelectedRowIndexes(),
                 records: ej2.getSelectedRecords()
             });
+        });
+
+        document.getElementById("method-hide-risk").addEventListener("click", () => {
+            ej2.hideColumns("risk", "field");
+            record("call hideColumns after", ej2.getHiddenColumns().map(col => col.field));
+        });
+
+        document.getElementById("method-show-risk").addEventListener("click", () => {
+            ej2.showColumns("risk", "field");
+            record("call showColumns after", ej2.getHiddenColumns().map(col => col.field));
+        });
+
+        document.getElementById("method-reorder-risk").addEventListener("click", () => {
+            ej2.reorderColumns("risk", "residentName");
+            record("call reorderColumns after", ej2.getColumns().map(col => col.field || col.headerText));
+        });
+
+        document.getElementById("method-current-view").addEventListener("click", () => {
+            record("call getCurrentViewRecords result", ej2.getCurrentViewRecords());
+        });
+
+        document.getElementById("method-row-index").addEventListener("click", () => {
+            record("call getRowIndexByPrimaryKey result", ej2.getRowIndexByPrimaryKey(103));
+        });
+
+        document.getElementById("method-set-cell").addEventListener("click", () => {
+            ej2.setCellValue(103, "risk", "Critical");
+            record("call setCellValue after", ej2.getCurrentViewRecords().find(row => row.residentId === 103));
+        });
+
+        document.getElementById("method-set-row").addEventListener("click", () => {
+            ej2.setRowData(104, {
+                residentId: 104,
+                residentName: "Irene Runtime",
+                age: 88,
+                careLevel: "Skilled Nursing",
+                wing: "South",
+                suite: "S-312",
+                risk: "Critical"
+            });
+            record("call setRowData after", ej2.getCurrentViewRecords().find(row => row.residentId === 104));
         });
 
         document.getElementById("clear").addEventListener("click", () => {
@@ -424,6 +481,76 @@
                 proof: "method button + rowSelected trace",
                 csharp: "SelectRow(int rowIndex), ClearSelection()",
                 outcome: "onboarded; covered by directory Playwright"
+            },
+            {
+                candidate: "selectRowsByRange(startIndex, endIndex)",
+                kind: "method",
+                builder: "selectionSettings owns selection mode",
+                args: "int startIndex, int endIndex",
+                returnOrPayload: "void; selected records update",
+                proof: "method button + getSelectedRecords trace",
+                csharp: "SelectRowsByRange(int startIndex, int endIndex)",
+                outcome: "onboarded; covered by operations Playwright"
+            },
+            {
+                candidate: "showColumns(keys, showBy) / hideColumns(keys, hideBy)",
+                kind: "method",
+                builder: "columns own initial render",
+                args: "typed row field expression; showBy/hideBy fixed to field",
+                returnOrPayload: "void; header/cell visibility changes",
+                proof: "method button + hidden columns trace",
+                csharp: "ShowColumn<TRow, TField>(field), HideColumn<TRow, TField>(field)",
+                outcome: "onboarded; covered by operations Playwright"
+            },
+            {
+                candidate: "reorderColumns(fromFName, toFName)",
+                kind: "method",
+                builder: "allowReordering owns static enablement",
+                args: "typed source field and typed target field expressions",
+                returnOrPayload: "void; column order changes",
+                proof: "method button + getColumns trace",
+                csharp: "ReorderColumnBefore<TRow, TFromField, TToField>(from, before)",
+                outcome: "onboarded; covered by operations Playwright"
+            },
+            {
+                candidate: "getCurrentViewRecords()",
+                kind: "method-return source",
+                builder: "not static initial render",
+                args: "none",
+                returnOrPayload: "current rendered row array",
+                proof: "method button + row array trace",
+                csharp: "CurrentViewRecords<TRow>()",
+                outcome: "onboarded; covered by operations Playwright"
+            },
+            {
+                candidate: "getRowIndexByPrimaryKey(value)",
+                kind: "method-return source",
+                builder: "primary key column owns key field",
+                args: "int primary key",
+                returnOrPayload: "visible row index or -1",
+                proof: "method button + numeric index trace",
+                csharp: "RowIndexByPrimaryKey(int primaryKey)",
+                outcome: "onboarded; covered by operations Playwright"
+            },
+            {
+                candidate: "setCellValue(key, field, value)",
+                kind: "method",
+                builder: "primary key column owns key field",
+                args: "int key, typed row field expression, typed value",
+                returnOrPayload: "void; visible cell and current view record update",
+                proof: "method button + visible cell/current view trace",
+                csharp: "SetCellValue(int primaryKey, Expression<Func<TRow, TValue>> field, TValue value)",
+                outcome: "onboarded; covered by operations Playwright"
+            },
+            {
+                candidate: "setRowData(key, rowData)",
+                kind: "method",
+                builder: "primary key column owns key field",
+                args: "int key, typed row or response-body row selector",
+                returnOrPayload: "void; visible row updates",
+                proof: "method button + current view trace",
+                csharp: "SetRowData<TRow>(int primaryKey, TRow row)",
+                outcome: "onboarded; covered by operations Playwright"
             },
             {
                 candidate: "startEdit/endEdit/closeEdit/addRecord/deleteRecord/updateRow",

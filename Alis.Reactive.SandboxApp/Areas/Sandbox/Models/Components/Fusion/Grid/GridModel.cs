@@ -74,7 +74,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public decimal? OpenTasks { get; set; }
     }
 
+    public class GridOperationsModel
+    {
+        public string? PatchRiskLevel { get; set; }
+        public decimal? PatchOpenTasks { get; set; }
+    }
+
     public class ResidentGridEditResponse
+    {
+        public ResidentDirectoryGridItem Row { get; set; } = new ResidentDirectoryGridItem();
+        public string Summary { get; set; } = "";
+    }
+
+    public class ResidentGridOperationsResponse
     {
         public ResidentDirectoryGridItem Row { get; set; } = new ResidentDirectoryGridItem();
         public string Summary { get; set; } = "";
@@ -83,6 +95,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public class ResidentGridBatchSummaryResponse
     {
         public string Summary { get; set; } = "";
+    }
+
+    public class GridTemplateActionPayload
+    {
+        public int Id { get; set; }
     }
 
     public class ResidentGridEditingValidator : ReactiveValidator<ResidentGridEditingModel>

@@ -9,6 +9,9 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod SelectRowMethod =
             ComponentMethod.Named("selectRow").WithArgs<int>();
 
+        private static readonly ComponentMethod SelectRowsByRangeMethod =
+            ComponentMethod.Named("selectRowsByRange").WithArgs<int, int>();
+
         private static readonly ComponentMethod ClearSelectionMethod =
             ComponentMethod.Named("clearSelection");
 
@@ -26,6 +29,20 @@ namespace Alis.Reactive.Fusion.Components
             int rowIndex)
             where TModel : class
             => self.EmitCall(SelectRowMethod, new List<ValueExpression> { ValueExpression.Literal(rowIndex) });
+
+        /// <summary>
+        /// Selects a contiguous range of rendered rows by zero-based row indexes.
+        /// </summary>
+        public static ComponentRef<FusionGrid, TModel> SelectRowsByRange<TModel>(
+            this ComponentRef<FusionGrid, TModel> self,
+            int startIndex,
+            int endIndex)
+            where TModel : class
+            => self.EmitCall(SelectRowsByRangeMethod, new List<ValueExpression>
+            {
+                ValueExpression.Literal(startIndex),
+                ValueExpression.Literal(endIndex)
+            });
 
         /// <summary>
         /// Clears grid selection through Syncfusion's public clearSelection method.
