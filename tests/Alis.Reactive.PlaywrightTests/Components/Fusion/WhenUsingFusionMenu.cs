@@ -52,6 +52,9 @@ public class WhenUsingFusionMenu : PlaywrightTestBase
         await Expect(Page.Locator("#before-item-state")).ToHaveTextAsync("rendered", new() { Timeout = 5000 });
         await Expect(Page.Locator("#before-item-text")).ToHaveTextAsync("Archive", new() { Timeout = 5000 });
         await Expect(Page.Locator("#before-item-id")).ToHaveTextAsync("archive-item", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-item-url")).ToHaveTextAsync("/archive", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-item-icon-css")).ToHaveTextAsync("e-icons e-archive", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-item-separator")).ToHaveTextAsync("false", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
@@ -62,10 +65,18 @@ public class WhenUsingFusionMenu : PlaywrightTestBase
         await NavigateAndBoot();
 
         await Menu.OpenButton.ClickAsync();
+        await Expect(Page.Locator("#before-open-state")).ToHaveTextAsync("rendered", new() { Timeout = 5000 });
         await Expect(Page.Locator("#before-open-kind")).ToHaveTextAsync("root", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-open-top")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-open-left")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-open-focused")).ToHaveTextAsync(new System.Text.RegularExpressions.Regex("^(true|false)$"), new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-open-first-item")).ToHaveTextAsync("Dashboard", new() { Timeout = 5000 });
         await Expect(Page.Locator("#before-open-parent")).ToHaveTextAsync("root", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-open-cancel-value")).ToHaveTextAsync("false", new() { Timeout = 5000 });
         await Expect(Page.Locator("#open-state")).ToHaveTextAsync("opened", new() { Timeout = 5000 });
         await Expect(Page.Locator("#open-kind")).ToHaveTextAsync("root", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#open-first-item")).ToHaveTextAsync("Dashboard", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#open-parent")).ToHaveTextAsync("root", new() { Timeout = 5000 });
         await Expect(Page.Locator("#menu-visibility")).ToHaveTextAsync("visible", new() { Timeout = 5000 });
 
         await Menu.Item("Projects").ClickAsync();
@@ -73,11 +84,17 @@ public class WhenUsingFusionMenu : PlaywrightTestBase
         await Expect(Page.Locator("#select-text")).ToHaveTextAsync("Projects", new() { Timeout = 5000 });
         await Expect(Page.Locator("#select-id")).ToHaveTextAsync("projects-item", new() { Timeout = 5000 });
         await Expect(Page.Locator("#select-url")).ToHaveTextAsync(string.Empty, new() { Timeout = 5000 });
+        await Expect(Page.Locator("#select-icon-css")).ToHaveTextAsync("e-icons e-folder", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#select-separator")).ToHaveTextAsync("false", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#select-first-child")).ToHaveTextAsync("Reports", new() { Timeout = 5000 });
         await Expect(Page.Locator("#before-item-state")).ToHaveTextAsync("rendered", new() { Timeout = 5000 });
         await Expect(Page.Locator("#before-item-text")).ToHaveTextAsync("Archive", new() { Timeout = 5000 });
         await Expect(Page.Locator("#before-item-id")).ToHaveTextAsync("archive-item", new() { Timeout = 5000 });
         await Expect(Page.Locator("#before-open-kind")).ToHaveTextAsync("submenu", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-open-first-item")).ToHaveTextAsync("Reports", new() { Timeout = 5000 });
         await Expect(Page.Locator("#before-open-parent")).ToHaveTextAsync("Projects", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#open-first-item")).ToHaveTextAsync("Dashboard", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#open-parent")).ToHaveTextAsync("root", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
@@ -90,8 +107,13 @@ public class WhenUsingFusionMenu : PlaywrightTestBase
         await Menu.OpenButton.ClickAsync();
         await Menu.CloseButton.ClickAsync();
         await Expect(Page.Locator("#before-close-state")).ToHaveTextAsync("rendered", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-close-first-item")).ToHaveTextAsync("Dashboard", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-close-parent")).ToHaveTextAsync("root", new() { Timeout = 5000 });
         await Expect(Page.Locator("#before-close-cancel")).ToHaveTextAsync("allowed", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-close-cancel-value")).ToHaveTextAsync("false", new() { Timeout = 5000 });
         await Expect(Page.Locator("#close-state")).ToHaveTextAsync("closed", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#close-first-item")).ToHaveTextAsync("Dashboard", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#close-parent")).ToHaveTextAsync("root", new() { Timeout = 5000 });
         await Expect(Page.Locator("#menu-visibility")).ToHaveTextAsync("hidden", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
@@ -105,6 +127,7 @@ public class WhenUsingFusionMenu : PlaywrightTestBase
         await Page.GetByLabel("Block open").CheckAsync();
         await Menu.OpenButton.ClickAsync();
         await Expect(Page.Locator("#before-open-cancel")).ToHaveTextAsync("cancelled", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-open-cancel-value")).ToHaveTextAsync("true", new() { Timeout = 5000 });
         await Expect(Page.Locator("#open-state")).ToHaveTextAsync("pending", new() { Timeout = 5000 });
         await Expect(Page.Locator("#menu-visibility")).ToHaveTextAsync("pending", new() { Timeout = 5000 });
 
@@ -115,6 +138,7 @@ public class WhenUsingFusionMenu : PlaywrightTestBase
         await Page.GetByLabel("Block close").CheckAsync();
         await Menu.CloseButton.ClickAsync();
         await Expect(Page.Locator("#before-close-cancel")).ToHaveTextAsync("cancelled", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#before-close-cancel-value")).ToHaveTextAsync("true", new() { Timeout = 5000 });
         await Expect(Page.Locator("#close-state")).ToHaveTextAsync("pending", new() { Timeout = 5000 });
         await Expect(Page.Locator("#menu-visibility")).ToHaveTextAsync("visible", new() { Timeout = 5000 });
 
