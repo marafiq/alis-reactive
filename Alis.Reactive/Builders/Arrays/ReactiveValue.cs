@@ -6,8 +6,9 @@ namespace Alis.Reactive.Builders.Arrays
 {
     /// <summary>
     /// A scalar value produced by an array operation (count, sum, any, find, ...). It is a
-    /// <see cref="TypedSource{TValue}"/>, so it plugs into every place a source is accepted —
-    /// <c>SetText</c>, <c>When</c>, dispatch payloads, and gather — with no new overloads.
+    /// <see cref="TypedSource{TValue}"/>, so it plugs into the places that accept the base
+    /// <c>TypedSource&lt;T&gt;</c> — <c>SetText</c>, <c>When</c>, and dispatch payloads — with no new
+    /// overloads. (Gather intake is typed to component/plugin sources, not the base source.)
     /// </summary>
     public sealed class ReactiveValue<TValue> : TypedSource<TValue>
     {

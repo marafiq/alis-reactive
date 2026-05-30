@@ -9,8 +9,8 @@ namespace Alis.Reactive.Builders.Arrays
     /// Compiles a captured per-element lambda into the closed plan-node algebra. A predicate
     /// becomes a SYNC <see cref="ConditionGraph"/> (compare/all/any/not) whose leaves read the
     /// element scope; reads rooted at the lambda parameter become element reads, everything else
-    /// is evaluated to a literal. Anything outside the whitelist throws at C# build time — the
-    /// same discipline as <c>ExpressionPathHelper</c>, and what keeps the DSL deterministic.
+    /// is evaluated to a literal. Anything outside the supported set throws at plan render time
+    /// (when the Razor view is first requested) — keeping the captured DSL deterministic.
     /// </summary>
     internal static class ElementExpressionCompiler
     {
@@ -34,7 +34,7 @@ namespace Alis.Reactive.Builders.Arrays
         /// <summary>
         /// Compiles a per-element value selector (<c>x =&gt; x.Balance</c>, <c>x =&gt; x</c>) to a
         /// value expression read against the element scope. v1 supports element member reads and
-        /// the element itself; richer projections (object init, arithmetic) throw at build time.
+        /// the element itself; richer projections (object init, arithmetic) throw at plan render time.
         /// </summary>
         internal static ValueExpression CompileProjection(LambdaExpression projection)
         {
@@ -109,9 +109,13 @@ namespace Alis.Reactive.Builders.Arrays
             // member's declared type, not from a literal. C# already forbids cross-category
             // comparisons, so this keeps a literal-on-left predicate (e.g. 65 < x.Age) shaped by
             // the member, not the literal.
-            var memberOperand = ReferencesParameter(left, element) ? left
-                : ReferencesParameter(right, element) ? right
-                : left;
+            Expression memberOperand;
+            if (ReferencesParameter(left, element)) memberOperand = left;
+            else if (ReferencesParameter(right, element)) memberOperand = right;
+            else throw new InvalidOperationException(
+                "Array predicate comparison must reference the element on at least one side; " +
+                "comparing two constants is a developer mistake. Got: " + binary);
+
             var shape = Shape.FromClrType(memberOperand.Type);
 
             return ConditionGraph.Compare(

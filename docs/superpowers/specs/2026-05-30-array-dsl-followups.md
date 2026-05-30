@@ -27,7 +27,10 @@ flow today into:
 - `p.When(...).NotEmpty()` / comparisons — `ConditionStart`/`GuardBuilder` take `TypedSource<TProp>`.
 - `Element.SetText(TypedSource<TProp>)` — `ElementBuilder.cs:87`.
 - `DispatchPayloadBuilder.Set(field, TypedSource<T>)`.
-- `gather.Include(...)` / `gather.Plugin(...)` — array members route into the HTTP payload.
+
+(NOT gather: `gather.Include` is typed to `TypedComponentSource<T>` and `gather.Plugin` to
+`TypedPluginSource<T>`, so a plain `AsSource()`/`ReactiveValue` does not route there. To gather an
+array, read the array member straight off the component — that source IS a `TypedComponentSource`.)
 
 And the read+transform half already spans components: `p.From(component.arrayMember())` seeds a
 `ReactiveArray<T>` from any `TypedSource<T[]>` (`PipelineBuilder.Arrays.cs:15`). No reinvention
@@ -36,8 +39,8 @@ reused, not duplicated.
 
 ## What shipped in this pass (the missing edge — DONE)
 
-The one asymmetry was the **sink**: a transformed array could reach `When`/`SetText`/`dispatch`/
-`gather`, but **not** a component's `dataSource` member — `SetDataSource` only accepted
+The one asymmetry was the **sink**: a transformed array could reach `When`/`SetText`/`dispatch`,
+but **not** a component's `dataSource` member — `SetDataSource` only accepted
 `ResponseBody`/event-payload. Completing it makes routing symmetric: *any value, including a
 transformed array, → any array-typed member sink.* Implemented:
 
@@ -68,7 +71,34 @@ constraint is already enforced behaviorally at lambda-compile time. Narrowing th
 `ValidationCondition` union. Add the marker to `ConditionGraph` only when that hierarchy is being
 touched for another reason; not standalone work.
 
-### 2. Per-element side-effecting reaction (foreach) — distinct primitive, narrower than first thought
+### Remaining quality debt (adversarial audit, 2026-05-30)
+
+An adversarial audit (10 of 14 findings survived refutation) cleared a must-fix and the cheap items
+inline; these two are deliberately scheduled as their own passes, not crammed in:
+
+- **eval-1 — Rule 6 type-split of `ArrayOperationExpression` (should-fix).** `evaluate.ts` has four
+  `if (predicate/projection === undefined) throw` guards defending shapes the DSL always provides
+  (filter/any/all always carry a predicate; map/orderBy/sum always carry a projection; only
+  `find.projection` is legitimately optional). Rule 6 says the runtime must not throw for
+  DSL-controlled shapes. Correct fix: split `ArrayOperationExpression` in the generated `plan.ts`
+  into per-op discriminated sub-interfaces with **non-optional** fields (via `PlanTypeScriptContract`),
+  regenerate `plan.ts`, narrow `evaluateArrayOp`, and delete the guards. Deferred because it touches
+  the generated plan contract and deserves a focused pass with `npm run typecheck` + vitest, not a
+  rushed edit.
+
+- **array-2 — per-element method whitelist is name-only (should-fix, needs a design decision).**
+  The whitelist matches a camelCased C# method name against JS method names (`getDay`, `trim`,
+  `getAttribute`, …). A domain method that happens to camelCase to a whitelisted name (e.g. a DTO
+  `GetDate()`) is accepted at authoring time but calls the JS Date/String/DOM method on an arbitrary
+  object at runtime. The audit's proposed receiver-type check does not cleanly apply because the C#
+  side is a developer stub, not a real `DateTime`/`String`. The robust fix is a contract decision
+  (explicit per-method opt-in, or a typed element-kind marker), not a name heuristic — recorded for a
+  design pass rather than a half-measure.
+
+(Also tracked: XML docs for the 16 pre-existing undocumented `FusionKanbanExtensions` methods — scout-rule
+hygiene, unrelated to the array DSL.)
+
+### Per-element side-effecting reaction (foreach) — distinct primitive, narrower than first thought
 
 The "update each row in a grid" case is **already solved** by the functional rebind shipped above:
 `grid.SetDataSource(roster.Where(...).Select(...).OrderBy(...).AsSource())` replaces the whole data

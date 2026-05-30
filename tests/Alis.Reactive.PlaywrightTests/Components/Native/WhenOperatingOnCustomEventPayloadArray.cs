@@ -63,4 +63,17 @@ public class WhenOperatingOnCustomEventPayloadArray : PlaywrightTestBase
         await Expect(Page.Locator("#unack-warning")).ToBeVisibleAsync(new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
+
+    [Test]
+    public async Task guard_clears_when_all_critical_alerts_are_acknowledged()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 10000);
+        await Page.Locator("#clear-report-btn").ClickAsync();
+
+        // Same array DSL guard, all-acknowledged roster => Else branch: clear shown, warning not.
+        await Expect(Page.Locator("#unack-clear")).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Page.Locator("#unack-warning")).Not.ToBeVisibleAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
 }

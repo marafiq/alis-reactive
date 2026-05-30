@@ -35,6 +35,14 @@
              .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
                  s.DispatchWith<ShiftReportPayload>("shift-report", b =>
                      b.Set(x => x.Alerts, json.Read(x => x.Alerts))))));
+
+    // Same custom event, a roster where every critical alert is acknowledged — drives the Else guard.
+    Html.NativeButton("clear-report-btn", "Generate Clear Report")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+            p.Get("/Sandbox/Components/ShiftReport/AlertsAllClear")
+             .Response(r => r.OnSuccess<AlertsResponse>((json, s) =>
+                 s.DispatchWith<ShiftReportPayload>("shift-report", b =>
+                     b.Set(x => x.Alerts, json.Read(x => x.Alerts))))));
 }
 
 <native-vstack gap="Lg">
@@ -47,8 +55,12 @@
     </native-text>
 
     <native-card><native-card-body>
-        @(Html.NativeButton("load-report-btn", "Generate Shift Report")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
+        <div class="flex items-center gap-3">
+            @(Html.NativeButton("load-report-btn", "Generate Shift Report")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"))
+            @(Html.NativeButton("clear-report-btn", "Generate Clear Report")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors"))
+        </div>
 
         <native-vstack gap="Xs" class="font-mono text-sm mt-4">
             <p>Total alerts: <span id="alert-total">&mdash;</span></p>

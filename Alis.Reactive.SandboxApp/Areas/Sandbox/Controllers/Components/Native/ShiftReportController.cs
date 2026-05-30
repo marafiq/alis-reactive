@@ -37,5 +37,22 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
                 },
             });
         }
+
+        /// <summary>A roster where every critical alert is acknowledged — exercises the clear (Else) guard.</summary>
+        [HttpGet("AlertsAllClear")]
+        public IActionResult AlertsAllClear()
+        {
+            return Ok(new AlertsResponse
+            {
+                Alerts = new[]
+                {
+                    new ResidentAlert { Resident = "Maple", Severity = "critical", Priority = 9, Acknowledged = true },
+                    new ResidentAlert { Resident = "Birch", Severity = "stable",   Priority = 2, Acknowledged = true },
+                    new ResidentAlert { Resident = "Cedar", Severity = "critical", Priority = 7, Acknowledged = true },
+                    new ResidentAlert { Resident = "Aspen", Severity = "urgent",   Priority = 5, Acknowledged = true },
+                    new ResidentAlert { Resident = "Oak",   Severity = "critical", Priority = 4, Acknowledged = true },
+                },
+            });
+        }
     }
 }

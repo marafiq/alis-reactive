@@ -47,10 +47,24 @@ namespace Alis.Reactive.Builders.Arrays
         public ReactiveArray<TElement> OrderByDescending<TKey>(Expression<Func<TElement, TKey>> key) =>
             Order(key, descending: true);
 
-        private ReactiveArray<TElement> Order<TKey>(Expression<Func<TElement, TKey>> key, bool descending) =>
-            new ReactiveArray<TElement>(
+        private ReactiveArray<TElement> Order<TKey>(Expression<Func<TElement, TKey>> key, bool descending)
+        {
+            // A sort key must coerce to a comparable scalar. A non-scalar key (object/collection)
+            // serializes as Shape.Any, and the runtime would fall back to lexicographic
+            // String(value) order — every element becomes "[object Object]", silently wrong.
+            // Reject it where it is authored rather than mis-sorting in the browser.
+            var keyKind = Shape.FromClrType(typeof(TKey)).Kind;
+            var keyIsSortableScalar = keyKind is "string" or "number" or "boolean" or "date" or "nullable";
+            if (!keyIsSortableScalar)
+                throw new InvalidOperationException(
+                    "OrderBy key must project to a scalar (string, number, date, bool, enum), not '" +
+                    typeof(TKey).Name + "'. Project a scalar field, e.g. .OrderBy(x => x.StartDate), " +
+                    "not .OrderBy(x => x.Address).");
+
+            return new ReactiveArray<TElement>(
                 ValueExpression.ArrayOrderBy(_source, Projection(key), _elementShape, descending),
                 _elementShape);
+        }
 
         /// <summary>Counts all elements.</summary>
         public ReactiveValue<int> Count() =>
