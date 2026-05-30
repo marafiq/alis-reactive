@@ -60,6 +60,9 @@ public class WhenUsingFusionBulletChart : PlaywrightTestBase
         await Expect(Page.Locator("#mouse-click-target")).ToContainTextAsync("FeatureMeasure", new() { Timeout = 5000 });
         await Expect(Page.Locator("#mouse-click-x")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
         await Expect(Page.Locator("#mouse-click-y")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#click-audit-message")).ToHaveTextAsync("Opened readiness drilldown for North Wing", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#click-audit-wing")).ToHaveTextAsync("North Wing", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#click-audit-coordinates")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }

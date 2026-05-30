@@ -15,5 +15,20 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "~/Areas/Sandbox/Views/Components/Fusion/BulletChart/Index.cshtml",
                 new FusionBulletChartModel());
         }
+
+        [HttpPost("ClickAudit")]
+        public IActionResult ClickAudit([FromBody] FusionBulletChartClickAuditRequest request)
+        {
+            var wing = request.Target.Contains("FeatureMeasure_0", StringComparison.Ordinal)
+                ? "North Wing"
+                : "Unknown wing";
+
+            return Ok(new FusionBulletChartClickAuditResponse
+            {
+                Wing = wing,
+                Coordinates = $"{Math.Round(request.X)},{Math.Round(request.Y)}",
+                Message = $"Opened readiness drilldown for {wing}"
+            });
+        }
     }
 }

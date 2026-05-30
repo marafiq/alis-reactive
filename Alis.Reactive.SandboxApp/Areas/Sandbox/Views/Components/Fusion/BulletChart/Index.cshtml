@@ -3,12 +3,15 @@
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart
 @using Syncfusion.EJ2.Charts
 @using BulletRange = Syncfusion.EJ2.Charts.Range
 @{
     ViewData["Title"] = "FusionBulletChart";
 
     const string BulletChartId = "resident-bullet-chart";
+    var clickAuditUrl = Url.Action("ClickAudit", "BulletChart", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve BulletChart.ClickAudit.");
 
     var plan = Html.ReactivePlan<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart.FusionBulletChartModel>();
     var data = new List<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart.BulletChartPoint>
@@ -92,6 +95,17 @@
             p.Element("mouse-click-target").SetText(args, x => x.Target);
             p.Element("mouse-click-x").SetText(args, x => x.X);
             p.Element("mouse-click-y").SetText(args, x => x.Y);
+            p.Post(clickAuditUrl)
+                .Gather(g => g
+                    .FromEvent(args, x => x.Target, "target")
+                    .FromEvent(args, x => x.X, "x")
+                    .FromEvent(args, x => x.Y, "y"))
+                .Response(r => r.OnSuccess<FusionBulletChartClickAuditResponse>((json, s) =>
+                {
+                    s.Element("click-audit-message").SetText(json, x => x.Message);
+                    s.Element("click-audit-wing").SetText(json, x => x.Wing);
+                    s.Element("click-audit-coordinates").SetText(json, x => x.Coordinates);
+                }));
         }))
     </native-card-body></native-card>
 
@@ -108,6 +122,9 @@
             <p>Mouse click target: <span id="mouse-click-target" class="text-text-muted">pending</span></p>
             <p>Mouse click x: <span id="mouse-click-x" class="text-text-muted">pending</span></p>
             <p>Mouse click y: <span id="mouse-click-y" class="text-text-muted">pending</span></p>
+            <p>Click audit message: <span id="click-audit-message" class="text-text-muted">pending</span></p>
+            <p>Click audit wing: <span id="click-audit-wing" class="text-text-muted">pending</span></p>
+            <p>Click audit coordinates: <span id="click-audit-coordinates" class="text-text-muted">pending</span></p>
             <p>Actual index -1: <span id="actual-index-negative" class="text-text-muted">pending</span></p>
             <p>Actual index 3: <span id="actual-index-overflow" class="text-text-muted">pending</span></p>
         </native-vstack>
