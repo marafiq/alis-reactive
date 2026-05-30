@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF Toolbar API Probe</title>
+    <link rel="stylesheet" href="/vendor/syncfusion/material.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <h1>SF Toolbar API Probe</h1>
+    <p>Trace the runtime surface before onboarding typed Fusion API.</p>
+
+    <div id="host">
+        <div id="toolbar"></div>
+    </div>
+
+    <div>
+        <button id="disable">Disable</button>
+        <button id="enable">Enable</button>
+        <button id="change-orientation">Change orientation</button>
+        <button id="refresh-overflow">Refresh overflow</button>
+        <button id="enable-item">Enable item 0</button>
+        <button id="disable-item">Disable item 0</button>
+        <button id="hide-item">Hide item 0</button>
+        <button id="show-item">Show item 0</button>
+        <button id="add-item">Add item</button>
+        <button id="remove-item">Remove item 1</button>
+        <button id="clear">Clear Trace</button>
+    </div>
+
+    <h2>Candidate Matrix</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Kind</th>
+                <th>Builder</th>
+                <th>Args</th>
+                <th>Return/Payload</th>
+                <th>Proof</th>
+                <th>Proposed C#</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody id="proposal-body"></tbody>
+    </table>
+
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const rows = [];
+        const target = document.getElementById("toolbar");
+        const initialItems = [
+            { id: "toolbar-save", text: "Save", type: "Button" },
+            { id: "toolbar-delete", text: "Delete", type: "Button" }
+        ];
+        let toolbar;
+
+        function clean(value, seen, depth) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).slice(0, 80).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function describePayload(args) {
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item, new WeakSet(), 0)
+                };
+            });
+            return { ownKeys: own, properties };
+        }
+
+        function record(label, value) {
+            trace.push({
+                at: new Date().toISOString(),
+                label,
+                value: clean(value, new WeakSet(), 0)
+            });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        function addRow(row) {
+            rows.push(row);
+            const tr = document.createElement("tr");
+            [row.candidate, row.kind, row.builder, row.args, row.returnOrPayload, row.proof, row.csharp, row.outcome].forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value || "";
+                tr.appendChild(td);
+            });
+            document.getElementById("proposal-body").appendChild(tr);
+        }
+
+        window.__sfProbe = {
+            trace,
+            rows,
+            record,
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke()),
+            event: (label, args) => record(label, describePayload(args))
+        };
+
+        toolbar = new ej.navigations.Toolbar({
+            items: initialItems,
+            clicked: args => {
+                record("clicked", {
+                    payload: describePayload(args),
+                    item: {
+                        id: args.item && args.item.id,
+                        text: args.item && args.item.text,
+                        disabled: args.item && args.item.disabled,
+                        visible: args.item && args.item.visible,
+                        type: args.item && args.item.type
+                    },
+                    cancel: args.cancel
+                });
+            },
+            created: args => record("created", describePayload(args)),
+            beforeCreate: args => record("beforeCreate", describePayload(args)),
+            destroyed: args => record("destroyed", describePayload(args)),
+            keyDown: args => record("keyDown", describePayload(args))
+        });
+
+        toolbar.appendTo(target);
+
+        record("ready", {
+            component: "toolbar",
+            namespace: "ej.navigations",
+            className: "Toolbar",
+            id: "toolbar",
+            methods: Object.getOwnPropertyNames(Object.getPrototypeOf(toolbar)).sort()
+        });
+
+        document.getElementById("disable").addEventListener("click", () => {
+            toolbar.disable(true);
+            record("after-disable", {
+                isDisabledClass: target.classList.contains("e-disabled"),
+                classes: Array.from(target.classList).sort()
+            });
+        });
+
+        document.getElementById("enable").addEventListener("click", () => {
+            toolbar.disable(false);
+            record("after-enable", {
+                isDisabledClass: target.classList.contains("e-disabled"),
+                classes: Array.from(target.classList).sort()
+            });
+        });
+
+        document.getElementById("change-orientation").addEventListener("click", () => {
+            toolbar.changeOrientation();
+            record("after-changeOrientation", {
+                classes: Array.from(target.classList).sort(),
+                nav: document.getElementById("toolbar_nav") ? document.getElementById("toolbar_nav").className : null
+            });
+        });
+
+        document.getElementById("refresh-overflow").addEventListener("click", () => {
+            toolbar.refreshOverflow();
+            record("after-refreshOverflow", {
+                itemCount: toolbar.items.length,
+                classes: Array.from(target.classList).sort()
+            });
+        });
+
+        document.getElementById("enable-item").addEventListener("click", () => {
+            toolbar.enableItems(0, true);
+            record("after-enableItems", {
+                item0Disabled: toolbar.items[0].disabled,
+                item0Visible: toolbar.items[0].visible
+            });
+        });
+
+        document.getElementById("disable-item").addEventListener("click", () => {
+            toolbar.enableItems(0, false);
+            record("after-disableItem", {
+                item0Disabled: toolbar.items[0].disabled,
+                item0Visible: toolbar.items[0].visible
+            });
+        });
+
+        document.getElementById("hide-item").addEventListener("click", () => {
+            toolbar.hideItem(0, true);
+            record("after-hideItem", {
+                item0Disabled: toolbar.items[0].disabled,
+                item0Visible: toolbar.items[0].visible
+            });
+        });
+
+        document.getElementById("show-item").addEventListener("click", () => {
+            toolbar.hideItem(0, false);
+            record("after-showItem", {
+                item0Disabled: toolbar.items[0].disabled,
+                item0Visible: toolbar.items[0].visible
+            });
+        });
+
+        document.getElementById("add-item").addEventListener("click", () => {
+            toolbar.addItems([
+                { id: "toolbar-more", text: "More", type: "Button", disabled: false }
+            ], 1);
+            record("after-addItems", {
+                items: toolbar.items.map(item => ({
+                    id: item.id,
+                    text: item.text,
+                    disabled: item.disabled,
+                    visible: item.visible,
+                    type: item.type
+                }))
+            });
+        });
+
+        document.getElementById("remove-item").addEventListener("click", () => {
+            toolbar.removeItems(1);
+            record("after-removeItems", {
+                items: toolbar.items.map(item => ({
+                    id: item.id,
+                    text: item.text,
+                    disabled: item.disabled,
+                    visible: item.visible,
+                    type: item.type
+                }))
+            });
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            document.getElementById("trace").textContent = "";
+        });
+
+        addRow({
+            candidate: "disable(value)",
+            kind: "method",
+            builder: "runtime",
+            args: "boolean",
+            returnOrPayload: "void; root gets/loses e-disabled",
+            proof: "disable button toggles root class",
+            csharp: "Disable(bool)",
+            outcome: "implement"
+        });
+
+        addRow({
+            candidate: "clicked",
+            kind: "event",
+            builder: "builder event",
+            args: "ClickEventArgs",
+            returnOrPayload: "item.id/text/disabled + cancel",
+            proof: "click Save button emits typed payload",
+            csharp: "Clicked event with FusionToolbarClickedArgs",
+            outcome: "implement"
+        });
+
+        addRow({
+            candidate: "changeOrientation()",
+            kind: "method",
+            builder: "runtime",
+            args: "void",
+            returnOrPayload: "layout flips orientation",
+            proof: "button call changes rendered orientation",
+            csharp: "ChangeOrientation()",
+            outcome: "candidate"
+        });
+
+        addRow({
+            candidate: "refreshOverflow()",
+            kind: "method",
+            builder: "runtime",
+            args: "void",
+            returnOrPayload: "reflows overflow state",
+            proof: "button call re-runs overflow rendering",
+            csharp: "RefreshOverflow()",
+            outcome: "candidate"
+        });
+
+        addRow({
+            candidate: "enableItems(index, isEnable)",
+            kind: "method",
+            builder: "runtime",
+            args: "index:number, isEnable:boolean",
+            returnOrPayload: "void; item disabled state mutates",
+            proof: "button toggles item 0 disabled flag",
+            csharp: "SetItemEnabled(int index, bool enabled)",
+            outcome: "candidate"
+        });
+
+        addRow({
+            candidate: "hideItem(index, value)",
+            kind: "method",
+            builder: "runtime",
+            args: "index:number, value:boolean",
+            returnOrPayload: "void; item visible state mutates",
+            proof: "button toggles item 0 visible flag",
+            csharp: "SetItemVisible(int index, bool visible)",
+            outcome: "candidate"
+        });
+
+        addRow({
+            candidate: "addItems(items, index)",
+            kind: "method",
+            builder: "runtime",
+            args: "ItemModel[], number?",
+            returnOrPayload: "void; new item appears in toolbar",
+            proof: "button inserts a More item",
+            csharp: "AddItems(...)",
+            outcome: "needs-proof"
+        });
+
+        addRow({
+            candidate: "removeItems(args)",
+            kind: "method",
+            builder: "runtime",
+            args: "number | HTMLElement | NodeList | Element | HTMLElement[]",
+            returnOrPayload: "void; item removed from toolbar",
+            proof: "button removes item at index 1",
+            csharp: "RemoveItemAtIndex(int)",
+            outcome: "candidate"
+        });
+    </script>
+</body>
+</html>
