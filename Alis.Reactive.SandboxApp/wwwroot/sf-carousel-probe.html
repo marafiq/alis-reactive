@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF Carousel API Probe</title>
+    <link rel="stylesheet" href="/vendor/syncfusion/material.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>SF Carousel API Probe</h1>
+    <p>Trace the runtime surface before promoting it into typed Fusion API.</p>
+
+    <div id="host">
+        <div id="carousel"></div>
+    </div>
+
+    <h2>Trace Matrix</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Kind</th>
+                <th>Builder</th>
+                <th>Proof</th>
+                <th>Typed Fusion API</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody id="proposal-body"></tbody>
+    </table>
+
+    <button id="dump">Dump Keys</button>
+    <button id="clear">Clear Trace</button>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const rows = [];
+        const target = document.getElementById("carousel");
+
+        function clean(value, seen, depth) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).slice(0, 80).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function describePayload(args) {
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item, new WeakSet(), 0)
+                };
+            });
+            return { ownKeys: own, properties };
+        }
+
+        function record(label, value) {
+            trace.push({
+                at: new Date().toISOString(),
+                label,
+                value: clean(value, new WeakSet(), 0)
+            });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        function addRow(row) {
+            rows.push(row);
+            const tr = document.createElement("tr");
+            [row.candidate, row.kind, row.builder, row.proof, row.csharp, row.outcome].forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value;
+                tr.appendChild(td);
+            });
+            document.getElementById("proposal-body").appendChild(tr);
+        }
+
+        const ej2 = new ej.navigations.Carousel({
+            items: [
+                { template: "<div class='carousel-slide carousel-slide-one'>One</div>" },
+                { template: "<div class='carousel-slide carousel-slide-two'>Two</div>" },
+                { template: "<div class='carousel-slide carousel-slide-three'>Three</div>" }
+            ],
+            selectedIndex: 1,
+            animationEffect: "None",
+            autoPlay: false,
+            buttonsVisibility: "Hidden",
+            showIndicators: false,
+            showPlayButton: false,
+            allowKeyboardInteraction: false,
+            enableTouchSwipe: false,
+            loop: false,
+            slideChanging: args => {
+                record("slideChanging", describePayload(args));
+                if (args.nextIndex === 0) {
+                    args.cancel = true;
+                    record("slideChanging.cancel", { nextIndex: args.nextIndex, cancel: args.cancel });
+                }
+            },
+            slideChanged: args => {
+                record("slideChanged", describePayload(args));
+                record("selectedIndex.read", ej2.selectedIndex);
+            }
+        });
+
+        ej2.appendTo(target);
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("own keys", Object.keys(ej2).sort());
+            record("prototype methods", Object.getOwnPropertyNames(Object.getPrototypeOf(ej2)).sort());
+            record("selectedIndex.read", ej2.selectedIndex);
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            document.getElementById("trace").textContent = "";
+        });
+
+        addRow({
+            candidate: "selectedIndex read",
+            kind: "prop-read",
+            builder: "static-only",
+            proof: "load trace and dump trace show selectedIndex is readable at runtime",
+            csharp: "SelectedIndex()",
+            outcome: "implement"
+        });
+
+        addRow({
+            candidate: "next()",
+            kind: "method",
+            builder: "runtime",
+            proof: "clicking Next moves from Two to Three",
+            csharp: "Next()",
+            outcome: "implement"
+        });
+
+        addRow({
+            candidate: "prev()",
+            kind: "method",
+            builder: "runtime",
+            proof: "clicking Previous moves from Three to Two",
+            csharp: "Previous()",
+            outcome: "implement"
+        });
+
+        addRow({
+            candidate: "slideChanging.cancel",
+            kind: "payload-write",
+            builder: "runtime",
+            proof: "setting cancel=true blocks the final move to the first slide",
+            csharp: "PreventTransition()",
+            outcome: "implement"
+        });
+
+        addRow({
+            candidate: "slideChanged payload",
+            kind: "payload-read",
+            builder: "runtime",
+            proof: "trace shows currentIndex, previousIndex, isSwiped, slideDirection",
+            csharp: "FusionCarouselSlideChangedArgs",
+            outcome: "implement"
+        });
+
+        record("ready", {
+            component: "carousel",
+            namespace: "ej.navigations",
+            className: "Carousel",
+            id: "carousel"
+        });
+    </script>
+</body>
+</html>
