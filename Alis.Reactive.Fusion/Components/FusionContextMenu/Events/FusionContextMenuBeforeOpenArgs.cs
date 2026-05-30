@@ -17,7 +17,7 @@ namespace Alis.Reactive.Fusion.Components
 
         public double Left { get; set; }
 
-        public bool IsFocused { get; set; }
+        public bool? IsFocused { get; set; }
 
         public bool Cancel { get; set; }
     }

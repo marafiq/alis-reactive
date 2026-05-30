@@ -13,15 +13,17 @@
     var plan = Html.ReactivePlan<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ContextMenu.FusionContextMenuModel>();
     var items = new List<MenuItem>
     {
-        new() { Id = "dashboard-item", Text = "Dashboard" },
+        new() { Id = "dashboard-item", Text = "Dashboard", Url = "/dashboard", IconCss = "e-icons e-home", Separator = false },
         new()
         {
             Id = "projects-item",
             Text = "Projects",
+            IconCss = "e-icons e-folder",
+            Separator = false,
             Items = new List<MenuItem>
             {
-                new() { Id = "reports-item", Text = "Reports" },
-                new() { Id = "archive-item", Text = "Archive" }
+                new() { Id = "reports-item", Text = "Reports", IconCss = "e-icons e-description", Separator = false },
+                new() { Id = "archive-item", Text = "Archive", IconCss = "e-icons e-archive", Separator = false }
             }
         },
         new() { Id = "help-item", Text = "Help" }
@@ -32,22 +34,37 @@
         p.Element("before-item-state").SetText("pending");
         p.Element("before-item-text").SetText("pending");
         p.Element("before-item-id").SetText("pending");
+        p.Element("before-item-url").SetText("pending");
+        p.Element("before-item-icon-css").SetText("pending");
+        p.Element("before-item-separator").SetText("pending");
         p.Element("before-open-state").SetText("pending");
         p.Element("before-open-kind").SetText("pending");
         p.Element("before-open-top").SetText("pending");
         p.Element("before-open-left").SetText("pending");
+        p.Element("before-open-focused").SetText("pending");
+        p.Element("before-open-first-item").SetText("pending");
         p.Element("before-open-parent").SetText("pending");
         p.Element("before-open-cancel").SetText("pending");
+        p.Element("before-open-cancel-value").SetText("pending");
         p.Element("open-state").SetText("pending");
         p.Element("open-kind").SetText("pending");
+        p.Element("open-first-item").SetText("pending");
+        p.Element("open-parent").SetText("pending");
         p.Element("menu-visibility").SetText("pending");
         p.Element("before-close-state").SetText("pending");
+        p.Element("before-close-first-item").SetText("pending");
+        p.Element("before-close-parent").SetText("pending");
         p.Element("before-close-cancel").SetText("pending");
+        p.Element("before-close-cancel-value").SetText("pending");
         p.Element("close-state").SetText("pending");
+        p.Element("close-first-item").SetText("pending");
+        p.Element("close-parent").SetText("pending");
         p.Element("select-state").SetText("pending");
         p.Element("select-text").SetText("pending");
         p.Element("select-id").SetText("pending");
         p.Element("select-url").SetText("pending");
+        p.Element("select-icon-css").SetText("pending");
+        p.Element("select-separator").SetText("pending");
     }));
 }
 
@@ -110,9 +127,19 @@
             p.Element("before-item-state").SetText("rendered");
             p.Element("before-item-text").SetText(args, x => x.Item.Text);
             p.Element("before-item-id").SetText(args, x => x.Item.Id);
+            p.Element("before-item-url").SetText(args, x => x.Item.Url);
+            p.Element("before-item-icon-css").SetText(args, x => x.Item.IconCss);
+            p.Element("before-item-separator").SetText(args, x => x.Item.Separator);
         })
         .Reactive(evt => evt.BeforeOpen, (args, p) =>
         {
+            p.Element("before-open-state").SetText("rendered");
+            p.When(args, x => x.IsFocused).Truthy()
+                .Then(t => t.Element("before-open-focused").SetText("true"))
+                .Else(e => e.Element("before-open-focused").SetText("false"));
+            p.Element("before-open-first-item").SetText(args, x => x.Items[0].Text);
+            p.Element("before-open-cancel-value").SetText(args, x => x.Cancel);
+
             p.When(args, x => x.ParentItem).IsNull()
                 .Then(t =>
                 {
@@ -134,33 +161,53 @@
                 {
                     t.Element("before-open-cancel").SetText("cancelled");
                     args.PreventOpen(t);
+                    t.Element("before-open-cancel-value").SetText(args, x => x.Cancel);
                 })
                 .Else(e => e.Element("before-open-cancel").SetText("allowed"));
         })
         .Reactive(evt => evt.Opened, (args, p) =>
         {
             p.When(args, x => x.ParentItem).IsNull()
-                .Then(t => t.Element("open-kind").SetText("root"))
-                .Else(e => e.Element("open-kind").SetText("submenu"));
+                .Then(t =>
+                {
+                    t.Element("open-kind").SetText("root");
+                    t.Element("open-parent").SetText("root");
+                })
+                .Else(e =>
+                {
+                    e.Element("open-kind").SetText("submenu");
+                    e.Element("open-parent").SetText(args, x => x.ParentItem!.Text);
+                });
 
             p.Element("open-state").SetText("opened");
+            p.Element("open-first-item").SetText(args, x => x.Items[0].Text);
             p.Element("menu-visibility").SetText("visible");
         })
         .Reactive(evt => evt.BeforeClose, (args, p) =>
         {
             p.Element("before-close-state").SetText("rendered");
+            p.Element("before-close-first-item").SetText(args, x => x.Items[0].Text);
+            p.When(args, x => x.ParentItem).IsNull()
+                .Then(t => t.Element("before-close-parent").SetText("root"))
+                .Else(e => e.Element("before-close-parent").SetText(args, x => x.ParentItem!.Text));
+            p.Element("before-close-cancel-value").SetText(args, x => x.Cancel);
 
             p.When(p.Component<NativeCheckBox>(m => m.BlockClose).Value()).Truthy()
                 .Then(t =>
                 {
                     t.Element("before-close-cancel").SetText("cancelled");
                     args.PreventClose(t);
+                    t.Element("before-close-cancel-value").SetText(args, x => x.Cancel);
                 })
                 .Else(e => e.Element("before-close-cancel").SetText("allowed"));
         })
         .Reactive(evt => evt.Closed, (args, p) =>
         {
             p.Element("close-state").SetText("closed");
+            p.Element("close-first-item").SetText(args, x => x.Items[0].Text);
+            p.When(args, x => x.ParentItem).IsNull()
+                .Then(t => t.Element("close-parent").SetText("root"))
+                .Else(e => e.Element("close-parent").SetText(args, x => x.ParentItem!.Text));
             p.Element("menu-visibility").SetText("hidden");
         })
         .Reactive(evt => evt.Select, (args, p) =>
@@ -169,6 +216,8 @@
             p.Element("select-text").SetText(args, x => x.Item.Text);
             p.Element("select-id").SetText(args, x => x.Item.Id);
             p.Element("select-url").SetText(args, x => x.Item.Url);
+            p.Element("select-icon-css").SetText(args, x => x.Item.IconCss);
+            p.Element("select-separator").SetText(args, x => x.Item.Separator);
         }))
     </native-card-body></native-card>
 
@@ -178,22 +227,37 @@
             <p>Before item state: <span id="before-item-state" class="text-text-muted">pending</span></p>
             <p>Before item text: <span id="before-item-text" class="text-text-muted">pending</span></p>
             <p>Before item id: <span id="before-item-id" class="text-text-muted">pending</span></p>
+            <p>Before item url: <span id="before-item-url" class="text-text-muted">pending</span></p>
+            <p>Before item icon CSS: <span id="before-item-icon-css" class="text-text-muted">pending</span></p>
+            <p>Before item separator: <span id="before-item-separator" class="text-text-muted">pending</span></p>
             <p>Before open state: <span id="before-open-state" class="text-text-muted">pending</span></p>
             <p>Before open kind: <span id="before-open-kind" class="text-text-muted">pending</span></p>
             <p>Before open top: <span id="before-open-top" class="text-text-muted">pending</span></p>
             <p>Before open left: <span id="before-open-left" class="text-text-muted">pending</span></p>
+            <p>Before open focused: <span id="before-open-focused" class="text-text-muted">pending</span></p>
+            <p>Before open first item: <span id="before-open-first-item" class="text-text-muted">pending</span></p>
             <p>Before open parent: <span id="before-open-parent" class="text-text-muted">pending</span></p>
             <p>Before open cancel: <span id="before-open-cancel" class="text-text-muted">pending</span></p>
+            <p>Before open cancel value: <span id="before-open-cancel-value" class="text-text-muted">pending</span></p>
             <p>Open state: <span id="open-state" class="text-text-muted">pending</span></p>
             <p>Open kind: <span id="open-kind" class="text-text-muted">pending</span></p>
+            <p>Open first item: <span id="open-first-item" class="text-text-muted">pending</span></p>
+            <p>Open parent: <span id="open-parent" class="text-text-muted">pending</span></p>
             <p>Menu visibility: <span id="menu-visibility" class="text-text-muted">pending</span></p>
             <p>Before close state: <span id="before-close-state" class="text-text-muted">pending</span></p>
+            <p>Before close first item: <span id="before-close-first-item" class="text-text-muted">pending</span></p>
+            <p>Before close parent: <span id="before-close-parent" class="text-text-muted">pending</span></p>
             <p>Before close cancel: <span id="before-close-cancel" class="text-text-muted">pending</span></p>
+            <p>Before close cancel value: <span id="before-close-cancel-value" class="text-text-muted">pending</span></p>
             <p>Close state: <span id="close-state" class="text-text-muted">pending</span></p>
+            <p>Close first item: <span id="close-first-item" class="text-text-muted">pending</span></p>
+            <p>Close parent: <span id="close-parent" class="text-text-muted">pending</span></p>
             <p>Select state: <span id="select-state" class="text-text-muted">pending</span></p>
             <p>Select text: <span id="select-text" class="text-text-muted">pending</span></p>
             <p>Select id: <span id="select-id" class="text-text-muted">pending</span></p>
             <p>Select url: <span id="select-url" class="text-text-muted">pending</span></p>
+            <p>Select icon CSS: <span id="select-icon-css" class="text-text-muted">pending</span></p>
+            <p>Select separator: <span id="select-separator" class="text-text-muted">pending</span></p>
         </native-vstack>
     </native-card-body></native-card>
 
