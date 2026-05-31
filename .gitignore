@@ -13,6 +13,7 @@ node_modules/
 tools/
 !tools/md-viewer/
 !tools/ApiDocGenerator/
+!tools/PlanTypeGenerator/
 tools/md-viewer/node_modules/
 tools/md-viewer-mockup.html
 

@@ -83,10 +83,15 @@ bundle output path is gitignored — `git status` stays clean after a build.
 Bringing the design system into a consuming app is four steps; you do **not** need to
 touch the framework internals.
 
-1. **Reference the package.** Add `AlisReactive.DesignSystem`. On build, the shipped
-   `AlisReactive.targets` copies `design-system.<version>.css` into your app's
-   `wwwroot/css/` (the version is baked into the filename). Add `AlisReactive.Fusion`
-   too if you use Syncfusion components — it ships `syncfusion.<version>.css` the same way.
+1. **Reference the NuGet package.** Add a **package** reference to `AlisReactive.DesignSystem`.
+   Each asset package ships a per-package MSBuild targets file (`{PackageId}.targets`, generated
+   from `build/AlisReactiveAssets.targets`) that, on build, copies its versioned CSS into your
+   app's `wwwroot/css/` — `design-system.<version>.css` here, and `syncfusion.<version>.css` if
+   you also add the `AlisReactive.Fusion` package. The version is baked into the filename.
+   *(This copy fires for **package** references only. The in-repo `examples/resident-intake`
+   uses local **project** references for source-contract testing, so it does not auto-copy the
+   CSS that way — rebuild it against the published packages with `scripts/rebuild-example-app.sh`
+   to see the packaged design system end to end.)*
 
 2. **Link the stylesheet and mark the root** in `_Layout.cshtml` — exactly as the
    example app and sandbox do:
