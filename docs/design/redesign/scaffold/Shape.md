@@ -69,13 +69,13 @@ public sealed class Shape : IEquatable<Shape>
 | Member | Signature | Intent (XML-doc-style) |
 |---|---|---|
 | `String` | `internal static readonly Shape` | The scalar string shape. |
-| `Number` | `internal static readonly Shape` | The scalar number shape (covers all CLR numeric types). |
+| `Number` | `internal static readonly Shape` | The scalar number shape. Covers **exactly** the eleven built-in numerics: `byte sbyte short ushort int uint long ulong float double decimal`. `nint`/`nuint` are **not** numeric → `Any` (Shape.cs:106–111). |
 | `Boolean` | `internal static readonly Shape` | The scalar boolean shape. |
 | `Date` | `internal static readonly Shape` | The scalar date shape (DateTime/DateTimeOffset/DateOnly). |
 | `Raw` | `internal static readonly Shape` | A value passed through verbatim — no conversion. |
 | `Any` | `internal static readonly Shape` | An unclassifiable value; accepts/merges with anything. |
 | `None` | `internal static readonly Shape` | Absence of a typed value. The sentinel that replaces null — never an exception target. |
-| `FromClrType` | `internal static Shape FromClrType(Type type)` | Infer the shape from a CLR type. The one authoring inference entry point every slice calls. Nullable&lt;T&gt;→`Nullable(inner)`; string/bool/date/numeric→scalar; Guid/TimeSpan/TimeOnly/enum→string; supported collection→`ArrayOf(item)`; else `Any`. |
+| `FromClrType` | `internal static Shape FromClrType(Type type)` | Infer the shape from a CLR type. The one authoring inference entry point every slice calls. **Ordered**: `Nullable<T>`→`Nullable(inner)`; `string`→string; `bool`→boolean; date(`DateTime`/`DateTimeOffset`/`DateOnly`)→date; one of the eleven built-in numerics→number; `Guid`/`TimeSpan`/`TimeOnly`→string; `enum`→string; **supported collection**→`ArrayOf(item)`; else `Any`. A **supported collection** is an array, OR a type whose generic-collection interfaces (`IEnumerable<T>`/`IReadOnlyCollection<T>`/`IReadOnlyList<T>`/`ICollection<T>`/`IList<T>`/`List<T>`/`HashSet<T>`/`ISet<T>`) resolve to **exactly one distinct** `T`. A non-generic `IEnumerable` (e.g. `ArrayList`), a dictionary, `string`, or a type with **two distinct** `IEnumerable<T>` → **not** supported → `Any` (Shape.cs:120–199). |
 | `FromValue` | `internal static Shape FromValue(object? value)` | Infer from a runtime value instance; `null`→`None`, else `FromClrType(value.GetType())`. |
 | `CollectionItemShapeOrNone` | `internal static Shape CollectionItemShapeOrNone(Type type)` | The element shape of a collection type, or `None` if the type is not a supported collection. |
 | `ArrayOf` | `internal static Shape ArrayOf(Shape item)` | An array of `item`. Item must not be `None` (an array of nothing is unrepresentable). |
@@ -178,21 +178,37 @@ export function applyShape(value: unknown, shape: Shape): unknown;
 /** Like applyShape but surfaces the miss as Err instead of returning the original. */
 export function convertByShape(value: unknown, shape: Shape): ConvertResult<unknown>;
 
-/** Scalar coercions, each total, each returns ConvertResult — exported for reuse. */
+/** Scalar coercions, each total, each returns ConvertResult — exported for reuse.
+ *  Edge rules are PINNED (shape-convert.ts) — the plain-object case is the only Err:
+ *  toString : missing→"" ; string→itself ; number/boolean→`${v}` ; Date→ISO ;
+ *             ARRAY→`String(v)` (comma-joined, NOT Err) ; plain object→Err.
+ *  toNumber : missing→0 ; number→finite-or-Err ; BOOLEAN→1/0 ; string→Number(s) finite-or-Err
+ *             (""/whitespace→0, "abc"→Err) ; Date→getTime finite-or-Err ; plain object→Err.
+ *  toBoolean: missing→false ; boolean→itself ; string→truthy (false ONLY for ""/"false"/"0";
+ *             "no"/"off"→true) ; number→truthy (false for 0/NaN) ; Date→true ;
+ *             ARRAY→length>0 ([]→false) ; plain object→Err.
+ *  toDate   : MISSING→ok(NaN) (not 0) ; Date→getTime ; number→treated as epoch ms (finite-or-Err) ;
+ *             "YYYY-MM-DD"→LOCAL midnight ms ; other string→`new Date(s).getTime()` finite-or-Err. */
 export function toString(value: unknown): ConvertResult<string>;
 export function toNumber(value: unknown): ConvertResult<number>;
 export function toBoolean(value: unknown): ConvertResult<boolean>;
-export function toDate(value: unknown): ConvertResult<number>;   // epoch ms (date-only → LOCAL midnight)
-export function toArray(value: unknown): ConvertResult<unknown[]>;
-export function toPlainObject(value: unknown): ConvertResult<Record<string, unknown>>;
+export function toDate(value: unknown): ConvertResult<number>;   // epoch ms; missing→NaN; date-only→LOCAL midnight
+export function toArray(value: unknown): ConvertResult<unknown[]>;       // array→self; missing/""→[]; plain object→Err; scalar→[v]
+export function toPlainObject(value: unknown): ConvertResult<Record<string, unknown>>; // plain object only; array/Date/scalar→Err
 ```
 
 `applyShape` / `convertByShape` switch on `shape.kind` with a final
 `const _: never = shape;` arm so a missing variant is a compile error (Kind's
-exhaustiveness contract). `string/number/boolean/date` → scalar coerce;
-`array` → `toArray` then recurse item shape; `object` → `toPlainObject` then per
-declared field (`additional` keeps extras); `nullable` → missing→`null` else
-recurse inner; `raw/any/none` → identity.
+exhaustiveness contract). `string/number/boolean/date` → scalar coerce, returning
+the **original value** on a miss (`applyShape`) or the `Err` (`convertByShape`);
+`array` → `toArray` then recurse item shape; `nullable` → missing→`null` else
+recurse inner; `raw/any/none` → identity. The **object** arm is pinned
+(`applyObjectFields`, shape-convert.ts:113–127): `toPlainObject` first; if
+`additional && zero declared fields`, return the input **unchanged**; otherwise
+build a fresh record (copying all input keys first when `additional`), then for
+each *declared* field **skip it entirely when the input lacks that key**
+(`hasOwnProperty` false → `continue`) — an absent declared field is **never
+materialized to its zero**. Only present declared fields are shaped.
 
 ### 2f. TS — `RuntimeShape` (`domain/runtime-shape.ts`, the wrapper + shape-once)
 
@@ -213,8 +229,11 @@ export class RuntimeShape {
   convert(value: unknown): ConvertResult<unknown>;
 
   /** SHAPE-ONCE egress: convert a runtime value to its wire form exactly once.
-   *  date(number) → ISO string; nullable unwraps to inner; everything else is
-   *  already wire-ready. This is the only re-shaping permitted on the gather path. */
+   *  PINNED (runtime-shape.ts:58–72): undeclared(`none`)→passthrough; `nullable`→
+   *  recurse the inner shape; a `date` whose value is a **finite number** →
+   *  `new Date(value).toISOString()` (UTC, millisecond precision, `…Z`); everything
+   *  else — including a `date` whose value is NaN or already a string — passes
+   *  through unchanged. This is the only re-shaping permitted on the gather path. */
   formatForWire(value: unknown): unknown;
 }
 ```
@@ -229,8 +248,8 @@ export class RuntimeShape {
 | **Construction** | factory args | a `Shape` | `ArrayOf`/`Nullable` reject a `None` item/inner (an array/nullable of nothing is unrepresentable) — these are the only constructor invariants, and they guard a *developer mis-call at authoring*, the real boundary. `ObjectOf` requires non-null `fields`. No public ctor (Rule 8). |
 | **Equality** | two `Shape` | bool | Structural: equal iff same `Kind` and same structure contract (recursive). `GetHashCode` agrees with `Equals`. Drives matrix de-dup and merge fast-paths. |
 | **Serialization** | a `Shape` + `Utf8JsonWriter` | `{ "kind":"…", <body> }` | Write-only (`Read` throws `NotSupportedException` — plan types are write-only). `kind` always first; body is `item`/`inner`/`fields`+`additional`/nothing. camelCase, owned ultimately by Kind's `PlanSerializer`. |
-| **Merge** | `existing`, `incoming` | `(true, merged)` or `(false, null)` | `Any` is identity; `None` conflicts with everything; nullable is transparent; arrays/objects recurse; two open objects with no fields → `OpenObject`. Conflict is a real value (`false`), never an exception. |
-| **Accept** | `expected`, `actual` | bool | `Any` accepts/accepted-by anything; `None` accepts nothing; nullable transparent; expected open-object-with-no-fields accepts any object; arrays/objects recurse. |
+| **Merge** | `existing`, `incoming` | `(true, merged)` or `(false, null)` | `Any` is identity; `None` conflicts with everything; nullable is transparent; arrays/objects recurse. Object merge **unions fields** (a per-field conflict is a conflict); the result is `OpenObject` **only** when *both* inputs allow additional fields **and** the union is empty — otherwise it is a closed `ObjectOf(union)`, so `closed{a} + open{}` merges to the **closed** `{a}`. Conflict is a real value (`false`), never an exception. |
+| **Accept** | `expected`, `actual` | bool | `Any` accepts/accepted-by anything; `None` accepts nothing; nullable transparent; arrays/objects recurse. For objects: an expected **open** object with no declared fields accepts any object; otherwise every expected declared field must be present-and-acceptable in `actual` — **except** a missing field is accepted when `actual` is open (`AllowsAdditionalFields`). So `CanAccept(closed{a}, open{})` = **true**, while `CanAccept(closed{a}, closed{b})` = **false**. |
 | **Runtime apply** | `unknown` value + `Shape` | coerced `unknown` | Total, never throws on type mismatch — returns the original (`applyShape`) or `Err` (`convertByShape`). Missing input coerces to the shape's zero (`""`/`0`/`false`/`NaN`/`[]`/`null`). |
 | **Runtime egress** | runtime value + declared `RuntimeShape` | wire value | `formatForWire` runs **exactly once** per value on the gather path (shape-once). Unshaped (`none`) → passthrough. |
 
@@ -304,14 +323,20 @@ public sealed class Shape : IEquatable<Shape>
     {
         // TODO: total inference — fixtures: clr_int_is_number, clr_string_is_string, clr_bool_is_boolean,
         //   clr_datetime_is_date, clr_nullable_int_is_nullable_number, clr_guid_is_string, clr_enum_is_string,
-        //   clr_list_of_t_is_array_of_t, clr_dictionary_is_any, clr_unknown_is_any
-        //   (Nullable<T> first → Nullable(FromClrType(underlying)); string/bool/date/numeric/string-serialized/enum;
+        //   clr_list_of_t_is_array_of_t, clr_dictionary_is_any, clr_unknown_is_any,
+        //   clr_nint_is_any, clr_non_generic_enumerable_is_any, clr_ambiguous_multi_enumerable_is_any
+        //   (Nullable<T> first → Nullable(FromClrType(underlying)); string; bool; date; numeric; string-serialized; enum;
         //    collection → ArrayOf(item); else Any)
+        //   numeric = EXACTLY {byte sbyte short ushort int uint long ulong float double decimal} — NOT nint/nuint.
+        //   collection = array OR generic IEnumerable<T>-family with EXACTLY ONE distinct T; a non-generic
+        //   IEnumerable (ArrayList), a dictionary, string, or two distinct IEnumerable<T> → Any (not array).
     }
 
     internal static Shape CollectionItemShapeOrNone(Type type)
     {
-        // TODO: TryGetCollectionItemShape ? item : None (fixture: collection_item_shape_or_none_for_non_collection)
+        // TODO: TryGetCollectionItemShape ? item : None
+        //   (fixtures: collection_item_shape_or_none_for_non_collection,
+        //    collection_item_shape_or_none_for_non_generic_enumerable — ArrayList → None, same boundary as FromClrType)
     }
 
     internal static Shape FromValue(object? value) =>
@@ -340,7 +365,11 @@ public sealed class Shape : IEquatable<Shape>
 
     internal string DescribeContract()
     {
-        // TODO: array<…> / nullable<…> / object{…} / Kind  (fixture: describe_contract_nested)
+        // TODO: array<…> / nullable<…> / object-contract.Describe() / Kind
+        //   (fixtures: describe_contract_nested, describe_open_object, describe_closed_multi_field)
+        //   ShapeObjectContract.Describe PINNED: empty → additional?"object<open>":"object{}";
+        //   with fields → "object{" + fields joined by ", " as `key:DescribeContract()` + (additional?", ...":"") + "}".
+        //   Field separator is ", " (comma-space); an open object is "object<open>", never "object{}".
     }
 
     internal void WriteContractDetails(Utf8JsonWriter writer, JsonSerializerOptions options) =>
@@ -385,15 +414,21 @@ internal static class ShapeContractCompatibility
     {
         // guard nulls (authoring boundary)
         // TODO: ordered rules — fixtures: merge_equal_is_self, merge_any_yields_other, merge_none_conflicts,
-        //   merge_nullable_absorbs_inner, merge_arrays_recurse, merge_objects_union_fields, merge_field_conflict_is_conflict
+        //   merge_nullable_absorbs_inner, merge_arrays_recurse, merge_objects_union_fields,
+        //   merge_field_conflict_is_conflict, merge_closed_with_open_is_closed
         //   (== → self; None → Conflict; Any → other; nullable-of → that; array recurse; object recurse; else Conflict)
+        //   object recurse = union fields (per-field conflict → Conflict); result is OpenObject ONLY when BOTH
+        //   inputs allow additional AND the union is empty — else closed ObjectOf(union). So closed{a}+open{} → closed{a}.
     }
 
     internal static bool CanAccept(Shape expected, Shape actual)
     {
         // guard nulls
-        // TODO: ordered rules — fixtures: accept_equal, accept_any_either_side, reject_none_either_side,
-        //   accept_nullable_either_side, accept_array_recurse, accept_open_object, reject_missing_required_field
+        // TODO: ordered rules — fixtures: accept_any_either_side, reject_none_either_side, accept_open_object,
+        //   accept_missing_field_when_actual_open, reject_missing_required_field
+        //   (== → true; None either side → false; Any either side → true; nullable-of either side → true;
+        //    array recurse; object: expected-open-no-fields → true; else every expected field must be present-and-
+        //    acceptable in actual, EXCEPT a missing field is accepted when actual.AllowsAdditionalFields).
     }
 
     private static bool Merge(Shape shape, [NotNullWhen(true)] out Shape? merged) { merged = shape; return true; }
@@ -419,7 +454,7 @@ export function applyShape(value: unknown, shape: Shape): unknown {
     case "boolean":  /* TODO applyScalar(value, toBoolean) — fixture: apply_boolean_truthy_text */
     case "date":     /* TODO applyScalar(value, toDate)    — fixture: apply_date_only_is_local_midnight */
     case "array":    /* TODO applyArrayShape  — fixture: apply_array_recurses_items */
-    case "object":   /* TODO applyObjectShape — fixture: apply_object_keeps_open_extras */
+    case "object":   /* TODO applyObjectShape — fixtures: apply_object_keeps_open_extras, apply_object_skips_absent_declared_field (absent declared field is SKIPPED, never materialized to its zero) */
     case "nullable": /* TODO missing→null else recurse inner — fixture: apply_nullable_missing_is_null */
     case "raw": case "any": case "none": return value; // fixture: apply_raw_is_identity
     default: { const _: never = shape; throw new Error(`[alis] unknown shape kind: "${(_ as Shape).kind}"`); }
@@ -430,12 +465,12 @@ export function convertByShape(value: unknown, shape: Shape): ConvertResult<unkn
   // TODO: same switch, but return ConvertResult (Err on miss) — fixture: convert_object_into_scalar_is_err
 }
 
-export function toString(value: unknown): ConvertResult<string> { /* TODO — missing→"" ; object→err */ }
-export function toNumber(value: unknown): ConvertResult<number> { /* TODO — missing→0 ; non-finite→err */ }
-export function toBoolean(value: unknown): ConvertResult<boolean> { /* TODO — "" / "false" / "0" / 0 / NaN → false */ }
-export function toDate(value: unknown): ConvertResult<number> { /* TODO — YYYY-MM-DD → LOCAL midnight ms */ }
-export function toArray(value: unknown): ConvertResult<unknown[]> { /* TODO — missing/""→[] ; object→err ; scalar→[v] */ }
-export function toPlainObject(value: unknown): ConvertResult<Record<string, unknown>> { /* TODO — non-object→err */ }
+export function toString(value: unknown): ConvertResult<string> { /* TODO — missing→"" ; number/bool→`${v}` ; Date→ISO ; ARRAY→String(v) ; plain object→err  (fixture: to_string_array_is_comma_joined) */ }
+export function toNumber(value: unknown): ConvertResult<number> { /* TODO — missing→0 ; BOOL→1/0 ; string→Number() finite-or-err (""→0, "abc"→err) ; non-finite→err  (fixtures: to_number_bool_is_one, to_number_unparseable_is_err) */ }
+export function toBoolean(value: unknown): ConvertResult<boolean> { /* TODO — missing→false ; ""/"false"/"0"/0/NaN→false ; other string→true ; ARRAY→length>0 ; plain object→err  (fixtures: to_boolean_empty_array_is_false, to_boolean_nonempty_array_is_true, to_boolean_object_is_err, to_boolean_arbitrary_text_is_true) */ }
+export function toDate(value: unknown): ConvertResult<number> { /* TODO — MISSING→ok(NaN) ; number→epoch ms ; "YYYY-MM-DD"→LOCAL midnight ms ; other string→new Date(s).getTime() finite-or-err  (fixture: to_date_missing_is_nan) */ }
+export function toArray(value: unknown): ConvertResult<unknown[]> { /* TODO — array→self ; missing/""→[] ; plain object→err ; scalar→[v] */ }
+export function toPlainObject(value: unknown): ConvertResult<Record<string, unknown>> { /* TODO — plain object only ; array/Date/scalar→err */ }
 ```
 
 ### 5d. `runtime-shape.ts`
@@ -491,8 +526,12 @@ preamble in `04-matrix-validation-components-slots.md`. Each becomes one test.
 | `clr_list_of_t_is_array_of_t` | `List<int>` / `int[]` / `IEnumerable<string>` | `array<number>` / `array<string>` |
 | `clr_dictionary_is_any` | `Dictionary<string,int>` | `any` (dictionary is not a supported collection) |
 | `clr_unknown_is_any` | a POCO with no classification | `any` |
+| `clr_nint_is_any` | `typeof(nint)` / `typeof(nuint)` | `any` (native ints are **not** in the numeric set) |
+| `clr_non_generic_enumerable_is_any` | `typeof(System.Collections.ArrayList)` | `any` (non-generic `IEnumerable` is not a supported collection — not `array<any>`) |
+| `clr_ambiguous_multi_enumerable_is_any` | a type implementing both `IEnumerable<int>` and `IEnumerable<string>` | `any` (two distinct `T` ⇒ ambiguous, not `array`) |
 | `from_value_null_is_none` | `FromValue(null)` | `none` |
 | `collection_item_shape_or_none_for_non_collection` | `CollectionItemShapeOrNone(typeof(int))` | `none` |
+| `collection_item_shape_or_none_for_non_generic_enumerable` | `CollectionItemShapeOrNone(typeof(System.Collections.ArrayList))` | `none` (same boundary as `FromClrType`) |
 
 ### B. Construction invariants (null unrepresentable by construction)
 
@@ -514,6 +553,8 @@ preamble in `04-matrix-validation-components-slots.md`. Each becomes one test.
 | `open_object_serializes_additional_true` | `OpenObject()` | `{"kind":"object","fields":{},"additional":true}` |
 | `read_is_not_supported` | `ShapeJsonConverter.Read` | `NotSupportedException` |
 | `describe_contract_nested` | `ArrayOf(ObjectOf({a:String}))` | `"array<object{a:string}>"` |
+| `describe_open_object` | `OpenObject()` | `"object<open>"` (an open object is **not** `"object{}"`) |
+| `describe_closed_multi_field` | `ObjectOf({a:String,b:Number})` | `"object{a:string, b:number}"` (fields joined by `", "`) |
 
 ### D. Equality + algebra (`ShapeContractCompatibility`)
 
@@ -528,10 +569,12 @@ preamble in `04-matrix-validation-components-slots.md`. Each becomes one test.
 | `merge_arrays_recurse` | merge `ArrayOf(Any)`,`ArrayOf(String)` | `(true, ArrayOf(String))` |
 | `merge_objects_union_fields` | merge `ObjectOf({a:String})`,`ObjectOf({b:Number})` | `(true, ObjectOf({a:String,b:Number}))` |
 | `merge_field_conflict_is_conflict` | merge `ObjectOf({a:String})`,`ObjectOf({a:Number})` | `(false, null)` |
+| `merge_closed_with_open_is_closed` | merge `ObjectOf({a:String})`,`OpenObject()` | `(true, ObjectOf({a:String}))` — union non-empty ⇒ **closed**, `additional:false` (only both-open + empty-union ⇒ `OpenObject`) |
 | `accept_any_either_side` | `CanAccept(Any, Object…)` and `CanAccept(String, Any)` | `true` |
 | `reject_none_either_side` | `CanAccept(None, String)` | `false` |
-| `accept_open_object` | `CanAccept(OpenObject(), ObjectOf({a:String}))` | `true` |
-| `reject_missing_required_field` | `CanAccept(ObjectOf({a:String}), OpenObject())`… closed expected, missing field | `false` |
+| `accept_open_object` | `CanAccept(OpenObject(), ObjectOf({a:String}))` | `true` (expected open-no-fields accepts any object) |
+| `accept_missing_field_when_actual_open` | `CanAccept(ObjectOf({a:String}), OpenObject())` — closed expected, field absent, **actual is open** | `true` (open actual allows the missing field — real `ShapeContractCompatibility.cs:129`) |
+| `reject_missing_required_field` | `CanAccept(ObjectOf({a:String}), ObjectOf({b:Number}))` — closed expected, field `a` absent, **actual is closed** | `false` (closed actual cannot supply the missing required field) |
 
 ### E. Runtime conversion (TS — `applyShape`/`convertByShape`/`formatForWire`)
 
@@ -545,10 +588,20 @@ preamble in `04-matrix-validation-components-slots.md`. Each becomes one test.
 | `apply_object_keeps_open_extras` | `applyShape({a:1,x:2}, open object)` | `{a:1,x:2}` |
 | `apply_nullable_missing_is_null` | `applyShape(undefined, nullable<string>)` | `null` |
 | `apply_raw_is_identity` | `applyShape(v, {kind:"raw"\|"any"\|"none"})` | `v` unchanged |
+| `apply_object_skips_absent_declared_field` | `applyShape({}, object{a:string})` | `{}` — absent declared field **skipped**, **not** `{a:""}` |
+| `to_string_array_is_comma_joined` | `toString([1,2])` | `ok("1,2")` (array coerces, not `Err`) |
+| `to_number_bool_is_one` | `toNumber(true)` / `toNumber(false)` | `ok(1)` / `ok(0)` |
+| `to_number_unparseable_is_err` | `toNumber("abc")` | `{ok:false}` (`""`/whitespace → `ok(0)`) |
+| `to_boolean_arbitrary_text_is_true` | `toBoolean("no")` / `toBoolean("off")` | `ok(true)` (falsy only for `""`/`"false"`/`"0"`) |
+| `to_boolean_empty_array_is_false` | `toBoolean([])` | `ok(false)` |
+| `to_boolean_nonempty_array_is_true` | `toBoolean([0])` | `ok(true)` (length-based, not element truthiness) |
+| `to_boolean_object_is_err` | `toBoolean({})` | `{ok:false}` (plain object cannot coerce) |
+| `to_date_missing_is_nan` | `toDate(null)` / `toDate(undefined)` | `ok(NaN)` (not epoch `0`) |
 | `convert_object_into_scalar_is_err` | `convertByShape({}, {kind:"string"})` | `{ok:false}` |
-| `format_date_to_iso` | `formatForWire(epochMs)` under `date` | ISO-8601 string |
-| `format_nullable_unwraps` | `formatForWire(epochMs)` under `nullable<date>` | ISO-8601 string |
+| `format_date_to_iso` | `formatForWire(epochMs)` under `date` | `new Date(epochMs).toISOString()` (UTC, ms precision, `…Z`) |
+| `format_nullable_unwraps` | `formatForWire(epochMs)` under `nullable<date>` | same ISO string (recurses inner) |
 | `format_unshaped_passthrough` | `formatForWire(v)` under `none` | `v` unchanged |
+| `format_nan_date_passthrough` | `formatForWire(NaN)` under `date` | `NaN` unchanged (only a finite number formats) |
 | `runtime_shape_item_of_array` | `RuntimeShape.from(array<number>).item()` | declared `number` |
 
 ### Coverage gate

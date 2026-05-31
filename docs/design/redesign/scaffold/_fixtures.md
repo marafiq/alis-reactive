@@ -97,10 +97,10 @@ guarantee; this file is its concrete, assertable form.
 | `F-Shape-String` | a `string` value reaches any sink | `{"kind":"string"}` | `applyShape(v,string)` → `String(v)`; `null`→`null` |
 | `F-Shape-Number` | an `int`/`long`/`decimal`/`double` value | `{"kind":"number"}` | coerces `"3"`→`3`; non-finite handled per op |
 | `F-Shape-Boolean` | a `bool` value | `{"kind":"boolean"}` | coerces truthy/`"true"`→`true` |
-| `F-Shape-Date` | a `DateTime` value | `{"kind":"date"}` | serialized round-trip-safe ISO-8601 `"O"` string |
+| `F-Shape-Date` | a `DateTime` value | `{"kind":"date"}` | C# **literal** = STJ round-trip ISO (`"O"`-style); runtime **egress** (`formatForWire`) of a finite epoch-ms number = `Date.toISOString()` (UTC, ms, `…Z`) — two distinct paths |
 | `F-Shape-NullableScalar` | a `int?`/`DateTime?` value | `{"kind":"nullable","inner":{"kind":"number"}}` | present→coerce inner; absent→`null` (no default) |
-| `F-Shape-Array` | a `T[]`/`IEnumerable<T>` value | `{"kind":"array","item":{…itemShape}}` | each item shaped by `item`; non-array → boundary normalize |
-| `F-Shape-Object` | a typed object value | `{"kind":"object","fields":{…},"additional":false}` | each field shaped; closed object (no extra keys) |
+| `F-Shape-Array` | a `T[]`/`IEnumerable<T>` value (generic, single `T`) | `{"kind":"array","item":{…itemShape}}` | each item shaped by `item`; non-array → boundary normalize. Authoring: only array or single-`T` generic `IEnumerable<T>` → `array`; non-generic `IEnumerable`/dictionary/ambiguous-`T` → `any` |
+| `F-Shape-Object` | a typed object value | `{"kind":"object","fields":{…},"additional":false}` | each present declared field shaped; extra keys dropped; an **absent** declared field is **skipped** (not materialized to its zero) |
 | `F-Shape-Raw` | a pre-serialized JSON value | `{"kind":"raw"}` | passed through unconverted |
 | `F-Shape-Any` | an unclassifiable type (object/dynamic) | `{"kind":"any"}` | identity — never a guessed scalar |
 | `F-Shape-None` | `null` literal / no-operand rule | `{"kind":"none"}` | absence, not a typed default; `""`→`null` not applied |
