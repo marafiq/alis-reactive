@@ -156,8 +156,10 @@ internal static class ShapeContractCompatibility
     internal static bool TryMergeContracts(Shape existing, Shape incoming, [NotNullWhen(true)] out Shape? merged);
 
     /// True when a value of <paramref name="actual"/> may be written to a member
-    /// declared as <paramref name="expected"/>. Any accepts anything; nullable is
-    /// transparent; arrays/objects recurse; None accepts nothing.
+    /// declared as <paramref name="expected"/>. Any accepts/accepted-by anything;
+    /// None accepts nothing; nullable is **narrow** — `nullable<X>` is accepted with
+    /// `X` only when the inner shapes are equal (`IsNullableOf`), so `nullable<any>`
+    /// does NOT accept a `string`; arrays/objects recurse.
     internal static bool CanAccept(Shape expected, Shape actual);
 }
 ```
@@ -166,6 +168,14 @@ internal static class ShapeContractCompatibility
 
 Crosses the contract. `Shape` here is the **generated** union from `types/plan.ts`
 (owned by Kind). This module is the single place Shape→value conversion happens.
+
+> **Runtime coercion is TS-only — JS semantics are authoritative.** The C# domain
+> does CLR *inference* (`FromClrType`) + *serialization* only; it never runs
+> `applyShape`/`toString`/`toNumber`/`toDate`. So number→string is JS `String(n)`,
+> string→number is JS `Number(s)`, date→wire is JS `Date.toISOString()` — the
+> scalar-rendering algorithm is JavaScript's, not the CLR's. A single-language
+> port of this engine (e.g. a C# dogfood proof) must *mirror* the JS result, and
+> any C#-vs-JS float-formatting nuance is a porting artifact, not a contract choice.
 
 ```ts
 /** Discriminated result — caller MUST check .ok before using .value. */
@@ -210,6 +220,18 @@ each *declared* field **skip it entirely when the input lacks that key**
 (`hasOwnProperty` false → `continue`) — an absent declared field is **never
 materialized to its zero**. Only present declared fields are shaped.
 
+**`convertByShape` is lenient on nested items/fields, strict only at the top and
+through nullable** (shape-convert.ts:96–111). Its `array`/`object` arms call
+`toArray`/`toPlainObject` (which *can* `Err` at the top level), then wrap
+`ok(applyArrayItemShape(…))` / `ok(applyObjectFields(…))` — and those helpers run
+each item/field through **`applyShape`** (original-on-miss), so a non-coercible
+*element* or *field* **never** turns the whole convert into an `Err`. The only
+recursive *strict* path is `nullable` → `convertByShape(inner)`. Net: `convertByShape`
+returns `Err` only on a top-level scalar mismatch, a top-level `toArray`/`toPlainObject`
+miss, or a failed nested nullable-inner convert. So
+`convertByShape([1,2,{}], array<number>)` = `ok([1,2,{}])` (the `{}` item stays as-is),
+**not** `Err`.
+
 ### 2f. TS — `RuntimeShape` (`domain/runtime-shape.ts`, the wrapper + shape-once)
 
 ```ts
@@ -248,8 +270,8 @@ export class RuntimeShape {
 | **Construction** | factory args | a `Shape` | `ArrayOf`/`Nullable` reject a `None` item/inner (an array/nullable of nothing is unrepresentable) — these are the only constructor invariants, and they guard a *developer mis-call at authoring*, the real boundary. `ObjectOf` requires non-null `fields`. No public ctor (Rule 8). |
 | **Equality** | two `Shape` | bool | Structural: equal iff same `Kind` and same structure contract (recursive). `GetHashCode` agrees with `Equals`. Drives matrix de-dup and merge fast-paths. |
 | **Serialization** | a `Shape` + `Utf8JsonWriter` | `{ "kind":"…", <body> }` | Write-only (`Read` throws `NotSupportedException` — plan types are write-only). `kind` always first; body is `item`/`inner`/`fields`+`additional`/nothing. camelCase, owned ultimately by Kind's `PlanSerializer`. |
-| **Merge** | `existing`, `incoming` | `(true, merged)` or `(false, null)` | `Any` is identity; `None` conflicts with everything; nullable is transparent; arrays/objects recurse. Object merge **unions fields** (a per-field conflict is a conflict); the result is `OpenObject` **only** when *both* inputs allow additional fields **and** the union is empty — otherwise it is a closed `ObjectOf(union)`, so `closed{a} + open{}` merges to the **closed** `{a}`. Conflict is a real value (`false`), never an exception. |
-| **Accept** | `expected`, `actual` | bool | `Any` accepts/accepted-by anything; `None` accepts nothing; nullable transparent; arrays/objects recurse. For objects: an expected **open** object with no declared fields accepts any object; otherwise every expected declared field must be present-and-acceptable in `actual` — **except** a missing field is accepted when `actual` is open (`AllowsAdditionalFields`). So `CanAccept(closed{a}, open{})` = **true**, while `CanAccept(closed{a}, closed{b})` = **false**. |
+| **Merge** | `existing`, `incoming` | `(true, merged)` or `(false, null)` | Ordered: equal→self; `None` conflicts with everything; `Any` is identity (yields the other). **Nullable is narrow** — `nullable<X>` merges with `X` (yielding `nullable<X>`) **only** when the inner equals the other (`IsNullableOf`); a nullable vs a non-matching inner falls through to array/object merge and ends in **conflict** (so `nullable<any>` + `string` → conflict, **not** `nullable<string>`). Then arrays/objects recurse. Object merge **unions fields** (a per-field conflict is a conflict); the result is `OpenObject` **only** when *both* inputs allow additional fields **and** the union is empty — otherwise a closed `ObjectOf(union)`, so `closed{a} + open{}` merges to the **closed** `{a}`. Conflict is a real value (`false`), never an exception. |
+| **Accept** | `expected`, `actual` | bool | Ordered: equal→true; `None` either side→false; `Any` either side→true. **Nullable is narrow** — accepted only when one side is exactly `nullable<the-other>` (`IsNullableOf`); `nullable<any>` does **not** accept a `string`, and `nullable<array<any>>` does **not** accept `array<string>`. Then arrays/objects recurse. For objects: an expected **open** object with no declared fields accepts any object; otherwise every expected declared field must be present-and-acceptable in `actual` — **except** a missing field is accepted when `actual` is open (`AllowsAdditionalFields`). So `CanAccept(closed{a}, open{})` = **true**, `CanAccept(closed{a}, closed{b})` = **false**. |
 | **Runtime apply** | `unknown` value + `Shape` | coerced `unknown` | Total, never throws on type mismatch — returns the original (`applyShape`) or `Err` (`convertByShape`). Missing input coerces to the shape's zero (`""`/`0`/`false`/`NaN`/`[]`/`null`). |
 | **Runtime egress** | runtime value + declared `RuntimeShape` | wire value | `formatForWire` runs **exactly once** per value on the gather path (shape-once). Unshaped (`none`) → passthrough. |
 
@@ -414,9 +436,11 @@ internal static class ShapeContractCompatibility
     {
         // guard nulls (authoring boundary)
         // TODO: ordered rules — fixtures: merge_equal_is_self, merge_any_yields_other, merge_none_conflicts,
-        //   merge_nullable_absorbs_inner, merge_arrays_recurse, merge_objects_union_fields,
-        //   merge_field_conflict_is_conflict, merge_closed_with_open_is_closed
-        //   (== → self; None → Conflict; Any → other; nullable-of → that; array recurse; object recurse; else Conflict)
+        //   merge_nullable_absorbs_inner, merge_nullable_any_vs_scalar_is_conflict, merge_arrays_recurse,
+        //   merge_objects_union_fields, merge_field_conflict_is_conflict, merge_closed_with_open_is_closed
+        //   (== → self; None → Conflict; Any → other; then NARROW nullable: existing.IsNullableOf(incoming) → existing,
+        //    incoming.IsNullableOf(existing) → incoming — NOT transparent, so nullable<any>+string falls through → Conflict;
+        //    array recurse; object recurse; else Conflict)
         //   object recurse = union fields (per-field conflict → Conflict); result is OpenObject ONLY when BOTH
         //   inputs allow additional AND the union is empty — else closed ObjectOf(union). So closed{a}+open{} → closed{a}.
     }
@@ -424,9 +448,12 @@ internal static class ShapeContractCompatibility
     internal static bool CanAccept(Shape expected, Shape actual)
     {
         // guard nulls
-        // TODO: ordered rules — fixtures: accept_any_either_side, reject_none_either_side, accept_open_object,
+        // TODO: ordered rules — fixtures: accept_any_either_side, reject_none_either_side,
+        //   accept_nullable_inner_exact, accept_nullable_any_vs_scalar_rejects, accept_open_object,
         //   accept_missing_field_when_actual_open, reject_missing_required_field
-        //   (== → true; None either side → false; Any either side → true; nullable-of either side → true;
+        //   (== → true; None either side → false; Any either side → true; then NARROW nullable:
+        //    expected.IsNullableOf(actual) || actual.IsNullableOf(expected) → true — NOT transparent, so
+        //    nullable<any> does NOT accept string and nullable<array<any>> does NOT accept array<string>;
         //    array recurse; object: expected-open-no-fields → true; else every expected field must be present-and-
         //    acceptable in actual, EXCEPT a missing field is accepted when actual.AllowsAdditionalFields).
     }
@@ -462,7 +489,12 @@ export function applyShape(value: unknown, shape: Shape): unknown {
 }
 
 export function convertByShape(value: unknown, shape: Shape): ConvertResult<unknown> {
-  // TODO: same switch, but return ConvertResult (Err on miss) — fixture: convert_object_into_scalar_is_err
+  // TODO: same switch. Scalars return their toX ConvertResult (Err on miss). LENIENT lanes:
+  //   array → toArray (top-level Err) then ok(applyArrayItemShape(...)) — items via applyShape, never nested Err;
+  //   object → toPlainObject (top-level Err) then ok(applyObjectFields(...)) — fields via applyShape, never nested Err;
+  //   nullable → missing→ok(null) else convertByShape(inner) (STRICT — the only nested-strict path);
+  //   raw/any/none → ok(value).
+  //   fixtures: convert_object_into_scalar_is_err, convert_array_lenient_on_noncoercible_item, convert_object_lenient_on_field_miss
 }
 
 export function toString(value: unknown): ConvertResult<string> { /* TODO — missing→"" ; number/bool→`${v}` ; Date→ISO ; ARRAY→String(v) ; plain object→err  (fixture: to_string_array_is_comma_joined) */ }
@@ -565,13 +597,16 @@ preamble in `04-matrix-validation-components-slots.md`. Each becomes one test.
 | `merge_equal_is_self` | merge `String`,`String` | `(true, String)` |
 | `merge_any_yields_other` | merge `Any`,`Number` | `(true, Number)` |
 | `merge_none_conflicts` | merge `None`,`String` | `(false, null)` |
-| `merge_nullable_absorbs_inner` | merge `Nullable(String)`,`String` | `(true, Nullable(String))` |
+| `merge_nullable_absorbs_inner` | merge `Nullable(String)`,`String` | `(true, Nullable(String))` (inner matches — narrow `IsNullableOf`) |
+| `merge_nullable_any_vs_scalar_is_conflict` | merge `Nullable(Any)`,`String` | `(false, null)` — inner (`any`) ≠ `string`, so nullable is **not** transparent; falls through to conflict |
 | `merge_arrays_recurse` | merge `ArrayOf(Any)`,`ArrayOf(String)` | `(true, ArrayOf(String))` |
 | `merge_objects_union_fields` | merge `ObjectOf({a:String})`,`ObjectOf({b:Number})` | `(true, ObjectOf({a:String,b:Number}))` |
 | `merge_field_conflict_is_conflict` | merge `ObjectOf({a:String})`,`ObjectOf({a:Number})` | `(false, null)` |
 | `merge_closed_with_open_is_closed` | merge `ObjectOf({a:String})`,`OpenObject()` | `(true, ObjectOf({a:String}))` — union non-empty ⇒ **closed**, `additional:false` (only both-open + empty-union ⇒ `OpenObject`) |
 | `accept_any_either_side` | `CanAccept(Any, Object…)` and `CanAccept(String, Any)` | `true` |
 | `reject_none_either_side` | `CanAccept(None, String)` | `false` |
+| `accept_nullable_inner_exact` | `CanAccept(Nullable(String), String)` and `CanAccept(String, Nullable(String))` | `true` (one side is exactly `nullable<the-other>`) |
+| `accept_nullable_any_vs_scalar_rejects` | `CanAccept(Nullable(Any), String)` and `CanAccept(Nullable(ArrayOf(Any)), ArrayOf(String))` | `false` — narrow `IsNullableOf`, **not** transparent unwrap-and-recurse |
 | `accept_open_object` | `CanAccept(OpenObject(), ObjectOf({a:String}))` | `true` (expected open-no-fields accepts any object) |
 | `accept_missing_field_when_actual_open` | `CanAccept(ObjectOf({a:String}), OpenObject())` — closed expected, field absent, **actual is open** | `true` (open actual allows the missing field — real `ShapeContractCompatibility.cs:129`) |
 | `reject_missing_required_field` | `CanAccept(ObjectOf({a:String}), ObjectOf({b:Number}))` — closed expected, field `a` absent, **actual is closed** | `false` (closed actual cannot supply the missing required field) |
@@ -597,7 +632,9 @@ preamble in `04-matrix-validation-components-slots.md`. Each becomes one test.
 | `to_boolean_nonempty_array_is_true` | `toBoolean([0])` | `ok(true)` (length-based, not element truthiness) |
 | `to_boolean_object_is_err` | `toBoolean({})` | `{ok:false}` (plain object cannot coerce) |
 | `to_date_missing_is_nan` | `toDate(null)` / `toDate(undefined)` | `ok(NaN)` (not epoch `0`) |
-| `convert_object_into_scalar_is_err` | `convertByShape({}, {kind:"string"})` | `{ok:false}` |
+| `convert_object_into_scalar_is_err` | `convertByShape({}, {kind:"string"})` | `{ok:false}` (top-level scalar mismatch) |
+| `convert_array_lenient_on_noncoercible_item` | `convertByShape([1,2,{}], array<number>)` | `ok([1,2,{}])` — item miss goes through `applyShape` (original-on-miss), **not** propagated as `Err` |
+| `convert_object_lenient_on_field_miss` | `convertByShape({a:{}}, object{a:number})` | `ok({a:{}})` — field miss left as-is, top-level convert still `ok` |
 | `format_date_to_iso` | `formatForWire(epochMs)` under `date` | `new Date(epochMs).toISOString()` (UTC, ms precision, `…Z`) |
 | `format_nullable_unwraps` | `formatForWire(epochMs)` under `nullable<date>` | same ISO string (recurses inner) |
 | `format_unshaped_passthrough` | `formatForWire(v)` under `none` | `v` unchanged |

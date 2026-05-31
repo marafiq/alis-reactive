@@ -94,7 +94,7 @@ guarantee; this file is its concrete, assertable form.
 
 | id | input (DSL / CLR type) | expected plan JSON (the shape tag) | expected browser behavior |
 |---|---|---|---|
-| `F-Shape-String` | a `string` value reaches any sink | `{"kind":"string"}` | `applyShape(v,string)` → `String(v)`; `null`→`null` |
+| `F-Shape-String` | a `string` value reaches any sink | `{"kind":"string"}` | `applyShape(v,string)` → `String(v)`; **bare** string missing/`null`→`""` (scalar zero). Only `nullable<string>` yields `null` for a missing value. |
 | `F-Shape-Number` | an `int`/`long`/`decimal`/`double` value | `{"kind":"number"}` | coerces `"3"`→`3`; non-finite handled per op |
 | `F-Shape-Boolean` | a `bool` value | `{"kind":"boolean"}` | coerces truthy/`"true"`→`true` |
 | `F-Shape-Date` | a `DateTime` value | `{"kind":"date"}` | C# **literal** = STJ round-trip ISO (`"O"`-style); runtime **egress** (`formatForWire`) of a finite epoch-ms number = `Date.toISOString()` (UTC, ms, `…Z`) — two distinct paths |
