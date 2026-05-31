@@ -15,16 +15,16 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <!-- net48 ships the pure plan domain (DSL builders, plan model, JSON serialization,
-         validation metadata). The Razor/Html authoring layer is ASP.NET Core only, so it
-         is excluded here; net48 apps build and serialize plans and render with their own
-         view layer. -->
+    <!-- net48 ships the same DSL: plan domain (builders, plan model, JSON serialization,
+         validation metadata) AND the Razor/Html authoring layer. The authoring layer
+         binds to ASP.NET MVC5 (System.Web.Mvc) on net48 instead of ASP.NET Core. -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="System.Text.Json" Version="9.*" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.*" />
         <PackageReference Include="PolySharp" Version="1.*" PrivateAssets="all" />
-        <Compile Remove="Razor\**\*.cs" />
+        <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+        <Reference Include="System.Web" />
     </ItemGroup>
 
     <!-- Ship the runtime JS bundle (built by npm in the sibling

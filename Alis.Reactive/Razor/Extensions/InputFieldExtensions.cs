@@ -1,7 +1,12 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.InputField;
+#if NET48
+using System.Web.Mvc;
+using System.Web.Mvc.Html;
+#else
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.Extensions
 {
@@ -26,7 +31,11 @@ namespace Alis.Reactive.Native.Extensions
         /// <param name="expression">The model property to bind the field to.</param>
         /// <returns>A bound field ready to receive a component extension.</returns>
         public static InputBoundField<TModel, TProp> InputField<TModel, TProp>(
+#if NET48
+            this HtmlHelper<TModel> html,
+#else
             this IHtmlHelper<TModel> html,
+#endif
             ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression)
             where TModel : class
@@ -44,7 +53,11 @@ namespace Alis.Reactive.Native.Extensions
         /// <param name="configure">Configures label text and required marker.</param>
         /// <returns>A bound field ready to receive a component extension.</returns>
         public static InputBoundField<TModel, TProp> InputField<TModel, TProp>(
+#if NET48
+            this HtmlHelper<TModel> html,
+#else
             this IHtmlHelper<TModel> html,
+#endif
             ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             Action<InputFieldOptions> configure)
@@ -52,16 +65,26 @@ namespace Alis.Reactive.Native.Extensions
             => CreateInputField(html, plan, expression, InputFieldConfiguration.Configured(configure));
 
         private static InputBoundField<TModel, TProp> CreateInputField<TModel, TProp>(
+#if NET48
+            HtmlHelper<TModel> html,
+#else
             IHtmlHelper<TModel> html,
+#endif
             ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             InputFieldConfiguration configuration)
             where TModel : class
         {
             var opts = configuration.CreateOptions();
+#if NET48
+            // System.Web.Mvc NameFor returns MvcHtmlString; the slot binding path is a string.
+            var bindingName = html.NameFor(expression).ToHtmlString();
+#else
+            var bindingName = html.NameFor(expression);
+#endif
             var componentSlot = ModelBoundInputComponentSlot.For<TModel, TProp>(
                 expression,
-                html.NameFor(expression));
+                bindingName);
             var boundField = BoundInputField<TModel, TProp>.Create(
                 plan,
                 expression,

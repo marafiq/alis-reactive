@@ -1,6 +1,10 @@
 using System.IO;
 using System.Text.Encodings.Web;
+#if NET48
+using System.Web;
+#else
 using Microsoft.AspNetCore.Html;
+#endif
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -20,7 +24,11 @@ namespace Alis.Reactive.Native.Components
     /// directly (no .Render() needed).
     /// </summary>
     public class NativeButtonBuilder<TModel> :
+#if NET48
+        IHtmlString
+#else
         IHtmlContent
+#endif
         where TModel : class
     {
         private readonly string _elementId;
@@ -51,6 +59,14 @@ namespace Alis.Reactive.Native.Components
             return this;
         }
 
+#if NET48
+        public string ToHtmlString()
+        {
+            var sw = new StringWriter();
+            WriteTo(sw, HtmlEncoder.Default);
+            return sw.ToString();
+        }
+#endif
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {

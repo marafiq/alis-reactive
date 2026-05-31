@@ -134,14 +134,31 @@ namespace Alis.Reactive
         {
             if (job == null) throw new ArgumentNullException(nameof(job));
 
+            // ASP.NET Core flows the source through the per-request IServiceProvider.
             var source = services?.GetService(typeof(IClientValidationRuleSource)) as IClientValidationRuleSource;
+
+#if NET48
+            // net48 / System.Web has no per-request IServiceProvider. MVC5's idiomatic
+            // service locator is DependencyResolver, bridged at startup via SetResolver.
+            source ??= System.Web.Mvc.DependencyResolver.Current?.GetService(typeof(IClientValidationRuleSource))
+                as IClientValidationRuleSource;
+#endif
+
             if (source != null) return source;
 
+#if NET48
+            throw new InvalidOperationException(
+                $"Request at '{job.RequestUrl}' specifies validation source '{job.ValidationSourceType.Name}', " +
+                "but no IClientValidationRuleSource could be resolved. " +
+                "Register the FluentValidation integration with AddReactiveFluentValidation(...) and bridge it to " +
+                "MVC5 by calling DependencyResolver.SetResolver(...) in Application_Start.");
+#else
             throw new InvalidOperationException(
                 $"Request at '{job.RequestUrl}' specifies validation source '{job.ValidationSourceType.Name}', " +
                 "but no IClientValidationRuleSource is registered in DI. " +
                 "Register the FluentValidation integration with services.AddReactiveFluentValidation(...), " +
                 "or register your own IClientValidationRuleSource.");
+#endif
         }
     }
 

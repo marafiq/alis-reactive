@@ -5,8 +5,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
 using Alis.Reactive;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Mvc.Html;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.Components
 {
@@ -27,9 +33,15 @@ namespace Alis.Reactive.Native.Components
     /// <typeparam name="TModel">The view model type.</typeparam>
     /// <typeparam name="TProp">The bound property type.</typeparam>
     public class NativeDropDownBuilder<TModel, TProp> :
+#if NET48
+        IHtmlString
+    {
+        private readonly HtmlHelper<TModel> _html;
+#else
         IHtmlContent
     {
         private readonly IHtmlHelper<TModel> _html;
+#endif
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
         private readonly string _bindingPath;
@@ -42,7 +54,11 @@ namespace Alis.Reactive.Native.Components
         // NEVER make public — devs create builders via the .NativeDropDown() factory,
         // which also registers the component in the plan's input component onboarding catalog.
         internal NativeDropDownBuilder(
+#if NET48
+            HtmlHelper<TModel> html,
+#else
             IHtmlHelper<TModel> html,
+#endif
             Expression<Func<TModel, TProp>> expression,
             InputComponentRenderTarget target)
         {
@@ -103,6 +119,15 @@ namespace Alis.Reactive.Native.Components
             return this;
         }
 
+#if NET48
+        /// <inheritdoc />
+        public string ToHtmlString()
+        {
+            var sw = new StringWriter();
+            WriteTo(sw, HtmlEncoder.Default);
+            return sw.ToString();
+        }
+#endif
 
         /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
@@ -116,7 +141,11 @@ namespace Alis.Reactive.Native.Components
                 _items ?? Enumerable.Empty<SelectListItem>(),
                 _placeholder,
                 attrs);
+#if NET48
+            writer.Write(result.ToHtmlString());
+#else
             result.WriteTo(writer, HtmlEncoder.Default);
+#endif
         }
     }
 

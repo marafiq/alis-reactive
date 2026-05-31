@@ -1,6 +1,11 @@
 using System;
 using Alis.Reactive.Builders;
 using Alis.Reactive.PlanModel;
+#if NET48
+using System.Web;
+#else
+using Microsoft.AspNetCore.Html;
+#endif
 
 namespace Alis.Reactive.Native.Components
 {
@@ -10,7 +15,7 @@ namespace Alis.Reactive.Native.Components
     /// <remarks>
     /// <para>
     /// <c>.Reactive()</c> is always the last call in the builder chain.
-    /// Native builders implement <see cref="IHtmlContent"/> directly, so no
+    /// Native builders implement the framework's HTML content type directly, so no
     /// separate <c>.Render()</c> is needed.
     /// </para>
     /// <code>

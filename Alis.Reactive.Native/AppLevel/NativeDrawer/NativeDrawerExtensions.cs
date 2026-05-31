@@ -1,7 +1,12 @@
 using Alis.Reactive;
 using Alis.Reactive.PlanModel;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
 
 namespace Alis.Reactive.Native.AppLevel
 {
@@ -87,9 +92,15 @@ namespace Alis.Reactive.Native.AppLevel
         /// and opened via <see cref="Open{TModel}"/> in a reactive pipeline.
         /// </remarks>
         /// <returns>The drawer HTML element.</returns>
+#if NET48
+        public static IHtmlString NativeDrawer(this HtmlHelper html)
+        {
+            return new MvcHtmlString(
+#else
         public static IHtmlContent NativeDrawer(this IHtmlHelper html)
         {
             return new HtmlString(
+#endif
                 "<aside id=\"" + AppLevel.NativeDrawer.ElementId + "\" class=\"alis-drawer\" aria-hidden=\"true\">\n" +
                 "  <div class=\"alis-drawer__panel\">\n" +
                 "    <div class=\"alis-drawer__header\">\n" +
