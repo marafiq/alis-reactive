@@ -1,0 +1,3 @@
+<Project>
+  <!-- Empty on purpose: isolates this dogfood proof from the repo's Directory.Build.targets. -->
+</Project>
