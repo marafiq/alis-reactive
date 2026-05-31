@@ -1,5 +1,85 @@
 # Determinism Confidence — Honest Coverage vs the 100% Claim
 
+> ## ROUND-2 FINAL (2026-05-31) — consolidated verdict against the CORRECTED criterion
+>
+> **What is being certified (criterion correction).** This verdict certifies the
+> **redesign blueprint's** determinism — the system the matrix files describe and we
+> will build — **not** current shipped source. Current source carries known bugs the
+> redesign deliberately fixes; "current source is non-deterministic" is true but
+> irrelevant. The right test: does the redesign matrix specify exactly **one**
+> deterministic output for every **live** public DSL variant, with each current
+> non-determinism resolved by a **stated redesign rule**, and dead/unconsumed surface
+> **excluded** from the denominator?
+>
+> Round-1 (below) answered the *wrong* question — it certified current source
+> (`deterministic=false` because the magic-member collision is still shipped). Against
+> the corrected criterion, that collision is a current-source bug correctly labeled
+> `RESOLVED-BY-REDESIGN` (Fix 1, distinct node kinds), so it does **not** defeat the
+> blueprint verdict.
+>
+> ### Re-verified against source (this round)
+> - **Live-variant census = 375 / 375 = 100%.** The proof's own Section 6 per-area
+>   table sums to **375** (`10+28+52+5+47+19+102+14+5+65+28`, confirmed by `bc`). Every
+>   per-area sub-table is internally `covered==total` (Plugins `1+1+1+21+10+11+12+8=65`;
+>   Validation `31+38+24+3+1+2+3=102` — both verified). The proof's headline read a stale
+>   **371** at lines 36, 503, 505, 521, 534 — a carry-over not recomputed after the
+>   per-area tables were revised upward (same class of slip as the round-1 trigger
+>   `11→10` fix). **Fixed this round: 371 → 375 at all five lines.** Verdict unchanged
+>   either way — every area is X/X, zero uncovered live variants.
+> - **`redesignDeterministic = true`.** The single live current-source non-determinism
+>   (the `responseBody`/`elementValue` magic-member collision) is still present in
+>   shipped source — verified: `ValueExpression.cs:379-380,400-403`,
+>   `plan.ts:783-799` (no `whole` field), `evaluate.ts:294-300` (discriminates on
+>   `member ===`, ignores `path`) — and is closed by a **stated structural redesign
+>   rule** (Fix 1: `kind:"whole-payload"`/`"whole-element"` distinct node kinds, member
+>   string never emitted for a whole read → collision unrepresentable). Fixes 2-4 close
+>   the supporting under-pinned defaults and the id-drift surface. No current
+>   non-determinism is left without a stated resolving rule.
+> - **Dead surface excluded, not invented.** `DrawerPosition`, `ToastType`,
+>   `ToastPosition` — verified **zero `.cs` consumers** (`grep -rwn … --include=*.cs`
+>   returns nothing outside each definition file). Deleted in the redesign, excluded
+>   from the live denominator. Not counted as covered; not counted as gaps.
+> - **Adversary: clean of any verdict-changing finding.** Round-1's five Finding-B
+>   source contradictions are all fixed (B1 single-command always sequence-wrapped; B2
+>   whole-payload node-kind agreement; B3 exact-status-preferred ordering; B4 inject
+>   string-only boundary throw; B5 Confirm-evaluates-first). Round-2 surfaced only
+>   non-verdict-changing items (below).
+>
+> ### Residual gaps (none changes the verdict — tracked for build accuracy)
+> 1. **(FIXED this round) Headline count slip** 371 → 375. Cosmetic; zero coverage or
+>    determinism impact.
+> 2. **Citation-path imprecision in the proof's validation surface.** The proof cites
+>    `ReactiveValidator.cs` / `ReactiveClientRuleBuilder.cs` without the project prefix;
+>    they live in `Alis.Reactive.FluentValidator/`, and `ClientValidationFieldRuleBuilder.cs`
+>    in `Alis.Reactive/Validation/`. Counts are exact and reproducible
+>    (`ClientValidationFieldRuleBuilder` = 31 public methods / 32 public lines;
+>    `ReactiveClientRuleBuilder` = 38 public static — both confirmed). The `WhenField*`
+>    family (`ReactiveValidator.cs:103-181`) is **`protected`** (the subclass-authoring
+>    surface), not public — a legitimate live surface, mislabeled in the proof as a
+>    public-method tally. No coverage impact.
+> 3. **Known missing-feature asymmetries (do not breach redesign-determinism).**
+>    `WhenFieldMaxLength` absent while `WhenFieldMinLength` exists
+>    (`ReactiveValidator.cs:162`); `SetHtml` has no `ResponseBody` overload while
+>    `SetText` does (`ElementBuilder.cs:76` vs `:96-120`); no bare `p.Put(url)` pipeline
+>    entry today (`PipelineBuilder.Http.cs:11-42`). Each is a per-overload row or an
+>    explicit labeled redesign target — none collapses two inputs to one output, so none
+>    breaches the corrected criterion. Tracked so the build does not assume symmetry.
+> 4. **Fix 1 (and the bare `Put(url)` entry, inline-gather for every body verb, plugin
+>    arity collapse-to-args-builder) are REDESIGN TARGETS not yet built in source.** The
+>    proof labels each `RESOLVED-BY-REDESIGN` / "labeled redesign". The determinism
+>    certification is sound as a **spec**; it becomes true-in-source only after Fix 1
+>    ships in `ValueExpression.cs` + `plan.ts` + `evaluate.ts`.
+>
+> **VERDICT (round 2, against the corrected criterion):** `liveVariants=375`,
+> `covered=375`, `realCoveragePct=100`, `redesignDeterministic=true`,
+> `realConfidence=true`. The redesign blueprint specifies exactly one deterministic
+> output for every live public DSL variant; every current non-determinism is resolved
+> by a stated redesign rule; dead surface is excluded; the adversary found nothing that
+> changes the verdict. Confidence is in the **blueprint as a generator spec** — it
+> becomes true-in-shipped-source the moment Fix 1 lands.
+>
+> ---
+
 > ## ROUND-1 RE-VERIFY (2026-05-31) — recomputed after the matrix/proof fixes
 >
 > The matrix files (`04-matrix-*.md`) and `05-determinism-proof.md` were revised

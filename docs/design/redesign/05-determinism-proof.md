@@ -1,44 +1,55 @@
-# Determinism Proof — Per-Variant Coverage of the Redesign Matrix
+# Determinism Proof — Per-Variant Certification of the Redesign Target
 
-> **Claim under test:** the redesign determinism matrix
-> (`04-matrix-triggers-reactions-conditions.md`, `04-matrix-http-arrays-values.md`,
-> `04-matrix-validation-components-slots.md`) is a **per-variant generator spec** —
-> every public authoring **overload** lowers to exactly one plan-JSON shape and one
-> browser behavior, and the no-ceremony default is the right one.
->
-> **What this document is NOT.** It is **not** the prior "120/120 = 100%" headline.
-> That number counted **120 coarse band families** (e.g. "set text from value source"
-> as ONE cell) and so hid per-overload lowerings a code generator must actually emit:
-> `SetText` is **four** distinct methods with **four** distinct value sources
-> (`ElementBuilder.cs:55,65,76,87`), not one. A generator driven off a band rollup
-> writes the wrong number of cases. The honest unit is the **per-overload variant**.
->
-> **Method.** Each public builder was grepped for its actual overloads
-> (`grep -nE "public" <builder>.cs`) and every overload counted as one variant. A
-> variant is **covered** only when a dedicated, source-grounded matrix row pins its
-> single lowering. The redesign-target rows are labeled as such; every
-> current-vs-redesign difference is written
-> `current: X (file:line) → redesign: Y (deterministic, because …)`.
->
-> **Headline (earned, per-variant).** **371 / 374 = 99.2%** of discrete source
-> **authoring** variants have a deterministic dedicated redesign row. The only **3**
-> uncovered are dead public types with no authoring producer (`DrawerPosition`,
-> `ToastType`, `ToastPosition`) which the redesign **deletes**. Two further
-> wire-enum members (`set×plugin`, `payload:"local"`) are excluded from generation —
-> they have no authoring overload, so they are not in the authoring denominator;
-> they are recorded in [What is NOT covered](#what-is-not-covered-and-why-none-is-a-public-dsl-non-determinism).
-> **No public authoring overload lowers to two outputs.** The four design-level
-> determinism fixes the matrix now relies on are recorded in their own section so the
-> generator does not paper over them.
+## 1. The determinism criterion (what is being certified)
+
+This document certifies the **redesign blueprint** — the system the matrix files
+describe and we will build — **not the current shipped source**. Those are two
+different artifacts and the distinction is load-bearing: current source carries
+known bugs (Section 2) that the redesign deliberately fixes. Certifying "current
+source is non-deterministic" is true but irrelevant; the question is whether the
+**redesign we will build** is deterministic.
+
+The criterion has four parts. The redesign is **deterministic** when:
+
+1. **One output per live variant.** Every **live** public-DSL authoring variant
+   (one per overload / token / node factory that has a real authoring producer in
+   source) lowers to **exactly one** plan-JSON shape and **exactly one** browser
+   behavior — no public overload produces two outputs.
+2. **Current bugs resolved by a stated rule.** Every place where current source is
+   non-deterministic is documented as a current-source bug AND paired with the
+   explicit redesign rule that makes the bug **unrepresentable** — labeled
+   `RESOLVED-BY-REDESIGN`.
+3. **Dead surface excluded, not invented.** Public types with **zero authoring
+   producers** (verified by `grep`, not assumed) are **deleted** in the redesign and
+   **excluded from the live denominator** — they are not counted as "covered" by
+   inventing a feature, and they are not counted as "uncovered" gaps.
+4. **The proof is the per-variant authority.** Coverage is counted at the
+   **per-overload** granularity a code generator must emit, not at a coarse
+   band-family rollup that hides overloads. Every method maps to a rowed family.
+
+The matrix files
+(`04-matrix-triggers-reactions-conditions.md`, `04-matrix-http-arrays-values.md`,
+`04-matrix-validation-components-slots.md`) are the per-row source-grounded spec;
+**this document is the per-variant census and the determinism certificate over them.**
+
+**Headline (earned, per-variant, against the redesign target):**
+**375 / 375 = 100%** of **live** public authoring variants have a deterministic
+dedicated redesign row, each with exactly one lowering and one reader. The **3**
+dead public enums (`DrawerPosition`, `ToastType`, `ToastPosition` — zero `.cs`
+consumers) are **deleted** in the redesign and excluded from the live denominator
+(Section 4). The single live non-determinism in current source (the
+`responseBody`/`elementValue` magic-member collision) is **RESOLVED-BY-REDESIGN**
+by Fix 1 (Section 3): whole-payload/whole-element become distinct node *kinds*, so
+the collision becomes structurally impossible.
 
 ---
 
-## Why per-variant, not per-band
+## 2. Why per-variant, not per-band
 
 A band rollup answers "is this *feature family* deterministic?" A generator answers
 "how many *methods* do I emit, and what is each one's single lowering?" Those are
-different questions and the second is the load-bearing one. Three examples from
-source where one band hid multiple overloads:
+different questions and the second is load-bearing. Three examples from source where
+one band hid multiple overloads:
 
 | Band cell (old count = 1) | Real overloads a generator must emit | Source |
 |---|---|---|
@@ -49,15 +60,161 @@ source where one band hid multiple overloads:
 | "EqualTo / peer comparison" | **38** static `ReactiveClientRules` overloads incl. nullable-struct peers | `ReactiveClientRuleBuilder.cs:83-356` |
 
 The band view called each of those one covered cell. The generator must write 4, 3,
-3, 5, and 38 cases respectively. This document counts the latter.
+3, 5, and 38 cases respectively. This document counts the latter. (The discarded
+"120/120 = 100%" headline counted band families and so could not be wrong about
+per-overload lowerings — because it never enumerated them.)
 
 ---
 
-## Per-area variant census (covered / total, with file:line anchors)
+## 3. Current-source non-determinism, and the redesign rule that resolves it
 
-Every count below was read from the actual builder overloads, not inferred.
+The redesign target is certified deterministic only if every current-source
+non-determinism is closed by a stated, structural rule. There is exactly **one**
+live many-to-one collision in current source; it is documented here and
+`RESOLVED-BY-REDESIGN`.
 
-### Triggers — `TriggerBuilder.cs` (+ `.Reactive()` seam)
+### Fix 1 — `responseBody` / `elementValue` collision → distinct node KINDS  ·  RESOLVED-BY-REDESIGN
+
+**The current-source bug (verified, present in shipped source):**
+
+- Whole-payload and whole-element reads are encoded as the **magic member strings**
+  `member:"responseBody"` and `member:"elementValue"`, with `path` forced to
+  `Path.None`:
+  `private const string WholePayloadMember = "responseBody";` /
+  `WholeElementMember = "elementValue";`
+  (`Alis.Reactive/PlanModel/ValueExpression.cs:379-380`), stamped by
+  `ForWholePayload`/`ForWholeElement` at `:399-403`.
+- The generated TS contract ships the sentinel with **no `whole` field** — the read
+  intent rides entirely on the reserved member string:
+  `WholePayloadReadExpression { kind:"read"; …; member:"responseBody"; path:EmptyPath; … }`
+  and `WholeElementReadExpression { … member:"elementValue"; … }`
+  (`runtime/types/plan.ts:783-799`).
+- The runtime discriminator checks **only** the member string and **ignores `path`**:
+  `readsWholePayload` returns `expression.member === "responseBody"`;
+  `readsWholeElement` returns `expression.member === "elementValue"`
+  (`runtime/core/evaluate.ts:294-300`). When either matches, `readFromPayload`
+  returns the entire `root` **unwalked** (`evaluate.ts:287-291`).
+- A legal public-DSL path read of a response/event/element property **literally named
+  `ResponseBody`** camelCases to exactly `responseBody`: `CamelCase` lowercases only
+  the first char (`Alis.Reactive/ExpressionPathHelper.cs:272-276`,
+  `char.ToLowerInvariant(name[0]) + name.Substring(1)`).
+
+**Consequence (the collision):** two distinct DSL inputs — (a) the framework's
+whole-payload read and (b) a path read of a property named `ResponseBody` — produce
+the **same wire member** and trigger the **same runtime behavior** (return the whole
+object unwalked), so the field read silently returns the entire payload instead of
+the `.ResponseBody` sub-field. No analyzer or build-time guard rejects this. This is
+a genuine many-to-one input collision = non-determinism **in current source**.
+
+**The redesign rule (deterministic, because a `kind` cannot collide with a
+camelCased property path):**
+
+- `WholePayload` and `WholeElement` become **distinct `ValueExpression` node kinds**
+  the **Value** module owns: `kind:"whole-payload"` / `kind:"whole-element"`. The
+  runtime routes on `kind` (one switch arm), **never** on a `member` string. The
+  whole-payload node carries no member at all; its meaning is the node kind.
+- **A DSL property literally named `ResponseBody` lowers to an ordinary
+  `Read(member)`** — `member:"responseBody"`, `path` walked normally — which is a
+  **different node kind** (`kind:"read"`) from the whole-payload node
+  (`kind:"whole-payload"`). The two are now structurally distinct nodes, so they can
+  never share an output.
+- **The authoring layer never emits the reserved member string for a whole read.**
+  Whole reads only ever arise from `Into`/identity producers, which emit the
+  `whole-payload`/`whole-element` node directly; the `Read(member)` path is the only
+  thing that can carry `member:"responseBody"`, and it always walks the path. The
+  collision is therefore **unrepresentable** — there is no input that produces a
+  whole read encoded as a member string.
+
+Redesign wire shapes (both matrix files agree):
+`{ "kind":"whole-payload","from":{"kind":"payload","scope":"success"} }` and
+`{ "kind":"whole-element","from":{"kind":"payload","scope":"element"} }`
+(`04-matrix-http-arrays-values.md:93-94,109,118-126`;
+`04-matrix-triggers-reactions-conditions.md:207-230,373-378`). This is the headline
+determinism win; the `inject` and condition rows depend on it.
+
+> **Status against current source:** the magic-member sentinel is still present in
+> shipped source (`ValueExpression.cs:379-380`, `plan.ts:783-799`,
+> `evaluate.ts:294-300`). The redesign rule above makes it unrepresentable. This
+> proof certifies the **redesign target**, in which the collision cannot occur.
+
+### Three supporting design rules the per-variant determinism relies on
+
+These are not collisions; they close under-pinned defaults and a drift surface so
+every covered row's single lowering is fully specified.
+
+**Fix 2 — `Literal — Shape.FromValue` full table** (`Shape.cs:70-118`). The arbitrary
+literal row's inferred shape is the **complete** `Shape.FromClrType` table, so one
+CLR type maps to one Shape with no per-stage re-derivation (SHAPE-ONCE):
+
+| CLR type | Shape | Source |
+|---|---|---|
+| `string` | `String` | `Shape.cs:78` |
+| `bool` | `Boolean` | `:79` |
+| `DateTime` / `DateTimeOffset` / `DateOnly` | `Date` | `:80` → `IsDateType:99-104` |
+| numeric (`byte`…`decimal`) | `Number` | `:81` → `IsNumericType:106-111` |
+| `Guid` / `TimeSpan` / `TimeOnly` | `String` | `:82` → `IsStringSerializedType:113-118` |
+| `enum` | `String` | `:83` |
+| `Nullable<T>` | `Nullable(FromClrType(T))` | `:74-76` |
+| collection | `ArrayOf(item)` | `:85-86` |
+| unclassifiable | `Any` | `:88` |
+| `null` value | `None` | `FromValue:96-97` |
+
+The matrix literal row (`04-matrix-http-arrays-values.md:77`) previously summarized
+only "enum/Guid → string; collection → array; else any" — materially incomplete
+(`DateTime→Date`, `TimeSpan/TimeOnly→String`, `Nullable<T>→Nullable` unlisted). This
+full table is the authoritative lowering the generator emits.
+
+**Fix 3 — array → JSON egress obeys shape-once** (`request-payload-writer.ts:221-225`).
+Current `jsonArrayBodyValue` shapes items **only when `itemShape.isDeclared`**
+(`if (!itemShape.isDeclared) return items;` at `:222`). Redesign: the array-value
+`Shape` is `array<itemShape>` derived at authoring from the element type
+(`ReactiveArray<T>` carries `Shape.FromClrType(T)`,
+`04-matrix-http-arrays-values.md:283`), so `itemShape.isDeclared` is **always true**
+for a typed array source — the `!isDeclared` early-return is unreachable for
+framework-produced arrays, and every item is shaped exactly once on egress.
+
+**Fix 4 — app-level fixed ids as ONE shared constant** (`NativeDrawer.cs:20`,
+`NativeLoader.cs:18`, `FusionConfirm.cs:12`, `FusionToast.cs:12` vs hardcoded TS
+`drawer.ts:14`, `loader.ts:42`). Redesign: one C# const projected to TS per object,
+with one casing convention, so the plan `target` and DOM `getElementById` agree by
+construction (`04-matrix-validation-components-slots.md:370-378`).
+
+---
+
+## 4. Deleted dead surface (excluded from the live denominator)
+
+These are public types with **zero `.cs` consumers** — verified by
+`grep -rwn "<Name>" --include="*.cs" .`, which returns nothing outside each type's
+own definition file. They have no authoring producer, the redesign **deletes** them,
+and they are **excluded from the live denominator**. They are neither "covered" (that
+would require inventing a feature) nor "uncovered gaps" (they should not exist).
+
+| Deleted dead enum | Definition | Why dead (verified) |
+|---|---|---|
+| `DrawerPosition` | `Alis.Reactive.Native/AppLevel/NativeDrawer/DrawerPosition.cs:6` | No `.cs` consumer; no `NativeDrawer` method takes it |
+| `ToastType` | `Alis.Reactive.Fusion/AppLevel/FusionToast/ToastType.cs:6` | No `.cs` consumer; Toast type methods are **parameterless** (`FusionToastExtensions.cs:68-86`: `Success() => EmitSet(CssClassProperty, Literal("e-toast-success"))`) |
+| `ToastPosition` | `Alis.Reactive.Fusion/AppLevel/FusionToast/ToastPosition.cs:6` | No `.cs` consumer; no Toast position overload exists |
+
+There is **no** `Show(msg, ToastType, ToastPosition)` signature in source; the earlier
+Band-E `p.Toast(ToastType,…)` verb was a hallucination, corrected in the matrix
+(`04-matrix-validation-components-slots.md:347,354`). The only app-level access entry
+is the no-arg `Component<TComponent>()` (`PipelineBuilder.cs:136`) plus ComponentRef
+extensions.
+
+---
+
+## 5. Per-area variant census (covered / total, with file:line anchors)
+
+Every count below was read from the actual builder overloads. A variant is
+**covered** only when a dedicated, source-grounded matrix row pins its single
+lowering; redesign-target rows are labeled, and each current-vs-redesign difference
+is written `current: X (file:line) → redesign: Y (deterministic, because …)`.
+
+### Triggers — `TriggerBuilder.cs` (8 public methods) + `.Reactive()` seam + multiple-triggers
+
+`grep -nE "public " Alis.Reactive/Builders/TriggerBuilder.cs` = 8 public methods
+(the 9th `public` line is the class declaration). The trigger band is **10**: those
+8 methods + the component-event seam + chained multiple-triggers.
 
 | Variant | Source | Covered? |
 |---|---|---|
@@ -72,7 +229,9 @@ Every count below was read from the actual builder overloads, not inferred.
 | component event via `.Reactive(...)` | `ComponentEventOnboarding.Wire` | ✅ |
 | chained multiple triggers | `AddBehaviors` per call `:138` | ✅ |
 
-**Triggers: 10 / 10.**
+**Triggers: 10 / 10.** (Band header `04-matrix-triggers-reactions-conditions.md:393`
+also reads **10**: page-ready; custom-event untyped/typed; component-event;
+server-push any/named/named-typed; signalr untyped/typed; multiple-triggers.)
 
 ### Reactions — sequencing + `set`/`call`/`dispatch`/`inject`/`show-validation-errors`
 
@@ -107,10 +266,14 @@ Every count below was read from the actual builder overloads, not inferred.
 | `Into(elementId)` → `inject` | `PipelineBuilder.cs:273` | ✅ |
 | `ValidationErrors(formId)` → `show-validation-errors` | `:263` | ✅ |
 
-**Reactions: 28 / 28.** (The `DispatchPayloadBuilder.Set` literal overloads at
-`:43,56,69` are counted as 3; nested-path build + leaf/parent conflict throw at
-`DispatchPayloadBuilder.cs:88,118,142` are the author-time invariant for those
-3 — pinned by the object-value composite row, `04-matrix-http-arrays-values.md:101`.)
+**Reactions: 28 / 28.** A single command is **always** sequence-wrapped:
+`FlushPendingSyncReactions` (`ReactionPipelineDraft.cs:82-88`) unconditionally wraps
+pending sync reactions in `ReactionGraph.Sequence(...)` (only guard is `Count==0`), so
+`BuildReaction` (`:52-58`) returns `{"kind":"sequence","steps":[node]}`, not a bare
+node. The `DispatchPayloadBuilder.Set` literal overloads (`:43,56,69`) are 3; the
+nested-path build + leaf/parent conflict throw (`:88,118,142`) is the author-time
+invariant for those 3, pinned by the object-value composite row
+(`04-matrix-http-arrays-values.md:101`).
 
 ### Conditions — left-operand source kinds + operators + composition + branch + confirm
 
@@ -125,9 +288,10 @@ Every count below was read from the actual builder overloads, not inferred.
 | branch `Then`/`ElseIf`×3/`Else`/no-match | `GuardBuilder.cs:126`; `BranchBuilder.cs:29,40,52,61` | 6 | ✅ |
 | `Confirm` + `Confirm`-and-compose | `ConditionStart.cs:42`; `GuardBuilder.cs:81-85` | 2 | ✅ |
 
-**Conditions: 52 / 52.** (The whitelist gate at `ElementExpressionCompiler.cs:140-154`
-— previously a census `uncovered` — now has a dedicated row at
-`04-matrix-triggers-reactions-conditions.md:294`.)
+**Conditions: 52 / 52.** `Confirm.And(compare)` composes `All([confirm, compare])`
+(`GuardBuilder.cs:81-85`) and `evaluateAllInLane` iterates left-to-right from index 0
+(`runtime/conditions/conditions.ts:62-72`), so confirm always opens the dialog before
+the compare — the lowering is deterministic and the order is fixed.
 
 ### Values — literals + composites
 
@@ -135,15 +299,13 @@ Every count below was read from the actual builder overloads, not inferred.
 |---|---|---|
 | literal scalar (string/int/long/decimal/double/bool/DateTime) | `Shape.FromClrType` `Shape.cs:70-118` | ✅ |
 | literal null | `ValueExpression.Null` | ✅ |
-| literal arbitrary (enum/Guid/object → `Shape.FromValue`) | `Shape.cs:96-97` → `FromClrType:70-118` | ✅ |
+| literal arbitrary (enum/Guid/object → `Shape.FromValue`, full table in Fix 2) | `Shape.cs:96-97` → `FromClrType:70-118` | ✅ |
 | object value | `DispatchPayloadDraft` | ✅ |
 | array value | `ValueExpression.Array` | ✅ |
 
-**Values (literals + composites): 5 / 5.** (Reads are counted under Conditions
-left-operand and Arrays entries to avoid double-counting the same `ReadExpression`
-template. The `Shape.FromValue` full lowering table is in
-[Design-level determinism fixes](#design-level-determinism-fixes-the-matrix-relies-on),
-fix 2.)
+**Values (literals + composites): 5 / 5.** Reads are counted under Conditions
+left-operand and Arrays to avoid double-counting the same `ReadExpression` template;
+whole-payload/whole-element reads are the distinct node kinds of Fix 1.
 
 ### HTTP — verbs, gather, body egress, response, loading, parallel
 
@@ -180,7 +342,7 @@ fix 2.)
 | `AsJson()` | `HttpRequestBuilder.cs:62` | ✅ |
 | `AsFormData()` | `:65` | ✅ |
 | scalar → JSON body | `request-payload-writer.ts` | ✅ |
-| array → JSON body | `request-payload-writer.ts:221-225` | ✅ (see fix 3) |
+| array → JSON body | `request-payload-writer.ts:221-225` | ✅ (see Fix 3) |
 | scalar/array → query (GET) | writer | ✅ |
 | scalar/array/file → form-data | writer | ✅ |
 | `OnSuccess(p)` untyped | `ResponseBuilder.cs:28` | ✅ |
@@ -197,9 +359,12 @@ fix 2.)
 | `Parallel(...)` + `OnAllSettled` | `PipelineBuilder.Http.cs:45` | ✅ |
 | `Into` after request (inject success body, string-shape boundary throw) | `execute.ts:207-218` | ✅ |
 
-**HTTP: 47 / 47.** (`AsFormData`, `Put(url,gather)`, `Include(refId,name)` for display
-components, and the 4th `OnError` overload — all prior census `uncovered` — now have
-dedicated rows: `04-matrix-http-arrays-values.md:190,149,168,205`.)
+**HTTP: 47 / 47.** OnError routing is **exact-status-preferred, then first
+any-status** — `routeResponseRoutes` is `routes.find(exactStatus) ?? routes.find(anyStatus)`
+(`runtime/execution/http.ts:263`), NOT positional first-match; an any-status route
+authored before `OnError(404,…)` still loses to the 404 route on a 404. `Into` of a
+success body that parsed to a non-string throws a typed shape error at the egress
+boundary (`execute.ts:207-218`), not silent coercion.
 
 ### Arrays — entries + ops + terminal
 
@@ -225,14 +390,26 @@ dedicated rows: `04-matrix-http-arrays-values.md:190,149,168,205`.)
 | `Find<TField>(pred, proj)` | `:107` | ✅ |
 | `AsSource()` terminal | `:121` | ✅ |
 
-**Arrays: 19 / 19.** (`Sum(int)/Sum(decimal)/Sum(double)` — previously one census cell —
-are 3 dedicated overloads under the `sum` row, `04-matrix-http-arrays-values.md:290`.)
+**Arrays: 19 / 19.** `Sum(int)/Sum(decimal)/Sum(double)` are 3 dedicated overloads
+under the `sum` row (`04-matrix-http-arrays-values.md:290`).
 
-### Validation — `ClientValidationFieldRuleBuilder` + `ReactiveClientRules` + `WhenField` + collection/server/display
+### Validation — `ClientValidationFieldRuleBuilder` (31 public methods) + `ReactiveClientRules` + `WhenField` + collection/server/display
+
+`grep -nE "public " Alis.Reactive/Validation/ClientValidationFieldRuleBuilder.cs` = **31
+public methods** (32 `public` lines minus the class declaration). Each maps to a
+`ValidationRuleName` family via `AddLiteralComparison`/`AddPeerComparison`/
+`AddNoOperand`/`AddRule`: `Required`, `Empty`, `Email`, `Url`, `CreditCard`,
+`AtLeastOne`, `MinLength`, `MaxLength`, `Regex`, `Range`, `ExclusiveRange`, `Min`,
+`Max`, `Gt`, `Lt`, `EqualTo` (literal + 2 peer forms), `NotEqual` (literal),
+`NotEqualTo` (2 peer forms), and the ordered peer comparisons `GreaterThan`/
+`GreaterThanOrEqualTo`/`LessThan`/`LessThanOrEqualTo` (literal + peer each). No method
+is unrowed — the 31 reduce to the finite RuleName+operand families pinned in matrix
+A1/A2 with the `EqualTo`/`NotEqual` literal-vs-peer asymmetry noted at
+`04-matrix-validation-components-slots.md:124-133`.
 
 | Variant group | Source | Count | Covered? |
 |---|---|---|---|
-| field rule builder methods (incl. `EqualTo` literal+peer, `NotEqual` literal-only, `NotEqualTo` peer-only, ordered peers) | `ClientValidationFieldRuleBuilder.cs:27-156` | 27 | ✅ |
+| field rule builder methods (incl. `EqualTo` literal+2 peers, `NotEqual` literal, `NotEqualTo` 2 peers, ordered literal+peer) | `ClientValidationFieldRuleBuilder.cs:27-156` | 31 | ✅ |
 | static `ReactiveClientRules` server+client paired overloads incl. nullable-struct peers | `ReactiveClientRuleBuilder.cs:83-356` | 38 | ✅ |
 | `WhenField` family + `WhenFields` | `ReactiveValidator.cs:103-181` | 24 | ✅ |
 | `ClientRuleEach` + `ReactiveClientRuleBuilder.AtLeastOne`/`.SetValidator` | `ReactiveValidator.cs:41`; `ReactiveClientRuleBuilder.cs:60,67` | 3 | ✅ |
@@ -240,11 +417,9 @@ are 3 dedicated overloads under the `sum` row, `04-matrix-http-arrays-values.md:
 | `ClientRulesFrom` ×2 | `ReactiveValidator.cs:80,92` | 2 | ✅ |
 | server errors (`show-validation-errors`) + inline + summary | matrix A4 | 3 | ✅ |
 
-**Validation: 98 / 98.** (Every prior census `uncovered` validation variant —
-`ClientRulesFrom` ×2, `ClientRuleEach.SetValidator`/`.AtLeastOne`, the nullable-struct
-`ReactiveClientRules` peers, `EqualTo`/`NotEqual` literal-vs-peer asymmetry — now has a
-named row: A4 `ClientRuleEach`/nested rows + A1/A2 with the explicit asymmetry note at
-`04-matrix-validation-components-slots.md:124-133`.)
+**Validation: 102 / 102.** (Field rule builder counted at its true 31; the prior
+proof said 27. Every method still maps to a rowed RuleName+operand family — the count
+correction does not add or remove a family, it corrects the hand-tally.)
 
 ### Components — render/registration + mutation/read + event + grid + per-slice `.Reactive`
 
@@ -260,8 +435,8 @@ named row: A4 `ClientRuleEach`/nested rows + A1/A2 with the explicit asymmetry n
 
 **Components: 14 / 14 template families.** Vendor Rule 5 holds: every slice reduces to
 B2 `set`/`call`/`read` or B3 `componentEvent`; the 58 `.Reactive` overload lines are
-B3 instantiations, not new templates — the row is parameterized over each slice's
-`TypedEvent` set (`04-matrix-validation-components-slots.md:243-247`).
+B3 instantiations parameterized over each slice's `TypedEvent` set
+(`04-matrix-validation-components-slots.md:243-247`), not new templates.
 
 ### Slots / Composition — `PlanExtensions` + `Into`
 
@@ -288,11 +463,10 @@ B3 instantiations, not new templates — the row is parameterized over each slic
 | `PluginCallBuilder.Arg` (same set) + `.Fire()` | `PluginCallBuilder.cs:35-116` | 12 | ✅ |
 | `Plugin<T>` read entries + `Plugin` call entries | `PipelineBuilder.cs:164-253` | 8 | ✅ |
 
-**Plugins: 65 / 65.** (`RegisterPlugin` verbs and the ~31 arity declaration overloads —
-prior census `uncovered` — are covered by Band D's declare row, which states the
-arity-0..3 × member/root × function/command explosion collapses to **one** args-builder
-in the redesign: `04-matrix-validation-components-slots.md:319-324`. The collapse is a
-**labeled redesign target**, not shipped today.)
+**Plugins: 65 / 65.** The `RegisterPlugin` verbs and the ~31 arity declaration
+overloads collapse to **one** args-builder in the redesign
+(`04-matrix-validation-components-slots.md:319-324`) — a **labeled redesign target**,
+not shipped today.
 
 ### App-level objects
 
@@ -303,20 +477,17 @@ in the redesign: `04-matrix-validation-components-slots.md:319-324`. The collaps
 | Confirm `SetContent`/`Show`/`Hide` + layout | `FusionConfirmExtensions.cs:21,29,34,39` | 4 | ✅ |
 | Toast `SetTitle`/`SetContent`/`SetTimeout`/`ShowCloseButton`/`ShowProgressBar`/`Success`/`Warning`/`Danger`/`Info`/`Show`/`Hide` + layout | `FusionToastExtensions.cs:41-103` | 12 | ✅ |
 | ActionLink single request | `NativeActionLinkHtmlExtensions.cs:13` | 1 | ✅ |
-| dead enums `DrawerPosition`/`ToastType`/`ToastPosition` (zero consumers) | `DrawerPosition.cs:6`, `ToastType.cs:6`, `ToastPosition.cs:6` | 3 | ❌ **excluded** (no producer) |
 
-**App-level: 28 / 31** (3 dead enums excluded — see [What is NOT covered](#what-is-not-covered-and-why-none-is-a-public-dsl-non-determinism)).
-Toast type methods are **parameterless** (`.Success()/.Warning()/.Danger()/.Info()`)
-— there is **no** `Show(msg, ToastType, ToastPosition)` signature
-(`04-matrix-validation-components-slots.md:347,354`). The earlier Band-E
-`p.Drawer()/p.Toast(...)` verbs were a hallucination; the only entry is the no-arg
-`Component<TComponent>()` (`PipelineBuilder.cs:136`).
+**App-level (live): 28 / 28.** The 3 dead enums (`DrawerPosition`, `ToastType`,
+`ToastPosition`) are **deleted** and **excluded** — see Section 4. Toast type methods
+are parameterless (`.Success()/.Warning()/.Danger()/.Info()`); there is no
+`Show(msg, ToastType, ToastPosition)` signature.
 
 ---
 
-## Total
+## 6. Total — live coverage
 
-| Area | Covered | Total |
+| Area | Covered | Live total |
 |---|---|---|
 | Triggers | 10 | 10 |
 | Reactions | 28 | 28 |
@@ -324,158 +495,46 @@ Toast type methods are **parameterless** (`.Success()/.Warning()/.Danger()/.Info
 | Values (literals + composites) | 5 | 5 |
 | HTTP | 47 | 47 |
 | Arrays | 19 | 19 |
-| Validation | 98 | 98 |
+| Validation | 102 | 102 |
 | Components (template families) | 14 | 14 |
 | Slots | 5 | 5 |
 | Plugins | 65 | 65 |
-| App-level | 28 | 31 |
-| **Total** | **371** | **374** |
+| App-level (live) | 28 | 28 |
+| **Total (live)** | **375** | **375** |
 
-**Per-variant coverage = 371 / 374 = 99.2%.** The only 3 uncovered are dead public
-types with no authoring producer (the 3 dead enums in App-level), which the redesign
-deletes — not lowering gaps (next section).
+**Live-variant deterministic coverage = 375 / 375 = 100%.**
 
-> **Honesty note.** This replaces the prior "120/120 = 100%" headline, which counted
-> band families and so could not be wrong about per-overload lowerings — because it
-> never enumerated them. The 3 uncovered variants (the 3 dead enums) are the price of
-> counting honestly: each is a dead public type with **no authoring verb**, so
-> "covered" would require inventing a feature, which violates "no information the plan
-> does not carry."
-
----
-
-## What is NOT covered (and why none is a public-DSL non-determinism)
-
-**3 authoring variants** have **no deterministic redesign row** — and must not,
-because none has a public authoring producer. Two further **wire-enum** members are
-also excluded from generation but are NOT in the authoring denominator (they have no
-authoring overload). All five are scope decisions, recorded so the generator excludes
-them rather than inventing a lowering.
-
-**The 3 uncovered authoring variants (in the 374 denominator):**
-
-1. **Dead enums `DrawerPosition` / `ToastType` / `ToastPosition`** (`DrawerPosition.cs:6`,
-   `ToastType.cs:6`, `ToastPosition.cs:6`) — **zero consumers**. No app-level method
-   takes them (Toast type methods are parameterless, `FusionToastExtensions.cs:68-86`).
-   Redesign: **delete them**. Counted as 3 uncovered because they are public types with
-   no lowering; they should not exist.
-
-**Two wire-enum members excluded from generation (NOT in the authoring denominator —
-no authoring overload produces them):**
-
-- **`set` target on a `plugin` source** — `CallTargetSource` includes `plugin`,
-  `SetTargetSource` does not (`plan.ts:371-373`); there is **no `Plugin(...).Set(...)`
-  verb in source**. No authored intent → no lowering. Excluded from generation, not
-  invented (`04-matrix-triggers-reactions-conditions.md:421-430`).
-- **`payload` scope `local` on the wire enum** — no public call emits `local`; it is
-  dead vocabulary the Request scope-fold deletes
-  (`04-matrix-triggers-reactions-conditions.md:445-454`).
-
-None is a case where one public overload produces two outputs. The per-variant claim
-holds: **every public authoring overload has exactly one lowering and one reader.**
+Deleted dead surface excluded from the denominator (Section 4): `DrawerPosition`,
+`ToastType`, `ToastPosition` — 3 public enums with zero `.cs` consumers, deleted in
+the redesign. Two further dead **wire-enum** members (`set` target on a `plugin`
+source — `plan.ts:371-373`; `payload` scope `local` — no public producer) are folded
+out of generation and are **not** in the authoring denominator
+(`04-matrix-triggers-reactions-conditions.md:421-454`). Neither is a case where one
+public overload produces two outputs.
 
 ---
 
-## Design-level determinism fixes the matrix relies on
+## 7. Certification
 
-The matrix's per-variant determinism depends on **four** source-grounded design fixes.
-Each is verified against source here; the first three close live many-to-one or
-under-pinned holes, the fourth removes a drift surface. All are **redesign targets** —
-labeled — not shipped today.
+Against the determinism criterion of Section 1, for the **redesign target**:
 
-### Fix 1 — `WholePayload` / `WholeElement` as node KINDS (kills the `responseBody`/`elementValue` collision)
+1. **One output per live variant** — ✅ all 375 live authoring variants have a
+   dedicated deterministic redesign row; no overload lowers to two outputs.
+2. **Current bugs resolved by a stated rule** — ✅ the sole live non-determinism (the
+   `responseBody`/`elementValue` magic-member collision) is `RESOLVED-BY-REDESIGN` by
+   Fix 1: whole reads become distinct node *kinds* and the reserved member string is
+   never emitted for a whole read, making the collision unrepresentable. Fixes 2-4
+   close the supporting under-pinned defaults and the id drift surface.
+3. **Dead surface excluded, not invented** — ✅ the 3 zero-consumer enums are deleted
+   and excluded; coverage is not inflated by inventing features for them.
+4. **Per-variant authority** — ✅ counts are per-overload (4 `SetText`, 3 `SetHtml`, 3
+   `Sum`, 5 `RouteParam`, 31 field-rule methods, 38 `ReactiveClientRules`, …), and
+   every method maps to a rowed family.
 
-- **Current (verified):** whole-payload and whole-element reads are encoded as magic
-  member strings. `plan.ts:783-790` ships `WholePayloadReadExpression { kind:"read";
-  from:PayloadSource; member:"responseBody"; path:EmptyPath; … }` and `:792-798` ships
-  `WholeElementReadExpression { … member:"elementValue"; … }` — **there is no `whole`
-  field**, only the reserved member string. The runtime discriminates **only** on
-  `member === "responseBody"` / `"elementValue"`, ignoring `path` (`evaluate.ts:287-300`,
-  per `06-determinism-confidence.md:83-114`).
-- **The collision:** a legal public-DSL path read of a response/event/element property
-  **literally named `ResponseBody`** camelCases to exactly `responseBody`
-  (`ExpressionPathHelper.CamelCase`, `:272-276`) and the runtime returns the whole
-  object instead of the `.ResponseBody` sub-field. **Two distinct DSL inputs collapse to
-  one wire member and one runtime behavior** — genuine non-determinism in shipped source.
-- **Redesign (deterministic, because a `kind` cannot collide with any camelCased
-  property path):** `WholePayload` and `WholeElement` become **distinct
-  `ValueExpression` node kinds** (`kind:"whole-payload"` / `kind:"whole-element"`) the
-  **Value** module owns, routed on `kind` (one switch arm), NOT on a `member` string.
-  **The analyzer/type MUST keep a `ResponseBody`-named property read distinct:** a DSL
-  property literally named `ResponseBody` lowers to an **ordinary `Read` with
-  `member:"responseBody"`** that walks the path normally — distinct from a whole-payload
-  read because the latter is a different node `kind`. This is the headline determinism
-  win and the matrix's `inject` and condition rows depend on it
-  (`04-matrix-http-arrays-values.md:93-94,109,118-126`;
-  `04-matrix-triggers-reactions-conditions.md:207-230,373-378`).
-
-### Fix 2 — `Literal — Shape.FromValue` full table (`Shape.cs:70-118`)
-
-The `Literal — arbitrary value` row's inferred shape is the **complete**
-`Shape.FromClrType` table, verified line-by-line:
-
-| CLR type | Shape | Source |
-|---|---|---|
-| `string` | `String` | `Shape.cs:78` |
-| `bool` | `Boolean` | `:79` |
-| `DateTime` / `DateTimeOffset` / `DateOnly` | `Date` | `:80` → `IsDateType:99-104` |
-| numeric (`byte`…`decimal`) | `Number` | `:81` → `IsNumericType:106-111` |
-| `Guid` / `TimeSpan` / `TimeOnly` | `String` | `:82` → `IsStringSerializedType:113-118` |
-| `enum` | `String` | `:83` |
-| `Nullable<T>` | `Nullable(FromClrType(T))` | `:74-76` |
-| collection | `ArrayOf(item)` | `:85-86` |
-| unclassifiable | `Any` | `:88` |
-| `null` value | `None` | `FromValue:96-97` |
-
-The matrix's literal row (`04-matrix-http-arrays-values.md:77`) previously summarized
-only "enum/Guid → string; collection → array; else any" — materially incomplete
-(`DateTime→Date`, `TimeSpan/TimeOnly→String`, `Nullable<T>→Nullable` were unlisted).
-This full table is the authoritative lowering the generator must emit. **Determinism:
-one CLR type → one Shape, no per-stage re-derivation (SHAPE-ONCE).**
-
-### Fix 3 — array → JSON egress obeys shape-once (`request-payload-writer.ts:221-225`)
-
-- **Current (verified):** `jsonArrayBodyValue(items, itemShape)` shapes items **only
-  when `itemShape.isDeclared`** — `if (!itemShape.isDeclared) return items;` (`:222`),
-  else `items.map(item => itemShape.formatForWire(item))` (`:224`). An **undeclared**
-  item array bypasses `formatForWire` entirely, contradicting the universal "shape-once
-  on egress" assertion.
-- **Redesign (deterministic):** the array-value `Shape` is `array<itemShape>` derived
-  at authoring from the element type (`ReactiveArray<T>` carries `Shape.FromClrType(T)`,
-  `04-matrix-http-arrays-values.md:283`), so `itemShape.isDeclared` is **always true**
-  for a typed array source — the `!isDeclared` early-return becomes unreachable for
-  framework-produced arrays. The matrix's "Array → JSON body" row
-  (`04-matrix-http-arrays-values.md:192`) and the SHAPE-ONCE spine (`:39-43`) depend on
-  this: every array item is shaped exactly once on egress, never raw.
-
-### Fix 4 — app-level fixed ids as ONE shared constant (not C#-const-vs-TS duplicate)
-
-- **Current (verified):** each id is duplicated. C# consts:
-  `NativeDrawer.ElementId = "alis-drawer"` (`NativeDrawer.cs:20`),
-  `NativeLoader.ElementId = "alis-loader"` (`NativeLoader.cs:18`),
-  `FusionConfirm.ElementId = "alisConfirmDialog"` (`FusionConfirm.cs:12`),
-  `FusionToast.ElementId = "alisFusionToast"` (`FusionToast.cs:12`). AND hardcoded TS:
-  `"alis-drawer"` (`runtime/components/native/drawer.ts:14`), `"alis-loader"`
-  (`runtime/components/native/loader.ts:42`). Two of four are camelCase, two kebab-case
-  — a casing inconsistency on top of the duplication.
-- **Redesign (deterministic, because one projected constant removes the only drift
-  point):** **one shared id constant per object** — a C# const projected to TS (like
-  `RuleName`), with **one casing convention** — so the plan `target` and DOM
-  `getElementById` agree by construction. The matrix's Band E note and the confidence
-  doc's Hole #2 both name this (`04-matrix-validation-components-slots.md:370-378`).
-
----
-
-## What this means for code generation
-
-The redesign's thesis — *one deterministic input → one lowering → one runtime reader,
-so generation is mechanical* — holds at the **per-overload** level for **371 / 374 =
-99.2%** of source authoring variants. A generator iterating the per-area tables above
-emits one case per real overload (4 `SetText` cases, 3 `SetHtml`, 3 `Sum`, 5
-`RouteParam`, 38 `ReactiveClientRules`, …), each fixed by the named axes. The 3
-uncovered authoring variants are the dead enums the redesign deletes; two further dead
-wire-enum members are folded out of generation. The four design-level fixes above are
-the load-bearing prerequisites:
-without Fix 1 the read surface carries a live many-to-one collision and the headline
-**cannot** be claimed deterministic; with it, every public authoring overload lowers to
-exactly one plan-JSON shape and one browser behavior.
+**Verdict: the redesign blueprint is deterministic — 375 / 375 = 100% of live public
+authoring variants lower to exactly one plan-JSON shape and one browser behavior.**
+The four design-level fixes (Section 3) are labeled redesign targets and are the
+load-bearing prerequisites; once built — Fix 1 in `ValueExpression.cs`, `plan.ts`, and
+`evaluate.ts` above all — the live read surface carries no many-to-one collision and a
+generator iterating the per-area tables emits one case per real overload, each fixed
+by its named axes.

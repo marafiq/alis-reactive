@@ -390,7 +390,7 @@ only changes the wrapping node, and the branch position only changes which
 
 | Sub-band | Features / variants |
 |---|---|
-| Triggers | 11 (page-ready; custom-event untyped/typed; component-event; server-push any/named/named-typed; signalr untyped/typed; multiple-triggers) |
+| Triggers | 10 (page-ready; custom-event untyped/typed; component-event; server-push any/named/named-typed; signalr untyped/typed; multiple-triggers) |
 | Reaction sequencing & lane | 3 (single command [always sequence-wrapped]; ordered sync; sync-async-sync) |
 | `set` reactions | 10 (element show/hide; **SetText ×4** literal/event-path/response-body-path/typed-source; **SetHtml ×3** literal/event-path/typed-source; component property write; event-arg set) |
 | `call` reactions | 5 (element css class; component method no-arg; component method with args; plugin command; event-arg method) |
