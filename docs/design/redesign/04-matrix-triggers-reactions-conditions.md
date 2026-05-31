@@ -122,14 +122,18 @@ via `switch` + `assertNever`.
 
 **Shared lowering template (R):** `p.<verb>(…)` → `ReactionGraph.<Kind>(…)` node →
 `draft.AddCommand(node)` (sync) or `BeginBranch`/`BeginHttp`/`BeginParallel` (lane
-openers) → `BuildReaction()` collapses to a single node when there is one block,
-else a `sequence`.
+openers) → `BuildReaction()` flushes the segment (`ReactionPipelineDraft.cs:52-58`).
+`FlushPendingSyncReactions` (`:82-88`) **always** wraps any pending sync block in
+`ReactionGraph.Sequence(...)` (only guard is `Count==0`), so even one sync command
+becomes a one-step `sequence`. `BuildReaction` returns `_orderedBlocks[0]` when there
+is one block, else a top-level `sequence` of the blocks — but that single block is
+itself the sync-`sequence`, never a bare node. The redesign keeps this one shape.
 
 ### Sequencing and the lane (the spine that makes ordering deterministic)
 
 | Feature / variant | Input (DSL) | Module interaction path | Output (plan JSON + browser behavior) | Good default |
 |---|---|---|---|---|
-| **Single command** | `p.Element("s").Show()` | `Reaction →` one node, `BuildReaction` returns it directly (no wrapper). | the bare node (e.g. a `set`). Browser: runs it. **SYNC**. | No `sequence` wrapper for one node. |
+| **Single command** | `p.Element("s").Show()` | `Reaction →` one node accumulates in `_pendingSyncReactions`; `BuildReaction` (`ReactionPipelineDraft.cs:52-58`) → `FlushSegment` → `FlushPendingSyncReactions` (`:82-88`) **always** wraps the pending block in `ReactionGraph.Sequence(...)` (only guard is `Count==0`), so `_orderedBlocks=[Sequence([node])]` and `BuildReaction` returns that single element. `⇒` `executeSequence` runs the one step. | `{ "kind":"sequence","steps":[ set… ] }` — a one-step sequence, **not** a bare node. Browser: runs the single command. **SYNC**. | **One deterministic shape: every reaction is sequence-wrapped.** *Redesign keeps the always-wrap* (current: `FlushPendingSyncReactions` already wraps unconditionally, `ReactionPipelineDraft.cs:82-88`) — the redesign does not special-case one node, because a single shape is more deterministic for the generator and runtime than a "bare-node-or-sequence" fork. |
 | **Ordered sync commands** | `p.Element("a").Show(); p.Dispatch("x")` | `Reaction →` `_pendingSyncReactions` accumulates in author order → `FlushPendingSyncReactions` → one `sequence`. `⇒` `executeSequence` runs steps in array order. | `{ "kind":"sequence","steps":[ set…, dispatch… ] }`. Browser: commands run top-to-bottom, same tick. **SYNC**. | Declaration order = execution order. |
 | **Sync then async opener then sync** | `p.Element(..).Show(); p.Get(..)…; p.Element(..).Hide()` | `Reaction →` draft flushes the pre-sync block, appends the async node, flushes the trailing sync block → ordered blocks `[seq, request, seq]`. `⇒` `executeSequence` detects the lane crossing **from the carried lane**, awaits, then continues. | `sequence` of `[sequence(sync), request, sequence(sync)]`. Browser: sync block runs, request awaited, then trailing sync block. **ASYNC** from the request onward. | The lane boundary is the async opener; everything before stays sync. |
 
@@ -142,11 +146,33 @@ else a `sequence`.
 | Feature / variant | Input (DSL) | Module interaction path | Output (plan JSON + browser behavior) | Good default |
 |---|---|---|---|---|
 | **Element show** | `p.Element("box").Show()` | `Reaction → ElementBuilder` declares element + property contract (`hidden`, write) → `set(ComponentSource("box"),"hidden", literal false)`. `⇒` `executeSet` resolves `RuntimeObject("box")`, `.set("hidden", false)`. | `{ "kind":"set","on":{"kind":"component","component":"box"},"property":"hidden","value":{"kind":"literal","value":false,"shape":{…bool}} }`. Browser: element becomes visible. **SYNC**. | `Show`=`hidden:false`, `Hide`=`hidden:true` — no separate verb node. |
-| **Element set text (literal)** | `p.Element("s").SetText("hi")` | same path, property `text`, value literal string. | `{…,"property":"text","value":{"kind":"literal","value":"hi","shape":{string}}}`. Browser: `textContent="hi"`. **SYNC**. | literal value, `Shape.String`. |
-| **Element set text (from value source)** | `p.Element("s").SetText(p.FromUrl("q"))` | `Reaction →` value = `Value` slice `read(url,"q")`. `⇒` `evaluateValue` reads url param, sets text. | `{…,"property":"text","value":{"kind":"read","from":{"kind":"url"},"member":"q",…}}`. Browser: text = the URL param. **SYNC**. | value flows through the one `ValueExpression` path. |
-| **Element set HTML** | `p.Element("s").SetHtml(src)` | property `html`. | `{…,"property":"html",…}`. Browser: `innerHTML`=value. **SYNC**. | property `html`. |
+| **Element set text — literal** (`SetText(string)`, `ElementBuilder.cs:55`) | `p.Element("s").SetText("hi")` | same path, property `text`, value literal string. | `{…,"property":"text","value":{"kind":"literal","value":"hi","shape":{string}}}`. Browser: `textContent="hi"`. **SYNC**. | literal value, `Shape.String`. |
+| **Element set text — event payload path** (`SetText<TSource>(TSource, path)`, `ElementBuilder.cs:65`) | `p.Element("s").SetText(args, a=>a.Total)` | `Reaction →` `ExpressionPathHelper.ToEventPath(path)`; value = `ReadPayload(PayloadSource.Event(), eventPath)`. | `{…,"property":"text","value":{"kind":"read","from":{"kind":"payload","scope":"event"},"member":"…","path":{…}}}`. Browser: text = the event-arg property. **SYNC**. | scope `event`; `TSource` is the phantom payload contract. |
+| **Element set text — HTTP response body path** (`SetText<TResponse>(ResponseBody<TResponse>, path)`, `ElementBuilder.cs:76`) | `p.Element("s").SetText(success, r=>r.Status)` | `Reaction →` `ExpressionPathHelper.ToResponsePath(path)`; value = `ReadPayload(source.Scope, responsePath)` — scope comes from the `ResponseBody` (success/error). | `{…,"property":"text","value":{"kind":"read","from":{"kind":"payload","scope":"success"},"member":"…","path":{…}}}`. Browser: text = the response-body property. **SYNC** (within the awaited response scope). | scope from the `ResponseBody`. **No `SetHtml` peer** — this overload is `SetText`-only (see asymmetry note below). |
+| **Element set text — typed source** (`SetText<TProp>(TypedSource<TProp>)`, `ElementBuilder.cs:87`) | `p.Element("s").SetText(p.FromUrl("q"))` | `Reaction →` value = `source.ToValueExpression()` (component / plugin / URL read). Returns the `ElementBuilder` (chainable), unlike the other three which return the pipeline. | `{…,"property":"text","value":{"kind":"read","from":{"kind":"url"},"member":"q",…}}`. Browser: text = the source value. **SYNC**. | value flows through the one `ValueExpression` path. |
+| **Element set HTML — literal** (`SetHtml(string)`, `ElementBuilder.cs:96`) | `p.Element("s").SetHtml(html)` | property `html`, value literal string. | `{…,"property":"html","value":{"kind":"literal",…,"shape":{string}}}`. Browser: `innerHTML`=value. **SYNC**. | property `html`. |
+| **Element set HTML — event payload path** (`SetHtml<TSource>(TSource, path)`, `ElementBuilder.cs:106`) | `p.Element("s").SetHtml(args, a=>a.Markup)` | `Reaction →` `ToEventPath(path)`; value = `ReadPayload(PayloadSource.Event(), eventPath)` — scope **hardcoded to `Event()`** at `:109` (no response-body SetHtml overload). | `{…,"property":"html","value":{"kind":"read","from":{"kind":"payload","scope":"event"},…}}`. Browser: `innerHTML`=event-arg property. **SYNC**. | scope `event`, fixed. |
+| **Element set HTML — typed source** (`SetHtml<TProp>(TypedSource<TProp>)`, `ElementBuilder.cs:116`) | `p.Element("s").SetHtml(p.FromUrl("q"))` | `Reaction →` value = `source.ToValueExpression()`; returns the `ElementBuilder` (chainable). | `{…,"property":"html","value":{"kind":"read",…}}`. Browser: `innerHTML`=source value. **SYNC**. | property `html`. |
 | **Component property write** | `p.Component<X>(m=>m.Field).Set(c=>c.Enabled, true)` | `Reaction →` `set(ComponentSource(id),"enabled", literal true)`; contract declared write. `⇒` `RuntimeObject(id).set("enabled", true)` via `ComponentDriver`. | `{ "kind":"set","on":{"kind":"component","component":"<id>"},"property":"enabled","value":{literal true} }`. Browser: vendor property updated. **SYNC**. | id from model expression. |
 | **Event-arg mutation** (`set` on payload) | inside `.Reactive((args,p)=>…)`, `p` sets an `args.*` member | `Reaction →` `set(PayloadSource(event),"cancel", literal true)`. `⇒` `executeSet` case `payload`: writes into the live event arg object. | `{ "kind":"set","on":{"kind":"payload","scope":"event","type":…},"property":"cancel","value":{literal true} }`. Browser: SF reads `args.cancel` after callback returns — must be **SYNC**. | scope `event`; sync is mandatory, not optional. |
+
+**`SetText` (4 overloads) vs `SetHtml` (3 overloads) asymmetry (`ElementBuilder.cs`).**
+The two verbs are **not** symmetric and each overload is its own deterministic row above:
+- `SetText` has **four** overloads — literal (`:55`), event-payload path (`:65`),
+  **HTTP-response-body path (`:76`)**, typed source (`:87`).
+- `SetHtml` has **three** — literal (`:96`), event-payload path (`:106`, scope
+  hardcoded to `Event()` at `:109`), typed source (`:116`). It has **no
+  `ResponseBody<TResponse>` overload**, so an HTTP success/error body cannot be read by
+  path into `innerHTML` via `SetHtml`.
+
+*Redesign decision (more deterministic + good default):* keep the four/three overloads
+exactly as authored — the generator emits one case per overload — and do **not** fold
+them into a single generic "set text/html from value source" cell. The per-overload
+scope is a plan-carried fact (`event` vs `success`/`error`), not a runtime inference.
+The `SetText(ResponseBody,path)` overload is the only path-into-`text` from a response
+body and must have its own row so a generator does not assume a non-existent `SetHtml`
+peer. (Adding a `SetHtml(ResponseBody,path)` overload is a separate DSL-source change,
+not a matrix assumption.)
 
 ### `call` reactions — `CallReaction` (template R, ReactionKind=`call`)
 
@@ -171,18 +197,37 @@ else a `sequence`.
 `p.Into(elementId)` (`Builders/PipelineBuilder.cs:273-279`) is the single inject
 authoring verb. It declares the target element on the `PlanBuildContext`
 (`Context.DeclareElement(elementId)`) and emits one `inject` node whose value is
-**fixed** at lowering time to `ValueExpression.ReadWholePayload(PayloadSource.Success())`
-(the HTTP success whole-body — the `WholeElement`/`WholePayload` variant the **Value**
-module owns, never a magic member name). The node is `ReactionGraph.Inject(slot, value)`
-→ `InjectReaction` (`PlanModel/ReactionGraph.cs:424`, `kind:"inject"`, `slot` (string,
-from `ComponentKey`), `value` (`ValueExpression`)). Runtime `executeInject`
-(`execution/execute.ts:207`) resolves the element by `slot`, evaluates the value, and
-sets the element's HTML via `injectHtml` — **SYNC** (no Promise opener; it consumes a
-success body that the surrounding request already awaited).
+**fixed** at lowering time to the HTTP-success whole-body read. The node is
+`ReactionGraph.Inject(slot, value)` → `InjectReaction` (`PlanModel/ReactionGraph.cs:424`,
+`kind:"inject"`, `slot` (string, from `ComponentKey`), `value` (`ValueExpression`)).
+Runtime `executeInject` (`execution/execute.ts:207`) resolves the element by `slot`,
+evaluates the value, and sets the element's HTML via `injectHtml` — **SYNC** (no Promise
+opener; it consumes a success body that the surrounding request already awaited).
+
+> **Current bug → redesign variant (the whole-payload read).** *Current:* the
+> whole-body read is encoded as a **magic member string** —
+> `ValueReadTarget.ForWholePayload` stamps `member:"responseBody"`, `path:Path.None`
+> (`PlanModel/ValueExpression.cs:379,399-400`); the generated TS still ships the same
+> sentinel `WholePayloadReadExpression { member:"responseBody" }` with **no `whole`
+> field** (`runtime/types/plan.ts:783-786`), and the runtime discriminates **only** on
+> `member==="responseBody"`. That collides with a legal path read of a property literally
+> named `ResponseBody` (`06-determinism-confidence.md:83-114`) — two distinct DSL inputs
+> collapse to one wire member. *Redesign:* replace the sentinel with a **distinct
+> `WholePayload` node kind** the **Value** module owns — the same variant the sibling
+> Values band defines (`04-matrix-http-arrays-values.md:93,109,118-119`):
+> `{ "kind":"whole-payload","from":{"kind":"payload","scope":"success"} }`, **not** a magic
+> member named `responseBody` and **not** a `whole:true` boolean on an ordinary read. This
+> is deterministic because a node `kind` cannot collide with any camelCased property path,
+> and the runtime routes on `kind` (one switch arm) instead of a string-equality probe on
+> `member` — so a `.ResponseBody` path read lowers to an ordinary `Read` with
+> `member:"responseBody"` that is now distinct from a whole-payload read. The same redesign
+> covers the element-scope `WholeElement` read (current sentinel `member:"elementValue"`,
+> `PlanModel/ValueExpression.cs:380,402`) as
+> `{ "kind":"whole-element","from":{"kind":"payload","scope":"element"} }`.
 
 | Feature / variant | Input (DSL) | Module interaction path | Output (plan JSON + browser behavior) | Good default |
 |---|---|---|---|---|
-| **Inject success body into element** | `p.Get("/card").Into("card-host")` (the `Into` follows a request, per the C# doc-comment) | `Reaction →` `Into(elementId)` declares the element, builds `value = Value` slice `ReadWholePayload(Success)` and emits `ReactionGraph.Inject(slot, value)`; the draft stamps **SYNC**. `Value →` the whole-payload(success) read variant. `⇒` `executeInject` reads `plan.components.element(slot)`, `evaluateValue(value)` → the success body string, `injectHtml(container, html, slot)` sets `innerHTML`. | `{ "kind":"inject","slot":"card-host","value":{"kind":"read","from":{"kind":"payload","scope":"success"},"whole":true} }`. Browser: the element's `innerHTML` is replaced by the HTTP success body. **SYNC** (within the success scope of the awaited request). | value is **always** `ReadWholePayload(Success)` — the developer supplies only the element id; no value axis to choose. |
+| **Inject success body into element** | `p.Get("/card").Into("card-host")` (the `Into` follows a request, per the C# doc-comment) | `Reaction →` `Into(elementId)` declares the element, builds the whole-success-body value and emits `ReactionGraph.Inject(slot, value)`; the draft stamps **SYNC**. `Value →` the whole-payload(success) read variant. `⇒` `executeInject` reads `plan.components.element(slot)`, `evaluateValue(value)` → the success body string, `injectHtml(container, html, slot)` sets `innerHTML`. | **Current** (`PlanModel/ValueExpression.cs:379,399-400`; `runtime/types/plan.ts:783-786`): `{ "kind":"inject","slot":"card-host","value":{"kind":"read","from":{"kind":"payload","scope":"success"},"member":"responseBody","path":null} }` — magic-member sentinel, no `whole` field, collides with a `.ResponseBody` path read. **→ Redesign** (distinct node kind, identical to the sibling Values band `04-matrix-http-arrays-values.md:93`): `{ "kind":"inject","slot":"card-host","value":{"kind":"whole-payload","from":{"kind":"payload","scope":"success"}} }` — a `WholePayload` value-node variant the **Value** module owns, deterministic because a `kind` cannot collide with any property path and the runtime routes on `kind`. Browser (both): the element's `innerHTML` is replaced by the HTTP success body. **SYNC** (within the success scope of the awaited request). | value is **always** the whole-success-payload read — the developer supplies only the element id; no value axis to choose. The redesign carries it as a `whole-payload` node, never the `member:"responseBody"` sentinel. |
 
 ### `show-validation-errors` reaction — `ShowValidationErrorsReaction` (template R, ReactionKind=`show-validation-errors`)
 
@@ -245,6 +290,8 @@ returns on the first matching guard).
 | **From plugin read** | `p.When(p.PluginProperty<bool>("net","online"))` | `Plugin` slice declares read; left = `read(plugin,…)`. | `"left":{"kind":"read","from":{"kind":"plugin",…}}`. | |
 | **From event payload** | `p.When(args, x=>x.Total)` | `Condition →` `PayloadTypedSource.FromEvent(path)` → left = `read(payload,event, path)`. | `"left":{"kind":"read","from":{"kind":"payload","scope":"event"},"member":"…","path":{…}}`. | scope `event`. |
 | **From HTTP response body** | `p.When(success, x=>x.Status)` | left = `read(payload, success/error, path)` (Response band supplies the `ResponseBody`). | `"left":{…,"from":{"kind":"payload","scope":"success"}…}`. | scope from the `ResponseBody`. |
+| **From element-scope member (array predicate)** | inside an array predicate, `x => x.Status` (per-element member read) | `Condition →` `ElementExpressionCompiler.CompileValue` (`Builders/Arrays/ElementExpressionCompiler.cs:130-136`): a member-access path rooted at the element compiles to `ReadPayload(PayloadSource.Element(), path, shape)` (or `ReadWholeElement(shape)` when the path is `x => x` itself). | `"left":{"kind":"read","from":{"kind":"payload","scope":"element"},"member":"…","path":{…}}`. **SYNC** (per-element predicate runs in the array op). | scope `element`; the per-element receiver is the array item. |
+| **From element-scope per-element method read (whitelisted)** | inside an array predicate, `x => x.GetDay()` or `x => x.Address.GetFormatted()` | `Condition →` `ElementExpressionCompiler.CompileValue` (`ElementExpressionCompiler.cs:140-154`): a `MethodCallExpression` whose receiver roots at the element → `methodName = CamelCase(call.Method.Name)`, then a **whitelist gate** (`!WhitelistedMethods.Contains(methodName)` ⇒ `InvalidOperationException` at author time — non-whitelisted/side-effecting per-element calls are rejected). The receiver path + method lower via `ValueExpression.InvokeElement(receiverPath, method, returns, args)` (`PlanModel/ValueExpression.cs:108-112`), which builds `ValueRead.Method(PayloadSource.Element(), method, Path.Parse(receiverPath + "." + method), returns, args)`. | `"left":{"kind":"read","from":{"kind":"payload","scope":"element"},"member":"getDay","path":{…receiverPath.method…},"access":"method","args":[…]}`. **SYNC** (reuses the same `RuntimePath.call` engine as component/plugin method reads). | **Whitelist is the determinism gate.** Only PURE, deterministic per-element methods are representable; a non-whitelisted method is a **compile-error-equivalent author-time throw**, not a runtime fallback — so every emitted element-method read is provably side-effect-free. Receiver must root at the element. |
 
 ### Compare operators — the 9 operand-shape families (21 tokens)
 
@@ -294,7 +341,7 @@ with the right operand's `value` being a `read` `ValueExpression` instead of a
 | Feature / variant | Input (DSL) | Module interaction path | Output (plan JSON + browser behavior) | Good default |
 |---|---|---|---|---|
 | **Confirm then run** | `p.Confirm("Delete?").Then(p2=>…)` | `Condition →` `ConditionGraph.Confirm(message)` as the guard. `⇒` `confirmThenEvaluate` awaits `window.alis.confirm(message)`, then routes the branch. | `{ "kind":"branch","cases":[{"guard":{"kind":"when","condition":{"kind":"confirm","message":"Delete?"}},…}] }`. Browser: shows confirm dialog; reaction runs only on accept. **ASYNC** (user decision). | guard composes like any other condition; missing dialog is a real boundary error (throws). |
-| **Confirm AND compare** | `p.Confirm("Sure?")` then `.And(s).Gt(0)`... (via guard composition) | `Condition →` `all([confirm, compare])`. `⇒` if a reached term is `confirm`, the whole evaluation lifts to a Promise; compares short-circuit first (sync) per `all` semantics. | `{ "kind":"all","terms":[{confirm},{compare}] }`. Browser: compares may avoid the dialog (short-circuit). **ASYNC if confirm reached**. | confirm is just another term in `all`/`any`. |
+| **Confirm AND compare** | `p.Confirm("Sure?").And(s).Gt(0)` (via guard composition) | `Condition →` `GuardBuilder.And<TProp>(TypedSource)` (`Builders/Conditions/GuardBuilder.cs:81-85`) composes `ConditionComposition.All(ConditionGraph)` with the **existing confirm flattened FIRST** → terms `[confirm, compare]` in author order. `⇒` `evaluateAllInLane` iterates the terms **left-to-right from index 0**, so the `confirm` term is reached first and lifts the whole evaluation to a Promise. | `{ "kind":"all","terms":[{confirm},{compare}] }`. Browser: **confirm evaluates first** — the dialog opens before the compare runs (the compare never short-circuits ahead of it). **ASYNC** (confirm is the first term). | **Confirm evaluates first (deterministic).** *Correction:* the prior "compares short-circuit first / may avoid the dialog" good-default is **impossible** — `And` flattens confirm at index 0 (`GuardBuilder.cs:81-85`) and `all` runs left-to-right, so the dialog always opens before the compare. Left-to-right author order in `all`/`any` is the deterministic rule; confirm is just the first term. |
 
 **Condition band parameterization.** A row = `(SourceKind × CompareFamily × OperandForm × GuardComposition × BranchPosition × Continuation)`.
 The generator enumerates the 9 compare families × their token set, crosses with the
@@ -317,32 +364,50 @@ only changes the wrapping node, and the branch position only changes which
 - The branch lane is **carried** in the plan (`ReactionLane`): a branch whose every
   guard is a compare is stamped SYNC; a branch reaching a `confirm` is stamped ASYNC.
   `executeReaction` routes on that fact instead of probing `instanceof Promise`.
+- **Every reaction is sequence-wrapped — one shape, no bare-node fork.**
+  `FlushPendingSyncReactions` (`ReactionPipelineDraft.cs:82-88`) already wraps even a
+  single sync command in `ReactionGraph.Sequence(...)`; the redesign keeps this rather
+  than collapsing to a bare node, so the runtime and the generator handle exactly one
+  reaction shape. (Correcting the prior "no wrapper for one node" row, which contradicted
+  source.)
+- **Whole-payload / whole-element reads are a distinct node kind, not a magic member.**
+  Current source encodes them as `member:"responseBody"` / `member:"elementValue"`
+  (`ValueExpression.cs:379-380,399-403`), which collides with a real `.ResponseBody` /
+  `.ElementValue` path read. The redesign carries a `whole-payload` / `whole-element`
+  node `kind` the **Value** module owns; a `kind` cannot collide with any camelCased
+  property path, so the many-to-one input collision is removed.
+- **Confirm in a guard composition evaluates FIRST (left-to-right).** `GuardBuilder.And`
+  flattens confirm at index 0 (`GuardBuilder.cs:81-85`) and `all`/`any` run in author
+  order, so the dialog opens before any later compare — the redesign documents this
+  deterministic order instead of the impossible "compares short-circuit ahead of the
+  dialog."
 
 ---
 
 ## Coverage count for this band
 
-**Features + variants made deterministic: 52.**
+**Features + variants made deterministic: 58.**
 
 | Sub-band | Features / variants |
 |---|---|
 | Triggers | 11 (page-ready; custom-event untyped/typed; component-event; server-push any/named/named-typed; signalr untyped/typed; multiple-triggers) |
-| Reaction sequencing & lane | 3 (single command; ordered sync; sync-async-sync) |
-| `set` reactions | 6 (element show/hide; set-text literal; set-text source; set-html; component property write; event-arg set) |
+| Reaction sequencing & lane | 3 (single command [always sequence-wrapped]; ordered sync; sync-async-sync) |
+| `set` reactions | 10 (element show/hide; **SetText ×4** literal/event-path/response-body-path/typed-source; **SetHtml ×3** literal/event-path/typed-source; component property write; event-arg set) |
 | `call` reactions | 5 (element css class; component method no-arg; component method with args; plugin command; event-arg method) |
 | `dispatch` reactions | 3 (no payload; literal payload; source-backed object payload) |
-| `inject` reaction | 1 (`p.Into(elementId)` — success body into element, SYNC) |
+| `inject` reaction | 1 (`p.Into(elementId)` — success body into element via `whole-payload` node [redesign], SYNC) |
 | `show-validation-errors` reaction | 1 (`p.ValidationErrors(formId)` — accumulated errors into container, SYNC) |
-| Condition source (left) | 5 (component; url; plugin; event payload; response body) |
+| Condition source (left) | 7 (component; url; plugin; event payload; response body; **element-scope member**; **element-scope whitelisted method read**) |
 | Compare operator families | 9 families covering all 21 tokens, **+1** source-vs-source operand form |
 | Guard composition | 6 (single; and-chain; or-chain; and-group; or-group; not) |
 | Branch routing | 4 (then; else-if; else; no-match) |
-| Confirm | 2 (confirm-then; confirm-in-composition) |
+| Confirm | 2 (confirm-then; confirm-and-compare [confirm evaluates first]) |
 
 (9 compare families is counted as 9 + 1 source-vs-source = the 10 entries summed
 above; the 21 individual operator tokens are sub-variants enumerated by the
-parameterization, not separate template rows. The two added flat verbs — `inject`
-and `show-validation-errors` — bring the band to 52.)
+parameterization, not separate template rows. The two flat verbs — `inject`
+and `show-validation-errors` — plus the per-overload `SetText`/`SetHtml` rows and the
+two element-scope condition sources bring the band to 58.)
 
 ---
 

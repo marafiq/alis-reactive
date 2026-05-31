@@ -90,8 +90,8 @@ This single template, ×6 sources ×2 accesses, covers the entire read surface.
 | **Read — URL query param (untyped)** | `p.FromUrl("page")` → `TypedUrlSource<string>` | Value → `ValueExpression.ReadUrl(name)` = `Read(UrlSource.Instance, name, Shape.String)`. ⇒ `readFromUrl` → `URLSearchParams.get(name)` → `applyShapeWhenPresent(raw, String)` | `{ "kind":"read","from":{"kind":"url"},"member":"page","path":[],"shape":{"kind":"string"},"access":{"kind":"property"} }`. Browser: read current location query string. | `Shape.String` — URL params are inherently strings. |
 | **Read — URL query param (typed)** | `p.FromUrl<int>("page")` | Value → `RequestScalarTarget.UrlQueryParameter<int>` enforces scalar at build; `ReadUrl(name, Shape.Number)`. ⇒ same as above, `applyShape` coerces `"3"`→`3` | `…"shape":{"kind":"number"}`. Browser: read + coerce to declared scalar. | scalar-only (non-scalar `T` rejected at authoring). |
 | **Read — payload (event/success/error/request/dispatch)** — *parameterized over PayloadScope* | `.OnSuccess<R>((json,s)=> … json.Read(r=>r.Data.Name))`; `FromEvent` overloads; `body.Read(...)` | VALUE-SPINE: Value → `ReadPayload(PayloadSource.<scope>(contract), path, shape)`; the dotted member is parsed into `Path`. ⇒ `evaluateValue` `isPayloadRead` → `readFromPayload(expr, ctx.resolvePayload(scope))` → `RuntimePath.read(root)` | `{ "kind":"read","from":{"kind":"payload","scope":"success","type":{…}},"member":"data.name","path":[{"kind":"property","name":"data"},{"kind":"property","name":"name"}],"shape":<TProp>,"access":{"kind":"property"} }`. Browser: walk path on the scope's payload object. | path parsed from the member; scope from where the source was created. |
-| **Read — WHOLE payload** | response body bound directly (whole-body read) | Value → `ReadWholePayload(scope)` → `WholeElement`/`WholePayload` **variant** (redesign: a real node, NOT the `"responseBody"` sentinel) | Redesign output: `{ "kind":"read","from":{"kind":"payload",…},"whole":true }` (variant tag) → the entire scope object. Browser: returns the root payload unwalked. | whole-body is an explicit variant, never a magic member name. |
-| **Read — WHOLE element** | identity `x => x` inside an array op over primitives | Value → `ReadWholeElement()` → `WholeElement` **variant** (redesign: real node, NOT `"elementValue"`) | `{ "kind":"read","from":{"kind":"payload","scope":"element"},"whole":true }`. Browser: returns the current element itself. | element-identity is an explicit variant. |
+| **Read — WHOLE payload** | response body bound directly (whole-body read), e.g. `Into(elementId)` → `ReadWholePayload(Success)` | Value → `ReadWholePayload(scope)` → a **distinct `WholePayload` node KIND** (redesign). **current: encoded as the magic member string `member:"responseBody"`, `path` forced to `Path.None` (`ValueExpression.cs:379,399-400`), and the runtime discriminates on `expression.member === "responseBody"` ignoring `path` (`evaluate.ts:287,294-296`) → redesign: a distinct node kind (deterministic, because the read intent rides on the node KIND, not a reserved member string, so it can never collide with a member name).** | Redesign output: `{ "kind":"whole-payload","from":{"kind":"payload",…} }` → the entire scope object, returned unwalked. Browser: returns the root payload. | whole-body is an explicit node kind, never a magic member name. |
+| **Read — WHOLE element** | identity `x => x` inside an array op over primitives | Value → `ReadWholeElement()` → a **distinct `WholeElement` node KIND** (redesign). **current: magic member `member:"elementValue"`, discriminated on `expression.member === "elementValue"` (`ValueExpression.cs:380,402-403`; `evaluate.ts:298-300`) → redesign: distinct node kind (deterministic, same reasoning as whole-payload).** | `{ "kind":"whole-element","from":{"kind":"payload","scope":"element"} }`. Browser: returns the current element itself. | element-identity is an explicit node kind. |
 | **Read — DOM member** | `p.FromDom("card","classList")` (array entry) / dom member read | Value → `ValueExpression.ReadDom(id, member, shape)` = `Read(DomSource.Of(id), member, Path.Parse(member), shape)`. ⇒ `readFromDom` → `getElementById(id)` (boundary throw if null) → `RuntimePath.read(element)` | `{ "kind":"read","from":{"kind":"dom","element":"card"},"member":"classList","path":[{"kind":"property","name":"classList"}],"shape":<>,"access":{"kind":"property"} }`. Browser: read member off the DOM element. | member name is stringly at the DOM boundary (like plugin names); id plan-carried (Rule 7). |
 
 ### A.3 — Composite values
@@ -101,13 +101,31 @@ This single template, ×6 sources ×2 accesses, covers the entire read surface.
 | **Object value** | `p.DispatchWith<P>(name, b => b.Set(x=>x.A, src).Set(x=>x.B, "lit"))` | Value → `ValueExpression.Object(fields)`; dotted field paths build a nested object tree (`DispatchPayloadDraft`); object `Shape` is `ObjectOf(field→shape)` derived from each field's `OutputShape` | `{ "kind":"object","fields":{"a":<ValueExpr>,"b":{"kind":"literal",…}},"shape":{"kind":"object","fields":{…},"additional":false} }`. Browser: each field evaluated, assembled into a JS object. | closed object shape; field name conflict (leaf vs parent) → authoring throw. |
 | **Array value (literal items)** | items composed into an array value | Value → `ValueExpression.Array(items)`; if all items share a shape → `array<itemShape>`, else `array<any>` | `{ "kind":"array","items":[<ValueExpr>…],"shape":{"kind":"array","item":{…}} }`. Browser: items evaluated in order into a JS array. | shared item shape when homogeneous, `array<any>` when mixed/empty. |
 
-> **Determinism note (Values):** every readable value funnels through exactly one
-> `ValueExpression` variant and is read back by exactly one `evaluateValue` case.
-> The redesign closes the two representable-but-invalid holes: the
-> `responseBody`/`elementValue` **magic-member sentinels become explicit
-> `WholePayload`/`WholeElement` variants** (a C# generation typo can no longer
-> silently change read semantics), and the gather-source hole closes (A read in
-> a gather flows the same `TypedSource` path — see B.3).
+> **Determinism note (Values) — the sentinel FIX is the headline determinism win
+> of this band.** Every readable value funnels through exactly one `ValueExpression`
+> variant and is read back by exactly one `evaluateValue` case. The redesign closes
+> the two representable-but-invalid holes:
+>
+> 1. **`responseBody`/`elementValue` magic-member sentinels → distinct node KINDS.**
+>    current: whole-payload and whole-element are encoded as the reserved member
+>    strings `member:"responseBody"` / `member:"elementValue"` with `path` forced to
+>    `Path.None` (`ValueExpression.cs:379-380,399-403`), and the runtime
+>    discriminates **only** on `expression.member === "responseBody"` /
+>    `"elementValue"`, ignoring `path` (`evaluate.ts:287,294-300`). This is a
+>    many-to-one input collision: a legal public-DSL read of a response/event/element
+>    property **literally named `ResponseBody`** camelCases to exactly `responseBody`
+>    and the runtime returns the whole object instead of the `.ResponseBody`
+>    sub-field. → redesign: `WholePayload` and `WholeElement` are **separate
+>    `ValueExpression` node kinds** (`kind:"whole-payload"` / `kind:"whole-element"`),
+>    NOT `member="responseBody"` / `member="elementValue"`. Therefore a DSL property
+>    literally named `ResponseBody` lowers to an **ordinary `Read` with
+>    `member:"responseBody"`** that walks the path normally and is **distinct from a
+>    whole-payload read** (deterministic, because read intent rides on the node kind,
+>    not a reserved member string — the current collision at `ValueExpression.cs:379`
+>    and `evaluate.ts:287` is resolved; a C# generation typo can no longer silently
+>    change read semantics).
+> 2. **The gather-source hole closes** — a read in a gather flows the same
+>    `TypedSource` path as every other value (see B.3 and Arrays C.Terminal).
 
 ---
 
@@ -127,7 +145,8 @@ finally → chain`), all `await`ed, REACTION-LANE = async.
 |---|---|---|---|---|
 | **GET** | `p.Get("/api/x")` | Reaction → `ReactionPipelineDraft.BeginHttp` (stamps async lane) → Request → `HttpRequestBuilder.Get` → `RequestEndpoint.To(Get, url)` → `RequestPlan.Create`. ⇒ `http.executeRequest` → `requestPayloadWriterFor` chooses **query-string** writer (`sendsInputInQueryString(GET)=true`) | `{ "kind":"request"(reaction) … "method":"GET","url":"/api/x", … }`. Browser: `fetch(url + ?query, {method:"GET"})`, no body. | body format irrelevant for GET (always query string). |
 | **POST / PUT / DELETE** — *parameterized over P-VERB ≠ GET* | `p.Post("/api/x")` etc. | same path, method token differs. ⇒ writer chooses **body** writer | `…"method":"POST"…`. Browser: `fetch(url, {method, body:<json\|formdata>})`; JSON body sets `Content-Type: application/json`. | body sent only when it has fields (`http-fetch.ts` `bodyHasFields`). |
-| **Inline gather overload** | `p.Post(url, g => g.Include(...))` | `PipelineBuilder.Post(url, gather)` = `.Post(url).Gather(gather)` — pure sugar | identical to POST + a gather input node | — |
+| **Bare PUT** | `p.Put("/api/x")` | **Current** (`PipelineBuilder.Http.cs:11-42`): there is NO bare `Put(url)` on `PipelineBuilder` — the pipeline entries are `Get`/`Post`/`Post(url,gather)`/`Put(url,gather)`/`Delete`; a bare PUT is reachable only as the endpoint selector `HttpRequestBuilder.Put(url)` (`HttpRequestBuilder.cs:42`). **→ Redesign**: a bare `p.Put(url)` pipeline entry exists for verb symmetry (deterministic, because the 4 verbs become one uniform 2-form set — bare + inline-gather — so the generator emits the same two templates per body verb). Path otherwise identical to POST, method token `PUT`. | `…"method":"PUT"…`. Browser: `fetch(url, {method:"PUT", body:<json\|formdata>})`. | restores the GET/POST/PUT/DELETE bare-verb symmetry the matrix's B.1 framing assumes. |
+| **Inline gather overload — POST / PUT** | `p.Post(url, g => g.Include(...))` (`PipelineBuilder.Http.cs:25`) / `p.Put(url, g => g.Include(...))` (`PipelineBuilder.Http.cs:31`) | `PipelineBuilder.Post(url, gather)` = `.Post(url).Gather(gather)`; `PipelineBuilder.Put(url, gather)` = `.Put(url).Gather(gather)` — pure sugar over verb + `.Gather(...)`. **Current**: inline-gather sugar exists for POST and PUT only (`PipelineBuilder.Http.cs:25,31`). **→ Redesign**: extends the inline-gather form to every body verb, pairing with the bare-verb entries above. | identical to the bare verb + a gather input node | inline-gather is the second of the two uniform per-verb templates (bare + inline-gather). |
 
 ### B.2 — Endpoint + URL template
 
@@ -146,6 +165,7 @@ finally → chain`), all `await`ed, REACTION-LANE = async.
 |---|---|---|---|---|
 | **Gather payload — typed component (by expression)** | `g.Include<TComp,TModel>(m => m.Name)` | Request `GatherBuilder.Include` → `IdGenerator.For` (Component module, the one id regime) → `RequestInputAssignment.Payload(BindingPath(prop), Read(ComponentSource, valueMember, shape))`; declares the input on `PlanBuildContext`. ⇒ `gather.resolveGatherRequestInput` → `evaluateValue(source)` → writer | `{ "kind":"gather","assignments":[{"target":{"kind":"payload","name":"name","path":[…]},"source":{"kind":"read",…}}],"bodyFormat":"json","registeredInputs":{"kind":"explicit"} }`. Browser: read component → write into body/query by verb. | param name = property name; component value member read. |
 | **Gather payload — typed component member source** | `g.Include(schedule.CurrentView())` / `…, "as")` | same, source = `TypedComponentSource` (property or method); default param name = the read member (`DefaultPayloadName`) | one payload assignment per source | param = member name unless overridden. |
+| **Gather payload — by-ref display OR input component** | `g.Include<TComp,TModel>(refId, name)` (`GatherExtensions.cs:36`) | Request `GatherExtensions.Include(refId, name)`: reads the named property; when `TComp is IInputComponent` the read member is the input's `ValueMember`, otherwise it is the named property `name` itself (display component) → `self.Include(refId, component.Vendor, name, valueMember)`. ⇒ same gather egress | one payload assignment keyed by `name`; for a display component the runtime reads the **named property** (not a value member). | works for BOTH input and display components: input → `ValueMember`, display → the named property (`GatherExtensions.cs:45-48`). Param key = `name`. |
 | **Gather payload — static literal** | `g.Static("token", "abc")` | `GatherBuilder.Static` → `AddPayload(BindingPath(param), LiteralFromValue(value))` | `…"source":{"kind":"literal",…}`. Browser: constant written to target. | — |
 | **Gather payload — from event arg** | `g.FromEvent(args, e => e.Id, "id")` | `ReadPayload(PayloadSource.Event(), eventPath, Shape.FromClrType(TProp))` | `…"source":{"kind":"read","from":{"kind":"payload","scope":"event"},…}`. Browser: read trigger payload → write. | shape from the event-arg property type. |
 | **Gather payload — from URL query** | `g.FromUrl("page")` / `g.FromUrl<int>("page","p")` / `(…, asParam)` | `RequestInputAssignment.Payload(BindingPath(asParam??param), ReadUrl(param[, shape]))` | payload assignment whose source is a `url` read | param name doubles as payload key unless `asParam` given; default `Shape.String`, typed overload coerces. |
@@ -166,6 +186,8 @@ finally → chain`), all `await`ed, REACTION-LANE = async.
 
 | Feature / variant | Input → resolved value | Module path | Output (browser wire form) | Good default |
 |---|---|---|---|---|
+| **Body format — AsJson (default)** | `.AsJson()` or no call (`HttpRequestBuilder.cs:62`) | Request → `_bodyFormat = RequestBodyFormat.Json`. ⇒ `requestPayloadWriterFor` picks the JSON writer for non-GET verbs | `"bodyFormat":"json"`. Browser: JSON body, `Content-Type: application/json`. | JSON is the default body format when `AsFormData` is not called. |
+| **Body format — AsFormData** | `.AsFormData()` (`HttpRequestBuilder.cs:65`) | Request → `_bodyFormat = RequestBodyFormat.FormData`. ⇒ writer picks the form-data writer for non-GET verbs | `"bodyFormat":"formdata"`. Browser: `FormData` body; `Content-Type` left to the browser. | explicit opt-in; files (`FileList`/`{rawFile}`) also force form-data at the egress boundary. GET ignores `bodyFormat` (always query string). |
 | **Scalar → JSON body** | scalar value, JSON format, non-GET | ⇒ `createJsonBodyWriter.emitScalar` → SHAPE-ONCE `formatForWire` → `jsonBodyValue` (`""`→`null`) → nested `assignJsonBodyValue` by `path` | `{ "<path>": <value> }`; empty string becomes `null`. | cleared field (`""`) → `null` (one named policy). |
 | **Array → JSON body** | array value | ⇒ `emitArray` → reject `File` items → each item `formatForWire(itemShape)` | `{ "<name>": [<item>…] }`. | items shaped by declared item shape. |
 | **Scalar/array → query string (GET)** | any value, GET | ⇒ `createQueryStringWriter` → `encodeURIComponent`; arrays repeat the key; `File` in GET → throw | `?name=a&name=b`. | repeated key per array item. |
@@ -177,8 +199,24 @@ finally → chain`), all `await`ed, REACTION-LANE = async.
 |---|---|---|---|---|
 | **OnSuccess (untyped)** | `r => r.OnSuccess(s => { … })` | Request `ResponseBuilder.OnSuccess` → sub-`ReactionPipelineDraft` → `AddSuccessRoute(reaction, match=Any)`. ⇒ `routeSuccess` → `routeResponseRoutes(success, status)` picks exact-status route else any-status | `"success":[{"match":{"kind":"any"},"reaction":{…}}]`. Browser: on `response.ok`, run reaction in success scope. | match = `any` when no status given. |
 | **OnSuccess<TResponse> (typed body)** | `r => r.OnSuccess<R>((json, s) => …)` | success scope opened with `PayloadContract.ForPayload(R)`; `json.Read(r=>r.X)` → payload read in success scope (VALUE-SPINE) | success route + reads with `from.scope="success"`, typed contract. Browser: body parsed (json/text) → success scope. | typed body provides compile-time paths; runtime still reads JSON. |
-| **OnError (any / by status / typed)** — *parameterized over status* | `r => r.OnError(...)` / `OnError(404, ...)` / `OnError<E>(...)` | `AddErrorRoute(reaction[, statusCode])`; status → `ExactResponseStatusMatch`. ⇒ `routeError` → exact-status route preferred, else any | `"error":[{"match":{"kind":"status","status":404},…}]`. Browser: on `!ok`, match status then any. | match = `any` unless a status is given; first match wins. |
+| **OnError — any-status** | `r => r.OnError(p => …)` (`ResponseBuilder.cs`, no status) | `AddErrorRoute(reaction)` → `match=Any`. ⇒ `routeError` → `routeResponseRoutes` (`http.ts:263`) | `"error":[{"match":{"kind":"any"},"reaction":{…}}]`. Browser: runs only when no exact-status error route matches the response status (see routing rule below). | match = `any`. |
+| **OnError — by status** | `r => r.OnError(404, p => …)` (`ResponseBuilder.cs:67`) | `AddErrorRoute(statusCode, reaction)`; status → `ExactResponseStatusMatch`. ⇒ same `routeResponseRoutes` | `"error":[{"match":{"kind":"status","status":404},…}]`. Browser: runs when the response status equals 404 (preferred over any any-status route). | exact status match. |
+| **OnError<TError> — typed body, any-status** | `r => r.OnError<E>((err, p) => …)` (`ResponseBuilder.cs:79`) | error scope opened with `PayloadContract.ForPayload(E)`; `match=Any`. Body reads via VALUE-SPINE in error scope. | typed any-status error route; reads with `from.scope="error"`. Browser: typed error body, any-status routing. | typed body, match = `any`. |
+| **OnError<TError> — typed body, by status (4th overload)** | `r => r.OnError<E>(404, (err, p) => …)` (`ResponseBuilder.cs:96`) | `AddErrorRoute(statusCode, reaction)` with an error scope opened from `PayloadContract.ForPayload(E)` AND `ExactResponseStatusMatch(404)` — the typed-body × exact-status combination. ⇒ same `routeResponseRoutes` | `"error":[{"match":{"kind":"status","status":404},"reaction":{…with from.scope="error"…}}]`. Browser: runs when status equals 404, with the typed error body parsed into the error scope. | typed body + exact status; this is the 4th `OnError` overload (`ResponseBuilder.cs:96`), distinct from the typed any-status form. |
 | **Response unavailable (network failure)** | (no DSL — runtime path) | ⇒ `exchangeOutcomeFromClientFailure` → `routeResponseUnavailable` → only the **any-status** error route runs (no body) | runs the any-status error reaction; never a success route. | network failure routes to any-error only; finally still runs. |
+
+> **Response-route selection rule (deterministic; the redesign keeps it).**
+> Both success and error routing run through the one `routeResponseRoutes`
+> function (`runtime/execution/http.ts:263`), which is
+> `routes.find(routeMatchesStatus(status)) ?? routes.find(routeMatchesAnyStatus)`.
+> The rule is **exact-status-preferred, then first any-status** — NOT positional
+> first-match. For a given response status the runtime first looks for a route
+> whose `match` is an exact status equal to the response status; only if none
+> matches does it fall back to the **first** any-status route. So an any-status
+> `OnError(p => …)` authored *before* an `OnError(404, …)` still **loses** to the
+> 404 route on a 404 response, and wins only when no exact-status route matches.
+> (The earlier "first match wins" phrasing was wrong against
+> `http.ts:263` — that would imply authored order decides, which it does not.)
 
 ### B.6 — Loading / finally
 
@@ -195,11 +233,23 @@ finally → chain`), all `await`ed, REACTION-LANE = async.
 | **Chained** | `r.Chained(req => req.Get("/next/{id}").Gather(g => g.RouteParam("id", json.Read(...))))` | Request `ResponseBuilder.Chained` → builds a full child `RequestPlan` → `ResponseRouting.Chain = FollowUpRequestChain(next)`. ⇒ `runFollowUpRequest` runs the next request **only after success**, in the success/response context (can gather from the prior body) | `"chain":{"kind":"follow-up","next":{…full request…}}`. Browser: success → run next request; the next may read the prior response. | terminal (`{"kind":"terminal"}`) when no `Chained`. Chain fires on success only. |
 | **Parallel** | `p.Parallel(b1 => b1.Get(...), b2 => b2.Post(...)).OnAllSettled(p => …)` | Reaction → `ReactionPipelineDraft.BeginParallel` (async lane) → `ParallelBuilder.AddBranch` builds each `RequestPlan` → `ParallelDraft.ToReaction`. ⇒ branches started concurrently (`Promise.all`), completion runs after **all settle** | a `parallel` reaction node carrying branch requests + an `onAllSettled` reaction. Browser: all branches fire concurrently; completion runs once all settle (success or error). | no completion reaction if `OnAllSettled` not called; all branches always started. |
 
+### B.8 — Inject success body (`Into` — the only string-shaped success-body sink)
+
+`Into(elementId)` follows a request and injects the **whole success body** into an
+element's `innerHTML`. Its value is fixed (no value axis — see the triggers file
+inject row); the only determinism question is the **shape** of that value.
+
+| Feature / variant | Input (DSL) | Module path | Output (plan JSON + browser behavior) | Good default |
+|---|---|---|---|---|
+| **Inject — success body is string-shaped** | `p.Get("/card").Into("card-host")` | Request success scope → `Into` builds `value = ReadWholePayload(Success)` and emits `ReactionGraph.Inject(slot, value)` (SYNC, within the awaited request's success scope). ⇒ `executeInject` (`execute.ts:207-218`): `evaluateValue(reaction.value)`; if `typeof value === "string"` → `injectHtml(container, value, slot)` (`execute.ts:210-213`); otherwise `log.error("inject.wrong-type")` then **throws** `[alis] inject expects string HTML, got <type>` (`execute.ts:216-217`) | **Current** (`ValueExpression.cs:379,399-400`; `runtime/types/plan.ts:783-786`): `{ "kind":"inject","slot":"card-host","value":{"kind":"read","from":{"kind":"payload","scope":"success"},"member":"responseBody","path":null} }` — the magic-member sentinel (see Values determinism note). **→ Redesign** (distinct node kind, identical to the triggers-file inject row and the Part A whole-payload shape at line 93): `{ "kind":"inject","slot":"card-host","value":{"kind":"whole-payload","from":{"kind":"payload","scope":"success"}} }`. Browser (both): when the success body is a string (HTML/text response) the element's `innerHTML` is replaced; when the success body parsed to a non-string (a JSON object/array — `application/json` response) the inject **throws a typed shape error at the egress boundary** (`execute.ts:216-217`), it does NOT silently inject `[object Object]`. | inject's value is **string-shaped**: the value axis is fixed (always the whole success body), so the only determinism question is shape. A non-string evaluated value is a typed/shape boundary error, not silent coercion. The deterministic contract is "this endpoint must return an HTML/text body"; a JSON body is a developer/endpoint mismatch surfaced at the boundary — the *same category* as `getElementById` returning null, not a plan-validator. |
+
 > **Determinism note (HTTP):** the request graph is fully decided at authoring —
 > verb, URL, every gather assignment, every response route + its status match,
 > the chain, the parallel branches, validation target, loading/finally. The
 > runtime walks a fixed pipeline (`gather → fetch → route → finally → chain`)
-> with **first-match** status routing and **only** the documented async lane. The
+> with **exact-status-preferred-then-first-any** status routing
+> (`routeResponseRoutes`, `http.ts:263` = `find(exactStatus) ?? find(anyStatus)`)
+> and **only** the documented async lane. The
 > redesign folds the 7-scope-onto-3-field `PayloadScope` to the scopes that
 > actually carry data (drops the dead `local`), and consolidates all FormData/File
 > body knowledge into the one `RequestPayloadWriter`.
@@ -237,7 +287,9 @@ uses) instead of one node with nullable+`[JsonIgnore]` predicate/projection pair
 | **count (predicated)** | `.Count(x => x.Active)` | `Where(pred).Count()` — compiles to **filter → count** (count never carries a predicate) | a `filter` array-op feeding a `count` array-op. Browser: filtered length. | predicated count is sugar over filter+count. |
 | **filter** | `.Where(x => x.Active)` | Value → `ArrayFilter(source, ConditionGraph predicate, itemShape)` (predicate = sync condition subset compiled by `ElementExpressionCompiler`) → out `array<itemShape>`. ⇒ engine `filter` → `items.filter(elementMatches(predicate))` | `{ "op":"filter","predicate":<ConditionGraph>,"shape":{"kind":"array","item":<itemShape>} }`. Browser: kept elements, shaped. | predicate evaluated per element on the immediate/sync lane (never confirm). |
 | **map** | `.Select(x => x.Name)` | `ArrayMap(source, projection, itemShape, resultItemShape=FromClrType(TResult))` → out `array<resultItem>`. ⇒ engine `map` → `items.map(project(projection))` | `{ "op":"map","projection":<ValueExpr>,"shape":{"kind":"array","item":<result>} }`. Browser: projected array. | result element type from `TResult`. |
-| **sum** | `.Sum(x => x.Amount)` (int/decimal/double) | `ArraySum(source, projection, itemShape)` → out `Shape.Number`; `ReactiveValue<int\|decimal\|double>`. ⇒ engine `sum` → `reduce(total + toNumber(projectedOrSelf))` | `{ "op":"sum","projection":<ValueExpr>,"shape":{"kind":"number"} }`. Browser: numeric sum; non-finite contributes 0. | projection optional (sum of elements themselves if absent). |
+| **sum — int selector** | `.Sum(x => x.Count)` (`ReactiveArray.cs:90`) | `ArraySum(source, Projection(selector), itemShape)` → out `Shape.Number`; result `ReactiveValue<int>`. ⇒ engine `sum` → `reduce(total + toNumber(projectedOrSelf))` | `{ "op":"sum","projection":<ValueExpr>,"shape":{"kind":"number"} }`. Browser: numeric sum; non-finite contributes 0. | int selector → `ReactiveValue<int>`. One `sum` op node — the three numeric overloads differ only in the C# CLR return type, not the wire node. |
+| **sum — decimal selector** | `.Sum(x => x.Amount)` (`ReactiveArray.cs:94`) | `ArraySum(source, Projection(selector), itemShape)` → out `Shape.Number`; result `ReactiveValue<decimal>`. ⇒ same engine `sum` | `{ "op":"sum","projection":<ValueExpr>,"shape":{"kind":"number"} }`. Browser: numeric sum. | decimal selector → `ReactiveValue<decimal>`; same `sum` node shape. |
+| **sum — double selector** | `.Sum(x => x.Weight)` (`ReactiveArray.cs:98`) | `ArraySum(source, Projection(selector), itemShape)` → out `Shape.Number`; result `ReactiveValue<double>`. ⇒ same engine `sum` | `{ "op":"sum","projection":<ValueExpr>,"shape":{"kind":"number"} }`. Browser: numeric sum. | double selector → `ReactiveValue<double>`; same `sum` node shape. The three rows share one node — the generator emits one `sum` template; the CLR return type only types the terminal `ReactiveValue<T>`. |
 | **any (unconditional)** | `.Any()` | `ArrayAny(source, predicate:null, itemShape)` → `Shape.Boolean`. ⇒ engine `any` (predicate undefined) → `items.length > 0` | `{ "op":"any","shape":{"kind":"boolean"} }` (no predicate). Browser: non-empty? | no predicate → "is non-empty". |
 | **any (predicated)** | `.Any(x => x.Active)` | `ArrayAny(source, predicate, itemShape)`. ⇒ `items.some(elementMatches)` | `{ "op":"any","predicate":<ConditionGraph>,… }`. Browser: any match? | — |
 | **all** | `.All(x => x.Valid)` | `ArrayAll(source, predicate, itemShape)` → `Shape.Boolean`. ⇒ `items.every(elementMatches)` | `{ "op":"all","predicate":<ConditionGraph>,"shape":{"kind":"boolean"} }`. Browser: every match? (vacuously true on empty). | predicate required. |
@@ -282,7 +334,9 @@ the point: the matrix is the generator spec.
   format** — each assignment is `(target, value)` where `value` is any Values
   case, so the gather product is `4 targets × 15 value cases × 4 verbs`.
 - **Response routes** scale on **status code × scope** (any-status + N exact
-  statuses × success/error) — one route template, first-match routing.
+  statuses × success/error) — one route template, **exact-status-preferred-then-first-any**
+  routing (`routeResponseRoutes`, `http.ts:263` = `find(exactStatus) ?? find(anyStatus)`),
+  NOT positional first-match.
 - **Arrays** scale on **P-ENTRY × P-OP × element type** and **composition depth**
   (any op's `source` is any prior op or any array-shaped Values case), so chains
   are the free monoid over the 8 ops.

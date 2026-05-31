@@ -1,5 +1,98 @@
 # Determinism Confidence — Honest Coverage vs the 100% Claim
 
+> ## ROUND-1 RE-VERIFY (2026-05-31) — recomputed after the matrix/proof fixes
+>
+> The matrix files (`04-matrix-*.md`) and `05-determinism-proof.md` were revised
+> after this document's first pass. This section is an **independent re-census +
+> adversary re-run** against the revised docs AND the actual source. It supersedes
+> the per-band numbers below where they differ; the older analysis is kept for
+> provenance.
+>
+> **Re-verified headline (per-overload authoring variant): 371 / 374 = 99.2%.**
+> Independently confirmed against source. The only **3** uncovered authoring
+> variants are dead public enums with **zero `.cs` consumers** (verified by
+> `find … -name '*.cs' | xargs grep -wn`, empty result outside their own
+> definition files):
+> - `DrawerPosition` (`Alis.Reactive.Native/AppLevel/NativeDrawer/DrawerPosition.cs:6`)
+> - `ToastType` (`Alis.Reactive.Fusion/AppLevel/FusionToast/ToastType.cs:6`)
+> - `ToastPosition` (`Alis.Reactive.Fusion/AppLevel/FusionToast/ToastPosition.cs:6`)
+>
+> Toast type methods are **parameterless** (`FusionToastExtensions.cs:68-86`:
+> `Success() => EmitSet(CssClassProperty, Literal("e-toast-success"))`), so the
+> enums have no authoring producer. The redesign **deletes** them; correctly
+> excluded from the 371 covered. There are **no** uncovered authoring variants
+> with a live producer.
+>
+> **Determinism = FALSE (current source). realConfidence = FALSE.** Re-verified
+> root cause, unchanged from the first pass and still **unfixed in source**:
+>
+> - **Finding A — live `responseBody`/`elementValue` magic-member collision.**
+>   `ValueExpression.cs:379-380` (`WholePayloadMember="responseBody"`,
+>   `WholeElementMember="elementValue"`) and `:399-403` stamp those members with
+>   `Path.None`. `plan.ts:783-799` ships the sentinel with **no `whole` field**.
+>   `evaluate.ts:294-300` (`readsWholePayload`/`readsWholeElement`) discriminates
+>   **only** on `member === "responseBody"`/`"elementValue"`, **ignoring `path`**.
+>   `ExpressionPathHelper.cs:272-276` (`CamelCase`) maps `"ResponseBody"` →
+>   `"responseBody"` exactly, so a DSL path read of a property literally named
+>   `ResponseBody` collapses to the whole-payload read — **two distinct DSL inputs
+>   → one wire member → one runtime behavior**. No analyzer/guard exists. The
+>   redesign target (distinct `kind:"whole-payload"`/`"whole-element"` nodes) IS
+>   deterministic, but the collision is **present in shipped source**. This single
+>   live many-to-one collision forbids `deterministic=true` and
+>   `realConfidence=true` for current source.
+>
+> **Adversary re-run: the 5 Finding-B contradictions are now FIXED and source-grounded.**
+> - **B1** single-command sequence-wrap — `04-matrix-triggers-…:136` now states
+>   the reaction is *always* sequence-wrapped, not a bare node
+>   (`ReactionPipelineDraft.cs:52-58,82-88`). ✔
+> - **B2** inject whole-payload — both matrix files now agree on the redesign
+>   `whole-payload` node kind; the triggers file explicitly says "not a
+>   `whole:true` boolean" (`04-matrix-triggers-…:219,230`;
+>   `04-matrix-http-…:93,244`). No `whole:true` asserted as shipped. ✔
+> - **B3** OnError — `04-matrix-http-…:212` now reads "exact-status-preferred,
+>   then first any-status — NOT positional first-match" and notes the prior
+>   wording was wrong (`http.ts:263`). ✔
+> - **B4** inject string-only boundary throw — documented at
+>   `04-matrix-http-…:244` (`execute.ts:207-218`). ✔
+> - **B5** Confirm evaluates first — `04-matrix-triggers-…:381` corrects the
+>   impossible short-circuit (`GuardBuilder.cs:81-85`; `conditions.ts:62-72`). ✔
+> - **Band E hallucination cured.** No `p.Drawer()/p.Toast(ToastType,…)` verbs
+>   asserted; access is `Component<T>()` + ComponentRef extensions. No remaining
+>   hallucinated/unverifiable row found.
+>
+> **Residual gaps (do NOT create uncovered variants; do block a clean 100%):**
+> 1. **Live collision (Finding A) unfixed in source** — the sole blocker for
+>    `deterministic`/`realConfidence`.
+> 2. **`Shape.FromValue` matrix row under-documents the arbitrary-value path.**
+>    `04-matrix-http-…:77` ("Literal — arbitrary value") summarizes only
+>    "enum/Guid → string; collection → array; else any". Source `Shape.cs:74-118`
+>    also yields `DateTime/DateTimeOffset/DateOnly → Date` (`:80`),
+>    `Guid/TimeSpan/TimeOnly → String` (`:82`), `Nullable<T> → Nullable(inner)`
+>    (`:74-76`). The complete table lives only in `05` Fix 2. Narrow: the typed
+>    "Literal — scalar" row (`:75`) does cover `DateTime → Date`, so egress is
+>    correct for the typed path; only the arbitrary-value (boxed `object`) row is
+>    incomplete in the matrix.
+> 3. **Cosmetic count slip (no coverage impact).** `04-matrix-triggers-…:393`
+>    band header labels the trigger sub-band "11" while its enumerated list has 10
+>    items; the proof per-area table (`05:321`) correctly says 10/10 (source: 8
+>    public `TriggerBuilder` methods + component-event seam + multiple-triggers).
+>    Recommend changing 11 → 10.
+> 4. **Hand-tally noise in per-area counts (no coverage impact).** Independent
+>    recount: `ClientValidationFieldRuleBuilder` = 31 public methods (proof A1
+>    says 27); these map to existing RuleName+operand rows, so coverage is
+>    unaffected. The 371/374 headline is reproducible because validation/plugins
+>    are counted by rowed families, not raw method count.
+>
+> **Verdict (round 1):** `totalVariants=374`, `coveredVariants=371`,
+> `realCoveragePct=99.2`, `deterministic=false`, `realConfidence=false`. The
+> matrix/proof are now an honest, source-grounded, near-complete per-overload
+> generator spec (99.2%) that correctly labels every current-vs-redesign delta.
+> `realConfidence` stays **false** for exactly one reason: the redesign's
+> headline determinism fix (Fix 1, the whole-payload/whole-element node kinds) is
+> **not yet built in source**, so the live magic-member collision still exists.
+>
+> ---
+
 > **Purpose.** `05-determinism-proof.md` asserts **120/120 = 100% deterministic
 > coverage of the public DSL, 0 non-deterministic, 0 gaps**. This document does
 > not trust that headline. It consolidates a code-grounded variant census (every
