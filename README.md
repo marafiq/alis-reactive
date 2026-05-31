@@ -13,7 +13,10 @@ Plan-driven reactive framework for ASP.NET MVC. C# fluent builders produce JSON 
 | `Alis.Reactive.DesignSystem` | Design-system tokens, layout helpers, and stylesheet |
 | `Alis.Reactive.NativeTagHelpers` | ASP.NET Core Tag Helpers for native components |
 
-All library packages target `net10.0`.
+`Alis.Reactive`, `Alis.Reactive.Native`, `Alis.Reactive.FluentValidator`, and
+`Alis.Reactive.DesignSystem` multi-target **`net48` and `net10.0`** — the *same* DSL on both
+runtimes (bridged by `#if` shims, never a divergent API). `Alis.Reactive.Fusion` and
+`Alis.Reactive.NativeTagHelpers` are **`net10.0`-only**.
 
 ## Getting Started
 
@@ -33,6 +36,20 @@ Open **http://localhost:5220** — the sandbox home page is the index of compone
 Order matters: the sandbox serves the bundles produced by `build:all` and
 refuses to start without them. If you skip step 2, startup throws with a
 message telling you to run `npm run build:all`.
+
+### One-shot scripts
+
+`scripts/` wraps the canonical commands so you do not have to remember the order:
+
+| Script | What it does |
+|--------|--------------|
+| `scripts/build.sh` | JS deps (if missing) → framework bundles → both-TFM C# build |
+| `scripts/run.sh` | bundles → start the sandbox at `http://localhost:5220` |
+| `scripts/test.sh` | full gate: vitest → both-TFM build → contract drift typecheck → Playwright (`--no-e2e` skips the browser leg) |
+| `scripts/pack.sh <version>` | delivery: bundles → Release build → pack the six library NuGets to `./nupkgs` |
+
+Each script is a thin, order-correct wrapper over the commands documented in
+**[CLAUDE.md → Build & Run](CLAUDE.md#build--run)** — no hidden behavior.
 
 ## Developing
 
@@ -60,6 +77,52 @@ bundle output path is gitignored — `git status` stays clean after a build.
 | **Sandbox** | `SandboxApp/Program.cs` serves `Alis.Reactive.Assets/dist/` directly via a `CompositeFileProvider` — no copy into `wwwroot/` |
 | **NuGet** | Each asset-bearing csproj packs its bundle from `Alis.Reactive.Assets/dist/` — `AlisReactive` the runtime JS, `AlisReactive.DesignSystem` the design-system CSS, `AlisReactive.Fusion` the Syncfusion CSS. `dotnet pack` never runs npm |
 | **Example app** (`examples/resident-intake/`) | Uses local project references so solution builds exercise the current source contract |
+
+## For UI developers — the design system
+
+Bringing the design system into a consuming app is four steps; you do **not** need to
+touch the framework internals.
+
+1. **Reference the package.** Add `AlisReactive.DesignSystem`. On build, the shipped
+   `AlisReactive.targets` copies `design-system.<version>.css` into your app's
+   `wwwroot/css/` (the version is baked into the filename). Add `AlisReactive.Fusion`
+   too if you use Syncfusion components — it ships `syncfusion.<version>.css` the same way.
+
+2. **Link the stylesheet and mark the root** in `_Layout.cshtml` — exactly as the
+   example app and sandbox do:
+
+   ```html
+   <link rel="stylesheet" href="~/css/design-system.1.0.0-preview.2.css" asp-append-version="true"/>
+   <link rel="stylesheet" href="~/css/syncfusion.1.0.0-preview.2.css" asp-append-version="true"/>  <!-- if using Fusion -->
+   ...
+   <body class="alis-root h-full">   <!-- the design system is scoped under .alis-root -->
+   ```
+
+   The design system expects the **`alis-root`** class on the element wrapping your
+   content; styles are scoped to it so they never leak into the rest of the host app.
+   (The Inter web font is the design default — see the example `_Layout` for the
+   `preconnect`/`font` links.)
+
+3. **Build class strings from C#, not by hand.** `Alis.Reactive.DesignSystem` exposes
+   small static layout helpers that return the right scoped classes for the current
+   tokens — so spacing, elevation, and color stay consistent without memorizing utility
+   names. Each takes typed token enums:
+
+   | Helper (in `DesignSystem/Layout`) | Returns classes for | Example tokens |
+   |---|---|---|
+   | `CardCss`, `ContainerCss`, `DividerCss` | cards, page containers, dividers | `CardElevation`, `CardPadding`, `CardDivider` |
+   | `GridCss`, `HStackCss`, `VStackCss` | grid + flex stacks | `GridCols`, `JustifyContent`, `AlignItems`, `SpacingScale` |
+   | `HeadingCss`, `TextCss`, `KvCss` | headings, body text, key/value rows | `HeadingLevel`, `TextSize`, `TextColor`, `AccentColor` |
+
+   ```razor
+   <div class="@CardCss.CardClasses(CardElevation.Low)">
+     <div class="@CardCss.BodyClasses(CardPadding.Standard)">…</div>
+   </div>
+   ```
+
+4. **Go deeper** in the docs site (`docs-site/`) and the
+   `Alis.Reactive.DesignSystem/Layout` + `Tokens` source — the enums there are the full,
+   typed vocabulary; there is no untyped string surface to discover.
 
 ## Repo Layout
 
