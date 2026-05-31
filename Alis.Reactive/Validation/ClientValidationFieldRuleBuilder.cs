@@ -25,33 +25,33 @@ namespace Alis.Reactive.Validation
         }
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> Required(string message) =>
-            AddNoOperand(ValidationRuleName.Required, message);
+            AddNoOperand(RuleName.Required, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> Empty(string message) =>
-            AddNoOperand(ValidationRuleName.Empty, message);
+            AddNoOperand(RuleName.Empty, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> Email(string message) =>
-            AddNoOperand(ValidationRuleName.Email, message);
+            AddNoOperand(RuleName.Email, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> Url(string message) =>
-            AddNoOperand(ValidationRuleName.Url, message);
+            AddNoOperand(RuleName.Url, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> CreditCard(string message) =>
-            AddNoOperand(ValidationRuleName.CreditCard, message);
+            AddNoOperand(RuleName.CreditCard, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> AtLeastOne(string message) =>
-            AddNoOperand(ValidationRuleName.AtLeastOne, message);
+            AddNoOperand(RuleName.AtLeastOne, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> MinLength(int length, string message)
         {
             if (length < 0) throw new ArgumentOutOfRangeException(nameof(length), "Minimum length must not be negative.");
-            return AddLiteral(ValidationRuleName.MinLength, length, Shape.None, message);
+            return AddLiteral(RuleName.MinLength, length, Shape.None, message);
         }
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> MaxLength(int length, string message)
         {
             if (length < 0) throw new ArgumentOutOfRangeException(nameof(length), "Maximum length must not be negative.");
-            return AddLiteral(ValidationRuleName.MaxLength, length, Shape.None, message);
+            return AddLiteral(RuleName.MaxLength, length, Shape.None, message);
         }
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> Regex(string pattern, string message)
@@ -59,41 +59,41 @@ namespace Alis.Reactive.Validation
             if (string.IsNullOrEmpty(pattern))
                 throw new ArgumentException("A regex pattern is required for a client validation rule.", nameof(pattern));
 
-            return AddLiteral(ValidationRuleName.Regex, pattern, Shape.None, message);
+            return AddLiteral(RuleName.Regex, pattern, Shape.None, message);
         }
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> Range(
             TValue lowerBound,
             TValue upperBound,
             string message) =>
-            AddRange(ValidationRuleName.Range, lowerBound, upperBound, message);
+            AddRange(RuleName.Range, lowerBound, upperBound, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> ExclusiveRange(
             TValue lowerBound,
             TValue upperBound,
             string message) =>
-            AddRange(ValidationRuleName.ExclusiveRange, lowerBound, upperBound, message);
+            AddRange(RuleName.ExclusiveRange, lowerBound, upperBound, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> Min(TValue minimum, string message) =>
-            AddLiteralComparison(ValidationRuleName.Min, minimum, message);
+            AddLiteralComparison(RuleName.Min, minimum, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> Max(TValue maximum, string message) =>
-            AddLiteralComparison(ValidationRuleName.Max, maximum, message);
+            AddLiteralComparison(RuleName.Max, maximum, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThanOrEqualTo(TValue minimum, string message) =>
-            AddLiteralComparison(ValidationRuleName.Min, minimum, message);
+            AddLiteralComparison(RuleName.Min, minimum, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> LessThanOrEqualTo(TValue maximum, string message) =>
-            AddLiteralComparison(ValidationRuleName.Max, maximum, message);
+            AddLiteralComparison(RuleName.Max, maximum, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThan(TValue value, string message) =>
-            AddLiteralComparison(ValidationRuleName.Gt, value, message);
+            AddLiteralComparison(RuleName.Gt, value, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> LessThan(TValue value, string message) =>
-            AddLiteralComparison(ValidationRuleName.Lt, value, message);
+            AddLiteralComparison(RuleName.Lt, value, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> EqualTo(TValue expected, string message) =>
-            AddLiteralComparison(ValidationRuleName.EqualTo, expected, message);
+            AddLiteralComparison(RuleName.EqualTo, expected, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> EqualTo(
             Expression<Func<TModel, TValue>> peerField,
@@ -103,10 +103,10 @@ namespace Alis.Reactive.Validation
         public ClientValidationFieldRuleBuilder<TModel, TValue> EqualTo(
             ClientValidationFieldToken<TModel, TValue> peerField,
             string message) =>
-            AddPeerComparison(ValidationRuleName.EqualTo, peerField, message);
+            AddPeerComparison(RuleName.EqualTo, peerField, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> NotEqual(TValue forbidden, string message) =>
-            AddLiteralComparison(ValidationRuleName.NotEqual, forbidden, message);
+            AddLiteralComparison(RuleName.NotEqual, forbidden, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> NotEqualTo(
             Expression<Func<TModel, TValue>> peerField,
@@ -116,7 +116,7 @@ namespace Alis.Reactive.Validation
         public ClientValidationFieldRuleBuilder<TModel, TValue> NotEqualTo(
             ClientValidationFieldToken<TModel, TValue> peerField,
             string message) =>
-            AddPeerComparison(ValidationRuleName.NotEqualTo, peerField, message);
+            AddPeerComparison(RuleName.NotEqualTo, peerField, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThan(
             Expression<Func<TModel, TValue>> peerField,
@@ -126,7 +126,7 @@ namespace Alis.Reactive.Validation
         public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThan(
             ClientValidationFieldToken<TModel, TValue> peerField,
             string message) =>
-            AddPeerComparison(ValidationRuleName.Gt, peerField, message);
+            AddPeerComparison(RuleName.Gt, peerField, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThanOrEqualTo(
             Expression<Func<TModel, TValue>> peerField,
@@ -136,7 +136,7 @@ namespace Alis.Reactive.Validation
         public ClientValidationFieldRuleBuilder<TModel, TValue> GreaterThanOrEqualTo(
             ClientValidationFieldToken<TModel, TValue> peerField,
             string message) =>
-            AddPeerComparison(ValidationRuleName.Min, peerField, message);
+            AddPeerComparison(RuleName.Min, peerField, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> LessThan(
             Expression<Func<TModel, TValue>> peerField,
@@ -146,7 +146,7 @@ namespace Alis.Reactive.Validation
         public ClientValidationFieldRuleBuilder<TModel, TValue> LessThan(
             ClientValidationFieldToken<TModel, TValue> peerField,
             string message) =>
-            AddPeerComparison(ValidationRuleName.Lt, peerField, message);
+            AddPeerComparison(RuleName.Lt, peerField, message);
 
         public ClientValidationFieldRuleBuilder<TModel, TValue> LessThanOrEqualTo(
             Expression<Func<TModel, TValue>> peerField,
@@ -156,19 +156,19 @@ namespace Alis.Reactive.Validation
         public ClientValidationFieldRuleBuilder<TModel, TValue> LessThanOrEqualTo(
             ClientValidationFieldToken<TModel, TValue> peerField,
             string message) =>
-            AddPeerComparison(ValidationRuleName.Max, peerField, message);
+            AddPeerComparison(RuleName.Max, peerField, message);
 
         private ClientValidationFieldRuleBuilder<TModel, TValue> AddNoOperand(
-            ValidationRuleName name,
+            RuleName name,
             string message) =>
             AddRule(
                 name,
                 message,
-                ValidationRuleOperand.None,
+                RuleOperand.None,
                 Shape.None);
 
         private ClientValidationFieldRuleBuilder<TModel, TValue> AddLiteralComparison(
-            ValidationRuleName name,
+            RuleName name,
             TValue value,
             string message)
         {
@@ -177,18 +177,18 @@ namespace Alis.Reactive.Validation
         }
 
         private ClientValidationFieldRuleBuilder<TModel, TValue> AddLiteral(
-            ValidationRuleName name,
+            RuleName name,
             object? value,
             Shape shape,
             string message) =>
             AddRule(
                 name,
                 message,
-                ValidationRuleOperand.Literal(value, shape),
+                RuleOperand.Literal(value, shape),
                 shape);
 
         private ClientValidationFieldRuleBuilder<TModel, TValue> AddRange(
-            ValidationRuleName name,
+            RuleName name,
             TValue lowerBound,
             TValue upperBound,
             string message)
@@ -197,12 +197,12 @@ namespace Alis.Reactive.Validation
             return AddRule(
                 name,
                 message,
-                ValidationRuleOperand.Range(bounds),
+                RuleOperand.Range(bounds),
                 bounds.Shape);
         }
 
         private ClientValidationFieldRuleBuilder<TModel, TValue> AddPeerComparison(
-            ValidationRuleName name,
+            RuleName name,
             ClientValidationFieldToken<TModel, TValue> peerField,
             string message)
         {
@@ -212,16 +212,16 @@ namespace Alis.Reactive.Validation
             return AddRule(
                 name,
                 message,
-                ValidationRuleOperand.PeerField(
+                RuleOperand.PeerField(
                     peerField.Reference.Path,
                     peerField.Reference.Shape),
                 peerField.Reference.Shape);
         }
 
         private ClientValidationFieldRuleBuilder<TModel, TValue> AddRule(
-            ValidationRuleName name,
+            RuleName name,
             string message,
-            ValidationRuleOperand operand,
+            RuleOperand operand,
             Shape shape)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
@@ -230,7 +230,7 @@ namespace Alis.Reactive.Validation
 
             _rules.AddRule(
                 _field.Reference,
-                new ValidationRule(name, ValidationMessage.Of(message), operand, _activation, shape));
+                new ClientRule(name, ValidationMessage.Of(message), operand, _activation, shape));
             return this;
         }
     }

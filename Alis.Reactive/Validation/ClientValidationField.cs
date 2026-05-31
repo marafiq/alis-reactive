@@ -15,12 +15,12 @@ namespace Alis.Reactive.Validation
         private readonly ClientValidationFieldReference _field;
 
         public string FieldName => _field.Path.Value;
-        public IReadOnlyList<ValidationRule> Rules { get; }
+        internal IReadOnlyList<ClientRule> Rules { get; }
         internal IReadOnlyList<ClientValidationField> ItemFields { get; }
 
         internal ClientValidationField(
             ClientValidationFieldReference field,
-            IEnumerable<ValidationRule> rules,
+            IEnumerable<ClientRule> rules,
             IEnumerable<ClientValidationField>? itemFields = null)
         {
             _field = field;

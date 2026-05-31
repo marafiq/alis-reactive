@@ -27,7 +27,7 @@ namespace Alis.Reactive.Validation
             _fields.Add(field.Path.Value, new ClientValidationRuleSetField(field));
         }
 
-        internal void AddRule(ClientValidationFieldReference field, ValidationRule rule)
+        internal void AddRule(ClientValidationFieldReference field, ClientRule rule)
         {
             EnsureFields(rule.PeerFieldReferences);
             EnsureField(field);
@@ -36,12 +36,12 @@ namespace Alis.Reactive.Validation
 
         internal void AddRule(
             ClientValidationFieldReference field,
-            ValidationRuleName name,
+            RuleName name,
             ValidationMessage message,
-            ValidationRuleOperand operand,
+            RuleOperand operand,
             ClientRuleActivation activation,
             Shape shape) =>
-            AddRule(field, new ValidationRule(name, message, operand, activation, shape));
+            AddRule(field, new ClientRule(name, message, operand, activation, shape));
 
         internal void AddItemFields(
             ClientValidationFieldReference collection,
@@ -77,7 +77,7 @@ namespace Alis.Reactive.Validation
     internal sealed class ClientValidationRuleSetField
     {
         private readonly ClientValidationFieldReference _field;
-        private readonly List<ValidationRule> _rules = new List<ValidationRule>();
+        private readonly List<ClientRule> _rules = new List<ClientRule>();
         private readonly List<ClientValidationField> _itemFields = new List<ClientValidationField>();
 
         internal ClientValidationRuleSetField(ClientValidationFieldReference field)
@@ -95,7 +95,7 @@ namespace Alis.Reactive.Validation
             }
         }
 
-        internal void AddRule(ValidationRule rule)
+        internal void AddRule(ClientRule rule)
         {
             _rules.Add(rule);
         }

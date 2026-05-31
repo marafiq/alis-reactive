@@ -151,7 +151,7 @@ namespace Alis.Reactive.PlanModel
                 .Requires("serverFieldName", "string")
                 .Requires("rules", "ValidationRule[]"));
 
-            contract.Declare(LiteralUnion("ValidationRuleName", ValidationRuleName.Values));
+            contract.Declare(LiteralUnion("ValidationRuleName", RuleName.Values));
 
             contract.Declare(Union(
                 "ValidationRule",
