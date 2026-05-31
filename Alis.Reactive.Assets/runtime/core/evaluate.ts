@@ -16,7 +16,7 @@ import { RuntimeValue, applyShapeWhenPresent } from "../domain/runtime-value";
 import { RuntimePath } from "../domain/runtime-path";
 import { ExecutionContext } from "../domain/execution-context";
 import { RuntimeObject } from "../domain/runtime-object";
-import { evaluateSyncCondition } from "../conditions/sync-condition";
+import { evaluateSyncCondition } from "../conditions/compare-engine";
 import { runArrayOp } from "../value/array-op-engine";
 
 type ObjectReadExpression = ObjectPropertyReadExpression | ObjectMethodReadExpression;

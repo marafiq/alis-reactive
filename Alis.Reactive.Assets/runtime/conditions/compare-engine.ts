@@ -1,4 +1,4 @@
-// conditions/sync-condition.ts — pure SYNC condition evaluation (compare/all/any/not).
+// conditions/compare-engine.ts — pure SYNC condition evaluation (compare/all/any/not).
 //
 // Leaf module: it receives the value-evaluator by dependency injection (evalValue) and
 // imports NOTHING from core/evaluate. This breaks the would-be cycle
