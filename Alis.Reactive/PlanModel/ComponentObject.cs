@@ -519,8 +519,8 @@ namespace Alis.Reactive.PlanModel
             writer.WriteStartObject();
             writer.WriteString("kind", Kind);
             WriteOperand(writer, options);
-            WriteProperty(writer, options, "activation", Activation);
-            WriteProperty(writer, options, "comparisonShape", ComparisonShape);
+            PlanJsonWriter.WriteProperty(writer, options, "activation", Activation);
+            PlanJsonWriter.WriteProperty(writer, options, "comparisonShape", ComparisonShape);
             writer.WriteEndObject();
         }
 
@@ -561,16 +561,6 @@ namespace Alis.Reactive.PlanModel
                 comparisonShape);
         }
 
-        private static void WriteProperty<T>(
-            Utf8JsonWriter writer,
-            JsonSerializerOptions options,
-            string name,
-            T value)
-        {
-            writer.WritePropertyName(name);
-            JsonSerializer.Serialize(writer, value, options);
-        }
-
         private sealed class NoOperandValidationRuleExecution : ValidationRuleExecution
         {
             public override string Kind => "none";
@@ -604,7 +594,7 @@ namespace Alis.Reactive.PlanModel
             public LiteralExpression Value => _value;
 
             internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-                WriteProperty(writer, options, "value", _value);
+                PlanJsonWriter.WriteProperty(writer, options, "value", _value);
         }
 
         private sealed class PeerValidationRuleExecution : ValidationRuleExecution
@@ -624,7 +614,7 @@ namespace Alis.Reactive.PlanModel
             public ReadExpression Value => _value;
 
             internal override void WriteOperand(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-                WriteProperty(writer, options, "value", _value);
+                PlanJsonWriter.WriteProperty(writer, options, "value", _value);
         }
     }
 
@@ -662,7 +652,7 @@ namespace Alis.Reactive.PlanModel
 
             public override string Kind => "when";
             internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-                ValidationRuleActivationJsonConverter.WriteProperty(writer, options, "condition", _condition);
+                PlanJsonWriter.WriteProperty(writer, options, "condition", _condition);
         }
     }
 
@@ -683,15 +673,5 @@ namespace Alis.Reactive.PlanModel
             System.Type typeToConvert,
             JsonSerializerOptions options) =>
             throw new System.NotSupportedException("Plan types are write-only.");
-
-        internal static void WriteProperty<T>(
-            Utf8JsonWriter writer,
-            JsonSerializerOptions options,
-            string name,
-            T value)
-        {
-            writer.WritePropertyName(name);
-            JsonSerializer.Serialize(writer, value, options);
-        }
     }
 }

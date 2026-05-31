@@ -68,11 +68,11 @@ namespace Alis.Reactive.PlanModel
         {
             writer.WriteStartObject();
             writer.WriteString("kind", value.Kind);
-            WriteProperty(writer, options, "left", value.Left);
+            PlanJsonWriter.WriteProperty(writer, options, "left", value.Left);
             writer.WriteString("op", value.Op);
-            WriteProperty(writer, options, "right", value.RightOperand);
-            WriteProperty(writer, options, "shape", value.Shape);
-            WriteProperty(writer, options, "itemShape", value.ItemShape);
+            PlanJsonWriter.WriteProperty(writer, options, "right", value.RightOperand);
+            PlanJsonWriter.WriteProperty(writer, options, "shape", value.Shape);
+            PlanJsonWriter.WriteProperty(writer, options, "itemShape", value.ItemShape);
             writer.WriteEndObject();
         }
 
@@ -81,16 +81,6 @@ namespace Alis.Reactive.PlanModel
             Type typeToConvert,
             JsonSerializerOptions options) =>
             throw new NotSupportedException("Plan types are write-only.");
-
-        private static void WriteProperty<T>(
-            Utf8JsonWriter writer,
-            JsonSerializerOptions options,
-            string name,
-            T value)
-        {
-            writer.WritePropertyName(name);
-            JsonSerializer.Serialize(writer, value, options);
-        }
     }
 
     internal sealed class ComparisonOperands
@@ -168,7 +158,7 @@ namespace Alis.Reactive.PlanModel
         public override string Kind => "value";
 
         internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-            ComparisonRightOperandJsonConverter.WriteProperty(writer, options, "value", _value);
+            PlanJsonWriter.WriteProperty(writer, options, "value", _value);
     }
 
     internal sealed class AbsentComparisonRightOperand : ComparisonRightOperand
@@ -198,16 +188,6 @@ namespace Alis.Reactive.PlanModel
             Type typeToConvert,
             JsonSerializerOptions options) =>
             throw new NotSupportedException("Plan types are write-only.");
-
-        internal static void WriteProperty<T>(
-            Utf8JsonWriter writer,
-            JsonSerializerOptions options,
-            string name,
-            T value)
-        {
-            writer.WritePropertyName(name);
-            JsonSerializer.Serialize(writer, value, options);
-        }
     }
 
     /// <summary>Logical AND: all child conditions must be true.</summary>

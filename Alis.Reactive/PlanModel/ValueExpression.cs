@@ -552,6 +552,7 @@ namespace Alis.Reactive.PlanModel
         /// SYNC condition subset (compare/all/any/not) — never a confirm — so per-element evaluation
         /// stays on the immediate lane.
         /// </remarks>
+        // audited null-ignore exception (see remarks): justified, do not "clean up".
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ConditionGraph? Predicate { get; }
         /// <summary>Gets the per-element projection for map/sum/find/orderBy, or null when unused.</summary>
@@ -560,6 +561,7 @@ namespace Alis.Reactive.PlanModel
         /// projected shape), sum/orderBy (the numeric/key selector), and find (optional field
         /// fold). It is a value expression evaluated against the element scope.
         /// </remarks>
+        // audited null-ignore exception (see remarks): justified, do not "clean up".
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ValueExpression? Projection { get; }
         /// <summary>Gets the declared element shape of the source array.</summary>

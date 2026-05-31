@@ -184,8 +184,8 @@ namespace Alis.Reactive.PlanModel
         public override void Write(Utf8JsonWriter writer, BranchCase value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
-            WriteProperty(writer, options, "guard", value.Guard);
-            WriteProperty(writer, options, "reaction", value.Reaction);
+            PlanJsonWriter.WriteProperty(writer, options, "guard", value.Guard);
+            PlanJsonWriter.WriteProperty(writer, options, "reaction", value.Reaction);
             writer.WriteEndObject();
         }
 
@@ -194,16 +194,6 @@ namespace Alis.Reactive.PlanModel
             Type typeToConvert,
             JsonSerializerOptions options) =>
             throw new NotSupportedException("Plan types are write-only.");
-
-        private static void WriteProperty<T>(
-            Utf8JsonWriter writer,
-            JsonSerializerOptions options,
-            string name,
-            T value)
-        {
-            writer.WritePropertyName(name);
-            JsonSerializer.Serialize(writer, value, options);
-        }
     }
 
     [JsonConverter(typeof(BranchGuardJsonConverter))]
@@ -241,7 +231,7 @@ namespace Alis.Reactive.PlanModel
             public override string Kind => "when";
 
             internal override void WriteGuardPayload(Utf8JsonWriter writer, JsonSerializerOptions options) =>
-                BranchGuardJsonConverter.WriteProperty(writer, options, "condition", _condition);
+                PlanJsonWriter.WriteProperty(writer, options, "condition", _condition);
         }
     }
 
@@ -260,16 +250,6 @@ namespace Alis.Reactive.PlanModel
             Type typeToConvert,
             JsonSerializerOptions options) =>
             throw new NotSupportedException("Plan types are write-only.");
-
-        internal static void WriteProperty<T>(
-            Utf8JsonWriter writer,
-            JsonSerializerOptions options,
-            string name,
-            T value)
-        {
-            writer.WritePropertyName(name);
-            JsonSerializer.Serialize(writer, value, options);
-        }
     }
 
     /// <summary>Sets a property value on a component or DOM element.</summary>
@@ -364,7 +344,7 @@ namespace Alis.Reactive.PlanModel
             writer.WriteStartObject();
             writer.WriteString("kind", value.Kind);
             writer.WriteString("event", value.Event);
-            WriteProperty(writer, options, "payload", value.PayloadForJson);
+            PlanJsonWriter.WriteProperty(writer, options, "payload", value.PayloadForJson);
             writer.WriteEndObject();
         }
 
@@ -373,16 +353,6 @@ namespace Alis.Reactive.PlanModel
             Type typeToConvert,
             JsonSerializerOptions options) =>
             throw new NotSupportedException("Plan types are write-only.");
-
-        private static void WriteProperty<T>(
-            Utf8JsonWriter writer,
-            JsonSerializerOptions options,
-            string name,
-            T value)
-        {
-            writer.WritePropertyName(name);
-            JsonSerializer.Serialize(writer, value, options);
-        }
     }
 
     [JsonConverter(typeof(DispatchPayloadJsonConverter))]
@@ -428,8 +398,8 @@ namespace Alis.Reactive.PlanModel
 
         internal override void WritePayload(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
-            DispatchPayloadJsonConverter.WriteProperty(writer, options, "data", _data);
-            DispatchPayloadJsonConverter.WriteProperty(writer, options, "payloadType", _payloadType);
+            PlanJsonWriter.WriteProperty(writer, options, "data", _data);
+            PlanJsonWriter.WriteProperty(writer, options, "payloadType", _payloadType);
         }
     }
 
@@ -448,16 +418,6 @@ namespace Alis.Reactive.PlanModel
             Type typeToConvert,
             JsonSerializerOptions options) =>
             throw new NotSupportedException("Plan types are write-only.");
-
-        internal static void WriteProperty<T>(
-            Utf8JsonWriter writer,
-            JsonSerializerOptions options,
-            string name,
-            T value)
-        {
-            writer.WritePropertyName(name);
-            JsonSerializer.Serialize(writer, value, options);
-        }
     }
 
     /// <summary>Injects HTML into a partial slot.</summary>
