@@ -161,7 +161,7 @@ namespace Alis.Reactive.Builders
         /// <param name="pluginName">The registered plugin name.</param>
         /// <param name="member">The method name on the plugin.</param>
         /// <returns>A builder that implicitly converts to <see cref="Conditions.TypedPluginSource{T}"/>.</returns>
-        public PluginReadBuilder<T, TModel> Plugin<T>(string pluginName, string member)
+        public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName, string member)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
             if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
@@ -169,21 +169,21 @@ namespace Alis.Reactive.Builders
             var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Function(
                 operation,
                 PlanModel.Shape.FromClrType(typeof(T))));
-            return new PluginReadBuilder<T, TModel>(
+            return new PluginMemberBuilder<T, TModel>(
                 operation,
                 signature.Arguments);
         }
 
         /// <summary>Reads a value by calling the registered plugin root function.</summary>
         /// <param name="pluginName">The registered plugin name.</param>
-        public PluginReadBuilder<T, TModel> Plugin<T>(string pluginName)
+        public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
             var operation = PluginOperationId.Root(pluginName);
             var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Function(
                 operation,
                 PlanModel.Shape.FromClrType(typeof(T))));
-            return new PluginReadBuilder<T, TModel>(
+            return new PluginMemberBuilder<T, TModel>(
                 operation,
                 signature.Arguments);
         }
@@ -203,11 +203,11 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Reads a value from a declared plugin function.</summary>
         /// <param name="function">The plugin function descriptor registered with the plan.</param>
-        public PluginReadBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
+        public PluginMemberBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
         {
             if (function == null) throw new System.ArgumentNullException(nameof(function));
             Context.DeclarePluginMethod(PluginMethodRequirement.Function(function));
-            return new PluginReadBuilder<T, TModel>(function);
+            return new PluginMemberBuilder<T, TModel>(function);
         }
 
         /// <summary>Reads a value from a declared plugin property.</summary>

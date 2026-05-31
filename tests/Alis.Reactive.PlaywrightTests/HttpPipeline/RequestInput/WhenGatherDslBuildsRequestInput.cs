@@ -16,7 +16,7 @@ public sealed class WhenGatherDslBuildsRequestInput
     public void assignments_keep_the_authored_source_to_target_order()
     {
         var plan = PlanExtensions.ReactivePlan(Html);
-        plan.RegisterPlugin("metrics", plugin => plugin.Method<int, string>("count"));
+        plan.RegisterPlugin("metrics", plugin => plugin.Method<int>("count", a => a.Arg<string>()));
 
         HtmlExtensions.On(Html, plan, trigger =>
             trigger.CustomEvent<GatherRequestInputEvent>("save", (args, pipeline) =>
@@ -364,14 +364,14 @@ public sealed class WhenGatherDslBuildsRequestInput
         public string Token { get; set; } = "";
     }
 
-    private sealed class GatherRequestInputPlugin : ReactivePlugin
+    private sealed class GatherRequestInputPlugin : Plugin
     {
         public GatherRequestInputPlugin()
             : base("gatherRequestInput")
         {
             Token = Property<string>("token");
-            Slugify = Function<string, string>("slugify");
-            Track = Command<string>("track");
+            Slugify = Function<string>("slugify").Arg<string>();
+            Track = Command("track").Arg<string>();
         }
 
         public PluginProperty<string> Token { get; }

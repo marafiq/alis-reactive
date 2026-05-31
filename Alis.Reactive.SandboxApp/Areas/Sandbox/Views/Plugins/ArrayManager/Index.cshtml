@@ -167,16 +167,16 @@
 @Html.RenderPlan(plan)
 
 @functions {
-    private sealed class ArrayPlugin : ReactivePlugin
+    private sealed class ArrayPlugin : Plugin
     {
         public ArrayPlugin()
             : base("array")
         {
-            Count = Function<int, object>("count");
-            Pluck = Function<object, object, int, string>("pluck");
-            Filter = Function<object, object, string, string>("filter");
-            Sum = Function<int, object, string>("sum");
-            Some = Function<bool, object, string, string>("some");
+            Count = Function<int>("count").Arg<object>();
+            Pluck = Function<object>("pluck").Arg<object>().Arg<int>().Arg<string>();
+            Filter = Function<object>("filter").Arg<object>().Arg<string>().Arg<string>();
+            Sum = Function<int>("sum").Arg<object>().Arg<string>();
+            Some = Function<bool>("some").Arg<object>().Arg<string>().Arg<string>();
         }
 
         public PluginFunction<int> Count { get; }
@@ -186,23 +186,23 @@
         public PluginFunction<bool> Some { get; }
     }
 
-    private sealed class AnalyticsPlugin : ReactivePlugin
+    private sealed class AnalyticsPlugin : Plugin
     {
         public AnalyticsPlugin()
             : base("analytics")
         {
-            Track = Command<string>("track");
+            Track = Command("track").Arg<string>();
         }
 
         public PluginCommand Track { get; }
     }
 
-    private sealed class SlugifyPlugin : ReactivePlugin
+    private sealed class SlugifyPlugin : Plugin
     {
         public SlugifyPlugin()
             : base("slugify")
         {
-            Slug = Function<string, string>();
+            Slug = Function<string>().Arg<string>();
         }
 
         public PluginFunction<string> Slug { get; }

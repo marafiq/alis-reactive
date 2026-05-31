@@ -62,7 +62,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Registers a typed browser plugin contract in the plan.</summary>
-        public void RegisterPlugin(ReactivePlugin plugin)
+        public void RegisterPlugin(Plugin plugin)
         {
             if (plugin == null) throw new ArgumentNullException(nameof(plugin));
             _context.RegisterPlugin(plugin.ToContract());
@@ -70,7 +70,7 @@ namespace Alis.Reactive
 
         /// <summary>Creates and registers a typed browser plugin contract in the plan.</summary>
         public TPlugin RegisterPlugin<TPlugin>()
-            where TPlugin : ReactivePlugin, new()
+            where TPlugin : Plugin, new()
         {
             var plugin = new TPlugin();
             RegisterPlugin(plugin);
