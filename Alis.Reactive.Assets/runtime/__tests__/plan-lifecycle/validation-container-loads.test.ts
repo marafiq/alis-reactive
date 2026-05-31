@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AppliedBrowserPlans } from "../../lifecycle/browser-plans";
+import { AppliedPlans } from "../../lifecycle/applied-plans";
 import {
   browserPlanWiring,
   partialPlan,
@@ -11,7 +11,7 @@ import {
 
 describe("validation container loads", () => {
   it("accepts matching validated component ids while adding new partial rules", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 
@@ -50,7 +50,7 @@ describe("validation container loads", () => {
   });
 
   it("preserves root-owned validation containers when unloading a partial slot", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 
@@ -84,7 +84,7 @@ describe("validation container loads", () => {
   });
 
   it("unloading a validation extension keeps root rules for the same validated component", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 
@@ -130,7 +130,7 @@ describe("validation container loads", () => {
   });
 
   it("unloading one validation extension keeps sibling slot rules", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 
@@ -177,7 +177,7 @@ describe("validation container loads", () => {
   });
 
   it("unloading one validation extension keeps duplicate field rules from a later active slot", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 

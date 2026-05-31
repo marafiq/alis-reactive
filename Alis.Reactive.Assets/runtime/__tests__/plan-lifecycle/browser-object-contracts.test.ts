@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AppliedBrowserPlans } from "../../lifecycle/browser-plans";
+import { AppliedPlans } from "../../lifecycle/applied-plans";
 import {
   behavior,
   component,
@@ -15,7 +15,7 @@ import {
 
 describe("browser object contract merging", () => {
   it("shares an identical type contract across slots until the last owner unloads", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.address";
@@ -42,7 +42,7 @@ describe("browser object contract merging", () => {
   });
 
   it("removes only the unloaded slot contract from a shared type key", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "native.component.shared-drawer";
@@ -72,7 +72,7 @@ describe("browser object contract merging", () => {
   });
 
   it("refines compatible property shapes when object contracts merge", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.address";
@@ -98,7 +98,7 @@ describe("browser object contract merging", () => {
   });
 
   it("merges compatible object property fields from separate slot contracts", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.resident";
@@ -138,7 +138,7 @@ describe("browser object contract merging", () => {
   });
 
   it("merges compatible method argument and return shapes", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "plugin.address";
@@ -160,7 +160,7 @@ describe("browser object contract merging", () => {
   });
 
   it("lets a later slot reuse a member differently after the previous contract unloads", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const sharedTypeKey = "native.component.shared-drawer";
@@ -184,7 +184,7 @@ describe("browser object contract merging", () => {
   });
 
   it("merges compatible contracts for a root-owned app-level component reference", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const drawerTypeKey = "native.component.alis-drawer";
@@ -223,7 +223,7 @@ describe("browser object contract merging", () => {
   });
 
   it("removes one partial contract from a root-owned app-level component reference", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const drawerTypeKey = "native.component.alis-drawer";
@@ -275,7 +275,7 @@ describe("browser object contract merging", () => {
   });
 
   it("recomputes merged property access when a partial contract unloads", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const typeKey = "native.component.care-unit";
@@ -309,7 +309,7 @@ describe("browser object contract merging", () => {
   });
 
   it("allows a partial behavior to reference a root-owned injection host element", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
     const hostTypeKey = "native.element.step-container";
@@ -347,7 +347,7 @@ describe("browser object contract merging", () => {
   });
 
   it("scopes component and type loads to the runtime plan document", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const rootPlanId = "Drawer.Root";
     const partialPlanId = "DrawerResident.Partial";

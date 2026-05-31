@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AppliedBrowserPlans } from "../../lifecycle/browser-plans";
+import { AppliedPlans } from "../../lifecycle/applied-plans";
 import {
   behavior,
   component,
@@ -11,7 +11,7 @@ import {
 
 describe("partial slot composition", () => {
   it("replaces the previous load from the same slot", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring, behaviorSignals } = browserPlanWiring();
     const planId = "Resident.Root";
 
@@ -52,7 +52,7 @@ describe("partial slot composition", () => {
   });
 
   it("unloads an active slot explicitly", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring, behaviorSignals } = browserPlanWiring();
     const planId = "Resident.Root";
     const loadedBehavior = behavior();
@@ -76,7 +76,7 @@ describe("partial slot composition", () => {
   });
 
   it("uses the browser slot id as the unload handle regardless of serialized plan scope", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 
@@ -97,7 +97,7 @@ describe("partial slot composition", () => {
   });
 
   it("replaces every plan document loaded by the same slot id together", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring, behaviorSignals } = browserPlanWiring();
     const residentPlanId = "Resident.Root";
     const billingPlanId = "Billing.Root";
@@ -130,7 +130,7 @@ describe("partial slot composition", () => {
   });
 
   it("wires validation once per active plan when one slot contains multiple fragments for the same plan", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Root";
 
@@ -150,7 +150,7 @@ describe("partial slot composition", () => {
   });
 
   it("keeps a browser-only active plan while another slot still owns entries", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring } = browserPlanWiring();
     const planId = "Resident.Dynamic";
 
@@ -176,7 +176,7 @@ describe("partial slot composition", () => {
   });
 
   it("unloading one slot keeps sibling slot behavior for the same plan", () => {
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const { wiring, behaviorSignals } = browserPlanWiring();
     const planId = "Resident.Dynamic";
     const addressBehavior = behavior();
