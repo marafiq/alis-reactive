@@ -29,7 +29,7 @@ function runReaction(reaction: ReactionGraph, plan: PlanDocument, context: Execu
   }
 }
 
-export function wireBehavior(
+export function wireTrigger(
   trigger: StartsWhen,
   reaction: ReactionGraph,
   plan: PlanDocument,

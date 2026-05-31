@@ -5,7 +5,7 @@
 import type { PlanDocument, Behavior } from "../types";
 import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
-import { wireBehavior } from "../execution/trigger";
+import { wireTrigger } from "../execution/trigger";
 import { resetActivePlanForTests, setActivePlan } from "../execution/execute";
 import { resetLiveClearForTests, wireLiveValidation } from "../validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
@@ -55,11 +55,11 @@ function wireBehaviors(behaviors: Behavior[], plan: PlanDocument, signal?: Abort
     if (behavior.startsWhen.kind === "page-ready") {
       deferred.push(behavior);
     } else {
-      wireBehavior(behavior.startsWhen, behavior.reaction, plan, signal);
+      wireTrigger(behavior.startsWhen, behavior.reaction, plan, signal);
     }
   }
   for (const behavior of deferred) {
-    wireBehavior(behavior.startsWhen, behavior.reaction, plan, signal);
+    wireTrigger(behavior.startsWhen, behavior.reaction, plan, signal);
   }
 }
 
