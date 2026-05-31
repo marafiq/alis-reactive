@@ -9,7 +9,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// Base class for conditional predicates evaluated when the plan executes. Not constructed in application code.
     /// </summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ConditionGraph>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<ConditionGraph>))]
     public abstract class ConditionGraph
     {
         private protected ConditionGraph() { }

@@ -9,7 +9,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// Base class for all executable actions in a reactive plan. Not constructed in application code.
     /// </summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ReactionGraph>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<ReactionGraph>))]
     public abstract class ReactionGraph
     {
         private protected ReactionGraph() { }
@@ -93,7 +93,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Base class for parallel completion behavior. Not constructed in application code.</summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ParallelCompletion>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<ParallelCompletion>))]
     public abstract class ParallelCompletion
     {
         private protected ParallelCompletion() { }

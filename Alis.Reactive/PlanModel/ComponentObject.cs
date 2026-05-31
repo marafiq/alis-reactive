@@ -105,7 +105,7 @@ namespace Alis.Reactive.PlanModel
         public string Kind => _kind;
     }
 
-    [System.Text.Json.Serialization.JsonConverter(typeof(WriteOnlyPolymorphicConverter<InputBinding>))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<InputBinding>))]
     public abstract class InputBinding
     {
         private protected InputBinding() { }
@@ -247,7 +247,7 @@ namespace Alis.Reactive.PlanModel
             new InputComponentPlanBinding(componentId, vendor, bindingPath, valueContract);
     }
 
-    [System.Text.Json.Serialization.JsonConverter(typeof(WriteOnlyPolymorphicConverter<ValidationContainerBinding>))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<ValidationContainerBinding>))]
     public abstract class ValidationContainerBinding
     {
         private protected ValidationContainerBinding() { }

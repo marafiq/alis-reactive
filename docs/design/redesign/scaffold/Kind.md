@@ -160,7 +160,21 @@ internal static class PlanSerializer
 > module as the shared `name + value` write helper if any node still needs it; it
 > carries no domain branch and is not a second serializer.
 
-### 3.3 `PlanContractGenerator` — reflects nodes → `plan.ts`
+### 3.3 `PlanContractGenerator` — generates `plan.ts` from a curated node description
+
+> **BUILD FINDING (2026-05-31, rejected the reflective sub-goal — feature loss).** The original spec
+> below assumed reflection over the C# plan-node families would reproduce `plan.ts`. It will not, and
+> implementing it would **drop kinds and lose features**: several plan nodes deliberately narrow ONE C#
+> class into MANY TS variants the runtime relies on as exhaustive discriminated unions —
+> `CompareCondition`→9 op-narrowed interfaces, `ValidationRule`→8 name-narrowed, `LiteralExpression`→4,
+> `ComparisonRightOperand`→7, `ComponentObject`→role×binding×container, plus `Dispatch*` reshaped by bespoke
+> converters. The C# domain exposes no reflectable source for these splits (verified consumers:
+> `sync-condition.ts`, `rule-engine.ts`, `rule-operands.ts`). **Implemented design:** keep the curated
+> generator (renamed `PlanTypeScriptContract`→`PlanContractGenerator`, render primitives + variant list
+> retained) — the real value is `ContractDriftGate` (§3.4), which makes C#/TS drift a hard build failure
+> regardless of whether the contract is reflected or curated. Reflection here would be the same hand-list
+> with added kind-dropping risk. The rename + `PlanSerializer` extraction + `PlanNodeDiscriminator` + drift
+> gate all shipped and are gate-green; only the "reflect" verb is rejected.
 
 ```csharp
 namespace Alis.Reactive.PlanModel;

@@ -156,7 +156,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    [System.Text.Json.Serialization.JsonConverter(typeof(WriteOnlyPolymorphicConverter<MethodArgumentContract>))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<MethodArgumentContract>))]
     internal abstract class MethodArgumentContract
     {
         internal static MethodArgumentContract Open { get; } =

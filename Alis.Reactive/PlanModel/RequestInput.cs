@@ -4,7 +4,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>Base class for request input strategies. Not constructed in application code.</summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<RequestInput>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<RequestInput>))]
     public abstract class RequestInput
     {
         private protected RequestInput() { }

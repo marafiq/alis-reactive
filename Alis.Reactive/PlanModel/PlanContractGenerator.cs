@@ -7,10 +7,15 @@ using Alis.Reactive.Validation;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Authoritative TypeScript contract for the plan JSON executed by the browser runtime.
-    /// Kept next to the plan domain so runtime types are generated from the plan model.
+    /// The single source of the TypeScript plan contract (<c>plan.ts</c>): one discriminated union per
+    /// polymorphic base, one interface per concrete node carrying its <c>kind</c> literal, camelCase members
+    /// matching <see cref="PlanSerializer"/>, and a <c>LiteralUnion</c> per token value object's <c>.Values</c>.
+    /// The variant set is curated, not reflected: several plan nodes intentionally narrow one C# class into
+    /// many TS variants (for example <c>CompareCondition</c> into one interface per operator) so the runtime
+    /// can switch over an exhaustive union — a CLR property reflection cannot express those splits without
+    /// dropping kinds. <see cref="ContractDriftGate"/> is what keeps this contract honest against the C# model.
     /// </summary>
-    internal static class PlanTypeScriptContract
+    internal static class PlanContractGenerator
     {
         internal static string Render()
         {
@@ -20,7 +25,7 @@ namespace Alis.Reactive.PlanModel
         private static TypeScriptContract CreateContract()
         {
             var contract = TypeScriptContract.GeneratedBy(
-                "Alis.Reactive.PlanModel.PlanTypeScriptContract",
+                "Alis.Reactive.PlanModel.PlanContractGenerator",
                 "npm run generate:plan-types -w Alis.Reactive.Assets");
 
             contract.Declare(Interface("PlanDocument")

@@ -6,7 +6,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// Base class for value source identifiers in a reactive plan. Not constructed in application code.
     /// </summary>
-    [System.Text.Json.Serialization.JsonConverter(typeof(WriteOnlyPolymorphicConverter<Source>))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<Source>))]
     public abstract class Source
     {
         private protected Source() { }

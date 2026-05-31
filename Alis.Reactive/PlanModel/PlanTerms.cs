@@ -83,7 +83,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Base class for plan merge scope. Not constructed in application code.</summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<PlanScope>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<PlanScope>))]
     public abstract class PlanScope
     {
         private protected PlanScope() { }
@@ -426,7 +426,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Base class for payload typing contracts. Not constructed in application code.</summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<PayloadContract>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<PayloadContract>))]
     public abstract class PayloadContract
     {
         private protected PayloadContract() { }
