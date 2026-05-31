@@ -1,0 +1,4 @@
+<Project>
+  <!-- Intentionally empty. Stops MSBuild from walking up to the repo-root
+       Directory.Build.targets so the dogfood proof stays self-contained. -->
+</Project>

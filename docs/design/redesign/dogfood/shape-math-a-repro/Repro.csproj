@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors><NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\..\..\Alis.Reactive\PlanModel\Shape.cs"><Link>Shape.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\Alis.Reactive\PlanModel\ShapeContractCompatibility.cs"><Link>SCC.cs</Link></Compile>
+  </ItemGroup>
+</Project>
