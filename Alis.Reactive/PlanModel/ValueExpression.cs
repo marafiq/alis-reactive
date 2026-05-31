@@ -9,7 +9,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// Base class for all value nodes in a reactive plan. Not constructed in application code.
     /// </summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ValueExpression>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<ValueExpression>))]
     public abstract class ValueExpression
     {
         private protected ValueExpression() { }
@@ -430,7 +430,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Base class for the member access intent of a value read.</summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ValueReadAccess>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<ValueReadAccess>))]
     public abstract class ValueReadAccess
     {
         private protected ValueReadAccess() { }

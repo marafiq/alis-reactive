@@ -5,10 +5,10 @@ namespace Alis.Reactive.PlanModel
 {
     internal sealed class BehaviorGraph
     {
-        private readonly ComponentObjects _components;
+        private readonly BrowserObjects _components;
         private readonly List<Behavior> _behaviors = new List<Behavior>();
 
-        internal BehaviorGraph(ComponentObjects components)
+        internal BehaviorGraph(BrowserObjects components)
         {
             _components = components;
         }

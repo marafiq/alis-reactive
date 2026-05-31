@@ -19,7 +19,7 @@ interface SyncfusionGlobal {
  * Extracts any <script data-reactive-plan> elements first and applies them using the
  * slot declared by the inject reaction.
  */
-export function injectHtml(container: HTMLElement, html: string, slot: string): void {
+export function injectPartial(container: HTMLElement, html: string, slot: string): void {
   const temp = document.createElement("div");
   temp.innerHTML = html;
 

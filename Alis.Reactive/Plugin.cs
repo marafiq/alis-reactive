@@ -6,16 +6,19 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Describes a browser plugin as a named set of callable JavaScript functions.
-    /// Plugins are the explicit bridge for browser behavior that does not need a
-    /// first-class deterministic DSL primitive.
+    /// Declares a browser plugin: a named browser object the DSL does not model,
+    /// exposing typed readable properties, value-returning functions, and void
+    /// commands. A plugin is the intentional escape hatch for browser behavior
+    /// that does not need a first-class deterministic DSL primitive. Subclass it,
+    /// name the plugin in the base constructor, and declare members in the body.
     /// </summary>
-    public abstract class ReactivePlugin
+    public abstract class Plugin
     {
         private readonly PluginName _name;
         private readonly PluginMemberDeclarations _members = new PluginMemberDeclarations();
 
-        protected ReactivePlugin(string name)
+        /// <summary>Names the plugin; the runtime resolves the host instance by this name.</summary>
+        protected Plugin(string name)
         {
             _name = PluginName.Of(name);
         }
@@ -57,30 +60,6 @@ namespace Alis.Reactive
             return property;
         }
 
-        /// <summary>Declares a plugin function with one typed JavaScript argument.</summary>
-        protected PluginFunction<TReturn> Function<TReturn, TArg1>(string member) =>
-            Function<TReturn>(member).Arg<TArg1>();
-
-        /// <summary>Declares the plugin root function with one typed JavaScript argument.</summary>
-        protected PluginFunction<TReturn> Function<TReturn, TArg1>() =>
-            Function<TReturn>().Arg<TArg1>();
-
-        /// <summary>Declares a plugin function with two typed JavaScript arguments.</summary>
-        protected PluginFunction<TReturn> Function<TReturn, TArg1, TArg2>(string member) =>
-            Function<TReturn>(member).Arg<TArg1>().Arg<TArg2>();
-
-        /// <summary>Declares the plugin root function with two typed JavaScript arguments.</summary>
-        protected PluginFunction<TReturn> Function<TReturn, TArg1, TArg2>() =>
-            Function<TReturn>().Arg<TArg1>().Arg<TArg2>();
-
-        /// <summary>Declares a plugin function with three typed JavaScript arguments.</summary>
-        protected PluginFunction<TReturn> Function<TReturn, TArg1, TArg2, TArg3>(string member) =>
-            Function<TReturn>(member).Arg<TArg1>().Arg<TArg2>().Arg<TArg3>();
-
-        /// <summary>Declares the plugin root function with three typed JavaScript arguments.</summary>
-        protected PluginFunction<TReturn> Function<TReturn, TArg1, TArg2, TArg3>() =>
-            Function<TReturn>().Arg<TArg1>().Arg<TArg2>().Arg<TArg3>();
-
         /// <summary>Declares a plugin command that performs behavior and returns no value.</summary>
         protected PluginCommand Command(string member)
         {
@@ -106,30 +85,6 @@ namespace Alis.Reactive
         /// <summary>Declares the plugin root command with an exact argument contract.</summary>
         protected PluginCommand Command(Action<PluginArgumentTypes> arguments) =>
             Command().Args(arguments);
-
-        /// <summary>Declares a plugin command with one typed JavaScript argument.</summary>
-        protected PluginCommand Command<TArg1>(string member) =>
-            Command(member).Arg<TArg1>();
-
-        /// <summary>Declares the plugin root command with one typed JavaScript argument.</summary>
-        protected PluginCommand Command<TArg1>() =>
-            Command().Arg<TArg1>();
-
-        /// <summary>Declares a plugin command with two typed JavaScript arguments.</summary>
-        protected PluginCommand Command<TArg1, TArg2>(string member) =>
-            Command(member).Arg<TArg1>().Arg<TArg2>();
-
-        /// <summary>Declares the plugin root command with two typed JavaScript arguments.</summary>
-        protected PluginCommand Command<TArg1, TArg2>() =>
-            Command().Arg<TArg1>().Arg<TArg2>();
-
-        /// <summary>Declares a plugin command with three typed JavaScript arguments.</summary>
-        protected PluginCommand Command<TArg1, TArg2, TArg3>(string member) =>
-            Command(member).Arg<TArg1>().Arg<TArg2>().Arg<TArg3>();
-
-        /// <summary>Declares the plugin root command with three typed JavaScript arguments.</summary>
-        protected PluginCommand Command<TArg1, TArg2, TArg3>() =>
-            Command().Arg<TArg1>().Arg<TArg2>().Arg<TArg3>();
 
         internal PluginContract ToContract()
         {
@@ -284,7 +239,10 @@ namespace Alis.Reactive
             PluginPropertyContract.Create(_property, _shape);
     }
 
-    /// <summary>Descriptor for a plugin function that returns a typed value.</summary>
+    /// <summary>
+    /// Descriptor for a plugin function that returns a typed value. Chain
+    /// <c>.Arg&lt;T&gt;()</c> or <c>.Args(...)</c> to set the argument contract.
+    /// </summary>
     public sealed class PluginFunction<TReturn> : PluginOperation
     {
         internal PluginFunction(string pluginName, string member)
@@ -312,7 +270,10 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>Descriptor for a plugin function that returns no value.</summary>
+    /// <summary>
+    /// Descriptor for a plugin command that returns no value. Chain
+    /// <c>.Arg&lt;T&gt;()</c> or <c>.Args(...)</c> to set the argument contract.
+    /// </summary>
     public sealed class PluginCommand : PluginOperation
     {
         internal PluginCommand(string pluginName, string member)

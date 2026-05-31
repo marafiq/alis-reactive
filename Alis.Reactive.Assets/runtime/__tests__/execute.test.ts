@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { registerPlugin } from "../core/plugin-catalog";
-import { registerComponentRuntime, type ComponentRuntimeDriver } from "../domain/component-runtime";
+import { registerComponentDriver, type ComponentDriver } from "../domain/component-driver";
 import { executeReaction } from "../execution/execute";
 import type {
   ComponentObject, ConditionGraph, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, ReactionGraph, RequestPlan, Shape, ValueExpression,
@@ -25,7 +25,7 @@ type BrowserWindowWithConfirm = typeof window & {
   alis?: { confirm?: (message: string) => boolean | Promise<boolean> };
 };
 
-const customWidgetRuntime: ComponentRuntimeDriver = {
+const customWidgetRuntime: ComponentDriver = {
   resolveRoot: element => {
     const root = (element as CustomWidgetHost).reactiveWidget;
     if (root !== undefined) return root;
@@ -35,7 +35,7 @@ const customWidgetRuntime: ComponentRuntimeDriver = {
   wireEvent: () => undefined,
 };
 
-registerComponentRuntime(customWidgetVendor, customWidgetRuntime);
+registerComponentDriver(customWidgetVendor, customWidgetRuntime);
 
 function literal(value: string): ValueExpression {
   return { kind: "literal", value, shape: stringShape };

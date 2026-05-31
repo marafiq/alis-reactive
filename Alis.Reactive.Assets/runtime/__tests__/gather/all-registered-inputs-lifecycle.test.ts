@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveRequestInput } from "../../execution/gather";
-import { AppliedBrowserPlans } from "../../lifecycle/browser-plans";
+import { AppliedPlans } from "../../lifecycle/applied-plans";
 import type { ComponentObject, RequestPayloadTarget, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath, ValueExpression } from "../../types";
 
 const stringShape: Shape = { kind: "string" };
@@ -31,7 +31,7 @@ describe("all registered input gather lifecycle", () => {
       <input id="first-name" value="Ada" />
       <input id="address-line" value="12 Main" />
     `;
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const planId = "Resident.PartialGather";
     const resident = rootPlan(planId, {
       "first-name": inputComponent("first-name", "firstName"),
@@ -63,7 +63,7 @@ describe("all registered input gather lifecycle", () => {
       <input id="first-name" value="Ada" />
       <input id="address" value="12 Main" />
     `;
-    const browserPlans = new AppliedBrowserPlans();
+    const browserPlans = new AppliedPlans();
     const planId = "Resident.PartialGatherAssignments";
     const resident = rootPlan(planId, {
       "first-name": inputComponent("first-name", "firstName"),

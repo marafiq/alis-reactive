@@ -37,24 +37,12 @@ namespace Alis.Reactive.Native.Extensions
         /// <returns>A new plan instance scoped to this view.</returns>
 #if NET48
         public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
-            where TModel : class
-        {
-            // net48 / System.Web has no per-request IServiceProvider, so the plan is
-            // created with services: null. Validation metadata is resolved at render
-            // time via the MVC5 DependencyResolver, which the app bridges over its DI
-            // container in Application_Start. See ReactivePlan.RequireClientValidationRuleSource.
-            return new ReactivePlan<TModel>(
-                ReactivePlanScope.RootView,
-                services: null);
-        }
+            where TModel : class =>
+            CreatePlan<TModel>(ReactivePlanScope.RootView);
 #else
         public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
-            where TModel : class
-        {
-            return new ReactivePlan<TModel>(
-                ReactivePlanScope.RootView,
-                html?.ViewContext.HttpContext.RequestServices);
-        }
+            where TModel : class =>
+            CreatePlan(html, ReactivePlanScope.RootView);
 #endif
 
         /// <summary>
@@ -76,24 +64,29 @@ namespace Alis.Reactive.Native.Extensions
         /// <returns>A plan instance that merges into the view's plan in the browser.</returns>
 #if NET48
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this HtmlHelper<TModel> html)
-            where TModel : class
-        {
-            // net48 / System.Web has no per-request IServiceProvider, so the plan is
-            // created with services: null. Validation metadata is resolved at render
-            // time via the MVC5 DependencyResolver, which the app bridges over its DI
-            // container in Application_Start. See ReactivePlan.RequireClientValidationRuleSource.
-            return new ReactivePlan<TModel>(
-                ReactivePlanScope.PartialView,
-                services: null);
-        }
+            where TModel : class =>
+            CreatePlan<TModel>(ReactivePlanScope.PartialView);
 #else
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
-            where TModel : class
-        {
-            return new ReactivePlan<TModel>(
-                ReactivePlanScope.PartialView,
-                html?.ViewContext.HttpContext.RequestServices);
-        }
+            where TModel : class =>
+            CreatePlan(html, ReactivePlanScope.PartialView);
+#endif
+
+        // Shared plan creation for ReactivePlan (root view) and ResolvePlan (partial
+        // view): the public methods differ only by the scope they pass here.
+#if NET48
+        // net48 / System.Web has no per-request IServiceProvider, so the plan is
+        // created with services: null. Validation metadata is resolved at render
+        // time via the MVC5 DependencyResolver, which the app bridges over its DI
+        // container in Application_Start. See ReactivePlan.RequireClientValidationRuleSource.
+        private static ReactivePlan<TModel> CreatePlan<TModel>(ReactivePlanScope scope)
+            where TModel : class =>
+            new ReactivePlan<TModel>(scope, services: null);
+#else
+        private static ReactivePlan<TModel> CreatePlan<TModel>(
+            IHtmlHelper<TModel> html, ReactivePlanScope scope)
+            where TModel : class =>
+            new ReactivePlan<TModel>(scope, html?.ViewContext.HttpContext.RequestServices);
 #endif
 
         /// <summary>
@@ -113,7 +106,7 @@ namespace Alis.Reactive.Native.Extensions
             ReactivePlan<TModel> plan) where TModel : class
         {
             var json = plan.Render();
-            var elementId = plan.PlanId.Replace('.', '-').Replace('+', '-');
+            var elementId = PlanElementId.For(plan.PlanId);
             var script = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
 
             // Validation errors display inline next to each field by default.
@@ -134,7 +127,7 @@ namespace Alis.Reactive.Native.Extensions
             ReactivePlan<TModel> plan) where TModel : class
         {
             var json = plan.Render();
-            var elementId = plan.PlanId.Replace('.', '-').Replace('+', '-');
+            var elementId = PlanElementId.For(plan.PlanId);
             var script = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
 
             // Validation errors display inline next to each field by default.
@@ -151,5 +144,20 @@ namespace Alis.Reactive.Native.Extensions
                 $"<div data-reactive-validation-summary=\"{planId}\" hidden></div>");
         }
 #endif
+    }
+
+    /// <summary>
+    /// Computes the DOM element id for a plan's rendered script element from its plan id.
+    /// </summary>
+    internal static class PlanElementId
+    {
+        /// <summary>
+        /// Sanitizes <paramref name="planId"/> into a DOM element id by replacing the
+        /// dot and plus characters with a hyphen.
+        /// </summary>
+        /// <param name="planId">The plan id to sanitize.</param>
+        /// <returns>The sanitized element id.</returns>
+        public static string For(string planId) =>
+            planId.Replace('.', '-').Replace('+', '-');
     }
 }

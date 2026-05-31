@@ -5,84 +5,21 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Validation
 {
-    /// <summary>
-    /// A single validation rule for browser execution.
-    /// </summary>
-    public sealed class ValidationRule
+    internal abstract class RuleOperand
     {
-        private readonly ValidationRuleName _rule;
-        private readonly ValidationMessage _message;
-        private readonly ValidationRuleOperand _operand;
-        private readonly ClientRuleActivation _activation;
-        private readonly Shape _shape;
+        private protected RuleOperand() { }
 
-        public string Message => _message.Value;
-        public Shape Shape => _shape;
+        internal static RuleOperand None { get; } = new NoRuleOperand();
 
-        // Projections for a vendor emitter that translates this rule into a native
-        // component validation shape (e.g. Syncfusion EJ2 column.validationRules).
-        // Internal so the public rule surface stays message + shape only.
-        internal ValidationRuleName Name => _rule;
-        internal bool IsUnconditional => _activation.IsAlways;
-        internal object? LiteralOperand => _operand.LiteralValue;
-        internal object[]? RangeOperand => _operand.RangeValues;
+        internal static RuleOperand Literal(object? value, Shape shape) =>
+            new LiteralRuleOperand(value, shape);
 
-        internal ValidationRule(
-            ValidationRuleName rule,
-            ValidationMessage message,
-            ValidationRuleOperand operand,
-            ClientRuleActivation activation,
-            Shape shape)
+        internal static RuleOperand Range(ValidationRangeBounds bounds) =>
+            new RangeRuleOperand(bounds);
+
+        internal static RuleOperand PeerField(ValidationFieldPath fieldPath, Shape shape)
         {
-            _rule = rule;
-            _message = message;
-            _operand = operand;
-            _activation = activation;
-            _shape = shape;
-        }
-
-        internal Alis.Reactive.PlanModel.ValidationRule ToPlanRule(ValidationPlanBinding binding)
-        {
-            return new Alis.Reactive.PlanModel.ValidationRule(
-                _rule,
-                _message,
-                _operand.ToPlanExecution(
-                    _activation.ToPlanActivation(binding),
-                    binding,
-                    _shape));
-        }
-
-        internal ValidationRule PrefixedBy(
-            ValidationFieldPath prefix,
-            ClientRuleActivation parentActivation)
-        {
-            return new ValidationRule(
-                _rule,
-                _message,
-                _operand.PrefixedBy(prefix),
-                parentActivation.Combine(_activation.PrefixedBy(prefix)),
-                _shape);
-        }
-
-        internal IEnumerable<ClientValidationFieldReference> PeerFieldReferences =>
-            _operand.PeerFieldReferences;
-    }
-
-    internal abstract class ValidationRuleOperand
-    {
-        private protected ValidationRuleOperand() { }
-
-        internal static ValidationRuleOperand None { get; } = new NoValidationRuleOperand();
-
-        internal static ValidationRuleOperand Literal(object? value, Shape shape) =>
-            new LiteralValidationRuleOperand(value, shape);
-
-        internal static ValidationRuleOperand Range(ValidationRangeBounds bounds) =>
-            new RangeValidationRuleOperand(bounds);
-
-        internal static ValidationRuleOperand PeerField(ValidationFieldPath fieldPath, Shape shape)
-        {
-            return new PeerFieldValidationRuleOperand(ClientValidationFieldReference.Of(fieldPath, shape));
+            return new PeerFieldRuleOperand(ClientValidationFieldReference.Of(fieldPath, shape));
         }
 
         // Emit projections for a native-component validation emitter. The default is
@@ -92,30 +29,30 @@ namespace Alis.Reactive.Validation
 
         internal abstract IEnumerable<ClientValidationFieldReference> PeerFieldReferences { get; }
 
-        internal abstract ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix);
+        internal abstract RuleOperand PrefixedBy(ValidationFieldPath prefix);
 
         internal abstract ValidationRuleExecution ToPlanExecution(
-            Alis.Reactive.PlanModel.ValidationRuleActivation activation,
+            ValidationRuleActivation activation,
             ValidationPlanBinding binding,
             Shape comparisonShape);
     }
 
-    internal sealed class NoValidationRuleOperand : ValidationRuleOperand
+    internal sealed class NoRuleOperand : RuleOperand
     {
-        internal NoValidationRuleOperand() { }
+        internal NoRuleOperand() { }
 
         internal override IEnumerable<ClientValidationFieldReference> PeerFieldReferences
         {
             get { yield break; }
         }
 
-        internal override ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix)
+        internal override RuleOperand PrefixedBy(ValidationFieldPath prefix)
         {
             return this;
         }
 
         internal override ValidationRuleExecution ToPlanExecution(
-            Alis.Reactive.PlanModel.ValidationRuleActivation activation,
+            ValidationRuleActivation activation,
             ValidationPlanBinding binding,
             Shape comparisonShape)
         {
@@ -123,12 +60,12 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    internal sealed class LiteralValidationRuleOperand : ValidationRuleOperand
+    internal sealed class LiteralRuleOperand : RuleOperand
     {
         private readonly object? _value;
         private readonly Shape _shape;
 
-        internal LiteralValidationRuleOperand(object? value, Shape shape)
+        internal LiteralRuleOperand(object? value, Shape shape)
         {
             _value = value;
             _shape = shape;
@@ -141,13 +78,13 @@ namespace Alis.Reactive.Validation
             get { yield break; }
         }
 
-        internal override ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix)
+        internal override RuleOperand PrefixedBy(ValidationFieldPath prefix)
         {
             return this;
         }
 
         internal override ValidationRuleExecution ToPlanExecution(
-            Alis.Reactive.PlanModel.ValidationRuleActivation activation,
+            ValidationRuleActivation activation,
             ValidationPlanBinding binding,
             Shape comparisonShape)
         {
@@ -158,11 +95,11 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    internal sealed class RangeValidationRuleOperand : ValidationRuleOperand
+    internal sealed class RangeRuleOperand : RuleOperand
     {
         private readonly ValidationRangeBounds _bounds;
 
-        internal RangeValidationRuleOperand(ValidationRangeBounds bounds)
+        internal RangeRuleOperand(ValidationRangeBounds bounds)
         {
             _bounds = bounds;
         }
@@ -174,13 +111,13 @@ namespace Alis.Reactive.Validation
             get { yield break; }
         }
 
-        internal override ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix)
+        internal override RuleOperand PrefixedBy(ValidationFieldPath prefix)
         {
             return this;
         }
 
         internal override ValidationRuleExecution ToPlanExecution(
-            Alis.Reactive.PlanModel.ValidationRuleActivation activation,
+            ValidationRuleActivation activation,
             ValidationPlanBinding binding,
             Shape comparisonShape)
         {
@@ -191,11 +128,11 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    internal sealed class PeerFieldValidationRuleOperand : ValidationRuleOperand
+    internal sealed class PeerFieldRuleOperand : RuleOperand
     {
         private readonly ClientValidationFieldReference _field;
 
-        internal PeerFieldValidationRuleOperand(ClientValidationFieldReference field)
+        internal PeerFieldRuleOperand(ClientValidationFieldReference field)
         {
             _field = field;
         }
@@ -205,13 +142,13 @@ namespace Alis.Reactive.Validation
             get { yield return _field; }
         }
 
-        internal override ValidationRuleOperand PrefixedBy(ValidationFieldPath prefix)
+        internal override RuleOperand PrefixedBy(ValidationFieldPath prefix)
         {
             return PeerField(prefix.Append(_field.Path), _field.Shape);
         }
 
         internal override ValidationRuleExecution ToPlanExecution(
-            Alis.Reactive.PlanModel.ValidationRuleActivation activation,
+            ValidationRuleActivation activation,
             ValidationPlanBinding binding,
             Shape comparisonShape)
         {
@@ -238,7 +175,7 @@ namespace Alis.Reactive.Validation
         // skips conditional rules because EJ2 column rules are always-on.
         internal abstract bool IsAlways { get; }
 
-        internal abstract Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding);
+        internal abstract ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding);
 
         internal abstract ClientRuleActivation Combine(ClientRuleActivation incoming);
 
@@ -253,9 +190,9 @@ namespace Alis.Reactive.Validation
 
         internal override bool IsAlways => true;
 
-        internal override Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
+        internal override ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
         {
-            return Alis.Reactive.PlanModel.ValidationRuleActivation.Always;
+            return ValidationRuleActivation.Always;
         }
 
         internal override ClientRuleActivation Combine(ClientRuleActivation incoming)
@@ -285,9 +222,9 @@ namespace Alis.Reactive.Validation
 
         internal override bool IsAlways => false;
 
-        internal override Alis.Reactive.PlanModel.ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
+        internal override ValidationRuleActivation ToPlanActivation(ValidationPlanBinding binding)
         {
-            return Alis.Reactive.PlanModel.ValidationRuleActivation.When(binding.ResolveActivationCondition(_condition));
+            return ValidationRuleActivation.When(binding.ResolveActivationCondition(_condition));
         }
 
         internal override ClientRuleActivation Combine(ClientRuleActivation incoming)

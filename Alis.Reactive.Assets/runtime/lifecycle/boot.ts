@@ -1,20 +1,20 @@
 // Boot — PlanDocument composition: boot, partial slot load/unload, reset.
 // Single responsibility: wire behaviors and validation for active plans.
-// Delegates plan composition state to browser-plans.ts.
+// Delegates plan composition state to applied-plans.ts.
 
 import type { PlanDocument, Behavior } from "../types";
 import { setLevel } from "../core/trace";
 import { scope } from "../core/trace";
-import { wireBehavior } from "../execution/trigger";
+import { wireTrigger } from "../execution/trigger";
 import { resetActivePlanForTests, setActivePlan } from "../execution/execute";
 import { resetLiveClearForTests, wireLiveValidation } from "../validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
 import { resetNativeActionLinksForTests } from "../components/native/native-action-link";
 import { resetPluginCatalogForTests } from "../core/plugin-catalog";
 import {
-  appliedBrowserPlans,
+  appliedPlans,
   type BrowserPlanWiring,
-} from "./browser-plans";
+} from "./applied-plans";
 
 const log = scope("boot");
 const BOOTED_ATTR = "alisBooted";
@@ -40,7 +40,7 @@ export function boot(plan: PlanDocument): void {
   wireBehaviors(plan.behaviors, plan, bootAbort.signal);
 
   setActivePlan(plan);
-  appliedBrowserPlans.register(plan);
+  appliedPlans.register(plan);
   markReactiveBooted(plan);
   log.info("booted", { planId: plan.planId });
 }
@@ -55,11 +55,11 @@ function wireBehaviors(behaviors: Behavior[], plan: PlanDocument, signal?: Abort
     if (behavior.startsWhen.kind === "page-ready") {
       deferred.push(behavior);
     } else {
-      wireBehavior(behavior.startsWhen, behavior.reaction, plan, signal);
+      wireTrigger(behavior.startsWhen, behavior.reaction, plan, signal);
     }
   }
   for (const behavior of deferred) {
-    wireBehavior(behavior.startsWhen, behavior.reaction, plan, signal);
+    wireTrigger(behavior.startsWhen, behavior.reaction, plan, signal);
   }
 }
 
@@ -72,7 +72,7 @@ function wireContainerValidation(plan: PlanDocument, signal?: AbortSignal): void
 }
 
 export function loadPartialSlot(slotId: string, incoming: PlanDocument[]): void {
-  const affectedPlanIds = appliedBrowserPlans.loadPartialSlot(slotId, incoming, browserPlanWiring());
+  const affectedPlanIds = appliedPlans.loadPartialSlot(slotId, incoming, browserPlanWiring());
 
   for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
@@ -89,7 +89,7 @@ export function loadPartialSlot(slotId: string, incoming: PlanDocument[]): void 
 }
 
 export function unloadPartialSlot(slotId: string): void {
-  const affectedPlanIds = appliedBrowserPlans.unloadPartialSlot(slotId);
+  const affectedPlanIds = appliedPlans.unloadPartialSlot(slotId);
 
   for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
@@ -102,7 +102,7 @@ export function unloadPartialSlot(slotId: string): void {
 }
 
 export function getBootedPlan(planId: string): PlanDocument | undefined {
-  return appliedBrowserPlans.get(planId);
+  return appliedPlans.get(planId);
 }
 
 export function resetBootStateForTests(): void {
@@ -124,7 +124,7 @@ function browserPlanWiring(): BrowserPlanWiring {
 
 function resetRuntimeSingletonsForTests(): void {
   resetActivePlanForTests();
-  appliedBrowserPlans.reset();
+  appliedPlans.reset();
   resetLiveClearForTests();
   resetNativeActionLinksForTests();
   resetPluginCatalogForTests();

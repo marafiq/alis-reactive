@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
@@ -63,7 +62,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Registers a typed browser plugin contract in the plan.</summary>
-        public void RegisterPlugin(ReactivePlugin plugin)
+        public void RegisterPlugin(Plugin plugin)
         {
             if (plugin == null) throw new ArgumentNullException(nameof(plugin));
             _context.RegisterPlugin(plugin.ToContract());
@@ -71,7 +70,7 @@ namespace Alis.Reactive
 
         /// <summary>Creates and registers a typed browser plugin contract in the plan.</summary>
         public TPlugin RegisterPlugin<TPlugin>()
-            where TPlugin : ReactivePlugin, new()
+            where TPlugin : Plugin, new()
         {
             var plugin = new TPlugin();
             RegisterPlugin(plugin);
@@ -91,26 +90,26 @@ namespace Alis.Reactive
         public string Render()
         {
             ResolveAll(_services);
-            return ReactivePlanSerializer.Serialize(_context.BuildPlan());
+            return PlanSerializer.Serialize(_context.BuildPlan());
         }
 
         public string Render(IServiceProvider services)
         {
             ResolveAll(services);
-            return ReactivePlanSerializer.Serialize(_context.BuildPlan());
+            return PlanSerializer.Serialize(_context.BuildPlan());
         }
 
         /// <summary>Registers all components and resolves validation, then serializes the plan as indented JSON for debugging.</summary>
         public string RenderFormatted()
         {
             ResolveAll(_services);
-            return ReactivePlanSerializer.SerializeFormatted(_context.BuildPlan());
+            return PlanSerializer.SerializeFormatted(_context.BuildPlan());
         }
 
         public string RenderFormatted(IServiceProvider services)
         {
             ResolveAll(services);
-            return ReactivePlanSerializer.SerializeFormatted(_context.BuildPlan());
+            return PlanSerializer.SerializeFormatted(_context.BuildPlan());
         }
 
         private void ResolveAll(IServiceProvider? services)
@@ -201,22 +200,5 @@ namespace Alis.Reactive
             if (planId == null) throw new ArgumentNullException(nameof(planId));
             return PlanIdentity.Partial(planId);
         }
-    }
-
-    internal static class ReactivePlanSerializer
-    {
-        private static readonly JsonSerializerOptions Compact = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
-        private static readonly JsonSerializerOptions Formatted = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        };
-
-        internal static string Serialize(PlanDocument plan) => JsonSerializer.Serialize(plan, Compact);
-        internal static string SerializeFormatted(PlanDocument plan) => JsonSerializer.Serialize(plan, Formatted);
     }
 }

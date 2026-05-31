@@ -273,13 +273,13 @@ public sealed class WhenConditionDslBuildsBehaviorGraph
         public string Status { get; set; } = "";
     }
 
-    private sealed class ConditionBehaviorPlugin : ReactivePlugin
+    private sealed class ConditionBehaviorPlugin : Plugin
     {
         public ConditionBehaviorPlugin()
             : base("conditionBehavior")
         {
             ExpectedStatus = Property<string>("expectedStatus");
-            NormalizeStatus = Function<string, string>("normalizeStatus");
+            NormalizeStatus = Function<string>("normalizeStatus").Arg<string>();
         }
 
         public PluginProperty<string> ExpectedStatus { get; }

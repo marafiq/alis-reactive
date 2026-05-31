@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveRequestInput } from "../execution/gather";
-import { injectHtml } from "../execution/inject";
+import { injectPartial } from "../execution/inject";
 import { boot, getBootedPlan, resetBootStateForTests } from "../lifecycle/boot";
 import type { ComponentObject, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath } from "../types";
 
@@ -108,12 +108,12 @@ afterEach(() => {
   resetBootStateForTests();
 });
 
-describe("injectHtml partial slot plan", () => {
+describe("injectPartial partial slot plan", () => {
   it("loads and unloads the plan declared by the partial slot", () => {
     const slot = document.createElement("div");
     const slotId = "address-container";
 
-    injectHtml(
+    injectPartial(
       slot,
       `<script type="application/json" data-reactive-plan>${JSON.stringify(
         partialPlan("Resident.Root"),
@@ -124,7 +124,7 @@ describe("injectHtml partial slot plan", () => {
     expect(getBootedPlan("Resident.Root")?.components["address-line"]).toBeDefined();
     expect(slot.querySelector("[data-reactive-plan]")).toBeNull();
 
-    injectHtml(slot, "<p>No address selected</p>", slotId);
+    injectPartial(slot, "<p>No address selected</p>", slotId);
 
     expect(getBootedPlan("Resident.Root")).toBeUndefined();
     expect(slot.textContent).toContain("No address selected");
@@ -144,7 +144,7 @@ describe("injectHtml partial slot plan", () => {
       components: { "first-name": inputComponent("first-name", "firstName") },
     }));
 
-    injectHtml(
+    injectPartial(
       slot,
       `<script type="application/json" data-reactive-plan>${JSON.stringify(
         partialPlan(planId, {
@@ -157,7 +157,7 @@ describe("injectHtml partial slot plan", () => {
     expect(resolveRequestInput(allRegisteredInputs(), "POST", getBootedPlan(planId)!, {}).body)
       .toEqual({ firstName: "Ada", addressLine: "12 Main" });
 
-    injectHtml(slot, "<p>No address selected</p>", slotId);
+    injectPartial(slot, "<p>No address selected</p>", slotId);
 
     expect(resolveRequestInput(allRegisteredInputs(), "POST", getBootedPlan(planId)!, {}).body)
       .toEqual({ firstName: "Ada" });

@@ -6,7 +6,8 @@ interface FusionElement extends HTMLElement {
   readonly ej2_instances?: unknown[];
 }
 
-export interface ComponentRuntimeDriver {
+/** The per-vendor driver — THE sole place vendor knowledge lives. Was ComponentRuntime. */
+export interface ComponentDriver {
   resolveRoot(element: HTMLElement): unknown;
 
   wireEvent(
@@ -40,30 +41,9 @@ export class RuntimeComponentReadinessError extends Error {
   }
 }
 
-export class ComponentRuntime {
-  constructor(private readonly driver: ComponentRuntimeDriver) {}
+const componentDrivers = new Map<Vendor, ComponentDriver>();
 
-  static for(componentId: string, vendor: Vendor): ComponentRuntime {
-    return new ComponentRuntime(requireComponentRuntimeDriver(componentId, vendor));
-  }
-
-  resolveRoot(element: HTMLElement): unknown {
-    return this.driver.resolveRoot(element);
-  }
-
-  wireEvent(
-    root: unknown,
-    channel: string,
-    handler: (data: unknown) => void,
-    opts: AddEventListenerOptions | undefined,
-  ): void {
-    this.driver.wireEvent(root, channel, handler, opts);
-  }
-}
-
-const componentRuntimeDrivers = new Map<Vendor, ComponentRuntimeDriver>();
-
-function componentRuntimeNotRegistered(
+function componentDriverNotRegistered(
   componentId: string,
   vendor: Vendor,
   registeredVendors: readonly Vendor[],
@@ -78,25 +58,25 @@ function componentRuntimeNotRegistered(
   );
 }
 
-function requireComponentRuntimeDriver(componentId: string, vendor: Vendor): ComponentRuntimeDriver {
-  const driver = componentRuntimeDrivers.get(vendor);
+export function requireComponentDriver(componentId: string, vendor: Vendor): ComponentDriver {
+  const driver = componentDrivers.get(vendor);
   if (driver) return driver;
 
-  throw componentRuntimeNotRegistered(componentId, vendor, [...componentRuntimeDrivers.keys()]);
+  throw componentDriverNotRegistered(componentId, vendor, [...componentDrivers.keys()]);
 }
 
-export function registerComponentRuntime(vendor: Vendor, driver: ComponentRuntimeDriver): void {
-  if (componentRuntimeDrivers.has(vendor)) throw new Error(`[alis] component runtime already registered for vendor "${vendor}"`);
+export function registerComponentDriver(vendor: Vendor, driver: ComponentDriver): void {
+  if (componentDrivers.has(vendor)) throw new Error(`[alis] component runtime already registered for vendor "${vendor}"`);
 
-  componentRuntimeDrivers.set(vendor, driver);
+  componentDrivers.set(vendor, driver);
 }
 
-const nativeComponentRuntime: ComponentRuntimeDriver = {
+const nativeComponentDriver: ComponentDriver = {
   resolveRoot: element => element,
   wireEvent: wireNative,
 };
 
-const fusionComponentRuntime: ComponentRuntimeDriver = {
+const fusionComponentDriver: ComponentDriver = {
   resolveRoot: element => {
     const root = (element as FusionElement).ej2_instances?.[0];
     if (root !== undefined && root !== null) return root;
@@ -106,5 +86,5 @@ const fusionComponentRuntime: ComponentRuntimeDriver = {
   wireEvent: wireFusion,
 };
 
-registerComponentRuntime("native", nativeComponentRuntime);
-registerComponentRuntime("fusion", fusionComponentRuntime);
+registerComponentDriver("native", nativeComponentDriver);
+registerComponentDriver("fusion", fusionComponentDriver);

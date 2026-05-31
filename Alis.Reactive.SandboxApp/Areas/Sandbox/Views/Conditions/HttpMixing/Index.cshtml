@@ -767,23 +767,23 @@
 @Html.RenderPlan(plan)
 
 @functions {
-    private sealed class HttpMixingSlugifyPlugin : ReactivePlugin
+    private sealed class HttpMixingSlugifyPlugin : Plugin
     {
         public HttpMixingSlugifyPlugin()
             : base("slugify")
         {
-            Slug = Function<string, string>();
+            Slug = Function<string>().Arg<string>();
         }
 
         public PluginFunction<string> Slug { get; }
     }
 
-    private sealed class HttpMixingOrderPlugin : ReactivePlugin
+    private sealed class HttpMixingOrderPlugin : Plugin
     {
         public HttpMixingOrderPlugin()
             : base("order")
         {
-            Mark = Function<string, string, string>();
+            Mark = Function<string>().Arg<string>().Arg<string>();
         }
 
         public PluginFunction<string> Mark { get; }

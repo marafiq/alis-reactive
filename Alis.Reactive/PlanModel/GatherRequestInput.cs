@@ -73,7 +73,7 @@ namespace Alis.Reactive.PlanModel
             => new RequestInputAssignment(RequestRouteParameterTarget.For(name), source);
     }
 
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<RequestInputTarget>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<RequestInputTarget>))]
     public abstract class RequestInputTarget
     {
         private protected RequestInputTarget() { }

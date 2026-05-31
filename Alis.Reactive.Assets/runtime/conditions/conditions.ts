@@ -1,5 +1,5 @@
 // conditions.ts — V3 ConditionGraph evaluation.
-// The SYNC subset (compare/all/any/not) lives in ./sync-condition, a DI leaf that
+// The SYNC subset (compare/all/any/not) lives in ./compare-engine, a DI leaf that
 // receives the value-evaluator as a parameter (so it never imports core/evaluate). This
 // module keeps the public entry points and owns the async lane: confirm is the only term
 // that crosses to async, so full ConditionGraph evaluation may return a Promise.
@@ -14,7 +14,7 @@ import { scope } from "../core/trace";
 import { assertNever } from "../core/assert-never";
 import { evaluateValue } from "../core/evaluate";
 import { ExecutionContext } from "../domain/execution-context";
-import { evaluateSyncCondition, evaluateCompare } from "./sync-condition";
+import { evaluateSyncCondition, evaluateCompare } from "./compare-engine";
 
 const log = scope("conditions");
 

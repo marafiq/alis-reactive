@@ -4,7 +4,7 @@ using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<StartsWhen>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<StartsWhen>))]
     internal abstract class StartsWhen
     {
         private protected StartsWhen() { }
@@ -108,7 +108,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ServerPushEventFilter>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<ServerPushEventFilter>))]
     public abstract class ServerPushEventFilter
     {
         private protected ServerPushEventFilter(PayloadContract payloadType)

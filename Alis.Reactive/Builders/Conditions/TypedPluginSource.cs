@@ -5,7 +5,7 @@ namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
     /// A typed source that reads a method return value from a registered plugin.
-    /// Returned by <c>PipelineBuilder.Plugin&lt;T&gt;()</c> via implicit conversion from <see cref="PluginReadBuilder{TReturn, TModel}"/>.
+    /// Returned by <c>PipelineBuilder.Plugin&lt;T&gt;()</c> via implicit conversion from <see cref="PluginMemberBuilder{TReturn, TModel}"/>.
     /// </summary>
     public sealed class TypedPluginSource<TProp> : TypedSource<TProp>
     {

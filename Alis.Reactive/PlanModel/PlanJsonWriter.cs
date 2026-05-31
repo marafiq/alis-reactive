@@ -5,7 +5,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// Stateless serialization mechanics shared by the plan model JSON converters. Writes a named
     /// property by emitting its name and delegating the value to <see cref="JsonSerializer"/>, in the
-    /// same category as <see cref="Serialization.WriteOnlyPolymorphicConverter{T}"/>. Carries no domain branch.
+    /// same category as <see cref="Serialization.PlanNodeDiscriminator{T}"/>. Carries no domain branch.
     /// </summary>
     internal static class PlanJsonWriter
     {

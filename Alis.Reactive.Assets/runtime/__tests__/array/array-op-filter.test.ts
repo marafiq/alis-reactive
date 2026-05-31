@@ -89,7 +89,7 @@ const compoundResidents = [
 ];
 const names = (v: unknown): string[] => (v as Array<{ name: string }>).map(r => r.name);
 
-describe("array-op filter (per-element sync predicate via the DI sync-condition leaf)", () => {
+describe("array-op filter (per-element sync predicate via the DI compare-engine leaf)", () => {
   it("filters object elements by an element-member predicate", () => {
     const residents = [
       { id: 1, status: "active" },

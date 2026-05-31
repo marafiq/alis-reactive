@@ -6,6 +6,9 @@ namespace Alis.Reactive.Builders
     /// <summary>
     /// Configures a plugin's BrowserObjectContract members during plan construction.
     /// Used by <c>plan.RegisterPlugin("name", p =&gt; p.Method&lt;string&gt;("getToken"))</c>.
+    /// Argument arity is declared once through the args builder
+    /// (<c>p.Method&lt;int&gt;("count", a =&gt; a.Arg&lt;string&gt;())</c>), not through
+    /// arity-specific overloads.
     /// </summary>
     public sealed class PluginTypeBuilder
     {
@@ -55,64 +58,6 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
-        /// <summary>Declares the plugin root function with one typed JavaScript argument.</summary>
-        public PluginTypeBuilder Function<TReturn, TArg1>()
-        {
-            return AddMethod<TReturn>(
-                PluginOperationId.Root(_pluginName),
-                ExactArguments(Shape.FromClrType(typeof(TArg1))));
-        }
-
-        /// <summary>Declares the plugin root function with two typed JavaScript arguments.</summary>
-        public PluginTypeBuilder Function<TReturn, TArg1, TArg2>()
-        {
-            return AddMethod<TReturn>(
-                PluginOperationId.Root(_pluginName),
-                ExactArguments(
-                    Shape.FromClrType(typeof(TArg1)),
-                    Shape.FromClrType(typeof(TArg2))));
-        }
-
-        /// <summary>Declares the plugin root function with three typed JavaScript arguments.</summary>
-        public PluginTypeBuilder Function<TReturn, TArg1, TArg2, TArg3>()
-        {
-            return AddMethod<TReturn>(
-                PluginOperationId.Root(_pluginName),
-                ExactArguments(
-                    Shape.FromClrType(typeof(TArg1)),
-                    Shape.FromClrType(typeof(TArg2)),
-                    Shape.FromClrType(typeof(TArg3))));
-        }
-
-        /// <summary>Declares a method with one typed JavaScript argument.</summary>
-        public PluginTypeBuilder Method<TReturn, TArg1>(string name)
-        {
-            return AddMethod<TReturn>(
-                name,
-                ExactArguments(Shape.FromClrType(typeof(TArg1))));
-        }
-
-        /// <summary>Declares a method with two typed JavaScript arguments.</summary>
-        public PluginTypeBuilder Method<TReturn, TArg1, TArg2>(string name)
-        {
-            return AddMethod<TReturn>(
-                name,
-                ExactArguments(
-                    Shape.FromClrType(typeof(TArg1)),
-                    Shape.FromClrType(typeof(TArg2))));
-        }
-
-        /// <summary>Declares a method with three typed JavaScript arguments.</summary>
-        public PluginTypeBuilder Method<TReturn, TArg1, TArg2, TArg3>(string name)
-        {
-            return AddMethod<TReturn>(
-                name,
-                ExactArguments(
-                    Shape.FromClrType(typeof(TArg1)),
-                    Shape.FromClrType(typeof(TArg2)),
-                    Shape.FromClrType(typeof(TArg3))));
-        }
-
         /// <summary>Declares a void method (no return value).</summary>
         public PluginTypeBuilder Void(string name)
         {
@@ -156,64 +101,6 @@ namespace Alis.Reactive.Builders
         /// <summary>Declares the plugin root command with an exact argument contract.</summary>
         public PluginTypeBuilder Command(Action<PluginArgumentTypes> arguments) =>
             Void(arguments);
-
-        /// <summary>Declares the plugin root command with one typed JavaScript argument.</summary>
-        public PluginTypeBuilder Void<TArg1>()
-        {
-            return AddVoid(
-                PluginOperationId.Root(_pluginName),
-                ExactArguments(Shape.FromClrType(typeof(TArg1))));
-        }
-
-        /// <summary>Declares the plugin root command with two typed JavaScript arguments.</summary>
-        public PluginTypeBuilder Void<TArg1, TArg2>()
-        {
-            return AddVoid(
-                PluginOperationId.Root(_pluginName),
-                ExactArguments(
-                    Shape.FromClrType(typeof(TArg1)),
-                    Shape.FromClrType(typeof(TArg2))));
-        }
-
-        /// <summary>Declares the plugin root command with three typed JavaScript arguments.</summary>
-        public PluginTypeBuilder Void<TArg1, TArg2, TArg3>()
-        {
-            return AddVoid(
-                PluginOperationId.Root(_pluginName),
-                ExactArguments(
-                    Shape.FromClrType(typeof(TArg1)),
-                    Shape.FromClrType(typeof(TArg2)),
-                    Shape.FromClrType(typeof(TArg3))));
-        }
-
-        /// <summary>Declares a void method with one typed JavaScript argument.</summary>
-        public PluginTypeBuilder Void<TArg1>(string name)
-        {
-            return AddVoid(
-                name,
-                ExactArguments(Shape.FromClrType(typeof(TArg1))));
-        }
-
-        /// <summary>Declares a void method with two typed JavaScript arguments.</summary>
-        public PluginTypeBuilder Void<TArg1, TArg2>(string name)
-        {
-            return AddVoid(
-                name,
-                ExactArguments(
-                    Shape.FromClrType(typeof(TArg1)),
-                    Shape.FromClrType(typeof(TArg2))));
-        }
-
-        /// <summary>Declares a void method with three typed JavaScript arguments.</summary>
-        public PluginTypeBuilder Void<TArg1, TArg2, TArg3>(string name)
-        {
-            return AddVoid(
-                name,
-                ExactArguments(
-                    Shape.FromClrType(typeof(TArg1)),
-                    Shape.FromClrType(typeof(TArg2)),
-                    Shape.FromClrType(typeof(TArg3))));
-        }
 
         internal PluginContract Build() => _members.ToContract(_pluginName);
 
@@ -262,11 +149,6 @@ namespace Alis.Reactive.Builders
             var builder = new PluginArgumentTypes();
             configure(builder);
             return MethodArgumentContract.Exact(builder.Shapes);
-        }
-
-        private static MethodArgumentContract ExactArguments(params Shape[] args)
-        {
-            return MethodArgumentContract.Exact(args);
         }
     }
 

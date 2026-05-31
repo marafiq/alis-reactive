@@ -95,7 +95,7 @@ namespace Alis.Reactive.Fusion.Components
             return rules;
         }
 
-        private static void Add(Dictionary<string, object> rules, ValidationRule rule)
+        private static void Add(Dictionary<string, object> rules, ClientRule rule)
         {
             var key = rule.Name.Value;
             switch (key)

@@ -6,7 +6,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// Base class for value source identifiers in a reactive plan. Not constructed in application code.
     /// </summary>
-    [System.Text.Json.Serialization.JsonConverter(typeof(WriteOnlyPolymorphicConverter<Source>))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<Source>))]
     public abstract class Source
     {
         private protected Source() { }
@@ -101,7 +101,7 @@ namespace Alis.Reactive.PlanModel
     public sealed class PluginSource : RuntimeObjectSource
     {
         private readonly PluginName _name;
-        private readonly TypeKey _type;
+        private readonly BrowserObjectId _type;
 
         /// <summary>Gets the kind. Always <c>"plugin"</c>.</summary>
         public string Kind => "plugin";
@@ -112,7 +112,7 @@ namespace Alis.Reactive.PlanModel
         private PluginSource(string name)
         {
             _name = PluginName.Of(name);
-            _type = TypeKey.Plugin(_name);
+            _type = BrowserObjectId.Plugin(_name);
         }
         internal static PluginSource Of(string name) => new PluginSource(name);
     }

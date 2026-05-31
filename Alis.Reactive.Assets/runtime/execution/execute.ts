@@ -14,7 +14,7 @@ export { evaluateValue };
 import { evaluateConditionInCurrentLane } from "../conditions/conditions";
 import { validateContainer, showServerErrors } from "../validation";
 import { executeRequest } from "./http";
-import { injectHtml } from "./inject";
+import { injectPartial } from "./inject";
 import { assertNever } from "../core/assert-never";
 import { scope } from "../core/trace";
 import { isMissingRuntimeValue } from "../domain/runtime-value";
@@ -208,7 +208,7 @@ function executeInject(reaction: InjectReaction, plan: RuntimePlan, context: Exe
   const container = plan.components.element(reaction.slot);
   const value = evaluateValue(reaction.value, plan.document, context.raw);
   if (typeof value === "string") {
-    injectHtml(container, value, reaction.slot);
+    injectPartial(container, value, reaction.slot);
     log.trace("inject.applied", { slot: reaction.slot, size: value.length });
     return;
   }

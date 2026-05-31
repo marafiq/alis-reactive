@@ -1,11 +1,9 @@
-// browser-plans.ts - boot plan composition and browser partial slot composition.
+// applied-plans.ts — composition state for all applied plans: boot snapshots,
+// loaded partial slots, per-slot AbortController. Active plans recompose from
+// the boot snapshot plus currently-loaded slots; the boot snapshot is immutable.
 
 import type { PlanDocument, Behavior } from "../types";
-import {
-  mergeBootComponent,
-  mergeSlotComponent,
-} from "./component-merge";
-import { mergeObjectContracts } from "./object-contracts";
+import { MergePolicy, emptyPlan, snapshotPlan } from "./merge-policy";
 
 type PlanId = string;
 type SlotId = string;
@@ -23,7 +21,7 @@ interface PartialSlotLoad {
   readonly plans: PlanDocument[];
 }
 
-export class AppliedBrowserPlans {
+export class AppliedPlans {
   private readonly activePlans = new Map<PlanId, PlanDocument>();
   private readonly bootSnapshots = new Map<PlanId, PlanDocument>();
   private readonly partialSlotLoads = new Map<SlotId, PartialSlotLoad>();
@@ -101,11 +99,11 @@ export class AppliedBrowserPlans {
     resetPlanDocument(target, planId);
 
     if (bootPlan !== undefined) {
-      composeBootPlanInto(target, bootPlan);
+      MergePolicy.composeBootPlanInto(target, bootPlan);
     }
 
     for (const slotPlan of slotPlans) {
-      composeSlotPlanInto(target, slotPlan, bootPlan);
+      MergePolicy.composeSlotPlanInto(target, slotPlan, bootPlan);
     }
   }
 
@@ -137,52 +135,17 @@ export class AppliedBrowserPlans {
   }
 }
 
-export const appliedBrowserPlans = new AppliedBrowserPlans();
+export const appliedPlans = new AppliedPlans();
 
 export function composeInitialPlans(plans: PlanDocument[]): PlanDocument[] {
   const assembledPlans = new Map<PlanId, PlanDocument>();
   for (const plan of plans) {
     const assembled = assembledPlans.get(plan.planId) ?? emptyPlan(plan.planId);
     assembledPlans.set(plan.planId, assembled);
-    composeBootPlanInto(assembled, plan);
+    MergePolicy.composeBootPlanInto(assembled, plan);
   }
 
   return Array.from(assembledPlans.values());
-}
-
-function composeBootPlanInto(target: PlanDocument, incoming: PlanDocument): void {
-  mergeTypeContracts(target, incoming);
-
-  for (const [componentKey, component] of Object.entries(incoming.components)) {
-    mergeBootComponent(target, componentKey, component);
-  }
-
-  target.behaviors.push(...incoming.behaviors);
-}
-
-function composeSlotPlanInto(
-  target: PlanDocument,
-  incoming: PlanDocument,
-  bootPlan: PlanDocument | undefined,
-): void {
-  mergeTypeContracts(target, incoming);
-
-  for (const [componentKey, component] of Object.entries(incoming.components)) {
-    mergeSlotComponent(
-      target,
-      componentKey,
-      component,
-      bootPlan?.components[componentKey] !== undefined,
-    );
-  }
-
-  target.behaviors.push(...incoming.behaviors);
-}
-
-function mergeTypeContracts(target: PlanDocument, incoming: PlanDocument): void {
-  for (const [typeKey, contract] of Object.entries(incoming.types)) {
-    target.types[typeKey] = mergeObjectContracts(target.types[typeKey], contract);
-  }
 }
 
 function resetPlanDocument(plan: PlanDocument, planId: PlanId): void {
@@ -192,28 +155,6 @@ function resetPlanDocument(plan: PlanDocument, planId: PlanId): void {
   plan.types = {};
   plan.components = {};
   plan.behaviors = [];
-}
-
-function emptyPlan(planId: PlanId): PlanDocument {
-  return {
-    version: 3,
-    planId,
-    scope: { kind: "root" },
-    types: {},
-    components: {},
-    behaviors: [],
-  };
-}
-
-function snapshotPlan(plan: PlanDocument): PlanDocument {
-  return {
-    version: plan.version,
-    planId: plan.planId,
-    scope: { ...plan.scope },
-    types: { ...plan.types },
-    components: { ...plan.components },
-    behaviors: [...plan.behaviors],
-  };
 }
 
 function planIdsIn(plans: PlanDocument[]): PlanId[] {

@@ -16,7 +16,8 @@ import { RuntimeValue, applyShapeWhenPresent } from "../domain/runtime-value";
 import { RuntimePath } from "../domain/runtime-path";
 import { ExecutionContext } from "../domain/execution-context";
 import { RuntimeObject } from "../domain/runtime-object";
-import { evaluateSyncCondition } from "../conditions/sync-condition";
+import { evaluateSyncCondition } from "../conditions/compare-engine";
+import { runArrayOp } from "../value/array-op-engine";
 
 type ObjectReadExpression = ObjectPropertyReadExpression | ObjectMethodReadExpression;
 type PayloadReadExpression = PayloadPathReadExpression | WholePayloadReadExpression | WholeElementReadExpression | ElementMethodReadExpression;
@@ -55,7 +56,12 @@ class ValueEvaluation {
           .usingDeclaredShape();
 
       case "array-op":
-        return this.evaluateArrayOp(expression);
+        return runArrayOp(
+          expression,
+          this.evaluate(expression.source),
+          (e, item) => this.inElement(item).evaluate(e),
+          (p, item) => this.elementMatches(p, item),
+        );
 
       default:
         assertNever(expression, "value expression kind");
@@ -127,57 +133,6 @@ class ValueEvaluation {
     return result;
   }
 
-  private evaluateArrayOp(expression: ArrayOperationExpression): unknown {
-    const items = normalizeToArray(this.evaluate(expression.source), expression.op);
-    switch (expression.op) {
-      case "count":
-        // Count is unconditional length; Count(predicate) compiles to filter -> count (ReactiveArray.cs),
-        // so the count node never carries a predicate.
-        return items.length;
-      case "filter":
-        return this.shapedArray(items.filter(item => this.elementMatches(expression.predicate, item)), expression);
-      case "map":
-        return this.shapedArray(items.map(item => this.project(expression.projection, item)), expression);
-      case "sum":
-        return items.reduce<number>(
-          (total, item) => total + toNumber(this.projectedOrSelf(expression.projection, item)), 0);
-      case "any":
-        return expression.predicate === undefined
-          ? items.length > 0
-          : items.some(item => this.elementMatches(expression.predicate, item));
-      case "all":
-        return items.every(item => this.elementMatches(expression.predicate, item));
-      case "find":
-        return this.findElement(expression, items);
-      case "orderBy":
-        return this.shapedArray(this.ordered(items, expression.projection, false), expression);
-      case "orderByDescending":
-        return this.shapedArray(this.ordered(items, expression.projection, true), expression);
-      default:
-        return assertNever(expression.op, "array-op kind");
-    }
-  }
-
-  private findElement(expression: ArrayOperationExpression, items: unknown[]): unknown {
-    if (expression.predicate === undefined) {
-      throw new Error("[alis] array-op 'find' requires a predicate");
-    }
-    const found = items.find(item => this.elementMatches(expression.predicate, item));
-    if (found === undefined) return null;
-    return expression.projection === undefined ? found : this.project(expression.projection, found);
-  }
-
-  private ordered(items: unknown[], key: ArrayOperationExpression["projection"], descending: boolean): unknown[] {
-    if (key === undefined) throw new Error("[alis] array-op orderBy requires a key projection");
-    const decorated = items.map(item => ({ item, sortKey: this.inElement(item).evaluate(key) }));
-    decorated.sort((a, b) => compareKeys(a.sortKey, b.sortKey) * (descending ? -1 : 1));
-    return decorated.map(entry => entry.item);
-  }
-
-  private shapedArray(result: unknown[], expression: ArrayOperationExpression): unknown {
-    return RuntimeValue.declared(result, expression.shape).usingDeclaredShape();
-  }
-
   /** Evaluate a per-element predicate against the element scope (immediate lane, sync subset). */
   private elementMatches(predicate: ArrayOperationExpression["predicate"], item: unknown): boolean {
     if (predicate === undefined) {
@@ -186,60 +141,9 @@ class ValueEvaluation {
     return evaluateSyncCondition(predicate, this.document, this.context.withElement(item), evaluateValue);
   }
 
-  private project(projection: ArrayOperationExpression["projection"], item: unknown): unknown {
-    if (projection === undefined) {
-      throw new Error("[alis] array-op projection is required for this operation");
-    }
-    return this.inElement(item).evaluate(projection);
-  }
-
-  private projectedOrSelf(projection: ArrayOperationExpression["projection"], item: unknown): unknown {
-    return projection === undefined ? item : this.inElement(item).evaluate(projection);
-  }
-
   private inElement(item: unknown): ValueEvaluation {
     return new ValueEvaluation(this.document, this.plan, this.context.withElement(item));
   }
-}
-
-/**
- * Normalize an array-op source to a JS array at the input boundary.
- * Browser/EJ2 JS APIs return an underdetermined union (Array | array-like | iterable
- * | scalar | null) that the C# T[] type cannot constrain at authoring time. This is an
- * external-boundary normalization — the same category as getElementById returning null —
- * not a plan validator or fallback. DOMStringMap (dataset) has no Symbol.iterator and
- * fails fast at the throw, keeping it in the plugin escape hatch's domain.
- */
-function normalizeToArray(value: unknown, label: string): unknown[] {
-  if (Array.isArray(value)) return value;
-  if (value === null || value === undefined) return [];
-  if (typeof value === "number" || typeof value === "string") return [value];
-  if (typeof value === "object" && Symbol.iterator in (value as object)) {
-    return Array.from(value as Iterable<unknown>);
-  }
-  throw new Error(`[alis] array-op source is not iterable: ${label} (got ${typeof value})`);
-}
-
-/** Coerce a projected value to a number for sum; non-finite contributes 0. */
-function toNumber(value: unknown): number {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : 0;
-}
-
-/** Deterministic ordering of sort keys: numeric when both numbers, else lexicographic. */
-function compareKeys(a: unknown, b: unknown): number {
-  if (typeof a === "number" && typeof b === "number") {
-    const aFinite = Number.isFinite(a);
-    const bFinite = Number.isFinite(b);
-    if (aFinite && bFinite) return a - b;
-    // Non-finite keys (NaN/Infinity from a missing or non-numeric field) sort last,
-    // deterministically — never feed NaN to Array.sort (engine-defined behavior).
-    if (aFinite === bFinite) return 0;
-    return aFinite ? -1 : 1;
-  }
-  const left = String(a);
-  const right = String(b);
-  return left < right ? -1 : left > right ? 1 : 0;
 }
 
 function isObjectRead(expression: ReadExpression): expression is ObjectReadExpression {

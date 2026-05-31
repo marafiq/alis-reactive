@@ -127,7 +127,7 @@ namespace Alis.Reactive.PlanModel
             new RequestEndpoint(method, url);
     }
 
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<RequestChain>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<RequestChain>))]
     public abstract class RequestChain
     {
         private protected RequestChain() { }
@@ -169,7 +169,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Base class for request validation targets. Not constructed in application code.</summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<RequestValidationTarget>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<RequestValidationTarget>))]
     public abstract class RequestValidationTarget
     {
         private protected RequestValidationTarget() { }
@@ -234,7 +234,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>Base class for HTTP response status matching. Not constructed in application code.</summary>
-    [JsonConverter(typeof(WriteOnlyPolymorphicConverter<ResponseStatusMatch>))]
+    [JsonConverter(typeof(PlanNodeDiscriminator<ResponseStatusMatch>))]
     public abstract class ResponseStatusMatch
     {
         private protected ResponseStatusMatch() { }
