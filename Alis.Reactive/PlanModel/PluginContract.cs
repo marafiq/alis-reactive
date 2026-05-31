@@ -213,7 +213,7 @@ namespace Alis.Reactive.PlanModel
 
         internal PluginName Name { get; }
 
-        internal TypeKey TypeKey => TypeKey.Plugin(Name);
+        internal BrowserObjectId BrowserObjectId => BrowserObjectId.Plugin(Name);
 
         internal static PluginContract Create(PluginName name, IEnumerable<PluginOperationContract> operations)
         {

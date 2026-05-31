@@ -128,16 +128,6 @@ namespace Alis.Reactive.PlanModel
         internal static ComponentKey Of(string value) => new ComponentKey(value);
     }
 
-    internal sealed class TypeKey : PlanString
-    {
-        private TypeKey(string value) : base(value, nameof(value)) { }
-
-        internal static TypeKey Of(string value) => new TypeKey(value);
-        internal static TypeKey NativeElement(ComponentId componentId) => Of("native.element." + componentId.Value);
-        internal static TypeKey ComponentObject(ComponentVendor vendor, ComponentId componentId) => Of(vendor.Value + ".component." + componentId.Value);
-        internal static TypeKey Plugin(PluginName pluginName) => Of("plugin." + pluginName.Value);
-    }
-
     internal sealed class BindingPath : PlanString
     {
         private readonly Path _path;

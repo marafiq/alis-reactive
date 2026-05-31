@@ -4,13 +4,13 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Alis.Reactive.PlanModel
 {
-    internal sealed class ComponentObjects
+    internal sealed class BrowserObjects
     {
         private readonly BrowserObjectContracts _objectContracts;
-        private readonly Dictionary<string, ComponentObject> _components = new Dictionary<string, ComponentObject>();
+        private readonly Dictionary<string, BrowserObject> _components = new Dictionary<string, BrowserObject>();
         private readonly RegisteredInputComponents _registrations;
 
-        internal ComponentObjects(
+        internal BrowserObjects(
             BrowserObjectContracts objectContracts,
             RegisteredInputComponents registrations)
         {
@@ -18,13 +18,13 @@ namespace Alis.Reactive.PlanModel
             _registrations = registrations;
         }
 
-        internal IReadOnlyDictionary<string, ComponentObject> Snapshot() =>
-            new Dictionary<string, ComponentObject>(_components);
+        internal IReadOnlyDictionary<string, BrowserObject> Snapshot() =>
+            new Dictionary<string, BrowserObject>(_components);
 
-        internal ComponentObject Get(ComponentKey componentKey) =>
+        internal BrowserObject Get(ComponentKey componentKey) =>
             _components[componentKey.Value];
 
-        internal void Set(ComponentKey componentKey, ComponentObject component) =>
+        internal void Set(ComponentKey componentKey, BrowserObject component) =>
             _components[componentKey.Value] = component;
 
         internal ComponentKey DeclareElement(string elementId)
@@ -33,22 +33,22 @@ namespace Alis.Reactive.PlanModel
             if (_components.ContainsKey(id.Value))
                 return ComponentKey.Of(id.Value);
 
-            var typeKey = TypeKey.NativeElement(id);
+            var typeKey = BrowserObjectId.NativeElement(id);
             _objectContracts.DeclareObject(typeKey);
-            _components[id.Value] = ComponentObject.Element(id, ComponentVendor.Native, typeKey);
+            _components[id.Value] = BrowserObject.Element(id, ComponentVendor.Native, typeKey);
             return ComponentKey.Of(id.Value);
         }
 
         internal ComponentKey DeclareObjectTarget(string componentId, string vendor) =>
-            DeclareComponentObject(componentId, vendor, ComponentObject.Element);
+            DeclareComponentObject(componentId, vendor, BrowserObject.Element);
 
         internal ComponentKey DeclareLayoutObject(string componentId, string vendor) =>
-            DeclareComponentObject(componentId, vendor, ComponentObject.LayoutObject);
+            DeclareComponentObject(componentId, vendor, BrowserObject.LayoutObject);
 
         private ComponentKey DeclareComponentObject(
             string componentId,
             string vendor,
-            Func<ComponentId, ComponentVendor, TypeKey, ComponentObject> createUnregisteredComponent)
+            Func<ComponentId, ComponentVendor, BrowserObjectId, BrowserObject> createUnregisteredComponent)
         {
             var id = ComponentId.Of(componentId);
             var componentVendor = ComponentVendor.From(vendor);
@@ -60,7 +60,7 @@ namespace Alis.Reactive.PlanModel
                 return ComponentKey.Of(id.Value);
             }
 
-            var typeKey = TypeKey.ComponentObject(componentVendor, id);
+            var typeKey = BrowserObjectId.ComponentObject(componentVendor, id);
             if (TryFindRegistration(id, out var registration))
             {
                 registration.DeclareValueContract(_objectContracts, typeKey);
@@ -85,12 +85,12 @@ namespace Alis.Reactive.PlanModel
             if (_components.TryGetValue(id.Value, out var existing))
             {
                 RequireSameVendor(existing, id, componentVendor);
-                _objectContracts.DeclareInputValueContract(TypeKey.Of(existing.Type), valueContract);
+                _objectContracts.DeclareInputValueContract(BrowserObjectId.Of(existing.Type), valueContract);
                 _components[id.Value] = existing.WithBindingIfAbsent(binding);
                 return ComponentKey.Of(id.Value);
             }
 
-            var typeKey = input.TypeKey;
+            var typeKey = input.BrowserObjectId;
             _objectContracts.DeclareInputValueContract(typeKey, valueContract);
             _components[id.Value] = input.CreateComponent();
 
@@ -100,19 +100,19 @@ namespace Alis.Reactive.PlanModel
         internal void DeclareProperty(ComponentKey componentKey, ObjectPropertyContract contract)
         {
             var component = Get(componentKey);
-            _objectContracts.DeclareProperty(TypeKey.Of(component.Type), contract);
+            _objectContracts.DeclareProperty(BrowserObjectId.Of(component.Type), contract);
         }
 
         internal ObjectMethod DeclareMethod(ComponentKey componentKey, ObjectMethodContract contract)
         {
             var component = Get(componentKey);
-            return _objectContracts.DeclareMethod(TypeKey.Of(component.Type), contract);
+            return _objectContracts.DeclareMethod(BrowserObjectId.Of(component.Type), contract);
         }
 
         internal void DeclareEvent(ComponentKey componentKey, ObjectEventContract contract)
         {
             var component = Get(componentKey);
-            _objectContracts.DeclareEvent(TypeKey.Of(component.Type), contract);
+            _objectContracts.DeclareEvent(BrowserObjectId.Of(component.Type), contract);
         }
 
         internal void RegisterInputComponents()
@@ -140,7 +140,7 @@ namespace Alis.Reactive.PlanModel
             throw valueRead.MissingRegistrationException();
         }
 
-        private static void RequireSameVendor(ComponentObject existing, ComponentId componentId, ComponentVendor vendor)
+        private static void RequireSameVendor(BrowserObject existing, ComponentId componentId, ComponentVendor vendor)
         {
             if (existing.Vendor != vendor.Value)
                 throw new InvalidOperationException(
@@ -148,14 +148,14 @@ namespace Alis.Reactive.PlanModel
                     $"but re-referenced as '{vendor.Value}'. A component cannot change vendor.");
         }
 
-        private void EnrichExistingComponent(ComponentObject existing, ComponentId componentId)
+        private void EnrichExistingComponent(BrowserObject existing, ComponentId componentId)
         {
             if (!TryFindRegistration(componentId, out var registration))
                 return;
 
             _components[componentId.Value] = registration.AddBindingTo(
                 existing,
-                _objectContracts.Require(TypeKey.Of(existing.Type)));
+                _objectContracts.Require(BrowserObjectId.Of(existing.Type)));
         }
 
     }

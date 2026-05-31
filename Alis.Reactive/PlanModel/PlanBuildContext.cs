@@ -12,7 +12,7 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly PlanIdentity _identity;
         private readonly BrowserObjectContracts _objectContracts;
-        private readonly ComponentObjects _components;
+        private readonly BrowserObjects _components;
         private readonly BehaviorGraph _behaviors;
         private readonly List<ValidationJob> _validationJobs = new List<ValidationJob>();
 
@@ -22,7 +22,7 @@ namespace Alis.Reactive.PlanModel
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             _objectContracts = new BrowserObjectContracts();
-            _components = new ComponentObjects(_objectContracts, registrations);
+            _components = new BrowserObjects(_objectContracts, registrations);
             _behaviors = new BehaviorGraph(_components);
         }
 
@@ -35,10 +35,10 @@ namespace Alis.Reactive.PlanModel
                 _behaviors.Snapshot());
 
         /// <summary>Gets a component already registered in the plan.</summary>
-        internal ComponentObject GetComponent(ComponentKey key) => _components.Get(key);
+        internal BrowserObject GetComponent(ComponentKey key) => _components.Get(key);
 
         /// <summary>Replaces a registered component, used when validation enriches a container scope.</summary>
-        internal void SetComponent(ComponentKey key, ComponentObject component) => _components.Set(key, component);
+        internal void SetComponent(ComponentKey key, BrowserObject component) => _components.Set(key, component);
 
         /// <summary>Records that a request declared a validation source, to be resolved during Render().</summary>
         internal void RegisterValidationJob(RequestPlan request, ComponentId container, Type validationSourceType) =>

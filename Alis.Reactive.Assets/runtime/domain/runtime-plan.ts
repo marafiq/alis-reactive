@@ -6,9 +6,9 @@ import type {
 } from "../types";
 import { browserPlugins, type BrowserPluginCatalog } from "../core/plugin-catalog";
 import { RuntimeObject } from "./runtime-object";
-import { ComponentRuntime } from "./component-runtime";
+import { type ComponentDriver, requireComponentDriver } from "./component-driver";
 
-export { RuntimeComponentReadinessError } from "./component-runtime";
+export { RuntimeComponentReadinessError } from "./component-driver";
 
 const cache = new WeakMap<PlanDocument, RuntimePlan>();
 
@@ -162,8 +162,8 @@ export class RuntimeComponent {
     );
   }
 
-  runtime(): ComponentRuntime {
-    return ComponentRuntime.for(this.id, this.definition.vendor);
+  runtime(): ComponentDriver {
+    return requireComponentDriver(this.id, this.definition.vendor);
   }
 }
 
