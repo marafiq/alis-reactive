@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Alis.Reactive — DSL Atlas (interactive)</title>
+<script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+<style>
+  :root { --bg:#0e1116; --panel:#161b22; --line:#2b333d; --txt:#e6edf3; --muted:#9aa7b4; --accent:#7c5cff; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--txt); }
+  #app { display:grid; grid-template-columns:1fr 360px; grid-template-rows:auto 1fr; height:100vh; }
+  header { grid-column:1 / span 2; display:flex; gap:12px; align-items:center; padding:10px 16px; border-bottom:1px solid var(--line); background:var(--panel); }
+  header h1 { font-size:15px; margin:0; font-weight:650; letter-spacing:.2px; }
+  header h1 span { color:var(--accent); }
+  header .grow { flex:1; }
+  #search { background:#0b0e13; border:1px solid var(--line); color:var(--txt); border-radius:8px; padding:7px 11px; width:280px; font-size:13px; outline:none; }
+  #search:focus { border-color:var(--accent); }
+  button.tool { background:#0b0e13; border:1px solid var(--line); color:var(--txt); border-radius:8px; padding:7px 12px; font-size:12.5px; cursor:pointer; }
+  button.tool:hover { border-color:var(--accent); color:#fff; }
+  #cy { width:100%; height:100%; background:radial-gradient(circle at 30% 20%, #141a22, var(--bg)); }
+  #side { border-left:1px solid var(--line); background:var(--panel); padding:18px; overflow:auto; }
+  #side .empty { color:var(--muted); font-size:13px; line-height:1.6; }
+  #side .kicker { font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:var(--accent); font-weight:700; }
+  #side h2 { font-size:18px; margin:6px 0 4px; }
+  #side .area-tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; margin-bottom:12px; font-weight:600; }
+  #side h3 { font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:18px 0 7px; }
+  #side code.ex { display:block; background:#0b0e13; border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:12.5px; font-family:"SF Mono",Menlo,Consolas,monospace; color:#c9d6e3; white-space:pre-wrap; word-break:break-word; }
+  #side ul { margin:0; padding-left:18px; } #side li { font-size:13px; line-height:1.6; }
+  .chip { display:inline-block; background:#0b0e13; border:1px solid var(--line); border-radius:6px; padding:3px 8px; margin:0 5px 5px 0; font-size:11.5px; font-family:"SF Mono",Menlo,monospace; color:#a9b6c4; }
+  #legend { position:absolute; bottom:14px; left:14px; background:rgba(22,27,34,.92); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:12px; max-width:300px; }
+  #legend .li { display:flex; align-items:center; gap:8px; margin:3px 0; cursor:pointer; }
+  #legend .dot { width:11px; height:11px; border-radius:3px; flex:none; }
+  #legend .li:hover { color:#fff; }
+  #hint { position:absolute; top:64px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12.5px; pointer-events:none; }
+  #stats { color:var(--muted); font-size:12px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1><span>Alis.Reactive</span> · DSL Atlas</h1>
+    <span id="stats"></span>
+    <span class="grow"></span>
+    <input id="search" placeholder="Search features, variants, types…" autocomplete="off" />
+    <button class="tool" id="btn-expand">Expand all</button>
+    <button class="tool" id="btn-collapse">Collapse all</button>
+    <button class="tool" id="btn-flow">Flow ▶</button>
+    <button class="tool" id="btn-fit">Fit</button>
+  </header>
+  <div style="position:relative">
+    <div id="cy"></div>
+    <div id="hint">Click an area to expand its features · click a feature for details · scroll to zoom</div>
+    <div id="legend"></div>
+  </div>
+  <aside id="side"><p class="empty">Select an <b>area</b> to expand it into features, or a <b>feature</b> to see its variants, DSL example, and domain types.<br><br>Use the search box to find any feature across the whole DSL. <b>Flow ▶</b> traces a request end-to-end.</p></aside>
+</div>
+<script src="./dsl-graph.js"></script>
+<script>
+(function () {
+  var G = window.DSL_GRAPH;
+  if (!G || !G.areas) { document.getElementById('side').innerHTML = '<p class="empty">dsl-graph.js failed to load.</p>'; return; }
+
+  var PALETTE = ['#7c5cff','#36c2ce','#f2a93b','#e5616f','#5aa9e6','#7ed957','#c77dff','#ff924c','#4dd0a8','#d4a5ff','#62b6ff','#ffd166'];
+  var areaColor = {}, expanded = {}, featureIndex = [];
+  G.areas.forEach(function (a, i) { areaColor[a.key] = PALETTE[i % PALETTE.length]; expanded[a.key] = false; });
+
+  function featCount(a) { return a.features ? a.features.length : 0; }
+  function areaEls() {
+    return G.areas.map(function (a) {
+      return { data: { id: a.key, label: a.title + '  (' + featCount(a) + ')', kind: 'area', color: areaColor[a.key], blurb: a.blurb || '' } };
+    });
+  }
+  function edgeEls() {
+    // Dedupe area↔area edges (the raw graph has many feature-level relations collapsed
+    // to the same area pair) so the top-level view reads cleanly instead of as a hairball.
+    var seen = {}, out = [];
+    (G.edges || []).forEach(function (e) {
+      var k = e.from + '|' + e.to;
+      if (seen[k]) { if (e.label) seen[k].labels.push(e.label); return; }
+      var rec = { id: 'e' + out.length, source: e.from, target: e.to, labels: e.label ? [e.label] : [] };
+      seen[k] = rec; out.push(rec);
+    });
+    return out.map(function (r) { return { data: { id: r.id, source: r.source, target: r.target, label: r.labels.join(' · ') } }; });
+  }
+  function areaConnections(key) {
+    var outs = (G.edges || []).filter(function (e) { return e.from === key; });
+    var ins = (G.edges || []).filter(function (e) { return e.to === key; });
+    function title(k) { var a = G.areas.find(function (x) { return x.key === k; }); return a ? a.title : k; }
+    return { outs: outs.map(function (e) { return { to: title(e.to), label: e.label }; }), ins: ins.map(function (e) { return { from: title(e.from), label: e.label }; }) };
+  }
+  function featureEls(a) {
+    return a.features.map(function (f, j) {
+      var id = a.key + '::' + j;
+      featureIndex.push({ id: id, area: a.key, f: f });
+      return { data: { id: id, parent: a.key, label: f.name, kind: 'feature', color: areaColor[a.key], area: a.key, fidx: j } };
+    });
+  }
+
+  var cy = cytoscape({
+    container: document.getElementById('cy'),
+    elements: areaEls().concat(edgeEls()),
+    wheelSensitivity: 0.25,
+    style: [
+      { selector: 'node[kind="area"]', style: {
+        'label': 'data(label)', 'color': '#fff', 'font-size': 14, 'font-weight': 700,
+        'text-valign': 'top', 'text-halign': 'center', 'text-margin-y': -4,
+        'background-color': 'data(color)', 'background-opacity': 0.10,
+        'border-width': 2, 'border-color': 'data(color)', 'shape': 'round-rectangle',
+        'padding': 14, 'width': 120, 'height': 44, 'corner-radius': 12 } },
+      { selector: 'node[kind="feature"]', style: {
+        'label': 'data(label)', 'color': '#e6edf3', 'font-size': 11,
+        'text-valign': 'center', 'text-halign': 'center', 'text-wrap': 'wrap', 'text-max-width': 120,
+        'background-color': 'data(color)', 'background-opacity': 0.22,
+        'border-width': 1, 'border-color': 'data(color)', 'shape': 'round-rectangle',
+        'width': 'label', 'height': 'label', 'padding': 8 } },
+      { selector: 'edge', style: {
+        'label': 'data(label)', 'font-size': 9, 'color': '#aab6c4', 'text-rotation': 'autorotate',
+        'text-opacity': 0, 'text-background-color': '#0e1116', 'text-background-opacity': 0.85, 'text-background-padding': 2,
+        'width': 1.2, 'line-color': '#39424f', 'target-arrow-color': '#39424f',
+        'target-arrow-shape': 'triangle', 'curve-style': 'bezier', 'arrow-scale': 0.8, 'opacity': 0.5 } },
+      { selector: 'edge.edge-hl', style: {
+        'text-opacity': 1, 'line-color': '#cdd6e0', 'target-arrow-color': '#cdd6e0', 'width': 2.4, 'opacity': 1, 'z-index': 50 } },
+      { selector: '.dim', style: { 'opacity': 0.12 } },
+      { selector: '.hit', style: { 'border-width': 3, 'border-color': '#fff', 'background-opacity': 0.5 } },
+      { selector: '.flow', style: { 'line-color': '#ffd166', 'target-arrow-color': '#ffd166', 'width': 3.5, 'opacity': 1, 'z-index': 99 } },
+      { selector: 'node.flown', style: { 'border-color': '#ffd166', 'border-width': 3 } }
+    ],
+    layout: { name: 'cose', animate: false, padding: 50, nodeRepulsion: 22000, idealEdgeLength: 220, nodeOverlap: 40, componentSpacing: 140, gravity: 0.25, nestingFactor: 1.2 }
+  });
+
+  function relayout() { cy.layout({ name: 'cose', animate: true, animationDuration: 400, padding: 50, nodeRepulsion: 22000, idealEdgeLength: 220, nodeOverlap: 40, componentSpacing: 140, gravity: 0.25, nestingFactor: 1.2, randomize: false }).run(); }
+
+  function expandArea(key) {
+    if (expanded[key]) return;
+    var a = G.areas.find(function (x) { return x.key === key; });
+    if (!a) return;
+    cy.add(featureEls(a)); expanded[key] = true;
+  }
+  function collapseArea(key) {
+    if (!expanded[key]) return;
+    cy.remove(cy.nodes('[area="' + key + '"]')); expanded[key] = false;
+  }
+
+  function showArea(node) {
+    var key = node.id(); var a = G.areas.find(function (x) { return x.key === key; });
+    cy.edges().removeClass('edge-hl');
+    cy.edges().filter(function (e) { return e.data('source') === key || e.data('target') === key; }).addClass('edge-hl');
+    var conn = areaConnections(key);
+    var connHtml = '';
+    if (conn.outs.length) connHtml += '<h3>Flows to</h3><ul>' + conn.outs.map(function (c) { return '<li><b>' + esc(c.to) + '</b> — ' + esc(c.label) + '</li>'; }).join('') + '</ul>';
+    if (conn.ins.length) connHtml += '<h3>Flows from</h3><ul>' + conn.ins.map(function (c) { return '<li><b>' + esc(c.from) + '</b> — ' + esc(c.label) + '</li>'; }).join('') + '</ul>';
+    document.getElementById('side').innerHTML =
+      '<div class="kicker">Area</div><h2>' + esc(a.title) + '</h2>' +
+      '<span class="area-tag" style="background:' + areaColor[key] + '22;color:' + areaColor[key] + ';border:1px solid ' + areaColor[key] + '55">' + featCount(a) + ' features · click to expand</span>' +
+      '<p style="color:var(--muted);font-size:13px;line-height:1.6">' + esc(a.blurb || '') + '</p>' +
+      '<h3>Features</h3><ul>' + a.features.map(function (f) { return '<li>' + esc(f.name) + '</li>'; }).join('') + '</ul>' + connHtml;
+  }
+  function showFeature(node) {
+    var key = node.data('area'); var a = G.areas.find(function (x) { return x.key === key; });
+    var f = a.features[node.data('fidx')];
+    var variants = (f.variants || []).map(function (v) { return '<li>' + esc(v) + '</li>'; }).join('');
+    var types = (f.domainTypes || []).map(function (t) { return '<span class="chip">' + esc(t) + '</span>'; }).join('');
+    document.getElementById('side').innerHTML =
+      '<div class="kicker">Feature</div><h2>' + esc(f.name) + '</h2>' +
+      '<span class="area-tag" style="background:' + areaColor[key] + '22;color:' + areaColor[key] + ';border:1px solid ' + areaColor[key] + '55">' + esc(a.title) + '</span>' +
+      (f.example ? '<h3>DSL</h3><code class="ex">' + esc(f.example) + '</code>' : '') +
+      (variants ? '<h3>Variants</h3><ul>' + variants + '</ul>' : '') +
+      (types ? '<h3>Domain types</h3><div>' + types + '</div>' : '');
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+
+  cy.on('tap', 'node[kind="area"]', function (e) {
+    var key = e.target.id();
+    if (expanded[key]) collapseArea(key); else expandArea(key);
+    showArea(e.target); relayout();
+  });
+  cy.on('tap', 'node[kind="feature"]', function (e) { showFeature(e.target); });
+  cy.on('tap', function (e) { if (e.target === cy) { cy.elements().removeClass('dim hit edge-hl'); } });
+
+  document.getElementById('btn-expand').onclick = function () { G.areas.forEach(function (a) { expandArea(a.key); }); relayout(); };
+  document.getElementById('btn-collapse').onclick = function () { G.areas.forEach(function (a) { collapseArea(a.key); }); relayout(); };
+  document.getElementById('btn-fit').onclick = function () { cy.fit(null, 50); };
+
+  var flowOn = false;
+  document.getElementById('btn-flow').onclick = function () {
+    flowOn = !flowOn; cy.elements().removeClass('flow flown');
+    if (!flowOn || !G.flow || !G.flow.length) return;
+    G.flow.forEach(function (k) { cy.getElementById(k).addClass('flown'); });
+    for (var i = 0; i < G.flow.length - 1; i++) {
+      cy.edges('[source="' + G.flow[i] + '"][target="' + G.flow[i + 1] + '"]').addClass('flow');
+    }
+    cy.fit(cy.elements('.flow,.flown'), 80);
+  };
+
+  var search = document.getElementById('search');
+  search.oninput = function () {
+    var q = search.value.trim().toLowerCase();
+    cy.elements().removeClass('dim hit');
+    if (!q) return;
+    // ensure areas with matches are expanded, then highlight matching features
+    G.areas.forEach(function (a) {
+      var match = a.features.some(function (f) {
+        return (f.name + ' ' + (f.variants || []).join(' ') + ' ' + (f.domainTypes || []).join(' ')).toLowerCase().indexOf(q) >= 0;
+      });
+      if (match) expandArea(a.key);
+    });
+    var hits = cy.nodes('[kind="feature"]').filter(function (n) {
+      var a = G.areas.find(function (x) { return x.key === n.data('area'); });
+      var f = a.features[n.data('fidx')];
+      return (f.name + ' ' + (f.variants || []).join(' ') + ' ' + (f.domainTypes || []).join(' ')).toLowerCase().indexOf(q) >= 0;
+    });
+    if (hits.length) { cy.elements().addClass('dim'); hits.removeClass('dim').addClass('hit'); hits.parents().removeClass('dim'); relayout(); }
+  };
+
+  // legend
+  var legend = document.getElementById('legend');
+  legend.innerHTML = '<div style="font-weight:700;margin-bottom:6px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Areas</div>' +
+    G.areas.map(function (a) { return '<div class="li" data-k="' + a.key + '"><span class="dot" style="background:' + areaColor[a.key] + '"></span>' + esc(a.title) + '</div>'; }).join('');
+  legend.querySelectorAll('.li').forEach(function (el) {
+    el.onclick = function () { var k = el.getAttribute('data-k'); var n = cy.getElementById(k); expandArea(k); showArea(n); cy.animate({ center: { eles: n }, zoom: 1.1 }, { duration: 350 }); relayout(); };
+  });
+
+  var totalF = G.areas.reduce(function (n, a) { return n + featCount(a); }, 0);
+  document.getElementById('stats').textContent = G.areas.length + ' areas · ' + totalF + ' features · ' + (G.edges ? G.edges.length : 0) + ' edges';
+})();
+</script>
+</body>
+</html>
