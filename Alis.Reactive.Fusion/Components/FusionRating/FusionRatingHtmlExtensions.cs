@@ -1,0 +1,35 @@
+using System;
+using System.Collections.Generic;
+using Alis.Reactive.Native;
+using Alis.Reactive.Native.Extensions;
+using Syncfusion.EJ2;
+using Syncfusion.EJ2.Inputs;
+
+namespace Alis.Reactive.Fusion.Components
+{
+    /// <summary>
+    /// Creates a FusionRating inside a field wrapper, bound to a numeric model property.
+    /// </summary>
+    public static class FusionRatingHtmlExtensions
+    {
+        /// <summary>
+        /// Renders a FusionRating bound to the field's model property.
+        /// </summary>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <param name="build">Callback to build the FusionRating initial configuration.</param>
+        public static void FusionRating<TModel>(
+            this InputBoundField<TModel, double> setup,
+            Action<RatingBuilder> build)
+            where TModel : class
+        {
+            var registration = global::Alis.Reactive.Fusion.Components.FusionRating.Registration;
+            setup.RegisterInputComponent(registration);
+
+            var builder = setup.Helper.EJS().Rating(setup.ElementId)
+                .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
+            build(builder);
+            setup.Render(builder.Render());
+        }
+    }
+}

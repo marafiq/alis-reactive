@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF Menu API Probe</title>
+    <link rel="stylesheet" href="/vendor/syncfusion/material.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+        label { margin-right: 12px; }
+    </style>
+</head>
+<body>
+    <h1>SF Menu API Probe</h1>
+    <p>This page is temporary. Use it to discover the exact JS object API before onboarding typed C# members.</p>
+    <div id="host">
+        <ul id="menu"></ul>
+    </div>
+
+    <div style="margin-bottom:12px;">
+        <label><input id="block-open" type="checkbox" /> Block open</label>
+        <label><input id="block-close" type="checkbox" /> Block close</label>
+        <button id="open-menu">Open</button>
+        <button id="close-menu">Close</button>
+    </div>
+
+    <h2>Candidate Matrix</h2>
+    <p>Every row must be proven here before it becomes typed Fusion API.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Kind</th>
+                <th>Builder</th>
+                <th>Args</th>
+                <th>Return/Payload</th>
+                <th>Proof</th>
+                <th>Proposed C#</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody id="proposal-body"></tbody>
+    </table>
+
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const proposalRows = [];
+        const target = document.getElementById("menu");
+
+        function safeJson(key, value) {
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (typeof value === "function") return "[Function]";
+            return value;
+        }
+
+        function clean(value, seen, depth) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).slice(0, 80).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function describePayload(args) {
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item, new WeakSet(), 0)
+                };
+            });
+            return { ownKeys: own, properties };
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value, new WeakSet(), 0) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, safeJson, 2);
+        }
+
+        const items = [
+            { id: "dashboard-item", text: "Dashboard" },
+            { id: "projects-item", text: "Projects", items: [{ id: "reports-item", text: "Reports" }, { id: "archive-item", text: "Archive" }] },
+            { id: "help-item", text: "Help" }
+        ];
+
+        const menu = new ej.navigations.Menu({
+            items,
+            hamburgerMode: true,
+            orientation: "Horizontal",
+            showItemOnClick: true,
+            title: "Resident menu",
+            animationSettings: { effect: "None", duration: 0, easing: "linear" },
+            beforeItemRender: args => record("beforeItemRender", describePayload(args)),
+            beforeOpen: args => {
+                record("beforeOpen", describePayload(args));
+                if (document.getElementById("block-open").checked) {
+                    args.cancel = true;
+                    record("beforeOpen.cancel", { cancel: args.cancel });
+                }
+            },
+            onOpen: args => record("onOpen", describePayload(args)),
+            beforeClose: args => {
+                record("beforeClose", describePayload(args));
+                if (document.getElementById("block-close").checked) {
+                    args.cancel = true;
+                    record("beforeClose.cancel", { cancel: args.cancel });
+                }
+            },
+            onClose: args => record("onClose", describePayload(args)),
+            select: args => record("select", describePayload(args))
+        });
+        menu.appendTo(target);
+        window.__sfProbe = { menu, trace, record };
+
+        document.getElementById("open-menu").addEventListener("click", () => menu.open());
+        document.getElementById("close-menu").addEventListener("click", () => menu.close());
+
+        record("ready", {
+            component: "menu",
+            namespace: "ej.navigations",
+            className: "Menu",
+            id: "menu"
+        });
+        record("own keys", Object.keys(menu).sort());
+        record("prototype methods", Object.getOwnPropertyNames(Object.getPrototypeOf(menu)).sort());
+    </script>
+</body>
+</html>

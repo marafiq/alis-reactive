@@ -12,7 +12,20 @@ namespace Alis.Reactive.PlaywrightTests;
 [SetUpFixture]
 public class WebServerFixture
 {
+    private const int CapturedServerOutputLines = 200;
     private static Process? _server;
+    private static readonly string[] RequiredBootAssets =
+    [
+        "/",
+        "/vendor/syncfusion/dist/ej2.min.js",
+        "/scripts/alis-reactive.dev.js",
+        "/css/design-system.dev.css",
+        "/css/syncfusion.dev.css",
+        "/css/sandbox.css",
+        "/js/disable-sf-animations.js",
+        "/js/sandbox-plugins.js"
+    ];
+
     public static string BaseUrl { get; private set; } = "";
 
     [OneTimeSetUp]
@@ -22,13 +35,16 @@ public class WebServerFixture
         BaseUrl = $"http://localhost:{port}";
 
         var projectDir = FindProjectDir();
+        var sandboxAssembly = FindSandboxAssembly();
+        var output = new ServerOutputBuffer(CapturedServerOutputLines);
 
         _server = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"run --project \"{projectDir}\" --no-launch-profile --urls {BaseUrl}",
+                Arguments = $"\"{sandboxAssembly}\" --urls {BaseUrl}",
+                WorkingDirectory = projectDir,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -41,35 +57,42 @@ public class WebServerFixture
             }
         };
 
+        TestContext.Out.WriteLine($"Starting sandbox at {BaseUrl}");
+        _server.OutputDataReceived += (_, e) => output.Capture("out", e.Data);
+        _server.ErrorDataReceived += (_, e) => output.Capture("err", e.Data);
         _server.Start();
+        _server.BeginOutputReadLine();
+        _server.BeginErrorReadLine();
 
-        // Wait for server to be ready (up to 30s)
         using var http = new HttpClient();
-        for (var i = 0; i < 60; i++)
+        if (await WaitForSandboxReadiness(http, output))
         {
-            try
-            {
-                var response = await http.GetAsync(BaseUrl);
-                if (response.IsSuccessStatusCode)
-                    return;
-            }
-            catch
-            {
-                // Server not ready yet
-            }
-            await Task.Delay(500);
+            TestContext.Out.WriteLine($"Sandbox ready at {BaseUrl}");
+            return;
         }
 
-        throw new Exception($"Server did not start within 30 seconds at {BaseUrl}");
+        StopServer();
+        throw new Exception(
+            $"Server did not start within 30 seconds at {BaseUrl}.{Environment.NewLine}{output.Render()}");
     }
 
     [OneTimeTearDown]
     public void StopServer()
     {
-        if (_server is { HasExited: false })
+        var server = _server;
+        _server = null;
+
+        if (server is null)
+            return;
+
+        try
         {
-            _server.Kill(entireProcessTree: true);
-            _server.Dispose();
+            if (!server.HasExited)
+                server.Kill(entireProcessTree: true);
+        }
+        finally
+        {
+            server.Dispose();
         }
     }
 
@@ -80,6 +103,48 @@ public class WebServerFixture
         var port = ((IPEndPoint)listener.LocalEndpoint).Port;
         listener.Stop();
         return port;
+    }
+
+    private static async Task<bool> WaitForSandboxReadiness(HttpClient http, ServerOutputBuffer output)
+    {
+        for (var i = 0; i < 60; i++)
+        {
+            if (_server is { HasExited: true })
+                throw new Exception(
+                    $"Server exited before it started at {BaseUrl}.{Environment.NewLine}{output.Render()}");
+
+            if (await AllBootAssetsRespond(http))
+                return true;
+
+            await Task.Delay(500);
+        }
+
+        return false;
+    }
+
+    private static async Task<bool> AllBootAssetsRespond(HttpClient http)
+    {
+        foreach (var asset in RequiredBootAssets)
+        {
+            if (!await BootAssetResponds(http, asset))
+                return false;
+        }
+
+        return true;
+    }
+
+    private static async Task<bool> BootAssetResponds(HttpClient http, string assetPath)
+    {
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, BaseUrl + assetPath);
+            using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static string FindProjectDir()
@@ -94,8 +159,56 @@ public class WebServerFixture
             dir = Path.GetDirectoryName(dir);
         }
 
-        // Fallback: relative from repo root
+        // Running from the repo root keeps local Playwright runs working outside test output.
         var repoRoot = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", "..", ".."));
         return Path.Combine(repoRoot, "Alis.Reactive.SandboxApp");
+    }
+
+    private static string FindSandboxAssembly()
+    {
+        var candidate = Path.Combine(TestContext.CurrentContext.TestDirectory, "Alis.Reactive.SandboxApp.dll");
+        if (File.Exists(candidate))
+            return candidate;
+
+        throw new FileNotFoundException(
+            "The Playwright test output is missing Alis.Reactive.SandboxApp.dll. " +
+            "Build tests/Alis.Reactive.PlaywrightTests before running Playwright tests.",
+            candidate);
+    }
+}
+
+internal sealed class ServerOutputBuffer
+{
+    private readonly int _capacity;
+    private readonly Queue<string> _lines = new();
+    private readonly object _gate = new();
+
+    internal ServerOutputBuffer(int capacity)
+    {
+        _capacity = capacity;
+    }
+
+    internal void Capture(string stream, string? line)
+    {
+        if (line == null) return;
+
+        lock (_gate)
+        {
+            if (_lines.Count == _capacity)
+                _lines.Dequeue();
+
+            _lines.Enqueue($"[{stream}] {line}");
+        }
+    }
+
+    internal string Render()
+    {
+        lock (_gate)
+        {
+            if (_lines.Count == 0)
+                return "No server output captured.";
+
+            return "Recent server output:" + Environment.NewLine + string.Join(Environment.NewLine, _lines);
+        }
     }
 }

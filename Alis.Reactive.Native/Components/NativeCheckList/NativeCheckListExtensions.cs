@@ -15,7 +15,11 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeCheckListExtensions
     {
-        private static readonly NativeCheckList _component = new NativeCheckList();
+        private static readonly ComponentProperty<string[]> ValueProperty =
+            ComponentProperty<string[]>.Named("value");
+
+        private static readonly ComponentMethod FocusMethod =
+            ComponentMethod.Named("focus");
 
         /// <summary>
         /// Sets the checked values in the browser.
@@ -28,10 +32,10 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckList, TModel> self, string[] value)
             where TModel : class
         {
-            var items = new System.Collections.Generic.List<ValueProducer>();
+            var items = new System.Collections.Generic.List<ValueExpression>();
             foreach (var v in value)
-                items.Add(ValueProducer.Literal(v));
-            return self.EmitSet("value", ValueProducer.Array(items));
+                items.Add(ValueExpression.Literal(v));
+            return self.EmitSet(ValueProperty, ValueExpression.Array(items));
         }
 
         /// <summary>
@@ -49,7 +53,7 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             var sourcePath = ExpressionPathHelper.ToEventPath(path);
-            return self.EmitSet("value", ValueProducer.Read(PayloadSource.Event(), "value", Path.Parse(sourcePath)));
+            return self.EmitSet(ValueProperty, ValueExpression.Read(PayloadSource.Event(), "value", Path.Parse(sourcePath)));
         }
 
         /// <summary>
@@ -61,7 +65,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckList, TModel> self)
             where TModel : class
         {
-            return self.EmitCall("focus");
+            return self.EmitCall(FocusMethod);
         }
 
         /// <summary>
@@ -73,9 +77,7 @@ namespace Alis.Reactive.Native.Components
             this ComponentRef<NativeCheckList, TModel> self)
             where TModel : class
         {
-            self.Pipeline.Context.EnsureComponent(self.TargetId, _component.Vendor);
-            self.Pipeline.Context.EnsureProperty(self.TargetId, _component.ValueMember, _component.ValueMember, Shape.ArrayOf(Shape.String), "read");
-            return new TypedComponentSource<string[]>(self.TargetId, _component.Vendor, _component.ValueMember);
+            return self.Read(ValueProperty);
         }
     }
 }

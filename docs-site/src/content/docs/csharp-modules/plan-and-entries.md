@@ -82,4 +82,4 @@ See the full [Grammar Tree](../mental-model/#the-grammar-tree) for what's availa
 
 Never on the server. `ReactivePlan` collects plan models, `RenderPlan` serializes them. The JSON is inert until the runtime reads it in the browser. This separation is why there's no JavaScript in your views — the C# fluent builders describe intent, the runtime executes it.
 
-Next: [Triggers](../reactivity/triggers-and-reactions/) — the different ways to say *when* something should happen.
+Next: [Triggers](../reactivity/triggers-and-reactions/) — the different ways to say *when* something must happen.

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
+using Alis.Reactive;
 #if NET48
 using System.Web;
 using System.Web.Mvc;
@@ -41,21 +42,24 @@ namespace Alis.Reactive.Native.Components
         private string? _placeholder;
 
         // NEVER make public — devs create builders via the .NativeTextArea() factory,
-        // which also registers the component in the plan's ComponentsMap.
+        // which also registers the component in the plan's input component onboarding catalog.
 #if NET48
-        internal NativeTextAreaBuilder(HtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+        internal NativeTextAreaBuilder(
+            HtmlHelper<TModel> html,
+            Expression<Func<TModel, TProp>> expression,
+            InputComponentRenderTarget target)
 #else
-        internal NativeTextAreaBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+        internal NativeTextAreaBuilder(
+            IHtmlHelper<TModel> html,
+            Expression<Func<TModel, TProp>> expression,
+            InputComponentRenderTarget target)
 #endif
         {
             _html = html;
             _expression = expression;
-            _elementId = IdGenerator.For<TModel, TProp>(expression);
-#if NET48
-            _bindingPath = ExpressionHelper.GetExpressionText(expression);
-#else
-            _bindingPath = html.NameFor(expression);
-#endif
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            _elementId = target.ElementId;
+            _bindingPath = target.BindingName;
         }
 
         /// <summary>Gets the resolved element ID for this textarea.</summary>

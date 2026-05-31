@@ -9,6 +9,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionInPlaceEditor : FusionComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new FusionInPlaceEditor(), "inplace-editor");
+
         /// <inheritdoc />
         public string ValueMember => "value";
     }

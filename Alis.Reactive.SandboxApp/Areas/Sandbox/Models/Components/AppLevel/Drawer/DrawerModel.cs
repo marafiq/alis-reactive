@@ -21,9 +21,17 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         {
             RuleFor(x => x.Name).NotEmpty().WithMessage("'Name' is required.")
                 .MinimumLength(2).WithMessage("'Name' must be at least 2 characters.");
+            ClientRule(x => x.Name)
+                .Required("'Name' is required.")
+                .MinLength(2, "'Name' must be at least 2 characters.");
             RuleFor(x => x.Email).NotEmpty().WithMessage("'Email' is required.")
                 .EmailAddress().WithMessage("'Email' must be a valid email address.");
+            ClientRule(x => x.Email)
+                .Required("'Email' is required.")
+                .Email("'Email' must be a valid email address.");
             RuleFor(x => x.CareLevel).NotEmpty().WithMessage("'Care Level' is required.");
+            ClientRule(x => x.CareLevel)
+                .Required("'Care Level' is required.");
         }
     }
 }

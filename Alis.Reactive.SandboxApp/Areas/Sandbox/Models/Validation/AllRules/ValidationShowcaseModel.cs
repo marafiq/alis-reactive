@@ -10,6 +10,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public CombinedSection Combined { get; set; } = new();
         public HiddenFieldsSection Hidden { get; set; } = new();
         public BasicSection Db { get; set; } = new();
+        public List<ValidationOrderLine> Lines { get; set; } = new();
     }
 
     public class BasicSection
@@ -63,5 +64,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public string? Instructions { get; set; }
         public string? ContactPhone { get; set; }
+    }
+
+    public class ValidationOrderLine
+    {
+        public string? Sku { get; set; }
+        public string? ConfirmSku { get; set; }
+        public bool GiftWrapped { get; set; }
+        public string? GiftNote { get; set; }
+        public List<ValidationLineDelivery> Deliveries { get; set; } = new();
+    }
+
+    public class ValidationLineDelivery
+    {
+        public string? LocationCode { get; set; }
+        public bool RequiresAccessCode { get; set; }
+        public string? AccessCode { get; set; }
     }
 }

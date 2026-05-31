@@ -1,0 +1,157 @@
+@model FusionCheckBoxModel
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "FusionCheckBox";
+
+    var plan = Html.ReactivePlan<FusionCheckBoxModel>();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var consent = p.Component<FusionCheckBox>(m => m.ConsentAccepted);
+        consent.SetChecked(true);
+        p.Element("checked-echo").SetText(consent.Checked());
+
+        var review = p.Component<FusionCheckBox>(m => m.ReviewNeeded);
+        review.SetIndeterminate(true);
+        p.Element("indeterminate-echo").SetText(review.Indeterminate());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionCheckBox</native-heading>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">State and Events</native-heading>
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.ConsentAccepted, o => o.Label("Consent Accepted"))
+                .FusionCheckBox(b => b
+                    .Label("Consent accepted")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        p.Element("change-checked").SetText(args, x => x.Checked);
+                        p.When(args, x => x.Checked).Truthy()
+                            .Then(t => t.Element("args-condition").SetText("checked"))
+                            .Else(e => e.Element("args-condition").SetText("unchecked"));
+                    })); }
+
+            @{ Html.InputField(plan, m => m.ReviewNeeded, o => o.Label("Review Needed"))
+                .FusionCheckBox(b => b.Label("Review needed")); }
+        </native-grid>
+
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("set-unchecked-btn", "Set Unchecked")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var consent = p.Component<FusionCheckBox>(m => m.ConsentAccepted);
+                    consent.SetChecked(false);
+                    p.Element("checked-echo").SetText(consent.Checked());
+                    p.Element("command-state").SetText("unchecked set");
+                }))
+            @(Html.NativeButton("set-indeterminate-btn", "Set Indeterminate")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var review = p.Component<FusionCheckBox>(m => m.ReviewNeeded);
+                    review.SetIndeterminate(true);
+                    p.Element("indeterminate-echo").SetText(review.Indeterminate());
+                    p.Element("command-state").SetText("indeterminate set");
+                }))
+            @(Html.NativeButton("disable-review-btn", "Disable Review")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var review = p.Component<FusionCheckBox>(m => m.ReviewNeeded);
+                    review.SetDisabled(true);
+                    p.Element("disabled-echo").SetText(review.Disabled());
+                    p.Element("command-state").SetText("review disabled");
+                }))
+            @(Html.NativeButton("enable-review-btn", "Enable Review")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var review = p.Component<FusionCheckBox>(m => m.ReviewNeeded);
+                    review.SetDisabled(false);
+                    p.Element("disabled-echo").SetText(review.Disabled());
+                    p.Element("command-state").SetText("review enabled");
+                }))
+            @(Html.NativeButton("click-consent-btn", "Click Consent")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionCheckBox>(m => m.ConsentAccepted).Click();
+                    p.Element("click-state").SetText("click called");
+                }))
+            @(Html.NativeButton("focus-consent-btn", "Focus Consent")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionCheckBox>(m => m.ConsentAccepted).FocusIn();
+                    p.Element("focus-state").SetText("focus called");
+                }))
+            @(Html.NativeButton("check-consent-btn", "Check Consent")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var consent = p.Component<FusionCheckBox>(m => m.ConsentAccepted);
+                    p.When(consent.Checked()).Truthy()
+                        .Then(t => t.Element("checked-state").SetText("accepted"))
+                        .Else(e => e.Element("checked-state").SetText("missing"));
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Gather</native-heading>
+        @(Html.NativeButton("gather-btn", "Gather CheckBox")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var consent = p.Component<FusionCheckBox>(m => m.ConsentAccepted);
+                var review = p.Component<FusionCheckBox>(m => m.ReviewNeeded);
+                p.Post("/Sandbox/Components/FusionCheckBox/Echo")
+                    .Gather(g =>
+                    {
+                        g.Include(consent.Checked(), "checked");
+                        g.Include(review.Indeterminate(), "indeterminate");
+                        g.Include(review.Disabled(), "disabled");
+                    })
+                    .Response(r => r.OnSuccess<FusionCheckBoxEchoResponse>((json, s) =>
+                    {
+                        s.Element("gather-checked").SetText(json, x => x.Checked);
+                        s.Element("gather-indeterminate").SetText(json, x => x.Indeterminate);
+                        s.Element("gather-disabled").SetText(json, x => x.Disabled);
+                        s.Element("gather-summary").SetText(json, x => x.Summary);
+                    }));
+            }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Command: <span id="command-state" class="text-text-muted">pending</span></p>
+            <p>Checked echo: <span id="checked-echo" class="text-text-muted">pending</span></p>
+            <p>Indeterminate echo: <span id="indeterminate-echo" class="text-text-muted">pending</span></p>
+            <p>Disabled echo: <span id="disabled-echo" class="text-text-muted">pending</span></p>
+            <p>Change checked: <span id="change-checked" class="text-text-muted">pending</span></p>
+            <p>Args condition: <span id="args-condition" class="text-text-muted">pending</span></p>
+            <p>Click state: <span id="click-state" class="text-text-muted">pending</span></p>
+            <p>Focus state: <span id="focus-state" class="text-text-muted">pending</span></p>
+            <p>Checked state: <span id="checked-state" class="text-text-muted">pending</span></p>
+            <p>Gather checked: <span id="gather-checked" class="text-text-muted">pending</span></p>
+            <p>Gather indeterminate: <span id="gather-indeterminate" class="text-text-muted">pending</span></p>
+            <p>Gather disabled: <span id="gather-disabled" class="text-text-muted">pending</span></p>
+            <p>Gather summary: <span id="gather-summary" class="text-text-muted">pending</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

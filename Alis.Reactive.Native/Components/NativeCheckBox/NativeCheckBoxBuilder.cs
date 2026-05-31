@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
+using Alis.Reactive;
 #if NET48
 using System.Web;
 using System.Web.Mvc;
@@ -43,21 +44,21 @@ namespace Alis.Reactive.Native.Components
         private string? _cssClass;
 
         // NEVER make public — devs create builders via the .NativeCheckBox() factory,
-        // which also registers the component in the plan's ComponentsMap.
+        // which also registers the component in the plan's input component onboarding catalog.
+        internal NativeCheckBoxBuilder(
 #if NET48
-        internal NativeCheckBoxBuilder(HtmlHelper<TModel> html, Expression<Func<TModel, bool>> expression)
+            HtmlHelper<TModel> html,
 #else
-        internal NativeCheckBoxBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, bool>> expression)
+            IHtmlHelper<TModel> html,
 #endif
+            Expression<Func<TModel, bool>> expression,
+            InputComponentRenderTarget target)
         {
             _html = html;
             _expression = expression;
-            _elementId = IdGenerator.For<TModel, bool>(expression);
-#if NET48
-            _bindingPath = ExpressionHelper.GetExpressionText(expression);
-#else
-            _bindingPath = html.NameFor(expression);
-#endif
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            _elementId = target.ElementId;
+            _bindingPath = target.BindingName;
         }
 
         /// <summary>Gets the resolved element ID for this checkbox.</summary>
@@ -76,6 +77,7 @@ namespace Alis.Reactive.Native.Components
             _cssClass = css;
             return this;
         }
+
 
 #if NET48
         /// <inheritdoc />

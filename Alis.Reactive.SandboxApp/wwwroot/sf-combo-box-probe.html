@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SF ComboBox API Probe</title>
+    <link rel="stylesheet" href="/vendor/syncfusion/material.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>SF ComboBox API Probe</h1>
+    <p>This page is temporary. Use it to discover the exact JS object API before onboarding typed C# members.</p>
+    <div id="host">
+        <input id="combo-box-probe" />
+        <button id="outside-button" type="button">Outside focus target</button>
+        <p>Active element: <span id="active-element"></span></p>
+    </div>
+
+    <h2>Candidate Matrix</h2>
+    <p>Every row must be proven here before it becomes typed Fusion API.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Kind</th>
+                <th>Builder</th>
+                <th>Args</th>
+                <th>Return/Payload</th>
+                <th>Proof</th>
+                <th>Proposed C#</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody id="proposal-body"></tbody>
+    </table>
+
+    <button id="dump">Dump Keys</button>
+    <button id="run-proof">Run Proof</button>
+    <button id="clear">Clear Trace</button>
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const proposalRows = [];
+        const target = document.getElementById("combo-box-probe");
+        const dataSource = [
+            { id: "AL", name: "Alice" },
+            { id: "BE", name: "Bennett" },
+            { id: "CA", name: "Carey" },
+            { id: "DA", name: "Dawson" }
+        ];
+
+        function safeJson(key, value) {
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (typeof value === "function") return "[Function]";
+            return value;
+        }
+
+        function clean(value, seen, depth) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).slice(0, 80).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") {
+                        names.add(name);
+                    }
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            if (args === null || args === undefined) {
+                return {
+                    ownKeys: [],
+                    functions: [],
+                    properties: {}
+                };
+            }
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item, new WeakSet(), 0)
+                };
+            });
+            return {
+                ownKeys: own,
+                functions: functionNames(args),
+                properties
+            };
+        }
+
+        function record(label, value) {
+            trace.push({
+                at: new Date().toISOString(),
+                label,
+                value: clean(value, new WeakSet(), 0)
+            });
+            renderTrace();
+        }
+
+        function renderTrace() {
+            document.getElementById("trace").textContent =
+                JSON.stringify(trace, safeJson, 2);
+        }
+
+        function renderProposal() {
+            const body = document.getElementById("proposal-body");
+            body.innerHTML = "";
+            proposalRows.forEach(row => {
+                const tr = document.createElement("tr");
+                [
+                    row.candidate,
+                    row.kind,
+                    row.builder,
+                    row.args,
+                    row.returnOrPayload,
+                    row.proof,
+                    row.csharp,
+                    row.outcome
+                ].forEach(value => {
+                    const td = document.createElement("td");
+                    td.textContent = value || "";
+                    tr.appendChild(td);
+                });
+                body.appendChild(tr);
+            });
+        }
+
+        function proposal(row) {
+            proposalRows.push(row);
+            renderProposal();
+            return row;
+        }
+
+        const probe = {
+            target,
+            trace,
+            proposalRows,
+            proposal,
+            record,
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke()),
+            event: (label, args) => record(label, describePayload(args))
+        };
+
+        window.__sfProbe = probe;
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function inputElement() {
+            return document.getElementById("combo-box-probe");
+        }
+
+        function hiddenElement() {
+            return document.querySelector("select[name='combo-box-probe']");
+        }
+
+        function popupElement() {
+            return document.querySelector(".e-ddl.e-popup") || document.querySelector(".e-popup.e-popup-open");
+        }
+
+        function snapshot(label) {
+            const input = inputElement();
+            const hidden = hiddenElement();
+            const popup = popupElement();
+            record(label, {
+                value: ej2.value,
+                text: ej2.text,
+                index: ej2.index,
+                enabled: ej2.enabled,
+                readonly: ej2.readonly,
+                inputValue: input?.value || null,
+                hiddenValue: hidden?.value || null,
+                activeElementId: document.activeElement?.id || null,
+                activeElementClass: document.activeElement?.className || null,
+                popupOpen: !!popup && popup.classList.contains("e-popup-open"),
+                popupDisplay: popup?.style.display || null,
+                listItemCount: ej2.getItems().length
+            });
+        }
+
+        const ej2 = new ej.dropdowns.ComboBox({
+            dataSource,
+            fields: { text: "name", value: "id" },
+            value: "AL",
+            placeholder: "Select resident",
+            allowCustom: true,
+            allowFiltering: false,
+            popupHeight: "160px",
+            change: args => probe.event("change", args),
+            focus: args => probe.event("focus", args),
+            blur: args => probe.event("blur", args),
+            open: args => probe.event("open", args),
+            close: args => probe.event("close", args),
+            filtering: args => probe.event("filtering", args),
+            customValueSpecifier: args => probe.event("customValueSpecifier", args),
+            created: args => probe.event("created", args)
+        });
+        ej2.appendTo(target);
+        probe.ej2 = ej2;
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("prototype-functions", functionNames(ej2));
+            record("own-keys", Object.keys(ej2).sort());
+            snapshot("dump-snapshot");
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            renderTrace();
+        });
+
+        document.addEventListener("focusin", () => {
+            document.getElementById("active-element").textContent =
+                document.activeElement?.id || document.activeElement?.tagName || "";
+        });
+
+        async function runProof() {
+            snapshot("initial");
+
+            proposal({
+                candidate: "value",
+                kind: "property read/write",
+                builder: "ComboBoxBuilder.Value",
+                args: "string",
+                returnOrPayload: "string|null",
+                proof: "Set value to BE, call dataBind, DOM/input text updates.",
+                csharp: "SetValue(string?) / Value()",
+                outcome: "proven"
+            });
+            ej2.value = "BE";
+            ej2.dataBind();
+            await delay(50);
+            snapshot("after-set-value");
+
+            proposal({
+                candidate: "text",
+                kind: "property read/write",
+                builder: "ComboBoxBuilder.Text",
+                args: "string",
+                returnOrPayload: "string|null",
+                proof: "Set text to Carey, call dataBind, value follows mapped item.",
+                csharp: "SetText(string?) / Text()",
+                outcome: "proven"
+            });
+            ej2.text = "Carey";
+            ej2.dataBind();
+            await delay(50);
+            snapshot("after-set-text");
+
+            proposal({
+                candidate: "index",
+                kind: "property read/write",
+                builder: "ComboBoxBuilder.Index",
+                args: "number",
+                returnOrPayload: "number|null",
+                proof: "Set index to 3, call dataBind, value/text update.",
+                csharp: "SetIndex(int) / Index()",
+                outcome: "proven"
+            });
+            ej2.index = 3;
+            ej2.dataBind();
+            await delay(50);
+            snapshot("after-set-index");
+
+            proposal({
+                candidate: "showPopup/hidePopup",
+                kind: "method call",
+                builder: "static popup configuration only",
+                args: "none",
+                returnOrPayload: "void",
+                proof: "showPopup opens list, hidePopup closes it.",
+                csharp: "ShowPopup() / HidePopup()",
+                outcome: "proven"
+            });
+            ej2.showPopup();
+            await delay(100);
+            snapshot("after-show-popup");
+            ej2.hidePopup();
+            await delay(100);
+            snapshot("after-hide-popup");
+
+            proposal({
+                candidate: "focusIn/focusOut",
+                kind: "method call",
+                builder: "none",
+                args: "none",
+                returnOrPayload: "void",
+                proof: "focusIn moves active element to ComboBox input, focusOut blurs it.",
+                csharp: "FocusIn() / FocusOut()",
+                outcome: "proven"
+            });
+            ej2.focusIn();
+            await delay(100);
+            snapshot("after-focus-in");
+            ej2.focusOut();
+            await delay(100);
+            snapshot("after-focus-out");
+
+            proposal({
+                candidate: "clear",
+                kind: "method call",
+                builder: "ComboBoxBuilder.ShowClearButton controls static button",
+                args: "none",
+                returnOrPayload: "void",
+                proof: "clear resets value/text/index after dataBind.",
+                csharp: "Clear()",
+                outcome: "proven"
+            });
+            ej2.clear();
+            ej2.dataBind();
+            await delay(50);
+            snapshot("after-clear");
+
+            inputElement().value = "Dawson";
+            inputElement().dispatchEvent(new Event("input", { bubbles: true }));
+            inputElement().dispatchEvent(new KeyboardEvent("keyup", { key: "n", bubbles: true }));
+            ej2.hidePopup();
+            await delay(100);
+            snapshot("after-typed-change");
+
+            record("proof-complete", true);
+            return {
+                trace,
+                proposalRows
+            };
+        }
+
+        window.runComboBoxProof = runProof;
+        document.getElementById("run-proof").addEventListener("click", runProof);
+        snapshot("created");
+
+        if (new URLSearchParams(window.location.search).has("autorun")) {
+            setTimeout(() => {
+                runProof()
+                    .then(() => {
+                        document.body.dataset.proofComplete = "true";
+                    })
+                    .catch(error => {
+                        record("proof-error", {
+                            name: error?.name || null,
+                            message: error?.message || String(error)
+                        });
+                        document.body.dataset.proofComplete = "false";
+                    });
+            }, 0);
+        }
+    </script>
+</body>
+</html>

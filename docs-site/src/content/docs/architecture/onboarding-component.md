@@ -5,7 +5,7 @@ sidebar:
   order: 10
 ---
 
-Adding a new Syncfusion component requires zero runtime changes and zero schema changes. The plan carries all behavior — the runtime is a dumb executor.
+Adding a new Syncfusion component requires zero runtime changes and zero generated-contract changes when existing object members cover it. The plan carries all behavior — the runtime is a dumb executor.
 
 This guide covers two distinct patterns. Read the decision section first to know which one you need.
 
@@ -525,7 +525,7 @@ When onboarding any component — **none of these change:**
 | Layer | Files | Why |
 |-------|-------|-----|
 | TS runtime | `trigger.ts`, `commands.ts`, `element.ts`, `gather.ts` | Plan carries vendor + readExpr, runtime resolves via bracket notation |
-| JSON schema | `reactive-plan.schema.json` | Existing mutation kinds (set-prop, call) cover all component APIs |
+| Generated plan contract | `runtime/types/plan.ts` | Existing object member primitives cover all component APIs |
 | TS types | `types/*.ts` | No new command kinds or trigger kinds |
 | Core plan models | `Alis.Reactive/` project | Existing mutation algebra handles everything |
 

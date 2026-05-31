@@ -11,6 +11,9 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public sealed class NativeRadioGroup : NativeComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new NativeRadioGroup(), "radiogroup");
+
         /// <inheritdoc />
         public string ValueMember => "value";
     }

@@ -1,4 +1,5 @@
 @model ComponentGatherModel
+@using Alis.Reactive
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
@@ -229,6 +230,23 @@
                         })
                         .OnError(400, e => { e.ValidationErrors("gather-form"); })
                      );
+                }))
+
+            @(Html.NativeButton("submit-explicit-id-btn", "Submit Explicit ID")
+                .CssClass("rounded-md bg-surface-alt px-4 py-2 text-sm font-medium text-text-primary border border-border hover:bg-surface-hover transition-colors")
+                .Reactive(plan, (NativeButtonEvents evt) => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/Patterns/ComponentGather/EchoJson", g => g.Include<NativeTextBox, ComponentGatherModel>(
+                            IdGenerator.For<ComponentGatherModel>(m => m.ResidentName),
+                            nameof(ComponentGatherModel.ResidentName)))
+                     .Response(r => r.OnSuccess<GatherEchoResponse>((json, s) =>
+                     {
+                         s.Element("submit-mode").SetText("ExplicitId");
+                         s.Element("echo-resident-name").SetText(json, x => x.ResidentName);
+                         s.Element("echo-field-count").SetText(json, x => x.FieldCount);
+                         s.Element("echo-result").AddClass("text-green-600");
+                         s.Element("echo-result").RemoveClass("text-red-600");
+                     }));
                 }))
         </native-hstack>
     </native-card-body></native-card>

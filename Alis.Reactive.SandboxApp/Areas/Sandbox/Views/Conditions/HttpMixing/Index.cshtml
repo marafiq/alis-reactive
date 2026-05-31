@@ -1,5 +1,6 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing.HttpMixingModel
 @using Alis.Reactive
+@using Alis.Reactive.Builders.Conditions
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing
@@ -7,6 +8,9 @@
     ViewData["Title"] = "Conditions + HTTP Mixing";
 
     var plan = Html.ReactivePlan<HttpMixingModel>();
+    var slugify = plan.RegisterPlugin<HttpMixingSlugifyPlugin>();
+    var order = plan.RegisterPlugin<HttpMixingOrderPlugin>();
+
     var saveUrl = Url.Action("Save", "HttpMixing", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve HttpMixing.Save.");
     var auditUrl = Url.Action("Audit", "HttpMixing", new { area = "Sandbox" })
@@ -15,6 +19,8 @@
         ?? throw new InvalidOperationException("Could not resolve HttpMixing.Classify.");
     var failValidationUrl = Url.Action("FailValidation", "HttpMixing", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve HttpMixing.FailValidation.");
+    var routeAuditUrl = "/Sandbox/Conditions/HttpMixing/Resident/{residentId}/Audit";
+    var routeAuditTrailUrl = "/Sandbox/Conditions/HttpMixing/Resident/{residentId}/AuditTrail/{categorySlug}";
 
     // ── Shared event listeners (Sections 1–8 use custom events dispatched from buttons) ──
 
@@ -144,6 +150,206 @@
                  .Then(then => then.Element("s8-qualified").Show())
                  .Else(else_ => else_.Element("s8-qualified").Hide());
          }));
+    }));
+
+    // Section 12: Ordered mixed modules after an HTTP request
+    Html.On(plan, t => t.CustomEvent("s12-dispatched", p =>
+    {
+        TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s12").Arg("dispatch");
+        p.Element("s12-sequence").SetText(mark);
+        p.Element("s12-order").SetText("dispatch");
+    }));
+
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s12-ordered-mixed-modules", (args, p) =>
+    {
+        TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s12").Arg("start");
+        p.Element("s12-sequence").SetText(markStart);
+        p.Element("s12-order").SetText("start");
+        p.When(args, x => x.Active).Truthy()
+            .Then(then =>
+            {
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s12").Arg("branch-before");
+                then.Element("s12-sequence").SetText(mark);
+                then.Element("s12-order").SetText("branch-before");
+            })
+            .Else(else_ =>
+            {
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s12").Arg("branch-before-else");
+                else_.Element("s12-sequence").SetText(mark);
+                else_.Element("s12-order").SetText("branch-before-else");
+            });
+        p.Post(saveUrl, g => g.Static("name", "Ordered"))
+         .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
+         {
+             s.Element("s12-http-done").SetText("done");
+             TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s12").Arg("http-success");
+             s.Element("s12-sequence").SetText(mark);
+             s.Element("s12-order").SetText("http-success");
+        }));
+        p.Dispatch("s12-dispatched");
+        TypedPluginSource<string> slug = p.Plugin(slugify.Slug).Arg("After Http");
+        p.Element("s12-plugin").SetText(slug);
+        TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s12").Arg("plugin");
+        p.Element("s12-sequence").SetText(markPlugin);
+        p.Element("s12-order").SetText("tail");
+        TypedPluginSource<string> markTail = p.Plugin(order.Mark).Arg("s12").Arg("tail");
+        p.Element("s12-sequence").SetText(markTail);
+        p.When(args, x => x.Category).Eq("premium")
+            .Then(then =>
+            {
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s12").Arg("branch-after");
+                then.Element("s12-sequence").SetText(mark);
+                then.Element("s12-order").SetText("branch-after");
+            })
+            .Else(else_ =>
+            {
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s12").Arg("branch-after-else");
+                else_.Element("s12-sequence").SetText(mark);
+                else_.Element("s12-order").SetText("branch-after-else");
+            });
+    }));
+
+    // Section 13: Ordered mixed modules around parallel HTTP requests
+    Html.On(plan, t => t.CustomEvent("s13-dispatched", p =>
+    {
+        TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s13").Arg("dispatch");
+        p.Element("s13-sequence").SetText(mark);
+        p.Element("s13-order").SetText("dispatch");
+    }));
+
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s13-ordered-parallel-mix", (args, p) =>
+    {
+        TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s13").Arg("start");
+        p.Element("s13-sequence").SetText(markStart);
+        p.Element("s13-order").SetText("start");
+        p.When(args, x => x.Active).Truthy()
+            .Then(then =>
+            {
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s13").Arg("branch-before");
+                then.Element("s13-sequence").SetText(mark);
+                then.Element("s13-order").SetText("branch-before");
+            })
+            .Else(else_ =>
+            {
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s13").Arg("branch-before-else");
+                else_.Element("s13-sequence").SetText(mark);
+                else_.Element("s13-order").SetText("branch-before-else");
+            });
+        p.Parallel(
+            a => a.Post(saveUrl)
+                  .Gather(g => g.Static("name", "Parallel A"))
+                  .Response(r => r.OnSuccess<HttpMixingEchoResponse>((json, s) =>
+                  {
+                      s.Element("s13-a").SetText(json, x => x.ReceivedName);
+                  })),
+            b => b.Post(auditUrl)
+                  .Gather(g => g.Static("action", "parallel-b"))
+                  .Response(r => r.OnSuccess<HttpMixingAuditResponse>((json, s) =>
+                  {
+                      s.Element("s13-b").SetText(json, x => x.Result);
+                  })))
+         .OnAllSettled(s =>
+         {
+             s.Element("s13-all").SetText("settled");
+             TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s13").Arg("settled");
+             s.Element("s13-sequence").SetText(mark);
+             s.Element("s13-order").SetText("settled");
+         });
+        p.Dispatch("s13-dispatched");
+        TypedPluginSource<string> slug = p.Plugin(slugify.Slug).Arg("After Parallel");
+        p.Element("s13-plugin").SetText(slug);
+        TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s13").Arg("plugin");
+        p.Element("s13-sequence").SetText(markPlugin);
+        p.Element("s13-order").SetText("tail");
+        TypedPluginSource<string> markTail = p.Plugin(order.Mark).Arg("s13").Arg("tail");
+        p.Element("s13-sequence").SetText(markTail);
+        p.When(args, x => x.Count).Gt(0)
+            .Then(then =>
+            {
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s13").Arg("branch-after");
+                then.Element("s13-sequence").SetText(mark);
+                then.Element("s13-order").SetText("branch-after");
+            })
+            .Else(else_ =>
+            {
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s13").Arg("branch-after-else");
+                else_.Element("s13-sequence").SetText(mark);
+                else_.Element("s13-order").SetText("branch-after-else");
+            });
+    }));
+
+    // Section 14: Route-template gather from the reactive event payload in a mixed pipeline
+    Html.On(plan, t => t.CustomEvent("s14-dispatched", p =>
+    {
+        TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s14").Arg("dispatch");
+        p.Element("s14-sequence").SetText(mark);
+        p.Element("s14-order").SetText("dispatch");
+    }));
+
+    Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s14-route-template-from-event", (args, p) =>
+    {
+        TypedPluginSource<string> categorySlug = p.Plugin(slugify.Slug).Arg(args, x => x.Category);
+        TypedPluginSource<string> markStart = p.Plugin(order.Mark).Arg("s14").Arg("start");
+        p.Element("s14-sequence").SetText(markStart);
+        p.Element("s14-order").SetText("start");
+        p.When(args, x => x.Active).Truthy()
+            .Then(then =>
+            {
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s14").Arg("branch-before");
+                then.Element("s14-sequence").SetText(mark);
+                then.Element("s14-order").SetText("branch-before");
+            })
+            .Else(else_ =>
+            {
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s14").Arg("branch-before-else");
+                else_.Element("s14-sequence").SetText(mark);
+                else_.Element("s14-order").SetText("branch-before-else");
+            });
+        p.Post(routeAuditUrl, g => g
+            .RouteParam("residentId", args, x => x.Count)
+            .Header("X-Category", args, x => x.Category)
+            .FromEvent(args, x => x.Category, "action"))
+         .Response(r => r.OnSuccess<HttpMixingResidentAuditResponse>((json, s) =>
+         {
+             s.Element("s14-route-id").SetText(json, x => x.ResidentId);
+             s.Element("s14-body-action").SetText(json, x => x.Action);
+             s.Element("s14-header-category").SetText(json, x => x.HeaderCategory);
+             TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s14").Arg("http-success");
+             s.Element("s14-sequence").SetText(mark);
+             s.Element("s14-order").SetText("http-success");
+         })
+         .Chained(c => c
+             .Post(routeAuditTrailUrl)
+             .Gather(g => g
+                 .RouteParam("residentId", args, x => x.Count)
+                 .RouteParam("categorySlug", categorySlug))
+             .Response(r => r.OnSuccess<HttpMixingAuditTrailResponse>((json, s) =>
+             {
+                 s.Element("s14-trail-id").SetText(json, x => x.ResidentId);
+                 s.Element("s14-trail-slug").SetText(json, x => x.CategorySlug);
+                 s.Element("s14-trail-step").SetText(json, x => x.Step);
+                 TypedPluginSource<string> mark = s.Plugin(order.Mark).Arg("s14").Arg("trail-success");
+                 s.Element("s14-sequence").SetText(mark);
+                 s.Element("s14-order").SetText("trail-success");
+             }))));
+        p.Dispatch("s14-dispatched");
+        p.Element("s14-plugin").SetText(categorySlug);
+        TypedPluginSource<string> markPlugin = p.Plugin(order.Mark).Arg("s14").Arg("plugin");
+        p.Element("s14-sequence").SetText(markPlugin);
+        p.Element("s14-order").SetText("tail");
+        p.When(args, x => x.Count).Gt(300)
+            .Then(then =>
+            {
+                TypedPluginSource<string> mark = then.Plugin(order.Mark).Arg("s14").Arg("branch-after");
+                then.Element("s14-sequence").SetText(mark);
+                then.Element("s14-order").SetText("branch-after");
+            })
+            .Else(else_ =>
+            {
+                TypedPluginSource<string> mark = else_.Plugin(order.Mark).Arg("s14").Arg("branch-after-else");
+                else_.Element("s14-sequence").SetText(mark);
+                else_.Element("s14-order").SetText("branch-after-else");
+            });
     }));
 
     // Section 9: Real component .Reactive() with HTTP before/after mixing
@@ -373,6 +579,80 @@
 
     <native-card>
     <native-card-body>
+        <native-heading level="H2">12. Ordered mixed modules around HTTP</native-heading>
+        <p class="text-sm text-text-secondary mb-3">
+            Branch, HTTP, dispatch, plugin source, element commands, and a second branch run in declaration order.
+        </p>
+        <native-hstack gap="Sm" class="mb-3">
+            @(Html.NativeButton("s12-btn-run", "run ordered mix")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s12-ordered-mixed-modules", new HttpMixingPayload { Active = true, Category = "premium" })))
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
+            <p>HTTP: <span id="s12-http-done">&mdash;</span></p>
+            <p>Plugin: <span id="s12-plugin">&mdash;</span></p>
+            <p>Order: <span id="s12-order">&mdash;</span></p>
+            <p>Sequence: <span id="s12-sequence">&mdash;</span></p>
+        </native-vstack>
+    </native-card-body>
+    </native-card>
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">13. Ordered mixed modules around parallel HTTP</native-heading>
+        <p class="text-sm text-text-secondary mb-3">
+            Branch, parallel HTTP, all-settled handlers, dispatch, plugin source, and tail branch preserve declaration order.
+        </p>
+        <native-hstack gap="Sm" class="mb-3">
+            @(Html.NativeButton("s13-btn-run", "run parallel mix")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s13-ordered-parallel-mix", new HttpMixingPayload { Active = true, Category = "premium", Count = 7 })))
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
+            <p>A: <span id="s13-a">&mdash;</span></p>
+            <p>B: <span id="s13-b">&mdash;</span></p>
+            <p>All: <span id="s13-all">&mdash;</span></p>
+            <p>Plugin: <span id="s13-plugin">&mdash;</span></p>
+            <p>Order: <span id="s13-order">&mdash;</span></p>
+            <p>Sequence: <span id="s13-sequence">&mdash;</span></p>
+        </native-vstack>
+    </native-card-body>
+    </native-card>
+
+    <native-card>
+    <native-card-body>
+        <native-heading level="H2">14. Route-template gather from reactive event payload</native-heading>
+        <p class="text-sm text-text-secondary mb-3">
+            Branch, route-template POST, header/body gather, dispatch, plugin source, and tail branch all read the same typed event payload.
+        </p>
+        <native-hstack gap="Sm" class="mb-3">
+            @(Html.NativeButton("s14-btn-active-high", "event resident 314")
+                .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s14-route-template-from-event", new HttpMixingPayload { Active = true, Count = 314, Category = "VIP Review" })))
+            @(Html.NativeButton("s14-btn-inactive-low", "event resident 271")
+                .CssClass("rounded-md bg-surface-alt px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-alt/80 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch("s14-route-template-from-event", new HttpMixingPayload { Active = false, Count = 271, Category = "Routine Check" })))
+        </native-hstack>
+        <native-vstack gap="Xs" class="font-mono text-sm text-text-muted">
+            <p>Route ID: <span id="s14-route-id">&mdash;</span></p>
+            <p>Body action: <span id="s14-body-action">&mdash;</span></p>
+            <p>Header category: <span id="s14-header-category">&mdash;</span></p>
+            <p>Trail ID: <span id="s14-trail-id">&mdash;</span></p>
+            <p>Trail slug: <span id="s14-trail-slug">&mdash;</span></p>
+            <p>Trail step: <span id="s14-trail-step">&mdash;</span></p>
+            <p>Plugin: <span id="s14-plugin">&mdash;</span></p>
+            <p>Order: <span id="s14-order">&mdash;</span></p>
+            <p>Sequence: <span id="s14-sequence">&mdash;</span></p>
+        </native-vstack>
+    </native-card-body>
+    </native-card>
+
+    <native-card>
+    <native-card-body>
         <native-heading level="H2">9. Reactive input with HTTP between shared commands and an outer condition</native-heading>
         <p class="text-sm text-text-secondary mb-3">
             Type a resident name, blur the field, and the real component <code>.Reactive()</code> path will run:
@@ -485,3 +765,27 @@
 </native-vstack>
 
 @Html.RenderPlan(plan)
+
+@functions {
+    private sealed class HttpMixingSlugifyPlugin : ReactivePlugin
+    {
+        public HttpMixingSlugifyPlugin()
+            : base("slugify")
+        {
+            Slug = Function<string, string>();
+        }
+
+        public PluginFunction<string> Slug { get; }
+    }
+
+    private sealed class HttpMixingOrderPlugin : ReactivePlugin
+    {
+        public HttpMixingOrderPlugin()
+            : base("order")
+        {
+            Mark = Function<string, string, string>();
+        }
+
+        public PluginFunction<string> Mark { get; }
+    }
+}

@@ -41,13 +41,11 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var descriptor = eventSelector(FusionColorPickerEvents.Instance);
-            var pb = new PipelineBuilder<TModel>(plan.Context);
-            pipeline(descriptor.Args, pb);
 
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
             var componentId = (string)attrs["id"];
 
-            plan.Context.WireComponentEvent(componentId, Component.Vendor, descriptor.JsEvent, pb.BuildReactions());
+            ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, descriptor, pipeline);
 
             return builder;
         }

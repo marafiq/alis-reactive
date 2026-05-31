@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
@@ -9,45 +8,37 @@ namespace Alis.Reactive.Builders.Requests
     public class ParallelBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
-        private readonly List<Request> _branches = new List<Request>();
-        private Reaction _onSettled;
+        private readonly ParallelDraft _draft = new ParallelDraft();
 
         internal ParallelBuilder(PlanBuildContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         internal void AddBranch(Action<HttpRequestBuilder<TModel>> request)
         {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
             var builder = new HttpRequestBuilder<TModel>(_context);
             request(builder);
-            _branches.Add(builder.BuildRequest());
+            _draft.AddBranch(builder.BuildRequest());
         }
 
-        /// <summary>Executes commands after all parallel requests complete.</summary>
+        /// <summary>Executes a reaction graph after all parallel requests complete.</summary>
         public ParallelBuilder<TModel> OnAllSettled(Action<PipelineBuilder<TModel>> pipeline)
         {
+            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
+
             var pb = new PipelineBuilder<TModel>(_context);
             pipeline(pb);
             var reaction = pb.BuildReaction();
-            var isPlainSequence = reaction is SequenceReaction;
-            if (!isPlainSequence)
-                throw new InvalidOperationException(
-                    "OnAllSettled only supports plain commands (sequential). " +
-                    "Conditions, HTTP, and parallel pipelines are not valid here.");
-            _onSettled = reaction;
+            _draft.RunWhenAllSettled(reaction);
             return this;
         }
 
-        internal Reaction BuildReaction(List<Reaction> preFetch)
+        internal ReactionGraph BuildReaction()
         {
-            var requestReactions = _branches.Select(r => Reaction.Request(r)).ToList();
-
-            var hasPreFetchCommands = preFetch.Count > 0;
-            if (hasPreFetchCommands)
-                requestReactions.InsertRange(0, preFetch);
-
-            return Reaction.Parallel(requestReactions, _onSettled);
+            return _draft.ToReaction();
         }
     }
 }

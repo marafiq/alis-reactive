@@ -1,5 +1,4 @@
 using System;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
@@ -10,8 +9,6 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeCheckBoxHtmlExtensions
     {
-        private static readonly NativeCheckBox _component = new NativeCheckBox();
-
         /// <summary>
         /// Creates a <see cref="NativeCheckBoxBuilder{TModel,TProp}"/> inside the field wrapper,
         /// registers the component in the plan, and renders the checkbox.
@@ -24,11 +21,13 @@ namespace Alis.Reactive.Native.Components
             Action<NativeCheckBoxBuilder<TModel, bool>> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ValueMember, "checkbox",
-                Shape.FromClrType(typeof(bool))));
+            var registration = global::Alis.Reactive.Native.Components.NativeCheckBox.Registration;
+            setup.RegisterInputComponent(registration);
 
-            var builder = new NativeCheckBoxBuilder<TModel, bool>(setup.Helper, setup.Expression);
+            var builder = new NativeCheckBoxBuilder<TModel, bool>(
+                setup.Helper,
+                setup.Expression,
+                setup.RenderTarget);
             build(builder);
             setup.Render(builder);
         }

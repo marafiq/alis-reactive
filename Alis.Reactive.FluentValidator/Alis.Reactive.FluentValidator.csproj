@@ -2,22 +2,26 @@
 
     <PropertyGroup>
         <TargetFrameworks>net48;net10.0</TargetFrameworks>
-        <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <PackageId>AlisReactive.FluentValidator</PackageId>
         <IsPackable>true</IsPackable>
-        <PackageDescription>FluentValidation integration for Alis.Reactive — server-side rules that automatically extract to client-side validation.</PackageDescription>
+        <PackageDescription>FluentValidation integration for Alis.Reactive that declares deterministic browser validation metadata.</PackageDescription>
         <PackageTags>reactive;aspnetcore;fluentvalidation;validation</PackageTags>
     </PropertyGroup>
 
+    <!-- net10 uses FluentValidation 12; net48 uses FluentValidation 11 (the last line
+         to support .NET Framework). The browser-metadata API used here is stable across both. -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
         <PackageReference Include="FluentValidation" Version="12.*" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.*" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
         <PackageReference Include="FluentValidation" Version="11.*" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.*" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+        <PackageReference Include="PolySharp" Version="1.*" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>

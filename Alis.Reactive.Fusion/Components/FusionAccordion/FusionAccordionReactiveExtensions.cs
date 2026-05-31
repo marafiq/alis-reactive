@@ -26,10 +26,8 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var descriptor = eventSelector(FusionAccordionEvents.Instance);
-            var pb = new PipelineBuilder<TModel>(builder.Plan.Context);
-            pipeline(descriptor.Args, pb);
 
-            builder.Plan.Context.WireComponentEvent(builder.ElementId, Component.Vendor, descriptor.JsEvent, pb.BuildReactions());
+            ComponentEventOnboarding.Wire(builder.Plan, builder.ElementId, Component.Vendor, descriptor, pipeline);
 
 
             return builder;

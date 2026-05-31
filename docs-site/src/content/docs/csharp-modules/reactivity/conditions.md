@@ -397,9 +397,9 @@ At runtime, automatic coercion is applied based on the C# type:
 | C# Type | Coercion |
 |---------|----------|
 | `string` | null becomes `""` |
-| `int`, `long`, `decimal`, `double` | NaN becomes `0` |
+| `int`, `long`, `decimal`, `double` | Finite values compare numerically; non-finite values do not satisfy ordered comparisons |
 | `bool` | `"false"` becomes `false` |
-| `DateTime` | Compared as ISO 8601 strings |
+| `DateTime` | Compared as browser timestamps after date coercion |
 
 You never specify coercion manually -- it is derived from the C# property type.
 

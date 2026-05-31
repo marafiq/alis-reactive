@@ -2,374 +2,348 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentValidation;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
 {
-    /// <summary>
-    /// Base class for validators that need client-side conditional rules.
-    /// Use WhenField() instead of FV's .When() to get both server + client validation.
-    /// FV's .When() still works for server-only conditions (DB, service calls).
-    /// </summary>
-    public abstract class ReactiveValidator<T> : AbstractValidator<T>, IClientConditionSource
+    public abstract class ReactiveValidator<T> :
+        AbstractValidator<T>,
+        IClientValidationMetadataSource
         where T : class
     {
-        private readonly Dictionary<IValidationRule, FieldCondition> _clientConditions =
-            new Dictionary<IValidationRule, FieldCondition>();
+        private readonly ClientValidationRuleSet _clientRules = new ClientValidationRuleSet();
+        private readonly ClientConditionScope _scope = new ClientConditionScope();
 
-        IReadOnlyDictionary<IValidationRule, FieldCondition> IClientConditionSource.ClientConditions =>
-            _clientConditions;
+        IReadOnlyList<ClientValidationField> IClientValidationMetadataSource.GetClientRules() =>
+            _clientRules.ToFields();
 
-        // ── Existing operators (unchanged signatures) ──────────────────────────
-
-        /// <summary>
-        /// Applies a "truthy" condition to all rules defined in the block.
-        /// Server: FV's When() runs the condition at validation time.
-        /// Client: Adapter extracts rules with FieldCondition.Compare(field, "truthy").
-        /// </summary>
-        /// <remarks>
-        /// For bool fields. Server predicate evaluates the bool expression directly.
-        /// For generic-typed truthy conditions via the composition API, use
-        /// <c>WhenFields</c> with <c>FieldStart.Truthy()</c> which checks all falsy
-        /// values (null, false, 0, empty string).
-        /// </remarks>
-        protected void WhenField(Expression<Func<T, bool>> conditionField, Action defineRules)
+        protected ReactiveClientRuleBuilder<T, TValue> ClientRule<TValue>(
+            Expression<Func<T, TValue>> field)
         {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(conditionField);
-            var compiled = conditionField.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.Truthy);
+            if (field == null) throw new ArgumentNullException(nameof(field));
 
-            ApplyClientCondition(compiled, condition, defineRules);
+            var token = ClientValidationFieldToken<T, TValue>.For(field);
+            var activation = _scope.ActiveClientRuleActivation(_clientRules);
+            _clientRules.EnsureField(token.Reference);
+            var clientRule = new ClientValidationFieldRuleBuilder<T, TValue>(
+                _clientRules,
+                token,
+                activation);
+            return new ReactiveClientRuleBuilder<T, TValue>(
+                RuleFor(field),
+                clientRule);
         }
 
-        /// <summary>
-        /// Applies an "eq" condition to all rules defined in the block.
-        /// Server: FV's When() checks field == value at validation time.
-        /// Client: Adapter extracts rules with FieldCondition.Compare(field, "eq", value).
-        /// </summary>
-        protected void WhenField<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
+        protected ReactiveClientCollectionRuleBuilder<T, TItem> ClientRuleEach<TItem>(
+            Expression<Func<T, IEnumerable<TItem>>> field)
+            where TItem : class
         {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.Eq, FieldConditionHelpers.SerializeConditionValue(value));
+            if (field == null) throw new ArgumentNullException(nameof(field));
 
-            ApplyClientCondition(
-                x => Equals(fieldFunc(x), value),
-                condition,
-                defineRules);
+            var token = ClientValidationFieldToken<T, IEnumerable<TItem>>.For(field);
+            var activation = _scope.ActiveClientRuleActivation(_clientRules);
+            _clientRules.EnsureField(token.Reference);
+            var clientRule = new ClientValidationFieldRuleBuilder<T, IEnumerable<TItem>>(
+                _clientRules,
+                token,
+                activation);
+            return new ReactiveClientCollectionRuleBuilder<T, TItem>(
+                RuleFor(field),
+                RuleForEach(field),
+                clientRule,
+                _clientRules,
+                token.Reference,
+                activation);
         }
 
-        /// <summary>
-        /// Applies a "falsy" condition to all rules defined in the block.
-        /// Server: FV's When() runs !condition at validation time.
-        /// Client: Adapter extracts rules with FieldCondition.Compare(field, "falsy").
-        /// </summary>
-        protected void WhenFieldNot(Expression<Func<T, bool>> conditionField, Action defineRules)
+        protected void ClientRule<TChild>(
+            Expression<Func<T, TChild>> field,
+            ReactiveValidator<TChild> validator)
+            where TChild : class
         {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(conditionField);
-            var compiled = conditionField.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.Falsy);
+            if (field == null) throw new ArgumentNullException(nameof(field));
+            if (validator == null) throw new ArgumentNullException(nameof(validator));
 
-            ApplyClientCondition(x => !compiled(x), condition, defineRules);
+            RuleFor(field).SetValidator(validator);
+
+            var prefix = ValidationFieldPath.Of(ExpressionPathHelper.ToPropertyName(field));
+            _clientRules.AddRulesFrom(
+                ((IClientValidationMetadataSource)validator).GetClientRules(),
+                prefix,
+                _scope.ActiveClientRuleActivation(_clientRules));
         }
 
-        /// <summary>
-        /// Applies a "neq" condition to all rules defined in the block.
-        /// Server: FV's When() checks field != value at validation time.
-        /// Client: Adapter extracts rules with FieldCondition.Compare(field, "neq", value).
-        /// </summary>
-        protected void WhenFieldNot<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
+        protected void ClientRulesFrom(ReactiveValidator<T> validator)
         {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.Neq, FieldConditionHelpers.SerializeConditionValue(value));
+            if (validator == null) throw new ArgumentNullException(nameof(validator));
 
-            ApplyClientCondition(
-                x => !Equals(fieldFunc(x), value),
-                condition,
-                defineRules);
+            Include(validator);
+
+            _clientRules.AddRulesFrom(
+                ((IClientValidationMetadataSource)validator).GetClientRules(),
+                ValidationFieldPath.Empty,
+                _scope.ActiveClientRuleActivation(_clientRules));
         }
 
-        // ── Ordering operators ─────────────────────────────────────────────────
-
-        /// <summary>Applies a "gt" (greater than) condition.</summary>
-        protected void WhenFieldGt<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
+        protected void ClientRulesFrom<TSource>(ReactiveValidator<TSource> validator)
+            where TSource : class
         {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.Gt, FieldConditionHelpers.SerializeConditionValue(value));
+            if (validator == null) throw new ArgumentNullException(nameof(validator));
 
-            ApplyClientCondition(
-                x => Comparer<TProp>.Default.Compare(fieldFunc(x), value) > 0,
-                condition,
-                defineRules);
+            _clientRules.AddRulesFrom(
+                ((IClientValidationMetadataSource)validator).GetClientRules(),
+                ValidationFieldPath.Empty,
+                _scope.ActiveClientRuleActivation(_clientRules));
         }
 
-        /// <summary>Applies a "gte" (greater than or equal) condition.</summary>
-        protected void WhenFieldGte<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.Gte, FieldConditionHelpers.SerializeConditionValue(value));
+        protected void WhenField(Expression<Func<T, bool>> field, Action defineRules) =>
+            Apply(new FieldStart<T, bool>(field).Truthy(), defineRules);
 
-            ApplyClientCondition(
-                x => Comparer<TProp>.Default.Compare(fieldFunc(x), value) >= 0,
-                condition,
-                defineRules);
-        }
+        protected void WhenField<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Eq(value), defineRules);
 
-        /// <summary>Applies a "lt" (less than) condition.</summary>
-        protected void WhenFieldLt<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.Lt, FieldConditionHelpers.SerializeConditionValue(value));
+        protected void WhenFieldNot(Expression<Func<T, bool>> field, Action defineRules) =>
+            Apply(new FieldStart<T, bool>(field).Falsy(), defineRules);
 
-            ApplyClientCondition(
-                x => Comparer<TProp>.Default.Compare(fieldFunc(x), value) < 0,
-                condition,
-                defineRules);
-        }
+        protected void WhenFieldNot<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Neq(value), defineRules);
 
-        /// <summary>Applies a "lte" (less than or equal) condition.</summary>
-        protected void WhenFieldLte<TProp>(
-            Expression<Func<T, TProp>> field, TProp value, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.Lte, FieldConditionHelpers.SerializeConditionValue(value));
+        protected void WhenFieldGt<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Gt(value), defineRules);
 
-            ApplyClientCondition(
-                x => Comparer<TProp>.Default.Compare(fieldFunc(x), value) <= 0,
-                condition,
-                defineRules);
-        }
+        protected void WhenFieldGte<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Gte(value), defineRules);
 
-        // ── Presence operators ─────────────────────────────────────────────────
+        protected void WhenFieldLt<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Lt(value), defineRules);
 
-        /// <summary>Applies an "is-null" condition.</summary>
-        protected void WhenFieldNull<TProp>(
-            Expression<Func<T, TProp>> field, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.IsNull);
+        protected void WhenFieldLte<TProp>(Expression<Func<T, TProp>> field, TProp value, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Lte(value), defineRules);
 
-            ApplyClientCondition(x => fieldFunc(x) == null, condition, defineRules);
-        }
+        protected void WhenFieldNull<TProp>(Expression<Func<T, TProp>> field, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).IsNull(), defineRules);
 
-        /// <summary>Applies a "not-null" condition.</summary>
-        protected void WhenFieldNotNull<TProp>(
-            Expression<Func<T, TProp>> field, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.NotNull);
+        protected void WhenFieldNotNull<TProp>(Expression<Func<T, TProp>> field, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).NotNull(), defineRules);
 
-            ApplyClientCondition(x => fieldFunc(x) != null, condition, defineRules);
-        }
+        protected void WhenFieldEmpty(Expression<Func<T, string?>> field, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).IsEmpty(), defineRules);
 
-        /// <summary>Applies an "is-empty" condition (null or empty string).</summary>
-        protected void WhenFieldEmpty(
-            Expression<Func<T, string>> field, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.IsEmpty);
+        protected void WhenFieldNotEmpty(Expression<Func<T, string?>> field, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).NotEmpty(), defineRules);
 
-            ApplyClientCondition(x => string.IsNullOrEmpty(fieldFunc(x)), condition, defineRules);
-        }
+        protected void WhenFieldIn<TProp>(Expression<Func<T, TProp>> field, TProp[] values, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).In(values), defineRules);
 
-        /// <summary>Applies a "not-empty" condition (non-null and non-empty string).</summary>
-        protected void WhenFieldNotEmpty(
-            Expression<Func<T, string>> field, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.NotEmpty);
+        protected void WhenFieldNotIn<TProp>(Expression<Func<T, TProp>> field, TProp[] values, Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).NotIn(values), defineRules);
 
-            ApplyClientCondition(x => !string.IsNullOrEmpty(fieldFunc(x)), condition, defineRules);
-        }
-
-        // ── Membership operators ───────────────────────────────────────────────
-
-        /// <summary>Applies an "in" condition — field value is in the given set.</summary>
-        protected void WhenFieldIn<TProp>(
-            Expression<Func<T, TProp>> field, TProp[] values, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var serialized = values.Select(v => FieldConditionHelpers.SerializeConditionValue(v)).ToArray();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.In, serialized);
-
-            var set = new HashSet<TProp>(values);
-            ApplyClientCondition(x => set.Contains(fieldFunc(x)), condition, defineRules);
-        }
-
-        // ── Text operators ─────────────────────────────────────────────────────
-
-        /// <summary>Applies a "contains" condition — string field contains substring.</summary>
-        protected void WhenFieldContains(
-            Expression<Func<T, string>> field, string substring, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.Contains, substring);
-
-            ApplyClientCondition(
-                x => fieldFunc(x)?.Contains(substring) == true,
-                condition,
-                defineRules);
-        }
-
-        /// <summary>Applies a "starts-with" condition.</summary>
-        protected void WhenFieldStartsWith(
-            Expression<Func<T, string>> field, string prefix, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.StartsWith, prefix);
-
-            ApplyClientCondition(
-                x => fieldFunc(x)?.StartsWith(prefix) == true,
-                condition,
-                defineRules);
-        }
-
-        /// <summary>Applies an "ends-with" condition.</summary>
-        protected void WhenFieldEndsWith(
-            Expression<Func<T, string>> field, string suffix, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.EndsWith, suffix);
-
-            ApplyClientCondition(
-                x => fieldFunc(x)?.EndsWith(suffix) == true,
-                condition,
-                defineRules);
-        }
-
-        /// <summary>Applies a "not-in" condition — field value is NOT in the given set.</summary>
-        protected void WhenFieldNotIn<TProp>(
-            Expression<Func<T, TProp>> field, TProp[] values, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var serialized = values.Select(v => FieldConditionHelpers.SerializeConditionValue(v)).ToArray();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.NotIn, serialized);
-
-            var set = new HashSet<TProp>(values);
-            ApplyClientCondition(x => !set.Contains(fieldFunc(x)), condition, defineRules);
-        }
-
-        /// <summary>Applies a "between" condition — field value is between low and high (inclusive).</summary>
         protected void WhenFieldBetween<TProp>(
-            Expression<Func<T, TProp>> field, TProp low, TProp high, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var serialized = new object[]
-            {
-                FieldConditionHelpers.SerializeConditionValue(low),
-                FieldConditionHelpers.SerializeConditionValue(high)
-            };
-            var condition = FieldCondition.Compare(fieldName, CompareOp.Between, serialized);
+            Expression<Func<T, TProp>> field,
+            TProp low,
+            TProp high,
+            Action defineRules) =>
+            Apply(new FieldStart<T, TProp>(field).Between(low, high), defineRules);
 
-            ApplyClientCondition(
-                x => Comparer<TProp>.Default.Compare(fieldFunc(x), low) >= 0 &&
-                     Comparer<TProp>.Default.Compare(fieldFunc(x), high) <= 0,
-                condition,
-                defineRules);
-        }
+        protected void WhenFieldContains(Expression<Func<T, string?>> field, string substring, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).Contains(substring), defineRules);
 
-        /// <summary>Applies a "matches" condition — string field matches regex pattern.</summary>
-        protected void WhenFieldMatches(
-            Expression<Func<T, string>> field, string pattern, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.Matches, pattern);
-            var regex = new System.Text.RegularExpressions.Regex(pattern);
+        protected void WhenFieldStartsWith(Expression<Func<T, string?>> field, string prefix, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).StartsWith(prefix), defineRules);
 
-            ApplyClientCondition(
-                x => fieldFunc(x) != null && regex.IsMatch(fieldFunc(x)!),
-                condition,
-                defineRules);
-        }
+        protected void WhenFieldEndsWith(Expression<Func<T, string?>> field, string suffix, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).EndsWith(suffix), defineRules);
 
-        /// <summary>Applies a "min-length" condition — string field length >= minimum.</summary>
-        protected void WhenFieldMinLength(
-            Expression<Func<T, string>> field, int minLength, Action defineRules)
-        {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.MinLength, minLength);
+        protected void WhenFieldMatches(Expression<Func<T, string?>> field, string pattern, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).Matches(pattern), defineRules);
 
-            ApplyClientCondition(
-                x => fieldFunc(x) != null && fieldFunc(x)!.Length >= minLength,
-                condition,
-                defineRules);
-        }
+        protected void WhenFieldMinLength(Expression<Func<T, string?>> field, int minLength, Action defineRules) =>
+            Apply(new FieldStart<T, string?>(field).MinLength(minLength), defineRules);
 
-        /// <summary>Applies an "array-contains" condition — array field contains the given element.</summary>
         protected void WhenFieldArrayContains<TProp>(
-            Expression<Func<T, IEnumerable<TProp>>> field, TProp value, Action defineRules)
+            Expression<Func<T, IEnumerable<TProp>?>> field,
+            TProp value,
+            Action defineRules)
         {
-            var fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            var fieldFunc = field.Compile();
-            var condition = FieldCondition.Compare(fieldName, CompareOp.ArrayContains,
-                FieldConditionHelpers.SerializeConditionValue(value));
-
-            ApplyClientCondition(
-                x => fieldFunc(x)?.Contains(value) == true,
-                condition,
+            var selected = SelectedClientValidationField<T, IEnumerable<TProp>?>.From(field);
+            Apply(
+                selected.GuardAgainstCollectionItem(
+                    CompareOperator.ArrayContains,
+                    value,
+                    candidate => FieldConditionPredicates.EnumerableContains(candidate, value)),
                 defineRules);
         }
 
-        // ── Composition ────────────────────────────────────────────────────────
-
-        /// <summary>
-        /// Applies a composed condition (And/Or/Not) to all rules defined in the block.
-        /// Server: combined predicate runs at validation time.
-        /// Client: adapter extracts the FieldCondition tree.
-        /// </summary>
         protected void WhenFields(
             Func<FieldConditionBuilder<T>, FieldGuard<T>> buildCondition,
             Action defineRules)
         {
-            var builder = new FieldConditionBuilder<T>();
-            var guard = buildCondition(builder);
-
-            ApplyClientCondition(guard.ServerPredicate, guard.Condition, defineRules);
+            if (buildCondition == null) throw new ArgumentNullException(nameof(buildCondition));
+            Apply(buildCondition(new FieldConditionBuilder<T>()), defineRules);
         }
 
-        // ── Internals ──────────────────────────────────────────────────────────
+        public new IConditionBuilder When(Func<T, bool> predicate, Action action) =>
+            ApplyServerOnlyCondition(predicate, action, guarded => base.When(predicate, guarded));
 
-        private void ApplyClientCondition(
-            Func<T, bool> serverPredicate,
-            FieldCondition clientCondition,
-            Action defineRules)
+        public new IConditionBuilder When(Func<T, ValidationContext<T>, bool> predicate, Action action) =>
+            ApplyServerOnlyCondition(predicate, action, guarded => base.When(predicate, guarded));
+
+        public new IConditionBuilder Unless(Func<T, bool> predicate, Action action) =>
+            ApplyServerOnlyCondition(predicate, action, guarded => base.Unless(predicate, guarded));
+
+        public new IConditionBuilder Unless(Func<T, ValidationContext<T>, bool> predicate, Action action) =>
+            ApplyServerOnlyCondition(predicate, action, guarded => base.Unless(predicate, guarded));
+
+        public new IConditionBuilder WhenAsync(
+            Func<T, CancellationToken, Task<bool>> predicate,
+            Action action) =>
+            ApplyServerOnlyCondition(predicate, action, guarded => base.WhenAsync(predicate, guarded));
+
+        public new IConditionBuilder WhenAsync(
+            Func<T, ValidationContext<T>, CancellationToken, Task<bool>> predicate,
+            Action action) =>
+            ApplyServerOnlyCondition(predicate, action, guarded => base.WhenAsync(predicate, guarded));
+
+        public new IConditionBuilder UnlessAsync(
+            Func<T, CancellationToken, Task<bool>> predicate,
+            Action action) =>
+            ApplyServerOnlyCondition(predicate, action, guarded => base.UnlessAsync(predicate, guarded));
+
+        public new IConditionBuilder UnlessAsync(
+            Func<T, ValidationContext<T>, CancellationToken, Task<bool>> predicate,
+            Action action) =>
+            ApplyServerOnlyCondition(predicate, action, guarded => base.UnlessAsync(predicate, guarded));
+
+        private void Apply(FieldGuard<T> guard, Action defineRules)
         {
-            var rulesBefore = ((IEnumerable<IValidationRule>)this).ToList();
+            if (guard == null) throw new ArgumentNullException(nameof(guard));
+            if (defineRules == null) throw new ArgumentNullException(nameof(defineRules));
 
-            // FV's When() — defines rules AND applies condition for server validation
-            When(serverPredicate, defineRules);
-
-            // Find new rules added by the block
-            var rulesAfter = ((IEnumerable<IValidationRule>)this).ToList();
-            for (int i = rulesBefore.Count; i < rulesAfter.Count; i++)
+            using (_scope.Enter(guard))
             {
-                _clientConditions[rulesAfter[i]] = clientCondition;
+                base.When(guard.ServerPredicate, defineRules);
             }
         }
 
+        private IConditionBuilder ApplyServerOnlyCondition<TPredicate>(
+            TPredicate predicate,
+            Action defineRules,
+            Func<Action, IConditionBuilder> applyCondition)
+        {
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+            if (defineRules == null) throw new ArgumentNullException(nameof(defineRules));
+            if (applyCondition == null) throw new ArgumentNullException(nameof(applyCondition));
+
+            using (_scope.EnterServerOnlyCondition())
+                return new ServerOnlyConditionBuilder(applyCondition(defineRules), _scope);
+        }
+
+        private sealed class ClientConditionScope
+        {
+            private readonly Stack<FieldGuard<T>> _clientConditions = new Stack<FieldGuard<T>>();
+            private int _serverOnlyDepth;
+
+            internal IDisposable Enter(FieldGuard<T> condition)
+            {
+                if (condition == null) throw new ArgumentNullException(nameof(condition));
+                _clientConditions.Push(condition);
+                return new Exit(this, scope => scope.ExitClient());
+            }
+
+            internal IDisposable EnterServerOnlyCondition()
+            {
+                _serverOnlyDepth++;
+                return new Exit(this, scope => scope.ExitServerOnlyCondition());
+            }
+
+            internal ClientRuleActivation ActiveClientRuleActivation(ClientValidationRuleSet rules)
+            {
+                if (rules == null) throw new ArgumentNullException(nameof(rules));
+
+                if (_serverOnlyDepth > 0)
+                {
+                    throw new InvalidOperationException(
+                        "ClientRule cannot be declared inside FluentValidation When, Unless, WhenAsync, or UnlessAsync. " +
+                        "Use WhenField for a browser condition, or keep the rule server-only with RuleFor.");
+                }
+
+                if (_clientConditions.Count == 0)
+                    return ClientRuleActivation.Always;
+
+                var conditions = _clientConditions.Reverse().ToArray();
+                var fieldCondition = ActiveClientCondition(conditions);
+                var fields = ClientValidationGuardFields.From(conditions.SelectMany(condition => condition.Fields));
+                rules.EnsureFields(fields);
+                return ClientRuleActivation.When(fieldCondition);
+            }
+
+            private static FieldCondition ActiveClientCondition(IReadOnlyList<FieldGuard<T>> conditions) =>
+                conditions.Count == 1
+                    ? conditions[0].Condition
+                    : FieldCondition.All(conditions.Select(condition => condition.Condition).ToArray());
+
+            private void ExitClient()
+            {
+                if (_clientConditions.Count == 0)
+                    throw new InvalidOperationException("Cannot exit a client validation condition scope that was not entered.");
+
+                _clientConditions.Pop();
+            }
+
+            private void ExitServerOnlyCondition()
+            {
+                if (_serverOnlyDepth == 0)
+                    throw new InvalidOperationException("Cannot exit a server-only validation condition scope that was not entered.");
+
+                _serverOnlyDepth--;
+            }
+
+            private sealed class Exit : IDisposable
+            {
+                private ClientConditionScope? _scope;
+                private readonly Action<ClientConditionScope> _exit;
+
+                internal Exit(ClientConditionScope scope, Action<ClientConditionScope> exit)
+                {
+                    _scope = scope ?? throw new ArgumentNullException(nameof(scope));
+                    _exit = exit ?? throw new ArgumentNullException(nameof(exit));
+                }
+
+                public void Dispose()
+                {
+                    var scope = _scope;
+                    if (scope == null) return;
+
+                    _scope = null;
+                    _exit(scope);
+                }
+            }
+        }
+
+        private sealed class ServerOnlyConditionBuilder : IConditionBuilder
+        {
+            private readonly IConditionBuilder _inner;
+            private readonly ClientConditionScope _scope;
+
+            internal ServerOnlyConditionBuilder(IConditionBuilder inner, ClientConditionScope scope)
+            {
+                _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+                _scope = scope ?? throw new ArgumentNullException(nameof(scope));
+            }
+
+            public void Otherwise(Action action)
+            {
+                if (action == null) throw new ArgumentNullException(nameof(action));
+                _inner.Otherwise(() =>
+                {
+                    using (_scope.EnterServerOnlyCondition())
+                        action();
+                });
+            }
+        }
     }
 }

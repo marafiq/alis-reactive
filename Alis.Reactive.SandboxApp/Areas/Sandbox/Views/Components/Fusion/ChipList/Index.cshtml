@@ -1,0 +1,165 @@
+@model ChipListModel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Syncfusion.EJ2.Buttons
+@{
+    ViewData["Title"] = "ChipList";
+
+    var plan = Html.ReactivePlan<ChipListModel>();
+
+    Html.On(plan, t => t.CustomEvent<ChipSelectionPayload>("chip-selection-read", (payload, p) =>
+    {
+        p.Element("selected-chip-texts").SetText(payload, x => x.Selection.Texts);
+        p.Element("found-chip-text").SetText(payload, x => x.Found.Text);
+    }));
+
+    var chips = new List<ChipCollection>
+    {
+        new() { Text = "Fall Risk", Value = "fall" },
+        new() { Text = "Hydration", Value = "hydration" },
+        new() { Text = "Medication Review", Value = "meds" }
+    };
+
+    var indexChips = new[] { "Routine", "Urgent", "Follow Up" };
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionChipList</native-heading>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <native-vstack gap="Base">
+            @(Html.FusionChipList(plan, "care-tags", b => b
+                .Chips(chips)
+                .Selection(Selection.Multiple)
+                .EnableDelete(true))
+                .Reactive(evt => evt.Clicked, (args, p) =>
+                {
+                    p.Element("chip-clicked").SetText(args, x => x.Text);
+                })
+                .Reactive(evt => evt.Deleted, (args, p) =>
+                {
+                    p.Element("chip-deleted").SetText(args, x => x.Text);
+                }))
+
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("add-chip-btn", "Add Wound Care")
+                    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionChipList>("care-tags").Add("Wound Care");
+                        p.Element("chip-command-status").SetText("add called");
+                    }))
+                @(Html.NativeButton("select-index-chip-btn", "Select Index")
+                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionChipList>("care-tags").SelectByIndex(1);
+                        p.Element("chip-command-status").SetText("select index called");
+                    }))
+                @(Html.NativeButton("select-text-chip-btn", "Select Text")
+                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var tagList = p.Component<FusionChipList>("care-tags");
+                        tagList.Add("Wound Care");
+                        tagList.SelectByText("Hydration", "Wound Care");
+                        p.DispatchWith<ChipSelectionPayload>("chip-selection-read", payload =>
+                        {
+                            payload.Set(x => x.Selection, tagList.SelectedChips());
+                            payload.Set(x => x.Found, tagList.Find(1));
+                        });
+                        p.Element("chip-command-status").SetText("select text called");
+                    }))
+                @(Html.NativeButton("remove-chip-btn", "Remove First")
+                    .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionChipList>("care-tags").RemoveByIndex(0);
+                        p.Element("chip-command-status").SetText("remove called");
+                    }))
+                @(Html.NativeButton("read-selected-values-btn", "Read Selected Values")
+                    .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var tagList = p.Component<FusionChipList>("care-tags");
+                        tagList.SelectByText("Hydration", "Medication Review");
+                        p.Element("selected-chip-values").SetText(tagList.SelectedChipValues());
+                        p.Element("chip-command-status").SetText("selected values read");
+                    }))
+                @(Html.NativeButton("apply-chip-filters-btn", "Apply Filters")
+                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var tagList = p.Component<FusionChipList>("care-tags");
+                        p.Post("/Sandbox/Components/ChipList/QuickFilter")
+                         .Gather(g => g.Include(tagList.SelectedChipValues(), "filters"))
+                         .Response(r => r.OnSuccess<ChipQuickFilterResponse>((json, s) =>
+                         {
+                             s.Element("quick-filter-values").SetText(json, x => x.Filters);
+                             s.Element("quick-filter-count").SetText(json, x => x.Count);
+                             s.Element("quick-filter-names").SetText(json, x => x.Names);
+                             s.Element("chip-command-status").SetText("filters applied");
+                         }));
+                    }))
+            </native-hstack>
+
+            <native-vstack gap="Xs" class="font-mono text-sm">
+                <p>Command: <span id="chip-command-status">idle</span></p>
+                <p>Clicked: <span id="chip-clicked">none</span></p>
+                <p>Deleted: <span id="chip-deleted">none</span></p>
+                <p>Selected texts: <span id="selected-chip-texts">none</span></p>
+                <p>Selected values: <span id="selected-chip-values">none</span></p>
+                <p>Found chip: <span id="found-chip-text">none</span></p>
+                <p>Quick filter values: <span id="quick-filter-values">none</span></p>
+                <p>Quick filter count: <span id="quick-filter-count">none</span></p>
+                <p>Quick filter names: <span id="quick-filter-names">none</span></p>
+            </native-vstack>
+        </native-vstack>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <native-vstack gap="Base">
+            @(Html.FusionChipList(plan, "index-tags", b => b
+                .Chips(indexChips)
+                .Selection(Selection.Multiple)))
+
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("select-indexes-chip-btn", "Select Indexes")
+                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionChipList>("index-tags").SelectByIndexes(0, 2);
+                        p.Element("index-chip-command-status").SetText("select indexes called");
+                    }))
+                @(Html.NativeButton("set-selected-indexes-btn", "Set Selected Indexes")
+                    .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var tagList = p.Component<FusionChipList>("index-tags");
+                        tagList.SetSelectedChipIndexes(0, 2);
+                        p.Element("selected-chip-indexes").SetText(tagList.SelectedChipIndexes());
+                        p.Element("index-chip-command-status").SetText("selected indexes set");
+                    }))
+                @(Html.NativeButton("remove-indexes-chip-btn", "Remove Indexes")
+                    .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Component<FusionChipList>("index-tags").RemoveByIndexes(0, 2);
+                        p.Element("index-chip-command-status").SetText("remove indexes called");
+                    }))
+            </native-hstack>
+
+            <native-vstack gap="Xs" class="font-mono text-sm">
+                <p>Index command: <span id="index-chip-command-status">idle</span></p>
+                <p>Selected indexes: <span id="selected-chip-indexes">none</span></p>
+            </native-vstack>
+        </native-vstack>
+    </section>
+
+    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

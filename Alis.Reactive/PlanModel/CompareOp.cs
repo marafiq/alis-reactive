@@ -3,9 +3,8 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// String constants for all compare-condition operators.
     /// Prevents typos when building conditions — callers use
-    /// <c>CompareOp.Eq</c> instead of the magic string <c>"eq"</c>.
-    /// The <see cref="Condition.Compare"/> parameter type stays <c>string</c>
-    /// (serializes directly) but all internal callers use these constants.
+    /// <c>CompareOperator.Eq</c> where a domain value object is available.
+    /// The constants remain the JSON tokens shared with generated TypeScript.
     /// </summary>
     internal static class CompareOp
     {

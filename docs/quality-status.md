@@ -11,8 +11,8 @@ Single source of truth for quality work. Updated after each quality session.
 - XML docs on builders — PRs #95, #97 (Builder APIs, PlanModel contract types)
 - Design system cleanup — PR #96 (unused builders removed, enums moved, TagMode fix)
 - Schema drift detection — removed empty `tests/Alis.Reactive.DriftDetection.Tests/` project
-  (infrastructure only, zero executable tests, never ran). Schema validation is covered by
-  70 `AssertSchemaValid()` calls across 9 test files (UnitTests, Fusion, Native).
+  (infrastructure only, zero executable tests, never ran). The schema layer is now retired;
+  the plan contract is the C# domain plus generated `plan.ts`.
 - Plugin Source vertical slice — 4 source kinds: `component`, `payload`, `url`, `plugin`
   (discriminated union at `Scripts/types/plan.ts` Source type)
 - HTTP Headers, URL Templates, URL Query Source — all landed
@@ -27,28 +27,24 @@ Tracked as GitHub issues or in `docs/issues.md`:
 
 | Item | Location | GH Issue |
 |------|----------|----------|
-| SonarQube CRITICALs: evaluateCompare (19-case switch) + ruleFails (20-case switch) | `Alis.Reactive.Assets/Scripts/conditions/conditions.ts`, `Scripts/validation/rule-engine.ts` | #54 |
-| Invalid trace level enables all logging (unsafe `as TraceLevel` cast) | `Scripts/root.ts:29` | #73 |
+| SonarQube CRITICALs: evaluateCompare (19-case switch) + ruleFails (20-case switch) | `Alis.Reactive.Assets/runtime/conditions/conditions.ts`, `runtime/validation/rule-engine.ts` | #54 |
+| Invalid trace level enables all logging (unsafe `as TraceLevel` cast) | `runtime/root.ts:29` | #73 |
 | HTTP Finally stage (prevents permanent WhileLoading spinners) | Feature request | #88 |
 | FlushSegment bundles commands across condition boundaries | `Alis.Reactive/Builders/PipelineBuilder.cs:184` | #90 |
 | ElementBuilder.Show()/Hide() return type | `Alis.Reactive/Builders/ElementBuilder.cs:161,171` | issues.md #1 |
-| itemShape no fail-fast on non-array | `Scripts/conditions/conditions.ts:122-127` | issues.md #2 |
-| Unknown vendor error missing element ID | `Scripts/resolution/resolver.ts:72` | issues.md #3 |
-| ForTests functions exported from production modules | `Scripts/lifecycle/boot.ts:81`, `Scripts/validation/live-clear.ts:72`, `Scripts/components/native/native-action-link.ts:25` | — |
-| PlanRegistry class exported (only facade functions should be public) | `Scripts/lifecycle/merge-plan.ts:18` | — |
+| itemShape no fail-fast on non-array | `runtime/conditions/conditions.ts:122-127` | issues.md #2 |
+| Unknown vendor error missing element ID | `runtime/resolution/resolver.ts:72` | issues.md #3 |
+| ForTests functions exported from production modules | `runtime/lifecycle/boot.ts:81`, `runtime/validation/live-clear.ts:72`, `runtime/components/native/native-action-link.ts:25` | — |
 
 SonarQube minor issues (#43, #45, #47) are open but may be partially resolved — verify against current code before acting.
 
 ## Open — Documentation
 
-- CS1591 XML docs: count needs recount after recent PRs #95, #97
-  - Per-module breakdown in `docs/cs1591-xml-docs-remaining.md`
 - Dev experience gaps: 6 items from review
   - Details in `docs/reviews/dev-experience-review.md`
 
 ## Open — Skills & Process
 
-- modern-csharp skill rewrite (1,272 lines, promotes C# 12+ but repo enforces C# 8.0 in libraries)
 - A/B testing incomplete for all 8 skills
 
 ## Deferred

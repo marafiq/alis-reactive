@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Conditions
     public sealed class BranchBuilder<TModel> where TModel : class
     {
         private readonly List<BranchCase> _cases;
-        private bool _elseCalled;
+        private bool _hasDefaultCase;
 
         internal PipelineBuilder<TModel> Pipeline { get; }
 
@@ -30,10 +30,9 @@ namespace Alis.Reactive.Builders.Conditions
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
-            if (_elseCalled)
-                throw new InvalidOperationException("Cannot add ElseIf after Else.");
+            EnsureElseIfCanBeAdded();
 
-            var source = new EventArgSource<TPayload, TProp>(path);
+            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
@@ -43,8 +42,7 @@ namespace Alis.Reactive.Builders.Conditions
             Expression<Func<TPayload, TProp>> path)
             where TPayload : class
         {
-            if (_elseCalled)
-                throw new InvalidOperationException("Cannot add ElseIf after Else.");
+            EnsureElseIfCanBeAdded();
 
             var source = responseBody.Read(path);
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
@@ -53,8 +51,7 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>Adds an ElseIf branch from a typed source.</summary>
         public ConditionSourceBuilder<TModel, TProp> ElseIf<TProp>(TypedSource<TProp> source)
         {
-            if (_elseCalled)
-                throw new InvalidOperationException("Cannot add ElseIf after Else.");
+            EnsureElseIfCanBeAdded();
 
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
@@ -63,20 +60,36 @@ namespace Alis.Reactive.Builders.Conditions
         /// <param name="pipeline">Builds the commands for the default case.</param>
         public void Else(Action<PipelineBuilder<TModel>> pipeline)
         {
-            if (_elseCalled)
-                throw new InvalidOperationException("Else already called.");
+            EnsureDefaultCanBeAdded();
 
             var pb = new PipelineBuilder<TModel>(Pipeline.Context);
             pipeline(pb);
             _cases.Add(BranchCase.Default(pb.BuildReaction()));
-            _elseCalled = true;
+            _hasDefaultCase = true;
         }
 
         internal void AddBranch(BranchCase branchCase)
         {
-            if (_elseCalled)
-                throw new InvalidOperationException("Cannot add branches after Else.");
+            EnsureBranchCanBeAdded();
             _cases.Add(branchCase);
+        }
+
+        private void EnsureElseIfCanBeAdded()
+        {
+            if (_hasDefaultCase)
+                throw new InvalidOperationException("Cannot add ElseIf after Else.");
+        }
+
+        private void EnsureDefaultCanBeAdded()
+        {
+            if (_hasDefaultCase)
+                throw new InvalidOperationException("Else already called.");
+        }
+
+        private void EnsureBranchCanBeAdded()
+        {
+            if (_hasDefaultCase)
+                throw new InvalidOperationException("Cannot add branches after Else.");
         }
     }
 }

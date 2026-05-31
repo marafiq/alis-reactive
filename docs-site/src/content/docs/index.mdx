@@ -76,7 +76,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 		The JSON plan is the **only** contract between C# and JS. No shortcuts, no manual JS in views.
 	</Card>
 	<Card title="Three Test Layers" icon="approve-check">
-		Every primitive is tested at C# unit (snapshots + schema), TS unit (jsdom), and Playwright (browser). ~1,800 tests total.
+		Every primitive is tested at C# unit, generated TypeScript contract/runtime unit, and Playwright browser layers.
 	</Card>
 	<Card title="Vertical Slices" icon="puzzle">
 		Each component is a self-contained 7-file slice. Duplication over abstraction. Zero shared base classes.

@@ -84,11 +84,11 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     public async Task nested_three_level_path_resolves_street_city_zip()
     {
         // C# expression x => x.Address.Street -> ExpressionPathHelper -> "evt.address.street"
-        // Runtime: walk(ctx, "evt.address.street") -> "123 Main St"
+        // Runtime: structured payload path address.street -> "123 Main St"
         //
-        // All three Address properties test the SAME dot-path walking code at different leaf nodes.
+        // All three Address properties test the SAME structured path resolution at different leaf nodes.
         // If ExpressionPathHelper breaks PascalCase -> camelCase conversion, ALL three fail.
-        // If walk() breaks at depth > 1, the nested paths fail but flat paths still pass.
+        // If structured path resolution breaks at depth > 1, the nested paths fail but flat paths still pass.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 

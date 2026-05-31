@@ -15,17 +15,17 @@
 
 <div class="min-h-full flex flex-col">
     <!-- Brand bar -->
-    <div class="h-1 bg-gradient-to-r from-[#7A2E3B] via-[#9B4A57] to-[#D4A053]"></div>
+    <div class="h-1 bg-gradient-to-r from-primary via-primary-light to-accent"></div>
 
     <header class="border-b border-border bg-white">
         <native-container>
             <div class="flex items-center h-16 gap-8">
                 <a asp-area="Sandbox" asp-controller="SandboxHome" asp-action="Index"
                    class="flex items-center gap-2.5 shrink-0 group">
-                    <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7A2E3B] to-[#9B4A57] flex items-center justify-center">
+                    <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-light flex items-center justify-center">
                         <span class="text-white font-bold text-sm">A</span>
                     </span>
-                    <span class="text-lg font-bold tracking-tight text-[#7A2E3B] group-hover:text-[#5E1F2C] transition-colors">
+                    <span class="text-lg font-bold tracking-tight text-primary group-hover:text-primary-dark transition-colors">
                         Alis.Reactive
                     </span>
                 </a>
@@ -45,8 +45,8 @@
             <div class="flex items-center justify-between">
                 <p class="text-xs text-text-muted">&copy; 2026 Alis.Reactive Sandbox</p>
                 <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-[#7A2E3B]"></span>
-                    <span class="w-2 h-2 rounded-full bg-[#D4A053]"></span>
+                    <span class="w-2 h-2 rounded-full bg-primary"></span>
+                    <span class="w-2 h-2 rounded-full bg-accent"></span>
                     <span class="w-2 h-2 rounded-full bg-border"></span>
                 </div>
             </div>
@@ -54,7 +54,7 @@
     </footer>
 </div>
 
-<script src="https://cdn.syncfusion.com/ej2/32.2.8/dist/ej2.min.js"></script>
+<script src="~/vendor/syncfusion/dist/ej2.min.js"></script>
 <script src="~/js/disable-sf-animations.js"></script>
 @Html.FusionToast()
 @Html.EJS().ScriptManager()

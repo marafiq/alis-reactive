@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFrameworks>net48;net10.0</TargetFrameworks>
-        <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>AlisReactive.Native</PackageId>
@@ -18,16 +17,15 @@
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
         <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+        <PackageReference Include="PolySharp" Version="1.*" PrivateAssets="all" />
         <Reference Include="System.Web" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <InternalsVisibleTo Include="Alis.Reactive.Native.UnitTests" />
-        <InternalsVisibleTo Include="Alis.Reactive.Fusion" />
+        <!-- Native components emit design-system classes; this flows the
+             design-system CSS package to Native consumers. -->
+        <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
     </ItemGroup>
 
 </Project>

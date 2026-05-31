@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPackable>false</IsPackable>
+        <AlisReactiveBrowserAssetsBeforeTargets>VSTest</AlisReactiveBrowserAssetsBeforeTargets>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,5 +19,7 @@
         <ProjectReference Include="../Alis.Reactive.Playwright.Extensions/Alis.Reactive.Playwright.Extensions.csproj" />
         <ProjectReference Include="../../Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj" />
     </ItemGroup>
+
+    <Import Project="..\..\build\AlisReactiveBrowserAssets.targets" />
 
 </Project>

@@ -136,7 +136,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Load Chain");
 
-        // Spinner hides in the chained (second) response handler
+        // Spinner hides in the chained (second) response route
         await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
         await Expect(Page.Locator("#chain-spinner")).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -364,16 +364,16 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 9: 422 error routing — correct handler fires ──────────────
+    // ── Section 9: 422 error routing — correct response route fires ───────
 
     [Test]
-    public async Task error_422_routes_to_correct_handler()
+    public async Task error_422_routes_to_correct_response_route()
     {
         await WaitForDomReadyGet();
 
         await ClickButton("Validate (will fail)");
 
-        // 422 handler sets specific text — verifies status-code routing works
+        // 422 route sets specific text and verifies status-code routing works
         await Expect(Page.Locator("#multi-err-summary")).ToHaveTextAsync(
             "422 — 2 validation error(s): Name, FacilityId", new() { Timeout = 5000 });
         AssertNoConsoleErrorsExcept("422");
@@ -515,7 +515,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
         await Expect(Page.Locator("#standalone-native-action-link-result"))
             .ToContainTextAsync("Standalone NativeActionLink response loaded.", new() { Timeout = 5000 });
 
-        // Status element is updated by the OnSuccess handler
+        // Status element is updated by the OnSuccess route
         await Expect(Page.Locator("#standalone-native-action-link-status"))
             .ToHaveTextAsync("Standalone NativeActionLink succeeded");
 
@@ -554,20 +554,20 @@ public class WhenServerDataLoads : PlaywrightTestBase
             }
         });
 
-        // First POST — intercepted as 400 — error handler fires
+        // First POST is intercepted as 400 and the error route fires
         await ClickButton("Save");
         await Expect(Page.Locator("#save-error")).ToHaveTextAsync(
             "Validation failed: Name is required", new() { Timeout = 5000 });
         await Expect(Page.Locator("#save-result")).ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-red-600"));
 
-        // Second POST — passes through to real server — success handler fires
+        // Second POST passes through to the real server and the success route fires
         await ClickButton("Save");
         await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync(
             "John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#save-result")).ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-green-600"));
-        // Success handler removes error class — proves error state is replaced
+        // Success route removes error class and proves error state is replaced
         await Expect(Page.Locator("#save-result")).Not.ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-red-600"));
 

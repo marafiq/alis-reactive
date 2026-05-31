@@ -1,0 +1,381 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentDirectoryModel
+@using Alis.Reactive
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "FusionGrid Resident Directory";
+
+    const string GridId = "resident-directory-grid";
+    const string VirtualGridId = "resident-virtual-grid";
+    var plan = Html.ReactivePlan<ResidentDirectoryModel>();
+    var careLevels = (List<string>)ViewBag.CareLevels;
+    var riskLevels = (List<string>)ViewBag.RiskLevels;
+
+    void LoadDirectory(PipelineBuilder<ResidentDirectoryModel> p, string status)
+    {
+        p.Post("/Sandbox/Components/Grid/DirectoryData")
+            .Gather(g =>
+            {
+                g.Static("skip", 0);
+                g.Static("take", 8);
+                g.Include<FusionTextBox, ResidentDirectoryModel>(m => m.ResidentSearch);
+                g.Include<FusionDropDownList, ResidentDirectoryModel>(m => m.CareLevel);
+                g.Include<FusionDropDownList, ResidentDirectoryModel>(m => m.RiskLevel);
+                g.Include<FusionNumericTextBox, ResidentDirectoryModel>(m => m.MinimumAge);
+            })
+            .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
+            {
+                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Element("directory-summary").SetText(json, x => x.Summary);
+                s.Element("directory-status").SetText(status);
+            }));
+    }
+
+    void LoadVirtualDirectory(PipelineBuilder<ResidentDirectoryModel> p, string status)
+    {
+        p.Post("/Sandbox/Components/Grid/DirectoryData")
+            .Gather(g =>
+            {
+                g.Static("skip", 0);
+                g.Static("take", 24);
+            })
+            .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
+            {
+                s.Component<FusionGrid>(VirtualGridId).SetDataSource(json);
+                s.Element("virtual-status").SetText(status);
+                s.Element("virtual-summary").SetText(json, x => x.Summary);
+            }));
+    }
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        LoadDirectory(p, "loaded first page");
+        LoadVirtualDirectory(p, "loaded first virtual block");
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
+        <div>
+            <native-heading level="H1">FusionGrid Resident Directory</native-heading>
+            <native-text color="Secondary">
+                Server-side paging, sorting, filtering, search, grouping, typed row events, and public Grid methods.
+            </native-text>
+        </div>
+        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Index"
+           class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+            Basic grid
+        </a>
+        <a asp-area="Sandbox" asp-controller="Grid" asp-action="Editing"
+           class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+            Editing workflows
+        </a>
+    </native-hstack>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Directory Filters</native-heading>
+        <native-grid cols="C4" gap="Base" class="mt-4">
+            @{ Html.InputField(plan, m => m.ResidentSearch, o => o.Label("Resident name"))
+                .FusionTextBox(b => b
+                    .Placeholder("Search by name")
+                    .ShowClearButton(true)
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        LoadDirectory(p, "name filter applied");
+                    })); }
+
+            @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care level"))
+                .FusionDropDownList(b => b
+                    .DataSource(careLevels)
+                    .Placeholder("All care levels")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        LoadDirectory(p, "care level filter applied");
+                    })); }
+
+            @{ Html.InputField(plan, m => m.RiskLevel, o => o.Label("Risk level"))
+                .FusionDropDownList(b => b
+                    .DataSource(riskLevels)
+                    .Placeholder("All risk levels")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        LoadDirectory(p, "risk filter applied");
+                    })); }
+
+            @{ Html.InputField(plan, m => m.MinimumAge, o => o.Label("Minimum age"))
+                .FusionNumericTextBox(b => b
+                    .Format("n0")
+                    .Min(0)
+                    .Max(120)
+                    .Placeholder("Any age")
+                    .Reactive(plan, evt => evt.Changed, (args, p) =>
+                    {
+                        LoadDirectory(p, "age filter applied");
+                    })); }
+        </native-grid>
+        <native-vstack gap="Xs" class="mt-4 font-mono text-sm">
+            <p>Status: <span id="directory-status" class="text-text-muted">waiting</span></p>
+            <p>Summary: <span id="directory-summary" class="text-text-muted">waiting</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Public Grid Method Controls</native-heading>
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("grid-page-2", "Page 2")
+                .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).GoToPage(2);
+                    p.Element("method-status").SetText("goToPage called");
+                }))
+            @(Html.NativeButton("grid-sort-risk", "Sort Risk Desc")
+                .CssClass("rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId)
+                        .SortBy((ResidentDirectoryGridItem x) => x.RiskLevel, FusionGridSortDirection.Descending);
+                    p.Element("method-status").SetText("sortColumn called");
+                }))
+            @(Html.NativeButton("grid-search-memory", "Search Memory")
+                .CssClass("rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).Search("Memory");
+                    p.Element("method-status").SetText("search called");
+                }))
+            @(Html.NativeButton("grid-clear-search", "Clear Search")
+                .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).ClearSearch();
+                    p.Element("method-status").SetText("search cleared");
+                }))
+            @(Html.NativeButton("grid-filter-north", "Filter North Wing")
+                .CssClass("rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId)
+                        .FilterTextBy((ResidentDirectoryGridItem x) => x.Wing, FusionGridTextFilterOperator.Equal, "North");
+                    p.Element("method-status").SetText("filterByColumn called");
+                }))
+            @(Html.NativeButton("grid-clear-filters", "Clear Filters")
+                .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).ClearFiltering();
+                    p.Element("method-status").SetText("filters cleared");
+                    LoadDirectory(p, "filters cleared");
+                }))
+            @(Html.NativeButton("grid-group-care", "Group Care Level")
+                .CssClass("rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId)
+                        .GroupBy((ResidentDirectoryGridItem x) => x.CareLevel);
+                    p.Element("method-status").SetText("groupColumn called");
+                }))
+            @(Html.NativeButton("grid-clear-grouping", "Clear Grouping")
+                .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).ClearGrouping();
+                    p.Element("method-status").SetText("grouping cleared");
+                }))
+            @(Html.NativeButton("grid-select-second", "Select Row 2")
+                .CssClass("rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).SelectRow(1);
+                    p.Element("method-status").SetText("selectRow called");
+                }))
+            @(Html.NativeButton("grid-clear-selection", "Clear Selection")
+                .CssClass("rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).ClearSelection();
+                    p.Element("method-status").SetText("selection cleared");
+                }))
+            @(Html.NativeButton("grid-gather-selection", "Gather Selection")
+                .CssClass("rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    p.Post("/Sandbox/Components/Grid/SelectionIndexes")
+                        .Gather(g => g.Include(grid.SelectedRowIndexes(), "selectedRowIndexes"))
+                        .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
+                        {
+                            s.Element("selection-indexes").SetText(json, x => x.Summary);
+                        }));
+                }))
+            @(Html.NativeButton("grid-gather-selected-records", "Gather Selected Records")
+                .CssClass("rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    p.Post("/Sandbox/Components/Grid/SelectionRecords")
+                        .Gather(g => g.Include(grid.SelectedRecords<ResidentDirectoryModel, ResidentDirectoryGridItem>(), "selectedRecords"))
+                        .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
+                        {
+                            s.Element("selected-records").SetText(json, x => x.Summary);
+                        }));
+                }))
+        </native-hstack>
+        <native-vstack gap="Xs" class="mt-4 font-mono text-sm">
+            <p>Method status: <span id="method-status" class="text-text-muted">waiting</span></p>
+            <p>Selection indexes: <span id="selection-indexes" class="text-text-muted">not gathered</span></p>
+            <p>Selected records: <span id="selected-records" class="text-text-muted">not gathered</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Server Bound Grid</native-heading>
+        @(Html.FusionGrid<ResidentDirectoryModel, ResidentDirectoryGridItem>(plan, GridId, b => b
+            .AllowPaging(true)
+            .AllowSorting(true)
+            .AllowMultiSorting(true)
+            .AllowFiltering(true)
+            .AllowGrouping(true)
+            .AllowSelection(true)
+            .Toolbar(new List<string> { "Search" })
+            .PageSettings(new GridPageSettings { PageSize = 8 })
+            .FilterSettings(new GridFilterSettings { Type = FilterType.FilterBar })
+            .GroupSettings(new GridGroupSettings { ShowDropArea = true })
+            .SearchSettings(new GridSearchSettings
+            {
+                Fields = new[] { "residentName", "careLevel", "wing", "suite", "riskLevel", "primaryNurse" }
+            })
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowFiltering = false },
+                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "180" },
+                new GridColumn { Field = "age", HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right, AllowFiltering = false },
+                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
+                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "110" },
+                new GridColumn { Field = "suite", HeaderText = "Suite", Width = "110" },
+                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "120" },
+                new GridColumn { Field = "openTasks", HeaderText = "Tasks", Width = "90", TextAlign = TextAlign.Right, AllowFiltering = false },
+                new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "160" }
+            }))
+            .Reactive(evt => evt.DataStateChange, (args, p) =>
+            {
+                p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
+                    .Then(t =>
+                    {
+                        t.Element("grid-action").SetText(args, x => x.Action.RequestType);
+                        t.Element("grid-skip").SetText(args, x => x.Skip);
+                        t.Element("grid-take").SetText(args, x => x.Take);
+                        t.Element("grid-column").SetText(args, x => x.Action.ColumnName);
+                        t.Element("grid-direction").SetText(args, x => x.Action.Direction);
+                        t.Post("/Sandbox/Components/Grid/DirectoryData")
+                            .Gather(g =>
+                            {
+                                g.FromEvent(args, x => x.Skip, "skip");
+                                g.FromEvent(args, x => x.Take, "take");
+                                g.FromEvent(args, x => x.Sorted, "sorted");
+                                g.FromEvent(args, x => x.Group, "group");
+                                g.FromEvent(args, x => x.Where, "where");
+                                g.FromEvent(args, x => x.Search, "search");
+                                g.Include<FusionTextBox, ResidentDirectoryModel>(m => m.ResidentSearch);
+                                g.Include<FusionDropDownList, ResidentDirectoryModel>(m => m.CareLevel);
+                                g.Include<FusionDropDownList, ResidentDirectoryModel>(m => m.RiskLevel);
+                                g.Include<FusionNumericTextBox, ResidentDirectoryModel>(m => m.MinimumAge);
+                            })
+                            .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
+                            {
+                                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                                s.Element("directory-summary").SetText(json, x => x.Summary);
+                                s.Element("directory-status").SetText("grid state sent to server");
+                            }));
+                    });
+            })
+            .Reactive(evt => evt.RecordClick<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("clicked-resident").SetText(args, x => x.RowData.ResidentName);
+                p.Element("clicked-cell").SetText(args, x => x.CellIndex);
+            })
+            .Reactive(evt => evt.RowSelected<ResidentDirectoryGridItem>(), (args, p) =>
+            {
+                p.Element("selected-row-index").SetText(args, x => x.RowIndex);
+                p.Post("/Sandbox/Components/Grid/SelectResident")
+                    .Gather(g =>
+                    {
+                        g.FromEvent(args, x => x.Data.ResidentId, "residentId");
+                        g.FromEvent(args, x => x.RowIndex, "rowIndex");
+                    })
+                    .Response(r => r.OnSuccess<ResidentDirectorySelectionResponse>((json, s) =>
+                    {
+                        s.Element("selected-resident").SetText(json, x => x.ResidentName);
+                        s.Element("selected-summary").SetText(json, x => x.Summary);
+                    }));
+            }))
+
+        <native-grid cols="C4" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Action: <span id="grid-action" class="text-text-muted">waiting</span></p>
+            <p>Skip: <span id="grid-skip" class="text-text-muted">waiting</span></p>
+            <p>Take: <span id="grid-take" class="text-text-muted">waiting</span></p>
+            <p>Column: <span id="grid-column" class="text-text-muted">waiting</span></p>
+            <p>Direction: <span id="grid-direction" class="text-text-muted">waiting</span></p>
+            <p>Clicked: <span id="clicked-resident" class="text-text-muted">waiting</span></p>
+            <p>Clicked cell: <span id="clicked-cell" class="text-text-muted">waiting</span></p>
+            <p>Selected row: <span id="selected-row-index" class="text-text-muted">waiting</span></p>
+        </native-grid>
+        <native-vstack gap="Xs" class="mt-3 font-mono text-sm">
+            <p>Selected resident: <span id="selected-resident" class="text-text-muted">waiting</span></p>
+            <p>Selection summary: <span id="selected-summary" class="text-text-muted">waiting</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Virtual Scrolling Custom Binding</native-heading>
+        @(Html.FusionGrid<ResidentDirectoryModel, ResidentDirectoryGridItem>(plan, VirtualGridId, b => b
+            .EnableVirtualization(true)
+            .Height("340")
+            .AllowSorting(true)
+            .PageSettings(new GridPageSettings { PageSize = 24 })
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true },
+                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "180" },
+                new GridColumn { Field = "age", HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
+                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
+                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "110" },
+                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "120" },
+                new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "160" }
+            }))
+            .Reactive(evt => evt.DataStateChange, (args, p) =>
+            {
+                p.Element("virtual-action").SetText(args, x => x.Action.RequestType);
+                p.Element("virtual-skip").SetText(args, x => x.Skip);
+                p.Element("virtual-take").SetText(args, x => x.Take);
+                p.Post("/Sandbox/Components/Grid/DirectoryData")
+                    .Gather(g =>
+                    {
+                        g.FromEvent(args, x => x.Skip, "skip");
+                        g.FromEvent(args, x => x.Take, "take");
+                        g.FromEvent(args, x => x.Sorted, "sorted");
+                    })
+                    .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
+                    {
+                        s.Component<FusionGrid>(VirtualGridId).SetDataSource(json);
+                        s.Element("virtual-status").SetText("virtual block refreshed");
+                        s.Element("virtual-summary").SetText(json, x => x.Summary);
+                    }));
+            }))
+
+        <native-grid cols="C4" gap="Base" class="mt-4 font-mono text-sm">
+            <p>Virtual status: <span id="virtual-status" class="text-text-muted">waiting</span></p>
+            <p>Virtual summary: <span id="virtual-summary" class="text-text-muted">waiting</span></p>
+            <p>Virtual action: <span id="virtual-action" class="text-text-muted">waiting</span></p>
+            <p>Virtual skip: <span id="virtual-skip" class="text-text-muted">waiting</span></p>
+            <p>Virtual take: <span id="virtual-take" class="text-text-muted">waiting</span></p>
+        </native-grid>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

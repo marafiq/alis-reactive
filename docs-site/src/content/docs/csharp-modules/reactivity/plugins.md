@@ -24,7 +24,7 @@ Two sides: C# declares the type metadata, JS provides the implementation.
 plan.RegisterPlugin("array", p =>
 {
     p.Method<int>("count");
-    p.Void("track");
+    p.Command("track");
 });
 ```
 
@@ -51,11 +51,11 @@ plan.RegisterPlugin("array", p =>
     p.Method<object>("filter");
     p.Method<int>("sum");
     p.Method<bool>("some");
-    p.Void("track");
+    p.Command("track");
 });
 ```
 
-`Method<T>()` declares a method that returns a typed value. `Void()` declares a method with no return value.
+`Method<T>()` declares a method that returns a typed value. `Command()` declares a method with no return value. `Void()` remains available as the compatibility name.
 
 ## How do I read a plugin method's return value?
 
@@ -168,7 +168,7 @@ Here is a complete pipeline from the ArrayManager sandbox — register plugins, 
         p.Method<object>("filter");
         p.Method<bool>("some");
     });
-    plan.RegisterPlugin("analytics", p => p.Void("track"));
+    plan.RegisterPlugin("analytics", p => p.Command("track"));
 
     Html.On(plan, t => t.DomReady(pipeline =>
         pipeline.Get("/api/residents")

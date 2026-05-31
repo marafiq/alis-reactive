@@ -32,7 +32,7 @@ namespace Alis.Reactive.Fusion.Components
             this FusionInPlaceEditorBeginEditArgs args,
             IReactionEmitter pipeline)
         {
-            pipeline.AddStep(Reaction.Set(PayloadSource.Event(), "cancel", ValueProducer.Literal(true)));
+            pipeline.AddStep(ReactionGraph.Set(PayloadSource.Event(), "cancel", ValueExpression.Literal(true)));
         }
     }
 }

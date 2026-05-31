@@ -1,85 +1,304 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Alis.Reactive;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// A symbolic condition tree built at extraction time using field NAMES.
-    /// Resolved to <see cref="PlanModel.Condition"/> at render time when
+    /// A symbolic condition tree built from client validation field paths.
+    /// Resolved to <see cref="PlanModel.ConditionGraph"/> at render time when
     /// the component map is available.
     /// </summary>
-    public abstract class FieldCondition
+    internal abstract class FieldCondition
     {
         private protected FieldCondition() { }
 
-        internal static FieldCondition Compare(string field, string op, object? value = null) =>
+        internal static FieldCondition Compare(ValidationFieldPath field, CompareOperator op) =>
+            Compare(field, op, FieldComparisonValue.None);
+
+        internal static FieldCondition Compare(ValidationFieldPath field, CompareOperator op, object? value) =>
+            Compare(field, op, FieldComparisonValue.Literal(value));
+
+        internal static FieldCondition Compare(
+            ValidationFieldPath field,
+            CompareOperator op,
+            FieldComparisonValue value) =>
             new FieldCompare(field, op, value);
 
         internal static FieldCondition All(params FieldCondition[] terms) =>
-            new FieldAll(terms);
+            new FieldAll(OrderedTerms(terms));
 
         internal static FieldCondition Any(params FieldCondition[] terms) =>
-            new FieldAny(terms);
+            new FieldAny(OrderedTerms(terms));
 
         internal static FieldCondition Not(FieldCondition term) =>
             new FieldNot(term);
+
+        internal abstract ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding);
+
+        internal abstract FieldCondition PrefixWith(FieldConditionPrefixBinding binding);
+
+        private static IReadOnlyList<FieldCondition> OrderedTerms(IEnumerable<FieldCondition> terms)
+        {
+            return new List<FieldCondition>(terms);
+        }
     }
 
     /// <summary>
-    /// A single field comparison: read field, apply operator, compare to optional value.
+    /// A single field comparison: read field, apply operator, and optionally compare to a right operand.
     /// </summary>
-    public sealed class FieldCompare : FieldCondition
+    internal sealed class FieldCompare : FieldCondition
     {
-        /// <summary>Property name to check (e.g. "IsEmployed").</summary>
-        public string Field { get; }
+        private readonly ValidationFieldPath _field;
+        private readonly CompareOperator _op;
+        private readonly FieldComparisonValue _value;
 
-        /// <summary>Operator from <see cref="PlanModel.CompareOp"/>.</summary>
-        public string Op { get; }
-
-        /// <summary>Comparison value (null for unary operators like truthy/falsy).</summary>
-        public object? Value { get; }
-
-        internal FieldCompare(string field, string op, object? value)
+        internal FieldCompare(ValidationFieldPath field, CompareOperator op, FieldComparisonValue value)
         {
-            Field = field ?? throw new ArgumentNullException(nameof(field));
-            Op = op ?? throw new ArgumentNullException(nameof(op));
-            Value = value;
+            _field = field;
+            _op = op;
+            _value = value;
+        }
+
+        internal ValidationFieldPath FieldPath => _field;
+        internal CompareOperator Operator => _op;
+        internal FieldComparisonValue ValueOperand => _value;
+
+        internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
+        {
+            return binding.Compare(_field, _op, _value);
+        }
+
+        internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
+        {
+            return binding.Compare(_field, _op, _value);
         }
     }
 
-    /// <summary>Logical AND — all terms must be true.</summary>
-    public sealed class FieldAll : FieldCondition
+    internal abstract class FieldComparisonValue
     {
-        /// <summary>Gets the child conditions that must all be true.</summary>
-        public IReadOnlyList<FieldCondition> Terms { get; }
+        private FieldComparisonValue() { }
 
-        internal FieldAll(FieldCondition[] terms)
+        internal static FieldComparisonValue None { get; } =
+            new UnaryFieldComparisonValue();
+
+        internal abstract ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape);
+
+        internal static FieldComparisonValue Literal(object? value)
         {
-            Terms = terms ?? throw new ArgumentNullException(nameof(terms));
+            return value is object[] items
+                ? (FieldComparisonValue)new ArrayFieldComparisonValue(items)
+                : new LiteralFieldComparisonValue(value);
+        }
+
+        internal static FieldComparisonValue Text(string value) =>
+            new ShapedLiteralFieldComparisonValue(value, Shape.String);
+
+        internal static FieldComparisonValue Number(int value) =>
+            new ShapedLiteralFieldComparisonValue(value, Shape.Number);
+
+        internal static FieldComparisonValue Array(IEnumerable<object?> items) =>
+            new ArrayFieldComparisonValue(items);
+
+        internal static FieldComparisonValue CollectionItem(object? value, Shape itemShape) =>
+            new CollectionItemFieldComparisonValue(value, itemShape);
+
+        private sealed class UnaryFieldComparisonValue : FieldComparisonValue
+        {
+            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
+                ComparisonOperands.Unary(left, fieldShape);
+        }
+
+        private sealed class LiteralFieldComparisonValue : FieldComparisonValue
+        {
+            private readonly object? _value;
+
+            internal LiteralFieldComparisonValue(object? value)
+            {
+                _value = value;
+            }
+
+            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
+                ComparisonOperands.Binary(left, ValueExpression.LiteralRaw(_value, fieldShape), fieldShape);
+        }
+
+        private sealed class ShapedLiteralFieldComparisonValue : FieldComparisonValue
+        {
+            private readonly object? _value;
+            private readonly Shape _literalShape;
+
+            internal ShapedLiteralFieldComparisonValue(object? value, Shape literalShape)
+            {
+                _value = value;
+                _literalShape = literalShape;
+            }
+
+            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
+                ComparisonOperands.Binary(left, ValueExpression.LiteralRaw(_value, _literalShape), fieldShape);
+        }
+
+        private sealed class ArrayFieldComparisonValue : FieldComparisonValue
+        {
+            private readonly IReadOnlyList<object?> _items;
+
+            internal ArrayFieldComparisonValue(IEnumerable<object?> items)
+            {
+                _items = items.ToArray();
+            }
+
+            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape)
+            {
+                var values = new List<ValueExpression>(_items.Count);
+                foreach (var item in _items)
+                    values.Add(ValueExpression.LiteralRaw(item, fieldShape));
+                return ComparisonOperands.Binary(
+                    left,
+                    ValueExpression.Array(values, Shape.ArrayOf(fieldShape.IsNone ? Shape.Any : fieldShape)),
+                    fieldShape);
+            }
+        }
+
+        private sealed class CollectionItemFieldComparisonValue : FieldComparisonValue
+        {
+            private readonly object? _value;
+            private readonly Shape _itemShape;
+
+            internal CollectionItemFieldComparisonValue(object? value, Shape itemShape)
+            {
+                _value = value;
+                _itemShape = itemShape;
+            }
+
+            internal override ComparisonOperands BuildOperands(ValueExpression left, Shape fieldShape) =>
+                ComparisonOperands.CollectionItem(
+                    left,
+                    ValueExpression.LiteralRaw(_value, _itemShape),
+                    fieldShape,
+                    _itemShape);
         }
     }
 
-    /// <summary>Logical OR — any term must be true.</summary>
-    public sealed class FieldAny : FieldCondition
+    internal sealed class FieldAll : FieldCondition
     {
-        /// <summary>Gets the child conditions where at least one must be true.</summary>
-        public IReadOnlyList<FieldCondition> Terms { get; }
+        private readonly IReadOnlyList<FieldCondition> _terms;
 
-        internal FieldAny(FieldCondition[] terms)
+        internal FieldAll(IReadOnlyList<FieldCondition> terms)
         {
-            Terms = terms ?? throw new ArgumentNullException(nameof(terms));
+            _terms = terms;
+        }
+
+        internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
+        {
+            return ConditionGraph.All(_terms.Select(term => term.ToPlanCondition(binding)).ToArray());
+        }
+
+        internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
+        {
+            return FieldCondition.All(_terms.Select(term => term.PrefixWith(binding)).ToArray());
         }
     }
 
-    /// <summary>Logical NOT — inverts the inner term.</summary>
-    public sealed class FieldNot : FieldCondition
+    internal sealed class FieldAny : FieldCondition
     {
-        /// <summary>Gets the inner condition to negate.</summary>
-        public FieldCondition Term { get; }
+        private readonly IReadOnlyList<FieldCondition> _terms;
+
+        internal FieldAny(IReadOnlyList<FieldCondition> terms)
+        {
+            _terms = terms;
+        }
+
+        internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
+        {
+            return ConditionGraph.Any(_terms.Select(term => term.ToPlanCondition(binding)).ToArray());
+        }
+
+        internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
+        {
+            return FieldCondition.Any(_terms.Select(term => term.PrefixWith(binding)).ToArray());
+        }
+    }
+
+    internal sealed class FieldNot : FieldCondition
+    {
+        private readonly FieldCondition _term;
 
         internal FieldNot(FieldCondition term)
         {
-            Term = term ?? throw new ArgumentNullException(nameof(term));
+            _term = term;
+        }
+
+        internal override ConditionGraph ToPlanCondition(FieldConditionPlanBinding binding)
+        {
+            return ConditionGraph.Not(_term.ToPlanCondition(binding));
+        }
+
+        internal override FieldCondition PrefixWith(FieldConditionPrefixBinding binding)
+        {
+            return FieldCondition.Not(_term.PrefixWith(binding));
+        }
+    }
+
+    internal sealed class FieldConditionPrefixBinding
+    {
+        private readonly ValidationFieldPath _prefix;
+
+        internal FieldConditionPrefixBinding(ValidationFieldPath prefix)
+        {
+            _prefix = prefix;
+        }
+
+        internal FieldCondition Compare(
+            ValidationFieldPath field,
+            CompareOperator op,
+            FieldComparisonValue value)
+        {
+            var fullField = _prefix.Append(field);
+            return FieldCondition.Compare(fullField, op, value);
+        }
+    }
+
+    internal sealed class FieldConditionPlanBinding
+    {
+        private readonly Func<ValidationFieldPath, FieldComparisonTarget> _target;
+
+        internal FieldConditionPlanBinding(Func<ValidationFieldPath, FieldComparisonTarget> target)
+        {
+            _target = target;
+        }
+
+        internal static FieldConditionPlanBinding For(ClientValidationFieldBinder fieldBindings)
+        {
+            return new FieldConditionPlanBinding(field => fieldBindings.Resolve(field).ReadConditionTarget());
+        }
+
+        internal ConditionGraph Compare(
+            ValidationFieldPath fieldPath,
+            CompareOperator op,
+            FieldComparisonValue value)
+        {
+            return _target(fieldPath).Compare(op, value);
+        }
+    }
+
+    internal sealed class FieldComparisonTarget
+    {
+        private readonly ValueExpression _left;
+        private readonly Shape _shape;
+
+        private FieldComparisonTarget(ValueExpression left, Shape shape)
+        {
+            _left = left;
+            _shape = shape;
+        }
+
+        internal static FieldComparisonTarget ForComponentValue(ValueExpression value, Shape shape) =>
+            new FieldComparisonTarget(value, shape);
+
+        internal ConditionGraph Compare(CompareOperator op, FieldComparisonValue value)
+        {
+            return ConditionGraph.Compare(op, value.BuildOperands(_left, _shape));
         }
     }
 }

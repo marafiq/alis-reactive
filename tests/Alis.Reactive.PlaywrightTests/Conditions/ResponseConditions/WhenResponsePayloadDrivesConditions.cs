@@ -2,7 +2,7 @@ namespace Alis.Reactive.PlaywrightTests.Conditions.ResponseConditions;
 
 /// <summary>
 /// Browser-level verification that response body properties drive conditions
-/// inside OnSuccess and OnError handlers. Each section proves one capability
+/// inside OnSuccess and OnError routes. Each section proves one capability
 /// of the uniform typed access DSL: When, ElseIf, And, OnError catch-all,
 /// and OnError typed with conditions.
 /// </summary>
@@ -46,13 +46,13 @@ public class WhenResponsePayloadDrivesConditions : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator("#s1-btn-approve").ClickAsync();
+        await ClickWhenStable(Page.Locator("#s1-btn-approve"));
         await Expect(Page.Locator("#s1-badge")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        await Page.Locator("#s1-btn-deny").ClickAsync();
+        await ClickWhenStable(Page.Locator("#s1-btn-deny"));
         await Expect(Page.Locator("#s1-badge")).ToBeHiddenAsync(new() { Timeout = 5000 });
 
-        await Page.Locator("#s1-btn-approve").ClickAsync();
+        await ClickWhenStable(Page.Locator("#s1-btn-approve"));
         await Expect(Page.Locator("#s1-badge")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();

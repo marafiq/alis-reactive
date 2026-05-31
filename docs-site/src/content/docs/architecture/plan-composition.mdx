@@ -20,13 +20,13 @@ page: "Page load\nroot.ts discovers all\n[data-reactive-plan] elements" {
   style.stroke: "#4285f4"
   style.font-size: 16
 }
-plan1: "Plan A\nResidentModel\nOwn entries + components" {
+plan1: "Plan A\nResidentModel\nOwn behaviors + components" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 16
 }
-plan2: "Plan B\nNotesModel\nOwn entries + components" {
+plan2: "Plan B\nNotesModel\nOwn behaviors + components" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
@@ -37,7 +37,7 @@ page -> plan1: boot()
 page -> plan2: boot()
 ```
 
-Plans with different `planId` values are completely independent — different ComponentsMaps, different entries, different event scopes. A `Dispatch("save")` in Plan A fires a `CustomEvent` on `document`, so Plan B can listen for it via `CustomEvent("save")`. This is the only cross-plan communication mechanism.
+Plans with different `planId` values are completely independent — different component maps, different behaviors, different event scopes. A `Dispatch("save")` in Plan A fires a `CustomEvent` on `document`, so Plan B can listen for it via `CustomEvent("save")`. This is the only cross-plan communication mechanism.
 
 ## Partial view merging — same model
 
@@ -58,13 +58,13 @@ partial: "Partial view\nResolvePlan<ResidentModel>\nEntries B + Components B" {
   style.stroke: "#f9ab00"
   style.font-size: 16
 }
-merged: "Composed plan\nplanId: ResidentModel\nEntries A+B, Components A+B" {
+merged: "Composed plan\nplanId: ResidentModel\nBehaviors A+B, Components A+B" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
   style.font-size: 16
 }
-boot: "boot()\nOne plan, all entries" {
+boot: "boot()\nOne plan, all behaviors" {
   shape: rectangle
   style.fill: "#d4edda"
   style.stroke: "#34a853"
@@ -76,13 +76,13 @@ partial -> merged: same planId
 merged -> boot
 ```
 
-`composeInitialPlans()` merges entries and components from all plan elements sharing the same `planId`. The result is one plan with all entries and a unified ComponentsMap. Boot runs once.
+`composeInitialPlans()` merges behaviors, components, and type fragments from all plan elements sharing the same `planId`. The result is one plan with all behavior graphs and one component map. Boot runs once.
 
 This is why `IncludeAll()` gathers values from components declared in both the parent and the partial — they share one ComponentsMap after composition.
 
-## AJAX-loaded partial views — runtime merging
+## AJAX-loaded partial views — slot replacement
 
-When a partial view is loaded via AJAX (the `into` command injects HTML), the injected content may contain its own `[data-reactive-plan]` element. `inject.ts` discovers it and calls `mergePlan()` in `boot.ts`:
+When a partial view is loaded via AJAX (the `into` command injects HTML), the injected content may contain its own `[data-reactive-plan]` element. `inject.ts` discovers those plans and calls `loadPartialSlot(slotId, plans)` in `boot.ts`:
 
 ```d2
 direction: right
@@ -99,7 +99,7 @@ inject: "inject.ts\nInsert HTML into container\nDiscover embedded plan" {
   style.stroke: "#f9ab00"
   style.font-size: 16
 }
-merge: "mergePlan()\nEnrich + wire new entries\nMerge into booted plan" {
+merge: "loadPartialSlot(slotId, plans)\nReplace slot contribution\nWire behavior + validation" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
@@ -109,7 +109,7 @@ merge: "mergePlan()\nEnrich + wire new entries\nMerge into booted plan" {
 fetch -> inject -> merge
 ```
 
-`mergePlan()` applies the same enrichment and trigger wiring as the initial boot — just on the new entries. Existing listeners are not re-wired. The booted plan's ComponentsMap grows to include the new components.
+`loadPartialSlot()` first removes the previous contribution for that slot, then applies the new plan documents under the slot handle. Component ids and type keys remain the runtime join keys; the slot id is only the replacement/unload handle.
 
 ## How plans stay isolated
 
@@ -128,6 +128,6 @@ fetch -> inject -> merge
 | Main view form | `Html.ReactivePlan<TModel>()` | New plan with own planId |
 | Partial view, same model | `Html.ResolvePlan<TModel>()` | Merges into parent plan |
 | Partial view, different model | `Html.ReactivePlan<TOtherModel>()` | Independent plan |
-| AJAX-loaded content | `into` command | Runtime merge via `mergePlan()` |
+| AJAX-loaded content | `into` command | Runtime slot replacement via `loadPartialSlot()` |
 
 **Previous:** [Error Behavior](../error-behavior/)

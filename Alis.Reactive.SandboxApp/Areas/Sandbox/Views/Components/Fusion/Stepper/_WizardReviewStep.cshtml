@@ -1,0 +1,76 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper.FusionStepperWizardReviewModel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper
+@{
+    const string StepperId = "stepper-wizard";
+    const string FormId = "stepper-wizard-review-form";
+    var submitUrl = Url.Action("SubmitWizard", "Stepper", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Stepper.SubmitWizard.");
+
+    var plan = Html.ReactivePlan<FusionStepperWizardReviewModel>();
+}
+
+<native-card><native-card-body id="@FormId">
+    <native-heading level="H2">Step 4: Review</native-heading>
+    <p class="text-sm text-text-secondary mb-4">
+        The summary is rebuilt from server drafts saved by the previous lazy steps.
+    </p>
+
+    @Html.HiddenFieldFor(plan, m => m.WizardId)
+
+    <native-grid cols="C2" gap="Base" class="mb-4">
+        <div class="rounded-md border border-border/60 p-4">
+            <p class="text-xs uppercase tracking-wide text-text-muted">Resident</p>
+            <p id="stepper-wizard-summary-resident" class="text-sm font-semibold text-text">@Model.ResidentName</p>
+            <p class="text-sm text-text-secondary">@Model.AdmissionType</p>
+        </div>
+        <div class="rounded-md border border-border/60 p-4">
+            <p class="text-xs uppercase tracking-wide text-text-muted">Care</p>
+            <p id="stepper-wizard-summary-care" class="text-sm font-semibold text-text">@Model.CareLevel</p>
+            <p class="text-sm text-text-secondary">@Model.PrimaryDiagnosis</p>
+        </div>
+        <div class="rounded-md border border-border/60 p-4">
+            <p class="text-xs uppercase tracking-wide text-text-muted">Responsible Party</p>
+            <p id="stepper-wizard-summary-contact" class="text-sm font-semibold text-text">@Model.ResponsibleParty</p>
+            <p class="text-sm text-text-secondary">@Model.Phone</p>
+        </div>
+        <div>
+            @{ Html.InputField(plan, m => m.AdmissionCoordinator, o => o.Required().Label("Admission Coordinator"))
+                .FusionTextBox(b => b.Placeholder("Coordinator name").ShowClearButton(true)); }
+        </div>
+    </native-grid>
+
+    <div id="stepper-wizard-submit-result" class="mt-4 rounded-md border border-border/60 bg-surface p-4 text-sm text-text-secondary">
+        Waiting for submission.
+    </div>
+
+    <native-hstack gap="Sm" justify="Between" class="mt-6 flex-wrap">
+        @(Html.NativeButton("stepper-wizard-back-review", "Back: Contacts")
+            .CssClass("rounded-md bg-surface px-5 py-2 text-sm font-medium text-text hover:bg-surface-2 transition-colors")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                p.Component<FusionStepper>(StepperId).SetActiveStep(2);
+                p.Element("stepper-wizard-status").SetText("returned to contacts");
+            }))
+
+        @(Html.NativeButton("stepper-wizard-submit", "Submit Admission")
+            .CssClass("rounded-md bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                p.Post(submitUrl, g => g.IncludeAll())
+                    .Validate<FusionStepperWizardReviewValidator>(FormId)
+                    .Response(r => r
+                        .OnSuccess<FusionStepperWizardSubmitResponse>((json, s) =>
+                        {
+                            s.Element("stepper-wizard-status").SetText("submitted");
+                            s.Element("stepper-wizard-submit-result").SetText(json, x => x.Message);
+                        })
+                        .OnError(400, e => e.ValidationErrors(FormId)));
+            }))
+    </native-hstack>
+</native-card-body></native-card>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)

@@ -9,9 +9,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// <c>.Reactive()</c> is called on the builder returned by
-    /// <see cref="FusionGridHtmlExtensions.FusionGrid{TModel}"/>:
+    /// <see cref="FusionGridHtmlExtensions.FusionGrid{TModel, TRow}"/>:
     /// <code>
-    /// @(Html.FusionGrid(plan, "residents-grid", b =&gt; { /* columns */ })
+    /// @(Html.FusionGrid&lt;GridModel, ResidentGridItem&gt;(plan, "residents-grid", b =&gt; { /* columns */ })
     ///     .Reactive(evt =&gt; evt.DataStateChange, (args, p) =&gt; { /* commands */ }))
     /// </code>
     /// </remarks>
@@ -35,10 +35,8 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
         {
             var descriptor = eventSelector(FusionGridEvents.Instance);
-            var pb = new PipelineBuilder<TModel>(builder.Plan.Context);
-            pipeline(descriptor.Args, pb);
 
-            builder.Plan.Context.WireComponentEvent(builder.ElementId, Component.Vendor, descriptor.JsEvent, pb.BuildReactions());
+            ComponentEventOnboarding.Wire(builder.Plan, builder.ElementId, Component.Vendor, descriptor, pipeline);
 
 
             return builder;

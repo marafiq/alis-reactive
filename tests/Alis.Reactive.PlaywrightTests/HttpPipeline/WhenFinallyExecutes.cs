@@ -49,7 +49,7 @@ public class WhenFinallyExecutes : PlaywrightTestBase
     // ── Finally on Unhandled Status (THE BUG from issue #88) ──
 
     [Test]
-    public async Task finally_hides_spinner_when_no_error_handler_matches()
+    public async Task finally_hides_spinner_when_no_error_route_matches()
     {
         await NavigateToHttpPage();
 

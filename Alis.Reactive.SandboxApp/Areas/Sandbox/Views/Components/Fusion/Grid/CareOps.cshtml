@@ -1,0 +1,344 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.CareOpsViewModel
+@using Alis.Reactive
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Templates
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@using Syncfusion.EJ2.Buttons
+@using Syncfusion.EJ2.Grids
+@inject Alis.Reactive.Validation.IClientValidationRuleSource ClientRules
+@{
+    ViewData["Title"] = "FusionGrid Care Operations";
+
+    // EJ2-native column validation generated from the SAME ResidentCareItemValidator
+    // ClientRule metadata — single source, client-side in-cell validation for free.
+    var careValidation = FusionGridValidation.From<ResidentCareItemValidator, ResidentCareItem>(ClientRules);
+
+    const string GridId = "careops-grid";
+    const string AdmitFormId = "careops-admit-form";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
+
+    var plan = Html.ReactivePlan<CareOpsViewModel>();
+    var wings = (List<string>)ViewBag.Wings;
+    var careLevels = (List<string>)ViewBag.CareLevels;
+    var riskLevels = (List<string>)ViewBag.RiskLevels;
+    var nurses = (List<string>)ViewBag.Nurses;
+    var careLevelEditOptions = careLevels.Where(c => !string.IsNullOrEmpty(c)).ToArray();
+    var riskEditOptions = riskLevels.Where(r => !string.IsNullOrEmpty(r)).ToArray();
+    var nurseEditOptions = nurses.ToArray();
+
+    var riskChips = new List<ChipCollection>
+    {
+        new() { Text = "All" }, new() { Text = "Low" }, new() { Text = "Moderate" },
+        new() { Text = "High" }, new() { Text = "Critical" }
+    };
+    var careChips = new List<ChipCollection>
+    {
+        new() { Text = "All" }, new() { Text = "Independent" }, new() { Text = "Assisted Living" },
+        new() { Text = "Memory Care" }, new() { Text = "Skilled Nursing" }
+    };
+
+    var riskTemplate = FusionTemplate.Create<ResidentCareItem>()
+        .When(m => m.RiskLevel == "Critical",
+            then: t => t.Badge(m => m.RiskLevel, "rounded bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700"),
+            @else: e => e.Badge(m => m.RiskLevel, "rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700"))
+        .Render();
+
+    void LoadCareOps(PipelineBuilder<CareOpsViewModel> p, string status)
+    {
+        p.Post("/Sandbox/Components/Grid/CareOpsData")
+            .Gather(g => { g.Static("skip", 0); g.Static("take", 10); })
+            .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
+            {
+                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Element("careops-summary").SetText(json, x => x.Summary);
+                s.Element("careops-status").SetText(status);
+            }));
+    }
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        LoadCareOps(p, "loaded care census");
+        p.Get("/Sandbox/Components/Grid/CareOpsActionRows")
+            .Response(r => r.OnSuccess(s => s.Into("careops-action-rows")));
+    }));
+
+    Html.On(plan, t => t.CustomEvent("careops-rows-refresh", p =>
+    {
+        p.Get("/Sandbox/Components/Grid/CareOpsActionRows")
+            .Response(r => r.OnSuccess(s => s.Into("careops-action-rows")));
+    }));
+
+    Html.On(plan, t => t.CustomEvent("careops-rows-refresh", p => LoadCareOps(p, "census updated")));
+}
+
+<!-- Templated "Admit resident" dialog -->
+<div id="admit-dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+    <div class="w-full max-w-xl rounded-lg border border-border bg-white p-6 shadow-xl">
+        <native-heading level="H2">Admit Resident</native-heading>
+        <native-text color="Secondary">Validated through the same ReactiveValidator the form layer uses.</native-text>
+        <form id="@AdmitFormId" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            @{ Html.InputField(plan, m => m.NewResidentName, o => o.Required().Label("Resident"))
+                .FusionTextBox(b => b.Placeholder("Resident name").ShowClearButton(true)); }
+            @{ Html.InputField(plan, m => m.NewWing, o => o.Required().Label("Wing"))
+                .FusionDropDownList(b => b.DataSource(wings).Placeholder("Select wing")); }
+            @{ Html.InputField(plan, m => m.NewCareLevel, o => o.Required().Label("Care level"))
+                .FusionDropDownList(b => b.DataSource(careLevels).Placeholder("Select care level")); }
+            @{ Html.InputField(plan, m => m.NewRiskLevel, o => o.Required().Label("Risk level"))
+                .FusionDropDownList(b => b.DataSource(riskLevels).Placeholder("Select risk")); }
+            @{ Html.InputField(plan, m => m.NewOpenTasks, o => o.Required().Label("Open tasks"))
+                .FusionNumericTextBox(b => b.Format("n0").Min(0).Max(12).Step(1).Placeholder("0")); }
+        </form>
+        <div data-reactive-validation-summary hidden
+             class="mt-3 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700"></div>
+        <native-hstack gap="Sm" justify="End" class="mt-5">
+            @(Html.NativeButton("admit-cancel", "Cancel")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) => { p.Element("admit-dialog").AddClass("hidden"); }))
+            @(Html.NativeButton("admit-save", "Admit")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/Components/Grid/CareOpsAdmit", g =>
+                    {
+                        g.Include<FusionTextBox, CareOpsViewModel>(m => m.NewResidentName);
+                        g.Include<FusionDropDownList, CareOpsViewModel>(m => m.NewWing);
+                        g.Include<FusionDropDownList, CareOpsViewModel>(m => m.NewCareLevel);
+                        g.Include<FusionDropDownList, CareOpsViewModel>(m => m.NewRiskLevel);
+                        g.Include<FusionNumericTextBox, CareOpsViewModel>(m => m.NewOpenTasks);
+                    })
+                    .Validate<CareOpsAdmitValidator>(AdmitFormId)
+                    .Response(r => r
+                        .OnSuccess<CareOpsResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Element("careops-summary").SetText(json, x => x.Summary);
+                            s.Element("careops-status").SetText("resident admitted");
+                            s.Element("admit-dialog").AddClass("hidden");
+                        })
+                        .OnError(400, e =>
+                        {
+                            e.ValidationErrors(AdmitFormId);
+                            e.Element("careops-status").SetText("admit validation failed");
+                        }));
+                }))
+        </native-hstack>
+    </div>
+</div>
+
+<native-vstack gap="Lg">
+    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
+        <div>
+            <native-heading level="H1">Care Operations Board</native-heading>
+            <native-text color="Secondary">
+                Chip fast-filters, checkbox bulk selection, dropdown/date cell editors, frozen columns, sticky header, and per-row discharge action links.
+            </native-text>
+        </div>
+        <native-hstack gap="Sm" class="flex-wrap">
+            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Billing"
+               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+                Billing board
+            </a>
+            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Editing"
+               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+                Editing grid
+            </a>
+        </native-hstack>
+    </native-hstack>
+
+    <!-- Chip fast filters -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Fast Filters</native-heading>
+        <native-vstack gap="Sm" class="mt-4">
+            <div>
+                <p class="mb-1 text-xs font-medium uppercase tracking-wide text-text-muted">Risk</p>
+                @(Html.FusionChipList(plan, "careops-risk-chips", b => b
+                    .Chips(riskChips)
+                    .Selection(Selection.Single))
+                    .Reactive(evt => evt.Clicked, (args, p) =>
+                    {
+                        p.Post("/Sandbox/Components/Grid/CareOpsData")
+                            .Gather(g =>
+                            {
+                                g.Static("skip", 0);
+                                g.Static("take", 10);
+                                g.FromEvent(args, x => x.Text, "filterRisk");
+                            })
+                            .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
+                            {
+                                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                                s.Element("careops-summary").SetText(json, x => x.Summary);
+                                s.Element("careops-status").SetText(args, x => x.Text);
+                            }));
+                    }))
+            </div>
+            <div>
+                <p class="mb-1 text-xs font-medium uppercase tracking-wide text-text-muted">Care level</p>
+                @(Html.FusionChipList(plan, "careops-care-chips", b => b
+                    .Chips(careChips)
+                    .Selection(Selection.Single))
+                    .Reactive(evt => evt.Clicked, (args, p) =>
+                    {
+                        p.Post("/Sandbox/Components/Grid/CareOpsData")
+                            .Gather(g =>
+                            {
+                                g.Static("skip", 0);
+                                g.Static("take", 10);
+                                g.FromEvent(args, x => x.Text, "filterCareLevel");
+                            })
+                            .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
+                            {
+                                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                                s.Element("careops-summary").SetText(json, x => x.Summary);
+                                s.Element("careops-status").SetText(args, x => x.Text);
+                            }));
+                    }))
+            </div>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <!-- Bulk operations -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Bulk Care Operations</native-heading>
+        <native-text color="Secondary">
+            Select residents with the checkboxes, edit Care Level / Risk / Nurse / Tasks / Review date in the grid, then save or bulk-apply.
+        </native-text>
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("careops-admit-open", "Admit Resident")
+                .CssClass(ButtonAccent)
+                .Reactive(plan, evt => evt.Click, (args, p) => { p.Element("admit-dialog").RemoveClass("hidden"); }))
+            @(Html.NativeButton("careops-save-all", "Save All Care Edits")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    grid.SaveCell();
+                    p.Post("/Sandbox/Components/Grid/CareOpsSave")
+                        .Gather(g => g.Include(grid.BatchChanges<CareOpsViewModel, ResidentCareItem>(), "batchChanges"))
+                        .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Element("careops-summary").SetText(json, x => x.Summary);
+                            s.Element("careops-status").SetText("care edits saved");
+                        }));
+                }))
+            @(Html.NativeButton("careops-reassign", "Reassign Selected To Night Float")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    p.Post("/Sandbox/Components/Grid/CareOpsBulkNurse")
+                        .Gather(g =>
+                        {
+                            g.Static("nurse", "Night Float Team");
+                            g.Include(grid.SelectedRecords<CareOpsViewModel, ResidentCareItem>(), "selectedRecords");
+                        })
+                        .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Element("careops-summary").SetText(json, x => x.Summary);
+                            s.Element("careops-status").SetText("nurse reassigned");
+                        }));
+                }))
+            @(Html.NativeButton("careops-flag-risk", "Flag Selected Critical")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    p.Post("/Sandbox/Components/Grid/CareOpsBulkRisk")
+                        .Gather(g =>
+                        {
+                            g.Static("risk", "Critical");
+                            g.Include(grid.SelectedRecords<CareOpsViewModel, ResidentCareItem>(), "selectedRecords");
+                        })
+                        .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Element("careops-summary").SetText(json, x => x.Summary);
+                            s.Element("careops-status").SetText("residents flagged critical");
+                        }));
+                }))
+            @(Html.NativeActionLink("Discharge Selected", "/Sandbox/Components/Grid/CareOpsDischargeSelected", p => p
+                .Confirm("Discharge the selected resident(s) from the active census?")
+                .Then(t2 => t2.Post("/Sandbox/Components/Grid/CareOpsDischargeSelected")
+                    .Gather(g => g.Include(p.Component<FusionGrid>(GridId).SelectedRecords<CareOpsViewModel, ResidentCareItem>(), "selectedRecords"))
+                    .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
+                    {
+                        s.Component<FusionGrid>(GridId).SetDataSource(json);
+                        s.Element("careops-summary").SetText(json, x => x.Summary);
+                        s.Element("careops-status").SetText("resident discharged");
+                    }))))
+                .CssClass("inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700"))
+        </native-hstack>
+        <native-vstack gap="Xs" class="mt-4 font-mono text-sm">
+            <p>Status: <span id="careops-status" class="text-text-muted">waiting</span></p>
+            <p>Summary: <span id="careops-summary" class="text-text-muted">waiting</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        @(Html.FusionGrid<CareOpsViewModel, ResidentCareItem>(plan, GridId, b => b
+            .AllowPaging(true)
+            .AllowSorting(true)
+            .AllowSelection(true)
+            .EnableStickyHeader(true)
+            .Height("360")
+            .SelectionSettings(new GridSelectionSettings
+            {
+                Type = SelectionType.Multiple,
+                CheckboxMode = CheckboxSelectionType.Default,
+                PersistSelection = true
+            })
+            .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Batch, ShowConfirmDialog = false })
+            .PageSettings(new GridPageSettings { PageSize = 10 })
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Type = "checkbox", Width = "50", AllowEditing = false, Freeze = FreezeDirection.Left },
+                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "90", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false, Freeze = FreezeDirection.Left },
+                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "190", AllowEditing = false, Freeze = FreezeDirection.Left },
+                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "120", AllowEditing = false },
+                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "180", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.CareLevel, careLevelEditOptions) },
+                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "150", Template = riskTemplate, EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.RiskLevel, riskEditOptions) },
+                new GridColumn { Field = "primaryNurse", HeaderText = "Primary Nurse", Width = "200", EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) => r.PrimaryNurse, nurseEditOptions) },
+                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right, EditType = "numericedit", ValidationRules = careValidation.Field(r => r.OpenTasks) },
+                new GridColumn { Field = "nextReview", HeaderText = "Next Review", Width = "150", EditTemplate = FusionGridEditTemplates.DateInput((ResidentCareItem r) => r.NextReview) }
+            }))
+            .Reactive(evt => evt.DataStateChange, (args, p) =>
+            {
+                p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
+                    .Then(t =>
+                    {
+                        t.Post("/Sandbox/Components/Grid/CareOpsData")
+                            .Gather(g =>
+                            {
+                                g.FromEvent(args, x => x.Skip, "skip");
+                                g.FromEvent(args, x => x.Take, "take");
+                                g.FromEvent(args, x => x.Sorted, "sorted");
+                            })
+                            .Response(r => r.OnSuccess<CareOpsResponse>((json, s) =>
+                            {
+                                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                                s.Element("careops-summary").SetText(json, x => x.Summary);
+                                s.Element("careops-status").SetText("grid state sent to server");
+                            }));
+                    });
+            }))
+    </native-card-body></native-card>
+
+    <!-- Per-resident NativeActionLink quick actions (server-rendered partial, Into-injected) -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Per-Resident Quick Actions</native-heading>
+        <native-text color="Secondary">
+            Each row is a real NativeActionLink — Flag Critical (immediate) and Discharge (confirm-gated). The list re-injects itself after each action.
+        </native-text>
+        <p class="mt-2 font-mono text-sm">Action: <span id="careops-rows-status" class="text-text-muted">waiting</span></p>
+        <div id="careops-action-rows" class="mt-3"></div>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

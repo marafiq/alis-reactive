@@ -48,8 +48,8 @@
     <native-card><native-card-body>
         <native-heading level="H2">Input</native-heading>
         <native-vstack gap="Sm">
-            <div id="@IdGenerator.For<DispatchSourceModel>(m => m.Name)-field"></div>
-            <div id="@IdGenerator.For<DispatchSourceModel>(m => m.Address.City)-field"></div>
+            <div id="@(IdGenerator.For<DispatchSourceModel>(m => m.Name))-field"></div>
+            <div id="@(IdGenerator.For<DispatchSourceModel>(m => m.Address.City))-field"></div>
             @(Html.NativeButton("dispatch-btn", "Dispatch Transfer")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>

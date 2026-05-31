@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
+using Alis.Reactive;
 #if NET48
 using System.Web;
 using System.Web.Mvc;
@@ -51,21 +52,21 @@ namespace Alis.Reactive.Native.Components
         private string? _cssClass;
 
         // NEVER make public — devs create builders via the .NativeDropDown() factory,
-        // which also registers the component in the plan's ComponentsMap.
+        // which also registers the component in the plan's input component onboarding catalog.
+        internal NativeDropDownBuilder(
 #if NET48
-        internal NativeDropDownBuilder(HtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+            HtmlHelper<TModel> html,
 #else
-        internal NativeDropDownBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+            IHtmlHelper<TModel> html,
 #endif
+            Expression<Func<TModel, TProp>> expression,
+            InputComponentRenderTarget target)
         {
             _html = html;
             _expression = expression;
-            _elementId = IdGenerator.For<TModel, TProp>(expression);
-#if NET48
-            _bindingPath = ExpressionHelper.GetExpressionText(expression);
-#else
-            _bindingPath = html.NameFor(expression);
-#endif
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            _elementId = target.ElementId;
+            _bindingPath = target.BindingName;
         }
 
         /// <summary>Gets the resolved element ID for this dropdown.</summary>

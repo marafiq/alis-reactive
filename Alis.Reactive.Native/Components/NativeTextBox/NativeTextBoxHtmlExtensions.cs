@@ -1,5 +1,4 @@
 using System;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
@@ -18,8 +17,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public static class NativeTextBoxHtmlExtensions
     {
-        private static readonly NativeTextBox _component = new NativeTextBox();
-
         /// <summary>
         /// Creates a <see cref="NativeTextBoxBuilder{TModel,TProp}"/> inside the field wrapper,
         /// registers the component in the plan, and renders the input.
@@ -33,11 +30,13 @@ namespace Alis.Reactive.Native.Components
             Action<NativeTextBoxBuilder<TModel, TProp>> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ValueMember, "textbox",
-                Shape.FromClrType(typeof(TProp))));
+            var registration = global::Alis.Reactive.Native.Components.NativeTextBox.Registration;
+            setup.RegisterInputComponent(registration);
 
-            var builder = new NativeTextBoxBuilder<TModel, TProp>(setup.Helper, setup.Expression);
+            var builder = new NativeTextBoxBuilder<TModel, TProp>(
+                setup.Helper,
+                setup.Expression,
+                setup.RenderTarget);
             build(builder);
             setup.Render(builder);
         }

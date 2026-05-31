@@ -17,7 +17,7 @@ namespace Alis.Reactive.Builders.Conditions
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
         {
-            var source = new EventArgSource<TPayload, TProp>(path);
+            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
             return new ConditionSourceBuilder<TModel, TProp>(source);
         }
 
@@ -41,7 +41,7 @@ namespace Alis.Reactive.Builders.Conditions
         /// <param name="message">The confirmation message shown to the user.</param>
         public GuardBuilder<TModel> Confirm(string message)
         {
-            return new GuardBuilder<TModel>(Condition.Confirm(message));
+            return new GuardBuilder<TModel>(ConditionGraph.Confirm(message));
         }
     }
 }

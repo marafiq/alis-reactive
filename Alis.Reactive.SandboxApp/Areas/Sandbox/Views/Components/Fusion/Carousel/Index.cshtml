@@ -1,0 +1,142 @@
+@model FusionCarouselModel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Syncfusion.EJ2.Navigations
+@{
+    ViewData["Title"] = "FusionCarousel";
+
+    const string CarouselId = "resident-carousel";
+    var auditUrl = Url.Action("Audit", "Carousel", new { area = "Sandbox" })
+        ?? throw new InvalidOperationException("Could not resolve Carousel.Audit.");
+
+    var plan = Html.ReactivePlan<FusionCarouselModel>();
+    var items = new List<CarouselItem>
+    {
+        new() { Template = "<div class='carousel-slide carousel-slide-one'><strong>Vitals Snapshot</strong><span>Respiration, pain score, and overnight alerts.</span></div>" },
+        new() { Template = "<div class='carousel-slide carousel-slide-two'><strong>Care Plan Review</strong><span>Therapy notes and medication adjustments.</span></div>" },
+        new() { Template = "<div class='carousel-slide carousel-slide-three'><strong>Discharge Readiness</strong><span>Family teaching and follow-up tasks.</span></div>" }
+    };
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var carousel = p.Component<FusionCarousel>(CarouselId);
+        p.Element("selected-index-echo").SetText(carousel.SelectedIndex());
+        p.When(carousel.SelectedIndex()).Eq(1)
+            .Then(t => t.Element("selected-state").SetText("second slide"))
+            .Else(e => e.Element("selected-state").SetText("other slide"));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionCarousel</native-heading>
+    <native-text color="Secondary">
+        Navigation component. Exercises selected-index reads, next/previous methods, and slide change cancellation.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Carousel</native-heading>
+        <p class="text-sm text-text-secondary mb-4">
+            The middle slide is active on load. Previous is canceled when it would move to the first slide.
+        </p>
+
+        @(Html.FusionCarousel(plan, CarouselId, b =>
+        {
+            b.Items(items);
+            b.SelectedIndex(1);
+            b.AnimationEffect(CarouselAnimationEffect.None);
+            b.AutoPlay(false);
+            b.ButtonsVisibility(CarouselButtonVisibility.Hidden);
+            b.ShowIndicators(false);
+            b.ShowPlayButton(false);
+            b.AllowKeyboardInteraction(false);
+            b.EnableTouchSwipe(false);
+            b.Loop(false);
+        })
+        .Reactive(evt => evt.SlideChanging, (args, p) =>
+        {
+            p.Element("changing-current").SetText(args, x => x.CurrentIndex);
+            p.Element("changing-next").SetText(args, x => x.NextIndex);
+            p.Element("changing-is-swiped").SetText(args, x => x.IsSwiped);
+            p.Element("changing-direction").SetText(args, x => x.SlideDirection);
+            p.Element("changing-cancel").SetText(args, x => x.Cancel);
+
+            p.When(args, x => x.NextIndex).Eq(0)
+                .Then(t =>
+                {
+                    t.Element("cancel-state").SetText("cancelled");
+                    args.PreventTransition(t);
+                    t.Element("changing-cancel").SetText(args, x => x.Cancel);
+                })
+                .Else(e => e.Element("cancel-state").SetText("allowed"));
+        })
+        .Reactive(evt => evt.SlideChanged, (args, p) =>
+        {
+            var carousel = p.Component<FusionCarousel>(CarouselId);
+            p.Element("selected-index-echo").SetText(carousel.SelectedIndex());
+            p.Element("changed-current").SetText(args, x => x.CurrentIndex);
+            p.Element("changed-previous").SetText(args, x => x.PreviousIndex);
+            p.Element("changed-is-swiped").SetText(args, x => x.IsSwiped);
+            p.Element("changed-direction").SetText(args, x => x.SlideDirection);
+            p.Element("changed-state").SetText("changed");
+            p.Post(auditUrl)
+                .Gather(g => g
+                    .FromEvent(args, x => x.CurrentIndex, "currentIndex")
+                    .FromEvent(args, x => x.PreviousIndex, "previousIndex")
+                    .FromEvent(args, x => x.SlideDirection, "slideDirection"))
+                .Response(r => r.OnSuccess<FusionCarouselAuditResponse>((json, s) =>
+                {
+                    s.Element("review-persisted").SetText(json, x => x.Message);
+                    s.Element("review-section").SetText(json, x => x.Section);
+                    s.Element("review-direction").SetText(json, x => x.Direction);
+                }));
+        }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Commands</native-heading>
+        <native-hstack gap="Sm" class="flex-wrap">
+            @(Html.NativeButton("next-btn", "Next")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionCarousel>(CarouselId).Next();
+                }))
+            @(Html.NativeButton("prev-btn", "Previous")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    p.Component<FusionCarousel>(CarouselId).Previous();
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Selected index: <span id="selected-index-echo" class="text-text-muted">pending</span></p>
+            <p>Selected state: <span id="selected-state" class="text-text-muted">pending</span></p>
+            <p>Changing current: <span id="changing-current" class="text-text-muted">pending</span></p>
+            <p>Changing next: <span id="changing-next" class="text-text-muted">pending</span></p>
+            <p>Changing is swiped: <span id="changing-is-swiped" class="text-text-muted">pending</span></p>
+            <p>Changing direction: <span id="changing-direction" class="text-text-muted">pending</span></p>
+            <p>Changing cancel: <span id="changing-cancel" class="text-text-muted">pending</span></p>
+            <p>Cancel state: <span id="cancel-state" class="text-text-muted">pending</span></p>
+            <p>Changed current: <span id="changed-current" class="text-text-muted">pending</span></p>
+            <p>Changed previous: <span id="changed-previous" class="text-text-muted">pending</span></p>
+            <p>Changed is swiped: <span id="changed-is-swiped" class="text-text-muted">pending</span></p>
+            <p>Changed direction: <span id="changed-direction" class="text-text-muted">pending</span></p>
+            <p>Changed state: <span id="changed-state" class="text-text-muted">pending</span></p>
+            <p>Review persisted: <span id="review-persisted" class="text-text-muted">pending</span></p>
+            <p>Review section: <span id="review-section" class="text-text-muted">pending</span></p>
+            <p>Review direction: <span id="review-direction" class="text-text-muted">pending</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,16 @@
+namespace Alis.Reactive.Fusion.Components
+{
+    /// <summary>
+    /// Event payload delivered when a <see cref="FusionRadioButton"/> is selected.
+    /// </summary>
+    public class FusionRadioButtonChangeArgs
+    {
+        /// <summary>Gets or sets the selected radio button value from the Syncfusion change event.</summary>
+        public string Value { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// </summary>
+        public FusionRadioButtonChangeArgs() { }
+    }
+}

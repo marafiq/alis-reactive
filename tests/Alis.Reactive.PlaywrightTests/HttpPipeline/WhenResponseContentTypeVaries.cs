@@ -1,12 +1,12 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline;
 
 /// <summary>
-/// Proves that the framework's response handling pipeline works for all supported content types:
+/// Proves that the framework's response routing pipeline works for all supported content types:
 ///   1. Flat JSON — OnSuccess&lt;T&gt; with shallow property walking
 ///   2. Nested JSON — OnSuccess&lt;T&gt; with 3-level deep dot-path walking
 ///   3. HTML partial — Into() injects server-rendered HTML, native inputs work, SF components initialize
 ///
-/// Each test clicks a button (triggering dispatch -> HTTP GET -> response handler) and verifies
+/// Each test clicks a button (triggering dispatch -> HTTP GET -> response route) and verifies
 /// that the EXACT server values arrive in the DOM. This proves the full pipeline:
 ///   C# anonymous object -> JSON serialization -> fetch -> response body walking -> DOM mutation
 /// </summary>
@@ -35,7 +35,7 @@ public class WhenResponseContentTypeVaries : PlaywrightTestBase
         await Expect(Page.Locator("#flat-message")).ToHaveTextAsync("Hello from server", new() { Timeout = 5000 });
         await Expect(Page.Locator("#flat-count")).ToHaveTextAsync("42", new() { Timeout = 5000 });
 
-        // Spinner must be hidden after success handler completes
+        // Spinner must be hidden after success route completes
         await Expect(Page.Locator("#flat-spinner")).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
@@ -45,12 +45,12 @@ public class WhenResponseContentTypeVaries : PlaywrightTestBase
     public async Task nested_json_walks_three_level_deep_path()
     {
         // Server returns: { data: { user: { name: "Jane Doe", email: "jane@example.com" }, total: 99.5 } }
-        // Plan walks:
+        // Plan reads structured payload paths:
         //   responseBody.data.user.name  -> #nested-name   (3 levels: data -> user -> name)
         //   responseBody.data.user.email -> #nested-email   (3 levels: data -> user -> email)
         //   responseBody.data.total      -> #nested-total   (2 levels: data -> total, decimal precision)
         //
-        // If walk() fails at depth > 2, name and email will be empty but total might still work.
+        // If structured path resolution fails at depth > 2, name and email will be empty but total might still work.
         // If decimal 99.5 gets mangled (e.g., "99.50" or "100"), the exact match catches it.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
@@ -61,7 +61,7 @@ public class WhenResponseContentTypeVaries : PlaywrightTestBase
         await Expect(Page.Locator("#nested-email")).ToHaveTextAsync("jane@example.com", new() { Timeout = 5000 });
         await Expect(Page.Locator("#nested-total")).ToHaveTextAsync("99.5", new() { Timeout = 5000 });
 
-        // Spinner must be hidden after success handler completes
+        // Spinner must be hidden after success route completes
         await Expect(Page.Locator("#nested-spinner")).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
@@ -97,7 +97,7 @@ public class WhenResponseContentTypeVaries : PlaywrightTestBase
         // the component constructor ran (not just raw HTML injection)
         await Expect(Page.Locator("#partial-container .e-numerictextbox")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        // Spinner must be hidden after success handler completes
+        // Spinner must be hidden after success route completes
         await Expect(Page.Locator("#partial-spinner")).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();

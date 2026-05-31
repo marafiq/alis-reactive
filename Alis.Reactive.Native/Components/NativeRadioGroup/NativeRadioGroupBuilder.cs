@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
+using Alis.Reactive;
 #if NET48
 using System.Web;
 using System.Web.Mvc;
@@ -51,21 +52,21 @@ namespace Alis.Reactive.Native.Components
         private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
 
         // NEVER make public — devs create builders via the .NativeRadioGroup() factory,
-        // which also registers the component in the plan's ComponentsMap.
+        // which also registers the component in the plan's input component onboarding catalog.
+        internal NativeRadioGroupBuilder(
 #if NET48
-        internal NativeRadioGroupBuilder(HtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+            HtmlHelper<TModel> html,
 #else
-        internal NativeRadioGroupBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+            IHtmlHelper<TModel> html,
 #endif
+            Expression<Func<TModel, TProp>> expression,
+            InputComponentRenderTarget target)
         {
             _html = html;
             _expression = expression;
-            _elementId = IdGenerator.For<TModel, TProp>(expression);
-#if NET48
-            _bindingPath = ExpressionHelper.GetExpressionText(expression);
-#else
-            _bindingPath = html.NameFor(expression);
-#endif
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            _elementId = target.ElementId;
+            _bindingPath = target.BindingName;
         }
 
         /// <summary>Gets the resolved element ID for this radio group.</summary>
@@ -161,7 +162,11 @@ namespace Alis.Reactive.Native.Components
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
 #if NET48
-            var modelValue = _html.ViewData.Eval(ExpressionHelper.GetExpressionText(_expression))?.ToString() ?? "";
+            // net48: read the model value directly. System.Web.Mvc ValueFor returns an
+            // already-HTML-encoded MvcHtmlString, which would double-encode at the hidden
+            // input below; ViewData.Eval returns the raw value, encoded once at line ~176.
+            // (ModelState-aware re-render after a failed POST is a net10-only nicety.)
+            var modelValue = _html.ViewData.Eval(System.Web.Mvc.ExpressionHelper.GetExpressionText(_expression))?.ToString() ?? "";
 #else
             var modelValue = _html.ValueFor(_expression, "{0}")?.ToString() ?? "";
 #endif

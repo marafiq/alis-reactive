@@ -123,7 +123,7 @@
 
     <native-hstack gap="Base">
         @(Html.NativeButton("submit-btn", "Admit Resident")
-            .CssClass("px-4 py-2 bg-[#7A2E3B] text-white rounded-md text-sm font-medium")
+            .CssClass("px-4 py-2 bg-primary text-white rounded-md text-sm font-medium")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Dispatch("do-submit");

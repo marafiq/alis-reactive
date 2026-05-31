@@ -48,13 +48,13 @@ plan -> json: serializes {
 
 ## The boundary rule
 
-The C# side builds plan models. It never touches the DOM, never calls `fetch`, never evaluates conditions. The JS side reads the plan and executes it. It never creates new commands, never extends the schema, never invents behavior.
+The C# side builds plan models. It never touches the DOM, never calls `fetch`, never evaluates conditions. The JS side reads the plan and executes it. It never creates new commands, never extends the generated contract, never invents behavior.
 
 If a feature can't be expressed as a plan model, it doesn't exist in the framework. The plan is the only contract.
 
 ## Why plan models instead of direct execution?
 
-Because the server and browser are different environments. C# runs on the server during Razor view rendering — the DOM doesn't exist yet. The browser runs JavaScript after the page loads — the C# code is long gone. Plan models bridge this gap: the C# side captures *what* should happen, serializes it as JSON, and the runtime executes it later.
+Because the server and browser are different environments. C# runs on the server during Razor view rendering — the DOM doesn't exist yet. The browser runs JavaScript after the page loads — the C# code is long gone. Plan models bridge this gap: the C# side captures *what* must happen, serializes it as JSON, and the runtime executes it later.
 
 This also means the C# API is compile-time checked. Rename a model property → every `m => m.Name` expression breaks at build. Wire a condition on `args.Checked` → the compiler enforces that `Checked` is `bool?`, not `object`. The type safety lives in the builders. The runtime just follows instructions.
 

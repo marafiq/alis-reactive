@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Builders;
@@ -19,15 +20,20 @@ namespace Alis.Reactive.Native.Components
             Action<PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var plan = Plan.Create("action-link", null);
-            var context = new PlanBuildContext(plan, new Dictionary<string, ComponentRegistration>());
+            var planIdentity = PlanIdentity.Root(PlanId.Of("action-link"));
+            var context = new PlanBuildContext(
+                planIdentity, new RegisteredInputComponents());
             var pb = new PipelineBuilder<TModel>(context);
             pipeline(pb);
 
+            if (context.ValidationJobs.Count > 0)
+                throw new InvalidOperationException(
+                    "NativeActionLink does not support validation.");
+
             var reaction = pb.BuildReaction();
-            var state = new RequestProjectionState();
-            var projectedReaction = ProjectReaction(reaction, href, state);
-            if (state.RequestCount != 1)
+            var requestCount = 0;
+            var actionLinkReaction = BuildActionLinkReaction(reaction, href, ref requestCount);
+            if (requestCount != 1)
             {
                 throw new InvalidOperationException(
                     "NativeActionLink supports exactly one request in its click reaction tree.");
@@ -36,34 +42,37 @@ namespace Alis.Reactive.Native.Components
             // Carry the full plan context so the runtime can resolve
             // all component references in the reaction tree.
             var payloadJson = JsonSerializer.Serialize(
-                new NativeActionLinkPayload(plan, projectedReaction),
+                new NativeActionLinkPayload(context.BuildPlan(), actionLinkReaction),
                 CompactOptions);
 
             return new NativeActionLinkContract(payloadJson);
         }
 
-        private static Reaction ProjectReaction(Reaction reaction, string href, RequestProjectionState state)
+        private static ReactionGraph BuildActionLinkReaction(ReactionGraph reaction, string href, ref int requestCount)
         {
             switch (reaction)
             {
                 case SequenceReaction sequential:
-                    return Reaction.Sequence(new List<Reaction>(sequential.Steps));
+                    var actionLinkSteps = new List<ReactionGraph>();
+                    foreach (var step in sequential.Steps)
+                        actionLinkSteps.Add(BuildActionLinkReaction(step, href, ref requestCount));
+                    return ReactionGraph.Sequence(actionLinkSteps);
 
                 case BranchReaction conditional:
-                    var projectedCases = new List<BranchCase>();
+                    var actionLinkCases = new List<BranchCase>();
                     foreach (var c in conditional.Cases)
-                        projectedCases.Add(new BranchCase(c.When, ProjectReaction(c.Reaction, href, state)));
-                    return Reaction.Branch(projectedCases);
+                        actionLinkCases.Add(c.WithReaction(BuildActionLinkReaction(c.Reaction, href, ref requestCount)));
+                    return ReactionGraph.Branch(actionLinkCases);
 
                 case RequestReaction http:
-                    state.RequestCount++;
-                    if (state.RequestCount > 1)
+                    requestCount++;
+                    if (requestCount > 1)
                         throw new InvalidOperationException(
                             "NativeActionLink supports exactly one request.");
                     if (!string.Equals(href, http.Request.Url, StringComparison.Ordinal))
                         throw new InvalidOperationException(
                             "NativeActionLink href must match the request URL.");
-                    return Reaction.Request(ProjectRequest(http.Request));
+                    return ReactionGraph.Request(BuildActionLinkRequest(http.Request));
 
                 case ParallelReaction _:
                     throw new InvalidOperationException(
@@ -74,27 +83,40 @@ namespace Alis.Reactive.Native.Components
             }
         }
 
-        private static Request ProjectRequest(Request request)
+        private static RequestPlan BuildActionLinkRequest(RequestPlan request)
         {
-            if (request.Next != null)
+            var requestHasFollowUp = request.Chain.HasFollowUp;
+            if (requestHasFollowUp)
                 throw new InvalidOperationException(
                     "NativeActionLink does not support chained requests.");
 
-            if (request.ValidatorType != null)
-                throw new InvalidOperationException(
-                    "NativeActionLink does not support validation.");
-
-            var projected = new Request(request.Method, string.Empty);
-            projected.Input = request.Input;
-            projected.Before = request.Before;
-            projected.Success = request.Success;
-            projected.Error = request.Error;
-            return projected;
+            return RequestPlan.Create(
+                RequestEndpoint.To(HttpMethodName.From(request.Method), RequestUrl.Of(string.Empty)),
+                BuildActionLinkInput(request.Input),
+                RequestReactions.From(request.WhileLoading, Array.Empty<ReactionGraph>()),
+                ResponseRouting.From(request.Success, request.Error, RequestChain.Terminal),
+                RequestValidationTarget.None);
         }
 
-        private sealed class RequestProjectionState
+        private static RequestInput BuildActionLinkInput(RequestInput input)
         {
-            public int RequestCount { get; set; }
+            if (input is not GatherRequestInput gather)
+                return input;
+
+            var payloadAssignments = gather.Assignments
+                .Where(assignment => assignment.Target is RequestPayloadTarget)
+                .ToList();
+
+            var hasNoActionLinkInput =
+                payloadAssignments.Count == 0
+                && !gather.RegisteredInputs.SelectsRegisteredInputs;
+            if (hasNoActionLinkInput)
+                return RequestInput.None;
+
+            return GatherRequestInput.From(
+                payloadAssignments,
+                RequestBodyFormat.From(gather.BodyFormat),
+                gather.RegisteredInputs);
         }
     }
 
@@ -106,12 +128,12 @@ namespace Alis.Reactive.Native.Components
 
     internal sealed class NativeActionLinkPayload
     {
-        public NativeActionLinkPayload(Plan plan, Reaction reaction)
+        public NativeActionLinkPayload(PlanDocument plan, ReactionGraph reaction)
         {
             Plan = plan;
             Reaction = reaction;
         }
-        public Plan Plan { get; }
-        public Reaction Reaction { get; }
+        public PlanDocument Plan { get; }
+        public ReactionGraph Reaction { get; }
     }
 }

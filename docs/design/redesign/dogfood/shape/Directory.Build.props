@@ -1,0 +1,5 @@
+<Project>
+  <!-- Intentionally empty and does NOT import the repo-root Directory.Build.props.
+       Keeps this spec-only dogfood proof self-contained and isolated from
+       framework-wide MSBuild settings (central package mgmt, asset packing, etc.). -->
+</Project>

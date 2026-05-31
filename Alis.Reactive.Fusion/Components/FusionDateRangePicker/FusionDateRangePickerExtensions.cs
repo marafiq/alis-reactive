@@ -24,6 +24,15 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionDateRangePicker Component = new FusionDateRangePicker();
 
+        private static readonly ComponentProperty<DateTime> StartDateProperty =
+            ComponentProperty<DateTime>.Named("startDate");
+
+        private static readonly ComponentProperty<DateTime> EndDateProperty =
+            ComponentProperty<DateTime>.Named("endDate");
+
+        private static readonly ComponentProperty<DateTime[]> ValueProperty =
+            ComponentProperty<DateTime[]>.Named(Component.ValueMember);
+
         /// <summary>Reads the start date for use in conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard:
@@ -33,7 +42,7 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<DateTime> StartDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, "startDate", "startDate", Shape.Date, "read"); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "startDate"); }
+            => self.Read(StartDateProperty);
 
         /// <summary>Reads the end date for use in conditions or gather.</summary>
         /// <remarks>
@@ -44,7 +53,7 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<DateTime> EndDate<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, "endDate", "endDate", Shape.Date, "read"); return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "endDate"); }
+            => self.Read(EndDateProperty);
 
         /// <summary>Reads both dates as an array for use in conditions or gather.</summary>
         /// <remarks>
@@ -60,6 +69,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<DateTime[]> Value<TModel>(
             this ComponentRef<FusionDateRangePicker, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.ArrayOf(Shape.Date), "read"); return new TypedComponentSource<DateTime[]>(self.TargetId, Component.Vendor, Component.ValueMember); }
+            => self.Read(ValueProperty);
     }
 }

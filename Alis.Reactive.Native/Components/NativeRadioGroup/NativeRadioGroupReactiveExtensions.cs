@@ -46,11 +46,8 @@ namespace Alis.Reactive.Native.Components
 
             for (int i = 0; i < builder.Options.Count; i++)
             {
-                var pb = new PipelineBuilder<TModel>(plan.Context);
-                pipeline(descriptor.Args, pb);
-
                 var radioId = $"{builder.ElementId}_r{i}";
-                plan.Context.WireComponentEvent(radioId, "native", descriptor.JsEvent, pb.BuildReactions());
+                ComponentEventOnboarding.Wire(plan, radioId, "native", descriptor, pipeline);
             }
 
             return builder;

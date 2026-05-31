@@ -1,0 +1,382 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentBillingViewModel
+@using Alis.Reactive
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Templates
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "FusionGrid Month-End Billing";
+
+    const string GridId = "billing-grid";
+    const string AddFormId = "billing-add-form";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string ButtonAccent = "rounded-md bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent/90";
+
+    var plan = Html.ReactivePlan<ResidentBillingViewModel>();
+    var careLevels = (List<string>)ViewBag.CareLevels;
+    var wings = (List<string>)ViewBag.Wings;
+    var statuses = (List<string>)ViewBag.Statuses;
+
+    var statusTemplate = FusionTemplate.Create<ResidentBillingItem>()
+        .When(m => m.BillingStatus == "Paid",
+            then: t => t.Badge(m => m.BillingStatus, "rounded bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700"),
+            @else: e => e.Badge(m => m.BillingStatus, "rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700"))
+        .Render();
+
+    void LoadBilling(PipelineBuilder<ResidentBillingViewModel> p, string status)
+    {
+        p.Post("/Sandbox/Components/Grid/BillingData")
+            .Gather(g =>
+            {
+                g.Static("skip", 0);
+                g.Static("take", 12);
+            })
+            .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
+            {
+                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                s.Element("billing-summary").SetText(json, x => x.Summary);
+                s.Element("billing-status").SetText(status);
+            }));
+    }
+
+    Html.On(plan, t => t.DomReady(p => LoadBilling(p, "loaded current census")));
+}
+
+<!-- Templated "Add charge" dialog -->
+<div id="add-charge-dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+    <div class="w-full max-w-lg rounded-lg border border-border bg-white p-6 shadow-xl">
+        <native-heading level="H2">Add Resident Charge</native-heading>
+        <native-text color="Secondary">Open a new monthly charge for a resident. Validated before it posts.</native-text>
+        <form id="@AddFormId" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            @{ Html.InputField(plan, m => m.NewResidentName, o => o.Required().Label("Resident"))
+                .FusionTextBox(b => b.Placeholder("Resident name").ShowClearButton(true)); }
+            @{ Html.InputField(plan, m => m.NewCareLevel, o => o.Required().Label("Care level"))
+                .FusionDropDownList(b => b.DataSource(careLevels).Placeholder("Select care level")); }
+            @{ Html.InputField(plan, m => m.NewMonthlyRate, o => o.Required().Label("Monthly rate"))
+                .FusionNumericTextBox(b => b.Format("c0").Min(0).Max(20000).Step(50).Placeholder("0")); }
+            @{ Html.InputField(plan, m => m.NewAddOnCharges, o => o.Required().Label("Add-on charges"))
+                .FusionNumericTextBox(b => b.Format("c0").Min(0).Max(5000).Step(25).Placeholder("0")); }
+        </form>
+        <div data-reactive-validation-summary hidden
+             class="mt-3 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700"></div>
+        <native-hstack gap="Sm" justify="End" class="mt-5">
+            @(Html.NativeButton("add-charge-cancel", "Cancel")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Element("add-charge-dialog").AddClass("hidden");
+                }))
+            @(Html.NativeButton("add-charge-save", "Save Charge")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/Components/Grid/BillingAddCharge", g =>
+                    {
+                        g.Include<FusionTextBox, ResidentBillingViewModel>(m => m.NewResidentName);
+                        g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.NewCareLevel);
+                        g.Include<FusionNumericTextBox, ResidentBillingViewModel>(m => m.NewMonthlyRate);
+                        g.Include<FusionNumericTextBox, ResidentBillingViewModel>(m => m.NewAddOnCharges);
+                    })
+                    .Validate<ResidentBillingAddValidator>(AddFormId)
+                    .Response(r => r
+                        .OnSuccess<ResidentBillingResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Element("billing-summary").SetText(json, x => x.Summary);
+                            s.Element("billing-status").SetText("charge added");
+                            s.Element("add-charge-dialog").AddClass("hidden");
+                        })
+                        .OnError(400, e =>
+                        {
+                            e.ValidationErrors(AddFormId);
+                            e.Element("billing-status").SetText("add validation failed");
+                        }));
+                }))
+        </native-hstack>
+    </div>
+</div>
+
+<native-vstack gap="Lg">
+    <native-hstack justify="Between" align="Center" class="flex-wrap gap-3">
+        <div>
+            <native-heading level="H1">Month-End Billing Board</native-heading>
+            <native-text color="Secondary">
+                Server-side filtering, bulk batch charge edits, rate increases, and templated-dialog admits over the resident census.
+            </native-text>
+        </div>
+        <native-hstack gap="Sm" class="flex-wrap">
+            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Directory"
+               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+                Directory grid
+            </a>
+            <a asp-area="Sandbox" asp-controller="Grid" asp-action="Editing"
+               class="rounded-md border border-border px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle">
+                Editing grid
+            </a>
+        </native-hstack>
+    </native-hstack>
+
+    <!-- Filter panel: our own buttons, server-side reload -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Filter Census</native-heading>
+        <native-grid cols="C3" gap="Base" class="mt-4">
+            @{ Html.InputField(plan, m => m.FilterCareLevel, o => o.Label("Care level"))
+                .FusionDropDownList(b => b.DataSource(careLevels).Placeholder("All care levels")); }
+            @{ Html.InputField(plan, m => m.FilterWing, o => o.Label("Wing"))
+                .FusionDropDownList(b => b.DataSource(wings).Placeholder("All wings")); }
+            @{ Html.InputField(plan, m => m.FilterStatus, o => o.Label("Status"))
+                .FusionDropDownList(b => b.DataSource(statuses).Placeholder("All statuses")); }
+        </native-grid>
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("billing-apply-filters", "Apply Filters")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/Components/Grid/BillingData")
+                        .Gather(g =>
+                        {
+                            g.Static("skip", 0);
+                            g.Static("take", 12);
+                            g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterCareLevel);
+                            g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterWing);
+                            g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterStatus);
+                        })
+                        .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Element("billing-summary").SetText(json, x => x.Summary);
+                            s.Element("billing-status").SetText("filters applied");
+                        }));
+                }))
+            @(Html.NativeButton("billing-quick-unbilled", "Unbilled Only")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/Components/Grid/BillingData")
+                        .Gather(g =>
+                        {
+                            g.Static("skip", 0);
+                            g.Static("take", 12);
+                            g.Static("filterStatus", "Pending");
+                        })
+                        .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Element("billing-summary").SetText(json, x => x.Summary);
+                            s.Element("billing-status").SetText("showing unbilled residents");
+                        }));
+                }))
+            @(Html.NativeButton("billing-quick-memory", "Memory Care")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post("/Sandbox/Components/Grid/BillingData")
+                        .Gather(g =>
+                        {
+                            g.Static("skip", 0);
+                            g.Static("take", 12);
+                            g.Static("filterCareLevel", "Memory Care");
+                        })
+                        .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Element("billing-summary").SetText(json, x => x.Summary);
+                            s.Element("billing-status").SetText("showing memory care residents");
+                        }));
+                }))
+            @(Html.NativeButton("billing-clear-filters", "Clear")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    LoadBilling(p, "filters cleared");
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <!-- Bulk operations panel -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Bulk Charge Operations</native-heading>
+        <native-text color="Secondary">
+            Edit Monthly Rate and Add-ons in the grid, select residents, then save or bulk-apply. Every change posts to the server.
+        </native-text>
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("billing-add-open", "Add Charge")
+                .CssClass(ButtonAccent)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Element("add-charge-dialog").RemoveClass("hidden");
+                }))
+            @(Html.NativeButton("billing-save-all", "Save All Charges")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    grid.SaveCell();
+                    p.Post("/Sandbox/Components/Grid/BillingSave")
+                        .Gather(g => g.Include(grid.BatchChanges<ResidentBillingViewModel, ResidentBillingItem>(), "batchChanges"))
+                        .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Element("billing-summary").SetText(json, x => x.Summary);
+                            s.Element("billing-status").SetText("charges saved");
+                        }));
+                }))
+            @(Html.NativeButton("billing-bulk-increase", "Apply 5% Increase To Selected")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    p.Post("/Sandbox/Components/Grid/BillingBulkIncrease")
+                        .Gather(g =>
+                        {
+                            g.Static("percent", 5);
+                            g.Include(grid.SelectedRecords<ResidentBillingViewModel, ResidentBillingItem>(), "selectedRecords");
+                        })
+                        .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Element("billing-summary").SetText(json, x => x.Summary);
+                            s.Element("billing-status").SetText("rate increase applied");
+                        }));
+                }))
+            @(Html.NativeButton("billing-mark-billed", "Mark Selected Billed")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var grid = p.Component<FusionGrid>(GridId);
+                    p.Post("/Sandbox/Components/Grid/BillingMarkBilled")
+                        .Gather(g => g.Include(grid.SelectedRecords<ResidentBillingViewModel, ResidentBillingItem>(), "selectedRecords"))
+                        .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
+                        {
+                            s.Component<FusionGrid>(GridId).SetDataSource(json);
+                            s.Element("billing-summary").SetText(json, x => x.Summary);
+                            s.Element("billing-status").SetText("residents marked billed");
+                        }));
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <!-- Tooling panel: onboarded export / print / column-chooser / auto-fit methods -->
+    <native-card><native-card-body>
+        <native-heading level="H2">Roster Tools</native-heading>
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("billing-export-excel", "Export Excel")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).ExcelExport();
+                    p.Element("tool-status").SetText("excel export started");
+                }))
+            @(Html.NativeButton("billing-export-csv", "Export CSV")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).CsvExport();
+                    p.Element("tool-status").SetText("csv export started");
+                }))
+            @(Html.NativeButton("billing-export-pdf", "Export PDF")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).PdfExport();
+                    p.Element("tool-status").SetText("pdf export started");
+                }))
+            @(Html.NativeButton("billing-print", "Print Roster")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).Print();
+                    p.Element("tool-status").SetText("print opened");
+                }))
+            @(Html.NativeButton("billing-columns", "Choose Columns")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).ShowColumnChooser();
+                    p.Element("tool-status").SetText("column chooser opened");
+                }))
+            @(Html.NativeButton("billing-autofit", "Auto-fit Columns")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionGrid>(GridId).AutoFitColumns();
+                    p.Element("tool-status").SetText("columns auto-fitted");
+                }))
+        </native-hstack>
+        <native-vstack gap="Xs" class="mt-4 font-mono text-sm">
+            <p>Status: <span id="billing-status" class="text-text-muted">waiting</span></p>
+            <p>Summary: <span id="billing-summary" class="text-text-muted">waiting</span></p>
+            <p>Tools: <span id="tool-status" class="text-text-muted">waiting</span></p>
+            <p>Toolbar: <span id="toolbar-status" class="text-text-muted">waiting</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        @(Html.FusionGrid<ResidentBillingViewModel, ResidentBillingItem>(plan, GridId, b => b
+            .AllowPaging(true)
+            .AllowSorting(true)
+            .AllowSelection(true)
+            .AllowExcelExport(true)
+            .AllowPdfExport(true)
+            .ShowColumnChooser(true)
+            .Toolbar(new List<object>
+            {
+                new { text = "Email Statements", id = "emailStatements", tooltipText = "Email statements", prefixIcon = "e-icons e-send-1" },
+                "ColumnChooser"
+            })
+            .PageSettings(new GridPageSettings { PageSize = 12 })
+            .SelectionSettings(new GridSelectionSettings { Type = SelectionType.Multiple, PersistSelection = true })
+            .EditSettings(new GridEditSettings
+            {
+                AllowEditing = true,
+                Mode = EditMode.Batch,
+                ShowConfirmDialog = false
+            })
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "70", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
+                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "170", AllowEditing = false },
+                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150", AllowEditing = false },
+                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "90", AllowEditing = false },
+                new GridColumn { Field = "monthlyRate", HeaderText = "Monthly Rate", Width = "140", Format = "C0", TextAlign = TextAlign.Right, EditType = "numericedit" },
+                new GridColumn { Field = "addOnCharges", HeaderText = "Add-ons", Width = "120", Format = "C0", TextAlign = TextAlign.Right, EditType = "numericedit" },
+                new GridColumn { Field = "balanceDue", HeaderText = "Balance Due", Width = "140", Format = "C0", TextAlign = TextAlign.Right, AllowEditing = false },
+                new GridColumn { Field = "billingStatus", HeaderText = "Status", Width = "120", AllowEditing = false, Template = statusTemplate }
+            }))
+            .Reactive(evt => evt.DataStateChange, (args, p) =>
+            {
+                p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
+                    .Then(t =>
+                    {
+                        t.Post("/Sandbox/Components/Grid/BillingData")
+                            .Gather(g =>
+                            {
+                                g.FromEvent(args, x => x.Skip, "skip");
+                                g.FromEvent(args, x => x.Take, "take");
+                                g.FromEvent(args, x => x.Sorted, "sorted");
+                                g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterCareLevel);
+                                g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterWing);
+                                g.Include<FusionDropDownList, ResidentBillingViewModel>(m => m.FilterStatus);
+                            })
+                            .Response(r => r.OnSuccess<ResidentBillingResponse>((json, s) =>
+                            {
+                                s.Component<FusionGrid>(GridId).SetDataSource(json);
+                                s.Element("billing-summary").SetText(json, x => x.Summary);
+                                s.Element("billing-status").SetText("grid state sent to server");
+                            }));
+                    });
+            })
+            .Reactive(evt => evt.ToolbarClick, (args, p) =>
+            {
+                p.When(args, x => x.Item.Id).Eq("emailStatements")
+                    .Then(t => t.Element("toolbar-status").SetText("statements queued for emailing"));
+            }))
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

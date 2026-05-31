@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
+using Alis.Reactive;
 #if NET48
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Mvc.Html;
 #else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -50,21 +52,24 @@ namespace Alis.Reactive.Native.Components
         private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
 
         // NEVER make public — devs create builders via the .NativeCheckList() factory,
-        // which also registers the component in the plan's ComponentsMap.
+        // which also registers the component in the plan's input component onboarding catalog.
 #if NET48
-        internal NativeCheckListBuilder(HtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+        internal NativeCheckListBuilder(
+            HtmlHelper<TModel> html,
+            Expression<Func<TModel, TProp>> expression,
+            InputComponentRenderTarget target)
 #else
-        internal NativeCheckListBuilder(IHtmlHelper<TModel> html, Expression<Func<TModel, TProp>> expression)
+        internal NativeCheckListBuilder(
+            IHtmlHelper<TModel> html,
+            Expression<Func<TModel, TProp>> expression,
+            InputComponentRenderTarget target)
 #endif
         {
             _html = html;
             _expression = expression;
-            _elementId = IdGenerator.For<TModel, TProp>(expression);
-#if NET48
-            _bindingPath = ExpressionHelper.GetExpressionText(expression);
-#else
-            _bindingPath = html.NameFor(expression);
-#endif
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            _elementId = target.ElementId;
+            _bindingPath = target.BindingName;
         }
 
         /// <summary>Gets the resolved element ID for this check list.</summary>
@@ -161,7 +166,8 @@ namespace Alis.Reactive.Native.Components
         {
             // Resolve model value — may be string[] or CSV string depending on model binding
 #if NET48
-            var rawValue = _html.ViewData.Eval(ExpressionHelper.GetExpressionText(_expression));
+            // System.Web.Mvc NameFor honors the active HtmlFieldPrefix; ExpressionHelper.GetExpressionText drops it.
+            var rawValue = _html.ViewData.Eval(_html.NameFor(_expression).ToHtmlString());
 #else
             var rawValue = _html.ViewData.Eval(_html.NameFor(_expression));
 #endif

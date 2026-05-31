@@ -3,63 +3,119 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
 {
-    /// <summary>
-    /// Entry point for building composed field conditions inside WhenFields().
-    /// </summary>
     public sealed class FieldConditionBuilder<T> where T : class
     {
         internal FieldConditionBuilder() { }
 
-        /// <summary>Start a condition on a field — chain an operator to complete it.</summary>
         public FieldStart<T, TProp> Field<TProp>(Expression<Func<T, TProp>> field) =>
             new FieldStart<T, TProp>(field);
     }
 
-    /// <summary>
-    /// Intermediate builder — a field has been selected, now pick an operator.
-    /// No IComparable constraints — comparison is deferred to the TS runtime
-    /// (matching ConditionSourceBuilder pattern).
-    /// </summary>
     public sealed class FieldStart<T, TProp> where T : class
     {
-        private readonly string _fieldName;
-        private readonly Func<T, TProp> _fieldFunc;
+        private readonly SelectedClientValidationField<T, TProp> _field;
 
         internal FieldStart(Expression<Func<T, TProp>> field)
         {
-            _fieldName = FieldConditionHelpers.ExtractPropertyName(field);
-            _fieldFunc = field.Compile();
+            _field = SelectedClientValidationField<T, TProp>.From(field);
         }
 
-        // ── Equality ───────────────────────────────────────────────────────
+        public FieldGuard<T> Truthy() => Unary(CompareOperator.Truthy, value => !IsFalsy(value));
+        public FieldGuard<T> Falsy() => Unary(CompareOperator.Falsy, IsFalsy);
+        public FieldGuard<T> Eq(TProp value) => Literal(CompareOperator.Eq, value, candidate => Equals(candidate, value));
+        public FieldGuard<T> Neq(TProp value) => Literal(CompareOperator.Neq, value, candidate => !Equals(candidate, value));
+        public FieldGuard<T> Gt(TProp value) => Compare(CompareOperator.Gt, value, result => result > 0);
+        public FieldGuard<T> Gte(TProp value) => Compare(CompareOperator.Gte, value, result => result >= 0);
+        public FieldGuard<T> Lt(TProp value) => Compare(CompareOperator.Lt, value, result => result < 0);
+        public FieldGuard<T> Lte(TProp value) => Compare(CompareOperator.Lte, value, result => result <= 0);
+        public FieldGuard<T> IsNull() => Unary(CompareOperator.IsNull, value => value == null);
+        public FieldGuard<T> NotNull() => Unary(CompareOperator.NotNull, value => value != null);
+        public FieldGuard<T> IsEmpty() => Unary(CompareOperator.IsEmpty, IsEmptyValue);
+        public FieldGuard<T> NotEmpty() => Unary(CompareOperator.NotEmpty, value => !IsEmptyValue(value));
+        public FieldGuard<T> Contains(string substring) => Text(CompareOperator.Contains, substring, text => text.Contains(substring));
+        public FieldGuard<T> StartsWith(string prefix) => Text(CompareOperator.StartsWith, prefix, text => text.StartsWith(prefix));
+        public FieldGuard<T> EndsWith(string suffix) => Text(CompareOperator.EndsWith, suffix, text => text.EndsWith(suffix));
 
-        /// <summary>
-        /// Generic truthy check: treats <see langword="null"/>, <see langword="false"/>, 0
-        /// (all numeric types), and empty string as falsy.
-        /// For bool-specific overload, use <c>WhenField(Expression&lt;Func&lt;T, bool&gt;&gt;)</c> directly.
-        /// </summary>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> Truthy() =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.Truthy),
-                x => !IsFalsy(_fieldFunc(x)));
+        public FieldGuard<T> Matches(string pattern)
+        {
+            var regex = new Regex(pattern);
+            return Text(CompareOperator.Matches, pattern, text => regex.IsMatch(text));
+        }
 
-        /// <summary>
-        /// Generic falsy check: treats <see langword="null"/>, <see langword="false"/>, 0
-        /// (all numeric types), and empty string as falsy.
-        /// </summary>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> Falsy() =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.Falsy),
-                x => IsFalsy(_fieldFunc(x)));
+        public FieldGuard<T> MinLength(int minLength)
+        {
+            var minimum = MinimumTextLength.From(minLength, nameof(minLength));
+            return _field.GuardWithOperand(
+                CompareOperator.MinLength,
+                FieldComparisonValue.Number(minimum.Value),
+                value => value is string text && text.Length >= minimum.Value);
+        }
+
+        public FieldGuard<T> In(params TProp[] values)
+        {
+            var set = ValueSet(values);
+            return _field.GuardWithOperand(
+                CompareOperator.In,
+                FieldComparisonValue.Array(PlanValues(values)),
+                value => set.Contains(value));
+        }
+
+        public FieldGuard<T> NotIn(params TProp[] values)
+        {
+            var set = ValueSet(values);
+            return _field.GuardWithOperand(
+                CompareOperator.NotIn,
+                FieldComparisonValue.Array(PlanValues(values)),
+                value => !set.Contains(value));
+        }
+
+        public FieldGuard<T> Between(TProp low, TProp high)
+        {
+            var comparer = Comparer<TProp>.Default;
+            return _field.GuardWithOperand(
+                CompareOperator.Between,
+                FieldComparisonValue.Array(new[] { ValidationConditionLiteral.From(low), ValidationConditionLiteral.From(high) }),
+                value => comparer.Compare(value, low) >= 0 && comparer.Compare(value, high) <= 0);
+        }
+
+        public FieldGuard<T> ArrayContains(TProp value) =>
+            _field.GuardAgainstCollectionItem(
+                CompareOperator.ArrayContains,
+                value,
+                candidate => FieldConditionPredicates.ArrayContains(candidate, value));
+
+        private FieldGuard<T> Unary(CompareOperator op, Func<TProp, bool> predicate) =>
+            _field.Guard(op, predicate);
+
+        private FieldGuard<T> Literal<TValue>(
+            CompareOperator op,
+            TValue value,
+            Func<TProp, bool> predicate) =>
+            _field.GuardAgainstLiteral(op, value, predicate);
+
+        private FieldGuard<T> Compare(
+            CompareOperator op,
+            TProp value,
+            Func<int, bool> accepts)
+        {
+            var comparer = Comparer<TProp>.Default;
+            return Literal(op, value, candidate => accepts(comparer.Compare(candidate, value)));
+        }
+
+        private FieldGuard<T> Text(
+            CompareOperator op,
+            string operand,
+            Func<string, bool> predicate) =>
+            _field.GuardWithOperand(
+                op,
+                FieldComparisonValue.Text(operand),
+                value => value is string text && predicate(text));
 
         private static bool IsFalsy(TProp value) => value switch
         {
@@ -74,243 +130,132 @@ namespace Alis.Reactive.FluentValidator
             _ => false
         };
 
-        /// <summary>Tests whether the field equals the specified value.</summary>
-        /// <param name="value">The value to compare against.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> Eq(TProp value) =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.Eq, FieldConditionHelpers.SerializeConditionValue(value)),
-                x => Equals(_fieldFunc(x), value));
-
-        /// <summary>Tests whether the field does not equal the specified value.</summary>
-        /// <param name="value">The value to compare against.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> Neq(TProp value) =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.Neq, FieldConditionHelpers.SerializeConditionValue(value)),
-                x => !Equals(_fieldFunc(x), value));
-
-        // ── Ordering ───────────────────────────────────────────────────────
-
-        /// <summary>Tests whether the field is greater than the specified value.</summary>
-        /// <param name="value">The threshold to compare against.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> Gt(TProp value) =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.Gt, FieldConditionHelpers.SerializeConditionValue(value)),
-                x => Comparer<TProp>.Default.Compare(_fieldFunc(x), value) > 0);
-
-        /// <summary>Tests whether the field is greater than or equal to the specified value.</summary>
-        /// <param name="value">The threshold to compare against.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> Gte(TProp value) =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.Gte, FieldConditionHelpers.SerializeConditionValue(value)),
-                x => Comparer<TProp>.Default.Compare(_fieldFunc(x), value) >= 0);
-
-        /// <summary>Tests whether the field is less than the specified value.</summary>
-        /// <param name="value">The threshold to compare against.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> Lt(TProp value) =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.Lt, FieldConditionHelpers.SerializeConditionValue(value)),
-                x => Comparer<TProp>.Default.Compare(_fieldFunc(x), value) < 0);
-
-        /// <summary>Tests whether the field is less than or equal to the specified value.</summary>
-        /// <param name="value">The threshold to compare against.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> Lte(TProp value) =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.Lte, FieldConditionHelpers.SerializeConditionValue(value)),
-                x => Comparer<TProp>.Default.Compare(_fieldFunc(x), value) <= 0);
-
-        // ── Presence ───────────────────────────────────────────────────────
-
-        /// <summary>Tests whether the field value is <see langword="null"/>.</summary>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> IsNull() =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.IsNull),
-                x => _fieldFunc(x) == null);
-
-        /// <summary>Tests whether the field value is not <see langword="null"/>.</summary>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> NotNull() =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.NotNull),
-                x => _fieldFunc(x) != null);
-
-        /// <summary>Tests whether the field value is <see langword="null"/> or an empty string.</summary>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> IsEmpty() =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.IsEmpty),
-                x => _fieldFunc(x) is string s ? string.IsNullOrEmpty(s) : _fieldFunc(x) == null);
-
-        /// <summary>Tests whether the field value is not <see langword="null"/> and not an empty string.</summary>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> NotEmpty() =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.NotEmpty),
-                x => _fieldFunc(x) is string s ? !string.IsNullOrEmpty(s) : _fieldFunc(x) != null);
-
-        // ── Membership ─────────────────────────────────────────────────────
-
-        /// <summary>Tests whether the field value is one of the specified values.</summary>
-        /// <param name="values">The allowed values.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> In(params TProp[] values)
+        private static bool IsEmptyValue(TProp value)
         {
-            var serialized = new object[values.Length];
-            for (int i = 0; i < values.Length; i++)
-                serialized[i] = FieldConditionHelpers.SerializeConditionValue(values[i]);
-
-            var set = new HashSet<TProp>(values);
-            return new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.In, serialized),
-                x => set.Contains(_fieldFunc(x)));
+            if (value == null) return true;
+            if (value is string text) return string.IsNullOrEmpty(text);
+            if (value is IEnumerable items) return IsEmptySequence(items);
+            return false;
         }
 
-        /// <summary>Tests whether the field value is not one of the specified values.</summary>
-        /// <param name="values">The disallowed values.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> NotIn(params TProp[] values)
+        private static bool IsEmptySequence(IEnumerable items)
         {
-            var serialized = new object[values.Length];
-            for (int i = 0; i < values.Length; i++)
-                serialized[i] = FieldConditionHelpers.SerializeConditionValue(values[i]);
-
-            var set = new HashSet<TProp>(values);
-            return new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.NotIn, serialized),
-                x => !set.Contains(_fieldFunc(x)));
-        }
-
-        /// <summary>Tests whether the field value falls within the inclusive range [low, high].</summary>
-        /// <param name="low">The lower bound (inclusive).</param>
-        /// <param name="high">The upper bound (inclusive).</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> Between(TProp low, TProp high)
-        {
-            var serialized = new object[]
+            var enumerator = items.GetEnumerator();
+            try
             {
-                FieldConditionHelpers.SerializeConditionValue(low),
-                FieldConditionHelpers.SerializeConditionValue(high)
-            };
-            return new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.Between, serialized),
-                x => Comparer<TProp>.Default.Compare(_fieldFunc(x), low) >= 0 &&
-                     Comparer<TProp>.Default.Compare(_fieldFunc(x), high) <= 0);
+                return !enumerator.MoveNext();
+            }
+            finally
+            {
+                (enumerator as IDisposable)?.Dispose();
+            }
         }
 
-        // ── Text ───────────────────────────────────────────────────────────
-
-        /// <summary>Tests whether the string field contains the specified substring.</summary>
-        /// <param name="substring">The substring to search for.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> Contains(string substring) =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.Contains, substring),
-                x => (_fieldFunc(x) as string)?.Contains(substring) == true);
-
-        /// <summary>Tests whether the string field starts with the specified prefix.</summary>
-        /// <param name="prefix">The prefix to check for.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> StartsWith(string prefix) =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.StartsWith, prefix),
-                x => (_fieldFunc(x) as string)?.StartsWith(prefix) == true);
-
-        /// <summary>Tests whether the string field ends with the specified suffix.</summary>
-        /// <param name="suffix">The suffix to check for.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> EndsWith(string suffix) =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.EndsWith, suffix),
-                x => (_fieldFunc(x) as string)?.EndsWith(suffix) == true);
-
-        /// <summary>Tests whether the string field matches the specified regular expression.</summary>
-        /// <param name="pattern">The regular expression pattern.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> Matches(string pattern)
+        private static HashSet<TProp> ValueSet(TProp[] values)
         {
-            var regex = new System.Text.RegularExpressions.Regex(pattern);
-            return new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.Matches, pattern),
-                x => (_fieldFunc(x) as string) is { } s && regex.IsMatch(s));
+            if (values == null) throw new ArgumentNullException(nameof(values));
+            return new HashSet<TProp>(values);
         }
 
-        /// <summary>Tests whether the string field has at least the specified number of characters.</summary>
-        /// <param name="minLength">The minimum character count.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> MinLength(int minLength) =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.MinLength, minLength),
-                x => (_fieldFunc(x) as string) is { } s && s.Length >= minLength);
-
-        // ── Array ──────────────────────────────────────────────────────────
-
-        /// <summary>Tests whether the array field contains the specified element.</summary>
-        /// <param name="value">The element to search for in the array.</param>
-        /// <returns>A guard that can be composed with <see cref="FieldGuard{T}.And"/>,
-        /// <see cref="FieldGuard{T}.Or"/>, or <see cref="FieldGuard{T}.Not"/>.</returns>
-        public FieldGuard<T> ArrayContains(TProp value) =>
-            new FieldGuard<T>(
-                FieldCondition.Compare(_fieldName, CompareOp.ArrayContains,
-                    FieldConditionHelpers.SerializeConditionValue(value)),
-                x => _fieldFunc(x) is System.Collections.IEnumerable enumerable &&
-                     enumerable.Cast<object>().Contains(value));
+        private static IReadOnlyList<object?> PlanValues(TProp[] values)
+        {
+            if (values == null) throw new ArgumentNullException(nameof(values));
+            return values.Select(ValidationConditionLiteral.From).ToArray();
+        }
     }
 
-    /// <summary>
-    /// A completed field condition with its server predicate.
-    /// Chain .And(), .Or(), .Not() to compose multiple conditions.
-    /// </summary>
     public sealed class FieldGuard<T> where T : class
     {
         internal FieldCondition Condition { get; }
+        internal IReadOnlyList<ClientValidationFieldReference> Fields { get; }
         internal Func<T, bool> ServerPredicate { get; }
 
-        internal FieldGuard(FieldCondition condition, Func<T, bool> serverPredicate)
+        internal FieldGuard(
+            FieldCondition condition,
+            IEnumerable<ClientValidationFieldReference> fields,
+            Func<T, bool> serverPredicate)
         {
-            Condition = condition;
-            ServerPredicate = serverPredicate;
+            Condition = condition ?? throw new ArgumentNullException(nameof(condition));
+            Fields = ClientValidationGuardFields.From(fields);
+            ServerPredicate = serverPredicate ?? throw new ArgumentNullException(nameof(serverPredicate));
         }
 
-        /// <summary>Logical AND — both this and the other condition must be true.</summary>
-        public FieldGuard<T> And(FieldGuard<T> other) =>
-            new FieldGuard<T>(
+        public FieldGuard<T> And(FieldGuard<T> other)
+        {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+            return new FieldGuard<T>(
                 FieldCondition.All(Condition, other.Condition),
-                x => ServerPredicate(x) && other.ServerPredicate(x));
+                ClientValidationGuardFields.Combine(Fields, other.Fields),
+                model => ServerPredicate(model) && other.ServerPredicate(model));
+        }
 
-        /// <summary>Logical OR — either this or the other condition must be true.</summary>
-        public FieldGuard<T> Or(FieldGuard<T> other) =>
-            new FieldGuard<T>(
+        public FieldGuard<T> Or(FieldGuard<T> other)
+        {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+            return new FieldGuard<T>(
                 FieldCondition.Any(Condition, other.Condition),
-                x => ServerPredicate(x) || other.ServerPredicate(x));
+                ClientValidationGuardFields.Combine(Fields, other.Fields),
+                model => ServerPredicate(model) || other.ServerPredicate(model));
+        }
 
-        /// <summary>Logical NOT — inverts this condition.</summary>
         public FieldGuard<T> Not() =>
-            new FieldGuard<T>(
-                FieldCondition.Not(Condition),
-                x => !ServerPredicate(x));
+            new FieldGuard<T>(FieldCondition.Not(Condition), Fields, model => !ServerPredicate(model));
+    }
+
+    internal static class ClientValidationGuardFields
+    {
+        internal static IReadOnlyList<ClientValidationFieldReference> From(IEnumerable<ClientValidationFieldReference> fields)
+        {
+            if (fields == null) throw new ArgumentNullException(nameof(fields));
+            var byPath = new Dictionary<string, ClientValidationFieldReference>(StringComparer.Ordinal);
+
+            foreach (var field in fields)
+            {
+                if (field == null) throw new ArgumentException("Client validation guard field must not be null.", nameof(fields));
+
+                if (byPath.TryGetValue(field.Path.Value, out var existing))
+                {
+                    if (!existing.Shape.Equals(field.Shape))
+                    {
+                        throw new InvalidOperationException(
+                            $"Client validation condition field '{field.Path.Value}' was declared with conflicting shapes: " +
+                            $"'{existing.Shape.Kind}' and '{field.Shape.Kind}'.");
+                    }
+
+                    continue;
+                }
+
+                byPath.Add(field.Path.Value, field);
+            }
+
+            return byPath.Values.ToArray();
+        }
+
+        internal static IReadOnlyList<ClientValidationFieldReference> Combine(
+            IEnumerable<ClientValidationFieldReference> first,
+            IEnumerable<ClientValidationFieldReference> second)
+        {
+            if (first == null) throw new ArgumentNullException(nameof(first));
+            if (second == null) throw new ArgumentNullException(nameof(second));
+            return From(first.Concat(second));
+        }
+    }
+
+    internal static class FieldConditionPredicates
+    {
+        internal static bool EnumerableContains<TItem>(IEnumerable<TItem>? values, TItem expected) =>
+            values != null && values.Contains(expected);
+
+        internal static bool ArrayContains<TItem>(object? value, TItem expected)
+        {
+            if (!(value is IEnumerable enumerable)) return false;
+
+            foreach (var item in enumerable)
+            {
+                if (Equals(item, expected)) return true;
+            }
+
+            return false;
+        }
     }
 }

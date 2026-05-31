@@ -1,0 +1,121 @@
+@model FusionListViewModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "FusionListView";
+
+    const string ResidentListId = "resident-list";
+    const string TaskListId = "task-list";
+
+    var plan = Html.ReactivePlan<FusionListViewModel>();
+    var residents = (string[])ViewBag.Residents;
+    var tasks = (string[])ViewBag.Tasks;
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Element("command-state").SetText("ready");
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionListView</native-heading>
+
+    <native-grid cols="C2" gap="Base">
+        <native-card><native-card-body>
+            <native-heading level="H2">Residents</native-heading>
+            @(Html.FusionListView(plan, ResidentListId, b => b
+                .DataSource(residents)
+                .Height("210px"))
+                .Reactive(evt => evt.Selected, (args, p) =>
+                {
+                    p.Element("selected-text").SetText(args, x => x.Text);
+                    p.Element("selected-index").SetText(args, x => x.Index);
+                    p.Element("selected-interacted").SetText(args, x => x.IsInteracted);
+                    p.When(args, x => x.Text).Eq("Alice")
+                        .Then(t => t.Element("selected-kind").SetText("primary"))
+                        .Else(e => e.Element("selected-kind").SetText("other"));
+                    p.When(args, x => x.Text).Eq("Carey")
+                        .Then(t =>
+                        {
+                            args.CancelSelection(t);
+                            t.Element("cancel-state").SetText("cancelled");
+                        })
+                        .Else(e => e.Element("cancel-state").SetText("allowed"));
+                }))
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-heading level="H2">Care Tasks</native-heading>
+            @(Html.FusionListView(plan, TaskListId, b => b
+                .DataSource(tasks)
+                .ShowCheckBox(true)
+                .Height("210px"))
+                .Reactive(evt => evt.Selected, (args, p) =>
+                {
+                    p.Element("task-selected-text").SetText(args, x => x.Text);
+                    p.Element("task-checked").SetText(args, x => x.IsChecked);
+                    p.When(args, x => x.IsChecked).Truthy()
+                        .Then(t => t.Element("task-check-state").SetText("checked"))
+                        .Else(e => e.Element("task-check-state").SetText("unchecked"));
+                }))
+        </native-card-body></native-card>
+    </native-grid>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Commands</native-heading>
+        <native-hstack gap="Sm" class="flex-wrap">
+            @(Html.NativeButton("select-bennett-btn", "Select Bennett")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionListView>(ResidentListId).SelectText("Bennett");
+                    p.Element("command-state").SetText("selected Bennett");
+                }))
+            @(Html.NativeButton("unselect-bennett-btn", "Unselect Bennett")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionListView>(ResidentListId).UnselectText("Bennett");
+                    p.Element("command-state").SetText("unselected Bennett");
+                }))
+            @(Html.NativeButton("check-all-btn", "Check All")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionListView>(TaskListId).CheckAllItems();
+                    p.Element("task-command-state").SetText("checked all");
+                }))
+            @(Html.NativeButton("uncheck-all-btn", "Uncheck All")
+                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionListView>(TaskListId).UncheckAllItems();
+                    p.Element("task-command-state").SetText("unchecked all");
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Command: <span id="command-state" class="text-text-muted">pending</span></p>
+            <p>Selected text: <span id="selected-text" class="text-text-muted">pending</span></p>
+            <p>Selected index: <span id="selected-index" class="text-text-muted">pending</span></p>
+            <p>Selected interacted: <span id="selected-interacted" class="text-text-muted">pending</span></p>
+            <p>Selected kind: <span id="selected-kind" class="text-text-muted">pending</span></p>
+            <p>Cancel state: <span id="cancel-state" class="text-text-muted">pending</span></p>
+            <p>Task command: <span id="task-command-state" class="text-text-muted">pending</span></p>
+            <p>Task selected text: <span id="task-selected-text" class="text-text-muted">pending</span></p>
+            <p>Task checked: <span id="task-checked" class="text-text-muted">pending</span></p>
+            <p>Task check state: <span id="task-check-state" class="text-text-muted">pending</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

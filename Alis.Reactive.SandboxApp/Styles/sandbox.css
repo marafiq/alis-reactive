@@ -3,18 +3,21 @@
    sandbox markup but not emitted by framework C#. Loaded alongside the
    framework-shipped design-system.css — not a replacement for it. */
 
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 @plugin "@tailwindcss/forms";
+
+/* Brand tokens — single source of truth, shared with the framework. */
+@import "../../Alis.Reactive.Assets/design-system/brand.css";
 
 /* Theme tokens live in the framework design-system.css; redeclare the
    ones tailwind needs to resolve utility classes compiled here. */
 @theme {
-  --color-primary: #7A2E3B;
-  --color-primary-light: #9B4A57;
-  --color-primary-dark: #5E1F2C;
-  --color-accent: #D4A053;
-  --color-accent-light: #E0B975;
-  --color-accent-dark: #B8873C;
+  --color-primary: var(--alis-brand-primary);
+  --color-primary-light: var(--alis-brand-primary-light);
+  --color-primary-dark: var(--alis-brand-primary-dark);
+  --color-accent: var(--alis-brand-accent);
+  --color-accent-light: var(--alis-brand-accent-light);
+  --color-accent-dark: var(--alis-brand-accent-dark);
 
   --color-surface: #F8FAFC;
   --color-surface-alt: #F1F5F9;

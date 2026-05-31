@@ -1,173 +1,137 @@
 # Validation Architecture
 
-> Code-first documentation of the validation system. Describes how it works, not how it should work.
+This document describes the current validation design. Keep it aligned with
+`docs/reactive-plan-domain-language.md`.
 
-## Overview
+## Boundary
 
-Validation is request-chained: `Validate<TValidator>(formId)` or `Validate(descriptor)` attaches a validation descriptor to an HTTP request. Before the request fires, the runtime runs `validate(desc)`. If it returns `false`, the request is aborted. Server errors are displayed via the `validation-errors` command in `OnError` handlers.
+FluentValidation still executes normally on submit or HTTP endpoints. Alis
+Reactive emits only deterministic client-side rules that are explicitly declared
+as browser metadata.
 
-**Key design:** Two-phase enrichment (C# at render + runtime at boot/merge) so partial-owned fields can be enriched when their partial loads.
-
----
+Unsupported browser behavior is not guessed or emitted into the plan. The
+original FluentValidation rule still runs normally on postback or HTTP submit.
 
 ## Data Flow
 
-```
-C# Authoring                          C# Render                         Runtime
-────────────────────────────────────────────────────────────────────────────────────
-Validate<TValidator>(formId)    →    ResolveAll()                    →   pipeline.ts
-  placeholder descriptor               ExtractRules() (throws if null)     passesValidation()
-  AttachValidator(type)                EnrichValidation                   wireLiveClearing()
-                                       EnrichFieldsFromComponents         validate()
-                                       StampPlanId
-
-Validate(descriptor)            →    ResolveAll()                    →   (same)
-  explicit descriptor                  EnrichFieldsFromComponents
-  no ValidatorType                     StampPlanId
+```text
+Validate<TValidationSource>(containerId)
+  -> RequestValidation registers a ValidationJob
+  -> ReactivePlan.Render() calls ResolveAll()
+  -> input component registrations are materialized into the plan
+  -> ClientValidationRuleBinder binds queued validation jobs
+  -> Component.container.validationRules carries browser validation rules
+  -> HTTP runtime validates the container before dispatch
 ```
 
----
+## C# Plan Side
 
-## C# Side
+`ConfiguredRequestValidation.Register(...)` records a `ValidationJob` containing:
 
-### Entry Points
+- request URL, used for diagnostics;
+- validation container id;
+- validation source type that provides browser rule metadata.
 
-| Method | Creates | File |
-|--------|---------|------|
-| `Validate<TValidator>(formId)` | `_validation = new ValidationDescriptor(formId, [])`, `_validatorType = typeof(TValidator)` | `HttpRequestBuilder.cs:93-98` |
-| `Validate(ValidationDescriptor)` | Uses provided descriptor | `HttpRequestBuilder.cs:82-86` |
+`ClientValidationRuleBinder` then:
 
-### ResolveAll (ReactivePlan.cs:95-116)
+1. Requires a registered `IClientValidationRuleSource`.
+2. Calls `GetClientRules(validationSourceType)`.
+3. Binds each `ClientValidationField` through `ClientValidationFieldBinder`.
+4. Merges the resulting `ComponentValidation` rules onto the validation-container component.
 
-```
-if (extractor != null)
-  ValidationResolver.Resolve(_entries, extractor, _componentsMap)
-else if (HasValidatorTypes)
-  throw "no validation extractor registered"
-else if (_componentsMap.Count > 0)
-  ValidationResolver.EnrichFromComponents(_entries, _componentsMap)
-always: StampPlanId(_entries, PlanId)
-```
+Field binding has two deterministic paths:
 
-### ValidationResolver.ResolveRequest (ValidationResolver.cs:81-104)
+- Registered input fields use the rendered component id, value member, and shape from `ComponentRegistration`.
+- Deferred fields use the metadata's declared field shape and the deterministic component id a partial will render later.
 
-1. **Extract:** If `ValidatorType` and `Validation` set → `extractor.ExtractRules()` → if null, throw; else `EnrichValidation(extracted)`.
-2. **Enrich:** If `Validation` and `componentsMap` set → `EnrichFieldsFromComponents(req.Validation, componentsMap)`.
-3. **Recurse:** If `Chained` → `ResolveRequest(req.Chained, ...)`.
+## Metadata Sources
 
-### EnrichFieldsFromComponents (ValidationResolver.cs:138-151)
+`IClientValidationRuleSource` is registered through DI. The built-in source
+combines metadata providers registered by:
 
-Maps `field.FieldName` → `componentsMap[fieldName]`:
-- Found → set `field.FieldId`, `field.Vendor`, `field.ReadExpr`
-- Not found → leave null (field stays unenriched)
+- `services.AddReactiveClientValidation(...)` for app-level browser rules;
+- `services.AddReactiveFluentValidation(...)` for `ReactiveValidator<T>` metadata.
 
-### FluentValidationAdapter.ExtractRules
+Both paths key rules by the validation source type named by
+`Validate<TValidationSource>()`, but public authoring selects fields through
+typed expressions and `ClientValidationFieldToken<TModel, TValue>`, not field
+name strings.
 
-Returns `null` when:
-- `_factory(validatorType)` returns null
-- `fields.Count == 0` (no extractable rules, e.g. `EmptyValidator`)
+FluentValidation metadata is snapshotted once by the singleton metadata
+provider. Validators still run normally through FluentValidation for server
+validation; the snapshot is only the deterministic browser-rule metadata used
+when rendering a plan.
 
----
+Rule-source fields carry their declared shape into render-time binding.
+That lets deferred partial fields bind through the same deterministic component
+id policy without reflecting over the model just to rediscover the field type.
+Peer fields and condition fields are also entered into the metadata so their
+component value contracts can be resolved by the same binding path as ordinary
+rules.
+
+## ReactiveValidator Metadata
+
+`ReactiveValidator<T>` records browser validation metadata explicitly through
+`ClientRule(...)`. FluentValidation remains the server authority: `RuleFor`,
+`Must`, regular `When`/`Unless`, and async rules still run on the server as normal.
+
+Browser rules are emitted only when the validator declares `ClientRule(...)`.
+Peer comparisons are declared through typed expressions such as `EqualTo(...)`,
+`NotEqualTo(...)`, and `GreaterThan(...)`; the framework does not infer peer
+paths from FluentValidation internals.
+
+Conditions are browser-visible only through the ReactiveValidator `WhenField*`
+language. Regular FluentValidation guards are server-only. Nested `WhenField*`
+scopes emit one active client condition; multiple active scopes compose with
+`all` in the same outer-to-inner order the server predicates use.
+
+After render-time field binding, client guards become `ValidationCondition`,
+the deterministic plan condition subset used by validation activation. It
+supports compare/all/any/not over declared value producers and excludes
+`Confirm`, which belongs to reactive branches because prompts cross into the
+async execution lane.
+
+`ClientRule(...)` cannot be declared inside regular FluentValidation
+`When`/`Unless` or async guards. Use `WhenField*` when a rule needs a browser
+condition; keep regular FluentValidation guards server-only.
 
 ## Runtime Side
 
-### Boot & Merge
+`RequestValidationGate` runs before HTTP dispatch. If a request has
+`validation.kind === "container"`, it calls:
 
-- **Boot:** `enrichEntries(plan.entries, plan.components)` enriches validation fields from `plan.components`.
-- **Merge:** When a partial loads, `applyMergedPlan` runs `enrichEntries` again. Previously unenriched fields (e.g. from a partial that hadn't loaded) can now be enriched.
-
-### Pre-Request Gate (pipeline.ts:10-18)
-
-```typescript
-function passesValidation(req): boolean {
-  if (!req.validation) return true;
-  wireLiveClearing(req.validation);
-  if (!validate(req.validation)) return false;
-  return true;
-}
+```ts
+validateContainer(plan, validation.container, context)
 ```
 
-### validate() Orchestrator (validation/orchestrator.ts)
+`validateContainer` resolves the validation container from `RuntimePlan`, clears
+current errors, evaluates each `ComponentValidation`, and routes failures to
+inline spans or the plan-level summary.
 
-**Initialization:** Clear inline + summary, find summary element by `planId`.
+Server validation errors are displayed separately through
+`showServerErrors(plan, container, data)`. Runtime maps server errors by
+`serverFieldName`; component keys are not fallback field names.
 
-**Form container missing:**
-- `fields.length > 0` → return false (block)
-- `fields.length === 0` → return true (nothing to validate)
+## Partial Lifecycle
 
-**Per-field loop:**
-- **Unenriched** (no fieldId/vendor/readExpr): If `allRulesConditionallySkipped` → skip. Else → add first rule to summary, block.
-- **Enriched but element missing:** Same logic (component removed or partial unloaded).
-- **Field outside form:** Skip (trace only).
-- **Enriched + element present:** Read value via `resolveRoot` + `walk`, evaluate rules with conditions, route errors to inline or summary.
+Partial load can add validation rules to a root-owned validation container.
+Partial unload removes only the exact rule objects loaded by that slot. It must
+not delete root validation rules or layout-owned app components.
 
-**allRulesConditionallySkipped:** Returns true only if every rule has `when` and `evalCondition` returns `false` for all. Otherwise block.
+## Key Types
 
-### Server Errors (validation-errors command)
+| Area | Types |
+| --- | --- |
+| Request gate | `RequestValidation`, `ValidationJob`, `RequestValidationTarget` |
+| Rule source contract | `IClientValidationRuleSource.GetClientRules(Type)` returning `IReadOnlyList<ClientValidationField>` |
+| Metadata registration | `AddReactiveClientValidation`, `AddReactiveFluentValidation`, `ClientValidationRulesBuilder<TModel>`, `ClientValidationFieldToken<TModel, TValue>` |
+| Rule binding | `ClientValidationRuleBinder`, `ClientValidationFieldBinder`, `ValidationFieldBinding` |
+| Plan payload | `ComponentValidation`, `ValidationRuleExecution`, `ValidationRuleOperand`, `ValidationRuleActivation`, `ValidationCondition` |
+| Runtime execution | `validateContainer`, `showServerErrors`, `RuntimeValidationActivation`, `RuntimeValidationPeerOperand`, `rule-engine.ts` |
 
-- Throws if `ctx.validationDesc` is missing. Use `.Validate<TValidator>(formId)` on the request to attach one.
-- `showServerErrors(desc, ctx.responseBody)` — `extractErrors` accepts only ProblemDetails `{ errors: Record<string, string[]> }`; otherwise returns null and logs.
+## Design Rules
 
-### Live Clear (validation/live-clear.ts)
-
-One-time wiring on form container: `input` and `change` events. Walks up from event target to find the field wrapper's `[data-valmsg-for]` span, looks up field by name, clears inline error. Vendor-agnostic: works for native inputs and Fusion inner elements.
-
----
-
-## Module Responsibilities
-
-| Module | Responsibility |
-|--------|----------------|
-| `orchestrator.ts` | Fail-closed validation, routing inline vs summary |
-| `rule-engine.ts` | Pure rule evaluation (required, minLength, equalTo, etc.) |
-| `condition.ts` | Pure condition evaluation (truthy, falsy, eq, neq) |
-| `error-display.ts` | DOM manipulation (inline spans, summary div) |
-| `live-clear.ts` | One-time input/change wiring on form container |
-| `enrichment.ts` | Enrich validation fields from `plan.components` |
-
----
-
-## Rule Types (rule-engine.ts)
-
-| Rule | Fail-closed behavior |
-|------|----------------------|
-| required, minLength, maxLength, email, regex, url, min, max, range | Standard checks |
-| equalTo | `peerReader.readPeer() === undefined` → block |
-| atLeastOne | Array length check |
-| unknown | `return true` (block) |
-| regex (broken) | `catch` → block |
-
----
-
-## Condition Operators (condition.ts)
-
-| Op | Returns |
-|----|---------|
-| truthy | `!empty` |
-| falsy | `empty` |
-| eq | `empty ? false : str === String(cond.value)` |
-| neq | `empty ? false : str !== String(cond.value)` |
-| source undefined | `null` (caller blocks) |
-
-**Design:** For eq/neq, empty source returns false ("not yet determined") — rule is skipped. Tests: `when-evaluating-pure-rules.test.ts`.
-
----
-
-## Design Decisions
-
-1. **Two-phase enrichment** — C# enriches from ComponentsMap; runtime enriches from plan.components. Partials can add components after boot; merge re-enriches.
-2. **Unenriched fields** — Block unless all rules conditionally skipped. Supports partial-owned fields that load later.
-3. **Extraction null** — Throws at render time when `Validate<TValidator>` is used but `ExtractRules` returns null.
-4. **ProblemDetails only** — Server errors must be `{ errors }` shape.
-5. **planId scoping** — Summary div: `[data-alis-validation-summary="${planId}"]`. `findSummaryElement(undefined)` returns null (refuse to guess).
-
----
-
-## Key Files
-
-| Layer | File |
-|-------|------|
-| C# | `HttpRequestBuilder.cs`, `ValidationResolver.cs`, `FluentValidationAdapter.cs`, `ReactivePlan.cs` |
-| Runtime | `pipeline.ts`, `validation/orchestrator.ts`, `validation/rule-engine.ts`, `validation/condition.ts`, `validation/error-display.ts`, `validation/live-clear.ts`, `enrichment.ts` |
-| Commands | `commands.ts` (validation-errors), `http.ts` (threads validationDesc to error handlers) |
-
+- Do not name browser metadata rules as if they were the normal validator execution path.
+- Do not use null as behavior; `none`, missing component, and literal `null` are distinct cases.
+- Do not infer FluentValidation behavior from implementation details; require explicit `ClientRule(...)` metadata for browser rules.
+- Do not create a separate validation read path in runtime; validation reads component values through the same declared object/member contract as gather and reactions.

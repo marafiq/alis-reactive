@@ -31,7 +31,7 @@ namespace Alis.Reactive
         public static string ToPath<TSource>(string prefix, Expression<Func<TSource, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return prefix + "." + string.Join(".", members);
+            return prefix + "." + ToRuntimePath(members);
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Alis.Reactive
         public static string ToPath<TSource, TProp>(string prefix, Expression<Func<TSource, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return prefix + "." + string.Join(".", members);
+            return prefix + "." + ToRuntimePath(members);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Alis.Reactive
         public static string ToEventPath<TSource>(Expression<Func<TSource, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members);
+            return ToRuntimePath(members);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Alis.Reactive
         public static string ToEventPath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members);
+            return ToRuntimePath(members);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Alis.Reactive
         public static string ToResponsePath<TSource>(Expression<Func<TSource, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members);
+            return ToRuntimePath(members);
         }
 
         /// <summary>
@@ -91,34 +91,37 @@ namespace Alis.Reactive
         public static string ToResponsePath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members);
+            return ToRuntimePath(members);
         }
 
         private static List<string> ExtractMemberChain(Expression expr)
         {
-            var members = new List<string>();
+            expr = UnwrapConvert(expr);
 
-            // Unwrap Convert (boxing of value types)
-            if (expr is UnaryExpression unary && unary.NodeType == ExpressionType.Convert)
-                expr = unary.Operand;
+            if (expr is ParameterExpression)
+                return new List<string>();
 
-            while (expr is MemberExpression member)
+            if (expr is MemberExpression member)
             {
-                members.Insert(0, CamelCase(member.Member.Name));
-                expr = member.Expression!;
+                var members = ExtractMemberChain(member.Expression!);
+                members.Add(CamelCase(member.Member.Name));
+                return members;
             }
 
-            // After walking all MemberExpression nodes, we must be at a ParameterExpression.
-            // Anything else (MethodCallExpression, BinaryExpression, etc.) is a computed
-            // expression — not a property path — and must fail fast.
-            if (!(expr is ParameterExpression))
+            if (TryIndexAccess(expr, out var collection, out var index))
             {
-                throw new InvalidOperationException(
-                    $"ExpressionPathHelper only supports simple property-access chains " +
-                    $"(e.g. m => m.Address.City). Got unsupported expression node: {expr.NodeType}.");
+                var members = ExtractMemberChain(collection);
+                var suffix = "[" + index.ToString(System.Globalization.CultureInfo.InvariantCulture) + "]";
+                if (members.Count == 0)
+                    members.Add(suffix);
+                else
+                    members[members.Count - 1] += suffix;
+                return members;
             }
 
-            return members;
+            throw new InvalidOperationException(
+                $"ExpressionPathHelper only supports property-access chains and MVC indexer paths " +
+                $"(e.g. m => m.Address.City or m => m.Items[0].Sku). Got unsupported expression node: {expr.NodeType}.");
         }
 
         /// <summary>
@@ -138,6 +141,21 @@ namespace Alis.Reactive
             return string.Join(".", members.ConvertAll(PascalRestore));
         }
 
+        internal static Type ToPropertyType(LambdaExpression expression)
+        {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            return UnwrapConvert(expression.Body).Type;
+        }
+
+        /// <summary>
+        /// Extracts the model binding path from a typed model expression, preserving type safety for value types.
+        /// </summary>
+        public static string ToPropertyName<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
+        {
+            var members = ExtractMemberChain(expression.Body);
+            return string.Join(".", members.ConvertAll(PascalRestore));
+        }
+
         /// <summary>
         /// Converts a model expression to the DOM element ID that ASP.NET generates.
         /// </summary>
@@ -152,7 +170,7 @@ namespace Alis.Reactive
         public static string ToElementId<TModel>(Expression<Func<TModel, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return string.Join("_", members.ConvertAll(PascalRestore));
+            return ToMvcElementId(string.Join(".", members.ConvertAll(PascalRestore)));
         }
 
         /// <summary>
@@ -165,7 +183,84 @@ namespace Alis.Reactive
         public static string ToElementId<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
-            return string.Join("_", members.ConvertAll(PascalRestore));
+            return ToMvcElementId(string.Join(".", members.ConvertAll(PascalRestore)));
+        }
+
+        internal static string ToMvcElementId(string propertyPath) =>
+            propertyPath
+                .Replace(".", "_")
+                .Replace("[", "_")
+                .Replace("]", "_");
+
+        private static string ToRuntimePath(List<string> members)
+        {
+            var segments = new List<string>();
+            foreach (var member in members)
+                AddRuntimePathSegments(member, segments);
+
+            return string.Join(".", segments);
+        }
+
+        private static void AddRuntimePathSegments(string member, List<string> segments)
+        {
+            var position = 0;
+            while (position < member.Length)
+            {
+                var bracket = member.IndexOf('[', position);
+                if (bracket < 0)
+                {
+                    segments.Add(member.Substring(position));
+                    return;
+                }
+
+                if (bracket > position)
+                    segments.Add(member.Substring(position, bracket - position));
+
+                var close = member.IndexOf(']', bracket + 1);
+                segments.Add(member.Substring(bracket + 1, close - bracket - 1));
+                position = close + 1;
+            }
+        }
+
+        private static bool TryIndexAccess(
+            Expression expr,
+            out Expression collection,
+            out int index)
+        {
+            collection = expr;
+            index = 0;
+
+            if (expr is BinaryExpression binary && binary.NodeType == ExpressionType.ArrayIndex)
+            {
+                collection = binary.Left;
+                index = EvaluateIndex(binary.Right);
+                return true;
+            }
+
+            if (expr is IndexExpression indexer && indexer.Object != null && indexer.Arguments.Count == 1)
+            {
+                collection = indexer.Object;
+                index = EvaluateIndex(indexer.Arguments[0]);
+                return true;
+            }
+
+            if (expr is MethodCallExpression call &&
+                call.Method.Name == "get_Item" &&
+                call.Object != null &&
+                call.Arguments.Count == 1)
+            {
+                collection = call.Object;
+                index = EvaluateIndex(call.Arguments[0]);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static int EvaluateIndex(Expression expression)
+        {
+            var value = Expression.Lambda(UnwrapConvert(expression)).Compile().DynamicInvoke();
+            return Convert.ToInt32(value);
         }
 
         private static string PascalRestore(string camel)
@@ -178,6 +273,18 @@ namespace Alis.Reactive
         {
             if (string.IsNullOrEmpty(name)) return name;
             return char.ToLowerInvariant(name[0]) + name.Substring(1);
+        }
+
+        private static Expression UnwrapConvert(Expression expr)
+        {
+            while (expr is UnaryExpression unary &&
+                   (unary.NodeType == ExpressionType.Convert ||
+                    unary.NodeType == ExpressionType.ConvertChecked))
+            {
+                expr = unary.Operand;
+            }
+
+            return expr;
         }
     }
 }

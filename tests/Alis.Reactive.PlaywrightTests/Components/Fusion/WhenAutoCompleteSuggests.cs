@@ -223,7 +223,7 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
         Assert.That(body, Does.Contain("smith"),
             $"Gather POST body must contain the initial value 'Dr. Smith' but was '{body}'");
 
-        // Confirm the round-trip completes — response handler fires
+        // Confirm the round-trip completes and the response route fires
         await Expect(Page.Locator("#gather-result"))
             .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
 

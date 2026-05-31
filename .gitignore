@@ -13,6 +13,7 @@ node_modules/
 tools/
 !tools/md-viewer/
 !tools/ApiDocGenerator/
+!tools/PlanTypeGenerator/
 tools/md-viewer/node_modules/
 tools/md-viewer-mockup.html
 
@@ -30,12 +31,12 @@ TestResults/
 .scannerwork/
 
 # Built JS/CSS bundles — produced by `npm run build:all`.
-# Framework bundles live in Alis.Reactive.Assets/dist/ and are served to
-# the sandbox via a CompositeFileProvider in SandboxApp/Program.cs and
-# packed into the NuGet by Alis.Reactive.csproj — never copied into
-# sandbox wwwroot. Sandbox-only bundles live in SandboxApp/wwwroot/.
+# All three framework bundles (runtime JS, design-system CSS, Syncfusion CSS)
+# build into Alis.Reactive.Assets/dist/. They are served to the sandbox via a
+# CompositeFileProvider in SandboxApp/Program.cs and packed into their
+# respective NuGets — never copied into sandbox wwwroot. Sandbox-only bundles
+# live in SandboxApp/wwwroot/.
 Alis.Reactive.Assets/dist/
-Alis.Reactive.Fusion/dist/
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
 Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
 

@@ -1,0 +1,155 @@
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
+
+namespace Alis.Reactive.Native.Extensions
+{
+    /// <summary>
+    /// Razor view extensions that open and close every reactive view: create the
+    /// <see cref="ReactivePlan{TModel}"/> at the top, render it at the bottom.
+    /// </summary>
+    /// <remarks>
+    /// Every view must call <see cref="ReactivePlan{TModel}(IHtmlHelper{TModel})"/> at the start of view and
+    /// <see cref="RenderPlan{TModel}"/> at the end of view. Partial views that share the same
+    /// model and need to merge into the same browser plan use
+    /// <see cref="ResolvePlan{TModel}(IHtmlHelper{TModel})"/> instead.
+    /// If a partial has its own independent model, treat it as
+    /// its own view with <c>ReactivePlan</c> and <c>RenderPlan</c>.
+    /// Omitting either call produces no reactive behavior.
+    /// </remarks>
+    public static class PlanExtensions
+    {
+        /// <summary>
+        /// Creates a <see cref="ReactivePlan{TModel}"/> for a view.
+        /// </summary>
+        /// <remarks>
+        /// This is the first call in a view. The returned plan is passed to
+        /// <see cref="HtmlExtensions.On{TModel}"/> to define behavior and to
+        /// <see cref="RenderPlan{TModel}"/> to render reactive behaviors that will execute in browser.
+        /// Partial views that share the same <typeparamref name="TModel"/> use
+        /// <see cref="ResolvePlan{TModel}"/> instead.
+        /// </remarks>
+        /// <typeparam name="TModel">The view model type, providing compile-time expression paths.</typeparam>
+        /// <returns>A new plan instance scoped to this view.</returns>
+#if NET48
+        public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
+            where TModel : class
+        {
+            // net48 / System.Web has no per-request IServiceProvider, so the plan is
+            // created with services: null. Validation metadata is resolved at render
+            // time via the MVC5 DependencyResolver, which the app bridges over its DI
+            // container in Application_Start. See ReactivePlan.RequireClientValidationRuleSource.
+            return new ReactivePlan<TModel>(
+                ReactivePlanScope.RootView,
+                services: null);
+        }
+#else
+        public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
+            where TModel : class
+        {
+            return new ReactivePlan<TModel>(
+                ReactivePlanScope.RootView,
+                html?.ViewContext.HttpContext.RequestServices);
+        }
+#endif
+
+        /// <summary>
+        /// Creates a <see cref="ReactivePlan{TModel}"/> for a partial view that merges
+        /// into an existing browser plan.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Partials follow the same create-at-top, render-at-bottom pattern as views:
+        /// call <c>ResolvePlan</c> at the top and <see cref="RenderPlan{TModel}"/> at the bottom.
+        /// Both calls are required for the partial's reactive behavior to work.
+        /// </para>
+        /// <para>
+        /// The returned plan's behaviors merge with the owning view's plan and execute
+        /// as a single unit in the browser.
+        /// </para>
+        /// </remarks>
+        /// <typeparam name="TModel">The view model type must match the view's model.</typeparam>
+        /// <returns>A plan instance that merges into the view's plan in the browser.</returns>
+#if NET48
+        public static ReactivePlan<TModel> ResolvePlan<TModel>(this HtmlHelper<TModel> html)
+            where TModel : class
+        {
+            // net48 / System.Web has no per-request IServiceProvider, so the plan is
+            // created with services: null. Validation metadata is resolved at render
+            // time via the MVC5 DependencyResolver, which the app bridges over its DI
+            // container in Application_Start. See ReactivePlan.RequireClientValidationRuleSource.
+            return new ReactivePlan<TModel>(
+                ReactivePlanScope.PartialView,
+                services: null);
+        }
+#else
+        public static ReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
+            where TModel : class
+        {
+            return new ReactivePlan<TModel>(
+                ReactivePlanScope.PartialView,
+                html?.ViewContext.HttpContext.RequestServices);
+        }
+#endif
+
+        /// <summary>
+        /// Renders all reactive behaviors defined in <paramref name="plan"/> so they
+        /// execute in the browser as expressed.
+        /// </summary>
+        /// <remarks>
+        /// This must be the last call in every view. A plan that is not rendered
+        /// produces no reactive behavior in the browser.
+        /// </remarks>
+        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The plan to render.</param>
+        /// <returns>HTML content that activates the plan when the page loads.</returns>
+#if NET48
+        public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html,
+            ReactivePlan<TModel> plan) where TModel : class
+        {
+            var json = plan.Render();
+            var elementId = plan.PlanId.Replace('.', '-').Replace('+', '-');
+            var script = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
+
+            // Validation errors display inline next to each field by default.
+            // The summary div is a fallback for errors that cannot be shown inline:
+            // hidden fields, unenriched fields (partial not yet loaded), or server
+            // errors with no matching error span. Only views emit it — partials
+            // rely on the view's summary div only if the partials are not rendered yet.
+            var planRendersValidationSummary = plan.RendersValidationSummary;
+            if (!planRendersValidationSummary)
+                return new MvcHtmlString(script);
+
+            var planId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
+            return new MvcHtmlString(script +
+                $"<div data-reactive-validation-summary=\"{planId}\" hidden></div>");
+        }
+#else
+        public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html,
+            ReactivePlan<TModel> plan) where TModel : class
+        {
+            var json = plan.Render();
+            var elementId = plan.PlanId.Replace('.', '-').Replace('+', '-');
+            var script = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
+
+            // Validation errors display inline next to each field by default.
+            // The summary div is a fallback for errors that cannot be shown inline:
+            // hidden fields, unenriched fields (partial not yet loaded), or server
+            // errors with no matching error span. Only views emit it — partials
+            // rely on the view's summary div only if the partials are not rendered yet.
+            var planRendersValidationSummary = plan.RendersValidationSummary;
+            if (!planRendersValidationSummary)
+                return new HtmlString(script);
+
+            var planId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
+            return new HtmlString(script +
+                $"<div data-reactive-validation-summary=\"{planId}\" hidden></div>");
+        }
+#endif
+    }
+}

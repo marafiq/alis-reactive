@@ -126,10 +126,20 @@ public class WhenDrawerOpensAndCloses : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // TODO: drawer_x_button_closes_the_drawer — needs investigation.
-    // The #alis-drawer-close button exists (rendered by NativeDrawerExtensions)
-    // but Playwright click times out. May need to wait for drawer CSS transition
-    // to complete before the X button becomes clickable.
+    [Test]
+    public async Task drawer_header_close_button_closes_the_drawer()
+    {
+        await NavigateAndBoot();
+
+        await Page.Locator("#btn-open-sm").ClickAsync();
+        await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 5000 });
+
+        await ClickWhenStable(Page.Locator("#alis-drawer-close"));
+
+        await Expect(Drawer).Not.ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 5000 });
+
+        AssertNoConsoleErrors();
+    }
 
     // ── Form validation: empty submit ──
 

@@ -1,0 +1,178 @@
+@model FusionRadioButtonModel
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "FusionRadioButton";
+
+    const string privateId = "private-room-radio";
+    const string sharedId = "shared-room-radio";
+    var plan = Html.ReactivePlan<FusionRadioButtonModel>();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var shared = p.Component<FusionRadioButton>(sharedId);
+        shared.SetChecked(true);
+        p.Element("selected-echo").SetText(shared.SelectedValue());
+        p.Element("shared-checked-echo").SetText(shared.Checked());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">FusionRadioButton</native-heading>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">State and Events</native-heading>
+        <native-vstack gap="Sm">
+            @(Html.FusionRadioButton(plan, privateId, b => b
+                .Name("roomType")
+                .Value("Private")
+                .Label("Private room"))
+                .Reactive(evt => evt.Changed, (args, p) =>
+                {
+                    p.Element("change-value").SetText(args, x => x.Value);
+                    p.When(args, x => x.Value).Eq("Private")
+                        .Then(t => t.Element("args-condition").SetText("private"))
+                        .Else(e => e.Element("args-condition").SetText("not private"));
+                }))
+
+            @(Html.FusionRadioButton(plan, sharedId, b => b
+                .Name("roomType")
+                .Value("Shared")
+                .Label("Shared room"))
+                .Reactive(evt => evt.Changed, (args, p) =>
+                {
+                    p.Element("change-value").SetText(args, x => x.Value);
+                    p.When(args, x => x.Value).Eq("Shared")
+                        .Then(t => t.Element("args-condition").SetText("shared"))
+                        .Else(e => e.Element("args-condition").SetText("not shared"));
+                }))
+        </native-vstack>
+
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
+            @(Html.NativeButton("set-private-btn", "Set Private")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var privateRoom = p.Component<FusionRadioButton>(privateId);
+                    var sharedRoom = p.Component<FusionRadioButton>(sharedId);
+                    privateRoom.SetChecked(true);
+                    p.Element("selected-echo").SetText(privateRoom.SelectedValue());
+                    p.Element("private-checked-echo").SetText(privateRoom.Checked());
+                    p.Element("shared-checked-echo").SetText(sharedRoom.Checked());
+                    p.Element("command-state").SetText("private set");
+                }))
+            @(Html.NativeButton("set-shared-btn", "Set Shared")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var privateRoom = p.Component<FusionRadioButton>(privateId);
+                    var sharedRoom = p.Component<FusionRadioButton>(sharedId);
+                    sharedRoom.SetChecked(true);
+                    p.Element("selected-echo").SetText(sharedRoom.SelectedValue());
+                    p.Element("private-checked-echo").SetText(privateRoom.Checked());
+                    p.Element("shared-checked-echo").SetText(sharedRoom.Checked());
+                    p.Element("command-state").SetText("shared set");
+                }))
+            @(Html.NativeButton("disable-shared-btn", "Disable Shared")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var sharedRoom = p.Component<FusionRadioButton>(sharedId);
+                    sharedRoom.SetDisabled(true);
+                    p.Element("disabled-echo").SetText(sharedRoom.Disabled());
+                    p.Element("command-state").SetText("shared disabled");
+                }))
+            @(Html.NativeButton("enable-shared-btn", "Enable Shared")
+                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var sharedRoom = p.Component<FusionRadioButton>(sharedId);
+                    sharedRoom.SetDisabled(false);
+                    p.Element("disabled-echo").SetText(sharedRoom.Disabled());
+                    p.Element("command-state").SetText("shared enabled");
+                }))
+            @(Html.NativeButton("click-shared-btn", "Click Shared")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var sharedRoom = p.Component<FusionRadioButton>(sharedId);
+                    sharedRoom.Click();
+                    p.Element("selected-echo").SetText(sharedRoom.SelectedValue());
+                    p.Element("click-state").SetText("click called");
+                }))
+            @(Html.NativeButton("focus-private-btn", "Focus Private")
+                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Component<FusionRadioButton>(privateId).FocusIn();
+                    p.Element("focus-state").SetText("focus called");
+                }))
+            @(Html.NativeButton("check-selected-btn", "Check Selected")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var privateRoom = p.Component<FusionRadioButton>(privateId);
+                    p.When(privateRoom.SelectedValue()).Eq("Private")
+                        .Then(t => t.Element("selected-state").SetText("private selected"))
+                        .Else(e => e.Element("selected-state").SetText("other selected"));
+                }))
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Gather</native-heading>
+        @(Html.NativeButton("gather-btn", "Gather RadioButton")
+            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var privateRoom = p.Component<FusionRadioButton>(privateId);
+                var sharedRoom = p.Component<FusionRadioButton>(sharedId);
+                p.Post("/Sandbox/Components/FusionRadioButton/Echo")
+                    .Gather(g =>
+                    {
+                        g.Include(privateRoom.SelectedValue(), "selectedValue");
+                        g.Include(privateRoom.Checked(), "privateChecked");
+                        g.Include(sharedRoom.Checked(), "sharedChecked");
+                        g.Include(sharedRoom.Disabled(), "sharedDisabled");
+                    })
+                    .Response(r => r.OnSuccess<FusionRadioButtonEchoResponse>((json, s) =>
+                    {
+                        s.Element("gather-selected").SetText(json, x => x.SelectedValue);
+                        s.Element("gather-private-checked").SetText(json, x => x.PrivateChecked);
+                        s.Element("gather-shared-checked").SetText(json, x => x.SharedChecked);
+                        s.Element("gather-shared-disabled").SetText(json, x => x.SharedDisabled);
+                        s.Element("gather-summary").SetText(json, x => x.Summary);
+                    }));
+            }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Trace</native-heading>
+        <native-vstack gap="Xs" class="font-mono text-sm">
+            <p>Command: <span id="command-state" class="text-text-muted">pending</span></p>
+            <p>Selected echo: <span id="selected-echo" class="text-text-muted">pending</span></p>
+            <p>Private checked: <span id="private-checked-echo" class="text-text-muted">pending</span></p>
+            <p>Shared checked: <span id="shared-checked-echo" class="text-text-muted">pending</span></p>
+            <p>Disabled echo: <span id="disabled-echo" class="text-text-muted">pending</span></p>
+            <p>Change value: <span id="change-value" class="text-text-muted">pending</span></p>
+            <p>Args condition: <span id="args-condition" class="text-text-muted">pending</span></p>
+            <p>Click state: <span id="click-state" class="text-text-muted">pending</span></p>
+            <p>Focus state: <span id="focus-state" class="text-text-muted">pending</span></p>
+            <p>Selected state: <span id="selected-state" class="text-text-muted">pending</span></p>
+            <p>Gather selected: <span id="gather-selected" class="text-text-muted">pending</span></p>
+            <p>Gather private checked: <span id="gather-private-checked" class="text-text-muted">pending</span></p>
+            <p>Gather shared checked: <span id="gather-shared-checked" class="text-text-muted">pending</span></p>
+            <p>Gather shared disabled: <span id="gather-shared-disabled" class="text-text-muted">pending</span></p>
+            <p>Gather summary: <span id="gather-summary" class="text-text-muted">pending</span></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Plan JSON</native-heading>
+        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

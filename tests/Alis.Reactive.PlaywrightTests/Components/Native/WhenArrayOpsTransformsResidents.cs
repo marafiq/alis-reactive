@@ -1,0 +1,75 @@
+namespace Alis.Reactive.PlaywrightTests.Components.Native;
+
+/// <summary>
+/// Complex array operations over an object array, end-to-end in the browser — a deterministic
+/// replacement for the ArrayManager plugin. On DomReady the plan loads a resident roster via HTTP
+/// then, in OnSuccess, operates on the array entirely in the closed DSL:
+///   residents.Count()                                                 -> total
+///   residents.Count(x => x.Status == "active")                        -> member predicate
+///   residents.Count(x => x.Status == "active" && x.Age >= 65)         -> compound predicate
+///   residents.Where(x => x.Status == "active").Sum(x => x.Age)        -> chained filter -> sum
+///   residents.Where(active).OrderByDescending(x => x.Age).Find(.., x => x.Name) -> filter/order/find/project
+///   residents.Any(x => x.Status == "critical")                        -> predicate guard
+/// No plugin, no hand-written JS.
+///
+/// Page under test: /Sandbox/Components/ArrayOps. Isolated slice.
+/// </summary>
+[TestFixture]
+public class WhenArrayOpsTransformsResidents : PlaywrightTestBase
+{
+    private const string Path = "/Sandbox/Components/ArrayOps";
+
+    private async Task NavigateAndBoot()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+    }
+
+    [Test]
+    public async Task counts_total_residents_from_the_loaded_array()
+    {
+        await NavigateAndBoot();
+        await Expect(Page.Locator("#res-total")).ToHaveTextAsync("5", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task counts_active_residents_by_member_predicate()
+    {
+        await NavigateAndBoot();
+        await Expect(Page.Locator("#res-active")).ToHaveTextAsync("3", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task counts_active_seniors_by_compound_member_predicate()
+    {
+        await NavigateAndBoot();
+        await Expect(Page.Locator("#res-active-seniors")).ToHaveTextAsync("2", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task sums_ages_of_active_residents_via_chained_filter_then_sum()
+    {
+        await NavigateAndBoot();
+        await Expect(Page.Locator("#res-active-age-sum")).ToHaveTextAsync("206", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task finds_oldest_active_resident_via_filter_orderby_find()
+    {
+        await NavigateAndBoot();
+        await Expect(Page.Locator("#res-oldest-active")).ToHaveTextAsync("Cy", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task flags_a_critical_resident_via_any_predicate_guard()
+    {
+        await NavigateAndBoot();
+        await Expect(Page.Locator("#res-critical-yes")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+}

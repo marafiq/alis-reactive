@@ -1,0 +1,78 @@
+@model ArrayOpsModel
+@using Alis.Reactive
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "ArrayOps";
+
+    var plan = Html.ReactivePlan<ArrayOpsModel>();
+    var activityItems = (RadioButtonItem[])ViewBag.ActivityItems;
+
+    // COMPLEX: load a resident roster, then operate on the object array deterministically —
+    // filter by element members, aggregate, find, and guard — all compiled to plan nodes.
+    // This is a deterministic replacement for the ArrayManager plugin: no plugin, no JS.
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get("/Sandbox/Components/ArrayOps/Residents")
+         .Response(r => r.OnSuccess<ResidentRosterResponse>((json, s) =>
+         {
+             var residents = p.From(json.Read(x => x.Residents));
+
+             s.Element("res-total").SetText(residents.Count());
+             s.Element("res-active").SetText(residents.Count(x => x.Status == "active"));
+             s.Element("res-active-seniors").SetText(residents.Count(x => x.Status == "active" && x.Age >= 65));
+             s.Element("res-active-age-sum").SetText(residents.Where(x => x.Status == "active").Sum(x => x.Age));
+             s.Element("res-oldest-active").SetText(
+                 residents.Where(x => x.Status == "active").OrderByDescending(x => x.Age).Find(x => true, x => x.Name));
+
+             s.When(residents.Any(x => x.Status == "critical")).Truthy()
+              .Then(then => then.Element("res-critical-yes").Show())
+              .Else(els => els.Element("res-critical-no").Show());
+         }))));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">ArrayOps</native-heading>
+    <native-text color="Secondary">
+        Deterministic array DSL. Each operation is captured from a C# lambda and compiled to a
+        plan <code>array-op</code> node; the runtime evaluates predicates and selectors against the
+        element scope. No plugin, no hand-written JS.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Resident roster — operate on the object array</native-heading>
+        <native-text color="Secondary">
+            Loaded via HTTP, then filtered/aggregated by element members in the plan
+            (e.g. <code>residents.Where(x =&gt; x.Status == "active").Sum(x =&gt; x.Age)</code>).
+        </native-text>
+        <native-vstack gap="Sm" class="font-mono text-sm">
+            <p>Total residents: <span id="res-total">&mdash;</span></p>
+            <p>Active: <span id="res-active">&mdash;</span></p>
+            <p>Active seniors (65+): <span id="res-active-seniors">&mdash;</span></p>
+            <p>Total age of active: <span id="res-active-age-sum">&mdash;</span></p>
+            <p>Oldest active: <span id="res-oldest-active">&mdash;</span></p>
+            <p id="res-critical-yes" hidden class="text-red-600">&#9888; Critical resident present</p>
+            <p id="res-critical-no" hidden class="text-green-600">No critical residents</p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Activity selection (live count)</native-heading>
+        <native-text color="Secondary">
+            The NativeCheckList <code>Changed</code> event delivers <code>e.Value</code> (a
+            <code>string[]</code>); <code>p.From(args, e =&gt; e.Value).Count()</code> updates on every change.
+        </native-text>
+
+        @{ Html.InputField(plan, m => m.SelectedActivities, o => o.Label("Activities"))
+            .NativeCheckList(b => b
+                .Items(activityItems)
+                .Reactive(plan, evt => evt.Changed, (args, p) =>
+                {
+                    var count = p.From(args, e => e.Value).Count();
+                    p.Element("selected-count").SetText(count);
+                })); }
+
+        <p class="font-mono text-sm mt-2">Selected count: <span id="selected-count">&mdash;</span></p>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

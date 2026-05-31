@@ -14,6 +14,12 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionRichTextEditor Component = new FusionRichTextEditor();
 
+        private static readonly ComponentProperty<string> ValueProperty =
+            ComponentProperty<string>.Named(Component.ValueMember);
+
+        private static readonly ComponentMethod FocusInMethod =
+            ComponentMethod.Named("focusIn");
+
         /// <summary>Sets the HTML content value.</summary>
         /// <param name="value">The HTML content to set.</param>
         /// <returns>The component reference for method chaining.</returns>
@@ -21,7 +27,7 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionRichTextEditor, TModel> self, string value)
             where TModel : class
         {
-            return self.EmitSet("value", ValueProducer.Literal(value));
+            return self.EmitSet(ValueProperty, ValueExpression.Literal(value));
         }
 
         /// <summary>Moves focus into the rich text editor.</summary>
@@ -29,7 +35,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionRichTextEditor, TModel> FocusIn<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self)
             where TModel : class
-            => self.EmitCall("focusIn");
+            => self.EmitCall(FocusInMethod);
 
         /// <summary>Reads the current HTML content for use in conditions or gather.</summary>
         /// <remarks>
@@ -40,6 +46,6 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self)
             where TModel : class
-            { self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor); self.Pipeline.Context.EnsureProperty(self.TargetId, Component.ValueMember, Component.ValueMember, Shape.String, "read"); return new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ValueMember); }
+            => self.Read(ValueProperty);
     }
 }

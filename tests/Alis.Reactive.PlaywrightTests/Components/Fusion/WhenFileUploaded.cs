@@ -2,8 +2,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 
 /// <summary>
 /// Exercises FusionFileUpload vertical slice end-to-end in the browser:
-/// FusionFileUpload in form mode (no auto-upload), FormData POST transport,
-/// and server echo proving files survive the gather + multipart transport.
+/// FusionFileUpload in form mode (no auto-upload), FormData POST body format,
+/// and server echo proving files survive the gather + multipart request body.
 ///
 /// Page under test: /Sandbox/Components/FusionFileUpload
 ///
@@ -12,7 +12,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion;
 /// File injection strategy:
 /// Sets files on the native input via DataTransfer API, then dispatches a change event
 /// so SF processes them into filesData[].rawFile. The gather reads ej2.filesData via
-/// valueMember "filesData", and the Transport extracts .rawFile (File objects) for FormData.
+/// valueMember "filesData", and the request payload writer extracts .rawFile (File objects) for FormData.
 /// </summary>
 [TestFixture]
 public class WhenFileUploaded : PlaywrightTestBase

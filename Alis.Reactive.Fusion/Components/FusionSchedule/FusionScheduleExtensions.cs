@@ -22,6 +22,45 @@ namespace Alis.Reactive.Fusion.Components
     {
         private static readonly FusionSchedule Component = new FusionSchedule();
 
+        private static readonly ComponentProperty<string> CurrentViewProperty =
+            ComponentProperty<string>.Named("currentView");
+
+        private static readonly ComponentProperty<DateTime> SelectedDateProperty =
+            ComponentProperty<DateTime>.Named("selectedDate");
+
+        private static readonly ComponentProperty<object> EventDataSourceProperty =
+            ComponentProperty<object>.Mapped("eventDataSource", "eventSettings.dataSource");
+
+        private static readonly ComponentMethod DataBindMethod =
+            ComponentMethod.Named("dataBind");
+
+        private static readonly ComponentMethod GetEventsMethod =
+            ComponentMethod.Named("getEvents");
+
+        private static readonly ComponentMethod AddEventMethod =
+            ComponentMethod.Named("addEvent").WithArgs<object>();
+
+        private static readonly ComponentMethod SaveEventMethod =
+            ComponentMethod.Named("saveEvent").WithArgs<object>();
+
+        private static readonly ComponentMethod DeleteEventMethod =
+            ComponentMethod.Named("deleteEvent").WithArgs<object>();
+
+        private static readonly ComponentMethod OpenEditorMethod =
+            ComponentMethod.Named("openEditor").WithArgs<object, string>();
+
+        private static readonly ComponentMethod CloseEditorMethod =
+            ComponentMethod.Named("closeEditor");
+
+        private static readonly ComponentMethod RefreshEventsMethod =
+            ComponentMethod.Named("refreshEvents");
+
+        private static readonly ComponentMethod PrintMethod =
+            ComponentMethod.Named("print");
+
+        private static readonly ComponentMethod ScrollToMethod =
+            ComponentMethod.Named("scrollTo").WithArgs<string>();
+
         /// <summary>
         /// Reads the active view ("Day", "Week", "WorkWeek", "Month", "Agenda").
         /// Use in conditions or gather to send the current view type to the server.
@@ -30,11 +69,7 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<string> CurrentView<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
             where TModel : class
-        {
-            self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor);
-            self.Pipeline.Context.EnsureProperty(self.TargetId, "currentView", "currentView", Shape.String, "read");
-            return new TypedComponentSource<string>(self.TargetId, Component.Vendor, "currentView");
-        }
+            => self.Read(CurrentViewProperty);
 
         /// <summary>
         /// Reads the currently selected date.
@@ -43,11 +78,16 @@ namespace Alis.Reactive.Fusion.Components
         public static TypedComponentSource<DateTime> SelectedDate<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
             where TModel : class
-        {
-            self.Pipeline.Context.EnsureComponent(self.TargetId, Component.Vendor);
-            self.Pipeline.Context.EnsureProperty(self.TargetId, "selectedDate", "selectedDate", Shape.Date, "read");
-            return new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "selectedDate");
-        }
+            => self.Read(SelectedDateProperty);
+
+        /// <summary>
+        /// Reads the current schedule event collection.
+        /// Runtime: calls ej2.getEvents() and uses the returned array as a typed source.
+        /// </summary>
+        public static TypedComponentSource<FusionScheduleEventData[]> GetEvents<TModel>(
+            this ComponentRef<FusionSchedule, TModel> self)
+            where TModel : class
+            => self.Read<FusionScheduleEventData[]>(GetEventsMethod);
 
         /// <summary>
         /// Replaces the schedule event data from an HTTP response body with a path selector.
@@ -60,8 +100,8 @@ namespace Alis.Reactive.Fusion.Components
             where TResponse : class
         {
             var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-            self.EmitSet("eventSettings.dataSource", ValueProducer.Read(source.Scope, sourcePath));
-            return self.EmitCall("dataBind");
+            self.EmitSet(EventDataSourceProperty, ValueExpression.Read(source.Scope, sourcePath));
+            return self.EmitCall(DataBindMethod);
         }
 
         /// <summary>
@@ -74,8 +114,8 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             where TResponse : class
         {
-            self.EmitSet("eventSettings.dataSource", ValueProducer.Read(source.Scope, "responseBody"));
-            return self.EmitCall("dataBind");
+            self.EmitSet(EventDataSourceProperty, ValueExpression.Read(source.Scope, "responseBody"));
+            return self.EmitCall(DataBindMethod);
         }
 
         /// <summary>
@@ -83,36 +123,36 @@ namespace Alis.Reactive.Fusion.Components
         /// Runtime: ej2.addEvent(data)
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> AddEvent<TModel>(
-            this ComponentRef<FusionSchedule, TModel> self, ValueProducer data)
+            this ComponentRef<FusionSchedule, TModel> self, ValueExpression data)
             where TModel : class
-            => self.EmitCall("addEvent", new System.Collections.Generic.List<ValueProducer> { data });
+            => self.EmitCall(AddEventMethod, new System.Collections.Generic.List<ValueExpression> { data });
 
         /// <summary>
         /// Updates an existing event.
         /// Runtime: ej2.saveEvent(data)
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> SaveEvent<TModel>(
-            this ComponentRef<FusionSchedule, TModel> self, ValueProducer data)
+            this ComponentRef<FusionSchedule, TModel> self, ValueExpression data)
             where TModel : class
-            => self.EmitCall("saveEvent", new System.Collections.Generic.List<ValueProducer> { data });
+            => self.EmitCall(SaveEventMethod, new System.Collections.Generic.List<ValueExpression> { data });
 
         /// <summary>
         /// Deletes an event by ID.
         /// Runtime: ej2.deleteEvent(id)
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> DeleteEvent<TModel>(
-            this ComponentRef<FusionSchedule, TModel> self, ValueProducer eventId)
+            this ComponentRef<FusionSchedule, TModel> self, ValueExpression eventId)
             where TModel : class
-            => self.EmitCall("deleteEvent", new System.Collections.Generic.List<ValueProducer> { eventId });
+            => self.EmitCall(DeleteEventMethod, new System.Collections.Generic.List<ValueExpression> { eventId });
 
         /// <summary>
         /// Opens the built-in event editor programmatically.
         /// Runtime: ej2.openEditor(data, action)
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> OpenEditor<TModel>(
-            this ComponentRef<FusionSchedule, TModel> self, ValueProducer data, string action = "Add")
+            this ComponentRef<FusionSchedule, TModel> self, ValueExpression data, string action = "Add")
             where TModel : class
-            => self.EmitCall("openEditor", new System.Collections.Generic.List<ValueProducer> { data, ValueProducer.Literal(action) });
+            => self.EmitCall(OpenEditorMethod, new System.Collections.Generic.List<ValueExpression> { data, ValueExpression.Literal(action) });
 
         /// <summary>
         /// Closes the event editor.
@@ -121,7 +161,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionSchedule, TModel> CloseEditor<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
             where TModel : class
-            => self.EmitCall("closeEditor", new System.Collections.Generic.List<ValueProducer>());
+            => self.EmitCall(CloseEditorMethod);
 
         /// <summary>
         /// Re-renders all events.
@@ -130,7 +170,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionSchedule, TModel> RefreshEvents<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
             where TModel : class
-            => self.EmitCall("refreshEvents", new System.Collections.Generic.List<ValueProducer>());
+            => self.EmitCall(RefreshEventsMethod);
 
         /// <summary>
         /// Prints the current schedule view.
@@ -139,7 +179,7 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionSchedule, TModel> Print<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
             where TModel : class
-            => self.EmitCall("print", new System.Collections.Generic.List<ValueProducer>());
+            => self.EmitCall(PrintMethod);
 
         /// <summary>
         /// Scrolls to a specific time in the schedule.
@@ -148,6 +188,6 @@ namespace Alis.Reactive.Fusion.Components
         public static ComponentRef<FusionSchedule, TModel> ScrollTo<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, string hour)
             where TModel : class
-            => self.EmitCall("scrollTo", new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(hour) });
+            => self.EmitCall(ScrollToMethod, new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(hour) });
     }
 }

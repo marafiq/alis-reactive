@@ -58,6 +58,20 @@ public sealed class AutoCompleteLocator
     /// </summary>
     public async Task Type(string text, int delayMs = 50)
     {
+        try
+        {
+            await TypeAndWaitForPopup(text, delayMs);
+        }
+        catch (TimeoutException)
+        {
+            await Clear();
+            await _page.WaitForTimeoutAsync(250);
+            await TypeAndWaitForPopup(text, delayMs);
+        }
+    }
+
+    private async Task TypeAndWaitForPopup(string text, int delayMs)
+    {
         await Input.ClickWhenStableAsync(_page);
         await Input.PressSequentiallyAsync(text, new() { Delay = delayMs });
         await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 15000 });

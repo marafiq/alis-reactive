@@ -2,7 +2,7 @@
 
 **Status:** proposed | accepted | implemented | superseded by ADR-NNN
 **Date:** YYYY-MM-DD
-**Domain:** schema | runtime | validation | pipeline | components | process | quality | docs
+**Domain:** plan-domain | generated-types | runtime | validation | pipeline | components | process | quality | docs
 
 ## Context
 

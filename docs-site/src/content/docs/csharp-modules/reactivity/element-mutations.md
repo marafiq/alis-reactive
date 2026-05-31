@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-Inside a `.Reactive()` or `Html.On()` pipeline, `pipeline` gives you access to mutations — ways to change what's on the page. You target an element or a component, then call methods that describe what should change.
+Inside a `.Reactive()` or `Html.On()` pipeline, `pipeline` gives you access to mutations — ways to change what's on the page. You target an element or a component, then call methods that describe what must change.
 
 From the [Grammar Tree](../../mental-model/#the-grammar-tree) — Element mutations:
 

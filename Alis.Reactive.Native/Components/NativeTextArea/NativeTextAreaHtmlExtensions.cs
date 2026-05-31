@@ -1,5 +1,4 @@
 using System;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
@@ -10,8 +9,6 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     public static class NativeTextAreaHtmlExtensions
     {
-        private static readonly NativeTextArea _component = new NativeTextArea();
-
         /// <summary>
         /// Creates a <see cref="NativeTextAreaBuilder{TModel,TProp}"/> inside the field wrapper,
         /// registers the component in the plan, and renders the textarea.
@@ -25,11 +22,13 @@ namespace Alis.Reactive.Native.Components
             Action<NativeTextAreaBuilder<TModel, TProp>> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, _component.Vendor, setup.BindingPath, _component.ValueMember, "textarea",
-                Shape.FromClrType(typeof(TProp))));
+            var registration = global::Alis.Reactive.Native.Components.NativeTextArea.Registration;
+            setup.RegisterInputComponent(registration);
 
-            var builder = new NativeTextAreaBuilder<TModel, TProp>(setup.Helper, setup.Expression);
+            var builder = new NativeTextAreaBuilder<TModel, TProp>(
+                setup.Helper,
+                setup.Expression,
+                setup.RenderTarget);
             build(builder);
             setup.Render(builder);
         }

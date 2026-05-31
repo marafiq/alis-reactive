@@ -7,6 +7,7 @@ on:
       - 'docs-site/**'
       - 'Alis.Reactive/**'
       - 'Alis.Reactive.Native/**'
+      - 'Alis.Reactive.DesignSystem/**'
       - 'Alis.Reactive.Fusion/**'
       - 'Alis.Reactive.FluentValidator/**'
       - 'Alis.Reactive.SandboxApp/wwwroot/**'

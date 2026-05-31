@@ -22,7 +22,7 @@ One page, zero JavaScript — every behavior below is expressed entirely in C# f
 7. **Conditional validation** — `WhenField` rules fire only when their condition is met: physician is required only when medication management is checked; cognitive assessment is required only when care level is "Memory Care"
 8. **Cross-partial validation** — dynamically loaded fields (Room Preference, Move-in Deposit) validate alongside static fields because plan merging enriched them with component metadata
 9. **Confirmation guard** — `Confirm()` shows a dialog before the POST; canceling aborts the entire pipeline
-10. **HTTP POST with gather** — `IncludeAll()` collects every registered component value — including fields from merged partials — and sends them as JSON
+10. **HTTP POST with gather** — `IncludeAll()` collects every registered component value — including fields from applied partials — and sends them as JSON
 11. **Loading overlay** — `WhileLoading()` shows a full-page loader during the save request
 12. **Toast notification** — on success, `FusionToast` shows a styled notification
 13. **Chained request** — after save succeeds, a follow-up GET fetches a confirmation number and displays it via `SetText(json, j => j.Number)` — typed response body access
@@ -39,7 +39,7 @@ One page, zero JavaScript — every behavior below is expressed entirely in C# f
 | **Components** | NativeTextBox, NativeCheckBox, FusionDropDownList, FusionDatePicker, FusionNumericTextBox, FusionInputMask, NativeButton |
 | **HTTP** | Parallel GET (DomReady + facility change), cascading GET, POST with `IncludeAll`, Chained requests |
 | **Conditions** | `When().Eq()` on dropdown, `When().Truthy()` on checkbox |
-| **Validation** | `ReactiveValidator<T>`, `WhenField` conditional rules, `ValidationErrors` routing, validation across merged partials |
+| **Validation** | `ReactiveValidator<T>`, `WhenField` conditional rules, `ValidationErrors` routing, validation across applied partials |
 | **Dynamic partials** | `ResolvePlan` + `Into()` — load form fields at runtime, plan merging enriches validation automatically |
 | **App-level** | FusionConfirm, FusionToast, NativeLoader, NativeDrawer |
 | **Content** | `Into()` for display partials and reactive partials, `Dispatch` for event decoupling |
@@ -184,14 +184,14 @@ The facility requirements partial uses `Html.ResolvePlan<T>()` — a partial pla
 1. `ResolvePlan<T>()` creates a partial plan (same model type = same `planId`)
 2. `RenderPlan()` emits only the plan JSON script tag (no validation summary — that's on the parent)
 3. `ScriptManager()` initializes Syncfusion components in the partial (NumericTextBox)
-4. When loaded via `Into()`, the runtime extracts the plan JSON and calls `mergePlan()`
-5. Components merge into the parent plan — validation fields get enriched with `fieldId`, `vendor`, `readExpr`
-6. Validation rules that were unenriched at boot time (no component yet) now fire correctly
+4. When loaded via `Into()`, the runtime extracts the plan JSON and calls `loadPartialSlot(slotId, plans)`
+5. Components and validation rules are applied under that slot handle
+6. Loading the same slot again replaces its previous contribution; loading empty content unloads it
 7. `IncludeAll()` on save gathers the partial's fields alongside the parent's fields
 </TabItem>
 </Tabs>
 
-The key insight: the parent plan's validator already has rules for `RoomPreference` and `DepositAmount`. At initial render those rules are *unenriched* (no component exists yet). When the partial loads and merges, the runtime enriches those validation fields — and validation just works.
+The key insight: the parent plan's validator and the partial components use the same model-driven component ids. When the partial loads into its slot, those ids become part of the applied browser plan — and validation just works.
 
 ## How do conditional sections work?
 
@@ -318,7 +318,7 @@ When the coordinator clicks "Submit Intake":
 
 1. **`Confirm()`** — A dialog asks "Are you sure?" If canceled, nothing happens.
 2. **`Validate<IntakeValidator>()`** — Client-side rules run first. If invalid, errors appear inline — the POST never fires.
-3. **`Post()` + `IncludeAll()`** — All registered form components are gathered and sent as JSON — including fields from merged partials.
+3. **`Post()` + `IncludeAll()`** — All registered form components are gathered and sent as JSON — including fields from applied partials.
 4. **`WhileLoading()`** — The loader overlay shows during the request.
 5. **`OnSuccess()`** — Hide loader, show toast, reveal confirmation section.
 6. **`OnError(400)`** — Hide loader, route server validation errors to fields.

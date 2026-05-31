@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
@@ -17,8 +16,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public static class FusionFileUploadHtmlExtensions
     {
-        private static readonly FusionFileUpload Component = new FusionFileUpload();
-
         /// <summary>
         /// Renders a FusionFileUpload bound to the field's model property.
         /// </summary>
@@ -31,9 +28,8 @@ namespace Alis.Reactive.Fusion.Components
             Action<UploaderBuilder> build)
             where TModel : class
         {
-            setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-                setup.ElementId, Component.Vendor, setup.BindingPath, Component.ValueMember, "fileupload",
-                Shape.FromClrType(typeof(TProp))));
+            var registration = global::Alis.Reactive.Fusion.Components.FusionFileUpload.Registration;
+            setup.RegisterInputComponent(registration);
 
             var builder = setup.Helper.EJS().Uploader(setup.ElementId)
                 .AutoUpload(false)

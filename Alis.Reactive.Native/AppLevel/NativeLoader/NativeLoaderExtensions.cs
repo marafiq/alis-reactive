@@ -15,6 +15,18 @@ namespace Alis.Reactive.Native.AppLevel
     /// </summary>
     public static class NativeLoaderExtensions
     {
+        private static readonly ComponentMethod SetAttributeMethod =
+            ComponentMethod.Named("setAttribute").WithArgs<string, string>();
+
+        private static readonly ComponentMethod RemoveAttributeMethod =
+            ComponentMethod.Named("removeAttribute").WithArgs<string>();
+
+        private static readonly ComponentMethod ClassAddMethod =
+            ComponentMethod.Mapped("classAdd", "classList.add").WithArgs<string>();
+
+        private static readonly ComponentMethod ClassRemoveMethod =
+            ComponentMethod.Mapped("classRemove", "classList.remove").WithArgs<string>();
+
         /// <summary>
         /// Sets which element the loader should cover.
         /// </summary>
@@ -29,8 +41,8 @@ namespace Alis.Reactive.Native.AppLevel
         public static ComponentRef<NativeLoader, TModel> SetTarget<TModel>(
             this ComponentRef<NativeLoader, TModel> self, string targetId)
             where TModel : class
-            => self.EmitCall("setAttribute",
-                   new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("data-target"), ValueProducer.Literal(targetId) });
+            => self.EmitCall(SetAttributeMethod,
+                   new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("data-target"), ValueExpression.Literal(targetId) });
 
         /// <summary>
         /// Sets an auto-hide timeout so the loader disappears after the specified duration.
@@ -42,8 +54,8 @@ namespace Alis.Reactive.Native.AppLevel
         public static ComponentRef<NativeLoader, TModel> SetTimeout<TModel>(
             this ComponentRef<NativeLoader, TModel> self, int ms)
             where TModel : class
-            => self.EmitCall("setAttribute",
-                   new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("data-timeout"), ValueProducer.Literal(ms.ToString()) });
+            => self.EmitCall(SetAttributeMethod,
+                   new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("data-timeout"), ValueExpression.Literal(ms.ToString()) });
 
         /// <summary>
         /// Shows the loader overlay, making it visible and accessible.
@@ -54,9 +66,10 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeLoader, TModel> self)
             where TModel : class
         {
-            EmitClassListCall(self, "classAdd", "classList.add", "alis-loader--visible");
-            self.EmitCall("removeAttribute",
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden") });
+            self.EmitCall(ClassAddMethod,
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("alis-loader--visible") });
+            self.EmitCall(RemoveAttributeMethod,
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("aria-hidden") });
             return self;
         }
 
@@ -69,21 +82,11 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeLoader, TModel> self)
             where TModel : class
         {
-            EmitClassListCall(self, "classRemove", "classList.remove", "alis-loader--visible");
-            self.EmitCall("setAttribute",
-                new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal("aria-hidden"), ValueProducer.Literal("true") });
+            self.EmitCall(ClassRemoveMethod,
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("alis-loader--visible") });
+            self.EmitCall(SetAttributeMethod,
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("aria-hidden"), ValueExpression.Literal("true") });
             return self;
-        }
-
-        private static void EmitClassListCall<TModel>(
-            ComponentRef<NativeLoader, TModel> self, string memberName, string pathExpr, string className)
-            where TModel : class
-        {
-            var componentKey = self.Pipeline.Context.EnsureComponent(self.TargetId, self.Vendor);
-            self.Pipeline.Context.EnsureMethod(componentKey, memberName, pathExpr);
-            self.Pipeline.Steps.Add(
-                Reaction.Call(ComponentSource.Of(componentKey), memberName,
-                    new System.Collections.Generic.List<ValueProducer> { ValueProducer.Literal(className) }));
         }
 
         /// <summary>

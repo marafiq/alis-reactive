@@ -9,6 +9,9 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionRichTextEditor : FusionComponent, IInputComponent
     {
+        internal static InputComponentRegistrationProfile Registration { get; } =
+            InputComponentRegistrationProfile.For(new FusionRichTextEditor(), "richtexteditor");
+
         /// <inheritdoc />
         public string ValueMember => "value";
     }

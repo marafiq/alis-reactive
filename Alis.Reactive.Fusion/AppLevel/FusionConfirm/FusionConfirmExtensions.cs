@@ -1,42 +1,42 @@
 using Alis.Reactive.PlanModel;
-#if NET48
-using System.Web;
-using System.Web.Mvc;
-#else
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-#endif
 
 namespace Alis.Reactive.Fusion.AppLevel
 {
     public static class FusionConfirmExtensions
     {
+        private static readonly ComponentProperty<string> ContentProperty =
+            ComponentProperty<string>.Named("content");
+
+        private static readonly ComponentMethod DataBindMethod =
+            ComponentMethod.Named("dataBind");
+
+        private static readonly ComponentMethod ShowMethod =
+            ComponentMethod.Named("show");
+
+        private static readonly ComponentMethod HideMethod =
+            ComponentMethod.Named("hide");
+
         public static ComponentRef<FusionConfirm, TModel> SetContent<TModel>(
             this ComponentRef<FusionConfirm, TModel> self, string message)
             where TModel : class
         {
-            return self.EmitSet("content", ValueProducer.Literal(message))
-                       .EmitCall("dataBind");
+            return self.EmitSet(ContentProperty, ValueExpression.Literal(message))
+                       .EmitCall(DataBindMethod);
         }
 
         public static ComponentRef<FusionConfirm, TModel> Show<TModel>(
             this ComponentRef<FusionConfirm, TModel> self)
             where TModel : class
-            => self.EmitCall("show");
+            => self.EmitCall(ShowMethod);
 
         public static ComponentRef<FusionConfirm, TModel> Hide<TModel>(
             this ComponentRef<FusionConfirm, TModel> self)
             where TModel : class
-            => self.EmitCall("hide");
+            => self.EmitCall(HideMethod);
 
-#if NET48
-        public static IHtmlString FusionConfirmDialog(this HtmlHelper html)
-        {
-            return new MvcHtmlString($"<div id=\"{FusionConfirm.ElementId}\"></div>\n");
-        }
-#else
         public static IHtmlContent FusionConfirmDialog(this IHtmlHelper html)
             => new HtmlString($"<div id=\"{FusionConfirm.ElementId}\"></div>\n");
-#endif
     }
 }

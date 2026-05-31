@@ -40,11 +40,8 @@ namespace Alis.Reactive.Native.Components
         {
             var descriptor = eventSelector(NativeCheckListEvents.Instance);
 
-            var pb = new PipelineBuilder<TModel>(plan.Context);
-            pipeline(descriptor.Args, pb);
-
             // Single entry on the hidden input -- checklist.ts dispatches change after sync
-            plan.Context.WireComponentEvent(builder.ElementId, "native", descriptor.JsEvent, pb.BuildReactions());
+            ComponentEventOnboarding.Wire(plan, builder.ElementId, "native", descriptor, pipeline);
 
 
             return builder;
