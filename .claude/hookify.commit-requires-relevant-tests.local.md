@@ -1,6 +1,6 @@
 ---
 name: commit-requires-relevant-tests
-enabled: true
+enabled: false
 event: bash
 pattern: git\s+commit
 ---

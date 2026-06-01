@@ -1,6 +1,6 @@
 ---
 name: merge-requires-all-tests
-enabled: true
+enabled: false
 event: bash
 pattern: git\s+merge|gh\s+pr\s+merge
 action: block

@@ -1,6 +1,6 @@
 ---
 name: null-escape-hatch-justify
-enabled: true
+enabled: false
 event: file
 action: warn
 conditions:

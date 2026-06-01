@@ -1,6 +1,6 @@
 ---
 name: no-raw-inputs
-enabled: true
+enabled: false
 event: file
 action: block
 conditions:

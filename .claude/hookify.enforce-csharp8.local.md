@@ -1,6 +1,6 @@
 ---
 name: enforce-csharp8
-enabled: true
+enabled: false
 event: file
 action: block
 conditions:

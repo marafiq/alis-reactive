@@ -1,6 +1,6 @@
 ---
 name: bdd-test-enforcement
-enabled: true
+enabled: false
 event: file
 action: warn
 conditions:

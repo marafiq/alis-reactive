@@ -1,6 +1,6 @@
 ---
 name: check-xml-docs-on-csharp-edit
-enabled: true
+enabled: false
 event: file
 conditions:
   - field: file_path

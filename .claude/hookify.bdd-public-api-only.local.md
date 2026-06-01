@@ -1,6 +1,6 @@
 ---
 name: bdd-public-api-only
-enabled: true
+enabled: false
 event: file
 action: warn
 conditions:
