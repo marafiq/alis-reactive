@@ -115,10 +115,15 @@ remaining Syncfusion components onboarded at full public API, NuGet packed and
 verified, and the autonomous gate system demonstrably green end-to-end.
 
 ### FRAME (non-negotiable)
-- **NEW FOLDER, everything from scratch.** A separate green-field root (e.g.
-  `Alis.Reactive.v1/`) with its own `.slnx`. **No backward-compatibility worry.** Do
-  not edit the old tree to "evolve" it; build the new one and prove it against the
-  old as oracle.
+- **SINGLE TREE, CLEAN SLATE — `delete-all → commit → rebuild-all`** (owner-decided
+  2026-06-01; see `REWRITE-PLAN.md`). On branch `cleanbreakbutrc1`: delete the entire
+  framework IMPLEMENTATION (P1–P8 C# source + `runtime/` TS + codegen + old sandbox
+  views), commit the empty slate, then rebuild it mechanically from the frozen specs.
+  **NO separate `Alis.Reactive.v1/` folder, NO swap, NO two trees coexisting** — a swap
+  was rejected because it entangles old and new until the cut is practically impossible.
+  The implementation is disposable; survivors of the delete are the **oracle** (1168
+  Playwright + 192 vitest), these specs, `archive-history/`, and the `.slnx`/CI plumbing.
+  **No backward-compatibility worry.** If the specs captured the facts, rebuild is mechanical.
 - **Runs AUTONOMOUSLY and works WITHOUT the owner's help.** Self-driving agents +
   process + airtight gates that *truly work*, not paper. The owner approves nothing
   mid-flight; the gates are the approval.

@@ -28,6 +28,8 @@ Non-blocking corrections (MAJOR/MINOR) are in §App-A (carried from the foundati
 
 Clean-break green-field rewrite to **1.0.0**. **DONE = 1.0.0 released**, all 14 decisions honored, the oracle green in a fresh clone.
 
+**Cutover model (owner-decided 2026-06-01): single tree, clean slate.** On `cleanbreakbutrc1`: `delete-all → commit → rebuild-all` — delete the entire framework implementation, commit the empty slate, rebuild mechanically from these specs. **NO separate `Alis.Reactive.v1/`, NO swap, NO two trees coexisting** (a swap was rejected: it entangles old+new until the cut is practically impossible). Survivors of the delete: the oracle (1168 Playwright + 192 vitest), these specs, `archive-history/`, the `.slnx`/CI plumbing. The one-page commit of this is `REWRITE-PLAN.md`.
+
 **Oracle (verified this session):** **1168** Playwright `[Test]` across **133** files + **192** vitest `it/test` across 28 files + typecheck + drift-check. Two tiers: (a) **FROZEN** user-visible behavior (DOM/text/focus/disabled/gather-body) — immutable; if it fails, the rewrite is wrong, never weaken it; (b) **UPDATABLE** plan-shape assertions — migrate OUT of Playwright INTO C# domain unit tests; they change only as documented wins (e.g. whole-payload kind, delivery-mode field).
 
 **Architecture rule:** DSL → Rich **public** Plan Domain → hand-authored `plan.ts` → dumb runtime executor. The runtime executes framework plans; it defends only true external boundaries (DOM lookup, browser API, network, malformed non-framework JSON). No preflight/rollback/fallback/registry/claims inside the generated graph.

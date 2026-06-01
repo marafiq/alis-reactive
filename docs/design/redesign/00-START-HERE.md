@@ -22,10 +22,12 @@
 > rewrite to **1.0.0 released** with **zero questions** to the owner. The owner is out of
 > the loop; the gates are the approval.
 
-**The one-sentence charter.** Rewrite Alis.Reactive **green-field, from scratch, in a NEW
-folder**, ship **1.0.0**, **lose zero features**, kill all the nonsense, keep only what is
-worth keeping. This is a **clean rewrite, not a refactor** — do not edit the old tree to
-evolve it; build the new one and prove it against the old as a differential oracle.
+**The one-sentence charter.** Rewrite Alis.Reactive **green-field, from scratch, in a
+**single clean-slate tree** (`delete-all → commit → rebuild-all` — NO second folder, NO
+`Alis.Reactive.v1/`, NO swap; owner-decided, see `REWRITE-PLAN.md`), ship **1.0.0**, **lose
+zero features**, kill all the nonsense, keep only what is worth keeping. This is a **clean
+rewrite, not a refactor** — do not evolve the old implementation; **delete it wholesale**,
+then rebuild against the frozen specs with the surviving test suite as the differential oracle.
 
 **The governing philosophy (memorize before reading anything else).** DESIGN-AND-PROVE-FIRST,
 CODE-LAST. Production code is the **last** phase and is **mechanical**. If code is hard to

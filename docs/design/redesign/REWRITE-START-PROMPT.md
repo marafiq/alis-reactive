@@ -13,6 +13,8 @@ You are continuing the **Alis.Reactive green-field rewrite to 1.0.0** — a clea
 ## Mission
 DSL → Rich **public** Plan Domain → **hand-authored `plan.ts`** (NO codegen) → **dumb** runtime executor. The C#→TS sync middle layer is REMOVED: no `PlanContractGenerator`, no `tools/PlanTypeGenerator`, no `generate:plan-types`; `plan.ts` is hand-authored under a strict linter and **drift-`--check`ed** (never regenerated). DONE = 1.0.0 released, all 14 decisions honored, the **1168 Playwright + 192 vitest** oracle green in a fresh clone. The guarantee of correctness is the GATES, not assertion.
 
+**Cutover = single tree, clean slate** (owner-decided): `delete-all → commit → rebuild-all` on `cleanbreakbutrc1` — NO `Alis.Reactive.v1/`, NO swap, NO coexisting trees (a swap entangles old+new until impossible). Survivors: the oracle, these specs, `archive-history/`, the `.slnx`/CI plumbing. **Read `REWRITE-PLAN.md` FIRST** — it is the one-page commit of the plan + this cutover.
+
 ## DO STEP 0 FIRST (source-verified BLOCKING defects — fix before AST/determinism)
 - **B1** `evaluate.ts` is 204 lines; fix the out-of-EOF citations in `04-matrix-http-arrays-values`/`05`/`06` (cited 287-300) to the real sites `188/199/203` (`08` already correct).
 - **B2** `ContractDriftGate.Check()` calls `PlanContractGenerator.Render()` — redesign G3: reflected **public-surface manifest** diffed against committed `plan.ts` + non-vacuity negative control; never `Render()`, never plan.ts-vs-itself.
