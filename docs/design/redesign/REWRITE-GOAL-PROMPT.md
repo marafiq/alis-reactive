@@ -707,8 +707,8 @@ work accountable with **zero false positives**.
 
 ## E. KEEP-vs-REWRITE + PROJECT / NAMESPACE / ENCAPSULATION MAP (decided up front)
 
-### The new-folder project layout (the structural prize)
-A separate green-field root with **one `.slnx`** and per-project boundaries chosen by
+### The project layout (the structural prize)
+The single clean-slate tree carries **one `.slnx`** and per-project boundaries chosen by
 **deployment + dependency layering** (NOT one-assembly-per-module — that balloons NuGet
 count and re-couples via friend access). ~8 projects:
 
