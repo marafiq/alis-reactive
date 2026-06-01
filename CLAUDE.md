@@ -308,10 +308,9 @@ npm test
 
 Runs vitest (jsdom) across both npm workspaces. Each workspace has its own
 `vitest.config.ts` — `Alis.Reactive.Assets` scans `runtime/__tests__/`,
-`Alis.Reactive.SandboxApp` scans `Scripts/__tests__/`.
-A branch with no such files (this branch has none) makes vitest print
-`No test files found` and exit non-zero — that is the empty-suite signal, not a
-failure in your code.
+`Alis.Reactive.SandboxApp` scans `Scripts/__tests__/`. A workspace whose test
+directory is empty or absent makes vitest print `No test files found` and exit
+non-zero — that is the empty-suite signal, not a failure in your code.
 
 **C# build gate — compile the DSL, plan model, generators, runtime host, and Playwright harness:**
 
@@ -391,8 +390,8 @@ dotnet pack Alis.Reactive/Alis.Reactive.csproj \
 
 ### Before every push
 
-1. **All tests pass** — vitest, all seven C# unit projects, and Playwright (see
-   Run the tests above). No exceptions.
+1. **All tests pass** — vitest, the `dotnet build` compile gate, and the Playwright
+   NUnit suite (see Run the tests above). No exceptions.
 2. **`git status` is clean** after a build. Every bundler output path is
    gitignored; tracked `wwwroot/` files are hand-written only
    (`disable-sf-animations.js`). A `dist/` or `wwwroot/` bundle showing in
