@@ -92,8 +92,9 @@ The existing artifacts you BUILD ON (do not recreate; extend):
 ## A. MISSION · DONE · FRAME
 
 ### Mission
-**Rewrite the Alis.Reactive framework green-field, from scratch, in a NEW FOLDER,
-and ship 1.0.0 — autonomously, with zero feature loss.**
+**Rewrite the Alis.Reactive framework green-field, from scratch, in a SINGLE
+CLEAN-SLATE TREE (`delete-all → commit → rebuild-all`; NO second folder, NO swap —
+see `REWRITE-PLAN.md`), and ship 1.0.0 — autonomously, with zero feature loss.**
 
 The framework is one data flow:
 
