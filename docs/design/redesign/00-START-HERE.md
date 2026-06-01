@@ -8,6 +8,13 @@
 > detail. Two known supersessions are flagged inline below: the **Slot↔Plan cycle** (§3) and the
 > **375 census** (§1/§5).
 
+> 📦 **Archived references.** On 2026-06-01 the RC1-era docs and the design-session scratch were moved to
+> `../../archive-history/` (`rc1-docs/` + `redesign-scratch/`) to leave this folder = the **54
+> rewrite-final docs only**. Any path in this corpus to `dogfood/`, `playground/`,
+> `governance-simulation.html`, `dsl-ast-tree.html`, `dsl-playground.html`, the `grammar-critique-*.md`
+> inputs, or an RC1 doc now resolves under there — the names are unchanged, only the prefix. Map +
+> rationale: `docs/archive-history/README.md`. Nothing archived is on the rewrite critical path.
+
 > You are a **fresh session with zero prior context.** This is the orientation map.
 > It is the map: which docs to read in what order, the execution sequence and its gates,
 > the module build order, what we KILL, and what we KEEP. Read this once top to bottom,

@@ -39,9 +39,9 @@ read more source.
 
 Before implementation, update the source-grounded design artifacts:
 
-- `docs/reactive-plan-source-blueprint.md` — actual DSL inputs and outputs.
-- `docs/reactive-plan-domain-language.md` — active domain vocabulary.
-- `docs/design/dsl-graph-coverage-matrix.md` — matrix coverage and proof links.
+- `docs/archive-history/rc1-docs/reactive-plan-source-blueprint.md` — actual DSL inputs and outputs.
+- `docs/archive-history/rc1-docs/reactive-plan-domain-language.md` — active domain vocabulary.
+- `docs/archive-history/rc1-docs/design/dsl-graph-coverage-matrix.md` — matrix coverage and proof links.
 
 Rich domain model means the smallest clear set of concepts that names real DSL
 behavior and removes confusion. It does not mean wrappers, registries, fallback
@@ -108,9 +108,9 @@ Layer 4  Browser Verification + Documentation
          Harness: sandbox-verified examples
 ```
 
-Detailed flows: `docs/reactive-plan-source-blueprint.md`,
-`docs/reactive-plan-domain-language.md`, `docs/design/dsl-graph-coverage-matrix.md`,
-and `docs/design/reactive-plan-domain-design.md`.
+Detailed flows: `docs/archive-history/rc1-docs/reactive-plan-source-blueprint.md`,
+`docs/archive-history/rc1-docs/reactive-plan-domain-language.md`, `docs/archive-history/rc1-docs/design/dsl-graph-coverage-matrix.md`,
+and `docs/archive-history/rc1-docs/design/reactive-plan-domain-design.md`.
 
 ## Plan-Driven IDs — No DOM Scanning
 
