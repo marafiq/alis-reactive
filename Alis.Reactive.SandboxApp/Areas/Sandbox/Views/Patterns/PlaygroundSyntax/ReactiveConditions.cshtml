@@ -26,11 +26,6 @@
         <native-heading level="H2">Form — Each control has its own .Reactive() pipeline</native-heading>
 
         <native-grid cols="C2" gap="Base" class="mb-4">
-
-            <!-- ── Status: Native dropdown with ElseIf branches ──
-                 "active"   → Amount=100, City="seattle", show success
-                 "inactive" → Amount=0,   hide address,   show warning
-                 else       → reset message, show address -->
             @{ Html.InputField(plan, m => m.Status, o => o.Required().Label("Status"))
                .NativeDropDown(b => b
                    .Items(statusItems)
@@ -67,10 +62,6 @@
                            });
                    })); }
 
-            <!-- ── Amount: Fusion NumericTextBox with ElseIf tier ladder ──
-                 >= 5000 → "High value order"
-                 >= 1000 → "Standard order"
-                 else    → "Small order" -->
             @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount"))
                .FusionNumericTextBox(b => b
                    .Min(0).Max(99999).Step(100)
@@ -102,14 +93,8 @@
                    })); }
         </native-grid>
 
-        <!-- Row 2: Address fields (nested) -->
         <div id="address-section" class="grid grid-cols-3 gap-4 mb-4">
 
-            <!-- ── City: Nested native dropdown with condition → auto-fill siblings ──
-                 "seattle"  → State=WA, PostalCode=98101
-                 "portland" → State=OR, PostalCode=97201
-                 "denver"   → State=CO, PostalCode=80201
-                 else       → clear both -->
             @{ Html.InputField(plan, m => m.Address!.City, o => o.Label("City"))
                .NativeDropDown(b => b
                    .Items(cityItems)
@@ -170,7 +155,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- What this proves -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">What this proves</native-heading>
@@ -185,7 +169,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Plan JSON -->
     <native-card>
     <native-card-body>
         <native-heading level="H2" spacing="Base">Plan JSON</native-heading>
