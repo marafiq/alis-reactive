@@ -1,7 +1,6 @@
 using System.Text;
 using System.Xml.Linq;
 
-// ── Configuration ──
 var config = args.Length > 0 ? args[0] : "Debug";
 var repoRoot = FindRepoRoot();
 var xmlFiles = new[]
@@ -12,7 +11,6 @@ var xmlFiles = new[]
 };
 var outputPath = Path.Combine(repoRoot, "docs-site/src/content/docs/reference/api-reference.md");
 
-// ── Parse all XML files ──
 var allMembers = new List<DocMember>();
 foreach (var xmlFile in xmlFiles)
 {
@@ -41,12 +39,10 @@ if (allMembers.Count == 0)
     return 1;
 }
 
-// ── Filter: skip internal constructors ──
 var publicMembers = allMembers
     .Where(m => !IsInternal(m))
     .ToList();
 
-// ── Group by namespace → type ──
 var types = publicMembers
     .Where(m => m.Kind == MemberKind.Type)
     .OrderBy(m => m.Namespace)
@@ -58,7 +54,6 @@ var membersByType = publicMembers
     .GroupBy(m => m.FullTypeName)
     .ToDictionary(g => g.Key, g => g.OrderBy(m => m.MemberName).ToList());
 
-// ── Generate markdown ──
 var sb = new StringBuilder();
 sb.AppendLine("---");
 sb.AppendLine("title: API Reference");
@@ -74,7 +69,6 @@ sb.AppendLine("Complete public API for Alis.Reactive. Auto-generated from XML do
 sb.AppendLine("For usage and examples, see the [Grammar Tree](../../csharp-modules/mental-model/#the-grammar-tree) and the [Reactivity](../../csharp-modules/reactivity/triggers-and-reactions/) pages.");
 sb.AppendLine();
 
-// Group types by assembly for top-level sections
 var byAssembly = types.GroupBy(t => t.Assembly).OrderBy(g => g.Key);
 foreach (var assemblyGroup in byAssembly)
 {
@@ -132,7 +126,6 @@ foreach (var assemblyGroup in byAssembly)
     }
 }
 
-// ── Write output ──
 var outputDir = Path.GetDirectoryName(outputPath)!;
 Directory.CreateDirectory(outputDir);
 File.WriteAllText(outputPath, sb.ToString());
@@ -143,10 +136,6 @@ Console.WriteLine($"  Members: {publicMembers.Count - types.Count}");
 Console.WriteLine($"  From: {xmlFiles.Length} XML files");
 
 return 0;
-
-// ══════════════════════════════════════════════════════
-// Helper methods
-// ══════════════════════════════════════════════════════
 
 static string FindRepoRoot()
 {
@@ -259,10 +248,6 @@ static string CleanGenericNotation(string name)
     if (idx >= 0) return $"{name[..idx]}<T>";
     return name;
 }
-
-// ══════════════════════════════════════════════════════
-// Types
-// ══════════════════════════════════════════════════════
 
 enum MemberKind { Type, Method, Property, Field, Event }
 
