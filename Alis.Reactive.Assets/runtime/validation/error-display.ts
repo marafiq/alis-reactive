@@ -1,16 +1,10 @@
-// Error Display — Single responsibility: DOM error manipulation
-// V3: uses component IDs directly (not ValidationField objects).
-// Error spans found by predictable ID: {componentDomId}_error (O(1) lookup).
-// Summary found by predictable ID: {planId_sanitized}_validation_summary.
-// Summary entries are matched by dataset value, not CSS selector interpolation.
+// Validation error UI is generated HTML, not plan components. These helpers use
+// predictable DOM IDs and dataset values instead of component lookup or selectors.
 
 const ERR_CLASS = "alis-has-error";
 
-// -- Inline errors (next to visible fields) --
-
+// Inline helpers receive pre-resolved DOM IDs (comp.id), not component keys.
 export function showInline(componentDomId: string, message: string): void {
-  // componentDomId is a pre-resolved DOM ID (comp.id), not a component key.
-  // Callers resolve via the shared resolver before calling this function.
   const el = document.getElementById(componentDomId);
   if (el) el.classList.add(ERR_CLASS);
 
@@ -29,12 +23,9 @@ export function clearInline(componentDomId: string): void {
     span.setAttribute("hidden", "");
     span.style.display = "none";
   }
-  // componentDomId is a pre-resolved DOM ID (comp.id), not a component key.
   const el = document.getElementById(componentDomId);
   if (el) el.classList.remove(ERR_CLASS);
 }
-
-// -- Summary errors --
 
 export function addToSummary(summaryEl: HTMLElement, name: string, message: string): void {
   const item = document.createElement("div");
@@ -71,15 +62,11 @@ export function findSummaryElement(planId: string): HTMLElement | null {
   return document.getElementById(summaryId);
 }
 
-// -- Server error inline display --
-
 export function showServerErrorInline(
   componentDomId: string,
   message: string,
   element?: HTMLElement,
 ): void {
-  // Error spans are generated HTML ({componentDomId}_error), NOT plan components.
-  // getElementById is correct here — see findErrorSpan.
   const span = findErrorSpan(componentDomId);
   if (span) {
     span.textContent = message;
@@ -90,10 +77,8 @@ export function showServerErrorInline(
   element?.classList.add(ERR_CLASS);
 }
 
-// -- Error span lookup -- ID only, no scanning --
 // Error spans ({componentDomId}_error) are generated HTML from Html.Field(),
 // NOT plan components. getElementById is correct here.
-
 function findErrorSpan(componentDomId: string): HTMLElement | null {
   return document.getElementById(componentDomId + "_error");
 }
