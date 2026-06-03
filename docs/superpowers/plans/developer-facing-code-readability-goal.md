@@ -382,12 +382,6 @@ Review cycle before every commit:
   visibility in a readability-only pass. A later API-visibility slice should
   verify external compatibility and whether the shared descriptor base should
   stay public or be removed from the public inheritance model.
-- TODO: `Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs`: public gather
-  XML docs still mix useful request-boundary notes with decorative route/query
-  banners and repeated "This builder for chaining" return text. A later
-  request-gather API-doc slice should remove the banners and rewrite only the
-  member docs that clarify payload, header, route, URL, event, component, and
-  plugin value-source contracts.
 
 ## Out Of Scope For The First Slice
 
