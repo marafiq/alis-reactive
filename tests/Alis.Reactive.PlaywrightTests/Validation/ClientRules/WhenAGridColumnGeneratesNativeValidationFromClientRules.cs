@@ -7,10 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Alis.Reactive.PlaywrightTests.Validation.ClientRules;
 
 /// <summary>
-/// The grid column validation emitter translates the SAME <c>ReactiveValidator</c>
-/// client metadata into an EJ2 <c>column.validationRules</c> object. Single-field rules
-/// with an EJ2 equivalent are emitted with their FluentValidation messages; conditional,
-/// cross-field, and exotic rules carry no EJ2 equivalent and stay server-authoritative.
+/// Grid column validation reuses <c>ReactiveValidator</c> client metadata to build
+/// EJ2 <c>column.validationRules</c>. Single-field rules with an EJ2 equivalent keep
+/// their FluentValidation messages; conditional, cross-field, and unsupported rules
+/// stay server-authoritative.
 /// </summary>
 [TestFixture]
 public class WhenAGridColumnGeneratesNativeValidationFromClientRules
