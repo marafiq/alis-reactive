@@ -176,16 +176,13 @@ public class WhenDateRangeSelected : PlaywrightTestBase
         var btn = Page.Locator("#check-stay-btn");
         var warning = Page.Locator("#stay-warning");
 
-        // Step 1: no range selected — check — "stay period is required"
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("stay period is required", new() { Timeout = 3000 });
 
-        // Step 2: set a stay period — click check — "stay period set"
         await StayStart.SelectRange(2026, 9, 1, 2026, 9, 30);
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("stay period set", new() { Timeout = 3000 });
 
-        // Step 3: clear the stay period — click check — "stay period is required" again
         await StayStart.Clear();
         await StayStart.Blur();
         await btn.ClickAsync();

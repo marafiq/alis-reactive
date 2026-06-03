@@ -196,18 +196,15 @@ public class WhenRichTextEdited : PlaywrightTestBase
         var btn = Page.Locator("#check-careplan-btn");
         var warning = Page.Locator("#careplan-warning");
 
-        // Step 1: clear the DomReady-set value, then check — "care plan is required"
         await CarePlan.Clear();
         await CarePlan.Blur();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("care plan is required", new() { Timeout = 3000 });
 
-        // Step 2: set a care plan — click check — "care plan set"
         await CarePlan.FillAndBlur("Medication review scheduled");
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("care plan set", new() { Timeout = 3000 });
 
-        // Step 3: clear the care plan — click check — "care plan is required" again
         await CarePlan.Clear();
         await CarePlan.Blur();
         await btn.ClickAsync();

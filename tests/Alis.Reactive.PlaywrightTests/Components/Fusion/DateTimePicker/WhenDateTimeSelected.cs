@@ -199,18 +199,15 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         var btn = Page.Locator("#check-medication-btn");
         var warning = Page.Locator("#medication-warning");
 
-        // Step 1: clear the DomReady-set value, then check — "medication time is required"
         await MedicationTime.Clear();
         await MedicationTime.Blur();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("medication time is required", new() { Timeout = 3000 });
 
-        // Step 2: set a medication time — click check — "medication time set"
         await MedicationTime.Select(2026, 9, 15, "10:00 AM");
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("medication time set", new() { Timeout = 3000 });
 
-        // Step 3: clear the medication time — click check — "medication time is required" again
         await MedicationTime.Clear();
         await MedicationTime.Blur();
         await btn.ClickAsync();

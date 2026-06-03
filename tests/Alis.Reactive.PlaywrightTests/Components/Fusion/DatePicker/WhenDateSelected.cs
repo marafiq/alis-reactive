@@ -199,16 +199,13 @@ public class WhenDateSelected : PlaywrightTestBase
         var btn = Page.Locator("#check-discharge-btn");
         var warning = Page.Locator("#discharge-warning");
 
-        // Step 1: discharge date is empty — click check → "discharge date is required"
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("discharge date is required", new() { Timeout = 3000 });
 
-        // Step 2: set a discharge date — click check → "discharge date set"
         await DischargeDate.SelectDate(2026, 9, 15);
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("discharge date set", new() { Timeout = 3000 });
 
-        // Step 3: clear the discharge date — click check → "discharge date is required" again
         await DischargeDate.Clear();
         await DischargeDate.Blur();
         await btn.ClickAsync();

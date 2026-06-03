@@ -200,18 +200,15 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         var btn = Page.Locator("#check-phone-btn");
         var warning = Page.Locator("#phone-warning");
 
-        // Step 1: clear the DomReady-set value, then check — "phone number is required"
         await PhoneNumber.Clear();
         await PhoneNumber.Blur();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("phone number is required", new() { Timeout = 3000 });
 
-        // Step 2: type a phone number — click check — "phone number set"
         await PhoneNumber.FillAndBlur("5551234567");
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("phone number set", new() { Timeout = 3000 });
 
-        // Step 3: clear the phone number — click check — "phone number is required" again
         await PhoneNumber.Clear();
         await PhoneNumber.Blur();
         await btn.ClickAsync();
