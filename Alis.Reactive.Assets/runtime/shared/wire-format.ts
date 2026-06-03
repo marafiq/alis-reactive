@@ -1,10 +1,7 @@
-// wire-format.ts — Shape-aware wire formatting for HTTP transport.
-// Date timestamps → ISO strings. Shared by gather, headers, route params.
-
 import type { Shape } from "../types/index";
 import { RuntimeShape } from "../browser-objects/runtime-shape";
 
-/** Shape-aware wire formatting. Date timestamps -> ISO strings for HTTP transport. */
+/** Formats values for HTTP transport according to their declared shape. */
 export function formatForWire(value: unknown, shape: Shape): unknown {
   return RuntimeShape.from(shape).formatForWire(value);
 }

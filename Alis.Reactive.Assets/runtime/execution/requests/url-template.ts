@@ -1,6 +1,3 @@
-// url-template.ts — URL template parameter resolution.
-// Pure function: resolves {param} placeholders using resolved route values.
-
 const ROUTE_PARAM_RE = /\{(\w+)\}/g;
 
 /** Resolve {param} placeholders in a URL template using resolved route values. */
