@@ -1,12 +1,6 @@
-// shared/shape-convert.ts - Shape-based value conversion.
-//
-// Shape is the foundational type contract. This module is the SINGLE place
-// where Shape → value conversion happens. Every module that needs type
-// conversion calls applyShape(). No other conversion path exists.
-//
-// Contract: conversion functions return ConvertResult<T> — never throw.
-// Ok(value) for meaningful conversions. Err(message) for type mismatches.
-// applyShape() is the main entry point — returns converted value or original on failure.
+// Shape conversion is centralized here so conditions, validation, gather, and
+// execution all coerce values through the same runtime boundary. ConvertResult
+// reports type mismatches without throwing.
 
 import type { Shape } from "../types/index";
 
@@ -17,10 +11,7 @@ function ok<T>(value: T): ConvertResult<T> { return { ok: true, value }; }
 function err<T>(error: string): ConvertResult<T> { return { ok: false, error }; }
 function isMissingInput(value: unknown): boolean { return value === null || value === undefined; }
 
-/**
- * Apply a Shape to a raw value. This is the ONE entry point for Shape conversion.
- * Every module calls this — conditions, validation, gather, execution.
- */
+/** Applies a Shape and returns the original value when conversion fails. */
 export function applyShape(value: unknown, shape: Shape): unknown {
   switch (shape.kind) {
     case "string":   return applyScalar(value, toString);
@@ -40,18 +31,16 @@ export function applyShape(value: unknown, shape: Shape): unknown {
   }
 }
 
-/** Apply a scalar conversion, returning original value on failure. */
 function applyScalar<T>(value: unknown, convert: (v: unknown) => ConvertResult<T>): unknown {
-  const r = convert(value);
-  if (r.ok) return r.value;
+  const conversion = convert(value);
+  if (conversion.ok) return conversion.value;
   return value;
 }
 
-/** Apply array shape — convert to array, then recursively apply item shape. */
 function applyArrayShape(value: unknown, shape: Extract<Shape, { kind: "array" }>): unknown {
-  const r = toArray(value);
-  if (!r.ok) return value;
-  return applyArrayItemShape(r.value, shape);
+  const conversion = toArray(value);
+  if (!conversion.ok) return value;
+  return applyArrayItemShape(conversion.value, shape);
 }
 
 function applyNullableShape(value: unknown, inner: Shape): unknown {
@@ -70,9 +59,7 @@ function applyObjectShape(value: unknown, shape: Extract<Shape, { kind: "object"
   return applyObjectFields(record.value, shape);
 }
 
-/**
- * Convert a value according to a Shape. Returns Result — never throws.
- */
+/** Converts a value according to a Shape and returns the conversion result. */
 export function convertByShape(value: unknown, shape: Shape): ConvertResult<unknown> {
   switch (shape.kind) {
     case "string":   return toString(value);
@@ -92,11 +79,10 @@ export function convertByShape(value: unknown, shape: Shape): ConvertResult<unkn
   }
 }
 
-/** Convert array shape — convert to array, then recursively apply item shape. */
 function convertArrayShape(value: unknown, shape: Extract<Shape, { kind: "array" }>): ConvertResult<unknown> {
-  const r = toArray(value);
-  if (!r.ok) return r;
-  return ok(applyArrayItemShape(r.value, shape));
+  const conversion = toArray(value);
+  if (!conversion.ok) return conversion;
+  return ok(applyArrayItemShape(conversion.value, shape));
 }
 
 function convertObjectShape(value: unknown, shape: Extract<Shape, { kind: "object" }>): ConvertResult<unknown> {
@@ -125,8 +111,6 @@ function applyObjectFields(
   }
   return output;
 }
-
-// ── Conversion functions ──────────────────────────────────
 
 export function toString(value: unknown): ConvertResult<string> {
   if (isMissingInput(value)) return ok("");
