@@ -1,5 +1,5 @@
-// sandbox-plugins.ts — Plugin instances for sandbox testing.
-// Bundled separately. Loaded before alis-reactive.js.
+// Sandbox plugins enqueue before runtime boot so root.ts can register them
+// before plan execution starts.
 
 interface BrowserPluginEntry {
   readonly name: string;

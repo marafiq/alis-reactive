@@ -1,6 +1,5 @@
-// root.ts — ESM entry point for alis-reactive runtime
-// esbuild bundles from here. Auto-discovers [data-reactive-plan] elements on page load.
-// V3: plans have version, planId, types, components, behaviors.
+// Runtime boot waits for DOM readiness, drains queued browser plugins, then
+// boots discovered [data-reactive-plan] scripts.
 
 import { boot, trace } from "./lifecycle/boot";
 import { init as initConfirm } from "./components/fusion/confirm";
@@ -44,7 +43,6 @@ function startRuntime(): void {
 }
 
 function drainPluginQueue(): void {
-  // Plugins push here from separate bundles before the framework starts.
   const pluginQueue = window as PluginQueueWindow;
   const pendingPlugins = pluginQueue.__alisPlugins;
   if (pendingPlugins === undefined) return;
