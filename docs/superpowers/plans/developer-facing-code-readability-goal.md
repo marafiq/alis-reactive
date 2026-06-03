@@ -71,11 +71,12 @@ Delete comments when they only:
 
 - Narrate the next line of code.
 - Repeat the method, parameter, locator, or assertion name.
-- Act as decorative section banners where the test name or helper name already
-  carries the behavior.
+- Act as decorative section banners where the test name already carries the
+  behavior.
 - Preserve stale vocabulary that no longer matches the DSL graph or domain
   terms.
-- Hide unclear test flow that should be expressed through helper methods.
+- Try to compensate for unclear test flow that should instead be fixed through
+  better names, tighter ordering, or a follow-up note.
 - Provide long examples better suited for docs, sandbox pages, or focused
   examples.
 - Strip standard XML documentation elements from public DSL members only because
@@ -87,22 +88,28 @@ Delete comments when they only:
 
 ### When To Replace Comments With Helper Methods
 
-Replace comments with helper methods when the comment describes a repeated
-developer action or behavior step, for example:
+In Playwright tests, helper extraction is the exception. Indirection is a
+readability cost unless the helper names a genuinely reusable operation that a
+framework developer should not have to re-parse in every test.
+
+Replace comments with helper methods only when the comment describes a repeated
+developer action or behavior step and the inline mechanics are already
+secondary to the behavior, for example:
 
 - "click active and expect the badge to show"
 - "select country and wait for cities"
 - "submit first, fix field, submit again"
 - "open Syncfusion popup and choose item"
 
-The helper name should describe the behavior under test, not the mechanics of
+The helper name should describe the reusable behavior, not the mechanics of
 Playwright. Prefer names such as `SelectCountryAndWaitForCities`,
-`AssertGradeBranch`, `AssertTrialBadgeVisible`, or `ConfirmDialogOk` over
-comments that sit above raw locator calls.
+`AssertGradeBranch`, `AssertTrialBadgeVisible`, or `ConfirmDialogOk` only when
+the helper removes repeated noise without hiding the proof.
 
-Do not extract a helper if it would hide the one assertion that makes the test
-valuable. Helper extraction should make the behavior easier to scan, not bury
-the proof.
+Do not extract a helper for a one-off sequence, a straightforward action plus
+assertion, or a comment-only cleanup. Do not extract a helper if it would hide
+the assertion that makes the test valuable. Keep the test body inline when the
+reader benefits from seeing the action and proof in one place.
 
 ### When To Stop And Write A Follow-Up Note
 
@@ -250,8 +257,9 @@ Allowed changes:
 - Rename local variables, private helper parameters, and test helper names when
   the new name makes the behavior easier to follow and does not change public
   API, generated plan JSON, routes, selectors, test names, or runtime contract.
-- Extract very small private helpers only when a repeated comment is currently
-  carrying the behavior name.
+- Extract very small private helpers only when repeated mechanics are making
+  multiple tests harder to read and the helper name captures a reusable
+  behavior, not just a wrapper around obvious Playwright calls.
 
 Disallowed changes:
 
@@ -281,8 +289,8 @@ Initial broad inventory on this branch:
 Expanded commit boundaries:
 
 1. Playwright tests: one behavior area per commit, verified with the matching
-   `scripts/playwright.sh --filter ...` only when helper extraction, selectors,
-   assertions, timing, or test flow changes. Pure comment removal does not
+   `scripts/playwright.sh --filter ...` only when selectors, assertions,
+   timing, helper extraction, or test flow changes. Pure comment removal does not
    warrant e2e; `git diff --check` is enough, with a build only if syntax or XML
    documentation could be affected.
 2. Public C# XML docs: one API/component family per commit, verified with
@@ -325,7 +333,8 @@ Review cycle before every commit:
 1. Confirm the branch is still `tiny-safe-but-important-refactorings`.
 2. Read the DSL source files listed for the selected slice.
 3. Inventory comments in the chosen test file.
-4. Classify each comment as keep, delete, rewrite, or replace with helper.
+4. Classify each comment as keep, delete, rewrite, or follow-up. Only classify
+   as helper-worthy when repeated mechanics are the actual readability problem.
 5. Apply the smallest useful cleanup.
 6. Run verification that matches the actual edit: diff hygiene for comment-only
    cleanup, scoped build/typecheck for syntax/XML/TS edits, and focused
@@ -333,8 +342,7 @@ Review cycle before every commit:
    runtime changes.
 7. Do not run e2e for pure comment removal.
 8. Commit one logical readability slice.
-9. Report which comments were kept, removed, rewritten, or replaced by helper
-   names.
+9. Report which comments were kept, removed, rewritten, or deferred.
 10. Add deferred concerns to a follow-up note instead of expanding the cleanup.
 
 ## Deferred Follow-Up Notes
