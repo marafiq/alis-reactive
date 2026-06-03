@@ -1,6 +1,5 @@
-// applied-plans.ts — composition state for all applied plans: boot snapshots,
-// loaded partial slots, per-slot AbortController. Active plans recompose from
-// the boot snapshot plus currently-loaded slots; the boot snapshot is immutable.
+// Applied plan state owns boot snapshots, loaded partial slots, and per-slot AbortControllers.
+// Active plans recompose from the boot snapshot plus currently loaded slots; the boot snapshot is immutable.
 
 import type { PlanDocument, Behavior } from "../types/index";
 import { MergePolicy, emptyPlan, snapshotPlan } from "./merge-policy";

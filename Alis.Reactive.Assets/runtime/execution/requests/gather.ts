@@ -1,5 +1,5 @@
-// gather.ts — Resolve gathered request input using the shared ValueExpression concept.
-// Every payload assignment is evaluated by evaluateValue(); runtime selected
+// Request input gathering uses the same ValueExpression resolver as execution.
+// Every payload assignment is evaluated by evaluateValue; runtime selected
 // registered inputs use the same writer path after reading their component value member.
 
 import type { PlanDocument, GatherRequestInput, RequestInputAssignment, HttpMethod, RequestInput } from "../../types/index";

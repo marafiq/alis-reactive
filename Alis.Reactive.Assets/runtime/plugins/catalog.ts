@@ -1,4 +1,3 @@
-// plugin-catalog.ts — Browser plugin instance storage.
 // Plugins are an explicit bridge for browser functions that are outside the
 // deterministic plan DSL. The plan still declares the callable contract; this
 // catalog only owns the browser-provided implementation objects.

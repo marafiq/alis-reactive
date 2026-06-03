@@ -1,5 +1,5 @@
-// Boot wires behaviors and validation for active PlanDocuments; composition
-// state for boot snapshots and partial slots stays in applied-plans.ts.
+// Boot wires behaviors and validation for active PlanDocuments.
+// Boot snapshots and partial-slot composition stay in applied plan state.
 
 import type { PlanDocument, Behavior } from "../types/index";
 import { setLevel } from "../diagnostics/trace";

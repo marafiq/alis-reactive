@@ -1,6 +1,5 @@
-// merge-policy.ts — the ONE replace-vs-append rule shared by C# container merge
-// and TS recompose. Type contracts merge; components replace-by-key with the
-// boot/slot join rules; behaviors append in order.
+// Replace-vs-append rules are shared by C# container merge and TS recompose.
+// Type contracts merge; components replace by key using boot/slot join rules; behaviors append in order.
 
 import type { PlanDocument } from "../types/index";
 import { mergeBootComponent, mergeSlotComponent } from "./component-merge";

@@ -1,5 +1,4 @@
-// http.ts - HTTP request execution using RequestPlan.
-// Uses the shared value/gather/runtime concepts and keeps HTTP async isolated.
+// HTTP request execution keeps gather, response routing, and chaining in the async lane.
 
 import type { RequestPlan, ResponseRoute, PlanDocument, ExecContext, ReactionGraph } from "../../types/index";
 import { resolveRequestInput, type ResolvedRequestInput } from "./gather";
