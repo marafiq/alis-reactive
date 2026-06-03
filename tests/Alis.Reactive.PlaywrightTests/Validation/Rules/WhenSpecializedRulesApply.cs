@@ -2,10 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
 
-/// <summary>
-/// BDD Playwright tests for /Sandbox/Validation/SpecializedRules — exercises every new validation
-/// rule type end-to-end in the browser. Senior living domain scenarios.
-/// </summary>
 [TestFixture]
 public class WhenSpecializedRulesApply : PlaywrightTestBase
 {
@@ -16,8 +12,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
     private ILocator Result => Page.Locator("#new-rules-result");
     private ILocator Input(string prop) => Page.Locator($"#{R}{prop}");
     private ILocator ErrorFor(string prop) => Page.Locator($"#{R}{prop}_error");
-
-    // ── creditCard ───────────────────────────────────────────
 
     [Test]
     public async Task when_billing_enters_invalid_card_number_error_shows()
@@ -38,12 +32,10 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // First trigger error
         await Input("CardNumber").FillAsync("1234567890123");
         await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("CardNumber")).ToContainTextAsync("not valid", new() { Timeout = 2000 });
 
-        // Fix with valid Visa test number, blur to live-clear
         await Input("CardNumber").FillAsync("4111111111111111");
         await Input("CardNumber").BlurAsync();
 
@@ -51,15 +43,12 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── exclusiveRange ───────────────────────────────────────
-
     [Test]
     public async Task when_nurse_enters_score_at_boundary_exclusive_range_error_shows()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Score at exact boundary (0) — exclusive range rejects boundaries
         await Input("Score").FillAsync("0");
         await ClickWhenStable(ValidateBtn);
 
@@ -86,20 +75,16 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Trigger error first
         await Input("Score").FillAsync("0");
         await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("Score")).ToContainTextAsync("exclusive", new() { Timeout = 2000 });
 
-        // Fix
         await Input("Score").FillAsync("50");
         await Input("Score").BlurAsync();
 
         await Expect(ErrorFor("Score")).ToBeHiddenAsync(new() { Timeout = 2000 });
         AssertNoConsoleErrors();
     }
-
-    // ── gt (greater than, implies required) ──────────────────
 
     [Test]
     public async Task when_monthly_rate_is_zero_gt_error_shows()
@@ -120,7 +105,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Leave empty — gt implies required
         await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("MonthlyRate")).ToContainTextAsync("greater than zero", new() { Timeout = 2000 });
@@ -143,8 +127,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Expect(ErrorFor("MonthlyRate")).ToBeHiddenAsync(new() { Timeout = 2000 });
         AssertNoConsoleErrors();
     }
-
-    // ── lt (less than) ───────────────────────────────────────
 
     [Test]
     public async Task when_deposit_equals_limit_lt_error_shows()
@@ -176,8 +158,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── notEqual (fixed value) ───────────────────────────────
-
     [Test]
     public async Task when_admin_sets_status_to_deleted_notEqual_error_shows()
     {
@@ -207,8 +187,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Expect(ErrorFor("Status")).ToBeHiddenAsync(new() { Timeout = 2000 });
         AssertNoConsoleErrors();
     }
-
-    // ── notEqualTo (cross-property) ──────────────────────────
 
     [Test]
     public async Task when_alternate_email_matches_primary_notEqualTo_error_shows()
@@ -242,8 +220,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── url ──────────────────────────────────────────────────
-
     [Test]
     public async Task when_facility_website_is_not_a_url_error_shows()
     {
@@ -274,8 +250,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── empty ────────────────────────────────────────────────
-
     [Test]
     public async Task when_nickname_field_has_value_empty_rule_error_shows()
     {
@@ -305,8 +279,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Expect(ErrorFor("Nickname")).ToBeHiddenAsync(new() { Timeout = 2000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Full valid form ──────────────────────────────────────
 
     [Test]
     public async Task when_all_fields_are_valid_form_passes()
