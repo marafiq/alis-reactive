@@ -1,5 +1,5 @@
-// native-action-link.ts — Click handler for <a data-reactive-link> elements.
-// Uses PlanDocument + ReactionGraph types for V3 plan-driven navigation.
+// Delegated handler for NativeActionLink anchors. The serialized reaction has
+// one request with an empty URL; the clicked href supplies the runtime URL.
 
 import { executeReaction } from "../../execution/reactions/execute";
 import { scope } from "../../diagnostics/trace";

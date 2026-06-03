@@ -1,10 +1,7 @@
-// loader.ts — self-initializing side-effect module
-// Handles target positioning, timeout auto-hide, and cleanup.
-// PlanDocument-driven show/hide uses existing native set reactions (AddClass/RemoveClass).
-//
-// All getElementById calls use hardcoded Layout singleton IDs ("alis-loader", etc.).
-// These are app-level infrastructure rendered by @Html.NativeLoader() — NOT plan components.
-export {}; // Module marker — prevents TS global-scope collisions
+// Native loader markup is a layout singleton rendered by @Html.NativeLoader().
+// This side-effect module uses its well-known DOM IDs directly; DSL show/hide
+// calls still target the IAppLevelComponent through native set reactions.
+export {};
 
 function handleVisible(loader: HTMLElement): void {
   const targetId = loader.dataset.target;

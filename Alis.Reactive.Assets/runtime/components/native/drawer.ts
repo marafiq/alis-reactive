@@ -1,10 +1,7 @@
-// drawer.ts — self-initializing side-effect module
-// Wires close button, Escape key, and transition cleanup.
-// PlanDocument-driven open/close uses existing native set reactions (AddClass/RemoveClass).
-//
-// All getElementById calls use hardcoded Layout singleton IDs ("alis-drawer", etc.).
-// These are app-level infrastructure rendered by @Html.NativeDrawer() — NOT plan components.
-export {}; // Module marker — prevents TS global-scope collisions
+// Native drawer markup is a layout singleton rendered by @Html.NativeDrawer().
+// This side-effect module uses its well-known DOM IDs directly; DSL open/close
+// calls still target the IAppLevelComponent through native set reactions.
+export {};
 
 function close(container: HTMLElement): void {
   container.classList.remove("alis-drawer--visible");
