@@ -27,9 +27,7 @@ describe("element scope", () => {
     const inner = outer.withElement({ id: "inner" });
 
     expect(inner.resolvePayload(elementSource)).toEqual({ id: "inner" });
-    // Immutable: pushing inner did not mutate outer.
     expect(outer.resolvePayload(elementSource)).toEqual({ id: "outer" });
-    // No element pushed yet -> undefined, not a throw.
     expect(base.resolvePayload(elementSource)).toBeUndefined();
   });
 

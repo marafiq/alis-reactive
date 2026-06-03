@@ -82,7 +82,7 @@ describe("array-op ops over an object array (element-member props)", () => {
       projection: memberRead("age", numberShape), itemShape: rawShape, shape: { kind: "array", item: rawShape },
     };
     const ordered = evaluateValue(node, plan()) as Array<{ name: string }>;
-    expect(ordered.map(r => r.name)).toEqual(["C", "A", "B"]); // 10, 30, missing-last
+    expect(ordered.map(r => r.name)).toEqual(["C", "A", "B"]);
   });
 
   it("orderBy is stable for equal keys (preserves input order)", () => {
@@ -149,8 +149,8 @@ describe("array-op ops over an object array (element-member props)", () => {
       itemShape: rawShape,
       shape: numberShape,
     };
-    // Ada(120) + Cy(200) = 320
-    expect(evaluateValue(node, plan())).toBe(320);
+    const activeBalanceTotal = evaluateValue(node, plan());
+    expect(activeBalanceTotal).toBe(320);
   });
 });
 
