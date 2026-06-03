@@ -6,10 +6,10 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed mutations and value reading for <see cref="FusionInPlaceEditor"/> in a reactive pipeline.
+    /// Reactive pipeline extensions for reading and mutating <see cref="FusionInPlaceEditor"/>.
     /// </summary>
     /// <remarks>
-    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// Use these from a <see cref="ComponentRef{TComponent, TModel}"/> resolved by the pipeline:
     /// <c>p.Component&lt;FusionInPlaceEditor&gt;(m =&gt; m.DateOfBirth).Save()</c>.
     /// </remarks>
     public static class FusionInPlaceEditorExtensions
@@ -33,9 +33,7 @@ namespace Alis.Reactive.Fusion.Components
         /// Writes to Syncfusion's <c>value</c> property. Updates the displayed text immediately
         /// without firing <c>change</c>.
         /// </remarks>
-        /// <param name="self">The component reference for the target editor.</param>
         /// <param name="value">The value to commit, or <see langword="null"/> to clear.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionInPlaceEditor, TModel> SetValue<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string? value)
             where TModel : class
@@ -46,7 +44,6 @@ namespace Alis.Reactive.Fusion.Components
         /// Calls Syncfusion's <c>disable(false)</c> method. A plain write to <c>disabled</c> does
         /// not apply the <c>.e-disable</c> CSS class that suppresses clicks.
         /// </remarks>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionInPlaceEditor, TModel> Enable<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
@@ -54,7 +51,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Disables the editor, blocking edit-mode entry.</summary>
         /// <remarks>Calls Syncfusion's <c>disable(true)</c> method. Applies the <c>.e-disable</c> CSS class.</remarks>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionInPlaceEditor, TModel> Disable<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
@@ -65,7 +61,6 @@ namespace Alis.Reactive.Fusion.Components
         /// Calls Syncfusion's <c>save()</c> method. Fires <c>beginEdit → change → endEdit → actionBegin → actionSuccess</c>.
         /// Does not fire <c>submitClick</c>, which is user-gesture only.
         /// </remarks>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionInPlaceEditor, TModel> Save<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
@@ -73,7 +68,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Moves focus into the inner editor input.</summary>
         /// <remarks>Calls Syncfusion's <c>setFocus()</c> method.</remarks>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionInPlaceEditor, TModel> Focus<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
@@ -87,9 +81,7 @@ namespace Alis.Reactive.Fusion.Components
         /// cycles; typical use is a visual commit signal (e.g. a CSS <c>::after</c> check mark)
         /// wired on <c>ActionSuccess</c> and removed on <c>BeginEdit</c>.
         /// </remarks>
-        /// <param name="self">The component reference for the target editor.</param>
         /// <param name="className">The class name to add.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionInPlaceEditor, TModel> AddClass<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string className)
             where TModel : class
@@ -97,9 +89,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Removes a CSS class from the editor's outer wrapper.</summary>
         /// <remarks>Emits a call on Syncfusion's <c>element.classList.remove</c>.</remarks>
-        /// <param name="self">The component reference for the target editor.</param>
         /// <param name="className">The class name to remove.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionInPlaceEditor, TModel> RemoveClass<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string className)
             where TModel : class
