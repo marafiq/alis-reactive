@@ -1,32 +1,14 @@
-// ExecContext — carries execution-scoped data through the reaction tree.
-// Each payload scope maps to a concrete runtime value.
+// Runtime values addressable by PayloadSource.scope while a reaction executes.
 
 export interface ExecContext {
-  /**
-   * Event payload — the triggering data for this reaction.
-   * Sources: component event args, custom event detail, SSE/SignalR message, OR dispatch data.
-   * Resolved by PayloadSource with scope "event" or "dispatch".
-   */
+  /** Trigger payload: component event args, CustomEvent detail, SSE/SignalR, or dispatch data. */
   readonly event?: unknown;
-  /**
-   * HTTP response body — set by HTTP response routing on success or error.
-   * Resolved by PayloadSource with scope "success" or "error".
-   */
+  /** HTTP response body exposed to success and error response routes. */
   readonly response?: unknown;
-  /**
-   * Outgoing request payload — the resolved request input before HTTP fetch.
-   * Resolved by PayloadSource with scope "request".
-   */
+  /** Resolved outgoing request input before fetch. */
   readonly request?: unknown;
-  /**
-   * Local scratch data for intermediate computation.
-   * Resolved by PayloadSource with scope "local". Not currently used.
-   */
+  /** Local payload object used by reactions that target PayloadSource scope "local". */
   readonly local?: Record<string, unknown>;
-  /**
-   * Element scope stack for array operations — the innermost (top) entry is the
-   * current element under iteration. Grown by ExecutionContext.withElement(item).
-   * Resolved by PayloadSource with scope "element" (reads top of stack).
-   */
+  /** Array-operation stack; the last item is PayloadSource scope "element". */
   readonly element?: readonly unknown[];
 }
