@@ -5,9 +5,8 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
 
 /// <summary>
-/// As a facility administrator
-/// I want to admit a new resident
-/// So that their care plan is documented in the system
+/// Exercises resident admission across physician search, reactive echo panels,
+/// validation, and submit status.
 /// </summary>
 [TestFixture]
 public class WhenAdmittingNewResident : PlaywrightTestBase
@@ -23,8 +22,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator Status => _plan.Element("submit-status");
-
-    // ─── Physician Search ───
 
     [Test]
     public async Task searching_physician_by_name_shows_matching_results_to_pick_from()
@@ -54,8 +51,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ─── Care Level Selection ───
-
     [Test]
     public async Task choosing_care_level_confirms_selection()
     {
@@ -67,8 +62,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
             .ToContainTextAsync("memory", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ─── Echo Panel — Live Feedback ───
 
     [Test]
     public async Task typing_resident_name_echoes_to_the_feedback_panel()
@@ -118,8 +111,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ─── Validation — Required Fields ───
-
     [Test]
     public async Task submitting_without_required_fields_tells_admin_what_is_missing()
     {
@@ -144,11 +135,10 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
 
         await SubmitBtn.ClickAsync();
 
-        // Wait for required errors to appear first (proves validation ran)
+        // A required-field error proves validation ran before optional fields are checked.
         await Expect(_plan.ErrorFor(m => m.ResidentName))
             .ToContainTextAsync("required", new() { Timeout = 5000 });
 
-        // CareLevel and Notes are optional — no error messages
         await Expect(_plan.ErrorFor(m => m.CareLevel)).ToBeHiddenAsync();
         await Expect(_plan.ErrorFor(m => m.Notes)).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -163,15 +153,11 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
 
         await SubmitBtn.ClickAsync();
 
-        // Validation blocks the HTTP post — status should NOT change to "Saving..."
-        // and should NOT change to "Resident admitted"
         await Expect(_plan.ErrorFor(m => m.ResidentName))
             .ToContainTextAsync("required", new() { Timeout = 5000 });
         await Expect(Status).ToHaveTextAsync("Ready");
         AssertNoConsoleErrors();
     }
-
-    // ─── Validation — Live Clear ───
 
     [Test]
     public async Task resident_name_error_clears_when_admin_types_a_name()
@@ -205,8 +191,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ─── Fix and Resubmit ───
-
     [Test]
     public async Task fixing_missing_fields_and_resubmitting_admits_the_resident()
     {
@@ -226,8 +210,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         await Expect(Status).ToContainTextAsync("Resident admitted", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ─── Successful Admission ───
 
     [Test]
     public async Task successful_admission_shows_green_confirmation()
@@ -252,7 +234,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Fill only the three required fields — skip CareLevel, IsActive, Notes
         await _plan.TextBox(m => m.ResidentName).FillAndBlur("Harold Jenkins");
         var physician = _plan.AutoComplete(m => m.Physician);
         await physician.Type("patel");
@@ -279,7 +260,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         await _plan.Switch(m => m.IsActive).Toggle();
         await _plan.TextBox(m => m.Notes).FillAndBlur("Prefers morning medication");
 
-        // Verify echo panels confirm all entered data before submission
         await Expect(_plan.Element("name-echo"))
             .ToContainTextAsync("Margaret Thompson", new() { Timeout = 5000 });
         await Expect(_plan.Element("physician-echo"))
@@ -289,7 +269,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         await Expect(_plan.Element("notes-echo"))
             .ToContainTextAsync("morning medication", new() { Timeout = 5000 });
 
-        // Submit — server confirms resident admitted (proves all data reached the server)
         await SubmitBtn.ClickAsync();
         await Expect(Status).ToContainTextAsync("Resident admitted", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
