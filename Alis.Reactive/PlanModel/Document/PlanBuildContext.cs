@@ -48,12 +48,12 @@ namespace Alis.Reactive.PlanModel
         internal IReadOnlyList<ValidationJob> ValidationJobs => _validationJobs;
 
         /// <summary>
-        /// Declares a DOM element as a native browser object in the plan.
+        /// Declares a DOM element as a native object target in the plan.
         /// Returns the component key for use in source references.
         /// </summary>
         internal ComponentKey DeclareElement(string elementId) => _components.DeclareElement(elementId);
 
-        /// <summary>Declares a component referenced by page behavior as a browser object target.</summary>
+        /// <summary>Declares a component referenced by page behavior as a plan object target.</summary>
         internal ComponentKey DeclareObjectTarget(string componentId, string vendor) =>
             _components.DeclareObjectTarget(componentId, vendor);
 
@@ -73,11 +73,11 @@ namespace Alis.Reactive.PlanModel
         internal ComponentKey DeclareInputComponent(InputComponentPlanBinding binding) =>
             _components.DeclareInputComponent(binding);
 
-        /// <summary>Declares a property member on a component's browser object contract.</summary>
+        /// <summary>Declares a property member on a component contract in the plan.</summary>
         internal void DeclareProperty(ComponentKey componentKey, ObjectPropertyContract contract) =>
             _components.DeclareProperty(componentKey, contract);
 
-        /// <summary>Declares a method member on a component's browser object contract.</summary>
+        /// <summary>Declares a method member on a component contract in the plan.</summary>
         internal ObjectMethod DeclareMethod(ComponentKey componentKey, ObjectMethodContract contract) =>
             _components.DeclareMethod(componentKey, contract);
 
@@ -85,11 +85,11 @@ namespace Alis.Reactive.PlanModel
         internal void RegisterPlugin(PluginContract contract) =>
             _objectContracts.RegisterPlugin(contract);
 
-        /// <summary>Declares a plugin method in the browser object contracts.</summary>
+        /// <summary>Declares a plugin method in the Reactive Plan contract registry.</summary>
         internal MethodSignature DeclarePluginMethod(PluginMethodRequirement requirement) =>
             _objectContracts.DeclarePluginMethod(requirement);
 
-        /// <summary>Declares a plugin property in the browser object contracts.</summary>
+        /// <summary>Declares a plugin property in the Reactive Plan contract registry.</summary>
         internal void DeclarePluginProperty(PluginPropertyRequirement requirement) =>
             _objectContracts.DeclarePluginProperty(requirement);
 

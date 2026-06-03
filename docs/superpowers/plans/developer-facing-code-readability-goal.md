@@ -384,14 +384,12 @@ Review cycle before every commit:
   visibility in a readability-only pass. A later API-visibility slice should
   verify external compatibility and whether the shared descriptor base should
   stay public or be removed from the public inheritance model.
-- TODO: `Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs`,
-  `Alis.Reactive/PlanAuthoring/TriggerBuilder.cs`,
-  `Alis.Reactive/PlanAuthoring/ReactivePlan.cs`, and
-  `Alis.Reactive/PlanModel/BrowserObjects/*`: tighten overbroad "browser"
-  wording during a dedicated API vocabulary slice. Use "Reactive Plan",
-  "plan-registered component", "plugin contract", or "runtime boundary" for
-  framework-owned plan concepts. Reserve "browser" for actual DOM/window/API,
-  network, and Playwright-visible behavior.
+- TODO: `Alis.Reactive/PlanModel/BrowserObjects/*` still carries the
+  historical `BrowserObject*` domain names because they are serialized/generated
+  plan-contract terms. Do not rename them in readability cleanup. A later
+  domain-vocabulary slice should decide whether those names remain correct
+  contract language or need a coordinated C# model, generated TS, runtime, and
+  glossary migration.
 
 ## Out Of Scope For The First Slice
 

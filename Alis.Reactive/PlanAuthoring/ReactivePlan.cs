@@ -7,7 +7,7 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// Collects reactive behavior for a view: triggers, reactions, and component registrations.
-    /// Renders the collected behavior as a plan document for browser execution.
+    /// Renders the collected behavior as a Reactive Plan runtime document.
     /// </summary>
     public sealed class ReactivePlan<TModel> where TModel : class
     {
@@ -91,7 +91,7 @@ namespace Alis.Reactive
         internal bool HasRegisteredInputComponent(BindingPath bindingPath) =>
             _registeredInputComponents.Contains(bindingPath);
 
-        /// <summary>Registers all components and resolves validation, then serializes the plan as compact JSON.</summary>
+        /// <summary>Registers all components, resolves validation, and serializes the plan as compact JSON.</summary>
         public string Render()
         {
             ResolveAll(_services);
@@ -104,7 +104,7 @@ namespace Alis.Reactive
             return PlanSerializer.Serialize(_context.BuildPlan());
         }
 
-        /// <summary>Registers all components and resolves validation, then serializes the plan as indented JSON for debugging.</summary>
+        /// <summary>Registers all components, resolves validation, and serializes the plan as indented JSON for debugging.</summary>
         public string RenderFormatted()
         {
             ResolveAll(_services);

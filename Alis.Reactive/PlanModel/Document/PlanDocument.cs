@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Immutable plan document — the serialized contract between C# and the browser runtime.
+    /// Immutable plan document: the serialized contract between C# authoring and the Reactive Plan runtime.
     /// Produced by <see cref="PlanBuildContext.BuildPlan"/> once construction is complete.
     /// </summary>
     internal sealed class PlanDocument

@@ -316,7 +316,7 @@ namespace Alis.Reactive.PlanModel
         internal RequestReaction(RequestPlan request) { Request = request; }
     }
 
-    /// <summary>Dispatches a custom browser event.</summary>
+    /// <summary>Dispatches a <c>CustomEvent</c>.</summary>
     [JsonConverter(typeof(DispatchReactionJsonConverter))]
     public sealed class DispatchReaction : ReactionGraph
     {
@@ -427,7 +427,7 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>Gets the kind. Always <c>"inject"</c>.</summary>
         public string Kind => "inject";
-        /// <summary>Gets the browser slot that receives injected HTML.</summary>
+        /// <summary>Gets the partial slot that receives injected HTML.</summary>
         public string Slot => _slot.Value;
         /// <summary>Gets the value to inject.</summary>
         public ValueExpression Value { get; }

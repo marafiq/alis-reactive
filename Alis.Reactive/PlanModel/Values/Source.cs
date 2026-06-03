@@ -12,7 +12,7 @@ namespace Alis.Reactive.PlanModel
         private protected Source() { }
     }
 
-    /// <summary>Identifies a browser object whose declared properties and methods can be evaluated at runtime.</summary>
+    /// <summary>Identifies a plan object whose declared properties and methods can be evaluated at runtime.</summary>
     public abstract class RuntimeObjectSource : Source
     {
         private protected RuntimeObjectSource() { }
@@ -105,7 +105,7 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>Gets the kind. Always <c>"plugin"</c>.</summary>
         public string Kind => "plugin";
-        /// <summary>Gets the browser plugin name.</summary>
+        /// <summary>Gets the plan-registered plugin name.</summary>
         public string Name => _name.Value;
         /// <summary>Gets the plugin object contract type key.</summary>
         public string Type => _type.Value;
@@ -117,7 +117,7 @@ namespace Alis.Reactive.PlanModel
         internal static PluginSource Of(string name) => new PluginSource(name);
     }
 
-    /// <summary>Reads a value from the browser's current URL query string.</summary>
+    /// <summary>Reads a value from the current page URL query string.</summary>
     public sealed class UrlSource : Source
     {
         /// <summary>Gets the kind. Always <c>"url"</c>.</summary>
@@ -129,7 +129,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Identifies a DOM element (by id) whose members are read directly via getElementById.</summary>
     /// <remarks>
     /// A DOM element is a JS object; its members are reached with the same RuntimePath primitive
-    /// that resolves component/plugin members — no BrowserObjectContract is required. Element ids
+    /// that resolves component/plugin members. Element ids
     /// are plan-carried (Rule 7: getElementById only, no scanning). The member name is stringly at
     /// this DOM boundary, like plugin names.
     /// </remarks>

@@ -1,8 +1,9 @@
 namespace Alis.Reactive.PlanModel
 {
-    /// <summary>Identifies one browser object: the <c>(vendor, kind, id)</c> token a
-    /// component's member contract is keyed by. Was <c>TypeKey</c>; renamed because
-    /// "TypeKey" never said what it keyed.</summary>
+    /// <summary>
+    /// Identifies the plan contract key for a DOM element, component, layout object,
+    /// or plugin.
+    /// </summary>
     internal sealed class BrowserObjectId : PlanString
     {
         private BrowserObjectId(string value) : base(value, nameof(value)) { }

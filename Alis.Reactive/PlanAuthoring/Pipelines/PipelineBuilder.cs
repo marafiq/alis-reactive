@@ -6,13 +6,13 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Builds the sequence of commands that execute when a trigger fires: element mutations,
+    /// Builds the ordered reactions that execute when a trigger fires: element mutations,
     /// event dispatches, HTTP calls, component interactions, and conditional logic.
     /// </summary>
     /// <remarks>
     /// Received as the <c>p</c> parameter inside trigger callbacks:
     /// <c>t.DomReady(p =&gt; { p.Element("id").AddClass("x"); p.Dispatch("ready"); })</c>.
-    /// Commands execute in declaration order.
+    /// Reactions execute in declaration order.
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns model-bound component IDs and validation/gather fields.</typeparam>
     public partial class PipelineBuilder<TModel> : IReactionEmitter where TModel : class
@@ -37,20 +37,20 @@ namespace Alis.Reactive.Builders
             _draft.AddCommand(step);
         }
 
-        /// <summary>Raises a browser <c>CustomEvent</c> without a payload.</summary>
+        /// <summary>Raises a <c>CustomEvent</c> without a payload.</summary>
         /// <param name="eventName">The event name matched by <c>t.CustomEvent(...)</c>.</param>
-        /// <returns>The current pipeline builder so later commands execute after the dispatch.</returns>
+        /// <returns>The current pipeline builder so later reactions execute after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {
             AddStep(ReactionGraph.Dispatch(eventName));
             return this;
         }
 
-        /// <summary>Raises a browser <c>CustomEvent</c> with a literal payload captured at plan build time.</summary>
+        /// <summary>Raises a <c>CustomEvent</c> with a literal payload captured at plan build time.</summary>
         /// <typeparam name="TPayload">The payload contract consumed by the matching custom event trigger.</typeparam>
         /// <param name="eventName">The event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c>.</param>
         /// <param name="payload">The payload object serialized into the generated plan.</param>
-        /// <returns>The current pipeline builder so later commands execute after the dispatch.</returns>
+        /// <returns>The current pipeline builder so later reactions execute after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
             AddStep(ReactionGraph.Dispatch(
@@ -60,7 +60,7 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Dispatches a custom browser event with a source-backed payload whose fields are resolved at runtime.</summary>
+        /// <summary>Raises a <c>CustomEvent</c> with a source-backed payload whose fields are resolved at runtime.</summary>
         /// <remarks>
         /// <para>Each field on <typeparamref name="TPayload"/> can come from a live component value,
         /// URL parameter, plugin read, or a compile-time literal. The listener consumes the
@@ -71,7 +71,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TPayload">The payload contract consumed by the matching custom event trigger.</typeparam>
         /// <param name="eventName">The event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c>.</param>
         /// <param name="configure">Configures each payload field from a runtime value source or literal.</param>
-        /// <returns>The current pipeline builder so later commands execute after the dispatch.</returns>
+        /// <returns>The current pipeline builder so later reactions execute after the dispatch.</returns>
         public PipelineBuilder<TModel> DispatchWith<TPayload>(
             string eventName,
             Action<DispatchPayloadBuilder<TPayload, TModel>> configure)
@@ -95,7 +95,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>References a model-bound component using the same generated ID as the markup helper.</summary>
-        /// <typeparam name="TComponent">The browser object contract exposed by the component.</typeparam>
+        /// <typeparam name="TComponent">The component contract registered in the Reactive Plan.</typeparam>
         /// <param name="expr">The model property expression used to generate the controlled component ID.</param>
         /// <returns>A typed component reference for configuring component operations.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(
@@ -107,7 +107,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>References a model-bound component from another view model, such as a partial slot model.</summary>
-        /// <typeparam name="TComponent">The browser object contract exposed by the component.</typeparam>
+        /// <typeparam name="TComponent">The component contract registered in the Reactive Plan.</typeparam>
         /// <typeparam name="TOtherModel">The model that owns the referenced component, often a partial-slot model.</typeparam>
         /// <param name="expr">The other model's property expression used to generate the controlled component ID.</param>
         /// <returns>A typed component reference for configuring component operations.</returns>
@@ -121,7 +121,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>References a component by an explicit controlled element ID.</summary>
-        /// <typeparam name="TComponent">The browser object contract exposed by the component.</typeparam>
+        /// <typeparam name="TComponent">The component contract registered in the Reactive Plan.</typeparam>
         /// <param name="refId">The explicit controlled component ID rendered in markup.</param>
         /// <returns>A typed component reference for configuring component operations.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)

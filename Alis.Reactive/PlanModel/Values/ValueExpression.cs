@@ -288,7 +288,7 @@ namespace Alis.Reactive.PlanModel
         internal override Shape OutputShape => Shape;
     }
 
-    /// <summary>A value read from a live source when the plan executes in the browser.</summary>
+    /// <summary>A value read from a live source when the Reactive Plan runtime executes.</summary>
     /// <remarks>
     /// Created by source-reading builders such as <c>p.Plugin&lt;int&gt;("array", "count").Arg(json, x =&gt; x.Items)</c>.
     /// </remarks>
@@ -532,7 +532,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>A deterministic operation over the elements of an array-shaped value.</summary>
     /// <remarks>
     /// One node, op sub-discriminator (mirrors <c>CompareCondition</c>). The runtime
-    /// iterates the source array — normalizing array-like/iterable browser values at the
+    /// iterates the source array — normalizing array-like or iterable runtime values at the
     /// input boundary — and produces the declared output. Predicate and projection
     /// operands are added by the ops that use them (filter/map/sum/find/...).
     /// </remarks>

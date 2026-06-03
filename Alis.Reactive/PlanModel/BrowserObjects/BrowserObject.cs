@@ -3,8 +3,10 @@ using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
-    /// <summary>A registered browser object the runtime talks to: an id, a vendor,
-    /// a type, a role, and (for inputs) a model binding. Was <c>ComponentObject</c>.</summary>
+    /// <summary>
+    /// A plan-registered object target: an id, a vendor, a contract type, a role,
+    /// and, for inputs, a model binding.
+    /// </summary>
     internal sealed class BrowserObject
     {
         private readonly ComponentId _id;
