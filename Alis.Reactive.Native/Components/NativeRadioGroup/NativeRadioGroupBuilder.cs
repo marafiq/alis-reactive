@@ -25,12 +25,6 @@ namespace Alis.Reactive.Native.Components
     /// value for form submission and component reads, while individual radio buttons
     /// use MVC model binding.
     /// </para>
-    /// <code>
-    /// Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care Level"))
-    ///     .NativeRadioGroup(b => b
-    ///         .Items(careLevelItems)
-    ///         .Reactive(plan, evt => evt.Changed, (args, p) => { ... }));
-    /// </code>
     /// </remarks>
     /// <typeparam name="TModel">The view model type.</typeparam>
     /// <typeparam name="TProp">The bound property type.</typeparam>
@@ -69,13 +63,10 @@ namespace Alis.Reactive.Native.Components
             _bindingPath = target.BindingName;
         }
 
-        /// <summary>Gets the resolved element ID for this radio group.</summary>
         internal string ElementId => _elementId;
 
-        /// <summary>Gets the model binding path (e.g. <c>"CareLevel"</c>).</summary>
         internal string BindingPath => _bindingPath;
 
-        /// <summary>Gets the configured radio options.</summary>
         internal IReadOnlyList<RadioButtonItem> Options => _options;
 
         /// <summary>
@@ -173,7 +164,6 @@ namespace Alis.Reactive.Native.Components
 
             var encodedId = encoder.Encode(_elementId);
 
-            // Container div wraps the radio group.
             writer.Write($"<div class=\"{encoder.Encode(_cssClass)}\">");
 
             // Hidden input — canonical element for evalRead + gather. NO name attr.
@@ -184,12 +174,10 @@ namespace Alis.Reactive.Native.Components
                 var option = _options[i];
                 var radioId = $"{_elementId}_r{i}";
 
-                // Label wrapper — stays display:block per design system (.alis-root label).
-                // Inner div provides flex layout for radio + text.
+                // Label stays display:block per design system; inner div supplies flex layout.
                 writer.Write("<label>");
                 writer.Write($"<div class=\"{encoder.Encode(_optionCssClass)}\">");
 
-                // Radio input via Html.RadioButtonFor for MVC strong binding
                 var attrs = new Dictionary<string, object> { ["id"] = radioId };
                 var radioHtml = _html.RadioButtonFor(_expression, option.Value, attrs);
 #if NET48
@@ -198,7 +186,6 @@ namespace Alis.Reactive.Native.Components
                 radioHtml.WriteTo(writer, HtmlEncoder.Default);
 #endif
 
-                // Text block — flex-col stacks label above description
                 writer.Write("<div class=\"flex flex-col\">");
                 writer.Write($"<span class=\"text-sm font-medium leading-none\">{encoder.Encode(option.Text)}</span>");
                 if (option.Description != null)

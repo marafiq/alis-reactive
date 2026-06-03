@@ -25,12 +25,6 @@ namespace Alis.Reactive.Native.Components
     /// is the canonical element (carries the element ID). A hidden input inside
     /// handles MVC form submission as a comma-separated string.
     /// </para>
-    /// <code>
-    /// Html.InputField(plan, m => m.Allergies, o => o.Label("Allergies"))
-    ///     .NativeCheckList(b => b
-    ///         .Items(allergyItems)
-    ///         .Reactive(plan, evt => evt.Changed, (args, p) => { ... }));
-    /// </code>
     /// </remarks>
     /// <typeparam name="TModel">The view model type.</typeparam>
     /// <typeparam name="TProp">The bound property type.</typeparam>
@@ -72,13 +66,10 @@ namespace Alis.Reactive.Native.Components
             _bindingPath = target.BindingName;
         }
 
-        /// <summary>Gets the resolved element ID for this check list.</summary>
         internal string ElementId => _elementId;
 
-        /// <summary>Gets the model binding path (e.g. <c>"Allergies"</c>).</summary>
         internal string BindingPath => _bindingPath;
 
-        /// <summary>Gets the configured checkbox options.</summary>
         internal IReadOnlyList<RadioButtonItem> Options => _options;
 
         /// <summary>
