@@ -370,6 +370,12 @@ Review cycle before every commit:
   inventory which behaviors are genuinely reusable for this framework and which
   are current test hacks, then design extensions that would be useful beyond this
   repo without hiding the browser-visible proof.
+- Fusion component Playwright tests often include `plan_json_contains_*` checks
+  that assert raw plan JSON substrings for method and event names. Some smoke
+  coverage may be useful, but broad raw-string assertions can pin internal plan
+  shape instead of browser-visible behavior. A later test-design slice should
+  classify which plan JSON checks are DSL contract proof and which should move
+  to lower-level plan/domain tests or be replaced by behavior assertions.
 
 ## Out Of Scope For The First Slice
 
