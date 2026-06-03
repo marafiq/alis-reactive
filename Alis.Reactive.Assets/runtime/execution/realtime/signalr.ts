@@ -1,6 +1,3 @@
-// signalr.ts — SignalR trigger wiring.
-// Uses SignalRTrigger from the generated plan contract.
-
 import * as signalR from "@microsoft/signalr";
 import type { SignalRTrigger, ReactionGraph, PlanDocument } from "../../types/index";
 import { catchAsyncReactionFailure, executeReaction } from "../reactions/execute";
@@ -19,7 +16,8 @@ interface ManagedConnection {
   stopping: boolean;
 }
 
-// Connection pool — singleton HubConnection per hubUrl
+// One HubConnection is shared per hub URL so partial-slot aborts can release
+// subscriptions without disconnecting active listeners.
 const hubs = new Map<string, ManagedConnection>();
 const reconnectDelays = [0, 2000, 10000, 30000] as const;
 

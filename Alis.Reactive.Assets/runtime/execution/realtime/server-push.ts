@@ -1,6 +1,3 @@
-// server-push.ts — SSE (EventSource) trigger wiring.
-// Uses ServerPushTrigger from the generated plan contract.
-
 import type { ServerPushTrigger, ReactionGraph, PlanDocument } from "../../types/index";
 import { catchAsyncReactionFailure, executeReaction } from "../reactions/execute";
 import { showRetryIndicators, removeRetryIndicators } from "../requests/retry-indicator";
@@ -23,7 +20,8 @@ interface ManagedSource {
   stopping: boolean;
 }
 
-// Connection pool — singleton EventSource per URL
+// One EventSource is shared per URL so retry wiring can restore all behaviors
+// attached to that browser connection.
 const sources = new Map<string, ManagedSource>();
 
 function retrySSE(url: string, behaviors: readonly WiredBehavior[]): void {
