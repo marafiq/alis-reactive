@@ -2,30 +2,22 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
 
-/// <summary>
-/// Playwright tests for /Sandbox/Validation/AllRules — verifies all rule types
-/// and conditional validation work end-to-end in the browser.
-/// </summary>
 [TestFixture]
 public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/AllRules";
     private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__";
 
-    // Section 1: All Rule Types
     private ILocator AllRulesBtn => Page.Locator("#validate-all-btn");
     private ILocator AllRulesResult => Page.Locator("#all-rules-result");
     private ILocator Input(string suffix) => Page.Locator($"#{R}{suffix}");
     private ILocator ErrorFor(string suffix) => Page.Locator($"#{R}{suffix}_error");
 
-    // Section 3: Conditional
     private ILocator ConditionalBtn => Page.Locator("#conditional-validate-btn");
     private ILocator ConditionalResult => Page.Locator("#conditional-result");
     private ILocator ServerBtn => Page.Locator("#server-save-btn");
     private ILocator HiddenBtn => Page.Locator("#hidden-validate-btn");
     private ILocator DbBtn => Page.Locator("#db-save-btn");
-
-    // ── Section 1: All Rule Types ──────────────────────────
 
     [Test]
     public async Task empty_form_shows_required_errors()
@@ -48,16 +40,13 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Submit to trigger first validation
         await ClickWhenStable(AllRulesBtn);
 
-        // Type too-short password, blur → minLength(8) error
         await Input("AllRules_Password").FillAsync("abc");
         await Input("AllRules_Password").BlurAsync();
 
         await Expect(ErrorFor("AllRules_Password")).ToContainTextAsync("at least 8", new() { Timeout = 2000 });
 
-        // Fix it
         await Input("AllRules_Password").FillAsync("securepassword");
         await Input("AllRules_Password").BlurAsync();
 
@@ -72,11 +61,9 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Submit to trigger first validation
         await ClickWhenStable(AllRulesBtn);
         await Expect(ErrorFor("AllRules_Name")).ToContainTextAsync("required");
 
-        // Type valid name, blur → error clears
         await Input("AllRules_Name").FillAsync("Margaret Thompson");
         await Input("AllRules_Name").BlurAsync();
 
@@ -94,13 +81,11 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await ClickWhenStable(AllRulesBtn);
         await Expect(ErrorFor("AllRules_Email")).ToContainTextAsync("required");
 
-        // Type invalid email, blur
         await Input("AllRules_Email").FillAsync("notanemail");
         await Input("AllRules_Email").BlurAsync();
 
         await Expect(ErrorFor("AllRules_Email")).ToContainTextAsync("valid email", new() { Timeout = 2000 });
 
-        // Fix it
         await Input("AllRules_Email").FillAsync("margaret@care.com");
         await Input("AllRules_Email").BlurAsync();
 
@@ -117,13 +102,11 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(AllRulesBtn);
 
-        // Age has range(0,120) — type 150, blur
         await Input("AllRules_Age").FillAsync("150");
         await Input("AllRules_Age").BlurAsync();
 
         await Expect(ErrorFor("AllRules_Age")).ToContainTextAsync("between", new() { Timeout = 2000 });
 
-        // Fix it
         await Input("AllRules_Age").FillAsync("75");
         await Input("AllRules_Age").BlurAsync();
 
@@ -132,15 +115,12 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 3: Conditional Rules ──────────────────────
-
     [Test]
     public async Task conditional_rule_skipped_when_unchecked()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // IsEmployed unchecked, submit → JobTitle should NOT show error
         await ClickWhenStable(ConditionalBtn);
 
         await Expect(ConditionalResult).ToContainTextAsync("passed", new() { Timeout = 5000 });
@@ -154,10 +134,8 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Check IsEmployed
         await Input("Conditional_IsEmployed").CheckAsync();
 
-        // Submit → JobTitle should show required error
         await ClickWhenStable(ConditionalBtn);
 
         await Expect(ErrorFor("Conditional_JobTitle")).ToContainTextAsync("required", new() { Timeout = 2000 });
@@ -171,12 +149,10 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Check → submit → error shows
         await Input("Conditional_IsEmployed").CheckAsync();
         await ClickWhenStable(ConditionalBtn);
         await Expect(ErrorFor("Conditional_JobTitle")).ToContainTextAsync("required", new() { Timeout = 2000 });
 
-        // Uncheck → submit again → error should clear (condition false → rule skipped)
         await Input("Conditional_IsEmployed").UncheckAsync();
         await ClickWhenStable(ConditionalBtn);
 
@@ -191,7 +167,6 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Check + fill + submit → should pass
         await Input("Conditional_IsEmployed").CheckAsync();
         await Input("Conditional_JobTitle").FillAsync("Care Coordinator");
         await ClickWhenStable(ConditionalBtn);
@@ -201,15 +176,12 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 1: Additional Rule Types ──────────────────
-
     [Test]
     public async Task phone_regex_shows_format_error()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Submit to activate validation, then type invalid phone, blur
         await ClickWhenStable(AllRulesBtn);
 
         await Input("AllRules_Phone").FillAsync("badphone");
@@ -217,7 +189,6 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await Expect(ErrorFor("AllRules_Phone")).ToContainTextAsync("123-456-7890", new() { Timeout = 2000 });
 
-        // Fix with valid format
         await Input("AllRules_Phone").FillAsync("123-456-7890");
         await Input("AllRules_Phone").BlurAsync();
 
@@ -234,13 +205,11 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(AllRulesBtn);
 
-        // Type salary above max (500000), blur
         await Input("AllRules_Salary").FillAsync("600000");
         await Input("AllRules_Salary").BlurAsync();
 
         await Expect(ErrorFor("AllRules_Salary")).ToContainTextAsync("500,000", new() { Timeout = 2000 });
 
-        // Fix with valid salary
         await Input("AllRules_Salary").FillAsync("75000");
         await Input("AllRules_Salary").BlurAsync();
 
@@ -255,7 +224,6 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Fill all fields with valid data
         await Input("AllRules_Name").FillAsync("Dorothy Henderson");
         await Input("AllRules_Email").FillAsync("dorothy@seniorcare.com");
         await Input("AllRules_Age").FillAsync("82");
@@ -277,14 +245,11 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Submit empty form
         await ClickWhenStable(AllRulesBtn);
 
-        // Both Name and Email should have error class
         await Expect(Input("AllRules_Name")).ToHaveClassAsync(new Regex("alis-has-error"));
         await Expect(Input("AllRules_Email")).ToHaveClassAsync(new Regex("alis-has-error"));
 
-        // Fill Name, blur — error class should be removed
         await Input("AllRules_Name").FillAsync("Valid Name");
         await Input("AllRules_Name").BlurAsync();
 
@@ -292,8 +257,6 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Section 2: Server Validation (400) ────────────────
 
     [Test]
     public async Task server_form_empty_shows_required_errors()
@@ -303,7 +266,6 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(ServerBtn);
 
-        // Client-side validation should catch required fields
         await Expect(ErrorFor("Server_Name")).ToContainTextAsync("required", new() { Timeout = 2000 });
         await Expect(ErrorFor("Server_Email")).ToContainTextAsync("required", new() { Timeout = 2000 });
 
@@ -313,10 +275,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
     [Test]
     public async Task server_rejects_incomplete_data_and_shows_errors()
     {
-        // Section 2 demonstrates server-side 400 validation. When client validation passes
-        // (Name + Email filled), the POST goes to the server which validates the FULL model
-        // and returns 400 with server-side errors. The OnError(400) route maps those errors
-        // back to the inline error slots.
+        // Name and Email satisfy client rules; this proves OnError(400) maps full-model server errors inline.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -348,20 +307,16 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 3: Conditional — additional ────────────────
-
     [Test]
     public async Task conditional_job_title_live_clears_on_valid_input()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Check IsEmployed, submit → error
         await Input("Conditional_IsEmployed").CheckAsync();
         await ClickWhenStable(ConditionalBtn);
         await Expect(ErrorFor("Conditional_JobTitle")).ToContainTextAsync("required", new() { Timeout = 2000 });
 
-        // Type valid job title, blur → error clears via live-clear
         await Input("Conditional_JobTitle").FillAsync("Activities Director");
         await Input("Conditional_JobTitle").BlurAsync();
 
@@ -369,8 +324,6 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Section 4: Hidden Fields ──────────────────────────
 
     [Test]
     public async Task hidden_form_name_required_when_extras_hidden()
@@ -380,7 +333,6 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(HiddenBtn);
 
-        // Name is always visible and required
         await Expect(ErrorFor("Hidden_Name")).ToContainTextAsync("required", new() { Timeout = 2000 });
 
         AssertNoConsoleErrors();
@@ -408,24 +360,18 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Extras are hidden by default
         var extras = Page.Locator("#hf_extras");
         await Expect(extras).ToBeHiddenAsync();
 
-        // Check "Show Extra Fields"
         await Input("Hidden_ShowExtras").CheckAsync();
 
-        // Extras should now be visible
         await Expect(extras).ToBeVisibleAsync(new() { Timeout = 2000 });
 
-        // Uncheck — extras hidden again
         await Input("Hidden_ShowExtras").UncheckAsync();
         await Expect(extras).ToBeHiddenAsync(new() { Timeout = 2000 });
 
         AssertNoConsoleErrors();
     }
-
-    // ── Section 5: DB Validation ──────────────────────────
 
     [Test]
     public async Task db_form_empty_shows_required_errors()
@@ -447,7 +393,6 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // "admin" is a reserved name per the server endpoint
         await Input("Db_Name").FillAsync("admin");
         await Input("Db_Email").FillAsync("valid@test.com");
 
@@ -456,7 +401,6 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         var dbResult = Page.Locator("#db-result");
         await Expect(dbResult).ToContainTextAsync("Database validation failed", new() { Timeout = 5000 });
 
-        // Server error should be routed to inline field error
         await Expect(ErrorFor("Db_Name")).ToContainTextAsync("reserved", new() { Timeout = 2000 });
 
         AssertNoConsoleErrorsExcept("400");
