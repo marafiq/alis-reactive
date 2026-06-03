@@ -26,7 +26,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="builder">The Fusion builder.</param>
         /// <param name="text">Expression selecting the display text property.</param>
         /// <param name="value">Expression selecting the value property.</param>
-        /// <returns>The builder for method chaining.</returns>
         public static MultiSelectBuilder Fields<TItem>(
             this MultiSelectBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -47,7 +46,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="text">Expression selecting the display text property.</param>
         /// <param name="value">Expression selecting the value property.</param>
         /// <param name="groupBy">Expression selecting the grouping property.</param>
-        /// <returns>The builder for method chaining.</returns>
         public static MultiSelectBuilder Fields<TItem>(
             this MultiSelectBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -65,7 +63,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders a FusionMultiSelect bound to the field's model property.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Callback to build the FusionMultiSelect (data source, fields, mode, etc.).</param>

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wraps Syncfusion ListBox render output while carrying reactive plan context.
+    /// Wraps Syncfusion ListBox render output while carrying Reactive Plan context.
     /// </summary>
     public sealed class FusionListBoxBuilder<TModel> : IHtmlContent
         where TModel : class

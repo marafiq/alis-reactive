@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed AIAssistView events available to reactive plans.
+    /// Typed AIAssistView events available to Reactive Plans.
     /// </summary>
     public sealed class FusionAIAssistViewEvents
     {

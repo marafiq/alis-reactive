@@ -22,7 +22,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the masked input value.</summary>
         /// <param name="value">The value to set.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionInputMask, TModel> SetValue<TModel>(
             this ComponentRef<FusionInputMask, TModel> self, string value)
             where TModel : class
@@ -31,7 +30,6 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Moves focus into the masked input.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionInputMask, TModel> FocusIn<TModel>(
             this ComponentRef<FusionInputMask, TModel> self)
             where TModel : class

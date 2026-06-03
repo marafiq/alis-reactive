@@ -25,7 +25,7 @@ namespace Alis.Reactive.Fusion.Components
         public string Text { get; set; } = "";
 
         /// <summary>
-        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// Creates an event payload instance for descriptor wiring.
         /// </summary>
         public FusionMultiSelectFilteringArgs() { }
     }
@@ -34,8 +34,8 @@ namespace Alis.Reactive.Fusion.Components
     /// Typed mutations on the filtering event args for <see cref="FusionMultiSelect"/>.
     /// </summary>
     /// <remarks>
-    /// These extensions modify the filtering event object in the browser (e.g. suppressing
-    /// client-side filtering or feeding server results). The pipeline parameter is required
+    /// These extensions mutate Syncfusion's filtering event object, such as suppressing
+    /// client-side filtering or feeding server results. The pipeline parameter is required
     /// because args does not carry pipeline context. Pass the current <c>p</c> or <c>s</c>.
     /// </remarks>
     public static class FusionMultiSelectFilteringArgsExtensions

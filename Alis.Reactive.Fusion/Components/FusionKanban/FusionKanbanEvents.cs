@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed Kanban events available to reactive plans.
+    /// Typed Kanban events available to Reactive Plans.
     /// </summary>
     public sealed class FusionKanbanEvents
     {

@@ -41,7 +41,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitSet(ValueProperty, StringArray(value));
 
-        /// <summary>Flushes pending property changes to the ListBox in the browser.</summary>
+        /// <summary>Flushes pending property changes through the Syncfusion ListBox instance.</summary>
         public static ComponentRef<FusionListBox, TModel> DataBind<TModel>(
             this ComponentRef<FusionListBox, TModel> self)
             where TModel : class

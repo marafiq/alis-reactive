@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public FusionSplitButtonItem Item { get; set; } = new FusionSplitButtonItem();
 
         /// <summary>
-        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// Creates an event payload instance for descriptor wiring.
         /// </summary>
         public FusionSplitButtonSelectArgs() { }
     }

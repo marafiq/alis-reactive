@@ -34,7 +34,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the selected value IDs.</summary>
         /// <param name="value">The selected IDs, or <see langword="null"/> to clear.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownTree, TModel> SetValue<TModel>(
             this ComponentRef<FusionDropDownTree, TModel> self, string[]? value)
             where TModel : class
@@ -44,35 +43,30 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the display text and lets Syncfusion map it back to the selected value ID.</summary>
         /// <param name="text">The display text to select, or <see langword="null"/> to clear.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownTree, TModel> SetText<TModel>(
             this ComponentRef<FusionDropDownTree, TModel> self, string? text)
             where TModel : class
             => self.EmitSet(TextProperty, ValueExpression.LiteralRaw(text, Shape.String));
 
-        /// <summary>Flushes pending property changes to the DropDownTree in the browser.</summary>
-        /// <returns>The component reference for method chaining.</returns>
+        /// <summary>Flushes pending property changes through the Syncfusion DropDownTree instance.</summary>
         public static ComponentRef<FusionDropDownTree, TModel> DataBind<TModel>(
             this ComponentRef<FusionDropDownTree, TModel> self)
             where TModel : class
             => self.EmitCall(DataBindMethod);
 
         /// <summary>Opens the DropDownTree popup.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownTree, TModel> ShowPopup<TModel>(
             this ComponentRef<FusionDropDownTree, TModel> self)
             where TModel : class
             => self.EmitCall(ShowPopupMethod);
 
         /// <summary>Closes the DropDownTree popup.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownTree, TModel> HidePopup<TModel>(
             this ComponentRef<FusionDropDownTree, TModel> self)
             where TModel : class
             => self.EmitCall(HidePopupMethod);
 
         /// <summary>Clears the selected values and display text.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDropDownTree, TModel> Clear<TModel>(
             this ComponentRef<FusionDropDownTree, TModel> self)
             where TModel : class

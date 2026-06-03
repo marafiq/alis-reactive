@@ -27,8 +27,8 @@ namespace Alis.Reactive.Fusion.Components
     /// Typed mutations on the filtering event args for <see cref="FusionAutoComplete"/>.
     /// </summary>
     /// <remarks>
-    /// These extensions modify the filtering event object in the browser (e.g. suppressing
-    /// client-side filtering or feeding server results). The pipeline parameter is required
+    /// These extensions mutate Syncfusion's filtering event object, such as suppressing
+    /// client-side filtering or feeding server results. The pipeline parameter is required
     /// because args does not carry pipeline context. Pass the current <c>p</c> or <c>s</c>.
     /// </remarks>
     public static class FusionAutoCompleteFilteringArgsExtensions

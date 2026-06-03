@@ -15,9 +15,9 @@ namespace Alis.Reactive.Fusion.Components
         /// Creates a FusionGrid with the given element ID.
         /// Non-input component: renders directly, no label/validation wrapper.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <param name="html">The HTML helper.</param>
-        /// <param name="plan">The reactive plan to register behaviors with.</param>
+        /// <param name="plan">The Reactive Plan that registers component behavior.</param>
         /// <param name="elementId">The DOM element ID for the grid.</param>
         /// <param name="build">Callback to configure columns, paging, sorting, etc.</param>
         /// <returns>A builder for chaining <c>.Reactive()</c>.</returns>

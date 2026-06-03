@@ -23,7 +23,7 @@ namespace Alis.Reactive.Fusion.Templates
     /// </summary>
     /// <remarks>
     /// The rendered string is consumed by Syncfusion's template engine. It is not a
-    /// reactive plan and it does not mutate live DOM until Syncfusion renders it.
+    /// Reactive Plan, and it does not mutate live DOM until Syncfusion renders it.
     /// </remarks>
     /// <typeparam name="TModel">The object shape exposed by the Syncfusion template context.</typeparam>
     public class FusionTemplateBuilder<TModel>

@@ -84,7 +84,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitSet(DataSourceProperty, source.ToValueExpression());
 
         /// <summary>
-        /// Flushes pending property changes to the component in the browser.
+        /// Flushes pending property changes through the Syncfusion AutoComplete instance.
         /// </summary>
         /// <remarks>
         /// Required after <c>SetDataSource</c> in cascade patterns (Changed event).

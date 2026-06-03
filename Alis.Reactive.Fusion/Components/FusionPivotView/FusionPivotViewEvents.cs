@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed PivotView events available to reactive plans.
+    /// Typed PivotView events available to Reactive Plans.
     /// </summary>
     public sealed class FusionPivotViewEvents
     {

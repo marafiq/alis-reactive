@@ -27,7 +27,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the selected time.</summary>
         /// <param name="value">The time to set (only the time portion is used).</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTimePicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionTimePicker, TModel> self, DateTime value)
             where TModel : class
@@ -37,14 +36,12 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Moves focus into the time picker.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTimePicker, TModel> FocusIn<TModel>(
             this ComponentRef<FusionTimePicker, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
         /// <summary>Removes focus from the time picker.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTimePicker, TModel> FocusOut<TModel>(
             this ComponentRef<FusionTimePicker, TModel> self)
             where TModel : class

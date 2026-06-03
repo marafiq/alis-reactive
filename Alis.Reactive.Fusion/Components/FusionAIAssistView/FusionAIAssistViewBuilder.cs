@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Carries rendered Syncfusion AIAssistView markup and the reactive plan for event wiring.
+    /// Carries rendered Syncfusion AIAssistView markup and the Reactive Plan for event wiring.
     /// </summary>
     public sealed class FusionAIAssistViewBuilder<TModel> : IHtmlContent
         where TModel : class

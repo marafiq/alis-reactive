@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public FusionDropDownButtonItem Item { get; set; } = new FusionDropDownButtonItem();
 
         /// <summary>
-        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// Creates an event payload instance for descriptor wiring.
         /// </summary>
         public FusionDropDownButtonSelectArgs() { }
     }

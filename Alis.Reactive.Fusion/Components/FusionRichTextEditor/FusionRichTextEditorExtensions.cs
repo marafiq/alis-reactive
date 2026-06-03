@@ -22,7 +22,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the HTML content value.</summary>
         /// <param name="value">The HTML content to set.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionRichTextEditor, TModel> SetValue<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self, string value)
             where TModel : class
@@ -31,7 +30,6 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Moves focus into the rich text editor.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionRichTextEditor, TModel> FocusIn<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self)
             where TModel : class

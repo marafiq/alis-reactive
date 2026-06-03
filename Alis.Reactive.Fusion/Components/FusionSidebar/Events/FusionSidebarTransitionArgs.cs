@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public bool IsInteracted { get; set; }
 
         /// <summary>
-        /// Framework-internal: instances are created by the event descriptor.
+        /// Created by the event descriptor during payload binding.
         /// </summary>
         public FusionSidebarTransitionArgs()
         {

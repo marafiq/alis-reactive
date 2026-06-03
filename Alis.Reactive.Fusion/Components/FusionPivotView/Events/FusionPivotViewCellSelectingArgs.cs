@@ -2,7 +2,7 @@ namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
     /// Payload for PivotView cellSelecting. This event is emitted during normal
-    /// late event subscription, which matches reactive runtime wiring.
+    /// late event subscription, which matches Reactive Plan runtime wiring.
     /// </summary>
     public sealed class FusionPivotViewCellSelectingArgs
     {

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Carries rendered Syncfusion Kanban markup and the reactive plan for event wiring.
+    /// Carries rendered Syncfusion Kanban markup and the Reactive Plan for event wiring.
     /// </summary>
     public sealed class FusionKanbanBuilder<TModel> : IHtmlContent
         where TModel : class

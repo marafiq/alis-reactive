@@ -25,14 +25,12 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the color value (hex string, e.g. "#ff0000").</summary>
         /// <param name="value">The hex color string to set, or <see langword="null"/> to clear.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionColorPicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, string? value)
             where TModel : class
             => self.EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String));
 
         /// <summary>Toggles the ColorPicker popup open/closed.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionColorPicker, TModel> Toggle<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self)
             where TModel : class
@@ -40,7 +38,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the disabled state of the ColorPicker.</summary>
         /// <param name="disabled"><see langword="true"/> to disable, <see langword="false"/> to enable.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionColorPicker, TModel> Disable<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, bool disabled = true)
             where TModel : class

@@ -21,7 +21,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the rating value and flushes it into the visible rating.</summary>
         /// <param name="value">The rating value to set.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionRating, TModel> SetValue<TModel>(
             this ComponentRef<FusionRating, TModel> self,
             double value)
@@ -31,7 +30,6 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitCall(DataBindMethod);
 
         /// <summary>Resets the rating value to its minimum.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionRating, TModel> Reset<TModel>(
             this ComponentRef<FusionRating, TModel> self)
             where TModel : class

@@ -13,7 +13,7 @@ namespace Alis.Reactive.Fusion.Components
         public string? Value { get; set; }
 
         /// <summary>
-        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
+        /// Creates an event payload instance for descriptor wiring.
         /// </summary>
         public FusionColorPickerChangeArgs() { }
     }

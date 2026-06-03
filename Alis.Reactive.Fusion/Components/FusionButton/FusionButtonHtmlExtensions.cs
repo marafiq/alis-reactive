@@ -13,10 +13,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Renders a non-input FusionButton with a stable component id.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <param name="html">The MVC HTML helper.</param>
-        /// <param name="plan">The reactive plan that will reference this component.</param>
-        /// <param name="elementId">The controlled browser id used as the runtime join key.</param>
+        /// <param name="plan">The Reactive Plan that will reference this component.</param>
+        /// <param name="elementId">The controlled DOM element ID used as the runtime join key.</param>
         /// <param name="build">Configures initial Syncfusion Button options.</param>
         /// <returns>The rendered Syncfusion button content.</returns>
         public static FusionButtonBuilder<TModel> FusionButton<TModel>(

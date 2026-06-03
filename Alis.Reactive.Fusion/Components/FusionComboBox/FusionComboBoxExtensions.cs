@@ -43,7 +43,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the selected value, or clears it with <see langword="null"/>.</summary>
         /// <param name="value">The string value to select.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionComboBox, TModel> SetValue<TModel>(
             this ComponentRef<FusionComboBox, TModel> self, string? value)
             where TModel : class
@@ -51,7 +50,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the displayed text, or clears it with <see langword="null"/>.</summary>
         /// <param name="text">The display text to select.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionComboBox, TModel> SetText<TModel>(
             this ComponentRef<FusionComboBox, TModel> self, string? text)
             where TModel : class
@@ -59,49 +57,42 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the selected list index.</summary>
         /// <param name="index">The zero-based list index to select.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionComboBox, TModel> SetIndex<TModel>(
             this ComponentRef<FusionComboBox, TModel> self, int index)
             where TModel : class
             => self.EmitSet(IndexProperty, ValueExpression.Literal(index));
 
-        /// <summary>Flushes pending property changes to the ComboBox in the browser.</summary>
-        /// <returns>The component reference for method chaining.</returns>
+        /// <summary>Flushes pending property changes through the Syncfusion ComboBox instance.</summary>
         public static ComponentRef<FusionComboBox, TModel> DataBind<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.EmitCall(DataBindMethod);
 
         /// <summary>Moves focus into the ComboBox input.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionComboBox, TModel> FocusIn<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
         /// <summary>Removes focus from the ComboBox input.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionComboBox, TModel> FocusOut<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.EmitCall(FocusOutMethod);
 
         /// <summary>Opens the ComboBox popup.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionComboBox, TModel> ShowPopup<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.EmitCall(ShowPopupMethod);
 
         /// <summary>Closes the ComboBox popup.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionComboBox, TModel> HidePopup<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.EmitCall(HidePopupMethod);
 
         /// <summary>Clears the selected value, text, and index.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionComboBox, TModel> Clear<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class

@@ -27,7 +27,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the selected date.</summary>
         /// <param name="value">The date to set.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDatePicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionDatePicker, TModel> self, DateTime value)
             where TModel : class
@@ -37,14 +36,12 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Moves focus into the date picker.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDatePicker, TModel> FocusIn<TModel>(
             this ComponentRef<FusionDatePicker, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
         /// <summary>Removes focus from the date picker.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionDatePicker, TModel> FocusOut<TModel>(
             this ComponentRef<FusionDatePicker, TModel> self)
             where TModel : class
