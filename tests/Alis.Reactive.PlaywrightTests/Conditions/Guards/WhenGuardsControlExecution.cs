@@ -9,8 +9,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
     }
 
-    // ── int (ElseIf grade ladder) ──
-
     [Test]
     public async Task int_elseif_takes_correct_branch()
     {
@@ -29,8 +27,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── long ──
-
     [Test]
     public async Task long_gt_threshold()
     {
@@ -45,8 +41,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── double ──
 
     [Test]
     public async Task double_gt_comparison()
@@ -63,8 +57,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── bool ──
-
     [Test]
     public async Task bool_truthy_falsy()
     {
@@ -79,8 +71,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── string ──
 
     [Test]
     public async Task string_eq_comparison()
@@ -97,8 +87,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── DateTime ──
-
     [Test]
     public async Task datetime_gt_comparison()
     {
@@ -113,8 +101,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── int? (nullable) ──
 
     [Test]
     public async Task nullable_int_is_null()
@@ -131,8 +117,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── AND (int + string) ──
-
     [Test]
     public async Task and_mixed_types()
     {
@@ -147,8 +131,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── OR (string alternatives) ──
 
     [Test]
     public async Task or_string_alternatives()
@@ -168,8 +150,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Nested payload — deep dot-path ──
-
     [Test]
     public async Task nested_payload_deep_path_eq()
     {
@@ -184,8 +164,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Null nested object ──
 
     [Test]
     public async Task null_nested_object_is_null()
@@ -206,8 +184,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Mixed nested + flat AND ──
-
     [Test]
     public async Task mixed_nested_and_flat_in_and()
     {
@@ -227,8 +203,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Null leaf in comparison ──
 
     [Test]
     public async Task null_leaf_in_comparison_takes_else_no_crash()
@@ -251,8 +225,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── In membership ──
-
     [Test]
     public async Task in_membership()
     {
@@ -268,8 +240,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── NotIn membership ──
-
     [Test]
     public async Task notin_membership()
     {
@@ -284,8 +254,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Between range ──
 
     [Test]
     public async Task between_range()
@@ -305,8 +273,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Contains text ──
-
     [Test]
     public async Task contains_text()
     {
@@ -321,8 +287,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── StartsWith text ──
 
     [Test]
     public async Task starts_with_text()
@@ -339,8 +303,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Matches regex ──
-
     [Test]
     public async Task matches_regex()
     {
@@ -356,8 +318,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── MinLength text ──
-
     [Test]
     public async Task min_length_text()
     {
@@ -372,8 +332,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── IsEmpty presence ──
 
     [Test]
     public async Task is_empty_presence()
@@ -393,8 +351,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── NOT (Not condition) ──
-
     [Test]
     public async Task not_inverts_guard()
     {
@@ -410,8 +366,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Single-command condition via When/Then ──
-
     [Test]
     public async Task single_command_condition_via_when_then()
     {
@@ -419,7 +373,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         var always = Page.Locator("#single-command-condition-result");
         var bonus = Page.Locator("#single-command-condition-bonus");
 
-        // score=95 → guard passes → both set
         await Page.Locator("#btn-single-command-condition-high").ClickAsync();
         await Expect(always).ToHaveTextAsync("Always runs");
         await Expect(bonus).ToHaveTextAsync("Bonus!");
@@ -427,14 +380,11 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         // score=50 → guard fails → first command still runs, branch skips the guarded command
         await Page.Locator("#btn-single-command-condition-low").ClickAsync();
         await Expect(always).ToHaveTextAsync("Always runs");
-        // Bonus stays "Bonus!" from previous click — the branch skips the guarded command,
-        // it doesn't reset. But if first time click is low, bonus stays as —.
-        // For a clean test, we test in isolation by reloading:
+        // Bonus stays "Bonus!" from the previous click; the fresh-page skip test
+        // covers the default bonus state when low is clicked first.
 
         AssertNoConsoleErrors();
     }
-
-    // ── Direct And syntax ──
 
     [Test]
     public async Task direct_and_syntax()
@@ -450,8 +400,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Direct Or syntax ──
 
     [Test]
     public async Task direct_or_syntax()
@@ -471,32 +419,26 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Confirm dialog — OK path ──
-
     [Test]
     public async Task confirm_ok_path()
     {
         await NavigateAndBoot();
         var result = Page.Locator("#confirm-result");
 
-        // Click the trigger button — this dispatches 'check-confirm' custom event
         await Page.Locator("#btn-confirm").ClickAsync();
 
-        // SF Dialog should appear with "Are you sure you want to proceed?"
+        // Confirm is an async user-decision boundary; the app-level dialog is the proof surface.
         var dialog = Page.Locator("#alisConfirmDialog");
         await Expect(dialog).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        // Click OK button
+        // The primary button is the OK action in the app-level confirm dialog.
         var okButton = dialog.Locator("button.e-primary");
         await okButton.ClickAsync();
 
-        // Result should be "Confirmed"
         await Expect(result).ToHaveTextAsync("Confirmed");
 
         AssertNoConsoleErrors();
     }
-
-    // ── Confirm dialog — Cancel path ──
 
     [Test]
     public async Task confirm_cancel_path()
@@ -504,24 +446,20 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         await NavigateAndBoot();
         var result = Page.Locator("#confirm-result");
 
-        // Click the trigger button
         await Page.Locator("#btn-confirm").ClickAsync();
 
-        // SF Dialog should appear
+        // Confirm is an async user-decision boundary; the app-level dialog is the proof surface.
         var dialog = Page.Locator("#alisConfirmDialog");
         await Expect(dialog).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        // Click Cancel button (non-primary)
+        // The non-primary button is the Cancel action in the app-level confirm dialog.
         var cancelButton = dialog.Locator("button:not(.e-primary)").Last;
         await cancelButton.ClickAsync();
 
-        // Result should be "Cancelled"
         await Expect(result).ToHaveTextAsync("Cancelled");
 
         AssertNoConsoleErrors();
     }
-
-    // ── Edge cases: branch exclusivity, null safety, composition semantics ──
 
     [Test]
     public async Task elseif_chain_only_executes_first_matching_branch()
@@ -666,8 +604,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Per-action When guard — low score on fresh page (skip path) ──
-
     [Test]
     public async Task single_command_condition_skips_guarded_branch_on_fresh_page()
     {
@@ -685,8 +621,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Direct And — first condition fails ──
-
     [Test]
     public async Task direct_and_fails_when_first_condition_fails()
     {
@@ -699,8 +633,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Direct Or — both conditions match (first wins) ──
 
     [Test]
     public async Task direct_or_succeeds_when_first_condition_matches()
@@ -723,8 +655,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Nested branch block — Then branch contains another When/Then/Else ──
-
     [Test]
     public async Task nested_branch_inside_then_executes_inner_branch_cases()
     {
@@ -745,8 +675,6 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Null leaf — missing address key entirely (not just city=null) ──
 
     [Test]
     public async Task null_leaf_with_missing_address_key_takes_else_no_crash()
