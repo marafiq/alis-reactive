@@ -54,8 +54,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         await city.Select(text);
     }
 
-    // ── Page loads ──
-
     [Test]
     public async Task page_loads_without_errors()
     {
@@ -76,8 +74,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Country dropdown has server-rendered options ──
-
     [Test]
     public async Task country_dropdown_has_server_rendered_options()
     {
@@ -96,8 +92,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         await Page.Keyboard.PressAsync("Escape");
         AssertNoConsoleErrors();
     }
-
-    // ── Selecting country loads cities via HTTP ──
 
     [Test]
     public async Task selecting_country_loads_cities_via_http()
@@ -118,8 +112,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Changing country updates city datasource ──
-
     [Test]
     public async Task changing_country_updates_city_datasource()
     {
@@ -138,8 +130,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Selecting city after cascade shows selected value ──
-
     [Test]
     public async Task selecting_city_after_cascade_shows_selected_value()
     {
@@ -157,8 +147,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
             .ToHaveTextAsync("SEA", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Gather sends both country and city values ──
 
     [Test]
     public async Task gather_sends_both_country_and_city_values()
@@ -183,8 +171,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Selective payload sends only country, not city ──
-
     [Test]
     public async Task selective_payload_sends_only_country_not_city()
     {
@@ -206,8 +192,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Full cascading workflow: country → city → save ──
 
     [Test]
     public async Task full_cascading_workflow_country_to_city_to_save()
@@ -240,8 +224,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Switching country clears previous city selection ──
 
     [Test]
     public async Task switching_country_clears_previous_city_selection()
@@ -281,13 +263,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ══════════════════════════════════════════════════════════
-    // Status indicators — initial state and CSS class mutations
-    // ══════════════════════════════════════════════════════════
-
-    // ── City dropdown starts empty before any country selection ──
-
     [Test]
     public async Task city_dropdown_has_no_items_before_country_selection()
     {
@@ -303,8 +278,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Status indicators show placeholder text on initial load ──
 
     [Test]
     public async Task status_indicators_show_placeholder_text_on_initial_load()
@@ -327,8 +300,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Cascade status turns green after cities load ──
-
     [Test]
     public async Task cascade_status_turns_green_after_cities_load()
     {
@@ -349,13 +320,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ══════════════════════════════════════════════════════════
-    // All country-to-city cascades — every country produces correct cities
-    // ══════════════════════════════════════════════════════════
-
-    // ── Canada selection loads Toronto and Vancouver ──
-
     [Test]
     public async Task selecting_canada_loads_two_cities()
     {
@@ -375,8 +339,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Australia selection loads Sydney and Melbourne ──
-
     [Test]
     public async Task selecting_australia_loads_two_cities()
     {
@@ -395,13 +357,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ══════════════════════════════════════════════════════════
-    // Save edge cases
-    // ══════════════════════════════════════════════════════════
-
-    // ── Save with country but no city sends empty city to server ──
-
     [Test]
     public async Task saving_with_country_but_no_city_shows_empty_city_in_result()
     {
@@ -426,8 +381,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Save result turns green on successful save ──
 
     [Test]
     public async Task save_result_turns_green_on_success()
@@ -456,13 +409,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ══════════════════════════════════════════════════════════
-    // Multi-step workflow variations
-    // ══════════════════════════════════════════════════════════
-
-    // ── Full workflow with Canada — different country exercises same pipeline ──
-
     [Test]
     public async Task full_cascading_workflow_with_canada()
     {
@@ -494,8 +440,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Rapid country switching — three countries in sequence stabilizes correctly ──
-
     // REMOVED: rapid_country_switching_stabilizes_with_correct_city_count
     // This test is inherently flaky with real browser DDL interactions because
     // ArrowDown keyboard navigation fires intermediate change events for each
@@ -503,8 +447,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
     // intermediate cascade HTTP requests racing against each other.
     // The individual country-switch behavior is already covered by
     // changing_country_updates_city_datasource and switching_country_clears_previous_city_selection.
-
-    // ── Selecting different city after first selection updates display ──
 
     [Test]
     public async Task selecting_different_city_updates_selected_city_display()

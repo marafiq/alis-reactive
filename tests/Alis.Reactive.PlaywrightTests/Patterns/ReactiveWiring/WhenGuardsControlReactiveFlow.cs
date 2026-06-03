@@ -26,8 +26,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
     }
 
-    // ── Scenario: Status dropdown drives entire form state ──
-
     /// <summary>
     /// Selecting "active" triggers the first ElseIf branch which:
     /// - Sets Fusion FusionNumericTextBox Amount to 100 (cross-vendor: native event -> fusion mutation)
@@ -96,8 +94,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Scenario: Amount numeric drives tier classification ──
-
     /// <summary>
     /// Entering different amounts evaluates the ElseIf tier ladder:
     /// - >= 5000: "High value order" (rose)
@@ -142,8 +138,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Scenario: City dropdown auto-fills sibling fields ──
-
     /// <summary>
     /// Selecting a city auto-fills the State dropdown and PostalCode numeric:
     /// - seattle  -> State=WA, PostalCode=98101
@@ -181,8 +175,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Scenario: Full ElseIf lifecycle — all branches fire in sequence ──
-
     /// <summary>
     /// Exercises every ElseIf branch of the Status dropdown in sequence:
     ///   1. "active"   → Amount=100, City=seattle, address visible, green text
@@ -206,8 +198,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         var amountInput = Page.Locator($"#{S}__Amount").First;
         var citySelect = Page.Locator($"#{S}__Address_City");
         var addressSection = Page.Locator("#address-section");
-
-        // ── Phase 1: Active ──
         await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "active" });
 
         await Expect(result).ToContainTextAsync("Active", new() { Timeout = 3000 });
@@ -216,8 +206,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
             new System.Text.RegularExpressions.Regex(@"^100(\.00)?$"), new() { Timeout = 3000 });
         await Expect(citySelect).ToHaveValueAsync("seattle", new() { Timeout = 3000 });
         await Expect(addressSection).ToBeVisibleAsync();
-
-        // ── Phase 2: Inactive ──
         await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "inactive" });
 
         await Expect(result).ToContainTextAsync("Inactive", new() { Timeout = 3000 });
@@ -227,8 +215,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         await Expect(amountInput).ToHaveValueAsync(
             new System.Text.RegularExpressions.Regex(@"^0(\.00)?$"), new() { Timeout = 3000 });
         await Expect(addressSection).ToBeHiddenAsync();
-
-        // ── Phase 3: Pending (Else branch) ──
         await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "pending" });
 
         await Expect(result).ToContainTextAsync("Pending or empty", new() { Timeout = 3000 });
@@ -241,8 +227,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Scenario: City autofill state survives address hide/show cycle ──
 
     /// <summary>
     /// Exercises a cross-vendor workflow spanning two reactive pipelines:
@@ -301,8 +285,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Scenario: Denver city autofills CO + 80201 ──
-
     /// <summary>
     /// Selecting "denver" in the City dropdown auto-fills State=CO and PostalCode=80201.
     /// The existing tests cover seattle (WA/98101) and portland (OR/97201) but NOT denver.
@@ -330,8 +312,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Scenario: City else branch clears state and resets postal code ──
 
     /// <summary>
     /// After selecting a city (which auto-fills State and PostalCode), selecting the
@@ -366,8 +346,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Scenario: Initial page state before any interaction ──
-
     /// <summary>
     /// On load, all echo elements display their default text: status-result and
     /// amount-tier show em-dash, city-auto shows "Select a city". No conditions
@@ -390,8 +368,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Scenario: Amount tier boundary values ──
 
     /// <summary>
     /// The tier ladder uses Gte (>=) comparisons:
@@ -438,8 +414,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Scenario: Pending status (Else branch) fires directly ──
-
     /// <summary>
     /// Selecting "pending" as the first interaction (without first going through
     /// "active" or "inactive") must fire the Else branch directly. The full lifecycle
@@ -465,8 +439,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Scenario: All three cities in sequence ──
 
     /// <summary>
     /// Selecting seattle → portland → denver exercises every ElseIf branch of the City
@@ -507,8 +479,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Scenario: Programmatic Amount set cascades into tier pipeline ──
 
     /// <summary>
     /// When Status "active" programmatically sets Amount to 100 via SetValue on the
