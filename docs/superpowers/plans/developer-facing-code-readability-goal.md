@@ -215,6 +215,78 @@ test: simplify guard Playwright test readability
 Do not include XML documentation cleanup, sandbox markup cleanup, runtime
 cleanup, generated TS changes, or product refactoring in this commit.
 
+## Full-Repo Adaptation
+
+The goal now applies across all C# projects, Razor/sandbox DSL files, tests,
+tools, examples, and TypeScript sources in the repository.
+
+Pass goal for the expanded work:
+
+```text
+Close matrix row: readability-only cleanup across C# and TS surfaces -> framework developer navigation and API clarity -> runtime behavior unchanged
+```
+
+Allowed changes:
+
+- Delete comments that repeat nearby code, test names, method names, parameter
+  names, or obvious assertion mechanics.
+- Rewrite comments so they explain the DSL, public API contract, runtime
+  boundary, browser timing, Syncfusion/vendor behavior, compatibility constraint,
+  or invariant.
+- Rename local variables, private helper parameters, and test helper names when
+  the new name makes the behavior easier to follow and does not change public
+  API, generated plan JSON, routes, selectors, test names, or runtime contract.
+- Extract very small private helpers only when a repeated comment is currently
+  carrying the behavior name.
+
+Disallowed changes:
+
+- Public DSL/API renames.
+- Generated TypeScript contract edits unless produced by the normal generator.
+- Runtime behavior changes, validation behavior changes, route changes, selector
+  changes, test intent changes, or sandbox product refactors.
+- Broad style churn, formatter-only commits, or comment deletion that removes
+  useful browser/vendor/domain context.
+
+Initial broad inventory on this branch:
+
+| Surface | Comment lines found | Highest-noise examples |
+| --- | ---: | --- |
+| `Alis.Reactive.Fusion` | 4431 | Fusion template/component XML docs |
+| `tests` | 3375 | Playwright section banners and step narration |
+| `Alis.Reactive` | 1610 | public builder/domain XML docs |
+| `Alis.Reactive.Native` | 1147 | native builder XML docs |
+| `Alis.Reactive.SandboxApp` | 816 | sandbox Razor DSL section banners |
+| `Alis.Reactive.Assets` TypeScript | 314 | runtime value/validation comments |
+| `Alis.Reactive.NativeTagHelpers` | 199 | public XML docs |
+| `tools` | 61 | small generator/tool docs |
+| `examples` | 21 | example Razor comments |
+| `Alis.Reactive.DesignSystem` | 20 | minimal |
+| `Alis.Reactive.FluentValidator` | 0 | no current target |
+
+Expanded commit boundaries:
+
+1. Playwright tests: one behavior area per commit, verified with the matching
+   `scripts/playwright.sh --filter ...` and `scripts/test.sh --no-e2e` when the
+   slice affects test compilation.
+2. Public C# XML docs: one API/component family per commit, verified with
+   `dotnet build` or `scripts/test.sh --no-e2e` depending on scope.
+3. Sandbox Razor DSL comments: one route or feature page per commit, verified
+   by the matching Playwright route when behavior is browser-visible.
+4. Runtime TypeScript: one runtime module per commit, verified with
+   `npm run typecheck`, `npm test`, and `npm run build:all`; add focused
+   Playwright only when runtime behavior code changes.
+5. Tools/examples/native/design-system: one project-sized cleanup per commit
+   when the project is small, verified with a build covering the project.
+
+Review cycle before every commit:
+
+- Re-run `rg -n "^\\s*//|^\\s*///|/\\*|^\\s*\\*"` on touched files.
+- Classify remaining comments as kept because they explain domain/API/runtime
+  context, or note a deferred concern.
+- Run `git diff --check`.
+- Confirm `git diff --name-only` matches the intended commit boundary.
+
 ## Execution Checklist For The Future Pass
 
 1. Confirm the branch is still `tiny-safe-but-important-refactorings`.
