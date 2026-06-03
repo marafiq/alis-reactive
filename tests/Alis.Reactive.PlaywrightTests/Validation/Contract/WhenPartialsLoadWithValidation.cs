@@ -27,8 +27,6 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await Input("ReasonForNoContact").FillAsync("No relatives nearby");
     }
 
-    // ── Basic composition ───────────────────────────────────
-
     [Test]
     public async Task parent_field_errors_show_inline()
     {
@@ -37,7 +35,6 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        // Parent fields should show inline errors
         await Expect(ErrorFor("Name")).ToContainTextAsync("required");
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
         await Expect(ErrorFor("Email")).ToContainTextAsync("required");
@@ -54,7 +51,6 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        // Address fields from partial should show inline
         await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
         await Expect(ErrorFor("Address.City")).ToContainTextAsync("required");
@@ -72,12 +68,10 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        // Parent fields
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
         await Expect(ErrorFor("Email")).ToBeVisibleAsync();
         await Expect(ErrorFor("CareLevel")).ToBeVisibleAsync();
 
-        // Address partial fields
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
         await Expect(ErrorFor("Address.City")).ToBeVisibleAsync();
         await Expect(ErrorFor("Address.ZipCode")).ToBeVisibleAsync();
@@ -85,8 +79,6 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Conditionals across parent and partial ──────────────
 
     [Test]
     public async Task conditional_rule_where_condition_source_is_in_parent_and_field_is_in_parent()
@@ -120,7 +112,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── EqualTo across form ─────────────────────────────────
+    // DSL condition: equalTo across parent fields.
 
     [Test]
     public async Task equalto_compares_two_parent_fields()
@@ -139,20 +131,18 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Partial's own reactive behavior ─────────────────────
-
     [Test]
     public async Task address_partial_zipcode_change_fires_partial_owned_dispatch()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Type into field and tab out to fire native change event
+        // Tab is required to fire the native change event.
         await Input("Address_ZipCode").ClickAsync();
         await Input("Address_ZipCode").PressSequentiallyAsync("90210");
         await Page.Keyboard.PressAsync("Tab");
 
-        // Wait for the dispatch chain: change → dispatch("zipcode-validated") → custom-event listener
+        // Wait for the dispatch chain from change to dispatch("zipcode-validated") to custom-event listener.
         var status = Page.Locator("#zipcode-status");
         await Expect(status).ToContainTextAsync("Zip validated", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -164,7 +154,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Type into field and tab out to fire native change event
+        // Tab is required to fire the native change event.
         await Input("EmergencyPhone").ClickAsync();
         await Input("EmergencyPhone").PressSequentiallyAsync("555-0123");
         await Page.Keyboard.PressAsync("Tab");
@@ -180,14 +170,13 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Trigger partial reactive behavior
+        // The partial dispatch should run before the parent validation submit path.
         await Input("Address_ZipCode").ClickAsync();
         await Input("Address_ZipCode").PressSequentiallyAsync("90210");
         await Page.Keyboard.PressAsync("Tab");
         await Expect(Page.Locator("#zipcode-status"))
             .ToContainTextAsync("Zip validated", new() { Timeout = 5000 });
 
-        // Then submit form — validation should work normally
         await FillAllRequired();
         await ClickWhenStable(SubmitBtn);
 
@@ -196,21 +185,17 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Full workflow ───────────────────────────────────────
-
     [Test]
     public async Task fixing_all_fields_across_parent_and_partials_results_in_success()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Submit empty → errors
         await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Fill everything
         await FillAllRequired();
         await ClickWhenStable(SubmitBtn);
 
