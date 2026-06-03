@@ -1,7 +1,5 @@
-// Validation Orchestrator — Fail-Closed, V3 ContainerScope
-//
-// Uses SHARED evaluateValue for ALL component value reads.
-// No parallel read path — same concept as pipeline and gather.
+// Validation uses the same evaluateValue path as execution and gather, so
+// component reads resolve consistently across runtime entry points.
 
 import type {
   PlanDocument, ValidationContainerScope, ComponentValidation,
@@ -83,8 +81,6 @@ interface FieldEvaluation {
   readonly hidden: boolean;
 }
 
-// -- Public API --
-
 export function validateContainer(plan: PlanDocument, containerKey: string, ctx?: ExecContext): boolean {
   const runtime = RuntimePlan.from(plan);
   const containerComp = runtime.components.find(containerKey);
@@ -131,10 +127,10 @@ export function validateContainer(plan: PlanDocument, containerKey: string, ctx?
   let valid = true;
   let summaryHasErrors = false;
 
-  for (const cv of containerScope.validationRules) {
-    if (!evaluateComponentRules(cv, surface, container)) {
+  for (const componentValidation of containerScope.validationRules) {
+    if (!evaluateComponentRules(componentValidation, surface, container)) {
       valid = false;
-      summaryHasErrors = summaryHasErrors || summaryHasError(surface.summary, cv.component);
+      summaryHasErrors = summaryHasErrors || summaryHasError(surface.summary, componentValidation.component);
     }
   }
 
@@ -213,16 +209,14 @@ export function revalidateField(plan: PlanDocument, containerKey: string, compon
   const containerScope = containerComp?.containerScope;
   if (!containerComp || !containerScope) return;
 
-  const cv = containerScope.validationRules.find(r => r.component === componentKey);
-  if (!cv) return;
+  const componentValidation = containerScope.validationRules.find(r => r.component === componentKey);
+  if (!componentValidation) return;
 
   const containerId = containerComp.id;
 
-  // Clear existing error for this field
   const comp = runtime.components.find(componentKey);
   if (comp) clearInline(comp.id);
 
-  // Find the container element
   let container: HTMLElement;
   try {
     container = containerComp.element();
@@ -241,7 +235,7 @@ export function revalidateField(plan: PlanDocument, containerKey: string, compon
     context: ExecutionContext.absent(),
   };
 
-  evaluateComponentRules(cv, surface, container);
+  evaluateComponentRules(componentValidation, surface, container);
 }
 
 export function clearContainerValidation(plan: PlanDocument, containerKey: string): void {
@@ -262,28 +256,26 @@ export function clearContainerValidation(plan: PlanDocument, containerKey: strin
   });
 }
 
-// -- Per-component evaluation --
-
 function evaluateComponentRules(
-  cv: ComponentValidation,
+  componentValidation: ComponentValidation,
   surface: ValidationSurface,
   container: HTMLElement,
 ): boolean {
-  const comp = surface.runtime.components.find(cv.component);
-  if (!comp) return handleInactiveValidationField(cv, surface);
+  const comp = surface.runtime.components.find(componentValidation.component);
+  if (!comp) return handleInactiveValidationField(componentValidation, surface);
 
-  const resolved = resolveFieldElement(comp, cv, surface);
+  const resolved = resolveFieldElement(comp, componentValidation, surface);
   if (resolved.done) return resolved.result;
 
   if (!container.contains(resolved.element)) {
-    log.trace("field.out-of-scope", { component: cv.component, containerId: surface.containerId });
+    log.trace("field.out-of-scope", { component: componentValidation.component, containerId: surface.containerId });
     return true;
   }
 
   const hidden = isErrorSpanHidden(comp.id);
-  const value = evaluateValue(cv.value, surface.plan);
+  const value = evaluateValue(componentValidation.value, surface.plan);
   const field: FieldEvaluation = {
-    componentValidation: cv,
+    componentValidation,
     componentDomId: comp.id,
     value,
     hidden,
@@ -294,14 +286,14 @@ function evaluateComponentRules(
 
 /** An unloaded partial field is valid only when its active rules are skipped. */
 function handleInactiveValidationField(
-  cv: ComponentValidation,
+  componentValidation: ComponentValidation,
   surface: ValidationSurface,
 ): boolean {
-  log.trace("validation-field.inactive", { component: cv.component });
-  if (allRulesInactiveForUnmountedField(cv.rules, surface)) return true;
-  const message = firstRuleMessage(cv);
+  log.trace("validation-field.inactive", { component: componentValidation.component });
+  if (allRulesInactiveForUnmountedField(componentValidation.rules, surface)) return true;
+  const message = firstRuleMessage(componentValidation);
   if (message !== undefined) {
-    addSummaryError(surface.summary, cv.component, message);
+    addSummaryError(surface.summary, componentValidation.component, message);
   }
   return false;
 }
@@ -311,24 +303,24 @@ type FieldResolution = { done: false; element: HTMLElement } | { done: true; res
 /** Resolve the field element. On resolution error, returns early result (true if all skipped, false otherwise). */
 function resolveFieldElement(
   component: RuntimeComponent,
-  cv: ComponentValidation,
+  componentValidation: ComponentValidation,
   surface: ValidationSurface,
 ): FieldResolution {
   try {
     return { done: false, element: component.element() };
   } catch (e) {
     if (!RuntimeResolutionError.is(e)) throw e;
-    if (allRulesInactiveForUnmountedField(cv.rules, surface)) return { done: true, result: true };
-    const message = firstRuleMessage(cv);
+    if (allRulesInactiveForUnmountedField(componentValidation.rules, surface)) return { done: true, result: true };
+    const message = firstRuleMessage(componentValidation);
     if (message !== undefined) {
-      addSummaryError(surface.summary, cv.component, message);
+      addSummaryError(surface.summary, componentValidation.component, message);
     }
     return { done: true, result: false };
   }
 }
 
-function firstRuleMessage(cv: ComponentValidation): string | undefined {
-  return cv.rules[0]?.message;
+function firstRuleMessage(componentValidation: ComponentValidation): string | undefined {
+  return componentValidation.rules[0]?.message;
 }
 
 /**
@@ -349,7 +341,6 @@ function canRenderInlineValidationMessage(compId: string): boolean {
   return !isHidden(parent);
 }
 
-/** Evaluate each rule against the field value. Returns false on first failure. */
 function evaluateRulesForField(
   field: FieldEvaluation,
   surface: ValidationSurface,
@@ -365,7 +356,6 @@ function evaluateRulesForField(
   return true;
 }
 
-/** Show the error inline or in the summary depending on visibility. */
 function reportRuleFailure(
   field: FieldEvaluation,
   rule: ValidationRule,
@@ -380,8 +370,6 @@ function reportRuleFailure(
     removeSummaryError(surface.summary, component);
   }
 }
-
-// -- Helpers --
 
 function allRulesInactiveForUnmountedField(rules: ValidationRule[], surface: ValidationSurface): boolean {
   if (rules.length === 0) return true;
@@ -444,8 +432,8 @@ function hasPeerTarget(rule: ValidationRule): rule is PeerTargetValidationRule {
 function clearContainerErrors(
   surface: ValidationSurface,
 ): void {
-  for (const cv of surface.containerScope.validationRules) {
-    const comp = surface.runtime.components.find(cv.component);
+  for (const componentValidation of surface.containerScope.validationRules) {
+    const comp = surface.runtime.components.find(componentValidation.component);
     if (comp) clearInline(comp.id);
   }
   clearAndHideSummary(surface.summary);
@@ -454,7 +442,8 @@ function clearContainerErrors(
 function findComponentValidationByName(surface: ValidationSurface, name: string): ComponentValidation | undefined {
   // PlanDocument-driven: each ComponentValidation carries serverFieldName set at C# build time.
   // No heuristics — the plan declares the mapping.
-  return surface.containerScope.validationRules.find(cv => matchesServerErrorName(cv, name));
+  return surface.containerScope.validationRules.find(componentValidation =>
+    matchesServerErrorName(componentValidation, name));
 }
 
 function matchesServerErrorName(componentValidation: ComponentValidation, serverFieldName: string): boolean {
