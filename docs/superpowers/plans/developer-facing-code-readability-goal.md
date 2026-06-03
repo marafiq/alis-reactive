@@ -55,7 +55,11 @@ Keep comments when they explain one of these developer-facing facts:
   could accidentally break.
 - Invariants that protect public DSL behavior, generated plan shape, or runtime
   execution.
-- Public API behavior that should be visible in IntelliSense.
+- Public API behavior that should be visible in IntelliSense or generated API
+  docs.
+- Public DSL XML documentation that follows normal .NET XML doc shape:
+  `<summary>`, `<typeparam>`, `<param>`, `<returns>`, and targeted
+  `<remarks>` or `<exception>` entries when they communicate contract behavior.
 
 ### What To Delete
 
@@ -70,6 +74,9 @@ Delete comments when they only:
 - Hide unclear test flow that should be expressed through helper methods.
 - Provide long examples better suited for docs, sandbox pages, or focused
   examples.
+- Strip standard XML documentation elements from public DSL members only because
+  the existing wording is repetitive. Rewrite those elements into useful API
+  contract language, or defer the API-doc slice.
 
 ### When To Replace Comments With Helper Methods
 
@@ -149,9 +156,9 @@ Concrete confusion:
 Why it matters for developers:
 Public XML docs are IntelliSense surface for framework developers. Repetitive wording makes important contract details harder to find, especially around runtime-resolved values, typed payloads, plugins, and component references.
 Recommended action:
-Do not mix XML cleanup into the first Playwright slice. Later, clean one public API slice at a time, keeping concise IntelliSense docs that explain contract differences and deleting summaries that only repeat obvious method names.
+Do not mix XML cleanup into the first Playwright slice. Later, clean one public API slice at a time, keeping concise .NET XML docs that explain contract differences and rewriting repetitive summaries, `typeparam`, `param`, and `returns` text into useful IntelliSense/API-doc language.
 Keep / rewrite / delete / defer:
-defer XML cleanup; later keep class-level and contract-specific docs, rewrite ambiguous API docs, delete repetitive member and parameter docs.
+defer XML cleanup; later keep class-level and contract-specific docs, rewrite ambiguous or repetitive API docs, and defer accidental-public-surface questions unless the slice explicitly covers API visibility.
 
 Reviewer:
 Test readability reviewer
@@ -272,9 +279,14 @@ Expanded commit boundaries:
    warrant e2e; `git diff --check` is enough, with a build only if syntax or XML
    documentation could be affected.
 2. Public C# XML docs: one API/component family per commit, verified with
-   `dotnet build` or `scripts/test.sh --no-e2e` depending on scope.
+   `dotnet build` or `scripts/test.sh --no-e2e` depending on scope. Public DSL
+   docs must remain valid .NET XML documentation suitable for IntelliSense and
+   generated docs; prefer rewriting repetitive `typeparam`, `param`, and
+   `returns` entries over deleting standard elements.
 3. Sandbox Razor DSL comments: one route or feature page per commit, verified
-   by the matching Playwright route when behavior is browser-visible.
+   by the matching build or Playwright route only when the edit can affect
+   rendering, selectors, timing, or browser-visible behavior. Pure comment
+   removal does not warrant e2e.
 4. Runtime TypeScript: one runtime module per commit, verified with
    `npm run typecheck` when TS syntax, names, or comments that can affect
    documentation tooling change. Add `npm test` or `npm run build:all` only for
@@ -288,6 +300,11 @@ Review cycle before every commit:
 - Re-run `rg -n "^\\s*//|^\\s*///|/\\*|^\\s*\\*"` on touched files.
 - Classify remaining comments as kept because they explain domain/API/runtime
   context, or note a deferred concern.
+- For public C# XML docs, confirm standard XML elements remain present and carry
+  contract value rather than repeating names.
+- If a public type appears to be implementation surface rather than DSL/API,
+  record the file and rationale as a follow-up unless the selected slice is
+  explicitly an API-visibility change.
 - Run `git diff --check`.
 - Confirm `git diff --name-only` matches the intended commit boundary.
 
@@ -298,8 +315,11 @@ Review cycle before every commit:
 3. Inventory comments in the chosen test file.
 4. Classify each comment as keep, delete, rewrite, or replace with helper.
 5. Apply the smallest useful cleanup.
-6. Run the focused Playwright proof through `scripts/playwright.sh`.
-7. Run `scripts/test.sh --no-e2e`.
+6. Run verification that matches the actual edit: diff hygiene for comment-only
+   cleanup, scoped build/typecheck for syntax/XML/TS edits, and focused
+   Playwright only for behavior-visible test, Razor, selector, timing, or
+   runtime changes.
+7. Do not run e2e for pure comment removal.
 8. Commit one logical readability slice.
 9. Report which comments were kept, removed, rewritten, or replaced by helper
    names.
