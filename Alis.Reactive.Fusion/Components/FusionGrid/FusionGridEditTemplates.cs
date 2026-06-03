@@ -9,26 +9,19 @@ using Alis.Reactive.Builders.Conditions;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed cell editors for <see cref="FusionGrid"/> columns, rendered as Syncfusion
-    /// <c>EditTemplate</c> markup. The template owns its own option data, so it works under
-    /// custom (server) binding where the built-in <c>dropdownedit</c> cannot read distinct
-    /// values from the remote data source.
+    /// Creates typed <see cref="FusionGrid"/> cell editors rendered as Syncfusion
+    /// <c>EditTemplate</c> markup.
     /// </summary>
     /// <remarks>
-    /// Field names come from a typed row expression (no stringly field names):
-    /// <code>
-    /// new GridColumn
-    /// {
-    ///     Field = "careLevel",
-    ///     EditTemplate = FusionGridEditTemplates.Select((ResidentCareItem r) =&gt; r.CareLevel,
-    ///         new[] { "Independent", "Assisted Living", "Memory Care", "Skilled Nursing" })
-    /// }
-    /// </code>
+    /// Select templates own their option data, so they work under custom server binding
+    /// where Syncfusion's built-in <c>dropdownedit</c> cannot read distinct values from
+    /// the remote data source.
+    /// Example: <c>FusionGridEditTemplates.Select((ResidentRow r) =&gt; r.CareLevel, careLevels)</c>.
     /// </remarks>
     public static class FusionGridEditTemplates
     {
         /// <summary>
-        /// A typed single-select cell editor bound to a row field, populated from a string list.
+        /// Creates a single-select cell editor bound to a typed row field and populated from a string list.
         /// </summary>
         public static string Select<TRow, TField>(
             Expression<Func<TRow, TField>> field,
@@ -40,7 +33,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// A typed single-select cell editor over a typed option list with text/value selectors.
+        /// Creates a single-select cell editor over a typed option list with text/value selectors.
         /// </summary>
         public static string Select<TRow, TField, TItem>(
             Expression<Func<TRow, TField>> field,
@@ -54,36 +47,27 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// A typed native date cell editor bound to a row field. Saves an ISO yyyy-MM-dd value.
+        /// Creates a native date cell editor bound to a typed row field.
         /// </summary>
         public static string DateInput<TRow, TField>(Expression<Func<TRow, TField>> field)
             where TRow : class
         {
             var fieldName = ExpressionPathHelper.ToEventPath(field);
             var name = HtmlEncoder.Default.Encode(fieldName);
-            // value="${field}" binds the editing row's current value through the SF
+            // value="${field}" binds the editing row's current value through the Syncfusion
             // template engine — the built-in editor leaves native date inputs unset.
             return "<input type=\"date\" name=\"" + name + "\" value=\"${" + fieldName
                 + "}\" class=\"e-field e-input\" style=\"width:100%\" />";
         }
 
         /// <summary>
-        /// A typed dialog-edit form template for <c>GridEditSettings.Template</c> in
-        /// <see cref="Syncfusion.EJ2.Grids.EditMode"/> Dialog mode. Each field is declared
-        /// from a typed row expression, so there is no stringly field name and no raw HTML
-        /// in the view.
+        /// Creates a typed dialog-edit form template for <c>GridEditSettings.Template</c>
+        /// in <see cref="Syncfusion.EJ2.Grids.EditMode"/> Dialog mode.
         /// </summary>
         /// <remarks>
-        /// <code>
-        /// EditSettings = new GridEditSettings
-        /// {
-        ///     Mode = EditMode.Dialog,
-        ///     Template = FusionGridEditTemplates.DialogForm&lt;ResidentRow&gt;(d => d
-        ///         .Text(r =&gt; r.ResidentName, "Resident")
-        ///         .Select(r =&gt; r.RiskLevel, "Risk", riskOptions)
-        ///         .Number(r =&gt; r.OpenTasks, "Open tasks"))
-        /// }
-        /// </code>
+        /// Each field is declared from a typed row expression, avoiding stringly field names
+        /// and raw HTML in the view.
+        /// Example: <c>FusionGridEditTemplates.DialogForm&lt;ResidentRow&gt;(d =&gt; d.Text(r =&gt; r.Name, "Name"))</c>.
         /// </remarks>
         public static string DialogForm<TRow>(Action<FusionGridDialogFormBuilder<TRow>> build)
             where TRow : class
@@ -119,7 +103,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Builds a typed dialog-edit form for a <see cref="FusionGrid"/> row. Each labeled
     /// field is declared from a typed row expression; the editing row's current value
-    /// binds through the SF <c>${field}</c> template token.
+    /// binds through the Syncfusion <c>${field}</c> template token.
     /// </summary>
     public sealed class FusionGridDialogFormBuilder<TRow>
         where TRow : class
