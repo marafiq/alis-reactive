@@ -1,15 +1,10 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
 /// <summary>
-/// Proves that C# types survive the full serialization path:
-///   C# expression -> ExpressionPathHelper -> plan JSON source binding -> runtime resolve() -> DOM text
-///
-/// Each test targets a specific C# type (int, long, double, string, bool) or a nested dot-path.
-/// If ExpressionPathHelper changes its casing/path logic, or resolver.ts changes its walk logic,
-/// or System.Text.Json changes its serialization, one or more of these tests will catch it.
-///
-/// The payload is dispatched via dom-ready and consumed via CustomEvent<PayloadShowcaseModel>.
-/// No HTTP calls — pure plan-driven data flow.
+/// Proves C# payload values survive the plan path:
+/// expression -> plan JSON source binding -> runtime resolution -> DOM text.
+/// The payload is dispatched on dom-ready and consumed by a typed CustomEvent,
+/// so failures usually point at expression path casing, JSON shape, or runtime value walking.
 /// </summary>
 [TestFixture]
 public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
@@ -19,8 +14,6 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task int_value_survives_serialization_and_displays_correctly()
     {
-        // C# int 42 -> JSON number 42 -> resolveToString -> DOM "42"
-        // If System.Text.Json wraps ints in quotes or resolver.ts coerces differently, this fails.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -31,9 +24,8 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task long_value_preserves_full_precision()
     {
-        // 9007199254740991 is Number.MAX_SAFE_INTEGER — the largest integer JS can represent exactly.
-        // If C# serializes as a JSON string instead of number, or JS loses precision via parseFloat,
-        // the displayed value will be wrong. This is the boundary case for C#-to-JS numeric fidelity.
+        // 9007199254740991 is Number.MAX_SAFE_INTEGER: the largest integer JS can represent exactly.
+        // If the JSON number or runtime text conversion loses precision, this displays the wrong value.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -44,9 +36,6 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task double_value_preserves_decimal_places()
     {
-        // C# double 3.14159 -> JSON 3.14159 -> DOM "3.14159"
-        // Floating point formatting must preserve all significant digits.
-        // If serialization truncates or rounds, the exact string won't match.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -57,9 +46,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task string_value_passes_through_unchanged()
     {
-        // "hello world" must arrive in the DOM exactly — no encoding, no trimming, no escaping.
-        // The space character is the simplest case that breaks if someone URL-encodes or HTML-encodes
-        // the value during serialization.
+        // The space in "hello world" catches accidental trimming or separator changes.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -70,9 +57,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task bool_value_displays_as_string()
     {
-        // C# bool true -> JSON true -> resolveToString -> DOM "true"
-        // If resolveToString returns "True" (C# casing) or "1" or empty string, this fails.
-        // JavaScript's String(true) produces "true" — that's the expected canonical form.
+        // Runtime text conversion should follow JavaScript casing: String(true) -> "true".
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -83,12 +68,8 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task nested_three_level_path_resolves_street_city_zip()
     {
-        // C# expression x => x.Address.Street -> ExpressionPathHelper -> "evt.address.street"
-        // Runtime: structured payload path address.street -> "123 Main St"
-        //
-        // All three Address properties test the SAME structured path resolution at different leaf nodes.
-        // If ExpressionPathHelper breaks PascalCase -> camelCase conversion, ALL three fail.
-        // If structured path resolution breaks at depth > 1, the nested paths fail but flat paths still pass.
+        // All three Address properties prove the same PascalCase -> camelCase structured path
+        // resolution at different leaves. Depth failures break these while flat properties still pass.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -101,12 +82,8 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task all_properties_resolved_shows_success_status()
     {
-        // After ALL SetText mutations complete, the reaction chain also mutates #payload-status:
-        //   RemoveClass("text-text-muted") + AddClass("text-green-600") + AddClass("font-semibold") + SetText(...)
-        //
-        // This is the aggregate indicator — if ANY preceding SetText failed to execute (e.g., because
-        // resolve() threw on a bad path), the sequential reaction would abort and status would stay gray.
-        // Green status = every single source binding in the reaction resolved without error.
+        // The status mutation runs after every source binding. If any SetText throws on a bad path,
+        // the sequence aborts before this element turns green.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -115,9 +92,8 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
         await Expect(status).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"));
         await Expect(status).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("font-semibold"));
 
-        // The initial muted class must have been removed — proves RemoveClass worked
-        var classAttr = await status.GetAttributeAsync("class") ?? "";
-        Assert.That(classAttr, Does.Not.Contain("text-text-muted"),
+        var statusClasses = await status.GetAttributeAsync("class") ?? "";
+        Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
             "RemoveClass('text-text-muted') must have removed the initial styling");
 
         AssertNoConsoleErrors();
@@ -126,11 +102,6 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task all_primitive_types_display_without_type_coercion_errors()
     {
-        // Single pass across all 5 primitive types: int, long, double, string, bool.
-        // Each type exercises a different serialization path in System.Text.Json and a
-        // different coercion path in resolveToString(). If any type breaks, the assertion
-        // identifies WHICH one failed — not just that "something" failed.
-        // This proves the entire resolver pipeline handles type diversity end-to-end.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -146,26 +117,18 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task status_element_has_correct_css_classes_after_all_resolved()
     {
-        // The reaction chain on #payload-status is a 3-mutation sequence:
-        //   1. RemoveClass("text-text-muted")  — removes initial gray styling
-        //   2. AddClass("text-green-600")      — adds success color
-        //   3. AddClass("font-semibold")       — adds emphasis
-        //
-        // This test verifies all three mutations executed correctly as a unit.
-        // If RemoveClass fails: muted class remains (conflicting styles).
-        // If either AddClass fails: visual cue is incomplete.
-        // All three together prove the multi-class mutation chain works correctly.
+        // Final class state proves the remove/add/add mutation sequence did not skip a step.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
         var status = Page.Locator("#payload-status");
-        var classAttr = await status.GetAttributeAsync("class") ?? "";
+        var statusClasses = await status.GetAttributeAsync("class") ?? "";
 
-        Assert.That(classAttr, Does.Contain("text-green-600"),
+        Assert.That(statusClasses, Does.Contain("text-green-600"),
             "AddClass('text-green-600') must have applied — success color");
-        Assert.That(classAttr, Does.Contain("font-semibold"),
+        Assert.That(statusClasses, Does.Contain("font-semibold"),
             "AddClass('font-semibold') must have applied — emphasis styling");
-        Assert.That(classAttr, Does.Not.Contain("text-text-muted"),
+        Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
             "RemoveClass('text-text-muted') must have removed the initial muted class — " +
             "proves the remove+add+add mutation chain executed in correct order");
 
@@ -175,30 +138,20 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task success_status_has_green_and_semibold_without_muted()
     {
-        // The payload-status element receives a 3-mutation sequence after ALL source bindings resolve:
-        //   1. RemoveClass("text-text-muted")  — strip initial gray
-        //   2. AddClass("text-green-600")      — apply success color
-        //   3. AddClass("font-semibold")       — apply emphasis
-        //
-        // This is a CSS class mutation COHERENCE test — it verifies the final class state
-        // as a single atomic assertion block. If mutations execute out of order or any
-        // mutation is skipped, the final class list will be wrong:
-        //   - Missing RemoveClass → "text-text-muted" still present (green + muted conflict)
-        //   - Missing AddClass → no green or no semibold (incomplete visual state)
-        //   - Aborted reaction → none of the mutations apply (element stays gray)
+        // Keep the complete final class invariant in one assertion block.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
         var status = Page.Locator("#payload-status");
-        var classAttr = await status.GetAttributeAsync("class") ?? "";
+        var statusClasses = await status.GetAttributeAsync("class") ?? "";
 
         Assert.Multiple(() =>
         {
-            Assert.That(classAttr, Does.Contain("text-green-600"),
+            Assert.That(statusClasses, Does.Contain("text-green-600"),
                 "AddClass('text-green-600') must have applied — success color after payload resolution");
-            Assert.That(classAttr, Does.Contain("font-semibold"),
+            Assert.That(statusClasses, Does.Contain("font-semibold"),
                 "AddClass('font-semibold') must have applied — emphasis after payload resolution");
-            Assert.That(classAttr, Does.Not.Contain("text-text-muted"),
+            Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
                 "RemoveClass('text-text-muted') must have stripped the initial muted class — " +
                 "stale class would cause conflicting green+muted styles");
         });
