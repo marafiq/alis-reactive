@@ -7,7 +7,6 @@
 
     var plan = Html.ReactivePlan<HttpShowcaseModel>();
 
-    // Section 1: DomReady → GET /Sandbox/HttpPipeline/Http/Residents → bind response data to DOM
     Html.On(plan, t => t.DomReady(p =>
         p.Get("/Sandbox/HttpPipeline/Http/Residents")
          .WhileLoading(l => l.Element("load-spinner").Show())
@@ -28,7 +27,6 @@
          .Response(r => r.OnSuccess(s => s.Into("native-action-link-grid")))
     ));
 
-    // Section 20: DomReady → FromUrl conditions (show/hide based on URL params)
     Html.On(plan, t => t.DomReady(p =>
     {
         p.When(p.FromUrl("tab")).Eq("medications")
@@ -40,14 +38,12 @@
          .Else(els => els.Element("url-cond-prev").Hide());
     }));
 
-    // Section 21: DomReady → FromUrl SetText (display URL params)
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Element("url-display-tab").SetText(p.FromUrl("tab"));
         p.Element("url-display-facility").SetText(p.FromUrl("facilityId"));
     }));
 
-    // NOTE: Finally demo buttons are wired inline below via .Reactive()
 }
 
 <native-vstack gap="Lg">
@@ -57,7 +53,6 @@
         FormData, GET with search params, multi-status error handling, NativeActionLink row actions, and Finally cleanup.
     </native-text>
 
-    <!-- Section 1: DomReady GET -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">1. DomReady &rarr; GET Residents</native-heading>
@@ -71,7 +66,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 2: POST with Gather -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">2. POST with Gather &rarr; Success/Error</native-heading>
@@ -109,7 +103,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 3: Chained Requests -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">3. Chained: GET Residents &rarr; GET Facilities</native-heading>
@@ -155,7 +148,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 4: Parallel Requests -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">4. Parallel: Residents + Facilities Concurrently</native-heading>
@@ -202,7 +194,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 5: PUT Update -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">5. PUT &rarr; Update Resident</native-heading>
@@ -239,7 +230,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 6: DELETE with Confirm -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">6. DELETE with Confirm &rarr; Guarded Deletion</native-heading>
@@ -270,7 +260,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 7: POST FormData (IncludeAll) -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">7. POST FormData &rarr; IncludeAll Gather</native-heading>
@@ -317,7 +306,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 8: GET with Search Params -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">8. GET with Search Params &rarr; URL Query</native-heading>
@@ -347,7 +335,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 9: Multi-Status Error Handling (422 + 500) -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">9. Multi-Status Error Handling &rarr; 422 Route</native-heading>
@@ -388,7 +375,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 10: NativeActionLink -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">10. NativeActionLink &rarr; Repeated Row Actions</native-heading>
@@ -427,7 +413,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 19: FromUrl in Gather -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">19. FromUrl in Gather &rarr; Send URL Params</native-heading>
@@ -456,7 +441,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 20: FromUrl in Conditions -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">20. FromUrl in Conditions &rarr; DomReady Branch</native-heading>
@@ -468,7 +452,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 21: FromUrl in SetText -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">21. FromUrl in SetText &rarr; Display URL Params</native-heading>
@@ -480,7 +463,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 22: FromUrl Composed with Route Params + Headers -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">22. FromUrl Composed &rarr; Route Param + Header + Gather</native-heading>
@@ -534,7 +516,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 15: Single Route Param -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">15. GET with Single Route Param</native-heading>
@@ -564,7 +545,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 16: Multiple Route Params -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">16. GET with Multiple Route Params</native-heading>
@@ -598,7 +578,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 17: Chained with Route Params + Headers -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">17. Chained with Route Params + Headers</native-heading>
@@ -645,7 +624,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 18: URI-Encoded Route Param -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">18. URI-Encoded Route Param</native-heading>
@@ -670,7 +648,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 12: Custom Headers (literal) -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">12. GET with Custom Headers</native-heading>
@@ -706,7 +683,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 13: Headers on Chained Requests -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">13. Chained with Headers</native-heading>
@@ -760,7 +736,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 14: Headers on Parallel Requests -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">14. Parallel with Headers</native-heading>
@@ -814,7 +789,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section: Finally Demo — guaranteed cleanup -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">Finally Demo &mdash; Guaranteed Cleanup</native-heading>
@@ -863,7 +837,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Plan JSON -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
