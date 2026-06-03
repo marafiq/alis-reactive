@@ -13,7 +13,7 @@ namespace Alis.Reactive.Native.Components
     {
         /// <summary>
         /// Creates a <see cref="NativeTextAreaBuilder{TModel,TProp}"/> inside the field wrapper,
-        /// registers the component in the plan, and renders the textarea.
+        /// registers the component in the Reactive Plan, and renders the textarea.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>

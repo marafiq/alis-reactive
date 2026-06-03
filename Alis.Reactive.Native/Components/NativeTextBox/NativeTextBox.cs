@@ -6,7 +6,7 @@ namespace Alis.Reactive.Native.Components
     /// <remarks>
     /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the
     /// <c>.NativeTextBox()</c> factory to create a model-bound text input with
-    /// label, validation, and reactive event support.
+    /// label, validation, and Reactive Plan event support.
     /// </remarks>
     public sealed class NativeTextBox : NativeComponent, IInputComponent
     {

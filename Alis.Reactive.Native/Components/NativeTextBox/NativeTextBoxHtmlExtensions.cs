@@ -21,7 +21,7 @@ namespace Alis.Reactive.Native.Components
     {
         /// <summary>
         /// Creates a <see cref="NativeTextBoxBuilder{TModel,TProp}"/> inside the field wrapper,
-        /// registers the component in the plan, and renders the input.
+        /// registers the component in the Reactive Plan, and renders the input.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>

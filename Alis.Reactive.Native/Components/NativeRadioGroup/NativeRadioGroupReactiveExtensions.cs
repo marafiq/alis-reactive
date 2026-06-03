@@ -5,36 +5,27 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Wires browser events from <see cref="NativeRadioGroup"/> into the reactive plan.
+    /// Wires <see cref="NativeRadioGroup"/> DOM events into the Reactive Plan.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Creates one plan entry per radio option so each radio button triggers the
-    /// pipeline independently. <c>.Reactive()</c> is always the last call in the
-    /// builder chain.
+    /// Creates one Reactive Plan entry per radio option so each radio button
+    /// can trigger the pipeline independently. <c>.Reactive()</c> is the final
+    /// builder call; native builders render directly.
     /// </para>
-    /// <code>
-    /// .NativeRadioGroup(b => b
-    ///     .Items(careLevelItems)
-    ///     .Reactive(plan, evt => evt.Changed, (args, p) =>
-    ///     {
-    ///         p.Element("status").SetText("selected!");
-    ///     }))
-    /// </code>
     /// </remarks>
     public static class NativeRadioGroupReactiveExtensions
     {
         /// <summary>
-        /// Wires a <see cref="NativeRadioGroup"/> browser event into a reactive pipeline.
+        /// Wires a <see cref="NativeRadioGroup"/> DOM event into a Reactive Plan pipeline.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <typeparam name="TArgs">The event args type selected by <paramref name="eventSelector"/>.</typeparam>
         /// <param name="builder">The radio group builder to wire events on.</param>
-        /// <param name="plan">The plan to add the reactive entries to.</param>
+        /// <param name="plan">The plan that receives the component event triggers.</param>
         /// <param name="eventSelector">Selects which event to listen for (e.g. <c>evt => evt.Changed</c>).</param>
-        /// <param name="pipeline">Configures the reactive pipeline that runs when the event fires.</param>
-        /// <returns>The builder for continued chaining.</returns>
+        /// <param name="pipeline">Builds the pipeline that runs when the event fires.</param>
         public static NativeRadioGroupBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeRadioGroupBuilder<TModel, TProp> builder,
             ReactivePlan<TModel> plan,

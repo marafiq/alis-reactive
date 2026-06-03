@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Pipeline extensions for <see cref="NativeRadioGroup"/>: set selected value, focus, and read.
+    /// Reactive Plan operations for <see cref="NativeRadioGroup"/> selected values and focus.
     /// </summary>
     /// <remarks>
     /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via
@@ -22,12 +22,11 @@ namespace Alis.Reactive.Native.Components
             ComponentMethod.Named("focus");
 
         /// <summary>
-        /// Sets the selected radio button value in the browser.
+        /// Sets the selected radio button value through the component contract.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <param name="self">The radio group component reference.</param>
         /// <param name="value">The radio option value to select.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeRadioGroup, TModel> SetValue<TModel>(
             this ComponentRef<NativeRadioGroup, TModel> self, string value)
             where TModel : class
@@ -38,12 +37,11 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Sets the selected radio button value from a source binding (e.g. event payload).
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <typeparam name="TSource">The source type containing the value.</typeparam>
         /// <param name="self">The radio group component reference.</param>
         /// <param name="source">The source object (e.g. event args).</param>
         /// <param name="path">Expression selecting the property to read (e.g. <c>x => x.Value</c>).</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeRadioGroup, TModel> SetValue<TModel, TSource>(
             this ComponentRef<NativeRadioGroup, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
@@ -56,8 +54,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Moves keyboard focus into the radio group.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <returns>The component reference for method chaining.</returns>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeRadioGroup, TModel> FocusIn<TModel>(
             this ComponentRef<NativeRadioGroup, TModel> self)
             where TModel : class
@@ -68,7 +65,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Reads the currently selected value for use in conditions or gather.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <returns>A typed source representing the radio group's selected value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeRadioGroup, TModel> self)

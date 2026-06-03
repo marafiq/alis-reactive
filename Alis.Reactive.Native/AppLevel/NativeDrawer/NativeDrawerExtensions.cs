@@ -29,15 +29,13 @@ namespace Alis.Reactive.Native.AppLevel
         /// <summary>
         /// Sets the drawer panel width.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <param name="self">The drawer component reference.</param>
         /// <param name="size">The desired panel width.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeDrawer, TModel> SetSize<TModel>(
             this ComponentRef<NativeDrawer, TModel> self, DrawerSize size)
             where TModel : class
         {
-            // Remove all size classes, then add the requested one
             foreach (var cls in SizeClasses)
                 self.EmitCall(ClassRemoveMethod,
                     new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(cls) });
@@ -57,8 +55,7 @@ namespace Alis.Reactive.Native.AppLevel
         /// <summary>
         /// Opens the drawer, making it visible and accessible.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <returns>The component reference for method chaining.</returns>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeDrawer, TModel> Open<TModel>(
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
@@ -73,8 +70,7 @@ namespace Alis.Reactive.Native.AppLevel
         /// <summary>
         /// Closes the drawer, hiding the panel.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <returns>The component reference for method chaining.</returns>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeDrawer, TModel> Close<TModel>(
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class

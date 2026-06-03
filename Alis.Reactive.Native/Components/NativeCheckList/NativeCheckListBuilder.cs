@@ -26,7 +26,7 @@ namespace Alis.Reactive.Native.Components
     /// handles MVC form submission as a comma-separated string.
     /// </para>
     /// </remarks>
-    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">The bound property type.</typeparam>
     public class NativeCheckListBuilder<TModel, TProp> :
 #if NET48
@@ -45,8 +45,7 @@ namespace Alis.Reactive.Native.Components
         private string _cssClass = "flex flex-col gap-2";
         private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
 
-        // NEVER make public — devs create builders via the .NativeCheckList() factory,
-        // which also registers the component in the plan's input component onboarding catalog.
+        // Keep internal: the factory also registers this input component in the Reactive Plan.
 #if NET48
         internal NativeCheckListBuilder(
             HtmlHelper<TModel> html,
@@ -76,7 +75,6 @@ namespace Alis.Reactive.Native.Components
         /// Adds checkbox options provided by the controller.
         /// </summary>
         /// <param name="items">The checkbox items to display.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeCheckListBuilder<TModel, TProp> Items(IEnumerable<RadioButtonItem> items)
         {
             foreach (var item in items)
@@ -88,7 +86,6 @@ namespace Alis.Reactive.Native.Components
         /// Adds a checkbox option where the value is also used as the display text.
         /// </summary>
         /// <param name="value">The option value and display text.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeCheckListBuilder<TModel, TProp> Option(string value)
         {
             _options.Add(new RadioButtonItem(value, value));
@@ -100,7 +97,6 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <param name="value">The option value submitted in the form.</param>
         /// <param name="text">The display text shown next to the checkbox.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeCheckListBuilder<TModel, TProp> Option(string value, string text)
         {
             _options.Add(new RadioButtonItem(value, text));
@@ -113,7 +109,6 @@ namespace Alis.Reactive.Native.Components
         /// <param name="value">The option value submitted in the form.</param>
         /// <param name="text">The display text shown next to the checkbox.</param>
         /// <param name="description">A secondary description shown below the text.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeCheckListBuilder<TModel, TProp> Option(string value, string text, string description)
         {
             _options.Add(new RadioButtonItem(value, text, description));
@@ -124,7 +119,6 @@ namespace Alis.Reactive.Native.Components
         /// Sets CSS classes on the checkbox list container.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeCheckListBuilder<TModel, TProp> CssClass(string css)
         {
             _cssClass = css;
@@ -135,7 +129,6 @@ namespace Alis.Reactive.Native.Components
         /// Sets CSS classes on each checkbox option wrapper label.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeCheckListBuilder<TModel, TProp> OptionCssClass(string css)
         {
             _optionCssClass = css;
@@ -155,7 +148,7 @@ namespace Alis.Reactive.Native.Components
         /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
-            // Resolve model value — may be string[] or CSV string depending on model binding
+            // Model binding can restore checkbox-list values as either string[] or CSV.
 #if NET48
             // System.Web.Mvc NameFor honors the active HtmlFieldPrefix; ExpressionHelper.GetExpressionText drops it.
             var rawValue = _html.ViewData.Eval(_html.NameFor(_expression).ToHtmlString());

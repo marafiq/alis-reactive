@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Pipeline extensions for <see cref="NativeCheckList"/>: set checked values, focus, and read.
+    /// Reactive Plan operations for <see cref="NativeCheckList"/> checked values and focus.
     /// </summary>
     /// <remarks>
     /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via
@@ -22,12 +22,11 @@ namespace Alis.Reactive.Native.Components
             ComponentMethod.Named("focus");
 
         /// <summary>
-        /// Sets the checked values in the browser.
+        /// Sets the checked values through the component contract.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <param name="self">The check list component reference.</param>
         /// <param name="value">The array of option values to check.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeCheckList, TModel> SetValue<TModel>(
             this ComponentRef<NativeCheckList, TModel> self, string[] value)
             where TModel : class
@@ -41,12 +40,11 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Sets the checked values from a source binding (e.g. event payload).
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <typeparam name="TSource">The source type containing the value.</typeparam>
         /// <param name="self">The check list component reference.</param>
         /// <param name="source">The source object (e.g. event args).</param>
         /// <param name="path">Expression selecting the property to read (e.g. <c>x => x.Value</c>).</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeCheckList, TModel> SetValue<TModel, TSource>(
             this ComponentRef<NativeCheckList, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
@@ -59,8 +57,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Moves keyboard focus into the check list.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <returns>The component reference for method chaining.</returns>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeCheckList, TModel> FocusIn<TModel>(
             this ComponentRef<NativeCheckList, TModel> self)
             where TModel : class
@@ -71,7 +68,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Reads the currently checked values for use in conditions or gather.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <returns>A typed source representing the check list's selected values as a string array.</returns>
         public static TypedComponentSource<string[]> Value<TModel>(
             this ComponentRef<NativeCheckList, TModel> self)
