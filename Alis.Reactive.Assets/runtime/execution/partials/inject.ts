@@ -1,5 +1,5 @@
-// inject.ts — Inject HTML into a partial slot.
-// Extracts any <script data-reactive-plan> elements and applies them to the injected slot.
+// Partial injection strips reactive plan scripts before DOM append so Syncfusion
+// can initialize the HTML and the slot plan can be applied separately.
 
 import type { PlanDocument } from "../../types/index";
 import { loadPartialSlot, unloadPartialSlot } from "../../lifecycle/boot";
@@ -15,15 +15,13 @@ interface SyncfusionGlobal {
 }
 
 /**
- * Inject HTML into a container, using ej.base.append when available (SF component init).
- * Extracts any <script data-reactive-plan> elements first and applies them using the
- * slot declared by the inject reaction.
+ * Inject HTML into a container, using ej.base.append when available for
+ * Syncfusion component initialization.
  */
 export function injectPartial(container: HTMLElement, html: string, slot: string): void {
   const temp = document.createElement("div");
   temp.innerHTML = html;
 
-  // Extract plan elements before injection (ej.base.append can't handle script tags with JSON)
   const planEls = temp.querySelectorAll<HTMLElement>("[data-reactive-plan]");
   const plans: PlanDocument[] = [];
   for (const el of planEls) {

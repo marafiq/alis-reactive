@@ -72,9 +72,7 @@ function showConfirmDialog(
 }
 
 /**
- * Initializes the SF Dialog on the confirm element and wires window.alis.confirm().
- * Called once from auto-boot before any plans are processed.
- * The element must exist in the DOM (rendered by @Html.FusionConfirmDialog() in Layout).
+ * Initializes the app-level Syncfusion confirm singleton before plan boot.
  */
 export function init(): void {
   // App-level singleton rendered by @Html.FusionConfirmDialog() in Layout.

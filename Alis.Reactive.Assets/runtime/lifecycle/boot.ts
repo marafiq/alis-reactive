@@ -1,6 +1,5 @@
-// Boot — PlanDocument composition: boot, partial slot load/unload, reset.
-// Single responsibility: wire behaviors and validation for active plans.
-// Delegates plan composition state to applied-plans.ts.
+// Boot wires behaviors and validation for active PlanDocuments; composition
+// state for boot snapshots and partial slots stays in applied-plans.ts.
 
 import type { PlanDocument, Behavior } from "../types/index";
 import { setLevel } from "../diagnostics/trace";
@@ -33,10 +32,8 @@ interface ReactiveBootWindow extends Window {
 export function boot(plan: PlanDocument): void {
   log.info("booting", { planId: plan.planId, behaviors: plan.behaviors.length });
 
-  // Wire validation live-clear for components with container scopes
   wireContainerValidation(plan, bootAbort.signal);
 
-  // Two-phase behavior wiring
   wireBehaviors(plan.behaviors, plan, bootAbort.signal);
 
   setActivePlan(plan);
