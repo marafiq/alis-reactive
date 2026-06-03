@@ -10,11 +10,9 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await NavigateTo("/Sandbox/HttpPipeline/Http");
         await WaitForTraceMessage("booted", 10000);
-        // DomReady GET fires automatically — wait for response data to arrive
+        // DomReady GET fires automatically; wait for response data before interacting.
         await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 15000 });
     }
-
-    // ── Section 1: DomReady GET — exact resident data round-trip ──────────
 
     [Test]
     public async Task domready_get_loads_first_resident_name()
@@ -62,8 +60,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 2: POST with gather — server echoes received name ─────────
-
     [Test]
     public async Task post_with_gather_echoes_received_name()
     {
@@ -71,7 +67,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Save");
 
-        // Server receives {name:"John Doe"} and echoes it back as receivedName
         await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -83,7 +78,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Save");
 
-        // Server returns message:"Saved: John Doe" — verifies full round-trip
         await Expect(Page.Locator("#save-message")).ToHaveTextAsync("Saved: John Doe", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -101,8 +95,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 3: Chained requests — residents THEN facilities ───────────
-
     [Test]
     public async Task chained_get_loads_resident_names_first()
     {
@@ -110,7 +102,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Load Chain");
 
-        // First request: residents
         await Expect(Page.Locator("#chain-resident-first")).ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#chain-resident-second")).ToHaveTextAsync("Jane Smith", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -123,7 +114,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Load Chain");
 
-        // Second request: facilities (only fires after first completes)
+        // Facilities load only after the residents request completes.
         await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
         await Expect(Page.Locator("#chain-facility-second")).ToHaveTextAsync("West Wing", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -136,13 +127,11 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Load Chain");
 
-        // Spinner hides in the chained (second) response route
+        // Spinner hides in the chained second response route.
         await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
         await Expect(Page.Locator("#chain-spinner")).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
-
-    // ── Section 4: Parallel requests — both datasets load concurrently ────
 
     [Test]
     public async Task parallel_get_loads_resident_names()
@@ -195,8 +184,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 5: PUT — server echoes updated payload ────────────────────
-
     [Test]
     public async Task put_sends_updated_name_and_server_echoes_it()
     {
@@ -204,7 +191,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Update Resident" }));
 
-        // Server receives {name:"Updated Name",facilityId:"1"} and echoes receivedName
         await Expect(Page.Locator("#put-received-name")).ToHaveTextAsync("Updated Name", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -216,7 +202,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Update Resident" }));
 
-        // Server receives facilityId:"1" and echoes it as receivedFacilityId
         await Expect(Page.Locator("#put-received-facility")).ToHaveTextAsync("1", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -234,8 +219,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 6: DELETE with confirm — server echoes deleted ID ─────────
-
     [Test]
     public async Task delete_with_confirm_sends_correct_id()
     {
@@ -247,7 +230,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
         await Expect(okButton).ToBeVisibleAsync(new() { Timeout = 3000 });
         await ClickWhenStable(okButton);
 
-        // Server receives DELETE /DeleteResident/42 and echoes deletedId:42
         await Expect(Page.Locator("#delete-id")).ToHaveTextAsync("42", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -285,8 +267,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 7: FormData POST — server echoes received field names ─────
-
     [Test]
     public async Task form_data_post_sends_three_fields()
     {
@@ -294,7 +274,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Submit Form");
 
-        // Server counts received fields: FirstName, LastName, Email = 3
         await Expect(Page.Locator("#formdata-count")).ToHaveTextAsync("3", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -306,7 +285,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Submit Form");
 
-        // Server echoes the exact field names it received — verifies model binding names
+        // Field names verify the model-binding names sent in the FormData payload.
         await Expect(Page.Locator("#formdata-fields")).ToHaveTextAsync(
             "FirstName, LastName, Email", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -325,8 +304,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 8: Search — server echoes query and match count ───────────
-
     [Test]
     public async Task search_query_param_arrives_at_server()
     {
@@ -334,7 +311,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Search for 'John'");
 
-        // Server receives ?q=John and echoes it back as query
         await Expect(Page.Locator("#search-query")).ToHaveTextAsync("John", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -346,7 +322,7 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Search for 'John'");
 
-        // "John" matches "John Doe" and "Bob Johnson" = 2 results
+        // John matches John Doe and Bob Johnson in the sandbox data.
         await Expect(Page.Locator("#search-match-count")).ToHaveTextAsync("2", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -364,8 +340,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 9: 422 error routing — correct response route fires ───────
-
     [Test]
     public async Task error_422_routes_to_correct_response_route()
     {
@@ -373,7 +347,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Validate (will fail)");
 
-        // 422 route sets specific text and verifies status-code routing works
         await Expect(Page.Locator("#multi-err-summary")).ToHaveTextAsync(
             "422 — 2 validation error(s): Name, FacilityId", new() { Timeout = 5000 });
         AssertNoConsoleErrorsExcept("422");
@@ -406,14 +379,12 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("422");
     }
 
-    // ── Section 10: NativeActionLink — row actions ────────────────────────
-
     [Test]
     public async Task native_action_link_grid_loads_initial_rows()
     {
         await WaitForDomReadyGet();
 
-        // All three seed rows must be present — proves Into() partial injection rendered the grid
+        // Seed rows prove Into() partial injection rendered the grid.
         await Expect(Page.GetByTestId("native-action-link-row-41"))
             .ToContainTextAsync("Resident #41", new() { Timeout = 5000 });
         await Expect(Page.GetByTestId("native-action-link-row-42"))
@@ -421,12 +392,10 @@ public class WhenServerDataLoads : PlaywrightTestBase
         await Expect(Page.GetByTestId("native-action-link-row-43"))
             .ToContainTextAsync("Resident #43", new() { Timeout = 5000 });
 
-        // Each row shows the resident name alongside the ID
         await Expect(Page.GetByTestId("native-action-link-row-41")).ToContainTextAsync("John Doe");
         await Expect(Page.GetByTestId("native-action-link-row-42")).ToContainTextAsync("Jane Smith");
         await Expect(Page.GetByTestId("native-action-link-row-43")).ToContainTextAsync("Bob Johnson");
 
-        // Each row has a Delete action link
         await Expect(Page.GetByTestId("native-action-link-41")).ToHaveTextAsync("Delete");
         await Expect(Page.GetByTestId("native-action-link-42")).ToHaveTextAsync("Delete");
         await Expect(Page.GetByTestId("native-action-link-43")).ToHaveTextAsync("Delete");
@@ -480,8 +449,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 11: Standalone NativeActionLink ───────────────────────────
-
     [Test]
     public async Task standalone_native_action_link_loads_its_own_success_target()
     {
@@ -502,24 +469,20 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        // Before click — status shows default text, result container has no server content
         await Expect(Page.Locator("#standalone-native-action-link-status"))
             .ToHaveTextAsync("Standalone link has not run yet");
         await Expect(Page.Locator("#standalone-native-action-link-result"))
             .ToHaveTextAsync("No standalone response yet");
 
-        // Click the standalone action link — fires POST with {command:"run"}
         await ClickWhenStable(Page.GetByTestId("standalone-native-action-link"));
 
-        // POST response HTML is injected Into() the result container
+        // POST response HTML is injected into the result container.
         await Expect(Page.Locator("#standalone-native-action-link-result"))
             .ToContainTextAsync("Standalone NativeActionLink response loaded.", new() { Timeout = 5000 });
 
-        // Status element is updated by the OnSuccess route
         await Expect(Page.Locator("#standalone-native-action-link-status"))
             .ToHaveTextAsync("Standalone NativeActionLink succeeded");
 
-        // The injected HTML contains the server-rendered styled div
         var injectedDiv = Page.Locator("#standalone-native-action-link-result div.text-blue-700");
         await Expect(injectedDiv).ToBeVisibleAsync();
         await Expect(injectedDiv).ToHaveTextAsync("Standalone NativeActionLink response loaded.");
@@ -527,14 +490,12 @@ public class WhenServerDataLoads : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 12: Error recovery — retry after error, spinner lifecycle, chain ordering ──
-
     [Test]
     public async Task save_error_then_retry_with_valid_data_shows_success()
     {
         await WaitForDomReadyGet();
 
-        // Intercept the first POST to /Save and return 400 (simulating validation failure)
+        // Intercept only the first save to prove retry replaces the error state.
         var intercepted = false;
         await Page.RouteAsync("**/Sandbox/HttpPipeline/Http/Save", async route =>
         {
@@ -554,20 +515,18 @@ public class WhenServerDataLoads : PlaywrightTestBase
             }
         });
 
-        // First POST is intercepted as 400 and the error route fires
         await ClickButton("Save");
         await Expect(Page.Locator("#save-error")).ToHaveTextAsync(
             "Validation failed: Name is required", new() { Timeout = 5000 });
         await Expect(Page.Locator("#save-result")).ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-red-600"));
 
-        // Second POST passes through to the real server and the success route fires
         await ClickButton("Save");
         await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync(
             "John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#save-result")).ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-green-600"));
-        // Success route removes error class and proves error state is replaced
+        // Success route removes the previous error class.
         await Expect(Page.Locator("#save-result")).Not.ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-red-600"));
 
@@ -580,13 +539,11 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        // POST valid data via Save — spinner shows during request, hides after success
         await ClickButton("Save");
         await Expect(Page.Locator("#save-received-name")).ToHaveTextAsync(
             "John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#save-spinner")).ToBeHiddenAsync();
 
-        // POST invalid data via Validate — spinner shows during request, hides after 422
         await ClickButton("Validate (will fail)");
         await Expect(Page.Locator("#multi-err-summary")).ToHaveTextAsync(
             "422 — 2 validation error(s): Name, FacilityId", new() { Timeout = 5000 });
@@ -602,40 +559,34 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Load Chain");
 
-        // First hop: wait for residents to arrive — proves first request completed
+        // Residents must complete before facilities can load.
         await Expect(Page.Locator("#chain-resident-first")).ToHaveTextAsync(
             "John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#chain-resident-second")).ToHaveTextAsync("Jane Smith");
         await Expect(Page.Locator("#chain-residents")).ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-green-600"));
 
-        // Second hop: facilities only fire after residents complete
         await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync(
             "Main Campus", new() { Timeout = 5000 });
         await Expect(Page.Locator("#chain-facility-second")).ToHaveTextAsync("West Wing");
         await Expect(Page.Locator("#chain-facilities")).ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-green-600"));
 
-        // Both visible at end, spinner hidden — proves full chain completed
         await Expect(Page.Locator("#chain-spinner")).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
 
-    // ── Section 13: WhileLoading spinner regression — stuck spinner detection ──
-
     [Test]
     public async Task all_spinners_are_hidden_after_page_fully_loads()
     {
-        // After DomReady GET completes, verify ALL spinner elements on the page are hidden.
-        // This catches "stuck spinner" bugs where a WhileLoading show fires but hide doesn't.
+        // After DomReady GET completes, every spinner should be hidden.
+        // This catches WhileLoading show/hide mismatches.
         await WaitForDomReadyGet();
 
-        // DomReady GET spinner — fires WhileLoading show, OnSuccess hides it
         await Expect(Page.Locator("#load-spinner")).ToBeHiddenAsync();
 
-        // All remaining spinners start with hidden attribute and should remain hidden
-        // since no user action has triggered their WhileLoading show
+        // Remaining spinners have not been triggered by user actions.
         await Expect(Page.Locator("#save-spinner")).ToBeHiddenAsync();
         await Expect(Page.Locator("#chain-spinner")).ToBeHiddenAsync();
         await Expect(Page.Locator("#parallel-spinner")).ToBeHiddenAsync();
@@ -651,30 +602,25 @@ public class WhenServerDataLoads : PlaywrightTestBase
     [Test]
     public async Task parallel_request_spinner_hides_only_after_both_complete()
     {
-        // Click parallel load — both requests fire — spinner should stay visible until BOTH complete.
-        // After OnAllSettled fires — spinner hidden.
-        // This catches bugs where spinner hides after first response instead of waiting for all.
+        // Parallel spinner must wait for OnAllSettled, not the first response.
         await WaitForDomReadyGet();
 
         await ClickButton("Load Parallel");
 
-        // Wait for BOTH datasets to arrive — proves both requests completed
+        // Both datasets must arrive before the all-settled route can run.
         await Expect(Page.Locator("#parallel-resident-first")).ToHaveTextAsync(
             "John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#parallel-facility-first")).ToHaveTextAsync(
             "Main Campus", new() { Timeout = 5000 });
 
-        // OnAllSettled sets completion text — this is the signal that both settled
+        // OnAllSettled sets completion text; this is the settled signal.
         await Expect(Page.Locator("#parallel-all")).ToHaveTextAsync(
             "All parallel requests completed!", new() { Timeout = 5000 });
 
-        // NOW the spinner must be hidden — not after the first response, only after OnAllSettled
         await Expect(Page.Locator("#parallel-spinner")).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
-
-    // ── Page-level checks ─────────────────────────────────────────────────
 
     [Test]
     public async Task http_page_renders_with_correct_title()
