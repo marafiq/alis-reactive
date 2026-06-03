@@ -1,18 +1,8 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline;
 
 /// <summary>
-/// Plugin Source vertical slice — exercises all 5 array methods (count, pluck, filter, sum, some)
-/// with mixed framework features: DomReady HTTP, conditions (Truthy), gather, headers,
-/// nested plugin composition, void .Fire(), and button-click pipelines.
-///
-/// Server data: 5 residents
-///   { id:1, name:"John Doe",       status:"active",     age:82 }
-///   { id:2, name:"Jane Smith",     status:"active",     age:75 }
-///   { id:3, name:"Bob Johnson",    status:"discharged", age:68 }
-///   { id:4, name:"Alice Brown",    status:"active",     age:91 }
-///   { id:5, name:"Charlie Wilson", status:"pending",    age:77 }
-///
-/// Active residents: John Doe (82), Jane Smith (75), Alice Brown (91)
+/// Exercises array plugin values across DomReady HTTP, conditions, gather,
+/// headers, nested plugin composition, void <c>.Fire()</c>, and button pipelines.
 /// </summary>
 [TestFixture]
 public class WhenArrayPluginManipulates : PlaywrightTestBase
@@ -23,8 +13,6 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
         await WaitForTraceMessage("booted", 10000);
         await Expect(Page.Locator("#arr-total")).Not.ToHaveTextAsync("—", new() { Timeout = 15000 });
     }
-
-    // ── Section 1: DomReady — count, pluck, filter+count, sum, some+condition ──
 
     [Test]
     public async Task count_shows_total_residents()
@@ -100,8 +88,6 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 2: Send button — gather + header with plugin arg propagation ──
-
     [Test]
     public async Task send_button_echoes_count_value()
     {
@@ -135,14 +121,12 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 3: Filter button — all 5 methods in button HTTP pipeline ──
-
     [Test]
     public async Task filter_button_count_shows_active_count()
     {
         await NavigateAndWaitForDomReady();
         await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Filter Active & Inspect" }));
-        // filter(items, "status", "active") → 3 items → count = 3
+        // filter(items, "status", "active") returns 3 active residents.
         await Expect(Page.Locator("#arr-f-count"))
             .ToHaveTextAsync("3", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
