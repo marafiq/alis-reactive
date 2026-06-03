@@ -60,6 +60,10 @@ Keep comments when they explain one of these developer-facing facts:
 - Public DSL XML documentation that follows normal .NET XML doc shape:
   `<summary>`, `<typeparam>`, `<param>`, `<returns>`, and targeted
   `<remarks>` or `<exception>` entries when they communicate contract behavior.
+- Editorial value: a retained comment should prevent concrete confusion or drift
+  for a framework developer. Visiting a file during this pass is not enough
+  reason to preserve, expand, or standardize comments that do not carry that
+  weight.
 
 ### What To Delete
 
@@ -77,6 +81,9 @@ Delete comments when they only:
 - Strip standard XML documentation elements from public DSL members only because
   the existing wording is repetitive. Rewrite those elements into useful API
   contract language, or defer the API-doc slice.
+- Add technically correct XML documentation that only repeats a fluent builder
+  return type, parameter name, or obvious method name without improving
+  IntelliSense or generated docs.
 
 ### When To Replace Comments With Helper Methods
 
@@ -281,8 +288,10 @@ Expanded commit boundaries:
 2. Public C# XML docs: one API/component family per commit, verified with
    `dotnet build` or `scripts/test.sh --no-e2e` depending on scope. Public DSL
    docs must remain valid .NET XML documentation suitable for IntelliSense and
-   generated docs; prefer rewriting repetitive `typeparam`, `param`, and
-   `returns` entries over deleting standard elements.
+   generated docs. Keep `typeparam`, `param`, and `returns` entries when they
+   explain contract behavior, generated output, security, vendor behavior, or
+   non-obvious fluent semantics; omit mechanically repetitive fluent-return
+   entries when the signature already communicates the chain.
 3. Sandbox Razor DSL comments: one route or feature page per commit, verified
    by the matching build or Playwright route only when the edit can affect
    rendering, selectors, timing, or browser-visible behavior. Pure comment
@@ -302,6 +311,9 @@ Review cycle before every commit:
   context, or note a deferred concern.
 - For public C# XML docs, confirm standard XML elements remain present and carry
   contract value rather than repeating names.
+- Ask the editorial question explicitly: what future confusion or drift does
+  this comment prevent? If the answer is only "it is public" or "it is standard",
+  rewrite it into API contract language or leave a follow-up note.
 - If a public type appears to be implementation surface rather than DSL/API,
   record the file and rationale as a follow-up unless the selected slice is
   explicitly an API-visibility change.
@@ -324,6 +336,15 @@ Review cycle before every commit:
 9. Report which comments were kept, removed, rewritten, or replaced by helper
    names.
 10. Add deferred concerns to a follow-up note instead of expanding the cleanup.
+
+## Deferred Follow-Up Notes
+
+- `Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs`: this public
+  expression converter looks like implementation support for typed Syncfusion
+  template builders, not necessarily a DSL surface developers should call
+  directly. Do not change visibility in a readability-only pass. A later
+  API-visibility slice should verify cross-assembly usage, generated-doc intent,
+  and binary/API compatibility before deciding whether it should remain public.
 
 ## Out Of Scope For The First Slice
 
