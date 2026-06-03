@@ -3,10 +3,8 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for FusionDropDownList.
-///
-/// Verified: click input to open popup, click list item to select.
-/// SF DDL popup: #{componentId}_popup contains .e-list-item elements.
+/// Locator surface for the Syncfusion DropDownList DOM used by Playwright tests.
+/// The popup uses <c>#{componentId}_popup</c> and contains <c>.e-list-item</c> options.
 /// </summary>
 public sealed class DropDownListLocator
 {
@@ -19,32 +17,23 @@ public sealed class DropDownListLocator
         _componentId = componentId;
     }
 
-    // ─── Surfaces ───
-
     public ILocator Input => _page.Locator($"#{_componentId}");
     public ILocator Wrapper => Input.Locator("xpath=..");
 
-    /// <summary>The dropdown arrow icon that opens the popup.</summary>
     public ILocator DropdownIcon => _page.Locator($"#{_componentId}").Locator("..").Locator(".e-ddl-icon");
 
-    /// <summary>The popup container (visible after opening the dropdown).</summary>
     public ILocator Popup => _page.Locator($"#{_componentId}_popup");
 
-    // ─── Gestures ───
-
-    /// <summary>Click the dropdown icon to open the popup.</summary>
     public async Task Open() => await DropdownIcon.ClickAsync();
 
-    /// <summary>Click the input to focus it.</summary>
     public async Task Focus() => await Input.ClickAsync();
 
     /// <summary>
-    /// Open the popup and click the exact list item text.
-    /// This keeps the interaction purely user-driven without depending on keyboard
-    /// focus state from a prior open popup.
+    /// Selects the exact option text without depending on focus from a prior popup.
     /// </summary>
     public async Task Select(string text)
     {
+        // Clear prior focus before opening; Syncfusion keeps popup/focus state internally.
         await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
 
         await DropdownIcon.ClickWhenStableAsync(_page);

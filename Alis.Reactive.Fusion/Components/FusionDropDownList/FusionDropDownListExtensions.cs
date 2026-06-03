@@ -8,10 +8,6 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Reactive pipeline extensions for reading and mutating <see cref="FusionDropDownList"/>.
     /// </summary>
-    /// <remarks>
-    /// Use these from a <see cref="ComponentRef{TComponent, TModel}"/> resolved by the pipeline:
-    /// <c>p.Component&lt;FusionDropDownList&gt;(m =&gt; m.Country).SetValue("US")</c>.
-    /// </remarks>
     public static class FusionDropDownListExtensions
     {
         private static readonly FusionDropDownList Component = new FusionDropDownList();
@@ -48,16 +44,12 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String));
 
         /// <summary>Sets the displayed text without changing the underlying value.</summary>
-        /// <param name="text">The text to display.</param>
         public static ComponentRef<FusionDropDownList, TModel> SetText<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self, string text)
             where TModel : class
             => self.EmitSet(TextProperty, ValueExpression.Literal(text));
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
-        /// <typeparam name="TSource">The event payload type containing the items.</typeparam>
-        /// <param name="source">Provides the event payload type; runtime reads the active event payload.</param>
-        /// <param name="path">Expression selecting the items collection from the payload.</param>
         public static ComponentRef<FusionDropDownList, TModel> SetDataSource<TModel, TSource>(
             this ComponentRef<FusionDropDownList, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
@@ -68,9 +60,6 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
-        /// <typeparam name="TResponse">The response body type containing the items.</typeparam>
-        /// <param name="source">The response scope used by the generated value expression.</param>
-        /// <param name="path">Expression selecting the items collection from the response.</param>
         public static ComponentRef<FusionDropDownList, TModel> SetDataSource<TModel, TResponse>(
             this ComponentRef<FusionDropDownList, TModel> self,
             ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
@@ -82,11 +71,9 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Replaces the data source with a typed array source — including a client-side
-        /// <see cref="Alis.Reactive.Builders.Arrays.ReactiveArray{T}"/> transform via <c>AsSource()</c>.
-        /// Routes any array value into the option list with no HTTP round-trip.
+        /// Replaces the data source with a typed array source, including client-side
+        /// <see cref="Alis.Reactive.Builders.Arrays.ReactiveArray{T}"/> values from <c>AsSource()</c>.
         /// </summary>
-        /// <param name="source">The typed array source.</param>
         public static ComponentRef<FusionDropDownList, TModel> SetDataSource<TModel, TElement>(
             this ComponentRef<FusionDropDownList, TModel> self,
             TypedSource<TElement[]> source)
@@ -128,10 +115,6 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(HidePopupMethod);
 
         /// <summary>Reads the current selected value for use in conditions or gather.</summary>
-        /// <remarks>
-        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
-        /// <c>p.When(p.Component&lt;FusionDropDownList&gt;(m =&gt; m.Country).Value()).Eq("US").Then(p =&gt; { ... })</c>.
-        /// </remarks>
         /// <returns>A typed source representing the dropdown's current value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)

@@ -8,16 +8,12 @@
     var plan = Html.ReactivePlan<DropDownListModel>();
     var categories = (List<string>)ViewBag.Categories;
 
-    // ── Section 1+2: Property Write (SetValue) + Property Read on DomReady ──
-
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<FusionDropDownList>(m => m.Category).SetValue("Books");
         var comp = p.Component<FusionDropDownList>(m => m.Category);
         p.Element("value-echo").SetText(comp.Value());
     }));
-
-    // ── Section 5: Gather — POST with Include ──
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
     {
@@ -38,7 +34,6 @@
         property reads, events, conditions, and gather.
     </native-text>
 
-    <!-- Section 1: Property Write (SetValue) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">1. Property Write (SetValue)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -93,7 +88,6 @@
         <p class="font-mono text-sm mt-4">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
     </section>
 
-    <!-- Section 2: Events — Changed, Focus, Blur -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">4. Events (Changed, Focus, Blur)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -108,7 +102,6 @@
         </native-vstack>
     </section>
 
-    <!-- Section 5: Conditions — Typed Event-Args + Component-Read -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">5. Conditions (Both Types)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -118,7 +111,6 @@
         </p>
     </section>
 
-    <!-- Section 6: Gather — Include in POST -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">6. Gather (Include in POST)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -134,7 +126,6 @@
         <p class="font-mono text-sm">Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
     </section>
 
-    <!-- Plan JSON -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
