@@ -362,6 +362,14 @@ Review cycle before every commit:
   "latest selection wins" or request cancellation/staleness handling from the
   DSL/runtime boundary, then prove it with stable Playwright or lower-level
   runtime tests. Do not reintroduce rapid browser interaction as a timing race.
+- `tests/Alis.Reactive.Playwright.Extensions`: the component locators are
+  revealing repeated browser interaction patterns (`Fill`, `Clear`, `Focus`,
+  `Blur`, popup selection, blur-to-commit, wrapper lookup) mixed with
+  component-specific Syncfusion DOM quirks. Do not extract helpers opportunistically
+  during readability cleanup. A dedicated Playwright-pattern session should
+  inventory which behaviors are genuinely reusable for this framework and which
+  are current test hacks, then design extensions that would be useful beyond this
+  repo without hiding the browser-visible proof.
 
 ## Out Of Scope For The First Slice
 
