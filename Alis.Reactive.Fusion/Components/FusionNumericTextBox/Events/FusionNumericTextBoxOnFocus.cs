@@ -8,9 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionNumericTextBoxFocusArgs
     {
-        /// <summary>
-        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
-        /// </summary>
+        /// <summary>Creates a focus event payload.</summary>
         public FusionNumericTextBoxFocusArgs() { }
     }
 }

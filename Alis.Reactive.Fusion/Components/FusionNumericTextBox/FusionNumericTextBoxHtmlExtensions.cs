@@ -10,21 +10,13 @@ using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionNumeri
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a FusionNumericTextBox inside a field wrapper, bound to a model property.
+    /// Adds rendering helpers for <see cref="FusionNumericTextBox"/>.
     /// </summary>
-    /// <remarks>
-    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Quantity)</c>, then call
-    /// <c>.FusionNumericTextBox(b =&gt; { b.Min(0).Max(100).Step(1); })</c>.
-    /// </remarks>
     public static class FusionNumericTextBoxHtmlExtensions
     {
         /// <summary>
-        /// Renders a FusionNumericTextBox bound to the field's model property.
+        /// Renders a FusionNumericTextBox bound to the field wrapper's model property.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <typeparam name="TProp">The bound property type.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the FusionNumericTextBox (min, max, step, format, etc.).</param>
         public static void FusionNumericTextBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<NumericTextBoxBuilder> build)

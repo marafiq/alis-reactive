@@ -8,9 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionNumericTextBoxBlurArgs
     {
-        /// <summary>
-        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
-        /// </summary>
+        /// <summary>Creates a blur event payload.</summary>
         public FusionNumericTextBoxBlurArgs() { }
     }
 }
