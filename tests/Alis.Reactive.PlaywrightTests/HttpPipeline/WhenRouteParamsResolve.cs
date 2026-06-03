@@ -13,8 +13,6 @@ public class WhenRouteParamsResolve : PlaywrightTestBase
         await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 15000 });
     }
 
-    // ── Section 15: Single Route Param ───────────────────
-
     [Test]
     public async Task single_route_param_resolves_to_correct_id()
     {
@@ -66,8 +64,6 @@ public class WhenRouteParamsResolve : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 16: Multiple Route Params ────────────────
-
     [Test]
     public async Task multiple_route_params_resolve_both_values()
     {
@@ -93,8 +89,6 @@ public class WhenRouteParamsResolve : PlaywrightTestBase
             .ToHaveTextAsync("Resident #99 at Facility #7", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Section 17: Chained with Route Params + Headers ──
 
     [Test]
     public async Task chained_first_hop_resolves_route_param()
@@ -133,8 +127,6 @@ public class WhenRouteParamsResolve : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 18: URI-Encoded Route Param ──────────────
-
     [Test]
     public async Task route_param_with_space_is_uri_encoded()
     {
@@ -142,7 +134,7 @@ public class WhenRouteParamsResolve : PlaywrightTestBase
 
         await ClickButton("Load Resident by Name");
 
-        // Server receives "John Doe" after URL-decoding the path segment "John%20Doe"
+        // Server receives "John Doe" after URL-decoding the path segment "John%20Doe".
         await Expect(Page.Locator("#route-encoded-name"))
             .ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
         AssertNoConsoleErrors();

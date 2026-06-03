@@ -6,7 +6,6 @@ public class WhenUrlParamsRead : PlaywrightTestBase
     private Task ClickButton(string name) =>
         ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = name }));
 
-    /// <summary>Navigate WITH query params so FromUrl reads real values.</summary>
     private async Task NavigateWithParams()
     {
         await NavigateTo("/Sandbox/HttpPipeline/Http?tab=medications&facilityId=7&page=3&residentId=42");
@@ -14,15 +13,12 @@ public class WhenUrlParamsRead : PlaywrightTestBase
         await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 15000 });
     }
 
-    /// <summary>Navigate WITHOUT query params so FromUrl returns null.</summary>
     private async Task NavigateWithoutParams()
     {
         await NavigateTo("/Sandbox/HttpPipeline/Http");
         await WaitForTraceMessage("booted", 10000);
         await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 15000 });
     }
-
-    // ── Section 19: FromUrl in Gather ────────────────────────
 
     [Test]
     public async Task url_param_sent_as_gather_field()
@@ -52,14 +48,12 @@ public class WhenUrlParamsRead : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 20: FromUrl in Conditions (DomReady) ─────────
-
     [Test]
     public async Task url_condition_string_eq_shows_correct_panel()
     {
         await NavigateWithParams();
 
-        // ?tab=medications → condition matches → panel visible
+        // FromUrl("tab") matches medications, so the panel is visible.
         await Expect(Page.Locator("#url-cond-meds"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -70,13 +64,11 @@ public class WhenUrlParamsRead : PlaywrightTestBase
     {
         await NavigateWithParams();
 
-        // ?page=3 → FromUrl<int>("page").Gt(1) → true → prev visible
+        // FromUrl<int>("page").Gt(1) is true for page=3.
         await Expect(Page.Locator("#url-cond-prev"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Section 21: FromUrl in SetText (DomReady) ────────────
 
     [Test]
     public async Task url_param_displayed_in_element_text()
@@ -89,8 +81,6 @@ public class WhenUrlParamsRead : PlaywrightTestBase
             .ToHaveTextAsync("7", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Section 22: Composition ──────────────────────────────
 
     [Test]
     public async Task url_param_composes_route_param_resolves()
@@ -140,14 +130,12 @@ public class WhenUrlParamsRead : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Missing params ───────────────────────────────────────
-
     [Test]
     public async Task missing_url_param_returns_null_condition_hides_panel()
     {
         await NavigateWithoutParams();
 
-        // No ?tab → condition evaluates to false → panel stays hidden
+        // Missing FromUrl("tab") evaluates the condition false.
         await Expect(Page.Locator("#url-cond-meds"))
             .ToBeHiddenAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
