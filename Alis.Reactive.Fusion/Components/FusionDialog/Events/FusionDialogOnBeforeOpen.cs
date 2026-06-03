@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionDialog.BeforeOpen (SF "beforeOpen" event).
+    /// Payload for FusionDialog.BeforeOpen.
     /// Fires before the dialog opens. Set cancel to true to prevent opening.
     /// </summary>
     public class FusionDialogBeforeOpenArgs

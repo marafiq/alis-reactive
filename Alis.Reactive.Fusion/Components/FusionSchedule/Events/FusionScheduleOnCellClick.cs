@@ -3,7 +3,7 @@ using System;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.CellClicked (SF "cellClick" event).
+    /// Payload for FusionSchedule.CellClicked.
     /// Fires when a time cell is clicked. Contains the time slot and resource group.
     /// </summary>
     public class FusionScheduleCellClickArgs

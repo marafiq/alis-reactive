@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.ActionComplete (SF "actionComplete" event).
+    /// Payload for FusionSchedule.ActionComplete.
     /// Fires after a scheduler action completes successfully.
     /// </summary>
     public class FusionScheduleActionCompleteArgs

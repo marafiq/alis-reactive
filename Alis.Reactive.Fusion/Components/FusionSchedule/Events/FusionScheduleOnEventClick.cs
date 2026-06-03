@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.EventClicked (SF "eventClick" event).
+    /// Payload for FusionSchedule.EventClicked.
     /// Fires when an appointment/event is clicked.
     /// </summary>
     public class FusionScheduleEventClickArgs

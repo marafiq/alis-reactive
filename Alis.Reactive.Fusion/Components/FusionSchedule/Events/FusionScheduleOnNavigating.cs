@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.Navigating (SF "navigating" event).
+    /// Payload for FusionSchedule.Navigating.
     /// Fires before date or view navigation. Set cancel to prevent.
     /// action: "date" for arrow navigation, "view" for Day/Week/Month tab switch.
     /// </summary>

@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionDialog.BeforeClose (SF "beforeClose" event).
+    /// Payload for FusionDialog.BeforeClose.
     /// Fires before the dialog closes.
     /// </summary>
     public class FusionDialogBeforeCloseArgs

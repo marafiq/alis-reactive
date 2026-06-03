@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.PopupOpen (SF "popupOpen" event).
+    /// Payload for FusionSchedule.PopupOpen.
     /// Fires before any popup opens. Set cancel to prevent.
     /// type: "QuickInfo" (click tooltip), "Editor" (full edit modal), "DeleteAlert" (confirmation).
     /// </summary>

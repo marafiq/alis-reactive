@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.EventRendered (SF "eventRendered" event).
+    /// Payload for FusionSchedule.EventRendered.
     /// Fires before each event/appointment renders on the UI.
     /// Use to apply custom styling (e.g., unassigned shifts in red).
     /// Set cancel to true to prevent the event from rendering.

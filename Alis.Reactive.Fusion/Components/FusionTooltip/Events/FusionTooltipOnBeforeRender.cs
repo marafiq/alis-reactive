@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionTooltip.BeforeRender (SF "beforeRender" event).
+    /// Payload for FusionTooltip.BeforeRender.
     /// Fires before tooltip content renders. Used for dynamic content injection.
     /// Set cancel to true to prevent rendering.
     /// </summary>

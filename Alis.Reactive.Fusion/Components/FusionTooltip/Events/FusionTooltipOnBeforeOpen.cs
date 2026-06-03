@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionTooltip.BeforeOpen (SF "beforeOpen" event).
+    /// Payload for FusionTooltip.BeforeOpen.
     /// Fires before the tooltip opens. Set cancel to true to prevent opening.
     /// </summary>
     public class FusionTooltipBeforeOpenArgs

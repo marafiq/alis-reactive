@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.PopupClose (SF "popupClose" event).
+    /// Payload for FusionSchedule.PopupClose.
     /// Fires when a popup closes.
     /// </summary>
     public class FusionSchedulePopupCloseArgs

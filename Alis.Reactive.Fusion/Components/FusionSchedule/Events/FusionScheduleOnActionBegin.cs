@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.ActionBegin (SF "actionBegin" event).
+    /// Payload for FusionSchedule.ActionBegin.
     /// Fires before every scheduler action. Set cancel to prevent the action.
     /// requestType: "eventCreate", "eventChange", "eventRemove", "dateNavigate", "viewNavigate".
     /// </summary>
