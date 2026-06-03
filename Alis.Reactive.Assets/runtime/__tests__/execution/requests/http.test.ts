@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { executeRequest } from "../execution/requests/http";
+import { executeRequest } from "../../../execution/requests/http";
 import type {
   ComponentObject,
   ConditionGraph,
@@ -14,7 +14,7 @@ import type {
   Shape,
   StructuredPath,
   ValueExpression,
-} from "../types/index";
+} from "../../../types/index";
 
 const stringShape: Shape = { kind: "string" };
 const booleanShape: Shape = { kind: "boolean" };

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../lifecycle/boot";
-import type { ComponentObject, BrowserObjectContract, PlanDocument, ReactionGraph, Shape } from "../types/index";
+import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../../lifecycle/boot";
+import type { ComponentObject, BrowserObjectContract, PlanDocument, ReactionGraph, Shape } from "../../../types/index";
 
 const signalR = vi.hoisted(() => {
   class FakeHubConnection {

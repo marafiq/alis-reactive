@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { resolveRequestInput } from "../execution/requests/gather";
-import { injectPartial } from "../execution/partials/inject";
-import { boot, getBootedPlan, resetBootStateForTests } from "../lifecycle/boot";
-import type { ComponentObject, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath } from "../types/index";
+import { resolveRequestInput } from "../../../execution/requests/gather";
+import { injectPartial } from "../../../execution/partials/inject";
+import { boot, getBootedPlan, resetBootStateForTests } from "../../../lifecycle/boot";
+import type { ComponentObject, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath } from "../../../types/index";
 
 const stringShape: Shape = { kind: "string" };
 

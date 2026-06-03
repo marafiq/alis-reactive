@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { evaluateValue } from "../../values/evaluate";
-import type { PlanDocument, Shape, ValueExpression } from "../../types/index";
+import { evaluateValue } from "../../../values/evaluate";
+import type { PlanDocument, Shape, ValueExpression } from "../../../types/index";
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };

@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { registerPlugin } from "../plugins/catalog";
-import { registerComponentDriver, type ComponentDriver } from "../browser-objects/component-driver";
-import { executeReaction } from "../execution/reactions/execute";
+import { registerPlugin } from "../../../plugins/catalog";
+import { registerComponentDriver, type ComponentDriver } from "../../../browser-objects/component-driver";
+import { executeReaction } from "../../../execution/reactions/execute";
 import type {
   ComponentObject, ConditionGraph, ExecContext, BrowserObjectContract, JsonValue, MemberAccess, PlanDocument, ReactionGraph, RequestPlan, Shape, ValueExpression,
-} from "../types/index";
+} from "../../../types/index";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };

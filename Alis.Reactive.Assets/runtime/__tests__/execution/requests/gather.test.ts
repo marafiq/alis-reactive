@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { resolveRequestInput } from "../execution/requests/gather";
+import { resolveRequestInput } from "../../../execution/requests/gather";
 import type {
   JsonValue,
   BrowserObjectContract,
@@ -12,7 +12,7 @@ import type {
   Shape,
   StructuredPath,
   ValueExpression,
-} from "../types/index";
+} from "../../../types/index";
 
 const stringShape: Shape = { kind: "string" };
 const dateShape: Shape = { kind: "date" };

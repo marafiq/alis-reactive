@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { boot, resetBootStateForTests } from "../../lifecycle/boot";
-import type { ComponentObject, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueExpression } from "../../types/index";
+import { boot, resetBootStateForTests } from "../../../lifecycle/boot";
+import type { ComponentObject, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueExpression } from "../../../types/index";
 
 const stringShape: Shape = { kind: "string" };
 

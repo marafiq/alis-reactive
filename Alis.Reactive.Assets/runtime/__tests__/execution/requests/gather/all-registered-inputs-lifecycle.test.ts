@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { resolveRequestInput } from "../../execution/requests/gather";
-import { AppliedPlans } from "../../lifecycle/applied-plans";
-import type { ComponentObject, RequestPayloadTarget, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath, ValueExpression } from "../../types/index";
+import { resolveRequestInput } from "../../../../execution/requests/gather";
+import { AppliedPlans } from "../../../../lifecycle/applied-plans";
+import type { ComponentObject, RequestPayloadTarget, BrowserObjectContract, PathSegment, PlanDocument, RequestInput, Shape, StructuredPath, ValueExpression } from "../../../../types/index";
 
 const stringShape: Shape = { kind: "string" };
 

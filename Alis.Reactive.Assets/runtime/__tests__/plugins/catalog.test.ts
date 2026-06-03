@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BrowserPluginCatalog } from "../plugins/catalog";
+import { BrowserPluginCatalog } from "../../plugins/catalog";
 
 describe("BrowserPluginCatalog", () => {
   it("rejects plugin names containing whitespace", () => {

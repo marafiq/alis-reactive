@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../lifecycle/boot";
-import type { BranchCase, ComponentObject, ConditionGraph, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueExpression } from "../../types/index";
+import { boot, loadPartialSlot, resetBootStateForTests, unloadPartialSlot } from "../../../lifecycle/boot";
+import type { BranchCase, ComponentObject, ConditionGraph, BrowserObjectContract, PlanDocument, ReactionGraph, Shape, ValueExpression } from "../../../types/index";
 
 const stringShape: Shape = { kind: "string" };
 const booleanShape: Shape = { kind: "boolean" };
