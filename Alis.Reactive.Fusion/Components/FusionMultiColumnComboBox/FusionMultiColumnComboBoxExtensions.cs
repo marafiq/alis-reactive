@@ -6,10 +6,10 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed mutations and value reading for <see cref="FusionMultiColumnComboBox"/> in a reactive pipeline.
+    /// Reactive pipeline extensions for reading and mutating <see cref="FusionMultiColumnComboBox"/>.
     /// </summary>
     /// <remarks>
-    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
+    /// Use these from a <see cref="ComponentRef{TComponent, TModel}"/> resolved by the pipeline:
     /// <c>p.Component&lt;FusionMultiColumnComboBox&gt;(m =&gt; m.Facility).SetValue("FAC-001")</c>.
     /// </remarks>
     public static class FusionMultiColumnComboBoxExtensions
@@ -42,7 +42,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the selected value.</summary>
         /// <param name="value">The value to select, or <see langword="null"/> to clear.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> SetValue<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self, string? value)
             where TModel : class
@@ -50,18 +49,15 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the displayed text without changing the underlying value.</summary>
         /// <param name="text">The text to display.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> SetText<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self, string text)
             where TModel : class
             => self.EmitSet(TextProperty, ValueExpression.Literal(text));
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TSource">The event payload type containing the items.</typeparam>
-        /// <param name="source">The event payload instance.</param>
+        /// <param name="source">Provides the event payload type; runtime reads the active event payload.</param>
         /// <param name="path">Expression selecting the items collection from the payload.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> SetDataSource<TModel, TSource>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
@@ -72,11 +68,9 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TResponse">The response body type containing the items.</typeparam>
-        /// <param name="source">The response body instance.</param>
+        /// <param name="source">The response scope used by the generated value expression.</param>
         /// <param name="path">Expression selecting the items collection from the response.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> SetDataSource<TModel, TResponse>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self,
             ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
@@ -92,10 +86,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <see cref="Alis.Reactive.Builders.Arrays.ReactiveArray{T}"/> transform via <c>AsSource()</c>.
         /// Routes any array value into the option list with no HTTP round-trip.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <typeparam name="TElement">The item element type carried by the source.</typeparam>
         /// <param name="source">The typed array source.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> SetDataSource<TModel, TElement>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self,
             TypedSource<TElement[]> source)
@@ -103,35 +94,30 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitSet(DataSourceProperty, source.ToValueExpression());
 
         /// <summary>Flushes pending property changes to the component in the browser.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> DataBind<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
             => self.EmitCall(DataBindMethod);
 
         /// <summary>Moves focus into the combo box.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> FocusIn<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
         /// <summary>Removes focus from the combo box.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> FocusOut<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
             => self.EmitCall(FocusOutMethod);
 
         /// <summary>Opens the multi-column dropdown popup.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> ShowPopup<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
             => self.EmitCall(ShowPopupMethod);
 
         /// <summary>Closes the multi-column dropdown popup.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> HidePopup<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class
