@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// Builds one model's deterministic browser validation rules.
+    /// Builds one model's deterministic client validation rules.
     /// </summary>
     public sealed class ClientValidationRulesBuilder<TModel>
         where TModel : class

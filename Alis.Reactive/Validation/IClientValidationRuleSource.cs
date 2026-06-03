@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// Provides deterministic browser validation rules for a validation source type.
+    /// Provides deterministic client validation rules for a validation source type.
     /// </summary>
     public interface IClientValidationRuleSource
     {

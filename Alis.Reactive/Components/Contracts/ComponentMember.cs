@@ -5,8 +5,8 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// Describes a readable or writable JavaScript property on a reactive component.
-    /// Component onboarding uses these descriptors to declare the browser object
-    /// contract that the plan can read or mutate.
+    /// Component onboarding uses these descriptors to declare the Reactive Plan
+    /// component contract that the runtime can read or mutate.
     /// </summary>
     internal sealed class ComponentProperty<TValue>
     {
@@ -122,7 +122,7 @@ namespace Alis.Reactive
     }
 
     /// <summary>
-    /// The browser element object contract used by <c>p.Element(...)</c>.
+    /// The DOM element contract used by <c>p.Element(...)</c>.
     /// This keeps native DOM onboarding explicit without changing the public DSL.
     /// </summary>
     internal static class BrowserElementMembers

@@ -105,7 +105,7 @@ namespace Alis.Reactive.PlanModel
         public override string Kind => "root";
     }
 
-    /// <summary>Represents a partial plan emitted by a view that can be loaded into a browser slot.</summary>
+    /// <summary>Represents a partial plan emitted by a view that can be loaded into a DOM slot.</summary>
     public sealed class PartialPlanScope : PlanScope
     {
         internal PartialPlanScope() { }

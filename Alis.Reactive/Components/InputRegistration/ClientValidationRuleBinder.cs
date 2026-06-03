@@ -11,12 +11,12 @@ namespace Alis.Reactive
     /// into the plan's component-level validation rules.
     /// <para>
     /// Each <see cref="ValidationJob"/> names a form and a validation source type. The registered
-    /// <see cref="IClientValidationRuleSource"/> returns the deterministic browser rules for
+    /// <see cref="IClientValidationRuleSource"/> returns the deterministic client rules for
     /// that source. This binder maps each model field to the component that
     /// renders it, or to the deterministic component id a partial will render later, and
     /// attaches the resulting <see cref="ComponentValidation"/> rules to the form's
     /// <see cref="ContainerScope"/>. Normal validator execution is separate; this binder
-    /// handles only the browser rules.
+    /// handles only the client-side rules.
     /// </para>
     /// </summary>
     internal sealed class ClientValidationRuleBinder
@@ -57,7 +57,7 @@ namespace Alis.Reactive
                 .SelectMany(field => bindings.ResolveAll(field, ruleBinding))
                 .ToList();
 
-            // Validation metadata belongs on the same runtime object contract declared
+            // Validation metadata belongs on the same component contract declared
             // by p.Element(...), not on a validation-only component concept.
             var containerKey = _context.DeclareElement(container);
             var comp = _context.GetComponent(containerKey);

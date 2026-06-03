@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Deterministic browser object target for a component reference.
+    /// Deterministic target for a component reference in the Reactive Plan.
     /// The target owns the component id and vendor before any property, method, or event
     /// contract is declared against the runtime object.
     /// </summary>
