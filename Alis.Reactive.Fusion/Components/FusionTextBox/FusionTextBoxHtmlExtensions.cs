@@ -10,17 +10,13 @@ using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionTextBo
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a FusionTextBox inside a field wrapper, bound to a model property.
+    /// Adds rendering helpers for <see cref="FusionTextBox"/>.
     /// </summary>
     public static class FusionTextBoxHtmlExtensions
     {
         /// <summary>
-        /// Renders a FusionTextBox bound to the field's model property.
+        /// Renders a FusionTextBox bound to the field wrapper's model property.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <typeparam name="TProp">The bound property type.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the TextBox using Syncfusion's MVC builder.</param>
         public static void FusionTextBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<TextBoxBuilder> build)

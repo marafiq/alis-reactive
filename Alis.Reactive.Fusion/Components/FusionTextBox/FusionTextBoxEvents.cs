@@ -9,22 +9,22 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionTextBoxEvents Instance = new FusionTextBoxEvents();
         private FusionTextBoxEvents() { }
 
-        /// <summary>Fires each time the textbox value changes (SF "input" event).</summary>
+        /// <summary>Fires as the text changes while editing.</summary>
         public TypedEvent<FusionTextBoxInputArgs> Input =>
             new TypedEvent<FusionTextBoxInputArgs>(
                 "input", new FusionTextBoxInputArgs());
 
-        /// <summary>Fires when the textbox value changes and focus leaves the input (SF "change" event).</summary>
+        /// <summary>Fires when the committed text changes after focus leaves the input.</summary>
         public TypedEvent<FusionTextBoxChangeArgs> Changed =>
             new TypedEvent<FusionTextBoxChangeArgs>(
                 "change", new FusionTextBoxChangeArgs());
 
-        /// <summary>Fires when the component receives focus (SF "focus" event).</summary>
+        /// <summary>Fires when the component receives focus.</summary>
         public TypedEvent<FusionTextBoxFocusArgs> Focus =>
             new TypedEvent<FusionTextBoxFocusArgs>(
                 "focus", new FusionTextBoxFocusArgs());
 
-        /// <summary>Fires when the component loses focus (SF "blur" event).</summary>
+        /// <summary>Fires when the component loses focus.</summary>
         public TypedEvent<FusionTextBoxBlurArgs> Blur =>
             new TypedEvent<FusionTextBoxBlurArgs>(
                 "blur", new FusionTextBoxBlurArgs());

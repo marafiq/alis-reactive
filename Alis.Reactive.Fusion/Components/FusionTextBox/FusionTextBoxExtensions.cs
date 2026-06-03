@@ -28,7 +28,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the text value and flushes it into the visible input.</summary>
         /// <param name="value">The text to set, or <see langword="null"/> to clear.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTextBox, TModel> SetValue<TModel>(
             this ComponentRef<FusionTextBox, TModel> self, string? value)
             where TModel : class
@@ -37,22 +36,19 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitCall(DataBindMethod);
 
         /// <summary>Moves focus into the textbox.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTextBox, TModel> FocusIn<TModel>(
             this ComponentRef<FusionTextBox, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
         /// <summary>Removes focus from the textbox.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTextBox, TModel> FocusOut<TModel>(
             this ComponentRef<FusionTextBox, TModel> self)
             where TModel : class
             => self.EmitCall(FocusOutMethod);
 
-        /// <summary>Adds an append icon span using Syncfusion's public addIcon API.</summary>
-        /// <param name="iconCssClass">The icon CSS classes to add.</param>
-        /// <returns>The component reference for method chaining.</returns>
+        /// <summary>Adds an append icon to the textbox input.</summary>
+        /// <param name="iconCssClass">CSS classes for the icon.</param>
         public static ComponentRef<FusionTextBox, TModel> AddAppendIcon<TModel>(
             this ComponentRef<FusionTextBox, TModel> self,
             string iconCssClass)

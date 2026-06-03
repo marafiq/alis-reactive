@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionTextBox for short text entry backed by Syncfusion EJ2 TextBox.
+    /// A FusionTextBox for short text entry.
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionTextBox&gt;(m =&gt; m.ResidentName)</c>
