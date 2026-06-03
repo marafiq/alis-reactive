@@ -4,15 +4,8 @@ using Alis.Reactive.Playwright.Extensions;
 namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
 
 /// <summary>
-/// Exercises IncludeAll() gather across all 18 input component types in a single HTTP POST.
-/// Page under test: /Sandbox/Patterns/ComponentGather
-///
-/// Two submit modes: JSON POST (EchoJson) and FormData POST (EchoFormData).
-/// FluentValidation via ComponentGatherValidator — all fields required.
-/// Server echoes received fields; tests verify the echo response populates.
-///
-/// All Fusion components are filled via real browser gestures (popup clicks,
-/// keyboard typing) through locator classes — no ej2_instances API calls.
+/// Exercises IncludeAll() gather across JSON, FormData, validation, and explicit
+/// component-ID submit paths on the ComponentGather sandbox page.
 /// </summary>
 // Heavy form-fill tests (14+ SF popup interactions) — cannot run in parallel reliably.
 // Under parallel load, SF popup animations overlap with other browser instances.
@@ -32,56 +25,41 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     {
         var scope = new ComponentScope(Page, Scope);
 
-        // Native scalars (ResidentName + CareNotes are seeded, but fill others)
-        // MobilityLevel — select an option
         await Page.Locator($"#{Scope}MobilityLevel").SelectOptionAsync("wheelchair");
 
-        // CareLevel — click a radio button
         await Page.Locator($"#{Scope}CareLevel_r1").ClickAsync(); // "assisted"
 
-        // NativeCheckList — check Dairy (index 1)
         await Page.Locator($"#{Scope}Allergies_c1").ClickAsync();
 
-        // Fusion components — real browser gestures via locator classes
-
-        // FacilityId (DropDownList) — type "Main Campus" + Enter
         var facility = scope.DropDownList("FacilityId");
         await facility.Select("Main Campus");
 
-        // PhysicianName (AutoComplete) — type partial text, click suggestion
         var physician = scope.AutoComplete("PhysicianName");
         await physician.TypeAndSelect("Smith", "Dr. Smith");
 
-        // AdmissionDate (DatePicker) — select a date in current month (no navigation needed)
+        // Use the current month so the date picker does not need calendar navigation.
         var now = DateTime.Now;
         var admissionDate = scope.DatePicker("AdmissionDate");
         await admissionDate.SelectDate(now.Year, now.Month, 15);
 
-        // MedicationTime (TimePicker) — open popup, click "8:30 AM"
         var medTime = scope.TimePicker("MedicationTime");
         await medTime.SelectTime("8:30 AM");
 
-        // AppointmentTime (DateTimePicker) — use current month date + time
         var aptTime = scope.DateTimePicker("AppointmentTime");
         await aptTime.Select(now.Year, now.Month, 10, "2:00 PM");
 
-        // StayPeriod (DateRangePicker) — current month to next month
         var stay = scope.DateRangePicker("StayPeriod");
         await stay.SelectRange(now.Year, now.Month, 5, now.Year, now.Month, 20);
 
-        // InsuranceProvider (MultiColumnComboBox) — type "Blue Cross" + Enter
         var insurance = scope.MultiColumnComboBox("InsuranceProvider");
         await insurance.Select("Blue Cross");
 
-        // PhoneNumber (InputMask) — type digits into masked input
         var phone = scope.InputMask("PhoneNumber");
         await phone.FillAndBlur("5551234567");
 
-        // CarePlan (RichTextEditor) — type into contenteditable area
         var carePlan = scope.RichTextEditor("CarePlan");
         await carePlan.FillAndBlur("Care plan content");
 
-        // DietaryRestrictions (MultiSelect) — click each item in popup
         var dietary = scope.MultiSelect("DietaryRestrictions");
         await dietary.SelectItems("Vegetarian", "Halal");
     }
@@ -91,7 +69,6 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await Page.RunAndWaitForRequestAsync(
             async () => await ClickWhenStable(Page.Locator("#submit-json-btn")),
             "**/Patterns/ComponentGather/EchoJson");
-        // Wait for the echo response to populate
         await Expect(Page.Locator("#echo-resident-name"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
     }
@@ -101,12 +78,9 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await Page.RunAndWaitForRequestAsync(
             async () => await ClickWhenStable(Page.Locator("#submit-form-btn")),
             "**/Patterns/ComponentGather/EchoFormData");
-        // Wait for the echo response to populate
         await Expect(Page.Locator("#echo-resident-name"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
     }
-
-    // ── Page loads ──
 
     [Test]
     public async Task page_loads_without_errors()
@@ -127,8 +101,6 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── JSON POST ──
-
     [Test]
     public async Task json_post_gathers_all_fields()
     {
@@ -137,7 +109,6 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
 
         await SubmitJsonAndWaitForEcho();
 
-        // Verify server echoed back key gathered fields
         await Expect(Page.Locator("#echo-resident-name"))
             .ToContainTextAsync("Margaret Thompson", new() { Timeout = 5000 });
         await Expect(Page.Locator("#echo-facility-id"))
@@ -172,8 +143,6 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
             .ToHaveTextAsync("JSON", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── JSON POST — individual field echo verification ──
 
     [Test]
     public async Task json_post_echo_shows_hidden_fields_from_server_seed()
@@ -294,7 +263,6 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await FillAllRequiredFields();
         await SubmitJsonAndWaitForEcho();
 
-        // Dates are selected using DateTime.Now (current year), not hardcoded 2024
         var year = DateTime.Now.Year.ToString();
         await Expect(Page.Locator("#echo-admission-date"))
             .ToContainTextAsync(year, new() { Timeout = 5000 });
@@ -302,10 +270,8 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         await Expect(Page.Locator("#echo-appointment-time"))
             .ToContainTextAsync(year, new() { Timeout = 5000 });
-        // DateRangePicker: StayPeriod is DateTime[] — echo shows JSON array of date strings
         var stayEcho = Page.Locator("#echo-stay-start");
         await Expect(stayEcho).ToContainTextAsync(year, new() { Timeout = 5000 });
-        // Verify both dates are present (array has 2 elements, both contain the year)
         var stayText = await stayEcho.TextContentAsync();
         Assert.That(stayText, Does.Contain(","),
             "StayPeriod echo must contain two dates (comma-separated in JSON array)");
@@ -349,8 +315,6 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── FormData POST ──
-
     [Test]
     public async Task form_data_post_echo_shows_submit_mode()
     {
@@ -371,7 +335,6 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
 
         await SubmitFormDataAndWaitForEcho();
 
-        // Verify server echoed back key gathered fields
         await Expect(Page.Locator("#echo-resident-name"))
             .ToContainTextAsync("Margaret Thompson", new() { Timeout = 5000 });
         await Expect(Page.Locator("#echo-facility-id"))
@@ -426,7 +389,6 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         await FillAllRequiredFields();
         await SubmitFormDataAndWaitForEcho();
 
-        // All 20 onboarded input components must gather into the FormData POST.
         await Expect(Page.Locator("#echo-field-count"))
             .ToHaveTextAsync("20", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -464,14 +426,11 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Validation ──
-
     [Test]
     public async Task submitting_empty_form_does_not_post_to_server()
     {
         await NavigateAndBoot();
 
-        // Clear seeded values so validation will fail
         await Page.Locator($"#{Scope}ResidentName").FillAsync("");
         await Page.Locator($"#{Scope}CareNotes").FillAsync("");
         var monthlyRate = new ComponentScope(Page, Scope).NumericTextBox("MonthlyRate");
@@ -480,10 +439,8 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
 
         await Page.Locator("#submit-json-btn").ClickAsync();
 
-        // Echo should remain in its default state (em dash)
         await Expect(Page.Locator("#echo-resident-name"))
             .ToHaveTextAsync("\u2014", new() { Timeout = 3000 });
-        // Submit mode should still be the default em dash
         await Expect(Page.Locator("#submit-mode"))
             .ToHaveTextAsync("\u2014", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
@@ -494,12 +451,10 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Clear the seeded resident name
         await Page.Locator($"#{Scope}ResidentName").FillAsync("");
 
         await Page.Locator("#submit-json-btn").ClickAsync();
 
-        // Validation error message should appear for ResidentName
         var errorSlot = Page.Locator($"span[data-valmsg-for='ResidentName']");
         await Expect(errorSlot).ToContainTextAsync("required", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -510,7 +465,6 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Clear the seeded care notes
         await Page.Locator($"#{Scope}CareNotes").FillAsync("");
 
         await Page.Locator("#submit-json-btn").ClickAsync();
@@ -525,7 +479,6 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // MobilityLevel is not seeded — submit without selecting it
         await Page.Locator("#submit-json-btn").ClickAsync();
 
         var errorSlot = Page.Locator($"span[data-valmsg-for='MobilityLevel']");
@@ -538,15 +491,12 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // First submit — validation should block (missing required fields)
         await Page.Locator("#submit-json-btn").ClickAsync();
         await Expect(Page.Locator($"span[data-valmsg-for='MobilityLevel']"))
             .ToContainTextAsync("required", new() { Timeout = 5000 });
 
-        // Now fill all required fields
         await FillAllRequiredFields();
 
-        // Resubmit — should succeed this time
         await SubmitJsonAndWaitForEcho();
 
         await Expect(Page.Locator("#echo-resident-name"))
