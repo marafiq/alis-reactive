@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 
@@ -23,10 +24,14 @@ public abstract class PlaywrightTestBase : PageTest
     protected readonly List<string> _consoleMessages = new();
     private readonly List<string> _consoleErrors = new();
     private readonly object _consoleLock = new();
+    private Stopwatch? _testStopwatch;
 
     [SetUp]
     public async Task SetUpConsoleCapture()
     {
+        _testStopwatch = Stopwatch.StartNew();
+        WriteProgress("start");
+
         ClearConsoleState();
         Page.SetDefaultTimeout(60000);
         Page.SetDefaultNavigationTimeout(60000);
@@ -96,6 +101,8 @@ public abstract class PlaywrightTestBase : PageTest
     {
         var failed = TestContext.CurrentContext.Result.Outcome.Status
             == NUnit.Framework.Interfaces.TestStatus.Failed;
+        var tracePath = default(string);
+        var screenshotPath = default(string);
 
         // Save trace + screenshot on failure to a FIXED path under the test project.
         // Traces: `npx playwright show-trace <path>` or https://trace.playwright.dev
@@ -106,8 +113,8 @@ public abstract class PlaywrightTestBase : PageTest
         Directory.CreateDirectory(traceDir);
 
         var testName = TestContext.CurrentContext.Test.Name;
-        var tracePath = failed ? Path.Combine(traceDir, $"{testName}.zip") : null;
-        var screenshotPath = failed ? Path.Combine(traceDir, $"{testName}.png") : null;
+        tracePath = failed ? Path.Combine(traceDir, $"{testName}.zip") : null;
+        screenshotPath = failed ? Path.Combine(traceDir, $"{testName}.png") : null;
 
         await Context.Tracing.StopAsync(new() { Path = tracePath });
 
@@ -126,6 +133,8 @@ public abstract class PlaywrightTestBase : PageTest
                 TestContext.Out.WriteLine("=== End Console Output ===");
             }
         }
+
+        WriteProgress("end", tracePath, screenshotPath);
     }
 
     protected async Task NavigateTo(string path)
@@ -355,6 +364,29 @@ public abstract class PlaywrightTestBase : PageTest
         foreach (var message in messages)
             TestContext.Out.WriteLine(message);
         TestContext.Out.WriteLine("=== End Console Output ===");
+    }
+
+    private void WriteProgress(string phase, string? tracePath = null, string? screenshotPath = null)
+    {
+        var test = TestContext.CurrentContext.Test;
+        var result = TestContext.CurrentContext.Result;
+        var outcome = phase == "start"
+            ? "Running"
+            : result.Outcome.Label is { Length: > 0 }
+            ? $"{result.Outcome.Status}:{result.Outcome.Label}"
+            : result.Outcome.Status.ToString();
+        var elapsed = _testStopwatch?.Elapsed;
+        var elapsedText = elapsed.HasValue ? $"{elapsed.Value.TotalSeconds:0.000}s" : "-";
+
+        TestContext.Progress.WriteLine(
+            $"[playwright:{phase}] {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz} " +
+            $"{outcome} elapsed={elapsedText} {test.FullName}");
+
+        if (tracePath is { Length: > 0 })
+            TestContext.Progress.WriteLine($"[playwright:artifact] trace={tracePath}");
+
+        if (screenshotPath is { Length: > 0 })
+            TestContext.Progress.WriteLine($"[playwright:artifact] screenshot={screenshotPath}");
     }
 
     private static string FindRequiredFile(string relativePath)

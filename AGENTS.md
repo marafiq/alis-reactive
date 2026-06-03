@@ -52,6 +52,7 @@ Approaches that worked and must be reused:
 - focused runtime tests before broader build gates
 - generated TS typecheck after C# domain or plan JSON changes
 - runtime asset build before Playwright
+- observable Playwright runs through `scripts/playwright.sh`, not raw `dotnet test`
 - glossary/process updates in the same commit when vocabulary changes
 
 Approaches that failed and must not be repeated:
@@ -186,6 +187,14 @@ Keep tests that prove behavior from DSL intent. Delete or rewrite tests that
 only pin helper classes, old JSON shape, stale vocabulary, or internal syntax.
 
 A module is closed only when tests prove the matrix rows for that module.
+
+Playwright tests must be run through `scripts/playwright.sh` so filtered and full
+runs are observable. The script prints the exact filter, writes live logs/TRX/diag
+artifacts under `tests/Alis.Reactive.PlaywrightTests/TestResults/observable/`,
+and each test emits `[playwright:start]` and `[playwright:end]` progress markers.
+If output appears stuck, use the most recent `[playwright:start]` line as the
+active test and re-run it with `scripts/playwright.sh --filter "..."`
+instead of starting another raw `dotnet test` session.
 
 ## Deletion Rule
 

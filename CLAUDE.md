@@ -321,15 +321,23 @@ dotnet build
 **Playwright — browser, end-to-end:**
 
 ```bash
-dotnet build                                                 # pre-build so the fixture's sandbox starts fast
-dotnet test tests/Alis.Reactive.PlaywrightTests --logger "console;verbosity=detailed"
+scripts/playwright.sh
 ```
 
 The fixture starts and stops its **own** sandbox on a random free port — do not
 pre-start the sandbox, and port 5220 does **not** need to be free for Playwright.
-The `console;verbosity=detailed` logger prints every test as `Passed`/`Failed` and
-ends with a `Total / Passed / Failed` summary, so a run always reports exactly
-what failed. (`dotnet test` is cross-platform; no `.trx` file needed.)
+The observable wrapper prints the exact `dotnet test` command, writes live output
+to `tests/Alis.Reactive.PlaywrightTests/TestResults/observable/`, emits TRX and
+VSTest diagnostic logs, and enables `--blame-hang` so a silent hang reports the
+last active test. During a run, progress lines look like:
+
+```text
+[playwright:start] ... Alis.Reactive.PlaywrightTests.SomeSlice.some_test
+[playwright:end]   ... Passed elapsed=... Alis.Reactive.PlaywrightTests.SomeSlice.some_test
+```
+
+If output appears stuck, the most recent `[playwright:start]` line is the active
+test to inspect or re-run.
 
 First run only — build the test project, then install the browser (the
 `playwright.ps1` script is a build output, so the build must come first):
@@ -342,7 +350,8 @@ pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 instal
 Re-run only the tests that failed — confirms a real failure vs. a load flake:
 
 ```bash
-dotnet test tests/Alis.Reactive.PlaywrightTests --filter "Name=test_one|Name=test_two"
+scripts/playwright.sh --filter "Name=test_one|Name=test_two"
+scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"
 ```
 
 A Playwright test that fails with a `TimeoutException` but passes on an isolated

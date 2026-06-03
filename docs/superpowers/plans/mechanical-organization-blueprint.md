@@ -248,8 +248,8 @@ Decision for this pass:
 
 7. `refactor: organize Playwright component tests`
    - Move Playwright tests after writing the Fusion inventory.
-   - Proof: targeted Fusion/Grid Playwright filter, then broader component
-     Playwright filter.
+   - Proof: `scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"`,
+     then `scripts/playwright.sh --filter "FullyQualifiedName~Components"`.
 
 8. Final gate
    - Proof: `scripts/test.sh`.

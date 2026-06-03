@@ -277,7 +277,7 @@ Playwright Fusion tests -> slice folders -> routes unchanged, tests unchanged
 
 Proof:
 
-- `dotnet test tests/Alis.Reactive.PlaywrightTests --filter "FullyQualifiedName~Components.Fusion"`
+- `scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion"`
 - Full `scripts/test.sh` before merging the whole mechanical plan.
 
 ## Suggested Execution Order

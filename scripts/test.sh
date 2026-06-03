@@ -13,7 +13,7 @@ dotnet build                            # net48 + net10.0
 npm run typecheck                       # regenerate plan.ts + tsc both projects (contract drift gate)
 
 if [ "${1:-}" != "--no-e2e" ]; then
-  dotnet test tests/Alis.Reactive.PlaywrightTests --logger "console;verbosity=detailed"
+  scripts/playwright.sh --no-build
 fi
 
 echo "All gates green."

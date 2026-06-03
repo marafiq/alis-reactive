@@ -57,7 +57,7 @@ public class WebServerFixture
             }
         };
 
-        TestContext.Out.WriteLine($"Starting sandbox at {BaseUrl}");
+        TestContext.Progress.WriteLine($"[playwright:sandbox] starting {BaseUrl}");
         _server.OutputDataReceived += (_, e) => output.Capture("out", e.Data);
         _server.ErrorDataReceived += (_, e) => output.Capture("err", e.Data);
         _server.Start();
@@ -67,7 +67,7 @@ public class WebServerFixture
         using var http = new HttpClient();
         if (await WaitForSandboxReadiness(http, output))
         {
-            TestContext.Out.WriteLine($"Sandbox ready at {BaseUrl}");
+            TestContext.Progress.WriteLine($"[playwright:sandbox] ready {BaseUrl}");
             return;
         }
 
