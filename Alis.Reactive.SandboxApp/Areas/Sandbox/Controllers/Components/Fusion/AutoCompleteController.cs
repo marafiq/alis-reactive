@@ -42,8 +42,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new() { Value = "benzodiazepine", Text = "Benzodiazepine", Category = "Anxiety" }
             };
 
-            // Gather sends the component's selected value (null → "null" string when nothing selected).
-            // Treat "null" same as empty — return all medications.
+            // Filtering gather can serialize an empty selection as "null"; treat it like no search text.
             var search = MedicationType == "null" ? null : MedicationType;
             var filtered = string.IsNullOrEmpty(search)
                 ? all

@@ -8,10 +8,6 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Reactive pipeline extensions for reading and mutating <see cref="FusionAutoComplete"/>.
     /// </summary>
-    /// <remarks>
-    /// Use these from a <see cref="ComponentRef{TComponent, TModel}"/> resolved by the pipeline:
-    /// <c>p.Component&lt;FusionAutoComplete&gt;(m =&gt; m.Physician).SetValue("Dr. Smith")</c>.
-    /// </remarks>
     public static class FusionAutoCompleteExtensions
     {
         private static readonly FusionAutoComplete Component = new FusionAutoComplete();
@@ -44,23 +40,19 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("hidePopup");
 
         /// <summary>Sets the selected value.</summary>
-        /// <param name="value">The value to select, or <see langword="null"/> to clear.</param>
+        /// <param name="value">The value to select, or <see langword="null"/> to clear the selection.</param>
         public static ComponentRef<FusionAutoComplete, TModel> SetValue<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self, string? value)
             where TModel : class
             => self.EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String));
 
         /// <summary>Sets the displayed text without changing the underlying value.</summary>
-        /// <param name="text">The text to display.</param>
         public static ComponentRef<FusionAutoComplete, TModel> SetText<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self, string text)
             where TModel : class
             => self.EmitSet(TextProperty, ValueExpression.Literal(text));
 
         /// <summary>Replaces the data source with items from an event payload.</summary>
-        /// <typeparam name="TSource">The event payload type containing the items.</typeparam>
-        /// <param name="source">Provides the event payload type; runtime reads the active event payload.</param>
-        /// <param name="path">Expression selecting the items collection from the payload.</param>
         public static ComponentRef<FusionAutoComplete, TModel> SetDataSource<TModel, TSource>(
             this ComponentRef<FusionAutoComplete, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
@@ -71,9 +63,6 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>Replaces the data source with items from an HTTP response body.</summary>
-        /// <typeparam name="TResponse">The response body type containing the items.</typeparam>
-        /// <param name="source">The response scope used by the generated value expression.</param>
-        /// <param name="path">Expression selecting the items collection from the response.</param>
         public static ComponentRef<FusionAutoComplete, TModel> SetDataSource<TModel, TResponse>(
             this ComponentRef<FusionAutoComplete, TModel> self,
             ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
@@ -85,11 +74,9 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Replaces the data source with a typed array source — including a client-side
-        /// <see cref="Alis.Reactive.Builders.Arrays.ReactiveArray{T}"/> transform via <c>AsSource()</c>.
-        /// Routes any array value into the suggestion list with no HTTP round-trip.
+        /// Replaces the data source with a typed array source, including client-side
+        /// <see cref="Alis.Reactive.Builders.Arrays.ReactiveArray{T}"/> values from <c>AsSource()</c>.
         /// </summary>
-        /// <param name="source">The typed array source.</param>
         public static ComponentRef<FusionAutoComplete, TModel> SetDataSource<TModel, TElement>(
             this ComponentRef<FusionAutoComplete, TModel> self,
             TypedSource<TElement[]> source)
@@ -148,10 +135,6 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitSet(EnabledProperty, ValueExpression.Literal(false));
 
         /// <summary>Reads the current selected value for use in conditions or gather.</summary>
-        /// <remarks>
-        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations:
-        /// <c>p.When(p.Component&lt;FusionAutoComplete&gt;(m =&gt; m.Physician).Value()).NotNull().Then(p =&gt; { ... })</c>.
-        /// </remarks>
         /// <returns>A typed source representing the autocomplete's current value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)

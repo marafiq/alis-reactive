@@ -9,24 +9,17 @@ namespace Alis.Reactive.Fusion.Components
     /// Event payload delivered when a user types in a <see cref="FusionAutoComplete"/> to filter suggestions.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// Access properties in conditions: <c>p.When(args, x =&gt; x.Text).Contains("asp")</c>.
-    /// </para>
-    /// <para>
     /// For server-side filtering, call <see cref="FusionAutoCompleteFilteringArgsExtensions.PreventDefault"/>
     /// to suppress the default client-side filter, then use
     /// <see cref="FusionAutoCompleteFilteringArgsExtensions.UpdateData{TResponse}"/> to feed
     /// server results into the popup.
-    /// </para>
     /// </remarks>
     public class FusionAutoCompleteFilteringArgs
     {
         /// <summary>Gets or sets the search text the user typed.</summary>
         public string Text { get; set; } = "";
 
-        /// <summary>
-        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
-        /// </summary>
+        /// <summary>Creates an event payload instance for descriptor wiring.</summary>
         public FusionAutoCompleteFilteringArgs() { }
     }
 
@@ -47,8 +40,6 @@ namespace Alis.Reactive.Fusion.Components
         /// Without this, the component briefly shows "No records found" while the
         /// server request is in flight. Call before issuing an HTTP request.
         /// </remarks>
-        /// <param name="args">The filtering event args.</param>
-        /// <param name="pipeline">The current pipeline builder.</param>
         public static void PreventDefault(
             this FusionAutoCompleteFilteringArgs args,
             IReactionEmitter pipeline)
@@ -64,11 +55,6 @@ namespace Alis.Reactive.Fusion.Components
         /// data source directly does not work because the popup rendering lifecycle must
         /// be re-entered via <c>updateData()</c>.
         /// </remarks>
-        /// <typeparam name="TResponse">The HTTP response body type.</typeparam>
-        /// <param name="args">The filtering event args.</param>
-        /// <param name="pipeline">The current pipeline builder.</param>
-        /// <param name="source">The response body instance.</param>
-        /// <param name="path">Expression selecting the items collection from the response.</param>
         public static void UpdateData<TResponse>(
             this FusionAutoCompleteFilteringArgs args,
             IReactionEmitter pipeline,

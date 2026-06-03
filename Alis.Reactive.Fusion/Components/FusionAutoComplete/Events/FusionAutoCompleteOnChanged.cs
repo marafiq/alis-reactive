@@ -14,9 +14,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
         public bool IsInteracted { get; set; }
 
-        /// <summary>
-        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
-        /// </summary>
+        /// <summary>Creates an event payload instance for descriptor wiring.</summary>
         public FusionAutoCompleteChangeArgs() { }
     }
 }

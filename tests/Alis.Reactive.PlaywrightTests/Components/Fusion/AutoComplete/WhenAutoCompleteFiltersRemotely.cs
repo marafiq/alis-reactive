@@ -3,8 +3,8 @@ using Alis.Reactive.Playwright.Extensions;
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.AutoComplete;
 
 /// <summary>
-/// Same tests as WhenUsingFusionAutoComplete but using Playwright.Extensions locators.
-/// Side-by-side comparison: is it better or worse?
+/// Proves the AutoComplete locator helpers against the same browser-visible
+/// property, event, condition, gather, and filtering behavior.
 /// </summary>
 [TestFixture]
 public class WhenAutoCompleteFiltersRemotely : PlaywrightTestBase
@@ -25,8 +25,6 @@ public class WhenAutoCompleteFiltersRemotely : PlaywrightTestBase
         _medication = _scope.AutoComplete("MedicationType");
     }
 
-    // ── Section 1: Property Write ──
-
     [Test]
     public async Task domready_sets_initial_value_ext()
     {
@@ -36,8 +34,6 @@ public class WhenAutoCompleteFiltersRemotely : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 2: Property Read ──
-
     [Test]
     public async Task domready_reads_value_into_echo_ext()
     {
@@ -46,8 +42,6 @@ public class WhenAutoCompleteFiltersRemotely : PlaywrightTestBase
             .ToContainTextAsync("smith", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Section 3: Method Calls ──
 
     [Test]
     public async Task showpopup_button_opens_dropdown_ext()
@@ -69,8 +63,6 @@ public class WhenAutoCompleteFiltersRemotely : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 4: Events ──
-
     [Test]
     public async Task changed_event_displays_new_value_ext()
     {
@@ -81,8 +73,6 @@ public class WhenAutoCompleteFiltersRemotely : PlaywrightTestBase
             .ToContainTextAsync("johnson", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Section 5: Conditions ──
 
     [Test]
     public async Task event_args_condition_matches_smith_ext()
@@ -118,34 +108,28 @@ public class WhenAutoCompleteFiltersRemotely : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 6: Gather ──
-
     [Test]
     public async Task gather_sends_current_value_after_change_ext()
     {
         await NavigateAndBoot();
 
-        // Change to Dr. Johnson via popup
         await Page.Locator("#show-popup-btn").ClickAsync();
         await _physician.SelectItem("Dr. Johnson");
         await Expect(_scope.Element("change-value"))
             .ToContainTextAsync("johnson", new() { Timeout = 5000 });
 
-        // Gather must POST the CURRENT value
-        var request = await Page.RunAndWaitForRequestAsync(
+        var gatherRequest = await Page.RunAndWaitForRequestAsync(
             async () => await Page.Locator("#gather-btn").ClickAsync(),
             "**/Sandbox/Components/AutoComplete/Echo");
 
-        var body = request.PostData ?? "";
-        Assert.That(body, Does.Contain("johnson"));
-        Assert.That(body, Does.Not.Contain("smith"));
+        var requestBody = gatherRequest.PostData ?? "";
+        Assert.That(requestBody, Does.Contain("johnson"));
+        Assert.That(requestBody, Does.Not.Contain("smith"));
 
         await Expect(_scope.Element("gather-result"))
             .ToHaveTextAsync("gathered", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Deep BDD: state-cycle ──
 
     [Test]
     public async Task selecting_multiple_values_fires_change_each_time_ext()
@@ -155,19 +139,16 @@ public class WhenAutoCompleteFiltersRemotely : PlaywrightTestBase
         var changeValue = _scope.Element("change-value");
         var argsCondition = _scope.Element("args-condition");
 
-        // Cycle 1: Dr. Johnson → "other physician"
         await Page.Locator("#show-popup-btn").ClickAsync();
         await _physician.SelectItem("Dr. Johnson");
         await Expect(changeValue).ToContainTextAsync("johnson", new() { Timeout = 5000 });
         await Expect(argsCondition).ToHaveTextAsync("other physician", new() { Timeout = 3000 });
 
-        // Cycle 2: Dr. Williams → still "other physician"
         await Page.Locator("#show-popup-btn").ClickAsync();
         await _physician.SelectItem("Dr. Williams");
         await Expect(changeValue).ToContainTextAsync("williams", new() { Timeout = 5000 });
         await Expect(argsCondition).ToHaveTextAsync("other physician", new() { Timeout = 3000 });
 
-        // Cycle 3: Dr. Smith → flips to "dr smith selected"
         await Page.Locator("#show-popup-btn").ClickAsync();
         await _physician.SelectItem("Dr. Smith");
         await Expect(changeValue).ToContainTextAsync("smith", new() { Timeout = 5000 });
@@ -181,28 +162,23 @@ public class WhenAutoCompleteFiltersRemotely : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var indicator = _scope.Element("selected-indicator");
+        var selectedIndicator = _scope.Element("selected-indicator");
 
-        // Select Dr. Johnson → indicator visible
         await Page.Locator("#show-popup-btn").ClickAsync();
         await _physician.SelectItem("Dr. Johnson");
-        await Expect(indicator).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await Expect(indicator).ToHaveTextAsync("selected", new() { Timeout = 3000 });
+        await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(selectedIndicator).ToHaveTextAsync("selected", new() { Timeout = 3000 });
 
-        // Clear via user gesture → indicator hides
         await _physician.Clear();
         await _physician.Blur();
-        await Expect(indicator).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Expect(selectedIndicator).ToBeHiddenAsync(new() { Timeout = 5000 });
 
-        // Reselect Dr. Smith → indicator back
         await Page.Locator("#show-popup-btn").ClickAsync();
         await _physician.SelectItem("Dr. Smith");
-        await Expect(indicator).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
-
-    // ── Section 7: Filtering ──
 
     [Test]
     public async Task filtering_fires_http_and_populates_popup_ext()

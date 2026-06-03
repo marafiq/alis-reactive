@@ -8,16 +8,12 @@
     var plan = Html.ReactivePlan<AutoCompleteModel>();
     var physicians = (List<PhysicianItem>)ViewBag.Physicians;
 
-    // ── Section 1+2: Property Write (SetValue) + Property Read on DomReady ──
-
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<FusionAutoComplete>(m => m.Physician).SetValue("smith");
         var comp = p.Component<FusionAutoComplete>(m => m.Physician);
         p.Element("value-echo").SetText(comp.Value());
     }));
-
-    // ── Section 5: Gather — POST with Include ──
 
     Html.On(plan, t => t.CustomEvent("do-gather", p =>
     {
@@ -30,8 +26,6 @@
             }));
     }));
 
-    // ── Section 7: Filtering event with HTTP — Server-filtered Medications ──
-    // (Section 7 plan wiring is inline below via .Reactive on the component)
 }
 
 <native-vstack gap="Lg">
@@ -41,7 +35,6 @@
         property reads, events, conditions, and gather.
     </native-text>
 
-    <!-- Section 1: Property Write (SetValue) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">1. Property Write (SetValue)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -89,7 +82,6 @@
         <p class="font-mono text-sm mt-4">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
     </section>
 
-    <!-- Section 2: Events — Changed -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">4. Events (Changed)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -102,7 +94,6 @@
         </native-vstack>
     </section>
 
-    <!-- Section 5: Conditions — Typed Event-Args + Component-Read -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">5. Conditions (Both Types)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -112,7 +103,6 @@
         </p>
     </section>
 
-    <!-- Section 6: Gather — Include in POST -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">6. Gather (Include in POST)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -128,7 +118,6 @@
         <p class="font-mono text-sm">Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
     </section>
 
-    <!-- Section 7: Filtering Event — Server-Filtered Medications -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">7. Filtering Event (Server-Filtered HTTP)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -145,7 +134,6 @@
                     .AllowCustom(false).ShowPopupButton().Highlight(true)
                     .Reactive(plan, evt => evt.Filtering, (args, p) =>
                     {
-                        
                         args.PreventDefault(p);
                         p.Get("/Sandbox/Components/AutoComplete/Medications")
                          .Gather(g => g.FromEvent(args, x => x.Text, "MedicationType"))
@@ -162,7 +150,6 @@
         </native-vstack>
     </section>
 
-    <!-- Plan JSON -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
