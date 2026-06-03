@@ -28,8 +28,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await Input("Address_ZipCode").FillAsync("62704");
     }
 
-    // ── Unconditional rules ──────────────────────────────────
-
     [Test]
     public async Task empty_form_blocks_request_and_shows_required_errors_inline()
     {
@@ -87,7 +85,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── equalTo ──────────────────────────────────────────────
+    // DSL condition: equalTo.
 
     [Test]
     public async Task confirm_email_fails_when_different_from_email()
@@ -121,7 +119,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("400");
     }
 
-    // ── Condition: truthy ────────────────────────────────────
+    // DSL condition: truthy.
 
     [Test]
     public async Task veteran_id_not_required_when_is_veteran_unchecked()
@@ -130,7 +128,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        // IsVeteran unchecked by default, VeteranId empty
+        // IsVeteran is unchecked by default and VeteranId is intentionally empty.
 
         await SubmitBtn.ClickAsync();
 
@@ -171,7 +169,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("400");
     }
 
-    // ── Condition: eq ────────────────────────────────────────
+    // DSL condition: eq.
 
     [Test]
     public async Task memory_assessment_not_required_when_care_level_is_assisted()
@@ -207,7 +205,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Mixed vendor: Fusion NumericTextBox validates inline ──
+    // Fusion NumericTextBox validates inline with regular validation errors.
 
     [Test]
     public async Task memory_care_with_fusion_numeric_validates_and_succeeds()
@@ -215,25 +213,23 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Fill all required + select Memory Care
         await FillAllRequired();
         await Input("CareLevel").SelectOptionAsync("Memory Care");
         await Input("PhysicianName").FillAsync("Dr. Smith");
         await Input("ReasonForNoContact").FillAsync("No relatives");
 
-        // Submit without filling MemoryAssessment (Fusion NumericTextBox) → error inline
+        // Leave the Fusion NumericTextBox empty so submit exercises inline validation.
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("MemoryAssessmentScore")).ToContainTextAsync("required");
         await Expect(ErrorFor("MemoryAssessmentScore")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Fill the Fusion NumericTextBox with a valid assessment score
+        // Tab commits the Syncfusion value before the next submit.
         var scoreInput = Page.Locator($"#{R}MemoryAssessmentScore");
         await scoreInput.ClickAsync();
         await scoreInput.FillAsync("85");
         await scoreInput.PressAsync("Tab");
 
-        // Submit → all pass → success
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
         await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
@@ -242,7 +238,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Condition: neq ───────────────────────────────────────
+    // DSL condition: neq.
 
     [Test]
     public async Task physician_not_required_when_care_level_is_independent()
@@ -251,7 +247,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        // CareLevel defaults to "Independent" via FillAllRequired
+        // FillAllRequired selects Independent; this test intentionally leaves it unchanged.
 
         await SubmitBtn.ClickAsync();
 
@@ -292,7 +288,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Condition: falsy ─────────────────────────────────────
+    // DSL condition: falsy.
 
     [Test]
     public async Task reason_for_no_contact_required_when_has_emergency_contact_unchecked()
@@ -301,7 +297,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        // HasEmergencyContact unchecked by default, ReasonForNoContact empty
+        // HasEmergencyContact is unchecked by default and ReasonForNoContact is intentionally empty.
 
         await SubmitBtn.ClickAsync();
 
@@ -328,8 +324,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("400");
     }
 
-    // ── Condition transitions ────────────────────────────────
-
     [Test]
     public async Task toggling_is_veteran_toggles_veteran_id_requirement()
     {
@@ -338,17 +332,14 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 
         await FillAllRequired();
 
-        // Unchecked → no error
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
 
-        // Check → required
         await Input("IsVeteran").CheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Uncheck → no error again
         await Input("IsVeteran").UncheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
@@ -364,20 +355,17 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 
         await FillAllRequired();
 
-        // Unchecked → ReasonForNoContact required, EmergencyName not required
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Check → EmergencyName required, ReasonForNoContact not required
         await Input("HasEmergencyContact").CheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("EmergencyName")).ToBeVisibleAsync();
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Uncheck → flips back
         await Input("HasEmergencyContact").UncheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
@@ -387,40 +375,32 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Multi-step fix and resubmit ──────────────────────────
-
     [Test]
     public async Task fixing_errors_and_resubmitting_clears_previous_errors()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Submit empty → multiple errors
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
         await Expect(ErrorFor("Email")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Fix Name only → Name error gone, others remain
         await Input("Name").FillAsync("Jane Smith");
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("Name")).Not.ToBeVisibleAsync();
         await Expect(ErrorFor("Email")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Fill remaining → all pass
         await FillAllRequired();
         await Input("ReasonForNoContact").FillAsync("No relatives nearby");
         await SubmitBtn.ClickAsync();
 
-        // All validation should pass — POST should be sent
         await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
     }
-
-    // ── Address validation ─────────────────────────────────
 
     [Test]
     public async Task empty_address_street_shows_required_error()
@@ -429,7 +409,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Address_Street").FillAsync(""); // Clear street
+        await Input("Address_Street").FillAsync("");
         await Input("ReasonForNoContact").FillAsync("No relatives");
 
         await SubmitBtn.ClickAsync();
@@ -447,7 +427,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Address_City").FillAsync(""); // Clear city
+        await Input("Address_City").FillAsync("");
         await Input("ReasonForNoContact").FillAsync("No relatives");
 
         await SubmitBtn.ClickAsync();
@@ -457,8 +437,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
-
-    // ── Email format validation ────────────────────────────
 
     [Test]
     public async Task invalid_email_format_shows_format_error()
@@ -477,20 +455,16 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Live-clear (blur clears error after fix) ───────────
-
     [Test]
     public async Task name_error_clears_on_blur_after_valid_input()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Submit empty → Name error
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
         await Expect(Input("Name")).ToHaveClassAsync(new Regex("alis-has-error"));
 
-        // Type valid name, blur → error clears
         await Input("Name").FillAsync("Robert Thompson");
         await Input("Name").BlurAsync();
 
@@ -506,11 +480,9 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Submit empty → Email error
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("Email")).ToBeVisibleAsync();
 
-        // Type valid email, blur → error clears
         await Input("Email").FillAsync("robert@care.com");
         await Input("Email").BlurAsync();
 
@@ -526,12 +498,11 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Address_ZipCode").FillAsync("abc"); // invalid
+        await Input("Address_ZipCode").FillAsync("abc");
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("Address.ZipCode")).ToBeVisibleAsync();
 
-        // Fix with valid 5-digit zip, blur → error clears
         await Input("Address_ZipCode").FillAsync("62704");
         await Input("Address_ZipCode").BlurAsync();
 
@@ -540,39 +511,30 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Full success path with all conditions met ──────────
-
     [Test]
     public async Task complete_form_with_all_conditional_fields_succeeds()
     {
-        // Fill every field on the page, including all conditional branches,
-        // and verify the server accepts the complete submission.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Basic
         await Input("Name").FillAsync("Eleanor Davis");
         await Input("Email").FillAsync("eleanor@care.com");
         await Input("ConfirmEmail").FillAsync("eleanor@care.com");
         await Input("CareLevel").SelectOptionAsync("Memory Care");
 
-        // Veteran
         await Input("IsVeteran").CheckAsync();
         await Input("VeteranId").FillAsync("V99999");
 
-        // Care details — Memory Care requires physician + assessment
         await Input("PhysicianName").FillAsync("Dr. Martinez");
         var assessmentInput = Page.Locator($"#{R}MemoryAssessmentScore");
         await assessmentInput.ClickAsync();
         await assessmentInput.FillAsync("72");
         await assessmentInput.PressAsync("Tab");
 
-        // Emergency contact
         await Input("HasEmergencyContact").CheckAsync();
         await Input("EmergencyName").FillAsync("Michael Davis");
         await Input("EmergencyPhone").FillAsync("555-9876");
 
-        // Address
         await Input("Address_Street").FillAsync("456 Oak Lane");
         await Input("Address_City").FillAsync("Portland");
         await Input("Address_ZipCode").FillAsync("97201");
@@ -582,7 +544,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // No inline errors should be visible
         await Expect(ErrorFor("Name")).Not.ToBeVisibleAsync();
         await Expect(ErrorFor("Email")).Not.ToBeVisibleAsync();
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
@@ -590,8 +551,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Confirm email live-clear ───────────────────────────
 
     [Test]
     public async Task confirm_email_error_clears_on_blur_when_corrected()
@@ -606,7 +565,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
 
-        // Fix confirm email to match, blur → error clears
         await Input("ConfirmEmail").FillAsync("test@care.com");
         await Input("ConfirmEmail").BlurAsync();
 
@@ -614,8 +572,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── CareLevel transitions: memory assessment visibility ──
 
     [Test]
     public async Task switching_care_level_away_from_memory_care_removes_assessment_error()
@@ -627,11 +583,9 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await Input("CareLevel").SelectOptionAsync("Memory Care");
         await Input("PhysicianName").FillAsync("Dr. Smith");
 
-        // Submit → MemoryAssessmentScore required
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("MemoryAssessmentScore")).ToBeVisibleAsync();
 
-        // Switch to Assisted Living → MemoryAssessmentScore no longer required
         await Input("CareLevel").SelectOptionAsync("Assisted Living");
         await SubmitBtn.ClickAsync();
 
