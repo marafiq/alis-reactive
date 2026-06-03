@@ -6,14 +6,18 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Vendor-agnostic gather extensions for including component values in HTTP requests.
+    /// Adds component value sources to HTTP request payloads.
     /// </summary>
     public static class GatherExtensions
     {
         /// <summary>
-        /// Includes an input component's value, identified by model expression.
-        /// The property name from the expression becomes the HTTP parameter name.
+        /// Adds a model-bound input component's value to the request payload.
+        /// The model property name becomes the payload field name.
         /// </summary>
+        /// <typeparam name="TComponent">The input component contract type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component ID.</typeparam>
+        /// <param name="self">The gather builder being configured.</param>
+        /// <param name="expr">The model property expression used to generate the component ID and payload field name.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             Expression<Func<TModel, object>> expr)
@@ -29,10 +33,17 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Includes a component's value by explicit element ID and property name.
-        /// Works for both input and display components. For input components, reads
-        /// the ValueMember; for display components, reads the named property.
+        /// Adds a component value to the request payload by explicit element ID and field name.
         /// </summary>
+        /// <remarks>
+        /// Input components read their configured value member. Display components read the
+        /// named member directly.
+        /// </remarks>
+        /// <typeparam name="TComponent">The component contract type.</typeparam>
+        /// <typeparam name="TModel">The view model for the gather builder.</typeparam>
+        /// <param name="self">The gather builder being configured.</param>
+        /// <param name="refId">The explicit controlled component ID rendered in markup.</param>
+        /// <param name="name">The payload field name and, for display components, the component member name.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             string refId,
@@ -50,11 +61,12 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Includes a typed component member value in the gather.
-        /// The member name becomes the HTTP parameter name.
-        /// Use with component value sources like <c>schedule.CurrentView()</c>,
-        /// <c>schedule.SelectedDate()</c>, or method-return sources such as <c>schedule.GetEvents()</c>.
+        /// Adds a typed component member value to the request payload.
         /// </summary>
+        /// <typeparam name="TModel">The view model for the gather builder.</typeparam>
+        /// <typeparam name="TProp">The component member value type.</typeparam>
+        /// <param name="self">The gather builder being configured.</param>
+        /// <param name="source">The typed component value source. Its default payload name is used.</param>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
             this GatherBuilder<TModel> self,
             TypedComponentSource<TProp> source)
@@ -65,9 +77,13 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Includes a typed component member value with an explicit HTTP parameter name.
-        /// Use when the parameter name differs from the component property name.
+        /// Adds a typed component member value to the request payload with an explicit field name.
         /// </summary>
+        /// <typeparam name="TModel">The view model for the gather builder.</typeparam>
+        /// <typeparam name="TProp">The component member value type.</typeparam>
+        /// <param name="self">The gather builder being configured.</param>
+        /// <param name="source">The typed component value source to evaluate before the request is sent.</param>
+        /// <param name="paramName">The HTTP payload field name.</param>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
             this GatherBuilder<TModel> self,
             TypedComponentSource<TProp> source,

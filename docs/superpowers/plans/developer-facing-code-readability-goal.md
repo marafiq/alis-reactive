@@ -46,8 +46,9 @@ verified, and committed.
 Keep comments when they explain one of these developer-facing facts:
 
 - DSL intent that is not obvious from the fluent call alone.
-- Browser/runtime boundary behavior, including DOM lookup, network, browser API,
-  malformed external JSON, or confirm/user-decision boundaries.
+- Reactive Plan runtime-boundary behavior, including DOM lookup, network,
+  actual browser API calls, malformed external JSON, or confirm/user-decision
+  boundaries.
 - Syncfusion or other vendor-specific behavior, such as duplicated inputs,
   popup sequencing, formatted display values, or required keyboard gestures.
 - `net48` or `net10` compatibility constraints.
@@ -118,8 +119,8 @@ Stop and write a follow-up note instead of refactoring when:
 - The comment reveals unclear DSL behavior rather than unclear test structure.
 - The cleanup would require changing sandbox markup, route behavior, public DSL
   names, generated TS terms, or runtime names.
-- A comment points to a flaky browser/vendor timing issue that needs diagnosis,
-  not cosmetic cleanup.
+- A comment points to flaky real-browser, runtime, or vendor timing that needs
+  diagnosis, not cosmetic cleanup.
 - Several tests share the same confusion and need a larger fixture design.
 - XML documentation cleanup starts to require API wording decisions outside the
   Playwright slice.
@@ -137,8 +138,8 @@ In this repo, "better for framework developers" means a developer can:
   names, assertion names, and public API docs.
 - Distinguish behavior proof from test mechanics without relying on step-by-step
   comments.
-- Preserve real browser and vendor-boundary knowledge where comments are the
-  right tool.
+- Preserve real browser API, Reactive Plan runtime-boundary, and
+  vendor-boundary knowledge where comments are the right tool.
 - Safely modify DSL, builders, plan domain, runtime, or tests without stale
   names or decorative comments obscuring the behavior.
 
@@ -151,11 +152,11 @@ Understand why the guard Playwright test fails and identify the behavior under t
 Files inspected:
 `tests/Alis.Reactive.PlaywrightTests/Conditions/Guards/WhenGuardsControlExecution.cs`; `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Conditions/Guards/Index.cshtml`; `docs/handoff-code-readability.md`
 Concrete confusion:
-`WhenGuardsControlExecution.cs` uses many banner comments such as `// -- int (ElseIf grade ladder) --`, `// -- long --`, and `// -- Direct Or syntax --`. The banners repeat or only slightly expand the test method names, while some genuinely important inline comments explain null leaf behavior and confirm-dialog behavior. Because all comments have similar visual weight, it is harder to spot the comments that protect actual DSL or browser-boundary intent.
+`WhenGuardsControlExecution.cs` uses many banner comments such as `// -- int (ElseIf grade ladder) --`, `// -- long --`, and `// -- Direct Or syntax --`. The banners repeat or only slightly expand the test method names, while some genuinely important inline comments explain null leaf behavior and confirm-dialog behavior. Because all comments have similar visual weight, it is harder to spot the comments that protect actual DSL intent, Reactive Plan runtime-boundary behavior, or real browser API behavior.
 Why it matters for developers:
 A developer debugging a failed guard test needs to scan from DSL source in `Guards/Index.cshtml` to the matching Playwright proof. Decorative banners slow that scan and make meaningful comments less visible.
 Recommended action:
-For the first commit, remove decorative section banners from `WhenGuardsControlExecution.cs` where the test name already carries the behavior. Keep or rewrite comments that explain null/undefined coercion, branch state that intentionally persists across clicks, and confirm dialog browser behavior.
+For the first commit, remove decorative section banners from `WhenGuardsControlExecution.cs` where the test name already carries the behavior. Keep or rewrite comments that explain null/undefined coercion, branch state that intentionally persists across clicks, and confirm dialog browser API behavior.
 Keep / rewrite / delete / defer:
 delete decorative banners; keep/rewrite null and confirm boundary comments; defer deeper helper extraction if it would change the test structure beyond one small slice.
 
@@ -166,7 +167,7 @@ Evaluate whether public XML docs and names communicate the API contract clearly.
 Files inspected:
 `Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs`; `Alis.Reactive/PlanModel/Values/ValueExpression.cs`; `docs/handoff-code-readability.md`
 Concrete confusion:
-`PipelineBuilder<TModel>` has useful class-level XML docs explaining declaration order and trigger callbacks, but several member comments mostly restate names, such as `Dispatches a custom browser event by name`, `References a component by explicit ID`, and parameter docs that repeat `eventName` or `pluginName`. `ValueExpression` has internal XML docs that are useful when they explain runtime path behavior, but simple operation summaries such as array count/filter/map risk becoming comment noise if handled mechanically.
+`PipelineBuilder<TModel>` has useful class-level XML docs explaining declaration order and trigger callbacks, but several member comments mostly restate names, such as `Raises a CustomEvent by name`, `References a component by explicit ID`, and parameter docs that repeat `eventName` or `pluginName`. `ValueExpression` has internal XML docs that are useful when they explain runtime path behavior, but simple operation summaries such as array count/filter/map risk becoming comment noise if handled mechanically.
 Why it matters for developers:
 Public XML docs are IntelliSense surface for framework developers. Repetitive wording makes important contract details harder to find, especially around runtime-resolved values, typed payloads, plugins, and component references.
 Recommended action:
@@ -183,11 +184,11 @@ Files inspected:
 Concrete confusion:
 `WhenTriggerDrivenConditionsMixWithHttp.cs` uses section banners and line comments like "HTTP response sets saved name" and "Outer condition evaluates active=true", while the test names already state the scenario. `WhenParentSelectionFiltersDependentList.cs` has comments before direct actions such as "Select US first", but it also has valuable Syncfusion comments about real keyboard gestures and duplicate/popup behavior. `WhenGuardsControlReactiveFlow.cs` has valuable comments explaining duplicated Syncfusion numeric inputs, but phase banners inside lifecycle tests could become helper names if the flow is later simplified.
 Why it matters for developers:
-Playwright tests are behavior documentation. If comments narrate every action, future maintainers learn to ignore them and may miss the comments that explain vendor timing, browser boundaries, or state leakage.
+Playwright tests are behavior documentation. If comments narrate every action, future maintainers learn to ignore them and may miss the comments that explain vendor timing, real browser API boundaries, Reactive Plan runtime boundaries, or state leakage.
 Recommended action:
 Start with one small guard file slice. Prefer deleting decorative comments first. Only extract helpers when repeated steps are already obvious and the helper name can express behavior more clearly than the inline sequence.
 Keep / rewrite / delete / defer:
-delete narrating and decorative comments in the selected slice; keep Syncfusion/browser timing comments; defer broader helper extraction across HttpMixing, Cascading, and ReactiveWiring.
+delete narrating and decorative comments in the selected slice; keep Syncfusion timing and real browser-boundary comments; defer broader helper extraction across HttpMixing, Cascading, and ReactiveWiring.
 
 ## First Implementation Slice
 
@@ -214,7 +215,7 @@ Code to delete or simplify:
   already describe the behavior.
 - Step comments that repeat an immediately following click or assertion.
 - Do not delete comments that explain null versus missing payload behavior,
-  branch state persistence, or confirm dialog browser boundaries unless they are
+  branch state persistence, or confirm dialog browser API boundaries unless they are
   rewritten into clearer helper names.
 
 Behavior proof before commit:
@@ -252,8 +253,8 @@ Allowed changes:
 - Delete comments that repeat nearby code, test names, method names, parameter
   names, or obvious assertion mechanics.
 - Rewrite comments so they explain the DSL, public API contract, runtime
-  boundary, browser timing, Syncfusion/vendor behavior, compatibility constraint,
-  or invariant.
+  Reactive Plan runtime boundary, real browser timing, Syncfusion/vendor
+  behavior, compatibility constraint, or invariant.
 - Rename local variables, private helper parameters, and test helper names when
   the new name makes the behavior easier to follow and does not change public
   API, generated plan JSON, routes, selectors, test names, or runtime contract.
@@ -268,7 +269,8 @@ Disallowed changes:
 - Runtime behavior changes, validation behavior changes, route changes, selector
   changes, test intent changes, or sandbox product refactors.
 - Broad style churn, formatter-only commits, or comment deletion that removes
-  useful browser/vendor/domain context.
+  useful real-browser, Reactive Plan runtime-boundary, vendor, or domain
+  context.
 
 Initial broad inventory on this branch:
 
@@ -382,6 +384,14 @@ Review cycle before every commit:
   visibility in a readability-only pass. A later API-visibility slice should
   verify external compatibility and whether the shared descriptor base should
   stay public or be removed from the public inheritance model.
+- TODO: `Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs`,
+  `Alis.Reactive/PlanAuthoring/TriggerBuilder.cs`,
+  `Alis.Reactive/PlanAuthoring/ReactivePlan.cs`, and
+  `Alis.Reactive/PlanModel/BrowserObjects/*`: tighten overbroad "browser"
+  wording during a dedicated API vocabulary slice. Use "Reactive Plan",
+  "plan-registered component", "plugin contract", or "runtime boundary" for
+  framework-owned plan concepts. Reserve "browser" for actual DOM/window/API,
+  network, and Playwright-visible behavior.
 
 ## Out Of Scope For The First Slice
 

@@ -4,7 +4,8 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
-    /// <summary>Builds a set of HTTP requests that execute concurrently.</summary>
+    /// <summary>Configures HTTP request branches that execute concurrently.</summary>
+    /// <typeparam name="TModel">The view model that owns model-bound component IDs.</typeparam>
     public class ParallelBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
@@ -24,7 +25,8 @@ namespace Alis.Reactive.Builders.Requests
             _draft.AddBranch(builder.BuildRequest());
         }
 
-        /// <summary>Executes a reaction graph after all parallel requests complete.</summary>
+        /// <summary>Runs reactions after all parallel request branches settle.</summary>
+        /// <param name="pipeline">Builds the all-settled reaction graph.</param>
         public ParallelBuilder<TModel> OnAllSettled(Action<PipelineBuilder<TModel>> pipeline)
         {
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
