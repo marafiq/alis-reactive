@@ -1,11 +1,5 @@
-// conditions/compare-engine.ts — pure SYNC condition evaluation (compare/all/any/not).
-//
-// Leaf module: it receives the value-evaluator by dependency injection (evalValue) and
-// imports NOTHING from values/evaluate. This breaks the would-be cycle
-// evaluate -> conditions -> evaluate (design §14.1): values/evaluate imports this leaf and
-// passes its own evaluator to evaluate per-element array-op predicates, while
-// conditions.ts delegates its sync subset here, passing evaluateValue. There is still one
-// value resolver — the injected evalValue is always evaluateValue.
+// Compare/all/any/not stay synchronous here and receive evaluateValue from callers.
+// That dependency shape prevents values/evaluate -> conditions -> values/evaluate cycles.
 
 import type {
   CompareCondition,
@@ -36,7 +30,6 @@ import { RuntimeShape } from "../browser-objects/runtime-shape";
 
 const log = scope("conditions");
 
-/** Value resolver injected by the caller - always values/evaluate's evaluateValue. */
 export type ValueEvaluator = (expression: ValueExpression, plan: PlanDocument, ctx?: ExecContext) => unknown;
 
 type TextOperand =
@@ -58,7 +51,7 @@ const missingText: TextOperand = { kind: "missing" };
 const missingOrderedConditionValue: OrderedConditionValue = { kind: "missing" };
 const noRightOperandTrace = { kind: "none" } as const;
 
-/** Evaluate the sync condition subset (compare/all/any/not). Confirm is not part of this subset. */
+/** Validation conditions intentionally exclude confirm, so this path stays synchronous. */
 export function evaluateSyncCondition(
   condition: ValidationCondition,
   plan: PlanDocument,
@@ -78,8 +71,6 @@ export function evaluateSyncCondition(
       return assertNever(condition, "condition kind");
   }
 }
-
-// -- Compare evaluation (always synchronous; shared by the async lane in conditions.ts) --
 
 export function evaluateCompare(
   condition: CompareCondition,

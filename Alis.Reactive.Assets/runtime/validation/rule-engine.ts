@@ -1,5 +1,4 @@
-// Rule Engine - pure validation rule evaluation.
-// No DOM, no vendor, no side effects. The orchestrator resolves peers first.
+// Pure rule evaluation; orchestrator resolves peers and owns DOM/vendor side effects.
 
 import { assertNever } from "../shared/assert-never";
 import type {

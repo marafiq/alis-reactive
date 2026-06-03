@@ -1,8 +1,5 @@
-// conditions.ts — V3 ConditionGraph evaluation.
-// The SYNC subset (compare/all/any/not) lives in ./compare-engine, a DI leaf that
-// receives the value-evaluator as a parameter (so it never imports values/evaluate). This
-// module keeps the public entry points and owns the async lane: confirm is the only term
-// that crosses to async, so full ConditionGraph evaluation may return a Promise.
+// ConditionGraph stays in the current lane until a reached confirm term crosses async.
+// The sync subset delegates to compare-engine so evaluateValue remains the only resolver.
 
 import type {
   ConditionGraph,
@@ -24,12 +21,12 @@ interface AlisBrowserApi {
   };
 }
 
-/** Sync condition evaluation for validation conditions (compare/all/any/not). */
+/** Validation conditions cannot contain confirm, so evaluation is always sync. */
 export function evaluateCondition(condition: ValidationCondition, plan: PlanDocument, ctx?: ExecContext): boolean {
   return evaluateSyncCondition(condition, plan, ExecutionContext.from(ctx), evaluateValue);
 }
 
-/** Current-lane condition evaluation. Crosses to async only when a reached term requires it. */
+/** Branch execution depends on sync results staying sync until confirm is reached. */
 export function evaluateConditionInCurrentLane(
   condition: ConditionGraph,
   plan: PlanDocument,

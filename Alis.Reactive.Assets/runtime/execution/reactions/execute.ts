@@ -1,6 +1,4 @@
-// execute.ts - ReactionGraph executor. The dumb runtime.
-// Dispatches on reaction.kind. Uses shared resolver for ALL component access.
-// Component references resolve through the currently active browser plan.
+// ReactionGraph execution dispatches generated reactions through the active RuntimePlan.
 
 import type {
   PlanDocument, ReactionGraph, SequenceReaction, ParallelReaction, BranchReaction,
@@ -41,13 +39,9 @@ function runtimePlanFor(plan: PlanDocument | undefined): RuntimePlan {
   throw new Error("[alis] no active plan");
 }
 
-// Returns void for immediate-lane reaction kinds (set, call, dispatch, inject,
-// show-validation-errors, branch with non-confirm conditions).
-// Returns Promise<void> only when execution reaches the async lane:
-// request, parallel, confirm, or a sequence/branch step that reaches one.
-//
-// This two-lane design keeps SF event arg mutations (args.cancel,
-// args.preventDefaultAction) in the same browser tick as the event callback.
+// Immediate reactions must stay synchronous so Syncfusion event arg mutations happen
+// in the same browser tick. request/parallel/confirm, or sequence/branch paths that
+// reach one, return Promise<void>.
 
 export function executeReaction(
   reaction: ReactionGraph,

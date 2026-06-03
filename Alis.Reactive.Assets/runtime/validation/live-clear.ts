@@ -1,8 +1,5 @@
-// Live Validation — Per-field event wiring for interactive validation
-// Reads container scope through RuntimePlan so component lookup and DOM resolution
-// stay on the same deterministic path as execution/gather.
-// On blur/change: re-validates the single field (not just clears).
-// On input: clears only (typing should not show errors mid-keystroke).
+// Live validation revalidates on blur/vendor change and only clears while typing.
+// RuntimePlan lookup keeps fields on the same component path as execution/gather.
 
 import type { PlanDocument } from "../types/index";
 import {
@@ -28,10 +25,6 @@ interface LiveFieldEvents {
   readonly listenerOptions: AddEventListenerOptions | undefined;
 }
 
-/**
- * Wire live validation for all components in a container scope.
- * containerKey identifies the component that holds the ContainerScope.
- */
 export function wireLiveValidation(plan: PlanDocument, containerKey: string, signal?: AbortSignal): void {
   const runtime = RuntimePlan.from(plan);
   const containerComp = runtime.components.find(containerKey);
@@ -88,7 +81,7 @@ function wireFieldDomEvents(
 ): boolean {
   if (fieldHasDomEvents(field.component.id)) return false;
 
-  // DOM events are best-effort field events; vendor semantic change is tracked separately.
+  // DOM events are best-effort; vendor semantic change is wired separately below.
   el.addEventListener("input", events.clear, events.listenerOptions);
   el.addEventListener("blur", events.revalidate, events.listenerOptions);
   wiredFieldDomEvents.add(field.component.id);
@@ -101,7 +94,7 @@ function wireComponentChangeEvent(
 ): boolean {
   if (fieldHasComponentChangeEvent(field.component.id)) return false;
 
-  // Semantic "change" goes through the vendor's event system (DOM or modelObserver).
+  // Semantic change must go through the vendor event adapter (DOM or modelObserver).
   try {
     wireEvent(field.plan, field.component.key, "change", () => events.revalidate(), events.listenerOptions);
   } catch (e) {
@@ -117,12 +110,11 @@ function componentChangeEventCanBeDeferred(error: unknown): boolean {
   return RuntimeResolutionError.is(error) || RuntimeComponentReadinessError.is(error);
 }
 
-/** Remove a field's wired status so it can be re-wired after partial reload. */
+/** Partial reloads unmount fields; clear wiring so remounted fields can wire again. */
 export function unwireField(domId: string): void {
   forgetFieldWiring(domId);
 }
 
-/** Reset for tests — clears the wired set so tests start clean. */
 export function resetLiveClearForTests(): void {
   wiredFieldDomEvents.clear();
   wiredFieldComponentChangeEvents.clear();

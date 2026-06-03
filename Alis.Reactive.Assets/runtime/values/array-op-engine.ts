@@ -6,10 +6,6 @@ type ProjectElementValue = (expression: ValueExpression, item: unknown) => unkno
 
 type MatchElementPredicate = (predicate: ValidationCondition, item: unknown) => boolean;
 
-/**
- * Executes array operations after evaluate.ts supplies element-scope value and
- * predicate readers.
- */
 export function runArrayOp(
   expression: ArrayOperationExpression,
   source: unknown,
@@ -19,8 +15,7 @@ export function runArrayOp(
   const items = normalizeToArray(source, expression.op);
   switch (expression.op) {
     case "count":
-      // Count is unconditional length; Count(predicate) compiles to filter -> count (ReactiveArray.cs),
-      // so the count node never carries a predicate.
+      // Count(predicate) compiles as filter -> count, so count nodes are unconditional.
       return items.length;
     case "filter":
       return shapedArray(items.filter(item => match(matchElementPredicate, expression.predicate, item)), expression);
@@ -107,12 +102,9 @@ function projectedOrSelf(
 }
 
 /**
- * Normalize an array-op source to a JS array at the input boundary.
- * Browser/EJ2 JS APIs return an underdetermined union (Array | array-like | iterable
- * | scalar | null) that the C# T[] type cannot constrain at authoring time. This is an
- * external-boundary normalization — the same category as getElementById returning null —
- * not a plan validator or fallback. DOMStringMap (dataset) has no Symbol.iterator and
- * fails fast at the throw, keeping it in the plugin escape hatch's domain.
+ * Normalize array-op input after browser/vendor reads, where C# T[] cannot constrain
+ * the JavaScript value. This boundary normalization is not a plan fallback;
+ * non-iterable objects fail fast instead of being guessed into arrays.
  */
 function normalizeToArray(value: unknown, label: string): unknown[] {
   if (Array.isArray(value)) return value;
@@ -134,8 +126,7 @@ function compareKeys(a: unknown, b: unknown): number {
     const aFinite = Number.isFinite(a);
     const bFinite = Number.isFinite(b);
     if (aFinite && bFinite) return a - b;
-    // Non-finite keys (NaN/Infinity from a missing or non-numeric field) sort last,
-    // deterministically — never feed NaN to Array.sort (engine-defined behavior).
+    // Non-finite keys sort last; never feed NaN to Array.sort's comparator.
     if (aFinite === bFinite) return 0;
     return aFinite ? -1 : 1;
   }

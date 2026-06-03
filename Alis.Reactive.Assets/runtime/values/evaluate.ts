@@ -1,6 +1,4 @@
-// values/evaluate.ts - Unified value evaluation.
-// The ONE way to read a value from any source: component, event, response, literal.
-// Every module that needs a value calls evaluateValue(). No parallel paths.
+// Keep every runtime value source on evaluateValue so reads share one resolver.
 
 import type {
   PlanDocument, ValueExpression, ExecContext, ReadExpression, RuntimeObjectSource,
@@ -112,12 +110,8 @@ class ValueEvaluation {
     }
   }
 
-  /**
-   * Invoke a method on the current element (element scope) — the same RuntimePath.call engine
-   * (fn.apply(owner, args)) that component/plugin method reads use. Args are full value
-   * expressions evaluated in the current element context. A non-function member is a true
-   * external-boundary error, surfaced by RuntimePath.call.
-   */
+  // Element-scope methods use RuntimePath.call so owner binding and non-function
+  // browser-boundary errors match component/plugin method reads.
   private readElementMethod(expression: ElementMethodReadExpression): unknown {
     const root = this.context.resolvePayload(expression.from);
     const args = expression.access.args.map(arg => this.evaluate(arg));
@@ -133,7 +127,7 @@ class ValueEvaluation {
     return result;
   }
 
-  /** Evaluate a per-element predicate against the element scope (immediate lane, sync subset). */
+  /** Array predicates run in the immediate lane; confirm is not legal in this scope. */
   private elementMatches(predicate: ArrayOperationExpression["predicate"], item: unknown): boolean {
     if (predicate === undefined) {
       throw new Error("[alis] array-op predicate is required for this operation");
@@ -166,7 +160,7 @@ function isDomRead(expression: ReadExpression): expression is DomPropertyReadExp
   return expression.from.kind === "dom";
 }
 
-/** Read a member off a DOM element resolved by id — same RuntimePath primitive, no contract. */
+/** DOM reads are browser-boundary access by id, not component-contract reads. */
 function readFromDom(expression: DomPropertyReadExpression): unknown {
   const element = document.getElementById(expression.from.element);
   if (element === null) {
@@ -176,7 +170,6 @@ function readFromDom(expression: DomPropertyReadExpression): unknown {
   return applyShapeWhenPresent(raw, expression.shape);
 }
 
-/** Read a query parameter from URL source. */
 function readFromUrl(
   expression: UrlParameterReadExpression, params: URLSearchParams,
 ): unknown {
@@ -184,7 +177,7 @@ function readFromUrl(
   return applyShapeWhenPresent(raw, expression.shape);
 }
 
-/** Read from a payload source through its structured path or explicit whole-body member. */
+/** responseBody and elementValue read the whole scope; other payload reads follow RuntimePath. */
 function readFromPayload(
   expression: PayloadReadExpression, root: unknown,
 ): unknown {
