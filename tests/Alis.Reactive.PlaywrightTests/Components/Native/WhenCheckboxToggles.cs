@@ -2,10 +2,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
 /// Exercises NativeCheckBox API end-to-end in the browser:
-/// property writes (SetChecked), property reads (Value as source),
-/// reactive events (Changed with typed condition), and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/CheckBox
+/// property writes (<c>SetChecked</c>), property reads (<c>Value</c> as source),
+/// reactive events (<c>Changed</c> with typed condition), and component-read conditions.
 /// </summary>
 [TestFixture]
 public class WhenCheckboxToggles : PlaywrightTestBase
@@ -18,8 +16,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
     }
-
-    // ── Page loads ──
 
     [Test]
     public async Task page_loads_without_errors()
@@ -41,21 +37,16 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 1: Property Write — DomReady unchecks medication checkbox ──
-
     [Test]
     public async Task domready_unchecks_medication_checkbox()
     {
         // ReceivesMedication starts checked in the model, but DomReady calls SetChecked(false).
-        // Expected: checkbox is unchecked after boot.
         await NavigateAndBoot();
 
         var cb = Page.Locator($"#{Scope}ReceivesMedication");
         await Expect(cb).Not.ToBeCheckedAsync(new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Section 2: Property Read — DomReady reads AllowsVisitors value into echo ──
 
     [Test]
     public async Task value_echoed_from_component_read()
@@ -67,20 +58,15 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 3: Changed event with typed condition ──
-
     [Test]
     public async Task changed_event_shows_restrictions_when_checked()
     {
         await NavigateAndBoot();
 
-        // Restrictions panel starts hidden
         await Expect(Page.Locator("#restrictions-panel")).ToBeHiddenAsync();
 
-        // Check the dietary restrictions checkbox
         await Page.Locator($"#{Scope}HasDietaryRestrictions").CheckAsync();
 
-        // Restrictions panel should appear and status should say "checked"
         await Expect(Page.Locator("#restrictions-panel"))
             .ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(Page.Locator("#restrictions-status"))
@@ -93,14 +79,12 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Check then uncheck the dietary restrictions checkbox
         await Page.Locator($"#{Scope}HasDietaryRestrictions").CheckAsync();
         await Expect(Page.Locator("#restrictions-panel"))
             .ToBeVisibleAsync(new() { Timeout = 3000 });
 
         await Page.Locator($"#{Scope}HasDietaryRestrictions").UncheckAsync();
 
-        // Restrictions panel should hide and status should say "unchecked"
         await Expect(Page.Locator("#restrictions-panel"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
         await Expect(Page.Locator("#restrictions-status"))
@@ -108,17 +92,14 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 4: Component value condition ──
-
     [Test]
     public async Task component_value_condition_confirms_when_checked()
     {
         await NavigateAndBoot();
 
-        // DomReady unchecked the medication checkbox — re-check it first
+        // DomReady unchecked the value under test.
         await Page.Locator($"#{Scope}ReceivesMedication").CheckAsync();
 
-        // Click the button that checks medication status
         await Page.Locator("#check-medication-btn").ClickAsync();
 
         var warning = Page.Locator("#medication-warning");
@@ -131,7 +112,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // DomReady already unchecked the medication checkbox — just click check
+        // DomReady already unchecked the value under test.
         await Page.Locator("#check-medication-btn").ClickAsync();
 
         var warning = Page.Locator("#medication-warning");
@@ -139,29 +120,24 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Multi-step state-cycle scenarios ──
-
     [Test]
     public async Task checking_then_unchecking_toggles_extras_visibility_both_ways()
     {
-        // Proves the full show->hide->show cycle works (catches state management bugs)
+        // The full show-hide-show cycle catches stale visibility state.
         await NavigateAndBoot();
 
         var cb = Page.Locator($"#{Scope}HasDietaryRestrictions");
         var panel = Page.Locator("#restrictions-panel");
         var status = Page.Locator("#restrictions-status");
 
-        // Check -> extras show
         await cb.CheckAsync();
         await Expect(panel).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(status).ToHaveTextAsync("checked", new() { Timeout = 3000 });
 
-        // Uncheck -> extras hide
         await cb.UncheckAsync();
         await Expect(panel).ToBeHiddenAsync(new() { Timeout = 3000 });
         await Expect(status).ToHaveTextAsync("unchecked", new() { Timeout = 3000 });
 
-        // Check again -> extras show again (proves state is not stuck)
         await cb.CheckAsync();
         await Expect(panel).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(status).ToHaveTextAsync("checked", new() { Timeout = 3000 });
@@ -172,32 +148,26 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task toggling_medication_checkbox_updates_condition_result_each_time()
     {
-        // Proves the component-read condition re-evaluates on every button click
-        // after the checkbox state changes (catches stale reads)
+        // The component-read condition must re-evaluate after each checkbox state change.
         await NavigateAndBoot();
 
         var cb = Page.Locator($"#{Scope}ReceivesMedication");
         var btn = Page.Locator("#check-medication-btn");
         var warning = Page.Locator("#medication-warning");
 
-        // DomReady unchecked it -> button should say "no medication on record"
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("no medication on record", new() { Timeout = 3000 });
 
-        // Check it -> button should now say "resident receives medication"
         await cb.CheckAsync();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("resident receives medication", new() { Timeout = 3000 });
 
-        // Uncheck it again -> button should revert to "no medication on record"
         await cb.UncheckAsync();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("no medication on record", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
     }
-
-    // ── Plan JSON structure — refactoring safety ──
 
     [Test]
     public async Task plan_carries_native_vendor_for_checkbox_mutations()
@@ -258,8 +228,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Initial DOM state — element rendering ──
-
     [Test]
     public async Task all_three_checkboxes_render_with_correct_element_ids()
     {
@@ -302,8 +270,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         await Expect(panel).ToHaveAttributeAsync("hidden", "");
         AssertNoConsoleErrors();
     }
-
-    // ── Boot trace ──
 
     [Test]
     public async Task boot_trace_is_emitted_on_page_load()
