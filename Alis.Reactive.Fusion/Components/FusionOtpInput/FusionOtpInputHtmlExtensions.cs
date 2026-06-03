@@ -10,16 +10,13 @@ using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionOtpInp
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a FusionOtpInput inside a field wrapper, bound to a string model property.
+    /// Adds rendering helpers for <see cref="FusionOtpInput"/>.
     /// </summary>
     public static class FusionOtpInputHtmlExtensions
     {
         /// <summary>
-        /// Renders a FusionOtpInput bound to the field's model property.
+        /// Renders a FusionOtpInput bound to the field wrapper's string model property.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the FusionOtpInput initial configuration.</param>
         public static void FusionOtpInput<TModel>(
             this InputBoundField<TModel, string?> setup,
             Action<OtpInputBuilder> build)

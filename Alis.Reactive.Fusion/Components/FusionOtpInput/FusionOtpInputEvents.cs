@@ -9,12 +9,12 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionOtpInputEvents Instance = new FusionOtpInputEvents();
         private FusionOtpInputEvents() { }
 
-        /// <summary>Fires each time an OTP field changes (SF "input" event).</summary>
+        /// <summary>Fires as an OTP field changes while editing.</summary>
         public TypedEvent<FusionOtpInputInputArgs> Input =>
             new TypedEvent<FusionOtpInputInputArgs>(
                 "input", new FusionOtpInputInputArgs());
 
-        /// <summary>Fires after the complete OTP value changes (SF "valueChanged" event).</summary>
+        /// <summary>Fires after the complete OTP value changes.</summary>
         public TypedEvent<FusionOtpInputValueChangedArgs> ValueChanged =>
             new TypedEvent<FusionOtpInputValueChangedArgs>(
                 "valueChanged", new FusionOtpInputValueChangedArgs());

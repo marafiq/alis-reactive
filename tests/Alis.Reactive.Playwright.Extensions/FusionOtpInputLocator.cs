@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for FusionOtpInput.
+/// Locator surface for the Syncfusion OtpInput used by Playwright tests.
 /// </summary>
 public sealed class FusionOtpInputLocator
 {
@@ -16,7 +16,6 @@ public sealed class FusionOtpInputLocator
         _componentId = componentId;
     }
 
-    /// <summary>The Syncfusion OtpInput host element.</summary>
     public ILocator Host => _page.Locator($"#{_componentId}");
 
     /// <summary>The hidden input Syncfusion uses as the submitted value.</summary>
@@ -25,13 +24,10 @@ public sealed class FusionOtpInputLocator
     /// <summary>Gets a visible OTP field by zero-based index.</summary>
     public ILocator Field(int index) => Host.Locator("input.e-otp-input-field").Nth(index);
 
-    /// <summary>Gets the hidden submitted value.</summary>
     public async Task<string> HiddenValue() => await HiddenInput.InputValueAsync();
 
-    /// <summary>Gets the visible field value at the zero-based index.</summary>
     public async Task<string> FieldValue(int index) => await Field(index).InputValueAsync();
 
-    /// <summary>Fill the OTP fields from left to right.</summary>
     public async Task FillCode(string value)
     {
         for (var index = 0; index < value.Length; index++)
@@ -40,7 +36,5 @@ public sealed class FusionOtpInputLocator
         }
     }
 
-    /// <summary>Focus the first visible OTP field.</summary>
     public async Task Focus() => await Field(0).ClickAsync();
-
 }

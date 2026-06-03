@@ -14,9 +14,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Gets or sets the zero-based field index that changed.</summary>
         public int Index { get; set; }
 
-        /// <summary>
-        /// Creates a new instance. Framework-internal: instances are created by the event descriptor.
-        /// </summary>
+        /// <summary>Creates an input event payload.</summary>
         public FusionOtpInputInputArgs() { }
     }
 }

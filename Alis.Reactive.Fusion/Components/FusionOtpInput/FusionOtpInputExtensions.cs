@@ -23,8 +23,6 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("focusOut");
 
         /// <summary>Sets the OTP value and flushes it into the visible fields.</summary>
-        /// <param name="value">The OTP value to set.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionOtpInput, TModel> SetValue<TModel>(
             this ComponentRef<FusionOtpInput, TModel> self,
             string value)
@@ -34,14 +32,12 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitCall(DataBindMethod);
 
         /// <summary>Moves focus into the OTP input.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionOtpInput, TModel> FocusIn<TModel>(
             this ComponentRef<FusionOtpInput, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
         /// <summary>Removes focus from the OTP input.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionOtpInput, TModel> FocusOut<TModel>(
             this ComponentRef<FusionOtpInput, TModel> self)
             where TModel : class
