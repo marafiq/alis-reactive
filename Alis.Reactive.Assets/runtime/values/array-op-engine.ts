@@ -102,8 +102,8 @@ function projectedOrSelf(
 }
 
 /**
- * Normalize array-op input after browser/vendor reads, where C# T[] cannot constrain
- * the JavaScript value. This boundary normalization is not a plan fallback;
+ * Normalize array-op input after runtime-object, DOM, or vendor reads, where C# T[]
+ * cannot constrain the JavaScript value. This boundary normalization is not a plan fallback;
  * non-iterable objects fail fast instead of being guessed into arrays.
  */
 function normalizeToArray(value: unknown, label: string): unknown[] {

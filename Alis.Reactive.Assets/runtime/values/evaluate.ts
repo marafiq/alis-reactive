@@ -111,7 +111,7 @@ class ValueEvaluation {
   }
 
   // Element-scope methods use RuntimePath.call so owner binding and non-function
-  // browser-boundary errors match component/plugin method reads.
+  // errors match component/plugin method reads.
   private readElementMethod(expression: ElementMethodReadExpression): unknown {
     const root = this.context.resolvePayload(expression.from);
     const args = expression.access.args.map(arg => this.evaluate(arg));
@@ -160,7 +160,7 @@ function isDomRead(expression: ReadExpression): expression is DomPropertyReadExp
   return expression.from.kind === "dom";
 }
 
-/** DOM reads are browser-boundary access by id, not component-contract reads. */
+/** DOM reads cross the DOM boundary by id; they are not component-contract reads. */
 function readFromDom(expression: DomPropertyReadExpression): unknown {
   const element = document.getElementById(expression.from.element);
   if (element === null) {
