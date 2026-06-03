@@ -186,7 +186,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         var request = await requestTask;
         Assert.That(request.Url, Does.Contain("Country=CA"),
             "GET request should contain Country=CA");
-        // Verify it does NOT contain City parameter
         Assert.That(request.Url, Does.Not.Contain("City="),
             "GET request should NOT contain City parameter — selective payload");
 
@@ -198,24 +197,20 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Step 1: Select United States
         await SelectCountry("United States");
         await Expect(Page.Locator("#cascade-status"))
             .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
         await Expect(Page.Locator("#city-count"))
             .ToHaveTextAsync("3", new() { Timeout = 3000 });
 
-        // Step 2: Select Seattle from cascaded city dropdown
         await SelectCity("Seattle");
         await Expect(Page.Locator("#selected-city"))
             .ToHaveTextAsync("SEA", new() { Timeout = 5000 });
 
-        // Step 3: Save — gathers both Country and City, verify server echoes both
         await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
         await Expect(Page.Locator("#save-result"))
             .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
 
-        // Verify the save result contains both the country and city values
         var saveText = await Page.Locator("#save-result").TextContentAsync();
         Assert.That(saveText, Does.Contain("SEA"),
             $"Save result should contain city value 'SEA' but was '{saveText}'");
@@ -403,7 +398,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         await Expect(Page.Locator("#save-result"))
             .ToContainTextAsync("Saved:", new() { Timeout = 5000 });
 
-        // After successful save, text turns green
         await Expect(Page.Locator("#save-result"))
             .ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-green-600"), new() { Timeout = 3000 });
 
@@ -414,19 +408,16 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Step 1: Select Canada
         await SelectCountry("Canada");
         await Expect(Page.Locator("#cascade-status"))
             .ToHaveTextAsync("cities loaded", new() { Timeout = 10000 });
         await Expect(Page.Locator("#city-count"))
             .ToHaveTextAsync("2", new() { Timeout = 3000 });
 
-        // Step 2: Select Vancouver
         await SelectCity("Vancouver");
         await Expect(Page.Locator("#selected-city"))
             .ToHaveTextAsync("VAN", new() { Timeout = 5000 });
 
-        // Step 3: Save — verify both values echo
         await Page.Locator("#save-btn").ClickWhenStableAsync(Page);
         await Expect(Page.Locator("#save-result"))
             .ToContainTextAsync("Saved:", new() { Timeout = 5000 });

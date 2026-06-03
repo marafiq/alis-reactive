@@ -1,11 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Conditions.ResponseConditions;
 
-/// <summary>
-/// Browser-level verification that response body properties drive conditions
-/// inside OnSuccess and OnError routes. Each section proves one capability
-/// of the uniform typed access DSL: When, ElseIf, And, OnError catch-all,
-/// and OnError typed with conditions.
-/// </summary>
 [TestFixture]
 public class WhenResponsePayloadDrivesConditions : PlaywrightTestBase
 {
@@ -14,10 +8,6 @@ public class WhenResponsePayloadDrivesConditions : PlaywrightTestBase
         await NavigateTo("/Sandbox/Conditions/ResponseConditions");
         await WaitForTraceMessage("booted", 10000);
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    // Section 1: When on success response body
-    // ════════════════════════════════════════════════════════════════════
 
     [Test]
     public async Task approved_response_shows_badge_and_sets_result()
@@ -58,10 +48,6 @@ public class WhenResponsePayloadDrivesConditions : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    // Section 2: ElseIf chain on response body
-    // ════════════════════════════════════════════════════════════════════
-
     [Test]
     public async Task elseif_chain_shows_green_for_approved()
     {
@@ -92,10 +78,6 @@ public class WhenResponsePayloadDrivesConditions : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    // Section 3: And composition on response body
-    // ════════════════════════════════════════════════════════════════════
-
     [Test]
     public async Task and_guard_passes_when_both_conditions_met()
     {
@@ -116,10 +98,6 @@ public class WhenResponsePayloadDrivesConditions : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    // Section 4: OnError catch-all
-    // ════════════════════════════════════════════════════════════════════
-
     [Test]
     public async Task error_catchall_fires_on_422()
     {
@@ -129,10 +107,6 @@ public class WhenResponsePayloadDrivesConditions : PlaywrightTestBase
         await Expect(Page.Locator("#s4-result")).ToHaveTextAsync("error caught", new() { Timeout = 5000 });
         AssertNoConsoleErrorsExcept("422");
     }
-
-    // ════════════════════════════════════════════════════════════════════
-    // Section 5: OnError typed with conditions
-    // ════════════════════════════════════════════════════════════════════
 
     [Test]
     public async Task typed_error_condition_matches_422_code()
