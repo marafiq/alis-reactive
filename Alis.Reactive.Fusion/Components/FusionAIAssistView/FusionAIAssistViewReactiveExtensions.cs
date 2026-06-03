@@ -4,7 +4,7 @@ using Alis.Reactive.Builders;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires AIAssistView events into the reactive plan.
+    /// Wires <see cref="FusionAIAssistView"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionAIAssistViewReactiveExtensions
     {

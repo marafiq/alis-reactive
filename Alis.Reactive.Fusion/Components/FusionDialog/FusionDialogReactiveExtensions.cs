@@ -5,7 +5,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionDialog"/> into the reactive plan.
+    /// Wires <see cref="FusionDialog"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionDialogReactiveExtensions
     {

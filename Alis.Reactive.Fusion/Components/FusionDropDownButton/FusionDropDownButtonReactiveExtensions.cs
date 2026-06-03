@@ -4,14 +4,14 @@ using Alis.Reactive.Builders;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionDropDownButton"/> into the reactive plan.
+    /// Wires <see cref="FusionDropDownButton"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionDropDownButtonReactiveExtensions
     {
         private static readonly FusionDropDownButton Component = new FusionDropDownButton();
 
         /// <summary>
-        /// Wires a FusionDropDownButton event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionDropDownButton"/> event into a Reactive Plan pipeline.
         /// </summary>
         public static FusionDropDownButtonBuilder<TModel> Reactive<TModel, TArgs>(
             this FusionDropDownButtonBuilder<TModel> builder,

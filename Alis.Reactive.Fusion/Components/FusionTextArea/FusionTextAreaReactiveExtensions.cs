@@ -6,14 +6,14 @@ using Syncfusion.EJ2.Inputs;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionTextArea"/> into the reactive plan.
+    /// Wires <see cref="FusionTextArea"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionTextAreaReactiveExtensions
     {
         private static readonly FusionTextArea Component = new FusionTextArea();
 
         /// <summary>
-        /// Wires a FusionTextArea event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionTextArea"/> event into a Reactive Plan pipeline.
         /// </summary>
         /// <remarks>
         /// Select the event with <c>evt =&gt; evt.Input</c>, <c>evt =&gt; evt.Changed</c>, etc.; see IntelliSense for the full event set.

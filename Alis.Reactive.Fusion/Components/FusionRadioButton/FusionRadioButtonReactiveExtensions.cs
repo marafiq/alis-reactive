@@ -4,14 +4,14 @@ using Alis.Reactive.Builders;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionRadioButton"/> into the reactive plan.
+    /// Wires <see cref="FusionRadioButton"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionRadioButtonReactiveExtensions
     {
         private static readonly FusionRadioButton Component = new FusionRadioButton();
 
         /// <summary>
-        /// Wires a FusionRadioButton event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionRadioButton"/> event into a Reactive Plan pipeline.
         /// </summary>
         public static FusionRadioButtonBuilder<TModel> Reactive<TModel, TArgs>(
             this FusionRadioButtonBuilder<TModel> builder,

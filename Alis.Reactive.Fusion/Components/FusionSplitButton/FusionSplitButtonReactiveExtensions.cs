@@ -4,14 +4,14 @@ using Alis.Reactive.Builders;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionSplitButton"/> into the reactive plan.
+    /// Wires <see cref="FusionSplitButton"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionSplitButtonReactiveExtensions
     {
         private static readonly FusionSplitButton Component = new FusionSplitButton();
 
         /// <summary>
-        /// Wires a FusionSplitButton event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionSplitButton"/> event into a Reactive Plan pipeline.
         /// </summary>
         public static FusionSplitButtonBuilder<TModel> Reactive<TModel, TArgs>(
             this FusionSplitButtonBuilder<TModel> builder,

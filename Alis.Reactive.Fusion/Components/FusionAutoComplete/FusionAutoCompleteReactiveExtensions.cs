@@ -7,14 +7,14 @@ using Syncfusion.EJ2.DropDowns;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionAutoComplete"/> into the reactive plan.
+    /// Wires <see cref="FusionAutoComplete"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionAutoCompleteReactiveExtensions
     {
         private static readonly FusionAutoComplete Component = new FusionAutoComplete();
 
         /// <summary>
-        /// Wires a FusionAutoComplete event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionAutoComplete"/> event into a Reactive Plan pipeline.
         /// </summary>
         /// <remarks>Select the event with <c>evt =&gt; evt.Changed</c> or <c>evt =&gt; evt.Filtering</c>.</remarks>
         public static AutoCompleteBuilder Reactive<TModel, TArgs>(

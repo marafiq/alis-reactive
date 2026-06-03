@@ -5,7 +5,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionBreadcrumb"/> into the reactive plan.
+    /// Wires <see cref="FusionBreadcrumb"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionBreadcrumbReactiveExtensions
     {

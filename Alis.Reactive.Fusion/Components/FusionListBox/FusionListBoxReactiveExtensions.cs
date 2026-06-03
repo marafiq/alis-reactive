@@ -4,7 +4,7 @@ using Alis.Reactive.Builders;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires ListBox browser events into a reactive plan.
+    /// Wires <see cref="FusionListBox"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionListBoxReactiveExtensions
     {

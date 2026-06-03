@@ -4,14 +4,14 @@ using Alis.Reactive.Builders;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionProgressButton"/> into the reactive plan.
+    /// Wires <see cref="FusionProgressButton"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionProgressButtonReactiveExtensions
     {
         private static readonly FusionProgressButton Component = new FusionProgressButton();
 
         /// <summary>
-        /// Wires a FusionProgressButton event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionProgressButton"/> event into a Reactive Plan pipeline.
         /// </summary>
         public static FusionProgressButtonBuilder<TModel> Reactive<TModel, TArgs>(
             this FusionProgressButtonBuilder<TModel> builder,

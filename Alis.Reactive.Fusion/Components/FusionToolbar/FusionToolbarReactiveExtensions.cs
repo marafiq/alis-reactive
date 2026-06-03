@@ -4,7 +4,7 @@ using Alis.Reactive.Builders;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionToolbar"/> into the reactive plan.
+    /// Wires <see cref="FusionToolbar"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionToolbarReactiveExtensions
     {

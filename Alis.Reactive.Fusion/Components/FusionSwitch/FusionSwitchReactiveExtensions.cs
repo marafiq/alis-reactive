@@ -7,14 +7,14 @@ using Syncfusion.EJ2.Buttons;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionSwitch"/> into the reactive plan.
+    /// Wires <see cref="FusionSwitch"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionSwitchReactiveExtensions
     {
         private static readonly FusionSwitch Component = new FusionSwitch();
 
         /// <summary>
-        /// Wires a FusionSwitch event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionSwitch"/> event into a Reactive Plan pipeline.
         /// </summary>
         /// <remarks>
         /// Select the event with <c>evt =&gt; evt.Changed</c>.

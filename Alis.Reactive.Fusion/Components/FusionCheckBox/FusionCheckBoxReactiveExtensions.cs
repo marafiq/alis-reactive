@@ -6,14 +6,14 @@ using Syncfusion.EJ2.Buttons;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionCheckBox"/> into the reactive plan.
+    /// Wires <see cref="FusionCheckBox"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionCheckBoxReactiveExtensions
     {
         private static readonly FusionCheckBox Component = new FusionCheckBox();
 
         /// <summary>
-        /// Wires a FusionCheckBox event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionCheckBox"/> event into a Reactive Plan pipeline.
         /// </summary>
         public static CheckBoxBuilder Reactive<TModel, TArgs>(
             this CheckBoxBuilder builder,

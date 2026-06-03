@@ -7,14 +7,14 @@ using Syncfusion.EJ2.DropDowns;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionDropDownList"/> into the reactive plan.
+    /// Wires <see cref="FusionDropDownList"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionDropDownListReactiveExtensions
     {
         private static readonly FusionDropDownList Component = new FusionDropDownList();
 
         /// <summary>
-        /// Wires a FusionDropDownList event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionDropDownList"/> event into a Reactive Plan pipeline.
         /// </summary>
         /// <remarks>
         /// Select the event with <c>evt =&gt; evt.Changed</c>, <c>evt =&gt; evt.Focus</c>, or <c>evt =&gt; evt.Blur</c>.

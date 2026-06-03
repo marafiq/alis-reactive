@@ -7,22 +7,21 @@ using Syncfusion.EJ2.Calendars;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionDatePicker"/> into the reactive plan.
+    /// Wires <see cref="FusionDatePicker"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionDatePickerReactiveExtensions
     {
         private static readonly FusionDatePicker Component = new FusionDatePicker();
 
         /// <summary>
-        /// Wires a FusionDatePicker event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionDatePicker"/> event into a Reactive Plan pipeline.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
         /// <param name="builder">The Syncfusion date picker builder.</param>
-        /// <param name="plan">The plan to add the reactive behavior to.</param>
+        /// <param name="plan">The plan that receives the component event trigger.</param>
         /// <param name="eventSelector">Selects the component event, for example <c>evt =&gt; evt.Changed</c>.</param>
         /// <param name="pipeline">Configures the commands to run when the event fires.</param>
-        /// <returns>The same builder instance.</returns>
         public static DatePickerBuilder Reactive<TModel, TArgs>(
             this DatePickerBuilder builder,
             ReactivePlan<TModel> plan,

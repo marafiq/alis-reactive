@@ -7,22 +7,21 @@ using Syncfusion.EJ2.DropDowns;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionMultiSelect"/> into the reactive plan.
+    /// Wires <see cref="FusionMultiSelect"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionMultiSelectReactiveExtensions
     {
         private static readonly FusionMultiSelect Component = new FusionMultiSelect();
 
         /// <summary>
-        /// Wires a FusionMultiSelect event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionMultiSelect"/> event into a Reactive Plan pipeline.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
         /// <param name="builder">The Syncfusion multi-select builder.</param>
-        /// <param name="plan">The plan to add the reactive behavior to.</param>
+        /// <param name="plan">The plan that receives the component event trigger.</param>
         /// <param name="eventSelector">Selects the component event, for example <c>evt =&gt; evt.Changed</c>.</param>
         /// <param name="pipeline">Configures the commands to run when the event fires.</param>
-        /// <returns>The same builder instance.</returns>
         public static MultiSelectBuilder Reactive<TModel, TArgs>(
             this MultiSelectBuilder builder,
             ReactivePlan<TModel> plan,

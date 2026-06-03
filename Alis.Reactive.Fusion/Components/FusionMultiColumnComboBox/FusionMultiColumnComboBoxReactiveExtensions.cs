@@ -7,14 +7,14 @@ using Syncfusion.EJ2.MultiColumnComboBox;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wires browser events from a <see cref="FusionMultiColumnComboBox"/> into the reactive plan.
+    /// Wires <see cref="FusionMultiColumnComboBox"/> events into the Reactive Plan.
     /// </summary>
     public static class FusionMultiColumnComboBoxReactiveExtensions
     {
         private static readonly FusionMultiColumnComboBox Component = new FusionMultiColumnComboBox();
 
         /// <summary>
-        /// Wires a FusionMultiColumnComboBox event to a reactive pipeline that executes in the browser.
+        /// Wires a <see cref="FusionMultiColumnComboBox"/> event into a Reactive Plan pipeline.
         /// </summary>
         /// <remarks>
         /// Select the event with <c>evt =&gt; evt.Changed</c>.
