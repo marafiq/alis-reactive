@@ -37,20 +37,20 @@ namespace Alis.Reactive.Builders
             _draft.AddCommand(step);
         }
 
-        /// <summary>Dispatches a custom browser event by name.</summary>
-        /// <param name="eventName">The event name. Listeners registered with <c>t.CustomEvent("name", ...)</c> will fire.</param>
-        /// <returns>This builder for chaining.</returns>
+        /// <summary>Dispatches a custom browser event that matching <c>CustomEvent</c> triggers can handle.</summary>
+        /// <param name="eventName">The event name consumed by a matching custom event trigger.</param>
+        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {
             AddStep(ReactionGraph.Dispatch(eventName));
             return this;
         }
 
-        /// <summary>Dispatches a custom browser event with a typed payload.</summary>
-        /// <typeparam name="TPayload">The payload type.</typeparam>
-        /// <param name="eventName">The event name.</param>
-        /// <param name="payload">The data to send with the event.</param>
-        /// <returns>This builder for chaining.</returns>
+        /// <summary>Dispatches a custom browser event with a literal typed payload.</summary>
+        /// <typeparam name="TPayload">The payload type consumed by the matching custom event trigger.</typeparam>
+        /// <param name="eventName">The event name consumed by a matching custom event trigger.</param>
+        /// <param name="payload">The literal payload object to send with the event.</param>
+        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
             AddStep(ReactionGraph.Dispatch(
@@ -68,10 +68,10 @@ namespace Alis.Reactive.Builders
         /// <para>Distinct from <see cref="Dispatch{TPayload}(string, TPayload)"/> which takes a
         /// compile-time literal payload object.</para>
         /// </remarks>
-        /// <typeparam name="TPayload">The payload type matching the <c>CustomEvent&lt;TPayload&gt;</c> listener.</typeparam>
-        /// <param name="eventName">The event name. Listeners registered with <c>t.CustomEvent("name", ...)</c> will fire.</param>
-        /// <param name="configure">Populates payload fields via <see cref="DispatchPayloadBuilder{TPayload, TModel}"/>.</param>
-        /// <returns>This builder for chaining.</returns>
+        /// <typeparam name="TPayload">The payload type consumed by the matching custom event trigger.</typeparam>
+        /// <param name="eventName">The event name consumed by a matching custom event trigger.</param>
+        /// <param name="configure">Configures each payload field from a runtime value source or literal.</param>
+        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> DispatchWith<TPayload>(
             string eventName,
             Action<DispatchPayloadBuilder<TPayload, TModel>> configure)
@@ -86,18 +86,18 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Targets a DOM element by ID for mutations (SetText, AddClass, Show, Hide).</summary>
-        /// <param name="elementId">The HTML element ID.</param>
-        /// <returns>An element builder for chaining mutations.</returns>
+        /// <summary>Targets a DOM element by ID for mutations such as text, class, and visibility changes.</summary>
+        /// <param name="elementId">The controlled DOM element ID.</param>
+        /// <returns>An element builder for configuring DOM mutations.</returns>
         public ElementBuilder<TModel> Element(string elementId)
         {
             return new ElementBuilder<TModel>(this, elementId);
         }
 
-        /// <summary>References a component bound to a model expression for method calls and property mutations.</summary>
-        /// <typeparam name="TComponent">The component type.</typeparam>
-        /// <param name="expr">The model expression that identifies the component.</param>
-        /// <returns>A typed component reference.</returns>
+        /// <summary>References a model-bound component using the generated element ID for the expression.</summary>
+        /// <typeparam name="TComponent">The component contract type.</typeparam>
+        /// <param name="expr">The model expression used to generate the controlled component ID.</param>
+        /// <returns>A typed component reference for configuring component operations.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(
             Expression<Func<TModel, object>> expr)
             where TComponent : IComponent, new()
@@ -106,11 +106,11 @@ namespace Alis.Reactive.Builders
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
-        /// <summary>References a component bound to a different model (cross-partial scenarios).</summary>
-        /// <typeparam name="TComponent">The component type.</typeparam>
-        /// <typeparam name="TOtherModel">The other view model type.</typeparam>
-        /// <param name="expr">The model expression on the other model.</param>
-        /// <returns>A typed component reference.</returns>
+        /// <summary>References a model-bound component from another view model, such as a partial slot model.</summary>
+        /// <typeparam name="TComponent">The component contract type.</typeparam>
+        /// <typeparam name="TOtherModel">The view model type that owns the component expression.</typeparam>
+        /// <param name="expr">The other model expression used to generate the controlled component ID.</param>
+        /// <returns>A typed component reference for configuring component operations.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent, TOtherModel>(
             Expression<Func<TOtherModel, object>> expr)
             where TComponent : IComponent, new()
@@ -120,19 +120,19 @@ namespace Alis.Reactive.Builders
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
-        /// <summary>References a component by explicit ID.</summary>
-        /// <typeparam name="TComponent">The component type.</typeparam>
-        /// <param name="refId">The component element ID.</param>
-        /// <returns>A typed component reference.</returns>
+        /// <summary>References a component by an explicit controlled element ID.</summary>
+        /// <typeparam name="TComponent">The component contract type.</typeparam>
+        /// <param name="refId">The controlled component element ID.</param>
+        /// <returns>A typed component reference for configuring component operations.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)
             where TComponent : IComponent, new()
         {
             return new ComponentRef<TComponent, TModel>(refId, this);
         }
 
-        /// <summary>References a layout-owned app component (e.g. Toast, Confirm) by its default ID.</summary>
-        /// <typeparam name="TComponent">The layout-owned app component type.</typeparam>
-        /// <returns>A typed component reference.</returns>
+        /// <summary>References a layout-owned app component, such as Toast or Confirm, by its default ID.</summary>
+        /// <typeparam name="TComponent">The layout-owned component contract type.</typeparam>
+        /// <returns>A typed component reference for configuring app-level component operations.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>()
             where TComponent : IAppLevelComponent, new()
         {
@@ -141,26 +141,28 @@ namespace Alis.Reactive.Builders
                 this);
         }
 
-        /// <summary>Reads a URL query parameter as a string for use in conditions or as a value source.</summary>
-        /// <param name="paramName">The query parameter name.</param>
-        /// <returns>A typed source for conditions, SetText, or gather.</returns>
+        /// <summary>Reads a URL query parameter as a string value source for conditions, mutations, or gather.</summary>
+        /// <param name="paramName">The URL query parameter name.</param>
+        /// <returns>A string URL value source.</returns>
         public Conditions.TypedUrlSource<string> FromUrl(string paramName)
         {
             return new Conditions.TypedUrlSource<string>(paramName);
         }
 
         /// <summary>Reads a URL query parameter as a typed value: <c>p.FromUrl&lt;int&gt;("page")</c>.</summary>
-        /// <param name="paramName">The query parameter name.</param>
-        /// <returns>A typed source for conditions, SetText, or gather.</returns>
+        /// <typeparam name="T">The value type expected by downstream conditions, mutations, or gather.</typeparam>
+        /// <param name="paramName">The URL query parameter name.</param>
+        /// <returns>A typed URL value source.</returns>
         public Conditions.TypedUrlSource<T> FromUrl<T>(string paramName)
         {
             return new Conditions.TypedUrlSource<T>(paramName);
         }
 
         /// <summary>Reads a value from a plugin method. Chain <c>.Arg()</c> to pass arguments.</summary>
+        /// <typeparam name="T">The plugin method return type.</typeparam>
         /// <param name="pluginName">The registered plugin name.</param>
-        /// <param name="member">The method name on the plugin.</param>
-        /// <returns>A builder that implicitly converts to <see cref="Conditions.TypedPluginSource{T}"/>.</returns>
+        /// <param name="member">The plugin method name.</param>
+        /// <returns>A plugin member builder that can be used as a typed value source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName, string member)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -175,7 +177,9 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads a value by calling the registered plugin root function.</summary>
+        /// <typeparam name="T">The plugin root function return type.</typeparam>
         /// <param name="pluginName">The registered plugin name.</param>
+        /// <returns>A plugin member builder that can be used as a typed value source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -189,8 +193,10 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads a property value from a registered plugin object.</summary>
+        /// <typeparam name="T">The plugin property value type.</typeparam>
         /// <param name="pluginName">The registered plugin name.</param>
-        /// <param name="member">The property name on the plugin object.</param>
+        /// <param name="member">The plugin property name.</param>
+        /// <returns>A typed plugin property value source.</returns>
         public Conditions.TypedPluginPropertySource<T> PluginProperty<T>(string pluginName, string member)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -202,7 +208,9 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads a value from a declared plugin function.</summary>
+        /// <typeparam name="T">The plugin function return type.</typeparam>
         /// <param name="function">The plugin function descriptor registered with the plan.</param>
+        /// <returns>A plugin member builder that can be used as a typed value source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
         {
             if (function == null) throw new System.ArgumentNullException(nameof(function));
@@ -211,7 +219,9 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads a value from a declared plugin property.</summary>
+        /// <typeparam name="T">The plugin property value type.</typeparam>
         /// <param name="property">The plugin property descriptor registered with the plan.</param>
+        /// <returns>A typed plugin property value source.</returns>
         public Conditions.TypedPluginPropertySource<T> Plugin<T>(PluginProperty<T> property)
         {
             if (property == null) throw new System.ArgumentNullException(nameof(property));
@@ -221,8 +231,8 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Calls a plugin method that does not return a value. Chain <c>.Arg()</c> then <c>.Fire()</c>.</summary>
         /// <param name="pluginName">The registered plugin name.</param>
-        /// <param name="member">The method name on the plugin.</param>
-        /// <returns>A builder for adding arguments and firing the call.</returns>
+        /// <param name="member">The plugin method name.</param>
+        /// <returns>A plugin call builder for configuring arguments and firing the command.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -237,6 +247,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Calls the registered plugin root function as a command. Chain <c>.Arg()</c> then <c>.Fire()</c>.</summary>
         /// <param name="pluginName">The registered plugin name.</param>
+        /// <returns>A plugin call builder for configuring arguments and firing the command.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -250,6 +261,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Calls a declared plugin command. Chain <c>.Arg()</c> then <c>.Fire()</c>.</summary>
         /// <param name="command">The plugin command descriptor registered with the plan.</param>
+        /// <returns>A plugin call builder for configuring arguments and firing the command.</returns>
         public PluginCallBuilder<TModel> Plugin(PluginCommand command)
         {
             if (command == null) throw new System.ArgumentNullException(nameof(command));
@@ -258,8 +270,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Displays accumulated validation errors in the specified container.</summary>
-        /// <param name="formId">The DOM element ID of the validation error container.</param>
-        /// <returns>This builder for chaining.</returns>
+        /// <param name="formId">The validation error container element ID.</param>
+        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
             AddStep(ReactionGraph.ShowValidationErrors(formId));
@@ -268,8 +280,8 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Injects the HTTP success response body into a DOM element as HTML content.</summary>
         /// <remarks>Must follow an HTTP request (Get/Post). The response body is read from the success payload.</remarks>
-        /// <param name="elementId">The target element ID.</param>
-        /// <returns>This builder for chaining.</returns>
+        /// <param name="elementId">The target DOM element ID.</param>
+        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
         {
             Context.DeclareElement(elementId);
