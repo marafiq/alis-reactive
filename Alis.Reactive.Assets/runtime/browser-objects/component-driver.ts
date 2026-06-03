@@ -6,7 +6,7 @@ interface FusionElement extends HTMLElement {
   readonly ej2_instances?: unknown[];
 }
 
-/** The per-vendor driver — THE sole place vendor knowledge lives. Was ComponentRuntime. */
+/** Centralizes per-vendor component roots and event wiring. */
 export interface ComponentDriver {
   resolveRoot(element: HTMLElement): unknown;
 

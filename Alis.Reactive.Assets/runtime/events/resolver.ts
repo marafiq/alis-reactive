@@ -1,12 +1,9 @@
-// resolver.ts — semantic component event wiring.
-
 import type { PlanDocument } from "../types/index";
 import { scope } from "../diagnostics/trace";
 import { RuntimePlan } from "../browser-objects/runtime-plan";
 
 const log = scope("resolver");
 
-/** Wire an event listener on a component — dispatches to vendor-specific module. */
 export function wireEvent(
   plan: PlanDocument,
   componentKey: string,
