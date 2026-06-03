@@ -22,12 +22,18 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Starts an HTTP POST with inline gather configuration.</summary>
+        /// <param name="url">The request URL, which may contain template placeholders.</param>
+        /// <param name="gather">Configures request inputs to gather before sending the request.</param>
+        /// <returns>An HTTP request builder for configuring validation and response routing.</returns>
         public HttpRequestBuilder<TModel> Post(string url, Action<GatherBuilder<TModel>> gather)
         {
             return _draft.BeginHttp(Context).Post(url).Gather(gather);
         }
 
         /// <summary>Starts an HTTP PUT with inline gather configuration.</summary>
+        /// <param name="url">The request URL, which may contain template placeholders.</param>
+        /// <param name="gather">Configures request inputs to gather before sending the request.</param>
+        /// <returns>An HTTP request builder for configuring validation and response routing.</returns>
         public HttpRequestBuilder<TModel> Put(string url, Action<GatherBuilder<TModel>> gather)
         {
             return _draft.BeginHttp(Context).Put(url).Gather(gather);
@@ -42,6 +48,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Executes multiple HTTP requests concurrently.</summary>
+        /// <param name="branches">The HTTP request branches to execute in parallel.</param>
+        /// <returns>A parallel request builder for configuring all-settled behavior.</returns>
         public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
         {
             var builder = _draft.BeginParallel(Context);

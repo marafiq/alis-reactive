@@ -12,6 +12,9 @@ namespace Alis.Reactive.Builders
         /// Begins a typed array transform over a component/method array source, e.g.
         /// <c>p.From(p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Tags).Value())</c>.
         /// </summary>
+        /// <typeparam name="TElement">The array element type.</typeparam>
+        /// <param name="source">The typed source that produces the array value.</param>
+        /// <returns>A reactive array builder for filtering, mapping, counting, or joining the source.</returns>
         public ReactiveArray<TElement> From<TElement>(TypedSource<TElement[]> source) =>
             new ReactiveArray<TElement>(source.ToValueExpression(), Shape.FromClrType(typeof(TElement)));
 
@@ -20,6 +23,11 @@ namespace Alis.Reactive.Builders
         /// <c>p.From(args, e =&gt; e.Data)</c> where <c>e.Data</c> is <c>T[]</c>. The element type
         /// flows through the chain; the lambda is captured into a plan read, never invoked.
         /// </summary>
+        /// <typeparam name="TArgs">The event payload type.</typeparam>
+        /// <typeparam name="TElement">The selected array element type.</typeparam>
+        /// <param name="args">The event payload placeholder supplied by the trigger callback.</param>
+        /// <param name="selector">The payload expression that selects the array value.</param>
+        /// <returns>A reactive array builder for filtering, mapping, counting, or joining the source.</returns>
         public ReactiveArray<TElement> From<TArgs, TElement>(TArgs args, Expression<Func<TArgs, TElement[]>> selector)
         {
             if (selector == null) throw new ArgumentNullException(nameof(selector));
@@ -34,10 +42,17 @@ namespace Alis.Reactive.Builders
         /// getElementById and the member read with RuntimePath; array-like collections
         /// (DOMTokenList, HTMLCollection, NodeList) are normalized at the array-op boundary.
         /// </summary>
+        /// <param name="elementId">The DOM element ID to resolve at runtime.</param>
+        /// <param name="member">The array-like DOM member to read.</param>
+        /// <returns>A string reactive array builder over the DOM member values.</returns>
         public ReactiveArray<string> FromDom(string elementId, string member) =>
             new ReactiveArray<string>(ValueExpression.ReadDom(elementId, member, Shape.None), Shape.String);
 
-        /// <summary>DOM array-like member of a declared element type (e.g. child elements).</summary>
+        /// <summary>Begins a typed array transform over a DOM element's array-like member.</summary>
+        /// <typeparam name="TElement">The element type expected after runtime normalization.</typeparam>
+        /// <param name="elementId">The DOM element ID to resolve at runtime.</param>
+        /// <param name="member">The array-like DOM member to read.</param>
+        /// <returns>A typed reactive array builder over the DOM member values.</returns>
         public ReactiveArray<TElement> FromDom<TElement>(string elementId, string member) =>
             new ReactiveArray<TElement>(ValueExpression.ReadDom(elementId, member, Shape.None), Shape.FromClrType(typeof(TElement)));
     }
