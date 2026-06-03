@@ -24,7 +24,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sets the text value and flushes it into the visible textarea.</summary>
         /// <param name="value">The text to set, or <see langword="null"/> to clear.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTextArea, TModel> SetValue<TModel>(
             this ComponentRef<FusionTextArea, TModel> self, string? value)
             where TModel : class
@@ -33,14 +32,12 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitCall(DataBindMethod);
 
         /// <summary>Moves focus into the textarea.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTextArea, TModel> FocusIn<TModel>(
             this ComponentRef<FusionTextArea, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
         /// <summary>Removes focus from the textarea.</summary>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<FusionTextArea, TModel> FocusOut<TModel>(
             this ComponentRef<FusionTextArea, TModel> self)
             where TModel : class

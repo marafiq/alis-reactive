@@ -10,17 +10,13 @@ using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionTextAr
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a FusionTextArea inside a field wrapper, bound to a model property.
+    /// Adds rendering helpers for <see cref="FusionTextArea"/>.
     /// </summary>
     public static class FusionTextAreaHtmlExtensions
     {
         /// <summary>
-        /// Renders a FusionTextArea bound to the field's model property.
+        /// Renders a FusionTextArea bound to the field wrapper's model property.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <typeparam name="TProp">The bound property type.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the TextArea using Syncfusion's MVC builder.</param>
         public static void FusionTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<TextAreaBuilder> build)
