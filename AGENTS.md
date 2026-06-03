@@ -192,11 +192,13 @@ Playwright tests must be run through `scripts/playwright.sh` so filtered and ful
 runs are observable. The script prints the exact filter, writes live logs/TRX/diag
 artifacts under `tests/Alis.Reactive.PlaywrightTests/TestResults/observable/`,
 and each test emits `[playwright:start]` and `[playwright:end]` progress markers.
-Browser assets must be built before Playwright, not inside VSTest: `scripts/test.sh`
-does `npm run build:all` and `dotnet build` first, then calls
-`scripts/playwright.sh --no-build`; the wrapper also passes
-`-p:BuildReactiveBrowserAssets=false` to prevent a silent second asset build
-during `dotnet test`.
+Browser assets must be built before Playwright, not inside VSTest. Full gate:
+`npm run typecheck` -> `npm run build:all` -> `npm test` -> `dotnet build` ->
+`scripts/playwright.sh --no-build`.
+
+Use `--no-build` only after fresh assets and a fresh C# build. The wrapper
+rejects stale C#/Razor test binaries and stale runtime, validation, CSS, or
+sandbox asset outputs.
 If output appears stuck, use the most recent `[playwright:start]` line as the
 active test and re-run it with `scripts/playwright.sh --filter "..."`
 instead of starting another raw `dotnet test` session.

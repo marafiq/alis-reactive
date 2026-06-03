@@ -332,10 +332,12 @@ VSTest diagnostic logs, and enables `--blame-hang` so a silent hang reports the
 last active test. During a run, progress lines look like:
 
 Browser assets are built before Playwright, not during VSTest. `scripts/test.sh`
-runs `npm run build:all` and `dotnet build`, then calls
-`scripts/playwright.sh --no-build`; the wrapper passes
-`-p:BuildReactiveBrowserAssets=false` to `dotnet test` so the Playwright project
-does not launch a second, silent `npm run build:all` during test discovery.
+runs: `npm run typecheck` -> `npm run build:all` -> `npm test` ->
+`dotnet build` -> `scripts/playwright.sh --no-build`.
+
+Use `--no-build` only after fresh assets and a fresh C# build. The wrapper
+rejects stale C#/Razor test binaries and stale runtime, validation, CSS, or
+sandbox asset outputs.
 
 ```text
 [playwright:start] ... Alis.Reactive.PlaywrightTests.SomeSlice.some_test
