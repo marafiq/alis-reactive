@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Pipeline extensions for <see cref="NativeTextArea"/>: set value, focus, and read.
+    /// Reactive Plan operations for <see cref="NativeTextArea"/> values and focus.
     /// </summary>
     /// <remarks>
     /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via
@@ -20,12 +20,11 @@ namespace Alis.Reactive.Native.Components
             ComponentMethod.Named("focus");
 
         /// <summary>
-        /// Sets the textarea value in the browser.
+        /// Sets the textarea value through the component contract.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <param name="self">The textarea component reference.</param>
         /// <param name="value">The value to set.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeTextArea, TModel> SetValue<TModel>(
             this ComponentRef<NativeTextArea, TModel> self, string value)
             where TModel : class
@@ -36,8 +35,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Moves keyboard focus into the textarea.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <returns>The component reference for method chaining.</returns>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeTextArea, TModel> FocusIn<TModel>(
             this ComponentRef<NativeTextArea, TModel> self)
             where TModel : class
@@ -48,7 +46,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Reads the current textarea value for use in conditions or gather.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <returns>A typed source representing the textarea's current value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeTextArea, TModel> self)

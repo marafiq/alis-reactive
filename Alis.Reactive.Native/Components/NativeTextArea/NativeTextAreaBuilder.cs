@@ -21,7 +21,7 @@ namespace Alis.Reactive.Native.Components
     /// Created by the <c>.NativeTextArea()</c> factory on
     /// <see cref="InputBoundField{TModel,TProp}"/>.
     /// </remarks>
-    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">The bound property type.</typeparam>
     public class NativeTextAreaBuilder<TModel, TProp> :
 #if NET48
@@ -41,8 +41,7 @@ namespace Alis.Reactive.Native.Components
         private string? _cssClass;
         private string? _placeholder;
 
-        // NEVER make public — devs create builders via the .NativeTextArea() factory,
-        // which also registers the component in the plan's input component onboarding catalog.
+        // Keep internal: the factory also registers this input component in the plan.
 #if NET48
         internal NativeTextAreaBuilder(
             HtmlHelper<TModel> html,
@@ -65,14 +64,13 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Gets the resolved element ID for this textarea.</summary>
         internal string ElementId => _elementId;
 
-        /// <summary>Gets the model binding path (e.g. <c>"CareNotes"</c>).</summary>
+        /// <summary>Gets the model binding path, such as <c>"CareNotes"</c>.</summary>
         internal string BindingPath => _bindingPath;
 
         /// <summary>
         /// Sets the visible row count. Defaults to 4.
         /// </summary>
         /// <param name="rows">Number of visible text rows.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeTextAreaBuilder<TModel, TProp> Rows(int rows)
         {
             _rows = rows;
@@ -83,7 +81,6 @@ namespace Alis.Reactive.Native.Components
         /// Adds CSS classes to the textarea element.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeTextAreaBuilder<TModel, TProp> CssClass(string css)
         {
             _cssClass = css;
@@ -94,7 +91,6 @@ namespace Alis.Reactive.Native.Components
         /// Sets the placeholder text shown when the textarea is empty.
         /// </summary>
         /// <param name="placeholder">The placeholder text.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeTextAreaBuilder<TModel, TProp> Placeholder(string placeholder)
         {
             _placeholder = placeholder;
