@@ -7,12 +7,8 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Collects typed arguments for a plugin read or call. Every <c>Arg</c> lowers
-    /// to a <see cref="ValueExpression"/> over the shared value spine; the
-    /// accumulation and contract checking are declared once here. The read face
-    /// (<see cref="PluginMemberBuilder{TReturn, TModel}"/>) and the call face
-    /// (<see cref="PluginCallBuilder{TModel}"/>) forward their <c>Arg</c> calls to
-    /// this collector.
+    /// Centralizes plugin argument lowering so value reads and commands enforce
+    /// the same argument contract.
     /// </summary>
     internal sealed class PluginArgumentCollector
     {
@@ -31,10 +27,11 @@ namespace Alis.Reactive.Builders
     }
 
     /// <summary>
-    /// Builds a plugin read (property-less function read) with optional arguments.
-    /// Implicitly converts to <see cref="TypedPluginSource{TReturn}"/> — the source
-    /// IS the builder, so there is no explicit Build() call.
+    /// Collects arguments for a value-returning plan-registered plugin method or root function.
+    /// Use the builder where a <see cref="TypedPluginSource{TReturn}"/> is expected.
     /// </summary>
+    /// <typeparam name="TReturn">The plugin method return type exposed to downstream value expressions.</typeparam>
+    /// <typeparam name="TModel">The model type for the pipeline that owns the plugin read.</typeparam>
     public sealed class PluginMemberBuilder<TReturn, TModel> where TModel : class
     {
         private readonly PluginOperationId _operation;
@@ -51,7 +48,11 @@ namespace Alis.Reactive.Builders
         {
         }
 
-        /// <summary>Adds a response body expression as an argument (carries success/error scope).</summary>
+        /// <summary>Adds a value from an HTTP response body as a plugin argument.</summary>
+        /// <typeparam name="TResponse">The response body type.</typeparam>
+        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <param name="body">The success or error response body scope.</param>
+        /// <param name="path">The response property path to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TResponse, TProp>(
             ResponseBody<TResponse> body, Expression<Func<TResponse, TProp>> path)
             where TResponse : class
@@ -60,7 +61,11 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Adds an event arg expression as an argument.</summary>
+        /// <summary>Adds a value from the current event payload as a plugin argument.</summary>
+        /// <typeparam name="TArgs">The event payload type.</typeparam>
+        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <param name="args">A typed event payload marker used to infer <typeparamref name="TArgs"/>.</param>
+        /// <param name="path">The event payload path to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TArgs, TProp>(
             TArgs args, Expression<Func<TArgs, TProp>> path)
         {
@@ -68,7 +73,9 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Adds a typed source as an argument (component read, URL param, another plugin read).</summary>
+        /// <summary>Adds another typed value source as a plugin argument.</summary>
+        /// <typeparam name="TArg">The source value type.</typeparam>
+        /// <param name="source">The component, URL, response, or plugin value source to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TArg>(TypedSource<TArg> source)
         {
             _args.Add(PluginInvocationArgument.FromSource(source));
@@ -118,7 +125,7 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Adds a DateTime literal argument formatted for browser date comparison.</summary>
+        /// <summary>Adds a <see cref="DateTime"/> literal argument formatted for runtime date comparison.</summary>
         public PluginMemberBuilder<TReturn, TModel> Arg(DateTime value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -126,13 +133,16 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a literal argument whose plan shape is derived from <typeparamref name="TValue"/>.</summary>
+        /// <typeparam name="TValue">The literal value type.</typeparam>
         public PluginMemberBuilder<TReturn, TModel> ArgValue<TValue>(TValue value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
             return this;
         }
 
-        /// <summary>Read terminal: implicit conversion to TypedPluginSource — the source IS the builder.</summary>
+        /// <summary>Creates the typed value source represented by the configured plugin method call.</summary>
+        /// <param name="b">The configured plugin member builder.</param>
+        /// <returns>A typed plugin value source that captures the configured arguments.</returns>
         public static implicit operator TypedPluginSource<TReturn>(PluginMemberBuilder<TReturn, TModel> b) =>
             new TypedPluginSource<TReturn>(
                 b._operation,
@@ -140,10 +150,10 @@ namespace Alis.Reactive.Builders
     }
 
     /// <summary>
-    /// Builds a void plugin command call with optional arguments. Shares the same
-    /// <c>Arg</c> surface as <see cref="PluginMemberBuilder{TReturn, TModel}"/>;
-    /// call <see cref="Fire"/> to emit the CallReaction into the pipeline.
+    /// Collects arguments for a Reactive Plan plugin command. Call <see cref="Fire"/>
+    /// to append the command to the current pipeline.
     /// </summary>
+    /// <typeparam name="TModel">The model type for the pipeline that owns the plugin command.</typeparam>
     public sealed class PluginCallBuilder<TModel> where TModel : class
     {
         private readonly PluginOperationId _operation;
@@ -165,7 +175,11 @@ namespace Alis.Reactive.Builders
         {
         }
 
-        /// <summary>Adds a response body expression as an argument.</summary>
+        /// <summary>Adds a value from an HTTP response body as a plugin argument.</summary>
+        /// <typeparam name="TResponse">The response body type.</typeparam>
+        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <param name="body">The success or error response body scope.</param>
+        /// <param name="path">The response property path to pass.</param>
         public PluginCallBuilder<TModel> Arg<TResponse, TProp>(
             ResponseBody<TResponse> body, Expression<Func<TResponse, TProp>> path)
             where TResponse : class
@@ -174,7 +188,11 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Adds an event arg expression as an argument.</summary>
+        /// <summary>Adds a value from the current event payload as a plugin argument.</summary>
+        /// <typeparam name="TArgs">The event payload type.</typeparam>
+        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <param name="args">A typed event payload marker used to infer <typeparamref name="TArgs"/>.</param>
+        /// <param name="path">The event payload path to pass.</param>
         public PluginCallBuilder<TModel> Arg<TArgs, TProp>(
             TArgs args, Expression<Func<TArgs, TProp>> path)
         {
@@ -182,7 +200,9 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Adds a typed source as an argument.</summary>
+        /// <summary>Adds a typed value source as a plugin argument.</summary>
+        /// <typeparam name="TArg">The source value type.</typeparam>
+        /// <param name="source">The component, URL, response, or plugin value source to pass.</param>
         public PluginCallBuilder<TModel> Arg<TArg>(TypedSource<TArg> source)
         {
             _args.Add(PluginInvocationArgument.FromSource(source));
@@ -232,7 +252,7 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Adds a DateTime literal argument formatted for browser date comparison.</summary>
+        /// <summary>Adds a <see cref="DateTime"/> literal argument formatted for runtime date comparison.</summary>
         public PluginCallBuilder<TModel> Arg(DateTime value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -240,13 +260,14 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a literal argument whose plan shape is derived from <typeparamref name="TValue"/>.</summary>
+        /// <typeparam name="TValue">The literal value type.</typeparam>
         public PluginCallBuilder<TModel> ArgValue<TValue>(TValue value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
             return this;
         }
 
-        /// <summary>Emits the CallReaction into the pipeline. Terminal method.</summary>
+        /// <summary>Appends the configured plugin command to the current pipeline.</summary>
         public void Fire()
         {
             _emitter.AddStep(ReactionGraph.Call(

@@ -201,9 +201,11 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        // ── Plugin ────────────────────────────────────────────
-
-        /// <summary>Includes a plugin method result in the gather. Accepts TypedPluginSource which may carry args.</summary>
+        /// <summary>Adds a plan-registered plugin method result to the HTTP request payload.</summary>
+        /// <typeparam name="T">The plugin method return type.</typeparam>
+        /// <param name="source">The typed plugin value source, including any arguments already configured.</param>
+        /// <param name="paramName">The HTTP payload field name.</param>
+        /// <returns>This builder for chaining.</returns>
         public GatherBuilder<TModel> Plugin<T>(Conditions.TypedPluginSource<T> source, string paramName)
         {
             if (source == null) throw new System.ArgumentNullException(nameof(source));

@@ -6,9 +6,9 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Declares a browser plugin: a named browser object the DSL does not model,
+    /// Declares a Reactive Plan plugin: a named runtime object the DSL does not model,
     /// exposing typed readable properties, value-returning functions, and void
-    /// commands. A plugin is the intentional escape hatch for browser behavior
+    /// commands. A plugin is the intentional escape hatch for runtime behavior
     /// that does not need a first-class deterministic DSL primitive. Subclass it,
     /// name the plugin in the base constructor, and declare members in the body.
     /// </summary>
@@ -23,7 +23,7 @@ namespace Alis.Reactive
             _name = PluginName.Of(name);
         }
 
-        /// <summary>Gets the browser plugin name used by the runtime.</summary>
+        /// <summary>Gets the plugin name used by the runtime.</summary>
         public string Name => _name.Value;
 
         /// <summary>Declares a plugin function that returns a value.</summary>
@@ -149,7 +149,7 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>Base descriptor for a declared plugin function.</summary>
+    /// <summary>Base descriptor for a declared Reactive Plan plugin operation.</summary>
     public abstract class PluginOperation
     {
         private readonly PluginName _pluginName;
@@ -174,7 +174,7 @@ namespace Alis.Reactive
             _returns = returns ?? throw new ArgumentNullException(nameof(returns));
         }
 
-        /// <summary>Gets the browser plugin name.</summary>
+        /// <summary>Gets the plugin registration name.</summary>
         public string PluginName => _pluginName.Value;
 
         /// <summary>Gets the declared plugin target name; root functions report <c>root</c>.</summary>
@@ -207,7 +207,8 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>Descriptor for a readable plugin object property.</summary>
+    /// <summary>Descriptor for a readable Reactive Plan plugin property.</summary>
+    /// <typeparam name="TValue">The property value type exposed to downstream value expressions.</typeparam>
     public sealed class PluginProperty<TValue>
     {
         private readonly PluginPropertyId _property;
@@ -224,7 +225,7 @@ namespace Alis.Reactive
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
-        /// <summary>Gets the browser plugin name.</summary>
+        /// <summary>Gets the plugin registration name.</summary>
         public string PluginName => _property.PluginNameValue;
 
         /// <summary>Gets the readable plugin property name.</summary>
@@ -243,6 +244,7 @@ namespace Alis.Reactive
     /// Descriptor for a plugin function that returns a typed value. Chain
     /// <c>.Arg&lt;T&gt;()</c> or <c>.Args(...)</c> to set the argument contract.
     /// </summary>
+    /// <typeparam name="TReturn">The function return type exposed to downstream value expressions.</typeparam>
     public sealed class PluginFunction<TReturn> : PluginOperation
     {
         internal PluginFunction(string pluginName, string member)
@@ -255,14 +257,14 @@ namespace Alis.Reactive
         {
         }
 
-        /// <summary>Declares one JavaScript argument accepted by this plugin function.</summary>
+        /// <summary>Declares one argument accepted by this plugin function.</summary>
         public PluginFunction<TReturn> Arg<TArg>()
         {
             AddArgument<TArg>();
             return this;
         }
 
-        /// <summary>Appends an exact JavaScript argument contract without an arity-specific overload.</summary>
+        /// <summary>Appends an exact argument contract without an arity-specific overload.</summary>
         public PluginFunction<TReturn> Args(Action<PluginArgumentTypes> arguments)
         {
             AddArguments(arguments);
@@ -286,14 +288,14 @@ namespace Alis.Reactive
         {
         }
 
-        /// <summary>Declares one JavaScript argument accepted by this plugin command.</summary>
+        /// <summary>Declares one argument accepted by this plugin command.</summary>
         public PluginCommand Arg<TArg>()
         {
             AddArgument<TArg>();
             return this;
         }
 
-        /// <summary>Appends an exact JavaScript argument contract without an arity-specific overload.</summary>
+        /// <summary>Appends an exact argument contract without an arity-specific overload.</summary>
         public PluginCommand Args(Action<PluginArgumentTypes> arguments)
         {
             AddArguments(arguments);

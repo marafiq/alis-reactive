@@ -49,7 +49,9 @@ namespace Alis.Reactive
             _registeredInputComponents.Snapshot();
         internal PlanBuildContext Context => _context;
 
-        /// <summary>Registers a plugin's type metadata in the plan. Must be called before any p.Plugin() reference.</summary>
+        /// <summary>Registers a plugin contract in the plan before pipelines reference it.</summary>
+        /// <param name="pluginName">The plugin registration name used by <c>p.Plugin(...)</c>.</param>
+        /// <param name="configure">Declares the methods and properties the plan can reference.</param>
         public void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder> configure)
         {
             if (string.IsNullOrWhiteSpace(pluginName))
@@ -61,14 +63,17 @@ namespace Alis.Reactive
             _context.RegisterPlugin(builder.Build());
         }
 
-        /// <summary>Registers a typed browser plugin contract in the plan.</summary>
+        /// <summary>Registers a typed plugin contract in the plan.</summary>
+        /// <param name="plugin">The plugin descriptor whose name and members define the contract.</param>
         public void RegisterPlugin(Plugin plugin)
         {
             if (plugin == null) throw new ArgumentNullException(nameof(plugin));
             _context.RegisterPlugin(plugin.ToContract());
         }
 
-        /// <summary>Creates and registers a typed browser plugin contract in the plan.</summary>
+        /// <summary>Creates and registers a typed plugin contract in the plan.</summary>
+        /// <typeparam name="TPlugin">The plugin descriptor type to instantiate and register.</typeparam>
+        /// <returns>The registered plugin descriptor for use in pipeline calls.</returns>
         public TPlugin RegisterPlugin<TPlugin>()
             where TPlugin : Plugin, new()
         {

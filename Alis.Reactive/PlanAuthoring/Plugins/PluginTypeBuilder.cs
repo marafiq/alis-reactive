@@ -4,11 +4,9 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Configures a plugin's BrowserObjectContract members during plan construction.
-    /// Used by <c>plan.RegisterPlugin("name", p =&gt; p.Method&lt;string&gt;("getToken"))</c>.
-    /// Argument arity is declared once through the args builder
-    /// (<c>p.Method&lt;int&gt;("count", a =&gt; a.Arg&lt;string&gt;())</c>), not through
-    /// arity-specific overloads.
+    /// Configures the methods and properties a Reactive Plan may use on a named plugin.
+    /// For example, <c>plan.RegisterPlugin("auth", p =&gt; p.Method&lt;string&gt;("getToken"))</c>.
+    /// Use the argument builder when a plugin method has fixed argument types.
     /// </summary>
     public sealed class PluginTypeBuilder
     {
@@ -20,13 +18,17 @@ namespace Alis.Reactive.Builders
             _pluginName = PluginName.Of(pluginName);
         }
 
-        /// <summary>Declares a method that returns a typed value. Shape inferred from T.</summary>
+        /// <summary>Declares a plugin method whose return shape is inferred from <typeparamref name="T"/>.</summary>
+        /// <typeparam name="T">The method return type.</typeparam>
+        /// <param name="name">The registered plugin method name.</param>
         public PluginTypeBuilder Method<T>(string name)
         {
             return AddMethod<T>(name, MethodArgumentContract.Open);
         }
 
-        /// <summary>Declares a readable plugin object property.</summary>
+        /// <summary>Declares a readable Reactive Plan plugin property.</summary>
+        /// <typeparam name="T">The property value type.</typeparam>
+        /// <param name="name">The registered plugin property name.</param>
         public PluginTypeBuilder Property<T>(string name)
         {
             EnsureName(name);
@@ -36,7 +38,10 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Declares a method that returns a typed value with an exact argument contract.</summary>
+        /// <summary>Declares a plugin method with a return type and exact argument contract.</summary>
+        /// <typeparam name="TReturn">The method return type.</typeparam>
+        /// <param name="name">The registered plugin method name.</param>
+        /// <param name="arguments">The ordered argument types accepted by the plugin method.</param>
         public PluginTypeBuilder Method<TReturn>(string name, Action<PluginArgumentTypes> arguments)
         {
             return AddMethod<TReturn>(
@@ -45,12 +50,15 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Declares the plugin root function as returning a typed value.</summary>
+        /// <typeparam name="T">The root function return type.</typeparam>
         public PluginTypeBuilder Function<T>()
         {
             return AddMethod<T>(PluginOperationId.Root(_pluginName), MethodArgumentContract.Open);
         }
 
-        /// <summary>Declares the plugin root function with an exact argument contract.</summary>
+        /// <summary>Declares the plugin root function with a return type and exact argument contract.</summary>
+        /// <typeparam name="TReturn">The root function return type.</typeparam>
+        /// <param name="arguments">The ordered argument types accepted by the root function.</param>
         public PluginTypeBuilder Function<TReturn>(Action<PluginArgumentTypes> arguments)
         {
             return AddMethod<TReturn>(
@@ -58,17 +66,21 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
-        /// <summary>Declares a void method (no return value).</summary>
+        /// <summary>Declares a plugin method command with no return value.</summary>
+        /// <param name="name">The registered plugin method name.</param>
         public PluginTypeBuilder Void(string name)
         {
             return AddVoid(name, MethodArgumentContract.Open);
         }
 
-        /// <summary>Declares a command method (no return value).</summary>
+        /// <summary>Alias for <c>Void(name)</c> using command vocabulary.</summary>
+        /// <param name="name">The registered plugin method name.</param>
         public PluginTypeBuilder Command(string name) =>
             Void(name);
 
-        /// <summary>Declares a void method with an exact argument contract.</summary>
+        /// <summary>Declares a plugin method command with an exact argument contract.</summary>
+        /// <param name="name">The registered plugin method name.</param>
+        /// <param name="arguments">The ordered argument types accepted by the plugin method.</param>
         public PluginTypeBuilder Void(string name, Action<PluginArgumentTypes> arguments)
         {
             return AddVoid(
@@ -76,7 +88,9 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
-        /// <summary>Declares a command method with an exact argument contract.</summary>
+        /// <summary>Alias for <c>Void(name, arguments)</c> using command vocabulary.</summary>
+        /// <param name="name">The registered plugin method name.</param>
+        /// <param name="arguments">The ordered argument types accepted by the plugin method.</param>
         public PluginTypeBuilder Command(string name, Action<PluginArgumentTypes> arguments) =>
             Void(name, arguments);
 
@@ -86,11 +100,12 @@ namespace Alis.Reactive.Builders
             return AddVoid(PluginOperationId.Root(_pluginName), MethodArgumentContract.Open);
         }
 
-        /// <summary>Declares the plugin root function as a command.</summary>
+        /// <summary>Alias for <c>Void()</c> using command vocabulary.</summary>
         public PluginTypeBuilder Command() =>
             Void();
 
         /// <summary>Declares the plugin root command with an exact argument contract.</summary>
+        /// <param name="arguments">The ordered argument types accepted by the root command.</param>
         public PluginTypeBuilder Void(Action<PluginArgumentTypes> arguments)
         {
             return AddVoid(
@@ -98,7 +113,8 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
-        /// <summary>Declares the plugin root command with an exact argument contract.</summary>
+        /// <summary>Alias for <c>Void(arguments)</c> using command vocabulary.</summary>
+        /// <param name="arguments">The ordered argument types accepted by the root command.</param>
         public PluginTypeBuilder Command(Action<PluginArgumentTypes> arguments) =>
             Void(arguments);
 
@@ -160,7 +176,8 @@ namespace Alis.Reactive.Builders
 
         internal System.Collections.Generic.IReadOnlyList<Shape> Shapes => _shapes;
 
-        /// <summary>Appends one typed JavaScript argument to the contract.</summary>
+        /// <summary>Appends one argument type to the plugin contract.</summary>
+        /// <typeparam name="T">The argument type accepted by the plugin member.</typeparam>
         public PluginArgumentTypes Arg<T>()
         {
             _shapes.Add(Shape.FromClrType(typeof(T)));
