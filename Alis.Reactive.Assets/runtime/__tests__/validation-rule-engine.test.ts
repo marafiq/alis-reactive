@@ -12,7 +12,7 @@ import type {
   RangeLiteralExpression,
   ReadExpression,
   Shape,
-} from "../types";
+} from "../types/index";
 
 const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };

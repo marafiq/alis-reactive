@@ -1,6 +1,6 @@
 // conditions.ts — V3 ConditionGraph evaluation.
 // The SYNC subset (compare/all/any/not) lives in ./compare-engine, a DI leaf that
-// receives the value-evaluator as a parameter (so it never imports core/evaluate). This
+// receives the value-evaluator as a parameter (so it never imports values/evaluate). This
 // module keeps the public entry points and owns the async lane: confirm is the only term
 // that crosses to async, so full ConditionGraph evaluation may return a Promise.
 
@@ -9,11 +9,11 @@ import type {
   PlanDocument,
   ExecContext,
   ValidationCondition,
-} from "../types";
-import { scope } from "../core/trace";
-import { assertNever } from "../core/assert-never";
-import { evaluateValue } from "../core/evaluate";
-import { ExecutionContext } from "../domain/execution-context";
+} from "../types/index";
+import { scope } from "../diagnostics/trace";
+import { assertNever } from "../shared/assert-never";
+import { evaluateValue } from "../values/evaluate";
+import { ExecutionContext } from "../browser-objects/execution-context";
 import { evaluateSyncCondition, evaluateCompare } from "./compare-engine";
 
 const log = scope("conditions");

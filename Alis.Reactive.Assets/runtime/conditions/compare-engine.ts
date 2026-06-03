@@ -1,8 +1,8 @@
 // conditions/compare-engine.ts — pure SYNC condition evaluation (compare/all/any/not).
 //
 // Leaf module: it receives the value-evaluator by dependency injection (evalValue) and
-// imports NOTHING from core/evaluate. This breaks the would-be cycle
-// evaluate -> conditions -> evaluate (design §14.1): core/evaluate imports this leaf and
+// imports NOTHING from values/evaluate. This breaks the would-be cycle
+// evaluate -> conditions -> evaluate (design §14.1): values/evaluate imports this leaf and
 // passes its own evaluator to evaluate per-element array-op predicates, while
 // conditions.ts delegates its sync subset here, passing evaluateValue. There is still one
 // value resolver — the injected evalValue is always evaluateValue.
@@ -27,16 +27,16 @@ import type {
   ValueExpression,
   ValidationCondition,
   ExecContext,
-} from "../types";
-import { scope } from "../core/trace";
-import { assertNever } from "../core/assert-never";
-import { applyShape, toString } from "../core/shape-convert";
-import { ExecutionContext } from "../domain/execution-context";
-import { RuntimeShape } from "../domain/runtime-shape";
+} from "../types/index";
+import { scope } from "../diagnostics/trace";
+import { assertNever } from "../shared/assert-never";
+import { applyShape, toString } from "../shared/shape-convert";
+import { ExecutionContext } from "../browser-objects/execution-context";
+import { RuntimeShape } from "../browser-objects/runtime-shape";
 
 const log = scope("conditions");
 
-/** Value resolver injected by the caller — always core/evaluate's evaluateValue. */
+/** Value resolver injected by the caller - always values/evaluate's evaluateValue. */
 export type ValueEvaluator = (expression: ValueExpression, plan: PlanDocument, ctx?: ExecContext) => unknown;
 
 type TextOperand =

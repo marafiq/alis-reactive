@@ -1,9 +1,9 @@
-import type { RequestPayloadTarget, HttpMethod, PathSegment, RequestBodyFormat } from "../types";
-import { toString } from "../core/shape-convert";
-import { scope } from "../core/trace";
-import { assertNever } from "../core/assert-never";
-import { plainObjectRecordFrom } from "../domain/object-record";
-import { RuntimeShape } from "../domain/runtime-shape";
+import type { RequestPayloadTarget, HttpMethod, PathSegment, RequestBodyFormat } from "../../types/index";
+import { toString } from "../../shared/shape-convert";
+import { scope } from "../../diagnostics/trace";
+import { assertNever } from "../../shared/assert-never";
+import { plainObjectRecordFrom } from "../../browser-objects/object-record";
+import { RuntimeShape } from "../../browser-objects/runtime-shape";
 
 const log = scope("gather");
 

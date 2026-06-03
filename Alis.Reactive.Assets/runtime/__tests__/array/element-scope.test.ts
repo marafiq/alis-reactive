@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { evaluateValue } from "../../core/evaluate";
-import { ExecutionContext } from "../../domain/execution-context";
-import type { PayloadSource, PlanDocument, ValueExpression } from "../../types";
+import { evaluateValue } from "../../values/evaluate";
+import { ExecutionContext } from "../../browser-objects/execution-context";
+import type { PayloadSource, PlanDocument, ValueExpression } from "../../types/index";
 
 const elementSource: PayloadSource = {
   kind: "payload",

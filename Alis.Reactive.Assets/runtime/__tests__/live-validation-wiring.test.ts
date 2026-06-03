@@ -7,7 +7,7 @@ import type {
   PlanDocument,
   Shape,
   ValueExpression,
-} from "../types";
+} from "../types/index";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };

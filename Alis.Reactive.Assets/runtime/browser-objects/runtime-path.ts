@@ -1,5 +1,5 @@
-import type { Path, PathSegment } from "../types";
-import { assertNever } from "../core/assert-never";
+import type { Path, PathSegment } from "../types/index";
+import { assertNever } from "../shared/assert-never";
 import { isMissingRuntimeValue } from "./runtime-value";
 
 type MemberKey = string | number;

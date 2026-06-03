@@ -1,12 +1,12 @@
-// value/array-op-engine.ts — The eight array ops, extracted from core/evaluate.ts.
+// values/array-op-engine.ts - The eight array ops, extracted from values/evaluate.ts.
 // Pure, sync, leaf-clean: the per-element predicate (sync condition) and projection
 // (value-in-element-scope) are PASSED IN as callbacks, so this engine imports no
 // Condition/Request/Reaction. evaluate.ts owns the element scope and hands it back through
 // `project` and `elementMatches`. Behavior is identical to the inline evaluateArrayOp it replaces.
 
-import type { ValueExpression, ArrayOperationExpression, ValidationCondition } from "../types";
-import { assertNever } from "../core/assert-never";
-import { RuntimeValue } from "../domain/runtime-value";
+import type { ValueExpression, ArrayOperationExpression, ValidationCondition } from "../types/index";
+import { assertNever } from "../shared/assert-never";
+import { RuntimeValue } from "../browser-objects/runtime-value";
 
 /** Projection callback: evaluate a value expression against a single element's scope. */
 type Project = (expression: ValueExpression, item: unknown) => unknown;

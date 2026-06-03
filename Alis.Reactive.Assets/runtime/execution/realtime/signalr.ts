@@ -2,12 +2,12 @@
 // Uses SignalRTrigger from the generated plan contract.
 
 import * as signalR from "@microsoft/signalr";
-import type { SignalRTrigger, ReactionGraph, PlanDocument } from "../types";
-import { catchAsyncReactionFailure, executeReaction } from "./execute";
-import { showRetryIndicators, removeRetryIndicators } from "./retry-indicator";
-import { scope } from "../core/trace";
-import { ExecutionContext } from "../domain/execution-context";
-import { objectRecordFrom } from "../domain/object-record";
+import type { SignalRTrigger, ReactionGraph, PlanDocument } from "../../types/index";
+import { catchAsyncReactionFailure, executeReaction } from "../reactions/execute";
+import { showRetryIndicators, removeRetryIndicators } from "../requests/retry-indicator";
+import { scope } from "../../diagnostics/trace";
+import { ExecutionContext } from "../../browser-objects/execution-context";
+import { objectRecordFrom } from "../../browser-objects/object-record";
 
 const log = scope("signalr");
 

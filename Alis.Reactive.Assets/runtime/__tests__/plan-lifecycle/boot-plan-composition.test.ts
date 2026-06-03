@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { composeInitialPlans } from "../../lifecycle/applied-plans";
-import type { ComponentObject } from "../../types";
+import type { ComponentObject } from "../../types/index";
 import {
   behavior,
   component,

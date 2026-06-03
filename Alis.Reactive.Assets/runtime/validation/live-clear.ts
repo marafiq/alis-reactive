@@ -4,14 +4,14 @@
 // On blur/change: re-validates the single field (not just clears).
 // On input: clears only (typing should not show errors mid-keystroke).
 
-import type { PlanDocument } from "../types";
+import type { PlanDocument } from "../types/index";
 import {
   RuntimeComponentReadinessError,
   RuntimePlan,
   RuntimeResolutionError,
   type RuntimeComponent,
-} from "../domain/runtime-plan";
-import { wireEvent } from "../resolution/resolver";
+} from "../browser-objects/runtime-plan";
+import { wireEvent } from "../events/resolver";
 import { clearInline } from "./error-display";
 import { revalidateField } from "./orchestrator";
 

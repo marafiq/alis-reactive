@@ -1,4 +1,4 @@
-// core/shape-convert.ts — Shape-based value conversion
+// shared/shape-convert.ts - Shape-based value conversion.
 //
 // Shape is the foundational type contract. This module is the SINGLE place
 // where Shape → value conversion happens. Every module that needs type
@@ -8,7 +8,7 @@
 // Ok(value) for meaningful conversions. Err(message) for type mismatches.
 // applyShape() is the main entry point — returns converted value or original on failure.
 
-import type { Shape } from "../types";
+import type { Shape } from "../types/index";
 
 /** Discriminated result — caller MUST check .ok before using .value. */
 export type ConvertResult<T> = { ok: true; value: T } | { ok: false; error: string };

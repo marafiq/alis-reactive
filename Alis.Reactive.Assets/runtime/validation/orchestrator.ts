@@ -9,22 +9,22 @@ import type {
   ValidationRuleActivation as PlanValidationRuleActivation,
   PeerEqualityValidationRule,
   PeerOrderedComparisonValidationRule,
-} from "../types";
-import type { ExecContext } from "../types";
-import { RuntimePlan, RuntimeResolutionError, type RuntimeComponent } from "../domain/runtime-plan";
+} from "../types/index";
+import type { ExecContext } from "../types/index";
+import { RuntimePlan, RuntimeResolutionError, type RuntimeComponent } from "../browser-objects/runtime-plan";
 import { evaluateCondition } from "../conditions/conditions";
-import { evaluateValue } from "../core/evaluate";
-import { scope } from "../core/trace";
-import { toString } from "../core/shape-convert";
+import { evaluateValue } from "../values/evaluate";
+import { scope } from "../diagnostics/trace";
+import { toString } from "../shared/shape-convert";
 import { ruleFails } from "./rule-engine";
 import {
   showInline, clearInline,
   addToSummary, removeSummaryEntry, hasSummaryEntry, clearSummary, showSummaryDiv, hideSummaryDiv, findSummaryElement,
   showServerErrorInline,
 } from "./error-display";
-import { ExecutionContext } from "../domain/execution-context";
-import { objectRecordFrom } from "../domain/object-record";
-import { assertNever } from "../core/assert-never";
+import { ExecutionContext } from "../browser-objects/execution-context";
+import { objectRecordFrom } from "../browser-objects/object-record";
+import { assertNever } from "../shared/assert-never";
 
 const log = scope("validation");
 

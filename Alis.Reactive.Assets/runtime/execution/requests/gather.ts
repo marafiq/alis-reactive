@@ -2,19 +2,19 @@
 // Every payload assignment is evaluated by evaluateValue(); runtime selected
 // registered inputs use the same writer path after reading their component value member.
 
-import type { PlanDocument, GatherRequestInput, RequestInputAssignment, HttpMethod, RequestInput } from "../types";
-import type { ExecContext } from "../types";
-import { assertNever } from "../core/assert-never";
-import { evaluateValue } from "../core/evaluate";
-import { toString } from "../core/shape-convert";
-import { RuntimePlan, type RuntimeComponent } from "../domain/runtime-plan";
-import { RuntimeShape } from "../domain/runtime-shape";
+import type { PlanDocument, GatherRequestInput, RequestInputAssignment, HttpMethod, RequestInput } from "../../types/index";
+import type { ExecContext } from "../../types/index";
+import { assertNever } from "../../shared/assert-never";
+import { evaluateValue } from "../../values/evaluate";
+import { toString } from "../../shared/shape-convert";
+import { RuntimePlan, type RuntimeComponent } from "../../browser-objects/runtime-plan";
+import { RuntimeShape } from "../../browser-objects/runtime-shape";
 import {
   requestPayloadWriterFor,
   writeRequestPayloadValue,
   type ResolvedRequestInput,
 } from "./request-payload-writer";
-import { isMissingRuntimeValue } from "../domain/runtime-value";
+import { isMissingRuntimeValue } from "../../browser-objects/runtime-value";
 
 export type { ResolvedRequestInput } from "./request-payload-writer";
 

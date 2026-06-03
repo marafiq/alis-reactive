@@ -1,12 +1,12 @@
-import { toString } from "../core/shape-convert";
-import type { ConvertResult } from "../core/shape-convert";
-import { RuntimeShape } from "../domain/runtime-shape";
+import { toString } from "../shared/shape-convert";
+import type { ConvertResult } from "../shared/shape-convert";
+import { RuntimeShape } from "../browser-objects/runtime-shape";
 import type {
   Shape,
   LiteralExpression,
   NumericLiteralExpression,
   RangeLiteralExpression,
-} from "../types";
+} from "../types/index";
 
 export class ValidationSubject {
   private constructor(

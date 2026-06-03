@@ -3,8 +3,8 @@ import type {
   ComponentObject,
   PlanDocument,
   RuntimeObjectSource,
-} from "../types";
-import { browserPlugins, type BrowserPluginCatalog } from "../core/plugin-catalog";
+} from "../types/index";
+import { browserPlugins, type BrowserPluginCatalog } from "../plugins/catalog";
 import { RuntimeObject } from "./runtime-object";
 import { type ComponentDriver, requireComponentDriver } from "./component-driver";
 

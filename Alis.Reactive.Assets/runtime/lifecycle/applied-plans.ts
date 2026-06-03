@@ -2,7 +2,7 @@
 // loaded partial slots, per-slot AbortController. Active plans recompose from
 // the boot snapshot plus currently-loaded slots; the boot snapshot is immutable.
 
-import type { PlanDocument, Behavior } from "../types";
+import type { PlanDocument, Behavior } from "../types/index";
 import { MergePolicy, emptyPlan, snapshotPlan } from "./merge-policy";
 
 type PlanId = string;

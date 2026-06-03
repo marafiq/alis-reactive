@@ -1,4 +1,4 @@
-import { scope } from "../../core/trace";
+import { scope } from "../../diagnostics/trace";
 
 const log = scope("confirm");
 const ELEMENT_ID = "alisConfirmDialog";

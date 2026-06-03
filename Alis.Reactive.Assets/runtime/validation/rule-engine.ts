@@ -1,7 +1,7 @@
 // Rule Engine - pure validation rule evaluation.
 // No DOM, no vendor, no side effects. The orchestrator resolves peers first.
 
-import { assertNever } from "../core/assert-never";
+import { assertNever } from "../shared/assert-never";
 import type {
   LengthValidationRule,
   LiteralEqualityValidationRule,
@@ -14,7 +14,7 @@ import type {
   Shape,
   ValidationRule,
   ValidationRuleName,
-} from "../types";
+} from "../types/index";
 import {
   ValidationLengthConstraint,
   ValidationRangeTarget,

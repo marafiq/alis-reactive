@@ -1,4 +1,4 @@
-// core/evaluate.ts — Unified value evaluation.
+// values/evaluate.ts - Unified value evaluation.
 // The ONE way to read a value from any source: component, event, response, literal.
 // Every module that needs a value calls evaluateValue(). No parallel paths.
 
@@ -8,16 +8,16 @@ import type {
   UrlParameterReadExpression, PayloadPathReadExpression, WholePayloadReadExpression,
   WholeElementReadExpression, ArrayOperationExpression, DomPropertyReadExpression,
   ElementMethodReadExpression,
-} from "../types";
-import { RuntimePlan } from "../domain/runtime-plan";
-import { applyShape } from "./shape-convert";
-import { assertNever } from "./assert-never";
-import { RuntimeValue, applyShapeWhenPresent } from "../domain/runtime-value";
-import { RuntimePath } from "../domain/runtime-path";
-import { ExecutionContext } from "../domain/execution-context";
-import { RuntimeObject } from "../domain/runtime-object";
+} from "../types/index";
+import { RuntimePlan } from "../browser-objects/runtime-plan";
+import { applyShape } from "../shared/shape-convert";
+import { assertNever } from "../shared/assert-never";
+import { RuntimeValue, applyShapeWhenPresent } from "../browser-objects/runtime-value";
+import { RuntimePath } from "../browser-objects/runtime-path";
+import { ExecutionContext } from "../browser-objects/execution-context";
+import { RuntimeObject } from "../browser-objects/runtime-object";
 import { evaluateSyncCondition } from "../conditions/compare-engine";
-import { runArrayOp } from "../value/array-op-engine";
+import { runArrayOp } from "./array-op-engine";
 
 type ObjectReadExpression = ObjectPropertyReadExpression | ObjectMethodReadExpression;
 type PayloadReadExpression = PayloadPathReadExpression | WholePayloadReadExpression | WholeElementReadExpression | ElementMethodReadExpression;

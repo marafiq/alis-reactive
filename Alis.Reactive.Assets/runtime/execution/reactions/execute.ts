@@ -7,19 +7,19 @@ import type {
   BranchCase, SetReaction, CallReaction, DispatchReaction,
   InjectReaction, ShowValidationErrorsReaction,
   ExecContext, PayloadSource,
-} from "../types";
-import { RuntimePlan } from "../domain/runtime-plan";
-import { evaluateValue } from "../core/evaluate";
+} from "../../types/index";
+import { RuntimePlan } from "../../browser-objects/runtime-plan";
+import { evaluateValue } from "../../values/evaluate";
 export { evaluateValue };
-import { evaluateConditionInCurrentLane } from "../conditions/conditions";
-import { validateContainer, showServerErrors } from "../validation";
-import { executeRequest } from "./http";
-import { injectPartial } from "./inject";
-import { assertNever } from "../core/assert-never";
-import { scope } from "../core/trace";
-import { isMissingRuntimeValue } from "../domain/runtime-value";
-import { ExecutionContext, type ServerValidationPayload } from "../domain/execution-context";
-import { plainObjectRecordFrom } from "../domain/object-record";
+import { evaluateConditionInCurrentLane } from "../../conditions/conditions";
+import { validateContainer, showServerErrors } from "../../validation/index";
+import { executeRequest } from "../requests/http";
+import { injectPartial } from "../partials/inject";
+import { assertNever } from "../../shared/assert-never";
+import { scope } from "../../diagnostics/trace";
+import { isMissingRuntimeValue } from "../../browser-objects/runtime-value";
+import { ExecutionContext, type ServerValidationPayload } from "../../browser-objects/execution-context";
+import { plainObjectRecordFrom } from "../../browser-objects/object-record";
 
 const log = scope("execute");
 

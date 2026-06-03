@@ -1,4 +1,4 @@
-import type { Shape } from "../types";
+import type { Shape } from "../types/index";
 import { RuntimeShape } from "./runtime-shape";
 
 export class RuntimeValue {

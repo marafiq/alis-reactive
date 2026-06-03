@@ -1,15 +1,15 @@
 // http.ts - HTTP request execution using RequestPlan.
 // Uses the shared value/gather/runtime concepts and keeps HTTP async isolated.
 
-import type { RequestPlan, ResponseRoute, PlanDocument, ExecContext, ReactionGraph } from "../types";
+import type { RequestPlan, ResponseRoute, PlanDocument, ExecContext, ReactionGraph } from "../../types/index";
 import { resolveRequestInput, type ResolvedRequestInput } from "./gather";
-import { executeReaction } from "./execute";
-import { validateContainer } from "../validation";
-import { scope } from "../core/trace";
-import { isMissingRuntimeValue } from "../domain/runtime-value";
-import { ExecutionContext } from "../domain/execution-context";
+import { executeReaction } from "../reactions/execute";
+import { validateContainer } from "../../validation/index";
+import { scope } from "../../diagnostics/trace";
+import { isMissingRuntimeValue } from "../../browser-objects/runtime-value";
+import { ExecutionContext } from "../../browser-objects/execution-context";
 import { resolveFetch, type ResolvedFetch } from "./http-fetch";
-import { assertNever } from "../core/assert-never";
+import { assertNever } from "../../shared/assert-never";
 
 const log = scope("http");
 

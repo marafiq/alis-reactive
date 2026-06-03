@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { initNativeActionLinks } from "../components/native/native-action-link";
-import { registerPlugin, resolvePlugin } from "../core/plugin-catalog";
-import { executeReaction } from "../execution/execute";
+import { registerPlugin, resolvePlugin } from "../plugins/catalog";
+import { executeReaction } from "../execution/reactions/execute";
 import { boot, resetBootStateForTests } from "../lifecycle/boot";
-import type { PlanDocument } from "../types";
+import type { PlanDocument } from "../types/index";
 
 function emptyPlan(planId: string): PlanDocument {
   return {

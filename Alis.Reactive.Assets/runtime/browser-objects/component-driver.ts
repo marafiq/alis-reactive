@@ -1,6 +1,6 @@
-import type { Vendor } from "../types";
-import { wire as wireFusion } from "../resolution/event-fusion";
-import { wire as wireNative } from "../resolution/event-native";
+import type { Vendor } from "../types/index";
+import { wire as wireFusion } from "../events/event-fusion";
+import { wire as wireNative } from "../events/event-native";
 
 interface FusionElement extends HTMLElement {
   readonly ej2_instances?: unknown[];

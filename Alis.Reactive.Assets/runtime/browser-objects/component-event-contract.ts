@@ -1,4 +1,4 @@
-import type { Event as PlanEvent } from "../types";
+import type { Event as PlanEvent } from "../types/index";
 import type { RuntimeComponent } from "./runtime-plan";
 
 export interface ComponentEventChannel {

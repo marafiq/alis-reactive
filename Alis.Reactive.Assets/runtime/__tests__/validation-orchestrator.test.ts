@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { AppliedPlans } from "../lifecycle/applied-plans";
 import { showServerErrors, validateContainer } from "../validation/orchestrator";
-import type { ComponentObject, ComponentValidation, BrowserObjectContract, PlanDocument, ReadExpression, Shape, ValueExpression } from "../types";
+import type { ComponentObject, ComponentValidation, BrowserObjectContract, PlanDocument, ReadExpression, Shape, ValueExpression } from "../types/index";
 
 const stringShape: Shape = { kind: "string" };
 const noneShape: Shape = { kind: "none" };

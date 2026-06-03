@@ -1,10 +1,10 @@
 // native-action-link.ts — Click handler for <a data-reactive-link> elements.
 // Uses PlanDocument + ReactionGraph types for V3 plan-driven navigation.
 
-import { executeReaction } from "../../execution/execute";
-import { scope } from "../../core/trace";
-import type { ReactionGraph, PlanDocument, RequestPlan } from "../../types";
-import { assertNever } from "../../core/assert-never";
+import { executeReaction } from "../../execution/reactions/execute";
+import { scope } from "../../diagnostics/trace";
+import type { ReactionGraph, PlanDocument, RequestPlan } from "../../types/index";
+import { assertNever } from "../../shared/assert-never";
 
 const log = scope("native-action-link");
 const SELECTOR = "a[data-reactive-link]";

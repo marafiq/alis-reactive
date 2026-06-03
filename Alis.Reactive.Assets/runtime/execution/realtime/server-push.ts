@@ -1,11 +1,11 @@
 // server-push.ts — SSE (EventSource) trigger wiring.
 // Uses ServerPushTrigger from the generated plan contract.
 
-import type { ServerPushTrigger, ReactionGraph, PlanDocument } from "../types";
-import { catchAsyncReactionFailure, executeReaction } from "./execute";
-import { showRetryIndicators, removeRetryIndicators } from "./retry-indicator";
-import { scope } from "../core/trace";
-import { ExecutionContext } from "../domain/execution-context";
+import type { ServerPushTrigger, ReactionGraph, PlanDocument } from "../../types/index";
+import { catchAsyncReactionFailure, executeReaction } from "../reactions/execute";
+import { showRetryIndicators, removeRetryIndicators } from "../requests/retry-indicator";
+import { scope } from "../../diagnostics/trace";
+import { ExecutionContext } from "../../browser-objects/execution-context";
 
 const log = scope("server-push");
 

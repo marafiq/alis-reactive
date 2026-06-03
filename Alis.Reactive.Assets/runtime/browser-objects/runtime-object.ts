@@ -1,5 +1,5 @@
-import type { BrowserObjectContract, MethodArgumentContract, Shape } from "../types";
-import { assertNever } from "../core/assert-never";
+import type { BrowserObjectContract, MethodArgumentContract, Shape } from "../types/index";
+import { assertNever } from "../shared/assert-never";
 import { RuntimePath } from "./runtime-path";
 import { RuntimeValue } from "./runtime-value";
 import { RuntimeShape } from "./runtime-shape";

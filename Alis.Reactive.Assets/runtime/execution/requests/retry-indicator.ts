@@ -5,7 +5,7 @@
 // This module has no PlanDocument access and operates as a pure UI overlay for
 // connection-lost indicators. It does not resolve components.
 
-import { scope } from "../core/trace";
+import { scope } from "../../diagnostics/trace";
 
 const log = scope("retry-indicator");
 

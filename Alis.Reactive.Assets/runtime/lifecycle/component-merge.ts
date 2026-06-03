@@ -1,4 +1,4 @@
-import type { ComponentObject, ComponentValidation, PlanDocument } from "../types";
+import type { ComponentObject, ComponentValidation, PlanDocument } from "../types/index";
 
 type ValidationContainerComponent = Extract<ComponentObject["container"], { kind: "validation-container" }>;
 

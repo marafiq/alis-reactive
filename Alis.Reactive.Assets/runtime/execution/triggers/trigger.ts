@@ -1,13 +1,13 @@
-import type { PlanDocument, ReactionGraph, StartsWhen } from "../types";
-import { wireEvent } from "../resolution/resolver";
-import { RuntimePlan } from "../domain/runtime-plan";
-import { catchAsyncReactionFailure, executeReaction } from "./execute";
-import { wireServerPush } from "./server-push";
-import { wireSignalR } from "./signalr";
-import { assertNever } from "../core/assert-never";
-import { scope } from "../core/trace";
-import { ExecutionContext } from "../domain/execution-context";
-import { componentEventChannel } from "../domain/component-event-contract";
+import type { PlanDocument, ReactionGraph, StartsWhen } from "../../types/index";
+import { wireEvent } from "../../events/resolver";
+import { RuntimePlan } from "../../browser-objects/runtime-plan";
+import { catchAsyncReactionFailure, executeReaction } from "../reactions/execute";
+import { wireServerPush } from "../realtime/server-push";
+import { wireSignalR } from "../realtime/signalr";
+import { assertNever } from "../../shared/assert-never";
+import { scope } from "../../diagnostics/trace";
+import { ExecutionContext } from "../../browser-objects/execution-context";
+import { componentEventChannel } from "../../browser-objects/component-event-contract";
 
 const log = scope("trigger");
 

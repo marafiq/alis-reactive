@@ -8,9 +8,9 @@ import { initNativeActionLinks } from "./components/native/native-action-link";
 import "./components/native/drawer";  // side-effect: wires close button + Escape key
 import "./components/native/loader";  // side-effect: handles target positioning + timeout
 import { composeInitialPlans } from "./lifecycle/applied-plans";
-import type { PlanDocument } from "./types";
-import type { TraceLevel } from "./core/trace";
-import { registerPlugin } from "./core/plugin-catalog";
+import type { PlanDocument } from "./types/index";
+import type { TraceLevel } from "./diagnostics/trace";
+import { registerPlugin } from "./plugins/catalog";
 
 interface PendingBrowserPlugin {
   readonly name: string;

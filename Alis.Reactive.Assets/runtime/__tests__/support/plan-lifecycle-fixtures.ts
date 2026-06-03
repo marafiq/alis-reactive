@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 import type { BrowserPlanWiring } from "../../lifecycle/applied-plans";
-import type { Behavior, ComponentObject, ComponentValidation, BrowserObjectContract, PathSegment, PlanDocument, Shape, StructuredPath } from "../../types";
+import type { Behavior, ComponentObject, ComponentValidation, BrowserObjectContract, PathSegment, PlanDocument, Shape, StructuredPath } from "../../types/index";
 
 export function objectContract(): BrowserObjectContract {
   return {

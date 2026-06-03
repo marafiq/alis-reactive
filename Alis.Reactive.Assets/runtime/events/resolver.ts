@@ -1,8 +1,8 @@
 // resolver.ts — semantic component event wiring.
 
-import type { PlanDocument } from "../types";
-import { scope } from "../core/trace";
-import { RuntimePlan } from "../domain/runtime-plan";
+import type { PlanDocument } from "../types/index";
+import { scope } from "../diagnostics/trace";
+import { RuntimePlan } from "../browser-objects/runtime-plan";
 
 const log = scope("resolver");
 

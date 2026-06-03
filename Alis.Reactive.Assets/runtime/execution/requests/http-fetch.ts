@@ -1,6 +1,6 @@
-import type { RequestPlan } from "../types";
+import type { RequestPlan } from "../../types/index";
 import type { ResolvedRequestInput } from "./gather";
-import { resolveRouteParams } from "../core/url-template";
+import { resolveRouteParams } from "./url-template";
 
 export interface ResolvedFetch {
   readonly url: string;

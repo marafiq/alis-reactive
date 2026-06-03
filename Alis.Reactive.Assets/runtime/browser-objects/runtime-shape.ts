@@ -1,5 +1,5 @@
-import type { Shape, ValueExpression } from "../types";
-import { applyShape, convertByShape, type ConvertResult } from "../core/shape-convert";
+import type { Shape, ValueExpression } from "../types/index";
+import { applyShape, convertByShape, type ConvertResult } from "../shared/shape-convert";
 
 const unshapedPlanShape: Shape = { kind: "none" };
 

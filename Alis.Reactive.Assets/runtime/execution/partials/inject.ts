@@ -1,8 +1,8 @@
 // inject.ts — Inject HTML into a partial slot.
 // Extracts any <script data-reactive-plan> elements and applies them to the injected slot.
 
-import type { PlanDocument } from "../types";
-import { loadPartialSlot, unloadPartialSlot } from "../lifecycle/boot";
+import type { PlanDocument } from "../../types/index";
+import { loadPartialSlot, unloadPartialSlot } from "../../lifecycle/boot";
 
 interface SyncfusionBase {
   append(nodes: ChildNode[], target: HTMLElement, shouldClone?: boolean): void;

@@ -2,7 +2,7 @@
 // and TS recompose. Type contracts merge; components replace-by-key with the
 // boot/slot join rules; behaviors append in order.
 
-import type { PlanDocument } from "../types";
+import type { PlanDocument } from "../types/index";
 import { mergeBootComponent, mergeSlotComponent } from "./component-merge";
 import { mergeObjectContracts } from "./object-contracts";
 

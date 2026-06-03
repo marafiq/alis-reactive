@@ -1,6 +1,6 @@
 // object-contracts.ts — merges browser object property, method, and event contracts.
 
-import type { BrowserObjectContract, Shape } from "../types";
+import type { BrowserObjectContract, Shape } from "../types/index";
 
 function cloneObjectContract(type: BrowserObjectContract): BrowserObjectContract {
   return mergeObjectContracts(emptyObjectContract(), type);

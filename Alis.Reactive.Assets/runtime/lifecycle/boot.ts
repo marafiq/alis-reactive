@@ -2,15 +2,15 @@
 // Single responsibility: wire behaviors and validation for active plans.
 // Delegates plan composition state to applied-plans.ts.
 
-import type { PlanDocument, Behavior } from "../types";
-import { setLevel } from "../core/trace";
-import { scope } from "../core/trace";
-import { wireTrigger } from "../execution/trigger";
-import { resetActivePlanForTests, setActivePlan } from "../execution/execute";
+import type { PlanDocument, Behavior } from "../types/index";
+import { setLevel } from "../diagnostics/trace";
+import { scope } from "../diagnostics/trace";
+import { wireTrigger } from "../execution/triggers/trigger";
+import { resetActivePlanForTests, setActivePlan } from "../execution/reactions/execute";
 import { resetLiveClearForTests, wireLiveValidation } from "../validation/live-clear";
 import { findSummaryElement, clearSummary, hideSummaryDiv } from "../validation/error-display";
 import { resetNativeActionLinksForTests } from "../components/native/native-action-link";
-import { resetPluginCatalogForTests } from "../core/plugin-catalog";
+import { resetPluginCatalogForTests } from "../plugins/catalog";
 import {
   appliedPlans,
   type BrowserPlanWiring,

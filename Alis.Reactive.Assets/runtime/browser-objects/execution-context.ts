@@ -1,4 +1,4 @@
-import type { ExecContext, PayloadSource } from "../types";
+import type { ExecContext, PayloadSource } from "../types/index";
 import { objectRecordFrom } from "./object-record";
 
 export type ServerValidationPayload =

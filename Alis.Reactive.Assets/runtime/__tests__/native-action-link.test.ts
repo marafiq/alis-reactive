@@ -3,7 +3,7 @@ import {
   initNativeActionLinks,
   resetNativeActionLinksForTests,
 } from "../components/native/native-action-link";
-import type { PlanDocument, ReactionGraph, RequestPlan } from "../types";
+import type { PlanDocument, ReactionGraph, RequestPlan } from "../types/index";
 
 const emptyPlan: PlanDocument = {
   version: 3,
