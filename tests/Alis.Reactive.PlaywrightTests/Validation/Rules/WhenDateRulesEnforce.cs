@@ -2,11 +2,6 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
 
-/// <summary>
-/// Playwright tests for /Sandbox/Validation/DateRules — verifies date-aware validation
-/// with shape: "date" and cross-property comparisons (discharge > admission).
-/// Uses FusionDatePicker components.
-/// </summary>
 [TestFixture]
 public class WhenDateRulesEnforce : PlaywrightTestBase
 {
@@ -18,8 +13,6 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
     private ILocator ErrorFor(string suffix) => Page.Locator($"#{R}{suffix}_error");
 
     private DatePickerLocator DatePicker(string suffix) => new(Page, R + suffix);
-
-    // ── Required ─────────────────────────────────────────────
 
     [Test]
     public async Task empty_dates_show_required_errors_on_submit()
@@ -35,15 +28,12 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Min date (admission >= 2020-01-01) ───────────────────
-
     [Test]
     public async Task admission_date_before_2020_shows_min_error()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Submit first to trigger validation
         await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
 
@@ -52,7 +42,6 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         // FillAndBlur types the date and blurs — SF parses the value.
         await DatePicker("AdmissionDate").FillAndBlur("06/15/2019");
 
-        // Trigger blur/change re-validation by clicking elsewhere
         await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("2020", new() { Timeout = 2000 });
@@ -66,23 +55,17 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Submit first
         await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
 
-        // Set valid date
         await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
 
-        // Re-validate
         await ClickWhenStable(ValidateBtn);
 
-        // Admission should pass (but discharge will still fail)
         await Expect(ErrorFor("AdmissionDate")).ToBeHiddenAsync(new() { Timeout = 2000 });
 
         AssertNoConsoleErrors();
     }
-
-    // ── Cross-property (discharge > admission) ───────────────
 
     [Test]
     public async Task discharge_before_admission_shows_gt_error()
@@ -90,9 +73,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Set admission to March 15, 2025
         await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
-        // Set discharge BEFORE admission (March 10, 2025)
         await DatePicker("DischargeDate").SelectDate(2025, 3, 10);
 
         await ClickWhenStable(ValidateBtn);
@@ -108,7 +89,6 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Same date — gt requires strictly greater
         await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
         await DatePicker("DischargeDate").SelectDate(2025, 3, 15);
 
@@ -125,7 +105,6 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Admission: March 15, Discharge: March 20
         await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
         await DatePicker("DischargeDate").SelectDate(2025, 3, 20);
 
@@ -135,8 +114,6 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── Full valid form ──────────────────────────────────────
 
     [Test]
     public async Task all_valid_dates_pass_validation()
