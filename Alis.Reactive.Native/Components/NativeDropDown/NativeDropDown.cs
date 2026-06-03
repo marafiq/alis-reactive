@@ -6,7 +6,7 @@ namespace Alis.Reactive.Native.Components
     /// <remarks>
     /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the
     /// <c>.NativeDropDown()</c> factory to create a model-bound dropdown with
-    /// label, validation, and reactive event support.
+    /// label, validation, and Reactive Plan event support.
     /// </remarks>
     public sealed class NativeDropDown : NativeComponent, IInputComponent
     {

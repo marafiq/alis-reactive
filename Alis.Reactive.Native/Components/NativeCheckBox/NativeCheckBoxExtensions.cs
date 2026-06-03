@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Pipeline extensions for <see cref="NativeCheckBox"/>: set checked state, focus, and read.
+    /// Reactive Plan operations for <see cref="NativeCheckBox"/> checked state and focus.
     /// </summary>
     /// <remarks>
     /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via
@@ -20,12 +20,11 @@ namespace Alis.Reactive.Native.Components
             ComponentMethod.Named("focus");
 
         /// <summary>
-        /// Sets the checkbox checked state in the browser.
+        /// Sets the checkbox checked state through the component contract.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <param name="self">The checkbox component reference.</param>
         /// <param name="isChecked"><see langword="true"/> to check, <see langword="false"/> to uncheck.</param>
-        /// <returns>The component reference for method chaining.</returns>
         public static ComponentRef<NativeCheckBox, TModel> SetChecked<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self, bool isChecked)
             where TModel : class
@@ -36,8 +35,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Moves keyboard focus into the checkbox.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <returns>The component reference for method chaining.</returns>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeCheckBox, TModel> FocusIn<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
@@ -48,7 +46,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Reads the current checked state for use in conditions or gather.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <returns>A typed source representing the checkbox's current checked state.</returns>
         public static TypedComponentSource<bool> Value<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self)

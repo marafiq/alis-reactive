@@ -22,15 +22,8 @@ namespace Alis.Reactive.Native.Components
     /// <remarks>
     /// Created by the <c>.NativeDropDown()</c> factory on
     /// <see cref="InputBoundField{TModel,TProp}"/>.
-    /// <code>
-    /// Html.InputField(plan, m => m.Status, o => o.Required().Label("Status"))
-    ///     .NativeDropDown(b => b
-    ///         .Items(statusItems)
-    ///         .Placeholder("-- Select --")
-    ///         .Reactive(plan, evt => evt.Changed, (args, p) => { ... }));
-    /// </code>
     /// </remarks>
-    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">The bound property type.</typeparam>
     public class NativeDropDownBuilder<TModel, TProp> :
 #if NET48
@@ -51,8 +44,7 @@ namespace Alis.Reactive.Native.Components
         private bool _enabled = true;
         private string? _cssClass;
 
-        // NEVER make public — devs create builders via the .NativeDropDown() factory,
-        // which also registers the component in the plan's input component onboarding catalog.
+        // Keep internal: the factory also registers this input component in the Reactive Plan.
         internal NativeDropDownBuilder(
 #if NET48
             HtmlHelper<TModel> html,
@@ -72,14 +64,13 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Gets the resolved element ID for this dropdown.</summary>
         internal string ElementId => _elementId;
 
-        /// <summary>Gets the model binding path (e.g. <c>"Address.City"</c>).</summary>
+        /// <summary>Gets the model binding path, such as <c>"Address.City"</c>.</summary>
         internal string BindingPath => _bindingPath;
 
         /// <summary>
         /// Sets the selectable options.
         /// </summary>
         /// <param name="items">The list of options to display.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeDropDownBuilder<TModel, TProp> Items(IEnumerable<SelectListItem> items)
         {
             _items = items;
@@ -90,7 +81,6 @@ namespace Alis.Reactive.Native.Components
         /// Sets the empty-selection placeholder label (e.g. <c>"-- Select --"</c>).
         /// </summary>
         /// <param name="optionLabel">The placeholder text for the empty option.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeDropDownBuilder<TModel, TProp> Placeholder(string optionLabel)
         {
             _placeholder = optionLabel;
@@ -101,7 +91,6 @@ namespace Alis.Reactive.Native.Components
         /// Enables or disables the dropdown. Defaults to enabled.
         /// </summary>
         /// <param name="enabled"><see langword="true"/> to enable, <see langword="false"/> to disable.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeDropDownBuilder<TModel, TProp> Enabled(bool enabled)
         {
             _enabled = enabled;
@@ -112,7 +101,6 @@ namespace Alis.Reactive.Native.Components
         /// Adds CSS classes to the select element.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
-        /// <returns>The builder for method chaining.</returns>
         public NativeDropDownBuilder<TModel, TProp> CssClass(string css)
         {
             _cssClass = css;

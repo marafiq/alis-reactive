@@ -15,7 +15,7 @@ namespace Alis.Reactive.Native.Components
         public bool? Checked { get; set; }
 
         /// <summary>
-        /// Initializes a new instance. Framework use only.
+        /// Initializes a new instance for event payload binding.
         /// </summary>
         public NativeCheckBoxChangeArgs() { }
     }
