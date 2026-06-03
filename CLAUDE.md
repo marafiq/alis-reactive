@@ -244,7 +244,7 @@ scripts/pack.sh <version>  # browser assets -> Release build -> six NuGets
 Full gate order:
 
 ```text
-npm run typecheck -> npm run build:all -> npm test -> dotnet build -> scripts/playwright.sh --no-build
+npm run typecheck -> npm run build:all -> npm test -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build
 ```
 
 Playwright must run through `scripts/playwright.sh`, not raw `dotnet test`. The

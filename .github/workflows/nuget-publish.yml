@@ -14,9 +14,15 @@ on:
       - 'Alis.Reactive.FluentValidator/**'
       - 'Alis.Reactive.NativeTagHelpers/**'
       - 'Alis.Reactive.Analyzers/**'
+      - 'build/**'
       - 'Directory.Build.props'
+      - 'global.json'
       - 'package.json'
       - 'package-lock.json'
+      - 'scripts/build.sh'
+      - 'scripts/test.sh'
+      - 'scripts/playwright.sh'
+      - 'scripts/pack.sh'
       - '.github/workflows/nuget-publish.yml'
   workflow_dispatch:
 
@@ -41,44 +47,10 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build JS + CSS bundles
-        run: npm run build:all
-
-      - name: Verify TypeScript — typecheck + unit tests
-        run: |
-          npm run typecheck
-          npm test
+      - name: Run non-browser verification gate
+        run: CONFIGURATION=Release scripts/test.sh --no-e2e
         # 'npm run lint' is intentionally NOT run here yet: the runtime has 10
         # pre-existing eslint errors. Add it once those are cleared.
-
-      - name: Build all C# projects
-        run: dotnet build --configuration Release
-
-      - name: Run non-Playwright .NET tests
-        shell: bash
-        run: |
-          projects=()
-          while IFS= read -r project; do
-            if [[ "$project" == *Playwright* ]]; then
-              continue
-            fi
-
-            if grep -q 'Microsoft.NET.Test.Sdk' "$project"; then
-              projects+=("$project")
-            fi
-          done < <(find tests -name '*.csproj' -print | sort)
-
-          if [ "${#projects[@]}" -eq 0 ]; then
-            echo "No non-Playwright .NET test projects found. Playwright tests run in the playwright job."
-            exit 0
-          fi
-
-          for project in "${projects[@]}"; do
-            dotnet test "$project" --configuration Release --no-build
-          done
 
   playwright:
     runs-on: ubuntu-latest
@@ -96,46 +68,14 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build JS + CSS bundles
-        run: npm run build:all
-
-      - name: Build all C# projects
-        run: dotnet build
+      - name: Build app and Playwright project
+        run: scripts/build.sh
 
       - name: Install Playwright browsers
         run: pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
 
-      - name: Run Playwright tests (attempt 1)
-        id: pw1
-        run: |
-          dotnet test tests/Alis.Reactive.PlaywrightTests \
-            --no-build \
-            --logger "html;LogFileName=playwright-report.html" \
-            --logger "trx;LogFileName=playwright-results.trx" \
-            --results-directory TestResults \
-            -- NUnit.NumberOfTestWorkers=1
-        continue-on-error: true
-
-      - name: Retry failed tests (attempt 2)
-        id: pw2
-        if: steps.pw1.outcome == 'failure'
-        run: |
-          FAILED=$(grep 'outcome="Failed"' TestResults/playwright-results.trx \
-            | sed 's/.*testName="//' | sed 's/".*//' | sort -u \
-            | grep -v "ResultSummary" | paste -sd '|' -)
-          if [ -n "$FAILED" ]; then
-            echo "Retrying: $FAILED"
-            dotnet test tests/Alis.Reactive.PlaywrightTests \
-              --no-build --filter "$FAILED" \
-              --logger "html;LogFileName=retry-2-report.html" \
-              --logger "trx;LogFileName=retry-2-results.trx" \
-              --results-directory TestResults \
-              -- NUnit.NumberOfTestWorkers=1
-          fi
-        continue-on-error: true
+      - name: Run observable Playwright tests
+        run: scripts/playwright.sh --no-build
 
       - name: Upload Playwright report
         if: always()
@@ -143,25 +83,11 @@ jobs:
         with:
           name: playwright-report
           path: |
-            TestResults/playwright-report.html
-            TestResults/playwright-results.trx
-            TestResults/retry-*-report.html
-            TestResults/retry-*-results.trx
+            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.log
+            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.trx
+            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.diag.log
+            tests/Alis.Reactive.PlaywrightTests/bin/TestResults/playwright-traces/*
           retention-days: 14
-
-      - name: Fail if Playwright failed after retry
-        if: always()
-        run: |
-          if [ "${{ steps.pw1.outcome }}" = "success" ]; then
-            exit 0
-          fi
-
-          if [ "${{ steps.pw2.outcome }}" = "success" ]; then
-            exit 0
-          fi
-
-          echo "Playwright tests failed after retry."
-          exit 1
 
   pack-and-publish:
     needs: [test, playwright]
@@ -182,40 +108,20 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build JS + CSS bundles
-        run: npm run build:all
-
-      - name: Build all C# projects
-        run: dotnet build --configuration Release
-
-      - name: Determine version suffix
+      - name: Determine package version
         id: version
         run: |
+          VERSION_PREFIX=$(dotnet msbuild Alis.Reactive/Alis.Reactive.csproj -getProperty:VersionPrefix -v:q | tail -n 1)
           if [[ "${{ github.ref }}" == refs/heads/release/* ]]; then
-            echo "suffix=preview.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+            echo "package_version=${VERSION_PREFIX}-preview.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
             echo "is_preview=true" >> "$GITHUB_OUTPUT"
           else
-            echo "suffix=" >> "$GITHUB_OUTPUT"
+            echo "package_version=${VERSION_PREFIX}" >> "$GITHUB_OUTPUT"
             echo "is_preview=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Pack NuGet packages
-        run: |
-          PACK_ARGS="--configuration Release --no-build --output ./nupkgs"
-          if [ -n "${{ steps.version.outputs.suffix }}" ]; then
-            PACK_ARGS="$PACK_ARGS --version-suffix ${{ steps.version.outputs.suffix }}"
-          fi
-
-          dotnet pack Alis.Reactive/Alis.Reactive.csproj $PACK_ARGS
-          dotnet pack Alis.Reactive.DesignSystem/Alis.Reactive.DesignSystem.csproj $PACK_ARGS
-          dotnet pack Alis.Reactive.Native/Alis.Reactive.Native.csproj $PACK_ARGS
-          dotnet pack Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj $PACK_ARGS
-          dotnet pack Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj $PACK_ARGS
-          dotnet pack Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj $PACK_ARGS
-          dotnet pack Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj $PACK_ARGS
+        run: scripts/pack.sh "${{ steps.version.outputs.package_version }}"
 
       - name: Log package versions
         run: ls -1 ./nupkgs/

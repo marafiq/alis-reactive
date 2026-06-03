@@ -112,6 +112,7 @@ check_no_build_is_fresh() {
       Alis.Reactive.SandboxApp \
       tests/Alis.Reactive.Playwright.Extensions \
       tests/Alis.Reactive.PlaywrightTests \
+      \( -path '*/bin' -o -path '*/bin/*' -o -path '*/obj' -o -path '*/obj/*' \) -prune -o \
       -type f \
       \( -name '*.cs' -o -name '*.cshtml' -o -name '*.csproj' -o -name '*.props' -o -name '*.targets' \) \
       -newer "$assembly" \

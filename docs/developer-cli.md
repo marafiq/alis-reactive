@@ -28,7 +28,7 @@ pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 instal
 | Check CLI environment | `scripts/doctor.sh` | Read-only. Reports missing tools, missing bundles, missing test DLL, and dirty git state. |
 | Build everything | `scripts/build.sh` | Installs npm deps if needed, builds all JS/CSS bundles, then runs `dotnet build`. |
 | Run sandbox | `scripts/run.sh` | Builds assets first, then starts `http://localhost:5220`. Stop with `Ctrl+C`. |
-| Full verification gate | `scripts/test.sh` | Typecheck -> assets -> vitest -> `dotnet build` -> observable Playwright. |
+| Full verification gate | `scripts/test.sh` | Typecheck -> assets -> vitest -> `dotnet build` -> non-Playwright dotnet tests -> observable Playwright. |
 | Non-browser gate | `scripts/test.sh --no-e2e` | Same as full gate without Playwright. |
 | Full Playwright | `scripts/playwright.sh` | Use this instead of raw `dotnet test` for browser tests. |
 | Filtered Playwright | `scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"` | Supports any VSTest filter. |
@@ -88,11 +88,18 @@ then run the full `scripts/test.sh` before push or release work.
 Use `scripts/test.sh` before push. It runs the gates in this order:
 
 ```text
-npm run typecheck -> npm run build:all -> npm test -> dotnet build -> scripts/playwright.sh --no-build
+npm run typecheck -> npm run build:all -> npm test -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build
 ```
 
 Use `scripts/test.sh --no-e2e` only when the browser leg is intentionally out of
 scope. Before merge or release work, run the full gate.
+
+Set `CONFIGURATION=Release` when you need the .NET build/test legs to match the
+GitHub publish gate:
+
+```bash
+CONFIGURATION=Release scripts/test.sh --no-e2e
+```
 
 Use `scripts/playwright.sh` for all browser runs. The wrapper prints the active
 filter, logs the exact `dotnet test` command, writes live output, TRX, and VSTest
@@ -120,7 +127,7 @@ to inspect or re-run with `--filter`.
 | Runtime TypeScript | `npm test`, `npm run build:all`, then relevant `scripts/playwright.sh --filter ...` | `scripts/test.sh` |
 | Validation behavior | `scripts/playwright.sh --filter "FullyQualifiedName~Validation"` after assets and build are fresh | `scripts/test.sh` |
 | Fusion component or grid behavior | `scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion"` or narrower | `scripts/test.sh` |
-| Packaging or asset delivery | `scripts/pack.sh <version>` | `scripts/test.sh` plus package inspection when publishing |
+| Packaging or asset delivery | `scripts/pack.sh <version>` | `CONFIGURATION=Release scripts/test.sh --no-e2e`, full Playwright when behavior changed, plus package inspection when publishing |
 
 ## Stale-Output Rules
 

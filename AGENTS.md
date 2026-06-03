@@ -202,9 +202,9 @@ scripts/pack.sh <version>
 
 Playwright must run through `scripts/playwright.sh`, not raw `dotnet test`. Full
 gate order is `npm run typecheck` -> `npm run build:all` -> `npm test` ->
-`dotnet build` -> `scripts/playwright.sh --no-build`. The wrapper prints active
-test markers, writes live log/TRX/diag artifacts, and rejects stale browser
-assets or stale `--no-build` binaries.
+`dotnet build` -> non-Playwright dotnet tests -> `scripts/playwright.sh --no-build`.
+The wrapper prints active test markers, writes live log/TRX/diag artifacts, and
+rejects stale browser assets or stale `--no-build` binaries.
 
 For UI work, use `docs/developer-cli.md#ui-developer-workflows` to choose the
 right watcher, distinguish framework-shipped assets from sandbox-only assets,

@@ -47,7 +47,7 @@ build, test, Playwright, and packaging order explicit:
 | `scripts/doctor.sh` | read-only CLI preflight: tools, script executability, restore/build-output hints, git status |
 | `scripts/build.sh` | JS deps (if missing) → framework bundles → both-TFM C# build |
 | `scripts/run.sh` | bundles → start the sandbox at `http://localhost:5220` |
-| `scripts/test.sh` | full gate: contract drift typecheck -> browser asset build -> vitest -> both-TFM build -> observable Playwright (`--no-e2e` skips the browser leg) |
+| `scripts/test.sh` | full gate: contract drift typecheck -> browser asset build -> vitest -> both-TFM build -> non-Playwright dotnet tests -> observable Playwright (`--no-e2e` skips the browser leg) |
 | `scripts/playwright.sh` | observable Playwright runner with filter support, live logs, TRX, diagnostics, active-test progress markers, stale `--no-build` detection, and stale browser asset detection |
 | `scripts/pack.sh <version>` | delivery: bundles → Release build → pack the six library NuGets to `./nupkgs` |
 
