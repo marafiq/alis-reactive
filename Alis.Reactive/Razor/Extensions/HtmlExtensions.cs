@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.Extensions
 {
     /// <summary>
-    /// Razor view extensions for adding reactive behavior to a plan.
+    /// Razor view extensions for adding behavior to a Reactive Plan.
     /// </summary>
     public static class HtmlExtensions
     {
         /// <summary>
-        /// Adds reactive behavior to <paramref name="plan"/> by configuring browser triggers
+        /// Adds behavior to <paramref name="plan"/> by configuring triggers
         /// and the commands that run when each trigger fires.
         /// </summary>
         /// <remarks>
@@ -33,8 +33,8 @@ namespace Alis.Reactive.Native.Extensions
         /// @Html.RenderPlan(plan)
         /// </code>
         /// <para>
-        /// A trigger is a browser event that starts a reaction: the page loading (<c>DomReady</c>),
-        /// a custom event (<c>CustomEvent</c>), a server-sent event (<c>ServerPush</c>), or a
+        /// A trigger is an event source that starts a reaction: the page loading (<c>DomReady</c>),
+        /// a DOM custom event (<c>CustomEvent</c>), a server-sent event (<c>ServerPush</c>), or a
         /// SignalR message (<c>SignalR</c>). When the trigger fires, the commands declared in
         /// its callback execute in declaration order.
         /// </para>
@@ -43,9 +43,9 @@ namespace Alis.Reactive.Native.Extensions
         /// rarely needed and usually indicate the reaction should be combined into one block.
         /// </para>
         /// </remarks>
-        /// <typeparam name="TModel">The view model type</typeparam>
+        /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
         /// <param name="html">The Razor HTML helper.</param>
-        /// <param name="plan">The plan to add reactive behavior to.</param>
+        /// <param name="plan">The Reactive Plan that receives the trigger declarations.</param>
         /// <param name="trigger">
         /// Configures one or more triggers via the fluent <see cref="TriggerBuilder{TModel}"/> API.
         /// Triggers can be chained: <c>t.DomReady(...).CustomEvent(...).SignalR(...).ServerPush(...)</c>.

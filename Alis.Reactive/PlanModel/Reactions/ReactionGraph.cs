@@ -7,7 +7,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Base class for all executable actions in a reactive plan. Not constructed in application code.
+    /// Base class for all executable actions in a Reactive Plan. Not constructed in application code.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ReactionGraph>))]
     public abstract class ReactionGraph

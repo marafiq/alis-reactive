@@ -10,10 +10,11 @@ namespace Alis.Reactive.Builders
     /// Builds DOM mutations on a target element: text, HTML, CSS classes, and visibility.
     /// </summary>
     /// <remarks>
-    /// Obtained via <c>p.Element("elementId")</c>. Most methods return the parent
-    /// <see cref="PipelineBuilder{TModel}"/> for continued chaining.
+    /// Obtained via <c>p.Element("elementId")</c>. Literal and payload overloads return
+    /// the parent <see cref="PipelineBuilder{TModel}"/>; typed-source overloads keep
+    /// the element builder active for additional element mutations.
     /// </remarks>
-    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
     public class ElementBuilder<TModel> where TModel : class
     {
         private readonly PipelineBuilder<TModel> _pipeline;

@@ -23,7 +23,7 @@ namespace Alis.Reactive
         /// <summary>
         /// Generates an element ID from a model expression using an untyped <c>object?</c> lambda.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
         /// <param name="expression">The model property expression (e.g. <c>m =&gt; m.Address.City</c>).</param>
         /// <returns>A scoped element ID like <c>Namespace_Model__Address_City</c>.</returns>
         public static string For<TModel>(Expression<Func<TModel, object?>> expression)
@@ -36,7 +36,7 @@ namespace Alis.Reactive
         /// <summary>
         /// Generates an element ID from a typed model expression, avoiding boxing for value types.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
         /// <typeparam name="TProp">The property type, preserving type safety for value types.</typeparam>
         /// <param name="expression">The model property expression (e.g. <c>m =&gt; m.FacilityId</c>).</param>
         /// <returns>A scoped element ID like <c>Namespace_Model__FacilityId</c>.</returns>

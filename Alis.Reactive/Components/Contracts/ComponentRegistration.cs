@@ -3,7 +3,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Immutable registration of a component in the reactive plan.
+    /// Immutable registration of a component in the Reactive Plan.
     /// Populated at view render time by each vertical slice's HtmlExtensions.
     /// Consumed by gather (HTTP serialization) and validation field binding.
     /// </summary>

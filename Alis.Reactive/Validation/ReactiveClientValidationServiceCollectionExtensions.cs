@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// Registers explicit browser validation metadata for reactive plans.
+    /// Registers explicit client validation metadata for Reactive Plans.
     /// </summary>
     public static class ReactiveClientValidationServiceCollectionExtensions
     {

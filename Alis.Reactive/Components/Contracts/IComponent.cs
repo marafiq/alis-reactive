@@ -1,7 +1,7 @@
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Marker interface for a browser component object that can be referenced in a reactive plan.
+    /// Marker interface for a component object that can be referenced in a Reactive Plan.
     /// </summary>
     public interface IComponent
     {

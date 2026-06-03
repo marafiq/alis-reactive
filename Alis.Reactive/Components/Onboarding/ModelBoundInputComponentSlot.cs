@@ -5,7 +5,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// The deterministic slot where a Razor-rendered input component joins the reactive plan.
+    /// The deterministic slot where a Razor-rendered input component joins the Reactive Plan.
     /// Its controlled component id is the join key across DOM rendering, plan registration,
     /// validation, gather, partial load/unload, and runtime component lookup.
     /// </summary>

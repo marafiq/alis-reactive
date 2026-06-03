@@ -9,9 +9,9 @@ namespace Alis.Reactive.InputField
     /// </summary>
     /// <remarks>
     /// <para>
-    /// NEVER make public. This is internal infrastructure used by
+    /// Keep internal: this infrastructure is used by
     /// <see cref="InputBoundFieldBase{THelper, TModel, TProp}"/> to emit
-    /// consistent field markup. Devs use <c>Html.InputField(...)</c> instead.
+    /// consistent field markup. Application code uses <c>Html.InputField(...)</c>.
     /// </para>
     /// <para>
     /// Pure BCL with no ASP.NET dependency. Writes directly to a <see cref="TextWriter"/>
@@ -27,7 +27,7 @@ namespace Alis.Reactive.InputField
         private string? _forId; // HTML id for the label's "for" attribute
 
         /// <summary>
-        /// NEVER make public. Constructed exclusively by <see cref="InputBoundFieldBase{THelper, TModel, TProp}.Render"/>.
+        /// Constructed exclusively by <see cref="InputBoundFieldBase{THelper, TModel, TProp}.Render"/>.
         /// </summary>
         internal InputFieldBuilder(TextWriter writer, string? name)
         {

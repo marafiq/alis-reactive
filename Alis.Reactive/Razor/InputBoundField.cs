@@ -22,7 +22,7 @@ namespace Alis.Reactive.Native
     /// <c>.NativeTextBox()</c>, <c>.FusionDropDownList()</c>. The field wrapper provides
     /// the label and validation error HTML elements automatically.
     /// </remarks>
-    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
     public class InputBoundField<TModel, TProp>
 #if NET48
@@ -33,8 +33,9 @@ namespace Alis.Reactive.Native
         where TModel : class
     {
         /// <summary>
-        /// NEVER make public. Devs get this from <see cref="Extensions.InputFieldExtensions.InputField{TModel,TProp}"/>
-        /// — a public constructor would bypass plan registration and break validation and gather.
+        /// Keep internal: <see cref="Extensions.InputFieldExtensions.InputField{TModel,TProp}"/>
+        /// creates the field and wires plan registration. Public construction would bypass
+        /// validation and gather registration.
         /// </summary>
         internal InputBoundField(
 #if NET48
@@ -49,8 +50,8 @@ namespace Alis.Reactive.Native
         }
 
         /// <summary>
-        /// NEVER make public. Component extensions call this to write their markup inside the
-        /// field wrapper — exposing it lets devs bypass the component pipeline entirely.
+        /// Keep internal: component extensions use this to write markup inside the field
+        /// wrapper after registration. Public rendering would bypass the component pipeline.
         /// </summary>
         /// <param name="content">The component markup to render inside the field wrapper.</param>
 #if NET48

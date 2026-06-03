@@ -7,7 +7,7 @@ namespace Alis.Reactive.Builders.Conditions
     /// <summary>
     /// Entry point for building standalone condition expressions used in nested And/Or calls.
     /// </summary>
-    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
     public sealed class ConditionStart<TModel> where TModel : class
     {
         internal ConditionStart() { }

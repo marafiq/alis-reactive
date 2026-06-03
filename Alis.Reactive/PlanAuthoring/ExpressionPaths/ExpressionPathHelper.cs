@@ -6,11 +6,11 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// Converts lambda expressions like <c>x =&gt; x.Address.City</c> into camelCase
-    /// dot-paths for use as source bindings in the plan.
+    /// dot-paths for use as Reactive Plan source bindings.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Each path gets a prefix that identifies where to resolve the value in the browser:
+    /// Each path gets a prefix that identifies the runtime value scope:
     /// <c>"evt"</c> for event payloads (<c>evt.address.city</c>),
     /// <c>"responseBody"</c> for HTTP response data (<c>responseBody.data.name</c>).
     /// </para>
@@ -132,7 +132,7 @@ namespace Alis.Reactive
         /// <c>m =&gt; m.Address.City</c> becomes <c>"Address.City"</c>.
         /// Dot-notation preserves the model structure for HTTP gather.
         /// </remarks>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
         /// <param name="expression">The model property expression.</param>
         /// <returns>A dot-separated binding path like <c>"Address.City"</c>.</returns>
         public static string ToPropertyName<TModel>(Expression<Func<TModel, object?>> expression)
@@ -164,7 +164,7 @@ namespace Alis.Reactive
         /// <c>m =&gt; m.Address.City</c> becomes <c>"Address_City"</c>.
         /// Underscores match the <c>Html.IdFor()</c> convention.
         /// </remarks>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
         /// <param name="expression">The model property expression.</param>
         /// <returns>An underscore-separated element ID like <c>"Address_City"</c>.</returns>
         public static string ToElementId<TModel>(Expression<Func<TModel, object?>> expression)
@@ -176,7 +176,7 @@ namespace Alis.Reactive
         /// <summary>
         /// Converts a typed model expression to a DOM element ID, preserving type safety for value types.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
         /// <typeparam name="TProp">The property type.</typeparam>
         /// <param name="expression">The model property expression.</param>
         /// <returns>An underscore-separated element ID like <c>"Address_City"</c>.</returns>

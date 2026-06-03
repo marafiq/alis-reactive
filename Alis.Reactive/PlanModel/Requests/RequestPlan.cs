@@ -4,7 +4,7 @@ using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.PlanModel
 {
-    /// <summary>An HTTP request definition in the reactive plan.</summary>
+    /// <summary>An HTTP request definition in a Reactive Plan.</summary>
     public sealed class RequestPlan
     {
         private readonly RequestEndpoint _endpoint;

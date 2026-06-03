@@ -13,9 +13,9 @@ namespace Alis.Reactive.Native.Extensions
     /// <see cref="ReactivePlan{TModel}"/> at the top, render it at the bottom.
     /// </summary>
     /// <remarks>
-    /// Every view must call <see cref="ReactivePlan{TModel}(IHtmlHelper{TModel})"/> at the start of view and
-    /// <see cref="RenderPlan{TModel}"/> at the end of view. Partial views that share the same
-    /// model and need to merge into the same browser plan use
+    /// Every view must call <see cref="ReactivePlan{TModel}(IHtmlHelper{TModel})"/> at the start of the view and
+    /// <see cref="RenderPlan{TModel}"/> at the end of the view. Partial views that share the same
+    /// model and need to merge into the same Reactive Plan use
     /// <see cref="ResolvePlan{TModel}(IHtmlHelper{TModel})"/> instead.
     /// If a partial has its own independent model, treat it as
     /// its own view with <c>ReactivePlan</c> and <c>RenderPlan</c>.
@@ -29,7 +29,7 @@ namespace Alis.Reactive.Native.Extensions
         /// <remarks>
         /// This is the first call in a view. The returned plan is passed to
         /// <see cref="HtmlExtensions.On{TModel}"/> to define behavior and to
-        /// <see cref="RenderPlan{TModel}"/> to render reactive behaviors that will execute in browser.
+        /// <see cref="RenderPlan{TModel}"/> to render the generated plan JSON.
         /// Partial views that share the same <typeparamref name="TModel"/> use
         /// <see cref="ResolvePlan{TModel}"/> instead.
         /// </remarks>
@@ -47,7 +47,7 @@ namespace Alis.Reactive.Native.Extensions
 
         /// <summary>
         /// Creates a <see cref="ReactivePlan{TModel}"/> for a partial view that merges
-        /// into an existing browser plan.
+        /// into an existing Reactive Plan.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -56,12 +56,12 @@ namespace Alis.Reactive.Native.Extensions
         /// Both calls are required for the partial's reactive behavior to work.
         /// </para>
         /// <para>
-        /// The returned plan's behaviors merge with the owning view's plan and execute
-        /// as a single unit in the browser.
+        /// The returned plan's behaviors merge with the owning view's plan and run
+        /// as a single runtime plan.
         /// </para>
         /// </remarks>
         /// <typeparam name="TModel">The view model type must match the view's model.</typeparam>
-        /// <returns>A plan instance that merges into the view's plan in the browser.</returns>
+        /// <returns>A plan instance that merges into the view's Reactive Plan.</returns>
 #if NET48
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this HtmlHelper<TModel> html)
             where TModel : class =>
@@ -90,17 +90,16 @@ namespace Alis.Reactive.Native.Extensions
 #endif
 
         /// <summary>
-        /// Renders all reactive behaviors defined in <paramref name="plan"/> so they
-        /// execute in the browser as expressed.
+        /// Renders the generated plan JSON for all behaviors defined in <paramref name="plan"/>.
         /// </summary>
         /// <remarks>
         /// This must be the last call in every view. A plan that is not rendered
-        /// produces no reactive behavior in the browser.
+        /// produces no runtime behavior.
         /// </remarks>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
         /// <param name="html">The Razor HTML helper.</param>
         /// <param name="plan">The plan to render.</param>
-        /// <returns>HTML content that activates the plan when the page loads.</returns>
+        /// <returns>HTML content that makes the plan available to the runtime when the page loads.</returns>
 #if NET48
         public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html,
             ReactivePlan<TModel> plan) where TModel : class

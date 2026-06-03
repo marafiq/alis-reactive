@@ -24,10 +24,10 @@ namespace Alis.Reactive.Native.Extensions
         /// e.g. <c>.NativeTextBox()</c>, <c>.FusionDropDownList()</c>. The field wrapper handles
         /// label display and validation error placement automatically.
         /// </remarks>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
         /// <param name="html">The Razor HTML helper.</param>
-        /// <param name="plan">The plan this field belongs to.</param>
+        /// <param name="plan">The Reactive Plan that owns this field registration.</param>
         /// <param name="expression">The model property to bind the field to.</param>
         /// <returns>A bound field ready to receive a component extension.</returns>
         public static InputBoundField<TModel, TProp> InputField<TModel, TProp>(
@@ -45,10 +45,10 @@ namespace Alis.Reactive.Native.Extensions
         /// Starts a model-bound input field for <paramref name="expression"/>, with label
         /// and required marker configuration.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
         /// <param name="html">The Razor HTML helper.</param>
-        /// <param name="plan">The plan this field belongs to.</param>
+        /// <param name="plan">The Reactive Plan that owns this field registration.</param>
         /// <param name="expression">The model property to bind the field to.</param>
         /// <param name="configure">Configures label text and required marker.</param>
         /// <returns>A bound field ready to receive a component extension.</returns>
