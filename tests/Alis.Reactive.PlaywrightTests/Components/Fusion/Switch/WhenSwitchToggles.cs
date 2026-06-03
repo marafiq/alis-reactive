@@ -3,25 +3,15 @@ using Alis.Reactive.Playwright.Extensions;
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Switch;
 
 /// <summary>
-/// Exercises all FusionSwitch API end-to-end in the browser:
-/// property writes (SetChecked), property reads (Value as source),
-/// reactive events (Changed with typed condition), and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/Switch
-///
-/// FusionSwitch renders an input element inside a wrapper.
-/// The wrapper element gets the IdGenerator-based ID. Tests use
-/// SwitchLocator.Toggle() to click the wrapper, which reliably
-/// triggers the SF change event via real browser interaction.
-///
-/// Senior living domain: notification preferences, email/SMS alerts.
+/// Proves FusionSwitch property writes, value reads, changed events,
+/// event-args conditions, and component-read conditions through browser-visible behavior.
 /// </summary>
 [TestFixture]
 public class WhenSwitchToggles : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Switch";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
+    // Generated component IDs are the DOM/plan join keys under test.
     private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_SwitchModel";
     private const string ReceiveNotificationsId = Scope + "__ReceiveNotifications";
     private const string EmailAlertsId = Scope + "__EmailAlerts";
@@ -34,8 +24,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateToAndWaitForTextSignal(Path, "#value-echo");
     }
-
-    // ── Page loads ──
 
     [Test]
     public async Task page_loads_without_errors()
@@ -57,41 +45,31 @@ public class WhenSwitchToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 1: Property Write ──
-
     [Test]
     public async Task domready_unchecks_notifications_switch()
     {
-        // ReceiveNotifications starts checked in model, but DomReady calls SetChecked(false).
-        // Expected: switch is unchecked after boot.
         await NavigateAndBoot();
 
         await Expect(ReceiveNotifications.Input).Not.ToBeCheckedAsync();
         AssertNoConsoleErrors();
     }
 
-    // ── Section 2: Property Read ──
-
     [Test]
     public async Task domready_reads_value_into_echo()
     {
         await NavigateAndBoot();
-        var echo = Page.Locator("#value-echo");
-        await Expect(echo).Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
+        var valueEcho = Page.Locator("#value-echo");
+        await Expect(valueEcho).Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Section 3: Events — Changed with typed condition ──
 
     [Test]
     public async Task changed_event_displays_checked_state()
     {
         await NavigateAndBoot();
 
-        // Toggle the switch on by clicking the wrapper
         await ReceiveNotifications.Toggle();
 
-        // SF change event payload contains the new checked state
         await Expect(Page.Locator("#change-value"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -102,10 +80,8 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Toggle the switch on by clicking the wrapper
         await ReceiveNotifications.Toggle();
 
-        // When(args, x => x.Checked).Truthy() => Then branch
         await Expect(Page.Locator("#args-condition"))
             .ToHaveTextAsync("notifications enabled", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -116,14 +92,12 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // DomReady already set it to false, toggle on then off to trigger event
         await ReceiveNotifications.Toggle();
         await Expect(Page.Locator("#args-condition"))
             .ToHaveTextAsync("notifications enabled", new() { Timeout = 5000 });
 
         await ReceiveNotifications.Toggle();
 
-        // When(args, x => x.Checked).Truthy() => Else branch
         await Expect(Page.Locator("#args-condition"))
             .ToHaveTextAsync("notifications disabled", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -134,10 +108,8 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Toggle the switch on by clicking the wrapper
         await ReceiveNotifications.Toggle();
 
-        // Indicator should appear with text "notifications active"
         await Expect(Page.Locator("#selected-indicator"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Page.Locator("#selected-indicator"))
@@ -145,14 +117,11 @@ public class WhenSwitchToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 4: Component-Read Condition ──
-
     [Test]
     public async Task component_value_condition_warns_when_unchecked()
     {
         await NavigateAndBoot();
 
-        // SmsAlerts starts false — click check
         await Page.Locator("#check-sms-btn").ClickAsync();
 
         var warning = Page.Locator("#sms-warning");
@@ -165,18 +134,14 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Toggle SmsAlerts on by clicking the wrapper
         await SmsAlerts.Toggle();
 
-        // Click check button
         await Page.Locator("#check-sms-btn").ClickAsync();
 
         var warning = Page.Locator("#sms-warning");
         await Expect(warning).ToHaveTextAsync("SMS alerts are enabled", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Deep BDD: state-cycle scenarios ──
 
     [Test]
     public async Task toggling_switch_multiple_times_fires_condition_each_time()
@@ -186,18 +151,15 @@ public class WhenSwitchToggles : PlaywrightTestBase
         var argsCondition = Page.Locator("#args-condition");
         var selectedIndicator = Page.Locator("#selected-indicator");
 
-        // Cycle 1: toggle on — condition evaluates "notifications enabled", indicator shows
         await ReceiveNotifications.Toggle();
         await Expect(argsCondition).ToHaveTextAsync("notifications enabled", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(selectedIndicator).ToHaveTextAsync("notifications active", new() { Timeout = 3000 });
 
-        // Cycle 2: toggle off — condition evaluates "notifications disabled", indicator hides
         await ReceiveNotifications.Toggle();
         await Expect(argsCondition).ToHaveTextAsync("notifications disabled", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeHiddenAsync(new() { Timeout = 3000 });
 
-        // Cycle 3: toggle on again — proves state is not stuck
         await ReceiveNotifications.Toggle();
         await Expect(argsCondition).ToHaveTextAsync("notifications enabled", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
@@ -213,24 +175,19 @@ public class WhenSwitchToggles : PlaywrightTestBase
         var btn = Page.Locator("#check-sms-btn");
         var warning = Page.Locator("#sms-warning");
 
-        // SMS starts off -> button should say "SMS alerts are disabled"
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("SMS alerts are disabled", new() { Timeout = 3000 });
 
-        // Toggle on -> button should now say "SMS alerts are enabled"
         await SmsAlerts.Toggle();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("SMS alerts are enabled", new() { Timeout = 3000 });
 
-        // Toggle off again -> button should revert to "SMS alerts are disabled"
         await SmsAlerts.Toggle();
         await btn.ClickAsync();
         await Expect(warning).ToHaveTextAsync("SMS alerts are disabled", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
     }
-
-    // ── Plan JSON structure — refactoring safety ──
 
     [Test]
     public async Task plan_carries_fusion_vendor_for_switch_mutations()
@@ -279,8 +236,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
             "runtime uses bracket notation root[prop] = val");
         AssertNoConsoleErrors();
     }
-
-    // ── Boot trace ──
 
     [Test]
     public async Task boot_trace_is_emitted_on_page_load()
