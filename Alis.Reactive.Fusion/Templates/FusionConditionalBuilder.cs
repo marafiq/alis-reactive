@@ -6,9 +6,9 @@ using System.Text;
 namespace Alis.Reactive.Fusion.Templates
 {
     /// <summary>
-    /// Builds conditional content inside Syncfusion template <c>When</c> and <c>ShowIf</c> blocks.
+    /// Builds content emitted inside a Syncfusion template <c>When</c> or <c>ShowIf</c> block.
     /// </summary>
-    /// <typeparam name="TModel">The template model type.</typeparam>
+    /// <typeparam name="TModel">The model exposed by the Syncfusion template context.</typeparam>
     public class FusionConditionalBuilder<TModel>
     {
         private readonly List<Func<string>> _children = new List<Func<string>>();
@@ -16,7 +16,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a span whose content is bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The bound property type.</typeparam>
         /// <param name="property">The model property rendered as span content.</param>
         public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property) =>
             Span(property, TemplateCss.None);
@@ -24,7 +23,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a span whose content is bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The bound property type.</typeparam>
         /// <param name="property">The model property rendered as span content.</param>
         /// <param name="css">The CSS class added to the span.</param>
         public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, string css) =>
@@ -60,7 +58,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a badge whose content is bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The bound property type.</typeparam>
         /// <param name="property">The model property rendered as badge content.</param>
         /// <param name="css">The CSS class added to the badge.</param>
         public FusionConditionalBuilder<TModel> Badge<TProperty>(Expression<Func<TModel, TProperty>> property, string css = "e-badge")
@@ -116,7 +113,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds an image whose source is bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The bound image source property type.</typeparam>
         /// <param name="srcProperty">The model property rendered as the image source.</param>
         public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty) =>
             Img(srcProperty, TemplateCss.None);
@@ -124,7 +120,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds an image whose source is bound to a template model property.
         /// </summary>
-        /// <typeparam name="TProperty">The bound image source property type.</typeparam>
         /// <param name="srcProperty">The model property rendered as the image source.</param>
         /// <param name="css">The CSS class added to the image.</param>
         public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css) =>
@@ -169,7 +164,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// Uses <c>&amp;quot;</c> for event name quoting to survive SF template engine
         /// single-to-double quote conversion.
         /// </summary>
-        /// <typeparam name="TProperty">The row ID property type.</typeparam>
         /// <param name="text">The button text.</param>
         /// <param name="eventName">The custom event name to dispatch.</param>
         /// <param name="idProperty">The model property passed as the event detail.</param>
@@ -182,7 +176,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button that dispatches a custom event with the row ID and a CSS class.
         /// </summary>
-        /// <typeparam name="TProperty">The row ID property type.</typeparam>
         /// <param name="text">The button text.</param>
         /// <param name="eventName">The custom event name to dispatch.</param>
         /// <param name="idProperty">The model property passed as the event detail.</param>
