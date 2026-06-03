@@ -3,17 +3,7 @@ using Alis.Reactive.Playwright.Extensions;
 namespace Alis.Reactive.PlaywrightTests.Conditions.CareLevelCascade;
 
 /// <summary>
-/// Exercises condition → component mutation patterns end-to-end:
-///   Section 1: DropDown condition → SetValue on another DropDown (cascade)
-///   Section 2: DropDown condition → SetChecked on Switch (cross-component type)
-///
-/// Page under test: /Sandbox/Conditions/CareLevelCascade
-///
-/// This is the first test where condition branches MUTATE other components.
-/// All prior condition tests only flip element text/visibility. This slice proves
-/// Then/Else branches can SetValue on dropdowns and SetChecked on switches.
-///
-/// Senior living domain: care level drives protocol assignment and escort requirements.
+/// Exercises condition branches that mutate other components through SetValue and SetChecked.
 /// </summary>
 [TestFixture]
 public class WhenCareLevelCascades : PlaywrightTestBase
@@ -39,12 +29,10 @@ public class WhenCareLevelCascades : PlaywrightTestBase
     {
         await CareLevel.Select(text);
 
-        // Wait for the cascade to confirm the change event fired
+        // Wait for the cascade to confirm the change event fired.
         await Expect(Page.Locator("#s1-current-level"))
             .ToHaveTextAsync(text, new() { Timeout = 5000 });
     }
-
-    // ── Section 1: Condition → SetValue on another dropdown ──
 
     [Test]
     public async Task memory_care_sets_protocol_to_enhanced_monitoring()
@@ -53,14 +41,11 @@ public class WhenCareLevelCascades : PlaywrightTestBase
 
         await SelectCareLevelAndWait("Memory Care");
 
-        // Before: current level updated
         await Expect(Page.Locator("#s1-current-level"))
             .ToHaveTextAsync("Memory Care", new() { Timeout = 5000 });
 
-        // Condition output: protocol dropdown got SetValue("Enhanced Monitoring")
         await Expect(Protocol.Input).ToHaveValueAsync("Enhanced Monitoring", new() { Timeout = 5000 });
 
-        // After: action status confirms cascade ran
         await Expect(Page.Locator("#s1-action-status"))
             .ToHaveTextAsync("cascade-complete", new() { Timeout = 3000 });
 
@@ -74,14 +59,11 @@ public class WhenCareLevelCascades : PlaywrightTestBase
 
         await SelectCareLevelAndWait("Skilled Nursing");
 
-        // Before: current level updated
         await Expect(Page.Locator("#s1-current-level"))
             .ToHaveTextAsync("Skilled Nursing", new() { Timeout = 5000 });
 
-        // Condition output: protocol dropdown got SetValue("Full Clinical")
         await Expect(Protocol.Input).ToHaveValueAsync("Full Clinical", new() { Timeout = 5000 });
 
-        // After: cascade complete
         await Expect(Page.Locator("#s1-action-status"))
             .ToHaveTextAsync("cascade-complete", new() { Timeout = 3000 });
 
@@ -93,17 +75,15 @@ public class WhenCareLevelCascades : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // First set to Memory Care to populate protocol
         await SelectCareLevelAndWait("Memory Care");
         await Expect(Protocol.Input).ToHaveValueAsync("Enhanced Monitoring", new() { Timeout = 5000 });
 
-        // Now switch to Independent → protocol should clear
         await SelectCareLevelAndWait("Independent");
 
         await Expect(Page.Locator("#s1-current-level"))
             .ToHaveTextAsync("Independent", new() { Timeout = 5000 });
 
-        // Protocol cleared (empty value — SF shows placeholder)
+        // Empty value makes Syncfusion show the placeholder.
         await Expect(Protocol.Input).ToHaveValueAsync("", new() { Timeout = 5000 });
 
         await Expect(Page.Locator("#s1-action-status"))
@@ -117,11 +97,9 @@ public class WhenCareLevelCascades : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set to Skilled Nursing first
         await SelectCareLevelAndWait("Skilled Nursing");
         await Expect(Protocol.Input).ToHaveValueAsync("Full Clinical", new() { Timeout = 5000 });
 
-        // Assisted Living is Else branch → protocol clears
         await SelectCareLevelAndWait("Assisted Living");
 
         await Expect(Protocol.Input).ToHaveValueAsync("", new() { Timeout = 5000 });
@@ -134,26 +112,20 @@ public class WhenCareLevelCascades : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Memory Care → Enhanced Monitoring
         await SelectCareLevelAndWait("Memory Care");
         await Expect(Protocol.Input).ToHaveValueAsync("Enhanced Monitoring", new() { Timeout = 5000 });
 
-        // Skilled Nursing → Full Clinical
         await SelectCareLevelAndWait("Skilled Nursing");
         await Expect(Protocol.Input).ToHaveValueAsync("Full Clinical", new() { Timeout = 5000 });
 
-        // Independent → cleared
         await SelectCareLevelAndWait("Independent");
         await Expect(Protocol.Input).ToHaveValueAsync("", new() { Timeout = 5000 });
 
-        // Back to Memory Care → Enhanced Monitoring (no sticky state)
         await SelectCareLevelAndWait("Memory Care");
         await Expect(Protocol.Input).ToHaveValueAsync("Enhanced Monitoring", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
-
-    // ── Section 2: Condition → SetChecked on Switch ──
 
     [Test]
     public async Task memory_care_enables_escort_requirement()
@@ -163,16 +135,13 @@ public class WhenCareLevelCascades : PlaywrightTestBase
         await SelectCareLevelAndWait("Memory Care");
         await Page.Locator("#s2-apply-btn").ClickAsync();
 
-        // Before: checking shows care level
         await Expect(Page.Locator("#s2-checking"))
             .ToHaveTextAsync("Memory Care", new() { Timeout = 5000 });
 
-        // Condition output: switch checked + text
         await Expect(RequiresEscort.Input).ToBeCheckedAsync(new() { Timeout = 5000 });
         await Expect(Page.Locator("#s2-result"))
             .ToHaveTextAsync("escort required", new() { Timeout = 3000 });
 
-        // After: policy applied
         await Expect(Page.Locator("#s2-policy-status"))
             .ToHaveTextAsync("policy-applied", new() { Timeout = 3000 });
 
@@ -199,12 +168,10 @@ public class WhenCareLevelCascades : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // First enable escort via Memory Care
         await SelectCareLevelAndWait("Memory Care");
         await Page.Locator("#s2-apply-btn").ClickAsync();
         await Expect(RequiresEscort.Input).ToBeCheckedAsync(new() { Timeout = 5000 });
 
-        // Now switch to Independent → escort unchecked
         await SelectCareLevelAndWait("Independent");
         await Page.Locator("#s2-apply-btn").ClickAsync();
 
@@ -223,22 +190,18 @@ public class WhenCareLevelCascades : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Memory Care → escort on
         await SelectCareLevelAndWait("Memory Care");
         await Page.Locator("#s2-apply-btn").ClickAsync();
         await Expect(RequiresEscort.Input).ToBeCheckedAsync(new() { Timeout = 5000 });
 
-        // Independent → escort off
         await SelectCareLevelAndWait("Independent");
         await Page.Locator("#s2-apply-btn").ClickAsync();
         await Expect(RequiresEscort.Input).Not.ToBeCheckedAsync(new() { Timeout = 5000 });
 
-        // Skilled Nursing → escort on again
         await SelectCareLevelAndWait("Skilled Nursing");
         await Page.Locator("#s2-apply-btn").ClickAsync();
         await Expect(RequiresEscort.Input).ToBeCheckedAsync(new() { Timeout = 5000 });
 
-        // Assisted Living → escort off
         await SelectCareLevelAndWait("Assisted Living");
         await Page.Locator("#s2-apply-btn").ClickAsync();
         await Expect(RequiresEscort.Input).Not.ToBeCheckedAsync(new() { Timeout = 5000 });
