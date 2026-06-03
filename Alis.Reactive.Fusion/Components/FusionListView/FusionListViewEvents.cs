@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionListViewEvents Instance = new FusionListViewEvents();
         private FusionListViewEvents() { }
 
-        /// <summary>Fires when a ListView item is selected (SF "select" event).</summary>
+        /// <summary>Fires when a ListView item is selected.</summary>
         public TypedEvent<FusionListViewSelectArgs> Selected =>
             new TypedEvent<FusionListViewSelectArgs>(
                 "select", new FusionListViewSelectArgs());

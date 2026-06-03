@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionDropDownButtonEvents Instance = new FusionDropDownButtonEvents();
         private FusionDropDownButtonEvents() { }
 
-        /// <summary>Fires after an action item is selected (SF "select" event).</summary>
+        /// <summary>Fires after an action item is selected.</summary>
         public TypedEvent<FusionDropDownButtonSelectArgs> Selected =>
             new TypedEvent<FusionDropDownButtonSelectArgs>(
                 "select", new FusionDropDownButtonSelectArgs());

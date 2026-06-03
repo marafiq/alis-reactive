@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionListBoxEvents Instance = new FusionListBoxEvents();
         private FusionListBoxEvents() { }
 
-        /// <summary>Fires when selected values change (SF "change" event).</summary>
+        /// <summary>Fires when selected values change.</summary>
         public TypedEvent<FusionListBoxChangeArgs> Changed =>
             new TypedEvent<FusionListBoxChangeArgs>(
                 "change", new FusionListBoxChangeArgs());

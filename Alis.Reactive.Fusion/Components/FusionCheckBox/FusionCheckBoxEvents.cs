@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionCheckBoxEvents Instance = new FusionCheckBoxEvents();
         private FusionCheckBoxEvents() { }
 
-        /// <summary>Fires when the checkbox state changes (SF "change" event).</summary>
+        /// <summary>Fires when the checkbox state changes.</summary>
         public TypedEvent<FusionCheckBoxChangeArgs> Changed =>
             new TypedEvent<FusionCheckBoxChangeArgs>(
                 "change", new FusionCheckBoxChangeArgs());

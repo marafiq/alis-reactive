@@ -3,10 +3,6 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Typed event descriptors for the <see cref="FusionGrid"/> component.
     /// </summary>
-    /// <remarks>
-    /// Select an event via the <c>.Reactive()</c> lambda:
-    /// <c>.Reactive(evt =&gt; evt.DataStateChange, (args, p) =&gt; { ... })</c>.
-    /// </remarks>
     public sealed class FusionGridEvents
     {
         /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
@@ -15,7 +11,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Fires when the grid needs data (sort, page, filter).
-        /// SF "dataStateChange" event in custom binding mode.
+        /// Raised in custom binding mode.
         /// </summary>
         public TypedEvent<FusionGridDataStateChangeArgs> DataStateChange =>
             new TypedEvent<FusionGridDataStateChangeArgs>(
@@ -23,7 +19,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Fires when any toolbar item is clicked, including custom toolbar buttons.
-        /// SF "toolbarClick" event. Branch on <c>args.Item.Id</c> to handle a specific button.
+        /// Branch on <c>args.Item.Id</c> to handle a specific button.
         /// </summary>
         public TypedEvent<FusionGridToolbarClickArgs> ToolbarClick =>
             new TypedEvent<FusionGridToolbarClickArgs>(

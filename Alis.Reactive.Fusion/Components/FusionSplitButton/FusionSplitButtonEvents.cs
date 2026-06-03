@@ -9,12 +9,12 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionSplitButtonEvents Instance = new FusionSplitButtonEvents();
         private FusionSplitButtonEvents() { }
 
-        /// <summary>Fires after the primary SplitButton action is clicked (SF "click" event).</summary>
+        /// <summary>Fires after the primary SplitButton action is clicked.</summary>
         public TypedEvent<FusionSplitButtonClickArgs> Clicked =>
             new TypedEvent<FusionSplitButtonClickArgs>(
                 "click", new FusionSplitButtonClickArgs());
 
-        /// <summary>Fires after a secondary action item is selected (SF "select" event).</summary>
+        /// <summary>Fires after a secondary action item is selected.</summary>
         public TypedEvent<FusionSplitButtonSelectArgs> Selected =>
             new TypedEvent<FusionSplitButtonSelectArgs>(
                 "select", new FusionSplitButtonSelectArgs());

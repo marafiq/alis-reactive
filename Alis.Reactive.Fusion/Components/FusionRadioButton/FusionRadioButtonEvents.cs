@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionRadioButtonEvents Instance = new FusionRadioButtonEvents();
         private FusionRadioButtonEvents() { }
 
-        /// <summary>Fires when this radio button becomes selected (SF "change" event).</summary>
+        /// <summary>Fires when this radio button becomes selected.</summary>
         public TypedEvent<FusionRadioButtonChangeArgs> Changed =>
             new TypedEvent<FusionRadioButtonChangeArgs>(
                 "change", new FusionRadioButtonChangeArgs());

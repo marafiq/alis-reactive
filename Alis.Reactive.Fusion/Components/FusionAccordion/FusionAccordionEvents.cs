@@ -1,16 +1,15 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Events available on FusionAccordion.
-    /// Singleton instance — used with .Reactive() event selector lambda:
-    ///   .Reactive(evt => evt.Expanded, (args, p) => { ... })
+    /// Typed event descriptors for the <see cref="FusionAccordion"/> component.
     /// </summary>
     public sealed class FusionAccordionEvents
     {
+        /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
         public static readonly FusionAccordionEvents Instance = new FusionAccordionEvents();
         private FusionAccordionEvents() { }
 
-        /// <summary>Fires after a panel expands or collapses (SF "expanded" event).</summary>
+        /// <summary>Fires after a panel expands or collapses.</summary>
         public TypedEvent<FusionAccordionExpandedArgs> Expanded =>
             new TypedEvent<FusionAccordionExpandedArgs>(
                 "expanded", new FusionAccordionExpandedArgs());

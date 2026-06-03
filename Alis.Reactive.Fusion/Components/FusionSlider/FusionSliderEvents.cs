@@ -9,12 +9,12 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionSliderEvents Instance = new FusionSliderEvents();
         private FusionSliderEvents() { }
 
-        /// <summary>Fires when the scalar slider value changes (SF "change" event).</summary>
+        /// <summary>Fires when the scalar slider value changes.</summary>
         public TypedEvent<FusionSliderChangeArgs> Change =>
             new TypedEvent<FusionSliderChangeArgs>(
                 "change", new FusionSliderChangeArgs());
 
-        /// <summary>Fires after the scalar slider value changes (SF "changed" event).</summary>
+        /// <summary>Fires after the scalar slider value changes.</summary>
         public TypedEvent<FusionSliderChangeArgs> Changed =>
             new TypedEvent<FusionSliderChangeArgs>(
                 "changed", new FusionSliderChangeArgs());
