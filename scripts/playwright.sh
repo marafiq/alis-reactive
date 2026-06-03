@@ -4,6 +4,7 @@
 # Use this instead of raw `dotnet test` for browser tests. The wrapper makes both
 # filtered and full runs observable by printing the active filter, teeing live
 # output to a log, writing TRX/diagnostic artifacts, and enabling blame-hang.
+# Browser assets are built before dotnet test, never during the VSTest phase.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -26,6 +27,7 @@ Usage:
 Options:
   --filter <expr>       VSTest filter expression to pass through unchanged.
   --no-build            Skip the project build and run the existing binaries.
+                        Use after npm run build:all + dotnet build.
   --configuration <cfg> Build/test configuration. Defaults to Debug.
   --hang-timeout <dur>  Per-test blame-hang timeout. Defaults to 10m.
   -h, --help            Show this help.
@@ -117,10 +119,12 @@ if [ "$no_build" -eq 0 ]; then
 else
   echo "[playwright:runner] skipping build (--no-build)"
 fi
+echo "[playwright:runner] disabling VSTest-time browser asset rebuild"
 
 cmd=(
   dotnet test "$project"
   -c "$configuration"
+  -p:BuildReactiveBrowserAssets=false
   --no-build
   --nologo
   --logger "console;verbosity=detailed"

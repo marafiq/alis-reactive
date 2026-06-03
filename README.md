@@ -51,6 +51,9 @@ message telling you to run `npm run build:all`.
 
 Each script is a thin, order-correct wrapper over the commands documented in
 **[CLAUDE.md → Build & Run](CLAUDE.md#build--run)** — no hidden behavior.
+The full test script builds browser assets once before Playwright; the
+Playwright wrapper disables the project-level VSTest asset rebuild so filtered
+and full browser runs do not disappear into a second silent `npm run build:all`.
 
 ## Developing
 

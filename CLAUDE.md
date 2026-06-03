@@ -331,6 +331,12 @@ to `tests/Alis.Reactive.PlaywrightTests/TestResults/observable/`, emits TRX and
 VSTest diagnostic logs, and enables `--blame-hang` so a silent hang reports the
 last active test. During a run, progress lines look like:
 
+Browser assets are built before Playwright, not during VSTest. `scripts/test.sh`
+runs `npm run build:all` and `dotnet build`, then calls
+`scripts/playwright.sh --no-build`; the wrapper passes
+`-p:BuildReactiveBrowserAssets=false` to `dotnet test` so the Playwright project
+does not launch a second, silent `npm run build:all` during test discovery.
+
 ```text
 [playwright:start] ... Alis.Reactive.PlaywrightTests.SomeSlice.some_test
 [playwright:end]   ... Passed elapsed=... Alis.Reactive.PlaywrightTests.SomeSlice.some_test
