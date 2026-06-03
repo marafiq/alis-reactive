@@ -10,6 +10,10 @@ using Microsoft.AspNetCore.Html;
 
 namespace Alis.Reactive.Native.Components
 {
+    /// <summary>
+    /// Builds the anchor element returned by <c>NativeActionLink</c>.
+    /// </summary>
+    /// <typeparam name="TModel">The view model type for the Razor view.</typeparam>
     public sealed class NativeActionLinkBuilder<TModel> :
 #if NET48
         IHtmlString
@@ -33,12 +37,32 @@ namespace Alis.Reactive.Native.Components
             _payloadJson = payloadJson ?? throw new ArgumentNullException(nameof(payloadJson));
         }
 
+        /// <summary>
+        /// Sets the anchor's <c>class</c> attribute.
+        /// </summary>
+        /// <param name="css">The CSS class string to render on the anchor.</param>
+        /// <returns>The current builder.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="css"/> is <c>null</c>.</exception>
         public NativeActionLinkBuilder<TModel> CssClass(string css)
         {
             _cssClass = css ?? throw new ArgumentNullException(nameof(css));
             return this;
         }
 
+        /// <summary>
+        /// Adds or replaces a non-reserved HTML attribute on the anchor.
+        /// </summary>
+        /// <remarks>
+        /// Use <c>Attr("class", value)</c> or <see cref="CssClass"/> for CSS classes.
+        /// The generated <c>id</c>, <c>href</c>, and <c>data-reactive-link</c> attributes
+        /// are reserved because they bind the anchor to the reactive runtime.
+        /// </remarks>
+        /// <param name="name">The attribute name.</param>
+        /// <param name="value">The attribute value to encode and render.</param>
+        /// <returns>The current builder.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is blank.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when <paramref name="name"/> is reserved by NativeActionLink.</exception>
         public NativeActionLinkBuilder<TModel> Attr(string name, string value)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -58,6 +82,7 @@ namespace Alis.Reactive.Native.Components
         }
 
 #if NET48
+        /// <inheritdoc />
         public string ToHtmlString()
         {
             var sw = new StringWriter();
@@ -66,6 +91,7 @@ namespace Alis.Reactive.Native.Components
         }
 #endif
 
+        /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             writer.Write("<a");
