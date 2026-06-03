@@ -353,6 +353,15 @@ Review cycle before every commit:
   directly. Do not change visibility in a readability-only pass. A later
   API-visibility slice should verify cross-assembly usage, generated-doc intent,
   and binary/API compatibility before deciding whether it should remain public.
+- `tests/Alis.Reactive.PlaywrightTests/Patterns/Cascading/WhenParentSelectionFiltersDependentList.cs`:
+  keep the removed rapid country-switch scenario out of this readability pass.
+  The note is a real behavior-test design concern, not a reason to keep brittle
+  inline test history. Syncfusion keyboard navigation can emit intermediate
+  change events while moving through items, which creates racing cascade HTTP
+  requests. A later flakiness slice should design behavior-focused coverage for
+  "latest selection wins" or request cancellation/staleness handling from the
+  DSL/runtime boundary, then prove it with stable Playwright or lower-level
+  runtime tests. Do not reintroduce rapid browser interaction as a timing race.
 
 ## Out Of Scope For The First Slice
 
