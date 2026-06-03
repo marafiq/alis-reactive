@@ -10,11 +10,9 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
     {
         await NavigateTo("/Sandbox/HttpPipeline/Http");
         await WaitForTraceMessage("booted", 10000);
-        // Wait for DomReady GET to complete before interacting
+        // Wait for the DomReady GET to complete before interacting.
         await Expect(Page.Locator("#load-first")).Not.ToHaveTextAsync("—", new() { Timeout = 15000 });
     }
-
-    // ── Section 12: Standalone GET with literal headers ──────────
 
     [Test]
     public async Task literal_headers_arrive_at_server()
@@ -59,8 +57,6 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 13: Chained requests each carry different headers ─
-
     [Test]
     public async Task chained_first_request_carries_its_headers()
     {
@@ -82,7 +78,7 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
 
         await ClickButton("Chain with Headers");
 
-        // Second request only fires after first completes — both carry separate headers
+        // The second request only fires after the first completes; each carries separate headers.
         await Expect(Page.Locator("#header-chain-second-version"))
             .ToHaveTextAsync("chain-v2", new() { Timeout = 5000 });
         await Expect(Page.Locator("#header-chain-second-tenant"))
@@ -102,8 +98,6 @@ public class WhenCustomHeadersSent : PlaywrightTestBase
         await Expect(Page.Locator("#header-chain-spinner")).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
-
-    // ── Section 14: Parallel requests each carry independent headers ─
 
     [Test]
     public async Task parallel_request_a_carries_its_headers()

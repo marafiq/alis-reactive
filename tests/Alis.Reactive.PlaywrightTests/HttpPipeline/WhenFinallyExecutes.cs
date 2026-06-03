@@ -1,8 +1,8 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline;
 
 /// <summary>
-/// Verifies that .Finally() cleanup commands execute after HTTP requests
-/// regardless of success, error, or network failure.
+/// .Finally() cleanup commands execute after HTTP success, routed errors,
+/// unmatched statuses, and network failures.
 /// </summary>
 [TestFixture]
 public class WhenFinallyExecutes : PlaywrightTestBase
@@ -17,8 +17,6 @@ public class WhenFinallyExecutes : PlaywrightTestBase
             "#load-first");
     }
 
-    // ── Finally on Success ──────────────────────────────────
-
     [Test]
     public async Task finally_hides_spinner_after_successful_save()
     {
@@ -30,8 +28,6 @@ public class WhenFinallyExecutes : PlaywrightTestBase
         await Expect(Page.Locator("#finally-result")).ToHaveTextAsync("Saved successfully!");
         AssertNoConsoleErrors();
     }
-
-    // ── Finally on Error ────────────────────────────────────
 
     [Test]
     public async Task finally_hides_spinner_after_server_500()
@@ -45,8 +41,6 @@ public class WhenFinallyExecutes : PlaywrightTestBase
             .ToContainTextAsync("Server error (500)");
         AssertNoConsoleErrorsExcept("500", "http");
     }
-
-    // ── Finally on Unhandled Status (THE BUG from issue #88) ──
 
     [Test]
     public async Task finally_hides_spinner_when_no_error_route_matches()
@@ -68,8 +62,6 @@ public class WhenFinallyExecutes : PlaywrightTestBase
         await Expect(Page.Locator("#finally-spinner")).ToBeHiddenAsync();
         AssertNoConsoleErrorsExcept("502", "http");
     }
-
-    // ── Finally on Network Error ────────────────────────────
 
     [Test]
     public async Task finally_hides_spinner_on_network_error()
