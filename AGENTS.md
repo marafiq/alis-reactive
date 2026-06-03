@@ -188,20 +188,27 @@ only pin helper classes, old JSON shape, stale vocabulary, or internal syntax.
 
 A module is closed only when tests prove the matrix rows for that module.
 
-Playwright tests must be run through `scripts/playwright.sh` so filtered and full
-runs are observable. The script prints the exact filter, writes live logs/TRX/diag
-artifacts under `tests/Alis.Reactive.PlaywrightTests/TestResults/observable/`,
-and each test emits `[playwright:start]` and `[playwright:end]` progress markers.
-Browser assets must be built before Playwright, not inside VSTest. Full gate:
-`npm run typecheck` -> `npm run build:all` -> `npm test` -> `dotnet build` ->
-`scripts/playwright.sh --no-build`.
+Use `docs/developer-cli.md` as the canonical build, test, Playwright, and pack
+command guide. Use root wrappers instead of ad hoc command sequences:
 
-Use `--no-build` only after fresh assets and a fresh C# build. The wrapper
-rejects stale C#/Razor test binaries and stale runtime, validation, CSS, or
-sandbox asset outputs.
-If output appears stuck, use the most recent `[playwright:start]` line as the
-active test and re-run it with `scripts/playwright.sh --filter "..."`
-instead of starting another raw `dotnet test` session.
+```text
+scripts/doctor.sh
+scripts/build.sh
+scripts/run.sh
+scripts/test.sh
+scripts/playwright.sh --filter "..."
+scripts/pack.sh <version>
+```
+
+Playwright must run through `scripts/playwright.sh`, not raw `dotnet test`. Full
+gate order is `npm run typecheck` -> `npm run build:all` -> `npm test` ->
+`dotnet build` -> `scripts/playwright.sh --no-build`. The wrapper prints active
+test markers, writes live log/TRX/diag artifacts, and rejects stale browser
+assets or stale `--no-build` binaries.
+
+For UI work, use `docs/developer-cli.md#ui-developer-workflows` to choose the
+right watcher, distinguish framework-shipped assets from sandbox-only assets,
+and pick a narrow Playwright proof before the full gate.
 
 ## Deletion Rule
 

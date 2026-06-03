@@ -22,54 +22,70 @@ runtimes (bridged by `#if` shims, never a divergent API). `Alis.Reactive.Fusion`
 
 Prerequisites: **.NET SDK 10.0.x** and **Node.js 22+**.
 
-A fresh clone has no installed dependencies and no built bundles. Run these
-three commands from the repo root, **in order**:
+A fresh clone has no installed dependencies and no built bundles. Run these from
+the repo root:
 
 ```bash
-npm ci                                          # 1. install JS dependencies
-npm run build:all                               # 2. build the JS/CSS bundles
-dotnet run --project Alis.Reactive.SandboxApp    # 3. start the sandbox
+scripts/doctor.sh
+scripts/build.sh
+scripts/run.sh
 ```
 
 Open **http://localhost:5220** — the sandbox home page is the index of component demos.
 
-Order matters: the sandbox serves the bundles produced by `build:all` and
-refuses to start without them. If you skip step 2, startup throws with a
-message telling you to run `npm run build:all`.
+`scripts/build.sh` installs npm dependencies if needed, builds the browser
+bundles, and runs `dotnet build`. `scripts/run.sh` rebuilds bundles before
+starting the sandbox so it does not serve stale browser assets.
 
-### One-shot scripts
+### CLI Commands
 
-`scripts/` wraps the canonical commands so you do not have to remember the order:
+`docs/developer-cli.md` is the canonical command guide. The root wrappers keep
+build, test, Playwright, and packaging order explicit:
 
 | Script | What it does |
 |--------|--------------|
+| `scripts/doctor.sh` | read-only CLI preflight: tools, script executability, restore/build-output hints, git status |
 | `scripts/build.sh` | JS deps (if missing) → framework bundles → both-TFM C# build |
 | `scripts/run.sh` | bundles → start the sandbox at `http://localhost:5220` |
 | `scripts/test.sh` | full gate: contract drift typecheck -> browser asset build -> vitest -> both-TFM build -> observable Playwright (`--no-e2e` skips the browser leg) |
 | `scripts/playwright.sh` | observable Playwright runner with filter support, live logs, TRX, diagnostics, active-test progress markers, stale `--no-build` detection, and stale browser asset detection |
 | `scripts/pack.sh <version>` | delivery: bundles → Release build → pack the six library NuGets to `./nupkgs` |
 
-Each script is a thin, order-correct wrapper over the commands documented in
-**[CLAUDE.md → Build & Run](CLAUDE.md#build--run)** — no hidden behavior.
-The full test script builds browser assets once before Playwright; the
-Playwright wrapper disables the project-level VSTest asset rebuild so filtered
-and full browser runs do not disappear into a second silent `npm run build:all`.
+Every wrapper supports `--help`. See **[docs/developer-cli.md](docs/developer-cli.md)**
+for filtered Playwright examples, first-time browser install, packaging, and the
+change-to-command matrix.
 
 ## Developing
 
-Three terminals give a live edit/refresh loop:
+For UI work, use the sandbox as the visual workbench. Build once, then start the
+sandbox:
 
 ```bash
-npm run watch:runtime                            # framework JS  — rebuild on .ts edit
-npm run watch:design-system                      # framework CSS — rebuild on .css edit
+scripts/build.sh
+scripts/run.sh
+```
+
+For a live edit/refresh loop, run the watcher that owns the asset you are
+editing:
+
+```bash
+npm run watch:runtime                            # framework runtime TS
+npm run watch:design-system                      # framework design-system CSS
+npm run watch:fusion                             # framework Fusion CSS
+npm run watch:sandbox-plugins                    # sandbox-only plugin JS
+npm run watch:sandbox-css                        # sandbox-only CSS
 dotnet watch --project Alis.Reactive.SandboxApp  # Razor + C# hot reload
 ```
 
-- Edit `.ts` / `.css` under `Alis.Reactive.Assets/` → save → **browser refresh**. No restart.
-- Edit `.cshtml` / `.cs` → `dotnet watch` hot-reloads automatically.
+Refresh the browser after TS/CSS watcher output changes. Razor and C# changes
+flow through `dotnet watch`. UI proof usually starts with a narrow browser test,
+for example:
 
-The full command reference — every build, test, and pack command — lives in
-**[CLAUDE.md → Build & Run](CLAUDE.md#build--run)**, the canonical guide.
+```bash
+scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion"
+```
+
+The full command reference lives in **[docs/developer-cli.md](docs/developer-cli.md)**.
 
 ## How the bundles ship
 
