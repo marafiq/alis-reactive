@@ -6,25 +6,22 @@ using System.Text;
 namespace Alis.Reactive.Fusion.Templates
 {
     /// <summary>
-    /// Builds content emitted inside a Syncfusion template <c>When</c> or <c>ShowIf</c> block.
+    /// Builds the content emitted inside a Syncfusion template conditional block.
     /// </summary>
-    /// <typeparam name="TModel">The model exposed by the Syncfusion template context.</typeparam>
+    /// <typeparam name="TModel">The object shape exposed by the Syncfusion template context.</typeparam>
     public class FusionConditionalBuilder<TModel>
     {
         private readonly List<Func<string>> _children = new List<Func<string>>();
 
         /// <summary>
-        /// Adds a span whose content is bound to a template model property.
+        /// Adds a <c>span</c> bound to a template model property.
         /// </summary>
-        /// <param name="property">The model property rendered as span content.</param>
         public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property) =>
             Span(property, TemplateCss.None);
 
         /// <summary>
-        /// Adds a span whose content is bound to a template model property.
+        /// Adds a styled <c>span</c> bound to a template model property.
         /// </summary>
-        /// <param name="property">The model property rendered as span content.</param>
-        /// <param name="css">The CSS class added to the span.</param>
         public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, string css) =>
             Span(property, TemplateCss.Class(css));
 
@@ -35,17 +32,14 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a span with static text content.
+        /// Adds a <c>span</c> with static text.
         /// </summary>
-        /// <param name="text">The text rendered as span content.</param>
         public FusionConditionalBuilder<TModel> Span(string text) =>
             Span(text, TemplateCss.None);
 
         /// <summary>
-        /// Adds a span with static text content.
+        /// Adds a styled <c>span</c> with static text.
         /// </summary>
-        /// <param name="text">The text rendered as span content.</param>
-        /// <param name="css">The CSS class added to the span.</param>
         public FusionConditionalBuilder<TModel> Span(string text, string css) =>
             Span(text, TemplateCss.Class(css));
 
@@ -58,8 +52,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a badge whose content is bound to a template model property.
         /// </summary>
-        /// <param name="property">The model property rendered as badge content.</param>
-        /// <param name="css">The CSS class added to the badge.</param>
         public FusionConditionalBuilder<TModel> Badge<TProperty>(Expression<Func<TModel, TProperty>> property, string css = "e-badge")
         {
             _children.Add(() => TemplateElements.Badge(FusionTemplateExpression.ToBinding(property), css));
@@ -67,10 +59,8 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a badge with static text content.
+        /// Adds a badge with static text.
         /// </summary>
-        /// <param name="text">The text rendered as badge content.</param>
-        /// <param name="css">The CSS class added to the badge.</param>
         public FusionConditionalBuilder<TModel> Badge(string text, string css = "e-badge")
         {
             _children.Add(() => TemplateElements.Badge(text, css));
@@ -78,17 +68,14 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a Syncfusion icon span.
+        /// Adds a Syncfusion icon <c>span</c>.
         /// </summary>
-        /// <param name="iconName">The Syncfusion icon class name.</param>
         public FusionConditionalBuilder<TModel> Icon(string iconName) =>
             Icon(iconName, TemplateCss.None);
 
         /// <summary>
-        /// Adds a Syncfusion icon span.
+        /// Adds a styled Syncfusion icon <c>span</c>.
         /// </summary>
-        /// <param name="iconName">The Syncfusion icon class name.</param>
-        /// <param name="css">The additional CSS class added to the icon span.</param>
         public FusionConditionalBuilder<TModel> Icon(string iconName, string css) =>
             Icon(iconName, TemplateCss.Class(css));
 
@@ -99,9 +86,8 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds nested div content using a template builder.
+        /// Adds a nested template <c>div</c> over the same Syncfusion model context.
         /// </summary>
-        /// <param name="configure">Configures the nested template content.</param>
         public FusionConditionalBuilder<TModel> Div(Action<FusionTemplateBuilder<TModel>> configure)
         {
             var nested = new FusionTemplateBuilder<TModel>();
@@ -111,17 +97,14 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds an image whose source is bound to a template model property.
+        /// Adds an <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
-        /// <param name="srcProperty">The model property rendered as the image source.</param>
         public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty) =>
             Img(srcProperty, TemplateCss.None);
 
         /// <summary>
-        /// Adds an image whose source is bound to a template model property.
+        /// Adds a styled <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
-        /// <param name="srcProperty">The model property rendered as the image source.</param>
-        /// <param name="css">The CSS class added to the image.</param>
         public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css) =>
             Img(srcProperty, TemplateCss.Class(css));
 
@@ -135,21 +118,16 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a button element.
-        /// The <paramref name="onClick"/> value is injected directly into the onclick
-        /// attribute — do not pass untrusted input.
+        /// Adds a button with a raw <c>onclick</c> expression.
         /// </summary>
-        /// <param name="text">The button text.</param>
-        /// <param name="onClick">The JavaScript onclick expression emitted into the template.</param>
+        /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
         public FusionConditionalBuilder<TModel> Button(string text, string onClick) =>
             Button(text, onClick, TemplateCss.None);
 
         /// <summary>
-        /// Adds a button element with a CSS class.
+        /// Adds a styled button with a raw <c>onclick</c> expression.
         /// </summary>
-        /// <param name="text">The button text.</param>
-        /// <param name="onClick">The JavaScript onclick expression emitted into the template.</param>
-        /// <param name="css">The CSS class added to the button.</param>
+        /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
         public FusionConditionalBuilder<TModel> Button(string text, string onClick, string css) =>
             Button(text, onClick, TemplateCss.Class(css));
 
@@ -160,13 +138,8 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a button that dispatches a custom event with the row ID.
-        /// Uses <c>&amp;quot;</c> for event name quoting to survive SF template engine
-        /// single-to-double quote conversion.
+        /// Adds a button that dispatches a browser <c>CustomEvent</c> with a bound row ID.
         /// </summary>
-        /// <param name="text">The button text.</param>
-        /// <param name="eventName">The custom event name to dispatch.</param>
-        /// <param name="idProperty">The model property passed as the event detail.</param>
         public FusionConditionalBuilder<TModel> EventButton<TProperty>(
             string text,
             string eventName,
@@ -174,12 +147,8 @@ namespace Alis.Reactive.Fusion.Templates
             EventButton(text, eventName, idProperty, TemplateCss.None);
 
         /// <summary>
-        /// Adds a button that dispatches a custom event with the row ID and a CSS class.
+        /// Adds a styled button that dispatches a browser <c>CustomEvent</c> with a bound row ID.
         /// </summary>
-        /// <param name="text">The button text.</param>
-        /// <param name="eventName">The custom event name to dispatch.</param>
-        /// <param name="idProperty">The model property passed as the event detail.</param>
-        /// <param name="css">The CSS class added to the button.</param>
         public FusionConditionalBuilder<TModel> EventButton<TProperty>(
             string text,
             string eventName,
@@ -198,10 +167,9 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds raw HTML content. The <paramref name="html"/> value is emitted
-        /// without escaping — do not pass untrusted input.
+        /// Adds raw HTML to the template output.
         /// </summary>
-        /// <param name="html">The raw HTML emitted into the template.</param>
+        /// <remarks>The <paramref name="html"/> value is emitted without escaping; do not pass untrusted input.</remarks>
         public FusionConditionalBuilder<TModel> Raw(string html)
         {
             _children.Add(() => html);
