@@ -166,8 +166,7 @@ describe("array-op ops over an empty source", () => {
   it("sum is 0", () => expect(evaluateValue(op({ op: "sum", projection: memberRead("balance", numberShape), shape: numberShape }), plan())).toBe(0));
   it("any(predicate) is false", () => expect(evaluateValue(op({ op: "any", predicate: pred, shape: { kind: "boolean" } }), plan())).toBe(false));
   it("any() is false", () => expect(evaluateValue(op({ op: "any", shape: { kind: "boolean" } }), plan())).toBe(false));
-  // Vacuous truth: All over an empty set is true (matches Array.every). Documented so authors aren't surprised.
-  it("all(predicate) is vacuously true", () => expect(evaluateValue(op({ op: "all", predicate: pred, shape: { kind: "boolean" } }), plan())).toBe(true));
+  it("all(predicate) is vacuously true like Array.every", () => expect(evaluateValue(op({ op: "all", predicate: pred, shape: { kind: "boolean" } }), plan())).toBe(true));
   it("find is null", () => expect(evaluateValue(op({ op: "find", predicate: pred, shape: rawShape }), plan())).toBeNull());
   it("orderBy is []", () => expect(evaluateValue(op({ op: "orderBy", projection: memberRead("age", numberShape), shape: { kind: "array", item: rawShape } }), plan())).toEqual([]));
 });
