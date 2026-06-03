@@ -3,13 +3,14 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
-    /// Provides typed comparison operators for a value source in a condition.
+    /// Provides comparison operators for a typed value source in a condition.
     /// </summary>
     /// <remarks>
     /// Obtained via <c>p.When(source)</c> or <c>p.When(args, x =&gt; x.Prop)</c>.
-    /// Chain an operator (e.g. <c>.Eq(5)</c>, <c>.Truthy()</c>) to produce a <see cref="GuardBuilder{TModel}"/>.
+    /// Chain an operator such as <c>.Eq(5)</c> or <c>.Truthy()</c> to produce a
+    /// <see cref="GuardBuilder{TModel}"/>.
     /// </remarks>
-    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TModel">The view model that owns the guarded pipeline.</typeparam>
     /// <typeparam name="TProp">The source value type, providing compile-time operator type safety.</typeparam>
     public sealed class ConditionSourceBuilder<TModel, TProp> where TModel : class
     {
@@ -44,7 +45,6 @@ namespace Alis.Reactive.Builders.Conditions
             _composeCondition = composeCondition ?? throw new System.ArgumentNullException(nameof(composeCondition));
         }
 
-        // Comparison operators (typed operand)
         /// <summary>True when the source value equals <paramref name="operand"/>.</summary>
         public GuardBuilder<TModel> Eq(TProp operand) => BuildLiteral(CompareOperator.Eq, operand);
         /// <summary>True when the source value does not equal <paramref name="operand"/>.</summary>
@@ -58,7 +58,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>True when the source value is less than or equal to <paramref name="operand"/>.</summary>
         public GuardBuilder<TModel> Lte(TProp operand) => BuildLiteral(CompareOperator.Lte, operand);
 
-        // Presence operators
         /// <summary>True when the source value is truthy (non-null, non-zero, non-empty).</summary>
         public GuardBuilder<TModel> Truthy() => BuildUnary(CompareOperator.Truthy);
         /// <summary>True when the source value is falsy (null, zero, or empty).</summary>
@@ -72,18 +71,15 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>True when the source value is not empty.</summary>
         public GuardBuilder<TModel> NotEmpty() => BuildUnary(CompareOperator.NotEmpty);
 
-        // Membership
         /// <summary>True when the source value is in the specified set.</summary>
         public GuardBuilder<TModel> In(params TProp[] values) => BuildArray(CompareOperator.In, values);
         /// <summary>True when the source value is not in the specified set.</summary>
         public GuardBuilder<TModel> NotIn(params TProp[] values) => BuildArray(CompareOperator.NotIn, values);
 
-        // Range
         /// <summary>True when the source value is between <paramref name="low"/> and <paramref name="high"/> inclusive.</summary>
         public GuardBuilder<TModel> Between(TProp low, TProp high) =>
             Build(CompareOperator.Between, RangeOperands(low, high));
 
-        // Text operators
         /// <summary>True when the source string contains the substring.</summary>
         public GuardBuilder<TModel> Contains(string substring) =>
             BuildTextLiteral(CompareOperator.Contains, substring);
@@ -100,14 +96,12 @@ namespace Alis.Reactive.Builders.Conditions
         public GuardBuilder<TModel> MinLength(int length) =>
             Build(CompareOperator.MinLength, MinimumLengthOperands(length));
 
-        // Array
         /// <summary>True when the source array contains the specified item.</summary>
         public GuardBuilder<TModel> ArrayContains(object item)
         {
             return Build(CompareOperator.ArrayContains, CollectionItemOperands(item));
         }
 
-        // Source-vs-source comparison
         /// <summary>True when the source value equals another typed source value.</summary>
         public GuardBuilder<TModel> Eq(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Eq, right);
         /// <summary>True when the source value does not equal another typed source value.</summary>

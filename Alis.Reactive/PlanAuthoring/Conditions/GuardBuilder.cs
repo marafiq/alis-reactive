@@ -6,12 +6,13 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
-    /// Composes conditions with And/Or/Not and branches with Then/ElseIf/Else.
+    /// Represents a completed condition expression that can be composed further or attached to a branch.
     /// </summary>
     /// <remarks>
-    /// Obtained after a comparison operator: <c>p.When(source).Gt(5).Then(...).Else(...)</c>.
+    /// Created after a comparison operator, for example
+    /// <c>p.When(source).Gt(5).Then(...).Else(...)</c>.
     /// </remarks>
-    /// <typeparam name="TModel">The view model type.</typeparam>
+    /// <typeparam name="TModel">The view model that owns the pipeline being guarded.</typeparam>
     public sealed class GuardBuilder<TModel> where TModel : class
     {
         internal ConditionGraph ConditionGraph { get; }
@@ -39,7 +40,7 @@ namespace Alis.Reactive.Builders.Conditions
             _continuation = continuation ?? throw new ArgumentNullException(nameof(continuation));
         }
 
-        /// <summary>Adds an AND condition from an event payload property.</summary>
+        /// <summary>Combines this guard with an event-payload comparison using <c>AND</c>.</summary>
         public ConditionSourceBuilder<TModel, TProp> And<TPayload, TProp>(
             TPayload payload, Expression<Func<TPayload, TProp>> path)
         {
@@ -48,7 +49,7 @@ namespace Alis.Reactive.Builders.Conditions
                 source, _continuation, ConditionComposition.All(ConditionGraph));
         }
 
-        /// <summary>Adds an AND condition from an HTTP response body property.</summary>
+        /// <summary>Combines this guard with an HTTP response-body comparison using <c>AND</c>.</summary>
         public ConditionSourceBuilder<TModel, TProp> And<TPayload, TProp>(
             ResponseBody<TPayload> responseBody, Expression<Func<TPayload, TProp>> path)
             where TPayload : class
@@ -58,7 +59,7 @@ namespace Alis.Reactive.Builders.Conditions
                 source, _continuation, ConditionComposition.All(ConditionGraph));
         }
 
-        /// <summary>Adds an OR condition from an event payload property.</summary>
+        /// <summary>Combines this guard with an event-payload comparison using <c>OR</c>.</summary>
         public ConditionSourceBuilder<TModel, TProp> Or<TPayload, TProp>(
             TPayload payload, Expression<Func<TPayload, TProp>> path)
         {
@@ -67,7 +68,7 @@ namespace Alis.Reactive.Builders.Conditions
                 source, _continuation, ConditionComposition.Any(ConditionGraph));
         }
 
-        /// <summary>Adds an OR condition from an HTTP response body property.</summary>
+        /// <summary>Combines this guard with an HTTP response-body comparison using <c>OR</c>.</summary>
         public ConditionSourceBuilder<TModel, TProp> Or<TPayload, TProp>(
             ResponseBody<TPayload> responseBody, Expression<Func<TPayload, TProp>> path)
             where TPayload : class
@@ -77,21 +78,21 @@ namespace Alis.Reactive.Builders.Conditions
                 source, _continuation, ConditionComposition.Any(ConditionGraph));
         }
 
-        /// <summary>Adds an AND condition from a typed source.</summary>
+        /// <summary>Combines this guard with another typed value source using <c>AND</c>.</summary>
         public ConditionSourceBuilder<TModel, TProp> And<TProp>(TypedSource<TProp> source)
         {
             return new ConditionSourceBuilder<TModel, TProp>(
                 source, _continuation, ConditionComposition.All(ConditionGraph));
         }
 
-        /// <summary>Adds an OR condition from a typed source.</summary>
+        /// <summary>Combines this guard with another typed value source using <c>OR</c>.</summary>
         public ConditionSourceBuilder<TModel, TProp> Or<TProp>(TypedSource<TProp> source)
         {
             return new ConditionSourceBuilder<TModel, TProp>(
                 source, _continuation, ConditionComposition.Any(ConditionGraph));
         }
 
-        /// <summary>Adds an AND condition built from a nested condition expression.</summary>
+        /// <summary>Combines this guard with a nested condition expression using <c>AND</c>.</summary>
         public GuardBuilder<TModel> And(
             Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
         {
@@ -102,7 +103,7 @@ namespace Alis.Reactive.Builders.Conditions
             return WrapCondition(PlanModel.ConditionGraph.All(terms.ToArray()));
         }
 
-        /// <summary>Adds an OR condition built from a nested condition expression.</summary>
+        /// <summary>Combines this guard with a nested condition expression using <c>OR</c>.</summary>
         public GuardBuilder<TModel> Or(
             Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
         {
@@ -120,9 +121,9 @@ namespace Alis.Reactive.Builders.Conditions
             return WrapCondition(PlanModel.ConditionGraph.Not(ConditionGraph));
         }
 
-        /// <summary>Executes the pipeline when the condition is true. Returns a branch builder for ElseIf/Else.</summary>
-        /// <param name="pipeline">Builds the commands to execute when the condition is met.</param>
-        /// <returns>A branch builder for chaining ElseIf and Else cases.</returns>
+        /// <summary>Starts the branch that executes when this guard evaluates to true.</summary>
+        /// <param name="pipeline">Builds the commands for the matching branch.</param>
+        /// <returns>A branch builder for optional <c>ElseIf</c> and <c>Else</c> cases.</returns>
         public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> pipeline)
         {
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
