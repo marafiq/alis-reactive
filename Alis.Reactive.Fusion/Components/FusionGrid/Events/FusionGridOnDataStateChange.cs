@@ -3,12 +3,11 @@ using System.Collections.Generic;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Event args for the SF Grid "dataStateChange" event.
-    /// Fires when the Grid needs data: on init, sort, page, or filter.
+    /// Event args for Syncfusion Grid's <c>dataStateChange</c> event.
     /// </summary>
     /// <remarks>
-    /// Top-level fields carry the FULL grid state on every event:
-    /// skip/take for paging, sorted[] for all active sort columns (multi-sort).
+    /// Top-level fields carry the full grid state on every event:
+    /// <c>skip</c>/<c>take</c> for paging and <c>sorted</c> for all active sort columns.
     /// Always send the full state to the server so paging preserves sort order.
     /// </remarks>
     public class FusionGridDataStateChangeArgs
@@ -31,7 +30,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Active search descriptors from Grid toolbar or public search method.</summary>
         public List<FusionGridSearchDescriptor>? Search { get; set; }
 
-        /// <summary>Action details: requestType, columnName, direction, currentPage.</summary>
+        /// <summary>Action details such as request type, column name, direction, and current page.</summary>
         public FusionGridAction Action { get; set; } = new FusionGridAction();
 
         public FusionGridDataStateChangeArgs() { }
@@ -39,14 +38,14 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>
     /// One sort column in the grid's sorted state.
-    /// SF uses lowercase direction: "ascending" / "descending".
+    /// Syncfusion uses lowercase direction values: <c>ascending</c> and <c>descending</c>.
     /// </summary>
     public class FusionGridSortColumn
     {
-        /// <summary>Field name (e.g., "name", "age").</summary>
+        /// <summary>Field name being sorted.</summary>
         public string Name { get; set; } = "";
 
-        /// <summary>Sort direction: "ascending" or "descending" (lowercase).</summary>
+        /// <summary>Sort direction: <c>ascending</c> or <c>descending</c>.</summary>
         public string Direction { get; set; } = "";
 
         public FusionGridSortColumn() { }
@@ -60,13 +59,13 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Field being filtered.</summary>
         public string? Field { get; set; }
 
-        /// <summary>Filter operator such as "contains", "equal", or "startswith".</summary>
+        /// <summary>Filter operator such as <c>contains</c>, <c>equal</c>, or <c>startswith</c>.</summary>
         public string? Operator { get; set; }
 
         /// <summary>Text value being filtered.</summary>
         public string? Value { get; set; }
 
-        /// <summary>Composite predicate condition such as "and" or "or".</summary>
+        /// <summary>Composite predicate condition such as <c>and</c> or <c>or</c>.</summary>
         public string? Condition { get; set; }
 
         /// <summary>Nested predicates when Syncfusion emits a composite Predicate.</summary>
@@ -98,7 +97,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Search text.</summary>
         public string? Key { get; set; }
 
-        /// <summary>Search operator such as "contains".</summary>
+        /// <summary>Search operator such as <c>contains</c>.</summary>
         public string? Operator { get; set; }
 
         /// <summary>Whether search is case-insensitive.</summary>
@@ -112,11 +111,11 @@ namespace Alis.Reactive.Fusion.Components
 
     /// <summary>
     /// Action details from the dataStateChange event.
-    /// Contains requestType plus context-specific parameters.
+    /// Contains <c>requestType</c> plus context-specific parameters.
     /// </summary>
     public class FusionGridAction
     {
-        /// <summary>SF Grid action type constants for use with When conditions.</summary>
+        /// <summary>Syncfusion Grid action type constants for use with <c>When</c> conditions.</summary>
         public const string Sorting = "sorting";
         public const string Paging = "paging";
         public const string Filtering = "filtering";
@@ -125,22 +124,22 @@ namespace Alis.Reactive.Fusion.Components
         public const string Ungrouping = "ungrouping";
         public const string Refresh = "refresh";
 
-        /// <summary>Gets or sets the request type (e.g. "sorting", "paging").</summary>
+        /// <summary>Syncfusion request type, such as <c>sorting</c> or <c>paging</c>.</summary>
         public string? RequestType { get; set; }
 
-        /// <summary>Gets or sets the column name being sorted (sorting actions only).</summary>
+        /// <summary>Column name for sorting actions.</summary>
         public string? ColumnName { get; set; }
 
-        /// <summary>Gets or sets the sort direction (sorting actions only).</summary>
+        /// <summary>Sort direction for sorting actions.</summary>
         public string? Direction { get; set; }
 
-        /// <summary>Gets or sets the current page number.</summary>
+        /// <summary>Current page number after the action.</summary>
         public int CurrentPage { get; set; }
 
-        /// <summary>Gets or sets the previous page number.</summary>
+        /// <summary>Previous page number before the action.</summary>
         public int PreviousPage { get; set; }
 
-        /// <summary>Gets or sets the page size.</summary>
+        /// <summary>Current page size.</summary>
         public int PageSize { get; set; }
 
         public FusionGridAction() { }
