@@ -11,22 +11,13 @@ using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionMultiC
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a FusionMultiColumnComboBox inside a field wrapper, bound to a model property.
+    /// Adds typed field mapping and rendering helpers for <see cref="FusionMultiColumnComboBox"/>.
     /// </summary>
-    /// <remarks>
-    /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Facility)</c>, then call
-    /// <c>.FusionMultiColumnComboBox(b =&gt; { b.Fields&lt;Item&gt;(t =&gt; t.Text, v =&gt; v.Value); })</c>.
-    /// </remarks>
     public static class FusionMultiColumnComboBoxHtmlExtensions
     {
         /// <summary>
-        /// Configures text and value field mappings using typed expressions.
+        /// Maps display text and selected value fields using typed item expressions.
         /// </summary>
-        /// <typeparam name="TItem">The data source item type.</typeparam>
-        /// <param name="builder">The Fusion builder.</param>
-        /// <param name="text">Expression selecting the display text property.</param>
-        /// <param name="value">Expression selecting the value property.</param>
-        /// <returns>The builder for method chaining.</returns>
         public static MultiColumnComboBoxBuilder Fields<TItem>(
             this MultiColumnComboBoxBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -40,14 +31,8 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Configures text, value, and group-by field mappings using typed expressions.
+        /// Maps display text, selected value, and grouping fields using typed item expressions.
         /// </summary>
-        /// <typeparam name="TItem">The data source item type.</typeparam>
-        /// <param name="builder">The Fusion builder.</param>
-        /// <param name="text">Expression selecting the display text property.</param>
-        /// <param name="value">Expression selecting the value property.</param>
-        /// <param name="groupBy">Expression selecting the grouping property.</param>
-        /// <returns>The builder for method chaining.</returns>
         public static MultiColumnComboBoxBuilder Fields<TItem>(
             this MultiColumnComboBoxBuilder builder,
             Expression<Func<TItem, object?>> text,
@@ -63,12 +48,8 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Renders a FusionMultiColumnComboBox bound to the field's model property.
+        /// Renders a FusionMultiColumnComboBox bound to the field wrapper's model property.
         /// </summary>
-        /// <typeparam name="TModel">The view model type.</typeparam>
-        /// <typeparam name="TProp">The bound property type.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the FusionMultiColumnComboBox (columns, data source, etc.).</param>
         public static void FusionMultiColumnComboBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<MultiColumnComboBoxBuilder> build)

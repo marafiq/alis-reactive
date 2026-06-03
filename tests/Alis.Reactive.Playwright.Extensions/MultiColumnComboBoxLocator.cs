@@ -3,18 +3,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for FusionMultiColumnComboBox.
-/// Like DropDownList — click wrapper to open, type text to filter, Enter to select.
-/// Does NOT provide assertions — the test decides what to verify.
-///
-/// Usage:
-///   var mccb = plan.MultiColumnComboBox(m => m.FacilityId);
-///
-///   // Gesture
-///   await mccb.Select("Sunrise Manor");
-///
-///   // Surface → test asserts
-///   await Expect(mccb.Input).ToHaveValueAsync("Sunrise Manor");
+/// Locator surface for the Syncfusion MultiColumnComboBox DOM used by Playwright tests.
 /// </summary>
 public sealed class MultiColumnComboBoxLocator
 {
@@ -27,25 +16,18 @@ public sealed class MultiColumnComboBoxLocator
         _componentId = componentId;
     }
 
-    // ─── Surfaces — What the User Sees ───
-
-    /// <summary>The combo box input field.</summary>
     public ILocator Input => _page.Locator($"#{_componentId}");
 
-    /// <summary>The wrapper element around the input.</summary>
     public ILocator Wrapper => Input.Locator("xpath=..");
 
-    // ─── Gestures — What the User Does ───
-
-    /// <summary>Click the wrapper to focus/open the dropdown.</summary>
     public async Task Focus() => await Wrapper.ClickWhenStableAsync(_page);
 
     /// <summary>
-    /// Select by typing text then Enter. SF highlights the match, Enter confirms.
-    /// Text-based — immune to item reordering. Fires change event reliably.
+    /// Selects by typing text and pressing Enter so row ordering does not affect the gesture.
     /// </summary>
     public async Task Select(string text)
     {
+        // Clear prior focus before opening; Syncfusion keeps popup/focus state internally.
         await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
         await Focus();
         await _page.Keyboard.TypeAsync(text);
