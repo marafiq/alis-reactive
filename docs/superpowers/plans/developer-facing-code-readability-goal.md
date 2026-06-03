@@ -267,15 +267,19 @@ Initial broad inventory on this branch:
 Expanded commit boundaries:
 
 1. Playwright tests: one behavior area per commit, verified with the matching
-   `scripts/playwright.sh --filter ...` and `scripts/test.sh --no-e2e` when the
-   slice affects test compilation.
+   `scripts/playwright.sh --filter ...` only when helper extraction, selectors,
+   assertions, timing, or test flow changes. Pure comment removal does not
+   warrant e2e; `git diff --check` is enough, with a build only if syntax or XML
+   documentation could be affected.
 2. Public C# XML docs: one API/component family per commit, verified with
    `dotnet build` or `scripts/test.sh --no-e2e` depending on scope.
 3. Sandbox Razor DSL comments: one route or feature page per commit, verified
    by the matching Playwright route when behavior is browser-visible.
 4. Runtime TypeScript: one runtime module per commit, verified with
-   `npm run typecheck`, `npm test`, and `npm run build:all`; add focused
-   Playwright only when runtime behavior code changes.
+   `npm run typecheck` when TS syntax, names, or comments that can affect
+   documentation tooling change. Add `npm test` or `npm run build:all` only for
+   executable runtime edits. Add focused Playwright only when browser-visible
+   runtime behavior changes.
 5. Tools/examples/native/design-system: one project-sized cleanup per commit
    when the project is small, verified with a build covering the project.
 
