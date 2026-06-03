@@ -2,10 +2,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
 /// Exercises NativeTextBox API end-to-end in the browser:
-/// property writes (SetValue), property reads (Value as source),
-/// reactive events (Changed with typed condition), and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/NativeTextBox
+/// property writes (<c>SetValue</c>), property reads (<c>Value</c> as source),
+/// reactive events (<c>Changed</c> with typed condition), and component-read conditions.
 /// </summary>
 [TestFixture]
 public class WhenTextInputChanges : PlaywrightTestBase
@@ -19,8 +17,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
     }
 
-    // ── Page loads ──
-
     [Test]
     public async Task page_loads_without_errors()
     {
@@ -28,8 +24,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
         await Expect(Page).ToHaveTitleAsync("NativeTextBox — Alis.Reactive Sandbox");
         AssertNoConsoleErrors();
     }
-
-    // ── Section 1: Property Write — DomReady sets resident name ──
 
     [Test]
     public async Task domready_sets_initial_resident_name()
@@ -41,8 +35,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 2: Property Read — DomReady reads resident name into echo ──
-
     [Test]
     public async Task value_echoed_from_component_read()
     {
@@ -53,8 +45,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 3: Changed event with typed condition ──
-
     [Test]
     public async Task changed_event_with_condition_shows_contact_status()
     {
@@ -62,9 +52,8 @@ public class WhenTextInputChanges : PlaywrightTestBase
 
         var input = Page.Locator($"#{Scope}EmergencyContact");
 
-        // Type a contact name — triggers Changed with non-empty value
         await input.FillAsync("John Smith");
-        // FillAsync dispatches "input" but we need "change" — blur the field
+        // FillAsync dispatches input, but this test needs the change event.
         await input.BlurAsync();
 
         var status = Page.Locator("#contact-status");
@@ -79,7 +68,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
 
         var input = Page.Locator($"#{Scope}EmergencyContact");
 
-        // First fill, then clear to trigger empty condition
         await input.FillAsync("John Smith");
         await input.BlurAsync();
         await input.ClearAsync();
@@ -90,18 +78,14 @@ public class WhenTextInputChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 4: Component value condition ──
-
     [Test]
     public async Task component_value_condition_warns_when_empty()
     {
         await NavigateAndBoot();
 
-        // Clear the resident name that was set by DomReady
         var input = Page.Locator($"#{Scope}ResidentName");
         await input.ClearAsync();
 
-        // Click the button that checks resident name
         await Page.Locator("#check-name-btn").ClickAsync();
 
         var warning = Page.Locator("#name-warning");
@@ -114,15 +98,13 @@ public class WhenTextInputChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // DomReady already set the name — just click check
+        // DomReady already set the value under test.
         await Page.Locator("#check-name-btn").ClickAsync();
 
         var warning = Page.Locator("#name-warning");
         await Expect(warning).ToHaveTextAsync("name set", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Deep BDD: reactive re-evaluation cycles ──
 
     [Test]
     public async Task typing_then_clearing_then_retyping_fires_condition_each_time()
@@ -132,17 +114,14 @@ public class WhenTextInputChanges : PlaywrightTestBase
         var input = Page.Locator($"#{Scope}EmergencyContact");
         var status = Page.Locator("#contact-status");
 
-        // Cycle 1: type a contact → "contact provided"
         await input.FillAsync("Alice Johnson");
         await input.BlurAsync();
         await Expect(status).ToHaveTextAsync("contact provided", new() { Timeout = 3000 });
 
-        // Cycle 2: clear → "contact required"
         await input.ClearAsync();
         await input.BlurAsync();
         await Expect(status).ToHaveTextAsync("contact required", new() { Timeout = 3000 });
 
-        // Cycle 3: retype → "contact provided" again
         await input.FillAsync("Bob Martinez");
         await input.BlurAsync();
         await Expect(status).ToHaveTextAsync("contact provided", new() { Timeout = 3000 });
@@ -155,19 +134,16 @@ public class WhenTextInputChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // DomReady set "Jane Doe" — verify echo shows it
         var echo = Page.Locator("#value-echo");
         await Expect(echo).ToHaveTextAsync("Jane Doe", new() { Timeout = 3000 });
 
-        // User overwrites with "John Smith"
         var input = Page.Locator($"#{Scope}ResidentName");
         await input.ClearAsync();
         await input.FillAsync("John Smith");
 
-        // Click check button — component-read condition evaluates CURRENT DOM value
+        // Component-read condition must use the current DOM value, not the DomReady value.
         await Page.Locator("#check-name-btn").ClickAsync();
 
-        // Component reads "John Smith" (non-empty) → "name set"
         var warning = Page.Locator("#name-warning");
         await Expect(warning).ToHaveTextAsync("name set", new() { Timeout = 3000 });
 
