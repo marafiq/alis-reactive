@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { AppliedPlans } from "../../lifecycle/applied-plans";
 import {
-  browserPlanWiring,
+  testPlanWiring,
   partialPlan,
   rootPlan,
   validationComponents,
@@ -11,11 +11,11 @@ import {
 
 describe("validation container loads", () => {
   it("accepts matching validated component ids while adding new partial rules", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring } = browserPlanWiring();
+    const appliedPlans = new AppliedPlans();
+    const { wiring } = testPlanWiring();
     const planId = "Resident.Root";
 
-    browserPlans.register({
+    appliedPlans.register({
       ...rootPlan(planId),
       components: {
         "resident-form": validationContainer("resident-form", [
@@ -25,7 +25,7 @@ describe("validation container loads", () => {
       },
     });
 
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         components: {
           "resident-form": validationContainer("resident-form", [
@@ -36,7 +36,7 @@ describe("validation container loads", () => {
       }),
     ], wiring);
 
-    const merged = browserPlans.get(planId)!;
+    const merged = appliedPlans.get(planId)!;
     const container = merged.components["resident-form"].container;
     const validationScope = expectValidationContainer(container);
 
@@ -50,11 +50,11 @@ describe("validation container loads", () => {
   });
 
   it("preserves root-owned validation containers when unloading a partial slot", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring } = browserPlanWiring();
+    const appliedPlans = new AppliedPlans();
+    const { wiring } = testPlanWiring();
     const planId = "Resident.Root";
 
-    browserPlans.register({
+    appliedPlans.register({
       ...rootPlan(planId),
       components: {
         "resident-form": validationContainer("resident-form", [
@@ -63,7 +63,7 @@ describe("validation container loads", () => {
       },
     });
 
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         components: {
           "resident-form": validationContainer("resident-form", [
@@ -73,22 +73,22 @@ describe("validation container loads", () => {
       }),
     ], wiring);
 
-    expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual([
+    expect(validationComponents(appliedPlans.get(planId)!, "resident-form")).toEqual([
       "first-name",
       "address-line",
     ]);
 
-    browserPlans.unloadPartialSlot("address-slot");
+    appliedPlans.unloadPartialSlot("address-slot");
 
-    expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual(["first-name"]);
+    expect(validationComponents(appliedPlans.get(planId)!, "resident-form")).toEqual(["first-name"]);
   });
 
   it("unloading a validation extension keeps root rules for the same validated component", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring } = browserPlanWiring();
+    const appliedPlans = new AppliedPlans();
+    const { wiring } = testPlanWiring();
     const planId = "Resident.Root";
 
-    browserPlans.register({
+    appliedPlans.register({
       ...rootPlan(planId),
       components: {
         "resident-form": validationContainer("resident-form", [
@@ -98,7 +98,7 @@ describe("validation container loads", () => {
       },
     });
 
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         components: {
           "resident-form": validationContainer("resident-form", [
@@ -109,7 +109,7 @@ describe("validation container loads", () => {
       }),
     ], wiring);
 
-    const extendedContainer = expectValidationContainer(browserPlans.get(planId)!.components["resident-form"].container);
+    const extendedContainer = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"].container);
     expect(extendedContainer.validationRules.map(rule => rule.component)).toEqual([
       "first-name",
       "zip-code",
@@ -118,9 +118,9 @@ describe("validation container loads", () => {
     expect(extendedContainer.validationRules.find(rule => rule.component === "zip-code")?.rules[0]?.message)
       .toBe("root zip required");
 
-    browserPlans.unloadPartialSlot("address-slot");
+    appliedPlans.unloadPartialSlot("address-slot");
 
-    const restoredContainer = expectValidationContainer(browserPlans.get(planId)!.components["resident-form"].container);
+    const restoredContainer = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"].container);
     expect(restoredContainer.validationRules.map(rule => rule.component)).toEqual([
       "first-name",
       "zip-code",
@@ -130,11 +130,11 @@ describe("validation container loads", () => {
   });
 
   it("unloading one validation extension keeps sibling slot rules", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring } = browserPlanWiring();
+    const appliedPlans = new AppliedPlans();
+    const { wiring } = testPlanWiring();
     const planId = "Resident.Root";
 
-    browserPlans.register({
+    appliedPlans.register({
       ...rootPlan(planId),
       components: {
         "resident-form": validationContainer("resident-form", [
@@ -143,7 +143,7 @@ describe("validation container loads", () => {
       },
     });
 
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         components: {
           "resident-form": validationContainer("resident-form", [
@@ -152,7 +152,7 @@ describe("validation container loads", () => {
         },
       }),
     ], wiring);
-    browserPlans.loadPartialSlot("contact-slot", [
+    appliedPlans.loadPartialSlot("contact-slot", [
       partialPlan(planId, {
         components: {
           "resident-form": validationContainer("resident-form", [
@@ -162,26 +162,26 @@ describe("validation container loads", () => {
       }),
     ], wiring);
 
-    expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual([
+    expect(validationComponents(appliedPlans.get(planId)!, "resident-form")).toEqual([
       "first-name",
       "address-line",
       "phone",
     ]);
 
-    browserPlans.unloadPartialSlot("address-slot");
+    appliedPlans.unloadPartialSlot("address-slot");
 
-    expect(validationComponents(browserPlans.get(planId)!, "resident-form")).toEqual([
+    expect(validationComponents(appliedPlans.get(planId)!, "resident-form")).toEqual([
       "first-name",
       "phone",
     ]);
   });
 
   it("unloading one validation extension keeps duplicate field rules from a later active slot", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring } = browserPlanWiring();
+    const appliedPlans = new AppliedPlans();
+    const { wiring } = testPlanWiring();
     const planId = "Resident.Root";
 
-    browserPlans.register({
+    appliedPlans.register({
       ...rootPlan(planId),
       components: {
         "resident-form": validationContainer("resident-form", [
@@ -190,7 +190,7 @@ describe("validation container loads", () => {
       },
     });
 
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         components: {
           "resident-form": validationContainer("resident-form", [
@@ -199,7 +199,7 @@ describe("validation container loads", () => {
         },
       }),
     ], wiring);
-    browserPlans.loadPartialSlot("contact-slot", [
+    appliedPlans.loadPartialSlot("contact-slot", [
       partialPlan(planId, {
         components: {
           "resident-form": validationContainer("resident-form", [
@@ -209,14 +209,14 @@ describe("validation container loads", () => {
       }),
     ], wiring);
 
-    const beforeUnload = expectValidationContainer(browserPlans.get(planId)!.components["resident-form"].container);
+    const beforeUnload = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"].container);
     expect(beforeUnload.validationRules.map(rule => rule.component)).toEqual(["first-name", "city"]);
     expect(beforeUnload.validationRules.find(rule => rule.component === "city")?.rules[0]?.message)
       .toBe("address city required");
 
-    browserPlans.unloadPartialSlot("address-slot");
+    appliedPlans.unloadPartialSlot("address-slot");
 
-    const afterUnload = expectValidationContainer(browserPlans.get(planId)!.components["resident-form"].container);
+    const afterUnload = expectValidationContainer(appliedPlans.get(planId)!.components["resident-form"].container);
     expect(afterUnload.validationRules.map(rule => rule.component)).toEqual(["first-name", "city"]);
     expect(afterUnload.validationRules.find(rule => rule.component === "city")?.rules[0]?.message)
       .toBe("contact city required");

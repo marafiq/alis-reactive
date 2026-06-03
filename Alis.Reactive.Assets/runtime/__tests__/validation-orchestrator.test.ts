@@ -237,13 +237,13 @@ describe("validation orchestrator server errors", () => {
 
   it("routes server errors for unloaded partial fields to the summary", () => {
     renderValidationDom();
-    const browserPlans = new AppliedPlans();
+    const appliedPlans = new AppliedPlans();
     const runtimePlan = plan([
       requiredRule("zip-code-field", "Address.ZipCode", "zip-code-field"),
     ], {});
 
-    browserPlans.register(runtimePlan);
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.register(runtimePlan);
+    appliedPlans.loadPartialSlot("address-slot", [
       {
         version: 3,
         planId: runtimePlan.planId,
@@ -255,7 +255,7 @@ describe("validation orchestrator server errors", () => {
         behaviors: [],
       },
     ], silentLifecycleHooks);
-    browserPlans.unloadPartialSlot("address-slot");
+    appliedPlans.unloadPartialSlot("address-slot");
 
     showServerErrors(runtimePlan, "resident-form", {
       errors: { "Address.ZipCode": ["Zip code is required"] },

@@ -3,21 +3,21 @@ import { AppliedPlans } from "../../lifecycle/applied-plans";
 import {
   objectContractWithWritableProperty,
   layoutComponent,
-  browserPlanWiring,
+  testPlanWiring,
   partialPlan,
   rootPlan,
 } from "../support/plan-lifecycle-fixtures";
 
 describe("layout object slots", () => {
   it("lets multiple slots share one layout-owned app component", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring } = browserPlanWiring();
+    const appliedPlans = new AppliedPlans();
+    const { wiring } = testPlanWiring();
     const planId = "Resident.Root";
     const toastTypeKey = "fusion.component.alisFusionToast";
 
-    browserPlans.register(rootPlan(planId));
+    appliedPlans.register(rootPlan(planId));
 
-    browserPlans.loadPartialSlot("first-toast-slot", [
+    appliedPlans.loadPartialSlot("first-toast-slot", [
       partialPlan(planId, {
         types: {
           [toastTypeKey]: objectContractWithWritableProperty("title"),
@@ -27,7 +27,7 @@ describe("layout object slots", () => {
         },
       }),
     ], wiring);
-    browserPlans.loadPartialSlot("second-toast-slot", [
+    appliedPlans.loadPartialSlot("second-toast-slot", [
       partialPlan(planId, {
         types: {
           [toastTypeKey]: objectContractWithWritableProperty("content"),
@@ -38,20 +38,20 @@ describe("layout object slots", () => {
       }),
     ], wiring);
 
-    expect(browserPlans.get(planId)?.components.alisFusionToast).toBeDefined();
-    expect(Object.keys(browserPlans.get(planId)?.types[toastTypeKey].properties ?? {}))
+    expect(appliedPlans.get(planId)?.components.alisFusionToast).toBeDefined();
+    expect(Object.keys(appliedPlans.get(planId)?.types[toastTypeKey].properties ?? {}))
       .toEqual(["title", "content"]);
 
-    browserPlans.unloadPartialSlot("first-toast-slot");
+    appliedPlans.unloadPartialSlot("first-toast-slot");
 
-    expect(browserPlans.get(planId)?.components.alisFusionToast).toBeDefined();
-    expect(Object.keys(browserPlans.get(planId)?.types[toastTypeKey].properties ?? {}))
+    expect(appliedPlans.get(planId)?.components.alisFusionToast).toBeDefined();
+    expect(Object.keys(appliedPlans.get(planId)?.types[toastTypeKey].properties ?? {}))
       .toEqual(["content"]);
 
-    browserPlans.unloadPartialSlot("second-toast-slot");
+    appliedPlans.unloadPartialSlot("second-toast-slot");
 
-    expect(browserPlans.get(planId)?.components.alisFusionToast).toBeUndefined();
-    expect(browserPlans.get(planId)?.types[toastTypeKey]).toBeUndefined();
+    expect(appliedPlans.get(planId)?.components.alisFusionToast).toBeUndefined();
+    expect(appliedPlans.get(planId)?.types[toastTypeKey]).toBeUndefined();
   });
 
 });

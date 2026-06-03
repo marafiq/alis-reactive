@@ -4,21 +4,21 @@ import {
   behavior,
   component,
   objectContract,
-  browserPlanWiring,
+  testPlanWiring,
   partialPlan,
   rootPlan,
 } from "../support/plan-lifecycle-fixtures";
 
 describe("partial slot composition", () => {
   it("replaces the previous load from the same slot", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring, behaviorSignals } = browserPlanWiring();
+    const appliedPlans = new AppliedPlans();
+    const { wiring, behaviorSignals } = testPlanWiring();
     const planId = "Resident.Root";
 
-    browserPlans.register(rootPlan(planId));
+    appliedPlans.register(rootPlan(planId));
 
     const oldBehavior = behavior();
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         types: { "native.element.address-line": objectContract() },
         components: { "address-line": component("address-line") },
@@ -26,14 +26,14 @@ describe("partial slot composition", () => {
       }),
     ], wiring);
 
-    const first = browserPlans.get(planId)!;
+    const first = appliedPlans.get(planId)!;
     expect(first.components["address-line"]).toBeDefined();
     expect(first.types["native.element.address-line"]).toBeDefined();
     expect(first.behaviors).toContain(oldBehavior);
     expect(behaviorSignals[0]?.aborted).toBe(false);
 
     const newBehavior = behavior();
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         types: { "native.element.zip-code": objectContract() },
         components: { "zip-code": component("zip-code") },
@@ -41,7 +41,7 @@ describe("partial slot composition", () => {
       }),
     ], wiring);
 
-    const second = browserPlans.get(planId)!;
+    const second = appliedPlans.get(planId)!;
     expect(behaviorSignals[0]?.aborted).toBe(true);
     expect(second.components["address-line"]).toBeUndefined();
     expect(second.types["native.element.address-line"]).toBeUndefined();
@@ -52,12 +52,12 @@ describe("partial slot composition", () => {
   });
 
   it("unloads an active slot explicitly", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring, behaviorSignals } = browserPlanWiring();
+    const appliedPlans = new AppliedPlans();
+    const { wiring, behaviorSignals } = testPlanWiring();
     const planId = "Resident.Root";
     const loadedBehavior = behavior();
 
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         types: { "native.element.address-line": objectContract() },
         components: { "address-line": component("address-line") },
@@ -65,23 +65,23 @@ describe("partial slot composition", () => {
       }),
     ], wiring);
 
-    expect(browserPlans.get(planId)?.components["address-line"]).toBeDefined();
+    expect(appliedPlans.get(planId)?.components["address-line"]).toBeDefined();
     expect(behaviorSignals[0]?.aborted).toBe(false);
 
-    const affectedPlanIds = browserPlans.unloadPartialSlot("address-slot");
+    const affectedPlanIds = appliedPlans.unloadPartialSlot("address-slot");
 
     expect(affectedPlanIds).toEqual([planId]);
     expect(behaviorSignals[0]?.aborted).toBe(true);
-    expect(browserPlans.get(planId)).toBeUndefined();
+    expect(appliedPlans.get(planId)).toBeUndefined();
   });
 
-  it("uses the browser slot id as the unload handle regardless of serialized plan scope", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring } = browserPlanWiring();
+  it("uses the DOM slot id as the unload handle regardless of serialized plan scope", () => {
+    const appliedPlans = new AppliedPlans();
+    const { wiring } = testPlanWiring();
     const planId = "Resident.Root";
 
-    browserPlans.register(rootPlan(planId));
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.register(rootPlan(planId));
+    appliedPlans.loadPartialSlot("address-slot", [
       {
         ...rootPlan(planId),
         types: { "native.element.address-line": objectContract() },
@@ -89,22 +89,22 @@ describe("partial slot composition", () => {
       },
     ], wiring);
 
-    expect(browserPlans.get(planId)?.components["address-line"]).toBeDefined();
+    expect(appliedPlans.get(planId)?.components["address-line"]).toBeDefined();
 
-    browserPlans.unloadPartialSlot("address-slot");
+    appliedPlans.unloadPartialSlot("address-slot");
 
-    expect(browserPlans.get(planId)?.components["address-line"]).toBeUndefined();
+    expect(appliedPlans.get(planId)?.components["address-line"]).toBeUndefined();
   });
 
   it("replaces every plan document loaded by the same slot id together", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring, behaviorSignals } = browserPlanWiring();
+    const appliedPlans = new AppliedPlans();
+    const { wiring, behaviorSignals } = testPlanWiring();
     const residentPlanId = "Resident.Root";
     const billingPlanId = "Billing.Root";
     const residentBehavior = behavior();
     const billingBehavior = behavior();
 
-    const affectedPlanIds = browserPlans.loadPartialSlot("drawer-slot", [
+    const affectedPlanIds = appliedPlans.loadPartialSlot("drawer-slot", [
       partialPlan(residentPlanId, {
         types: { "native.element.resident-name": objectContract() },
         components: { "resident-name": component("resident-name") },
@@ -118,24 +118,24 @@ describe("partial slot composition", () => {
     ], wiring);
 
     expect(affectedPlanIds).toEqual([residentPlanId, billingPlanId]);
-    expect(browserPlans.get(residentPlanId)?.components["resident-name"]).toBeDefined();
-    expect(browserPlans.get(billingPlanId)?.components["invoice-total"]).toBeDefined();
+    expect(appliedPlans.get(residentPlanId)?.components["resident-name"]).toBeDefined();
+    expect(appliedPlans.get(billingPlanId)?.components["invoice-total"]).toBeDefined();
     expect(behaviorSignals[0]).toBe(behaviorSignals[1]);
 
-    browserPlans.unloadPartialSlot("drawer-slot");
+    appliedPlans.unloadPartialSlot("drawer-slot");
 
     expect(behaviorSignals[0]?.aborted).toBe(true);
-    expect(browserPlans.get(residentPlanId)).toBeUndefined();
-    expect(browserPlans.get(billingPlanId)).toBeUndefined();
+    expect(appliedPlans.get(residentPlanId)).toBeUndefined();
+    expect(appliedPlans.get(billingPlanId)).toBeUndefined();
   });
 
   it("wires validation once per active plan when one slot contains multiple fragments for the same plan", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring } = browserPlanWiring();
+    const appliedPlans = new AppliedPlans();
+    const { wiring } = testPlanWiring();
     const planId = "Resident.Root";
 
-    browserPlans.register(rootPlan(planId));
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.register(rootPlan(planId));
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         components: { "address-line": component("address-line") },
       }),
@@ -144,61 +144,61 @@ describe("partial slot composition", () => {
       }),
     ], wiring);
 
-    expect(browserPlans.get(planId)?.components["address-line"]).toBeDefined();
-    expect(browserPlans.get(planId)?.components["zip-code"]).toBeDefined();
+    expect(appliedPlans.get(planId)?.components["address-line"]).toBeDefined();
+    expect(appliedPlans.get(planId)?.components["zip-code"]).toBeDefined();
     expect(wiring.wireContainerValidation).toHaveBeenCalledTimes(1);
   });
 
-  it("keeps a browser-only active plan while another slot still owns entries", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring } = browserPlanWiring();
+  it("keeps an active plan with only slot-owned entries", () => {
+    const appliedPlans = new AppliedPlans();
+    const { wiring } = testPlanWiring();
     const planId = "Resident.Dynamic";
 
-    browserPlans.loadPartialSlot("type-slot", [
+    appliedPlans.loadPartialSlot("type-slot", [
       partialPlan(planId, {
         types: { "native.element.shared": objectContract() },
       }),
     ], wiring);
-    browserPlans.loadPartialSlot("component-slot", [
+    appliedPlans.loadPartialSlot("component-slot", [
       partialPlan(planId, {
         components: { "address-line": component("address-line", "native.element.shared") },
       }),
     ], wiring);
 
-    browserPlans.unloadPartialSlot("component-slot");
+    appliedPlans.unloadPartialSlot("component-slot");
 
-    expect(browserPlans.get(planId)?.components["address-line"]).toBeUndefined();
-    expect(browserPlans.get(planId)?.types["native.element.shared"]).toBeDefined();
+    expect(appliedPlans.get(planId)?.components["address-line"]).toBeUndefined();
+    expect(appliedPlans.get(planId)?.types["native.element.shared"]).toBeDefined();
 
-    browserPlans.unloadPartialSlot("type-slot");
+    appliedPlans.unloadPartialSlot("type-slot");
 
-    expect(browserPlans.get(planId)).toBeUndefined();
+    expect(appliedPlans.get(planId)).toBeUndefined();
   });
 
   it("unloading one slot keeps sibling slot behavior for the same plan", () => {
-    const browserPlans = new AppliedPlans();
-    const { wiring, behaviorSignals } = browserPlanWiring();
+    const appliedPlans = new AppliedPlans();
+    const { wiring, behaviorSignals } = testPlanWiring();
     const planId = "Resident.Dynamic";
     const addressBehavior = behavior();
     const contactBehavior = behavior();
 
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, { behaviors: [addressBehavior] }),
     ], wiring);
-    browserPlans.loadPartialSlot("contact-slot", [
+    appliedPlans.loadPartialSlot("contact-slot", [
       partialPlan(planId, { behaviors: [contactBehavior] }),
     ], wiring);
 
-    browserPlans.unloadPartialSlot("address-slot");
+    appliedPlans.unloadPartialSlot("address-slot");
 
-    const activePlan = browserPlans.get(planId);
+    const activePlan = appliedPlans.get(planId);
     expect(activePlan?.behaviors).toEqual([contactBehavior]);
     expect(behaviorSignals[0]?.aborted).toBe(true);
     expect(behaviorSignals[1]?.aborted).toBe(false);
 
-    browserPlans.unloadPartialSlot("contact-slot");
+    appliedPlans.unloadPartialSlot("contact-slot");
 
-    expect(browserPlans.get(planId)).toBeUndefined();
+    expect(appliedPlans.get(planId)).toBeUndefined();
     expect(behaviorSignals[1]?.aborted).toBe(true);
   });
 });

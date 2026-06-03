@@ -191,7 +191,7 @@ export function partialPlan(
   };
 }
 
-export function browserPlanWiring() {
+export function testPlanWiring() {
   const behaviorSignals: (AbortSignal | undefined)[] = [];
   const wiring: BrowserPlanWiring = {
     wireBehaviors: vi.fn((_behaviors, _plan, signal) => behaviorSignals.push(signal)),

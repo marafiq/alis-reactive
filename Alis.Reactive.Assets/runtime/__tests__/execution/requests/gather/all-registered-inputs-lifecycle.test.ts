@@ -31,14 +31,14 @@ describe("all registered input gather lifecycle", () => {
       <input id="first-name" value="Ada" />
       <input id="address-line" value="12 Main" />
     `;
-    const browserPlans = new AppliedPlans();
+    const appliedPlans = new AppliedPlans();
     const planId = "Resident.PartialGather";
     const resident = rootPlan(planId, {
       "first-name": inputComponent("first-name", "firstName"),
     });
 
-    browserPlans.register(resident);
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.register(resident);
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         components: {
           "address-line": inputComponent("address-line", "addressLine"),
@@ -51,7 +51,7 @@ describe("all registered input gather lifecycle", () => {
       addressLine: "12 Main",
     });
 
-    browserPlans.unloadPartialSlot("address-slot");
+    appliedPlans.unloadPartialSlot("address-slot");
 
     expect(resolveRequestInput(allRegisteredInputs(), "POST", resident, {}).body).toEqual({
       firstName: "Ada",
@@ -63,14 +63,14 @@ describe("all registered input gather lifecycle", () => {
       <input id="first-name" value="Ada" />
       <input id="address" value="12 Main" />
     `;
-    const browserPlans = new AppliedPlans();
+    const appliedPlans = new AppliedPlans();
     const planId = "Resident.PartialGatherAssignments";
     const resident = rootPlan(planId, {
       "first-name": inputComponent("first-name", "firstName"),
     });
 
-    browserPlans.register(resident);
-    browserPlans.loadPartialSlot("address-slot", [
+    appliedPlans.register(resident);
+    appliedPlans.loadPartialSlot("address-slot", [
       partialPlan(planId, {
         components: {
           address: inputComponent("address", "address"),
