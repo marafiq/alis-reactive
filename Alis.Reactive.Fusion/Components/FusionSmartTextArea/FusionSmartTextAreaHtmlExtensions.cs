@@ -6,6 +6,8 @@ using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 using Microsoft.AspNetCore.Html;
 
+using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionSmartTextArea;
+
 namespace Alis.Reactive.Fusion.Components
 {
     public static class FusionSmartTextAreaHtmlExtensions
@@ -15,7 +17,7 @@ namespace Alis.Reactive.Fusion.Components
             Action<FusionSmartTextAreaOptions> configure)
             where TModel : class
         {
-            var registration = global::Alis.Reactive.Fusion.Components.FusionSmartTextArea.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
             var options = new FusionSmartTextAreaOptions();

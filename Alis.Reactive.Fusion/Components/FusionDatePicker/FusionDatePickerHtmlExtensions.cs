@@ -5,6 +5,8 @@ using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Calendars;
 
+using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionDatePicker;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -28,7 +30,7 @@ namespace Alis.Reactive.Fusion.Components
             Action<DatePickerBuilder> build)
             where TModel : class
         {
-            var registration = global::Alis.Reactive.Fusion.Components.FusionDatePicker.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
             var builder = setup.Helper.EJS().DatePickerFor(setup.Expression)

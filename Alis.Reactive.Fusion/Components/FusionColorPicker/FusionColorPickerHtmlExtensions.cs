@@ -5,6 +5,8 @@ using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Inputs;
 
+using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionColorPicker;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -28,7 +30,7 @@ namespace Alis.Reactive.Fusion.Components
             Action<ColorPickerBuilder> build)
             where TModel : class
         {
-            var registration = global::Alis.Reactive.Fusion.Components.FusionColorPicker.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
             // CRITICAL: Pass htmlAttributes as a parameter to ColorPickerFor(), NOT as a fluent

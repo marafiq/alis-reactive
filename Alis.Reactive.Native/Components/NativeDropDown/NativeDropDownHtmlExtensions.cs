@@ -2,6 +2,8 @@ using System;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
+using ComponentRegistrationSource = Alis.Reactive.Native.Components.NativeDropDown;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -22,7 +24,7 @@ namespace Alis.Reactive.Native.Components
             Action<NativeDropDownBuilder<TModel, TProp>> build)
             where TModel : class
         {
-            var registration = global::Alis.Reactive.Native.Components.NativeDropDown.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
             var builder = new NativeDropDownBuilder<TModel, TProp>(

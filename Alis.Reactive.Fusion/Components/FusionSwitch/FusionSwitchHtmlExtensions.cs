@@ -5,6 +5,8 @@ using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Buttons;
 
+using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionSwitch;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -27,7 +29,7 @@ namespace Alis.Reactive.Fusion.Components
             Action<SwitchBuilder> build)
             where TModel : class
         {
-            var registration = global::Alis.Reactive.Fusion.Components.FusionSwitch.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
             var builder = setup.Helper.EJS().SwitchFor(setup.Expression)

@@ -6,6 +6,8 @@ using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
 
+using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionDropDownList;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -80,7 +82,7 @@ namespace Alis.Reactive.Fusion.Components
             Action<DropDownListBuilder> build)
             where TModel : class
         {
-            var registration = global::Alis.Reactive.Fusion.Components.FusionDropDownList.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
             var builder = setup.Helper.EJS().DropDownListFor(setup.Expression)

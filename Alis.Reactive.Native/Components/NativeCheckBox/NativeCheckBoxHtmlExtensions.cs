@@ -2,6 +2,8 @@ using System;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
+using ComponentRegistrationSource = Alis.Reactive.Native.Components.NativeCheckBox;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -21,7 +23,7 @@ namespace Alis.Reactive.Native.Components
             Action<NativeCheckBoxBuilder<TModel, bool>> build)
             where TModel : class
         {
-            var registration = global::Alis.Reactive.Native.Components.NativeCheckBox.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
             var builder = new NativeCheckBoxBuilder<TModel, bool>(

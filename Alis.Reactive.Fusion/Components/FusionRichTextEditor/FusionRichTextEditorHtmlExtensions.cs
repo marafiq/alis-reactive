@@ -5,6 +5,8 @@ using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.RichTextEditor;
 
+using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionRichTextEditor;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -28,7 +30,7 @@ namespace Alis.Reactive.Fusion.Components
             Action<RichTextEditorBuilder> build)
             where TModel : class
         {
-            var registration = global::Alis.Reactive.Fusion.Components.FusionRichTextEditor.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
             var builder = setup.Helper.EJS().RichTextEditorFor(setup.Expression)

@@ -5,6 +5,8 @@ using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.InPlaceEditor;
 
+using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionInPlaceEditor;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -30,7 +32,7 @@ namespace Alis.Reactive.Fusion.Components
             Action<InPlaceEditorBuilder> build)
             where TModel : class
         {
-            var registration = global::Alis.Reactive.Fusion.Components.FusionInPlaceEditor.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
             var initialValue = InitialEditorValue.FromModel(

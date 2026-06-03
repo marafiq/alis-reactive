@@ -2,6 +2,8 @@ using System;
 using Alis.Reactive.Native;
 using Alis.Reactive.Native.Extensions;
 
+using ComponentRegistrationSource = Alis.Reactive.Native.Components.NativeRadioGroup;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -22,7 +24,7 @@ namespace Alis.Reactive.Native.Components
             Action<NativeRadioGroupBuilder<TModel, TProp>> build)
             where TModel : class
         {
-            var registration = global::Alis.Reactive.Native.Components.NativeRadioGroup.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
             var builder = new NativeRadioGroupBuilder<TModel, TProp>(

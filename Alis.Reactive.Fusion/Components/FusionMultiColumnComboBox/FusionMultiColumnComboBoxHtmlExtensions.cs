@@ -6,6 +6,8 @@ using Alis.Reactive.Native.Extensions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.MultiColumnComboBox;
 
+using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionMultiColumnComboBox;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
@@ -72,7 +74,7 @@ namespace Alis.Reactive.Fusion.Components
             Action<MultiColumnComboBoxBuilder> build)
             where TModel : class
         {
-            var registration = global::Alis.Reactive.Fusion.Components.FusionMultiColumnComboBox.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
             var builder = setup.Helper.EJS().MultiColumnComboBoxFor(setup.Expression)

@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
+using ComponentRegistrationSource = Alis.Reactive.Native.Components.NativeHiddenField;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
@@ -39,7 +41,7 @@ namespace Alis.Reactive.Native.Components
 #else
             var bindingPath = html.NameFor(expression);
 #endif
-            var registration = global::Alis.Reactive.Native.Components.NativeHiddenField.Registration;
+            var registration = ComponentRegistrationSource.Registration;
             var slot = ModelBoundInputComponentSlot.For<TModel, TProp>(expression, bindingPath);
             plan.RegisterInputComponent(slot.Register(registration));
 
