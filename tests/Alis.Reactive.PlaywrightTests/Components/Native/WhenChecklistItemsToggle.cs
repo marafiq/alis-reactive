@@ -1,12 +1,8 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
-/// Exercises NativeCheckList API end-to-end in the browser:
-/// text + description variation, text-only variation,
-/// form submission (JSON POST + FluentValidation), component-read conditions,
-/// model binding proof (pre-selected checkboxes).
-///
-/// Page under test: /Sandbox/Components/NativeCheckList
+/// Exercises NativeCheckList selection, form submission, component-read conditions,
+/// and pre-selected checkbox model binding in the browser.
 /// </summary>
 [TestFixture]
 public class WhenChecklistItemsToggle : PlaywrightTestBase
@@ -20,8 +16,6 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
     }
 
-    // ── Page loads ──
-
     [Test]
     public async Task page_loads_without_errors()
     {
@@ -30,14 +24,12 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 1: Text + description checkbox list ──
-
     [Test]
     public async Task clicking_checkbox_echoes_comma_separated_value()
     {
         await NavigateAndBoot();
 
-        // Click Shellfish (index 1) — Peanuts + Dairy already pre-checked
+        // Peanuts and Dairy are pre-selected before Shellfish is clicked.
         await Page.Locator($"#{Scope}Allergies_c1").ClickAsync();
 
         var echo = Page.Locator("#allergy-echo");
@@ -50,7 +42,6 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Uncheck Dairy (index 2) — was pre-checked
         await Page.Locator($"#{Scope}Allergies_c2").ClickAsync();
 
         var echo = Page.Locator("#allergy-echo");
@@ -63,16 +54,13 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Click Gluten (index 3)
         await Page.Locator($"#{Scope}Allergies_c3").ClickAsync();
 
-        // Hidden input is inside the container div (which has the ID)
+        // Hidden input is inside the container div, which carries the scoped ID.
         var hidden = Page.Locator($"#{Scope}Allergies input[type='hidden']");
         await Expect(hidden).ToHaveValueAsync("Peanuts,Dairy,Gluten", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Section 2: Text-only checkbox list ──
 
     [Test]
     public async Task text_only_checkboxes_render()
@@ -81,8 +69,6 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         await Expect(Page.Locator($"input[type='checkbox'][name='Amenities']")).ToHaveCountAsync(5);
         AssertNoConsoleErrors();
     }
-
-    // ── Section 3: Form — validation blocks when empty ──
 
     [Test]
     public async Task form_validation_blocks_empty_submit()
@@ -104,7 +90,6 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         var nameInput = Page.Locator($"#{Scope}ResidentName");
         await nameInput.FillAsync("Margaret Thompson");
 
-        // Check a dietary need
         await Page.Locator($"#{Scope}DietaryNeeds_c0").ClickAsync();
 
         await Page.Locator("#submit-btn").ClickAsync();
@@ -122,23 +107,22 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         var nameInput = Page.Locator($"#{Scope}ResidentName");
         await nameInput.FillAsync("Margaret Thompson");
 
-        // Check a dietary need (LowSodium at index 0)
         await Page.Locator($"#{Scope}DietaryNeeds_c0").ClickAsync();
 
-        // Intercept the POST to verify array payload
+        // Intercept the POST because the array payload shape is the behavior under test.
         var request = await Page.RunAndWaitForRequestAsync(
             async () => await Page.Locator("#submit-btn").ClickAsync(),
             "**/Sandbox/Components/NativeCheckList/Submit");
 
         var body = request.PostData ?? "";
-        // Allergies are pre-selected: ["Peanuts","Dairy"] — should be array in JSON
+        // Pre-selected Allergies must stay an array in JSON.
         Assert.That(body, Does.Contain("\"Allergies\""),
             $"Body must contain Allergies key but was '{body}'");
         Assert.That(body, Does.Contain("Peanuts"),
             $"Body must contain Peanuts but was '{body}'");
         Assert.That(body, Does.Contain("Dairy"),
             $"Body must contain Dairy but was '{body}'");
-        // DietaryNeeds should also be array
+        // Newly selected DietaryNeeds must also stay an array in JSON.
         Assert.That(body, Does.Contain("\"DietaryNeeds\""),
             $"Body must contain DietaryNeeds key but was '{body}'");
         Assert.That(body, Does.Contain("LowSodium"),
@@ -146,14 +130,12 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 4: Component value condition ──
-
     [Test]
     public async Task component_value_condition_confirms_when_set()
     {
         await NavigateAndBoot();
 
-        // Allergies are pre-selected (Peanuts,Dairy)
+        // Allergies are pre-selected.
         await Page.Locator("#check-allergy-btn").ClickAsync();
 
         var status = Page.Locator("#allergy-confirmation");
@@ -166,7 +148,6 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Uncheck both pre-selected allergies
         await Page.Locator($"#{Scope}Allergies_c0").ClickAsync();
         await Page.Locator($"#{Scope}Allergies_c2").ClickAsync();
 
@@ -177,20 +158,14 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 5: Model binding proof ──
-
     [Test]
     public async Task pre_selected_checkboxes_are_checked_on_load()
     {
         await NavigateAndBoot();
 
-        // Peanuts (index 0) should be checked
         await Expect(Page.Locator($"#{Scope}Allergies_c0")).ToBeCheckedAsync();
-        // Shellfish (index 1) should NOT be checked
         await Expect(Page.Locator($"#{Scope}Allergies_c1")).Not.ToBeCheckedAsync();
-        // Dairy (index 2) should be checked
         await Expect(Page.Locator($"#{Scope}Allergies_c2")).ToBeCheckedAsync();
-        // Gluten (index 3) should NOT be checked
         await Expect(Page.Locator($"#{Scope}Allergies_c3")).Not.ToBeCheckedAsync();
         AssertNoConsoleErrors();
     }
@@ -205,14 +180,12 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── DOM structure ──
-
     [Test]
     public async Task hidden_inputs_render_for_all_groups()
     {
         await NavigateAndBoot();
 
-        // Hidden inputs are now inside container divs (which carry the element ID)
+        // Hidden inputs live inside container divs, which carry the scoped IDs.
         await Expect(Page.Locator($"#{Scope}Allergies input[type='hidden']")).ToHaveCountAsync(1);
         await Expect(Page.Locator($"#{Scope}Amenities input[type='hidden']")).ToHaveCountAsync(1);
         await Expect(Page.Locator($"#{Scope}DietaryNeeds input[type='hidden']")).ToHaveCountAsync(1);
@@ -243,8 +216,6 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Plan JSON ──
-
     [Test]
     public async Task plan_carries_native_vendor()
     {
@@ -263,8 +234,6 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Multi-step toggle cycle ──
-
     [Test]
     public async Task toggling_multiple_checkboxes_updates_correctly()
     {
@@ -272,22 +241,17 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
 
         var echo = Page.Locator("#allergy-echo");
 
-        // Check Shellfish
         await Page.Locator($"#{Scope}Allergies_c1").ClickAsync();
         await Expect(echo).ToHaveTextAsync("Peanuts,Shellfish,Dairy", new() { Timeout = 3000 });
 
-        // Uncheck Peanuts
         await Page.Locator($"#{Scope}Allergies_c0").ClickAsync();
         await Expect(echo).ToHaveTextAsync("Shellfish,Dairy", new() { Timeout = 3000 });
 
-        // Check Gluten
         await Page.Locator($"#{Scope}Allergies_c3").ClickAsync();
         await Expect(echo).ToHaveTextAsync("Shellfish,Dairy,Gluten", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
     }
-
-    // ── Boot trace ──
 
     [Test]
     public async Task boot_trace_is_emitted()

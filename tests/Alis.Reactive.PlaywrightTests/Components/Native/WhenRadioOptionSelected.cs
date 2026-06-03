@@ -1,11 +1,8 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
-/// Exercises NativeRadioGroup API end-to-end in the browser:
-/// text-only variation, text + description variation,
-/// form submission (JSON POST + FluentValidation), component-read conditions.
-///
-/// Page under test: /Sandbox/Components/NativeRadioGroup
+/// Exercises NativeRadioGroup text-only, text-with-description, form submission,
+/// and component-read condition behavior in the browser.
 /// </summary>
 [TestFixture]
 public class WhenRadioOptionSelected : PlaywrightTestBase
@@ -19,8 +16,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
     }
 
-    // ── Page loads ──
-
     [Test]
     public async Task page_loads_without_errors()
     {
@@ -28,8 +23,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         await Expect(Page).ToHaveTitleAsync("NativeRadioGroup — Alis.Reactive Sandbox");
         AssertNoConsoleErrors();
     }
-
-    // ── Section 1: Text-only radio group ──
 
     [Test]
     public async Task text_only_radio_selects_and_echoes_value()
@@ -55,14 +48,11 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 2: Text + description radio group ──
-
     [Test]
     public async Task description_radio_shows_condition_match()
     {
         await NavigateAndBoot();
 
-        // Click "Memory Care" (index 1)
         await Page.Locator($"#{Scope}CareLevel_r1").ClickAsync();
 
         var notice = Page.Locator("#care-notice");
@@ -75,15 +65,12 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Click "Independent Living" (index 2)
         await Page.Locator($"#{Scope}CareLevel_r2").ClickAsync();
 
         var notice = Page.Locator("#care-notice");
         await Expect(notice).ToHaveTextAsync("Standard admission process", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Section 3: Form — validation blocks when empty ──
 
     [Test]
     public async Task form_validation_blocks_empty_submit()
@@ -92,7 +79,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
 
         await Page.Locator("#submit-btn").ClickAsync();
 
-        // Both fields should show required errors
         var nameError = Page.Locator($"[data-valmsg-for='ResidentName']");
         await Expect(nameError).ToContainTextAsync("required", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
@@ -103,14 +89,11 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Fill name
         var nameInput = Page.Locator($"#{Scope}ResidentName");
         await nameInput.FillAsync("Margaret Thompson");
 
-        // Select room type
         await Page.Locator($"#{Scope}RoomType_r1").ClickAsync();
 
-        // Submit
         await Page.Locator("#submit-btn").ClickAsync();
 
         var result = Page.Locator("#result");
@@ -118,14 +101,11 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 4: Component value condition ──
-
     [Test]
     public async Task component_value_condition_confirms_when_set()
     {
         await NavigateAndBoot();
 
-        // Select a care level first
         await Page.Locator($"#{Scope}CareLevel_r0").ClickAsync();
 
         await Page.Locator("#check-care-btn").ClickAsync();
@@ -140,15 +120,12 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Don't select any care level — hidden input is empty
         await Page.Locator("#check-care-btn").ClickAsync();
 
         var status = Page.Locator("#care-confirmation");
         await Expect(status).ToHaveTextAsync("care level is required", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Multi-step state cycle ──
 
     [Test]
     public async Task changing_selection_multiple_times_updates_each_time()
@@ -168,8 +145,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // ── DOM structure ──
 
     [Test]
     public async Task hidden_inputs_render_for_all_groups()
@@ -206,8 +181,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Plan JSON ──
-
     [Test]
     public async Task plan_carries_native_vendor()
     {
@@ -225,8 +198,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         Assert.That(planJson, Does.Contain("\"member\": \"value\""));
         AssertNoConsoleErrors();
     }
-
-    // ── Boot trace ──
 
     [Test]
     public async Task boot_trace_is_emitted()
