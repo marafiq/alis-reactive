@@ -4,9 +4,7 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
 
 /// <summary>
-/// As a user managing my task list
-/// I want to create todo items with optional urgency and due dates
-/// So that I can track what needs to be done and when
+/// Exercises todo form validation, conditional due-date visibility, and save feedback.
 /// </summary>
 [TestFixture]
 public class WhenManagingTodoItems : PlaywrightTestBase
@@ -28,8 +26,6 @@ public class WhenManagingTodoItems : PlaywrightTestBase
     private ILocator DueDateSection => Page.Locator("#due-date-section");
     private ILocator UrgentCheckbox => Page.Locator($"#{Scope}IsUrgent");
 
-    // ── Page Load ──
-
     [Test]
     public async Task page_loads_with_empty_form_and_save_button()
     {
@@ -40,8 +36,6 @@ public class WhenManagingTodoItems : PlaywrightTestBase
         await Expect(Result).ToContainTextAsync("Fill in the form and click Save");
         AssertNoConsoleErrors();
     }
-
-    // ── Validation — Required Title ──
 
     [Test]
     public async Task submitting_empty_title_shows_required_error()
@@ -54,8 +48,6 @@ public class WhenManagingTodoItems : PlaywrightTestBase
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Conditional Visibility — Due Date ──
 
     [Test]
     public async Task checking_urgent_reveals_due_date_field()
@@ -84,8 +76,6 @@ public class WhenManagingTodoItems : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Validation — Conditional Due Date ──
-
     [Test]
     public async Task urgent_todo_without_due_date_shows_required_error()
     {
@@ -102,8 +92,6 @@ public class WhenManagingTodoItems : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Successful Submission ──
-
     [Test]
     public async Task saving_valid_todo_shows_success_message()
     {
@@ -113,7 +101,7 @@ public class WhenManagingTodoItems : PlaywrightTestBase
 
         await SaveBtn.ClickAsync();
 
-        // Success shows a toast notification
+        // Save feedback is rendered through the Syncfusion toast surface.
         await Expect(Page.Locator(".e-toast").First)
             .ToContainTextAsync("Todo saved successfully", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -131,7 +119,7 @@ public class WhenManagingTodoItems : PlaywrightTestBase
 
         await SaveBtn.ClickAsync();
 
-        // Success shows a toast notification
+        // Save feedback is rendered through the Syncfusion toast surface.
         await Expect(Page.Locator(".e-toast").First)
             .ToContainTextAsync("Todo saved successfully", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
