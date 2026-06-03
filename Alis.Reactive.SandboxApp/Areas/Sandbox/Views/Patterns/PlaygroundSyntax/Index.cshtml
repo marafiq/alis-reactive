@@ -11,10 +11,8 @@
     var cityItems = (IEnumerable<SelectListItem>)ViewBag.CityItems;
     var stateItems = (IEnumerable<SelectListItem>)ViewBag.StateItems;
 
-    // ── Create the plan instance — one per view ──
     var plan = Html.ReactivePlan<PlaygroundSyntaxModel>();
 
-    // ── One custom event to demo cross-vendor pipeline ──
     Html.On(plan, t => t.CustomEvent("reset-all", p =>
     {
         p.Component<FusionNumericTextBox>(m => m.Amount).SetValue(0);
@@ -30,7 +28,6 @@
         and cross-vendor pipelines via a single custom event.
     </native-text>
 
-    <!-- Section 1: Fusion .Reactive() inside Html.InputField() -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">1. Fusion — Html.InputField + .Reactive()</native-heading>
@@ -53,7 +50,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 2: Native .Reactive() inside Html.InputField() -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">2. Native — Html.InputField + .Reactive()</native-heading>
@@ -80,7 +76,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 3: Cross-vendor custom event — one pipeline, both vendors -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">3. Cross-Vendor — Html.On() custom event resets both</native-heading>
@@ -94,7 +89,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 4: Read properties (BindExpr) -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">4. Read Properties — BindExpr Strings</native-heading>
@@ -115,7 +109,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 5: Nested Properties — Element ID pattern verification -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">5. Nested Properties — Element ID = underscores, BindingPath = dots</native-heading>
@@ -153,7 +146,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Plan JSON -->
     <native-card>
     <native-card-body>
         <native-heading level="H2" spacing="Base">Plan JSON</native-heading>
