@@ -376,11 +376,6 @@ Review cycle before every commit:
   shape instead of browser-visible behavior. A later test-design slice should
   classify which plan JSON checks are DSL contract proof and which should move
   to lower-level plan/domain tests or be replaced by behavior assertions.
-- Fusion reactive extension XML docs repeat long `.Reactive()` example remarks,
-  and at least one sampled file has a stale `<see cref>` target
-  (`Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadReactiveExtensions.cs`).
-  A later API-doc pass should tighten these as one concept, keeping only
-  IntelliSense-visible contract wording and short event-selector examples.
 
 ## Out Of Scope For The First Slice
 

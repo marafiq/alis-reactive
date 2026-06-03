@@ -8,10 +8,6 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Wires browser events from a <see cref="FusionDropDownTree"/> into the reactive plan.
     /// </summary>
-    /// <remarks>
-    /// <c>.Reactive()</c> is always the last call inside the build callback passed to
-    /// <see cref="FusionDropDownTreeHtmlExtensions.FusionDropDownTree{TModel,TProp}"/>.
-    /// </remarks>
     public static class FusionDropDownTreeReactiveExtensions
     {
         private static readonly FusionDropDownTree Component = new FusionDropDownTree();
@@ -23,9 +19,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
         /// <param name="builder">The Syncfusion DropDownTree builder.</param>
         /// <param name="plan">The plan to add the reactive behavior to.</param>
-        /// <param name="eventSelector">Selects which event to react to.</param>
+        /// <param name="eventSelector">Selects the component event, for example <c>evt =&gt; evt.Changed</c>.</param>
         /// <param name="pipeline">Configures the commands to run when the event fires.</param>
-        /// <returns>The builder for method chaining.</returns>
+        /// <returns>The same builder instance.</returns>
         public static DropDownTreeBuilder Reactive<TModel, TArgs>(
             this DropDownTreeBuilder builder,
             ReactivePlan<TModel> plan,

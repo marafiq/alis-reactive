@@ -7,14 +7,6 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Wires browser events from a <see cref="FusionGrid"/> into the reactive plan.
     /// </summary>
-    /// <remarks>
-    /// <c>.Reactive()</c> is called on the builder returned by
-    /// <see cref="FusionGridHtmlExtensions.FusionGrid{TModel, TRow}"/>:
-    /// <code>
-    /// @(Html.FusionGrid&lt;GridModel, ResidentGridItem&gt;(plan, "residents-grid", b =&gt; { /* columns */ })
-    ///     .Reactive(evt =&gt; evt.DataStateChange, (args, p) =&gt; { /* commands */ }))
-    /// </code>
-    /// </remarks>
     public static class FusionGridReactiveExtensions
     {
         private static readonly FusionGrid Component = new FusionGrid();
@@ -25,9 +17,9 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TModel">The view model type.</typeparam>
         /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
         /// <param name="builder">The grid builder.</param>
-        /// <param name="eventSelector">Selects which event to react to (e.g. <c>evt =&gt; evt.DataStateChange</c>).</param>
+        /// <param name="eventSelector">Selects the component event, for example <c>evt =&gt; evt.DataStateChange</c>.</param>
         /// <param name="pipeline">Configures the commands to run when the event fires.</param>
-        /// <returns>The builder for method chaining.</returns>
+        /// <returns>The same builder instance.</returns>
         public static FusionGridBuilder<TModel> Reactive<TModel, TArgs>(
             this FusionGridBuilder<TModel> builder,
             Func<FusionGridEvents, TypedEvent<TArgs>> eventSelector,
