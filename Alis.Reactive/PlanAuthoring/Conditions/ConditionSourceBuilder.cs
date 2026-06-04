@@ -3,12 +3,13 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
-    /// Provides comparison operators for a typed value source in a condition.
+    /// Authors comparison nodes for a typed value source.
     /// </summary>
     /// <remarks>
     /// Obtained via <c>p.When(source)</c> or <c>p.When(args, x =&gt; x.Prop)</c>.
     /// Chain an operator such as <c>.Eq(5)</c> or <c>.Truthy()</c> to produce a
-    /// <see cref="GuardBuilder{TModel}"/>.
+    /// <see cref="GuardBuilder{TModel}"/>. Operators are serialized into the
+    /// Reactive Plan and evaluated by the runtime; they do not read values on the server.
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns the guarded pipeline.</typeparam>
     /// <typeparam name="TProp">The source value type, providing compile-time operator type safety.</typeparam>
