@@ -225,8 +225,8 @@ function arrayContains(left: JsonValue[], right: JsonValue, itemShape: Shape): C
   };
 }
 
-function matches(condition: ValidationCondition, ctx?: ExecContext): boolean {
-  return evaluateCondition(condition, plan(), ctx);
+function matches(condition: ValidationCondition, context?: ExecContext): boolean {
+  return evaluateCondition(condition, plan(), context);
 }
 
 afterEach(() => {
