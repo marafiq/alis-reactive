@@ -60,8 +60,8 @@ namespace Alis.Reactive
             // Validation metadata belongs on the same component contract declared
             // by p.Element(...), not on a validation-only component concept.
             var containerKey = _context.DeclareElement(container);
-            var comp = _context.GetComponent(containerKey);
-            _context.SetComponent(containerKey, comp.WithValidationRulesMerged(componentValidations));
+            var containerObject = _context.GetBrowserObject(containerKey);
+            _context.SetBrowserObject(containerKey, containerObject.WithValidationRulesMerged(componentValidations));
         }
     }
 

@@ -1,16 +1,15 @@
-using System;
 using System.Collections.Generic;
 
 namespace Alis.Reactive.PlanModel
 {
     internal sealed class BehaviorGraph
     {
-        private readonly BrowserObjects _components;
+        private readonly BrowserObjects _browserObjects;
         private readonly List<Behavior> _behaviors = new List<Behavior>();
 
-        internal BehaviorGraph(BrowserObjects components)
+        internal BehaviorGraph(BrowserObjects browserObjects)
         {
-            _components = components;
+            _browserObjects = browserObjects;
         }
 
         internal IReadOnlyList<Behavior> Snapshot() => new List<Behavior>(_behaviors);
@@ -25,7 +24,7 @@ namespace Alis.Reactive.PlanModel
         {
             if (trigger is ComponentEventTrigger componentEvent)
             {
-                _components.DeclareEvent(
+                _browserObjects.DeclareEvent(
                     componentEvent.ComponentKey,
                     ObjectEventContract.ForComponentEvent(componentEvent.EventName));
             }

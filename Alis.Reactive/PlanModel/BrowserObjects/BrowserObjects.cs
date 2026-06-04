@@ -7,7 +7,7 @@ namespace Alis.Reactive.PlanModel
     internal sealed class BrowserObjects
     {
         private readonly BrowserObjectContracts _objectContracts;
-        private readonly Dictionary<string, BrowserObject> _components = new Dictionary<string, BrowserObject>();
+        private readonly Dictionary<string, BrowserObject> _objects = new Dictionary<string, BrowserObject>();
         private readonly RegisteredInputComponents _registrations;
 
         internal BrowserObjects(
@@ -19,23 +19,23 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal IReadOnlyDictionary<string, BrowserObject> Snapshot() =>
-            new Dictionary<string, BrowserObject>(_components);
+            new Dictionary<string, BrowserObject>(_objects);
 
         internal BrowserObject Get(ComponentKey componentKey) =>
-            _components[componentKey.Value];
+            _objects[componentKey.Value];
 
-        internal void Set(ComponentKey componentKey, BrowserObject component) =>
-            _components[componentKey.Value] = component;
+        internal void Set(ComponentKey componentKey, BrowserObject browserObject) =>
+            _objects[componentKey.Value] = browserObject;
 
         internal ComponentKey DeclareElement(string elementId)
         {
             var id = ComponentId.Of(elementId);
-            if (_components.ContainsKey(id.Value))
+            if (_objects.ContainsKey(id.Value))
                 return ComponentKey.Of(id.Value);
 
             var typeKey = BrowserObjectId.NativeElement(id);
             _objectContracts.DeclareObject(typeKey);
-            _components[id.Value] = BrowserObject.Element(id, ComponentVendor.Native, typeKey);
+            _objects[id.Value] = BrowserObject.Element(id, ComponentVendor.Native, typeKey);
             return ComponentKey.Of(id.Value);
         }
 
@@ -53,7 +53,7 @@ namespace Alis.Reactive.PlanModel
             var id = ComponentId.Of(componentId);
             var componentVendor = ComponentVendor.From(vendor);
 
-            if (_components.TryGetValue(id.Value, out var existing))
+            if (_objects.TryGetValue(id.Value, out var existing))
             {
                 RequireSameVendor(existing, id, componentVendor);
                 EnrichExistingComponent(existing, id);
@@ -64,12 +64,12 @@ namespace Alis.Reactive.PlanModel
             if (TryFindRegistration(id, out var registration))
             {
                 registration.DeclareValueContract(_objectContracts, typeKey);
-                _components[id.Value] = registration.CreateComponent(id, componentVendor, typeKey);
+                _objects[id.Value] = registration.CreateComponent(id, componentVendor, typeKey);
             }
             else
             {
                 _objectContracts.DeclareObject(typeKey);
-                _components[id.Value] = createUnregisteredComponent(id, componentVendor, typeKey);
+                _objects[id.Value] = createUnregisteredComponent(id, componentVendor, typeKey);
             }
 
             return ComponentKey.Of(id.Value);
@@ -82,37 +82,37 @@ namespace Alis.Reactive.PlanModel
             var valueContract = input.ValueContract;
             var binding = input.InputBinding;
 
-            if (_components.TryGetValue(id.Value, out var existing))
+            if (_objects.TryGetValue(id.Value, out var existing))
             {
                 RequireSameVendor(existing, id, componentVendor);
                 _objectContracts.DeclareInputValueContract(BrowserObjectId.Of(existing.Type), valueContract);
-                _components[id.Value] = existing.WithBindingIfAbsent(binding);
+                _objects[id.Value] = existing.WithBindingIfAbsent(binding);
                 return ComponentKey.Of(id.Value);
             }
 
             var typeKey = input.BrowserObjectId;
             _objectContracts.DeclareInputValueContract(typeKey, valueContract);
-            _components[id.Value] = input.CreateComponent();
+            _objects[id.Value] = input.CreateComponent();
 
             return ComponentKey.Of(id.Value);
         }
 
         internal void DeclareProperty(ComponentKey componentKey, ObjectPropertyContract contract)
         {
-            var component = Get(componentKey);
-            _objectContracts.DeclareProperty(BrowserObjectId.Of(component.Type), contract);
+            var browserObject = Get(componentKey);
+            _objectContracts.DeclareProperty(BrowserObjectId.Of(browserObject.Type), contract);
         }
 
         internal ObjectMethod DeclareMethod(ComponentKey componentKey, ObjectMethodContract contract)
         {
-            var component = Get(componentKey);
-            return _objectContracts.DeclareMethod(BrowserObjectId.Of(component.Type), contract);
+            var browserObject = Get(componentKey);
+            return _objectContracts.DeclareMethod(BrowserObjectId.Of(browserObject.Type), contract);
         }
 
         internal void DeclareEvent(ComponentKey componentKey, ObjectEventContract contract)
         {
-            var component = Get(componentKey);
-            _objectContracts.DeclareEvent(BrowserObjectId.Of(component.Type), contract);
+            var browserObject = Get(componentKey);
+            _objectContracts.DeclareEvent(BrowserObjectId.Of(browserObject.Type), contract);
         }
 
         internal void RegisterInputComponents()
@@ -153,7 +153,7 @@ namespace Alis.Reactive.PlanModel
             if (!TryFindRegistration(componentId, out var registration))
                 return;
 
-            _components[componentId.Value] = registration.AddBindingTo(
+            _objects[componentId.Value] = registration.AddBindingTo(
                 existing,
                 _objectContracts.Require(BrowserObjectId.Of(existing.Type)));
         }
