@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for FusionRating.
+/// Playwright gestures and surfaces for FusionRating tests.
 /// </summary>
 public sealed class FusionRatingLocator
 {
@@ -19,11 +19,10 @@ public sealed class FusionRatingLocator
     /// <summary>The Syncfusion Rating input element.</summary>
     public ILocator Input => _page.Locator($"#{_componentId}");
 
-    /// <summary>Gets the current input value attribute.</summary>
     public async Task<string?> ValueAttribute() =>
         await Input.GetAttributeAsync("value");
 
-    /// <summary>Gets the visible rating list's ARIA value.</summary>
+    /// <summary>The visible rating list's ARIA value.</summary>
     public async Task<string?> AriaValue() =>
         await _page.EvaluateAsync<string?>(
             @"id => {

@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for FusionRadioButton.
+/// Playwright gestures and surfaces for FusionRadioButton tests.
 /// </summary>
 public sealed class FusionRadioButtonLocator
 {
@@ -22,6 +22,5 @@ public sealed class FusionRadioButtonLocator
     /// <summary>The Syncfusion wrapper around the radio input.</summary>
     public ILocator Wrapper => Input.Locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' e-radio-wrapper ')][1]");
 
-    /// <summary>Returns whether the native input is checked.</summary>
     public async Task<bool> IsChecked() => await Input.IsCheckedAsync();
 }

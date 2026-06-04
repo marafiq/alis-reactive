@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for FusionCheckBox.
+/// Playwright gestures and surfaces for FusionCheckBox tests.
 /// </summary>
 public sealed class FusionCheckBoxLocator
 {
@@ -25,21 +25,18 @@ public sealed class FusionCheckBoxLocator
     /// <summary>The visible Syncfusion checkbox frame.</summary>
     public ILocator Frame => Wrapper.Locator(".e-frame");
 
-    /// <summary>Returns whether the native input is checked.</summary>
     public async Task<bool> IsChecked() => await Input.IsCheckedAsync();
 
     /// <summary>Returns whether the native input is indeterminate.</summary>
     public async Task<bool> IsIndeterminate() =>
         await Input.EvaluateAsync<bool>("element => element.indeterminate");
 
-    /// <summary>Returns whether the visible frame has the given CSS class.</summary>
     public async Task<bool> FrameHasClass(string className)
     {
         var classes = await Frame.GetAttributeAsync("class") ?? string.Empty;
         return classes.Split(' ').Contains(className);
     }
 
-    /// <summary>Returns whether the wrapper has the given CSS class.</summary>
     public async Task<bool> WrapperHasClass(string className)
     {
         var classes = await Wrapper.GetAttributeAsync("class") ?? string.Empty;
