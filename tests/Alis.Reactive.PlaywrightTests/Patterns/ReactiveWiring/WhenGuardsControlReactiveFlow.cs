@@ -1,24 +1,14 @@
 namespace Alis.Reactive.PlaywrightTests.Patterns.ReactiveWiring;
 
 /// <summary>
-/// Verifies conditions inside .Reactive() with cross-vendor mutations, ElseIf chains,
-/// and auto-fill cascades. This is the heart of the framework: a user interacts with
-/// one component, conditions evaluate, and dependent components/elements update.
-///
-/// Page under test: /Sandbox/Patterns/PlaygroundSyntax/ReactiveConditions
-///
-/// Form layout:
-///   Status  (native dropdown, reactive)  -- ElseIf drives Amount, City, address visibility, status text
-///   Amount  (fusion numeric, reactive)   -- ElseIf tier ladder drives amount-tier text + color
-///   City    (nested native dropdown, reactive) -- ElseIf auto-fills State + PostalCode
-///   State   (nested native dropdown, target only)
-///   PostalCode (nested fusion numeric, target only)
+/// Verifies condition branches inside .Reactive() pipelines across native and Fusion components.
+/// Syncfusion numeric controls render duplicate generated-ID inputs and formatted display text;
+/// these tests target .First and use regex values where that browser output matters.
 /// </summary>
 [TestFixture]
 public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 {
-    /// <summary>IdGenerator type scope for PlaygroundSyntaxModel.</summary>
-    private const string S = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_PlaygroundSyntaxModel";
+    private const string ModelIdScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_PlaygroundSyntaxModel";
 
     private async Task NavigateAndBoot()
     {
@@ -31,18 +21,16 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "active" });
+        await Page.Locator($"#{ModelIdScope}__Status").SelectOptionAsync(new SelectOptionValue { Value = "active" });
 
         var result = Page.Locator("#status-result");
         await Expect(result).ToContainTextAsync("Active", new() { Timeout = 3000 });
         await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
 
-        // SF FusionNumericTextBox renders TWO inputs with the same ID — use .First for the visible one
-        // SF formats numeric display (e.g. "100.00"), so use regex to match the numeric value
-        var amountInput = Page.Locator($"#{S}__Amount").First;
+        var amountInput = Page.Locator($"#{ModelIdScope}__Amount").First;
         await Expect(amountInput).ToHaveValueAsync(new System.Text.RegularExpressions.Regex(@"^100(\.00)?$"), new() { Timeout = 3000 });
 
-        var citySelect = Page.Locator($"#{S}__Address_City");
+        var citySelect = Page.Locator($"#{ModelIdScope}__Address_City");
         await Expect(citySelect).ToHaveValueAsync("seattle", new() { Timeout = 3000 });
 
         await Expect(Page.Locator("#address-section")).ToBeVisibleAsync();
@@ -55,14 +43,13 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "inactive" });
+        await Page.Locator($"#{ModelIdScope}__Status").SelectOptionAsync(new SelectOptionValue { Value = "inactive" });
 
         var result = Page.Locator("#status-result");
         await Expect(result).ToContainTextAsync("Inactive", new() { Timeout = 3000 });
         await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
 
-        // SF may format as "0" or "0.00" — regex handles both
-        var amountInput = Page.Locator($"#{S}__Amount").First;
+        var amountInput = Page.Locator($"#{ModelIdScope}__Amount").First;
         await Expect(amountInput).ToHaveValueAsync(new System.Text.RegularExpressions.Regex(@"^0(\.00)?$"), new() { Timeout = 3000 });
 
         await Expect(Page.Locator("#address-section")).ToBeHiddenAsync();
@@ -75,8 +62,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // SF FusionNumericTextBox renders TWO inputs with the same ID — use .First for the visible one
-        var input = Page.Locator($"#{S}__Amount").First;
+        var input = Page.Locator($"#{ModelIdScope}__Amount").First;
         var tier = Page.Locator("#amount-tier");
 
         await input.ClickAsync();
@@ -108,16 +94,14 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var citySelect = Page.Locator($"#{S}__Address_City");
-        var stateSelect = Page.Locator($"#{S}__Address_State");
-        // SF FusionNumericTextBox renders TWO inputs — .First targets the visible one
-        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
+        var citySelect = Page.Locator($"#{ModelIdScope}__Address_City");
+        var stateSelect = Page.Locator($"#{ModelIdScope}__Address_State");
+        var postalInput = Page.Locator($"#{ModelIdScope}__Address_PostalCode").First;
         var autoText = Page.Locator("#city-auto");
 
         await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "seattle" });
 
         await Expect(stateSelect).ToHaveValueAsync("WA", new() { Timeout = 3000 });
-        // SF formats numeric display (e.g. "98,101.00"), so use regex to match the core digits
         await Expect(postalInput).ToHaveValueAsync(new System.Text.RegularExpressions.Regex("98.?101"), new() { Timeout = 3000 });
         await Expect(autoText).ToContainTextAsync("WA, 98101");
 
@@ -139,10 +123,10 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var statusSelect = Page.Locator($"#{S}__Status");
+        var statusSelect = Page.Locator($"#{ModelIdScope}__Status");
         var result = Page.Locator("#status-result");
-        var amountInput = Page.Locator($"#{S}__Amount").First;
-        var citySelect = Page.Locator($"#{S}__Address_City");
+        var amountInput = Page.Locator($"#{ModelIdScope}__Amount").First;
+        var citySelect = Page.Locator($"#{ModelIdScope}__Address_City");
         var addressSection = Page.Locator("#address-section");
         await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "active" });
 
@@ -182,10 +166,10 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var statusSelect = Page.Locator($"#{S}__Status");
-        var citySelect = Page.Locator($"#{S}__Address_City");
-        var stateSelect = Page.Locator($"#{S}__Address_State");
-        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
+        var statusSelect = Page.Locator($"#{ModelIdScope}__Status");
+        var citySelect = Page.Locator($"#{ModelIdScope}__Address_City");
+        var stateSelect = Page.Locator($"#{ModelIdScope}__Address_State");
+        var postalInput = Page.Locator($"#{ModelIdScope}__Address_PostalCode").First;
         var addressSection = Page.Locator("#address-section");
 
         await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "active" });
@@ -220,9 +204,9 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var citySelect = Page.Locator($"#{S}__Address_City");
-        var stateSelect = Page.Locator($"#{S}__Address_State");
-        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
+        var citySelect = Page.Locator($"#{ModelIdScope}__Address_City");
+        var stateSelect = Page.Locator($"#{ModelIdScope}__Address_State");
+        var postalInput = Page.Locator($"#{ModelIdScope}__Address_PostalCode").First;
         var autoText = Page.Locator("#city-auto");
 
         await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "denver" });
@@ -243,8 +227,8 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var citySelect = Page.Locator($"#{S}__Address_City");
-        var stateSelect = Page.Locator($"#{S}__Address_State");
+        var citySelect = Page.Locator($"#{ModelIdScope}__Address_City");
+        var stateSelect = Page.Locator($"#{ModelIdScope}__Address_State");
         var autoText = Page.Locator("#city-auto");
 
         await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "seattle" });
@@ -278,7 +262,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator($"#{S}__Amount").First;
+        var input = Page.Locator($"#{ModelIdScope}__Amount").First;
         var tier = Page.Locator("#amount-tier");
 
         await input.ClickAsync();
@@ -307,7 +291,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "pending" });
+        await Page.Locator($"#{ModelIdScope}__Status").SelectOptionAsync(new SelectOptionValue { Value = "pending" });
 
         var result = Page.Locator("#status-result");
         await Expect(result).ToContainTextAsync("Pending or empty", new() { Timeout = 3000 });
@@ -326,9 +310,9 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var citySelect = Page.Locator($"#{S}__Address_City");
-        var stateSelect = Page.Locator($"#{S}__Address_State");
-        var postalInput = Page.Locator($"#{S}__Address_PostalCode").First;
+        var citySelect = Page.Locator($"#{ModelIdScope}__Address_City");
+        var stateSelect = Page.Locator($"#{ModelIdScope}__Address_State");
+        var postalInput = Page.Locator($"#{ModelIdScope}__Address_PostalCode").First;
         var autoText = Page.Locator("#city-auto");
 
         await citySelect.SelectOptionAsync(new SelectOptionValue { Value = "seattle" });
@@ -362,7 +346,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         await Expect(amountTier).ToHaveTextAsync("\u2014");
 
-        await Page.Locator($"#{S}__Status").SelectOptionAsync(new SelectOptionValue { Value = "active" });
+        await Page.Locator($"#{ModelIdScope}__Status").SelectOptionAsync(new SelectOptionValue { Value = "active" });
 
         await Expect(Page.Locator("#status-result")).ToContainTextAsync("Active", new() { Timeout = 3000 });
 
