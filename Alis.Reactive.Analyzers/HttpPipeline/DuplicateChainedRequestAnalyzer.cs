@@ -9,14 +9,7 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
     /// <summary>
     /// Error when .Chained() is called more than once on the same ResponseBuilder fluent chain.
     /// Only the last .Chained() survives — earlier ones are silently overwritten.
-    ///
-    /// Catches:
-    ///   .Response(r => r.Chained(c => c.Post("/step-1")).Chained(c => c.Post("/step-2")))
-    ///   .Response(r => r.Chained(...).OnSuccess(...).Chained(...))
-    ///
-    /// Does NOT flag:
-    ///   Single .Chained() on a ResponseBuilder chain
-    ///   .Chained() on separate ResponseBuilder chains (separate .Response() calls)
+    /// Separate ResponseBuilder chains are independent.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DuplicateChainedRequestAnalyzer : DiagnosticAnalyzer

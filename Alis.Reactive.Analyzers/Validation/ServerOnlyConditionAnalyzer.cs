@@ -10,13 +10,7 @@ namespace Alis.Reactive.Analyzers.Validation
     /// Warning when FluentValidation's <c>.When()</c> or <c>.Unless()</c> is used inside a
     /// <c>ReactiveValidator&lt;T&gt;</c>. These are server-only conditions (arbitrary C#
     /// lambdas that cannot serialize to JSON). Use <c>WhenField()</c> instead.
-    ///
-    /// Catches:
-    ///   <c>RuleFor(x =&gt; x.Name).NotEmpty().When(x =&gt; x.IsActive)</c>
-    ///   <c>RuleFor(x =&gt; x.Name).NotEmpty().Unless(x =&gt; x.IsAdmin)</c>
-    ///
-    /// Does NOT flag:
-    ///   <c>p.When(args, a =&gt; a.Value).Eq("Custom")</c> — framework's When() on PipelineBuilder.
+    /// Reactive Plan <c>PipelineBuilder.When()</c> conditions are outside this diagnostic.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ServerOnlyConditionAnalyzer : DiagnosticAnalyzer

@@ -9,14 +9,7 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
     /// <summary>
     /// Error when .Reactive() is called multiple times for the same event on the same builder chain.
     /// Each event should have ONE .Reactive() call containing all the logic for that event.
-    ///
-    /// Catches:
-    ///   .Reactive(plan, evt => evt.Changed, ...).Reactive(plan, evt => evt.Changed, ...)
-    ///   .Reactive(plan, evt => evt.Changed, ...).Reactive(plan, evt => evt.Focus, ...).Reactive(plan, evt => evt.Changed, ...)
-    ///
-    /// Does NOT flag:
-    ///   Different builders each with their own .Reactive(evt.Click) — separate components
-    ///   .Reactive(evt.Changed) and .Reactive(evt.Focus) on same builder — different events
+    /// Different events and separate component builders are allowed.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DuplicateReactiveEventAnalyzer : DiagnosticAnalyzer

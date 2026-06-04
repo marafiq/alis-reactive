@@ -11,8 +11,6 @@ namespace Alis.Reactive.Analyzers.Validation
     /// Info diagnostic when FluentValidation methods that produce server-only rules are used
     /// inside a <c>ReactiveValidator&lt;T&gt;</c>. These rules cannot be extracted for
     /// client-side validation and will silently drop during extraction.
-    ///
-    /// Detected methods: IsInEnum, Must, MustAsync, Custom, CustomAsync.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ServerOnlyValidationRuleAnalyzer : DiagnosticAnalyzer
