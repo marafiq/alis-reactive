@@ -32,7 +32,7 @@ Close matrix row: readability planning only -> framework developer cleanup rubri
 First implementation slice goal:
 
 ```text
-Close matrix row: Html.On(plan, t => t.CustomEvent<ScorePayload>("set-score", ... p.When(args, x => x.Score).Gte(90).ElseIf(...))) -> condition guard branch proof -> Playwright grade assertions remain browser-visible and unchanged
+Close matrix row: Html.On(plan, t => t.CustomEvent<ScorePayload>("set-score", ... p.When(args, x => x.Score).Gte(90).ElseIf(...))) -> condition guard branch proof -> Playwright grade assertions remain page-visible and unchanged
 ```
 
 The first implementation commit should target Playwright test readability only.
@@ -312,12 +312,12 @@ Expanded commit boundaries:
    entries when the signature already communicates the chain.
 3. Sandbox Razor DSL comments: one route or feature page per commit, verified
    by the matching build or Playwright route only when the edit can affect
-   rendering, selectors, timing, or browser-visible behavior. Pure comment
+   rendering, selectors, timing, or page-visible behavior. Pure comment
    removal does not warrant e2e.
 4. Runtime TypeScript: one runtime module per commit, verified with
    `npm run typecheck` when TS syntax, names, or comments that can affect
    documentation tooling change. Add `npm test` or `npm run build:all` only for
-   executable runtime edits. Add focused Playwright only when browser-visible
+   executable runtime edits. Add focused Playwright only when page-visible
    runtime behavior changes.
 5. Tools/examples/native/design-system: one project-sized cleanup per commit
    when the project is small, verified with a build covering the project.
@@ -379,11 +379,11 @@ Review cycle before every commit:
   during readability cleanup. A dedicated Playwright-pattern session should
   inventory which behaviors are genuinely reusable for this framework and which
   are current test hacks, then design extensions that would be useful beyond this
-  repo without hiding the browser-visible proof.
+  repo without hiding the page-visible proof.
 - Fusion component Playwright tests often include `plan_json_contains_*` checks
   that assert raw plan JSON substrings for method and event names. Some smoke
   coverage may be useful, but broad raw-string assertions can pin internal plan
-  shape instead of browser-visible behavior. A later test-design slice should
+  shape instead of page-visible behavior. A later test-design slice should
   classify which plan JSON checks are DSL contract proof and which should move
   to lower-level plan/domain tests or be replaced by behavior assertions.
 - TODO: `tests/Alis.Reactive.PlaywrightTests/Components/Native/WhenDropdownSelectionChanges.cs`:
