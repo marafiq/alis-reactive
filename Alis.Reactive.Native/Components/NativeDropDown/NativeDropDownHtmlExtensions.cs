@@ -15,7 +15,7 @@ namespace Alis.Reactive.Native.Components
         /// Registers the dropdown with the Reactive Plan and renders it inside the field wrapper.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <typeparam name="TProp">The model value type registered as the selected option value.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Configures the dropdown (items, placeholder, CSS, reactive events).</param>
         public static void NativeDropDown<TModel, TProp>(
