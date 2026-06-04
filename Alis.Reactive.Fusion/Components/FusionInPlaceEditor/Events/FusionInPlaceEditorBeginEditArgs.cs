@@ -17,8 +17,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>The SF event name.</summary>
         public string? Name { get; set; }
-
-        /// <summary>Creates an event payload instance for descriptor wiring.</summary>
         public FusionInPlaceEditorBeginEditArgs() { }
     }
 

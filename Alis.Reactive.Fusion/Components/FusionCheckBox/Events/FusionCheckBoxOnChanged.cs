@@ -7,10 +7,6 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Gets or sets whether the checkbox is checked after the change.</summary>
         public bool Checked { get; set; }
-
-        /// <summary>
-        /// Creates an event payload instance for descriptor wiring.
-        /// </summary>
         public FusionCheckBoxChangeArgs() { }
     }
 }

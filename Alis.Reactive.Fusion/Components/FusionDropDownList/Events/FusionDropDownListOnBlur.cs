@@ -8,7 +8,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionDropDownListBlurArgs
     {
-        /// <summary>Creates a blur event payload.</summary>
         public FusionDropDownListBlurArgs() { }
     }
 }

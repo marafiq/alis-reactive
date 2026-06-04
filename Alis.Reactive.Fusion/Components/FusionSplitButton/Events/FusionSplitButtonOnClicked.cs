@@ -6,9 +6,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionSplitButtonClickArgs
     {
-        /// <summary>
-        /// Creates an event payload instance for descriptor wiring.
-        /// </summary>
         public FusionSplitButtonClickArgs() { }
     }
 }

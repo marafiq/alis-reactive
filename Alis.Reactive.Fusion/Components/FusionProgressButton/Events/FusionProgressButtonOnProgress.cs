@@ -13,10 +13,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Gets or sets the progress step interval.</summary>
         public double Step { get; set; }
-
-        /// <summary>
-        /// Creates an event payload instance for descriptor wiring.
-        /// </summary>
         public FusionProgressButtonProgressArgs() { }
     }
 }

@@ -8,7 +8,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionNumericTextBoxBlurArgs
     {
-        /// <summary>Creates a blur event payload.</summary>
         public FusionNumericTextBoxBlurArgs() { }
     }
 }

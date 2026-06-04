@@ -13,10 +13,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
         public bool IsInteracted { get; set; }
-
-        /// <summary>
-        /// Creates an event payload instance for descriptor wiring.
-        /// </summary>
         public FusionRatingValueChangedArgs() { }
     }
 }

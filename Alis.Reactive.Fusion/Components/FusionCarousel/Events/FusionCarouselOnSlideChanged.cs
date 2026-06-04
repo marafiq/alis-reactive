@@ -16,10 +16,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Slide direction: Previous or Next.</summary>
         public string SlideDirection { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Creates an event payload instance for descriptor wiring.
-        /// </summary>
         public FusionCarouselSlideChangedArgs()
         {
         }

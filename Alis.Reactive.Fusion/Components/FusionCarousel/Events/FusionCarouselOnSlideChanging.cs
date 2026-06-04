@@ -22,10 +22,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Whether the slide change should be cancelled.</summary>
         public bool Cancel { get; set; }
-
-        /// <summary>
-        /// Creates an event payload instance for descriptor wiring.
-        /// </summary>
         public FusionCarouselSlideChangingArgs()
         {
         }

@@ -8,7 +8,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionDropDownListFocusArgs
     {
-        /// <summary>Creates a focus event payload.</summary>
         public FusionDropDownListFocusArgs() { }
     }
 }

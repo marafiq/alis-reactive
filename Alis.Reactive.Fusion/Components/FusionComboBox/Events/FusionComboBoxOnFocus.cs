@@ -8,9 +8,6 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionComboBoxFocusArgs
     {
-        /// <summary>
-        /// Creates an event payload instance for descriptor wiring.
-        /// </summary>
         public FusionComboBoxFocusArgs() { }
     }
 }

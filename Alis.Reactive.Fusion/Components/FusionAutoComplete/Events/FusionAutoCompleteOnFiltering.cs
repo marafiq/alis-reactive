@@ -18,8 +18,6 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Gets or sets the search text the user typed.</summary>
         public string Text { get; set; } = "";
-
-        /// <summary>Creates an event payload instance for descriptor wiring.</summary>
         public FusionAutoCompleteFilteringArgs() { }
     }
 

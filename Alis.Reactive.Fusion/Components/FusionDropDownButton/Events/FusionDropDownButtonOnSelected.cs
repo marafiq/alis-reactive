@@ -7,10 +7,6 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Gets or sets the selected item metadata from the Syncfusion select event.</summary>
         public FusionDropDownButtonItem Item { get; set; } = new FusionDropDownButtonItem();
-
-        /// <summary>
-        /// Creates an event payload instance for descriptor wiring.
-        /// </summary>
         public FusionDropDownButtonSelectArgs() { }
     }
 
