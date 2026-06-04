@@ -47,8 +47,8 @@ export function wireTrigger(
     case "document-event": {
       const source = `document-event:${trigger.event}`;
       log.debug("document-event.listening", { event: trigger.event });
-      document.addEventListener(trigger.event, (e: Event) => {
-        const context = ExecutionContext.event(documentEventPayload(e));
+      document.addEventListener(trigger.event, (documentEvent: Event) => {
+        const context = ExecutionContext.event(documentEventPayload(documentEvent));
         runReaction(reaction, planDocument, context, source);
       }, eventOptions);
       break;

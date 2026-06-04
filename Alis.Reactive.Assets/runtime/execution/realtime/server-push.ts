@@ -29,8 +29,8 @@ function retrySSE(url: string, behaviors: readonly WiredBehavior[]): void {
   removeRetryIndicators(url);
   log.info("retry.manual", { url });
 
-  for (const b of behaviors) {
-    wireServerPush(b.trigger, b.reaction, b.plan);
+  for (const wiredBehavior of behaviors) {
+    wireServerPush(wiredBehavior.trigger, wiredBehavior.reaction, wiredBehavior.plan);
   }
 }
 
@@ -81,8 +81,8 @@ export function wireServerPush(
   const managed = getOrCreate(trigger.url);
   const eventName = serverPushEventName(trigger);
 
-  const handler = (e: MessageEvent) => {
-    const eventPayload: Record<string, unknown> = JSON.parse(e.data);
+  const handler = (messageEvent: MessageEvent) => {
+    const eventPayload: Record<string, unknown> = JSON.parse(messageEvent.data);
     log.debug("message.received", { url: trigger.url, event: eventName });
     catchAsyncReactionFailure(
       executeReaction(reaction, plan, ExecutionContext.event(eventPayload).raw),
