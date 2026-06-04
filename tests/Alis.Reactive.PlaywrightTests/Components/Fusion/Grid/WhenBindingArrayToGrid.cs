@@ -28,7 +28,6 @@ public class WhenBindingArrayToGrid : PlaywrightTestBase
         var rows = Page.Locator("#roster-grid .e-row");
         await Expect(rows).ToHaveCountAsync(5, new() { Timeout = 10000 });
 
-        // OrderBy(x => x.Name) — the client-side transform routed into the grid: Ada is first.
         await Expect(rows.First).ToContainTextAsync("Ada", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
@@ -45,8 +44,6 @@ public class WhenBindingArrayToGrid : PlaywrightTestBase
         await Expect(Page.Locator("#grid-status"))
             .ToHaveTextAsync("active only", new() { Timeout = 5000 });
 
-        // Where(x => x.Status == "active") over the grid's own rows: 3 remain (Ada, Cy, Ed),
-        // and no discharged/critical row survives.
         await Expect(Page.Locator("#roster-grid .e-row")).ToHaveCountAsync(3, new() { Timeout = 10000 });
         await Expect(Page.Locator("#roster-grid")).Not.ToContainTextAsync("discharged", new() { Timeout = 5000 });
         await Expect(Page.Locator("#roster-grid")).Not.ToContainTextAsync("critical", new() { Timeout = 5000 });

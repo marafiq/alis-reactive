@@ -39,7 +39,6 @@ public class WhenInPlaceEditorShowsSavedIndicator : PlaywrightTestBase
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#card-dob .e-editable-value-wrapper");
 
-        // Commit once so the class lands.
         await Page.Locator("#card-dob .e-editable-value-wrapper").First.ClickAsync();
         var inner = Page.Locator("#card-dob input.e-control").First;
         await Expect(inner).ToBeVisibleAsync(new() { Timeout = 5000 });
@@ -50,7 +49,6 @@ public class WhenInPlaceEditorShowsSavedIndicator : PlaywrightTestBase
         await Expect(editor).ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("alis-editor-saved"), new() { Timeout = 5000 });
 
-        // Click the display again to re-enter edit mode; BeginEdit pipeline removes the class.
         await Page.Locator("#card-dob .e-editable-value-wrapper").First.ClickAsync();
 
         await Expect(editor).Not.ToHaveClassAsync(
