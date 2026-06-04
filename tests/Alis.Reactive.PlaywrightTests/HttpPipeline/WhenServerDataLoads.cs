@@ -114,7 +114,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Load Chain");
 
-        // Facilities load only after the residents request completes.
         await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
         await Expect(Page.Locator("#chain-facility-second")).ToHaveTextAsync("West Wing", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -127,7 +126,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Load Chain");
 
-        // Spinner hides in the chained second response route.
         await Expect(Page.Locator("#chain-facility-first")).ToHaveTextAsync("Main Campus", new() { Timeout = 5000 });
         await Expect(Page.Locator("#chain-spinner")).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -285,7 +283,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Submit Form");
 
-        // Field names verify the model-binding names sent in the FormData payload.
         await Expect(Page.Locator("#formdata-fields")).ToHaveTextAsync(
             "FirstName, LastName, Email", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -322,7 +319,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Search for 'John'");
 
-        // John matches John Doe and Bob Johnson in the sandbox data.
         await Expect(Page.Locator("#search-match-count")).ToHaveTextAsync("2", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -384,7 +380,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        // Seed rows prove Into() partial injection rendered the grid.
         await Expect(Page.GetByTestId("native-action-link-row-41"))
             .ToContainTextAsync("Resident #41", new() { Timeout = 5000 });
         await Expect(Page.GetByTestId("native-action-link-row-42"))
@@ -476,7 +471,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickWhenStable(Page.GetByTestId("standalone-native-action-link"));
 
-        // POST response HTML is injected into the result container.
         await Expect(Page.Locator("#standalone-native-action-link-result"))
             .ToContainTextAsync("Standalone NativeActionLink response loaded.", new() { Timeout = 5000 });
 
@@ -495,7 +489,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
     {
         await WaitForDomReadyGet();
 
-        // Intercept only the first save to prove retry replaces the error state.
         var intercepted = false;
         await Page.RouteAsync("**/Sandbox/HttpPipeline/Http/Save", async route =>
         {
@@ -526,7 +519,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
             "John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#save-result")).ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-green-600"));
-        // Success route removes the previous error class.
         await Expect(Page.Locator("#save-result")).Not.ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-red-600"));
 
@@ -559,7 +551,6 @@ public class WhenServerDataLoads : PlaywrightTestBase
 
         await ClickButton("Load Chain");
 
-        // Residents must complete before facilities can load.
         await Expect(Page.Locator("#chain-resident-first")).ToHaveTextAsync(
             "John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#chain-resident-second")).ToHaveTextAsync("Jane Smith");
@@ -580,13 +571,10 @@ public class WhenServerDataLoads : PlaywrightTestBase
     [Test]
     public async Task all_spinners_are_hidden_after_page_fully_loads()
     {
-        // After DomReady GET completes, every spinner should be hidden.
-        // This catches WhileLoading show/hide mismatches.
         await WaitForDomReadyGet();
 
         await Expect(Page.Locator("#load-spinner")).ToBeHiddenAsync();
 
-        // Remaining spinners have not been triggered by user actions.
         await Expect(Page.Locator("#save-spinner")).ToBeHiddenAsync();
         await Expect(Page.Locator("#chain-spinner")).ToBeHiddenAsync();
         await Expect(Page.Locator("#parallel-spinner")).ToBeHiddenAsync();
@@ -602,18 +590,15 @@ public class WhenServerDataLoads : PlaywrightTestBase
     [Test]
     public async Task parallel_request_spinner_hides_only_after_both_complete()
     {
-        // Parallel spinner must wait for OnAllSettled, not the first response.
         await WaitForDomReadyGet();
 
         await ClickButton("Load Parallel");
 
-        // Both datasets must arrive before the all-settled route can run.
         await Expect(Page.Locator("#parallel-resident-first")).ToHaveTextAsync(
             "John Doe", new() { Timeout = 5000 });
         await Expect(Page.Locator("#parallel-facility-first")).ToHaveTextAsync(
             "Main Campus", new() { Timeout = 5000 });
 
-        // OnAllSettled sets completion text; this is the settled signal.
         await Expect(Page.Locator("#parallel-all")).ToHaveTextAsync(
             "All parallel requests completed!", new() { Timeout = 5000 });
 
