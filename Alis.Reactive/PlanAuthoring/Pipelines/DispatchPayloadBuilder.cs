@@ -18,7 +18,7 @@ namespace Alis.Reactive.Builders
         where TPayload : class
         where TModel : class
     {
-        private readonly DispatchPayloadDraft _payload = new DispatchPayloadDraft();
+        private readonly DispatchPayloadDraft _draft = new DispatchPayloadDraft();
 
         internal DispatchPayloadBuilder() { }
 
@@ -30,8 +30,8 @@ namespace Alis.Reactive.Builders
             Expression<Func<TPayload, TProp>> field,
             TypedSource<TProp> source)
         {
-            var fieldName = ExpressionPathHelper.ToEventPath<TPayload, TProp>(field);
-            _payload.Set(fieldName, source.ToValueExpression());
+            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, TProp>(field);
+            _draft.Set(payloadPath, source.ToValueExpression());
             return this;
         }
 
@@ -42,8 +42,8 @@ namespace Alis.Reactive.Builders
             Expression<Func<TPayload, string>> field,
             string value)
         {
-            var fieldName = ExpressionPathHelper.ToEventPath<TPayload, string>(field);
-            _payload.Set(fieldName, ValueExpression.Literal(value));
+            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, string>(field);
+            _draft.Set(payloadPath, ValueExpression.Literal(value));
             return this;
         }
 
@@ -54,8 +54,8 @@ namespace Alis.Reactive.Builders
             Expression<Func<TPayload, int>> field,
             int value)
         {
-            var fieldName = ExpressionPathHelper.ToEventPath<TPayload, int>(field);
-            _payload.Set(fieldName, ValueExpression.Literal(value));
+            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, int>(field);
+            _draft.Set(payloadPath, ValueExpression.Literal(value));
             return this;
         }
 
@@ -66,18 +66,18 @@ namespace Alis.Reactive.Builders
             Expression<Func<TPayload, bool>> field,
             bool value)
         {
-            var fieldName = ExpressionPathHelper.ToEventPath<TPayload, bool>(field);
-            _payload.Set(fieldName, ValueExpression.Literal(value));
+            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, bool>(field);
+            _draft.Set(payloadPath, ValueExpression.Literal(value));
             return this;
         }
 
         internal ValueExpression Build()
         {
-            if (!_payload.HasFields)
+            if (!_draft.HasFields)
                 throw new InvalidOperationException(
                     "Dispatch payload must have at least one field. Use Dispatch(eventName) for no-payload dispatch.");
 
-            return _payload.ToValueExpression();
+            return _draft.ToValueExpression();
         }
     }
 
