@@ -27,7 +27,7 @@ namespace Alis.Reactive.Native.Components
     /// </para>
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The bound property type.</typeparam>
+    /// <typeparam name="TProp">The model value type represented by the checked option values.</typeparam>
     public class NativeCheckListBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
