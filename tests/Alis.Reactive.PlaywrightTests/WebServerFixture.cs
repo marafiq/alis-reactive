@@ -5,9 +5,7 @@ using System.Net.Sockets;
 namespace Alis.Reactive.PlaywrightTests;
 
 /// <summary>
-/// Starts the SandboxApp Kestrel server for Playwright tests.
-/// One instance per test run (assembly-level setup).
-/// Uses a random available port so parallel sessions don't collide.
+/// Runs one SandboxApp Kestrel instance on an isolated port for the Playwright test assembly.
 /// </summary>
 [SetUpFixture]
 public class WebServerFixture
@@ -149,7 +147,6 @@ public class WebServerFixture
 
     private static string FindProjectDir()
     {
-        // Walk up from test output directory to find the SandboxApp project
         var dir = TestContext.CurrentContext.TestDirectory;
         while (dir != null)
         {
@@ -159,7 +156,7 @@ public class WebServerFixture
             dir = Path.GetDirectoryName(dir);
         }
 
-        // Running from the repo root keeps local Playwright runs working outside test output.
+        // Fallback supports local runs launched from the repo root instead of test output.
         var repoRoot = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", "..", ".."));
         return Path.Combine(repoRoot, "Alis.Reactive.SandboxApp");
     }

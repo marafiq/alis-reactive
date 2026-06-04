@@ -57,8 +57,7 @@ public abstract class PlaywrightTestBase : PageTest
             }
         };
 
-        // Start tracing — captures screenshots, DOM snapshots, and network.
-        // On failure, saved as a .zip trace viewable at https://trace.playwright.dev
+        // Failure traces capture screenshots, DOM snapshots, and network in a Playwright .zip.
         await Context.Tracing.StartAsync(new()
         {
             Title = $"{TestContext.CurrentContext.Test.ClassName}.{TestContext.CurrentContext.Test.Name}",
@@ -104,10 +103,7 @@ public abstract class PlaywrightTestBase : PageTest
         var tracePath = default(string);
         var screenshotPath = default(string);
 
-        // Save trace + screenshot on failure to a FIXED path under the test project.
-        // Traces: `npx playwright show-trace <path>` or https://trace.playwright.dev
-        // Screenshots: PNG files viewable directly
-        // Output next to the test .cs files — not buried in bin/Debug/net10.0/
+        // Keep failure artifacts beside the test project so wrapper diagnostics use stable paths.
         var projectDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", ".."));
         var traceDir = Path.Combine(projectDir, "TestResults", "playwright-traces");
         Directory.CreateDirectory(traceDir);
