@@ -44,7 +44,7 @@ type WindowWithConfirm = typeof window & {
   alis?: { confirm?: (message: string) => boolean | Promise<boolean> };
 };
 
-function plan(): PlanDocument {
+function emptyConditionPlan(): PlanDocument {
   return {
     version: 3,
     planId: "ConditionGraph.Runtime",
@@ -226,7 +226,7 @@ function arrayContains(left: JsonValue[], right: JsonValue, itemShape: Shape): C
 }
 
 function matches(condition: ValidationCondition, context?: ExecContext): boolean {
-  return evaluateCondition(condition, plan(), context);
+  return evaluateCondition(condition, emptyConditionPlan(), context);
 }
 
 afterEach(() => {
@@ -332,7 +332,7 @@ describe("condition runtime", () => {
         ],
       };
 
-      const completion = evaluateConditionInCurrentLane(condition, plan());
+      const completion = evaluateConditionInCurrentLane(condition, emptyConditionPlan());
 
       expect(completion).toBeInstanceOf(Promise);
       await expect(completion).resolves.toBe(true);
@@ -350,7 +350,7 @@ describe("condition runtime", () => {
         ],
       };
 
-      const completion = evaluateConditionInCurrentLane(condition, plan());
+      const completion = evaluateConditionInCurrentLane(condition, emptyConditionPlan());
 
       expect(completion).toBe(true);
       expect(confirm).not.toHaveBeenCalled();
@@ -360,7 +360,7 @@ describe("condition runtime", () => {
       const confirm = vi.fn(() => false);
       (window as WindowWithConfirm).alis = { confirm };
 
-      const completion = evaluateConditionInCurrentLane({ kind: "confirm", message: "Delete?" }, plan());
+      const completion = evaluateConditionInCurrentLane({ kind: "confirm", message: "Delete?" }, emptyConditionPlan());
 
       expect(completion).toBeInstanceOf(Promise);
       await expect(completion).resolves.toBe(false);
