@@ -116,10 +116,10 @@ export function wireSignalR(
   const { connection } = managed;
 
   const handler = (...args: unknown[]) => {
-    const evt = signalRInvocationPayload(args, trigger);
+    const eventPayload = signalRInvocationPayload(args, trigger);
     log.debug("method.received", { hubUrl: trigger.hubUrl, method: trigger.method });
     catchAsyncReactionFailure(
-      executeReaction(reaction, plan, ExecutionContext.event(evt).raw),
+      executeReaction(reaction, plan, ExecutionContext.event(eventPayload).raw),
       err => log.error("reaction.failed", { hubUrl: trigger.hubUrl, method: trigger.method, error: toJavaScriptString(err) }),
     );
   };

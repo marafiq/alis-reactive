@@ -82,10 +82,10 @@ export function wireServerPush(
   const eventName = serverPushEventName(trigger);
 
   const handler = (e: MessageEvent) => {
-    const evt: Record<string, unknown> = JSON.parse(e.data);
+    const eventPayload: Record<string, unknown> = JSON.parse(e.data);
     log.debug("message.received", { url: trigger.url, event: eventName });
     catchAsyncReactionFailure(
-      executeReaction(reaction, plan, ExecutionContext.event(evt).raw),
+      executeReaction(reaction, plan, ExecutionContext.event(eventPayload).raw),
       err => log.error("reaction.failed", { url: trigger.url, event: eventName, error: toJavaScriptString(err) }),
     );
   };
