@@ -386,6 +386,13 @@ Review cycle before every commit:
   shape instead of browser-visible behavior. A later test-design slice should
   classify which plan JSON checks are DSL contract proof and which should move
   to lower-level plan/domain tests or be replaced by behavior assertions.
+- TODO: `tests/Alis.Reactive.PlaywrightTests/Components/Native/WhenDropdownSelectionChanges.cs`:
+  `plan_carries_prop_value_for_setvalue_mutation` is named and commented as a
+  NativeDropDown SetValue property proof, but its raw JSON assertion currently
+  matches `"property": "text"`, which can be satisfied by unrelated DOM text
+  mutations in the same plan. A later test-design slice should prove the
+  dropdown `value` contract directly, preferably below the browser layer or
+  through behavior-focused coverage, then remove or rename the raw JSON check.
 - TODO: `tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Grid/WhenUsingFusionGrid.cs`:
   the former `sorting_then_paging_preserves_sort_order` name promised row-order
   proof, but the test only asserts the paging echo after sorting. A later
