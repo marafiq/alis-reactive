@@ -1,14 +1,10 @@
 import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
 
-// Fusion (Syncfusion EJ2) CSS pipeline.
-// Entry:  Alis.Reactive.Assets/fusion/syncfusion.entry.css
-// Output: Alis.Reactive.Assets/dist/css/syncfusion.dev.css
-//
-// Bundles @syncfusion/ej2/tailwind3.css (from npm) with the framework's
-// Syncfusion overrides. `root` is pinned to the repo root so the @syncfusion/ej2
-// node_modules import resolves identically to the former repo-root build.
-// No @tailwindcss/vite plugin: the input is plain vendor CSS + overrides.
+// Fusion CSS bundles Syncfusion EJ2 Tailwind CSS with the framework overrides.
+// Build from the repo root so the @syncfusion/ej2 import resolves through the
+// same node_modules tree as the package build. No Tailwind plugin is needed here;
+// this input is vendor CSS plus overrides.
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 export default defineConfig({
