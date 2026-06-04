@@ -122,16 +122,16 @@ function toNumber(value: unknown): number {
   return Number.isFinite(numericValue) ? numericValue : 0;
 }
 
-function compareKeys(a: unknown, b: unknown): number {
-  if (typeof a === "number" && typeof b === "number") {
-    const aFinite = Number.isFinite(a);
-    const bFinite = Number.isFinite(b);
-    if (aFinite && bFinite) return a - b;
+function compareKeys(leftKey: unknown, rightKey: unknown): number {
+  if (typeof leftKey === "number" && typeof rightKey === "number") {
+    const leftKeyIsFinite = Number.isFinite(leftKey);
+    const rightKeyIsFinite = Number.isFinite(rightKey);
+    if (leftKeyIsFinite && rightKeyIsFinite) return leftKey - rightKey;
     // Non-finite keys sort last; never feed NaN to Array.sort's comparator.
-    if (aFinite === bFinite) return 0;
-    return aFinite ? -1 : 1;
+    if (leftKeyIsFinite === rightKeyIsFinite) return 0;
+    return leftKeyIsFinite ? -1 : 1;
   }
-  const left = toJavaScriptString(a);
-  const right = toJavaScriptString(b);
-  return left < right ? -1 : left > right ? 1 : 0;
+  const leftText = toJavaScriptString(leftKey);
+  const rightText = toJavaScriptString(rightKey);
+  return leftText < rightText ? -1 : leftText > rightText ? 1 : 0;
 }
