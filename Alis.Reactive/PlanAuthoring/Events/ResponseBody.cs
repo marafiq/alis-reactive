@@ -18,7 +18,7 @@ namespace Alis.Reactive
     /// <para>
     /// Use it directly with response-aware overloads such as <c>SetText</c>, or
     /// call <see cref="Read{TProp}"/> to create a <see cref="TypedSource{TProp}"/>
-    /// for conditions, comparisons, plugin arguments, etc.
+    /// for conditions and plugin arguments.
     /// <code>
     /// .OnSuccess&lt;ApiResponse&gt;((body, s) =&gt; {
     ///     s.Element("name").SetText(body, r =&gt; r.Data.Name);
@@ -42,7 +42,7 @@ namespace Alis.Reactive
         /// </summary>
         /// <typeparam name="TProp">The value type returned by the selected response-body path.</typeparam>
         /// <param name="expression">The response-body property path, for example <c>r =&gt; r.Data.Name</c>.</param>
-        /// <returns>A typed source for conditions, comparisons, plugin arguments, and other source-based APIs.</returns>
+        /// <returns>A typed source for conditions and plugin arguments.</returns>
         public TypedSource<TProp> Read<TProp>(Expression<Func<T, TProp>> expression)
         {
             return new PayloadTypedSource<T, TProp>(Scope, expression);
