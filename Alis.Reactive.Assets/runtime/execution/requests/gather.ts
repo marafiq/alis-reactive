@@ -19,9 +19,9 @@ export type { ResolvedRequestInput } from "./request-payload-writer";
 
 interface GatherExecution {
   readonly method: HttpMethod;
-  readonly plan: PlanDocument;
+  readonly planDocument: PlanDocument;
   readonly runtimePlan: RuntimePlan;
-  readonly ctx: ExecContext;
+  readonly context: ExecContext;
 }
 
 type RequestPayloadWriter = ReturnType<typeof requestPayloadWriterFor>;
@@ -31,61 +31,69 @@ function emptyRequestInput(): ResolvedRequestInput {
 }
 
 export function resolveRequestInput(
-  input: RequestInput,
+  authoredInput: RequestInput,
   method: HttpMethod,
-  plan: PlanDocument,
-  ctx: ExecContext,
+  planDocument: PlanDocument,
+  context: ExecContext,
 ): ResolvedRequestInput {
-  const execution = { method, plan, runtimePlan: RuntimePlan.from(plan), ctx };
-  switch (input.kind) {
+  const execution = {
+    method,
+    planDocument,
+    runtimePlan: RuntimePlan.from(planDocument),
+    context,
+  };
+  switch (authoredInput.kind) {
     case "none":
       return emptyRequestInput();
     case "gather":
-      return resolveGatherRequestInput(input, execution);
+      return resolveGatherRequestInput(authoredInput, execution);
     default:
-      return assertNever(input, "request input");
+      return assertNever(authoredInput, "request input");
   }
 }
 
-function resolveGatherRequestInput(input: GatherRequestInput, execution: GatherExecution): ResolvedRequestInput {
-  const requestInput = emptyRequestInput();
-  const writer = requestPayloadWriterFor(requestInput, input.bodyFormat, execution.method);
+function resolveGatherRequestInput(
+  authoredInput: GatherRequestInput,
+  execution: GatherExecution,
+): ResolvedRequestInput {
+  const resolvedInput = emptyRequestInput();
+  const writer = requestPayloadWriterFor(resolvedInput, authoredInput.bodyFormat, execution.method);
 
-  writeAuthoredAssignments(input.assignments, requestInput, writer, execution);
-  writeRuntimeSelectedInputs(input.registeredInputs, execution, writer);
+  writeAuthoredAssignments(authoredInput.assignments, resolvedInput, writer, execution);
+  writeRuntimeSelectedInputs(authoredInput.registeredInputs, execution, writer);
 
-  return requestInput;
+  return resolvedInput;
 }
 
 function writeAuthoredAssignments(
   assignments: RequestInputAssignment[],
-  requestInput: ResolvedRequestInput,
+  resolvedInput: ResolvedRequestInput,
   writer: RequestPayloadWriter,
   execution: GatherExecution,
 ): void {
   for (const assignment of assignments) {
-    writeRequestInputAssignment(assignment, requestInput, writer, execution);
+    writeRequestInputAssignment(assignment, resolvedInput, writer, execution);
   }
 }
 
 function writeRequestInputAssignment(
   assignment: RequestInputAssignment,
-  requestInput: ResolvedRequestInput,
+  resolvedInput: ResolvedRequestInput,
   writer: RequestPayloadWriter,
   execution: GatherExecution,
 ): void {
-  const raw = evaluateValue(assignment.source, execution.plan, execution.ctx);
+  const rawValue = evaluateValue(assignment.source, execution.planDocument, execution.context);
   const shape = RuntimeShape.declaredBy(assignment.source);
   switch (assignment.target.kind) {
     case "payload":
-      writeRequestPayloadValue(assignment.target, raw, shape, writer);
+      writeRequestPayloadValue(assignment.target, rawValue, shape, writer);
       return;
     case "header":
-      if (isMissingRuntimeValue(raw)) return;
-      writeRequestHeader(requestInput, assignment.target.name, raw, shape);
+      if (isMissingRuntimeValue(rawValue)) return;
+      writeRequestHeader(resolvedInput, assignment.target.name, rawValue, shape);
       return;
     case "route-param":
-      writeRequestRouteParam(requestInput, assignment.target.name, raw, shape);
+      writeRequestRouteParam(resolvedInput, assignment.target.name, rawValue, shape);
       return;
     default:
       return assertNever(assignment.target, "request input target");
@@ -93,16 +101,16 @@ function writeRequestInputAssignment(
 }
 
 function writeRequestHeader(
-  requestInput: ResolvedRequestInput,
+  resolvedInput: ResolvedRequestInput,
   name: string,
   value: unknown,
   shape: RuntimeShape,
 ): void {
-  requestInput.headers[name] = requestScalarWireValue("header", name, value, shape);
+  resolvedInput.headers[name] = requestScalarWireValue("header", name, value, shape);
 }
 
 function writeRequestRouteParam(
-  requestInput: ResolvedRequestInput,
+  resolvedInput: ResolvedRequestInput,
   name: string,
   value: unknown,
   shape: RuntimeShape,
@@ -112,7 +120,7 @@ function writeRequestRouteParam(
     throw new Error(`[alis] route param "${name}" evaluated to null; cannot build URL`);
   }
 
-  requestInput.routeParams[name] = requestScalarWireValue("route param", name, value, shape);
+  resolvedInput.routeParams[name] = requestScalarWireValue("route param", name, value, shape);
 }
 
 function requestScalarWireValue(
