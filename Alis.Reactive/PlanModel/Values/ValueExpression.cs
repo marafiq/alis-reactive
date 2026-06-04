@@ -546,7 +546,6 @@ namespace Alis.Reactive.PlanModel
         /// condition subset, never confirm, so per-element evaluation stays on
         /// the immediate lane.
         /// </remarks>
-        // Null omission is part of the JSON contract; keep it aligned with the remarks.
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ConditionGraph? Predicate { get; }
         /// <summary>Gets the per-element projection, or null when the operation does not use one.</summary>
@@ -555,7 +554,6 @@ namespace Alis.Reactive.PlanModel
         /// sum, and ordering require a selector; find includes one only for field
         /// projection. It is evaluated against the element scope.
         /// </remarks>
-        // Null omission is part of the JSON contract; keep it aligned with the remarks.
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ValueExpression? Projection { get; }
         /// <summary>Gets the declared element shape of the source array.</summary>
