@@ -55,7 +55,7 @@ function readUrlParameter(name: string, shape: Shape): ValueExpression {
   };
 }
 
-function browserValue(value: unknown, shape: Shape): ValueExpression {
+function runtimeLiteral(value: unknown, shape: Shape): ValueExpression {
   return { kind: "literal", value, shape };
 }
 
@@ -270,12 +270,12 @@ describe("resolveRequestInput", () => {
     });
   });
 
-  it("writes form-data from scalar, array, and browser file values", () => {
+  it("writes form-data from scalar, array, and File values", () => {
     const file = new File(["hello"], "summary.txt", { type: "text/plain" });
     const input = gatherInput([
       assignment("resident", literal("Ada", stringShape)),
       assignment("tags", literal(["fall-risk", "new"], arrayShape(stringShape))),
-      assignment("documents", browserValue([file], arrayShape(rawShape))),
+      assignment("documents", runtimeLiteral([file], arrayShape(rawShape))),
     ], "form-data");
 
     const body = resolveBody(input) as FormData;
@@ -285,10 +285,10 @@ describe("resolveRequestInput", () => {
     expect(body.getAll("documents")).toEqual([file]);
   });
 
-  it("uses rawFile wrappers as browser file values for form-data", () => {
+  it("uses rawFile wrappers as File values for form-data", () => {
     const file = new File(["hello"], "summary.txt", { type: "text/plain" });
     const input = gatherInput([
-      assignment("documents", browserValue([{ rawFile: file }], arrayShape(rawShape))),
+      assignment("documents", runtimeLiteral([{ rawFile: file }], arrayShape(rawShape))),
     ], "form-data");
 
     const body = resolveBody(input) as FormData;
@@ -296,19 +296,19 @@ describe("resolveRequestInput", () => {
     expect(body.getAll("documents")).toEqual([file]);
   });
 
-  it("requires form-data body format when browser files are gathered into the request body", () => {
+  it("requires form-data body format when File values are gathered into the request body", () => {
     const file = new File(["hello"], "summary.txt", { type: "text/plain" });
     const input = gatherInput([
-      assignment("documents", browserValue([file], arrayShape(rawShape))),
+      assignment("documents", runtimeLiteral([file], arrayShape(rawShape))),
     ]);
 
     expect(() => resolveBody(input)).toThrow("[alis] File objects require form-data body format");
   });
 
-  it("does not send browser files through query parameters", () => {
+  it("does not send File values through query parameters", () => {
     const file = new File(["hello"], "summary.txt", { type: "text/plain" });
     const input = gatherInput([
-      assignment("documents", browserValue([file], arrayShape(rawShape))),
+      assignment("documents", runtimeLiteral([file], arrayShape(rawShape))),
     ]);
 
     expect(() => resolveBody(input, "GET")).toThrow("[alis] File objects cannot be sent via GET");

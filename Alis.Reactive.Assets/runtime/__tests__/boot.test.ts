@@ -46,7 +46,7 @@ describe("runtime boot state", () => {
       .toThrow("[alis] no active plan");
   });
 
-  it("clears browser plugin instances during boot reset", () => {
+  it("clears registered plugin instances during boot reset", () => {
     registerPlugin("slugify", (value: string): string => value.toLowerCase());
 
     resetBootStateForTests();
