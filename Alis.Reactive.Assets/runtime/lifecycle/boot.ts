@@ -12,7 +12,7 @@ import { resetNativeActionLinksForTests } from "../components/native/native-acti
 import { resetPluginCatalogForTests } from "../plugins/catalog";
 import {
   appliedPlans,
-  type BrowserPlanWiring,
+  type ActivePlanWiring,
 } from "./applied-plans";
 
 const log = scope("boot");
@@ -69,7 +69,7 @@ function wireContainerValidation(plan: PlanDocument, signal?: AbortSignal): void
 }
 
 export function loadPartialSlot(slotId: string, incoming: PlanDocument[]): void {
-  const affectedPlanIds = appliedPlans.loadPartialSlot(slotId, incoming, browserPlanWiring());
+  const affectedPlanIds = appliedPlans.loadPartialSlot(slotId, incoming, activePlanWiring());
 
   for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
@@ -112,7 +112,7 @@ export function resetBootStateForTests(): void {
 
 export const trace = { setLevel };
 
-function browserPlanWiring(): BrowserPlanWiring {
+function activePlanWiring(): ActivePlanWiring {
   return {
     wireBehaviors,
     wireContainerValidation,

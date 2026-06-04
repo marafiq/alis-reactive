@@ -61,6 +61,11 @@ Keep comments when they explain one of these developer-facing facts:
 - Public DSL XML documentation that follows normal .NET XML doc shape:
   `<summary>`, `<typeparam>`, `<param>`, `<returns>`, and targeted
   `<remarks>` or `<exception>` entries when they communicate contract behavior.
+- Precise Reactive Plan vocabulary. Use "browser" only for DOM/window/network
+  APIs, user-agent behavior, Playwright-visible outcomes, or generated
+  `BrowserObject*` contract terms that still exist. Use "Reactive Plan",
+  "active PlanDocument", "plan-registered component", or "runtime boundary"
+  for framework-owned plan concepts.
 - Editorial value: a retained comment should prevent concrete confusion or drift
   for a framework developer. Visiting a file during this pass is not enough
   reason to preserve, expand, or standardize comments that do not carry that
@@ -76,6 +81,8 @@ Delete comments when they only:
   behavior.
 - Preserve stale vocabulary that no longer matches the DSL graph or domain
   terms.
+- Widen "browser" into a synonym for the Reactive Plan, plan lifecycle,
+  component contract, or framework runtime.
 - Try to compensate for unclear test flow that should instead be fixed through
   better names, tighter ordering, or a follow-up note.
 - Provide long examples better suited for docs, sandbox pages, or focused

@@ -10,7 +10,7 @@ type SlotId = string;
 type WireBehaviors = (behaviors: Behavior[], plan: PlanDocument, signal?: AbortSignal) => void;
 type WireContainerValidation = (plan: PlanDocument, signal?: AbortSignal) => void;
 
-export interface BrowserPlanWiring {
+export interface ActivePlanWiring {
   wireBehaviors: WireBehaviors;
   wireContainerValidation: WireContainerValidation;
 }
@@ -30,7 +30,7 @@ export class AppliedPlans {
     this.bootSnapshots.set(plan.planId, snapshotPlan(plan));
   }
 
-  loadPartialSlot(slotId: SlotId, plans: PlanDocument[], wiring: BrowserPlanWiring): PlanId[] {
+  loadPartialSlot(slotId: SlotId, plans: PlanDocument[], wiring: ActivePlanWiring): PlanId[] {
     const affectedPlanIds = new Set(this.unloadSlot(slotId));
 
     const abortController = new AbortController();

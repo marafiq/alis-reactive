@@ -27,7 +27,7 @@ export class RuntimeResolutionError extends Error {
   static componentNotActive(componentKey: string): RuntimeResolutionError {
     return new RuntimeResolutionError(
       { kind: "active-component", key: componentKey },
-      `[alis] component not active in browser plan: ${componentKey}`,
+      `[alis] component not active in Reactive Plan: ${componentKey}`,
     );
   }
 

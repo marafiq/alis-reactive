@@ -13,15 +13,16 @@ The audit looked for:
 - inline `//` comments in tests that describe each action instead of naming the behavior through helpers or test names
 
 Target audience is framework developers. Comments should explain DSL intent,
-browser boundary behavior, compatibility constraints, or non-obvious tradeoffs.
-They should not narrate ordinary code.
+Reactive Plan runtime-boundary behavior, real browser API behavior,
+compatibility constraints, or non-obvious tradeoffs. They should not narrate
+ordinary code.
 
 ## Cleanup Standard
 
 Keep comments when they answer one of these questions:
 
-- What DSL concept or browser boundary is this code protecting?
-- Why is this implementation intentionally different for `net48`, Syncfusion, or browser runtime behavior?
+- What DSL concept, Reactive Plan runtime boundary, or real browser API boundary is this code protecting?
+- Why is this implementation intentionally different for `net48`, Syncfusion, or Reactive Plan runtime behavior?
 - What invariant would be easy to break during refactoring?
 - What public API behavior must remain visible in IntelliSense?
 
@@ -58,8 +59,8 @@ Examples to simplify:
 - `WhenAllComponentsGatherIntoOnePost.cs` has many field-by-field comments inside long form-fill flows. Prefer helper methods named by domain action.
 - validation rule tests use comments like `// Fix it`, `// Submit first`, and `// Trigger error first`; those should either disappear or become focused helper names.
 
-Comments worth keeping in tests are the ones that explain an unstable browser
-surface or vendor behavior, such as duplicate Syncfusion inputs, required popup
+Comments worth keeping in tests are the ones that explain unstable DOM/event
+timing or vendor behavior, such as duplicate Syncfusion inputs, required popup
 sequencing, or why a test must be non-parallel.
 
 ### Builder XML Documentation
@@ -93,7 +94,7 @@ or runtime constraints. Others narrate obvious writes.
 Keep:
 
 - `net48` comments that explain MVC `ValueFor` encoding behavior.
-- comments that explain Syncfusion rendering quirks, duplicated inputs, or browser event ordering.
+- comments that explain Syncfusion rendering quirks, duplicated inputs, or real browser event ordering.
 - comments that mark plan/runtime invariants that are not obvious from code.
 
 Rewrite or delete:
@@ -107,9 +108,8 @@ Rewrite or delete:
 1. Start with Playwright test files, because they have the highest noise and the
    lowest public API risk.
 2. Replace repeated step comments with helper methods named after the domain action.
-3. Preserve comments that explain Syncfusion, browser timing, or compatibility quirks.
+3. Preserve comments that explain Syncfusion, real browser timing, or compatibility quirks.
 4. Then trim public XML docs in one logical API slice at a time, keeping concise
    IntelliSense summaries for public DSL methods.
 5. Run the focused Playwright filter for each touched slice, then the observable
    full Playwright gate before committing the cleanup.
-

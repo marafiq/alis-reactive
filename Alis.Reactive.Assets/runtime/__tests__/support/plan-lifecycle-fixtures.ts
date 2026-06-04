@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { BrowserPlanWiring } from "../../lifecycle/applied-plans";
+import type { ActivePlanWiring } from "../../lifecycle/applied-plans";
 import type { Behavior, ComponentObject, ComponentValidation, BrowserObjectContract, PathSegment, PlanDocument, Shape, StructuredPath } from "../../types/index";
 
 export function objectContract(): BrowserObjectContract {
@@ -193,7 +193,7 @@ export function partialPlan(
 
 export function testPlanWiring() {
   const behaviorSignals: (AbortSignal | undefined)[] = [];
-  const wiring: BrowserPlanWiring = {
+  const wiring: ActivePlanWiring = {
     wireBehaviors: vi.fn((_behaviors, _plan, signal) => behaviorSignals.push(signal)),
     wireContainerValidation: vi.fn(),
   };
