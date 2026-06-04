@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Alis.Reactive.Builders;
 using Alis.Reactive.PlanModel;
 using Syncfusion.EJ2.Inputs;
@@ -31,10 +30,7 @@ namespace Alis.Reactive.Fusion.Components
         {
             var descriptor = eventSelector(FusionFileUploadEvents.Instance);
 
-            // Uploader uses Uploader(id) — id is set via the constructor, stored in model.Id.
-            // name is set via HtmlAttributes.
             var componentId = builder.model.Id;
-            var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
 
             ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, descriptor, pipeline);
 
