@@ -8,8 +8,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 [Route("Sandbox/Conditions/AdmissionAssessment")]
 public class AdmissionAssessmentController : Controller
 {
-    // ── Draft persistence (in-memory, keyed by screeningId) ──────────────────
-
+    // In-memory drafts are keyed by screeningId so each step can save independently.
     private static readonly ConcurrentDictionary<string, Step1DemographicsModel> Step1Drafts = new();
     private static readonly ConcurrentDictionary<string, Step2ClinicalModel> Step2Drafts = new();
     private static readonly ConcurrentDictionary<string, Step3FunctionalModel> Step3Drafts = new();
@@ -18,14 +17,11 @@ public class AdmissionAssessmentController : Controller
     private static string EnsureScreeningId(string? id) =>
         string.IsNullOrEmpty(id) ? $"SCR-{DateTime.UtcNow:yyyyMMddHHmmssffff}" : id;
 
-    // ── GET Index ──────────────────────────────────────────────────────────────
-
     [HttpGet("")]
     public IActionResult Index([FromQuery] string? screeningId)
     {
         var id = screeningId ?? "";
 
-        // Load each step from draft (or fresh)
         Step1Drafts.TryGetValue(id, out var step1);
         Step2Drafts.TryGetValue(id, out var step2);
         Step3Drafts.TryGetValue(id, out var step3);
@@ -34,13 +30,12 @@ public class AdmissionAssessmentController : Controller
         step2 ??= new Step2ClinicalModel();
         step3 ??= new Step3FunctionalModel();
 
-        // Cross-step data: copy from Step 1 draft into Step 2 and Step 3
+        // Later step plans read Step 1 values through hidden fields in the Active Plan.
         step2.PrimaryDiagnosis = step1.PrimaryDiagnosis;
         step2.ResidentName = step1.ResidentName;
         step3.Age = step1.Age;
         step3.ResidentName = step1.ResidentName;
 
-        // Step 4 summary from all drafts
         var step4 = new Step4ReviewModel
         {
             ScreeningId = id,
@@ -54,7 +49,6 @@ public class AdmissionAssessmentController : Controller
         if (Step4Drafts.TryGetValue(id, out var step4Draft))
             step4.EmergencyContact = step4Draft.EmergencyContact;
 
-        // Data sources for dropdowns
         ViewBag.Diagnoses = new[] { "Alzheimer's", "Parkinson's", "Heart Disease", "Diabetes", "Stroke", "Other" };
         ViewBag.FallOptions = new[] { "None", "1-2 falls", "3+ falls" };
         ViewBag.MobilityAids = new[] { "None", "Cane", "Walker", "Wheelchair" };
@@ -77,8 +71,6 @@ public class AdmissionAssessmentController : Controller
         return View("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/Index.cshtml", model);
     }
 
-    // ── POST SaveStep1 ──────────────────────────────────────────────────────
-
     [HttpPost("SaveStep1")]
     public async Task<IActionResult> SaveStep1([FromBody] Step1DemographicsModel model)
     {
@@ -88,14 +80,11 @@ public class AdmissionAssessmentController : Controller
         return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 1 saved" });
     }
 
-    // ── POST SaveStep2 ──────────────────────────────────────────────────────
-
     [HttpPost("SaveStep2")]
     public async Task<IActionResult> SaveStep2([FromBody] Step2ClinicalModel model)
     {
         await Task.Delay(200);
 
-        // Generate assessment IDs based on diagnosis
         var ts = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
         if (model.PrimaryDiagnosis is "Alzheimer's" or "Parkinson's" && model.CognitiveScore > 0)
             model.CognitiveAssessmentId = $"COG-{ts}";
@@ -110,8 +99,6 @@ public class AdmissionAssessmentController : Controller
         return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 2 saved" });
     }
 
-    // ── POST SaveStep3 ──────────────────────────────────────────────────────
-
     [HttpPost("SaveStep3")]
     public async Task<IActionResult> SaveStep3([FromBody] Step3FunctionalModel model)
     {
@@ -121,8 +108,6 @@ public class AdmissionAssessmentController : Controller
             Step3Drafts[id] = model;
         return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 3 saved" });
     }
-
-    // ── GET SearchPhysicians ───────────────────────────────────────────────────
 
     [HttpGet("SearchPhysicians")]
     public async Task<IActionResult> SearchPhysicians([FromQuery] string? q)
@@ -146,8 +131,6 @@ public class AdmissionAssessmentController : Controller
         return Ok(new PhysicianSearchResponse { Physicians = filtered });
     }
 
-    // ── POST VerifyVeteran ─────────────────────────────────────────────────────
-
     [HttpPost("VerifyVeteran")]
     public async Task<IActionResult> VerifyVeteran([FromBody] VerifyVeteranRequest? request)
     {
@@ -163,8 +146,6 @@ public class AdmissionAssessmentController : Controller
             Eligible = eligible
         });
     }
-
-    // ── POST Alert endpoints (5) ──────────────────────────────────────────────
 
     [HttpPost("AlertElopement")]
     public async Task<IActionResult> AlertElopement([FromBody] AlertElopementRequest? request)
@@ -221,8 +202,6 @@ public class AdmissionAssessmentController : Controller
         });
     }
 
-    // ── POST RequestRoomSetup ─────────────────────────────────────────────────
-
     [HttpPost("RequestRoomSetup")]
     public async Task<IActionResult> RequestRoomSetup([FromBody] RequestRoomSetupRequest? request)
     {
@@ -234,10 +213,6 @@ public class AdmissionAssessmentController : Controller
         });
     }
 
-    // ── POST Save section endpoints (3) — within Step 2 ─────────────────────
-
-    // ── POST Submit ───────────────────────────────────────────────────────────
-
     [HttpPost("Submit")]
     public async Task<IActionResult> Submit([FromBody] Step4ReviewModel model)
     {
@@ -246,14 +221,11 @@ public class AdmissionAssessmentController : Controller
         var errors = new Dictionary<string, string[]>();
         var id = model.ScreeningId;
 
-        // Step 4: validate with proper validator (includes ScreeningId NotEmpty)
         CollectErrors(new Step4Validator().Validate(model), errors);
 
-        // If ScreeningId missing, can't look up drafts — return early
         if (string.IsNullOrEmpty(id))
             return BadRequest(new { errors });
 
-        // Step 1: must be saved
         if (!Step1Drafts.TryGetValue(id, out var step1))
         {
             errors["Step1"] = ["Step 1 (Demographics) must be saved before submission"];
@@ -263,7 +235,6 @@ public class AdmissionAssessmentController : Controller
             CollectErrors(new Step1Validator().Validate(step1), errors);
         }
 
-        // Step 2: validate draft + check section saves
         Step2Drafts.TryGetValue(id, out var step2);
         if (step2 != null)
             CollectErrors(new Step2Validator().Validate(step2), errors);
@@ -283,14 +254,12 @@ public class AdmissionAssessmentController : Controller
                 errors["DiabetesAssessmentId"] = ["Diabetes assessment must be saved"];
         }
 
-        // Step 3: validate draft
         Step3Drafts.TryGetValue(id, out var step3);
         if (step3 != null)
             CollectErrors(new Step3Validator().Validate(step3), errors);
 
         if (errors.Count > 0) return BadRequest(new { errors });
 
-        // Compute care plan from drafts
         var careUnit = step1?.PrimaryDiagnosis switch
         {
             "Alzheimer's" or "Parkinson's" when (step2?.CognitiveScore ?? 0) < 15 => "Memory Care",
@@ -311,8 +280,6 @@ public class AdmissionAssessmentController : Controller
             Alerts = model.AlertsSent
         });
     }
-
-    // ── Helpers ──────────────────────────────────────────────────────────────
 
     private static void CollectErrors(FluentValidation.Results.ValidationResult result,
         Dictionary<string, string[]> errors)

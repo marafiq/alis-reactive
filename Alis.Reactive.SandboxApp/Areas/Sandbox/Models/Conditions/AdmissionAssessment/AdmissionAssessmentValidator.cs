@@ -7,7 +7,6 @@ public class AdmissionAssessmentValidator : ReactiveValidator<HealthScreeningMod
 {
     public AdmissionAssessmentValidator()
     {
-        // Always required
         RuleFor(x => x.ResidentName).NotEmpty();
         ClientRule(x => x.ResidentName).Required("'Resident Name' is required.");
         RuleFor(x => x.Age).GreaterThan(0m);
@@ -17,49 +16,42 @@ public class AdmissionAssessmentValidator : ReactiveValidator<HealthScreeningMod
         RuleFor(x => x.EmergencyContact).NotEmpty();
         ClientRule(x => x.EmergencyContact).Required("'Emergency Contact' is required.");
 
-        // Veteran conditional
         WhenField(x => x.IsVeteran, () =>
         {
             RuleFor(x => x.VaId).NotEmpty();
             ClientRule(x => x.VaId).Required("'VA ID' is required.");
         });
 
-        // Cognitive conditional (Alzheimer's)
         WhenField(x => x.PrimaryDiagnosis, "Alzheimer's", () =>
         {
             RuleFor(x => x.CognitiveScore).GreaterThan(0m);
             ClientRule(x => x.CognitiveScore).GreaterThan(0m, "'Cognitive Score' must be greater than 0.");
         });
 
-        // Cognitive conditional (Parkinson's)
         WhenField(x => x.PrimaryDiagnosis, "Parkinson's", () =>
         {
             RuleFor(x => x.CognitiveScore).GreaterThan(0m);
             ClientRule(x => x.CognitiveScore).GreaterThan(0m, "'Cognitive Score' must be greater than 0.");
         });
 
-        // Wandering conditional
         WhenField(x => x.Wanders, () =>
         {
             RuleFor(x => x.WanderFrequency).NotEmpty();
             ClientRule(x => x.WanderFrequency).Required("'Wander Frequency' is required.");
         });
 
-        // Cardiac conditional
         WhenField(x => x.PrimaryDiagnosis, "Heart Disease", () =>
         {
             RuleFor(x => x.SystolicBP).GreaterThan(0m);
             ClientRule(x => x.SystolicBP).GreaterThan(0m, "'Systolic BP' must be greater than 0.");
         });
 
-        // Pacemaker conditional
         WhenField(x => x.HasPacemaker, () =>
         {
             RuleFor(x => x.PacemakerModel).NotEmpty();
             ClientRule(x => x.PacemakerModel).Required("'Pacemaker Model' is required.");
         });
 
-        // Diabetes conditional
         WhenField(x => x.PrimaryDiagnosis, "Diabetes", () =>
         {
             RuleFor(x => x.DiabetesType).NotEmpty();
@@ -68,21 +60,18 @@ public class AdmissionAssessmentValidator : ReactiveValidator<HealthScreeningMod
             ClientRule(x => x.A1cLevel).GreaterThan(0m, "'A1c Level' must be greater than 0.");
         });
 
-        // Insulin conditional
         WhenField(x => x.InsulinDependent, () =>
         {
             RuleFor(x => x.InsulinSchedule).NotEmpty();
             ClientRule(x => x.InsulinSchedule).Required("'Insulin Schedule' is required.");
         });
 
-        // Falls conditional
         WhenField(x => x.CausedInjury, () =>
         {
             RuleFor(x => x.InjuryType).NotEmpty();
             ClientRule(x => x.InjuryType).Required("'Injury Type' is required.");
         });
 
-        // Pain conditional
         WhenField(x => x.TakesPainMedication, () =>
         {
             RuleFor(x => x.PainLevel).GreaterThan(0m);

@@ -5,7 +5,7 @@ public class Step4ReviewModel
     public string EmergencyContact { get; set; } = "";
     public string ScreeningId { get; set; } = "";
 
-    // Read-only summary from all step drafts
+    // Derived from saved step drafts on review load.
     public string RiskTier { get; set; } = "";
     public string CareUnit { get; set; } = "";
     public string MonitoringLevel { get; set; } = "";
