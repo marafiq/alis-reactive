@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Alis.Reactive.Builders;
 using Alis.Reactive.PlanModel;
 using Syncfusion.EJ2.RichTextEditor;
@@ -35,7 +34,6 @@ namespace Alis.Reactive.Fusion.Components
             // of HtmlAttributes["id"] because Syncfusion RTE Render() uses model.Id for the
             // textarea's id attribute, not HtmlAttributes.
             var componentId = builder.model.Id;
-            var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
 
             ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, descriptor, pipeline);
 
