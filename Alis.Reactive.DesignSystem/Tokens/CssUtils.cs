@@ -1,21 +1,16 @@
 namespace Alis.Reactive.DesignSystem.Tokens
 {
     /// <summary>
-    /// Composes CSS class strings from design-system defaults and developer-supplied overrides.
+    /// Merges generated design-system classes with caller-supplied HTML classes.
     /// </summary>
     public static class CssUtils
     {
         /// <summary>
-        /// Appends a developer-supplied class string to the design-system generated classes,
-        /// letting callers extend or override the default styling.
+        /// Appends caller classes after generated classes so normal CSS ordering can override defaults.
         /// </summary>
-        /// <param name="generated">The design-system generated class string.</param>
-        /// <param name="cssClass">The developer-supplied class string, or <see langword="null"/> when none is set.</param>
-        /// <returns>
-        /// The combined class string. Returns <paramref name="generated"/> when
-        /// <paramref name="cssClass"/> is empty, and the trimmed <paramref name="cssClass"/>
-        /// when <paramref name="generated"/> is empty.
-        /// </returns>
+        /// <param name="generated">Generated design-system classes.</param>
+        /// <param name="cssClass">Caller-supplied HTML classes, or <see langword="null"/> when none are set.</param>
+        /// <returns>The merged class string.</returns>
         public static string MergeClasses(string generated, string? cssClass)
         {
             var overrideClasses = cssClass ?? string.Empty;

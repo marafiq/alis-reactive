@@ -5,11 +5,10 @@ namespace Alis.Reactive.DesignSystem.Layout
     public static class KvCss
     {
         /// <summary>
-        /// Builds the wrapper class string for a stacked key/value pair, merging any
-        /// developer-supplied override classes.
+        /// Builds the wrapper class string for a stacked key/value pair.
         /// </summary>
-        /// <param name="cssClass">Optional developer-supplied class string.</param>
-        /// <returns>The wrapper class string, or an empty string when no override is supplied.</returns>
+        /// <param name="cssClass">Optional caller-supplied HTML classes.</param>
+        /// <returns>The wrapper class string.</returns>
         public static string StackedWrapperClasses(string? cssClass = null)
         {
             return CssUtils.MergeClasses(string.Empty, cssClass);
