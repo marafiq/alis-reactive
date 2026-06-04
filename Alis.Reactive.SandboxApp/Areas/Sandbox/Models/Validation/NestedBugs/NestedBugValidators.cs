@@ -2,20 +2,17 @@ using Alis.Reactive.FluentValidator;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
 {
-    // --- Claim 1: Nested condition carries full path ---
-    // Claim 3: Nested peer field carries full path ---
+    // Included nested validators must emit Address.* paths for conditions and peer references.
     public class NestedBugAddressValidator : ReactiveValidator<NestedBugAddress>
     {
         public NestedBugAddressValidator()
         {
-            // Claim 1: WhenField on nested property — condition must carry "Address.City"
             WhenFieldNotEmpty(x => x.City, () =>
             {
                 ClientRule(x => x.ConfirmCity)
                     .Required("Confirm city is required when city is set.");
             });
 
-            // Claim 3: Cross-property comparison — peer field must be "Address.City"
             ClientRule(x => x.ConfirmCity)
                 .EqualTo(x => x.City, "Confirm city must match city.");
         }
@@ -31,7 +28,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
         }
     }
 
-    // --- Claim 2: Parent + child conditions compose ---
     public class ChildSectionValidator : ReactiveValidator<ChildSection>
     {
         public ChildSectionValidator()
@@ -44,6 +40,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
         }
     }
 
+    // Parent and child conditions must compose instead of letting the child rule fire alone.
     public class ParentChildBugValidator : ReactiveValidator<ParentChildModel>
     {
         public ParentChildBugValidator()
@@ -55,7 +52,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
         }
     }
 
-    // --- Claim 4: Composed rules inside WhenField carry condition ---
     public class SharedEmploymentRulesValidator : ReactiveValidator<IncludeModel>
     {
         public SharedEmploymentRulesValidator()
@@ -67,6 +63,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
         }
     }
 
+    // Rules imported inside WhenField must inherit the outer condition.
     public class IncludeBugValidator : ReactiveValidator<IncludeModel>
     {
         public IncludeBugValidator()
