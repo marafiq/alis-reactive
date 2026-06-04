@@ -1,9 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
 /// <summary>
-/// Verifies the Events page renders correctly: navigation works, plan JSON is valid,
-/// and all step sections are present in the DOM before the chain fires.
-/// These are precondition tests — if these fail, chain tests are meaningless.
+/// Precondition coverage for the Events page before event-chain behavior tests run.
 /// </summary>
 [TestFixture]
 public class WhenPlanBoots : PlaywrightTestBase
@@ -11,13 +9,10 @@ public class WhenPlanBoots : PlaywrightTestBase
     [Test]
     public async Task home_page_links_to_sandbox_events()
     {
-        // The home page must have a working navigation path to the Events page.
-        // If routing or area registration breaks, this link disappears or 404s.
         await NavigateTo("/");
         await Expect(Page).ToHaveTitleAsync("Home — Alis.Reactive Sandbox");
         AssertNoConsoleErrors();
 
-        // Click the "Events & Dispatch" card link on the home page
         var link = Page.GetByRole(AriaRole.Link, new() { Name = "Events & Dispatch" });
         await Expect(link).ToBeVisibleAsync();
         await link.ClickAsync();
@@ -28,8 +23,6 @@ public class WhenPlanBoots : PlaywrightTestBase
     [Test]
     public async Task events_page_renders_plan_json()
     {
-        // The plan JSON section must contain valid JSON with an behaviors array.
-        // If plan.Render() or plan.RenderFormatted() breaks, this section is empty or malformed.
         await NavigateTo("/Sandbox/CoreBehaviors/Events");
 
         var planJson = Page.Locator("#plan-json");
@@ -38,7 +31,6 @@ public class WhenPlanBoots : PlaywrightTestBase
         var text = await planJson.TextContentAsync();
         Assert.That(text, Is.Not.Null.And.Not.Empty, "Plan JSON must not be empty");
 
-        // Validate it's actual JSON with expected structure
         Assert.That(text, Does.Contain("\"behaviors\""), "Plan must have behaviors array");
         Assert.That(text, Does.Contain("\"page-ready\""), "Plan must contain page-ready trigger");
         Assert.That(text, Does.Contain("\"document-event\""), "Plan must contain document-event triggers");
@@ -51,8 +43,7 @@ public class WhenPlanBoots : PlaywrightTestBase
     [Test]
     public async Task events_page_shows_all_three_steps()
     {
-        // The three step elements must exist in the DOM — they are the mutation targets.
-        // If the view removes or renames an element ID, the chain will throw at runtime.
+        // These controlled element IDs are the mutation targets for the event chain.
         await NavigateTo("/Sandbox/CoreBehaviors/Events");
 
         await Expect(Page.Locator("#step-1")).ToBeVisibleAsync();
@@ -74,10 +65,7 @@ public class WhenPlanBoots : PlaywrightTestBase
     [Test]
     public async Task plan_json_has_correct_entry_count()
     {
-        // Parse the plan JSON from #plan-json element and verify it has exactly 4 behaviors,
-        // matching the 4 Html.On() calls in the view (page-ready, test, test-received, final).
-        // Proves plan serialization includes all behaviors — if an behavior silently drops,
-        // the chain breaks and this test catches it before Playwright chain tests run.
+        // The Events view declares four Html.On calls: page-ready, test, test-received, final.
         await NavigateTo("/Sandbox/CoreBehaviors/Events");
 
         var planJson = Page.Locator("#plan-json");
