@@ -6,11 +6,11 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Arrays
 {
     /// <summary>
-    /// A typed, deferred array transform. Operators capture authoring intent and compile to
-    /// plan-JSON <c>array-op</c> nodes — nothing executes on the server. Deliberately NOT
+    /// A typed, deferred array transform. Operators capture authoring intent as
+    /// Reactive Plan <c>array-op</c> nodes; they do not execute on the server. Deliberately not
     /// <see cref="System.Collections.IEnumerable"/>/<c>IQueryable</c>, so LINQ extension methods
     /// are not candidates (no collision) and lambdas are captured, not invoked. Per-element
-    /// predicates and selectors read the element scope; chains compose (filter then sum, etc.).
+    /// predicates and selectors read the element scope; chains compose as plan nodes.
     /// </summary>
     /// <typeparam name="TElement">The element type, carried through transforms.</typeparam>
     public sealed class ReactiveArray<TElement>
@@ -51,7 +51,7 @@ namespace Alis.Reactive.Builders.Arrays
         {
             // A sort key must coerce to a comparable scalar. A non-scalar key (object/collection)
             // serializes as Shape.Any, and the runtime would fall back to lexicographic
-            // String(value) order — every element becomes "[object Object]", silently wrong.
+            // String(value) order, where every object becomes "[object Object]".
             // Reject it where it is authored rather than emit a silently wrong runtime sort.
             var keyKind = Shape.FromClrType(typeof(TKey)).Kind;
             var keyIsSortableScalar = keyKind is "string" or "number" or "boolean" or "date" or "nullable";
@@ -114,8 +114,8 @@ namespace Alis.Reactive.Builders.Arrays
 
         /// <summary>
         /// Exposes the composed array as a typed source so the transformed array can bind to a
-        /// component data source wherever a <see cref="TypedSource{T}"/> is accepted (e.g. a
-        /// <c>SetDataSource(TypedSource&lt;T[]&gt;)</c> overload) — without an HTTP round-trip. The
+        /// component data source wherever a <see cref="TypedSource{T}"/> is accepted, such as a
+        /// <c>SetDataSource(TypedSource&lt;T[]&gt;)</c> overload, without an HTTP round-trip. The
         /// underlying value is the same array-op expression the runtime already evaluates.
         /// </summary>
         public TypedSource<TElement[]> AsSource() => new ReactiveArraySource<TElement>(_source);
