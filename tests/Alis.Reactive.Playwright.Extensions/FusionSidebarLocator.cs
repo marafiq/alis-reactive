@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// User interaction primitives for FusionSidebar.
-/// </summary>
 public sealed class FusionSidebarLocator
 {
     private readonly IPage _page;
@@ -16,15 +13,11 @@ public sealed class FusionSidebarLocator
         _componentId = componentId;
     }
 
-    /// <summary>The rendered sidebar root element.</summary>
     public ILocator Root => _page.Locator($"#{_componentId}");
 
-    /// <summary>The open-state root element.</summary>
     public ILocator OpenRoot => _page.Locator($"#{_componentId}.e-open");
 
-    /// <summary>The closed-state root element.</summary>
     public ILocator ClosedRoot => _page.Locator($"#{_componentId}.e-close");
 
-    /// <summary>The sidebar text content.</summary>
     public async Task<string> Text() => await Root.TextContentAsync() ?? string.Empty;
 }
