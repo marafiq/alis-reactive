@@ -145,19 +145,19 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var btn = Page.Locator("#check-stay-btn");
+        var checkStayButton = Page.Locator("#check-stay-btn");
         var warning = Page.Locator("#stay-warning");
 
-        await btn.ClickAsync();
+        await checkStayButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("stay period is required", new() { Timeout = 3000 });
 
         await StayStart.SelectRange(2026, 9, 1, 2026, 9, 30);
-        await btn.ClickAsync();
+        await checkStayButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("stay period set", new() { Timeout = 3000 });
 
         await StayStart.Clear();
         await StayStart.Blur();
-        await btn.ClickAsync();
+        await checkStayButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("stay period is required", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();

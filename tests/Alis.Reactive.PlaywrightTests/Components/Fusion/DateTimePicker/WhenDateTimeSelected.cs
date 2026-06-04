@@ -165,21 +165,21 @@ public class WhenDateTimeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var btn = Page.Locator("#check-medication-btn");
+        var checkMedicationButton = Page.Locator("#check-medication-btn");
         var warning = Page.Locator("#medication-warning");
 
         await MedicationTime.Clear();
         await MedicationTime.Blur();
-        await btn.ClickAsync();
+        await checkMedicationButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("medication time is required", new() { Timeout = 3000 });
 
         await MedicationTime.Select(2026, 9, 15, "10:00 AM");
-        await btn.ClickAsync();
+        await checkMedicationButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("medication time set", new() { Timeout = 3000 });
 
         await MedicationTime.Clear();
         await MedicationTime.Blur();
-        await btn.ClickAsync();
+        await checkMedicationButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("medication time is required", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();

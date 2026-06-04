@@ -172,18 +172,18 @@ public class WhenSwitchToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var btn = Page.Locator("#check-sms-btn");
+        var checkSmsButton = Page.Locator("#check-sms-btn");
         var warning = Page.Locator("#sms-warning");
 
-        await btn.ClickAsync();
+        await checkSmsButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("SMS alerts are disabled", new() { Timeout = 3000 });
 
         await SmsAlerts.Toggle();
-        await btn.ClickAsync();
+        await checkSmsButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("SMS alerts are enabled", new() { Timeout = 3000 });
 
         await SmsAlerts.Toggle();
-        await btn.ClickAsync();
+        await checkSmsButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("SMS alerts are disabled", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();

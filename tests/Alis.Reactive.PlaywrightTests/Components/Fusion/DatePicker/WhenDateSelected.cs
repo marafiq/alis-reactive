@@ -165,19 +165,19 @@ public class WhenDateSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var btn = Page.Locator("#check-discharge-btn");
+        var checkDischargeButton = Page.Locator("#check-discharge-btn");
         var warning = Page.Locator("#discharge-warning");
 
-        await btn.ClickAsync();
+        await checkDischargeButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("discharge date is required", new() { Timeout = 3000 });
 
         await DischargeDate.SelectDate(2026, 9, 15);
-        await btn.ClickAsync();
+        await checkDischargeButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("discharge date set", new() { Timeout = 3000 });
 
         await DischargeDate.Clear();
         await DischargeDate.Blur();
-        await btn.ClickAsync();
+        await checkDischargeButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("discharge date is required", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();

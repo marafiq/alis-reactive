@@ -166,21 +166,21 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var btn = Page.Locator("#check-phone-btn");
+        var checkPhoneButton = Page.Locator("#check-phone-btn");
         var warning = Page.Locator("#phone-warning");
 
         await PhoneNumber.Clear();
         await PhoneNumber.Blur();
-        await btn.ClickAsync();
+        await checkPhoneButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("phone number is required", new() { Timeout = 3000 });
 
         await PhoneNumber.FillAndBlur("5551234567");
-        await btn.ClickAsync();
+        await checkPhoneButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("phone number set", new() { Timeout = 3000 });
 
         await PhoneNumber.Clear();
         await PhoneNumber.Blur();
-        await btn.ClickAsync();
+        await checkPhoneButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("phone number is required", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();

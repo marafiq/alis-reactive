@@ -129,18 +129,18 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         await NavigateAndBoot();
 
         var select = Page.Locator($"#{Scope}CareLevel");
-        var btn = Page.Locator("#check-care-btn");
+        var checkCareButton = Page.Locator("#check-care-btn");
         var status = Page.Locator("#care-confirmation");
 
-        await btn.ClickAsync();
+        await checkCareButton.ClickAsync();
         await Expect(status).ToHaveTextAsync("care level confirmed", new() { Timeout = 3000 });
 
         await select.SelectOptionAsync("");
-        await btn.ClickAsync();
+        await checkCareButton.ClickAsync();
         await Expect(status).ToHaveTextAsync("care level is required", new() { Timeout = 3000 });
 
         await select.SelectOptionAsync("Skilled Nursing");
-        await btn.ClickAsync();
+        await checkCareButton.ClickAsync();
         await Expect(status).ToHaveTextAsync("care level confirmed", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();

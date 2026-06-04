@@ -42,8 +42,8 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         // ReceivesMedication starts checked in the model, but DomReady calls SetChecked(false).
         await NavigateAndBoot();
 
-        var cb = Page.Locator($"#{Scope}ReceivesMedication");
-        await Expect(cb).Not.ToBeCheckedAsync(new() { Timeout = 3000 });
+        var medicationCheckbox = Page.Locator($"#{Scope}ReceivesMedication");
+        await Expect(medicationCheckbox).Not.ToBeCheckedAsync(new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
 
@@ -125,19 +125,19 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         // The full show-hide-show cycle catches stale visibility state.
         await NavigateAndBoot();
 
-        var cb = Page.Locator($"#{Scope}HasDietaryRestrictions");
+        var dietaryRestrictionsCheckbox = Page.Locator($"#{Scope}HasDietaryRestrictions");
         var panel = Page.Locator("#restrictions-panel");
         var status = Page.Locator("#restrictions-status");
 
-        await cb.CheckAsync();
+        await dietaryRestrictionsCheckbox.CheckAsync();
         await Expect(panel).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(status).ToHaveTextAsync("checked", new() { Timeout = 3000 });
 
-        await cb.UncheckAsync();
+        await dietaryRestrictionsCheckbox.UncheckAsync();
         await Expect(panel).ToBeHiddenAsync(new() { Timeout = 3000 });
         await Expect(status).ToHaveTextAsync("unchecked", new() { Timeout = 3000 });
 
-        await cb.CheckAsync();
+        await dietaryRestrictionsCheckbox.CheckAsync();
         await Expect(panel).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(status).ToHaveTextAsync("checked", new() { Timeout = 3000 });
 
@@ -150,19 +150,19 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         // The component-read condition must re-evaluate after each checkbox state change.
         await NavigateAndBoot();
 
-        var cb = Page.Locator($"#{Scope}ReceivesMedication");
-        var btn = Page.Locator("#check-medication-btn");
+        var medicationCheckbox = Page.Locator($"#{Scope}ReceivesMedication");
+        var checkMedicationButton = Page.Locator("#check-medication-btn");
         var warning = Page.Locator("#medication-warning");
 
-        await btn.ClickAsync();
+        await checkMedicationButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("no medication on record", new() { Timeout = 3000 });
 
-        await cb.CheckAsync();
-        await btn.ClickAsync();
+        await medicationCheckbox.CheckAsync();
+        await checkMedicationButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("resident receives medication", new() { Timeout = 3000 });
 
-        await cb.UncheckAsync();
-        await btn.ClickAsync();
+        await medicationCheckbox.UncheckAsync();
+        await checkMedicationButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("no medication on record", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();

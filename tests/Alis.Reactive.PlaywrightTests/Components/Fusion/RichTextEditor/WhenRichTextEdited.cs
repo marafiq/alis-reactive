@@ -164,21 +164,21 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var btn = Page.Locator("#check-careplan-btn");
+        var checkCarePlanButton = Page.Locator("#check-careplan-btn");
         var warning = Page.Locator("#careplan-warning");
 
         await CarePlan.Clear();
         await CarePlan.Blur();
-        await btn.ClickAsync();
+        await checkCarePlanButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("care plan is required", new() { Timeout = 3000 });
 
         await CarePlan.FillAndBlur("Medication review scheduled");
-        await btn.ClickAsync();
+        await checkCarePlanButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("care plan set", new() { Timeout = 3000 });
 
         await CarePlan.Clear();
         await CarePlan.Blur();
-        await btn.ClickAsync();
+        await checkCarePlanButton.ClickAsync();
         await Expect(warning).ToHaveTextAsync("care plan is required", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
