@@ -3,8 +3,8 @@ using System;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.CellClicked.
-    /// Fires when a time cell is clicked. Contains the time slot and resource group.
+    /// Event payload delivered when a Syncfusion Schedule time cell is clicked.
+    /// Includes the selected slot and resource group.
     /// </summary>
     public class FusionScheduleCellClickArgs
     {

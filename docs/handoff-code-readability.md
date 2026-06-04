@@ -4,7 +4,8 @@ Date: 2026-06-03
 
 ## Scope
 
-This is a report only. No source comments were edited in this pass.
+This began as a report-only audit. Branch implementation passes should append
+follow-up notes here rather than rewriting the historical findings.
 
 The audit looked for:
 
@@ -114,3 +115,12 @@ Rewrite or delete:
    IntelliSense summaries for public DSL methods.
 5. Run the focused Playwright filter for each touched slice, then the observable
    full Playwright gate before committing the cleanup.
+
+## Branch Follow-Up Notes
+
+- `Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs`
+  exposes `FusionScheduleEventData` as framework public surface with schedule-domain
+  fields such as `ShiftId`, `StaffName`, and `StaffRole`. This may be intentional
+  Schedule integration shape because `FusionScheduleExtensions.GetEvents()` returns
+  it and the sandbox posts it back, but it should be reviewed in a dedicated API
+  surface slice instead of being changed during XML documentation cleanup.

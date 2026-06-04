@@ -1,12 +1,11 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.ActionComplete.
-    /// Fires after a scheduler action completes successfully.
+    /// Event payload delivered after Syncfusion Schedule completes an action successfully.
     /// </summary>
     public class FusionScheduleActionCompleteArgs
     {
-        /// <summary>The type of action that completed.</summary>
+        /// <summary>Syncfusion action name that completed, for example <c>eventChange</c> or <c>viewNavigate</c>.</summary>
         public string RequestType { get; set; } = "";
 
         public FusionScheduleActionCompleteArgs() { }

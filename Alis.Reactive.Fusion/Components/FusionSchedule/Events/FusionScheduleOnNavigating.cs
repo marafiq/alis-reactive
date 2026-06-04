@@ -1,34 +1,30 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.Navigating.
-    /// Fires before date or view navigation. Set cancel to prevent.
-    /// action: "date" for arrow navigation, "view" for Day/Week/Month tab switch.
+    /// Event payload delivered before Syncfusion Schedule changes date or view.
+    /// Set <see cref="Cancel"/> to prevent navigation.
     /// </summary>
     public class FusionScheduleNavigatingArgs
     {
-        /// <summary>The navigation action: "date" or "view".</summary>
+        /// <summary>Navigation action, either <c>date</c> or <c>view</c>.</summary>
         public string Action { get; set; } = "";
 
-        /// <summary>The date being navigated TO (ISO string from Syncfusion).</summary>
+        /// <summary>Target date as an ISO string reported by Syncfusion.</summary>
         public string CurrentDate { get; set; } = "";
 
-        /// <summary>The date being navigated FROM (ISO string from Syncfusion).</summary>
+        /// <summary>Previous date as an ISO string reported by Syncfusion.</summary>
         public string PreviousDate { get; set; } = "";
 
-        /// <summary>The view being navigated TO: "Day", "Week", "WorkWeek", "Month", "Agenda".
-        /// Present on view switch (action="view"). Empty on date navigation.</summary>
+        /// <summary>Target view, for example <c>Day</c> or <c>Week</c>. Empty on date navigation.</summary>
         public string CurrentView { get; set; } = "";
 
-        /// <summary>The view being navigated FROM.
-        /// Present on view switch (action="view"). Empty on date navigation.</summary>
+        /// <summary>Previous view when switching views. Empty on date navigation.</summary>
         public string PreviousView { get; set; } = "";
 
-        /// <summary>Zero-based index of the target view in the views array.
-        /// Present on view switch (action="view").</summary>
+        /// <summary>Zero-based index of the target view when switching views.</summary>
         public int ViewIndex { get; set; }
 
-        /// <summary>Set to true to cancel the navigation.</summary>
+        /// <summary>Set to true before the callback returns to cancel navigation.</summary>
         public bool Cancel { get; set; }
 
         public FusionScheduleNavigatingArgs() { }

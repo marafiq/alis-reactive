@@ -4,49 +4,47 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionSchedule.PopupOpen.
-    /// Fires before any popup opens. Set cancel to prevent.
-    /// type: "QuickInfo" (click tooltip), "Editor" (full edit modal), "DeleteAlert" (confirmation).
+    /// Event payload delivered before Syncfusion Schedule opens a popup.
+    /// Set <see cref="Cancel"/> to prevent the popup.
     /// </summary>
     public class FusionSchedulePopupOpenArgs
     {
-        /// <summary>The popup type: "QuickInfo", "Editor", or "DeleteAlert".</summary>
+        /// <summary>Popup type, for example <c>QuickInfo</c> or <c>Editor</c>.</summary>
         public string Type { get; set; } = "";
 
-        /// <summary>Set to true to prevent the popup from opening.</summary>
+        /// <summary>Set to true before the callback returns to prevent the popup from opening.</summary>
         public bool Cancel { get; set; }
 
-        /// <summary>The event data associated with this popup (id, subject, startTime, etc.).</summary>
+        /// <summary>Schedule event data associated with this popup when Syncfusion provides it.</summary>
         public FusionSchedulePopupData Data { get; set; } = new FusionSchedulePopupData();
 
         public FusionSchedulePopupOpenArgs() { }
     }
 
     /// <summary>
-    /// Event data nested inside popupOpen args. Contains the schedule event being
-    /// acted on. Use with FromEvent to pass the event ID to server endpoints.
+    /// Schedule event subset available while a Syncfusion Schedule popup opens.
     /// </summary>
     public class FusionSchedulePopupData
     {
-        /// <summary>The event ID.</summary>
+        /// <summary>Schedule event identifier.</summary>
         public int Id { get; set; }
 
-        /// <summary>The event subject/title.</summary>
+        /// <summary>Display title for the appointment.</summary>
         public string Subject { get; set; } = "";
 
         public FusionSchedulePopupData() { }
     }
 
     /// <summary>
-    /// Extensions for <see cref="FusionSchedulePopupOpenArgs"/> — cancel Syncfusion popup to use custom UI.
-    /// Same pattern as <see cref="FusionAutoCompleteFilteringArgs"/>.PreventDefault.
+    /// Typed mutations for Syncfusion Schedule <c>popupOpen</c> event args.
     /// </summary>
     public static class FusionSchedulePopupOpenArgsExtensions
     {
         /// <summary>
-        /// Cancels the Syncfusion popup from opening. Use inside a When(args.Type).Eq("Editor") branch
-        /// to replace the built-in editor with a custom form loaded via Into().
-        /// Runtime: sets evt.cancel = true on the Syncfusion popupOpen event args.
+        /// Prevents the current Syncfusion popup from opening.
+        /// Use inside a branch such as <c>When(args.Type).Eq("Editor")</c> when
+        /// replacing the built-in editor with a custom form. This sets the event
+        /// payload's <c>cancel</c> member before Syncfusion resumes its popup lifecycle.
         /// </summary>
         public static void PreventDefault(
             this FusionSchedulePopupOpenArgs args,

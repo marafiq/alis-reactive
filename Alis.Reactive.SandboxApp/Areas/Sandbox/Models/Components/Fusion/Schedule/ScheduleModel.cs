@@ -15,7 +15,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     /// <summary>
     /// A single shift assignment shown as an event on the schedule.
-    /// Maps to SF Schedule eventSettings.dataSource items.
+    /// Maps to Syncfusion Schedule eventSettings.dataSource items.
     /// </summary>
     public class ShiftAssignment
     {
@@ -38,7 +38,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// Shift resource — maps to SF Schedule resources[].dataSource items.
+    /// Shift resource mapped to Syncfusion Schedule resources[].dataSource items.
     /// </summary>
     public class ShiftResource
     {
