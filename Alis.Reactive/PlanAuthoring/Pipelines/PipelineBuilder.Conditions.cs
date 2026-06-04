@@ -9,7 +9,7 @@ namespace Alis.Reactive.Builders
     {
         /// <summary>Starts a conditional branch from an event payload property.</summary>
         /// <typeparam name="TPayload">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <typeparam name="TProp">The payload value type compared by this branch.</typeparam>
         /// <param name="payload">The typed event payload placeholder supplied by the trigger callback.</param>
         /// <param name="path">The payload property used as the condition source.</param>
         /// <returns>A condition source builder for choosing the comparison operation.</returns>
@@ -25,7 +25,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Starts a conditional branch from an HTTP response body property.</summary>
         /// <typeparam name="TPayload">The HTTP response body type.</typeparam>
-        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <typeparam name="TProp">The response value type compared by this branch.</typeparam>
         /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
         /// <param name="path">The response property used as the condition source.</param>
         /// <returns>A condition source builder for choosing the comparison operation.</returns>
