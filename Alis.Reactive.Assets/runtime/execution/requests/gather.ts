@@ -1,6 +1,5 @@
 // Request input gathering uses the same ValueExpression resolver as execution.
-// Every payload assignment is evaluated by evaluateValue; runtime selected
-// registered inputs use the same writer path after reading their component value member.
+// Authored assignments and IncludeAll registered inputs share the same payload writer.
 
 import type { PlanDocument, GatherRequestInput, RequestInputAssignment, HttpMethod, RequestInput } from "../../types/index";
 import type { ExecContext } from "../../types/index";
@@ -31,9 +30,6 @@ function emptyRequestInput(): ResolvedRequestInput {
   return { urlParams: [], routeParams: {}, headers: {}, body: {} };
 }
 
-/**
- * Resolve request input into URL params, route params, headers, and body/FormData.
- */
 export function resolveRequestInput(
   input: RequestInput,
   method: HttpMethod,

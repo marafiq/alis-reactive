@@ -23,7 +23,6 @@ type HttpExchangeOutcome =
   | { readonly kind: "error"; readonly status: number; readonly body: HttpResponseBody }
   | { readonly kind: "response-unavailable" };
 
-/** Execute a single HTTP request with gather, while-loading, response routing, finally, and chaining. */
 export async function executeRequest(req: RequestPlan, plan: PlanDocument, ctx?: ExecContext): Promise<void> {
   await runHttpRequest(req, plan, ExecutionContext.from(ctx));
 }

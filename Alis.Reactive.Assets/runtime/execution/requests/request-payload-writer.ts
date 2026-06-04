@@ -1,3 +1,7 @@
+// Request payload writing is where gathered values cross into query string,
+// JSON body, or FormData. File inputs may arrive as FileList or Syncfusion
+// items carrying the browser File in rawFile.
+
 import type { RequestPayloadTarget, HttpMethod, PathSegment, RequestBodyFormat } from "../../types/index";
 import { toString } from "../../shared/shape-convert";
 import { scope } from "../../diagnostics/trace";
@@ -18,7 +22,6 @@ export interface ResolvedRequestInput {
   body: Record<string, unknown> | FormData;
 }
 
-/** Writes request payload values into query string, FormData, or JSON body. */
 interface RequestPayloadWriter {
   emitScalar(target: RequestPayloadTarget, value: unknown, shape: RuntimeShape): void;
   emitArray(target: RequestPayloadTarget, items: unknown[], itemShape: RuntimeShape): void;
