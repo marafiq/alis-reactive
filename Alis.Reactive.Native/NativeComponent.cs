@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native
 {
     /// <summary>
-    /// Base class for all native HTML components (text inputs, checkboxes, dropdowns, etc.).
+    /// Base class for framework-owned native HTML components such as text inputs and checkboxes.
     /// </summary>
     /// <remarks>
     /// Sealed subclasses constrain which extension methods are available at compile time.

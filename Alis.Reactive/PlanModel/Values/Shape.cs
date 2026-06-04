@@ -23,7 +23,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>
-    /// Declares the expected type for a value in the plan (string, number, date, array, object, etc.).
+    /// Declares the expected type for a value in the Reactive Plan, such as string or number.
     /// Used across value expressions, conditions, and validation to ensure type consistency.
     /// </summary>
     [JsonConverter(typeof(ShapeJsonConverter))]
