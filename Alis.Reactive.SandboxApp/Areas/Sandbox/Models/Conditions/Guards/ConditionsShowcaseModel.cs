@@ -1,7 +1,5 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.Guards
 {
-    // ── Event payloads (typed args for When/Then/Else) ──
-
     public class ScorePayload
     {
         public int Score { get; set; }
@@ -40,8 +38,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.Guards
         public bool? NullableBool { get; set; }
     }
 
-    // ── Nested payload (deep path conditions + null safety) ──
-
     public class AddressInfo
     {
         public string? City { get; set; }
@@ -53,8 +49,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.Guards
         public AddressInfo? Address { get; set; }
         public int Id { get; set; }
     }
-
-    // ── New payloads for expanded operators ──
 
     public class MembershipPayload
     {
@@ -72,8 +66,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.Guards
     {
         public int Age { get; set; }
     }
-
-    // ── View model ──
 
     public class ConditionsShowcaseModel
     {

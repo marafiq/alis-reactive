@@ -1,7 +1,5 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing
 {
-    // ── View model ──
-
     public class HttpMixingModel
     {
         public string ReactiveResidentName { get; set; } = "";
@@ -9,16 +7,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing
         public string ReactiveErrorCategory { get; set; } = "";
     }
 
-    // ── Event payload (typed args for When/Then/Else + HTTP pipeline) ──
-
     public class HttpMixingPayload
     {
         public bool Active { get; set; }
         public int Count { get; set; }
         public string Category { get; set; } = "";
     }
-
-    // ── Response DTOs for typed OnSuccess<T> bindings ──
 
     public class HttpMixingEchoResponse
     {

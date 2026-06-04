@@ -16,8 +16,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Name { get; set; } = string.Empty;
     }
 
-    // ── Response DTOs for typed OnSuccess<T> bindings ──────────────
-
     public class ResidentsResponse
     {
         public string? First { get; set; }
