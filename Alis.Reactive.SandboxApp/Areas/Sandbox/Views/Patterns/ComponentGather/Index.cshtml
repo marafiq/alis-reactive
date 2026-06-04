@@ -28,7 +28,6 @@
 
     <form id="gather-form">
 
-    <!-- Hidden fields — invisible but gathered via IncludeAll -->
     @Html.HiddenFieldFor(plan, m => m.ResidentId)
     @Html.HiddenFieldFor(plan, m => m.FormToken)
 
@@ -146,7 +145,6 @@
                 .Mode(VisualMode.Box)); }
     </native-card-body></native-card>
 
-    <!-- Submit Buttons -->
     <native-card><native-card-body>
         <native-heading level="H2">Submit</native-heading>
         <native-text color="Secondary">
@@ -252,7 +250,6 @@
     </native-card-body></native-card>
     </form>
 
-    <!-- Echo Results -->
     <native-card><native-card-body>
         <native-heading level="H2">Server Echo</native-heading>
         <native-text color="Secondary">
@@ -298,7 +295,6 @@
         </div>
     </native-card-body></native-card>
 
-    <!-- Plan JSON -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
