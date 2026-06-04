@@ -33,14 +33,13 @@ public class NativeValidationSummaryTagHelper : TagHelper
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-reactive-validation-summary", PlanId);
-        output.Attributes.SetAttribute("id", ToSummaryId(PlanId));
+        output.Attributes.SetAttribute("id", ToValidationSummaryId(PlanId));
         output.Attributes.SetAttribute("hidden", "");
 
         if (!string.IsNullOrWhiteSpace(CssClass))
             output.Attributes.SetAttribute("class", CssClass);
     }
 
-    // Predictable element id for the summary: dots and plus signs become underscores.
-    private static string ToSummaryId(string planId) =>
+    private static string ToValidationSummaryId(string planId) =>
         planId.Replace('.', '_').Replace('+', '_') + "_validation_summary";
 }
