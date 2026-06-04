@@ -38,13 +38,13 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets the checked values from a source binding (e.g. event payload).
+        /// Sets the checked values from the current event payload.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
-        /// <typeparam name="TSource">The source type containing the value.</typeparam>
+        /// <typeparam name="TSource">The event payload type containing the values.</typeparam>
         /// <param name="self">The check list component reference.</param>
-        /// <param name="source">The source object (e.g. event args).</param>
-        /// <param name="path">Expression selecting the property to read (e.g. <c>x => x.Value</c>).</param>
+        /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
+        /// <param name="path">Expression selecting the event payload property to read.</param>
         public static ComponentRef<NativeCheckList, TModel> SetValue<TModel, TSource>(
             this ComponentRef<NativeCheckList, TModel> self,
             TSource source, Expression<Func<TSource, object?>> path)
