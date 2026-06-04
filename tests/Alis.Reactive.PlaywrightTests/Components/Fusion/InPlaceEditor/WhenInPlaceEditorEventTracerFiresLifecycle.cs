@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
 /// <summary>
 /// Event tracer card: proves every onboarded lifecycle event surfaces its typed args-props
-/// into a dedicated trace cell end-to-end in the browser.
+/// into a dedicated trace cell through page-visible behavior.
 /// </summary>
 [TestFixture]
 public class WhenInPlaceEditorEventTracerFiresLifecycle : PlaywrightTestBase

@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
 /// <summary>
 /// Control panel card: proves the full mutation surface (SetValue / Enable / Disable / Save / Focus / Validate)
-/// and the Value() read end-to-end in the browser. Every button fires a DomReady-style pipeline that drives
+/// and the Value() read through page-visible behavior. Every button fires a DomReady-style pipeline that drives
 /// the InPlaceEditor through <c>p.Component&lt;FusionInPlaceEditor&gt;(m =&gt; m.Value).Xxx()</c>.
 /// </summary>
 [TestFixture]

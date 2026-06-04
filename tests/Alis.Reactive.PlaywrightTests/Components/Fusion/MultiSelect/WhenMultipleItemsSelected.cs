@@ -3,7 +3,7 @@ using Alis.Reactive.Playwright.Extensions;
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.MultiSelect;
 
 /// <summary>
-/// Exercises FusionMultiSelect browser behavior: array-valued selections, builder
+/// Exercises FusionMultiSelect page behavior: array-valued selections, builder
 /// preselection, Changed events, gather, typed fields, GroupBy, and server filtering.
 /// Tests use real popup gestures through MultiSelectLocator rather than direct EJ2
 /// instance manipulation.

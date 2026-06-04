@@ -6,7 +6,7 @@ namespace Alis.Reactive.PlaywrightTests.Conditions.HttpMixing;
 /// <summary>
 /// As a UI author
 /// I want real component .Reactive() flows to mix HTTP and supported conditions cleanly
-/// So that browser-visible outcomes stay correct across success, error, and reevaluation paths
+/// So that page-visible outcomes stay correct across success, error, and reevaluation paths
 /// </summary>
 [TestFixture]
 public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase

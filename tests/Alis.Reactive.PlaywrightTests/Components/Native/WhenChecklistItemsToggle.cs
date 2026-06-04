@@ -2,7 +2,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
 /// Exercises NativeCheckList selection, form submission, component-read conditions,
-/// and pre-selected checkbox model binding in the browser.
+/// and pre-selected checkbox model binding through rendered output.
 /// </summary>
 [TestFixture]
 public class WhenChecklistItemsToggle : PlaywrightTestBase

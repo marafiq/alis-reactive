@@ -62,7 +62,7 @@ public class WhenInPlaceEditorQuickEditBlocksOnValidationRule : PlaywrightTestBa
 
         var request = await requestTask;
         Assert.That(request.PostData ?? "", Does.Contain(ServerOnlyDuplicateRate),
-            "Browser-declared rules must pass so the commit reaches the server.");
+            "Client-declared rules must pass so the commit reaches the server.");
 
         var errorSlot = Page.Locator($"#{MonthlyRateEditorId}_error");
         await Expect(errorSlot).ToContainTextAsync("server-only check", new() { Timeout = 5000 });

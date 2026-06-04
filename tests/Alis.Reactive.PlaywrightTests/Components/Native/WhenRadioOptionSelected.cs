@@ -2,7 +2,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
 /// Exercises NativeRadioGroup text-only, text-with-description, form submission,
-/// and component-read condition behavior in the browser.
+/// and component-read condition behavior through rendered output.
 /// </summary>
 [TestFixture]
 public class WhenRadioOptionSelected : PlaywrightTestBase

@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Switch;
 
 /// <summary>
 /// Proves FusionSwitch property writes, value reads, changed events,
-/// event-args conditions, and component-read conditions through browser-visible behavior.
+/// event-args conditions, and component-read conditions through page-visible behavior.
 /// </summary>
 [TestFixture]
 public class WhenSwitchToggles : PlaywrightTestBase

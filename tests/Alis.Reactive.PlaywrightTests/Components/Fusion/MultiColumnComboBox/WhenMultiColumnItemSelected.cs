@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.MultiColumnComboBox;
 
 /// <summary>
 /// Proves FusionMultiColumnComboBox property writes, reads, methods, events,
-/// conditions, and gather through browser-visible behavior.
+/// conditions, and gather through page-visible behavior.
 /// </summary>
 [TestFixture]
 public class WhenMultiColumnItemSelected : PlaywrightTestBase
