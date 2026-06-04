@@ -15,8 +15,8 @@ const options = {
 };
 
 if (watch) {
-  const ctx = await esbuild.context(options);
-  await ctx.watch();
+  const buildContext = await esbuild.context(options);
+  await buildContext.watch();
   console.log('esbuild: watching runtime/ for the alis-reactive runtime bundle');
 } else {
   await esbuild.build(options);
