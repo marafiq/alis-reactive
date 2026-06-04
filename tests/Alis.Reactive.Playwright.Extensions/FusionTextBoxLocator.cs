@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Locator surface for the Syncfusion TextBox input used by Playwright tests.
-/// </summary>
 public sealed class FusionTextBoxLocator
 {
     private readonly IPage _page;

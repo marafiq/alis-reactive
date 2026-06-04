@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Locator surface for the Syncfusion OtpInput used by Playwright tests.
-/// </summary>
 public sealed class FusionOtpInputLocator
 {
     private readonly IPage _page;

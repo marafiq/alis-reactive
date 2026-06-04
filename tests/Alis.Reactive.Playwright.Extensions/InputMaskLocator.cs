@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Playwright gestures and surfaces for FusionInputMask tests.
-/// </summary>
 public sealed class InputMaskLocator
 {
     private readonly IPage _page;

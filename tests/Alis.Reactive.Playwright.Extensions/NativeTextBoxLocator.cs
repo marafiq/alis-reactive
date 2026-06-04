@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Playwright gestures and surfaces for native text input tests.
-/// </summary>
 public sealed class NativeTextBoxLocator
 {
     private readonly IPage _page;
