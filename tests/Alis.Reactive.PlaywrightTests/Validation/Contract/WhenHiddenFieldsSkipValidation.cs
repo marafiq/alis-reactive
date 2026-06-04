@@ -26,8 +26,6 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await Input("Address_ZipCode").FillAsync("62704");
     }
 
-    // DSL condition and Show/Hide stay aligned for VeteranId.
-
     [Test]
     public async Task hidden_veteran_section_with_truthy_condition_skips_rule()
     {
@@ -35,12 +33,10 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        // IsVeteran is unchecked by default, so veteran-section is hidden.
         await Expect(Page.Locator("#veteran-section")).ToBeHiddenAsync();
 
         await ClickWhenStable(SubmitBtn);
 
-        // VeteranId has a truthy IsVeteran condition, so the rule is skipped.
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
         AssertNoConsoleErrorsExcept("400");
     }
@@ -89,8 +85,6 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
-
-    // DSL condition and Show/Hide stay aligned for care level sections.
 
     [Test]
     public async Task independent_hides_physician_and_memory_sections()
@@ -147,8 +141,6 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // DSL truthy and falsy emergency-contact rules switch together.
-
     [Test]
     public async Task unchecked_emergency_contact_requires_reason_and_hides_contact_fields()
     {
@@ -156,13 +148,10 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        // HasEmergencyContact is unchecked by default, so the no-contact section is visible.
 
         await ClickWhenStable(SubmitBtn);
 
-        // ReasonForNoContact uses the falsy condition.
         await Expect(ErrorFor("ReasonForNoContact")).ToContainTextAsync("required");
-        // EmergencyName's truthy condition is not met while HasEmergencyContact is unchecked.
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
@@ -185,7 +174,6 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
 
         await Expect(ErrorFor("EmergencyName")).ToContainTextAsync("required");
         await Expect(ErrorFor("EmergencyPhone")).ToContainTextAsync("required");
-        // ReasonForNoContact's falsy condition is not met while HasEmergencyContact is checked.
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
