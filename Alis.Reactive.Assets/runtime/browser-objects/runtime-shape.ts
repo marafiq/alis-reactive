@@ -1,5 +1,5 @@
 import type { Shape, ValueExpression } from "../types/index";
-import { applyShape, convertByShape, type ConvertResult } from "../shared/shape-convert";
+import { applyShape, convertByShape, type ShapeConversionResult } from "../shared/shape-convert";
 
 const unshapedPlanShape: Shape = { kind: "none" };
 
@@ -51,7 +51,7 @@ export class RuntimeShape {
     return items.map(item => applyShape(item, this.shape));
   }
 
-  convert(value: unknown): ConvertResult<unknown> {
+  convert(value: unknown): ShapeConversionResult<unknown> {
     return convertByShape(value, this.shape);
   }
 

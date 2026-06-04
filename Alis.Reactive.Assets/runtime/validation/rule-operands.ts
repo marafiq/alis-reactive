@@ -1,5 +1,5 @@
 import { toString } from "../shared/shape-convert";
-import type { ConvertResult } from "../shared/shape-convert";
+import type { ShapeConversionResult } from "../shared/shape-convert";
 import { RuntimeShape } from "../browser-objects/runtime-shape";
 import type {
   Shape,
@@ -11,7 +11,7 @@ import type {
 export class ValidationSubject {
   private constructor(
     readonly raw: unknown,
-    private readonly textConversion: ConvertResult<string>,
+    private readonly textConversion: ShapeConversionResult<string>,
   ) {}
 
   static from(raw: unknown): ValidationSubject {

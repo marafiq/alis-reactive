@@ -1,15 +1,13 @@
 // Shape conversion is centralized here so conditions, validation, gather, and
-// execution all coerce values through the same runtime boundary. ConvertResult
-// reports type mismatches without throwing.
+// execution all coerce values through the same runtime boundary.
 
 import type { Shape } from "../types/index";
 import { toJavaScriptString } from "./javascript-string";
 
-/** Discriminated result — caller MUST check .ok before using .value. */
-export type ConvertResult<T> = { ok: true; value: T } | { ok: false; error: string };
+export type ShapeConversionResult<T> = { ok: true; value: T } | { ok: false; error: string };
 
-function ok<T>(value: T): ConvertResult<T> { return { ok: true, value }; }
-function err<T>(error: string): ConvertResult<T> { return { ok: false, error }; }
+function ok<T>(value: T): ShapeConversionResult<T> { return { ok: true, value }; }
+function err<T>(error: string): ShapeConversionResult<T> { return { ok: false, error }; }
 function isMissingInput(value: unknown): boolean { return value === null || value === undefined; }
 
 /** Applies a Shape and returns the original value when conversion fails. */
@@ -32,7 +30,7 @@ export function applyShape(value: unknown, shape: Shape): unknown {
   }
 }
 
-function applyScalar<T>(value: unknown, convert: (v: unknown) => ConvertResult<T>): unknown {
+function applyScalar<T>(value: unknown, convert: (v: unknown) => ShapeConversionResult<T>): unknown {
   const conversion = convert(value);
   if (conversion.ok) return conversion.value;
   return value;
@@ -61,7 +59,7 @@ function applyObjectShape(value: unknown, shape: Extract<Shape, { kind: "object"
 }
 
 /** Converts a value according to a Shape and returns the conversion result. */
-export function convertByShape(value: unknown, shape: Shape): ConvertResult<unknown> {
+export function convertByShape(value: unknown, shape: Shape): ShapeConversionResult<unknown> {
   switch (shape.kind) {
     case "string":   return toString(value);
     case "number":   return toNumber(value);
@@ -80,19 +78,19 @@ export function convertByShape(value: unknown, shape: Shape): ConvertResult<unkn
   }
 }
 
-function convertArrayShape(value: unknown, shape: Extract<Shape, { kind: "array" }>): ConvertResult<unknown> {
+function convertArrayShape(value: unknown, shape: Extract<Shape, { kind: "array" }>): ShapeConversionResult<unknown> {
   const conversion = toArray(value);
   if (!conversion.ok) return conversion;
   return ok(applyArrayItemShape(conversion.value, shape));
 }
 
-function convertObjectShape(value: unknown, shape: Extract<Shape, { kind: "object" }>): ConvertResult<unknown> {
+function convertObjectShape(value: unknown, shape: Extract<Shape, { kind: "object" }>): ShapeConversionResult<unknown> {
   const record = toPlainObject(value);
   if (!record.ok) return record;
   return ok(applyObjectFields(record.value, shape));
 }
 
-function convertNullableShape(value: unknown, inner: Shape): ConvertResult<unknown> {
+function convertNullableShape(value: unknown, inner: Shape): ShapeConversionResult<unknown> {
   if (isMissingInput(value)) return ok(null);
   return convertByShape(value, inner);
 }
@@ -113,7 +111,7 @@ function applyObjectFields(
   return output;
 }
 
-export function toString(value: unknown): ConvertResult<string> {
+export function toString(value: unknown): ShapeConversionResult<string> {
   if (isMissingInput(value)) return ok("");
   if (typeof value === "string") return ok(value);
   if (typeof value === "number" || typeof value === "boolean") return ok(`${value}`);
@@ -122,7 +120,7 @@ export function toString(value: unknown): ConvertResult<string> {
   return err(`toString: received object — missing shape or wrong member. Got: ${JSON.stringify(value)}`);
 }
 
-export function toNumber(value: unknown): ConvertResult<number> {
+export function toNumber(value: unknown): ShapeConversionResult<number> {
   if (isMissingInput(value)) return ok(0);
   if (typeof value === "number") return finiteNumber(value, "number");
   if (typeof value === "boolean") return ok(booleanAsNumber(value));
@@ -133,7 +131,7 @@ export function toNumber(value: unknown): ConvertResult<number> {
   return err(`toNumber: cannot convert ${typeof value} to number`);
 }
 
-export function toBoolean(value: unknown): ConvertResult<boolean> {
+export function toBoolean(value: unknown): ShapeConversionResult<boolean> {
   if (isMissingInput(value)) return ok(false);
   if (typeof value === "boolean") return ok(value);
   if (typeof value === "string") return ok(textIsTruthy(value));
@@ -143,7 +141,7 @@ export function toBoolean(value: unknown): ConvertResult<boolean> {
   return err(`toBoolean: received object — cannot convert`);
 }
 
-export function toDate(value: unknown): ConvertResult<number> {
+export function toDate(value: unknown): ShapeConversionResult<number> {
   if (isMissingInput(value)) return ok(NaN);
   if (value instanceof Date) return finiteNumber(value.getTime(), "Date object");
   if (typeof value === "number") return finiteNumber(value, "date timestamp");
@@ -183,7 +181,7 @@ function localMidnightTimestamp(value: DateOnlyParts): number {
   return new Date(value.year, value.month - 1, value.day).getTime();
 }
 
-export function toArray(value: unknown): ConvertResult<unknown[]> {
+export function toArray(value: unknown): ShapeConversionResult<unknown[]> {
   if (Array.isArray(value)) return ok(value);
   const missingOrEmptyTextRepresentsEmptyArray = isMissingInput(value) || value === "";
   if (missingOrEmptyTextRepresentsEmptyArray) return ok([]);
@@ -195,7 +193,7 @@ export function toArray(value: unknown): ConvertResult<unknown[]> {
   return ok([value]);
 }
 
-export function toPlainObject(value: unknown): ConvertResult<Record<string, unknown>> {
+export function toPlainObject(value: unknown): ShapeConversionResult<Record<string, unknown>> {
   const valueIsPlainObject =
     typeof value === "object"
     && value !== null
@@ -211,12 +209,12 @@ function booleanAsNumber(value: boolean): number {
   return 0;
 }
 
-function numberFromText(value: string): ConvertResult<number> {
+function numberFromText(value: string): ShapeConversionResult<number> {
   const parsed = Number(value);
   return finiteNumber(parsed, `text "${value}"`);
 }
 
-function finiteNumber(value: number, source: string): ConvertResult<number> {
+function finiteNumber(value: number, source: string): ShapeConversionResult<number> {
   if (Number.isFinite(value)) return ok(value);
   return err(`toNumber: ${source} is not a finite number`);
 }
