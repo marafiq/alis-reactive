@@ -140,7 +140,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         await Expect(result).ToContainTextAsync("Inactive", new() { Timeout = 3000 });
         await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
-        // Must NOT still have the green class from active phase (state leak check)
+        // Branch re-evaluation must clear the prior active class.
         await Expect(result).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
         await Expect(amountInput).ToHaveValueAsync(
             new System.Text.RegularExpressions.Regex(@"^0(\.00)?$"), new() { Timeout = 3000 });
@@ -149,7 +149,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         await Expect(result).ToContainTextAsync("Pending or empty", new() { Timeout = 3000 });
         await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
-        // Must NOT still have amber from inactive phase (state leak check)
+        // Pending branch must clear classes from earlier branches.
         await Expect(result).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
         await Expect(result).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
         await Expect(addressSection).ToBeVisibleAsync();
