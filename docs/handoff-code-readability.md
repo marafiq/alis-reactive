@@ -129,3 +129,8 @@ Rewrite or delete:
   generated component IDs and gather reads the first matching DOM ID. The test now
   marks this with `TODO:`; a later slice should give repeated forms an explicit
   component ID scope instead of relying on first-match DOM lookup.
+- `tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/*`
+  contains fixed waits around Syncfusion commit completion and negative-request
+  assertions. The touched waits are now marked with `TODO:`; a later slice should
+  replace them with visible commit signals or a shared behavior-focused no-POST
+  proof.

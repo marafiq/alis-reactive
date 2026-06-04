@@ -18,14 +18,13 @@ public class WhenResidentProfileFormValidatesInPlaceEditorFields : PlaywrightTes
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#submit-profile");
 
-        // Open the mixed-form Nickname InPlaceEditor, commit an invalid value (60 chars)
         await Page.Locator($"#{NicknameEditorId} .e-editable-value-wrapper").First.ClickAsync();
         var inner = Page.Locator($"#{NicknameEditorId} input.e-control").First;
         await Expect(inner).ToBeVisibleAsync(new() { Timeout = 5000 });
         await inner.FillAsync(new string('x', 60));
         await inner.PressAsync("Enter");
 
-        // Give Syncfusion time to close the editor and commit the value to ej.value
+        // TODO: Replace this fixed Syncfusion commit wait with a visible editor-close or value-commit signal.
         await Page.WaitForTimeoutAsync(400);
 
         var postFired = false;
@@ -37,6 +36,7 @@ public class WhenResidentProfileFormValidatesInPlaceEditorFields : PlaywrightTes
 
         await Page.Locator("#submit-profile").ClickAsync();
 
+        // TODO: Replace this fixed negative-request wait with a behavior-focused no-POST proof.
         await Page.WaitForTimeoutAsync(2800);
 
         Assert.That(postFired, Is.False,

@@ -77,6 +77,7 @@ public class WhenInPlaceEditorQuickEditCommitsMaskedMrn : PlaywrightTestBase
         try
         {
             await inner.PressAsync("Enter");
+            // TODO: Replace this fixed negative-request wait with a behavior-focused no-POST proof.
             await Page.WaitForTimeoutAsync(1000);
         }
         finally

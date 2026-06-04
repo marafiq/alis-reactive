@@ -34,6 +34,7 @@ public class WhenInPlaceEditorQuickEditCancelReverts : PlaywrightTestBase
         await Expect(Page.Locator("#card-cancel-status"))
             .ToContainTextAsync("User cancelled the edit", new() { Timeout = 5000 });
 
+        // TODO: Replace this fixed negative-request wait with a behavior-focused no-POST proof.
         await Page.WaitForTimeoutAsync(2800);
         Assert.That(postFired, Is.False, "Cancel must not trigger any HTTP request.");
 
