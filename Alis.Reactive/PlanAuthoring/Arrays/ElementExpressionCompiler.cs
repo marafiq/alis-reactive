@@ -17,7 +17,7 @@ namespace Alis.Reactive.Builders.Arrays
         // Pure, deterministic, side-effect-free element methods only. A per-element method call is a
         // value projection, so it must not mutate; side-effecting methods (e.g. grid Row.setCellValue)
         // belong in a per-element reaction (foreach), not a projection. Grow this set deliberately.
-        private static readonly HashSet<string> WhitelistedMethods = new HashSet<string>(StringComparer.Ordinal)
+        private static readonly HashSet<string> PureElementMethods = new HashSet<string>(StringComparer.Ordinal)
         {
             "getDay", "getMonth", "getFullYear", "getDate", "getHours", "getMinutes", "getSeconds", "getTime",
             "toUpperCase", "toLowerCase", "trim",
@@ -70,7 +70,7 @@ namespace Alis.Reactive.Builders.Arrays
             if (body is UnaryExpression unary && unary.NodeType == ExpressionType.Not)
                 return ConditionGraph.Not(CompileCondition(Unwrap(unary.Operand), element));
 
-            if (body is MethodCallExpression call && call.Object != null && TryStringOperator(call, out var textOp))
+            if (body is MethodCallExpression call && call.Object != null && TryStringOperator(call, out var textOperator))
             {
                 var argument = Unwrap(call.Arguments[0]);
                 if (ReferencesParameter(argument, element))
@@ -79,7 +79,7 @@ namespace Alis.Reactive.Builders.Arrays
                         "values, not element-scope reads — the runtime text operand requires a literal. Got: " + argument);
 
                 return ConditionGraph.Compare(
-                    textOp,
+                    textOperator,
                     ComparisonOperands.Binary(
                         CompileValue(Unwrap(call.Object), element),
                         CompileValue(argument, element),
@@ -136,14 +136,14 @@ namespace Alis.Reactive.Builders.Arrays
             }
 
             // Per-element method call (x => x.GetDay(), x => x.Address.GetFormatted()) — the receiver must
-            // be rooted at the element; the method must be whitelisted (pure). Reuses the RuntimePath.call engine.
+            // be rooted at the element and the method must be deterministic. Reuses the RuntimePath.call engine.
             if (node is MethodCallExpression call && call.Object != null && TryElementPath(call.Object, element, out var receiverPath))
             {
                 var methodName = CamelCase(call.Method.Name);
-                if (!WhitelistedMethods.Contains(methodName))
+                if (!PureElementMethods.Contains(methodName))
                     throw new InvalidOperationException(
-                        "Element method '" + methodName + "' is not whitelisted for the array DSL. Whitelist a PURE, " +
-                        "deterministic method in ElementExpressionCompiler.WhitelistedMethods, or use a server-side " +
+                        "Element method '" + methodName + "' is not an allowed pure array DSL method. Add it to " +
+                        "ElementExpressionCompiler.PureElementMethods only if deterministic and side-effect-free, or use a server-side " +
                         "projection. Side-effecting per-element calls need a reaction, not a projection. Got: " + node);
 
                 var methodArgs = new List<ValueExpression>();
