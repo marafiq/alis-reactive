@@ -136,7 +136,7 @@ function literal(value: string): ValueExpression {
   };
 }
 
-function plan(
+function validationRuntimePlan(
   validationRules: ComponentValidation[],
   components: Record<string, ComponentObject> = {
     "resident-name-field": nativeComponent("resident-name-input"),
@@ -189,7 +189,7 @@ function renderValidationDomWithHiddenErrorSlot(): void {
 describe("validation orchestrator server errors", () => {
   it("places server errors using the declared server field name", () => {
     renderValidationDom();
-    const runtimePlan = plan([
+    const runtimePlan = validationRuntimePlan([
       requiredRule("resident-name-field", "Name"),
     ]);
 
@@ -205,7 +205,7 @@ describe("validation orchestrator server errors", () => {
 
   it("does not treat component keys as server field names", () => {
     renderValidationDom();
-    const runtimePlan = plan([
+    const runtimePlan = validationRuntimePlan([
       requiredRule("resident-name-field", "Name"),
     ]);
 
@@ -221,7 +221,7 @@ describe("validation orchestrator server errors", () => {
 
   it("routes server errors for known fields to summary when the component is not in the current plan", () => {
     renderValidationDom();
-    const runtimePlan = plan([
+    const runtimePlan = validationRuntimePlan([
       requiredRule("notify-field", "ReceiveNotifications"),
     ], {});
 
@@ -238,7 +238,7 @@ describe("validation orchestrator server errors", () => {
   it("routes server errors for unloaded partial fields to the summary", () => {
     renderValidationDom();
     const appliedPlans = new AppliedPlans();
-    const runtimePlan = plan([
+    const runtimePlan = validationRuntimePlan([
       requiredRule("zip-code-field", "Address.ZipCode", "zip-code-field"),
     ], {});
 
@@ -269,7 +269,7 @@ describe("validation orchestrator server errors", () => {
 
   it("routes server errors for known fields to summary when the component element is not mounted", () => {
     renderValidationDom();
-    const runtimePlan = plan([
+    const runtimePlan = validationRuntimePlan([
       requiredRule("notify-field", "ReceiveNotifications"),
     ], {
       "notify-field": nativeComponent("notify-input"),
@@ -285,7 +285,7 @@ describe("validation orchestrator server errors", () => {
 
   it("routes server errors for known fields to summary when the inline error slot is missing", () => {
     renderValidationDomWithoutErrorSlot();
-    const runtimePlan = plan([
+    const runtimePlan = validationRuntimePlan([
       requiredRule("resident-name-field", "Name"),
     ]);
 
@@ -299,7 +299,7 @@ describe("validation orchestrator server errors", () => {
 
   it("routes server errors for known fields to summary when the inline error slot is hidden by layout", () => {
     renderValidationDomWithHiddenErrorSlot();
-    const runtimePlan = plan([
+    const runtimePlan = validationRuntimePlan([
       requiredRule("resident-name-field", "Name"),
     ]);
 
@@ -318,7 +318,7 @@ describe("validation orchestrator client rules", () => {
   it("matches summary entries by component key without CSS selector interpolation", () => {
     renderValidationDomWithHiddenErrorSlot();
     const componentKey = 'resident["name"]';
-    const runtimePlan = plan([
+    const runtimePlan = validationRuntimePlan([
       requiredRule(componentKey, "Name"),
     ], {
       [componentKey]: nativeComponent("resident-name-input"),
@@ -330,7 +330,7 @@ describe("validation orchestrator client rules", () => {
 
   it("treats an unmounted activation dependency as inactive only for an unmounted validation field", () => {
     renderValidationDom();
-    const runtimePlan = plan([
+    const runtimePlan = validationRuntimePlan([
       unmountedConditionalRuleWithMissingActivationSource(),
     ]);
 
