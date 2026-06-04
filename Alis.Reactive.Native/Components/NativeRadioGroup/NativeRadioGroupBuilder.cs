@@ -21,9 +21,9 @@ namespace Alis.Reactive.Native.Components
     /// <remarks>
     /// <para>
     /// Created by the <c>.NativeRadioGroup()</c> factory on
-    /// <see cref="InputBoundField{TModel,TProp}"/>. A hidden input holds the selected
-    /// value for form submission and component reads, while individual radio buttons
-    /// use MVC model binding.
+    /// <see cref="InputBoundField{TModel,TProp}"/>. The hidden input is the
+    /// Reactive Plan component target for reads and gather, while individual
+    /// radio buttons keep MVC form submission and model binding.
     /// </para>
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Native.Components
         private string _cssClass = "flex flex-col gap-2";
         private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
 
-        // Keep internal: the factory also registers this input component in the Reactive Plan.
+        // Internal because the factory also registers this input component in the Reactive Plan.
         internal NativeRadioGroupBuilder(
 #if NET48
             HtmlHelper<TModel> html,
@@ -149,17 +149,17 @@ namespace Alis.Reactive.Native.Components
             // net48: read the raw model value directly. System.Web.Mvc ValueFor returns an
             // already-HTML-encoded MvcHtmlString, which would double-encode in the hidden input.
             // (ModelState-aware re-render after a failed POST is a net10-only nicety.)
-            var modelValue = _html.ViewData.Eval(System.Web.Mvc.ExpressionHelper.GetExpressionText(_expression))?.ToString() ?? "";
+            var selectedValue = _html.ViewData.Eval(System.Web.Mvc.ExpressionHelper.GetExpressionText(_expression))?.ToString() ?? "";
 #else
-            var modelValue = _html.ValueFor(_expression, "{0}")?.ToString() ?? "";
+            var selectedValue = _html.ValueFor(_expression, "{0}")?.ToString() ?? "";
 #endif
 
             var encodedId = encoder.Encode(_elementId);
 
             writer.Write($"<div class=\"{encoder.Encode(_cssClass)}\">");
 
-            // Hidden input is the evalRead/gather target and intentionally omits a name attribute.
-            writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(modelValue)}\" />");
+            // The hidden input is the Reactive Plan component target and intentionally omits a name attribute.
+            writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(selectedValue)}\" />");
 
             for (int i = 0; i < _options.Count; i++)
             {
@@ -170,8 +170,8 @@ namespace Alis.Reactive.Native.Components
                 writer.Write("<label>");
                 writer.Write($"<div class=\"{encoder.Encode(_optionCssClass)}\">");
 
-                var attrs = new Dictionary<string, object> { ["id"] = radioId };
-                var radioHtml = _html.RadioButtonFor(_expression, option.Value, attrs);
+                var radioAttributes = new Dictionary<string, object> { ["id"] = radioId };
+                var radioHtml = _html.RadioButtonFor(_expression, option.Value, radioAttributes);
 #if NET48
                 writer.Write(radioHtml.ToHtmlString());
 #else
@@ -192,8 +192,7 @@ namespace Alis.Reactive.Native.Components
 
             writer.Write("</div>");
 
-            // Inline init — same pattern as SF component initialization.
-            // Targets known ID, no DOM scanning. Works on page load AND partial injection.
+            // Inline initialization works on page load and partial injection without DOM scanning.
             writer.Write($@"<script>(function(){{var h=document.getElementById(""{encodedId}"");h.isInteracted=false;h.parentElement.addEventListener(""change"",function(e){{if(e.target.type!==""radio"")return;h.value=e.target.value;h.isInteracted=true;h.dispatchEvent(new Event(""change"",{{bubbles:true}}));}});}})();</script>");
         }
     }
