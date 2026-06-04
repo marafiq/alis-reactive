@@ -74,7 +74,6 @@ namespace Alis.Reactive.PlanModel
         internal BrowserObject WithBindingIfAbsent(InputBinding binding) =>
             new BrowserObject(_id, _vendor, _type, ComponentRole.PlanInput, _binding.FillIfAbsent(binding), _container);
 
-        /// <summary>Returns a copy carrying the given container scope.</summary>
         internal BrowserObject WithContainer(ContainerScope container) =>
             new BrowserObject(_id, _vendor, _type, ComponentRole.ValidationContainer, _binding, ValidationContainerBinding.Scoped(container));
 
