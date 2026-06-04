@@ -146,9 +146,8 @@ namespace Alis.Reactive.Native.Components
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
 #if NET48
-            // net48: read the model value directly. System.Web.Mvc ValueFor returns an
-            // already-HTML-encoded MvcHtmlString, which would double-encode at the hidden
-            // input below; ViewData.Eval returns the raw value, encoded once at line ~176.
+            // net48: read the raw model value directly. System.Web.Mvc ValueFor returns an
+            // already-HTML-encoded MvcHtmlString, which would double-encode in the hidden input.
             // (ModelState-aware re-render after a failed POST is a net10-only nicety.)
             var modelValue = _html.ViewData.Eval(System.Web.Mvc.ExpressionHelper.GetExpressionText(_expression))?.ToString() ?? "";
 #else
@@ -159,7 +158,7 @@ namespace Alis.Reactive.Native.Components
 
             writer.Write($"<div class=\"{encoder.Encode(_cssClass)}\">");
 
-            // Hidden input — canonical element for evalRead + gather. NO name attr.
+            // Hidden input is the evalRead/gather target and intentionally omits a name attribute.
             writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(modelValue)}\" />");
 
             for (int i = 0; i < _options.Count; i++)
