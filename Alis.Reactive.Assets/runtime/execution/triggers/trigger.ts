@@ -11,13 +11,8 @@ import { componentEventChannel } from "../../browser-objects/component-event-con
 
 const log = scope("trigger");
 
-/**
- * Execute a reaction and handle errors for both sync and async paths.
- * `source` identifies the originating trigger so failure logs point at
- * which wiring broke. Execution is synchronous for pure sync reactions
- * (set, call, branch with compare conditions) — required so SF event
- * mutations like args.cancel are visible when SF checks them after return.
- */
+// Pure sync reactions must return before Syncfusion inspects mutable event args
+// such as args.cancel. The source tag ties failure logs to trigger wiring.
 function runReaction(reaction: ReactionGraph, plan: PlanDocument, context: ExecutionContext, source: string): void {
   try {
     catchAsyncReactionFailure(
