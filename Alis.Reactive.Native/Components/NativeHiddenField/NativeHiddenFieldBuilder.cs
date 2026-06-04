@@ -23,7 +23,7 @@ namespace Alis.Reactive.Native.Components
     /// No label or validation slot is rendered.
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The bound property type.</typeparam>
+    /// <typeparam name="TProp">The model value type rendered through the hidden input.</typeparam>
     public class NativeHiddenFieldBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
