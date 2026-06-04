@@ -21,7 +21,7 @@ interface ManagedSource {
 }
 
 // One EventSource is shared per URL so retry wiring can restore all behaviors
-// attached to that browser connection.
+// attached to that stream.
 const sources = new Map<string, ManagedSource>();
 
 function retrySSE(url: string, behaviors: readonly WiredBehavior[]): void {

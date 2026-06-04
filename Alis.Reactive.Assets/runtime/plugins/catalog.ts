@@ -1,6 +1,6 @@
-// Plugins are an explicit bridge for browser functions that are outside the
-// deterministic plan DSL. The plan still declares the callable contract; this
-// catalog only owns the browser-provided implementation objects.
+// Plugins bridge host-page functions that are outside the Reactive Plan DSL.
+// The plan still declares the callable contract; this catalog only owns the
+// host-provided implementation objects.
 
 type BrowserPluginFunction = (...args: unknown[]) => unknown;
 export type BrowserPluginRoot = object | BrowserPluginFunction;

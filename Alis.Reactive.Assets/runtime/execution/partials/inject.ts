@@ -1,5 +1,5 @@
-// Partial injection strips reactive plan scripts before DOM append so Syncfusion
-// can initialize the HTML and the slot plan can be applied separately.
+// Partial injection strips Reactive Plan scripts before DOM append so Syncfusion
+// can initialize the HTML and the slot's plans can be applied separately.
 
 import type { PlanDocument } from "../../types/index";
 import { loadPartialSlot, unloadPartialSlot } from "../../lifecycle/boot";

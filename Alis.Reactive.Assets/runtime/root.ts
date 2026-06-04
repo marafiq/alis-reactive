@@ -1,4 +1,4 @@
-// Runtime boot waits for DOM readiness, drains queued browser plugins, then
+// Runtime boot waits for DOM readiness, drains queued host-page plugins, then
 // boots discovered [data-reactive-plan] scripts.
 
 import { boot, trace } from "./lifecycle/boot";
@@ -11,13 +11,13 @@ import type { PlanDocument } from "./types/index";
 import type { TraceLevel } from "./diagnostics/trace";
 import { registerPlugin } from "./plugins/catalog";
 
-interface PendingBrowserPlugin {
+interface PendingHostPlugin {
   readonly name: string;
   readonly instance: unknown;
 }
 
 interface PluginQueueWindow extends Window {
-  __alisPlugins?: PendingBrowserPlugin[];
+  __alisPlugins?: PendingHostPlugin[];
 }
 
 startRuntimeWhenDocumentIsReady();

@@ -52,7 +52,7 @@ namespace Alis.Reactive.Builders.Arrays
             // A sort key must coerce to a comparable scalar. A non-scalar key (object/collection)
             // serializes as Shape.Any, and the runtime would fall back to lexicographic
             // String(value) order — every element becomes "[object Object]", silently wrong.
-            // Reject it where it is authored rather than mis-sorting in the browser.
+            // Reject it where it is authored rather than emit a silently wrong runtime sort.
             var keyKind = Shape.FromClrType(typeof(TKey)).Kind;
             var keyIsSortableScalar = keyKind is "string" or "number" or "boolean" or "date" or "nullable";
             if (!keyIsSortableScalar)
