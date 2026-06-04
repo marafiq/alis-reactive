@@ -181,21 +181,21 @@ function readFromUrl(
   return applyShapeWhenPresent(rawValue, expression.shape);
 }
 
-/** responseBody and elementValue read the whole scope; other payload reads follow RuntimePath. */
+/** Whole payload and whole element reads return the current payload scope; path reads follow RuntimePath. */
 function readFromPayload(
   expression: PayloadReadExpression, payloadRoot: unknown,
 ): unknown {
-  const rawValue = readsWholePayload(expression) || readsWholeElement(expression)
+  const rawValue = isWholePayloadRead(expression) || isWholeElementRead(expression)
     ? payloadRoot
     : RuntimePath.from(expression.path).read(payloadRoot);
 
   return applyShapeWhenPresent(rawValue, expression.shape);
 }
 
-function readsWholePayload(expression: PayloadReadExpression): expression is WholePayloadReadExpression {
+function isWholePayloadRead(expression: PayloadReadExpression): expression is WholePayloadReadExpression {
   return expression.member === "responseBody";
 }
 
-function readsWholeElement(expression: PayloadReadExpression): expression is WholeElementReadExpression {
+function isWholeElementRead(expression: PayloadReadExpression): expression is WholeElementReadExpression {
   return expression.member === "elementValue";
 }
