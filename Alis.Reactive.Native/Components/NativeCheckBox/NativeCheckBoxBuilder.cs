@@ -43,7 +43,7 @@ namespace Alis.Reactive.Native.Components
 
         private string? _cssClass;
 
-        // Keep internal: the factory also registers this input component in the Reactive Plan.
+        // Internal because the factory also registers this input component in the Reactive Plan.
         internal NativeCheckBoxBuilder(
 #if NET48
             HtmlHelper<TModel> html,
@@ -60,10 +60,8 @@ namespace Alis.Reactive.Native.Components
             _bindingPath = target.BindingName;
         }
 
-        /// <summary>Gets the resolved element ID for this checkbox.</summary>
         internal string ElementId => _elementId;
 
-        /// <summary>Gets the model binding path, such as <c>"IsActive"</c>.</summary>
         internal string BindingPath => _bindingPath;
 
         /// <summary>
@@ -75,7 +73,6 @@ namespace Alis.Reactive.Native.Components
             _cssClass = css;
             return this;
         }
-
 
 #if NET48
         /// <inheritdoc />
@@ -90,13 +87,13 @@ namespace Alis.Reactive.Native.Components
         /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
-            var attrs = new Dictionary<string, object>
+            var checkboxAttributes = new Dictionary<string, object>
             {
                 ["id"] = _elementId
             };
-            if (_cssClass != null) attrs["class"] = _cssClass;
+            if (_cssClass != null) checkboxAttributes["class"] = _cssClass;
 
-            var result = _html.CheckBoxFor(_expression, attrs);
+            var result = _html.CheckBoxFor(_expression, checkboxAttributes);
 #if NET48
             writer.Write(result.ToHtmlString());
 #else

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text.Encodings.Web;
@@ -15,10 +16,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Renders a native HTML &lt;input type="hidden"&gt; element bound to a model property.
-    /// Uses the plan-owned render target for element ID and MVC binding name.
-    /// No label, no validation slot — hidden inputs are invisible.
+    /// Renders a native HTML <c>&lt;input type="hidden"&gt;</c> bound to a model property.
     /// </summary>
+    /// <remarks>
+    /// Uses the Reactive Plan-owned render target for element ID and MVC binding name.
+    /// No label or validation slot is rendered.
+    /// </remarks>
+    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
+    /// <typeparam name="TProp">The bound property type.</typeparam>
     public class NativeHiddenFieldBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
@@ -53,6 +58,7 @@ namespace Alis.Reactive.Native.Components
         internal string BindingPath => _bindingPath;
 
 #if NET48
+        /// <inheritdoc />
         public string ToHtmlString()
         {
             var sw = new StringWriter();
@@ -61,14 +67,15 @@ namespace Alis.Reactive.Native.Components
         }
 #endif
 
+        /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
-            var attrs = new System.Collections.Generic.Dictionary<string, object>
+            var hiddenInputAttributes = new Dictionary<string, object>
             {
                 ["id"] = _elementId
             };
 
-            var result = _html.HiddenFor(_expression, attrs);
+            var result = _html.HiddenFor(_expression, hiddenInputAttributes);
 #if NET48
             writer.Write(result.ToHtmlString());
 #else
