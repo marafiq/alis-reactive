@@ -6,8 +6,6 @@
 
     var plan = Html.ReactivePlan<ContentTypeModel>();
 
-    // ── Section 1: JSON Flat Response — OnSuccess<FlatResponse> ──
-
     Html.On(plan, t => t.CustomEvent("fetch-flat", p =>
     {
         p.Get("/Sandbox/HttpPipeline/ContentType/FlatJson")
@@ -21,8 +19,6 @@
             })
          );
     }));
-
-    // ── Section 2: JSON Nested Response — OnSuccess<NestedResponse> ──
 
     Html.On(plan, t => t.CustomEvent("fetch-nested", p =>
     {
@@ -38,8 +34,6 @@
             })
          );
     }));
-
-    // ── Section 3: HTML Partial via Into ──
 
     Html.On(plan, t => t.CustomEvent("fetch-partial", p =>
     {
@@ -62,7 +56,6 @@
         HTML partials use <code>Into</code> with <code>ej.base.append</code>.
     </native-text>
 
-    <!-- Section 1: Flat JSON Response -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">1. JSON Flat Response</native-heading>
@@ -84,7 +77,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 2: Nested JSON Response -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">2. JSON Nested Response</native-heading>
@@ -107,7 +99,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 3: HTML Partial via Into -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">3. HTML Partial via Into</native-heading>
@@ -129,7 +120,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Plan JSON -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
