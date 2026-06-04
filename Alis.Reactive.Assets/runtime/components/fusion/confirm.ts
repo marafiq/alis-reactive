@@ -71,9 +71,6 @@ function showConfirmDialog(
   });
 }
 
-/**
- * Initializes the app-level Syncfusion confirm singleton before plan boot.
- */
 export function init(): void {
   // App-level singleton rendered by @Html.FusionConfirmDialog() in Layout.
   // Not a plan component — getElementById is correct.
