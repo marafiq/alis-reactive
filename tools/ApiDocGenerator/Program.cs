@@ -102,7 +102,9 @@ foreach (var assemblyGroup in byAssembly)
                     foreach (var prop in properties)
                     {
                         var propSummary = GetSummaryInline(prop.Element);
-                        sb.AppendLine($"{prop.DisplaySignature}  // {propSummary}");
+                        sb.AppendLine(string.IsNullOrWhiteSpace(propSummary)
+                            ? prop.DisplaySignature
+                            : $"{prop.DisplaySignature}  // {propSummary}");
                     }
                     sb.AppendLine("```");
                     sb.AppendLine();
@@ -128,7 +130,7 @@ foreach (var assemblyGroup in byAssembly)
 
 var outputDir = Path.GetDirectoryName(outputPath)!;
 Directory.CreateDirectory(outputDir);
-File.WriteAllText(outputPath, sb.ToString());
+File.WriteAllText(outputPath, sb.ToString().TrimEnd() + Environment.NewLine);
 
 Console.WriteLine($"Generated API reference: {outputPath}");
 Console.WriteLine($"  Types: {types.Count}");
@@ -164,14 +166,31 @@ static string GetSummaryText(XElement member)
 {
     var summary = member.Element("summary");
     if (summary == null) return "";
-    return CleanXmlText(summary);
+    return NormalizeDocText(CleanXmlText(summary));
 }
 
 static string GetSummaryInline(XElement member)
 {
     var summary = member.Element("summary");
     if (summary == null) return "";
-    return CleanXmlText(summary).Trim().Replace("\n", " ");
+    return string.Join(" ", NormalizeDocText(CleanXmlText(summary))
+        .Split('\n')
+        .Select(line => line.Trim()));
+}
+
+static string NormalizeDocText(string text)
+{
+    var lines = text.Replace("\r\n", "\n").Split('\n')
+        .Select(line => line.TrimEnd())
+        .ToList();
+
+    while (lines.Count > 0 && string.IsNullOrWhiteSpace(lines[0]))
+        lines.RemoveAt(0);
+
+    while (lines.Count > 0 && string.IsNullOrWhiteSpace(lines[^1]))
+        lines.RemoveAt(lines.Count - 1);
+
+    return string.Join(Environment.NewLine, lines);
 }
 
 static string CleanXmlText(XElement element)
