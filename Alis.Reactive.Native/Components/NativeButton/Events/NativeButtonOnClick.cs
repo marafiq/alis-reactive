@@ -1,12 +1,17 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Payload for NativeButton.Click (DOM "click" event).
-    /// Button clicks carry no data payload — this class is an empty marker
-    /// used by the generic inference chain in .Reactive().
+    /// Event args for <see cref="NativeButtonEvents.Click"/>.
     /// </summary>
+    /// <remarks>
+    /// Native button clicks carry no payload fields; this marker type keeps the
+    /// event selector and pipeline lambda strongly typed.
+    /// </remarks>
     public class NativeButtonClickArgs
     {
+        /// <summary>
+        /// Initializes a new marker payload for click event binding.
+        /// </summary>
         public NativeButtonClickArgs() { }
     }
 }

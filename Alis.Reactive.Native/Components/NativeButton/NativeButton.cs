@@ -1,10 +1,12 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Native HTML &lt;button&gt; element.
-    /// Phantom type — constrains which vertical slice extensions are available.
-    /// Not an IInputComponent — buttons have no form value to read.
+    /// Explicit-ID native HTML <c>&lt;button&gt;</c> component.
     /// </summary>
+    /// <remarks>
+    /// Buttons are not input components: they have no form value for gather, but
+    /// the component type constrains button operations and event wiring.
+    /// </remarks>
     public sealed class NativeButton : NativeComponent
     {
     }

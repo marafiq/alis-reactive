@@ -7,13 +7,18 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Factory extension for creating NativeButtonBuilder.
+    /// Factory extension for rendering explicit-ID native buttons directly in a Razor view.
     /// </summary>
     public static class NativeButtonHtmlExtensions
     {
         /// <summary>
-        /// Creates a native &lt;button&gt; builder with an explicit element ID.
+        /// Creates a native button builder with the element ID used by Reactive Plan event wiring.
         /// </summary>
+        /// <typeparam name="TModel">The view model type for the current Razor view.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="elementId">The element ID rendered on the button and used for component lookup.</param>
+        /// <param name="text">The button text content.</param>
+        /// <returns>A builder that renders the button directly in the view.</returns>
         public static NativeButtonBuilder<TModel> NativeButton<TModel>(
 #if NET48
             this HtmlHelper<TModel> html, string elementId, string text)
