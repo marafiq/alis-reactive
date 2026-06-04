@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Playwright gestures and surfaces for FusionCheckBox tests.
-/// </summary>
 public sealed class FusionCheckBoxLocator
 {
     private readonly IPage _page;
@@ -16,7 +13,6 @@ public sealed class FusionCheckBoxLocator
         _componentId = componentId;
     }
 
-    /// <summary>The rendered Syncfusion CheckBox input.</summary>
     public ILocator Input => _page.Locator($"#{_componentId}");
 
     /// <summary>The Syncfusion wrapper around the checkbox input.</summary>
@@ -27,7 +23,6 @@ public sealed class FusionCheckBoxLocator
 
     public async Task<bool> IsChecked() => await Input.IsCheckedAsync();
 
-    /// <summary>Returns whether the native input is indeterminate.</summary>
     public async Task<bool> IsIndeterminate() =>
         await Input.EvaluateAsync<bool>("element => element.indeterminate");
 

@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Playwright gestures and surfaces for FusionRadioButton tests.
-/// </summary>
 public sealed class FusionRadioButtonLocator
 {
     private readonly IPage _page;
@@ -16,7 +13,6 @@ public sealed class FusionRadioButtonLocator
         _componentId = componentId;
     }
 
-    /// <summary>The rendered Syncfusion RadioButton input.</summary>
     public ILocator Input => _page.Locator($"#{_componentId}");
 
     /// <summary>The Syncfusion wrapper around the radio input.</summary>

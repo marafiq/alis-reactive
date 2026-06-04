@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Locator surface for the Syncfusion Switch DOM used by Playwright tests.
-/// </summary>
 public sealed class SwitchLocator
 {
     private readonly IPage _page;

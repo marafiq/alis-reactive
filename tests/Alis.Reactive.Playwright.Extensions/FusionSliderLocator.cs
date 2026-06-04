@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Playwright gestures and surfaces for FusionSlider tests.
-/// </summary>
 public sealed class FusionSliderLocator
 {
     private readonly IPage _page;
@@ -16,7 +13,6 @@ public sealed class FusionSliderLocator
         _componentId = componentId;
     }
 
-    /// <summary>The Syncfusion Slider host element.</summary>
     public ILocator Host => _page.Locator($"#{_componentId}");
 
     public ILocator Handle(int index) => Host.Locator(".e-handle").Nth(index);

@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Playwright gestures and surfaces for FusionRating tests.
-/// </summary>
 public sealed class FusionRatingLocator
 {
     private readonly IPage _page;
@@ -16,7 +13,6 @@ public sealed class FusionRatingLocator
         _componentId = componentId;
     }
 
-    /// <summary>The Syncfusion Rating input element.</summary>
     public ILocator Input => _page.Locator($"#{_componentId}");
 
     public async Task<string?> ValueAttribute() =>
