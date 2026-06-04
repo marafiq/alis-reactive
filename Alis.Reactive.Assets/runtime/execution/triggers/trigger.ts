@@ -14,10 +14,10 @@ const log = scope("trigger");
 
 // Pure sync reactions must return before Syncfusion inspects mutable event args
 // such as args.cancel. The source tag ties failure logs to trigger wiring.
-function runReaction(reaction: ReactionGraph, plan: PlanDocument, context: ExecutionContext, source: string): void {
+function runReaction(reaction: ReactionGraph, planDocument: PlanDocument, context: ExecutionContext, source: string): void {
   try {
     catchAsyncReactionFailure(
-      executeReaction(reaction, plan, context.raw),
+      executeReaction(reaction, planDocument, context.raw),
       err => log.error("reaction.failed", { source, sync: false, error: toJavaScriptString(err) }),
     );
   } catch (err) {
@@ -28,19 +28,19 @@ function runReaction(reaction: ReactionGraph, plan: PlanDocument, context: Execu
 export function wireTrigger(
   trigger: StartsWhen,
   reaction: ReactionGraph,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   signal?: AbortSignal
 ): void {
-  const opts = listenerOptions(signal);
+  const eventOptions = listenerOptions(signal);
 
   switch (trigger.kind) {
     case "page-ready":
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => {
-          runReaction(reaction, plan, ExecutionContext.empty(), "page-ready");
-        }, opts);
+          runReaction(reaction, planDocument, ExecutionContext.empty(), "page-ready");
+        }, eventOptions);
       } else {
-        runReaction(reaction, plan, ExecutionContext.empty(), "page-ready");
+        runReaction(reaction, planDocument, ExecutionContext.empty(), "page-ready");
       }
       break;
 
@@ -49,13 +49,13 @@ export function wireTrigger(
       log.debug("document-event.listening", { event: trigger.event });
       document.addEventListener(trigger.event, (e: Event) => {
         const context = ExecutionContext.event(documentEventPayload(e));
-        runReaction(reaction, plan, context, source);
-      }, opts);
+        runReaction(reaction, planDocument, context, source);
+      }, eventOptions);
       break;
     }
 
     case "component-event": {
-      const component = RuntimePlan.from(plan).components.component(trigger.component);
+      const component = RuntimePlan.from(planDocument).components.component(trigger.component);
       const eventContract = componentEventChannel(component, trigger.event);
 
       const source = `component-event:${trigger.component}:${trigger.event}`;
@@ -66,19 +66,19 @@ export function wireTrigger(
         channel: eventContract.channel,
       });
 
-      wireEvent(plan, trigger.component, eventContract.channel, (eventData) => {
+      wireEvent(planDocument, trigger.component, eventContract.channel, (eventData) => {
         const context = ExecutionContext.event(eventData);
-        runReaction(reaction, plan, context, source);
-      }, opts);
+        runReaction(reaction, planDocument, context, source);
+      }, eventOptions);
       break;
     }
 
     case "server-push":
-      wireServerPush(trigger, reaction, plan, signal);
+      wireServerPush(trigger, reaction, planDocument, signal);
       break;
 
     case "signalr":
-      wireSignalR(trigger, reaction, plan, signal);
+      wireSignalR(trigger, reaction, planDocument, signal);
       break;
 
     default:

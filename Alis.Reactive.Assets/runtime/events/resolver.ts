@@ -5,19 +5,19 @@ import { RuntimePlan } from "../browser-objects/runtime-plan";
 const log = scope("resolver");
 
 export function wireEvent(
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   componentKey: string,
   channel: string,
   handler: (data: unknown) => void,
-  opts?: AddEventListenerOptions,
+  eventOptions?: AddEventListenerOptions,
 ): void {
-  const runtimePlan = RuntimePlan.from(plan);
+  const runtimePlan = RuntimePlan.from(planDocument);
   const component = runtimePlan.components.component(componentKey);
   component.runtime().wireEvent(
     component.root(),
     channel,
     handler,
-    opts,
+    eventOptions,
   );
 }
 
