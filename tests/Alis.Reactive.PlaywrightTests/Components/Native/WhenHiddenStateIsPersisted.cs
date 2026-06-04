@@ -1,11 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
-/// Exercises NativeHiddenField API end-to-end in the browser:
-/// hidden inputs with seeded values, property reads (Value as source),
-/// and POST gather (IncludeAll picks up hidden fields).
-///
-/// Page under test: /Sandbox/Components/NativeHiddenField
+/// Exercises NativeHiddenField seeded values, Value reads, and IncludeAll gather behavior.
 /// </summary>
 [TestFixture]
 public class WhenHiddenStateIsPersisted : PlaywrightTestBase
@@ -19,8 +15,6 @@ public class WhenHiddenStateIsPersisted : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
     }
 
-    // -- Page loads --
-
     [Test]
     public async Task page_loads_without_errors()
     {
@@ -28,8 +22,6 @@ public class WhenHiddenStateIsPersisted : PlaywrightTestBase
         await Expect(Page).ToHaveTitleAsync("NativeHiddenField — Alis.Reactive Sandbox");
         AssertNoConsoleErrors();
     }
-
-    // -- Section 1: Hidden inputs have seeded values --
 
     [Test]
     public async Task hidden_resident_id_has_seeded_value()
@@ -53,8 +45,6 @@ public class WhenHiddenStateIsPersisted : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // -- Section 2: Property Read -- DomReady reads hidden value into echo --
-
     [Test]
     public async Task domready_reads_resident_id_into_echo()
     {
@@ -75,21 +65,16 @@ public class WhenHiddenStateIsPersisted : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // -- Section 3: POST gather includes hidden values --
-
     [Test]
     public async Task post_gather_includes_hidden_fields()
     {
         await NavigateAndBoot();
 
-        // Fill in the visible resident name field
         var nameInput = Page.Locator($"#{Scope}ResidentName");
         await nameInput.FillAsync("Margaret Thompson");
 
-        // Click submit button
         await Page.Locator("#submit-btn").ClickAsync();
 
-        // Verify server echoes back hidden field values
         await Expect(Page.Locator("#echo-resident-id")).ToHaveTextAsync("RES-1042", new() { Timeout = 5000 });
         await Expect(Page.Locator("#echo-form-token")).ToHaveTextAsync("abc123");
         await Expect(Page.Locator("#echo-resident-name")).ToHaveTextAsync("Margaret Thompson");
@@ -102,13 +87,10 @@ public class WhenHiddenStateIsPersisted : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Don't fill in resident name — just click submit
         await Page.Locator("#submit-btn").ClickAsync();
 
-        // Hidden fields should still be gathered
         await Expect(Page.Locator("#echo-resident-id")).ToHaveTextAsync("RES-1042", new() { Timeout = 5000 });
         await Expect(Page.Locator("#echo-form-token")).ToHaveTextAsync("abc123");
-        // field count is 2 (ResidentId + FormToken, but not ResidentName which is empty)
         await Expect(Page.Locator("#echo-field-count")).ToHaveTextAsync("2");
         AssertNoConsoleErrors();
     }
