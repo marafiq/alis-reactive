@@ -29,58 +29,58 @@ interface ReactiveBootWindow extends Window {
   __alisReactiveBoot?: ReactiveBootState;
 }
 
-export function boot(plan: PlanDocument): void {
-  log.info("booting", { planId: plan.planId, behaviors: plan.behaviors.length });
+export function boot(bootPlan: PlanDocument): void {
+  log.info("booting", { planId: bootPlan.planId, behaviors: bootPlan.behaviors.length });
 
-  wireContainerValidation(plan, bootAbort.signal);
+  wireContainerValidation(bootPlan, bootAbort.signal);
 
-  wireBehaviors(plan.behaviors, plan, bootAbort.signal);
+  wireBehaviors(bootPlan.behaviors, bootPlan, bootAbort.signal);
 
-  setActivePlan(plan);
-  appliedPlans.register(plan);
-  markReactiveBooted(plan);
-  log.info("booted", { planId: plan.planId });
+  setActivePlan(bootPlan);
+  appliedPlans.register(bootPlan);
+  markReactiveBooted(bootPlan);
+  log.info("booted", { planId: bootPlan.planId });
 }
 
 /**
  * Two-phase wiring: wire all non-page-ready listeners first, then execute page-ready.
  * This ensures document-event listeners exist before page-ready dispatches into them.
  */
-function wireBehaviors(behaviors: Behavior[], plan: PlanDocument, signal?: AbortSignal): void {
+function wireBehaviors(behaviors: Behavior[], activePlan: PlanDocument, signal?: AbortSignal): void {
   const deferred: Behavior[] = [];
   for (const behavior of behaviors) {
     if (behavior.startsWhen.kind === "page-ready") {
       deferred.push(behavior);
     } else {
-      wireTrigger(behavior.startsWhen, behavior.reaction, plan, signal);
+      wireTrigger(behavior.startsWhen, behavior.reaction, activePlan, signal);
     }
   }
   for (const behavior of deferred) {
-    wireTrigger(behavior.startsWhen, behavior.reaction, plan, signal);
+    wireTrigger(behavior.startsWhen, behavior.reaction, activePlan, signal);
   }
 }
 
-function wireContainerValidation(plan: PlanDocument, signal?: AbortSignal): void {
-  for (const [componentKey, component] of Object.entries(plan.components)) {
+function wireContainerValidation(activePlan: PlanDocument, signal?: AbortSignal): void {
+  for (const [componentKey, component] of Object.entries(activePlan.components)) {
     if (component.container.kind !== "none") {
-      wireLiveValidation(plan, componentKey, signal);
+      wireLiveValidation(activePlan, componentKey, signal);
     }
   }
 }
 
-export function loadPartialSlot(slotId: string, incoming: PlanDocument[]): void {
-  const affectedPlanIds = appliedPlans.loadPartialSlot(slotId, incoming, activePlanWiring());
+export function loadPartialSlot(slotId: string, incomingPlans: PlanDocument[]): void {
+  const affectedPlanIds = appliedPlans.loadPartialSlot(slotId, incomingPlans, activePlanWiring());
 
   for (const planId of affectedPlanIds) {
     clearSummaryForPlan(planId);
   }
 
-  const incomingComponentCount = incoming
-    .map(plan => Object.keys(plan.components).length)
+  const incomingComponentCount = incomingPlans
+    .map(incomingPlan => Object.keys(incomingPlan.components).length)
     .reduce((sum, count) => sum + count, 0);
   log.info("partial-slot.load", {
     slotId,
-    plans: incoming.length,
+    plans: incomingPlans.length,
     newComponents: incomingComponentCount,
   });
 }
@@ -135,11 +135,11 @@ function clearSummaryForPlan(planId: string): void {
   }
 }
 
-function markReactiveBooted(plan: PlanDocument): void {
+function markReactiveBooted(bootPlan: PlanDocument): void {
   document.documentElement.dataset[BOOTED_ATTR] = "true";
   (window as ReactiveBootWindow).__alisReactiveBoot = {
     booted: true,
-    planId: plan.planId,
+    planId: bootPlan.planId,
   };
-  document.dispatchEvent(new CustomEvent("alis:booted", { detail: { planId: plan.planId } }));
+  document.dispatchEvent(new CustomEvent("alis:booted", { detail: { planId: bootPlan.planId } }));
 }
