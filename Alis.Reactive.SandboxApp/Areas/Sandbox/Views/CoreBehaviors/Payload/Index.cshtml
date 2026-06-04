@@ -6,7 +6,6 @@
 
     var plan = Html.ReactivePlan<PayloadShowcaseModel>();
 
-    // Entry 1: On page load, dispatch event with rich payload containing all types + nested props
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Dispatch("payload-test", new PayloadShowcaseModel
@@ -25,22 +24,18 @@
         });
     }));
 
-    // Entry 2: On "payload-test" event, extract each property and render to DOM
     Html.On(plan, t => t.CustomEvent<PayloadShowcaseModel>("payload-test", (payload, p) =>
     {
-        // Flat primitive properties
         p.Element("int-value").SetText(payload, x => x.IntValue);
         p.Element("long-value").SetText(payload, x => x.LongValue);
         p.Element("double-value").SetText(payload, x => x.DoubleValue);
         p.Element("string-value").SetText(payload, x => x.StringValue);
         p.Element("bool-value").SetText(payload, x => x.BoolValue);
 
-        // Nested properties — Address.Street, Address.City, Address.Zip
         p.Element("address-street").SetText(payload, x => x.Address!.Street);
         p.Element("address-city").SetText(payload, x => x.Address!.City);
         p.Element("address-zip").SetText(payload, x => x.Address!.Zip);
 
-        // Mark test complete
         p.Element("payload-status").RemoveClass("text-text-muted");
         p.Element("payload-status").AddClass("text-green-600");
         p.Element("payload-status").AddClass("font-semibold");
@@ -59,7 +54,6 @@
         </native-text>
     </div>
 
-    <!-- Payload Property Grid — all driven by plan source resolution -->
     <native-card><native-card-body>
         <native-heading level="H2">Resolved Payload Properties</native-heading>
 
@@ -108,7 +102,6 @@
         <p id="payload-status" class="text-text-muted mt-6">Waiting for payload dispatch...</p>
     </native-card-body></native-card>
 
-    <!-- Plan JSON -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto"><code id="plan-json">@Html.Raw(formattedJson)</code></pre>
