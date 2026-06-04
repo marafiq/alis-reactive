@@ -14,10 +14,6 @@ interface SyncfusionGlobal {
   };
 }
 
-/**
- * Inject HTML into a container, using ej.base.append when available for
- * Syncfusion component initialization.
- */
 export function injectPartial(container: HTMLElement, html: string, slot: string): void {
   const temp = document.createElement("div");
   temp.innerHTML = html;
