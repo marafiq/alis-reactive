@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline;
 
-/// <summary>
-/// Exercises array plugin values across DomReady HTTP, conditions, gather,
-/// headers, nested plugin composition, void <c>.Fire()</c>, and button pipelines.
-/// </summary>
 [TestFixture]
 public class WhenArrayPluginManipulates : PlaywrightTestBase
 {
