@@ -21,7 +21,7 @@ interface CustomWidgetHost extends HTMLElement {
   reactiveWidget?: CustomWidgetRoot;
 }
 
-type BrowserWindowWithConfirm = typeof window & {
+type WindowWithConfirm = typeof window & {
   alis?: { confirm?: (message: string) => boolean | Promise<boolean> };
 };
 
@@ -428,9 +428,9 @@ describe("executeReaction member targets", () => {
 
   it("keeps branch execution synchronous when an earlier guard matches before a confirm guard", () => {
     document.body.innerHTML = `<input id="resident-name" value="Ada" />`;
-    const browserWindow = window as BrowserWindowWithConfirm;
+    const hostWindow = window as WindowWithConfirm;
     const confirm = vi.fn(() => true);
-    browserWindow.alis = { confirm };
+    hostWindow.alis = { confirm };
 
     try {
       const reaction: ReactionGraph = {
@@ -453,15 +453,15 @@ describe("executeReaction member targets", () => {
       expect(confirm).not.toHaveBeenCalled();
       expect((document.getElementById("resident-name") as HTMLInputElement).value).toBe("matched");
     } finally {
-      delete browserWindow.alis;
+      delete hostWindow.alis;
     }
   });
 
   it("keeps any guards synchronous when an earlier term decides the condition before confirm", () => {
     document.body.innerHTML = `<input id="resident-name" value="Ada" />`;
-    const browserWindow = window as BrowserWindowWithConfirm;
+    const hostWindow = window as WindowWithConfirm;
     const confirm = vi.fn(() => true);
-    browserWindow.alis = { confirm };
+    hostWindow.alis = { confirm };
 
     try {
       const reaction: ReactionGraph = {
@@ -487,15 +487,15 @@ describe("executeReaction member targets", () => {
       expect(confirm).not.toHaveBeenCalled();
       expect((document.getElementById("resident-name") as HTMLInputElement).value).toBe("matched");
     } finally {
-      delete browserWindow.alis;
+      delete hostWindow.alis;
     }
   });
 
   it("keeps all guards synchronous when an earlier term rejects the condition before confirm", () => {
     document.body.innerHTML = `<input id="resident-name" value="Ada" />`;
-    const browserWindow = window as BrowserWindowWithConfirm;
+    const hostWindow = window as WindowWithConfirm;
     const confirm = vi.fn(() => true);
-    browserWindow.alis = { confirm };
+    hostWindow.alis = { confirm };
 
     try {
       const reaction: ReactionGraph = {
@@ -527,15 +527,15 @@ describe("executeReaction member targets", () => {
       expect(confirm).not.toHaveBeenCalled();
       expect((document.getElementById("resident-name") as HTMLInputElement).value).toBe("default");
     } finally {
-      delete browserWindow.alis;
+      delete hostWindow.alis;
     }
   });
 
   it("crosses the async boundary only when a reached guard term requires confirm", async () => {
     document.body.innerHTML = `<input id="resident-name" value="Ada" />`;
-    const browserWindow = window as BrowserWindowWithConfirm;
+    const hostWindow = window as WindowWithConfirm;
     const confirm = vi.fn(async () => true);
-    browserWindow.alis = { confirm };
+    hostWindow.alis = { confirm };
 
     try {
       const reaction: ReactionGraph = {
@@ -562,7 +562,7 @@ describe("executeReaction member targets", () => {
       expect(confirm).toHaveBeenCalledOnce();
       expect((document.getElementById("resident-name") as HTMLInputElement).value).toBe("confirmed");
     } finally {
-      delete browserWindow.alis;
+      delete hostWindow.alis;
     }
   });
 

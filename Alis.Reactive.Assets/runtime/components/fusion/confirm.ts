@@ -34,7 +34,7 @@ interface SyncfusionDialogOptions {
   readonly target: HTMLElement;
 }
 
-interface SyncfusionBrowserWindow extends Window {
+interface SyncfusionWindow extends Window {
   readonly ej: {
     readonly popups: {
       readonly Dialog: new (options: SyncfusionDialogOptions) => SyncfusionDialog;
@@ -42,7 +42,7 @@ interface SyncfusionBrowserWindow extends Window {
   };
 }
 
-interface AlisBrowserWindow extends Window {
+interface AlisWindow extends Window {
   alis?: {
     confirm?: (message: string) => Promise<boolean>;
   };
@@ -80,8 +80,8 @@ export function init(): void {
     return;
   }
 
-  const browser = window as unknown as SyncfusionBrowserWindow & AlisBrowserWindow;
-  const dialog = new browser.ej.popups.Dialog({
+  const hostWindow = window as unknown as SyncfusionWindow & AlisWindow;
+  const dialog = new hostWindow.ej.popups.Dialog({
     isModal: true,
     visible: false,
     width: "400px",
@@ -92,8 +92,8 @@ export function init(): void {
   });
   dialog.appendTo(el);
 
-  browser.alis = browser.alis || {};
-  browser.alis.confirm = function (message: string): Promise<boolean> {
+  hostWindow.alis = hostWindow.alis || {};
+  hostWindow.alis.confirm = function (message: string): Promise<boolean> {
     return new Promise<boolean>((outerResolve) => {
       queue = queue.then(() => showConfirmDialog(dialog, message, outerResolve));
     });

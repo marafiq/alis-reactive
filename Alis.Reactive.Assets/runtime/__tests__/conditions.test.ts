@@ -40,7 +40,7 @@ const rawShape: Shape = { kind: "raw" };
 const noneShape: Shape = { kind: "none" };
 const stringArrayShape: Shape = { kind: "array", item: stringShape };
 
-type BrowserWindowWithConfirm = typeof window & {
+type WindowWithConfirm = typeof window & {
   alis?: { confirm?: (message: string) => boolean | Promise<boolean> };
 };
 
@@ -230,7 +230,7 @@ function matches(condition: ValidationCondition, ctx?: ExecContext): boolean {
 }
 
 afterEach(() => {
-  delete (window as BrowserWindowWithConfirm).alis;
+  delete (window as WindowWithConfirm).alis;
 });
 
 describe("condition runtime", () => {
@@ -323,7 +323,7 @@ describe("condition runtime", () => {
   describe("confirm conditions", () => {
     it("executes confirm only when the current lane reaches an async condition", async () => {
       const confirm = vi.fn(async () => true);
-      (window as BrowserWindowWithConfirm).alis = { confirm };
+      (window as WindowWithConfirm).alis = { confirm };
       const condition: ConditionGraph = {
         kind: "all",
         terms: [
@@ -341,7 +341,7 @@ describe("condition runtime", () => {
 
     it("stays synchronous when logical terms decide before confirm is reached", () => {
       const confirm = vi.fn(() => true);
-      (window as BrowserWindowWithConfirm).alis = { confirm };
+      (window as WindowWithConfirm).alis = { confirm };
       const condition: ConditionGraph = {
         kind: "any",
         terms: [
@@ -358,7 +358,7 @@ describe("condition runtime", () => {
 
     it("runs confirm when the current lane starts at an async condition", async () => {
       const confirm = vi.fn(() => false);
-      (window as BrowserWindowWithConfirm).alis = { confirm };
+      (window as WindowWithConfirm).alis = { confirm };
 
       const completion = evaluateConditionInCurrentLane({ kind: "confirm", message: "Delete?" }, plan());
 
