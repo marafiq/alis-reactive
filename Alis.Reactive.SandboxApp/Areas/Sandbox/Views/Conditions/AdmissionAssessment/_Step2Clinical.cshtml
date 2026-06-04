@@ -8,11 +8,6 @@
         ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.SaveStep2.");
 }
 
-<!-- ASSERT: Step 2 validation scopes to step2-form only — never leaks to Step 1 or Step 3
-     ASSERT: cognitive-section visible when PrimaryDiagnosis is "Alzheimer's" or "Parkinson's" (set by Step 1)
-     ASSERT: cardiac-section visible when PrimaryDiagnosis is "Heart Disease" (set by Step 1)
-     ASSERT: diabetes-section visible when PrimaryDiagnosis is "Diabetes" (set by Step 1)
-     ASSERT: save Step 2 with valid data → "Step 2 saved" message -->
 <native-card><native-card-body id="step2-form">
     <native-heading level="H2">Step 2: Clinical Assessment</native-heading>
     <p class="text-sm text-text-secondary mb-4">
@@ -20,13 +15,13 @@
         Each section can be saved independently.
     </p>
 
-    <!-- Hidden fields: cross-step data + auto-populated by conditions -->
+    <!-- Shared Active Plan fields populated by Step 1 and nested clinical partials. -->
     @Html.HiddenFieldFor(plan, m => m.ScreeningId)
     @Html.HiddenFieldFor(plan, m => m.PrimaryDiagnosis)
     @Html.HiddenFieldFor(plan, m => m.ResidentName)
     @Html.HiddenFieldFor(plan, m => m.CareUnit)
 
-    <!-- Conditional clinical sections (visibility set by Step 1 diagnosis dropdown targeting these element IDs cross-plan) -->
+    <!-- Step 1 diagnosis conditions target these IDs across step plans. -->
     <div id="cognitive-section" hidden>
         @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_CognitiveAssessment.cshtml", Model)
     </div>
