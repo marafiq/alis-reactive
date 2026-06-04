@@ -24,9 +24,8 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Sets a payload field from a live source resolved at dispatch time.</summary>
         /// <typeparam name="TProp">The field value type, inferred from the expression.</typeparam>
-        /// <param name="field">The payload property to populate, e.g. <c>x =&gt; x.Name</c>.</param>
+        /// <param name="field">The payload property to populate.</param>
         /// <param name="source">A component value, URL param, or plugin read that provides the runtime value.</param>
-        /// <returns>This builder for chaining.</returns>
         public DispatchPayloadBuilder<TPayload, TModel> Set<TProp>(
             Expression<Func<TPayload, TProp>> field,
             TypedSource<TProp> source)
@@ -37,9 +36,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets a payload field to a literal string value.</summary>
-        /// <param name="field">The payload property to populate, e.g. <c>x =&gt; x.Status</c>.</param>
+        /// <param name="field">The payload property to populate.</param>
         /// <param name="value">The compile-time constant embedded in the plan.</param>
-        /// <returns>This builder for chaining.</returns>
         public DispatchPayloadBuilder<TPayload, TModel> Set(
             Expression<Func<TPayload, string>> field,
             string value)
@@ -50,9 +48,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets a payload field to a literal int value.</summary>
-        /// <param name="field">The payload property to populate, e.g. <c>x =&gt; x.Status</c>.</param>
+        /// <param name="field">The payload property to populate.</param>
         /// <param name="value">The compile-time constant embedded in the plan.</param>
-        /// <returns>This builder for chaining.</returns>
         public DispatchPayloadBuilder<TPayload, TModel> Set(
             Expression<Func<TPayload, int>> field,
             int value)
@@ -63,9 +60,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets a payload field to a literal bool value.</summary>
-        /// <param name="field">The payload property to populate, e.g. <c>x =&gt; x.Status</c>.</param>
+        /// <param name="field">The payload property to populate.</param>
         /// <param name="value">The compile-time constant embedded in the plan.</param>
-        /// <returns>This builder for chaining.</returns>
         public DispatchPayloadBuilder<TPayload, TModel> Set(
             Expression<Func<TPayload, bool>> field,
             bool value)

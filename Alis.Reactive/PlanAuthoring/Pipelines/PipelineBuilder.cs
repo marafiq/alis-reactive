@@ -271,7 +271,6 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Displays accumulated validation errors in the specified container.</summary>
         /// <param name="formId">The validation error container element ID.</param>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
             AddStep(ReactionGraph.ShowValidationErrors(formId));
@@ -281,7 +280,6 @@ namespace Alis.Reactive.Builders
         /// <summary>Injects the HTTP success response body into a DOM element as HTML content.</summary>
         /// <remarks>Must follow an HTTP request (Get/Post). The response body is read from the success payload.</remarks>
         /// <param name="elementId">The target DOM element ID.</param>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
         {
             Context.DeclareElement(elementId);
