@@ -12,7 +12,6 @@
 
     var plan = Html.ReactivePlan<PointInTimeScheduleModel>();
 
-    // Typed SF templates for QuickInfo popup
     var quickInfoContent = FusionTemplate.Create<ShiftAssignment>()
         .Class("p-3 space-y-2")
         .Div(d => d.Class("font-semibold text-base").Text(m => m.Subject))
@@ -35,7 +34,6 @@
                 .EventButton("Reassign", "schedule:reassign", m => m.Id, "e-small"))
         .Render();
 
-    // Listen for assignment-saved event from the edit form partial
     Html.On(plan, t => t.CustomEvent("schedule:assignment-saved", p =>
     {
         p.Element("status").SetText("Refreshing after save...");
@@ -53,8 +51,7 @@
          }));
     }));
 
-    // Listen for edit/reassign events from QuickInfo template buttons
-    // EventButton dispatches { detail: { id: <assignmentId> } }
+    // FusionTemplate.EventButton dispatches detail.id for the parent plan to load the drawer form.
     Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>("schedule:edit", (payload, p) =>
     {
         p.Element("alis-drawer-title").SetText("Edit Shift Assignment");
@@ -75,7 +72,6 @@
         p.Component<NativeDrawer>().Open();
     }));
 
-    // DomReady: Load initial week's assignments from server
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Get("/api/schedule/assignments?selectedFacilityId=mystery-manor")
@@ -96,7 +92,6 @@
         Change facility to load different data. Navigate weeks to see different assignments.
     </native-text>
 
-    <!-- Filter Bar -->
     <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
         <native-hstack gap="Lg" wrap="true">
             @{ Html.InputField(plan, m => m.SelectedFacilityId, o => o.Label("Facility"))
@@ -172,7 +167,6 @@
         </native-hstack>
     </section>
 
-    <!-- Schedule -->
     <section class="rounded-lg border border-border bg-white shadow-sm" style="height: 600px;">
         @(Html.FusionSchedule(plan, "shift-schedule", b =>
             {
@@ -220,11 +214,9 @@
             })
             .Reactive(evt => evt.CellClicked, (args, p) =>
             {
-                // Trace: show which cell was clicked
                 p.Element("event-trace").SetText(args, x => x.StartTime);
                 p.Element("event-shift").SetText(args, x => x.GroupIndex);
 
-                // Load new assignment form into dialog via Into(), then show
                 p.Get("/Sandbox/Components/Schedule/NewAssignmentForm")
                  .Gather(g => g
                      .FromEvent(args, x => x.StartTime, "startTime")
@@ -236,13 +228,12 @@
             })
             .Reactive(evt => evt.PopupOpen, (args, p) =>
             {
-                // Cancel QuickInfo on empty cells — we use FusionDialog for new assignments.
-                // Event QuickInfo (with data.id > 0) still shows our custom template.
+                // Syncfusion opens QuickInfo for empty cells too; cancel only those so event QuickInfo keeps the custom template.
                 p.When(args, x => x.Type).Eq("QuickInfo")
                  .And(args, x => x.Data.Id).Eq(0)
                  .Then(t => { args.PreventDefault(t); });
 
-                // Cancel Editor — we use Drawer for editing
+                // Replace Syncfusion's built-in editor with the app-level drawer.
                 p.When(args, x => x.Type).Eq("Editor")
                  .Then(t =>
                  {
@@ -261,7 +252,6 @@
             })
             .Reactive(evt => evt.ActionBegin, (args, p) =>
             {
-                // Intercept event changes — POST to server to persist
                 p.When(args, x => x.RequestType).Eq("eventChange")
                  .Then(t =>
                  {
@@ -270,7 +260,7 @@
             })
             .Reactive(evt => evt.ActionComplete, (args, p) =>
             {
-                // After SF finishes a CRUD action — reload fresh data from server
+                // Syncfusion emits eventChanged after CRUD; reload authoritative assignments then.
                 p.When(args, x => x.RequestType).Eq("eventChanged")
                  .Then(t =>
                  {
@@ -293,7 +283,7 @@
             {
                 p.Element("status").SetText("Navigating...");
 
-                // View switch: args carry the NEW currentView
+                // For view switches, Syncfusion args carry the new currentView.
                 p.When(args, x => x.Action).Eq("view")
                  .Then(t =>
                  {
@@ -310,7 +300,7 @@
                           s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
                       }));
                  })
-                 // Date navigation: view hasn't changed, read from component
+                 // For date navigation, read the unchanged view from the component.
                  .Else(e =>
                  {
                      e.Get("/api/schedule/assignments")
@@ -333,7 +323,6 @@
             }))
     </section>
 
-    <!-- New Assignment Dialog (SF Modal) -->
     @(Html.FusionDialog(plan, "new-assignment-dialog", b =>
     {
         b.Header("New Assignment");
@@ -349,7 +338,6 @@
         p.Component<FusionDialog>("new-assignment-dialog").Hide();
     }))
 
-    <!-- Event Trace -->
     <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
         <h3 class="text-sm font-semibold mb-2">Event Trace</h3>
         <native-vstack gap="Xs" class="font-mono text-xs">
@@ -361,7 +349,6 @@
         </native-vstack>
     </section>
 
-    <!-- Plan JSON -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code>@Html.Raw(plan.RenderFormatted())</code></pre>

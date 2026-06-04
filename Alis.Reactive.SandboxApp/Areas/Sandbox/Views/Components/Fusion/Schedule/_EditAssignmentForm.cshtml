@@ -45,7 +45,7 @@
                      {
                          s.Element("edit-status").SetText("Saved successfully");
                          s.Component<NativeDrawer>().Close();
-                         // Dispatch custom event — parent plan listens and refreshes schedule
+                         // Parent plan listens for this event and refreshes the schedule after the save.
                          s.Dispatch("schedule:assignment-saved");
                      })
                      .OnError(400, e => e.ValidationErrors("assignment-form")));
