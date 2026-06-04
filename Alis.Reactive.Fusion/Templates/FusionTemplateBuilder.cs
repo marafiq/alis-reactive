@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Templates
     public class FusionTemplateBuilder<TModel>
     {
         internal FusionTemplateBuilder() { }
-        private readonly List<Func<string>> _children = new List<Func<string>>();
+        private readonly List<Func<string>> _childRenderers = new List<Func<string>>();
         private readonly List<string> _cssClasses = new List<string>();
         private readonly Dictionary<string, string> _attributes = new Dictionary<string, string>();
         private TemplateElementId _id = TemplateElementId.None;
@@ -67,7 +67,7 @@ namespace Alis.Reactive.Fusion.Templates
         public FusionTemplateBuilder<TModel> Text<TProperty>(Expression<Func<TModel, TProperty>> property)
         {
             var binding = FusionTemplateExpression.ToBinding(property);
-            _children.Add(() => binding);
+            _childRenderers.Add(() => binding);
             return this;
         }
 
@@ -76,7 +76,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         public FusionTemplateBuilder<TModel> Text(string text)
         {
-            _children.Add(() => text);
+            _childRenderers.Add(() => text);
             return this;
         }
 
@@ -94,7 +94,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         private FusionTemplateBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, TemplateCss css)
         {
-            _children.Add(() => TemplateElements.Span(FusionTemplateExpression.ToBinding(property), css));
+            _childRenderers.Add(() => TemplateElements.Span(FusionTemplateExpression.ToBinding(property), css));
             return this;
         }
 
@@ -112,7 +112,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         private FusionTemplateBuilder<TModel> Span(string text, TemplateCss css)
         {
-            _children.Add(() => TemplateElements.Span(text, css));
+            _childRenderers.Add(() => TemplateElements.Span(text, css));
             return this;
         }
 
@@ -139,7 +139,7 @@ namespace Alis.Reactive.Fusion.Templates
             TemplateCss css,
             TemplateAltText alt)
         {
-            _children.Add(() => TemplateElements.Img(FusionTemplateExpression.ToBinding(srcProperty), css, alt));
+            _childRenderers.Add(() => TemplateElements.Img(FusionTemplateExpression.ToBinding(srcProperty), css, alt));
             return this;
         }
 
@@ -148,9 +148,9 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         public FusionTemplateBuilder<TModel> Div(Action<FusionTemplateBuilder<TModel>> configure)
         {
-            var nested = new FusionTemplateBuilder<TModel>();
-            configure(nested);
-            _children.Add(() => nested.Render());
+            var nestedTemplate = new FusionTemplateBuilder<TModel>();
+            configure(nestedTemplate);
+            _childRenderers.Add(() => nestedTemplate.Render());
             return this;
         }
 
@@ -159,7 +159,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         public FusionTemplateBuilder<TModel> Badge<TProperty>(Expression<Func<TModel, TProperty>> property, string css = "e-badge")
         {
-            _children.Add(() => TemplateElements.Badge(FusionTemplateExpression.ToBinding(property), css));
+            _childRenderers.Add(() => TemplateElements.Badge(FusionTemplateExpression.ToBinding(property), css));
             return this;
         }
 
@@ -168,7 +168,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         public FusionTemplateBuilder<TModel> Badge(string text, string css = "e-badge")
         {
-            _children.Add(() => TemplateElements.Badge(text, css));
+            _childRenderers.Add(() => TemplateElements.Badge(text, css));
             return this;
         }
 
@@ -186,7 +186,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         private FusionTemplateBuilder<TModel> Icon(string iconName, TemplateCss css)
         {
-            _children.Add(() => TemplateElements.Icon(iconName, css));
+            _childRenderers.Add(() => TemplateElements.Icon(iconName, css));
             return this;
         }
 
@@ -206,7 +206,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         private FusionTemplateBuilder<TModel> Button(string text, string onClick, TemplateCss css)
         {
-            _children.Add(() => TemplateElements.Button(text, onClick, css));
+            _childRenderers.Add(() => TemplateElements.Button(text, onClick, css));
             return this;
         }
 
@@ -237,10 +237,10 @@ namespace Alis.Reactive.Fusion.Templates
             string onClickFn,
             TemplateCss css)
         {
-            _children.Add(() =>
+            _childRenderers.Add(() =>
             {
-                var binding = FusionTemplateExpression.ToBinding(idProperty);
-                return $"<button class=\"{css.AppendTo("e-btn")}\" onclick=\"{onClickFn}({binding})\">{text}</button>";
+                var idBinding = FusionTemplateExpression.ToBinding(idProperty);
+                return $"<button class=\"{css.AppendTo("e-btn")}\" onclick=\"{onClickFn}({idBinding})\">{text}</button>";
             });
             return this;
         }
@@ -270,7 +270,7 @@ namespace Alis.Reactive.Fusion.Templates
             Expression<Func<TModel, TProperty>> idProperty,
             TemplateCss css)
         {
-            _children.Add(() => TemplateElements.EventButton(text, eventName, FusionTemplateExpression.ToBinding(idProperty), css));
+            _childRenderers.Add(() => TemplateElements.EventButton(text, eventName, FusionTemplateExpression.ToBinding(idProperty), css));
             return this;
         }
 
@@ -296,7 +296,7 @@ namespace Alis.Reactive.Fusion.Templates
             Expression<Func<TModel, TText>> textProperty,
             TemplateCss css)
         {
-            _children.Add(() => TemplateElements.Link(
+            _childRenderers.Add(() => TemplateElements.Link(
                 FusionTemplateExpression.ToBinding(hrefProperty),
                 FusionTemplateExpression.ToBinding(textProperty),
                 css));
@@ -325,20 +325,20 @@ namespace Alis.Reactive.Fusion.Templates
             Action<FusionConditionalBuilder<TModel>> then,
             TemplateElseBranch<TModel> elseBranch)
         {
-            _children.Add(() =>
+            _childRenderers.Add(() =>
             {
-                var conditionStr = FusionTemplateExpression.ToCondition(condition);
-                var thenBuilder = new FusionConditionalBuilder<TModel>();
-                then(thenBuilder);
+                var templateCondition = FusionTemplateExpression.ToCondition(condition);
+                var thenContent = new FusionConditionalBuilder<TModel>();
+                then(thenContent);
 
-                var sb = new StringBuilder();
-                sb.Append($"${{if({conditionStr})}}");
-                sb.Append(thenBuilder.Render());
+                var html = new StringBuilder();
+                html.Append($"${{if({templateCondition})}}");
+                html.Append(thenContent.Render());
 
-                elseBranch.AppendTo(sb);
+                elseBranch.AppendTo(html);
 
-                sb.Append("${/if}");
-                return sb.ToString();
+                html.Append("${/if}");
+                return html.ToString();
             });
             return this;
         }
@@ -357,7 +357,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <remarks>The <paramref name="html"/> value is emitted without escaping; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> Raw(string html)
         {
-            _children.Add(() => html);
+            _childRenderers.Add(() => html);
             return this;
         }
 
@@ -366,23 +366,23 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         public string Render()
         {
-            var sb = new StringBuilder();
-            sb.Append("<div");
-            sb.Append(_id.Attribute);
+            var html = new StringBuilder();
+            html.Append("<div");
+            html.Append(_id.Attribute);
 
             if (_cssClasses.Count > 0)
-                sb.Append($" class=\"{string.Join(" ", _cssClasses)}\"");
+                html.Append($" class=\"{string.Join(" ", _cssClasses)}\"");
 
-            foreach (var attr in _attributes)
-                sb.Append($" {attr.Key}=\"{attr.Value}\"");
+            foreach (var attribute in _attributes)
+                html.Append($" {attribute.Key}=\"{attribute.Value}\"");
 
-            sb.Append(">");
+            html.Append(">");
 
-            foreach (var child in _children)
-                sb.Append(child());
+            foreach (var renderChild in _childRenderers)
+                html.Append(renderChild());
 
-            sb.Append("</div>");
-            return sb.ToString();
+            html.Append("</div>");
+            return html.ToString();
         }
 
         /// <inheritdoc />
@@ -423,10 +423,10 @@ namespace Alis.Reactive.Fusion.Templates
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            var elseBuilder = new FusionConditionalBuilder<TModel>();
-            _configure(elseBuilder);
+            var elseContent = new FusionConditionalBuilder<TModel>();
+            _configure(elseContent);
             builder.Append("${else}");
-            builder.Append(elseBuilder.Render());
+            builder.Append(elseContent.Render());
         }
     }
 }
