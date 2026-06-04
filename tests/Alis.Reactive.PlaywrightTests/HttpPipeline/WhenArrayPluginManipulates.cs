@@ -115,7 +115,6 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
         await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Send to Server" }));
         await Expect(Page.Locator("#arr-echo-count"))
             .ToHaveTextAsync("5", new() { Timeout = 10000 });
-        // Success class proves OnSuccess ran (which includes analytics.track void .Fire())
         await Expect(Page.Locator("#arr-echo-result")).ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-green-600"));
         AssertNoConsoleErrors();
@@ -126,7 +125,6 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
     {
         await NavigateAndWaitForDomReady();
         await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Filter Active & Inspect" }));
-        // filter(items, "status", "active") returns 3 active residents.
         await Expect(Page.Locator("#arr-f-count"))
             .ToHaveTextAsync("3", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
@@ -137,7 +135,6 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
     {
         await NavigateAndWaitForDomReady();
         await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Filter Active & Inspect" }));
-        // sum(active, "age") = 82 + 75 + 91 = 248
         await Expect(Page.Locator("#arr-f-age-sum"))
             .ToHaveTextAsync("248", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
@@ -148,7 +145,6 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
     {
         await NavigateAndWaitForDomReady();
         await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Filter Active & Inspect" }));
-        // pluck(active, 0, "name") = "John Doe"
         await Expect(Page.Locator("#arr-f-first"))
             .ToHaveTextAsync("John Doe", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
@@ -159,7 +155,6 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
     {
         await NavigateAndWaitForDomReady();
         await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Filter Active & Inspect" }));
-        // some(active, "status", "active") = true
         await Expect(Page.Locator("#arr-f-some"))
             .ToHaveTextAsync("true", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
@@ -172,7 +167,6 @@ public class WhenArrayPluginManipulates : PlaywrightTestBase
         await ClickWhenStable(Page.GetByRole(AriaRole.Button, new() { Name = "Filter Active & Inspect" }));
         await Expect(Page.Locator("#arr-f-count"))
             .ToHaveTextAsync("3", new() { Timeout = 10000 });
-        // Success class proves pipeline complete (includes analytics.track void .Fire())
         await Expect(Page.Locator("#arr-f-result")).ToHaveClassAsync(
             new System.Text.RegularExpressions.Regex("text-green-600"));
         AssertNoConsoleErrors();
