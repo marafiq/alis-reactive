@@ -50,7 +50,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Adds a value from an HTTP response body as a plugin argument.</summary>
         /// <typeparam name="TResponse">The response body type.</typeparam>
-        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <typeparam name="TProp">The response value type passed to the plugin.</typeparam>
         /// <param name="body">The success or error response body scope.</param>
         /// <param name="path">The response property path to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TResponse, TProp>(
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Adds a value from the current event payload as a plugin argument.</summary>
         /// <typeparam name="TArgs">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <typeparam name="TProp">The event value type passed to the plugin.</typeparam>
         /// <param name="args">A typed event payload marker used to infer <typeparamref name="TArgs"/>.</param>
         /// <param name="path">The event payload path to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TArgs, TProp>(
@@ -177,7 +177,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Adds a value from an HTTP response body as a plugin argument.</summary>
         /// <typeparam name="TResponse">The response body type.</typeparam>
-        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <typeparam name="TProp">The response value type passed to the plugin command.</typeparam>
         /// <param name="body">The success or error response body scope.</param>
         /// <param name="path">The response property path to pass.</param>
         public PluginCallBuilder<TModel> Arg<TResponse, TProp>(
@@ -190,7 +190,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Adds a value from the current event payload as a plugin argument.</summary>
         /// <typeparam name="TArgs">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <typeparam name="TProp">The event value type passed to the plugin command.</typeparam>
         /// <param name="args">A typed event payload marker used to infer <typeparamref name="TArgs"/>.</param>
         /// <param name="path">The event payload path to pass.</param>
         public PluginCallBuilder<TModel> Arg<TArgs, TProp>(
