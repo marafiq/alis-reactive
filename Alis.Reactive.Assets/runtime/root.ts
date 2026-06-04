@@ -65,8 +65,8 @@ function discoverPlans(): PlanDocument[] {
       const text = planElement.textContent?.trim();
       if (!text) throw new Error("[alis] empty plan element");
       plans.push(JSON.parse(text));
-    } catch (e) {
-      throw new Error(`[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(e as Error).message}`);
+    } catch (error) {
+      throw new Error(`[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(error as Error).message}`);
     }
   }
 
