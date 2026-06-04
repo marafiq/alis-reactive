@@ -25,7 +25,7 @@ const stringArrayShape: Shape = { kind: "array", item: stringShape };
 const numberArrayShape: Shape = { kind: "array", item: numberShape };
 const rawShape: Shape = { kind: "raw" };
 
-function plan(entries: {
+function valueEvaluationPlan(entries: {
   readonly types?: Record<string, BrowserObjectContract>;
   readonly components?: Record<string, ComponentObject>;
 } = {}): PlanDocument {
@@ -58,7 +58,7 @@ describe("evaluateValue", () => {
       },
     };
 
-    expect(evaluateValue(producer, plan())).toEqual({
+    expect(evaluateValue(producer, valueEvaluationPlan())).toEqual({
       age: 42,
       tags: ["alpha", "beta"],
     });
@@ -74,7 +74,7 @@ describe("evaluateValue", () => {
       ],
     };
 
-    expect(evaluateValue(producer, plan())).toEqual([41, 42]);
+    expect(evaluateValue(producer, valueEvaluationPlan())).toEqual([41, 42]);
   });
 
   it("applies declared field shapes to object value expressions", () => {
@@ -95,7 +95,7 @@ describe("evaluateValue", () => {
       },
     };
 
-    expect(evaluateValue(producer, plan())).toEqual({
+    expect(evaluateValue(producer, valueEvaluationPlan())).toEqual({
       age: 42,
       address: {
         zipCode: 90210,
@@ -116,7 +116,7 @@ describe("evaluateValue", () => {
       access: { kind: "property" },
     };
 
-    const value = evaluateValue(producer, plan(), {
+    const value = evaluateValue(producer, valueEvaluationPlan(), {
       event: { address: { zipCode: "90210" } },
     });
 
@@ -136,25 +136,25 @@ describe("evaluateValue", () => {
       access: { kind: "property" },
     };
 
-    expect(evaluateValue(producer, plan(), { event: {} })).toBeUndefined();
+    expect(evaluateValue(producer, valueEvaluationPlan(), { event: {} })).toBeUndefined();
   });
 
   it("does not coerce malformed numeric text to zero", () => {
     const producer = literal("not-a-number", numberShape);
 
-    expect(evaluateValue(producer, plan())).toBe("not-a-number");
+    expect(evaluateValue(producer, valueEvaluationPlan())).toBe("not-a-number");
   });
 
   it("does not coerce malformed date text to NaN", () => {
     const producer = literal("not-a-date", { kind: "date" });
 
-    expect(evaluateValue(producer, plan())).toBe("not-a-date");
+    expect(evaluateValue(producer, valueEvaluationPlan())).toBe("not-a-date");
   });
 
   it("does not normalize impossible date-only text", () => {
     const producer = literal("2026-99-99", { kind: "date" });
 
-    expect(evaluateValue(producer, plan())).toBe("2026-99-99");
+    expect(evaluateValue(producer, valueEvaluationPlan())).toBe("2026-99-99");
   });
 
   it("reads the whole payload through the explicit responseBody member", () => {
@@ -168,7 +168,7 @@ describe("evaluateValue", () => {
     };
     const payload = { data: { name: "Ada" } };
 
-    expect(evaluateValue(producer, plan(), { response: payload })).toBe(payload);
+    expect(evaluateValue(producer, valueEvaluationPlan(), { response: payload })).toBe(payload);
   });
 
   it("reads component properties and calls component methods from the declared JS object contract", () => {
@@ -205,7 +205,7 @@ describe("evaluateValue", () => {
       binding: { kind: "none" },
       container: { kind: "none" },
     };
-    const runtimePlan = plan({
+    const runtimePlan = valueEvaluationPlan({
       types: { "native.textbox": objectContract },
       components: { "resident-name": component },
     });
@@ -256,7 +256,7 @@ describe("evaluateValue", () => {
       access: { kind: "property" },
     };
 
-    expect(() => evaluateValue(producer, plan({
+    expect(() => evaluateValue(producer, valueEvaluationPlan({
       types: { "native.textbox": objectContract },
       components: {
         "resident-name": {
@@ -295,7 +295,7 @@ describe("evaluateValue", () => {
     document.body.innerHTML = "";
 
     try {
-      evaluateValue(producer, plan({
+      evaluateValue(producer, valueEvaluationPlan({
         types: { "native.textbox": objectContract },
         components: {
           "resident-name": {
@@ -345,7 +345,7 @@ describe("evaluateValue", () => {
       },
     };
 
-    expect(evaluateValue(producer, plan({
+    expect(evaluateValue(producer, valueEvaluationPlan({
       types: { ["plugin." + pluginName]: pluginType },
     }))).toBe("john-doe");
   });
@@ -374,7 +374,7 @@ describe("evaluateValue", () => {
       access: { kind: "property" },
     };
 
-    expect(evaluateValue(producer, plan({
+    expect(evaluateValue(producer, valueEvaluationPlan({
       types: { ["plugin." + pluginName]: pluginType },
     }))).toBe("abc-123");
   });
@@ -412,7 +412,7 @@ describe("evaluateValue", () => {
       },
     };
 
-    expect(evaluateValue(producer, plan({
+    expect(evaluateValue(producer, valueEvaluationPlan({
       types: { "native.button": objectContract },
       components: {
         save: {
