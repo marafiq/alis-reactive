@@ -13,11 +13,11 @@ namespace Alis.Reactive.Fusion.Components
         {
         }
 
-        /// <summary>Fires before the sidebar opens.</summary>
+        /// <summary>Selects the Syncfusion <c>open</c> transition event.</summary>
         public TypedEvent<FusionSidebarTransitionArgs> Opened =>
             new TypedEvent<FusionSidebarTransitionArgs>("open", new FusionSidebarTransitionArgs());
 
-        /// <summary>Fires before the sidebar closes.</summary>
+        /// <summary>Selects the Syncfusion <c>close</c> transition event.</summary>
         public TypedEvent<FusionSidebarTransitionArgs> Closed =>
             new TypedEvent<FusionSidebarTransitionArgs>("close", new FusionSidebarTransitionArgs());
     }

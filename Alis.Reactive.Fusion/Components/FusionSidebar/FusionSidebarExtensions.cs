@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed post-render runtime behavior for <see cref="FusionSidebar"/>.
+    /// Component actions and value sources available inside Reactive Plan pipelines for <see cref="FusionSidebar"/>.
     /// </summary>
     public static class FusionSidebarExtensions
     {

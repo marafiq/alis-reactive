@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wraps SidebarBuilder.Render() output and carries plan metadata for reactive chaining.
+    /// Wraps rendered Syncfusion sidebar markup while carrying plan metadata for <c>.Reactive(...)</c> chaining.
     /// </summary>
     public sealed class FusionSidebarBuilder<TModel> : IHtmlContent
         where TModel : class

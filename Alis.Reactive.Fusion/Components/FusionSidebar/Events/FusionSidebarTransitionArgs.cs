@@ -5,11 +5,11 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionSidebarTransitionArgs
     {
-        /// <summary>Whether the transition was triggered by user interaction.</summary>
+        /// <summary>Gets or sets whether Syncfusion reports user interaction for this transition.</summary>
         public bool IsInteracted { get; set; }
 
         /// <summary>
-        /// Created by the event descriptor during payload binding.
+        /// Initializes a payload marker for Reactive Plan expression binding.
         /// </summary>
         public FusionSidebarTransitionArgs()
         {

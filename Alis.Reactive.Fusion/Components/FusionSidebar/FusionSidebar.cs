@@ -1,11 +1,11 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// FusionSidebar - non-input navigation component wrapping Syncfusion EJ2 Sidebar.
-    /// Exposes typed open-state reads, navigation methods, and transition events.
+    /// Represents a Syncfusion Sidebar navigation component.
+    /// Exposes open-state reads, show/hide/toggle methods, and transition events;
+    /// it is not an input component.
     /// </summary>
     public sealed class FusionSidebar : FusionComponent
     {
-        // No ValueMember. This is a navigation component, not a form input.
     }
 }
