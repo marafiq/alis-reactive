@@ -8,9 +8,7 @@
     var plan = Html.ReactivePlan<ArrayOpsModel>();
     var activityItems = (RadioButtonItem[])ViewBag.ActivityItems;
 
-    // COMPLEX: load a resident roster, then operate on the object array deterministically —
-    // filter by element members, aggregate, find, and guard — all compiled to plan nodes.
-    // This is a deterministic replacement for the ArrayManager plugin: no plugin, no JS.
+    // The roster proves array operators compile to plan nodes instead of plugin calls.
     Html.On(plan, t => t.DomReady(p =>
         p.Get("/Sandbox/Components/ArrayOps/Residents")
          .Response(r => r.OnSuccess<ResidentRosterResponse>((json, s) =>

@@ -7,9 +7,7 @@
 
     var plan = Html.ReactivePlan<DomOpsModel>();
 
-    // The array DSL over native DOM: a DOM element resolved by getElementById is a JS object;
-    // classList (DOMTokenList) and children (HTMLCollection) are array-likes the runtime
-    // normalizes, so filter/count/any apply. No plugin, no hand-written JS.
+    // FromDom normalizes DOMTokenList and HTMLCollection so array operators run at the browser boundary.
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Element("dom-total-classes").SetText(p.FromDom("dom-card", "classList").Count());
@@ -21,13 +19,12 @@
          .Then(then => then.Element("dom-memory-yes").Show())
          .Else(els => els.Element("dom-memory-no").Show());
 
-        // Per-element METHOD call: each list child is a live DOM element; call its getAttribute
-        // method per element and count those flagged high-risk. RuntimePath.call at the element scope.
+        // RuntimePath.call invokes getAttribute at each DOM child element scope.
         p.Element("dom-high-risk-count").SetText(
             p.FromDom<DomChild>("risk-list", "children").Count(x => x.GetAttribute("data-risk") == "high"));
     }));
 
-    // Mutate the DOM, then re-run a DOM array op on the updated element — same tick.
+    // The follow-up read observes the class added earlier in the same reaction.
     Html.NativeButton("dom-add-risk-btn", "Add Risk Flag")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {

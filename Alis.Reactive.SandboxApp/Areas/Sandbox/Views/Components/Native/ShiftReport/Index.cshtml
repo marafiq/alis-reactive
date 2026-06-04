@@ -8,9 +8,7 @@
 
     var plan = Html.ReactivePlan<ShiftReportModel>();
 
-    // A CUSTOM event whose payload carries an array of objects (ResidentAlert[]). The handler runs
-    // the array DSL over the payload's elements BY THEIR MEMBERS — count, filter, aggregate, find,
-    // and a guard — all compiled to plan nodes. No plugin, no hand-written JS.
+    // The custom event payload array is queried through element members inside the Reactive Plan.
     Html.On(plan, t => t.CustomEvent<ShiftReportPayload>("shift-report", (payload, p) =>
     {
         var alerts = p.From(payload, x => x.Alerts);
@@ -27,8 +25,6 @@
          .Else(els => els.Element("unack-clear").Show());
     }));
 
-    // Load the alert roster, then broadcast it as the custom event payload — the array travels in
-    // the payload. A real app might broadcast on a SignalR push; here a button stands in.
     Html.NativeButton("load-report-btn", "Generate Shift Report")
         .Reactive(plan, evt => evt.Click, (args, p) =>
             p.Get("/Sandbox/Components/ShiftReport/Alerts")
@@ -36,7 +32,6 @@
                  s.DispatchWith<ShiftReportPayload>("shift-report", b =>
                      b.Set(x => x.Alerts, json.Read(x => x.Alerts))))));
 
-    // Same custom event, a roster where every critical alert is acknowledged — drives the Else guard.
     Html.NativeButton("clear-report-btn", "Generate Clear Report")
         .Reactive(plan, evt => evt.Click, (args, p) =>
             p.Get("/Sandbox/Components/ShiftReport/AlertsAllClear")
