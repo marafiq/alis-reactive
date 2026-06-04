@@ -11,43 +11,40 @@ export function setLevel(level: TraceLevel): void {
 }
 
 export interface Logger {
-  error(msg: string, data?: unknown): void;
-  warn(msg: string, data?: unknown): void;
-  info(msg: string, data?: unknown): void;
-  debug(msg: string, data?: unknown): void;
-  trace(msg: string, data?: unknown): void;
+  error(msg: string, details?: unknown): void;
+  warn(msg: string, details?: unknown): void;
+  info(msg: string, details?: unknown): void;
+  debug(msg: string, details?: unknown): void;
+  trace(msg: string, details?: unknown): void;
 }
 
 export function scope(name: string): Logger {
   const tag = `[alis:${name}]`;
   return {
-    error: (msg, data) => emit(LEVELS.error, tag, msg, data),
-    warn: (msg, data) => emit(LEVELS.warn, tag, msg, data),
-    info: (msg, data) => emit(LEVELS.info, tag, msg, data),
-    debug: (msg, data) => emit(LEVELS.debug, tag, msg, data),
-    trace: (msg, data) => emit(LEVELS.trace, tag, msg, data),
+    error: (msg, details) => emit(LEVELS.error, tag, msg, details),
+    warn: (msg, details) => emit(LEVELS.warn, tag, msg, details),
+    info: (msg, details) => emit(LEVELS.info, tag, msg, details),
+    debug: (msg, details) => emit(LEVELS.debug, tag, msg, details),
+    trace: (msg, details) => emit(LEVELS.trace, tag, msg, details),
   };
 }
 
-function emit(level: number, tag: string, msg: string, data?: unknown): void {
+function emit(level: number, tag: string, msg: string, details?: unknown): void {
   if (level > active) return;
   const out = level <= LEVELS.error ? console.error
             : level <= LEVELS.warn  ? console.warn
             : level <= LEVELS.info  ? console.info
             : console.log;
-  // Dual form: JSON embedded in the message (so console-text scrapers and
-  // log aggregators can substring-match on payload keys) AND the live object
-  // as a second arg (so DevTools renders it as an expandable tree).
-  if (data !== undefined) out(`${tag} ${msg} ${safeStringify(data)}`, data);
+  // Emit searchable JSON text and the live object DevTools can expand.
+  if (details !== undefined) out(`${tag} ${msg} ${safeStringify(details)}`, details);
   else                    out(`${tag} ${msg}`);
 }
 
-function safeStringify(data: unknown): string {
+function safeStringify(details: unknown): string {
   try {
-    return JSON.stringify(data);
+    return JSON.stringify(details);
   } catch {
-    // Circular reference or BigInt — fall back to a marker so text scrapers
-    // still see SOMETHING while DevTools handles the live object gracefully.
+    // Circular references and BigInt values still get a text marker.
     return "[unserializable]";
   }
 }
