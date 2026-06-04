@@ -1,10 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RealTime;
 
-/// <summary>
-/// As a care coordinator
-/// I want to see notification updates in real time
-/// So that I don't miss important events about my residents
-/// </summary>
 [TestFixture]
 public class WhenNotificationPushArrives : PlaywrightTestBase
 {
@@ -39,7 +34,6 @@ public class WhenNotificationPushArrives : PlaywrightTestBase
 
         await PushBtn.ClickAsync();
 
-        // Count updates from "—" to "99" — proves the hub message arrived
         await Expect(NotifCount).Not.ToContainTextAsync("—", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
@@ -55,7 +49,6 @@ public class WhenNotificationPushArrives : PlaywrightTestBase
         await PushBtn.ClickAsync();
         await Expect(NotifCount).ToContainTextAsync("99", new() { Timeout = 5000 });
 
-        // Second click — same payload arrives again
         await PushBtn.ClickAsync();
         await Expect(NotifCount).ToContainTextAsync("99", new() { Timeout = 5000 });
 

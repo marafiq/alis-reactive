@@ -1,10 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RealTime;
 
-/// <summary>
-/// As a care coordinator
-/// I want to open a resident detail panel that also receives live updates
-/// So that the panel stays current without me manually refreshing it
-/// </summary>
 [TestFixture]
 public class WhenHubConnectionEstablishes : PlaywrightTestBase
 {
@@ -46,12 +41,10 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
 
         await PushStatusBtn.ClickAsync();
 
-        // Parent DOM updates
         var parentName = Page.Locator("#resident-name");
         await Expect(parentName).ToContainTextAsync("Helen Martinez",
             new() { Timeout = 5000 });
 
-        // Partial DOM also updates (same hub, reused connection)
         await Expect(PanelResidentName).ToContainTextAsync("Helen Martinez",
             new() { Timeout = 5000 });
         await Expect(PanelResidentStatus).ToContainTextAsync("Under Review");
@@ -69,13 +62,12 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
         await LoadPanelBtn.ClickAsync();
         await Expect(PanelResidentName).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        // Match only our "connected" trace, not the library's routed "lib" messages
-        var connectTraces = _consoleMessages
+        var residentStatusConnectTraces = _consoleMessages
             .Where(m => m.Contains("[alis:signalr] connected")
                         && m.Contains("resident-status"))
             .ToList();
 
-        Assert.That(connectTraces, Has.Count.EqualTo(1),
+        Assert.That(residentStatusConnectTraces, Has.Count.EqualTo(1),
             "Expected partial to reuse parent's hub connection, not create a second one");
 
         AssertNoConsoleErrors();

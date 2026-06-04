@@ -1,10 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RealTime;
 
-/// <summary>
-/// As a shift supervisor
-/// I want to see resident status updates from a different hub
-/// So that I know when care levels change across the facility
-/// </summary>
 [TestFixture]
 public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
 {
@@ -39,13 +34,11 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
         await WaitForTraceMessage("booted", 10000);
         await WaitForTraceMessage("[alis:signalr] connected", 10000);
 
-        // Push to Hub 2 only
         await PushStatusBtn.ClickAsync();
 
         await Expect(ResidentName).ToContainTextAsync("Helen Martinez",
             new() { Timeout = 5000 });
 
-        // Hub 1 (notifications) still shows initial "—"
         var notifCount = Page.Locator("#notif-count");
         await Expect(notifCount).ToContainTextAsync("—");
 

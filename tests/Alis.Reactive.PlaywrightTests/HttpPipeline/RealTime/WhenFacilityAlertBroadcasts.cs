@@ -1,12 +1,5 @@
-using System.Text.RegularExpressions;
-
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RealTime;
 
-/// <summary>
-/// As a facility manager
-/// I want to see live facility alerts without refreshing
-/// So that I can respond to issues immediately
-/// </summary>
 [TestFixture]
 public class WhenFacilityAlertBroadcasts : PlaywrightTestBase
 {
