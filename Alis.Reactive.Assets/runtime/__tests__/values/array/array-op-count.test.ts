@@ -5,7 +5,7 @@ import type { PlanDocument, Shape, ValueExpression } from "../../../types/index"
 const rawShape: Shape = { kind: "raw" };
 const numberShape: Shape = { kind: "number" };
 
-function plan(): PlanDocument {
+function emptyArrayPlan(): PlanDocument {
   return {
     version: 3,
     planId: "Runtime.ArrayDsl.Count",
@@ -28,28 +28,28 @@ function count(value: unknown): ValueExpression {
 
 describe("array-op count + array-like normalization", () => {
   it("counts a true JS array", () => {
-    expect(evaluateValue(count([{ id: 1 }, { id: 2 }, { id: 3 }]), plan())).toBe(3);
+    expect(evaluateValue(count([{ id: 1 }, { id: 2 }, { id: 3 }]), emptyArrayPlan())).toBe(3);
   });
 
   it("normalizes a DOMTokenList (classList) via Array.from before counting", () => {
     const hostElement = document.createElement("div");
     hostElement.className = "risk-fall risk-oxygen care-memory";
-    expect(evaluateValue(count(hostElement.classList), plan())).toBe(3);
+    expect(evaluateValue(count(hostElement.classList), emptyArrayPlan())).toBe(3);
   });
 
   it("normalizes a generic iterable (Set) via Array.from", () => {
-    expect(evaluateValue(count(new Set(["a", "b"])), plan())).toBe(2);
+    expect(evaluateValue(count(new Set(["a", "b"])), emptyArrayPlan())).toBe(2);
   });
 
   it("treats null as an empty array (e.g. EJ2 multiSelect.value when nothing selected)", () => {
-    expect(evaluateValue(count(null), plan())).toBe(0);
+    expect(evaluateValue(count(null), emptyArrayPlan())).toBe(0);
   });
 
   it("wraps a scalar as a singleton (e.g. ChipList single-select returns a number)", () => {
-    expect(evaluateValue(count(2), plan())).toBe(1);
+    expect(evaluateValue(count(2), emptyArrayPlan())).toBe(1);
   });
 
   it("throws a fail-fast boundary error for a non-iterable object (e.g. dataset/DOMStringMap)", () => {
-    expect(() => evaluateValue(count({ flag: "x" }), plan())).toThrow(/not iterable/);
+    expect(() => evaluateValue(count({ flag: "x" }), emptyArrayPlan())).toThrow(/not iterable/);
   });
 });

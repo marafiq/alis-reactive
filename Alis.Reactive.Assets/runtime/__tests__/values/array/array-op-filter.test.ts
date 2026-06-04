@@ -7,7 +7,7 @@ const noneShape: Shape = { kind: "none" };
 const rawShape: Shape = { kind: "raw" };
 const elementSource: PayloadSource = { kind: "payload", scope: "element", type: { kind: "untyped" } };
 
-function plan(): PlanDocument {
+function emptyArrayPlan(): PlanDocument {
   return {
     version: 3,
     planId: "Runtime.ArrayDsl.Filter",
@@ -97,7 +97,7 @@ describe("array-op filter (per-element sync predicate via the DI compare-engine 
       { id: 3, status: "active" },
     ];
 
-    expect(evaluateValue(filter(residents, elementMemberEquals("status", "active")), plan())).toEqual([
+    expect(evaluateValue(filter(residents, elementMemberEquals("status", "active")), emptyArrayPlan())).toEqual([
       { id: 1, status: "active" },
       { id: 3, status: "active" },
     ]);
@@ -106,7 +106,7 @@ describe("array-op filter (per-element sync predicate via the DI compare-engine 
   it("filters primitive (string[]) elements via the x => x element-self read", () => {
     const tags = ["fall-risk", "none", "memory-care"];
 
-    expect(evaluateValue(filter(tags, elementSelfNotEquals("none"), stringShape), plan())).toEqual([
+    expect(evaluateValue(filter(tags, elementSelfNotEquals("none"), stringShape), emptyArrayPlan())).toEqual([
       "fall-risk",
       "memory-care",
     ]);
@@ -115,7 +115,7 @@ describe("array-op filter (per-element sync predicate via the DI compare-engine 
   it("filters a DOMTokenList after array-like normalization", () => {
     const hostElement = document.createElement("div");
     hostElement.className = "risk-fall care-memory plain";
-    expect(evaluateValue(filter(hostElement.classList, elementSelfNotEquals("plain"), stringShape), plan())).toEqual([
+    expect(evaluateValue(filter(hostElement.classList, elementSelfNotEquals("plain"), stringShape), emptyArrayPlan())).toEqual([
       "risk-fall",
       "care-memory",
     ]);
@@ -123,16 +123,16 @@ describe("array-op filter (per-element sync predicate via the DI compare-engine 
 
   it("filters by a compound AND predicate (all node) threading element scope to each term", () => {
     const pred = all(memberCompare("status", "eq", "active", stringShape), memberCompare("age", "gte", 65, numberShape));
-    expect(names(evaluateValue(filter(compoundResidents, pred), plan()))).toEqual(["Ada"]);
+    expect(names(evaluateValue(filter(compoundResidents, pred), emptyArrayPlan()))).toEqual(["Ada"]);
   });
 
   it("filters by a compound OR predicate (any node)", () => {
     const pred = any(memberCompare("status", "eq", "active", stringShape), memberCompare("age", "lt", 30, numberShape));
-    expect(names(evaluateValue(filter(compoundResidents, pred), plan()))).toEqual(["Ada", "Cy"]);
+    expect(names(evaluateValue(filter(compoundResidents, pred), emptyArrayPlan()))).toEqual(["Ada", "Cy"]);
   });
 
   it("filters by a negated predicate (not node)", () => {
     const pred = not(memberCompare("status", "eq", "discharged", stringShape));
-    expect(names(evaluateValue(filter(compoundResidents, pred), plan()))).toEqual(["Ada", "Cy"]);
+    expect(names(evaluateValue(filter(compoundResidents, pred), emptyArrayPlan()))).toEqual(["Ada", "Cy"]);
   });
 });

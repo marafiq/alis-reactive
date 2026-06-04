@@ -6,7 +6,7 @@ const stringShape: Shape = { kind: "string" };
 const numberShape: Shape = { kind: "number" };
 const noneShape: Shape = { kind: "none" };
 
-function plan(): PlanDocument {
+function emptyArrayPlan(): PlanDocument {
   return { version: 3, planId: "Runtime.ArrayDsl.Dom", scope: { kind: "root" }, types: {}, components: {}, behaviors: [] };
 }
 
@@ -46,21 +46,21 @@ function selfStartsWith(prefix: string): ValidationCondition {
 describe("DOM element source — array ops over live DOM collections", () => {
   it("counts the CSS classes of a DOM element (classList DOMTokenList)", () => {
     document.body.innerHTML = `<div id="card" class="risk-fall care-memory plain"></div>`;
-    expect(evaluateValue(count(domRead("card", "classList")), plan())).toBe(3);
+    expect(evaluateValue(count(domRead("card", "classList")), emptyArrayPlan())).toBe(3);
   });
 
   it("filters classList tokens by prefix and counts (filter -> count over DOM element members)", () => {
     document.body.innerHTML = `<div id="card" class="risk-fall risk-oxygen care-memory"></div>`;
-    expect(evaluateValue(count(filterByPrefix(domRead("card", "classList"), "risk-")), plan())).toBe(2);
+    expect(evaluateValue(count(filterByPrefix(domRead("card", "classList"), "risk-")), emptyArrayPlan())).toBe(2);
   });
 
   it("counts child elements (children HTMLCollection)", () => {
     document.body.innerHTML = `<ul id="list"><li>a</li><li>b</li><li>c</li></ul>`;
-    expect(evaluateValue(count(domRead("list", "children")), plan())).toBe(3);
+    expect(evaluateValue(count(domRead("list", "children")), emptyArrayPlan())).toBe(3);
   });
 
   it("throws a clear boundary error when the DOM element is absent", () => {
     document.body.innerHTML = "";
-    expect(() => evaluateValue(count(domRead("missing", "classList")), plan())).toThrow(/dom source element "missing" not found/);
+    expect(() => evaluateValue(count(domRead("missing", "classList")), emptyArrayPlan())).toThrow(/dom source element "missing" not found/);
   });
 });

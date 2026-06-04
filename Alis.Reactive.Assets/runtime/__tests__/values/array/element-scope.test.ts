@@ -9,7 +9,7 @@ const elementSource: PayloadSource = {
   type: { kind: "untyped" },
 };
 
-function plan(): PlanDocument {
+function emptyArrayPlan(): PlanDocument {
   return {
     version: 3,
     planId: "Runtime.ArrayDsl.ElementScope",
@@ -41,7 +41,7 @@ describe("element scope", () => {
       access: { kind: "property" },
     };
 
-    const value = evaluateValue(read, plan(), {
+    const value = evaluateValue(read, emptyArrayPlan(), {
       element: [{ status: "active", age: 71 }],
     });
 
@@ -58,7 +58,7 @@ describe("element scope", () => {
       access: { kind: "property" },
     };
 
-    expect(evaluateValue(read, plan(), { element: ["peanuts"] })).toBe("peanuts");
+    expect(evaluateValue(read, emptyArrayPlan(), { element: ["peanuts"] })).toBe("peanuts");
   });
 
   it("applies the declared shape to a primitive element read", () => {
@@ -71,6 +71,6 @@ describe("element scope", () => {
       access: { kind: "property" },
     };
 
-    expect(evaluateValue(read, plan(), { element: ["42"] })).toBe(42);
+    expect(evaluateValue(read, emptyArrayPlan(), { element: ["42"] })).toBe(42);
   });
 });

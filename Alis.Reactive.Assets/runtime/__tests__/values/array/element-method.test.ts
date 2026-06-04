@@ -14,7 +14,7 @@ type ElementMethodOptions = {
   args?: ValueExpression[];
 };
 
-function plan(): PlanDocument {
+function emptyArrayPlan(): PlanDocument {
   return { version: 3, planId: "Runtime.ArrayDsl.ElementMethod", scope: { kind: "root" }, types: {}, components: {}, behaviors: [] };
 }
 
@@ -44,7 +44,7 @@ describe("per-element method calls (RuntimePath.call at the element scope)", () 
   it("calls an argless method on each element (Date.getDay via fn.apply)", () => {
     const dates = [new Date(2026, 8, 14), new Date(2026, 8, 16)];
     const node = mapOp(dates, elementMethod({ method: "getDay", shape: numberShape }), numberShape);
-    expect(evaluateValue(node, plan())).toEqual(dates.map(d => d.getDay()));
+    expect(evaluateValue(node, emptyArrayPlan())).toEqual(dates.map(d => d.getDay()));
   });
 
   it("binds `this` to the element when calling a custom method", () => {
@@ -53,30 +53,30 @@ describe("per-element method calls (RuntimePath.call at the element scope)", () 
       { score: 3, double() { return this.score * 2; } },
     ];
     const node = mapOp(items, elementMethod({ method: "double", shape: numberShape }), numberShape);
-    expect(evaluateValue(node, plan())).toEqual([14, 6]);
+    expect(evaluateValue(node, emptyArrayPlan())).toEqual([14, 6]);
   });
 
   it("passes a constant argument to the method", () => {
     const items: any[] = [{ greeting: "hi", say(suffix: string) { return this.greeting + suffix; } }];
     const node = mapOp(items, elementMethod({ method: "say", shape: stringShape, args: [literal("!", stringShape)] }), stringShape);
-    expect(evaluateValue(node, plan())).toEqual(["hi!"]);
+    expect(evaluateValue(node, emptyArrayPlan())).toEqual(["hi!"]);
   });
 
   it("passes an element-member read as a method argument", () => {
     const items: any[] = [{ base: 10, bonus: 5, add(b: number) { return this.base + b; } }];
     const node = mapOp(items, elementMethod({ method: "add", shape: numberShape, args: [elementMember("bonus", numberShape)] }), numberShape);
-    expect(evaluateValue(node, plan())).toEqual([15]);
+    expect(evaluateValue(node, emptyArrayPlan())).toEqual([15]);
   });
 
   it("calls a method on a nested owner, binding `this` to that owner", () => {
     const items: any[] = [{ address: { city: "NYC", getCity() { return this.city; } } }];
     const node = mapOp(items, elementMethod({ ownerPath: "address", method: "getCity", shape: stringShape }), stringShape);
-    expect(evaluateValue(node, plan())).toEqual(["NYC"]);
+    expect(evaluateValue(node, emptyArrayPlan())).toEqual(["NYC"]);
   });
 
   it("surfaces a boundary error when the named member is not a function", () => {
     const items: any[] = [{ notAFn: 42 }];
     const node = mapOp(items, elementMethod({ method: "notAFn", shape: numberShape }), numberShape);
-    expect(() => evaluateValue(node, plan())).toThrow(/not a function/);
+    expect(() => evaluateValue(node, emptyArrayPlan())).toThrow(/not a function/);
   });
 });
