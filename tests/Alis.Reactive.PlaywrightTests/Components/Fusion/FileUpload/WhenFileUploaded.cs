@@ -1,19 +1,13 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.FileUpload;
 
 /// <summary>
-/// Exercises FusionFileUpload vertical slice end-to-end in the browser:
-/// FusionFileUpload in form mode (no auto-upload), FormData POST body format,
-/// and server echo proving files survive the gather + multipart request body.
-///
-/// Page under test: /Sandbox/Components/FusionFileUpload
-///
-/// Senior living domain: resident document uploads (medical records, photos, consent forms).
-///
-/// File injection strategy:
-/// Sets files on the native input via DataTransfer API, then dispatches a change event
-/// so SF processes them into filesData[].rawFile. The gather reads ej2.filesData via
-/// valueMember "filesData", and the request payload writer extracts .rawFile (File objects) for FormData.
+/// Exercises FusionFileUpload form-mode gather, multipart FormData payloads,
+/// and server echo behavior for resident document uploads.
 /// </summary>
+/// <remarks>
+/// File injection uses DataTransfer on the native input so Syncfusion populates
+/// <c>filesData[].rawFile</c>; gather then reads <c>filesData</c> for FormData.
+/// </remarks>
 [TestFixture]
 public class WhenFileUploaded : PlaywrightTestBase
 {
@@ -27,8 +21,8 @@ public class WhenFileUploaded : PlaywrightTestBase
     }
 
     /// <summary>
-    /// Sets files on the SF Uploader via DataTransfer + dispatches change event
-    /// so SF processes them into filesData[].rawFile for the gather to read.
+    /// Sets files through DataTransfer and dispatches change so Syncfusion processes
+    /// <c>filesData[].rawFile</c>.
     /// </summary>
     private async Task SetFiles(params (string Name, string Content, string MimeType)[] files)
     {
@@ -46,8 +40,6 @@ public class WhenFileUploaded : PlaywrightTestBase
             }",
             new { elementId = DocumentsId, files = fileSpecs });
     }
-
-    // ── Page loads ──
 
     [Test]
     public async Task page_loads_without_errors()
@@ -67,8 +59,6 @@ public class WhenFileUploaded : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── File picker renders ──
-
     [Test]
     public async Task file_picker_renders_syncfusion_uploader()
     {
@@ -86,8 +76,6 @@ public class WhenFileUploaded : PlaywrightTestBase
         await Expect(fileInput).ToBeAttachedAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── FormData POST with files ──
 
     [Test]
     public async Task selecting_files_and_submitting_sends_to_server()
@@ -148,8 +136,6 @@ public class WhenFileUploaded : PlaywrightTestBase
             "Server should receive 1 file alongside the scalar field");
         AssertNoConsoleErrors();
     }
-
-    // ── Boot trace ──
 
     [Test]
     public async Task boot_trace_is_emitted_on_page_load()
