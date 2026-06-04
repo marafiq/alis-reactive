@@ -1,15 +1,8 @@
 import * as esbuild from 'esbuild';
 import { fileURLToPath } from 'node:url';
 
-// Builds the sandbox-only plugins bundle (not shipped — sandbox app asset).
-//   input  : Alis.Reactive.SandboxApp/Scripts/sandbox-plugins.ts
-//   output : Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
-//
-//   node esbuild.config.mjs            one-shot build
-//   node esbuild.config.mjs --watch    rebuild on change
-//
-// absWorkingDir is pinned to the repo root so esbuild's module-path comments
-// in the (unminified) bundle match the former repo-root build byte-for-byte.
+// Sandbox-only plugin bundle; the framework package does not ship these demo plugins.
+// absWorkingDir stays at repo root so entry and output paths match build wrappers.
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const watch = process.argv.includes('--watch');
 

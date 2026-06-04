@@ -1,8 +1,6 @@
 import { defineConfig } from "vitest/config";
 
-// Sandbox runtime unit tests. The Alis.Reactive.Assets workspace has its own
-// vitest.config.ts for the framework runtime — this one is the second half of
-// the former repo-root config, kept so a sandbox test path is never silently lost.
+// Sandbox runtime tests stay separate from the framework runtime tests in Alis.Reactive.Assets.
 export default defineConfig({
   test: {
     environment: "jsdom",
