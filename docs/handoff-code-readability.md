@@ -44,7 +44,7 @@ The highest concentration of inline comments is in Playwright tests. Many are
 step narration or section banners. These should become smaller helpers, clearer
 test names, or no comment at all.
 
-Top files by inline `//` count:
+Initial top files by inline `//` count:
 
 - `tests/Alis.Reactive.PlaywrightTests/Conditions/Guards/WhenGuardsControlExecution.cs` - 95
 - `tests/Alis.Reactive.PlaywrightTests/Conditions/HttpMixing/WhenTriggerDrivenConditionsMixWithHttp.cs` - 89
@@ -55,11 +55,16 @@ Top files by inline `//` count:
 - `tests/Alis.Reactive.PlaywrightTests/Validation/Contract/WhenMultiFieldFormSubmits.cs` - 48
 - `tests/Alis.Reactive.PlaywrightTests/Components/Fusion/AutoComplete/WhenAutoCompleteSuggests.cs` - 48
 
-Examples to simplify:
+Examples and current status:
 
-- `WhenDateTimeSelected.cs` uses section-banner comments such as `// Section 1: Property Write` and step comments before direct Playwright actions.
-- `WhenAllComponentsGatherIntoOnePost.cs` has many field-by-field comments inside long form-fill flows. Prefer helper methods named by domain action.
-- validation rule tests use comments like `// Fix it`, `// Submit first`, and `// Trigger error first`; those should either disappear or become focused helper names.
+- Resolved on `tiny-safe-but-important-refactorings`: section banners and repeated
+  branch-result comments were removed from the touched Fusion date/time/input tests.
+- `WhenAllComponentsGatherIntoOnePost.cs` has long form-fill flows, but helper
+  extraction should happen only if it names a reusable domain action. Do not add
+  private helper indirection that hides a one-off behavior proof.
+- Resolved on `tiny-safe-but-important-refactorings`: simple validation step
+  comments such as "fix it", "submit first", and "trigger error first" no longer
+  appear in the active validation/conditions/Fusion test scan.
 
 Comments worth keeping in tests are the ones that explain unstable DOM/event
 timing or vendor behavior, such as duplicate Syncfusion inputs, required popup
