@@ -22,33 +22,42 @@ interface AlisBrowserApi {
 }
 
 /** Validation conditions cannot contain confirm, so evaluation is always sync. */
-export function evaluateCondition(condition: ValidationCondition, plan: PlanDocument, ctx?: ExecContext): boolean {
-  return evaluateSyncCondition(condition, plan, ExecutionContext.from(ctx), evaluateValue);
+export function evaluateCondition(
+  condition: ValidationCondition,
+  planDocument: PlanDocument,
+  context?: ExecContext,
+): boolean {
+  return evaluateSyncCondition(
+    condition,
+    planDocument,
+    ExecutionContext.from(context),
+    evaluateValue,
+  );
 }
 
 /** Branch execution depends on sync results staying sync until confirm is reached. */
 export function evaluateConditionInCurrentLane(
   condition: ConditionGraph,
-  plan: PlanDocument,
-  ctx?: ExecContext,
+  planDocument: PlanDocument,
+  context?: ExecContext,
 ): boolean | Promise<boolean> {
-  return evaluateConditionInLane(condition, plan, ExecutionContext.from(ctx));
+  return evaluateConditionInLane(condition, planDocument, ExecutionContext.from(context));
 }
 
 function evaluateConditionInLane(
   condition: ConditionGraph,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
 ): boolean | Promise<boolean> {
   switch (condition.kind) {
     case "compare":
-      return evaluateCompare(condition, plan, context, evaluateValue);
+      return evaluateCompare(condition, planDocument, context, evaluateValue);
     case "all":
-      return evaluateAllInLane(condition.terms, plan, context, 0);
+      return evaluateAllInLane(condition.terms, planDocument, context, 0);
     case "any":
-      return evaluateAnyInLane(condition.terms, plan, context, 0);
+      return evaluateAnyInLane(condition.terms, planDocument, context, 0);
     case "not":
-      return negateConditionInLane(condition.term, plan, context);
+      return negateConditionInLane(condition.term, planDocument, context);
     case "confirm":
       return evaluateConfirmCondition(condition.message);
     default:
@@ -58,15 +67,16 @@ function evaluateConditionInLane(
 
 function evaluateAllInLane(
   terms: readonly ConditionGraph[],
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
   startIndex: number,
 ): boolean | Promise<boolean> {
   for (let index = startIndex; index < terms.length; index++) {
-    const termMatches = evaluateConditionInLane(terms[index]!, plan, context);
+    const termMatches = evaluateConditionInLane(terms[index]!, planDocument, context);
     if (termMatches instanceof Promise) {
-      return termMatches.then(matches =>
-        matches ? evaluateAllInLane(terms, plan, context, index + 1) : false);
+      return termMatches.then(matches => matches
+        ? evaluateAllInLane(terms, planDocument, context, index + 1)
+        : false);
     }
 
     if (!termMatches) return false;
@@ -77,15 +87,16 @@ function evaluateAllInLane(
 
 function evaluateAnyInLane(
   terms: readonly ConditionGraph[],
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
   startIndex: number,
 ): boolean | Promise<boolean> {
   for (let index = startIndex; index < terms.length; index++) {
-    const termMatches = evaluateConditionInLane(terms[index]!, plan, context);
+    const termMatches = evaluateConditionInLane(terms[index]!, planDocument, context);
     if (termMatches instanceof Promise) {
-      return termMatches.then(matches =>
-        matches ? true : evaluateAnyInLane(terms, plan, context, index + 1));
+      return termMatches.then(matches => matches
+        ? true
+        : evaluateAnyInLane(terms, planDocument, context, index + 1));
     }
 
     if (termMatches) return true;
@@ -96,10 +107,10 @@ function evaluateAnyInLane(
 
 function negateConditionInLane(
   condition: ConditionGraph,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
 ): boolean | Promise<boolean> {
-  const termMatches = evaluateConditionInLane(condition, plan, context);
+  const termMatches = evaluateConditionInLane(condition, planDocument, context);
   if (termMatches instanceof Promise) return termMatches.then(matches => !matches);
 
   return !termMatches;

@@ -30,7 +30,11 @@ import { RuntimeShape } from "../browser-objects/runtime-shape";
 
 const log = scope("conditions");
 
-export type ValueEvaluator = (expression: ValueExpression, plan: PlanDocument, ctx?: ExecContext) => unknown;
+export type ValueEvaluator = (
+  expression: ValueExpression,
+  planDocument: PlanDocument,
+  context?: ExecContext,
+) => unknown;
 
 type TextOperand =
   | { readonly kind: "text"; readonly value: string }
@@ -54,19 +58,21 @@ const noRightOperandTrace = { kind: "none" } as const;
 /** Validation conditions intentionally exclude confirm, so this path stays synchronous. */
 export function evaluateSyncCondition(
   condition: ValidationCondition,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
-  evalValue: ValueEvaluator,
+  evaluateValueExpression: ValueEvaluator,
 ): boolean {
   switch (condition.kind) {
     case "compare":
-      return evaluateCompare(condition, plan, context, evalValue);
+      return evaluateCompare(condition, planDocument, context, evaluateValueExpression);
     case "all":
-      return condition.terms.every(term => evaluateSyncCondition(term, plan, context, evalValue));
+      return condition.terms.every(term =>
+        evaluateSyncCondition(term, planDocument, context, evaluateValueExpression));
     case "any":
-      return condition.terms.some(term => evaluateSyncCondition(term, plan, context, evalValue));
+      return condition.terms.some(term =>
+        evaluateSyncCondition(term, planDocument, context, evaluateValueExpression));
     case "not":
-      return !evaluateSyncCondition(condition.term, plan, context, evalValue);
+      return !evaluateSyncCondition(condition.term, planDocument, context, evaluateValueExpression);
     default:
       return assertNever(condition, "condition kind");
   }
@@ -74,11 +80,11 @@ export function evaluateSyncCondition(
 
 export function evaluateCompare(
   condition: CompareCondition,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
-  evalValue: ValueEvaluator,
+  evaluateValueExpression: ValueEvaluator,
 ): boolean {
-  const left = resolveComparisonLeft(condition, plan, context, evalValue);
+  const left = resolveComparisonLeft(condition, planDocument, context, evaluateValueExpression);
 
   switch (condition.op) {
     case "is-null":
@@ -92,7 +98,7 @@ export function evaluateCompare(
 
     case "eq":
     case "neq": {
-      const right = resolveRightValue(condition, plan, context, condition.shape, evalValue);
+      const right = resolveRightValue(condition, planDocument, context, condition.shape, evaluateValueExpression);
       traceCompare(condition, left, right);
       return equalityMatches(condition.op, left, right);
     }
@@ -101,26 +107,26 @@ export function evaluateCompare(
     case "gte":
     case "lt":
     case "lte": {
-      const right = resolveRightValue(condition, plan, context, condition.shape, evalValue);
+      const right = resolveRightValue(condition, planDocument, context, condition.shape, evaluateValueExpression);
       traceCompare(condition, left, right);
       return orderedComparisonMatches(condition.op, left.shaped, right);
     }
 
     case "in":
     case "not-in": {
-      const right = resolveMembershipItems(condition, plan, context, evalValue);
+      const right = resolveMembershipItems(condition, planDocument, context, evaluateValueExpression);
       traceCompare(condition, left, right);
       return membershipMatches(condition.op, left, right);
     }
 
     case "between": {
-      const [lower, upper] = resolveRangeBounds(condition, plan, context, evalValue);
+      const [lower, upper] = resolveRangeBounds(condition, planDocument, context, evaluateValueExpression);
       traceCompare(condition, left, [lower, upper]);
       return inclusiveRangeContains(lower, upper, left.shaped);
     }
 
     case "array-contains": {
-      const right = resolveRightValue(condition, plan, context, condition.itemShape, evalValue);
+      const right = resolveRightValue(condition, planDocument, context, condition.itemShape, evaluateValueExpression);
       const items = shapeCollectionItems(left.shaped, condition.itemShape);
       traceCompare(condition, left, right);
       return items !== undefined && items.includes(right);
@@ -148,11 +154,11 @@ export function evaluateCompare(
 
 function resolveComparisonLeft(
   condition: CompareCondition,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
-  evalValue: ValueEvaluator,
+  evaluateValueExpression: ValueEvaluator,
 ): ComparisonLeft {
-  const raw = evalValue(condition.left, plan, context.raw);
+  const raw = evaluateValueExpression(condition.left, planDocument, context.raw);
   const shaped = applyShape(raw, condition.shape);
   return { raw, shaped };
 }
@@ -172,46 +178,64 @@ function traceCompare(condition: CompareCondition, left: ComparisonLeft, right: 
 
 function resolveRightValue(
   condition: ScalarRightCondition,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
   shape: Shape,
-  evalValue: ValueEvaluator,
+  evaluateValueExpression: ValueEvaluator,
 ): unknown {
-  const raw = evalValue(condition.right.value, plan, context.raw);
+  const raw = evaluateValueExpression(condition.right.value, planDocument, context.raw);
   return applyShape(raw, shape);
 }
 
 function resolveMembershipItems(
   condition: MembershipCompareCondition,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
-  evalValue: ValueEvaluator,
+  evaluateValueExpression: ValueEvaluator,
 ): unknown[] {
   return condition.right.value.items.map(item =>
-    resolveShapedComparisonItem(item, plan, context, condition.shape, evalValue));
+    resolveShapedComparisonItem(
+      item,
+      planDocument,
+      context,
+      condition.shape,
+      evaluateValueExpression,
+    ));
 }
 
 function resolveRangeBounds(
   condition: RangeCompareCondition,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
-  evalValue: ValueEvaluator,
+  evaluateValueExpression: ValueEvaluator,
 ): [unknown, unknown] {
   const [lower, upper] = condition.right.value.items;
   return [
-    resolveShapedComparisonItem(lower, plan, context, condition.shape, evalValue),
-    resolveShapedComparisonItem(upper, plan, context, condition.shape, evalValue),
+    resolveShapedComparisonItem(
+      lower,
+      planDocument,
+      context,
+      condition.shape,
+      evaluateValueExpression,
+    ),
+    resolveShapedComparisonItem(
+      upper,
+      planDocument,
+      context,
+      condition.shape,
+      evaluateValueExpression,
+    ),
   ];
 }
 
 function resolveShapedComparisonItem(
   producer: ValueExpression,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
   shape: Shape,
-  evalValue: ValueEvaluator,
+  evaluateValueExpression: ValueEvaluator,
 ): unknown {
-  return applyShape(evalValue(producer, plan, context.raw), shape);
+  return applyShape(evaluateValueExpression(producer, planDocument, context.raw), shape);
 }
 
 function textOperand(condition: TextRightCondition): string {
