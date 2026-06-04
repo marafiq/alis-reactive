@@ -28,9 +28,9 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the reaction graph to execute on success.</param>
         public ResponseBuilder<TModel> OnSuccess(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(pb);
-            _draft.AddSuccessRoute(pb.BuildReaction());
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(reactionPipeline);
+            _draft.AddSuccessRoute(reactionPipeline.BuildReaction());
             return this;
         }
 
@@ -44,11 +44,11 @@ namespace Alis.Reactive.Builders.Requests
             Action<ResponseBody<TResponse>, PipelineBuilder<TModel>> pipeline)
             where TResponse : class
         {
-            var pb = new PipelineBuilder<TModel>(_context);
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(
                 new ResponseBody<TResponse>(PayloadSource.Success(PayloadContract.ForPayload(typeof(TResponse)))),
-                pb);
-            _draft.AddSuccessRoute(pb.BuildReaction());
+                reactionPipeline);
+            _draft.AddSuccessRoute(reactionPipeline.BuildReaction());
             return this;
         }
 
@@ -56,9 +56,9 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the reaction graph to execute for the error route.</param>
         public ResponseBuilder<TModel> OnError(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(pb);
-            _draft.AddErrorRoute(pb.BuildReaction());
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(reactionPipeline);
+            _draft.AddErrorRoute(reactionPipeline.BuildReaction());
             return this;
         }
 
@@ -67,9 +67,9 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the reaction graph to execute for the matching status code.</param>
         public ResponseBuilder<TModel> OnError(int statusCode, Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(pb);
-            _draft.AddErrorRoute(statusCode, pb.BuildReaction());
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(reactionPipeline);
+            _draft.AddErrorRoute(statusCode, reactionPipeline.BuildReaction());
             return this;
         }
 
@@ -83,11 +83,11 @@ namespace Alis.Reactive.Builders.Requests
             Action<ResponseBody<TError>, PipelineBuilder<TModel>> pipeline)
             where TError : class
         {
-            var pb = new PipelineBuilder<TModel>(_context);
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(
                 new ResponseBody<TError>(PayloadSource.Error(PayloadContract.ForPayload(typeof(TError)))),
-                pb);
-            _draft.AddErrorRoute(pb.BuildReaction());
+                reactionPipeline);
+            _draft.AddErrorRoute(reactionPipeline.BuildReaction());
             return this;
         }
 
@@ -102,11 +102,11 @@ namespace Alis.Reactive.Builders.Requests
             Action<ResponseBody<TError>, PipelineBuilder<TModel>> pipeline)
             where TError : class
         {
-            var pb = new PipelineBuilder<TModel>(_context);
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(
                 new ResponseBody<TError>(PayloadSource.Error(PayloadContract.ForPayload(typeof(TError)))),
-                pb);
-            _draft.AddErrorRoute(statusCode, pb.BuildReaction());
+                reactionPipeline);
+            _draft.AddErrorRoute(statusCode, reactionPipeline.BuildReaction());
             return this;
         }
 

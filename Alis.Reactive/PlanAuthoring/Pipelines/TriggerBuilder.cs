@@ -25,9 +25,9 @@ namespace Alis.Reactive.Builders
         /// <param name="pipeline">Builds the reaction graph for the page-ready trigger.</param>
         public TriggerBuilder<TModel> DomReady(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(pb);
-            AddBehaviors(StartsWhen.PageReady(), pb);
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(reactionPipeline);
+            AddBehaviors(StartsWhen.PageReady(), reactionPipeline);
             return this;
         }
 
@@ -36,9 +36,9 @@ namespace Alis.Reactive.Builders
         /// <param name="pipeline">Builds the reaction graph for each matching event.</param>
         public TriggerBuilder<TModel> CustomEvent(string eventName, Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(pb);
-            AddBehaviors(StartsWhen.DocumentEvent(eventName), pb);
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(reactionPipeline);
+            AddBehaviors(StartsWhen.DocumentEvent(eventName), reactionPipeline);
             return this;
         }
 
@@ -50,11 +50,11 @@ namespace Alis.Reactive.Builders
             Action<TPayload, PipelineBuilder<TModel>> pipeline)
             where TPayload : new()
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(new TPayload(), pb);
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(new TPayload(), reactionPipeline);
             AddBehaviors(
                 StartsWhen.DocumentEvent(eventName, PayloadContract.ForPayload(typeof(TPayload))),
-                pb);
+                reactionPipeline);
             return this;
         }
 
@@ -63,9 +63,9 @@ namespace Alis.Reactive.Builders
         /// <param name="pipeline">Builds the reaction graph for each server-sent message.</param>
         public TriggerBuilder<TModel> ServerPush(string url, Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(pb);
-            AddBehaviors(StartsWhen.ServerPush(url), pb);
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(reactionPipeline);
+            AddBehaviors(StartsWhen.ServerPush(url), reactionPipeline);
             return this;
         }
 
@@ -75,9 +75,9 @@ namespace Alis.Reactive.Builders
         /// <param name="pipeline">Builds the reaction graph for each matching server-sent event.</param>
         public TriggerBuilder<TModel> ServerPush(string url, string eventType, Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(pb);
-            AddBehaviors(StartsWhen.ServerPush(url, eventType), pb);
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(reactionPipeline);
+            AddBehaviors(StartsWhen.ServerPush(url, eventType), reactionPipeline);
             return this;
         }
 
@@ -90,11 +90,11 @@ namespace Alis.Reactive.Builders
             Action<TPayload, PipelineBuilder<TModel>> pipeline)
             where TPayload : new()
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(new TPayload(), pb);
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(new TPayload(), reactionPipeline);
             AddBehaviors(
                 StartsWhen.ServerPush(url, eventType, PayloadContract.ForPayload(typeof(TPayload))),
-                pb);
+                reactionPipeline);
             return this;
         }
 
@@ -105,9 +105,9 @@ namespace Alis.Reactive.Builders
         public TriggerBuilder<TModel> SignalR(string hubUrl, string methodName,
             Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(pb);
-            AddBehaviors(StartsWhen.SignalR(hubUrl, methodName), pb);
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(reactionPipeline);
+            AddBehaviors(StartsWhen.SignalR(hubUrl, methodName), reactionPipeline);
             return this;
         }
 
@@ -120,17 +120,17 @@ namespace Alis.Reactive.Builders
             Action<TPayload, PipelineBuilder<TModel>> pipeline)
             where TPayload : new()
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(new TPayload(), pb);
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(new TPayload(), reactionPipeline);
             AddBehaviors(
                 StartsWhen.SignalR(hubUrl, methodName, PayloadContract.ForPayload(typeof(TPayload))),
-                pb);
+                reactionPipeline);
             return this;
         }
 
-        private void AddBehaviors(StartsWhen trigger, PipelineBuilder<TModel> pb)
+        private void AddBehaviors(StartsWhen trigger, PipelineBuilder<TModel> reactionPipeline)
         {
-            _context.AddBehavior(Behavior.On(trigger, pb.BuildReaction()));
+            _context.AddBehavior(Behavior.On(trigger, reactionPipeline.BuildReaction()));
         }
     }
 }

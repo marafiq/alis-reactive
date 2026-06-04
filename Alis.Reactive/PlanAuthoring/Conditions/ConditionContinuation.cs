@@ -92,9 +92,9 @@ namespace Alis.Reactive.Builders.Conditions
             ConditionGraph condition,
             Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_pipeline.Context);
-            pipeline(pb);
-            var branchCase = BranchCase.Of(condition, pb.BuildReaction());
+            var reactionPipeline = new PipelineBuilder<TModel>(_pipeline.Context);
+            pipeline(reactionPipeline);
+            var branchCase = BranchCase.Of(condition, reactionPipeline.BuildReaction());
             var cases = new List<BranchCase> { branchCase };
             _pipeline.SetConditionalBranches(cases);
             return new BranchBuilder<TModel>(_pipeline, cases);
@@ -118,9 +118,9 @@ namespace Alis.Reactive.Builders.Conditions
             ConditionGraph condition,
             Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_branch.Pipeline.Context);
-            pipeline(pb);
-            _branch.AddBranch(BranchCase.Of(condition, pb.BuildReaction()));
+            var reactionPipeline = new PipelineBuilder<TModel>(_branch.Pipeline.Context);
+            pipeline(reactionPipeline);
+            _branch.AddBranch(BranchCase.Of(condition, reactionPipeline.BuildReaction()));
             return _branch;
         }
     }

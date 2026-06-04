@@ -63,9 +63,9 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the pre-request reaction graph, such as showing a spinner.</param>
         public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(pb);
-            var reaction = pb.BuildReaction();
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(reactionPipeline);
+            var reaction = reactionPipeline.BuildReaction();
             _whileLoading.Clear();
             _whileLoading.Add(reaction);
             return this;
@@ -81,9 +81,9 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the cleanup reaction graph to run after the request settles.</param>
         public HttpRequestBuilder<TModel> Finally(Action<PipelineBuilder<TModel>> pipeline)
         {
-            var pb = new PipelineBuilder<TModel>(_context);
-            pipeline(pb);
-            var reaction = pb.BuildReaction();
+            var reactionPipeline = new PipelineBuilder<TModel>(_context);
+            pipeline(reactionPipeline);
+            var reaction = reactionPipeline.BuildReaction();
             _finally.Clear();
             _finally.Add(reaction);
             return this;
