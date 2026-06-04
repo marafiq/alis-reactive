@@ -16,7 +16,7 @@ public class NativeCardHeaderTagHelper : TagHelper
     public CardDivider Divider { get; set; } = CardDivider.None;
 
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the header's design-system classes.
+    /// Additional HTML classes merged with the generated card header classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }

@@ -29,7 +29,7 @@ public class NativeHeadingTagHelper : TagHelper
     public string? Overline { get; set; }
 
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the heading's design-system classes.
+    /// Additional HTML classes merged with the generated heading classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }

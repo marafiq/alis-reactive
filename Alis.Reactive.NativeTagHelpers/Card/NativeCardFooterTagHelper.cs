@@ -16,7 +16,7 @@ public class NativeCardFooterTagHelper : TagHelper
     public CardDivider Divider { get; set; } = CardDivider.None;
 
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the footer's design-system classes.
+    /// Additional HTML classes merged with the generated card footer classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }

@@ -17,7 +17,7 @@ public class NativeValidationSummaryTagHelper : TagHelper
     public string PlanId { get; set; } = "";
 
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the summary element.
+    /// Additional HTML classes merged with the validation summary classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }

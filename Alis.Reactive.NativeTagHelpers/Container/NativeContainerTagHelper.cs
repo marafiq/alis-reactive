@@ -11,7 +11,7 @@ namespace Alis.Reactive.NativeTagHelpers.Container;
 public class NativeContainerTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the container's design-system classes.
+    /// Additional HTML classes merged with the generated container classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }

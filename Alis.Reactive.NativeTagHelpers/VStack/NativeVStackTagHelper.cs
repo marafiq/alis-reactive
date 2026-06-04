@@ -22,7 +22,7 @@ public class NativeVStackTagHelper : TagHelper
     public bool DivideY { get; set; }
 
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the column's design-system classes.
+    /// Additional HTML classes merged with the generated column classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }

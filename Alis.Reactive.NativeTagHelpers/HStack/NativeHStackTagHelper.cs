@@ -32,7 +32,7 @@ public class NativeHStackTagHelper : TagHelper
     public bool Wrap { get; set; }
 
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the row's design-system classes.
+    /// Additional HTML classes merged with the generated row classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }

@@ -36,7 +36,7 @@ public class NativeTextTagHelper : TagHelper
     public bool AsSpan { get; set; }
 
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the text's design-system classes.
+    /// Additional HTML classes merged with the generated text classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }

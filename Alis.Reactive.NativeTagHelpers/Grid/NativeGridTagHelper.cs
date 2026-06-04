@@ -27,7 +27,7 @@ public class NativeGridTagHelper : TagHelper
     public bool Responsive { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the grid's design-system classes.
+    /// Additional HTML classes merged with the generated grid classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }

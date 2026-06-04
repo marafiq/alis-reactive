@@ -23,7 +23,7 @@ public class NativeDividerTagHelper : TagHelper
     public string? Label { get; set; }
 
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the divider's design-system classes.
+    /// Additional HTML classes merged with the generated divider classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }

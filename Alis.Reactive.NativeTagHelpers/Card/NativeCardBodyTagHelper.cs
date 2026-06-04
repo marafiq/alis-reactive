@@ -16,7 +16,7 @@ public class NativeCardBodyTagHelper : TagHelper
     public CardPadding Padding { get; set; } = CardPadding.Standard;
 
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the body's design-system classes.
+    /// Additional HTML classes merged with the generated card body classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }

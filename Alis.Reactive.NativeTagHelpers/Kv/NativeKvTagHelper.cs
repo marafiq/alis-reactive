@@ -30,7 +30,7 @@ public class NativeKvTagHelper : TagHelper
     public KvLayout Layout { get; set; } = KvLayout.Stacked;
 
     /// <summary>
-    /// Gets or sets extra CSS classes appended to the pair's design-system classes.
+    /// Additional HTML classes merged with the generated key/value classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }
