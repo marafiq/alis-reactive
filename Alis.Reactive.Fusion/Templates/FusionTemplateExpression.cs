@@ -19,7 +19,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// Converts a property expression to a Syncfusion <c>${...}</c> binding token.
         /// </summary>
         /// <typeparam name="TModel">The template model type.</typeparam>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <typeparam name="TProperty">The template value type emitted by the binding token.</typeparam>
         /// <param name="expression">The property-access expression to bind.</param>
         /// <returns>A binding token such as <c>${propertyName}</c>.</returns>
         public static string ToBinding<TModel, TProperty>(Expression<Func<TModel, TProperty>> expression)
@@ -32,7 +32,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// Converts a property expression to a Syncfusion template property path.
         /// </summary>
         /// <typeparam name="TModel">The template model type.</typeparam>
-        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <typeparam name="TProperty">The template value type at the selected property path.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A property path without the surrounding binding token.</returns>
         public static string ToPropertyPath<TModel, TProperty>(Expression<Func<TModel, TProperty>> expression)
