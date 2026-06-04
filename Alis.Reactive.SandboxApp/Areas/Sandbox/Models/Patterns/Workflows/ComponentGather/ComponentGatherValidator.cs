@@ -7,7 +7,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public ComponentGatherValidator()
         {
-            // Native scalar — multiple rules on ResidentName
             RuleFor(x => x.ResidentName)
                 .NotEmpty().WithMessage("'Resident Name' is required.")
                 .MinimumLength(3).WithMessage("'Resident Name' must be at least 3 characters.")
@@ -23,11 +22,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.CareLevel).NotEmpty().WithMessage("'Care Level' is required.");
             ClientRule(x => x.CareLevel).Required("'Care Level' is required.");
 
-            // Native array
             RuleFor(x => x.Allergies).NotEmpty().WithMessage("Select at least one allergy.");
             ClientRule(x => x.Allergies).AtLeastOne("Select at least one allergy.");
 
-            // Fusion scalar
             RuleFor(x => x.MonthlyRate).GreaterThan(0).WithMessage("'Monthly Rate' must be greater than 0.");
             ClientRule(x => x.MonthlyRate).GreaterThan(0, "'Monthly Rate' must be greater than 0.");
             RuleFor(x => x.FacilityId).NotEmpty().WithMessage("'Facility' is required.");
@@ -49,7 +46,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.CarePlan).NotEmpty().WithMessage("'Care Plan' is required.");
             ClientRule(x => x.CarePlan).Required("'Care Plan' is required.");
 
-            // Fusion array
             RuleFor(x => x.DietaryRestrictions).NotEmpty().WithMessage("Select at least one dietary restriction.");
             ClientRule(x => x.DietaryRestrictions).AtLeastOne("Select at least one dietary restriction.");
         }
