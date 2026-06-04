@@ -3,15 +3,15 @@ import { assertNever } from "../shared/assert-never";
 import { RuntimeValue } from "../browser-objects/runtime-value";
 import { toJavaScriptString } from "../shared/javascript-string";
 
-type ProjectElementValue = (expression: ValueExpression, item: unknown) => unknown;
+type EvaluateElementValue = (expression: ValueExpression, item: unknown) => unknown;
 
-type MatchElementPredicate = (predicate: ValidationCondition, item: unknown) => boolean;
+type EvaluateElementPredicate = (predicate: ValidationCondition, item: unknown) => boolean;
 
 export function runArrayOp(
   expression: ArrayOperationExpression,
   source: unknown,
-  projectElementValue: ProjectElementValue,
-  matchElementPredicate: MatchElementPredicate,
+  evaluateElementValue: EvaluateElementValue,
+  evaluateElementPredicate: EvaluateElementPredicate,
 ): unknown {
   const items = normalizeToArray(source, expression.op);
   switch (expression.op) {
@@ -19,24 +19,24 @@ export function runArrayOp(
       // Count(predicate) compiles as filter -> count, so count nodes are unconditional.
       return items.length;
     case "filter":
-      return shapedArray(items.filter(item => match(matchElementPredicate, expression.predicate, item)), expression);
+      return shapedArray(items.filter(item => match(evaluateElementPredicate, expression.predicate, item)), expression);
     case "map":
-      return shapedArray(items.map(item => projected(projectElementValue, expression.projection, item)), expression);
+      return shapedArray(items.map(item => projected(evaluateElementValue, expression.projection, item)), expression);
     case "sum":
       return items.reduce<number>(
-        (total, item) => total + toNumber(projectedOrSelf(projectElementValue, expression.projection, item)), 0);
+        (total, item) => total + toNumber(projectedOrSelf(evaluateElementValue, expression.projection, item)), 0);
     case "any":
       return expression.predicate === undefined
         ? items.length > 0
-        : items.some(item => match(matchElementPredicate, expression.predicate, item));
+        : items.some(item => match(evaluateElementPredicate, expression.predicate, item));
     case "all":
-      return items.every(item => match(matchElementPredicate, expression.predicate, item));
+      return items.every(item => match(evaluateElementPredicate, expression.predicate, item));
     case "find":
-      return findElement(expression, items, projectElementValue, matchElementPredicate);
+      return findElement(expression, items, evaluateElementValue, evaluateElementPredicate);
     case "orderBy":
-      return shapedArray(ordered(items, expression.projection, false, projectElementValue), expression);
+      return shapedArray(ordered(items, expression.projection, false, evaluateElementValue), expression);
     case "orderByDescending":
-      return shapedArray(ordered(items, expression.projection, true, projectElementValue), expression);
+      return shapedArray(ordered(items, expression.projection, true, evaluateElementValue), expression);
     default:
       return assertNever(expression.op, "array-op kind");
   }
@@ -45,27 +45,27 @@ export function runArrayOp(
 function findElement(
   expression: ArrayOperationExpression,
   items: unknown[],
-  projectElementValue: ProjectElementValue,
-  matchElementPredicate: MatchElementPredicate,
+  evaluateElementValue: EvaluateElementValue,
+  evaluateElementPredicate: EvaluateElementPredicate,
 ): unknown {
   if (expression.predicate === undefined) {
     throw new Error("[alis] array-op 'find' requires a predicate");
   }
-  const found = items.find(item => match(matchElementPredicate, expression.predicate, item));
+  const found = items.find(item => match(evaluateElementPredicate, expression.predicate, item));
   if (found === undefined) return null;
-  return expression.projection === undefined ? found : projected(projectElementValue, expression.projection, found);
+  return expression.projection === undefined ? found : projected(evaluateElementValue, expression.projection, found);
 }
 
 function ordered(
   items: unknown[],
-  key: ArrayOperationExpression["projection"],
+  keyProjection: ArrayOperationExpression["projection"],
   descending: boolean,
-  projectElementValue: ProjectElementValue,
+  evaluateElementValue: EvaluateElementValue,
 ): unknown[] {
-  if (key === undefined) throw new Error("[alis] array-op orderBy requires a key projection");
-  const decorated = items.map(item => ({ item, sortKey: projectElementValue(key, item) }));
-  decorated.sort((a, b) => compareKeys(a.sortKey, b.sortKey) * (descending ? -1 : 1));
-  return decorated.map(entry => entry.item);
+  if (keyProjection === undefined) throw new Error("[alis] array-op orderBy requires a key projection");
+  const keyedItems = items.map(item => ({ item, sortKey: evaluateElementValue(keyProjection, item) }));
+  keyedItems.sort((left, right) => compareKeys(left.sortKey, right.sortKey) * (descending ? -1 : 1));
+  return keyedItems.map(keyedItem => keyedItem.item);
 }
 
 function shapedArray(result: unknown[], expression: ArrayOperationExpression): unknown {
@@ -73,33 +73,33 @@ function shapedArray(result: unknown[], expression: ArrayOperationExpression): u
 }
 
 function match(
-  matchElementPredicate: MatchElementPredicate,
+  evaluateElementPredicate: EvaluateElementPredicate,
   predicate: ArrayOperationExpression["predicate"],
   item: unknown,
 ): boolean {
   if (predicate === undefined) {
     throw new Error("[alis] array-op predicate is required for this operation");
   }
-  return matchElementPredicate(predicate, item);
+  return evaluateElementPredicate(predicate, item);
 }
 
 function projected(
-  projectElementValue: ProjectElementValue,
+  evaluateElementValue: EvaluateElementValue,
   projection: ArrayOperationExpression["projection"],
   item: unknown,
 ): unknown {
   if (projection === undefined) {
     throw new Error("[alis] array-op projection is required for this operation");
   }
-  return projectElementValue(projection, item);
+  return evaluateElementValue(projection, item);
 }
 
 function projectedOrSelf(
-  projectElementValue: ProjectElementValue,
+  evaluateElementValue: EvaluateElementValue,
   projection: ArrayOperationExpression["projection"],
   item: unknown,
 ): unknown {
-  return projection === undefined ? item : projectElementValue(projection, item);
+  return projection === undefined ? item : evaluateElementValue(projection, item);
 }
 
 /**
@@ -118,8 +118,8 @@ function normalizeToArray(value: unknown, label: string): unknown[] {
 }
 
 function toNumber(value: unknown): number {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : 0;
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : 0;
 }
 
 function compareKeys(a: unknown, b: unknown): number {

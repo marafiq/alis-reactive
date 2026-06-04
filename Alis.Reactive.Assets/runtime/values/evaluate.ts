@@ -57,8 +57,8 @@ class ValueEvaluation {
         return runArrayOp(
           expression,
           this.evaluate(expression.source),
-          (e, item) => this.inElement(item).evaluate(e),
-          (p, item) => this.elementMatches(p, item),
+          (valueExpression, item) => this.inElement(item).evaluate(valueExpression),
+          (predicate, item) => this.elementMatches(predicate, item),
         );
 
       default:
