@@ -7,8 +7,8 @@ import { MergePolicy, emptyPlan, snapshotPlan } from "./merge-policy";
 type PlanId = string;
 type SlotId = string;
 
-type WireBehaviors = (behaviors: Behavior[], plan: PlanDocument, signal?: AbortSignal) => void;
-type WireContainerValidation = (plan: PlanDocument, signal?: AbortSignal) => void;
+type WireBehaviors = (behaviors: Behavior[], activePlan: PlanDocument, signal?: AbortSignal) => void;
+type WireContainerValidation = (activePlan: PlanDocument, signal?: AbortSignal) => void;
 
 export interface ActivePlanWiring {
   wireBehaviors: WireBehaviors;
@@ -17,7 +17,7 @@ export interface ActivePlanWiring {
 
 interface PartialSlotLoad {
   readonly abortController: AbortController;
-  readonly plans: PlanDocument[];
+  readonly slotPlans: PlanDocument[];
 }
 
 export class AppliedPlans {
@@ -25,25 +25,25 @@ export class AppliedPlans {
   private readonly bootSnapshots = new Map<PlanId, PlanDocument>();
   private readonly partialSlotLoads = new Map<SlotId, PartialSlotLoad>();
 
-  register(plan: PlanDocument): void {
-    this.activePlans.set(plan.planId, plan);
-    this.bootSnapshots.set(plan.planId, snapshotPlan(plan));
+  register(bootPlan: PlanDocument): void {
+    this.activePlans.set(bootPlan.planId, bootPlan);
+    this.bootSnapshots.set(bootPlan.planId, snapshotPlan(bootPlan));
   }
 
-  loadPartialSlot(slotId: SlotId, plans: PlanDocument[], wiring: ActivePlanWiring): PlanId[] {
+  loadPartialSlot(slotId: SlotId, incomingPlans: PlanDocument[], wiring: ActivePlanWiring): PlanId[] {
     const affectedPlanIds = new Set(this.unloadSlot(slotId));
 
     const abortController = new AbortController();
-    const slotPlans = plans.map(snapshotPlan);
+    const slotPlans = incomingPlans.map(snapshotPlan);
     const loadedPlanIds = planIdsIn(slotPlans);
-    this.partialSlotLoads.set(slotId, { abortController, plans: slotPlans });
+    this.partialSlotLoads.set(slotId, { abortController, slotPlans });
 
     for (const planId of loadedPlanIds) affectedPlanIds.add(planId);
 
     this.recomposePlans(affectedPlanIds);
-    for (const plan of slotPlans) {
-      const activePlan = this.activePlans.get(plan.planId)!;
-      wiring.wireBehaviors(plan.behaviors, activePlan, abortController.signal);
+    for (const slotPlan of slotPlans) {
+      const activePlan = this.activePlans.get(slotPlan.planId)!;
+      wiring.wireBehaviors(slotPlan.behaviors, activePlan, abortController.signal);
     }
     for (const planId of loadedPlanIds) {
       const activePlan = this.activePlans.get(planId)!;
@@ -76,7 +76,7 @@ export class AppliedPlans {
 
     this.partialSlotLoads.delete(slotId);
     slotLoad.abortController.abort();
-    return planIdsIn(slotLoad.plans);
+    return planIdsIn(slotLoad.slotPlans);
   }
 
   private recomposePlans(planIds: Iterable<PlanId>): void {
@@ -94,15 +94,15 @@ export class AppliedPlans {
       return;
     }
 
-    const target = this.activePlanDocument(planId);
-    resetPlanDocument(target, planId);
+    const activePlan = this.activePlanDocument(planId);
+    resetPlanDocument(activePlan, planId);
 
     if (bootPlan !== undefined) {
-      MergePolicy.composeBootPlanInto(target, bootPlan);
+      MergePolicy.composeBootPlanInto(activePlan, bootPlan);
     }
 
     for (const slotPlan of slotPlans) {
-      MergePolicy.composeSlotPlanInto(target, slotPlan, bootPlan);
+      MergePolicy.composeSlotPlanInto(activePlan, slotPlan, bootPlan);
     }
   }
 
@@ -117,14 +117,14 @@ export class AppliedPlans {
   }
 
   private slotPlansFor(planId: PlanId): PlanDocument[] {
-    const plans: PlanDocument[] = [];
+    const matchingSlotPlans: PlanDocument[] = [];
     for (const slotLoad of this.partialSlotLoads.values()) {
-      for (const plan of slotLoad.plans) {
-        if (plan.planId === planId) plans.push(plan);
+      for (const slotPlan of slotLoad.slotPlans) {
+        if (slotPlan.planId === planId) matchingSlotPlans.push(slotPlan);
       }
     }
 
-    return plans;
+    return matchingSlotPlans;
   }
 
   private abortSlots(): void {
@@ -136,26 +136,26 @@ export class AppliedPlans {
 
 export const appliedPlans = new AppliedPlans();
 
-export function composeInitialPlans(plans: PlanDocument[]): PlanDocument[] {
+export function composeInitialPlans(bootPlans: PlanDocument[]): PlanDocument[] {
   const assembledPlans = new Map<PlanId, PlanDocument>();
-  for (const plan of plans) {
-    const assembled = assembledPlans.get(plan.planId) ?? emptyPlan(plan.planId);
-    assembledPlans.set(plan.planId, assembled);
-    MergePolicy.composeBootPlanInto(assembled, plan);
+  for (const bootPlan of bootPlans) {
+    const assembled = assembledPlans.get(bootPlan.planId) ?? emptyPlan(bootPlan.planId);
+    assembledPlans.set(bootPlan.planId, assembled);
+    MergePolicy.composeBootPlanInto(assembled, bootPlan);
   }
 
   return Array.from(assembledPlans.values());
 }
 
-function resetPlanDocument(plan: PlanDocument, planId: PlanId): void {
-  plan.version = 3;
-  plan.planId = planId;
-  plan.scope = { kind: "root" };
-  plan.types = {};
-  plan.components = {};
-  plan.behaviors = [];
+function resetPlanDocument(planDocument: PlanDocument, planId: PlanId): void {
+  planDocument.version = 3;
+  planDocument.planId = planId;
+  planDocument.scope = { kind: "root" };
+  planDocument.types = {};
+  planDocument.components = {};
+  planDocument.behaviors = [];
 }
 
-function planIdsIn(plans: PlanDocument[]): PlanId[] {
-  return Array.from(new Set(plans.map(plan => plan.planId)));
+function planIdsIn(planDocuments: PlanDocument[]): PlanId[] {
+  return Array.from(new Set(planDocuments.map(planDocument => planDocument.planId)));
 }
