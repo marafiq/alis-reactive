@@ -40,7 +40,7 @@ namespace Alis.Reactive
         /// <summary>
         /// Creates a typed source that reads a property from this response body scope.
         /// </summary>
-        /// <typeparam name="TProp">The property type.</typeparam>
+        /// <typeparam name="TProp">The value type returned by the selected response-body path.</typeparam>
         /// <param name="expression">The response-body property path, for example <c>r =&gt; r.Data.Name</c>.</param>
         /// <returns>A typed source for conditions, comparisons, plugin arguments, and other source-based APIs.</returns>
         public TypedSource<TProp> Read<TProp>(Expression<Func<T, TProp>> expression)
