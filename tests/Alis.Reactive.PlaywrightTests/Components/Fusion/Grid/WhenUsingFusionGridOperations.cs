@@ -6,9 +6,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 public class WhenUsingFusionGridOperations : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/Operations";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_GridOperationsModel";
-    private const string PatchRiskLevelId = Scope + "__PatchRiskLevel";
-    private const string PatchOpenTasksId = Scope + "__PatchOpenTasks";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_GridOperationsModel";
+    private const string PatchRiskLevelId = GeneratedTypeScope + "__PatchRiskLevel";
+    private const string PatchOpenTasksId = GeneratedTypeScope + "__PatchOpenTasks";
 
     private DropDownListLocator PatchRiskLevel => new(Page, PatchRiskLevelId);
     private NumericTextBoxLocator PatchOpenTasks => new(Page, PatchOpenTasksId);

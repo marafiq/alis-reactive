@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 public class WhenMultilineTextEntered : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NativeTextArea";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeTextAreaModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeTextAreaModel__";
 
     private async Task NavigateAndBoot()
     {
@@ -29,7 +29,7 @@ public class WhenMultilineTextEntered : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var textarea = Page.Locator($"#{Scope}CareNotes");
+        var textarea = Page.Locator($"#{ModelIdPrefix}CareNotes");
         await Expect(textarea).ToHaveValueAsync("Resident stable. Vitals within normal range.");
         AssertNoConsoleErrors();
     }
@@ -49,7 +49,7 @@ public class WhenMultilineTextEntered : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var textarea = Page.Locator($"#{Scope}IncidentDescription");
+        var textarea = Page.Locator($"#{ModelIdPrefix}IncidentDescription");
 
         await textarea.FillAsync("Resident fell in hallway at 2pm.");
         // FillAsync dispatches input, but this test needs the change event.
@@ -65,7 +65,7 @@ public class WhenMultilineTextEntered : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var textarea = Page.Locator($"#{Scope}IncidentDescription");
+        var textarea = Page.Locator($"#{ModelIdPrefix}IncidentDescription");
 
         await textarea.FillAsync("Resident fell in hallway at 2pm.");
         await textarea.BlurAsync();
@@ -82,7 +82,7 @@ public class WhenMultilineTextEntered : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var textarea = Page.Locator($"#{Scope}CareNotes");
+        var textarea = Page.Locator($"#{ModelIdPrefix}CareNotes");
         await textarea.ClearAsync();
 
         await Page.Locator("#check-notes-btn").ClickAsync();

@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 public class WhenTextInputChanges : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NativeTextBox";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeTextBoxModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeTextBoxModel__";
 
     private async Task NavigateAndBoot()
     {
@@ -29,7 +29,7 @@ public class WhenTextInputChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator($"#{Scope}ResidentName");
+        var input = Page.Locator($"#{ModelIdPrefix}ResidentName");
         await Expect(input).ToHaveValueAsync("Jane Doe");
         AssertNoConsoleErrors();
     }
@@ -49,7 +49,7 @@ public class WhenTextInputChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator($"#{Scope}EmergencyContact");
+        var input = Page.Locator($"#{ModelIdPrefix}EmergencyContact");
 
         await input.FillAsync("John Smith");
         // FillAsync dispatches input, but this test needs the change event.
@@ -65,7 +65,7 @@ public class WhenTextInputChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator($"#{Scope}EmergencyContact");
+        var input = Page.Locator($"#{ModelIdPrefix}EmergencyContact");
 
         await input.FillAsync("John Smith");
         await input.BlurAsync();
@@ -82,7 +82,7 @@ public class WhenTextInputChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator($"#{Scope}ResidentName");
+        var input = Page.Locator($"#{ModelIdPrefix}ResidentName");
         await input.ClearAsync();
 
         await Page.Locator("#check-name-btn").ClickAsync();
@@ -110,7 +110,7 @@ public class WhenTextInputChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator($"#{Scope}EmergencyContact");
+        var input = Page.Locator($"#{ModelIdPrefix}EmergencyContact");
         var status = Page.Locator("#contact-status");
 
         await input.FillAsync("Alice Johnson");
@@ -136,7 +136,7 @@ public class WhenTextInputChanges : PlaywrightTestBase
         var echo = Page.Locator("#value-echo");
         await Expect(echo).ToHaveTextAsync("Jane Doe", new() { Timeout = 3000 });
 
-        var input = Page.Locator($"#{Scope}ResidentName");
+        var input = Page.Locator($"#{ModelIdPrefix}ResidentName");
         await input.ClearAsync();
         await input.FillAsync("John Smith");
 

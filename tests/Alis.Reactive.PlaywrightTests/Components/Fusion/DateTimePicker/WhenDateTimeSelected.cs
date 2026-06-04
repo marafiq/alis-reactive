@@ -15,8 +15,8 @@ public class WhenDateTimeSelected : PlaywrightTestBase
     private const string Path = "/Sandbox/Components/DateTimePicker";
 
     // IdGenerator scope is the plan/DOM join key used by the rendered component.
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DateTimePickerModel";
-    private const string MedicationTimeId = Scope + "__MedicationTime";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DateTimePickerModel";
+    private const string MedicationTimeId = GeneratedTypeScope + "__MedicationTime";
 
     private DateTimePickerLocator MedicationTime => new(Page, MedicationTimeId);
 

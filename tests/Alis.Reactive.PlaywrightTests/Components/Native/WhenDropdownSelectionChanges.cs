@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 public class WhenDropdownSelectionChanges : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NativeDropDown";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeDropDownModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeDropDownModel__";
 
     private async Task NavigateAndBoot()
     {
@@ -29,7 +29,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var select = Page.Locator($"#{Scope}CareLevel");
+        var select = Page.Locator($"#{ModelIdPrefix}CareLevel");
         await Expect(select).ToHaveValueAsync("Memory Care");
         AssertNoConsoleErrors();
     }
@@ -49,7 +49,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var select = Page.Locator($"#{Scope}FacilityType");
+        var select = Page.Locator($"#{ModelIdPrefix}FacilityType");
         await select.SelectOptionAsync("Medical");
 
         var notice = Page.Locator("#medical-notice");
@@ -62,7 +62,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var select = Page.Locator($"#{Scope}FacilityType");
+        var select = Page.Locator($"#{ModelIdPrefix}FacilityType");
         await select.SelectOptionAsync("Residential");
 
         var notice = Page.Locator("#medical-notice");
@@ -88,7 +88,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var select = Page.Locator($"#{Scope}CareLevel");
+        var select = Page.Locator($"#{ModelIdPrefix}CareLevel");
         await select.SelectOptionAsync("");
 
         await Page.Locator("#check-care-btn").ClickAsync();
@@ -104,7 +104,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         // The reactive handler must fire on every change, not only the first.
         await NavigateAndBoot();
 
-        var select = Page.Locator($"#{Scope}FacilityType");
+        var select = Page.Locator($"#{ModelIdPrefix}FacilityType");
         var notice = Page.Locator("#medical-notice");
 
         await select.SelectOptionAsync("Medical");
@@ -128,7 +128,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         // The component-read condition must re-evaluate after a clear-to-reselect cycle.
         await NavigateAndBoot();
 
-        var select = Page.Locator($"#{Scope}CareLevel");
+        var select = Page.Locator($"#{ModelIdPrefix}CareLevel");
         var checkCareButton = Page.Locator("#check-care-btn");
         var status = Page.Locator("#care-confirmation");
 
@@ -210,8 +210,8 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         // If IdGenerator changes, these elements vanish and all reactive wiring breaks.
         await NavigateAndBoot();
 
-        await Expect(Page.Locator($"#{Scope}CareLevel")).ToBeVisibleAsync();
-        await Expect(Page.Locator($"#{Scope}FacilityType")).ToBeVisibleAsync();
+        await Expect(Page.Locator($"#{ModelIdPrefix}CareLevel")).ToBeVisibleAsync();
+        await Expect(Page.Locator($"#{ModelIdPrefix}FacilityType")).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
@@ -222,8 +222,8 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         // the runtime's el.value read/write path breaks silently.
         await NavigateAndBoot();
 
-        var careLevel = Page.Locator($"select#{Scope}CareLevel");
-        var facilityType = Page.Locator($"select#{Scope}FacilityType");
+        var careLevel = Page.Locator($"select#{ModelIdPrefix}CareLevel");
+        var facilityType = Page.Locator($"select#{ModelIdPrefix}FacilityType");
 
         await Expect(careLevel).ToHaveCountAsync(1);
         await Expect(facilityType).ToHaveCountAsync(1);
@@ -237,7 +237,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         // Missing options prevent SelectOptionAsync and SetValue from matching "Memory Care".
         await NavigateAndBoot();
 
-        var options = Page.Locator($"#{Scope}CareLevel option");
+        var options = Page.Locator($"#{ModelIdPrefix}CareLevel option");
         await Expect(options).ToHaveCountAsync(5);
         AssertNoConsoleErrors();
     }
@@ -248,7 +248,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         // Controller provides 3 facility type items plus 1 placeholder.
         await NavigateAndBoot();
 
-        var options = Page.Locator($"#{Scope}FacilityType option");
+        var options = Page.Locator($"#{ModelIdPrefix}FacilityType option");
         await Expect(options).ToHaveCountAsync(4);
         AssertNoConsoleErrors();
     }
@@ -260,7 +260,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         // via SelectOptionAsync("") works for the component-read condition test.
         await NavigateAndBoot();
 
-        var placeholder = Page.Locator($"#{Scope}CareLevel option").First;
+        var placeholder = Page.Locator($"#{ModelIdPrefix}CareLevel option").First;
         await Expect(placeholder).ToHaveAttributeAsync("value", "");
         AssertNoConsoleErrors();
     }

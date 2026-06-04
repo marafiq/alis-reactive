@@ -6,9 +6,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.CheckBox;
 public class WhenUsingFusionCheckBox : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionCheckBox";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionCheckBoxModel";
-    private const string ConsentAcceptedId = Scope + "__ConsentAccepted";
-    private const string ReviewNeededId = Scope + "__ReviewNeeded";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionCheckBoxModel";
+    private const string ConsentAcceptedId = GeneratedTypeScope + "__ConsentAccepted";
+    private const string ReviewNeededId = GeneratedTypeScope + "__ReviewNeeded";
 
     private FusionCheckBoxLocator ConsentAccepted => new(Page, ConsentAcceptedId);
     private FusionCheckBoxLocator ReviewNeeded => new(Page, ReviewNeededId);

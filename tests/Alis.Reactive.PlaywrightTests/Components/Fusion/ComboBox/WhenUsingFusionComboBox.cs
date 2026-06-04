@@ -6,8 +6,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ComboBox;
 public class WhenUsingFusionComboBox : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionComboBox";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionComboBoxModel";
-    private const string ResidentId = Scope + "__Resident";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionComboBoxModel";
+    private const string ResidentId = GeneratedTypeScope + "__Resident";
 
     private FusionComboBoxLocator Resident => new(Page, ResidentId);
 

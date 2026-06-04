@@ -6,9 +6,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Slider;
 public class WhenUsingFusionSlider : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Slider";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_SliderModel";
-    private const string PainScoreId = Scope + "__PainScore";
-    private const string PreferredRangeId = Scope + "__PreferredRange";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_SliderModel";
+    private const string PainScoreId = GeneratedTypeScope + "__PainScore";
+    private const string PreferredRangeId = GeneratedTypeScope + "__PreferredRange";
 
     private FusionSliderLocator PainScore => new(Page, PainScoreId);
     private FusionSliderLocator PreferredRange => new(Page, PreferredRangeId);

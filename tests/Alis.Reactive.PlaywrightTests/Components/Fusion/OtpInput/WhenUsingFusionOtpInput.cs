@@ -6,9 +6,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.OtpInput;
 public class WhenUsingFusionOtpInput : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/OtpInput";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_OtpInputModel";
-    private const string PasscodeId = Scope + "__Passcode";
-    private const string AutoBlurCodeId = Scope + "__AutoBlurCode";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_OtpInputModel";
+    private const string PasscodeId = GeneratedTypeScope + "__Passcode";
+    private const string AutoBlurCodeId = GeneratedTypeScope + "__AutoBlurCode";
 
     private FusionOtpInputLocator Passcode => new(Page, PasscodeId);
     private FusionOtpInputLocator AutoBlurCode => new(Page, AutoBlurCodeId);

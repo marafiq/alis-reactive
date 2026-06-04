@@ -6,9 +6,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TextBox;
 public class WhenUsingFusionTextBox : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/TextBox";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TextBoxModel";
-    private const string ResidentNameId = Scope + "__ResidentName";
-    private const string AutoBlurNoteId = Scope + "__AutoBlurNote";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TextBoxModel";
+    private const string ResidentNameId = GeneratedTypeScope + "__ResidentName";
+    private const string AutoBlurNoteId = GeneratedTypeScope + "__AutoBlurNote";
 
     private FusionTextBoxLocator ResidentName => new(Page, ResidentNameId);
     private FusionTextBoxLocator AutoBlurNote => new(Page, AutoBlurNoteId);

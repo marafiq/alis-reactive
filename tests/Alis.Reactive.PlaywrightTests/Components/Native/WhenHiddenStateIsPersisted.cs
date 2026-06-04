@@ -7,7 +7,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 public class WhenHiddenStateIsPersisted : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NativeHiddenField";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeHiddenFieldModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeHiddenFieldModel__";
 
     private async Task NavigateAndBoot()
     {
@@ -28,7 +28,7 @@ public class WhenHiddenStateIsPersisted : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator($"#{Scope}ResidentId");
+        var input = Page.Locator($"#{ModelIdPrefix}ResidentId");
         await Expect(input).ToHaveValueAsync("RES-1042");
         await Expect(input).ToHaveAttributeAsync("type", "hidden");
         AssertNoConsoleErrors();
@@ -39,7 +39,7 @@ public class WhenHiddenStateIsPersisted : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator($"#{Scope}FormToken");
+        var input = Page.Locator($"#{ModelIdPrefix}FormToken");
         await Expect(input).ToHaveValueAsync("abc123");
         await Expect(input).ToHaveAttributeAsync("type", "hidden");
         AssertNoConsoleErrors();
@@ -70,7 +70,7 @@ public class WhenHiddenStateIsPersisted : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var nameInput = Page.Locator($"#{Scope}ResidentName");
+        var nameInput = Page.Locator($"#{ModelIdPrefix}ResidentName");
         await nameInput.FillAsync("Margaret Thompson");
 
         await Page.Locator("#submit-btn").ClickAsync();

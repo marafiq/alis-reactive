@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 public class WhenChecklistItemsToggle : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NativeCheckList";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeCheckListModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeCheckListModel__";
 
     private async Task NavigateAndBoot()
     {
@@ -30,7 +30,7 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Peanuts and Dairy are pre-selected before Shellfish is clicked.
-        await Page.Locator($"#{Scope}Allergies_c1").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}Allergies_c1").ClickAsync();
 
         var echo = Page.Locator("#allergy-echo");
         await Expect(echo).ToHaveTextAsync("Peanuts,Shellfish,Dairy", new() { Timeout = 3000 });
@@ -42,7 +42,7 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}Allergies_c2").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}Allergies_c2").ClickAsync();
 
         var echo = Page.Locator("#allergy-echo");
         await Expect(echo).ToHaveTextAsync("Peanuts", new() { Timeout = 3000 });
@@ -54,10 +54,10 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}Allergies_c3").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}Allergies_c3").ClickAsync();
 
         // Hidden input is inside the container div, which carries the scoped ID.
-        var hidden = Page.Locator($"#{Scope}Allergies input[type='hidden']");
+        var hidden = Page.Locator($"#{ModelIdPrefix}Allergies input[type='hidden']");
         await Expect(hidden).ToHaveValueAsync("Peanuts,Dairy,Gluten", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
@@ -87,10 +87,10 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var nameInput = Page.Locator($"#{Scope}ResidentName");
+        var nameInput = Page.Locator($"#{ModelIdPrefix}ResidentName");
         await nameInput.FillAsync("Margaret Thompson");
 
-        await Page.Locator($"#{Scope}DietaryNeeds_c0").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}DietaryNeeds_c0").ClickAsync();
 
         await Page.Locator("#submit-btn").ClickAsync();
 
@@ -104,10 +104,10 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var nameInput = Page.Locator($"#{Scope}ResidentName");
+        var nameInput = Page.Locator($"#{ModelIdPrefix}ResidentName");
         await nameInput.FillAsync("Margaret Thompson");
 
-        await Page.Locator($"#{Scope}DietaryNeeds_c0").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}DietaryNeeds_c0").ClickAsync();
 
         // Intercept the POST because the array payload shape is the behavior under test.
         var request = await Page.RunAndWaitForRequestAsync(
@@ -148,8 +148,8 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}Allergies_c0").ClickAsync();
-        await Page.Locator($"#{Scope}Allergies_c2").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}Allergies_c0").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}Allergies_c2").ClickAsync();
 
         await Page.Locator("#check-allergy-btn").ClickAsync();
 
@@ -163,10 +163,10 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Expect(Page.Locator($"#{Scope}Allergies_c0")).ToBeCheckedAsync();
-        await Expect(Page.Locator($"#{Scope}Allergies_c1")).Not.ToBeCheckedAsync();
-        await Expect(Page.Locator($"#{Scope}Allergies_c2")).ToBeCheckedAsync();
-        await Expect(Page.Locator($"#{Scope}Allergies_c3")).Not.ToBeCheckedAsync();
+        await Expect(Page.Locator($"#{ModelIdPrefix}Allergies_c0")).ToBeCheckedAsync();
+        await Expect(Page.Locator($"#{ModelIdPrefix}Allergies_c1")).Not.ToBeCheckedAsync();
+        await Expect(Page.Locator($"#{ModelIdPrefix}Allergies_c2")).ToBeCheckedAsync();
+        await Expect(Page.Locator($"#{ModelIdPrefix}Allergies_c3")).Not.ToBeCheckedAsync();
         AssertNoConsoleErrors();
     }
 
@@ -175,7 +175,7 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var hidden = Page.Locator($"#{Scope}Allergies input[type='hidden']");
+        var hidden = Page.Locator($"#{ModelIdPrefix}Allergies input[type='hidden']");
         await Expect(hidden).ToHaveValueAsync("Peanuts,Dairy", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
@@ -186,9 +186,9 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
         await NavigateAndBoot();
 
         // Hidden inputs live inside container divs, which carry the scoped IDs.
-        await Expect(Page.Locator($"#{Scope}Allergies input[type='hidden']")).ToHaveCountAsync(1);
-        await Expect(Page.Locator($"#{Scope}Amenities input[type='hidden']")).ToHaveCountAsync(1);
-        await Expect(Page.Locator($"#{Scope}DietaryNeeds input[type='hidden']")).ToHaveCountAsync(1);
+        await Expect(Page.Locator($"#{ModelIdPrefix}Allergies input[type='hidden']")).ToHaveCountAsync(1);
+        await Expect(Page.Locator($"#{ModelIdPrefix}Amenities input[type='hidden']")).ToHaveCountAsync(1);
+        await Expect(Page.Locator($"#{ModelIdPrefix}DietaryNeeds input[type='hidden']")).ToHaveCountAsync(1);
         AssertNoConsoleErrors();
     }
 
@@ -241,13 +241,13 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
 
         var echo = Page.Locator("#allergy-echo");
 
-        await Page.Locator($"#{Scope}Allergies_c1").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}Allergies_c1").ClickAsync();
         await Expect(echo).ToHaveTextAsync("Peanuts,Shellfish,Dairy", new() { Timeout = 3000 });
 
-        await Page.Locator($"#{Scope}Allergies_c0").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}Allergies_c0").ClickAsync();
         await Expect(echo).ToHaveTextAsync("Shellfish,Dairy", new() { Timeout = 3000 });
 
-        await Page.Locator($"#{Scope}Allergies_c3").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}Allergies_c3").ClickAsync();
         await Expect(echo).ToHaveTextAsync("Shellfish,Dairy,Gluten", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();

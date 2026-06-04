@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 public class WhenRadioOptionSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NativeRadioGroup";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeRadioGroupModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeRadioGroupModel__";
 
     private async Task NavigateAndBoot()
     {
@@ -29,7 +29,7 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}MealPlan_r1").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}MealPlan_r1").ClickAsync();
 
         var echo = Page.Locator("#meal-echo");
         await Expect(echo).ToHaveTextAsync("Vegetarian", new() { Timeout = 3000 });
@@ -41,9 +41,9 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}MealPlan_r2").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}MealPlan_r2").ClickAsync();
 
-        var hidden = Page.Locator($"input[type='hidden']#{Scope}MealPlan");
+        var hidden = Page.Locator($"input[type='hidden']#{ModelIdPrefix}MealPlan");
         await Expect(hidden).ToHaveValueAsync("Diabetic", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
@@ -53,7 +53,7 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}CareLevel_r1").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}CareLevel_r1").ClickAsync();
 
         var notice = Page.Locator("#care-notice");
         await Expect(notice).ToHaveTextAsync("Memory Care selected — assessment score required", new() { Timeout = 3000 });
@@ -65,7 +65,7 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}CareLevel_r2").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}CareLevel_r2").ClickAsync();
 
         var notice = Page.Locator("#care-notice");
         await Expect(notice).ToHaveTextAsync("Standard admission process", new() { Timeout = 3000 });
@@ -89,10 +89,10 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var nameInput = Page.Locator($"#{Scope}ResidentName");
+        var nameInput = Page.Locator($"#{ModelIdPrefix}ResidentName");
         await nameInput.FillAsync("Margaret Thompson");
 
-        await Page.Locator($"#{Scope}RoomType_r1").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}RoomType_r1").ClickAsync();
 
         await Page.Locator("#submit-btn").ClickAsync();
 
@@ -106,7 +106,7 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}CareLevel_r0").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}CareLevel_r0").ClickAsync();
 
         await Page.Locator("#check-care-btn").ClickAsync();
 
@@ -134,13 +134,13 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
 
         var notice = Page.Locator("#care-notice");
 
-        await Page.Locator($"#{Scope}CareLevel_r1").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}CareLevel_r1").ClickAsync();
         await Expect(notice).ToHaveTextAsync("Memory Care selected — assessment score required", new() { Timeout = 3000 });
 
-        await Page.Locator($"#{Scope}CareLevel_r0").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}CareLevel_r0").ClickAsync();
         await Expect(notice).ToHaveTextAsync("Standard admission process", new() { Timeout = 3000 });
 
-        await Page.Locator($"#{Scope}CareLevel_r1").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}CareLevel_r1").ClickAsync();
         await Expect(notice).ToHaveTextAsync("Memory Care selected — assessment score required", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();
@@ -151,9 +151,9 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Expect(Page.Locator($"input[type='hidden']#{Scope}CareLevel")).ToHaveCountAsync(1);
-        await Expect(Page.Locator($"input[type='hidden']#{Scope}MealPlan")).ToHaveCountAsync(1);
-        await Expect(Page.Locator($"input[type='hidden']#{Scope}RoomType")).ToHaveCountAsync(1);
+        await Expect(Page.Locator($"input[type='hidden']#{ModelIdPrefix}CareLevel")).ToHaveCountAsync(1);
+        await Expect(Page.Locator($"input[type='hidden']#{ModelIdPrefix}MealPlan")).ToHaveCountAsync(1);
+        await Expect(Page.Locator($"input[type='hidden']#{ModelIdPrefix}RoomType")).ToHaveCountAsync(1);
         AssertNoConsoleErrors();
     }
 

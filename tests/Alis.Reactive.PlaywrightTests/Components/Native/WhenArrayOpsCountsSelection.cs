@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 public class WhenArrayOpsCountsSelection : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/ArrayOps";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ArrayOpsModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ArrayOpsModel__";
 
     private async Task NavigateAndBoot()
     {
@@ -29,7 +29,7 @@ public class WhenArrayOpsCountsSelection : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}SelectedActivities_c0").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}SelectedActivities_c0").ClickAsync();
 
         var count = Page.Locator("#selected-count");
         await Expect(count).ToHaveTextAsync("1", new() { Timeout = 3000 });
@@ -41,8 +41,8 @@ public class WhenArrayOpsCountsSelection : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}SelectedActivities_c0").ClickAsync();
-        await Page.Locator($"#{Scope}SelectedActivities_c1").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}SelectedActivities_c0").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}SelectedActivities_c1").ClickAsync();
 
         var count = Page.Locator("#selected-count");
         await Expect(count).ToHaveTextAsync("2", new() { Timeout = 3000 });
@@ -54,9 +54,9 @@ public class WhenArrayOpsCountsSelection : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}SelectedActivities_c0").ClickAsync();
-        await Page.Locator($"#{Scope}SelectedActivities_c1").ClickAsync();
-        await Page.Locator($"#{Scope}SelectedActivities_c0").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}SelectedActivities_c0").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}SelectedActivities_c1").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}SelectedActivities_c0").ClickAsync();
 
         var count = Page.Locator("#selected-count");
         await Expect(count).ToHaveTextAsync("1", new() { Timeout = 3000 });
@@ -69,7 +69,7 @@ public class WhenArrayOpsCountsSelection : PlaywrightTestBase
         await NavigateAndBoot();
 
         for (var i = 0; i < 5; i++)
-            await Page.Locator($"#{Scope}SelectedActivities_c{i}").ClickAsync();
+            await Page.Locator($"#{ModelIdPrefix}SelectedActivities_c{i}").ClickAsync();
 
         var count = Page.Locator("#selected-count");
         await Expect(count).ToHaveTextAsync("5", new() { Timeout = 3000 });

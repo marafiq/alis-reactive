@@ -14,9 +14,9 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     private const string Path = "/Sandbox/Components/MultiSelect";
 
     // Controlled component IDs follow IdGenerator's type-scope + property convention.
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_MultiSelectModel";
-    private const string AllergiesId = Scope + "__Allergies";
-    private const string DietaryRestrictionsId = Scope + "__DietaryRestrictions";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_MultiSelectModel";
+    private const string AllergiesId = GeneratedTypeScope + "__Allergies";
+    private const string DietaryRestrictionsId = GeneratedTypeScope + "__DietaryRestrictions";
 
     private MultiSelectLocator Allergies => new(Page, AllergiesId);
     private MultiSelectLocator DietaryRestrictions => new(Page, DietaryRestrictionsId);
@@ -199,7 +199,7 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    private const string SuppliesId = Scope + "__Supplies";
+    private const string SuppliesId = GeneratedTypeScope + "__Supplies";
 
     /// <summary>
     /// Types real keystrokes into the Syncfusion filtering input. FillAsync does not

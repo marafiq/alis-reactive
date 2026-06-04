@@ -6,15 +6,15 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 public class WhenUsingFusionGridBilling : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/Billing";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentBillingViewModel";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentBillingViewModel";
     private const string GridId = "billing-grid";
 
-    private FusionTextBoxLocator NewResidentName => new(Page, Scope + "__NewResidentName");
-    private DropDownListLocator NewCareLevel => new(Page, Scope + "__NewCareLevel");
-    private NumericTextBoxLocator NewMonthlyRate => new(Page, Scope + "__NewMonthlyRate");
-    private NumericTextBoxLocator NewAddOnCharges => new(Page, Scope + "__NewAddOnCharges");
+    private FusionTextBoxLocator NewResidentName => new(Page, GeneratedTypeScope + "__NewResidentName");
+    private DropDownListLocator NewCareLevel => new(Page, GeneratedTypeScope + "__NewCareLevel");
+    private NumericTextBoxLocator NewMonthlyRate => new(Page, GeneratedTypeScope + "__NewMonthlyRate");
+    private NumericTextBoxLocator NewAddOnCharges => new(Page, GeneratedTypeScope + "__NewAddOnCharges");
 
-    private ILocator ErrorFor(string property) => Page.Locator($"#{Scope}__{property}_error");
+    private ILocator ErrorFor(string property) => Page.Locator($"#{GeneratedTypeScope}__{property}_error");
     private ILocator FirstRowCell(int columnIndex) =>
         Page.Locator($"#{GridId} .e-row").First.Locator(".e-rowcell").Nth(columnIndex);
 

@@ -15,8 +15,8 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
     private const string Path = "/Sandbox/Components/InputMask";
 
     // IdGenerator produces: {TypeScope}__{PropertyName}
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_InputMaskModel";
-    private const string PhoneNumberId = Scope + "__PhoneNumber";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_InputMaskModel";
+    private const string PhoneNumberId = GeneratedTypeScope + "__PhoneNumber";
 
     private InputMaskLocator PhoneNumber => new(Page, PhoneNumberId);
 

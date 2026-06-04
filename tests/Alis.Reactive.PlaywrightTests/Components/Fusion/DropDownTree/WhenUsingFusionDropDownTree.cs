@@ -6,8 +6,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DropDownTree;
 public class WhenUsingFusionDropDownTree : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionDropDownTree";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionDropDownTreeModel";
-    private const string ResidentIdsId = Scope + "__ResidentIds";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionDropDownTreeModel";
+    private const string ResidentIdsId = GeneratedTypeScope + "__ResidentIds";
 
     private FusionDropDownTreeLocator ResidentTree => new(Page, ResidentIdsId);
 

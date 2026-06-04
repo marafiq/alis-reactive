@@ -6,8 +6,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Rating;
 public class WhenUsingFusionRating : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Rating";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_RatingModel";
-    private const string SatisfactionScoreId = Scope + "__SatisfactionScore";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_RatingModel";
+    private const string SatisfactionScoreId = GeneratedTypeScope + "__SatisfactionScore";
 
     private FusionRatingLocator SatisfactionScore => new(Page, SatisfactionScoreId);
 

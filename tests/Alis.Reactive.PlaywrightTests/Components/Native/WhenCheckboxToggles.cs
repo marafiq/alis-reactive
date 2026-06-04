@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 public class WhenCheckboxToggles : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/CheckBox";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_CheckBoxModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_CheckBoxModel__";
 
     private async Task NavigateAndBoot()
     {
@@ -42,7 +42,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         // ReceivesMedication starts checked in the model, but DomReady calls SetChecked(false).
         await NavigateAndBoot();
 
-        var medicationCheckbox = Page.Locator($"#{Scope}ReceivesMedication");
+        var medicationCheckbox = Page.Locator($"#{ModelIdPrefix}ReceivesMedication");
         await Expect(medicationCheckbox).Not.ToBeCheckedAsync(new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
@@ -64,7 +64,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
 
         await Expect(Page.Locator("#restrictions-panel")).ToBeHiddenAsync();
 
-        await Page.Locator($"#{Scope}HasDietaryRestrictions").CheckAsync();
+        await Page.Locator($"#{ModelIdPrefix}HasDietaryRestrictions").CheckAsync();
 
         await Expect(Page.Locator("#restrictions-panel"))
             .ToBeVisibleAsync(new() { Timeout = 3000 });
@@ -78,11 +78,11 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}HasDietaryRestrictions").CheckAsync();
+        await Page.Locator($"#{ModelIdPrefix}HasDietaryRestrictions").CheckAsync();
         await Expect(Page.Locator("#restrictions-panel"))
             .ToBeVisibleAsync(new() { Timeout = 3000 });
 
-        await Page.Locator($"#{Scope}HasDietaryRestrictions").UncheckAsync();
+        await Page.Locator($"#{ModelIdPrefix}HasDietaryRestrictions").UncheckAsync();
 
         await Expect(Page.Locator("#restrictions-panel"))
             .ToBeHiddenAsync(new() { Timeout = 3000 });
@@ -97,7 +97,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         await NavigateAndBoot();
 
         // DomReady unchecked the value under test.
-        await Page.Locator($"#{Scope}ReceivesMedication").CheckAsync();
+        await Page.Locator($"#{ModelIdPrefix}ReceivesMedication").CheckAsync();
 
         await Page.Locator("#check-medication-btn").ClickAsync();
 
@@ -125,7 +125,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         // The full show-hide-show cycle catches stale visibility state.
         await NavigateAndBoot();
 
-        var dietaryRestrictionsCheckbox = Page.Locator($"#{Scope}HasDietaryRestrictions");
+        var dietaryRestrictionsCheckbox = Page.Locator($"#{ModelIdPrefix}HasDietaryRestrictions");
         var panel = Page.Locator("#restrictions-panel");
         var status = Page.Locator("#restrictions-status");
 
@@ -150,7 +150,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         // The component-read condition must re-evaluate after each checkbox state change.
         await NavigateAndBoot();
 
-        var medicationCheckbox = Page.Locator($"#{Scope}ReceivesMedication");
+        var medicationCheckbox = Page.Locator($"#{ModelIdPrefix}ReceivesMedication");
         var checkMedicationButton = Page.Locator("#check-medication-btn");
         var warning = Page.Locator("#medication-warning");
 
@@ -234,9 +234,9 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         // If IdGenerator changes, these elements vanish and all reactive wiring breaks.
         await NavigateAndBoot();
 
-        await Expect(Page.Locator($"#{Scope}ReceivesMedication")).ToBeVisibleAsync();
-        await Expect(Page.Locator($"#{Scope}AllowsVisitors")).ToBeVisibleAsync();
-        await Expect(Page.Locator($"#{Scope}HasDietaryRestrictions")).ToBeVisibleAsync();
+        await Expect(Page.Locator($"#{ModelIdPrefix}ReceivesMedication")).ToBeVisibleAsync();
+        await Expect(Page.Locator($"#{ModelIdPrefix}AllowsVisitors")).ToBeVisibleAsync();
+        await Expect(Page.Locator($"#{ModelIdPrefix}HasDietaryRestrictions")).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
@@ -247,9 +247,9 @@ public class WhenCheckboxToggles : PlaywrightTestBase
         // type changes, the runtime's el.checked read/write path breaks silently.
         await NavigateAndBoot();
 
-        var medication = Page.Locator($"#{Scope}ReceivesMedication");
-        var visitors = Page.Locator($"#{Scope}AllowsVisitors");
-        var dietary = Page.Locator($"#{Scope}HasDietaryRestrictions");
+        var medication = Page.Locator($"#{ModelIdPrefix}ReceivesMedication");
+        var visitors = Page.Locator($"#{ModelIdPrefix}AllowsVisitors");
+        var dietary = Page.Locator($"#{ModelIdPrefix}HasDietaryRestrictions");
 
         await Expect(medication).ToHaveAttributeAsync("type", "checkbox");
         await Expect(visitors).ToHaveAttributeAsync("type", "checkbox");

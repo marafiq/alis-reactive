@@ -6,16 +6,16 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 public class WhenUsingFusionGridEditing : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/Editing";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentGridEditingModel";
-    private const string ResidentNameId = Scope + "__ResidentName";
-    private const string RiskLevelId = Scope + "__RiskLevel";
-    private const string OpenTasksId = Scope + "__OpenTasks";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentGridEditingModel";
+    private const string ResidentNameId = GeneratedTypeScope + "__ResidentName";
+    private const string RiskLevelId = GeneratedTypeScope + "__RiskLevel";
+    private const string OpenTasksId = GeneratedTypeScope + "__OpenTasks";
 
     private FusionTextBoxLocator ResidentName => new(Page, ResidentNameId);
     private DropDownListLocator RiskLevel => new(Page, RiskLevelId);
     private NumericTextBoxLocator OpenTasks => new(Page, OpenTasksId);
 
-    private ILocator ErrorFor(string property) => Page.Locator($"#{Scope}__{property}_error");
+    private ILocator ErrorFor(string property) => Page.Locator($"#{GeneratedTypeScope}__{property}_error");
 
     private async Task NavigateEditing()
     {

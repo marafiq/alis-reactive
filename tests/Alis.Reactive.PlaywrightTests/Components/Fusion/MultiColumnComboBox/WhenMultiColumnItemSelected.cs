@@ -12,8 +12,8 @@ public class WhenMultiColumnItemSelected : PlaywrightTestBase
     private const string Path = "/Sandbox/Components/MultiColumnComboBox";
 
     // Generated component IDs are the DOM/plan join keys under test.
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_MultiColumnComboBoxModel";
-    private const string FacilityId = Scope + "__Facility";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_MultiColumnComboBoxModel";
+    private const string FacilityId = GeneratedTypeScope + "__Facility";
 
     private MultiColumnComboBoxLocator Facility => new(Page, FacilityId);
 

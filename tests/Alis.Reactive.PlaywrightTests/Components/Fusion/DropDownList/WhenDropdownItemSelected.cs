@@ -12,8 +12,8 @@ public class WhenDropdownItemSelected : PlaywrightTestBase
     private const string Path = "/Sandbox/Components/DropDownList";
 
     // Generated component IDs are the DOM/plan join keys under test.
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DropDownListModel";
-    private const string CategoryId = Scope + "__Category";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DropDownListModel";
+    private const string CategoryId = GeneratedTypeScope + "__Category";
 
     private DropDownListLocator Category => new(Page, CategoryId);
 

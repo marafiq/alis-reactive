@@ -15,9 +15,9 @@ public class WhenDateSelected : PlaywrightTestBase
     private const string Path = "/Sandbox/Components/FusionDatePicker";
 
     // IdGenerator produces: {TypeScope}__{PropertyName}
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionDatePickerModel";
-    private const string AdmissionDateId = Scope + "__AdmissionDate";
-    private const string DischargeDateId = Scope + "__DischargeDate";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionDatePickerModel";
+    private const string AdmissionDateId = GeneratedTypeScope + "__AdmissionDate";
+    private const string DischargeDateId = GeneratedTypeScope + "__DischargeDate";
 
     private DatePickerLocator AdmissionDate => new(Page, AdmissionDateId);
     private DatePickerLocator DischargeDate => new(Page, DischargeDateId);
@@ -55,8 +55,7 @@ public class WhenDateSelected : PlaywrightTestBase
         await Expect(wrapper).ToBeVisibleAsync();
 
         // Set-prop writes Syncfusion ej2.value; the visible input proves it applied.
-        var dp = AdmissionDate;
-        var inputValue = await dp.Input.InputValueAsync();
+        var inputValue = await AdmissionDate.Input.InputValueAsync();
         Assert.That(inputValue, Is.Not.Null.And.Not.Empty,
             $"Expected FusionDatePicker input to have a value but got '{inputValue}'");
 
