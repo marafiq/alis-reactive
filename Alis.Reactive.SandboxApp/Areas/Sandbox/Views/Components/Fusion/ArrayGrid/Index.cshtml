@@ -10,10 +10,7 @@
 
     var plan = Html.ReactivePlan<ArrayGridModel>();
 
-    // First-class value routing: an array value flows into a component's dataSource member the
-    // same way any value flows to any member. The roster loads once over HTTP, then a client-side
-    // ReactiveArray transform (OrderBy over the Name element member) routes straight into the grid
-    // via SetDataSource(TypedSource<T[]>). No per-row plumbing, no hand-written JS.
+    // The HTTP array flows through ReactiveArray ordering before binding the grid dataSource.
     Html.On(plan, t => t.DomReady(p =>
         p.Get("/Sandbox/Components/ArrayGrid/Residents")
          .Response(r => r.OnSuccess<ResidentRosterResponse>((json, s) =>
@@ -24,8 +21,7 @@
              s.Element("grid-status").SetText("roster loaded");
          }))));
 
-    // Re-filter the rows ALREADY on screen: read the grid's own dataSource member, keep the
-    // active residents, rebind. Entirely client-side over element members — no server call.
+    // This stays client-side by reading and rebinding the grid's current dataSource.
     Html.NativeButton("show-active-btn", "Show Active Only")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {

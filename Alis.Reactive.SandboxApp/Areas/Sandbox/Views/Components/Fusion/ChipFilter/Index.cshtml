@@ -19,9 +19,7 @@
         new() { Text = "Skilled Nursing", Value = "skilled" },
     };
 
-    // The chip selection is broadcast as a custom event; p.From(payload, x => x.Selection.Data) yields
-    // a ReactiveArray of the selected chip OBJECTS, operated on by member (Count, Any-by-Value guard).
-    // The selected texts then gather into a POST that filters the grid server-side.
+    // The custom event carries selected chip objects for ReactiveArray guards and selected texts for server filtering.
     Html.On(plan, t => t.CustomEvent<ChipFilterPayload>("filters-applied", (payload, p) =>
     {
         var selected = p.From(payload, x => x.Selection.Data);
@@ -41,7 +39,6 @@
          }));
     }));
 
-    // Initial load: all residents.
     Html.On(plan, t => t.DomReady(p =>
         p.Get("/Sandbox/Components/ChipFilter/Residents")
          .Response(r => r.OnSuccess<CareResidentResponse>((json, s) =>
@@ -50,7 +47,6 @@
              s.Element("filter-status").SetText("all residents");
          }))));
 
-    // Apply: read the chip selection and broadcast it.
     Html.NativeButton("apply-filters-btn", "Apply Filters")
         .Reactive(plan, evt => evt.Click, (args, p) =>
             p.DispatchWith<ChipFilterPayload>("filters-applied", b =>
