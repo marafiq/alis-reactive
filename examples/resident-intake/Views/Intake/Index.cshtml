@@ -3,7 +3,6 @@
     ViewData["Title"] = "New Resident Intake";
     var plan = Html.ReactivePlan<ResidentIntakeModel>();
 
-    // ── DomReady: Load facility + care level lookups via parallel HTTP ──
     Html.On(plan, t => t.DomReady(pipeline =>
     {
         pipeline.Parallel(
@@ -29,7 +28,6 @@
         });
     }));
 
-    // ── CustomEvent: loads summary into drawer after save ──
     Html.On(plan, t => t.CustomEvent("intake-saved", pipeline =>
     {
         pipeline.Get("/Intake/Summary")
@@ -58,9 +56,6 @@
     <native-card-body>
         <form id="intake-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4" hidden>
 
-            @* ═══════════════════════════════════════════════════════ *@
-            @* PERSONAL INFORMATION                                    *@
-            @* ═══════════════════════════════════════════════════════ *@
             <div class="col-span-full">
                 <native-heading level="H3">Personal Information</native-heading>
             </div>
@@ -79,9 +74,6 @@
                 .FusionDatePicker(b => b
                     .Placeholder("Select date of birth")); }
 
-            @* ═══════════════════════════════════════════════════════ *@
-            @* PLACEMENT                                               *@
-            @* ═══════════════════════════════════════════════════════ *@
             <div class="col-span-full mt-2">
                 <native-heading level="H3">Placement</native-heading>
             </div>
@@ -92,7 +84,6 @@
                     .Fields<LookupItem>(t => t.Name, v => v.Id)
                     .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
                     {
-                        // ── Parallel: cascade units + facility info + facility requirements ──
                         pipeline.Parallel(
                             a => a.Get("/Intake/Units")
                                 .Gather(g => g
@@ -131,7 +122,6 @@
                     .Fields<LookupItem>(t => t.Name, v => v.Id)
                     .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
                     {
-                        // ── Condition: "Memory Care" → show cognitive assessment ──
                         pipeline.When(args, a => a.Value).Eq("memory-care")
                             .Then(t => t.Element("cognitive-section").Show())
                             .Else(e => e.Element("cognitive-section").Hide());
@@ -152,9 +142,6 @@
                         .Placeholder("Assessment date")); }
             </div>
 
-            @* ═══════════════════════════════════════════════════════ *@
-            @* MEDICAL                                                 *@
-            @* ═══════════════════════════════════════════════════════ *@
             <div class="col-span-full mt-2">
                 <native-heading level="H3">Medical</native-heading>
             </div>
@@ -166,7 +153,6 @@
                         .CssClass("h-4 w-4 rounded border-border text-accent")
                         .Reactive(plan, evt => evt.Changed, (args, pipeline) =>
                         {
-                            // ── Condition: checkbox → show/hide physician field ──
                             pipeline.When(args, a => a.Checked).Truthy()
                                 .Then(t => t.Element("physician-section").Show())
                                 .Else(e => e.Element("physician-section").Hide());
@@ -181,9 +167,6 @@
                         .Placeholder("Dr. Smith")); }
             </div>
 
-            @* ═══════════════════════════════════════════════════════ *@
-            @* EMERGENCY CONTACT                                       *@
-            @* ═══════════════════════════════════════════════════════ *@
             <div class="col-span-full mt-2">
                 <native-heading level="H3">Emergency Contact</native-heading>
             </div>
@@ -202,15 +185,11 @@
 
         </form>
 
-        @* ═══════════════════════════════════════════════════════ *@
-        @* FORM ACTIONS                                            *@
-        @* ═══════════════════════════════════════════════════════ *@
         <div id="form-actions" class="mt-6 flex items-center gap-3" hidden>
             @(Html.NativeButton("submit-intake", "Submit Intake")
                 .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90")
                 .Reactive(plan, evt => evt.Click, (args, pipeline) =>
                 {
-                    // ── Confirm → POST → Validate → Toast → Chained confirmation # ──
                     pipeline.Confirm("Submit this resident intake? Please verify all information is correct.")
                         .Then(t =>
                         {
@@ -249,9 +228,6 @@
                 }))
         </div>
 
-        @* ═══════════════════════════════════════════════════════ *@
-        @* POST-SAVE SECTION (hidden until save succeeds)          *@
-        @* ═══════════════════════════════════════════════════════ *@
         <div id="post-save-section" class="mt-6 p-4 rounded-md border border-border bg-surface-alt" hidden>
             <div class="flex items-center gap-2 mb-2">
                 <span class="w-2 h-2 rounded-full bg-green-500"></span>
@@ -265,7 +241,6 @@
                     .CssClass("rounded-md border border-border px-4 py-1.5 text-sm font-medium hover:bg-surface-alt")
                     .Reactive(plan, evt => evt.Click, (args, pipeline) =>
                     {
-                        // ── Dispatch event → CustomEvent handler loads drawer ──
                         pipeline.Dispatch("intake-saved");
                     }))
             </div>
@@ -274,9 +249,6 @@
     </native-card-body>
     </native-card>
 
-    @* ═══════════════════════════════════════════════════════ *@
-    @* PLAN JSON (developer reference)                         *@
-    @* ═══════════════════════════════════════════════════════ *@
     <native-card>
     <native-card-body>
         <native-heading level="H3">Plan JSON</native-heading>
