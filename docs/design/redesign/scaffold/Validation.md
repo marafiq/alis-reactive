@@ -653,7 +653,7 @@ Every fixture below is a **named row** in
 [`04-matrix-validation-components-slots.md`](../04-matrix-validation-components-slots.md),
 **Band A**. The module is not done until each is covered by a C# domain test (the DSL
 call produces the node), a TS runtime test (`ruleFails`/`validateContainer` behavior
-in jsdom), and a Playwright slice (browser-visible). Cases are listed by name.
+in jsdom), and a Playwright slice (page-visible). Cases are listed by name.
 
 ### A1 — the 18 rule types (one `RuleName` × operand-execution cell each)
 

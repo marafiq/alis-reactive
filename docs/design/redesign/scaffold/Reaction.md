@@ -542,7 +542,7 @@ Condition.)
 3. The C# node shape change (`lane` on Sequence/Branch) is regenerated into `plan.ts`
    by the **Kind** kernel; `npm run typecheck` passes; `assertNever` stays exhaustive.
 4. No new nullable property and no new `[JsonIgnore(WhenWritingNull)]` (Rule 6 gate).
-5. Runtime assets rebuilt before Playwright; browser-visible rows (`element-show-hide`,
+5. Runtime assets rebuilt before Playwright; page-visible rows (`element-show-hide`,
    `inject-success-body`, `confirm-then`) proved with Playwright against fresh assets.
 6. `git status` clean; commit names the closed row(s).
 ```

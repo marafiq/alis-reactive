@@ -72,7 +72,8 @@ Fusion package and sandbox:
 ## Organization Principles
 
 1. Preserve behavior first. Moves must not change generated plan JSON, runtime
-   execution, browser-visible routes, public DSL names, or public component API.
+   execution, MVC routes, page-visible behavior, public DSL names, or public
+   component API.
 2. Preserve Fusion vertical slices. Do not flatten source slices into generic
    folders such as `Events`, `Builders`, or `Extensions` across components.
 3. Make the main architecture flow visible:
@@ -240,7 +241,7 @@ Proof:
 
 ### 5. Sandbox and Playwright Slice Alignment
 
-Goal: make browser-visible examples and tests easier to navigate without
+Goal: make page-visible examples and tests easier to navigate without
 collapsing vertical slices or changing routes.
 
 Rules:

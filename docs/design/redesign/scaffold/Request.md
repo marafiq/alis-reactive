@@ -584,7 +584,7 @@ export function resolveRequestInput(input: RequestInput, method: HttpMethod, pla
 From [`04-matrix-http-arrays-values.md`](../04-matrix-http-arrays-values.md) Part B.
 Each row below is a fixture the slice must satisfy. Prove C# lowering with a domain
 test (the DSL call → the exact node) and runtime behavior with a vitest in
-`http.test.ts` / `gather.test.ts`; Playwright proves the browser-visible ones.
+`http.test.ts` / `gather.test.ts`; Playwright proves the page-visible ones.
 
 **B.1 Verbs**
 1. `GET` — `p.Get("/api/x")` → `method:"GET"`, query-string egress, no body.

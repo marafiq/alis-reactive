@@ -9,7 +9,7 @@ Close matrix row: repository organization only -> PlanAuthoring/PlanModel/runtim
 This document is the execution blueprint. It keeps the existing analysis document
 as background context and makes the implementation decisions required to move
 files without changing public DSL/API behavior, generated plan JSON, runtime
-behavior, MVC routes, or browser-visible behavior.
+behavior, MVC routes, or page-visible behavior.
 
 ## Target Organization
 

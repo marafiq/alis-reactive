@@ -658,7 +658,7 @@ These are the named Trigger-band rows from
 ("Trigger band — `Trigger` module"). Each is the proof for the `// TODO` markers above.
 A row is satisfied by: one C# domain test (DSL call → expected `StartsWhen` node + wire
 JSON), and one TS runtime test (`wireTrigger` attaches the listener and feeds the right
-`ExecutionContext`), plus a Playwright slice for browser-visible kinds.
+`ExecutionContext`), plus a Playwright slice for page-visible kinds.
 
 | Fixture name | Matrix row | Proves | C# `// TODO` | TS `// TODO` |
 |---|---|---|---|---|

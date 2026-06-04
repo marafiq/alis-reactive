@@ -551,4 +551,4 @@ is done when its case's exact plan JSON + browser behavior matches the row.
 > the gather-source hole) are closed. Prove with: C# domain test (DSL call → node
 > shape, fixtures 1–31), TS runtime test (`evaluateValue` behavior in jsdom),
 > `npm run typecheck` (generated `plan.ts` agrees), and a Playwright slice for the
-> browser-visible read (e.g. component property → `SetText`).
+> page-visible read (e.g. component property → `SetText`).
