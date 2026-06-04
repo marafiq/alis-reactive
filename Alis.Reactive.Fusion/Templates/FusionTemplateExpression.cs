@@ -7,15 +7,17 @@ namespace Alis.Reactive.Fusion.Templates
 {
     /// <summary>
     /// Converts C# expressions to Syncfusion template syntax.
-    /// m => m.PropertyName → ${PropertyName}
-    /// m => m.Address.City → ${Address.City}
-    /// m => m.Status == "Active" → Status === 'Active'
     /// </summary>
+    /// <remarks>
+    /// Examples include <c>m =&gt; m.PropertyName</c> becoming <c>${propertyName}</c>
+    /// and <c>m =&gt; m.Status == "Active"</c> becoming <c>status === 'Active'</c>.
+    /// </remarks>
     public static class FusionTemplateExpression
     {
         /// <summary>
-        /// Converts a property expression to Syncfusion binding syntax: ${PropertyName}
+        /// Converts a property expression to a Syncfusion binding token.
         /// </summary>
+        /// <returns>A binding token such as <c>${propertyName}</c>.</returns>
         public static string ToBinding<TModel, TProperty>(Expression<Func<TModel, TProperty>> expression)
         {
             var propertyPath = GetPropertyPath(expression.Body);
@@ -23,15 +25,16 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Converts a property expression to just the property path (without ${})
+        /// Converts a property expression to a Syncfusion template property path.
         /// </summary>
+        /// <returns>A property path without the surrounding binding token.</returns>
         public static string ToPropertyPath<TModel, TProperty>(Expression<Func<TModel, TProperty>> expression)
         {
             return GetPropertyPath(expression.Body);
         }
 
         /// <summary>
-        /// Converts a boolean predicate expression to Syncfusion condition syntax
+        /// Converts a boolean predicate expression to Syncfusion condition syntax.
         /// </summary>
         public static string ToCondition<TModel>(Expression<Func<TModel, bool>> predicate)
         {
@@ -55,7 +58,7 @@ namespace Alis.Reactive.Fusion.Templates
 
             while (current != null)
             {
-                // Convert to camelCase to match global JSON serialization (PascalCase C# → camelCase JSON)
+                // Template data uses the same camelCase names as generated JSON.
                 var name = current.Member.Name;
                 if (name.Length > 0)
                     name = char.ToLowerInvariant(name[0]) + name.Substring(1);
