@@ -389,8 +389,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // TODO: Replace rapid country-switch flakiness with stable behavior coverage
-    // for latest-selection-wins or stale cascade responses.
     [Test]
     public async Task selecting_different_city_updates_selected_city_display()
     {
@@ -414,4 +412,6 @@ public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 
         AssertNoConsoleErrors();
     }
+
+    // TODO: Add stable behavior coverage for country-cascade request staleness.
 }
