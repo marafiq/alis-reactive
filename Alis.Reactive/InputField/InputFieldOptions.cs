@@ -18,14 +18,12 @@ namespace Alis.Reactive.InputField
         /// <summary>
         /// Marks the field as required, showing a <c>*</c> indicator next to the label.
         /// </summary>
-        /// <returns>This options instance for chaining.</returns>
         public InputFieldOptions Required() { IsRequired = true; return this; }
 
         /// <summary>
         /// Sets the label text displayed above the input component.
         /// </summary>
         /// <param name="label">The label text to display.</param>
-        /// <returns>This options instance for chaining.</returns>
         public InputFieldOptions Label(string label) { LabelText = label; return this; }
     }
 }
