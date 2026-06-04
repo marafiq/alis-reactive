@@ -13,6 +13,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
         public bool IsInteracted { get; set; }
-        public FusionRichTextEditorChangeArgs() { }
     }
 }

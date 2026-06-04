@@ -17,7 +17,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>The Syncfusion event name.</summary>
         public string? Name { get; set; }
-        public FusionInPlaceEditorEndEditArgs() { }
     }
 
     /// <summary>Typed mutations on the endEdit event args for <see cref="FusionInPlaceEditor"/>.</summary>

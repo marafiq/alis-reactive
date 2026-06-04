@@ -11,8 +11,5 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Initializes a payload marker for Reactive Plan expression binding.
         /// </summary>
-        public FusionSidebarTransitionArgs()
-        {
-        }
     }
 }

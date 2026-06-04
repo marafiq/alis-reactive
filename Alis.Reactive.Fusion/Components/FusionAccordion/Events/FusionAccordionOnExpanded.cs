@@ -14,7 +14,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>True if the panel was expanded, false if collapsed.</summary>
         public bool IsExpanded { get; set; }
-
-        public FusionAccordionExpandedArgs() { }
     }
 }

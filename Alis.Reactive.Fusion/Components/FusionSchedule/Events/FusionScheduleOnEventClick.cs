@@ -7,7 +7,5 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Set to true before the callback returns to prevent the default quick-info popup.</summary>
         public bool Cancel { get; set; }
-
-        public FusionScheduleEventClickArgs() { }
     }
 }

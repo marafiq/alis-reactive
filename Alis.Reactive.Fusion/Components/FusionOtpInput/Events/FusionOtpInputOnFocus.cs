@@ -13,7 +13,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Gets or sets whether the focus came from user interaction.</summary>
         public bool IsInteracted { get; set; }
-
-        public FusionOtpInputFocusArgs() { }
     }
 }

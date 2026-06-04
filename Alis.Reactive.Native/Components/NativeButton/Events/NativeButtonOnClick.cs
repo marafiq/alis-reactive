@@ -9,6 +9,5 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public class NativeButtonClickArgs
     {
-        public NativeButtonClickArgs() { }
     }
 }

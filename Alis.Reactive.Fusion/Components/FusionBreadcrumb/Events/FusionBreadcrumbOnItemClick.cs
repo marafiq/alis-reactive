@@ -7,9 +7,6 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Gets or sets the clicked item metadata from the Syncfusion event.</summary>
         public FusionBreadcrumbItem Item { get; set; } = new FusionBreadcrumbItem();
-        public FusionBreadcrumbItemClickArgs()
-        {
-        }
     }
 
     /// <summary>

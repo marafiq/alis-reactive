@@ -13,7 +13,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Gets or sets whether the blur came from user interaction.</summary>
         public bool IsInteracted { get; set; }
-
-        public FusionOtpInputBlurArgs() { }
     }
 }

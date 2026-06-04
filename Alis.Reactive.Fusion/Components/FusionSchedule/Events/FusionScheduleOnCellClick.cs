@@ -19,7 +19,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>True if the all-day row was clicked.</summary>
         public bool IsAllDay { get; set; }
-
-        public FusionScheduleCellClickArgs() { }
     }
 }

@@ -32,8 +32,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Action details such as request type, column name, direction, and current page.</summary>
         public FusionGridAction Action { get; set; } = new FusionGridAction();
-
-        public FusionGridDataStateChangeArgs() { }
     }
 
     /// <summary>
@@ -47,8 +45,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Sort direction: <c>ascending</c> or <c>descending</c>.</summary>
         public string Direction { get; set; } = "";
-
-        public FusionGridSortColumn() { }
     }
 
     /// <summary>
@@ -82,8 +78,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Whether the filter ignores accents.</summary>
         public bool IgnoreAccent { get; set; }
-
-        public FusionGridTextFilterCriterion() { }
     }
 
     /// <summary>
@@ -105,8 +99,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Whether search ignores accents.</summary>
         public bool IgnoreAccent { get; set; }
-
-        public FusionGridSearchDescriptor() { }
     }
 
     /// <summary>
@@ -141,7 +133,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Current page size.</summary>
         public int PageSize { get; set; }
-
-        public FusionGridAction() { }
     }
 }

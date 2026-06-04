@@ -13,7 +13,5 @@ namespace Alis.Reactive.Native.Components
         /// Gets or sets the selected option's value after the change.
         /// </summary>
         public string? Value { get; set; }
-
-        public NativeDropDownChangeArgs() { }
     }
 }

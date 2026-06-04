@@ -16,8 +16,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Slide direction: Previous or Next.</summary>
         public string SlideDirection { get; set; } = string.Empty;
-        public FusionCarouselSlideChangedArgs()
-        {
-        }
     }
 }

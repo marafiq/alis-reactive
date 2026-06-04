@@ -18,7 +18,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Whether selection came from user interaction.</summary>
         public bool IsInteracted { get; set; }
-
-        public FusionGridRowSelectedArgs() { }
     }
 }

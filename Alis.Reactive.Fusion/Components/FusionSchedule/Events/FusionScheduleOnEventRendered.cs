@@ -15,8 +15,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Syncfusion render type, for example <c>event</c>.</summary>
         public string Type { get; set; } = "";
-
-        public FusionScheduleEventRenderedArgs() { }
     }
 
     /// <summary>
@@ -44,7 +42,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Assigned staff member role when available.</summary>
         public string? StaffRole { get; set; }
-
-        public FusionScheduleEventData() { }
     }
 }

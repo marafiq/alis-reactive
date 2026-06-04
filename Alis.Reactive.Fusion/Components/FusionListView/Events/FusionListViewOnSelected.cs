@@ -22,8 +22,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Gets or sets whether Syncfusion should cancel the selection.</summary>
         public bool Cancel { get; set; }
-
-        public FusionListViewSelectArgs() { }
     }
 
     public static class FusionListViewSelectArgsExtensions

@@ -11,7 +11,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>True when the user closed the dialog via X button or overlay click.</summary>
         public bool IsInteracted { get; set; }
-
-        public FusionDialogBeforeCloseArgs() { }
     }
 }

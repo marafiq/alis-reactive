@@ -12,8 +12,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Set true to cancel the default toolbar action.</summary>
         public bool Cancel { get; set; }
-
-        public FusionGridToolbarClickArgs() { }
     }
 
     /// <summary>
@@ -27,7 +25,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>The toolbar item display text.</summary>
         public string? Text { get; set; }
-
-        public FusionGridToolbarItem() { }
     }
 }

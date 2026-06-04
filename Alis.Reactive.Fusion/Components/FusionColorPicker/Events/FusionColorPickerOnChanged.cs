@@ -11,6 +11,5 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Gets or sets the selected color as a hex+alpha string (e.g. "#1dc7e1ff").</summary>
         public string? Value { get; set; }
-        public FusionColorPickerChangeArgs() { }
     }
 }

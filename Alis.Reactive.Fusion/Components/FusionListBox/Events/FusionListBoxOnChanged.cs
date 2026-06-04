@@ -7,7 +7,5 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Gets or sets the selected string values.</summary>
         public string[]? Value { get; set; }
-
-        public FusionListBoxChangeArgs() { }
     }
 }

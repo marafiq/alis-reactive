@@ -7,7 +7,5 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Syncfusion action name that completed, for example <c>eventChange</c> or <c>viewNavigate</c>.</summary>
         public string RequestType { get; set; } = "";
-
-        public FusionScheduleActionCompleteArgs() { }
     }
 }

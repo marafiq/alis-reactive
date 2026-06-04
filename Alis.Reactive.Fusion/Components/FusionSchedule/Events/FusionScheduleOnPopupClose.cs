@@ -7,7 +7,5 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Popup type that closed, for example <c>QuickInfo</c> or <c>Editor</c>.</summary>
         public string Type { get; set; } = "";
-
-        public FusionSchedulePopupCloseArgs() { }
     }
 }

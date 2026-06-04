@@ -10,7 +10,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Gets or sets the previously input text value.</summary>
         public string? PreviousValue { get; set; }
-
-        public FusionTextBoxInputArgs() { }
     }
 }

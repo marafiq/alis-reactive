@@ -23,7 +23,6 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Gets or sets the search text the user typed.</summary>
         public string Text { get; set; } = "";
-        public FusionMultiSelectFilteringArgs() { }
     }
 
     /// <summary>

@@ -13,6 +13,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Gets or sets the progress step interval.</summary>
         public double Step { get; set; }
-        public FusionProgressButtonProgressArgs() { }
     }
 }

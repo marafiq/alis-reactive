@@ -7,7 +7,6 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Gets or sets the selected item metadata from the Syncfusion select event.</summary>
         public FusionSplitButtonItem Item { get; set; } = new FusionSplitButtonItem();
-        public FusionSplitButtonSelectArgs() { }
     }
 
     /// <summary>

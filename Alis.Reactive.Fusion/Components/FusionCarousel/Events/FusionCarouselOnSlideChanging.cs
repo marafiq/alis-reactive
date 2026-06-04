@@ -22,9 +22,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Whether the slide change should be cancelled.</summary>
         public bool Cancel { get; set; }
-        public FusionCarouselSlideChangingArgs()
-        {
-        }
     }
 
     /// <summary>

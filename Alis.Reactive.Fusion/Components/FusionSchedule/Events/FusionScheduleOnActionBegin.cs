@@ -12,7 +12,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Set to true before the callback returns to cancel the action.</summary>
         public bool Cancel { get; set; }
-
-        public FusionScheduleActionBeginArgs() { }
     }
 }

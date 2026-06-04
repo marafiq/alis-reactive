@@ -13,7 +13,5 @@ namespace Alis.Reactive.Native.Components
         /// Gets or sets the value captured from the change event.
         /// </summary>
         public string? Value { get; set; }
-
-        public NativeTextBoxChangeArgs() { }
     }
 }

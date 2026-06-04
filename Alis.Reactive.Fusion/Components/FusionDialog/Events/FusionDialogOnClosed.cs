@@ -6,6 +6,5 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionDialogClosedArgs
     {
-        public FusionDialogClosedArgs() { }
     }
 }

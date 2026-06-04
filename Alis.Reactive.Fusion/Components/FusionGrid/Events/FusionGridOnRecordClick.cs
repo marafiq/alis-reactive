@@ -18,7 +18,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Syncfusion event name.</summary>
         public string? Name { get; set; }
-
-        public FusionGridRecordClickArgs() { }
     }
 }

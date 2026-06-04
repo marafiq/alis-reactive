@@ -8,7 +8,5 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Set to true to prevent the tooltip from closing.</summary>
         public bool Cancel { get; set; }
-
-        public FusionTooltipBeforeCloseArgs() { }
     }
 }

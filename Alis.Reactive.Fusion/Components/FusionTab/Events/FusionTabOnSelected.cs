@@ -18,7 +18,5 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Whether the selection was triggered by a swipe gesture.</summary>
         public bool IsSwiped { get; set; }
-
-        public FusionTabSelectedArgs() { }
     }
 }

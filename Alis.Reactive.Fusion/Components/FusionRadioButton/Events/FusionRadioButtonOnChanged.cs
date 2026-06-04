@@ -7,6 +7,5 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Gets or sets the selected radio button value from the Syncfusion change event.</summary>
         public string Value { get; set; } = string.Empty;
-        public FusionRadioButtonChangeArgs() { }
     }
 }

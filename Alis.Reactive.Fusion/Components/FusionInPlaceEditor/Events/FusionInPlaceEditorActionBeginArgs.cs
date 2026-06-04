@@ -19,7 +19,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Whether Syncfusion's built-in submit has been cancelled. Set via <see cref="FusionInPlaceEditorActionBeginArgsExtensions.PreventDefault"/>.</summary>
         public bool Cancel { get; set; }
-        public FusionInPlaceEditorActionBeginArgs() { }
     }
 
     /// <summary>Typed mutations on the actionBegin event args for <see cref="FusionInPlaceEditor"/>.</summary>

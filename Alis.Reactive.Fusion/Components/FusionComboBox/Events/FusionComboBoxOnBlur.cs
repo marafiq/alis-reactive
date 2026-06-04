@@ -8,6 +8,5 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionComboBoxBlurArgs
     {
-        public FusionComboBoxBlurArgs() { }
     }
 }

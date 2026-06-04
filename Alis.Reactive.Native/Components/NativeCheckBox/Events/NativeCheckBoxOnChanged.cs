@@ -13,7 +13,5 @@ namespace Alis.Reactive.Native.Components
         /// Gets or sets the checked state after the change.
         /// </summary>
         public bool? Checked { get; set; }
-
-        public NativeCheckBoxChangeArgs() { }
     }
 }

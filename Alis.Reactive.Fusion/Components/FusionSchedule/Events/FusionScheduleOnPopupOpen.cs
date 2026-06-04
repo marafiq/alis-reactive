@@ -17,8 +17,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Schedule event data associated with this popup when Syncfusion provides it.</summary>
         public FusionSchedulePopupData Data { get; set; } = new FusionSchedulePopupData();
-
-        public FusionSchedulePopupOpenArgs() { }
     }
 
     /// <summary>
@@ -31,8 +29,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Display title for the appointment.</summary>
         public string Subject { get; set; } = "";
-
-        public FusionSchedulePopupData() { }
     }
 
     /// <summary>

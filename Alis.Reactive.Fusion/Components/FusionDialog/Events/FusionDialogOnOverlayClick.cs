@@ -7,6 +7,5 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionDialogOverlayClickArgs
     {
-        public FusionDialogOverlayClickArgs() { }
     }
 }
