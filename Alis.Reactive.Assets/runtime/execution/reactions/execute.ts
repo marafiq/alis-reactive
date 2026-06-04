@@ -26,69 +26,69 @@ export type ReactionCompletion = void | Promise<void>;
 
 let activeRuntimePlan: RuntimePlan | undefined;
 
-export function setActivePlan(plan: PlanDocument): void {
-  activeRuntimePlan = RuntimePlan.from(plan);
+export function setActivePlan(planDocument: PlanDocument): void {
+  activeRuntimePlan = RuntimePlan.from(planDocument);
 }
 
 export function resetActivePlanForTests(): void {
   activeRuntimePlan = undefined;
 }
 
-function runtimePlanFor(plan: PlanDocument | undefined): RuntimePlan {
-  if (plan) return RuntimePlan.from(plan);
+function runtimePlanFor(planDocument: PlanDocument | undefined): RuntimePlan {
+  if (planDocument) return RuntimePlan.from(planDocument);
   if (activeRuntimePlan) return activeRuntimePlan;
   throw new Error("[alis] no active plan");
 }
 
 // Immediate reactions must stay synchronous so Syncfusion event arg mutations happen
-// in the same browser tick. request/parallel/confirm, or sequence/branch paths that
+// in the same event-handler turn. request/parallel/confirm, or sequence/branch paths that
 // reach one, return Promise<void>.
 
 export function executeReaction(
   reaction: ReactionGraph,
-  plan?: PlanDocument,
+  planDocument?: PlanDocument,
   ctx?: ExecContext,
 ): ReactionCompletion {
-  return executeReactionWith(reaction, runtimePlanFor(plan), ExecutionContext.from(ctx));
+  return executeReactionWith(reaction, runtimePlanFor(planDocument), ExecutionContext.from(ctx));
 }
 
 function executeReactionWith(
   reaction: ReactionGraph,
-  plan: RuntimePlan,
+  runtimePlan: RuntimePlan,
   context: ExecutionContext,
 ): ReactionCompletion {
   switch (reaction.kind) {
     case "set":
-      executeSet(reaction, plan, context);
+      executeSet(reaction, runtimePlan, context);
       return;
 
     case "call":
-      executeCall(reaction, plan, context);
+      executeCall(reaction, runtimePlan, context);
       return;
 
     case "dispatch":
-      executeDispatch(reaction, plan, context);
+      executeDispatch(reaction, runtimePlan, context);
       return;
 
     case "inject":
-      executeInject(reaction, plan, context);
+      executeInject(reaction, runtimePlan, context);
       return;
 
     case "show-validation-errors":
-      executeShowValidationErrors(reaction, plan, context);
+      executeShowValidationErrors(reaction, runtimePlan, context);
       return;
 
     case "sequence":
-      return executeSequence(reaction, plan, context);
+      return executeSequence(reaction, runtimePlan, context);
 
     case "branch":
-      return executeBranch(reaction, plan, context);
+      return executeBranch(reaction, runtimePlan, context);
 
     case "request":
-      return executeRequest(reaction.request, plan.document, context.raw);
+      return executeRequest(reaction.request, runtimePlan.document, context.raw);
 
     case "parallel":
-      return executeParallel(reaction, plan, context);
+      return executeParallel(reaction, runtimePlan, context);
 
     default:
       assertNever(reaction, "reaction kind");
@@ -97,44 +97,44 @@ function executeReactionWith(
 
 function executeSequence(
   reaction: SequenceReaction,
-  plan: RuntimePlan,
+  runtimePlan: RuntimePlan,
   context: ExecutionContext,
 ): ReactionCompletion {
   for (const [index, step] of reaction.steps.entries()) {
-    const result = executeReactionWith(step, plan, context);
+    const result = executeReactionWith(step, runtimePlan, context);
     if (crossedAsyncBoundary(result)) {
       const remaining = reaction.steps.slice(index + 1);
-      return result.then(() => executeRemainingSequence(remaining, plan, context));
+      return result.then(() => executeRemainingSequence(remaining, runtimePlan, context));
     }
   }
 }
 
 async function executeRemainingSequence(
   steps: readonly ReactionGraph[],
-  plan: RuntimePlan,
+  runtimePlan: RuntimePlan,
   context: ExecutionContext,
 ): Promise<void> {
   for (const step of steps) {
-    const result = executeReactionWith(step, plan, context);
+    const result = executeReactionWith(step, runtimePlan, context);
     if (crossedAsyncBoundary(result)) await result;
   }
 }
 
 function executeBranch(
   reaction: BranchReaction,
-  plan: RuntimePlan,
+  runtimePlan: RuntimePlan,
   context: ExecutionContext,
 ): ReactionCompletion {
-  return executeBranchFrom(reaction.cases, plan, context, 0);
+  return executeBranchFrom(reaction.cases, runtimePlan, context, 0);
 }
 
 async function executeParallel(
   reaction: ParallelReaction,
-  plan: RuntimePlan,
+  runtimePlan: RuntimePlan,
   context: ExecutionContext,
 ): Promise<void> {
   const settledSteps = await Promise.allSettled(
-    reaction.steps.map(step => reactionCompletion(executeReactionWith(step, plan, context))),
+    reaction.steps.map(step => reactionCompletion(executeReactionWith(step, runtimePlan, context))),
   );
   reportParallelStepFailures(settledSteps);
 
@@ -143,7 +143,7 @@ async function executeParallel(
       return;
 
     case "on-settled":
-      await waitForAsyncBoundary(executeReactionWith(reaction.completion.reaction, plan, context));
+      await waitForAsyncBoundary(executeReactionWith(reaction.completion.reaction, runtimePlan, context));
       return;
 
     default:
@@ -151,13 +151,13 @@ async function executeParallel(
   }
 }
 
-function executeSet(reaction: SetReaction, plan: RuntimePlan, context: ExecutionContext): void {
-  const value = evaluateValue(reaction.value, plan.document, context.raw);
+function executeSet(reaction: SetReaction, runtimePlan: RuntimePlan, context: ExecutionContext): void {
+  const value = evaluateValue(reaction.value, runtimePlan.document, context.raw);
 
   switch (reaction.on.kind) {
     case "component":
       log.trace("set", { target: reaction.on.component, property: reaction.property, value });
-      plan.objectForSource(reaction.on).set(reaction.property, value);
+      runtimePlan.objectForSource(reaction.on).set(reaction.property, value);
       return;
 
     case "payload":
@@ -167,8 +167,8 @@ function executeSet(reaction: SetReaction, plan: RuntimePlan, context: Execution
   }
 }
 
-function executeCall(reaction: CallReaction, plan: RuntimePlan, context: ExecutionContext): void {
-  const args = reaction.args.map(arg => evaluateValue(arg, plan.document, context.raw));
+function executeCall(reaction: CallReaction, runtimePlan: RuntimePlan, context: ExecutionContext): void {
+  const args = reaction.args.map(arg => evaluateValue(arg, runtimePlan.document, context.raw));
 
   switch (reaction.on.kind) {
     case "component":
@@ -178,7 +178,7 @@ function executeCall(reaction: CallReaction, plan: RuntimePlan, context: Executi
         method: reaction.method,
         args,
       });
-      plan.objectForSource(reaction.on).call(reaction.method, args);
+      runtimePlan.objectForSource(reaction.on).call(reaction.method, args);
       return;
 
     case "payload":
@@ -193,15 +193,15 @@ function executeCall(reaction: CallReaction, plan: RuntimePlan, context: Executi
   }
 }
 
-function executeDispatch(reaction: DispatchReaction, plan: RuntimePlan, context: ExecutionContext): void {
-  const detail = dispatchPayload(reaction, plan.document, context);
+function executeDispatch(reaction: DispatchReaction, runtimePlan: RuntimePlan, context: ExecutionContext): void {
+  const detail = dispatchPayload(reaction, runtimePlan.document, context);
   log.trace("dispatch", { event: reaction.event, detail });
   document.dispatchEvent(new CustomEvent(reaction.event, { detail }));
 }
 
-function executeInject(reaction: InjectReaction, plan: RuntimePlan, context: ExecutionContext): void {
-  const container = plan.components.element(reaction.slot);
-  const value = evaluateValue(reaction.value, plan.document, context.raw);
+function executeInject(reaction: InjectReaction, runtimePlan: RuntimePlan, context: ExecutionContext): void {
+  const container = runtimePlan.components.element(reaction.slot);
+  const value = evaluateValue(reaction.value, runtimePlan.document, context.raw);
   if (typeof value === "string") {
     injectPartial(container, value, reaction.slot);
     log.trace("inject.applied", { slot: reaction.slot, size: value.length });
@@ -214,18 +214,18 @@ function executeInject(reaction: InjectReaction, plan: RuntimePlan, context: Exe
 
 function executeShowValidationErrors(
   reaction: ShowValidationErrorsReaction,
-  plan: RuntimePlan,
+  runtimePlan: RuntimePlan,
   context: ExecutionContext,
 ): void {
   const payload: ServerValidationPayload = context.serverValidationPayload();
   if (payload.kind === "available") {
     log.debug("show-validation.server", { id: reaction.container });
-    showServerErrors(plan.document, reaction.container, payload.response);
+    showServerErrors(runtimePlan.document, reaction.container, payload.response);
     return;
   }
 
   log.debug("show-validation.client", { id: reaction.container });
-  validateContainer(plan.document, reaction.container, context.raw);
+  validateContainer(runtimePlan.document, reaction.container, context.raw);
 }
 
 function reportParallelStepFailures(results: readonly PromiseSettledResult<void>[]): void {
@@ -290,27 +290,27 @@ async function waitForAsyncBoundary(result: ReactionCompletion): Promise<void> {
   if (crossedAsyncBoundary(result)) await result;
 }
 
-function dispatchPayload(reaction: DispatchReaction, plan: PlanDocument, context: ExecutionContext): unknown {
+function dispatchPayload(reaction: DispatchReaction, planDocument: PlanDocument, context: ExecutionContext): unknown {
   if (reaction.payload.kind === "none") return {};
 
-  return evaluateValue(reaction.payload.data, plan, context.raw);
+  return evaluateValue(reaction.payload.data, planDocument, context.raw);
 }
 
 function executeBranchFrom(
   cases: readonly BranchCase[],
-  plan: RuntimePlan,
+  runtimePlan: RuntimePlan,
   context: ExecutionContext,
   startIndex: number,
 ): ReactionCompletion {
   for (let index = startIndex; index < cases.length; index++) {
     const branchCase = cases[index]!;
 
-    const guardMatches = branchGuardMatches(branchCase, plan.document, context);
+    const guardMatches = branchGuardMatches(branchCase, runtimePlan.document, context);
     if (guardMatches instanceof Promise) {
-      return executeAfterAsyncBranchGuard(cases, plan, context, index, branchCase, guardMatches);
+      return executeAfterAsyncBranchGuard(cases, runtimePlan, context, index, branchCase, guardMatches);
     }
 
-    if (guardMatches) return executeReactionWith(branchCase.reaction, plan, context);
+    if (guardMatches) return executeReactionWith(branchCase.reaction, runtimePlan, context);
   }
 
   log.trace("branch.no-match", { caseCount: cases.length });
@@ -318,30 +318,30 @@ function executeBranchFrom(
 
 async function executeAfterAsyncBranchGuard(
   cases: readonly BranchCase[],
-  plan: RuntimePlan,
+  runtimePlan: RuntimePlan,
   context: ExecutionContext,
   index: number,
   branchCase: BranchCase,
   guardMatches: Promise<boolean>,
 ): Promise<void> {
   if (await guardMatches) {
-    await waitForAsyncBoundary(executeReactionWith(branchCase.reaction, plan, context));
+    await waitForAsyncBoundary(executeReactionWith(branchCase.reaction, runtimePlan, context));
     return;
   }
 
-  await waitForAsyncBoundary(executeBranchFrom(cases, plan, context, index + 1));
+  await waitForAsyncBoundary(executeBranchFrom(cases, runtimePlan, context, index + 1));
 }
 
 function branchGuardMatches(
   branchCase: BranchCase,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
 ): boolean | Promise<boolean> {
   switch (branchCase.guard.kind) {
     case "default":
       return true;
     case "when":
-      return evaluateConditionInCurrentLane(branchCase.guard.condition, plan, context.raw);
+      return evaluateConditionInCurrentLane(branchCase.guard.condition, planDocument, context.raw);
     default:
       return assertNever(branchCase.guard, "branch guard");
   }
