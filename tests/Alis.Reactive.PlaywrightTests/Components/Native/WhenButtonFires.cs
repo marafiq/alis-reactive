@@ -29,8 +29,8 @@ public class WhenButtonFires : PlaywrightTestBase
 
         await Page.Locator("#btn-admit").ClickAsync();
 
-        var status = Page.Locator("#admit-status");
-        await Expect(status).ToHaveTextAsync("Admit Resident clicked", new() { Timeout = 3000 });
+        var admitStatus = Page.Locator("#admit-status");
+        await Expect(admitStatus).ToHaveTextAsync("Admit Resident clicked", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
 
@@ -51,8 +51,8 @@ public class WhenButtonFires : PlaywrightTestBase
 
         await Page.Locator("#btn-transfer").ClickAsync();
 
-        var status = Page.Locator("#transfer-status");
-        await Expect(status).ToHaveTextAsync("transfer confirmed", new() { Timeout = 3000 });
+        var transferStatus = Page.Locator("#transfer-status");
+        await Expect(transferStatus).ToHaveTextAsync("transfer confirmed", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
 
@@ -85,8 +85,8 @@ public class WhenButtonFires : PlaywrightTestBase
         var transferStatus = Page.Locator("#transfer-status");
         await Expect(transferStatus).Not.ToHaveTextAsync("transfer confirmed");
 
-        // Button Click dispatches resident-transferred, then the CustomEvent listener mutates text and classes.
-        await Page.Locator("#btn-transfer").ClickAsync();
+        var transferButton = Page.Locator("#btn-transfer");
+        await transferButton.ClickAsync();
 
         await Expect(transferStatus).ToHaveTextAsync("transfer confirmed", new() { Timeout = 3000 });
 
