@@ -169,8 +169,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
     }
 
-    // ── Form-scoped validators (one per form, validates only that form's fields) ──
-
     public class AllRulesFormValidator : ReactiveValidator<ValidationShowcaseModel>
     {
         public AllRulesFormValidator()
