@@ -15,7 +15,6 @@
         BeforeClose, Closed, OverlayClick events. Senior living domain: confirming a resident discharge.
     </native-text>
 
-    <!-- Section 1: Open the Dialog -->
     <native-card><native-card-body>
         <native-heading level="H2">1. Open the Dialog (Show method)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -30,7 +29,6 @@
             }))
     </native-card-body></native-card>
 
-    <!-- Section 2: The Dialog Component -->
     <native-card><native-card-body>
         <native-heading level="H2">2. Dialog Component</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -71,7 +69,6 @@
         }))
     </native-card-body></native-card>
 
-    <!-- Section 3: Hide via External Button -->
     <native-card><native-card-body>
         <native-heading level="H2">3. Hide the Dialog (Hide method)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -86,7 +83,6 @@
             }))
     </native-card-body></native-card>
 
-    <!-- Section 4: Event Log -->
     <native-card><native-card-body>
         <native-heading level="H2">4. Event Log</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -101,7 +97,6 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    <!-- Plan JSON — always last -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>

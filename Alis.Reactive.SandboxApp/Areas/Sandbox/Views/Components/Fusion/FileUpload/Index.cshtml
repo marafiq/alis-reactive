@@ -18,7 +18,6 @@
         Senior living domain: resident document uploads (medical records, photos, consent forms).
     </native-text>
 
-    <!-- Section 1: Form with TextBox + FileUpload -->
     <native-card><native-card-body>
         <native-heading level="H2">1. Document Upload Form</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -35,7 +34,6 @@
         </form>
     </native-card-body></native-card>
 
-    <!-- Section 2: FormData POST with Echo -->
     <native-card><native-card-body>
         <native-heading level="H2">2. FormData POST (Echo)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -71,7 +69,6 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    <!-- Plan JSON -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
