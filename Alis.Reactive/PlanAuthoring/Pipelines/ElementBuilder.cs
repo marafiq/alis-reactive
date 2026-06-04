@@ -56,8 +56,8 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Sets the text content from an event payload property.</summary>
         /// <typeparam name="TSource">The event payload type.</typeparam>
-        /// <param name="source">The event payload instance.</param>
-        /// <param name="path">Expression selecting the property to display.</param>
+        /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
+        /// <param name="path">Expression selecting the event payload property to display.</param>
         public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object>> path)
         {
             var eventPath = ExpressionPathHelper.ToEventPath<TSource, object>(path);
@@ -66,8 +66,8 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Sets the text content from an HTTP response body property.</summary>
         /// <typeparam name="TResponse">The response body type.</typeparam>
-        /// <param name="source">The response body instance from <c>OnSuccess</c> or <c>OnError</c>.</param>
-        /// <param name="path">Expression selecting the property to display.</param>
+        /// <param name="source">The typed response body scope from <c>OnSuccess</c> or <c>OnError</c>.</param>
+        /// <param name="path">Expression selecting the response body property to display.</param>
         public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, object>> path)
             where TResponse : class
         {
@@ -94,8 +94,8 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Sets the inner HTML from an event payload property.</summary>
         /// <typeparam name="TSource">The event payload type.</typeparam>
-        /// <param name="source">The event payload instance.</param>
-        /// <param name="path">Expression selecting the property containing HTML.</param>
+        /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
+        /// <param name="path">Expression selecting the event payload property containing HTML.</param>
         public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object>> path)
         {
             var eventPath = ExpressionPathHelper.ToEventPath<TSource, object>(path);
