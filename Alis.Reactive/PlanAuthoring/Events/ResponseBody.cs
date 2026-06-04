@@ -6,22 +6,23 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Represents the typed response payload scope available inside HTTP response routes.
+    /// Represents the typed response body scope available inside HTTP response routes.
     /// </summary>
     /// <remarks>
     /// <para>
     /// Created by <see cref="Builders.Requests.ResponseBuilder{TModel}.OnSuccess{TResponse}"/>
     /// or <see cref="Builders.Requests.ResponseBuilder{TModel}.OnError{TError}"/>
     /// and passed as the first parameter of the lambda. The instance is an authoring handle:
-    /// property expressions become Reactive Plan payload reads for the success or error scope.
+    /// property expressions become Reactive Plan response-body reads for the success or error scope.
     /// </para>
     /// <para>
-    /// Use with <c>SetText</c>/<c>SetHtml</c> to bind response properties to elements,
-    /// or with <c>Read</c> to create a <see cref="TypedSource{TProp}"/> for conditions:
+    /// Use it directly with response-aware overloads such as <c>SetText</c>, or
+    /// call <see cref="Read{TProp}"/> to create a <see cref="TypedSource{TProp}"/>
+    /// for conditions, comparisons, plugin arguments, etc.
     /// <code>
-    /// .OnSuccess&lt;ApiResponse&gt;((json, s) =&gt; {
-    ///     s.Element("name").SetText(json, r =&gt; r.Data.Name);
-    ///     s.When(json, r =&gt; r.Status).Eq("approved").Then(...);
+    /// .OnSuccess&lt;ApiResponse&gt;((body, s) =&gt; {
+    ///     s.Element("name").SetText(body, r =&gt; r.Data.Name);
+    ///     s.When(body.Read(r =&gt; r.Status)).Eq("approved").Then(...);
     /// })
     /// </code>
     /// </para>
@@ -37,13 +38,11 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Creates a typed source that reads from this response payload scope.
-        /// The returned <see cref="TypedSource{TProp}"/> can be used in conditions
-        /// (<c>When</c>, <c>And</c>, <c>Or</c>) and source-vs-source comparisons.
+        /// Creates a typed source that reads a property from this response body scope.
         /// </summary>
         /// <typeparam name="TProp">The property type.</typeparam>
         /// <param name="expression">The response-body property path, for example <c>r =&gt; r.Data.Name</c>.</param>
-        /// <returns>A typed source that reads from this response payload scope.</returns>
+        /// <returns>A typed source for conditions, comparisons, plugin arguments, and other source-based APIs.</returns>
         public TypedSource<TProp> Read<TProp>(Expression<Func<T, TProp>> expression)
         {
             return new PayloadTypedSource<T, TProp>(Scope, expression);
