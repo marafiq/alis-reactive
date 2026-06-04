@@ -12,23 +12,15 @@
         ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.SaveStep3.");
 }
 
-<!-- ASSERT: select "1-2 falls" or "3+ falls" → fall-details visible
-     ASSERT: FallRiskScore >= 7 AND Age >= 80 → MonitoringLevel = "Continuous", result shows
-     ASSERT: MobilityAid = "Walker" or "Wheelchair" → escort-indicator visible
-     ASSERT: MobilityAid = "Wheelchair" → room-spinner shows, POST fires, room-result shows
-     ASSERT: MedicationCount > 10 → polypharmacy-warning visible
-     ASSERT: TakesBloodThinners ON → MonitoringLevel = "Enhanced"
-     ASSERT: TakesPainMedication ON → pain-section visible
-     ASSERT: save Step 3 with valid data → "Step 3 saved" message -->
 <native-card><native-card-body id="step3-form">
     <native-heading level="H2">Step 3: Functional Assessment</native-heading>
     <p class="text-sm text-text-secondary mb-4">
         Fall risk, mobility, and medication assessment. High-risk combinations trigger automatic monitoring level changes.
     </p>
 
-    <!-- Hidden fields: cross-step data -->
+    <!-- Shared Active Plan fields populated by earlier steps and nested partials. -->
     @Html.HiddenFieldFor(plan, m => m.ScreeningId)
-    <!-- Age uses NumericTextBox (hidden) so compound condition gets decimal type for .Gte(80m) -->
+    <!-- Hidden NumericTextBox keeps Age typed as decimal for the compound .Gte(80m) condition. -->
     <div hidden>
         @{ Html.InputField(plan, m => m.Age, o => o.Label("Age"))
             .FusionNumericTextBox(b => b.Min(0).Max(120).Step(1)); }
@@ -36,7 +28,6 @@
     @Html.HiddenFieldFor(plan, m => m.ResidentName)
     @Html.HiddenFieldFor(plan, m => m.MonitoringLevel)
 
-    <!-- Row 1: Fall History + Fall Risk Score -->
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.FallHistory, o => o.Label("Fall History"))
             .FusionDropDownList(b => b
@@ -54,7 +45,6 @@
             .FusionNumericTextBox(b => b.Min(0).Max(10).Step(1)); }
     </native-grid>
 
-    <!-- Fall Risk Check button -->
     <native-hstack class="mb-4">
         @(Html.NativeButton("check-fallrisk-btn", "Check Fall Risk")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -79,7 +69,6 @@
         <span id="fallrisk-result" hidden class="ml-3 text-sm font-semibold text-accent"></span>
     </native-hstack>
 
-    <!-- Row 2: Mobility Aid + Medication Count -->
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.MobilityAid, o => o.Label("Mobility Aid"))
             .FusionDropDownList(b => b
@@ -121,7 +110,6 @@
                 })); }
     </native-grid>
 
-    <!-- Status indicators for mobility -->
     <native-vstack gap="Xs" class="font-mono text-sm mb-4">
         <div id="escort-indicator" hidden class="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-700">
             Escort required for mobility aid user.
@@ -133,7 +121,6 @@
         </div>
     </native-vstack>
 
-    <!-- Row 3: Blood Thinners + Pain Medication -->
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.TakesBloodThinners, o => o.Label("Takes Blood Thinners"))
             .FusionSwitch(b => b
@@ -156,7 +143,6 @@
                 })); }
     </native-grid>
 
-    <!-- Conditional sections -->
     <div id="fall-details" hidden>
         @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_FallDetails.cshtml", Model)
     </div>
@@ -165,7 +151,6 @@
         @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_PainAssessment.cshtml", Model)
     </div>
 
-    <!-- Step 3 Navigation: validate + save on Next, Previous is free -->
     <native-hstack gap="None" justify="Between" class="mt-6">
         @(Html.NativeButton("prev-3", "\u2190 Back: Clinical")
             .CssClass("rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
