@@ -5,8 +5,8 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
-    /// A typed source that reads from any payload scope (event, success, error, dispatch).
-    /// Generalizes event, response, and error payload reads into a single TypedSource.
+    /// Reads a typed value from a Reactive Plan payload scope such as event,
+    /// success, error, or dispatch.
     /// </summary>
     public sealed class PayloadTypedSource<TPayload, TProp> : TypedSource<TProp>
     {
