@@ -42,7 +42,7 @@ namespace Alis.Reactive.Native.Components
         private string? _cssClass;
         private string? _placeholder;
 
-        // Keep internal: the factory also registers this input component in the plan.
+        // Internal because the factory also registers this input component in the Reactive Plan.
 #if NET48
         internal NativeTextBoxBuilder(
             HtmlHelper<TModel> html,
@@ -111,15 +111,15 @@ namespace Alis.Reactive.Native.Components
         /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
-            var attrs = new System.Collections.Generic.Dictionary<string, object>
+            var inputAttributes = new System.Collections.Generic.Dictionary<string, object>
             {
                 ["id"] = _elementId,
                 ["type"] = _type
             };
-            if (_cssClass != null) attrs["class"] = _cssClass;
-            if (_placeholder != null) attrs["placeholder"] = _placeholder;
+            if (_cssClass != null) inputAttributes["class"] = _cssClass;
+            if (_placeholder != null) inputAttributes["placeholder"] = _placeholder;
 
-            var result = _html.TextBoxFor(_expression, attrs);
+            var result = _html.TextBoxFor(_expression, inputAttributes);
 #if NET48
             writer.Write(result.ToHtmlString());
 #else
