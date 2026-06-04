@@ -4,7 +4,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for FusionListBox.
+/// Playwright gestures and surfaces for FusionListBox tests.
 /// </summary>
 public sealed class FusionListBoxLocator
 {
@@ -17,7 +17,6 @@ public sealed class FusionListBoxLocator
         _componentId = componentId;
     }
 
-    /// <summary>The rendered ListBox wrapper.</summary>
     public ILocator Root => _page.Locator($"#{_componentId}_parent");
 
     /// <summary>A list item by exact visible text.</summary>
@@ -26,7 +25,6 @@ public sealed class FusionListBoxLocator
         .Filter(new() { HasTextString = text })
         .First;
 
-    /// <summary>Selects or toggles an item through the browser UI.</summary>
     public async Task ClickItem(string text, int timeoutMs = 15000)
     {
         var item = Item(text);

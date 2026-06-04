@@ -3,7 +3,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for FusionBreadcrumb.
+/// Playwright gestures and surfaces for FusionBreadcrumb tests.
 /// </summary>
 public sealed class FusionBreadcrumbLocator
 {
@@ -16,7 +16,6 @@ public sealed class FusionBreadcrumbLocator
         _componentId = componentId;
     }
 
-    /// <summary>The rendered breadcrumb root element.</summary>
     public ILocator Root => _page.Locator($"#{_componentId}");
 
     /// <summary>The current breadcrumb item rendered with aria-current.</summary>
@@ -25,7 +24,6 @@ public sealed class FusionBreadcrumbLocator
     /// <summary>Locates a clickable breadcrumb link by its visible text.</summary>
     public ILocator Link(string text) => Root.GetByRole(AriaRole.Link, new() { Name = text });
 
-    /// <summary>Clicks a breadcrumb link through the browser UI.</summary>
     public async Task ClickLink(string text, int timeoutMs = 15000)
     {
         var link = Link(text);
@@ -33,7 +31,6 @@ public sealed class FusionBreadcrumbLocator
         await link.ClickWhenStableAsync(_page, timeoutMs);
     }
 
-    /// <summary>Returns the current visible breadcrumb text.</summary>
     public async Task<string> CurrentText()
     {
         return await CurrentItem.TextContentAsync() ?? string.Empty;

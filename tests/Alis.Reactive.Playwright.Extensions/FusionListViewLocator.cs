@@ -4,7 +4,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// User interaction primitives for FusionListView.
+/// Playwright gestures and surfaces for FusionListView tests.
 /// </summary>
 public sealed class FusionListViewLocator
 {
@@ -17,7 +17,6 @@ public sealed class FusionListViewLocator
         _componentId = componentId;
     }
 
-    /// <summary>The rendered ListView root.</summary>
     public ILocator Root => _page.Locator($"#{_componentId}");
 
     /// <summary>A list item by exact visible text.</summary>
@@ -25,10 +24,8 @@ public sealed class FusionListViewLocator
         Root.GetByText(text, new() { Exact = true })
             .Locator("xpath=ancestor::li[contains(@class,'e-list-item')][1]");
 
-    /// <summary>The checked icon for a list item.</summary>
     public ILocator CheckedIcon(string text) => Item(text).Locator(".e-check");
 
-    /// <summary>Selects or toggles an item through the browser UI.</summary>
     public async Task ClickItem(string text, int timeoutMs = 15000)
     {
         var item = Item(text);
