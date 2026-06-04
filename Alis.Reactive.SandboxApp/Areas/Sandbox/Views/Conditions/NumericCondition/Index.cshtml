@@ -7,17 +7,6 @@
 
     var plan = Html.ReactivePlan<NumericConditionModel>();
 
-    // ── Section 1: Simple condition — When(comp.Value()).Gt(100m) ──
-    // HeartRate change → Gt(100) shows tachycardia warning, Else hides it
-
-    // ── Section 2: ElseIf grade ladder — comp.Value() ranges ──
-    // HeartRate change → Gte(120) "Critical" / Gte(100) "High" / Gte(60) "Normal" / Else "Low"
-
-    // ── Section 3: AND compound — Gt(60) AND Lt(100) → "Normal range" ──
-    // BloodPressure change → compound condition
-
-    // ── Section 4: Cross-component — When(heartRate).Gte(threshold) ──
-    // Button click reads both components and compares
 }
 
 <native-vstack gap="Lg">
@@ -27,7 +16,6 @@
         and cross-component source-vs-source comparison. Senior living domain: vital sign thresholds.
     </native-text>
 
-    <!-- Section 1: Simple Gt condition -->
     <native-card><native-card-body>
         <native-heading level="H2">1. Simple Condition — Gt(100)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -42,7 +30,6 @@
                     {
                         var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
-                        // Simple condition: Gt(100) → tachycardia warning
                         p.When(comp.Value()).Gt(100m)
                             .Then(then =>
                             {
@@ -54,7 +41,6 @@
                                 else_.Element("tachycardia-warning").Hide();
                             });
 
-                        // ElseIf ladder: heart rate zones
                         p.When(comp.Value()).Gte(120m)
                             .Then(t => t.Element("hr-zone").SetText("Critical"))
                             .ElseIf(comp.Value()).Gte(100m)
@@ -67,7 +53,6 @@
         <p class="font-mono text-sm">Warning: <span id="tachycardia-warning" hidden class="text-rose-600">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Section 2: ElseIf grade ladder -->
     <native-card><native-card-body>
         <native-heading level="H2">2. ElseIf Ladder — Heart Rate Zones</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -78,7 +63,6 @@
         <p class="font-mono text-sm">Zone: <span id="hr-zone" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Section 3: AND compound condition -->
     <native-card><native-card-body>
         <native-heading level="H2">3. AND Compound — Normal Range</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -108,7 +92,6 @@
         <p class="font-mono text-sm">Range: <span id="bp-range" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Section 4: Cross-component source-vs-source -->
     <native-card><native-card-body>
         <native-heading level="H2">4. Cross-Component — Value vs Threshold</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -136,7 +119,6 @@
         <p class="font-mono text-sm mt-2">Result: <span id="threshold-result" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Plan JSON -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>

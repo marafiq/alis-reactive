@@ -17,7 +17,6 @@
         Conditions mutate OTHER components — not just element text.
     </native-text>
 
-    <!-- Section 1: Condition → Component.SetValue() on another dropdown -->
     <native-card><native-card-body>
         <native-heading level="H2">1. Condition → SetValue (Dropdown Cascade)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -34,10 +33,8 @@
                     {
                         var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
-                        // BEFORE condition — always: show current selection
                         p.Element("s1-current-level").SetText(careLevel.Value());
 
-                        // Condition → mutate another component
                         p.When(careLevel.Value()).Eq("Memory Care")
                             .Then(then =>
                             {
@@ -53,7 +50,6 @@
                                 else_.Component<FusionDropDownList>(m => m.Protocol).SetValue("");
                             });
 
-                        // AFTER condition — always: confirm update ran
                         p.Element("s1-action-status").SetText("cascade-complete");
                     })); }
 
@@ -68,7 +64,6 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    <!-- Section 2: Condition → SetChecked on Switch (cross-component type) -->
     <native-card><native-card-body>
         <native-heading level="H2">2. Condition → SetChecked (Cross-Component Type)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -88,10 +83,8 @@
                 {
                     var careLevel = p.Component<FusionDropDownList>(m => m.CareLevel);
 
-                    // BEFORE: show what we're checking
                     p.Element("s2-checking").SetText(careLevel.Value());
 
-                    // Condition → mutate switch
                     p.When(careLevel.Value()).In("Memory Care", "Skilled Nursing")
                         .Then(then =>
                         {
@@ -104,7 +97,6 @@
                             else_.Element("s2-result").SetText("no escort needed");
                         });
 
-                    // AFTER: confirm policy applied
                     p.Element("s2-policy-status").SetText("policy-applied");
                 }))
         </native-hstack>
@@ -115,7 +107,6 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    <!-- Plan JSON -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
