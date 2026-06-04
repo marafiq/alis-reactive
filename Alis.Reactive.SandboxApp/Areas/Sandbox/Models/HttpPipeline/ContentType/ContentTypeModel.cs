@@ -6,14 +6,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public decimal FusionAmount { get; set; }
     }
 
-    /// <summary>Flat JSON response — no nesting.</summary>
     public class FlatResponse
     {
         public string? Message { get; set; }
         public int Count { get; set; }
     }
 
-    /// <summary>Nested JSON response — multiple levels deep.</summary>
     public class NestedResponse
     {
         public ResponseData? Data { get; set; }

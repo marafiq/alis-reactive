@@ -13,14 +13,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             return View("~/Areas/Sandbox/Views/HttpPipeline/ContentType/Index.cshtml");
         }
 
-        /// <summary>Returns a flat JSON response.</summary>
         [HttpGet("FlatJson")]
         public IActionResult FlatJson()
         {
             return Json(new { message = "Hello from server", count = 42 });
         }
 
-        /// <summary>Returns a nested JSON response with multiple levels.</summary>
         [HttpGet("NestedJson")]
         public IActionResult NestedJson()
         {
@@ -34,7 +32,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             });
         }
 
-        /// <summary>Returns HTML partial with native components.</summary>
         [HttpGet("Partial")]
         public IActionResult Partial()
         {
