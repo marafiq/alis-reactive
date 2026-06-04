@@ -1,8 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
-/// <summary>
-/// Issue #86: Dispatch payloads carry live component values — flat, literal, and nested.
-/// </summary>
 [TestFixture]
 public class WhenDispatchingWithComponentValue : PlaywrightTestBase
 {
