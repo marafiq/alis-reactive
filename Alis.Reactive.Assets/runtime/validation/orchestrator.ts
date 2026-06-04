@@ -143,7 +143,7 @@ export function validateContainer(
   return valid;
 }
 
-export function showServerErrors(planDocument: PlanDocument, containerKey: string, data: unknown): void {
+export function showServerErrors(planDocument: PlanDocument, containerKey: string, serverPayload: unknown): void {
   const runtime = RuntimePlan.from(planDocument);
   const containerComponent = runtime.components.find(containerKey);
   const containerScope = containerComponent?.containerScope;
@@ -162,7 +162,7 @@ export function showServerErrors(planDocument: PlanDocument, containerKey: strin
 
   clearContainerErrors(surface);
 
-  const errors = serverValidationErrorsFrom(data);
+  const errors = serverValidationErrorsFrom(serverPayload);
   if (errors.kind === "wrong-shape") log.warn("server-errors.wrong-shape");
   if (errors.kind !== "field-errors") return;
   if (errors.fields.length === 0) return;
@@ -465,8 +465,8 @@ type ServerValidationErrors =
   | { readonly kind: "wrong-shape" }
   | { readonly kind: "field-errors"; readonly fields: ServerValidationError[] };
 
-function serverValidationErrorsFrom(data: unknown): ServerValidationErrors {
-  const payload = objectRecordFrom(data);
+function serverValidationErrorsFrom(serverPayload: unknown): ServerValidationErrors {
+  const payload = objectRecordFrom(serverPayload);
   if (payload === undefined) return { kind: "not-validation-payload" };
 
   const errors = objectRecordFrom(payload["errors"]);
