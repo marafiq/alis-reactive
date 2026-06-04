@@ -29,8 +29,6 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             where TRow : class
         {
-            // NO input component registration — this is NOT an input component
-
             var builder = html.EJS().Grid<TRow>(elementId);
             build(builder);
 
