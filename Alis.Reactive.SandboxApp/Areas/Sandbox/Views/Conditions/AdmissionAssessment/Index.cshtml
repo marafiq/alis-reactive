@@ -23,30 +23,18 @@
         </native-hstack>
     </native-card-body></native-card>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- Step 1: Demographics (own model, own plan)                             -->
-    <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <div id="step-1">
         @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_Step1Demographics.cshtml", Model.Step1)
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- Step 2: Clinical Assessment (own model, own plan)                      -->
-    <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <div id="step-2" hidden>
         @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_Step2Clinical.cshtml", Model.Step2)
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- Step 3: Functional Assessment (own model, own plan)                    -->
-    <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <div id="step-3" hidden>
         @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_Step3Functional.cshtml", Model.Step3)
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════ -->
-    <!-- Step 4: Review & Submit (own model, own plan)                          -->
-    <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <div id="step-4" hidden>
         @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_Step4Review.cshtml", Model.Step4)
     </div>
