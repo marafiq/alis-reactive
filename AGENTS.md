@@ -72,7 +72,7 @@ patch does all of this:
 
 - deletes stale indirection instead of preserving it under new names
 - keeps C# domain terms, generated TS terms, runtime names, and glossary terms aligned
-- proves behavior at the DSL boundary or browser-visible runtime boundary
+- proves behavior at the DSL boundary or page-visible runtime boundary
 - leaves no half-renamed vocabulary or dead helper path behind
 
 If a commit cannot be described as a closed matrix row, keep cutting scope until

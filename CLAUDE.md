@@ -69,7 +69,7 @@ the C# plan domain plus generated TypeScript plan types.
 | Keep runtime as a direct executor of generated plans | Add plan-shape validators, fallback paths, registries, claims, or rejects |
 | Keep sync reactions sync | Make the runtime async by default |
 | Generate TS types from C# plan domain | Hand-maintain TS plan contract or revive schema as contract |
-| Prove browser-visible behavior with Playwright | Use `page.evaluate()` shortcuts for user behavior |
+| Prove page-visible behavior with Playwright | Use `page.evaluate()` shortcuts for user behavior |
 
 Throughout this document, "the runtime" means the TypeScript code in
 `Alis.Reactive.Assets/runtime/` that executes plans in the browser. It is
@@ -101,7 +101,7 @@ Layer 3  Generated TypeScript Plan Types + Runtime Domain
          Quality: generated discriminated unions, immediate/async execution lanes, no fallback behavior
          Harness: npm run typecheck and focused runtime behavior tests
          ↓
-         BOUNDARY: browser-visible behavior
+         BOUNDARY: page-visible behavior
          ↓
 Layer 4  Browser Verification + Documentation
          Quality: real interactions, visible outcomes, no page.evaluate(), glossary aligned with code
@@ -382,7 +382,7 @@ that only pin helper classes, old JSON shape, stale vocabulary, or internal
 syntax. A test that changes every time implementation changes is design debt.
 
 Use focused runtime tests for pure executor behavior and Playwright for
-browser-visible DSL behavior. Playwright sandbox runs must use freshly built
+page-visible DSL behavior. Playwright sandbox runs must use freshly built
 runtime assets.
 
 ### 11. Code Hygiene
@@ -535,7 +535,7 @@ new edge, and redesign before continuing.
 - [ ] Focused behavior tests pass.
 - [ ] Generated TS checked when C# plan shape changed.
 - [ ] Runtime assets rebuilt before Playwright when TS changed.
-- [ ] Playwright behavior proved for browser-visible changes.
+- [ ] Playwright behavior proved for page-visible changes.
 - [ ] `git status` inspected.
 - [ ] Commit message names the closed behavior row.
 - [ ] No stale vocabulary, dead code, defensive plan validation, or schema-contract references left behind.
