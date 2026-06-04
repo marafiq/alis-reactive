@@ -4,11 +4,12 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Configures the reactions that run for HTTP success routes, error routes,
-    /// and successful follow-up requests.
+    /// Configures success routes, error routes, and the optional follow-up
+    /// request for one HTTP request.
     /// </summary>
     /// <remarks>
     /// Created by <c>request.Response(r =&gt; ...)</c>.
+    /// Exact error-status routes are matched before any-status error routes.
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns model-bound component IDs.</typeparam>
     public class ResponseBuilder<TModel> where TModel : class
@@ -23,7 +24,7 @@ namespace Alis.Reactive.Builders.Requests
 
         internal ResponseRoutingDraft Draft => _draft;
 
-        /// <summary>Adds a route for any successful HTTP response.</summary>
+        /// <summary>Adds a route for any successful 2xx HTTP response.</summary>
         /// <param name="pipeline">Builds the reaction graph to execute on success.</param>
         public ResponseBuilder<TModel> OnSuccess(Action<PipelineBuilder<TModel>> pipeline)
         {
@@ -33,7 +34,10 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a route for any successful HTTP response with typed response-body access.</summary>
+        /// <summary>
+        /// Adds a route for any successful 2xx HTTP response with typed
+        /// response-body access.
+        /// </summary>
         /// <typeparam name="TResponse">The response body type exposed to downstream value sources.</typeparam>
         /// <param name="pipeline">Builds the reaction graph using the success body scope.</param>
         public ResponseBuilder<TModel> OnSuccess<TResponse>(
@@ -48,8 +52,8 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a route for any HTTP error response.</summary>
-        /// <param name="pipeline">Builds the reaction graph to execute on error.</param>
+        /// <summary>Adds a route for any non-2xx response or response-unavailable failure.</summary>
+        /// <param name="pipeline">Builds the reaction graph to execute for the error route.</param>
         public ResponseBuilder<TModel> OnError(Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>(_context);
@@ -58,9 +62,9 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a route for an HTTP error response with a specific status code.</summary>
+        /// <summary>Adds a route for a non-2xx response with a specific status code.</summary>
         /// <param name="statusCode">The HTTP status code to match.</param>
-        /// <param name="pipeline">Builds the reaction graph to execute for this status code.</param>
+        /// <param name="pipeline">Builds the reaction graph to execute for the matching status code.</param>
         public ResponseBuilder<TModel> OnError(int statusCode, Action<PipelineBuilder<TModel>> pipeline)
         {
             var pb = new PipelineBuilder<TModel>(_context);
@@ -69,7 +73,10 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a route for any HTTP error response with typed error-body access.</summary>
+        /// <summary>
+        /// Adds a route for any error outcome with typed error-body access when
+        /// a response body is available.
+        /// </summary>
         /// <typeparam name="TError">The error body type exposed to downstream value sources.</typeparam>
         /// <param name="pipeline">Builds the reaction graph using the error body scope.</param>
         public ResponseBuilder<TModel> OnError<TError>(
@@ -84,7 +91,10 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a route for a specific HTTP error status code with typed error-body access.</summary>
+        /// <summary>
+        /// Adds a route for a non-2xx response with a specific status code and
+        /// typed error-body access.
+        /// </summary>
         /// <typeparam name="TError">The error body type exposed to downstream value sources.</typeparam>
         /// <param name="statusCode">The HTTP status code to match.</param>
         /// <param name="pipeline">Builds the reaction graph using the error body scope.</param>
@@ -100,8 +110,14 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a follow-up HTTP request that runs after the current request succeeds.</summary>
+        /// <summary>
+        /// Adds one follow-up HTTP request that runs only after the current
+        /// request succeeds.
+        /// </summary>
         /// <param name="request">Builds the follow-up request.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this response already has a follow-up request.
+        /// </exception>
         public ResponseBuilder<TModel> Chained(Action<HttpRequestBuilder<TModel>> request)
         {
             var chainedBuilder = new HttpRequestBuilder<TModel>(_context);
