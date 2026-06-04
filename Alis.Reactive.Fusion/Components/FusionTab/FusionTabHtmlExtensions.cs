@@ -6,16 +6,18 @@ using Syncfusion.EJ2.Navigations;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating FusionTab (non-input component).
-    /// No InputField wrapper. No input component registration.
-    /// Uses explicit string elementId (not model-expression-derived).
+    /// Creates typed <see cref="FusionTabBuilder{TModel}"/> instances for Reactive Plan wiring.
     /// </summary>
     public static class FusionTabHtmlExtensions
     {
         /// <summary>
-        /// Creates a FusionTab component with reactive wiring support.
-        /// Non-input component: renders directly, no label/validation wrapper.
+        /// Creates a Syncfusion Tab and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The Reactive Plan that receives tab event wiring.</param>
+        /// <param name="elementId">The controlled component ID shared by markup and plan entries.</param>
+        /// <param name="build">Configures the underlying Syncfusion tab builder.</param>
         public static FusionTabBuilder<TModel> FusionTab<TModel>(
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,
@@ -23,8 +25,6 @@ namespace Alis.Reactive.Fusion.Components
             Action<TabBuilder> build)
             where TModel : class
         {
-            // NO input component registration — Tab is NOT an input component
-
             var builder = html.EJS().Tab(elementId);
             build(builder);
 

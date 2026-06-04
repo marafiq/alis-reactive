@@ -7,14 +7,18 @@ using Syncfusion.EJ2.Navigations;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating FusionStepperBuilder.
-    /// Non-input component - NO InputField wrapper, NO input component registration.
+    /// Creates typed <see cref="FusionStepperBuilder{TModel}"/> instances for Reactive Plan wiring.
     /// </summary>
     public static class FusionStepperHtmlExtensions
     {
         /// <summary>
-        /// Creates a FusionStepper with the given element ID.
+        /// Creates a Syncfusion Stepper and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The Reactive Plan that receives stepper event wiring.</param>
+        /// <param name="elementId">The controlled component ID shared by markup and plan entries.</param>
+        /// <param name="build">Configures the underlying Syncfusion stepper builder.</param>
         public static FusionStepperBuilder<TModel> FusionStepper<TModel>(
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,

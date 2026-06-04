@@ -7,14 +7,18 @@ using Syncfusion.EJ2.Navigations;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating FusionToolbarBuilder.
-    /// Non-input component - NO InputField wrapper, NO input component registration.
+    /// Creates typed <see cref="FusionToolbarBuilder{TModel}"/> instances for Reactive Plan wiring.
     /// </summary>
     public static class FusionToolbarHtmlExtensions
     {
         /// <summary>
-        /// Creates a FusionToolbar with the given element ID.
+        /// Creates a Syncfusion Toolbar and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The Reactive Plan that receives toolbar event wiring.</param>
+        /// <param name="elementId">The controlled component ID shared by markup and plan entries.</param>
+        /// <param name="build">Configures the underlying Syncfusion toolbar builder.</param>
         public static FusionToolbarBuilder<TModel> FusionToolbar<TModel>(
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wraps SF CarouselBuilder.Render() output and carries plan metadata for reactive chaining.
+    /// Wraps rendered Syncfusion carousel markup while carrying plan metadata for <c>.Reactive(...)</c> chaining.
     /// </summary>
     public sealed class FusionCarouselBuilder<TModel> : IHtmlContent
         where TModel : class

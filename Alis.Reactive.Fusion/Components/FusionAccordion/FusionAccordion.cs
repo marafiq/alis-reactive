@@ -1,11 +1,10 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// FusionAccordion — non-input container component.
-    /// Has events and methods but no form value (no ValueMember, no IInputComponent).
+    /// Represents a Syncfusion Accordion container component.
+    /// Exposes panel mutation methods and item events; it is not an input component.
     /// </summary>
     public sealed class FusionAccordion : FusionComponent
     {
-        // NO ValueMember — this component has no form value to read
     }
 }

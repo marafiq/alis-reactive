@@ -6,11 +6,18 @@ using Syncfusion.EJ2.Navigations;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating a typed FusionCarousel slice.
-    /// Non-input component — no input registration wrapper.
+    /// Creates typed <see cref="FusionCarouselBuilder{TModel}"/> instances for Reactive Plan wiring.
     /// </summary>
     public static class FusionCarouselHtmlExtensions
     {
+        /// <summary>
+        /// Creates a Syncfusion Carousel and carries its controlled component ID into the Reactive Plan.
+        /// </summary>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The Reactive Plan that receives carousel event wiring.</param>
+        /// <param name="elementId">The controlled component ID shared by markup and plan entries.</param>
+        /// <param name="build">Configures the underlying Syncfusion carousel builder.</param>
         public static FusionCarouselBuilder<TModel> FusionCarousel<TModel>(
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,

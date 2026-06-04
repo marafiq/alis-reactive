@@ -6,13 +6,18 @@ using Syncfusion.EJ2.Navigations;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating FusionMenuBuilder.
+    /// Creates typed <see cref="FusionMenuBuilder{TModel}"/> instances for Reactive Plan wiring.
     /// </summary>
     public static class FusionMenuHtmlExtensions
     {
         /// <summary>
-        /// Creates a FusionMenu with the given element ID.
+        /// Creates a Syncfusion Menu and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The Reactive Plan that receives menu event wiring.</param>
+        /// <param name="elementId">The controlled component ID shared by markup and plan entries.</param>
+        /// <param name="build">Configures the underlying Syncfusion menu builder.</param>
         public static FusionMenuBuilder<TModel> FusionMenu<TModel>(
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,

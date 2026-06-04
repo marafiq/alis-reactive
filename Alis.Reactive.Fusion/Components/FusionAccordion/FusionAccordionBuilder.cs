@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wraps SF AccordionBuilder.Render() output + carries plan and elementId
-    /// for .Reactive() chaining. Non-input component — no input component registration.
+    /// Wraps rendered Syncfusion accordion markup while carrying plan metadata for <c>.Reactive(...)</c> chaining.
     /// </summary>
     public class FusionAccordionBuilder<TModel> :
         IHtmlContent
@@ -23,7 +22,6 @@ namespace Alis.Reactive.Fusion.Components
             ElementId = elementId;
             _inner = inner;
         }
-
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {

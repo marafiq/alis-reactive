@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wraps SF GridBuilder.Render() output and carries plan and elementId
-    /// for <c>.Reactive()</c> chaining. Non-input component.
+    /// Wraps rendered Syncfusion grid markup while carrying plan metadata for <c>.Reactive(...)</c> chaining.
     /// </summary>
     public class FusionGridBuilder<TModel> :
         IHtmlContent
@@ -23,7 +22,6 @@ namespace Alis.Reactive.Fusion.Components
             ElementId = elementId;
             _inner = inner;
         }
-
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {

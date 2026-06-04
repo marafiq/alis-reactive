@@ -10,7 +10,14 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public static class FusionListBoxHtmlExtensions
     {
-        /// <summary>Creates a FusionListBox with the given element ID.</summary>
+        /// <summary>
+        /// Creates a Syncfusion ListBox and carries its controlled component ID into the Reactive Plan.
+        /// </summary>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The Reactive Plan that receives list box event wiring.</param>
+        /// <param name="elementId">The controlled component ID shared by markup and plan entries.</param>
+        /// <param name="build">Configures the underlying Syncfusion list box builder.</param>
         public static FusionListBoxBuilder<TModel> FusionListBox<TModel>(
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,

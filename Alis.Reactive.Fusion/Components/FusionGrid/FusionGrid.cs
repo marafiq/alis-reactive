@@ -10,6 +10,5 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionGrid : FusionComponent
     {
-        // NO ValueMember — grid has no single form value to read
     }
 }

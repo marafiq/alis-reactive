@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Html;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Wraps SF BreadcrumbBuilder.Render() output and carries plan metadata for reactive chaining.
+    /// Wraps rendered Syncfusion breadcrumb markup while carrying plan metadata for <c>.Reactive(...)</c> chaining.
     /// </summary>
     public sealed class FusionBreadcrumbBuilder<TModel> : IHtmlContent
         where TModel : class

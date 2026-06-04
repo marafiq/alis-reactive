@@ -1,15 +1,10 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// FusionTab (ej2.navigations.Tab) component.
-    /// Non-input component — container with no form value.
-    /// No ValueMember, no input component registration, no validation, no gather.
+    /// Represents a Syncfusion Tab navigation component.
+    /// Exposes selected-tab state, tab visibility methods, and selection events; it is not an input component.
     /// </summary>
     public sealed class FusionTab : FusionComponent
     {
-        // NO IInputComponent — Tab has no form value to read.
-        // Events: selected (tab selection changed)
-        // Methods: select(index), hideTab(index, isHidden)
-        // Properties: selectedItem (read-only in reactive context)
     }
 }

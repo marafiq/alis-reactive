@@ -1,14 +1,10 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// FusionSchedule — non-input display component wrapping Syncfusion EJ2 Schedule.
-    /// Calendar/scheduler for shift management, appointments, and event planning.
-    /// Supports multiple views (Day, Week, Month, Agenda, Timeline), resource grouping,
-    /// drag-and-drop, and server-driven data loading.
-    /// Has events and methods but no form value (no ValueMember, no IInputComponent).
+    /// Represents a Syncfusion Schedule display component.
+    /// Exposes scheduler methods and lifecycle events; it is not an input component.
     /// </summary>
     public sealed class FusionSchedule : FusionComponent
     {
-        // NO ValueMember — this component has no form value to read
     }
 }

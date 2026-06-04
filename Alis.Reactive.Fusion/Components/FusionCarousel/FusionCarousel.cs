@@ -1,11 +1,10 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// FusionCarousel — non-input navigation component wrapping Syncfusion EJ2 Carousel.
-    /// Exposes typed selected-index state, slide navigation methods, and slide-change events.
+    /// Represents a Syncfusion Carousel navigation component.
+    /// Exposes selected-index state, slide navigation methods, and slide-change events; it is not an input component.
     /// </summary>
     public sealed class FusionCarousel : FusionComponent
     {
-        // No ValueMember. This is a navigation component, not a form input.
     }
 }

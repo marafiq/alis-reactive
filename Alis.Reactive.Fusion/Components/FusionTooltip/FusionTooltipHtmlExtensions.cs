@@ -6,15 +6,18 @@ using Syncfusion.EJ2.Popups;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Factory extension for creating FusionTooltipBuilder.
-    /// Non-input component — NO InputField wrapper, NO input component registration.
+    /// Creates typed <see cref="FusionTooltipBuilder{TModel}"/> instances for Reactive Plan wiring.
     /// </summary>
     public static class FusionTooltipHtmlExtensions
     {
         /// <summary>
-        /// Creates a FusionTooltip with the given element ID.
-        /// Non-input component: renders directly, no label/validation wrapper.
+        /// Creates a Syncfusion Tooltip and carries its controlled component ID into the Reactive Plan.
         /// </summary>
+        /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
+        /// <param name="html">The Razor HTML helper.</param>
+        /// <param name="plan">The Reactive Plan that receives tooltip event wiring.</param>
+        /// <param name="elementId">The controlled component ID shared by markup and plan entries.</param>
+        /// <param name="build">Configures the underlying Syncfusion tooltip builder.</param>
         public static FusionTooltipBuilder<TModel> FusionTooltip<TModel>(
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,
@@ -22,8 +25,6 @@ namespace Alis.Reactive.Fusion.Components
             Action<TooltipBuilder> build)
             where TModel : class
         {
-            // NO input component registration — this is NOT an input component
-
             var builder = html.EJS().Tooltip(elementId);
             build(builder);
 

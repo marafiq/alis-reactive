@@ -1,11 +1,10 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// FusionBulletChart - non-input chart component wrapping Syncfusion EJ2 BulletChart.
-    /// Exposes typed load, tooltip, mouse click, and navigation helper behavior.
+    /// Represents a Syncfusion BulletChart view component.
+    /// Exposes load, tooltip, click, and navigation event helpers; it is not an input component.
     /// </summary>
     public sealed class FusionBulletChart : FusionComponent
     {
-        // No ValueMember. This is a chart/view component, not a form input.
     }
 }
