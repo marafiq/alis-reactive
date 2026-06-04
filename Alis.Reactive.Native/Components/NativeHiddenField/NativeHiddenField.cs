@@ -1,10 +1,12 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Native HTML &lt;input type="hidden"&gt; element.
-    /// Phantom type — constrains which vertical slice extensions are available.
-    /// Participates in input component onboarding catalog for gather (IncludeAll picks it up).
+    /// Reactive Plan-registered native HTML <c>&lt;input type="hidden"&gt;</c> component.
     /// </summary>
+    /// <remarks>
+    /// The component type constrains hidden-field operations and allows gather to
+    /// include the hidden input through the input component catalog.
+    /// </remarks>
     public sealed class NativeHiddenField : NativeComponent, IInputComponent
     {
         internal static InputComponentRegistrationProfile Registration { get; } =

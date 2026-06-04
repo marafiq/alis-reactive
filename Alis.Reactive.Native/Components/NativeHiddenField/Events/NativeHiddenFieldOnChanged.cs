@@ -1,16 +1,22 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Payload for NativeHiddenField.Changed (DOM "change" event).
-    /// Properties are typed markers for expression-based condition sources:
-    ///   p.When(args, x => x.Value).Eq("RES-1042")
-    /// ExpressionPathHelper resolves x => x.Value to "evt.value".
+    /// Event args for <see cref="NativeHiddenFieldEvents.Changed"/>.
     /// </summary>
+    /// <remarks>
+    /// The properties are typed markers for event-payload paths; <c>x => x.Value</c>
+    /// resolves to <c>evt.value</c> in condition expressions.
+    /// </remarks>
     public class NativeHiddenFieldChangeArgs
     {
-        /// <summary>The hidden input's value after the change.</summary>
+        /// <summary>
+        /// Gets or sets the hidden input value after the change event.
+        /// </summary>
         public string? Value { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance for event payload binding.
+        /// </summary>
         public NativeHiddenFieldChangeArgs() { }
     }
 }

@@ -14,17 +14,23 @@ using ComponentRegistrationSource = Alis.Reactive.Native.Components.NativeHidden
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Factory extension for creating NativeHiddenFieldBuilder.
-    /// Hidden fields bypass InputField wrapper entirely -- no label, no validation slot.
-    /// Registers in the input component onboarding catalog for gather.
+    /// Factory extension for rendering model-bound hidden fields directly in a Razor view.
     /// </summary>
+    /// <remarks>
+    /// Hidden fields bypass the <c>InputField</c> wrapper because they do not render
+    /// labels or validation slots, but they still register with the Reactive Plan for gather.
+    /// </remarks>
     public static class NativeHiddenFieldHtmlExtensions
     {
         /// <summary>
-        /// Creates a hidden field bound to the model property.
-        /// Registers in the input component onboarding catalog for gather -- no InputField wrapper.
-        /// Returns IHtmlContent for direct rendering in views: @Html.HiddenFieldFor(plan, m => m.Id)
+        /// Registers and renders a hidden field bound to a model property.
         /// </summary>
+        /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <param name="html">The Razor HTML helper used to render the hidden input.</param>
+        /// <param name="plan">The Reactive Plan that receives the hidden-field registration.</param>
+        /// <param name="expression">The model property expression used for MVC binding and component registration.</param>
+        /// <returns>A builder that renders the hidden input directly in the view.</returns>
         public static NativeHiddenFieldBuilder<TModel, TProp> HiddenFieldFor<TModel, TProp>(
 #if NET48
             this HtmlHelper<TModel> html,

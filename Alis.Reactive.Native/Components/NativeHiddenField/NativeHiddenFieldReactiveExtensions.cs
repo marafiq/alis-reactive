@@ -5,12 +5,24 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Wires reactive event pipelines onto the NativeHiddenFieldBuilder.
-    /// Hidden inputs rarely fire change events -- this exists for completeness
-    /// (programmatic value changes can be observed via dispatched change events).
+    /// Wires <see cref="NativeHiddenField"/> DOM events into the Reactive Plan.
     /// </summary>
+    /// <remarks>
+    /// Hidden inputs do not raise user-driven change events. Programmatic value
+    /// changes are observable only when the caller dispatches a DOM <c>change</c> event.
+    /// </remarks>
     public static class NativeHiddenFieldReactiveExtensions
     {
+        /// <summary>
+        /// Wires a <see cref="NativeHiddenField"/> DOM event into a Reactive Plan pipeline.
+        /// </summary>
+        /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
+        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <typeparam name="TArgs">The event args type selected by <paramref name="eventSelector"/>.</typeparam>
+        /// <param name="builder">The hidden-field builder to wire events on.</param>
+        /// <param name="plan">The Reactive Plan that receives the component event trigger.</param>
+        /// <param name="eventSelector">Selects which event to listen for, such as <c>evt => evt.Changed</c>.</param>
+        /// <param name="pipeline">Builds the pipeline that runs when the event fires.</param>
         public static NativeHiddenFieldBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeHiddenFieldBuilder<TModel, TProp> builder,
             ReactivePlan<TModel> plan,
