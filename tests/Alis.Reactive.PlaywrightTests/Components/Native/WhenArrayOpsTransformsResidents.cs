@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 /// Exercises closed array DSL operations over an HTTP-loaded resident roster.
 /// </summary>
 /// <remarks>
-/// Examples include <c>Count</c>, <c>Where(...).Sum(...)</c>, etc.; no plugin or hand-written JavaScript.
+/// Covers <c>Count</c> and <c>Where(...).Sum(...)</c> without plugin or hand-written JavaScript.
 /// </remarks>
 [TestFixture]
 public class WhenArrayOpsTransformsResidents : PlaywrightTestBase

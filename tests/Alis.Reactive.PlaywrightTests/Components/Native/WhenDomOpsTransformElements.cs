@@ -4,8 +4,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Native;
 /// Exercises array DSL operations over DOM array-like values.
 /// </summary>
 /// <remarks>
-/// DOM <c>classList</c> and <c>children</c> are normalized so <c>Count</c>,
-/// <c>Where</c>, etc. work without a plugin or hand-written JavaScript.
+/// DOM <c>classList</c> and <c>children</c> are normalized so <c>Count</c>
+/// and <c>Where</c> work without a plugin or hand-written JavaScript.
 /// </remarks>
 [TestFixture]
 public class WhenDomOpsTransformElements : PlaywrightTestBase
