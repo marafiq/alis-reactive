@@ -6,7 +6,7 @@ namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/Contract";
-    private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
+    private const string ResidentModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator SummaryDiv => Page.Locator("[data-reactive-validation-summary]");
@@ -15,7 +15,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
     private ILocator ErrorFor(string fieldName) =>
         Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
 
-    private ILocator Input(string suffix) => Page.Locator($"#{R}{suffix}");
+    private ILocator Input(string suffix) => Page.Locator($"#{ResidentModelIdPrefix}{suffix}");
 
     private async Task FillAllRequired()
     {
@@ -57,9 +57,8 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        await Input("Name").FillAsync("A");
         await FillAllRequired();
-        await Input("Name").FillAsync("A"); // Override back to short name
+        await Input("Name").FillAsync("A");
 
         await SubmitBtn.ClickAsync();
 
@@ -225,7 +224,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
         // Tab commits the Syncfusion value before the next submit.
-        var scoreInput = Page.Locator($"#{R}MemoryAssessmentScore");
+        var scoreInput = Page.Locator($"#{ResidentModelIdPrefix}MemoryAssessmentScore");
         await scoreInput.ClickAsync();
         await scoreInput.FillAsync("85");
         await scoreInput.PressAsync("Tab");
@@ -247,7 +246,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        // FillAllRequired selects Independent; this test intentionally leaves it unchanged.
+        await Input("CareLevel").SelectOptionAsync("Independent");
 
         await SubmitBtn.ClickAsync();
 
@@ -526,7 +525,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await Input("VeteranId").FillAsync("V99999");
 
         await Input("PhysicianName").FillAsync("Dr. Martinez");
-        var assessmentInput = Page.Locator($"#{R}MemoryAssessmentScore");
+        var assessmentInput = Page.Locator($"#{ResidentModelIdPrefix}MemoryAssessmentScore");
         await assessmentInput.ClickAsync();
         await assessmentInput.FillAsync("72");
         await assessmentInput.PressAsync("Tab");
