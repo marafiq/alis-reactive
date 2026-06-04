@@ -91,26 +91,34 @@ namespace Alis.Reactive
         internal bool HasRegisteredInputComponent(BindingPath bindingPath) =>
             _registeredInputComponents.Contains(bindingPath);
 
-        /// <summary>Registers all components, resolves validation, and serializes the plan as compact JSON.</summary>
+        /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as compact JSON.</summary>
+        /// <returns>Compact Reactive Plan JSON ready to embed in the page.</returns>
         public string Render()
         {
             ResolveAll(_services);
             return PlanSerializer.Serialize(_context.BuildPlan());
         }
 
+        /// <summary>Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as compact JSON.</summary>
+        /// <param name="services">Services used to resolve validation rule sources required by queued validation rules.</param>
+        /// <returns>Compact Reactive Plan JSON ready to embed in the page.</returns>
         public string Render(IServiceProvider services)
         {
             ResolveAll(services);
             return PlanSerializer.Serialize(_context.BuildPlan());
         }
 
-        /// <summary>Registers all components, resolves validation, and serializes the plan as indented JSON for debugging.</summary>
+        /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as indented JSON for debugging.</summary>
+        /// <returns>Indented Reactive Plan JSON for diagnostics or sandbox display.</returns>
         public string RenderFormatted()
         {
             ResolveAll(_services);
             return PlanSerializer.SerializeFormatted(_context.BuildPlan());
         }
 
+        /// <summary>Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as indented JSON.</summary>
+        /// <param name="services">Services used to resolve validation rule sources required by queued validation rules.</param>
+        /// <returns>Indented Reactive Plan JSON for diagnostics or sandbox display.</returns>
         public string RenderFormatted(IServiceProvider services)
         {
             ResolveAll(services);
