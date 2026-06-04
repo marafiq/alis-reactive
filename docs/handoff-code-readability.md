@@ -114,12 +114,15 @@ Rewrite or delete:
 
 1. Start with Playwright test files, because they have the highest noise and the
    lowest public API risk.
-2. Replace repeated step comments with helper methods named after the domain action.
+2. Prefer deleting narrating comments or naming locals clearly. Extract helpers
+   only when the helper names a genuinely reusable behavior and removes repeated
+   mechanics without hiding the assertion proof.
 3. Preserve comments that explain Syncfusion, real browser timing, or compatibility quirks.
 4. Then trim public XML docs in one logical API slice at a time, keeping concise
    IntelliSense summaries for public DSL methods.
-5. Run the focused Playwright filter for each touched slice, then the observable
-   full Playwright gate before committing the cleanup.
+5. Match verification to risk: comment-only and XML-doc slices need build/typecheck
+   proof, not Playwright. Use `scripts/playwright.sh --filter "..."` when selectors,
+   waits, assertions, test flow, sandbox behavior, or runtime behavior changes.
 
 ## Branch Follow-Up Notes
 
@@ -143,3 +146,7 @@ Rewrite or delete:
   `vite build --config vite.design-system.config.ts`; the focused Playwright
   test project build completed afterward. TODO: capture logs/process state if it
   repeats and decide whether the wrapper needs timeout or progress diagnostics.
+- Native and Fusion component files are intentional vertical slices. Do not sweep
+  every component just because a repeated XML-doc phrase appears; finish one
+  component or one non-component concept at a time and keep the commit boundary
+  reviewable.
