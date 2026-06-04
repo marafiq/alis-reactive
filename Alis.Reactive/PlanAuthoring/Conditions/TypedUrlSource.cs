@@ -4,9 +4,9 @@ using Alis.Reactive.Builders.Requests;
 namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
-    /// A typed source that reads a URL query parameter from the browser's current location.
+    /// A typed source whose runtime value is read from the browser <c>window.location</c> query string.
     /// Returned by <c>PipelineBuilder.FromUrl()</c> and <c>PipelineBuilder.FromUrl&lt;T&gt;()</c>.
-    /// Plugs into all TypedSource&lt;T&gt; consumers: conditions, guards, branches, element ops, gather, headers, route params.
+    /// Can be used anywhere a <see cref="TypedSource{TProp}"/> is accepted, including conditions and request inputs.
     /// </summary>
     public sealed class TypedUrlSource<TProp> : TypedSource<TProp>
     {
