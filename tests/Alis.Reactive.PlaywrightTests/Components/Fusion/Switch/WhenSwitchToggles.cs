@@ -244,7 +244,7 @@ public class WhenSwitchToggles : PlaywrightTestBase
 
         var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
         Assert.That(hasBootTrace, Is.True,
-            "Boot trace must be emitted — confirms auto-boot discovered and executed the plan");
+            "Boot trace must be emitted — confirms runtime boot discovered and executed the plan");
         AssertNoConsoleErrors();
     }
 }

@@ -268,13 +268,13 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     [Test]
     public async Task boot_trace_is_emitted_on_page_load()
     {
-        // auto-boot.ts emits a "booted" trace message. If boot fails silently,
+        // Runtime boot emits a "booted" trace message. If boot fails silently,
         // no reactive behavior works and tests pass vacuously.
         await NavigateAndBoot();
 
         var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
         Assert.That(hasBootTrace, Is.True,
-            "Boot trace must be emitted — confirms auto-boot discovered and executed the plan");
+            "Boot trace must be emitted — confirms runtime boot discovered and executed the plan");
         AssertNoConsoleErrors();
     }
 }
