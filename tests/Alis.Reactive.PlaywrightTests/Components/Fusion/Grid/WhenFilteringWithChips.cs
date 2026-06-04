@@ -41,7 +41,6 @@ public class WhenFilteringWithChips : PlaywrightTestBase
         await SelectChip("Assisted");
         await Page.Locator("#apply-filters-btn").ClickAsync();
 
-        // Array DSL over the selected chip OBJECTS: 2 selected; Memory Care included (by Value).
         await Expect(Page.Locator("#filter-count")).ToHaveTextAsync("2", new() { Timeout = 10000 });
         await Expect(Page.Locator("#memory-on")).ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -59,7 +58,6 @@ public class WhenFilteringWithChips : PlaywrightTestBase
         await Expect(Page.Locator("#filter-status"))
             .ToHaveTextAsync("filtered", new() { Timeout = 10000 });
 
-        // Memory Care (Ada, Cy, Gus) + Assisted (Bo, Fay) = 5 rows; no Independent/Skilled.
         await Expect(Page.Locator("#care-grid .e-row")).ToHaveCountAsync(5, new() { Timeout = 10000 });
         await Expect(Page.Locator("#care-grid")).Not.ToContainTextAsync("Skilled Nursing", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
