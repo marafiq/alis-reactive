@@ -8,7 +8,6 @@
 
     var plan = Html.ReactivePlan<GridModel>();
 
-    // DomReady: Load page 1 from server
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Post("/Sandbox/Components/Grid/Data")
@@ -48,7 +47,6 @@
         filter resets to page 1 and sends the current minAge.
     </native-text>
 
-    <!-- Section 1: Grid + Sort + Paging + External Filter -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">1. Grid with Server-Side Sort, Paging &amp; External Filter</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -56,7 +54,6 @@
             + current filter value to the server. Response is <code>{result, count}</code>.
         </p>
 
-        <!-- External Filter Panel -->
         <div class="mb-4 p-4 rounded-md bg-slate-50 border border-border/50">
             <native-grid cols="C3" gap="Base">
                 @{ Html.InputField(plan, m => m.MinAge, o => o.Label("Min Age Filter"))
@@ -132,7 +129,6 @@
         </native-vstack>
     </section>
 
-    <!-- Plan JSON -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>

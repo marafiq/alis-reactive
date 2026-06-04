@@ -47,7 +47,6 @@
     Html.On(plan, t => t.DomReady(p => LoadBilling(p, "loaded current census")));
 }
 
-<!-- Templated "Add charge" dialog -->
 <div id="add-charge-dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
     <div class="w-full max-w-lg rounded-lg border border-border bg-white p-6 shadow-xl">
         <native-heading level="H2">Add Resident Charge</native-heading>
@@ -121,7 +120,6 @@
         </native-hstack>
     </native-hstack>
 
-    <!-- Filter panel: our own buttons, server-side reload -->
     <native-card><native-card-body>
         <native-heading level="H2">Filter Census</native-heading>
         <native-grid cols="C3" gap="Base" class="mt-4">
@@ -198,7 +196,6 @@
         </native-hstack>
     </native-card-body></native-card>
 
-    <!-- Bulk operations panel -->
     <native-card><native-card-body>
         <native-heading level="H2">Bulk Charge Operations</native-heading>
         <native-text color="Secondary">
@@ -261,7 +258,6 @@
         </native-hstack>
     </native-card-body></native-card>
 
-    <!-- Tooling panel: onboarded export / print / column-chooser / auto-fit methods -->
     <native-card><native-card-body>
         <native-heading level="H2">Roster Tools</native-heading>
         <native-hstack gap="Sm" class="mt-4 flex-wrap">

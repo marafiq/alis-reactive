@@ -13,8 +13,7 @@
 @{
     ViewData["Title"] = "FusionGrid Care Operations";
 
-    // EJ2-native column validation generated from the SAME ResidentCareItemValidator
-    // ClientRule metadata — single source, client-side in-cell validation for free.
+    // EJ2 column validation uses the same ResidentCareItemValidator metadata as Reactive validation.
     var careValidation = FusionGridValidation.From<ResidentCareItemValidator, ResidentCareItem>(ClientRules);
 
     const string GridId = "careops-grid";
@@ -77,7 +76,6 @@
     Html.On(plan, t => t.CustomEvent("careops-rows-refresh", p => LoadCareOps(p, "census updated")));
 }
 
-<!-- Templated "Admit resident" dialog -->
 <div id="admit-dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
     <div class="w-full max-w-xl rounded-lg border border-border bg-white p-6 shadow-xl">
         <native-heading level="H2">Admit Resident</native-heading>
@@ -151,7 +149,6 @@
         </native-hstack>
     </native-hstack>
 
-    <!-- Chip fast filters -->
     <native-card><native-card-body>
         <native-heading level="H2">Fast Filters</native-heading>
         <native-vstack gap="Sm" class="mt-4">
@@ -202,7 +199,6 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    <!-- Bulk operations -->
     <native-card><native-card-body>
         <native-heading level="H2">Bulk Care Operations</native-heading>
         <native-text color="Secondary">
@@ -330,7 +326,6 @@
             }))
     </native-card-body></native-card>
 
-    <!-- Per-resident NativeActionLink quick actions (server-rendered partial, Into-injected) -->
     <native-card><native-card-body>
         <native-heading level="H2">Per-Resident Quick Actions</native-heading>
         <native-text color="Secondary">
