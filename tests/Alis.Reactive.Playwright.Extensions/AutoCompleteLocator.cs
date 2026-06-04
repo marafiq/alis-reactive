@@ -3,8 +3,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// Locator surface for the Syncfusion AutoComplete DOM used by Playwright tests.
-/// The input uses <c>#{componentId}</c>; the popup uses <c>#{componentId}_popup</c>.
+/// Syncfusion AutoComplete uses <c>#{componentId}</c> input and <c>#{componentId}_popup</c> popup IDs.
 /// </summary>
 public sealed class AutoCompleteLocator
 {

@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Playwright gestures and surfaces for FusionDropDownButton tests.
-/// </summary>
 public sealed class FusionDropDownButtonLocator
 {
     private readonly IPage _page;

@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Playwright gestures and surfaces for FusionRichTextEditor tests.
-/// </summary>
 public sealed class RichTextEditorLocator
 {
     private readonly IPage _page;

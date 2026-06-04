@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Playwright gestures and surfaces for FusionProgressButton tests.
-/// </summary>
 public sealed class FusionProgressButtonLocator
 {
     private readonly IPage _page;

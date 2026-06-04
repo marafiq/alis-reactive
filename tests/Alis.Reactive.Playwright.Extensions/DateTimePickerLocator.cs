@@ -4,11 +4,10 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// Playwright gestures and surfaces for FusionDateTimePicker tests.
+/// Uses popup gestures because typed text does not always update Syncfusion <c>ej2.value</c>.
 /// </summary>
 /// <remarks>
-/// Popup gestures are preferred because typed text does not always update the
-/// Syncfusion ej2 value. Calendar and time popups both use <c>#{id}_options</c>.
+/// Calendar and time popups both use <c>#{id}_options</c>.
 /// </remarks>
 public sealed class DateTimePickerLocator
 {

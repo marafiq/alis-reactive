@@ -3,12 +3,8 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// Playwright gestures and surfaces for FusionMultiSelect tests.
+/// Selects through the popup and blurs because Syncfusion MultiSelect raises <c>change</c> on blur.
 /// </summary>
-/// <remarks>
-/// Syncfusion MultiSelect fires <c>change</c> on blur, not individual item
-/// selection, so selection helpers click outside the component after choosing.
-/// </remarks>
 public sealed class MultiSelectLocator
 {
     private readonly IPage _page;

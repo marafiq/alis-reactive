@@ -3,9 +3,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Playwright gestures and surfaces for FusionListView tests.
-/// </summary>
 public sealed class FusionListViewLocator
 {
     private readonly IPage _page;

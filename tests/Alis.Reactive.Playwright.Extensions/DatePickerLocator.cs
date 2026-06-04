@@ -4,12 +4,8 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// Playwright gestures and surfaces for FusionDatePicker tests.
+/// Uses popup gestures because typed text does not always update Syncfusion <c>ej2.value</c>.
 /// </summary>
-/// <remarks>
-/// Popup gestures are preferred because typed text does not always update the
-/// Syncfusion ej2 value.
-/// </remarks>
 public sealed class DatePickerLocator
 {
     private readonly IPage _page;

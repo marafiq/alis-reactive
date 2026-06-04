@@ -3,8 +3,7 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// Locator surface for the Syncfusion DropDownList DOM used by Playwright tests.
-/// The popup uses <c>#{componentId}_popup</c> and contains <c>.e-list-item</c> options.
+/// Syncfusion DropDownList uses <c>#{componentId}_popup</c> with <c>.e-list-item</c> options.
 /// </summary>
 public sealed class DropDownListLocator
 {

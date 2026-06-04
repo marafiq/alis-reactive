@@ -4,12 +4,10 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// Playwright gestures and surfaces for FusionDateRangePicker tests.
+/// Uses popup gestures because typed text does not always update Syncfusion range values.
 /// </summary>
 /// <remarks>
-/// Popup gestures are preferred because typed text does not always update
-/// Syncfusion's <c>startDate</c> and <c>endDate</c>. DateRangePicker uses
-/// <c>#{id}_popup</c>, unlike DatePicker and DateTimePicker.
+/// DateRangePicker uses <c>#{id}_popup</c>, unlike DatePicker and DateTimePicker.
 /// </remarks>
 public sealed class DateRangePickerLocator
 {

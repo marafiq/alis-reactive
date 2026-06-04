@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.Playwright.Extensions;
 
-/// <summary>
-/// Playwright gestures and surfaces for FusionSplitButton tests.
-/// </summary>
 public sealed class FusionSplitButtonLocator
 {
     private readonly IPage _page;
