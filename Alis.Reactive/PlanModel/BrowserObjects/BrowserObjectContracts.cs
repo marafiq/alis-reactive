@@ -47,32 +47,32 @@ namespace Alis.Reactive.PlanModel
             _byTypeKey[contract.BrowserObjectId.Value] = contract.ToBrowserObjectContract();
         }
 
-        internal MethodSignature DeclarePluginMethod(PluginMethodRequirement methodRead)
+        internal MethodSignature DeclarePluginMethod(PluginMethodRequirement requirement)
         {
-            var typeKey = BrowserObjectId.Plugin(methodRead.PluginName);
+            var typeKey = BrowserObjectId.Plugin(requirement.PluginName);
 
             if (!_byTypeKey.ContainsKey(typeKey.Value))
                 throw new InvalidOperationException(
-                    $"Plugin '{methodRead.PluginName.Value}' is not registered. " +
-                    $"Call plan.RegisterPlugin(\"{methodRead.PluginName.Value}\", ...) first.");
+                    $"Plugin '{requirement.PluginName.Value}' is not registered. " +
+                    $"Call plan.RegisterPlugin(\"{requirement.PluginName.Value}\", ...) first.");
 
             var method = DeclareMethod(
                 typeKey,
-                methodRead.ToObjectMethodContract());
+                requirement.ToObjectMethodContract());
 
             return method.Signature;
         }
 
-        internal void DeclarePluginProperty(PluginPropertyRequirement propertyRead)
+        internal void DeclarePluginProperty(PluginPropertyRequirement requirement)
         {
-            var typeKey = BrowserObjectId.Plugin(propertyRead.PluginName);
+            var typeKey = BrowserObjectId.Plugin(requirement.PluginName);
 
             if (!_byTypeKey.ContainsKey(typeKey.Value))
                 throw new InvalidOperationException(
-                    $"Plugin '{propertyRead.PluginName.Value}' is not registered. " +
-                    $"Call plan.RegisterPlugin(\"{propertyRead.PluginName.Value}\", ...) first.");
+                    $"Plugin '{requirement.PluginName.Value}' is not registered. " +
+                    $"Call plan.RegisterPlugin(\"{requirement.PluginName.Value}\", ...) first.");
 
-            DeclareProperty(typeKey, propertyRead.ToObjectPropertyContract());
+            DeclareProperty(typeKey, requirement.ToObjectPropertyContract());
         }
     }
 }
