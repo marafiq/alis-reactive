@@ -5,12 +5,12 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Configures one HTTP request reaction: endpoint, gathered input, body
-    /// format, validation, loading/finally reactions, and response routes.
+    /// Configures one HTTP request reaction: endpoint, request input,
+    /// lifecycle reactions, validation, and response routes.
     /// </summary>
     /// <remarks>
-    /// Created by HTTP entry points such as <c>p.Get("/url")</c>,
-    /// <c>p.Post("/url")</c>, or branches inside <c>p.Parallel(...)</c>.
+    /// Created by HTTP entry points such as <c>p.Get("/url")</c> and
+    /// <c>p.Post("/url")</c>. Branches inside <c>p.Parallel(...)</c> use the same builder.
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns model-bound component IDs.</typeparam>
     public class HttpRequestBuilder<TModel> where TModel : class
