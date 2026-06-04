@@ -268,7 +268,7 @@ namespace Alis.Reactive.FluentValidator
                 {
                     throw new InvalidOperationException(
                         "ClientRule cannot be declared inside FluentValidation When, Unless, WhenAsync, or UnlessAsync. " +
-                        "Use WhenField for a browser condition, or keep the rule server-only with RuleFor.");
+                        "Use WhenField for a Reactive Plan field condition, or keep the rule server-only with RuleFor.");
                 }
 
                 if (_clientConditions.Count == 0)

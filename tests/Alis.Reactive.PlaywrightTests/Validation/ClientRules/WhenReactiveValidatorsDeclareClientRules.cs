@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 public sealed class WhenReactiveValidatorsDeclareClientRules
 {
     [Test]
-    public void declared_client_rules_emit_browser_rules()
+    public void declared_client_rules_emit_reactive_plan_client_rules()
     {
         using var doc = ClientValidationRulePlanHarness
             .RenderPlan<BuiltInClientRulesModel, BuiltInClientRulesValidator>();

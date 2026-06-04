@@ -32,7 +32,7 @@ namespace Alis.Reactive.Validation
                     return fields;
 
             throw new InvalidOperationException(
-                $"No browser validation metadata is registered for validation source '{validationSourceType.FullName}'. " +
+                $"No Reactive Plan client validation metadata is registered for validation source '{validationSourceType.FullName}'. " +
                 "Register FluentValidation metadata with services.AddReactiveFluentValidation(...), " +
                 "or app-level rules with services.AddReactiveClientValidation(...).");
         }
