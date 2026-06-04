@@ -5,51 +5,51 @@ namespace Alis.Reactive.Builders
 {
     public partial class PipelineBuilder<TModel> where TModel : class
     {
-        /// <summary>Starts an HTTP GET request.</summary>
+        /// <summary>Appends an async HTTP GET reaction to the current pipeline.</summary>
         /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <returns>An HTTP request builder for configuring gather, validation, and response routing.</returns>
+        /// <returns>A request builder for route values, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Get(string url)
         {
             return _draft.BeginHttp(Context).Get(url);
         }
 
-        /// <summary>Starts an HTTP POST request.</summary>
+        /// <summary>Appends an async HTTP POST reaction to the current pipeline.</summary>
         /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <returns>An HTTP request builder for configuring gather, validation, and response routing.</returns>
+        /// <returns>A request builder for gathered input, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Post(string url)
         {
             return _draft.BeginHttp(Context).Post(url);
         }
 
-        /// <summary>Starts an HTTP POST request with inline gather configuration.</summary>
+        /// <summary>Appends an async HTTP POST reaction and configures gathered input inline.</summary>
         /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <param name="gather">Configures values to gather before sending the request.</param>
+        /// <param name="gather">Collects request body, header, or route-template values before the request is sent.</param>
         /// <returns>An HTTP request builder for configuring validation and response routing.</returns>
         public HttpRequestBuilder<TModel> Post(string url, Action<GatherBuilder<TModel>> gather)
         {
             return _draft.BeginHttp(Context).Post(url).Gather(gather);
         }
 
-        /// <summary>Starts an HTTP PUT request with inline gather configuration.</summary>
+        /// <summary>Appends an async HTTP PUT reaction and configures gathered input inline.</summary>
         /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <param name="gather">Configures values to gather before sending the request.</param>
+        /// <param name="gather">Collects request body, header, or route-template values before the request is sent.</param>
         /// <returns>An HTTP request builder for configuring validation and response routing.</returns>
         public HttpRequestBuilder<TModel> Put(string url, Action<GatherBuilder<TModel>> gather)
         {
             return _draft.BeginHttp(Context).Put(url).Gather(gather);
         }
 
-        /// <summary>Starts an HTTP DELETE request.</summary>
+        /// <summary>Appends an async HTTP DELETE reaction to the current pipeline.</summary>
         /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <returns>An HTTP request builder for configuring gather, validation, and response routing.</returns>
+        /// <returns>A request builder for route values, validation, loading/finally reactions, and response routing.</returns>
         public HttpRequestBuilder<TModel> Delete(string url)
         {
             return _draft.BeginHttp(Context).Delete(url);
         }
 
-        /// <summary>Starts multiple HTTP request branches that execute concurrently.</summary>
-        /// <param name="branches">The HTTP request branches to build and run in parallel.</param>
-        /// <returns>A parallel request builder for configuring all-settled behavior.</returns>
+        /// <summary>Appends an async reaction whose HTTP request branches execute concurrently.</summary>
+        /// <param name="branches">The request branches to build before they run in parallel.</param>
+        /// <returns>A parallel request builder for configuring the optional all-settled reaction.</returns>
         public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
         {
             var builder = _draft.BeginParallel(Context);
