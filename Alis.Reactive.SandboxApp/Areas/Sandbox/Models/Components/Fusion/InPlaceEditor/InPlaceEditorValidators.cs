@@ -68,12 +68,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .LessThanOrEqualTo(25000m, "'Value' must be at most 25000.");
 
             RuleFor(x => x.Value)
-                .Must(rate => !IsAlreadyAssignedToAnotherResident(rate))
+                .Must(rate => !IsAssignedToAnotherResidentInDemoStore(rate))
                 .WithMessage("Monthly rate is already assigned to another resident (server-only check).");
         }
 
-        // Pretend this reaches a database. In production this would be a repository call.
-        private static bool IsAlreadyAssignedToAnotherResident(decimal rate) => rate == 7777m;
+        private static bool IsAssignedToAnotherResidentInDemoStore(decimal rate) => rate == 7777m;
     }
 
     public class NicknameQuickEditValidator : ReactiveValidator<NicknameQuickEdit>
