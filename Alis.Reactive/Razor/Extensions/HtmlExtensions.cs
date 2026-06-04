@@ -33,10 +33,10 @@ namespace Alis.Reactive.Native.Extensions
         /// @Html.RenderPlan(plan)
         /// </code>
         /// <para>
-        /// A trigger is an event source that starts a reaction: the page loading (<c>DomReady</c>),
-        /// a DOM custom event (<c>CustomEvent</c>), a server-sent event (<c>ServerPush</c>), or a
-        /// SignalR message (<c>SignalR</c>). When the trigger fires, the commands declared in
-        /// its callback execute in declaration order.
+        /// A trigger is an event source that starts a reaction, such as page loading
+        /// (<c>DomReady</c>) or a DOM custom event (<c>CustomEvent</c>). See
+        /// <see cref="TriggerBuilder{TModel}"/> for the full trigger surface. When the
+        /// trigger fires, the commands declared in its callback execute in declaration order.
         /// </para>
         /// <para>
         /// Avoid defining the same event twice in the same view. Duplicate listeners are
@@ -48,7 +48,7 @@ namespace Alis.Reactive.Native.Extensions
         /// <param name="plan">The Reactive Plan that receives the trigger declarations.</param>
         /// <param name="trigger">
         /// Configures one or more triggers via the fluent <see cref="TriggerBuilder{TModel}"/> API.
-        /// Triggers can be chained: <c>t.DomReady(...).CustomEvent(...).SignalR(...).ServerPush(...)</c>.
+        /// Triggers can be chained, for example <c>t.DomReady(...).CustomEvent(...)</c>.
         /// </param>
         public static void On<TModel>(
 #if NET48
