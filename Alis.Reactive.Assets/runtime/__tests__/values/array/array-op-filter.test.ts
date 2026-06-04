@@ -113,9 +113,9 @@ describe("array-op filter (per-element sync predicate via the DI compare-engine 
   });
 
   it("filters a DOMTokenList after array-like normalization", () => {
-    const el = document.createElement("div");
-    el.className = "risk-fall care-memory plain";
-    expect(evaluateValue(filter(el.classList, elementSelfNotEquals("plain"), stringShape), plan())).toEqual([
+    const hostElement = document.createElement("div");
+    hostElement.className = "risk-fall care-memory plain";
+    expect(evaluateValue(filter(hostElement.classList, elementSelfNotEquals("plain"), stringShape), plan())).toEqual([
       "risk-fall",
       "care-memory",
     ]);

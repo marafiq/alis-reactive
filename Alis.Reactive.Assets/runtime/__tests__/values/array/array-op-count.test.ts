@@ -32,9 +32,9 @@ describe("array-op count + array-like normalization", () => {
   });
 
   it("normalizes a DOMTokenList (classList) via Array.from before counting", () => {
-    const el = document.createElement("div");
-    el.className = "risk-fall risk-oxygen care-memory";
-    expect(evaluateValue(count(el.classList), plan())).toBe(3);
+    const hostElement = document.createElement("div");
+    hostElement.className = "risk-fall risk-oxygen care-memory";
+    expect(evaluateValue(count(hostElement.classList), plan())).toBe(3);
   });
 
   it("normalizes a generic iterable (Set) via Array.from", () => {
