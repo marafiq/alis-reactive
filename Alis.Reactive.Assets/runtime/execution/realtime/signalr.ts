@@ -31,7 +31,7 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
     } catch (err) {
       const delay = reconnectDelayForAttempt(attempt);
       log.warn("start.retry", { hubUrl, attempt: attempt + 1, delay, error: toJavaScriptString(err) });
-      await new Promise(r => setTimeout(r, delay));
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
 
