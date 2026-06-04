@@ -39,7 +39,6 @@ public class WhenOperatingOnCustomEventPayloadArray : PlaywrightTestBase
     public async Task sums_priority_of_critical_alerts()
     {
         await NavigateAndGenerateReport();
-        // Where(Severity == "critical").Sum(Priority) = 9 + 7 + 4
         await Expect(Page.Locator("#critical-priority-sum")).ToHaveTextAsync("20", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
@@ -48,7 +47,6 @@ public class WhenOperatingOnCustomEventPayloadArray : PlaywrightTestBase
     public async Task finds_the_highest_priority_critical_resident()
     {
         await NavigateAndGenerateReport();
-        // Where(critical).OrderByDescending(Priority).Find(first).Resident => Maple (priority 9)
         await Expect(Page.Locator("#top-critical")).ToHaveTextAsync("Maple", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
@@ -57,7 +55,6 @@ public class WhenOperatingOnCustomEventPayloadArray : PlaywrightTestBase
     public async Task guards_on_an_unacknowledged_critical_alert()
     {
         await NavigateAndGenerateReport();
-        // Any(Severity == "critical" && !Acknowledged) => true (Maple, Oak)
         await Expect(Page.Locator("#unack-warning")).ToBeVisibleAsync(new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
@@ -69,7 +66,6 @@ public class WhenOperatingOnCustomEventPayloadArray : PlaywrightTestBase
         await WaitForTraceMessage("booted", 10000);
         await Page.Locator("#clear-report-btn").ClickAsync();
 
-        // Same array DSL guard, all-acknowledged roster => Else branch: clear shown, warning not.
         await Expect(Page.Locator("#unack-clear")).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Page.Locator("#unack-warning")).Not.ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
