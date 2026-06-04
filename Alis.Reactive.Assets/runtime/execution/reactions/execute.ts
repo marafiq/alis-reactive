@@ -47,9 +47,9 @@ function runtimePlanFor(planDocument: PlanDocument | undefined): RuntimePlan {
 export function executeReaction(
   reaction: ReactionGraph,
   planDocument?: PlanDocument,
-  ctx?: ExecContext,
+  rawContext?: ExecContext,
 ): ReactionCompletion {
-  return executeReactionWith(reaction, runtimePlanFor(planDocument), ExecutionContext.from(ctx));
+  return executeReactionWith(reaction, runtimePlanFor(planDocument), ExecutionContext.from(rawContext));
 }
 
 function executeReactionWith(

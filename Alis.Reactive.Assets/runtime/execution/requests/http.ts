@@ -27,9 +27,9 @@ type HttpExchangeOutcome =
 export async function executeRequest(
   request: RequestPlan,
   planDocument: PlanDocument,
-  ctx?: ExecContext,
+  rawContext?: ExecContext,
 ): Promise<void> {
-  await runHttpRequest(request, planDocument, ExecutionContext.from(ctx));
+  await runHttpRequest(request, planDocument, ExecutionContext.from(rawContext));
 }
 
 async function runHttpRequest(
