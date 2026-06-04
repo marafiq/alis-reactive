@@ -45,7 +45,7 @@ namespace Alis.Reactive.Native.Components
         private string _cssClass = "flex flex-col gap-2";
         private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
 
-        // Keep internal: the factory also registers this input component in the Reactive Plan.
+        // Internal because the factory also registers this input component in the Reactive Plan.
 #if NET48
         internal NativeCheckListBuilder(
             HtmlHelper<TModel> html,
@@ -157,10 +157,10 @@ namespace Alis.Reactive.Native.Components
 #endif
             string modelValue;
             HashSet<string> checkedValues;
-            if (rawValue is string[] arr)
+            if (rawValue is string[] selectedValues)
             {
-                modelValue = string.Join(",", arr);
-                checkedValues = new HashSet<string>(arr);
+                modelValue = string.Join(",", selectedValues);
+                checkedValues = new HashSet<string>(selectedValues);
             }
             else
             {
@@ -171,11 +171,10 @@ namespace Alis.Reactive.Native.Components
 
             var encodedId = encoder.Encode(_elementId);
 
-            // Container div IS the canonical element — carries the element ID.
-            // Inline init sets container.value = string[] (array semantics for evalRead + gather).
+            // The container is the Reactive Plan component target and exposes string[] value semantics.
             writer.Write($"<div id=\"{encodedId}\" class=\"{encoder.Encode(_cssClass)}\">");
 
-            // Hidden input — for MVC form submission (CSV value), NOT the canonical element.
+            // The hidden input keeps MVC form submission as CSV; it is not the component target.
             writer.Write($"<input type=\"hidden\" name=\"{encoder.Encode(_bindingPath)}\" value=\"{encoder.Encode(modelValue)}\" />");
 
             for (int i = 0; i < _options.Count; i++)
@@ -205,9 +204,8 @@ namespace Alis.Reactive.Native.Components
 
             writer.Write("</div>");
 
-            // Inline init — same pattern as SF component initialization.
-            // Targets known ID, no DOM scanning. Works on page load AND partial injection.
-            // Sets container.value = string[] (array semantics) and syncs hidden input (CSV for MVC).
+            // Inline initialization works on page load and partial injection without DOM scanning.
+            // It keeps the container string[] value and hidden input CSV in sync.
             writer.Write($@"<script>(function(){{var c=document.getElementById(""{encodedId}"");var h=c.querySelector(""input[type=hidden]"");var init=h.value.split("","").filter(Boolean);c.value=init;c.isInteracted=false;c.addEventListener(""change"",function(e){{if(e.target.type!==""checkbox"")return;var v=[];var cbs=c.querySelectorAll(""input[type=checkbox]"");for(var i=0;i<cbs.length;i++)if(cbs[i].checked)v.push(cbs[i].value);c.value=v;h.value=v.join("","");c.isInteracted=true;}});}})();</script>");
         }
     }
