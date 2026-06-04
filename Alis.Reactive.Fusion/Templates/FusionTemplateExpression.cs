@@ -6,17 +6,21 @@ using System.Linq.Expressions;
 namespace Alis.Reactive.Fusion.Templates
 {
     /// <summary>
-    /// Converts C# expressions to Syncfusion template syntax.
+    /// Converts supported C# expressions to Syncfusion template syntax.
     /// </summary>
     /// <remarks>
     /// Examples include <c>m =&gt; m.PropertyName</c> becoming <c>${propertyName}</c>
     /// and <c>m =&gt; m.Status == "Active"</c> becoming <c>status === 'Active'</c>.
+    /// Unsupported expression nodes throw <see cref="ArgumentException"/>.
     /// </remarks>
     public static class FusionTemplateExpression
     {
         /// <summary>
-        /// Converts a property expression to a Syncfusion binding token.
+        /// Converts a property expression to a Syncfusion <c>${...}</c> binding token.
         /// </summary>
+        /// <typeparam name="TModel">The template model type.</typeparam>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="expression">The property-access expression to bind.</param>
         /// <returns>A binding token such as <c>${propertyName}</c>.</returns>
         public static string ToBinding<TModel, TProperty>(Expression<Func<TModel, TProperty>> expression)
         {
@@ -27,6 +31,9 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Converts a property expression to a Syncfusion template property path.
         /// </summary>
+        /// <typeparam name="TModel">The template model type.</typeparam>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A property path without the surrounding binding token.</returns>
         public static string ToPropertyPath<TModel, TProperty>(Expression<Func<TModel, TProperty>> expression)
         {
@@ -34,8 +41,11 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Converts a boolean predicate expression to Syncfusion condition syntax.
+        /// Converts a supported boolean predicate expression to Syncfusion condition syntax.
         /// </summary>
+        /// <typeparam name="TModel">The template model type.</typeparam>
+        /// <param name="predicate">The predicate expression to convert.</param>
+        /// <returns>A Syncfusion condition expression such as <c>status === 'Active'</c>.</returns>
         public static string ToCondition<TModel>(Expression<Func<TModel, bool>> predicate)
         {
             return ConvertToCondition(predicate.Body);
