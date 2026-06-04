@@ -24,43 +24,55 @@ type HttpExchangeOutcome =
   | { readonly kind: "error"; readonly status: number; readonly body: HttpResponseBody }
   | { readonly kind: "response-unavailable" };
 
-export async function executeRequest(req: RequestPlan, plan: PlanDocument, ctx?: ExecContext): Promise<void> {
-  await runHttpRequest(req, plan, ExecutionContext.from(ctx));
+export async function executeRequest(
+  request: RequestPlan,
+  planDocument: PlanDocument,
+  ctx?: ExecContext,
+): Promise<void> {
+  await runHttpRequest(request, planDocument, ExecutionContext.from(ctx));
 }
 
-async function runHttpRequest(request: RequestPlan, plan: PlanDocument, context: ExecutionContext): Promise<void> {
-  if (!requestCanSend(request, plan, context)) return;
+async function runHttpRequest(
+  request: RequestPlan,
+  planDocument: PlanDocument,
+  context: ExecutionContext,
+): Promise<void> {
+  if (!requestCanSend(request, planDocument, context)) return;
 
-  await runRequestReactions(request.whileLoading, plan, context.asAvailable());
+  await runRequestReactions(request.whileLoading, planDocument, context.asAvailable());
 
-  const prepared = prepareHttpRequest(request, plan, context);
-  const outcome = await sendHttpRequest(request, prepared.fetch);
-  await routeExchangeOutcome(outcome, request, plan, prepared.context);
+  const preparedRequest = prepareHttpRequest(request, planDocument, context);
+  const outcome = await sendHttpRequest(request, preparedRequest.fetchRequest);
+  await routeExchangeOutcome(outcome, request, planDocument, preparedRequest.context);
 }
 
-function requestCanSend(request: RequestPlan, plan: PlanDocument, context: ExecutionContext): boolean {
+function requestCanSend(request: RequestPlan, planDocument: PlanDocument, context: ExecutionContext): boolean {
   const validation = request.validation;
   const requestRequiresClientValidation = validation.kind === "container";
   if (!requestRequiresClientValidation) return true;
 
-  const valid = validateContainer(plan, validation.container, context.asAvailable());
+  const valid = validateContainer(planDocument, validation.container, context.asAvailable());
   if (!valid) log.debug("validation.aborted", { id: validation.container, url: request.url });
 
   return valid;
 }
 
 interface PreparedHttpRequest {
-  readonly fetch: ResolvedFetch;
+  readonly fetchRequest: ResolvedFetch;
   readonly context: ExecutionContext;
 }
 
-function prepareHttpRequest(request: RequestPlan, plan: PlanDocument, context: ExecutionContext): PreparedHttpRequest {
+function prepareHttpRequest(
+  request: RequestPlan,
+  planDocument: PlanDocument,
+  context: ExecutionContext,
+): PreparedHttpRequest {
   const currentContext = context.asAvailable();
-  const resolvedInput = resolveRequestInput(request.input, request.method, plan, currentContext);
+  const resolvedInput = resolveRequestInput(request.input, request.method, planDocument, currentContext);
   const requestContext = context.withRequest(requestPayloadSnapshotFrom(resolvedInput));
-  const fetch = resolveFetch(request, resolvedInput);
+  const fetchRequest = resolveFetch(request, resolvedInput);
 
-  return { fetch, context: requestContext };
+  return { fetchRequest, context: requestContext };
 }
 
 async function sendHttpRequest(request: RequestPlan, fetchRequest: ResolvedFetch): Promise<HttpExchangeOutcome> {
@@ -102,18 +114,18 @@ function exchangeOutcomeFromClientFailure(request: RequestPlan, err: unknown): H
 async function routeExchangeOutcome(
   outcome: HttpExchangeOutcome,
   request: RequestPlan,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
 ): Promise<void> {
   switch (outcome.kind) {
     case "success":
-      await routeSuccess(request, plan, context, outcome.status, outcome.body);
+      await routeSuccess(request, planDocument, context, outcome.status, outcome.body);
       return;
     case "error":
-      await routeError(request, plan, context, outcome.status, outcome.body);
+      await routeError(request, planDocument, context, outcome.status, outcome.body);
       return;
     case "response-unavailable":
-      await routeResponseUnavailable(request, plan, context);
+      await routeResponseUnavailable(request, planDocument, context);
       return;
     default:
       return assertNever(outcome, "HTTP exchange outcome");
@@ -127,60 +139,60 @@ function clientRequestFailureTraceEvent(error: unknown): "fetch.network-error" |
 
 async function routeSuccess(
   request: RequestPlan,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
   status: number,
   body: HttpResponseBody,
 ): Promise<void> {
   const responseContext = contextWithResponseBody(context, body);
-  await routeAndComplete(request, plan, context, () =>
-    routeResponseRoutes(request.success, status, plan, responseContext.asAvailable()));
-  await runFollowUpRequest(request.chain, plan, responseContext);
+  await routeAndComplete(request, planDocument, context, () =>
+    routeResponseRoutes(request.success, status, planDocument, responseContext.asAvailable()));
+  await runFollowUpRequest(request.chain, planDocument, responseContext);
 }
 
 async function routeError(
   request: RequestPlan,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
   status: number,
   body: HttpResponseBody,
 ): Promise<void> {
-  await routeAndComplete(request, plan, context, () =>
-    routeResponseRoutes(request.error, status, plan, contextWithResponseBody(context, body).asAvailable()));
+  await routeAndComplete(request, planDocument, context, () =>
+    routeResponseRoutes(request.error, status, planDocument, contextWithResponseBody(context, body).asAvailable()));
 }
 
 async function routeResponseUnavailable(
   request: RequestPlan,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
 ): Promise<void> {
-  await routeAndComplete(request, plan, context, () =>
-    routeAnyResponseRoute(request.error, plan, context.asAvailable()));
+  await routeAndComplete(request, planDocument, context, () =>
+    routeAnyResponseRoute(request.error, planDocument, context.asAvailable()));
 }
 
 async function routeAndComplete(
   request: RequestPlan,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
   routeStage: () => Promise<void>,
 ): Promise<void> {
   try {
     await routeStage();
   } finally {
-    await runRequestReactions(request.finally, plan, context.asAvailable());
+    await runRequestReactions(request.finally, planDocument, context.asAvailable());
   }
 }
 
 async function runFollowUpRequest(
   chain: RequestPlan["chain"],
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecutionContext,
 ): Promise<void> {
   switch (chain.kind) {
     case "terminal":
       return;
     case "follow-up":
-      await runHttpRequest(chain.next, plan, context);
+      await runHttpRequest(chain.next, planDocument, context);
       return;
     default:
       return assertNever(chain, "request chain");
@@ -189,11 +201,11 @@ async function runFollowUpRequest(
 
 async function runRequestReactions(
   reactions: readonly ReactionGraph[],
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecContext,
 ): Promise<void> {
   for (const reaction of reactions) {
-    await executeReaction(reaction, plan, context);
+    await executeReaction(reaction, planDocument, context);
   }
 }
 
@@ -256,12 +268,12 @@ function responseBodyFrom(rawBody: unknown): HttpResponseBody {
 async function routeResponseRoutes(
   routes: ResponseRoute[],
   status: number,
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecContext,
 ): Promise<void> {
   const route = routes.find(routeMatchesStatus(status)) ?? routes.find(routeMatchesAnyStatus);
   if (route) {
-    await executeReaction(route.reaction, plan, context);
+    await executeReaction(route.reaction, planDocument, context);
     return;
   }
 
@@ -275,12 +287,12 @@ async function routeResponseRoutes(
 
 async function routeAnyResponseRoute(
   routes: ResponseRoute[],
-  plan: PlanDocument,
+  planDocument: PlanDocument,
   context: ExecContext,
 ): Promise<void> {
   const route = routes.find(routeMatchesAnyStatus);
   if (route) {
-    await executeReaction(route.reaction, plan, context);
+    await executeReaction(route.reaction, planDocument, context);
     return;
   }
 
