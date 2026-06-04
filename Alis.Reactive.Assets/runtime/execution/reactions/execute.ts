@@ -1,4 +1,4 @@
-// ReactionGraph execution dispatches generated reactions through the active RuntimePlan.
+// ReactionGraph execution dispatches generated reactions through the Active Plan.
 
 import type {
   PlanDocument, ReactionGraph, SequenceReaction, ParallelReaction, BranchReaction,
@@ -24,19 +24,19 @@ const log = scope("execute");
 
 export type ReactionCompletion = void | Promise<void>;
 
-let activeRuntimePlan: RuntimePlan | undefined;
+let activePlan: RuntimePlan | undefined;
 
 export function setActivePlan(planDocument: PlanDocument): void {
-  activeRuntimePlan = RuntimePlan.from(planDocument);
+  activePlan = RuntimePlan.from(planDocument);
 }
 
 export function resetActivePlanForTests(): void {
-  activeRuntimePlan = undefined;
+  activePlan = undefined;
 }
 
 function runtimePlanFor(planDocument: PlanDocument | undefined): RuntimePlan {
   if (planDocument) return RuntimePlan.from(planDocument);
-  if (activeRuntimePlan) return activeRuntimePlan;
+  if (activePlan) return activePlan;
   throw new Error("[alis] no active plan");
 }
 
