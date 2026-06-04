@@ -280,17 +280,17 @@ function atLeastOneFails(subject: ValidationSubject): boolean {
 function luhn(digits: string): boolean {
   if (digits.length < 13) return false;
   let sum = 0;
-  let alt = false;
-  for (let i = digits.length - 1; i >= 0; i--) {
-    const digit = digits[i];
+  let doubleNextDigit = false;
+  for (let digitIndex = digits.length - 1; digitIndex >= 0; digitIndex--) {
+    const digit = digits[digitIndex];
     if (digit === undefined) return false;
-    let n = parseInt(digit, 10);
-    if (alt) {
-      n *= 2;
-      if (n > 9) n -= 9;
+    let digitValue = parseInt(digit, 10);
+    if (doubleNextDigit) {
+      digitValue *= 2;
+      if (digitValue > 9) digitValue -= 9;
     }
-    sum += n;
-    alt = !alt;
+    sum += digitValue;
+    doubleNextDigit = !doubleNextDigit;
   }
   return sum % 10 === 0;
 }
