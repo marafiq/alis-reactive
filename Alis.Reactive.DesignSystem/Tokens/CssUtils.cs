@@ -18,13 +18,15 @@ namespace Alis.Reactive.DesignSystem.Tokens
         /// </returns>
         public static string MergeClasses(string generated, string? cssClass)
         {
-            if (string.IsNullOrWhiteSpace(cssClass))
+            var overrideClasses = cssClass ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(overrideClasses))
                 return generated;
 
             if (string.IsNullOrWhiteSpace(generated))
-                return cssClass.Trim();
+                return overrideClasses.Trim();
 
-            return generated + " " + cssClass.Trim();
+            return generated + " " + overrideClasses.Trim();
         }
     }
 }
