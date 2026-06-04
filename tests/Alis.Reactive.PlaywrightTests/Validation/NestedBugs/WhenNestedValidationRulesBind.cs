@@ -9,7 +9,6 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
     [Test]
     public async Task nested_condition_skips_rule_when_city_empty()
     {
-        // WhenFieldNotEmpty(City) is false, so ConfirmCity is not required.
         await NavigateToAndWaitForBoot(NestedConditionPath);
 
         await Page.Locator($"#{R1}Name").FillAsync("Jane");
@@ -23,7 +22,6 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
     [Test]
     public async Task nested_condition_fires_rule_when_city_filled()
     {
-        // WhenFieldNotEmpty(City) is true, so ConfirmCity is required.
         await NavigateToAndWaitForBoot(NestedConditionPath);
 
         await Page.Locator($"#{R1}Name").FillAsync("Jane");
@@ -41,7 +39,6 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
     [Test]
     public async Task parent_false_child_true_skips_validation()
     {
-        // ParentFlag=false blocks validation even when ChildFlag=true.
         await NavigateToAndWaitForBoot(ParentChildPath);
 
         await Page.Locator($"#{R2}Child_ChildFlag").CheckAsync();
@@ -55,7 +52,6 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
     [Test]
     public async Task parent_true_child_false_skips_validation()
     {
-        // ChildFlag=false blocks validation even when ParentFlag=true.
         await NavigateToAndWaitForBoot(ParentChildPath);
 
         await Page.Locator($"#{R2}ParentFlag").CheckAsync();
@@ -69,7 +65,6 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
     [Test]
     public async Task both_flags_true_fires_validation()
     {
-        // ParentFlag=true and ChildFlag=true allow ChildName validation to fire.
         await NavigateToAndWaitForBoot(ParentChildPath);
 
         await Page.Locator($"#{R2}ParentFlag").CheckAsync();
@@ -84,7 +79,6 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
     [Test]
     public async Task nested_cross_property_validates_correct_peer()
     {
-        // The equalTo peer reference must resolve as Address.City.
         await NavigateToAndWaitForBoot(NestedConditionPath);
 
         await Page.Locator($"#{R1}Name").FillAsync("Jane");
@@ -119,7 +113,6 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
     [Test]
     public async Task not_employed_skips_included_rules()
     {
-        // IsEmployed=false skips Include(SharedEmploymentRules).
         await NavigateToAndWaitForBoot(IncludePath);
 
         await ClickWhenStable(Page.Locator("#submit-btn"));
@@ -135,7 +128,6 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
     [Test]
     public async Task employed_fires_included_rules()
     {
-        // IsEmployed=true runs Include(SharedEmploymentRules).
         await NavigateToAndWaitForBoot(IncludePath);
 
         await Page.Locator($"#{R4}IsEmployed").CheckAsync();
