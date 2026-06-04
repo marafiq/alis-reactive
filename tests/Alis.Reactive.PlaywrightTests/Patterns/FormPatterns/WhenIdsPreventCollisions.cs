@@ -89,7 +89,7 @@ public class WhenIdsPreventCollisions : PlaywrightTestBase
         await Expect(result).ToContainTextAsync("Status=inactive", new() { Timeout = 5000 });
         await Expect(result).ToContainTextAsync("City=Denver", new() { Timeout = 5000 });
 
-        // Amount and PostalCode keep their model defaults (SF NumericTextBox — not changed)
+        // Amount and PostalCode keep their model defaults (Syncfusion NumericTextBox — not changed)
         await Expect(result).ToContainTextAsync("Amount=42.5", new() { Timeout = 5000 });
         await Expect(result).ToContainTextAsync("Zip=98101", new() { Timeout = 5000 });
 
@@ -126,7 +126,7 @@ public class WhenIdsPreventCollisions : PlaywrightTestBase
         await Expect(result).ToContainTextAsync("Name=FormUser", new() { Timeout = 5000 });
         await Expect(result).ToContainTextAsync("Status=pending", new() { Timeout = 5000 });
 
-        // Amount keeps its model default (SF NumericTextBox — not changed)
+        // Amount keeps its model default (Syncfusion NumericTextBox — not changed)
         await Expect(result).ToContainTextAsync("Amount=42.5", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();

@@ -5,7 +5,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 /// <summary>
 /// Visual commit feedback: `p.Component&lt;FusionInPlaceEditor&gt;(m =&gt; m.X).AddClass("alis-editor-saved")`
 /// on ActionSuccess + `.RemoveClass(...)` on BeginEdit toggles a CSS-driven green check mark on
-/// the editor's outer wrapper. SF preserves the wrapper's classList across edit/close cycles,
+/// the editor's outer wrapper. Syncfusion preserves the wrapper's classList across edit/close cycles,
 /// so the class survives until the user re-enters edit mode.
 /// </summary>
 [TestFixture]

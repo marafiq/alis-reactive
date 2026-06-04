@@ -78,7 +78,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         /// <summary>
         /// Server-side grid data endpoint. Accepts the full grid state:
         /// skip/take for paging, sorted[] for multi-column sort, minAge for filtering.
-        /// Returns {result, count} for SF Grid custom binding.
+        /// Returns {result, count} for Syncfusion Grid custom binding.
         /// </summary>
         [HttpPost("Data")]
         public IActionResult Data([FromBody] GridDataRequest? request)

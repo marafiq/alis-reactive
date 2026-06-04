@@ -25,7 +25,7 @@ public class WhenResidentProfileFormValidatesInPlaceEditorFields : PlaywrightTes
         await inner.FillAsync(new string('x', 60));
         await inner.PressAsync("Enter");
 
-        // Give SF time to close the editor and commit the value to ej.value
+        // Give Syncfusion time to close the editor and commit the value to ej.value
         await Page.WaitForTimeoutAsync(400);
 
         var postFired = false;

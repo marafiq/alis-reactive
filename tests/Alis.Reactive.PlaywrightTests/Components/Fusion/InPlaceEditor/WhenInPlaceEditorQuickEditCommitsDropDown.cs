@@ -17,7 +17,7 @@ public class WhenInPlaceEditorQuickEditCommitsDropDown : PlaywrightTestBase
 
         await Page.Locator("#card-care-level .e-editable-value-wrapper").First.ClickAsync();
 
-        // SF DropDownList: the inner input is tabindex="-1" readonly; click its parent wrapper (which
+        // Syncfusion DropDownList: the inner input is tabindex="-1" readonly; click its parent wrapper (which
         // owns the click handler that opens the popup).
         var dropDownWrap = Page.Locator("#card-care-level .e-input-group").First;
         await Expect(dropDownWrap).ToBeVisibleAsync(new() { Timeout = 10000 });

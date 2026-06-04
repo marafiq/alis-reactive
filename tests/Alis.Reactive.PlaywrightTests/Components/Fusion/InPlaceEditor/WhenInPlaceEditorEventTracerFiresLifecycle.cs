@@ -44,7 +44,7 @@ public class WhenInPlaceEditorEventTracerFiresLifecycle : PlaywrightTestBase
         await Expect(Page.Locator("#trace-actionbegin")).ToHaveTextAsync("fired", new() { Timeout = 3000 });
         await Expect(Page.Locator("#trace-actionsuccess")).ToHaveTextAsync("world", new() { Timeout = 3000 });
 
-        // SubmitClick carries args.Name (the SF event name)
+        // SubmitClick carries args.Name (the Syncfusion event name)
         await Expect(Page.Locator("#trace-submitclick")).Not.ToHaveTextAsync("", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();

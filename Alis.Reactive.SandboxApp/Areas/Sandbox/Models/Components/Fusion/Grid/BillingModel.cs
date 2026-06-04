@@ -36,7 +36,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string BillingStatus { get; set; } = "";
     }
 
-    /// <summary>Server-side billing response. SF Grid custom binding expects {result, count}.</summary>
+    /// <summary>Server-side billing response. Syncfusion Grid custom binding expects {result, count}.</summary>
     public class ResidentBillingResponse
     {
         public List<ResidentBillingItem> Result { get; set; } = new();

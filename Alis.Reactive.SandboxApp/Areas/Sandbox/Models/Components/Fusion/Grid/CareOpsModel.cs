@@ -31,7 +31,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string NextReview { get; set; } = "";
     }
 
-    /// <summary>Server-side care response. SF Grid custom binding expects {result, count}.</summary>
+    /// <summary>Server-side care response. Syncfusion Grid custom binding expects {result, count}.</summary>
     public class CareOpsResponse
     {
         public List<ResidentCareItem> Result { get; set; } = new();

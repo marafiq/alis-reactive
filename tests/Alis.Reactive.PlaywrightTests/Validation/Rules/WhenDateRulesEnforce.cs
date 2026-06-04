@@ -39,7 +39,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         // Set date before 2020 using text input instead of calendar navigation.
         // Calendar navigation to 2019 would require 80+ month clicks from 2026.
-        // FillAndBlur types the date and blurs — SF parses the value.
+        // FillAndBlur types the date and blurs — Syncfusion parses the value.
         await DatePicker("AdmissionDate").FillAndBlur("06/15/2019");
 
         await ClickWhenStable(ValidateBtn);

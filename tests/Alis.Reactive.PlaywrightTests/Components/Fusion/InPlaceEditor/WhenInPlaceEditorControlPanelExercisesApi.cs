@@ -32,7 +32,7 @@ public class WhenInPlaceEditorControlPanelExercisesApi : PlaywrightTestBase
         await Page.Locator("#ctrl-btn-set-null").ClickAsync();
         await Page.Locator("#ctrl-btn-set-hello").ClickAsync();
 
-        // SF reflects the property write in the collapsed display.
+        // Syncfusion reflects the property write in the collapsed display.
         await Expect(Page.Locator("#card-control-panel .e-editable-value").First)
             .ToHaveTextAsync("Hello", new() { Timeout = 3000 });
         AssertNoConsoleErrors();

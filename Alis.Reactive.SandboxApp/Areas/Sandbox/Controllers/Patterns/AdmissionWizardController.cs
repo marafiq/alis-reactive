@@ -14,7 +14,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns;
 ///   Submit   → POST Submit (JSON) → validates all drafts server-side
 ///
 /// Draft persistence: static ConcurrentDictionary per step, keyed by screeningId.
-/// Edit scenario: LoadStep reads from draft, model carries saved values, SF components render them.
+/// Edit scenario: LoadStep reads from draft, model carries saved values, Syncfusion components render them.
 /// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Patterns/AdmissionWizard")]

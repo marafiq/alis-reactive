@@ -101,7 +101,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
             // Same FluentValidator used client-side. Server runs it; on failure returns the framework's standard
             // { errors: { fieldName: [msg] } } shape so .OnError(400, e => e.ValidationErrors(formId)) on the
-            // client writes each message into its per-field validation slot. No custom rules, no SF channel.
+            // client writes each message into its per-field validation slot. No custom rules, no Syncfusion channel.
             var result = new MonthlyRateQuickEditValidator().Validate(body);
             if (!result.IsValid)
             {

@@ -98,7 +98,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             var firstOfMonth = new DateTime(anchor.Year, anchor.Month, 1);
             var lastOfMonth = firstOfMonth.AddMonths(1).AddDays(-1);
-            // SF Month view shows full weeks — pad to surrounding Sundays
+            // Syncfusion Month view shows full weeks — pad to surrounding Sundays
             var rangeStart = firstOfMonth.AddDays(-(int)firstOfMonth.DayOfWeek);
             var rangeEnd = lastOfMonth.AddDays(6 - (int)lastOfMonth.DayOfWeek + 1);
             return (rangeStart, rangeEnd);

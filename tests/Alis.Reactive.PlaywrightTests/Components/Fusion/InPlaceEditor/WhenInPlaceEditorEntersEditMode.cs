@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
 /// <summary>
 /// Clicking the pencil on the DOB card enters edit mode. Inner input appears.
-/// Verified against real SF DOM (e-editable-value-wrapper → e-editable-action-buttons).
+/// Verified against real Syncfusion DOM (e-editable-value-wrapper → e-editable-action-buttons).
 /// </summary>
 [TestFixture]
 public class WhenInPlaceEditorEntersEditMode : PlaywrightTestBase

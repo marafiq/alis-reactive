@@ -19,7 +19,7 @@ public class WhenInPlaceEditorQuickEditCommitsMaskedMrn : PlaywrightTestBase
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#card-mrn .e-editable-value-wrapper");
 
-        // SF Mask stores the raw characters in `.value` and applies the LLL-0000 format only
+        // Syncfusion Mask stores the raw characters in `.value` and applies the LLL-0000 format only
         // inside the live editor input — the collapsed display span shows the raw value as-is.
         await Expect(Page.Locator("#card-mrn .e-editable-value").First)
             .ToHaveTextAsync("MRN1234", new() { Timeout = 5000 });

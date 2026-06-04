@@ -18,7 +18,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// Server-side grid response. SF Grid custom binding expects {result, count}.
+    /// Server-side grid response. Syncfusion Grid custom binding expects {result, count}.
     /// Set as dataSource directly: ej2.dataSource = {result: [...], count: N}.
     /// </summary>
     public class ResidentGridResponse
