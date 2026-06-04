@@ -28,7 +28,6 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Adds a CSS class to the element.</summary>
         /// <param name="className">The CSS class name.</param>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> AddClass(string className)
         {
             return Call(BrowserElementMembers.AddClass, ValueExpression.Literal(className));
@@ -36,7 +35,6 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Removes a CSS class from the element.</summary>
         /// <param name="className">The CSS class name.</param>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> RemoveClass(string className)
         {
             return Call(BrowserElementMembers.RemoveClass, ValueExpression.Literal(className));
@@ -44,7 +42,6 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Toggles a CSS class on the element.</summary>
         /// <param name="className">The CSS class name.</param>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> ToggleClass(string className)
         {
             return Call(BrowserElementMembers.ToggleClass, ValueExpression.Literal(className));
@@ -52,7 +49,6 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Sets the text content of the element to a literal string.</summary>
         /// <param name="text">The text to display.</param>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> SetText(string text)
         {
             return Set(BrowserElementMembers.Text, ValueExpression.Literal(text));
@@ -62,7 +58,6 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TSource">The event payload type.</typeparam>
         /// <param name="source">The event payload instance.</param>
         /// <param name="path">Expression selecting the property to display.</param>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object>> path)
         {
             var eventPath = ExpressionPathHelper.ToEventPath<TSource, object>(path);
@@ -73,7 +68,6 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TResponse">The response body type.</typeparam>
         /// <param name="source">The response body instance from <c>OnSuccess</c> or <c>OnError</c>.</param>
         /// <param name="path">Expression selecting the property to display.</param>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, object>> path)
             where TResponse : class
         {
@@ -93,7 +87,6 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Sets the inner HTML of the element to a literal string.</summary>
         /// <param name="html">The HTML content.</param>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> SetHtml(string html)
         {
             return Set(BrowserElementMembers.Html, ValueExpression.Literal(html));
@@ -103,7 +96,6 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TSource">The event payload type.</typeparam>
         /// <param name="source">The event payload instance.</param>
         /// <param name="path">Expression selecting the property containing HTML.</param>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object>> path)
         {
             var eventPath = ExpressionPathHelper.ToEventPath<TSource, object>(path);
@@ -121,14 +113,12 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Shows the element by removing the hidden attribute.</summary>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> Show()
         {
             return Set(BrowserElementMembers.Hidden, ValueExpression.Literal(false));
         }
 
         /// <summary>Hides the element by setting the hidden attribute.</summary>
-        /// <returns>The pipeline builder for chaining.</returns>
         public PipelineBuilder<TModel> Hide()
         {
             return Set(BrowserElementMembers.Hidden, ValueExpression.Literal(true));
