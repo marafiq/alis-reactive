@@ -27,28 +27,28 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a CSS class to the element.</summary>
-        /// <param name="className">The CSS class name.</param>
+        /// <param name="className">CSS class token to add.</param>
         public PipelineBuilder<TModel> AddClass(string className)
         {
             return Call(BrowserElementMembers.AddClass, ValueExpression.Literal(className));
         }
 
         /// <summary>Removes a CSS class from the element.</summary>
-        /// <param name="className">The CSS class name.</param>
+        /// <param name="className">CSS class token to remove.</param>
         public PipelineBuilder<TModel> RemoveClass(string className)
         {
             return Call(BrowserElementMembers.RemoveClass, ValueExpression.Literal(className));
         }
 
         /// <summary>Toggles a CSS class on the element.</summary>
-        /// <param name="className">The CSS class name.</param>
+        /// <param name="className">CSS class token to toggle.</param>
         public PipelineBuilder<TModel> ToggleClass(string className)
         {
             return Call(BrowserElementMembers.ToggleClass, ValueExpression.Literal(className));
         }
 
         /// <summary>Sets the text content of the element to a literal string.</summary>
-        /// <param name="text">The text to display.</param>
+        /// <param name="text">Literal text content serialized into the Reactive Plan.</param>
         public PipelineBuilder<TModel> SetText(string text)
         {
             return Set(BrowserElementMembers.Text, ValueExpression.Literal(text));
@@ -77,7 +77,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Sets the text content from a typed source (component, plugin, or URL value).</summary>
         /// <typeparam name="TProp">The source value type.</typeparam>
-        /// <param name="source">The typed source providing the value.</param>
+        /// <param name="source">Source evaluated when the reaction executes.</param>
         /// <returns>This element builder for chaining additional element mutations.</returns>
         public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
         {
@@ -86,7 +86,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the inner HTML of the element to a literal string.</summary>
-        /// <param name="html">The HTML content.</param>
+        /// <param name="html">Literal HTML content serialized into the Reactive Plan.</param>
         public PipelineBuilder<TModel> SetHtml(string html)
         {
             return Set(BrowserElementMembers.Html, ValueExpression.Literal(html));
@@ -104,7 +104,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Sets the inner HTML from a typed source.</summary>
         /// <typeparam name="TProp">The source value type.</typeparam>
-        /// <param name="source">The typed source providing the HTML content.</param>
+        /// <param name="source">Source evaluated when the reaction executes.</param>
         /// <returns>This element builder for chaining additional element mutations.</returns>
         public ElementBuilder<TModel> SetHtml<TProp>(TypedSource<TProp> source)
         {
