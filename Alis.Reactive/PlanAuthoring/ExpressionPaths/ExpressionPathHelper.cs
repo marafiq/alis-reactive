@@ -5,27 +5,29 @@ using System.Linq.Expressions;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Converts lambda expressions like <c>x =&gt; x.Address.City</c> into camelCase
-    /// dot-paths for use as Reactive Plan source bindings.
+    /// Converts lambda expressions like <c>x =&gt; x.Address.City</c> into runtime,
+    /// model-binding, or MVC element-ID paths used by Reactive Plan bindings.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Each path gets a prefix that identifies the runtime value scope:
-    /// <c>"evt"</c> for event payloads (<c>evt.address.city</c>),
-    /// <c>"responseBody"</c> for HTTP response data (<c>responseBody.data.name</c>).
+    /// <c>ToPath(...)</c> adds a caller-provided runtime scope prefix such as
+    /// <c>"evt"</c> or <c>"responseBody"</c>. Event and response helpers return
+    /// scope-relative paths because the surrounding <c>PayloadSource</c> already
+    /// identifies the value scope.
     /// </para>
     /// <para>
-    /// Only simple property-access chains are supported. Computed expressions
-    /// (method calls, arithmetic) throw <see cref="InvalidOperationException"/>.
+    /// Property-access chains and MVC-style constant indexer paths are
+    /// supported. Computed expressions such as method calls or arithmetic throw
+    /// <see cref="InvalidOperationException"/>.
     /// </para>
     /// </remarks>
     public static class ExpressionPathHelper
     {
         /// <summary>
-        /// Converts an expression to a prefixed camelCase dot-path.
+        /// Converts an expression to a prefixed camelCase runtime path.
         /// </summary>
         /// <typeparam name="TSource">The source type containing the property chain.</typeparam>
-        /// <param name="prefix">The resolution context prefix (e.g. <c>"evt"</c>, <c>"responseBody"</c>).</param>
+        /// <param name="prefix">The runtime scope prefix to prepend, such as <c>"evt"</c> or <c>"responseBody"</c>.</param>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>evt.address.city</c>.</returns>
         public static string ToPath<TSource>(string prefix, Expression<Func<TSource, object?>> expression)
@@ -35,11 +37,11 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Converts a typed expression to a prefixed camelCase dot-path, avoiding boxing for value types.
+        /// Converts a typed expression to a prefixed camelCase runtime path.
         /// </summary>
         /// <typeparam name="TSource">The source type containing the property chain.</typeparam>
-        /// <typeparam name="TProp">The property type.</typeparam>
-        /// <param name="prefix">The resolution context prefix.</param>
+        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <param name="prefix">The runtime scope prefix to prepend.</param>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>evt.facilityId</c>.</returns>
         public static string ToPath<TSource, TProp>(string prefix, Expression<Func<TSource, TProp>> expression)
@@ -49,7 +51,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Converts an expression to an event payload dot-path (<c>evt.</c> prefix).
+        /// Converts an expression to a camelCase path relative to the event payload scope.
         /// </summary>
         /// <typeparam name="TSource">The event payload type.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
@@ -61,10 +63,10 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Converts a typed expression to an event payload dot-path, preserving type safety for value types.
+        /// Converts a typed expression to a camelCase path relative to the event payload scope.
         /// </summary>
         /// <typeparam name="TSource">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The property type.</typeparam>
+        /// <typeparam name="TProp">The selected property type.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>facilityId</c>.</returns>
         public static string ToEventPath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
@@ -74,7 +76,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Converts an expression to an HTTP response body dot-path (<c>responseBody.</c> prefix).
+        /// Converts an expression to a camelCase path relative to the HTTP response body scope.
         /// </summary>
         /// <typeparam name="TSource">The response body type.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
@@ -86,8 +88,12 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Converts a typed expression to an HTTP response body dot-path, preserving type safety for value types.
+        /// Converts a typed expression to a camelCase path relative to the HTTP response body scope.
         /// </summary>
+        /// <typeparam name="TSource">The response body type.</typeparam>
+        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <param name="expression">The property-access expression to convert.</param>
+        /// <returns>A dot-path like <c>data.name</c>.</returns>
         public static string ToResponsePath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
@@ -148,8 +154,12 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Extracts the model binding path from a typed model expression, preserving type safety for value types.
+        /// Extracts the model binding path from a typed model expression.
         /// </summary>
+        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
+        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <param name="expression">The model property expression.</param>
+        /// <returns>A dot-separated binding path like <c>"Address.City"</c>.</returns>
         public static string ToPropertyName<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
@@ -157,7 +167,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Converts a model expression to the DOM element ID that ASP.NET generates.
+        /// Converts a model expression to the DOM element ID generated by <c>Html.IdFor()</c>.
         /// </summary>
         /// <remarks>
         /// <c>m =&gt; m.FacilityId</c> becomes <c>"FacilityId"</c>,
@@ -174,10 +184,10 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Converts a typed model expression to a DOM element ID, preserving type safety for value types.
+        /// Converts a typed model expression to the DOM element ID generated by <c>Html.IdFor()</c>.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
-        /// <typeparam name="TProp">The property type.</typeparam>
+        /// <typeparam name="TProp">The selected property type.</typeparam>
         /// <param name="expression">The model property expression.</param>
         /// <returns>An underscore-separated element ID like <c>"Address_City"</c>.</returns>
         public static string ToElementId<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
