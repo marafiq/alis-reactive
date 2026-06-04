@@ -20,8 +20,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns;
 [Route("Sandbox/Patterns/AdmissionWizard")]
 public class AdmissionWizardController : Controller
 {
-    // ── Draft store (in-memory, keyed by screeningId) ────────────────────────
-
     private static readonly ConcurrentDictionary<string, Step1DemographicsModel> Step1Drafts = new();
     private static readonly ConcurrentDictionary<string, Step2ClinicalModel> Step2Drafts = new();
     private static readonly ConcurrentDictionary<string, Step3FunctionalModel> Step3Drafts = new();
@@ -37,8 +35,6 @@ public class AdmissionWizardController : Controller
 
     private const string ViewBase = "~/Areas/Sandbox/Views/Patterns/AdmissionWizard/";
 
-    // ── Data sources (shared by all steps) ───────────────────────────────────
-
     private void SetDataSources()
     {
         ViewBag.Diagnoses = new[] { "Alzheimer's", "Parkinson's", "Heart Disease", "Diabetes", "Stroke", "Other" };
@@ -51,8 +47,6 @@ public class AdmissionWizardController : Controller
         ViewBag.ServiceBranches = new[] { "Army", "Navy", "Air Force", "Marines", "Coast Guard" };
     }
 
-    // ── GET Index — shell page, Step 1 loads on DomReady via Into() ──────────
-
     [HttpGet("")]
     public IActionResult Index([FromQuery] string? screeningId)
     {
@@ -60,8 +54,6 @@ public class AdmissionWizardController : Controller
         ViewBag.CurrentStep = 1;
         return View(ViewBase + "Index.cshtml", new Step1DemographicsModel());
     }
-
-    // ── POST SaveStep1/2/3 — validate → save draft → return JSON ────────────
 
     [HttpPost("SaveStep1")]
     public IActionResult SaveStep1([FromBody] Step1DemographicsModel model)
@@ -104,8 +96,6 @@ public class AdmissionWizardController : Controller
         Step3Drafts[id] = model;
         return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 3 saved" });
     }
-
-    // ── POST LoadStep — loads step partial from draft (Next chained / Previous) ─
 
     [HttpPost("LoadStep")]
     public IActionResult LoadStep([FromBody] LoadStepRequest request)
@@ -164,8 +154,6 @@ public class AdmissionWizardController : Controller
         return model;
     }
 
-    // ── POST Submit — validates all drafts, returns care plan ────────────────
-
     [HttpPost("Submit")]
     public async Task<IActionResult> Submit([FromBody] Step4ReviewModel model)
     {
@@ -211,8 +199,6 @@ public class AdmissionWizardController : Controller
         });
     }
 
-    // ── Alert + search endpoints ─────────────────────────────────────────────
-
     [HttpGet("SearchPhysicians")]
     public async Task<IActionResult> SearchPhysicians([FromQuery] string? q)
     {
@@ -255,8 +241,6 @@ public class AdmissionWizardController : Controller
     [HttpPost("RequestRoomSetup")]
     public async Task<IActionResult> RequestRoomSetup([FromBody] RequestRoomSetupRequest? r)
     { await Task.Delay(500); return Ok(new ScreeningAlertResponse { Message = $"Room setup for {r?.ResidentName}", Urgency = "routine" }); }
-
-    // ── Helpers ──────────────────────────────────────────────────────────────
 
     private bool TryValidate<T>(FluentValidation.IValidator<T> validator, T model, out IActionResult error)
     {
