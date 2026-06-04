@@ -11,8 +11,6 @@ namespace Alis.Reactive.Analyzers.ControlFlow
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ControlFlowInReactiveCallbackAnalyzer : DiagnosticAnalyzer
     {
-        // ── DATA (OCP: extend by adding one line) ─────────────────
-
         private static readonly ImmutableHashSet<SyntaxKind> AllowedStatementKinds =
             ImmutableHashSet.Create(
                 SyntaxKind.ExpressionStatement,
@@ -49,8 +47,6 @@ namespace Alis.Reactive.Analyzers.ControlFlow
         private static readonly Regex PascalCaseRegex = new Regex(
             "([a-z])([A-Z])", RegexOptions.Compiled);
 
-        // ── DIAGNOSTIC ────────────────────────────────────────────
-
         public const string DiagnosticId = "ALIS004";
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
@@ -66,8 +62,6 @@ namespace Alis.Reactive.Analyzers.ControlFlow
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);
-
-        // ── PLUMBING ──────────────────────────────────────────────
 
         public override void Initialize(AnalysisContext context)
         {
@@ -91,8 +85,6 @@ namespace Alis.Reactive.Analyzers.ControlFlow
                     SyntaxKind.ParenthesizedLambdaExpression);
             });
         }
-
-        // ── VALIDATION ────────────────────────────────────────────
 
         private static void AnalyzeLambda(
             SyntaxNodeAnalysisContext context,
