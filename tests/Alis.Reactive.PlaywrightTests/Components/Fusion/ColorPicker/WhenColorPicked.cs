@@ -1,11 +1,8 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ColorPicker;
 
 /// <summary>
-/// Exercises FusionColorPicker behaviors end-to-end:
-/// DomReady SetValue + Value read, Changed event with condition,
-/// component-read condition, and toggle method call.
-///
-/// Page under test: /Sandbox/Components/ColorPicker
+/// Exercises FusionColorPicker SetValue, Value reads, component-read conditions,
+/// method calls, and emitted Reactive Plan metadata.
 /// </summary>
 [TestFixture]
 public class WhenColorPicked : PlaywrightTestBase
@@ -17,8 +14,6 @@ public class WhenColorPicked : PlaywrightTestBase
         await NavigateToAndWaitForTextSignal(Path, "#set-value-result");
     }
 
-    // ── DomReady SetValue ──
-
     [Test]
     public async Task domready_sets_theme_color()
     {
@@ -27,8 +22,6 @@ public class WhenColorPicked : PlaywrightTestBase
             .ToHaveTextAsync("SetValue applied", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── DomReady Value read ──
 
     [Test]
     public async Task domready_reads_value_into_echo()
@@ -39,8 +32,6 @@ public class WhenColorPicked : PlaywrightTestBase
             "Value echo should show a color value after DomReady");
         AssertNoConsoleErrors();
     }
-
-    // ── Toggle method call ──
 
     [Test]
     public async Task toggle_button_calls_toggle_method()
@@ -54,8 +45,6 @@ public class WhenColorPicked : PlaywrightTestBase
             .ToHaveTextAsync("toggle called", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Component-read condition ──
 
     [Test]
     public async Task check_accent_button_evaluates_component_value()
@@ -73,8 +62,6 @@ public class WhenColorPicked : PlaywrightTestBase
             "Should report whether accent color is set or not");
         AssertNoConsoleErrors();
     }
-
-    // ── Plan JSON ──
 
     [Test]
     public async Task plan_json_contains_colorpicker_behaviors()
