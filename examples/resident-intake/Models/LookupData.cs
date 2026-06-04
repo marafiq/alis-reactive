@@ -2,7 +2,6 @@ namespace ResidentIntake.Models;
 
 public record LookupItem(string Id, string Name);
 
-// Response shapes for API endpoints
 public class FacilitiesResponse
 {
     public List<LookupItem> Facilities { get; set; } = [];

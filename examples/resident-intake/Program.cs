@@ -2,7 +2,7 @@ using Alis.Reactive.FluentValidator;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-// SF EJ2 uses Newtonsoft internally — camelCase for DataSource rendering
+// Syncfusion EJ2 DataSource rendering reads Newtonsoft defaults, so example API payloads stay camelCase.
 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {
     ContractResolver = new CamelCasePropertyNamesContractResolver()

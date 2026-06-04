@@ -131,7 +131,6 @@ public class IntakeController : Controller
     [HttpGet]
     public IActionResult ConfirmationNumber()
     {
-        // Simulate generating a confirmation number
         var number = $"RES-{DateTime.Now:yyyyMMdd}-{Random.Shared.Next(1000, 9999)}";
         return Ok(new ConfirmationResponse { Number = number });
     }
