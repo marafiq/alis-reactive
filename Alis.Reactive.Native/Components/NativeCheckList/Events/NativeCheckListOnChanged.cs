@@ -4,14 +4,13 @@ namespace Alis.Reactive.Native.Components
     /// Event args for <see cref="NativeCheckListEvents.Changed"/>.
     /// </summary>
     /// <remarks>
-    /// Properties provide typed access for conditions:
-    /// <code>p.When(args, x => x.Value).NotEmpty()</code>
+    /// The properties are typed markers for event-payload paths; <c>x => x.Value</c>
+    /// resolves to <c>evt.value</c> in condition expressions.
     /// </remarks>
     public class NativeCheckListChangeArgs
     {
         /// <summary>
-        /// Gets or sets the array of checked values after the change
-        /// (e.g. <c>["Peanuts", "Dairy"]</c>).
+        /// Gets or sets the checked values after the change.
         /// </summary>
         public string[]? Value { get; set; }
 

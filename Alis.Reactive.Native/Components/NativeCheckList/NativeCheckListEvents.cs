@@ -4,8 +4,8 @@ namespace Alis.Reactive.Native.Components
     /// Typed event descriptors for <see cref="NativeCheckList"/>.
     /// </summary>
     /// <remarks>
-    /// Used with the <c>.Reactive()</c> event selector lambda:
-    /// <code>.Reactive(plan, evt => evt.Changed, (args, p) => { ... })</code>
+    /// <c>.Reactive()</c> uses these descriptors to select the DOM event name
+    /// and the payload type passed to the pipeline lambda.
     /// </remarks>
     public sealed class NativeCheckListEvents
     {

@@ -4,8 +4,8 @@ namespace Alis.Reactive.Native.Components
     /// Event args for <see cref="NativeCheckBoxEvents.Changed"/>.
     /// </summary>
     /// <remarks>
-    /// Properties provide typed access for conditions:
-    /// <code>p.When(args, x => x.Checked).Truthy()</code>
+    /// The properties are typed markers for event-payload paths; <c>x => x.Checked</c>
+    /// resolves to <c>evt.checked</c> in condition expressions.
     /// </remarks>
     public class NativeCheckBoxChangeArgs
     {

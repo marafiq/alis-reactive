@@ -4,8 +4,8 @@ namespace Alis.Reactive.Native.Components
     /// Event args for <see cref="NativeTextAreaEvents.Changed"/>.
     /// </summary>
     /// <remarks>
-    /// Properties provide typed access for conditions:
-    /// <code>p.When(args, x => x.Value).Eq("hello")</code>
+    /// The properties are typed markers for event-payload paths; <c>x => x.Value</c>
+    /// resolves to <c>evt.value</c> in condition expressions.
     /// </remarks>
     public class NativeTextAreaChangeArgs
     {
