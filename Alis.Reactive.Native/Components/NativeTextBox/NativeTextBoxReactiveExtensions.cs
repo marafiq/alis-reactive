@@ -21,7 +21,7 @@ namespace Alis.Reactive.Native.Components
         /// Wires a <see cref="NativeTextBox"/> DOM event into a Reactive Plan pipeline.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <typeparam name="TProp">The model value type associated with the text input component.</typeparam>
         /// <typeparam name="TArgs">The event args type selected by <paramref name="eventSelector"/>.</typeparam>
         /// <param name="builder">The text box builder to wire events on.</param>
         /// <param name="plan">The Reactive Plan that receives the component event trigger.</param>

@@ -23,7 +23,7 @@ namespace Alis.Reactive.Native.Components
     /// <see cref="InputBoundField{TModel,TProp}"/>.
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The bound property type.</typeparam>
+    /// <typeparam name="TProp">The model value type rendered through the text input.</typeparam>
     public class NativeTextBoxBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
