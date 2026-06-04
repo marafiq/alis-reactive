@@ -12,18 +12,12 @@
         ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.SaveStep1.");
 }
 
-<!-- ASSERT: enter age 85 → risk badge shows "High Risk"
-     ASSERT: select "Alzheimer's" → cognitive-section visible (in Step 2)
-     ASSERT: toggle IsVeteran ON → veteran-section visible
-     ASSERT: save Step 1 with empty name → validation error on step1-form only
-     ASSERT: save Step 1 with valid data → "Step 1 saved" message -->
 <native-card><native-card-body id="step1-form">
     <native-heading level="H2">Step 1: Demographics</native-heading>
     <p class="text-sm text-text-secondary mb-4">
         Basic resident information. Age auto-calculates risk tier. Diagnosis determines which clinical sections appear in Step 2.
     </p>
 
-    <!-- Row 1: Resident Name + Age -->
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident Name"))
             .NativeTextBox(b => b.Placeholder("Full name")); }
@@ -61,7 +55,6 @@
                 })); }
     </native-grid>
 
-    <!-- Row 2: Primary Diagnosis + Attending Physician -->
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.PrimaryDiagnosis, o => o.Required().Label("Primary Diagnosis"))
             .FusionDropDownList(b => b
@@ -71,7 +64,7 @@
                 {
                     var diag = p.Component<FusionDropDownList>(m => m.PrimaryDiagnosis);
 
-                    // Cross-step: sync diagnosis to Step 2's hidden field
+                    // Step 2 conditions read this hidden field from the shared Active Plan.
                     p.Component<NativeHiddenField, Step2ClinicalModel>(m => m.PrimaryDiagnosis)
                         .SetValue(diag.Value());
 
@@ -104,7 +97,6 @@
                 })); }
     </native-grid>
 
-    <!-- Row 3: Risk Tier (auto) + Is Veteran -->
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.RiskTier, o => o.Label("Risk Tier (auto)"))
             .FusionDropDownList(b => b
@@ -128,7 +120,6 @@
         <p>Age status: <span id="age-status" class="text-text-muted">&mdash;</span></p>
     </native-vstack>
 
-    <!-- Veteran section (conditionally visible — inline, validated on Next) -->
     <div id="veteran-section" hidden>
         <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.VaId, o => o.Label("VA ID"))
@@ -152,7 +143,7 @@
                  .Response(r => r
                     .OnSuccess<SaveStepResponse>((json, s) =>
                     {
-                        // Propagate screeningId to Steps 2, 3, 4
+                        // Later step saves use the Step 1 draft key from the Active Plan.
                         s.Component<NativeHiddenField, Step2ClinicalModel>(m => m.ScreeningId)
                             .SetValue(json, x => x.ScreeningId);
                         s.Component<NativeHiddenField, Step3FunctionalModel>(m => m.ScreeningId)
