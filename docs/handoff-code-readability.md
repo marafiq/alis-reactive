@@ -124,3 +124,8 @@ Rewrite or delete:
   Schedule integration shape because `FusionScheduleExtensions.GetEvents()` returns
   it and the sandbox posts it back, but it should be reviewed in a dedicated API
   surface slice instead of being changed during XML documentation cleanup.
+- `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Patterns/IdGenerator/Index.cshtml`
+  renders two forms from the same `ReactivePlan<IdGeneratorModel>`, so they share
+  generated component IDs and gather reads the first matching DOM ID. The test now
+  marks this with `TODO:`; a later slice should give repeated forms an explicit
+  component ID scope instead of relying on first-match DOM lookup.
