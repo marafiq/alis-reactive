@@ -20,9 +20,8 @@ namespace Alis.Reactive.Native.Extensions
         /// label and required marker.
         /// </summary>
         /// <remarks>
-        /// Chain a component extension on the result to choose what renders inside the field —
-        /// e.g. <c>.NativeTextBox()</c>, <c>.FusionDropDownList()</c>. The field wrapper handles
-        /// label display and validation error placement automatically.
+        /// Chain a component extension on the result to choose the rendered control.
+        /// The field wrapper owns label display and validation error placement.
         /// </remarks>
         /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
@@ -77,7 +76,7 @@ namespace Alis.Reactive.Native.Extensions
         {
             var opts = configuration.CreateOptions();
 #if NET48
-            // System.Web.Mvc NameFor returns MvcHtmlString; the slot binding path is a string.
+            // System.Web.Mvc NameFor honors HtmlFieldPrefix and returns MvcHtmlString; the slot stores a string binding path.
             var bindingName = html.NameFor(expression).ToHtmlString();
 #else
             var bindingName = html.NameFor(expression);

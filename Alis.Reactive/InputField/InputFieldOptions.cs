@@ -4,8 +4,8 @@ namespace Alis.Reactive.InputField
     /// Configures the label and required marker for an input field wrapper.
     /// </summary>
     /// <remarks>
-    /// Passed as an optional callback to <c>Html.InputField(plan, expr, o =&gt; o.Label("Name").Required())</c>.
-    /// When no options are provided, the field renders without a label or required indicator.
+    /// Passed to <c>Html.InputField</c> when the field wrapper needs label text
+    /// or a required marker. Fields render without either option by default.
     /// </remarks>
     public class InputFieldOptions
     {

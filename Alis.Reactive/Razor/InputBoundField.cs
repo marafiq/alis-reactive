@@ -18,9 +18,8 @@ namespace Alis.Reactive.Native
     /// a component extension that renders inside the field wrapper.
     /// </summary>
     /// <remarks>
-    /// Chain a component extension on this to choose what renders — e.g.
-    /// <c>.NativeTextBox()</c>, <c>.FusionDropDownList()</c>. The field wrapper provides
-    /// the label and validation error HTML elements automatically.
+    /// Component extensions choose the concrete rendered control. The field
+    /// wrapper owns label markup and validation message placement.
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
@@ -32,11 +31,7 @@ namespace Alis.Reactive.Native
 #endif
         where TModel : class
     {
-        /// <summary>
-        /// Keep internal: <see cref="Extensions.InputFieldExtensions.InputField{TModel,TProp}"/>
-        /// creates the field and wires plan registration. Public construction would bypass
-        /// validation and gather registration.
-        /// </summary>
+        // Internal because Html.InputField creates the slot used by validation and gather.
         internal InputBoundField(
 #if NET48
             HtmlHelper<TModel> html,
@@ -49,11 +44,7 @@ namespace Alis.Reactive.Native
         {
         }
 
-        /// <summary>
-        /// Keep internal: component extensions use this to write markup inside the field
-        /// wrapper after registration. Public rendering would bypass the component pipeline.
-        /// </summary>
-        /// <param name="content">The component markup to render inside the field wrapper.</param>
+        // Component extensions render only after registration; public rendering would bypass the component pipeline.
 #if NET48
         internal void Render(IHtmlString content)
         {

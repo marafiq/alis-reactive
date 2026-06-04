@@ -30,16 +30,12 @@ namespace Alis.Reactive.InputField
         /// <summary>Gets the label and required options for this field.</summary>
         public InputFieldOptions Options { get; }
 
-        /// <summary>Gets the generated HTML element ID for this field's input.</summary>
         internal string ElementId => _componentSlot.ElementId;
 
-        /// <summary>Gets the model binding path (e.g. <c>"Address.City"</c>) for validation message targeting.</summary>
         internal string BindingPath => _componentSlot.BindingName;
 
-        /// <summary>Gets the controlled DOM/render target owned by the model-bound component slot.</summary>
         internal InputComponentRenderTarget RenderTarget => _componentSlot.RenderTarget;
 
-        /// <summary>Gets the writer for emitting HTML output.</summary>
         internal TextWriter Writer { get; }
 
         private readonly ModelBoundInputComponentSlot _componentSlot;
@@ -50,10 +46,7 @@ namespace Alis.Reactive.InputField
             Plan.RegisterInputComponent(_componentSlot.Register(profile));
         }
 
-        /// <summary>
-        /// Keep internal: platform-specific factories such as <c>Html.InputField()</c>
-        /// create the controlled component id and registration slot that field wrappers depend on.
-        /// </summary>
+        // Internal because Html.InputField owns the component slot used by validation and gather.
         internal InputBoundFieldBase(
             THelper helper,
             BoundInputField<TModel, TProp> field,
@@ -82,10 +75,10 @@ namespace Alis.Reactive.InputField
                     "Validation and gather depend on the registered input contract. " +
                     "Call setup.RegisterInputComponent(...) in the component HtmlExtension before rendering the component.");
 
-            var fb = new InputFieldBuilder(Writer, BindingPath).ForId(ElementId);
-            if (Options.LabelText != null) fb.Label(Options.LabelText);
-            if (Options.IsRequired) fb.Required();
-            using (fb.Begin()) { writeContent(); }
+            var fieldMarkup = new InputFieldBuilder(Writer, BindingPath).ForInputId(ElementId);
+            if (Options.LabelText != null) fieldMarkup.Label(Options.LabelText);
+            if (Options.IsRequired) fieldMarkup.Required();
+            using (fieldMarkup.Begin()) { writeContent(); }
         }
     }
 
