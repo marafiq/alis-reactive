@@ -15,7 +15,7 @@ namespace Alis.Reactive.Builders.Conditions
     /// <typeparam name="TProp">The source value type, providing compile-time operator type safety.</typeparam>
     public sealed class ConditionSourceBuilder<TModel, TProp> where TModel : class
     {
-        private readonly TypedSource<TProp> _typedSource;
+        private readonly TypedSource<TProp> _leftSource;
         private readonly Shape _shape;
         private readonly System.Func<ConditionGraph, ConditionGraph> _composeCondition;
         private readonly ConditionContinuation<TModel> _continuation;
@@ -40,7 +40,7 @@ namespace Alis.Reactive.Builders.Conditions
             ConditionContinuation<TModel> continuation,
             System.Func<ConditionGraph, ConditionGraph> composeCondition)
         {
-            _typedSource = source ?? throw new System.ArgumentNullException(nameof(source));
+            _leftSource = source ?? throw new System.ArgumentNullException(nameof(source));
             _shape = source.Shape;
             _continuation = continuation ?? throw new System.ArgumentNullException(nameof(continuation));
             _composeCondition = composeCondition ?? throw new System.ArgumentNullException(nameof(composeCondition));
@@ -140,7 +140,7 @@ namespace Alis.Reactive.Builders.Conditions
             return ComposeAndWrap(condition);
         }
 
-        private ValueExpression LeftValue() => _typedSource.ToValueExpression();
+        private ValueExpression LeftValue() => _leftSource.ToValueExpression();
 
         private ComparisonOperands UnaryOperands() =>
             ComparisonOperands.Unary(LeftValue(), _shape);
@@ -186,9 +186,9 @@ namespace Alis.Reactive.Builders.Conditions
         private ComparisonOperands CollectionItemOperands(object item) =>
             ComparisonOperands.CollectionItem(
                 LeftValue(),
-                ValueExpression.LiteralRaw(item, _typedSource.ElementShape),
+                ValueExpression.LiteralRaw(item, _leftSource.ElementShape),
                 _shape,
-                _typedSource.ElementShape);
+                _leftSource.ElementShape);
 
         private ComparisonOperands RangeOperands(TProp low, TProp high)
         {
