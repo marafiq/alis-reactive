@@ -87,7 +87,6 @@ namespace Alis.Reactive.Native.AppLevel
         /// Call this once in <c>_Layout.cshtml</c>. The drawer is hidden by default
         /// and opened via <see cref="Open{TModel}"/> in a reactive pipeline.
         /// </remarks>
-        /// <returns>The drawer HTML element.</returns>
 #if NET48
         public static IHtmlString NativeDrawer(this HtmlHelper html)
         {
