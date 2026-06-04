@@ -3,22 +3,13 @@ using Alis.Reactive.Playwright.Extensions;
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DateRangePicker;
 
 /// <summary>
-/// Exercises all FusionDateRangePicker API end-to-end in the browser:
-/// property reads (startDate + endDate), events with typed conditions,
-/// and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/DateRangePicker
-///
-/// FusionDateRangePicker renders an input element inside a wrapper span.
-/// The wrapper element gets the IdGenerator-based ID. Tests use
-/// DateRangePickerLocator to interact via real browser gestures (calendar
-/// popup clicks and Apply button) rather than ej2 instance manipulation.
-///
-/// UNIQUE: This component exposes TWO readable properties (startDate, endDate)
-/// from the ej2 instance. Both are exercised in these tests.
-///
-/// Senior living domain: resident stay periods.
+/// Exercises FusionDateRangePicker changed-event conditions, component-read conditions,
+/// and resident stay period reads.
 /// </summary>
+/// <remarks>
+/// The component exposes both <c>startDate</c> and <c>endDate</c> from the Syncfusion instance.
+/// DateRangePickerLocator uses calendar popup and Apply-button gestures so Syncfusion commits the range.
+/// </remarks>
 [TestFixture]
 public class WhenDateRangeSelected : PlaywrightTestBase
 {
@@ -34,8 +25,6 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     {
         await NavigateToAndWaitForTextSignal(Path, "#start-echo");
     }
-
-    // ── Page loads ──
 
     [Test]
     public async Task page_loads_without_errors()
@@ -59,17 +48,13 @@ public class WhenDateRangeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 3: Events — Changed with typed condition ──
-
     [Test]
     public async Task changed_event_displays_start_and_end_dates()
     {
         await NavigateAndBoot();
 
-        // Select date range via the calendar popup — triggers SF change event
         await StayStart.SelectRange(2026, 7, 1, 2026, 7, 15);
 
-        // SF change event payload contains both dates
         await Expect(Page.Locator("#change-start"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         await Expect(Page.Locator("#change-end"))
@@ -82,7 +67,6 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Select date range via the calendar popup
         await StayStart.SelectRange(2026, 7, 1, 2026, 7, 15);
 
         // When(args, x => x.StartDate).NotNull() => Then branch
@@ -96,10 +80,8 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Select date range via the calendar popup
         await StayStart.SelectRange(2026, 7, 1, 2026, 7, 15);
 
-        // Indicator should appear with text "stay period confirmed"
         await Expect(Page.Locator("#selected-indicator"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Page.Locator("#selected-indicator"))
@@ -107,14 +89,11 @@ public class WhenDateRangeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 4: Component-Read Condition ──
-
     [Test]
     public async Task component_value_condition_shows_warning_when_empty()
     {
         await NavigateAndBoot();
 
-        // Click check without any range selected
         await Page.Locator("#check-stay-btn").ClickAsync();
 
         var warning = Page.Locator("#stay-warning");
@@ -127,18 +106,14 @@ public class WhenDateRangeSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Set a stay period via the calendar popup
         await StayStart.SelectRange(2026, 8, 1, 2026, 8, 31);
 
-        // Click check button
         await Page.Locator("#check-stay-btn").ClickAsync();
 
         var warning = Page.Locator("#stay-warning");
         await Expect(warning).ToHaveTextAsync("stay period set", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Deep BDD: state-cycle scenarios ──
 
     [Test]
     public async Task changing_date_range_multiple_times_fires_condition_each_time()
@@ -148,18 +123,15 @@ public class WhenDateRangeSelected : PlaywrightTestBase
         var argsCondition = Page.Locator("#args-condition");
         var selectedIndicator = Page.Locator("#selected-indicator");
 
-        // Cycle 1: select a date range — condition evaluates "stay period selected", indicator shows
         await StayStart.SelectRange(2026, 7, 1, 2026, 7, 15);
         await Expect(argsCondition).ToHaveTextAsync("stay period selected", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(selectedIndicator).ToHaveTextAsync("stay period confirmed", new() { Timeout = 3000 });
 
-        // Cycle 2: change to a different date range — condition still fires
         await StayStart.SelectRange(2026, 12, 1, 2026, 12, 31);
         await Expect(argsCondition).ToHaveTextAsync("stay period selected", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
 
-        // Verify the change-start and change-end updated
         await Expect(Page.Locator("#change-start"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 3000 });
         await Expect(Page.Locator("#change-end"))
