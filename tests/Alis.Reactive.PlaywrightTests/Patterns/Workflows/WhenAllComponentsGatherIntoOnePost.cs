@@ -13,7 +13,7 @@ namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
 public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Patterns/ComponentGather";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ComponentGatherModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ComponentGatherModel__";
 
     private async Task NavigateAndBoot()
     {
@@ -23,13 +23,13 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
 
     private async Task FillAllRequiredFields()
     {
-        var scope = new ComponentScope(Page, Scope);
+        var scope = new ComponentScope(Page, ModelIdPrefix);
 
-        await Page.Locator($"#{Scope}MobilityLevel").SelectOptionAsync("wheelchair");
+        await Page.Locator($"#{ModelIdPrefix}MobilityLevel").SelectOptionAsync("wheelchair");
 
-        await Page.Locator($"#{Scope}CareLevel_r1").ClickAsync(); // "assisted"
+        await Page.Locator($"#{ModelIdPrefix}CareLevel_r1").ClickAsync();
 
-        await Page.Locator($"#{Scope}Allergies_c1").ClickAsync();
+        await Page.Locator($"#{ModelIdPrefix}Allergies_c1").ClickAsync();
 
         var facility = scope.DropDownList("FacilityId");
         await facility.Select("Main Campus");
@@ -411,7 +411,7 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     public async Task explicit_component_id_include_posts_the_registered_member_value_only()
     {
         await NavigateAndBoot();
-        await Page.Locator($"#{Scope}ResidentName").FillAsync("Explicit Ada");
+        await Page.Locator($"#{ModelIdPrefix}ResidentName").FillAsync("Explicit Ada");
 
         await Page.RunAndWaitForRequestAsync(
             async () => await ClickWhenStable(Page.Locator("#submit-explicit-id-btn")),
@@ -431,9 +431,9 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}ResidentName").FillAsync("");
-        await Page.Locator($"#{Scope}CareNotes").FillAsync("");
-        var monthlyRate = new ComponentScope(Page, Scope).NumericTextBox("MonthlyRate");
+        await Page.Locator($"#{ModelIdPrefix}ResidentName").FillAsync("");
+        await Page.Locator($"#{ModelIdPrefix}CareNotes").FillAsync("");
+        var monthlyRate = new ComponentScope(Page, ModelIdPrefix).NumericTextBox("MonthlyRate");
         await monthlyRate.Clear();
         await monthlyRate.FillAndBlur("0");
 
@@ -451,7 +451,7 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}ResidentName").FillAsync("");
+        await Page.Locator($"#{ModelIdPrefix}ResidentName").FillAsync("");
 
         await Page.Locator("#submit-json-btn").ClickAsync();
 
@@ -465,7 +465,7 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await Page.Locator($"#{Scope}CareNotes").FillAsync("");
+        await Page.Locator($"#{ModelIdPrefix}CareNotes").FillAsync("");
 
         await Page.Locator("#submit-json-btn").ClickAsync();
 

@@ -10,10 +10,10 @@ public class WhenCareLevelCascades : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Conditions/CareLevelCascade";
 
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_CareLevelModel";
-    private const string CareLevelId = Scope + "__CareLevel";
-    private const string ProtocolId = Scope + "__Protocol";
-    private const string RequiresEscortId = Scope + "__RequiresEscort";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_CareLevelModel";
+    private const string CareLevelId = GeneratedTypeScope + "__CareLevel";
+    private const string ProtocolId = GeneratedTypeScope + "__Protocol";
+    private const string RequiresEscortId = GeneratedTypeScope + "__RequiresEscort";
 
     private DropDownListLocator CareLevel => new(Page, CareLevelId);
     private DropDownListLocator Protocol => new(Page, ProtocolId);

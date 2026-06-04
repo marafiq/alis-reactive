@@ -11,10 +11,10 @@ public class WhenNumericConditionEvaluates : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Conditions/NumericCondition";
 
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NumericConditionModel";
-    private const string HeartRateId = Scope + "__HeartRate";
-    private const string BloodPressureId = Scope + "__BloodPressure";
-    private const string ThresholdValueId = Scope + "__ThresholdValue";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NumericConditionModel";
+    private const string HeartRateId = GeneratedTypeScope + "__HeartRate";
+    private const string BloodPressureId = GeneratedTypeScope + "__BloodPressure";
+    private const string ThresholdValueId = GeneratedTypeScope + "__ThresholdValue";
 
     private NumericTextBoxLocator HeartRate => new(Page, HeartRateId);
     private NumericTextBoxLocator BloodPressure => new(Page, BloodPressureId);

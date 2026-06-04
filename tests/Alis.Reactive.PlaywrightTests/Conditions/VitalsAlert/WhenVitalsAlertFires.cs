@@ -11,8 +11,8 @@ public class WhenVitalsAlertFires : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Conditions/VitalsAlert";
 
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_VitalsAlertModel";
-    private const string HeartRateId = Scope + "__HeartRate";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_VitalsAlertModel";
+    private const string HeartRateId = GeneratedTypeScope + "__HeartRate";
 
     private NumericTextBoxLocator HeartRate => new(Page, HeartRateId);
 
