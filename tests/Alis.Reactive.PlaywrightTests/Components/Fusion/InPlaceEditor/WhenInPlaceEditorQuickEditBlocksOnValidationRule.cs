@@ -26,9 +26,9 @@ public class WhenInPlaceEditorQuickEditBlocksOnValidationRule : PlaywrightTestBa
         await inner.FillAsync("0");
 
         var postFired = false;
-        _ = Page.WaitForRequestAsync(req =>
-            req.Url.Contains(UpdateMonthlyRateEndpoint)
-            && req.Method == "POST",
+        _ = Page.WaitForRequestAsync(matchingRequest =>
+            matchingRequest.Url.Contains(UpdateMonthlyRateEndpoint)
+            && matchingRequest.Method == "POST",
             new() { Timeout = 2500 })
             .ContinueWith(t => { postFired = !t.IsFaulted && t.Result != null; return t; });
 
@@ -53,9 +53,9 @@ public class WhenInPlaceEditorQuickEditBlocksOnValidationRule : PlaywrightTestBa
         await Expect(inner).ToBeVisibleAsync(new() { Timeout = 10000 });
         await inner.FillAsync(ServerOnlyDuplicateRate);
 
-        var requestTask = Page.WaitForRequestAsync(req =>
-            req.Url.Contains(UpdateMonthlyRateEndpoint)
-            && req.Method == "POST",
+        var requestTask = Page.WaitForRequestAsync(matchingRequest =>
+            matchingRequest.Url.Contains(UpdateMonthlyRateEndpoint)
+            && matchingRequest.Method == "POST",
             new() { Timeout = 10000 });
 
         await inner.PressAsync("Enter");

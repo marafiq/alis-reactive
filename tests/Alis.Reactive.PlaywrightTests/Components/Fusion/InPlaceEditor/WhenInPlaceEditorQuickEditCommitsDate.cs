@@ -24,9 +24,9 @@ public class WhenInPlaceEditorQuickEditCommitsDate : PlaywrightTestBase
         await Expect(inner).ToBeVisibleAsync(new() { Timeout = 5000 });
         await inner.FillAsync("5/15/2000");
 
-        var requestTask = Page.WaitForRequestAsync(req =>
-            req.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateDateOfBirth")
-            && req.Method == "POST",
+        var requestTask = Page.WaitForRequestAsync(matchingRequest =>
+            matchingRequest.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateDateOfBirth")
+            && matchingRequest.Method == "POST",
             new() { Timeout = 10000 });
 
         await inner.PressAsync("Enter");

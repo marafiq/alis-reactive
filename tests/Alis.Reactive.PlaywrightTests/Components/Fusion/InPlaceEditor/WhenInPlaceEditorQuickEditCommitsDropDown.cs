@@ -27,9 +27,9 @@ public class WhenInPlaceEditorQuickEditCommitsDropDown : PlaywrightTestBase
         await Expect(item).ToBeVisibleAsync(new() { Timeout = 5000 });
         await item.ClickAsync();
 
-        var requestTask = Page.WaitForRequestAsync(req =>
-            req.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateCareLevel")
-            && req.Method == "POST",
+        var requestTask = Page.WaitForRequestAsync(matchingRequest =>
+            matchingRequest.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateCareLevel")
+            && matchingRequest.Method == "POST",
             new() { Timeout = 10000 });
 
         // Commit via Save button (real click) — proven reliable by playground evidence for this kind of inner type

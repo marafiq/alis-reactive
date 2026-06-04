@@ -21,9 +21,9 @@ public class WhenInPlaceEditorQuickEditServerErrorSurfaces : PlaywrightTestBase
         await Expect(inner).ToBeVisibleAsync(new() { Timeout = 5000 });
         await inner.FillAsync("boom");
 
-        var requestTask = Page.WaitForRequestAsync(req =>
-            req.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateNickname")
-            && req.Method == "POST",
+        var requestTask = Page.WaitForRequestAsync(matchingRequest =>
+            matchingRequest.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateNickname")
+            && matchingRequest.Method == "POST",
             new() { Timeout = 10000 });
 
         await inner.PressAsync("Enter");

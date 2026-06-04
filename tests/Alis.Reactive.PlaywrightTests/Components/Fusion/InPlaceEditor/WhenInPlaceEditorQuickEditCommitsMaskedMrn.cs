@@ -31,9 +31,9 @@ public class WhenInPlaceEditorQuickEditCommitsMaskedMrn : PlaywrightTestBase
         // Inside the editor, the mask formatter runs and the input shows MRN-1234.
         await Expect(inner).ToHaveValueAsync("MRN-1234", new() { Timeout = 3000 });
 
-        var requestTask = Page.WaitForRequestAsync(req =>
-            req.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateMedicalRecordNumber")
-            && req.Method == "POST",
+        var requestTask = Page.WaitForRequestAsync(matchingRequest =>
+            matchingRequest.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateMedicalRecordNumber")
+            && matchingRequest.Method == "POST",
             new() { Timeout = 10000 });
 
         await inner.PressAsync("Enter");
@@ -68,9 +68,9 @@ public class WhenInPlaceEditorQuickEditCommitsMaskedMrn : PlaywrightTestBase
         await inner.PressSequentiallyAsync("AB1234");
 
         var requestFired = false;
-        void OnRequest(object? _, IRequest req)
+        void OnRequest(object? _, IRequest observedRequest)
         {
-            if (req.Url.Contains("/UpdateMedicalRecordNumber"))
+            if (observedRequest.Url.Contains("/UpdateMedicalRecordNumber"))
                 requestFired = true;
         }
         Page.Request += OnRequest;

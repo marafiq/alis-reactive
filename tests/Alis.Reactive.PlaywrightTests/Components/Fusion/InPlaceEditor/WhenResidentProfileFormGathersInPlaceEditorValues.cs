@@ -17,9 +17,9 @@ public class WhenResidentProfileFormGathersInPlaceEditorValues : PlaywrightTestB
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#submit-profile");
 
-        var requestTask = Page.WaitForRequestAsync(req =>
-            req.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateProfile")
-            && req.Method == "POST",
+        var requestTask = Page.WaitForRequestAsync(matchingRequest =>
+            matchingRequest.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateProfile")
+            && matchingRequest.Method == "POST",
             new() { Timeout = 10000 });
 
         await Page.Locator("#submit-profile").ClickAsync();

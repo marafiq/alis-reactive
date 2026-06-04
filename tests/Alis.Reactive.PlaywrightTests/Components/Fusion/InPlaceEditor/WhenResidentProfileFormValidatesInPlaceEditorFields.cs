@@ -28,9 +28,9 @@ public class WhenResidentProfileFormValidatesInPlaceEditorFields : PlaywrightTes
         await Page.WaitForTimeoutAsync(400);
 
         var postFired = false;
-        _ = Page.WaitForRequestAsync(req =>
-            req.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateProfile")
-            && req.Method == "POST",
+        _ = Page.WaitForRequestAsync(matchingRequest =>
+            matchingRequest.Url.Contains("/Sandbox/Components/FusionInPlaceEditor/UpdateProfile")
+            && matchingRequest.Method == "POST",
             new() { Timeout = 2500 })
             .ContinueWith(t => { postFired = !t.IsFaulted && t.Result != null; return t; });
 
