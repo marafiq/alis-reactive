@@ -386,6 +386,11 @@ Review cycle before every commit:
   shape instead of browser-visible behavior. A later test-design slice should
   classify which plan JSON checks are DSL contract proof and which should move
   to lower-level plan/domain tests or be replaced by behavior assertions.
+- TODO: `tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Grid/WhenUsingFusionGrid.cs`:
+  the former `sorting_then_paging_preserves_sort_order` name promised row-order
+  proof, but the test only asserts the paging echo after sorting. A later
+  behavior-test slice should either assert sorted row content across page changes
+  or keep the test explicitly scoped to action metadata.
 - TODO: `Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs`: `PluginOperation` is public
   because public plugin descriptors inherit from it, but framework developers do
   not appear to use the base type directly through the DSL. Do not change
