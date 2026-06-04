@@ -74,8 +74,8 @@ function showConfirmDialog(
 export function init(): void {
   // App-level singleton rendered by @Html.FusionConfirmDialog() in Layout.
   // Not a plan component — getElementById is correct.
-  const el = document.getElementById(ELEMENT_ID);
-  if (!el) {
+  const dialogHostElement = document.getElementById(ELEMENT_ID);
+  if (!dialogHostElement) {
     log.warn("element.not-found", { id: ELEMENT_ID });
     return;
   }
@@ -90,7 +90,7 @@ export function init(): void {
     closeOnEscape: true,
     target: document.body,
   });
-  dialog.appendTo(el);
+  dialog.appendTo(dialogHostElement);
 
   hostWindow.alis = hostWindow.alis || {};
   hostWindow.alis.confirm = function (message: string): Promise<boolean> {

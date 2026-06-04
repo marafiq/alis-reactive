@@ -54,15 +54,15 @@ function drainPluginQueue(): void {
 }
 
 function discoverPlans(): PlanDocument[] {
-  const planEls = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
+  const planElements = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
   const plans: PlanDocument[] = [];
 
-  for (const el of planEls) {
-    const traceLevel = el.dataset.trace as TraceLevel | undefined;
+  for (const planElement of planElements) {
+    const traceLevel = planElement.dataset.trace as TraceLevel | undefined;
     if (traceLevel) trace.setLevel(traceLevel);
 
     try {
-      const text = el.textContent?.trim();
+      const text = planElement.textContent?.trim();
       if (!text) throw new Error("[alis] empty plan element");
       plans.push(JSON.parse(text));
     } catch (e) {

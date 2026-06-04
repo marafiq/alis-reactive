@@ -128,10 +128,10 @@ function resetRuntimeSingletonsForTests(): void {
 }
 
 function clearSummaryForPlan(planId: string): void {
-  const el = findSummaryElement(planId);
-  if (el) {
-    clearSummary(el);
-    hideSummaryDiv(el);
+  const summaryElement = findSummaryElement(planId);
+  if (summaryElement) {
+    clearSummary(summaryElement);
+    hideSummaryDiv(summaryElement);
   }
 }
 

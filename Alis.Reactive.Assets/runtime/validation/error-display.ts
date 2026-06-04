@@ -4,54 +4,54 @@
 const ERR_CLASS = "alis-has-error";
 
 export function showInline(componentDomId: string, message: string): void {
-  const el = document.getElementById(componentDomId);
-  if (el) el.classList.add(ERR_CLASS);
+  const componentElement = document.getElementById(componentDomId);
+  if (componentElement) componentElement.classList.add(ERR_CLASS);
 
-  const span = findErrorSpan(componentDomId);
-  if (span) {
-    span.textContent = message;
-    span.removeAttribute("hidden");
-    span.style.display = "";
+  const errorSpan = findErrorSpan(componentDomId);
+  if (errorSpan) {
+    errorSpan.textContent = message;
+    errorSpan.removeAttribute("hidden");
+    errorSpan.style.display = "";
   }
 }
 
 export function clearInline(componentDomId: string): void {
-  const span = findErrorSpan(componentDomId);
-  if (span) {
-    span.textContent = "";
-    span.setAttribute("hidden", "");
-    span.style.display = "none";
+  const errorSpan = findErrorSpan(componentDomId);
+  if (errorSpan) {
+    errorSpan.textContent = "";
+    errorSpan.setAttribute("hidden", "");
+    errorSpan.style.display = "none";
   }
-  const el = document.getElementById(componentDomId);
-  if (el) el.classList.remove(ERR_CLASS);
+  const componentElement = document.getElementById(componentDomId);
+  if (componentElement) componentElement.classList.remove(ERR_CLASS);
 }
 
-export function addToSummary(summaryEl: HTMLElement, name: string, message: string): void {
+export function addToSummary(summaryElement: HTMLElement, name: string, message: string): void {
   const item = document.createElement("div");
   item.dataset.valmsgSummaryFor = name;
   item.textContent = message;
-  summaryEl.appendChild(item);
+  summaryElement.appendChild(item);
 }
 
-export function removeSummaryEntry(summaryEl: HTMLElement, name: string): void {
-  const entry = findSummaryEntry(summaryEl, name);
+export function removeSummaryEntry(summaryElement: HTMLElement, name: string): void {
+  const entry = findSummaryEntry(summaryElement, name);
   if (entry) entry.remove();
 }
 
-export function hasSummaryEntry(summaryEl: HTMLElement, name: string): boolean {
-  return findSummaryEntry(summaryEl, name) !== undefined;
+export function hasSummaryEntry(summaryElement: HTMLElement, name: string): boolean {
+  return findSummaryEntry(summaryElement, name) !== undefined;
 }
 
-export function clearSummary(summaryEl: HTMLElement): void {
-  summaryEl.innerHTML = "";
+export function clearSummary(summaryElement: HTMLElement): void {
+  summaryElement.innerHTML = "";
 }
 
-export function showSummaryDiv(summaryEl: HTMLElement): void {
-  summaryEl.removeAttribute("hidden");
+export function showSummaryDiv(summaryElement: HTMLElement): void {
+  summaryElement.removeAttribute("hidden");
 }
 
-export function hideSummaryDiv(summaryEl: HTMLElement): void {
-  summaryEl.setAttribute("hidden", "");
+export function hideSummaryDiv(summaryElement: HTMLElement): void {
+  summaryElement.setAttribute("hidden", "");
 }
 
 export function findSummaryElement(planId: string): HTMLElement | null {
@@ -64,11 +64,11 @@ export function showServerErrorInline(
   message: string,
   element?: HTMLElement,
 ): void {
-  const span = findErrorSpan(componentDomId);
-  if (span) {
-    span.textContent = message;
-    span.removeAttribute("hidden");
-    span.style.display = "";
+  const errorSpan = findErrorSpan(componentDomId);
+  if (errorSpan) {
+    errorSpan.textContent = message;
+    errorSpan.removeAttribute("hidden");
+    errorSpan.style.display = "";
   }
 
   element?.classList.add(ERR_CLASS);
@@ -78,8 +78,8 @@ function findErrorSpan(componentDomId: string): HTMLElement | null {
   return document.getElementById(componentDomId + "_error");
 }
 
-function findSummaryEntry(summaryEl: HTMLElement, name: string): HTMLElement | undefined {
-  for (const child of summaryEl.children) {
+function findSummaryEntry(summaryElement: HTMLElement, name: string): HTMLElement | undefined {
+  for (const child of summaryElement.children) {
     if (!(child instanceof HTMLElement)) continue;
     if (child.dataset.valmsgSummaryFor === name) return child;
   }

@@ -8,17 +8,17 @@ const log = scope("retry-indicator");
 
 const RETRY_ATTR = "data-alis-retry";
 
-export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry: () => void): void {
+export function showRetryIndicators(connectionKey: string, targetDomIds: Set<string>, onRetry: () => void): void {
   const anchored = new Set<HTMLElement>();
 
-  for (const id of targetIds) {
-    const el = document.getElementById(id);
-    if (!el) {
-      log.warn("target.not-found", { key, id });
+  for (const targetDomId of targetDomIds) {
+    const targetElement = document.getElementById(targetDomId);
+    if (!targetElement) {
+      log.warn("target.not-found", { key: connectionKey, id: targetDomId });
       continue;
     }
 
-    const anchor = el.parentElement ?? el;
+    const anchor = targetElement.parentElement ?? targetElement;
     if (anchored.has(anchor) || anchor.querySelector(`[${RETRY_ATTR}]`)) continue;
     anchored.add(anchor);
 
@@ -26,7 +26,7 @@ export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry
 
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.setAttribute(RETRY_ATTR, key);
+    btn.setAttribute(RETRY_ATTR, connectionKey);
     btn.setAttribute("title", "Connection lost — click to reconnect");
     btn.className = "alis-retry-indicator";
     btn.addEventListener("click", (e) => {
@@ -38,14 +38,14 @@ export function showRetryIndicators(key: string, targetIds: Set<string>, onRetry
   }
 
   if (anchored.size > 0) {
-    log.info("indicators.shown", { key, placed: anchored.size });
-  } else if (targetIds.size > 0) {
-    log.error("indicators.all-targets-missing", { key, targets: [...targetIds] });
+    log.info("indicators.shown", { key: connectionKey, placed: anchored.size });
+  } else if (targetDomIds.size > 0) {
+    log.error("indicators.all-targets-missing", { key: connectionKey, targets: [...targetDomIds] });
   }
 }
 
-export function removeRetryIndicators(key: string): void {
-  const icons = document.querySelectorAll(`[${RETRY_ATTR}="${key}"]`);
+export function removeRetryIndicators(connectionKey: string): void {
+  const icons = document.querySelectorAll(`[${RETRY_ATTR}="${connectionKey}"]`);
   icons.forEach(icon => icon.remove());
-  if (icons.length > 0) log.debug("indicators.removed", { key, count: icons.length });
+  if (icons.length > 0) log.debug("indicators.removed", { key: connectionKey, count: icons.length });
 }

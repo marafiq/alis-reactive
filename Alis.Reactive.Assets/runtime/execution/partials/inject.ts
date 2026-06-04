@@ -18,13 +18,13 @@ export function injectPartial(container: HTMLElement, html: string, slot: string
   const temp = document.createElement("div");
   temp.innerHTML = html;
 
-  const planEls = temp.querySelectorAll<HTMLElement>("[data-reactive-plan]");
+  const planElements = temp.querySelectorAll<HTMLElement>("[data-reactive-plan]");
   const plans: PlanDocument[] = [];
-  for (const el of planEls) {
-    const text = el.textContent?.trim();
+  for (const planElement of planElements) {
+    const text = planElement.textContent?.trim();
     if (!text) throw new Error("[alis] empty plan element in injected HTML");
     plans.push(JSON.parse(text));
-    el.remove();
+    planElement.remove();
   }
 
   container.innerHTML = "";
