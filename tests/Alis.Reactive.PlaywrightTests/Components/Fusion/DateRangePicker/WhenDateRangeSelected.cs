@@ -68,7 +68,6 @@ public class WhenDateRangeSelected : PlaywrightTestBase
 
         await StayStart.SelectRange(2026, 7, 1, 2026, 7, 15);
 
-        // When(args, x => x.StartDate).NotNull() => Then branch
         await Expect(Page.Locator("#args-condition"))
             .ToHaveTextAsync("stay period selected", new() { Timeout = 5000 });
         AssertNoConsoleErrors();

@@ -89,7 +89,6 @@ public class WhenDateSelected : PlaywrightTestBase
 
         await AdmissionDate.SelectDate(2026, 7, 4);
 
-        // When(args, x => x.Value).NotNull() => Then branch
         await Expect(Page.Locator("#args-condition"))
             .ToHaveTextAsync("date selected", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
