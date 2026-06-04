@@ -1,14 +1,20 @@
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Typed event reference for component .Reactive() extensions.
-    /// Holds the JS event name and provides compile-time type safety for event args.
+    /// Describes a component event selected by a component <c>.Reactive(...)</c> overload.
     /// </summary>
+    /// <remarks>
+    /// Component event collections return this descriptor so the framework can write the
+    /// event name into the Reactive Plan while giving the authoring lambda a typed payload
+    /// placeholder for expression paths.
+    /// </remarks>
+    /// <typeparam name="TArgs">The event payload contract exposed to the reaction pipeline.</typeparam>
     public sealed class TypedEvent<TArgs>
     {
-        /// <summary>Gets the JavaScript event name.</summary>
+        /// <summary>Gets the component-object event name written into the Reactive Plan.</summary>
         public string ObjectEvent { get; }
-        /// <summary>Gets the typed event arguments instance.</summary>
+
+        /// <summary>Gets the typed payload placeholder used to author event-argument reads.</summary>
         public TArgs Args { get; }
 
         internal TypedEvent(string jsEvent, TArgs args)
