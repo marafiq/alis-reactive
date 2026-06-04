@@ -8,6 +8,7 @@ import { assertNever } from "../../shared/assert-never";
 import { scope } from "../../diagnostics/trace";
 import { ExecutionContext } from "../../browser-objects/execution-context";
 import { componentEventChannel } from "../../browser-objects/component-event-contract";
+import { toJavaScriptString } from "../../shared/javascript-string";
 
 const log = scope("trigger");
 
@@ -17,10 +18,10 @@ function runReaction(reaction: ReactionGraph, plan: PlanDocument, context: Execu
   try {
     catchAsyncReactionFailure(
       executeReaction(reaction, plan, context.raw),
-      err => log.error("reaction.failed", { source, sync: false, error: String(err) }),
+      err => log.error("reaction.failed", { source, sync: false, error: toJavaScriptString(err) }),
     );
   } catch (err) {
-    log.error("reaction.failed", { source, sync: true, error: String(err) });
+    log.error("reaction.failed", { source, sync: true, error: toJavaScriptString(err) });
   }
 }
 

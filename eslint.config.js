@@ -35,13 +35,11 @@ export default tseslint.config(
 
       "@typescript-eslint/no-explicit-any": "warn",
 
-      // Ban raw String() on value paths. Use toString() from core/coerce instead.
-      // Allowed: String(err) for error logging (matched by the err/error variable name).
       "no-restricted-syntax": [
         "error",
         {
-          selector: "CallExpression[callee.name='String'][arguments.length=1]:not([arguments.0.name=/^err/]):not([arguments.0.property.name=/^err/])",
-          message: "Use toString() from core/coerce instead of raw String(). String(err) for error logging is allowed.",
+          selector: "CallExpression[callee.name='String'][arguments.length=1]",
+          message: "Use shape conversion for plan values or toJavaScriptString() at runtime boundaries.",
         },
       ],
     },

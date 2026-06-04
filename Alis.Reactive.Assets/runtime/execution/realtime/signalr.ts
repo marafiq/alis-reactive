@@ -5,6 +5,7 @@ import { showRetryIndicators, removeRetryIndicators } from "../requests/retry-in
 import { scope } from "../../diagnostics/trace";
 import { ExecutionContext } from "../../browser-objects/execution-context";
 import { objectRecordFrom } from "../../browser-objects/object-record";
+import { toJavaScriptString } from "../../shared/javascript-string";
 
 const log = scope("signalr");
 
@@ -29,7 +30,7 @@ async function startWithRetry(connection: signalR.HubConnection, hubUrl: string)
       return;
     } catch (err) {
       const delay = reconnectDelayForAttempt(attempt);
-      log.warn("start.retry", { hubUrl, attempt: attempt + 1, delay, error: String(err) });
+      log.warn("start.retry", { hubUrl, attempt: attempt + 1, delay, error: toJavaScriptString(err) });
       await new Promise(r => setTimeout(r, delay));
     }
   }
@@ -119,7 +120,7 @@ export function wireSignalR(
     log.debug("method.received", { hubUrl: trigger.hubUrl, method: trigger.method });
     catchAsyncReactionFailure(
       executeReaction(reaction, plan, ExecutionContext.event(evt).raw),
-      err => log.error("reaction.failed", { hubUrl: trigger.hubUrl, method: trigger.method, error: String(err) }),
+      err => log.error("reaction.failed", { hubUrl: trigger.hubUrl, method: trigger.method, error: toJavaScriptString(err) }),
     );
   };
 
@@ -153,7 +154,7 @@ function signalRErrorMessage(error: unknown): string | undefined {
   const errorWasProvided = error !== null && error !== undefined;
   if (!errorWasProvided) return undefined;
 
-  return String(error);
+  return toJavaScriptString(error);
 }
 
 function signalRInvocationPayload(args: unknown[], trigger: SignalRTrigger): Record<string, unknown> {

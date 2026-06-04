@@ -3,6 +3,7 @@ import { catchAsyncReactionFailure, executeReaction } from "../reactions/execute
 import { showRetryIndicators, removeRetryIndicators } from "../requests/retry-indicator";
 import { scope } from "../../diagnostics/trace";
 import { ExecutionContext } from "../../browser-objects/execution-context";
+import { toJavaScriptString } from "../../shared/javascript-string";
 
 const log = scope("server-push");
 
@@ -85,7 +86,7 @@ export function wireServerPush(
     log.debug("message.received", { url: trigger.url, event: eventName });
     catchAsyncReactionFailure(
       executeReaction(reaction, plan, ExecutionContext.event(evt).raw),
-      err => log.error("reaction.failed", { url: trigger.url, event: eventName, error: String(err) }),
+      err => log.error("reaction.failed", { url: trigger.url, event: eventName, error: toJavaScriptString(err) }),
     );
   };
   const wiredBehavior = { trigger, reaction, plan, handler: handler as EventListener };

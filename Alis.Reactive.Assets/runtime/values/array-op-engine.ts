@@ -1,6 +1,7 @@
 import type { ValueExpression, ArrayOperationExpression, ValidationCondition } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { RuntimeValue } from "../browser-objects/runtime-value";
+import { toJavaScriptString } from "../shared/javascript-string";
 
 type ProjectElementValue = (expression: ValueExpression, item: unknown) => unknown;
 
@@ -130,7 +131,7 @@ function compareKeys(a: unknown, b: unknown): number {
     if (aFinite === bFinite) return 0;
     return aFinite ? -1 : 1;
   }
-  const left = String(a);
-  const right = String(b);
+  const left = toJavaScriptString(a);
+  const right = toJavaScriptString(b);
   return left < right ? -1 : left > right ? 1 : 0;
 }

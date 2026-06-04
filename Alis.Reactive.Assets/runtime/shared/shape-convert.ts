@@ -3,6 +3,7 @@
 // reports type mismatches without throwing.
 
 import type { Shape } from "../types/index";
+import { toJavaScriptString } from "./javascript-string";
 
 /** Discriminated result — caller MUST check .ok before using .value. */
 export type ConvertResult<T> = { ok: true; value: T } | { ok: false; error: string };
@@ -117,7 +118,7 @@ export function toString(value: unknown): ConvertResult<string> {
   if (typeof value === "string") return ok(value);
   if (typeof value === "number" || typeof value === "boolean") return ok(`${value}`);
   if (value instanceof Date) return ok(value.toISOString());
-  if (Array.isArray(value)) return ok(String(value));
+  if (Array.isArray(value)) return ok(toJavaScriptString(value));
   return err(`toString: received object — missing shape or wrong member. Got: ${JSON.stringify(value)}`);
 }
 

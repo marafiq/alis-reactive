@@ -5,6 +5,7 @@ import { executeReaction } from "../../execution/reactions/execute";
 import { scope } from "../../diagnostics/trace";
 import type { ReactionGraph, PlanDocument, RequestPlan } from "../../types/index";
 import { assertNever } from "../../shared/assert-never";
+import { toJavaScriptString } from "../../shared/javascript-string";
 
 const log = scope("native-action-link");
 const SELECTOR = "a[data-reactive-link]";
@@ -43,7 +44,7 @@ function handleClick(event: MouseEvent): void {
   log.debug("activated", { id: anchor.id, href: anchor.href });
   const result = executeReaction(payload.reaction, payload.plan);
   if (result instanceof Promise) {
-    result.catch(err => log.error("reaction.failed", { id: anchor.id, error: String(err) }));
+    result.catch(err => log.error("reaction.failed", { id: anchor.id, error: toJavaScriptString(err) }));
   }
 }
 
@@ -56,7 +57,7 @@ function decodePayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
   try {
     return JSON.parse(raw) as NativeActionLinkPayload;
   } catch (error) {
-    throw new Error(`NativeActionLink payload is invalid JSON: ${String(error)}`);
+    throw new Error(`NativeActionLink payload is invalid JSON: ${toJavaScriptString(error)}`);
   }
 }
 

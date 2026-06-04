@@ -1,6 +1,7 @@
 import type { Path, PathSegment } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { isMissingRuntimeValue } from "./runtime-value";
+import { toJavaScriptString } from "../shared/javascript-string";
 
 type MemberKey = string | number;
 type MemberOwner = { [key: string]: unknown; [key: number]: unknown };
@@ -88,7 +89,7 @@ function requireMemberOwner(source: unknown, label: string): MemberOwner {
 function requireMember(owner: MemberOwner, key: MemberKey, label: string): RuntimeMember {
   if (key in owner) return { owner, key };
 
-  throw new Error(`[alis] runtime path member "${String(key)}" is missing on ${label}`);
+  throw new Error(`[alis] runtime path member "${toJavaScriptString(key)}" is missing on ${label}`);
 }
 
 function memberValue(member: RuntimeMember): unknown {

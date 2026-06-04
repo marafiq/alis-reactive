@@ -9,6 +9,7 @@ import { isMissingRuntimeValue } from "../../browser-objects/runtime-value";
 import { ExecutionContext } from "../../browser-objects/execution-context";
 import { resolveFetch, type ResolvedFetch } from "./http-fetch";
 import { assertNever } from "../../shared/assert-never";
+import { toJavaScriptString } from "../../shared/javascript-string";
 
 const log = scope("http");
 
@@ -93,7 +94,7 @@ function exchangeOutcomeFromClientFailure(request: RequestPlan, err: unknown): H
   log.error(traceEvent, {
     method: request.method,
     url: request.url,
-    error: String(err),
+    error: toJavaScriptString(err),
   });
   return { kind: "response-unavailable" };
 }

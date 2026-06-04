@@ -18,6 +18,7 @@ import { scope } from "../../diagnostics/trace";
 import { isMissingRuntimeValue } from "../../browser-objects/runtime-value";
 import { ExecutionContext, type ServerValidationPayload } from "../../browser-objects/execution-context";
 import { plainObjectRecordFrom } from "../../browser-objects/object-record";
+import { toJavaScriptString } from "../../shared/javascript-string";
 
 const log = scope("execute");
 
@@ -230,7 +231,7 @@ function executeShowValidationErrors(
 function reportParallelStepFailures(results: readonly PromiseSettledResult<void>[]): void {
   for (const result of results) {
     if (result.status === "rejected") {
-      log.error("parallel.step-failed", { error: String(result.reason) });
+      log.error("parallel.step-failed", { error: toJavaScriptString(result.reason) });
     }
   }
 }
