@@ -177,7 +177,7 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         await Page.Locator("#btn-nested-present").ClickAsync();
         await Expect(result).ToHaveTextAsync("Has Address");
 
-        // Missing key entirely → also null
+        // Missing payload keys are treated as null by IsNull().
         await Page.Locator("#btn-nested-missing").ClickAsync();
         await Expect(result).ToHaveTextAsync("No Address");
 
@@ -193,11 +193,10 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         await Page.Locator("#btn-nested-and-pass").ClickAsync();
         await Expect(result).ToHaveTextAsync("Valid");
 
-        // null address → city is null → AND fails
+        // Null and missing nested objects both make the nested NotNull() guard fail.
         await Page.Locator("#btn-nested-and-null").ClickAsync();
         await Expect(result).ToHaveTextAsync("Invalid");
 
-        // missing address → city is undefined → AND fails
         await Page.Locator("#btn-nested-and-missing").ClickAsync();
         await Expect(result).ToHaveTextAsync("Invalid");
 
@@ -210,15 +209,14 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         await NavigateAndBoot();
         var result = Page.Locator("#null-leaf-result");
 
-        // city is null → coerced to "" → != "Seattle" → else branch
+        // Null leaf values are coerced to an empty string for string comparison.
         await Page.Locator("#btn-null-leaf-null").ClickAsync();
         await Expect(result).ToHaveTextAsync("Not Seattle");
 
-        // city is "Seattle" → match → then branch
         await Page.Locator("#btn-null-leaf-match").ClickAsync();
         await Expect(result).ToHaveTextAsync("Seattle");
 
-        // address is null → city resolve returns undefined → coerced to "" → else
+        // Null parent objects also fall through without throwing.
         await Page.Locator("#btn-null-leaf-obj-null").ClickAsync();
         await Expect(result).ToHaveTextAsync("Not Seattle");
 
@@ -377,11 +375,10 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         await Expect(always).ToHaveTextAsync("Always runs");
         await Expect(bonus).ToHaveTextAsync("Bonus!");
 
-        // score=50 → guard fails → first command still runs, branch skips the guarded command
+        // A failed guard skips only the guarded command; unguarded commands still run.
         await Page.Locator("#btn-single-command-condition-low").ClickAsync();
         await Expect(always).ToHaveTextAsync("Always runs");
-        // Bonus stays "Bonus!" from the previous click; the fresh-page skip test
-        // covers the default bonus state when low is clicked first.
+        // Bonus keeps the previous successful branch value; the fresh-page test covers the default state.
 
         AssertNoConsoleErrors();
     }
@@ -485,21 +482,16 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     [Test]
     public async Task null_nested_object_does_not_crash_and_evaluates_to_null()
     {
-        // Dispatch with address:null → When(address).IsNull() should be true
-        // Then dispatch with address:{city:"NYC"} → IsNull() should be false
-        // Proves null-safe dot-path walking doesn't throw
         await NavigateAndBoot();
         var result = Page.Locator("#nested-null-result");
 
-        // address explicitly null → IsNull() = true → "No Address"
+        // Explicit null must stay null-safe before and after a present address dispatch.
         await Page.Locator("#btn-nested-null").ClickAsync();
         await Expect(result).ToHaveTextAsync("No Address");
 
-        // address present with city → IsNull() = false → "Has Address"
         await Page.Locator("#btn-nested-present").ClickAsync();
         await Expect(result).ToHaveTextAsync("Has Address");
 
-        // Transition back to null — confirms re-evaluation works after non-null
         await Page.Locator("#btn-nested-null").ClickAsync();
         await Expect(result).ToHaveTextAsync("No Address");
 
@@ -509,20 +501,16 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     [Test]
     public async Task missing_key_in_payload_evaluates_as_null()
     {
-        // Dispatch with {id:3} (no address key at all) → When(address).IsNull() should be true
-        // Proves structured payload path resolution returns undefined for missing keys, and IsNull treats undefined as null
         await NavigateAndBoot();
         var result = Page.Locator("#nested-null-result");
 
-        // Missing key → path read returns undefined → IsNull treats as null → "No Address"
+        // Missing structured payload paths resolve as undefined; IsNull treats that as null across repeated dispatches.
         await Page.Locator("#btn-nested-missing").ClickAsync();
         await Expect(result).ToHaveTextAsync("No Address");
 
-        // Contrast with present address → "Has Address"
         await Page.Locator("#btn-nested-present").ClickAsync();
         await Expect(result).ToHaveTextAsync("Has Address");
 
-        // Missing key again to confirm idempotent
         await Page.Locator("#btn-nested-missing").ClickAsync();
         await Expect(result).ToHaveTextAsync("No Address");
 
@@ -586,15 +574,13 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     [Test]
     public async Task single_command_condition_skips_guarded_branch_on_fresh_page()
     {
-        // Fresh navigation — bonus starts as "—" (em dash default)
         await NavigateAndBoot();
         var always = Page.Locator("#single-command-condition-result");
         var bonus = Page.Locator("#single-command-condition-bonus");
 
-        // score=50 → guard fails → first command fires, guarded branch is skipped
+        // Fresh navigation proves a failed guard does not inherit a prior bonus value.
         await Page.Locator("#btn-single-command-condition-low").ClickAsync();
         await Expect(always).ToHaveTextAsync("Always runs");
-        // Bonus was never set — remains at default em dash
         await Expect(bonus).ToHaveTextAsync("\u2014");
 
         AssertNoConsoleErrors();
@@ -654,16 +640,13 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     [Test]
     public async Task null_leaf_with_missing_address_key_takes_else_no_crash()
     {
-        // Dispatch check-null-leaf with NO address key at all → path read returns undefined
-        // → coerced to "" → != "Seattle" → else branch, no crash
         await NavigateAndBoot();
         var result = Page.Locator("#null-leaf-result");
 
-        // address key entirely missing → path read returns undefined → else
+        // Missing address resolves as undefined, falls through the string comparison, and does not poison the next dispatch.
         await Page.Locator("#btn-null-leaf-missing").ClickAsync();
         await Expect(result).ToHaveTextAsync("Not Seattle");
 
-        // Confirm recovery: city=Seattle still matches after missing-key dispatch
         await Page.Locator("#btn-null-leaf-match").ClickAsync();
         await Expect(result).ToHaveTextAsync("Seattle");
 
