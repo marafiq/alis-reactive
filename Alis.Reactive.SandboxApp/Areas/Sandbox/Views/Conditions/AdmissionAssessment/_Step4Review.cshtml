@@ -8,23 +8,18 @@
         ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.Submit.");
 }
 
-<!-- ASSERT: empty EmergencyContact → contact-warning visible
-     ASSERT: fill EmergencyContact → contact-warning hidden
-     ASSERT: submit with empty contact → validation error on screening-form
-     ASSERT: submit with valid data → submit-result shows message -->
 <native-card><native-card-body id="screening-form">
     <native-heading level="H2">Step 4: Review &amp; Submit</native-heading>
     <p class="text-sm text-text-secondary mb-4">
         Review the assessment summary and provide emergency contact before final submission.
     </p>
 
-    <!-- Hidden fields: cross-step summary data -->
+    <!-- Shared Active Plan summary fields populated by earlier steps. -->
     @Html.HiddenFieldFor(plan, m => m.ScreeningId)
     @Html.HiddenFieldFor(plan, m => m.RiskTier)
     @Html.HiddenFieldFor(plan, m => m.CareUnit)
     @Html.HiddenFieldFor(plan, m => m.MonitoringLevel)
 
-    <!-- Emergency Contact -->
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.EmergencyContact, o => o.Required().Label("Emergency Contact"))
             .NativeTextBox(b => b
@@ -42,7 +37,6 @@
         Emergency contact is required before submission.
     </div>
 
-    <!-- Summary Panel — only shows fields that have values from previous steps -->
     @if (!string.IsNullOrEmpty(Model.RiskTier) || !string.IsNullOrEmpty(Model.CareUnit) || !string.IsNullOrEmpty(Model.MonitoringLevel))
     {
         <native-card>
@@ -75,10 +69,8 @@
         </native-card>
     }
 
-    <!-- Submit Result -->
     <div id="submit-result" hidden class="rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2 text-sm text-emerald-700 mt-4"></div>
 
-    <!-- Step 4 Navigation + Submit -->
     <native-hstack gap="None" justify="Between" class="mt-6">
         @(Html.NativeButton("prev-4", "\u2190 Back: Functional")
             .CssClass("rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
