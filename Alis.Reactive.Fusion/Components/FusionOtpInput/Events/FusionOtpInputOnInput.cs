@@ -14,7 +14,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Gets or sets the zero-based field index that changed.</summary>
         public int Index { get; set; }
 
-        /// <summary>Creates an input event payload.</summary>
         public FusionOtpInputInputArgs() { }
     }
 }

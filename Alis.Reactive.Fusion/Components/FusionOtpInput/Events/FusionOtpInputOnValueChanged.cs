@@ -14,7 +14,6 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
         public bool IsInteracted { get; set; }
 
-        /// <summary>Creates a value-changed event payload.</summary>
         public FusionOtpInputValueChangedArgs() { }
     }
 }
