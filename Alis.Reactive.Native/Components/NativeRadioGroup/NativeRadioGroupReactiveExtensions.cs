@@ -23,8 +23,8 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TProp">The bound property type.</typeparam>
         /// <typeparam name="TArgs">The event args type selected by <paramref name="eventSelector"/>.</typeparam>
         /// <param name="builder">The radio group builder to wire events on.</param>
-        /// <param name="plan">The plan that receives the component event triggers.</param>
-        /// <param name="eventSelector">Selects which event to listen for (e.g. <c>evt => evt.Changed</c>).</param>
+        /// <param name="plan">The Reactive Plan that receives the component event triggers.</param>
+        /// <param name="eventSelector">Selects which event to listen for, such as <c>evt => evt.Changed</c>.</param>
         /// <param name="pipeline">Builds the pipeline that runs when the event fires.</param>
         public static NativeRadioGroupBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
             this NativeRadioGroupBuilder<TModel, TProp> builder,
