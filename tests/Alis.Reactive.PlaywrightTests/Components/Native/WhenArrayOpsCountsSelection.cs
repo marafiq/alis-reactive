@@ -1,13 +1,8 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
-/// Exercises the deterministic array-operations DSL end-to-end in the browser:
-/// NativeCheckList Changed -> p.From(args, e => e.Value).Count() ->
-/// p.Element("selected-count").SetText(count). Proves the array-op plan node executes
-/// in the runtime against a real string[] event payload, with no plugin and no hand-written JS.
-///
-/// Page under test: /Sandbox/Components/ArrayOps
-/// Isolated slice — touches no other vertical slice.
+/// Exercises the array-operation DSL for NativeCheckList Changed payloads:
+/// <c>p.From(args, e => e.Value).Count()</c> to <c>SetText(count)</c>.
 /// </summary>
 [TestFixture]
 public class WhenArrayOpsCountsSelection : PlaywrightTestBase

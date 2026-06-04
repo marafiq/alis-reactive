@@ -1,8 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
-/// Exercises NativeButton API end-to-end in the browser:
-/// click events, <c>SetText</c> mutations, and dispatch chains.
+/// Exercises NativeButton click events, SetText mutations, and dispatch chains.
 /// </summary>
 [TestFixture]
 public class WhenButtonFires : PlaywrightTestBase

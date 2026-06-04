@@ -1,9 +1,8 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
-/// Exercises NativeDropDown API end-to-end in the browser:
-/// property writes (<c>SetValue</c>), property reads (<c>Value</c> as source),
-/// reactive events (<c>Changed</c> with typed condition), and component-read conditions.
+/// Exercises NativeDropDown SetValue, Value reads, Changed-event conditions,
+/// and component-read conditions.
 /// </summary>
 [TestFixture]
 public class WhenDropdownSelectionChanges : PlaywrightTestBase
