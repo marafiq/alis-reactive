@@ -3,19 +3,13 @@ using Alis.Reactive.Playwright.Extensions;
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.RichTextEditor;
 
 /// <summary>
-/// Exercises all FusionRichTextEditor API end-to-end in the browser:
-/// property writes, property reads, events with typed conditions,
-/// and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/RichTextEditor
-///
-/// FusionRichTextEditor hides the textarea and renders a
-/// contenteditable div inside a wrapper with class e-richtexteditor.
-/// Tests use RichTextEditorLocator to interact via real browser gestures
-/// (typing into the contenteditable area) rather than ej2 instance manipulation.
-///
-/// Senior living domain: care plan documentation, discharge summaries.
+/// Exercises FusionRichTextEditor property writes, value reads, changed-event conditions,
+/// and component-read conditions for care plan documentation.
 /// </summary>
+/// <remarks>
+/// Syncfusion hides the textarea and commits edits through the contenteditable editor.
+/// RichTextEditorLocator fills and blurs that editor so Syncfusion raises <c>change</c>.
+/// </remarks>
 [TestFixture]
 public class WhenRichTextEdited : PlaywrightTestBase
 {
@@ -31,8 +25,6 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateToAndWaitForTextSignal(Path, "#value-echo");
     }
-
-    // ── Page loads ──
 
     [Test]
     public async Task page_loads_without_errors()
@@ -54,21 +46,17 @@ public class WhenRichTextEdited : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 1: Property Write ──
-
     [Test]
     public async Task domready_sets_initial_careplan_value()
     {
         await NavigateAndBoot();
 
-        // SF RTE hides the textarea — verify the contenteditable editor has content.
+        // Syncfusion RTE hides the textarea; the contenteditable editor proves the value applied.
         var rte = CarePlan;
         await Expect(rte.Editor).Not.ToHaveTextAsync("", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
-
-    // ── Section 2: Property Read ──
 
     [Test]
     public async Task domready_reads_value_into_echo()
@@ -79,17 +67,13 @@ public class WhenRichTextEdited : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 3: Events — Changed with typed condition ──
-
     [Test]
     public async Task changed_event_displays_new_value()
     {
         await NavigateAndBoot();
 
-        // Type into the contenteditable editor and blur — triggers SF change event
         await CarePlan.FillAndBlur("Discharge ready");
 
-        // SF change event payload contains the new value
         await Expect(Page.Locator("#change-value"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -100,7 +84,6 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Type into the contenteditable editor and blur — triggers SF change event
         await CarePlan.FillAndBlur("Discharge ready");
 
         // When(args, x => x.Value).NotEmpty() => Then branch
@@ -114,10 +97,8 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Type into the contenteditable editor and blur — triggers SF change event
         await CarePlan.FillAndBlur("Discharge ready");
 
-        // Indicator should appear with text "care plan on file"
         await Expect(Page.Locator("#selected-indicator"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Page.Locator("#selected-indicator"))
@@ -125,14 +106,12 @@ public class WhenRichTextEdited : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Section 4: Component-Read Condition ──
-
     [Test]
     public async Task component_value_condition_shows_warning_when_empty()
     {
         await NavigateAndBoot();
 
-        // Clear the DomReady-set value first
+        // DomReady seeds a value, so clear before checking the empty branch.
         await CarePlan.Clear();
         await CarePlan.Blur();
 
@@ -148,18 +127,14 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Type care plan content and blur
         await CarePlan.FillAndBlur("Physical therapy 3x weekly");
 
-        // Click check button
         await Page.Locator("#check-careplan-btn").ClickAsync();
 
         var warning = Page.Locator("#careplan-warning");
         await Expect(warning).ToHaveTextAsync("care plan set", new() { Timeout = 3000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Deep BDD: state-cycle scenarios ──
 
     [Test]
     public async Task changing_rich_text_multiple_times_fires_condition_each_time()
@@ -169,19 +144,15 @@ public class WhenRichTextEdited : PlaywrightTestBase
         var argsCondition = Page.Locator("#args-condition");
         var selectedIndicator = Page.Locator("#selected-indicator");
 
-        // Cycle 1: type care plan content — condition evaluates "content entered", indicator shows
         await CarePlan.FillAndBlur("Initial assessment complete");
         await Expect(argsCondition).ToHaveTextAsync("content entered", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
         await Expect(selectedIndicator).ToHaveTextAsync("care plan on file", new() { Timeout = 3000 });
 
-        // Cycle 2: change to different content — condition still fires and re-evaluates
         await CarePlan.FillAndBlur("Updated: weekly therapy sessions");
-        // args-condition should still say "content entered" (value is still not empty)
         await Expect(argsCondition).ToHaveTextAsync("content entered", new() { Timeout = 5000 });
         await Expect(selectedIndicator).ToBeVisibleAsync(new() { Timeout = 3000 });
 
-        // Verify the change-value updated
         await Expect(Page.Locator("#change-value"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 3000 });
 
