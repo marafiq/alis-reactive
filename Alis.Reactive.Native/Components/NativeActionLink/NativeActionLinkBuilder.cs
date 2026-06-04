@@ -41,7 +41,6 @@ namespace Alis.Reactive.Native.Components
         /// Sets the anchor's <c>class</c> attribute.
         /// </summary>
         /// <param name="css">The CSS class string to render on the anchor.</param>
-        /// <returns>The current builder.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="css"/> is <c>null</c>.</exception>
         public NativeActionLinkBuilder<TModel> CssClass(string css)
         {
@@ -59,7 +58,6 @@ namespace Alis.Reactive.Native.Components
         /// </remarks>
         /// <param name="name">The attribute name.</param>
         /// <param name="value">The attribute value to encode and render.</param>
-        /// <returns>The current builder.</returns>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is blank.</exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is <c>null</c>.</exception>
         /// <exception cref="InvalidOperationException">Thrown when <paramref name="name"/> is reserved by NativeActionLink.</exception>
