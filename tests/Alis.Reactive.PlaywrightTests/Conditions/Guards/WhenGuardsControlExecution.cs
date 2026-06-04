@@ -428,9 +428,8 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         var dialog = Page.Locator("#alisConfirmDialog");
         await Expect(dialog).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        // The primary button is the OK action in the app-level confirm dialog.
-        var okButton = dialog.Locator("button.e-primary");
-        await okButton.ClickAsync();
+        var confirmOkButton = dialog.Locator("button.e-primary");
+        await confirmOkButton.ClickAsync();
 
         await Expect(result).ToHaveTextAsync("Confirmed");
 
@@ -449,9 +448,8 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         var dialog = Page.Locator("#alisConfirmDialog");
         await Expect(dialog).ToBeVisibleAsync(new() { Timeout = 5000 });
 
-        // The non-primary button is the Cancel action in the app-level confirm dialog.
-        var cancelButton = dialog.Locator("button:not(.e-primary)").Last;
-        await cancelButton.ClickAsync();
+        var confirmCancelButton = dialog.Locator("button:not(.e-primary)").Last;
+        await confirmCancelButton.ClickAsync();
 
         await Expect(result).ToHaveTextAsync("Cancelled");
 
