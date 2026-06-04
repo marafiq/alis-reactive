@@ -31,8 +31,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             return View("~/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml", model);
         }
 
-        // ── Section 1: DomReady GET ──────────────────────────
-
         [HttpGet("Residents")]
         public IActionResult Residents()
         {
@@ -43,8 +41,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
                 count = 2
             });
         }
-
-        // ── Section 2: POST with gather ──────────────────────
 
         [HttpPost("Save")]
         public IActionResult Save([FromBody] SaveRequest? request)
@@ -57,8 +53,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             return Ok(new { message = $"Saved: {request.Name}", receivedName = request.Name });
         }
 
-        // ── Section 3: Chained GET ───────────────────────────
-
         [HttpGet("Facilities")]
         public IActionResult Facilities()
         {
@@ -69,8 +63,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
                 count = 2
             });
         }
-
-        // ── Section 5: PUT update ────────────────────────────
 
         [HttpPut("UpdateResident")]
         public IActionResult UpdateResident([FromBody] UpdateRequest? request)
@@ -83,15 +75,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             return Ok(new { receivedName = request.Name, receivedFacilityId = request.FacilityId?.ToString() ?? "", updated = true });
         }
 
-        // ── Section 6: DELETE ────────────────────────────────
-
         [HttpDelete("DeleteResident/{id}")]
         public IActionResult DeleteResident(int id)
         {
             return Ok(new { deleted = true, deletedId = id });
         }
-
-        // ── Section 7: POST FormData ─────────────────────────
 
         [HttpPost("SaveFormData")]
         public IActionResult SaveFormData([FromBody] SaveFormRequest? request)
@@ -102,8 +90,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             if (!string.IsNullOrEmpty(request?.Email)) fields.Add("Email");
             return Ok(new { receivedFields = string.Join(", ", fields), count = fields.Count });
         }
-
-        // ── Section 8: GET search ────────────────────────────
 
         [HttpGet("Search")]
         public IActionResult Search(string? q)
@@ -118,8 +104,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             var results = string.IsNullOrEmpty(q) ? all : all.Where(r => r.name.Contains(q, StringComparison.OrdinalIgnoreCase)).ToArray();
             return Json(new { query = q ?? "", matchCount = results.Length });
         }
-
-        // ── Section 9: Multi-status validation ───────────────
 
         [HttpPost("ValidateResident")]
         public IActionResult ValidateResident([FromBody] ValidateRequest? request)
@@ -141,8 +125,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         {
             return PartialView("~/Areas/Sandbox/Views/HttpPipeline/Http/_NativeActionLinkGrid.cshtml", GetNativeActionLinkRows());
         }
-
-        // ── Section 10: NativeActionLink row action ───────────
 
         [HttpPost("ActionLinkDelete/{id}")]
         public IActionResult ActionLinkDelete(int id, [FromBody] ActionLinkDeleteRequest? request)
@@ -196,8 +178,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             }
         }
 
-        // ── Section 19-22: URL Query Params ─────────────────────
-
         [HttpGet("UrlParamEcho")]
         public IActionResult UrlParamEcho(string? tab, string? facilityId, string? page) =>
             Json(new { tab, facilityId, page });
@@ -211,8 +191,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
                 receivedFacility = facility ?? "(none)"
             });
 
-        // ── Section 15-18: Route Params ────────────────────��───
-
         [HttpGet("Residents/{id:int}")]
         public IActionResult ResidentById(int id) =>
             Json(new { residentId = id, name = $"Resident #{id}" });
@@ -224,8 +202,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         [HttpGet("ResidentByName/{name}")]
         public IActionResult ResidentByName(string name) =>
             Json(new { receivedName = name });
-
-        // ── Section 12: Custom Headers ─────────────────────────
 
         [HttpGet("EchoHeaders")]
         public IActionResult EchoHeaders()
@@ -245,8 +221,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             return Json(new { apiVersion, requestId, tenantId });
         }
 
-        // ── Finally Demo: deterministic success/failure ────────
-
         [HttpPost("FlakyEndpoint")]
         public IActionResult FlakyEndpoint([FromBody] SaveRequest? request)
         {
@@ -255,8 +229,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 
             return Ok(new { message = $"Saved: {request?.Name}", receivedName = request?.Name });
         }
-
-        // ── DTOs ─────────────────────────────────────────────
 
         public class SaveRequest
         {
