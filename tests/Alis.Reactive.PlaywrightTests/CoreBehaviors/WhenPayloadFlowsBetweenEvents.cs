@@ -1,20 +1,19 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
 /// <summary>
-/// Proves C# payload values survive the plan path:
-/// expression -> plan JSON source binding -> runtime resolution -> DOM text.
-/// The payload is dispatched on dom-ready and consumed by a typed CustomEvent,
-/// so failures usually point at expression path casing, JSON shape, or runtime value walking.
+/// Proves <c>DomReady</c> dispatch payloads can be read by a typed
+/// <c>CustomEvent</c> and rendered from expression paths.
 /// </summary>
 [TestFixture]
 public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
 {
-    private const string Path = "/Sandbox/CoreBehaviors/Payload";
+    private const string PayloadPath = "/Sandbox/CoreBehaviors/Payload";
+    private const string JavaScriptMaxSafeIntegerText = "9007199254740991";
 
     [Test]
     public async Task int_value_survives_serialization_and_displays_correctly()
     {
-        await NavigateTo(Path);
+        await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 
         await Expect(Page.Locator("#int-value")).ToHaveTextAsync("42");
@@ -22,21 +21,19 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     }
 
     [Test]
-    public async Task long_value_preserves_full_precision()
+    public async Task long_value_at_javascript_max_safe_integer_preserves_full_precision()
     {
-        // 9007199254740991 is Number.MAX_SAFE_INTEGER: the largest integer JS can represent exactly.
-        // If the JSON number or runtime text conversion loses precision, this displays the wrong value.
-        await NavigateTo(Path);
+        await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 
-        await Expect(Page.Locator("#long-value")).ToHaveTextAsync("9007199254740991");
+        await Expect(Page.Locator("#long-value")).ToHaveTextAsync(JavaScriptMaxSafeIntegerText);
         AssertNoConsoleErrors();
     }
 
     [Test]
     public async Task double_value_preserves_decimal_places()
     {
-        await NavigateTo(Path);
+        await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 
         await Expect(Page.Locator("#double-value")).ToHaveTextAsync("3.14159");
@@ -44,10 +41,9 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     }
 
     [Test]
-    public async Task string_value_passes_through_unchanged()
+    public async Task string_value_preserves_spaces()
     {
-        // The space in "hello world" catches accidental trimming or separator changes.
-        await NavigateTo(Path);
+        await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 
         await Expect(Page.Locator("#string-value")).ToHaveTextAsync("hello world");
@@ -55,10 +51,9 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     }
 
     [Test]
-    public async Task bool_value_displays_as_string()
+    public async Task bool_value_uses_javascript_string_casing()
     {
-        // Runtime text conversion should follow JavaScript casing: String(true) -> "true".
-        await NavigateTo(Path);
+        await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 
         await Expect(Page.Locator("#bool-value")).ToHaveTextAsync("true");
@@ -68,9 +63,8 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task nested_three_level_path_resolves_street_city_zip()
     {
-        // All three Address properties prove the same PascalCase -> camelCase structured path
-        // resolution at different leaves. Depth failures break these while flat properties still pass.
-        await NavigateTo(Path);
+        // The PascalCase expression path must resolve against camelCase payload JSON.
+        await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 
         await Expect(Page.Locator("#address-street")).ToHaveTextAsync("123 Main St");
@@ -84,7 +78,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     {
         // The status mutation runs after every source binding. If any SetText throws on a bad path,
         // the sequence aborts before this element turns green.
-        await NavigateTo(Path);
+        await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 
         var status = Page.Locator("#payload-status");
@@ -102,11 +96,11 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task all_primitive_types_display_without_type_coercion_errors()
     {
-        await NavigateTo(Path);
+        await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 
         await Expect(Page.Locator("#int-value")).ToHaveTextAsync("42");
-        await Expect(Page.Locator("#long-value")).ToHaveTextAsync("9007199254740991");
+        await Expect(Page.Locator("#long-value")).ToHaveTextAsync(JavaScriptMaxSafeIntegerText);
         await Expect(Page.Locator("#double-value")).ToHaveTextAsync("3.14159");
         await Expect(Page.Locator("#string-value")).ToHaveTextAsync("hello world");
         await Expect(Page.Locator("#bool-value")).ToHaveTextAsync("true");
@@ -117,8 +111,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task status_element_has_correct_css_classes_after_all_resolved()
     {
-        // Final class state proves the remove/add/add mutation sequence did not skip a step.
-        await NavigateTo(Path);
+        await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 
         var status = Page.Locator("#payload-status");
@@ -138,8 +131,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task success_status_has_green_and_semibold_without_muted()
     {
-        // Keep the complete final class invariant in one assertion block.
-        await NavigateTo(Path);
+        await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 
         var status = Page.Locator("#payload-status");
