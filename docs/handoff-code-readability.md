@@ -15,7 +15,8 @@ The audit looked for:
 Target audience is framework developers. Comments should explain DSL intent,
 Reactive Plan runtime-boundary behavior, real browser API behavior,
 compatibility constraints, or non-obvious tradeoffs. They should not narrate
-ordinary code.
+ordinary code. Use "Active Plan" only when the code is about the runtime-composed
+plan state.
 
 ## Cleanup Standard
 

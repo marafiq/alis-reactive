@@ -1,4 +1,4 @@
-// Boot wires behaviors and validation for active PlanDocuments.
+// Boot wires behaviors and validation for Active Plans.
 // Boot snapshots and partial-slot composition stay in applied plan state.
 
 import type { PlanDocument, Behavior } from "../types/index";
