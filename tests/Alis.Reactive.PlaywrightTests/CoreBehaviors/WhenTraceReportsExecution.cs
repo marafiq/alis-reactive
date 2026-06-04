@@ -30,10 +30,10 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         var messages = _consoleMessages;
 
         var lastListenerTraceIndex = -1;
-        for (var i = 0; i < messages.Count; i++)
+        for (var messageIndex = 0; messageIndex < messages.Count; messageIndex++)
         {
-            if (messages[i].Contains("[alis:trigger]") && messages[i].Contains("document-event"))
-                lastListenerTraceIndex = i;
+            if (messages[messageIndex].Contains("[alis:trigger]") && messages[messageIndex].Contains("document-event"))
+                lastListenerTraceIndex = messageIndex;
         }
 
         var firstDispatchTraceIndex = messages.FindIndex(m =>
