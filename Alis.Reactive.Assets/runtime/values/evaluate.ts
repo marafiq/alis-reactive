@@ -91,22 +91,22 @@ class ValueEvaluation {
   }
 
   private readFromRuntimeObject(expression: ObjectReadExpression, source: RuntimeObjectSource): unknown {
-    const object = this.runtimePlan.objectForSource(source);
-    const value = this.resolveRuntimeObjectRead(expression, object);
+    const runtimeObject = this.runtimePlan.objectForSource(source);
+    const value = this.resolveRuntimeObjectRead(expression, runtimeObject);
     return value.usingRequestedShape(expression.shape);
   }
 
   private resolveRuntimeObjectRead(
     expression: ObjectReadExpression,
-    object: RuntimeObject,
+    runtimeObject: RuntimeObject,
   ): RuntimeValue {
     switch (expression.access.kind) {
       case "property":
-        return object.read(expression.member);
+        return runtimeObject.read(expression.member);
 
       case "method": {
         const args = expression.access.args.map(arg => this.evaluate(arg));
-        return object.call(expression.member, args);
+        return runtimeObject.call(expression.member, args);
       }
 
       default:

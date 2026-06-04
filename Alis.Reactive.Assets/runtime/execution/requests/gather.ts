@@ -164,8 +164,8 @@ function writeMountedRegisteredInput(
   const registeredInputIsMounted = component.tryElement() !== undefined;
   if (!registeredInputIsMounted) return;
 
-  const object = component.object();
-  const runtimeValue = object.read(binding.valueMember);
+  const runtimeObject = component.object();
+  const runtimeValue = runtimeObject.read(binding.valueMember);
 
   writeRequestPayloadValue(
     {
