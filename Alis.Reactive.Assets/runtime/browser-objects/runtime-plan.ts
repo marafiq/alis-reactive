@@ -4,7 +4,7 @@ import type {
   PlanDocument,
   RuntimeObjectSource,
 } from "../types/index";
-import { browserPlugins, type BrowserPluginCatalog } from "../plugins/catalog";
+import { pluginCatalog, type PluginCatalog } from "../plugins/catalog";
 import { RuntimeObject } from "./runtime-object";
 import { type ComponentDriver, requireComponentDriver } from "./component-driver";
 
@@ -51,7 +51,7 @@ export class RuntimePlan {
   private constructor(readonly document: PlanDocument) {
     this.objectContracts = new RuntimeObjectContracts(document);
     this.components = new RuntimeComponents(document, this.objectContracts);
-    this.plugins = new RuntimePlugins(this.objectContracts, browserPlugins);
+    this.plugins = new RuntimePlugins(this.objectContracts, pluginCatalog);
   }
 
   static from(plan: PlanDocument): RuntimePlan {
@@ -170,7 +170,7 @@ export class RuntimeComponent {
 export class RuntimePlugins {
   constructor(
     private readonly objectContracts: RuntimeObjectContracts,
-    private readonly instances: BrowserPluginCatalog,
+    private readonly instances: PluginCatalog,
   ) {}
 
   objectContract(typeKey: string): BrowserObjectContract {

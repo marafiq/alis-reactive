@@ -1,13 +1,13 @@
 // Sandbox plugins enqueue before runtime boot so root.ts can register them
 // before plan execution starts.
 
-interface BrowserPluginEntry {
+interface PendingHostPlugin {
   readonly name: string;
   readonly instance: Record<string, unknown> | ((...args: unknown[]) => unknown);
 }
 
 interface PluginQueueWindow extends Window {
-  __alisPlugins?: BrowserPluginEntry[];
+  __alisPlugins?: PendingHostPlugin[];
 }
 
 type LengthBearingValue = ArrayLike<unknown> | string | undefined;
