@@ -8,8 +8,6 @@
     var plan = Html.ReactivePlan<CascadingModel>();
     var countries = (List<CountryItem>)ViewBag.Countries;
 
-    // ── Gather both for final submit ──
-
     Html.On(plan, t => t.CustomEvent("do-save", p =>
     {
         p.Post("/Sandbox/Patterns/Cascading/Save", g =>
@@ -35,7 +33,6 @@
         Senior living domain: facility location selection.
     </native-text>
 
-    <!-- Section 1: Parent Dropdown (Country) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">1. Country (Parent — Server-Side DataSource)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -49,13 +46,11 @@
                 .Placeholder("Select a country")
                 .Reactive(plan, evt => evt.Changed, (args, p) =>
                 {
-                    // Selective payload — only send country value
                     p.Get("/Sandbox/Patterns/Cascading/Cities")
                      .Gather(g => g.Include<FusionDropDownList, CascadingModel>(m => m.Country))
                      .Response(r => r
                         .OnSuccess<CityLookupResponse>((json, s) =>
                         {
-                            // Set child dropdown DataSource from response
                             s.Component<FusionDropDownList>(m => m.City)
                                 .SetDataSource(json, j => j.Cities)
                                 .DataBind();
@@ -68,7 +63,6 @@
                 })); }
     </section>
 
-    <!-- Section 2: Child Dropdown (City) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">2. City (Child — HTTP DataSource via Cascade)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -90,7 +84,6 @@
         </native-vstack>
     </section>
 
-    <!-- Section 3: Submit Both -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">3. Submit (Gather Both)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -105,7 +98,6 @@
         <p class="font-mono text-sm mt-2">Result: <span id="save-result" class="text-text-muted">&mdash;</span></p>
     </section>
 
-    <!-- Plan JSON -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
