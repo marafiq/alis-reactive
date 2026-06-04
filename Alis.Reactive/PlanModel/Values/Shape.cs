@@ -450,13 +450,13 @@ namespace Alis.Reactive.PlanModel
 
             internal override bool HasSameContract(ShapeStructure other)
             {
-                var obj = other as ObjectShapeStructure;
-                if (obj == null) return false;
-                if (_fields.Count != obj._fields.Count) return false;
+                var otherObject = other as ObjectShapeStructure;
+                if (otherObject == null) return false;
+                if (_fields.Count != otherObject._fields.Count) return false;
 
                 foreach (var field in _fields)
                 {
-                    var otherHasField = obj._fields.TryGetValue(field.Key, out var otherShape);
+                    var otherHasField = otherObject._fields.TryGetValue(field.Key, out var otherShape);
                     if (!otherHasField) return false;
                     if (!field.Value.Equals(otherShape)) return false;
                 }
