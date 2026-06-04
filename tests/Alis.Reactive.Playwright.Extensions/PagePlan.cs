@@ -5,13 +5,12 @@ using Microsoft.Playwright;
 namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// Reads the V3 plan JSON from the page and provides typed component locators.
-/// V3 plan: { version, planId, types, components, behaviors }
-/// Components keyed by deterministic ID (FullNamespace__PropertyPath).
-///
-/// BDD: tests use model expressions → locators → real browser interactions.
-/// Tests never see plan internals — they interact with behavior.
+/// Reads the emitted Reactive Plan and provides typed component locators.
 /// </summary>
+/// <remarks>
+/// Test bodies stay at the model-expression and locator level while this helper
+/// handles the plan JSON shape.
+/// </remarks>
 public sealed class PagePlan<TModel> where TModel : class
 {
     private readonly IPage _page;
@@ -33,22 +32,22 @@ public sealed class PagePlan<TModel> where TModel : class
         var components = new Dictionary<string, BoundComponent>(StringComparer.OrdinalIgnoreCase);
         var root = doc.RootElement;
 
-        if (root.TryGetProperty("components", out var comps))
+        if (root.TryGetProperty("components", out var componentMap))
         {
-            foreach (var prop in comps.EnumerateObject())
+            foreach (var componentProperty in componentMap.EnumerateObject())
             {
-                var key = prop.Name;
-                var obj = prop.Value;
-                var id = obj.GetProperty("id").GetString()!;
-                var vendor = obj.GetProperty("vendor").GetString()!;
-                var typeKey = obj.GetProperty("type").GetString()!;
+                var componentKey = componentProperty.Name;
+                var component = componentProperty.Value;
+                var id = component.GetProperty("id").GetString()!;
+                var vendor = component.GetProperty("vendor").GetString()!;
+                var typeKey = component.GetProperty("type").GetString()!;
 
-                var bindingPath = ExtractBindingPath(key);
+                var bindingPath = ExtractBindingPath(componentKey);
 
                 components[bindingPath] = new BoundComponent(
                     ElementId: id,
                     BindingPath: bindingPath,
-                    ComponentKey: key,
+                    ComponentKey: componentKey,
                     Vendor: vendor,
                     TypeKey: typeKey);
             }
@@ -58,8 +57,6 @@ public sealed class PagePlan<TModel> where TModel : class
     }
 
     public IReadOnlyCollection<string> ComponentNames => _components.Keys;
-
-    // ── Typed Component Locators ──
 
     public AutoCompleteLocator AutoComplete(Expression<Func<TModel, object?>> expr)
         => new AutoCompleteLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
@@ -100,41 +97,40 @@ public sealed class PagePlan<TModel> where TModel : class
     public MultiSelectLocator MultiSelect(Expression<Func<TModel, object?>> expr)
         => new MultiSelectLocator(_page, Resolve(ToBindingPath(expr)).ElementId);
 
-    // String overloads
     public AutoCompleteLocator AutoComplete(string bindingPath)
         => new AutoCompleteLocator(_page, Resolve(bindingPath).ElementId);
 
     public BoundComponent? FindComponent(string bindingPath)
-        => _components.TryGetValue(bindingPath, out var c) ? c : FindBySuffix(bindingPath);
+        => _components.TryGetValue(bindingPath, out var component) ? component : FindBySuffix(bindingPath);
 
     public BoundComponent? FindComponent(Expression<Func<TModel, object?>> expr)
         => FindComponent(ToBindingPath(expr));
 
-    // Page-level
     public ILocator Element(string elementId) => _page.Locator($"#{elementId}");
 
     public ILocator ErrorFor(Expression<Func<TModel, object?>> expr)
         => _page.Locator($"span[data-valmsg-for='{ToBindingPath(expr)}']");
 
-    // ── Internal ──
-
     private BoundComponent Resolve(string bindingPath)
     {
-        if (_components.TryGetValue(bindingPath, out var c)) return c;
-        var bySuffix = FindBySuffix(bindingPath);
-        if (bySuffix != null) return bySuffix;
+        if (_components.TryGetValue(bindingPath, out var component))
+            return component;
+
+        var suffixMatch = FindBySuffix(bindingPath);
+        if (suffixMatch != null)
+            return suffixMatch;
 
         throw new InvalidOperationException(
             $"Component '{bindingPath}' not found in plan. Available: [{string.Join(", ", _components.Keys)}]");
     }
 
-    private BoundComponent? FindBySuffix(string path)
+    private BoundComponent? FindBySuffix(string bindingPath)
     {
         foreach (var kvp in _components)
         {
-            if (kvp.Value.ComponentKey.EndsWith("__" + path, StringComparison.OrdinalIgnoreCase) ||
-                kvp.Value.ComponentKey.EndsWith(path, StringComparison.OrdinalIgnoreCase) ||
-                kvp.Key.EndsWith(path, StringComparison.OrdinalIgnoreCase))
+            if (kvp.Value.ComponentKey.EndsWith("__" + bindingPath, StringComparison.OrdinalIgnoreCase) ||
+                kvp.Value.ComponentKey.EndsWith(bindingPath, StringComparison.OrdinalIgnoreCase) ||
+                kvp.Key.EndsWith(bindingPath, StringComparison.OrdinalIgnoreCase))
                 return kvp.Value;
         }
         return null;
@@ -173,7 +169,7 @@ public sealed class PagePlan<TModel> where TModel : class
     }
 }
 
-/// <summary>A component resolved from the V3 plan.</summary>
+/// <summary>A component resolved from the emitted Reactive Plan.</summary>
 public sealed record BoundComponent(
     string ElementId,
     string BindingPath,
