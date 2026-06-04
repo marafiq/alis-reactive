@@ -328,12 +328,12 @@ namespace Alis.Reactive.Fusion.Templates
             _childRenderers.Add(() =>
             {
                 var templateCondition = FusionTemplateExpression.ToCondition(condition);
-                var thenContent = new FusionConditionalBuilder<TModel>();
-                then(thenContent);
+                var thenBuilder = new FusionConditionalBuilder<TModel>();
+                then(thenBuilder);
 
                 var html = new StringBuilder();
                 html.Append($"${{if({templateCondition})}}");
-                html.Append(thenContent.Render());
+                html.Append(thenBuilder.Render());
 
                 elseBranch.AppendTo(html);
 
@@ -378,8 +378,8 @@ namespace Alis.Reactive.Fusion.Templates
 
             html.Append(">");
 
-            foreach (var renderChild in _childRenderers)
-                html.Append(renderChild());
+            foreach (var childRenderer in _childRenderers)
+                html.Append(childRenderer());
 
             html.Append("</div>");
             return html.ToString();
@@ -423,10 +423,10 @@ namespace Alis.Reactive.Fusion.Templates
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            var elseContent = new FusionConditionalBuilder<TModel>();
-            _configure(elseContent);
+            var elseBuilder = new FusionConditionalBuilder<TModel>();
+            _configure(elseBuilder);
             builder.Append("${else}");
-            builder.Append(elseContent.Render());
+            builder.Append(elseBuilder.Render());
         }
     }
 }
