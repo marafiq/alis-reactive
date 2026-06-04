@@ -13,7 +13,7 @@ import { clearInline } from "./error-display";
 import { revalidateField } from "./orchestrator";
 
 interface LiveFieldWire {
-  readonly plan: PlanDocument;
+  readonly planDocument: PlanDocument;
   readonly containerKey: string;
   readonly component: RuntimeComponent;
   readonly signal: AbortSignal | undefined;
@@ -25,28 +25,28 @@ interface LiveFieldEvents {
   readonly listenerOptions: AddEventListenerOptions | undefined;
 }
 
-export function wireLiveValidation(plan: PlanDocument, containerKey: string, signal?: AbortSignal): void {
-  const runtime = RuntimePlan.from(plan);
-  const containerComp = runtime.components.find(containerKey);
-  const containerScope = containerComp?.containerScope;
-  if (!containerComp || !containerScope) return;
+export function wireLiveValidation(planDocument: PlanDocument, containerKey: string, signal?: AbortSignal): void {
+  const runtime = RuntimePlan.from(planDocument);
+  const containerComponent = runtime.components.find(containerKey);
+  const containerScope = containerComponent?.containerScope;
+  if (!containerComponent || !containerScope) return;
 
-  for (const cv of containerScope.validationRules) {
-    const comp = runtime.components.find(cv.component);
-    if (!comp) continue;
-    wireField({ plan, containerKey, component: comp, signal });
+  for (const componentValidation of containerScope.validationRules) {
+    const component = runtime.components.find(componentValidation.component);
+    if (!component) continue;
+    wireField({ planDocument, containerKey, component, signal });
   }
 }
 
 function wireField(field: LiveFieldWire): void {
   if (field.signal?.aborted === true) return;
 
-  const el = resolveFieldElement(field.component);
-  if (el === undefined) return;
+  const element = resolveFieldElement(field.component);
+  if (element === undefined) return;
 
   const events = liveFieldEventsFor(field);
 
-  const domEventsWereAdded = wireFieldDomEvents(field, el, events);
+  const domEventsWereAdded = wireFieldDomEvents(field, element, events);
   const changeEventWasAdded = wireComponentChangeEvent(field, events);
 
   if (domEventsWereAdded || changeEventWasAdded) {
@@ -60,7 +60,7 @@ function wireField(field: LiveFieldWire): void {
 function liveFieldEventsFor(field: LiveFieldWire): LiveFieldEvents {
   return {
     clear: () => clearInline(field.component.id),
-    revalidate: () => revalidateField(field.plan, field.containerKey, field.component.key),
+    revalidate: () => revalidateField(field.planDocument, field.containerKey, field.component.key),
     listenerOptions: listenerOptionsFor(field.signal),
   };
 }
@@ -76,14 +76,14 @@ function resolveFieldElement(component: RuntimeComponent): HTMLElement | undefin
 
 function wireFieldDomEvents(
   field: LiveFieldWire,
-  el: HTMLElement,
+  element: HTMLElement,
   events: LiveFieldEvents,
 ): boolean {
   if (fieldHasDomEvents(field.component.id)) return false;
 
   // DOM events are best-effort; vendor semantic change is wired separately below.
-  el.addEventListener("input", events.clear, events.listenerOptions);
-  el.addEventListener("blur", events.revalidate, events.listenerOptions);
+  element.addEventListener("input", events.clear, events.listenerOptions);
+  element.addEventListener("blur", events.revalidate, events.listenerOptions);
   wiredFieldDomEvents.add(field.component.id);
   return true;
 }
@@ -96,7 +96,13 @@ function wireComponentChangeEvent(
 
   // Semantic change must go through the vendor event adapter (DOM or modelObserver).
   try {
-    wireEvent(field.plan, field.component.key, "change", () => events.revalidate(), events.listenerOptions);
+    wireEvent(
+      field.planDocument,
+      field.component.key,
+      "change",
+      () => events.revalidate(),
+      events.listenerOptions,
+    );
   } catch (e) {
     if (componentChangeEventCanBeDeferred(e)) return false;
     throw e;
@@ -111,8 +117,8 @@ function componentChangeEventCanBeDeferred(error: unknown): boolean {
 }
 
 /** Partial reloads unmount fields; clear wiring so remounted fields can wire again. */
-export function unwireField(domId: string): void {
-  forgetFieldWiring(domId);
+export function unwireField(componentDomId: string): void {
+  forgetFieldWiring(componentDomId);
 }
 
 export function resetLiveClearForTests(): void {
