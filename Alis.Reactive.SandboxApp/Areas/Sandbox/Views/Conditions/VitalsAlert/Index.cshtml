@@ -13,18 +13,6 @@
     var warningUrl = Url.Action("Warning", "VitalsAlert", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve VitalsAlert.Warning.");
 
-    // ── Section 1: Simple condition → HTTP in Then, Element in Else ──
-    // Commands BEFORE and AFTER the condition always execute.
-    // This proves: condition branches can contain full HTTP pipelines,
-    // and non-condition commands around them are not blocked.
-
-    // ── Section 2: ElseIf → different HTTP per severity tier ──
-    // Gte(180) → POST /Critical, Gte(140) → POST /Warning, Else → text only.
-    // This proves: each ElseIf branch can independently POST to different endpoints.
-
-    // ── Section 3: Commands before + condition + commands after ──
-    // Element.SetText BEFORE condition → When → Then/Else → Element.SetText AFTER.
-    // Button-triggered so we can test the "sandwich" pattern with component reads.
 }
 
 <native-vstack gap="Lg">
@@ -34,7 +22,6 @@
         Conditions gate POST requests — not just element text flips.
     </native-text>
 
-    <!-- Section 1: Simple condition → HTTP in Then -->
     <native-card><native-card-body>
         <native-heading level="H2">1. Condition → HTTP in Then</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -50,10 +37,8 @@
                     {
                         var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
-                        // BEFORE condition — always executes
                         p.Element("s1-last-reading").SetText(comp.Value());
 
-                        // Condition: Gt(140) → POST alert, Else → text only
                         p.When(comp.Value()).Gt(140m)
                             .Then(then =>
                             {
@@ -71,7 +56,6 @@
                                 else_.Element("s1-alert-time").SetText("");
                             });
 
-                        // AFTER condition — always executes
                         p.Element("s1-check-status").SetText("checked");
                     })); }
         </native-grid>
@@ -83,7 +67,6 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    <!-- Section 2: ElseIf → different HTTP per severity tier -->
     <native-card><native-card-body>
         <native-heading level="H2">2. ElseIf → Different HTTP per Tier</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -133,7 +116,6 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    <!-- Section 3: Commands before + condition + commands after (sandwich) -->
     <native-card><native-card-body>
         <native-heading level="H2">3. Command Sandwich — Before + Condition + After</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -148,11 +130,9 @@
                 {
                     var comp = p.Component<FusionNumericTextBox>(m => m.HeartRate);
 
-                    // BEFORE condition — always
                     p.Element("s3-before").SetText("before-ran");
                     p.Element("s3-reading").SetText(comp.Value());
 
-                    // Condition: Gt(140) → POST, Else → text
                     p.When(comp.Value()).Gt(140m)
                         .Then(then =>
                         {
@@ -168,7 +148,6 @@
                             else_.Element("s3-branch").SetText("no alert");
                         });
 
-                    // AFTER condition — always
                     p.Element("s3-after").SetText("after-ran");
                 }))
         </native-hstack>
@@ -180,7 +159,6 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    <!-- Plan JSON -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>

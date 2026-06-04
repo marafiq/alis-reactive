@@ -16,7 +16,6 @@
     var failUrl = Url.Action("Fail", "ResponseConditions", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve ResponseConditions.Fail.");
 
-    // ── Section 1: When on success response body ──
     Html.On(plan, t => t.CustomEvent("s1-when-approved", p =>
     {
         p.Post(approveUrl)
@@ -51,7 +50,6 @@
          }));
     }));
 
-    // ── Section 2: ElseIf chain on response body ──
     Html.On(plan, t => t.CustomEvent("s2-elseif-approve", p =>
     {
         p.Post(approveUrl)
@@ -91,7 +89,6 @@
          }));
     }));
 
-    // ── Section 3: And composition on response body ──
     Html.On(plan, t => t.CustomEvent("s3-and-approve", p =>
     {
         p.Post(approveUrl)
@@ -116,7 +113,6 @@
          }));
     }));
 
-    // ── Section 4: OnError catch-all ──
     Html.On(plan, t => t.CustomEvent("s4-error-catchall", p =>
     {
         p.Post(failUrl)
@@ -125,8 +121,7 @@
              .OnError(e => e.Element("s4-result").SetText("error caught")));
     }));
 
-    // ── Section 5: OnError typed with conditions ──
-    // Generic syntax (OnError<ErrorDetailResponse>) confuses Razor — helper wraps it.
+    // Razor parses generic OnError<T> poorly in this block, so the helper keeps the DSL shape explicit.
     Html.On(plan, t => t.CustomEvent("s5-error-typed", p =>
     {
         p.Post(failUrl)
@@ -138,7 +133,6 @@
     <native-heading level="H1">Response Body Conditions</native-heading>
     <p class="text-sm text-text-secondary">Verifies that <code>When(json, r =&gt; r.Property)</code> works inside <code>OnSuccess</code> and <code>OnError</code> handlers.</p>
 
-    <!-- Section 1: When on success response body -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">1. When on success response body</native-heading>
@@ -158,7 +152,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 2: ElseIf chain on response body -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">2. ElseIf chain on response body</native-heading>
@@ -180,7 +173,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 3: And composition on response body -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">3. And composition on response body</native-heading>
@@ -199,7 +191,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 4: OnError catch-all -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">4. OnError catch-all</native-heading>
@@ -215,7 +206,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 5: OnError typed with conditions -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">5. OnError typed with conditions</native-heading>
