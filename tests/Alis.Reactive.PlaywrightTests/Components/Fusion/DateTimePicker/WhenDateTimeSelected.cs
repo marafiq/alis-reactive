@@ -3,18 +3,12 @@ using Alis.Reactive.Playwright.Extensions;
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DateTimePicker;
 
 /// <summary>
-/// Exercises all FusionDateTimePicker API end-to-end in the browser:
-/// property writes, property reads, events with typed conditions,
-/// and component-read conditions.
-///
-/// Page under test: /Sandbox/Components/DateTimePicker
-///
-/// FusionDateTimePicker renders an input element inside a wrapper span.
-/// The wrapper element gets the IdGenerator-based ID. Tests use
-/// DateTimePickerLocator to interact via real browser gestures (calendar
-/// and time popup clicks) rather than ej2 instance manipulation.
-/// Senior living domain: medication schedule times.
+/// Exercises FusionDateTimePicker property writes, value reads, changed-event conditions,
+/// and component-read conditions for medication schedule times.
 /// </summary>
+/// <remarks>
+/// DateTimePickerLocator uses calendar and time popup gestures so Syncfusion updates <c>ej2.value</c>.
+/// </remarks>
 [TestFixture]
 public class WhenDateTimeSelected : PlaywrightTestBase
 {
