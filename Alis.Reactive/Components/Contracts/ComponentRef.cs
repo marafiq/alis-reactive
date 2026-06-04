@@ -6,7 +6,7 @@ namespace Alis.Reactive
     /// <summary>
     /// Typed reference to a component instance on the page.
     /// Returned by p.Component&lt;T&gt;(). Vendor-specific extensions add
-    /// mutation methods (SetValue, Show, Focus, etc.) that emit
+    /// mutation methods such as <c>SetValue</c> or <c>Focus</c> that emit
     /// Set/Call reactions on the component's source.
     /// </summary>
     public class ComponentRef<TComponent, TModel>
