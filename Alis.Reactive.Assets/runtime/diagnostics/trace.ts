@@ -31,13 +31,17 @@ export function scope(name: string): Logger {
 
 function emit(level: number, tag: string, msg: string, details?: unknown): void {
   if (level > active) return;
-  const out = level <= LEVELS.error ? console.error
-            : level <= LEVELS.warn  ? console.warn
-            : level <= LEVELS.info  ? console.info
-            : console.log;
+  const consoleMethod = level <= LEVELS.error ? console.error
+                      : level <= LEVELS.warn  ? console.warn
+                      : level <= LEVELS.info  ? console.info
+                      : console.log;
   // Emit searchable JSON text and the live object DevTools can expand.
-  if (details !== undefined) out(`${tag} ${msg} ${safeStringify(details)}`, details);
-  else                    out(`${tag} ${msg}`);
+  if (details !== undefined) {
+    consoleMethod(`${tag} ${msg} ${safeStringify(details)}`, details);
+    return;
+  }
+
+  consoleMethod(`${tag} ${msg}`);
 }
 
 function safeStringify(details: unknown): string {
