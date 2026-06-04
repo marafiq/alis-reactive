@@ -22,9 +22,6 @@
     var routeAuditUrl = "/Sandbox/Conditions/HttpMixing/Resident/{residentId}/Audit";
     var routeAuditTrailUrl = "/Sandbox/Conditions/HttpMixing/Resident/{residentId}/AuditTrail/{categorySlug}";
 
-    // ── Shared event listeners (Sections 1–8 use custom events dispatched from buttons) ──
-
-    // Section 1: Condition AFTER HTTP — the core fix
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s1-save-then-check", (args, p) =>
     {
         p.Post(saveUrl, g => g.Static("name", "Alice"))
@@ -37,7 +34,6 @@
             .Else(else_ => else_.Element("s1-badge").Hide());
     }));
 
-    // Section 2: HTTP BETWEEN two conditions
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s2-condition-http-condition", (args, p) =>
     {
         p.When(args, x => x.Active).Truthy()
@@ -53,7 +49,6 @@
             .Else(else_ => else_.Element("s2-count-badge").Hide());
     }));
 
-    // Section 3: Full interleaving — commands + condition + HTTP + condition + commands
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s3-full-interleave", (args, p) =>
     {
         p.Element("s3-header").SetText("start");
@@ -71,7 +66,6 @@
         p.Element("s3-footer").SetText("done");
     }));
 
-    // Section 4: Condition INSIDE OnSuccess
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s4-condition-inside-success", (args, p) =>
     {
         p.Element("s4-pre").SetText("loading");
@@ -87,7 +81,6 @@
         p.Element("s4-footer").SetText("done");
     }));
 
-    // Section 5: ElseIf chain inside OnSuccess + outer condition
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s5-elseif-inside-success", (args, p) =>
     {
         p.Post(classifyUrl, g => g
@@ -108,7 +101,6 @@
             .Else(else_ => else_.Element("s5-trial-badge").Show());
     }));
 
-    // Section 6: Multiple conditions after HTTP
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s6-multi-conditions-after-http", (args, p) =>
     {
         p.Post(saveUrl, g => g.Static("name", "Dave"))
@@ -124,7 +116,6 @@
         p.Element("s6-footer").SetText("complete");
     }));
 
-    // Section 7: Condition inside OnError handler
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s7-condition-in-error", (args, p) =>
     {
         p.Post(failValidationUrl)
@@ -138,7 +129,6 @@
              }));
     }));
 
-    // Section 8: And guard inside OnSuccess
     Html.On(plan, t => t.CustomEvent<HttpMixingPayload>("s8-and-guard-inside-success", (args, p) =>
     {
         p.Post(saveUrl, g => g.Static("name", "Eve"))
@@ -152,7 +142,6 @@
          }));
     }));
 
-    // Section 12: Ordered mixed modules after an HTTP request
     Html.On(plan, t => t.CustomEvent("s12-dispatched", p =>
     {
         TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s12").Arg("dispatch");
@@ -209,7 +198,6 @@
             });
     }));
 
-    // Section 13: Ordered mixed modules around parallel HTTP requests
     Html.On(plan, t => t.CustomEvent("s13-dispatched", p =>
     {
         TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s13").Arg("dispatch");
@@ -278,7 +266,6 @@
             });
     }));
 
-    // Section 14: Route-template gather from the reactive event payload in a mixed pipeline
     Html.On(plan, t => t.CustomEvent("s14-dispatched", p =>
     {
         TypedPluginSource<string> mark = p.Plugin(order.Mark).Arg("s14").Arg("dispatch");
@@ -352,15 +339,6 @@
             });
     }));
 
-    // Section 9: Real component .Reactive() with HTTP before/after mixing
-    // NativeTextBox change -> pre command -> HTTP -> outer condition -> tail command
-    // Uses only the supported When/Then/Else DSL around an HTTP block.
-
-    // Section 10: Real component .Reactive() with condition inside OnSuccess
-    // NativeTextBox change -> HTTP -> OnSuccess { condition + surrounding commands }.
-
-    // Section 11: Real component .Reactive() with condition inside OnError
-    // NativeTextBox change -> failing HTTP -> OnError { condition + surrounding commands }.
 }
 
 <native-vstack gap="Lg">
@@ -374,7 +352,6 @@
         </native-text>
     </div>
 
-    <!-- Section 1: Condition after HTTP -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">1. Condition after HTTP</native-heading>
@@ -396,7 +373,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 2: HTTP between conditions -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">2. HTTP between two conditions</native-heading>
@@ -419,7 +395,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 3: Full interleaving -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">3. Full interleaving</native-heading>
@@ -445,7 +420,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 4: Condition inside OnSuccess -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">4. Condition inside OnSuccess</native-heading>
@@ -470,7 +444,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 5: ElseIf inside OnSuccess + outer condition -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">5. ElseIf inside OnSuccess + outer condition</native-heading>
@@ -501,7 +474,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 6: Multiple conditions after HTTP -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">6. Multiple conditions after HTTP</native-heading>
@@ -529,7 +501,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 7: Condition inside OnError -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">7. Condition inside OnError handler</native-heading>
@@ -551,7 +522,6 @@
     </native-card-body>
     </native-card>
 
-    <!-- Section 8: And guard inside OnSuccess -->
     <native-card>
     <native-card-body>
         <native-heading level="H2">8. And guard inside OnSuccess</native-heading>
