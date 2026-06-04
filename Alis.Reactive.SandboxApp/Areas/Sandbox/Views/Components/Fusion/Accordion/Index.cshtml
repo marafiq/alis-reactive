@@ -8,15 +8,11 @@
 
     var plan = Html.ReactivePlan<AccordionModel>();
 
-    // ── Section 1: Method Call — ExpandItem on DomReady ──
-
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<FusionAccordion>("demo-accordion").ExpandItem(true, 1);
         p.Element("expand-result").SetText("Panel 1 expanded via ExpandItem");
     }));
-
-    // ── Section 4: EnableItem — triggered by custom event from button ──
 
     Html.On(plan, t => t.CustomEvent("disable-panel", p =>
     {
@@ -32,7 +28,6 @@
         and typed conditions on event args. Senior living domain: facility information sections.
     </native-text>
 
-    <!-- Section 1: Method Call (ExpandItem on DomReady) -->
     <native-card><native-card-body>
         <native-heading level="H2">1. Method Call (ExpandItem on DomReady)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -41,7 +36,6 @@
         <p class="font-mono text-sm mt-2">ExpandItem result: <span id="expand-result" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Section 2: The Accordion Component -->
     <native-card><native-card-body>
         <native-heading level="H2">2. Accordion Component</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -72,7 +66,6 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    <!-- Section 3: Condition (When/Then/Else on event args) -->
     <native-card><native-card-body>
         <native-heading level="H2">3. Condition (When/Then/Else)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -82,7 +75,6 @@
         <p class="font-mono text-sm mt-2">Condition result: <span id="condition-result" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Section 4: Method Call (EnableItem via button) -->
     <native-card><native-card-body>
         <native-heading level="H2">4. Method Call (EnableItem via Button)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -100,7 +92,6 @@
         <p class="font-mono text-sm mt-2">EnableItem result: <span id="enable-result" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Section 5: Lazy-Load Content on Expand (HTTP + Into) -->
     <native-card><native-card-body>
         <native-heading level="H2">5. Lazy-Load Content on Expand (HTTP + Into)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -155,7 +146,6 @@
         <p class="font-mono text-sm mt-4">Load status: <span id="lazy-load-status" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Plan JSON — always last -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>

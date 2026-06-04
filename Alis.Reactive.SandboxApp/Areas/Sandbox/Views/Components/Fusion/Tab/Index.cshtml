@@ -8,14 +8,12 @@
 
     var plan = Html.ReactivePlan<TabModel>();
 
-    // -- Section 1: Property Write (SetSelectedItem) on DomReady --
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<FusionTab>("demo-tab").SetSelectedItem(1);
         p.Element("set-selected-result").SetText("SetSelectedItem applied (tab 2)");
     }));
 
-    // -- Section 5: Load first tab content on DomReady --
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Get("/Sandbox/Components/Tab/ResidentsPartial")
@@ -26,28 +24,24 @@
          }));
     }));
 
-    // -- Section 3: Method Call (Select via button) --
     Html.On(plan, t => t.CustomEvent("do-select-tab", p =>
     {
         p.Component<FusionTab>("demo-tab").Select(2);
         p.Element("method-result").SetText("select(2) called");
     }));
 
-    // -- Section 4: Method Call (HideTab via button) --
     Html.On(plan, t => t.CustomEvent("do-hide-tab", p =>
     {
         p.Component<FusionTab>("demo-tab").HideTab(3, true);
         p.Element("hide-result").SetText("hideTab(3, true) called");
     }));
 
-    // -- Section 5: Unhide Tab via button --
     Html.On(plan, t => t.CustomEvent("do-show-tab", p =>
     {
         p.Component<FusionTab>("demo-tab").HideTab(3, false);
         p.Element("hide-result").SetText("hideTab(3, false) called");
     }));
 
-    // Tab items for the demo
     var tabItems = new List<TabItem>
     {
         new TabItem { Header = new TabHeader { Text = "Residents" },
@@ -68,7 +62,6 @@
         and events (Selected) with typed conditions. Senior living domain: facility management tabs.
     </native-text>
 
-    <!-- Section 1: Property Write (SetSelectedItem) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">1. Property Write (SetSelectedItem)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -77,7 +70,6 @@
         <p class="font-mono text-sm mt-4">SetSelectedItem result: <span id="set-selected-result" class="text-text-muted">&mdash;</span></p>
     </section>
 
-    <!-- Section 2: Tab Component -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">2. Tab Component + Selected Event</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -108,7 +100,6 @@
         </native-vstack>
     </section>
 
-    <!-- Section 3: Method Call (Select) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">3. Method Call (Select)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -123,7 +114,6 @@
         <p class="font-mono text-sm mt-4">Method result: <span id="method-result" class="text-text-muted">&mdash;</span></p>
     </section>
 
-    <!-- Section 4: Method Call (HideTab / ShowTab) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">4. Method Call (HideTab / ShowTab)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -144,7 +134,6 @@
         <p class="font-mono text-sm mt-4">Hide/Show result: <span id="hide-result" class="text-text-muted">&mdash;</span></p>
     </section>
 
-    <!-- Section 5: Lazy-Load Tab Content via HTTP + Into -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">5. Lazy-Load Content (HTTP + Into)</h2>
         <p class="text-sm text-text-secondary mb-4">
@@ -201,7 +190,6 @@
         <p class="font-mono text-sm mt-4">Load status: <span id="lazy-load-status" class="text-text-muted">&mdash;</span></p>
     </section>
 
-    <!-- Plan JSON -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
         <pre id="plan-json" class="text-xs overflow-auto max-h-96">@Html.Raw(plan.RenderFormatted())</pre>
