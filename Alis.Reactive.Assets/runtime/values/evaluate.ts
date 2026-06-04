@@ -20,19 +20,23 @@ import { runArrayOp } from "./array-op-engine";
 type ObjectReadExpression = ObjectPropertyReadExpression | ObjectMethodReadExpression;
 type PayloadReadExpression = PayloadPathReadExpression | WholePayloadReadExpression | WholeElementReadExpression | ElementMethodReadExpression;
 
-export function evaluateValue(expression: ValueExpression, plan: PlanDocument, ctx?: ExecContext): unknown {
-  return ValueEvaluation.from(plan, ctx).evaluate(expression);
+export function evaluateValue(
+  expression: ValueExpression,
+  planDocument: PlanDocument,
+  context?: ExecContext,
+): unknown {
+  return ValueEvaluation.from(planDocument, context).evaluate(expression);
 }
 
 class ValueEvaluation {
   private constructor(
-    private readonly document: PlanDocument,
-    private readonly plan: RuntimePlan,
+    private readonly planDocument: PlanDocument,
+    private readonly runtimePlan: RuntimePlan,
     private readonly context: ExecutionContext,
   ) {}
 
-  static from(plan: PlanDocument, ctx?: ExecContext): ValueEvaluation {
-    return new ValueEvaluation(plan, RuntimePlan.from(plan), ExecutionContext.from(ctx));
+  static from(planDocument: PlanDocument, context?: ExecContext): ValueEvaluation {
+    return new ValueEvaluation(planDocument, RuntimePlan.from(planDocument), ExecutionContext.from(context));
   }
 
   evaluate(expression: ValueExpression): unknown {
@@ -71,7 +75,7 @@ class ValueEvaluation {
       return this.readFromRuntimeObject(expression, expression.from);
     }
     if (isUrlRead(expression)) {
-      return readFromUrl(expression, this.plan.urlParameters());
+      return readFromUrl(expression, this.runtimePlan.urlParameters());
     }
     if (isPayloadRead(expression)) {
       if (isElementMethodRead(expression)) {
@@ -87,7 +91,7 @@ class ValueEvaluation {
   }
 
   private readFromRuntimeObject(expression: ObjectReadExpression, source: RuntimeObjectSource): unknown {
-    const object = this.plan.objectForSource(source);
+    const object = this.runtimePlan.objectForSource(source);
     const value = this.resolveRuntimeObjectRead(expression, object);
     return value.usingRequestedShape(expression.shape);
   }
@@ -113,10 +117,10 @@ class ValueEvaluation {
   // Element-scope methods use RuntimePath.call so owner binding and non-function
   // errors match component/plugin method reads.
   private readElementMethod(expression: ElementMethodReadExpression): unknown {
-    const root = this.context.resolvePayload(expression.from);
+    const payloadRoot = this.context.resolvePayload(expression.from);
     const args = expression.access.args.map(arg => this.evaluate(arg));
-    const raw = RuntimePath.from(expression.path).call(root, args, `element method "${expression.member}"`);
-    return applyShapeWhenPresent(raw, expression.shape);
+    const rawValue = RuntimePath.from(expression.path).call(payloadRoot, args, `element method "${expression.member}"`);
+    return applyShapeWhenPresent(rawValue, expression.shape);
   }
 
   private evaluateObject(fields: Record<string, ValueExpression>): Record<string, unknown> {
@@ -132,11 +136,11 @@ class ValueEvaluation {
     if (predicate === undefined) {
       throw new Error("[alis] array-op predicate is required for this operation");
     }
-    return evaluateSyncCondition(predicate, this.document, this.context.withElement(item), evaluateValue);
+    return evaluateSyncCondition(predicate, this.planDocument, this.context.withElement(item), evaluateValue);
   }
 
   private inElement(item: unknown): ValueEvaluation {
-    return new ValueEvaluation(this.document, this.plan, this.context.withElement(item));
+    return new ValueEvaluation(this.planDocument, this.runtimePlan, this.context.withElement(item));
   }
 }
 
@@ -166,26 +170,26 @@ function readFromDom(expression: DomPropertyReadExpression): unknown {
   if (element === null) {
     throw new Error(`[alis] dom source element "${expression.from.element}" not found`);
   }
-  const raw = RuntimePath.from(expression.path).read(element);
-  return applyShapeWhenPresent(raw, expression.shape);
+  const rawValue = RuntimePath.from(expression.path).read(element);
+  return applyShapeWhenPresent(rawValue, expression.shape);
 }
 
 function readFromUrl(
   expression: UrlParameterReadExpression, params: URLSearchParams,
 ): unknown {
-  const raw = params.get(expression.member);
-  return applyShapeWhenPresent(raw, expression.shape);
+  const rawValue = params.get(expression.member);
+  return applyShapeWhenPresent(rawValue, expression.shape);
 }
 
 /** responseBody and elementValue read the whole scope; other payload reads follow RuntimePath. */
 function readFromPayload(
-  expression: PayloadReadExpression, root: unknown,
+  expression: PayloadReadExpression, payloadRoot: unknown,
 ): unknown {
-  const raw = readsWholePayload(expression) || readsWholeElement(expression)
-    ? root
-    : RuntimePath.from(expression.path).read(root);
+  const rawValue = readsWholePayload(expression) || readsWholeElement(expression)
+    ? payloadRoot
+    : RuntimePath.from(expression.path).read(payloadRoot);
 
-  return applyShapeWhenPresent(raw, expression.shape);
+  return applyShapeWhenPresent(rawValue, expression.shape);
 }
 
 function readsWholePayload(expression: PayloadReadExpression): expression is WholePayloadReadExpression {
