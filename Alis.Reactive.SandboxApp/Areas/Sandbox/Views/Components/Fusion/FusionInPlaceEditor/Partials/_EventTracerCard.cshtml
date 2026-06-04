@@ -22,7 +22,6 @@
              .Mode(SfInPlace.RenderMode.Inline)
              .EditableOn(SfInPlace.EditableType.Click);
 
-            // PreventDefault on BeginEdit when the currently-stored value equals "lock".
             b.Reactive(plan, evt => evt.BeginEdit, (args, p) =>
             {
                 p.Element("trace-begin").SetText(args, x => x.Mode);
@@ -30,37 +29,31 @@
                     .Then(then => args.PreventDefault(then));
             });
 
-            // Change event — reads args.Value and surfaces it live.
             b.Reactive(plan, evt => evt.Changed, (args, p) =>
             {
                 p.Element("trace-change").SetText(args, x => x.Value);
             });
 
-            // EndEdit — reads args.Action ("submit" / "cancel" / "outside").
             b.Reactive(plan, evt => evt.EndEdit, (args, p) =>
             {
                 p.Element("trace-endedit").SetText(args, x => x.Action);
             });
 
-            // ActionBegin — PreventDefault extension proven here too.
             b.Reactive(plan, evt => evt.ActionBegin, (args, p) =>
             {
                 p.Element("trace-actionbegin").SetText("fired");
             });
 
-            // ActionSuccess — reads args.Value.
             b.Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
             {
                 p.Element("trace-actionsuccess").SetText(args, x => x.Value);
             });
 
-            // SubmitClick — args.Name only.
             b.Reactive(plan, evt => evt.SubmitClick, (args, p) =>
             {
                 p.Element("trace-submitclick").SetText(args, x => x.Name);
             });
 
-            // CancelClick — args.Name only.
             b.Reactive(plan, evt => evt.CancelClick, (args, p) =>
             {
                 p.Element("trace-cancelclick").SetText(args, x => x.Name);

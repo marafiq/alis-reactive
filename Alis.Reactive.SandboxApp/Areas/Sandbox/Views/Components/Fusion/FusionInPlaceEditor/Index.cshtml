@@ -21,10 +21,6 @@
         and standalone quick-edit cards where each partial view owns its own <code>ReactivePlan&lt;TStandalone&gt;</code>.
     </native-text>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════
-         §A — Use Case A: Mixed form. InPlaceEditor participates in Gather + Validate
-         alongside FusionTextBox, FusionDropDownList, FusionDatePicker, FusionNumericTextBox.
-         ═══════════════════════════════════════════════════════════════════════ -->
     <section id="resident-form" class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">§A · Mixed form (one plan, one submit)</h2>
 
@@ -91,9 +87,6 @@
         <p class="text-sm mt-3">Status: <span id="profile-status" class="font-mono text-text-muted">not saved</span></p>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════
-         §B — Use Case B: Standalone quick-edit cards. Each partial owns its own plan.
-         ═══════════════════════════════════════════════════════════════════════ -->
     <native-heading level="H2" class="mt-8">§B · Standalone quick-edit cards</native-heading>
     <native-text color="Secondary">
         Each card below is a partial with its own <code>ReactivePlan&lt;TStandalone&gt;</code>
@@ -113,7 +106,6 @@
     @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_ControlPanelCard.cshtml", new InPlaceEditorControlPanelModel { Value = "Hello" })
     @Html.Partial("~/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_EventTracerCard.cshtml", new InPlaceEditorEventTracerModel { Value = "" })
 
-    <!-- Plan JSON (main-view §A plan only) -->
     <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold mb-4">Main-view plan JSON (§A)</h2>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>

@@ -22,7 +22,7 @@
             .EditableOn(SfInPlace.EditableType.Click)); }
 
     @{
-        // DomReady runs AFTER the InputField has registered the editor; Value() now reads the registered shape.
+        // DomReady runs after InputField registration, so Value() can read the editor contract.
         Html.On(plan, t => t.DomReady(p =>
         {
             var comp = p.Component<FusionInPlaceEditor>(m => m.Value);

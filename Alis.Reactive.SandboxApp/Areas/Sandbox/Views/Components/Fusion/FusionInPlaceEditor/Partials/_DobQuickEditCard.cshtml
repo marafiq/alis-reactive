@@ -25,7 +25,6 @@
             .EditableOn(SfInPlace.EditableType.Click)
             .Reactive(plan, evt => evt.BeginEdit, (args, p) =>
             {
-                // Clear the saved-indicator the moment the user starts editing again.
                 p.Component<FusionInPlaceEditor>(m => m.Value).RemoveClass("alis-editor-saved");
             })
             .Reactive(plan, evt => evt.ActionSuccess, (args, p) =>
@@ -39,7 +38,6 @@
                     .OnSuccess<InPlaceEditorUpdateResponse>((json, s) =>
                     {
                         s.Element("card-dob-display").SetText(json, x => x.DisplayValue);
-                        // Flip the saved-indicator once the server confirms the commit.
                         s.Component<FusionInPlaceEditor>(m => m.Value).AddClass("alis-editor-saved");
                     })
                     .OnError<InPlaceEditorCommitError>((err, e) =>
