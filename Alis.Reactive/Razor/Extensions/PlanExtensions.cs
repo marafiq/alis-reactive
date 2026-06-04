@@ -106,7 +106,7 @@ namespace Alis.Reactive.Native.Extensions
         {
             var json = plan.Render();
             var elementId = PlanElementId.For(plan.PlanId);
-            var script = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
+            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
 
             // Validation errors display inline next to each field by default.
             // The summary div is a fallback for errors that cannot be shown inline:
@@ -115,11 +115,11 @@ namespace Alis.Reactive.Native.Extensions
             // rely on the view's summary div only if the partials are not rendered yet.
             var planRendersValidationSummary = plan.RendersValidationSummary;
             if (!planRendersValidationSummary)
-                return new MvcHtmlString(script);
+                return new MvcHtmlString(planScript);
 
-            var planId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
-            return new MvcHtmlString(script +
-                $"<div data-reactive-validation-summary=\"{planId}\" hidden></div>");
+            var encodedPlanId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
+            return new MvcHtmlString(planScript +
+                $"<div data-reactive-validation-summary=\"{encodedPlanId}\" hidden></div>");
         }
 #else
         public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html,
@@ -127,7 +127,7 @@ namespace Alis.Reactive.Native.Extensions
         {
             var json = plan.Render();
             var elementId = PlanElementId.For(plan.PlanId);
-            var script = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
+            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
 
             // Validation errors display inline next to each field by default.
             // The summary div is a fallback for errors that cannot be shown inline:
@@ -136,11 +136,11 @@ namespace Alis.Reactive.Native.Extensions
             // rely on the view's summary div only if the partials are not rendered yet.
             var planRendersValidationSummary = plan.RendersValidationSummary;
             if (!planRendersValidationSummary)
-                return new HtmlString(script);
+                return new HtmlString(planScript);
 
-            var planId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
-            return new HtmlString(script +
-                $"<div data-reactive-validation-summary=\"{planId}\" hidden></div>");
+            var encodedPlanId = System.Net.WebUtility.HtmlEncode(plan.PlanId);
+            return new HtmlString(planScript +
+                $"<div data-reactive-validation-summary=\"{encodedPlanId}\" hidden></div>");
         }
 #endif
     }
