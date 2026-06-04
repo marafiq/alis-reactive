@@ -112,8 +112,6 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // DSL condition: equalTo across parent fields.
-
     [Test]
     public async Task equalto_compares_two_parent_fields()
     {
