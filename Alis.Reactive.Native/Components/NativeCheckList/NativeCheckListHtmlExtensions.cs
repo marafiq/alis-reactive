@@ -7,13 +7,12 @@ using ComponentRegistrationSource = Alis.Reactive.Native.Components.NativeCheckL
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Factory extension for creating a <see cref="NativeCheckList"/> inside a field wrapper.
+    /// <c>InputField</c> extension for choosing <see cref="NativeCheckList"/> as the wrapper's rendered control.
     /// </summary>
     public static class NativeCheckListHtmlExtensions
     {
         /// <summary>
-        /// Creates a <see cref="NativeCheckListBuilder{TModel,TProp}"/> inside the field wrapper,
-        /// registers the component in the Reactive Plan, and renders the checkbox list.
+        /// Registers the checkbox list with the Reactive Plan and renders it inside the field wrapper.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>

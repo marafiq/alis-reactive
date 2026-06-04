@@ -7,21 +7,12 @@ using ComponentRegistrationSource = Alis.Reactive.Native.Components.NativeTextBo
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Factory extension for creating a <see cref="NativeTextBox"/> inside a field wrapper.
+    /// <c>InputField</c> extension for choosing <see cref="NativeTextBox"/> as the wrapper's rendered control.
     /// </summary>
-    /// <remarks>
-    /// Start the chain with <see cref="Alis.Reactive.Native.Extensions.InputFieldExtensions.InputField{TModel, TProp}"/>
-    /// and call <c>.NativeTextBox()</c> to choose the text input:
-    /// <code>
-    /// Html.InputField(plan, m =&gt; m.Name, o =&gt; o.Required().Label("Name"))
-    ///     .NativeTextBox(b =&gt; b.Placeholder("Enter name"));
-    /// </code>
-    /// </remarks>
     public static class NativeTextBoxHtmlExtensions
     {
         /// <summary>
-        /// Creates a <see cref="NativeTextBoxBuilder{TModel,TProp}"/> inside the field wrapper,
-        /// registers the component in the Reactive Plan, and renders the input.
+        /// Registers the text input with the Reactive Plan and renders it inside the field wrapper.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>

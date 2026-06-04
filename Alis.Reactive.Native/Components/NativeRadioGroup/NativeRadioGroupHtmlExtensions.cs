@@ -7,13 +7,12 @@ using ComponentRegistrationSource = Alis.Reactive.Native.Components.NativeRadioG
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Factory extension for creating a <see cref="NativeRadioGroup"/> inside a field wrapper.
+    /// <c>InputField</c> extension for choosing <see cref="NativeRadioGroup"/> as the wrapper's rendered control.
     /// </summary>
     public static class NativeRadioGroupHtmlExtensions
     {
         /// <summary>
-        /// Creates a <see cref="NativeRadioGroupBuilder{TModel,TProp}"/> inside the field wrapper,
-        /// registers the component in the Reactive Plan, and renders the radio group.
+        /// Registers the radio group with the Reactive Plan and renders it inside the field wrapper.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The bound property type.</typeparam>
