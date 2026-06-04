@@ -9,13 +9,11 @@
     var careLevelItems = (SelectListItem[])ViewBag.CareLevelItems;
     var facilityTypeItems = (SelectListItem[])ViewBag.FacilityTypeItems;
 
-    // Section 1: Property write — DomReady sets CareLevel to "Memory Care"
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<NativeDropDown>(m => m.CareLevel).SetValue("Memory Care");
     }));
 
-    // Section 2: Property read — DomReady reads CareLevel value into echo span
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<NativeDropDown>(m => m.CareLevel);
@@ -31,7 +29,6 @@
         Senior living domain: care levels and facility types.
     </native-text>
 
-    <!-- Section 1: Property Write -->
     <native-card><native-card-body>
         <native-heading level="H2">1. Property Write (SetValue)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -44,7 +41,6 @@
                 .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
     </native-card-body></native-card>
 
-    <!-- Section 2: Property Read -->
     <native-card><native-card-body>
         <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -53,7 +49,6 @@
         <p class="font-mono text-sm">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Section 3: Event + Event-Args Condition -->
     <native-card><native-card-body>
         <native-heading level="H2">3. Changed Event with Typed Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -84,7 +79,6 @@
         <p class="font-mono text-sm mt-2">Notice: <span id="medical-notice" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Section 4: Component-Read Condition -->
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -103,7 +97,6 @@
         <p class="font-mono text-sm mt-2">Status: <span id="care-confirmation" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Plan JSON -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>

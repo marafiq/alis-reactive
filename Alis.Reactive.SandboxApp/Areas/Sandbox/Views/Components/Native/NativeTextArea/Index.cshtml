@@ -6,13 +6,11 @@
 
     var plan = Html.ReactivePlan<NativeTextAreaModel>();
 
-    // Section 1: Property write — DomReady sets care notes
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<NativeTextArea>(m => m.CareNotes).SetValue("Resident stable. Vitals within normal range.");
     }));
 
-    // Section 2: Property read — DomReady reads care notes into echo
     Html.On(plan, t => t.DomReady(p =>
     {
         var comp = p.Component<NativeTextArea>(m => m.CareNotes);
@@ -28,7 +26,6 @@
         Senior living domain: care notes and incident descriptions.
     </native-text>
 
-    <!-- Section 1: Property Write -->
     <native-card><native-card-body>
         <native-heading level="H2">1. Property Write (SetValue)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -41,7 +38,6 @@
                 .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
     </native-card-body></native-card>
 
-    <!-- Section 2: Property Read -->
     <native-card><native-card-body>
         <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -50,7 +46,6 @@
         <p class="font-mono text-sm">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Section 3: Event + Event-Args Condition -->
     <native-card><native-card-body>
         <native-heading level="H2">3. Changed Event with Typed Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -81,7 +76,6 @@
         <p class="font-mono text-sm mt-2">Status: <span id="incident-status" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Section 4: Component-Read Condition -->
     <native-card><native-card-body>
         <native-heading level="H2">4. Component Value Condition</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -100,7 +94,6 @@
         <p class="font-mono text-sm mt-2">Warning: <span id="notes-warning" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Plan JSON -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>

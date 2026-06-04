@@ -6,14 +6,11 @@
 
     var plan = Html.ReactivePlan<NativeButtonModel>();
 
-    // Section 2: DomReady sets button text from "Loading..." to "Admit Resident"
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Component<NativeButton>("btn-admit-text").SetText("Admit Resident");
     }));
 
-    // Section 4: Dispatch chain — transfer-btn dispatches "resident-transferred",
-    // a custom-event listener picks it up and updates transfer-status
     Html.On(plan, t => t.CustomEvent("resident-transferred", p =>
     {
         p.Element("transfer-status").SetText("transfer confirmed");
@@ -30,7 +27,6 @@
         Senior living domain: resident admit, discharge, and transfer actions.
     </native-text>
 
-    <!-- Section 1: Click Event -->
     <native-card><native-card-body>
         <native-heading level="H2">1. Click Event (Updates Status Text)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -47,7 +43,6 @@
         <p class="font-mono text-sm mt-2">Status: <span id="admit-status" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Section 2: SetText on DomReady -->
     <native-card><native-card-body>
         <native-heading level="H2">2. SetText (DomReady Changes Button Label)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -57,7 +52,6 @@
             .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors"))
     </native-card-body></native-card>
 
-    <!-- Section 3: FocusIn -->
     <native-card><native-card-body>
         <native-heading level="H2">3. FocusIn (Click Focuses Another Button)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -75,7 +69,6 @@
         </native-hstack>
     </native-card-body></native-card>
 
-    <!-- Section 4: Dispatch Chain -->
     <native-card><native-card-body>
         <native-heading level="H2">4. Dispatch Chain (Click Dispatches Event to Listener)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -91,7 +84,6 @@
         <p class="font-mono text-sm mt-2">Transfer: <span id="transfer-status" class="text-text-muted">&mdash;</span></p>
     </native-card-body></native-card>
 
-    <!-- Plan JSON -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>

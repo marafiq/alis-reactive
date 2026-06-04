@@ -6,7 +6,6 @@
 
     var plan = Html.ReactivePlan<NativeHiddenFieldModel>();
 
-    // Section 2: Property read — DomReady reads hidden values into echo spans
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Element("resident-id-echo").SetText(
@@ -24,7 +23,6 @@
         for gather (IncludeAll picks them up) and support property reads.
     </native-text>
 
-    <!-- Section 1: Hidden Fields (rendered but invisible) -->
     <native-card><native-card-body>
         <native-heading level="H2">1. Hidden Fields (Seeded Values)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -42,7 +40,6 @@
         <p class="mt-4 font-mono text-sm text-text-muted">Hidden inputs are present in the DOM but not visible to the user.</p>
     </native-card-body></native-card>
 
-    <!-- Section 2: Property Read -->
     <native-card><native-card-body>
         <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -55,7 +52,6 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    <!-- Section 3: POST Gather -->
     <native-card><native-card-body>
         <native-heading level="H2">3. POST Gather (IncludeAll)</native-heading>
         <p class="text-sm text-text-secondary mb-4">
@@ -86,7 +82,6 @@
         </div>
     </native-card-body></native-card>
 
-    <!-- Plan JSON -->
     <native-card><native-card-body>
         <native-heading level="H2">Plan JSON</native-heading>
         <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
