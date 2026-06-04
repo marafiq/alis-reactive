@@ -29,7 +29,6 @@ public class WhenCareLevelCascades : PlaywrightTestBase
     {
         await CareLevel.Select(text);
 
-        // Wait for the cascade to confirm the change event fired.
         await Expect(Page.Locator("#s1-current-level"))
             .ToHaveTextAsync(text, new() { Timeout = 5000 });
     }
