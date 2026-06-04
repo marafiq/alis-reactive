@@ -84,8 +84,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // DSL condition: equalTo.
-
     [Test]
     public async Task confirm_email_fails_when_different_from_email()
     {
@@ -118,8 +116,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("400");
     }
 
-    // DSL condition: truthy.
-
     [Test]
     public async Task veteran_id_not_required_when_is_veteran_unchecked()
     {
@@ -127,8 +123,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        // IsVeteran is unchecked by default and VeteranId is intentionally empty.
-
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
@@ -168,8 +162,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("400");
     }
 
-    // DSL condition: eq.
-
     [Test]
     public async Task memory_assessment_not_required_when_care_level_is_assisted()
     {
@@ -178,7 +170,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 
         await FillAllRequired();
         await Input("CareLevel").SelectOptionAsync("Assisted Living");
-        await Input("PhysicianName").FillAsync("Dr. Smith"); // required for non-Independent
+        await Input("PhysicianName").FillAsync("Dr. Smith");
 
         await SubmitBtn.ClickAsync();
 
@@ -237,8 +229,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // DSL condition: neq.
-
     [Test]
     public async Task physician_not_required_when_care_level_is_independent()
     {
@@ -287,8 +277,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // DSL condition: falsy.
-
     [Test]
     public async Task reason_for_no_contact_required_when_has_emergency_contact_unchecked()
     {
@@ -296,8 +284,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        // HasEmergencyContact is unchecked by default and ReasonForNoContact is intentionally empty.
-
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("ReasonForNoContact")).ToContainTextAsync("required");
