@@ -14,7 +14,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// Starts a template for rows, cards, list items, or other Syncfusion template contexts.
         /// </summary>
         /// <typeparam name="TModel">The object shape exposed by the Syncfusion template context.</typeparam>
-        /// <returns>A builder that renders the template HTML string.</returns>
         public static FusionTemplateBuilder<TModel> Create<TModel>() => new FusionTemplateBuilder<TModel>();
     }
 
@@ -365,7 +364,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Renders the root <c>div</c> and all nested content to an HTML string.
         /// </summary>
-        /// <returns>The rendered template HTML.</returns>
         public string Render()
         {
             var sb = new StringBuilder();

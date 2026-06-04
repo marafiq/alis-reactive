@@ -179,7 +179,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Renders the conditional content to an HTML string.
         /// </summary>
-        /// <returns>The rendered HTML content.</returns>
         public string Render()
         {
             var sb = new StringBuilder();
