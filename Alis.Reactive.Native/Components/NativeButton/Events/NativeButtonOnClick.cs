@@ -9,9 +9,6 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     public class NativeButtonClickArgs
     {
-        /// <summary>
-        /// Initializes a new marker payload for click event binding.
-        /// </summary>
         public NativeButtonClickArgs() { }
     }
 }

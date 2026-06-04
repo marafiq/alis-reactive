@@ -14,9 +14,6 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         public string? Value { get; set; }
 
-        /// <summary>
-        /// Initializes a new instance for event payload binding.
-        /// </summary>
         public NativeRadioGroupChangeArgs() { }
     }
 }
