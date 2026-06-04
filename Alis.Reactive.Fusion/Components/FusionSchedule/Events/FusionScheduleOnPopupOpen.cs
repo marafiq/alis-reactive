@@ -38,15 +38,15 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>
-    /// Extensions for <see cref="FusionSchedulePopupOpenArgs"/> — cancel SF popup to use custom UI.
+    /// Extensions for <see cref="FusionSchedulePopupOpenArgs"/> — cancel Syncfusion popup to use custom UI.
     /// Same pattern as <see cref="FusionAutoCompleteFilteringArgs"/>.PreventDefault.
     /// </summary>
     public static class FusionSchedulePopupOpenArgsExtensions
     {
         /// <summary>
-        /// Cancels the SF popup from opening. Use inside a When(args.Type).Eq("Editor") branch
+        /// Cancels the Syncfusion popup from opening. Use inside a When(args.Type).Eq("Editor") branch
         /// to replace the built-in editor with a custom form loaded via Into().
-        /// Runtime: sets evt.cancel = true on the SF popupOpen event args.
+        /// Runtime: sets evt.cancel = true on the Syncfusion popupOpen event args.
         /// </summary>
         public static void PreventDefault(
             this FusionSchedulePopupOpenArgs args,

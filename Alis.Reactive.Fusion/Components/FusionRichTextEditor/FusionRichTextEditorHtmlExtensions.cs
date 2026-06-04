@@ -36,11 +36,11 @@ namespace Alis.Reactive.Fusion.Components
             var builder = setup.Helper.EJS().RichTextEditorFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["name"] = setup.BindingPath });
 
-            // Override the SF-derived Id BEFORE build so .Reactive() can read it.
+            // Override the Syncfusion-derived Id BEFORE build so .Reactive() can read it.
             // RichTextEditorFor sets model.Id from the expression member name, but
             // Render() uses model.Id for the textarea's id attribute AND for the
             // Script Manager's appendTo selector. Setting model.Id ensures a single,
-            // correct id attribute and proper SF component initialization.
+            // correct id attribute and proper Syncfusion component initialization.
             builder.model.Id = setup.ElementId;
 
             build(builder);

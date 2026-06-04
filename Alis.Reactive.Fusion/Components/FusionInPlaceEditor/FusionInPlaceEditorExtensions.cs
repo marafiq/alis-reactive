@@ -76,8 +76,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Adds a CSS class to the editor's outer wrapper.</summary>
         /// <remarks>
         /// Emits a call on Syncfusion's <c>element.classList.add</c>. The Fusion vendor resolver
-        /// returns the ej2 instance, so the path reaches through <c>ej.element</c> (SF's reference
-        /// back to the editor's outer DOM element). The class persists across SF's edit/close
+        /// returns the ej2 instance, so the path reaches through <c>ej.element</c> (Syncfusion's reference
+        /// back to the editor's outer DOM element). The class persists across Syncfusion's edit/close
         /// cycles; typical use is a visual commit signal (e.g. a CSS <c>::after</c> check mark)
         /// wired on <c>ActionSuccess</c> and removed on <c>BeginEdit</c>.
         /// </remarks>

@@ -32,7 +32,7 @@ namespace Alis.Reactive.Fusion.Components
             var descriptor = eventSelector(FusionRichTextEditorEvents.Instance);
 
             // RTE uses model.Id (set by FusionRichTextEditorHtmlExtensions) instead
-            // of HtmlAttributes["id"] because SF RTE Render() uses model.Id for the
+            // of HtmlAttributes["id"] because Syncfusion RTE Render() uses model.Id for the
             // textarea's id attribute, not HtmlAttributes.
             var componentId = builder.model.Id;
             var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;

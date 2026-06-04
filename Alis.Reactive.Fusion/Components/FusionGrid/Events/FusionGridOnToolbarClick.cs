@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Event args for the SF Grid "toolbarClick" event.
+    /// Event args for the Syncfusion Grid "toolbarClick" event.
     /// Fires when any toolbar item is clicked, including custom items.
     /// Read <see cref="Item"/> to branch on which button was pressed.
     /// </summary>

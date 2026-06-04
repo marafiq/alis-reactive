@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Event args for the SF Grid "recordClick" event.
+    /// Event args for the Syncfusion Grid "recordClick" event.
     /// </summary>
     /// <typeparam name="TRow">The row DTO type bound to the grid.</typeparam>
     public class FusionGridRecordClickArgs<TRow>

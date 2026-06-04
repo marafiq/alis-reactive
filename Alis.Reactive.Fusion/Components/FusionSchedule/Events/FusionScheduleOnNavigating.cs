@@ -10,10 +10,10 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The navigation action: "date" or "view".</summary>
         public string Action { get; set; } = "";
 
-        /// <summary>The date being navigated TO (ISO string from SF).</summary>
+        /// <summary>The date being navigated TO (ISO string from Syncfusion).</summary>
         public string CurrentDate { get; set; } = "";
 
-        /// <summary>The date being navigated FROM (ISO string from SF).</summary>
+        /// <summary>The date being navigated FROM (ISO string from Syncfusion).</summary>
         public string PreviousDate { get; set; } = "";
 
         /// <summary>The view being navigated TO: "Day", "Week", "WorkWeek", "Month", "Agenda".

@@ -15,7 +15,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The current editor mode ("Inline" or "Popup").</summary>
         public string? Mode { get; set; }
 
-        /// <summary>The SF event name.</summary>
+        /// <summary>The Syncfusion event name.</summary>
         public string? Name { get; set; }
         public FusionInPlaceEditorBeginEditArgs() { }
     }

@@ -2,7 +2,7 @@ namespace Alis.Reactive.Fusion.AppLevel
 {
     /// <summary>
     /// App-level toast notification backed by Syncfusion Toast.
-    /// Singleton per page — one SF Toast instance serves all notifications.
+    /// Singleton per page — one Syncfusion Toast instance serves all notifications.
     ///
     /// Implements IAppLevelComponent so it can be resolved without an explicit ID:
     ///   p.Component&lt;FusionToast&gt;().SetContent("Saved").Success().Show()

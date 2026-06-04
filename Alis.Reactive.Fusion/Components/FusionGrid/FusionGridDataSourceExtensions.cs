@@ -29,7 +29,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Replaces the grid data source with the entire HTTP response body.
-        /// Use for SF Grid custom binding where the response shape is
+        /// Use for Syncfusion Grid custom binding where the response shape is
         /// <c>{ result: [...], count: N }</c>.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> SetDataSource<TModel, TResponse>(

@@ -1,11 +1,11 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Event args for the SF Tab "selected" event.
+    /// Event args for the Syncfusion Tab "selected" event.
     /// Fires when a tab is selected.
     ///
     /// Properties are primitives — safe for echo and conditions.
-    /// SF args also contain selectedItem/previousItem (DOM objects) — intentionally omitted
+    /// Syncfusion args also contain selectedItem/previousItem (DOM objects) — intentionally omitted
     /// as they would serialize as [object Object].
     /// </summary>
     public class FusionTabSelectedArgs
