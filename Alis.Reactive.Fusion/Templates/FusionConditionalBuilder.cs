@@ -138,7 +138,7 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a button that dispatches a browser <c>CustomEvent</c> with a bound row ID.
+        /// Adds a button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
         public FusionConditionalBuilder<TModel> EventButton<TProperty>(
             string text,
@@ -147,7 +147,7 @@ namespace Alis.Reactive.Fusion.Templates
             EventButton(text, eventName, idProperty, TemplateCss.None);
 
         /// <summary>
-        /// Adds a styled button that dispatches a browser <c>CustomEvent</c> with a bound row ID.
+        /// Adds a styled button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
         public FusionConditionalBuilder<TModel> EventButton<TProperty>(
             string text,

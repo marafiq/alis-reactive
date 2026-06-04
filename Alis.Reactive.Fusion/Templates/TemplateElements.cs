@@ -2,7 +2,7 @@ namespace Alis.Reactive.Fusion.Templates
 {
     /// <summary>
     /// Shared HTML element rendering for Syncfusion template builders.
-    /// Each method produces a single HTML element string using SF template binding syntax.
+    /// Each method produces a single HTML element string using Syncfusion template binding syntax.
     /// </summary>
     internal static class TemplateElements
     {
@@ -41,8 +41,8 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Renders a button that dispatches a CustomEvent with the bound ID.
-        /// Uses <c>&amp;quot;</c> for event name quoting to survive SF template engine
+        /// Renders a button that dispatches a CustomEvent with the bound <c>detail.id</c> value.
+        /// Uses <c>&amp;quot;</c> for event name quoting to survive Syncfusion template engine
         /// single-to-double quote conversion.
         /// </summary>
         internal static string EventButton(string text, string eventName, string idBinding, TemplateCss css)

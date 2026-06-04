@@ -214,7 +214,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button that calls a JavaScript function with a bound model value.
         /// </summary>
-        /// <remarks>The function name is emitted into <c>onclick</c> as supplied.</remarks>
+        /// <remarks>The function name is emitted into <c>onclick</c> as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> ButtonFor<TProperty>(
             string text,
             Expression<Func<TModel, TProperty>> idProperty,
@@ -224,7 +224,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled button that calls a JavaScript function with a bound model value.
         /// </summary>
-        /// <remarks>The function name is emitted into <c>onclick</c> as supplied.</remarks>
+        /// <remarks>The function name is emitted into <c>onclick</c> as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> ButtonFor<TProperty>(
             string text,
             Expression<Func<TModel, TProperty>> idProperty,
@@ -247,7 +247,7 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a button that dispatches a browser <c>CustomEvent</c> with a bound row ID.
+        /// Adds a button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
         public FusionTemplateBuilder<TModel> EventButton<TProperty>(
             string text,
@@ -256,7 +256,7 @@ namespace Alis.Reactive.Fusion.Templates
             EventButton(text, eventName, idProperty, TemplateCss.None);
 
         /// <summary>
-        /// Adds a styled button that dispatches a browser <c>CustomEvent</c> with a bound row ID.
+        /// Adds a styled button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
         public FusionTemplateBuilder<TModel> EventButton<TProperty>(
             string text,
@@ -345,7 +345,7 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Alias for the two-argument <c>When</c> overload.
+        /// Adds conditional content when the typed condition is true.
         /// </summary>
         public FusionTemplateBuilder<TModel> ShowIf(Expression<Func<TModel, bool>> condition, Action<FusionConditionalBuilder<TModel>> content)
         {
