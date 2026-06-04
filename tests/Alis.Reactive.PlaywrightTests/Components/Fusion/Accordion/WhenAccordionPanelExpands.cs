@@ -4,8 +4,6 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Accordion;
 /// Exercises FusionAccordion behaviors end-to-end:
 /// DomReady expand, event args echo, condition branching,
 /// button-triggered disable, and lazy-load via HTTP + Into.
-///
-/// Page under test: /Sandbox/Components/Accordion
 /// </summary>
 [TestFixture]
 public class WhenAccordionPanelExpands : PlaywrightTestBase
@@ -17,8 +15,6 @@ public class WhenAccordionPanelExpands : PlaywrightTestBase
         await NavigateToAndWaitForTextSignal(Path, "#expand-result");
     }
 
-    // ── DomReady expand ──
-
     [Test]
     public async Task domready_expands_second_panel()
     {
@@ -28,14 +24,11 @@ public class WhenAccordionPanelExpands : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Event args echo ──
-
     [Test]
     public async Task clicking_panel_echoes_expanded_index()
     {
         await NavigateAndBoot();
 
-        // Click the first panel header to expand it
         var firstHeader = Page.Locator("#demo-accordion .e-acrdn-header").First;
         await ClickWhenStable(firstHeader);
 
@@ -43,8 +36,6 @@ public class WhenAccordionPanelExpands : PlaywrightTestBase
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Condition branching ──
 
     [Test]
     public async Task expanding_panel_shows_expanded_condition()
@@ -54,7 +45,6 @@ public class WhenAccordionPanelExpands : PlaywrightTestBase
         var firstHeader = Page.Locator("#demo-accordion .e-acrdn-header").First;
         await ClickWhenStable(firstHeader);
 
-        // Wait for condition result to update
         await Expect(Page.Locator("#condition-result"))
             .Not.ToHaveTextAsync("\u2014", new() { Timeout = 5000 });
 
@@ -63,8 +53,6 @@ public class WhenAccordionPanelExpands : PlaywrightTestBase
             "Condition should show 'Panel expanded' or 'Panel collapsed'");
         AssertNoConsoleErrors();
     }
-
-    // ── EnableItem via button ──
 
     [Test]
     public async Task disable_button_disables_contact_panel()
@@ -79,14 +67,11 @@ public class WhenAccordionPanelExpands : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── Lazy-load via HTTP + Into ──
-
     [Test]
     public async Task expanding_lazy_panel_loads_content_via_http()
     {
         await NavigateAndBoot();
 
-        // Click first panel of the lazy accordion
         var lazyHeader = Page.Locator("#lazy-accordion .e-acrdn-header").First;
         await ClickWhenStable(lazyHeader);
 
@@ -94,8 +79,6 @@ public class WhenAccordionPanelExpands : PlaywrightTestBase
             .ToHaveTextAsync("Overview loaded", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
-
-    // ── Plan JSON ──
 
     [Test]
     public async Task plan_json_contains_accordion_behaviors()
