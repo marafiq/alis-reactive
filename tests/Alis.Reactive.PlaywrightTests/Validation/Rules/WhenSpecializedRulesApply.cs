@@ -294,7 +294,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("Email").FillAsync("nurse@facility.com");
         await Input("AlternateEmail").FillAsync("backup@facility.com");
         await Input("Website").FillAsync("https://sunnyacres.com");
-        // Nickname left empty (as required by empty rule)
 
         await ClickWhenStable(ValidateBtn);
 

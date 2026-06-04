@@ -275,7 +275,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
     [Test]
     public async Task server_rejects_incomplete_data_and_shows_errors()
     {
-        // Name and Email satisfy client rules; this proves OnError(400) maps full-model server errors inline.
+        // Client rules pass first; OnError(400) must map full-model server errors inline.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
