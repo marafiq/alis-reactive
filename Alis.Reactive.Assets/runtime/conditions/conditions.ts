@@ -15,7 +15,7 @@ import { evaluateSyncCondition, evaluateCompare } from "./compare-engine";
 
 const log = scope("conditions");
 
-interface AlisBrowserApi {
+interface WindowWithConfirm {
   readonly alis?: {
     readonly confirm?: (message: string) => Promise<boolean> | boolean;
   };
@@ -117,7 +117,7 @@ function negateConditionInLane(
 }
 
 async function evaluateConfirmCondition(message: string): Promise<boolean> {
-  const confirmFn = (window as AlisBrowserApi).alis?.confirm;
+  const confirmFn = (window as WindowWithConfirm).alis?.confirm;
   if (!confirmFn) {
     log.error("confirm.dialog-missing");
     throw new Error("[alis] confirm condition requires @Html.FusionConfirmDialog() in layout");
