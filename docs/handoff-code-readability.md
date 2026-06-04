@@ -134,3 +134,7 @@ Rewrite or delete:
   assertions. The touched waits are now marked with `TODO:`; a later slice should
   replace them with visible commit signals or a shared behavior-focused no-POST
   proof.
+- `scripts/build.sh` hung once on this branch while running
+  `vite build --config vite.design-system.config.ts`; the focused Playwright
+  test project build completed afterward. TODO: capture logs/process state if it
+  repeats and decide whether the wrapper needs timeout or progress diagnostics.
