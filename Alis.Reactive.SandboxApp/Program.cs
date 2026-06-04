@@ -5,9 +5,7 @@ using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-// Global: Newtonsoft serializes PascalCase C# → camelCase JSON.
-// SF EJ2 uses Newtonsoft internally for DataSource rendering —
-// JsonConvert.DefaultSettings merges into SF's explicit settings.
+// Syncfusion EJ2 DataSource rendering reads Newtonsoft defaults; keep sandbox API payloads camelCase.
 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {
     ContractResolver = new CamelCasePropertyNamesContractResolver()
@@ -15,21 +13,20 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Syncfusion license — stored in user secrets: dotnet user-secrets set "Syncfusion:LicenseKey" "YOUR_KEY"
+// Optional Syncfusion license comes from configuration or user secrets.
 var sfLicense = builder.Configuration["Syncfusion:LicenseKey"];
 if (!string.IsNullOrEmpty(sfLicense))
     Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(sfLicense);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
-// Per-session in-memory state so sandbox grid edits persist across saves and page
-// refreshes within a browser session, while each browser/test context stays isolated.
+// Per-session state keeps sandbox grid edits isolated across separate app/test sessions.
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(2));
 builder.Services.AddReactiveFluentValidation(validation =>
     validation.AddFromAssemblyContaining<Program>());
 
-// Broadcast service pushes updates every 2s for demo — disabled during Playwright tests
+// Disable demo broadcasts in Playwright so realtime tests control their own events.
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ALIS_NO_BROADCAST")))
     builder.Services.AddHostedService<RealTimeBroadcastService>();
 
@@ -43,18 +40,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Sandbox eats its own dog food as an Alis.Reactive consumer: serve the
-// framework bundles straight from Alis.Reactive.Assets/dist/, produced by
-// `npm run build:all`. All three framework bundles build into that one tree:
-//
-//   Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js   — runtime JS
-//   Alis.Reactive.Assets/dist/css/design-system.dev.css      — design system
-//   Alis.Reactive.Assets/dist/css/syncfusion.dev.css         — Fusion
-//
-// Same path in dev and CI — no copy into sandbox wwwroot, so `git status`
-// stays clean after a local build. Fail fast if the dist folder is missing
-// (Rule 5): the sandbox is a dev-only harness, and silently serving 404 on a
-// bundle is a trap for first-run devs who haven't run the build yet.
+// Sandbox consumes the built framework bundles directly from Assets/dist.
+// Using the same path in dev and CI catches stale or missing bundles early.
 var assetDistDir = Path.GetFullPath(
     Path.Combine(app.Environment.ContentRootPath, "..", "Alis.Reactive.Assets", "dist"));
 if (!Directory.Exists(assetDistDir))
@@ -68,8 +55,7 @@ app.Environment.WebRootFileProvider = new CompositeFileProvider(
     app.Environment.WebRootFileProvider);
 
 // Playwright boot must not depend on CDN availability. Syncfusion's ASP.NET
-// helpers emit scripts that require the global `ej/ejs` object before the
-// reactive runtime boots, so serve the npm package from the local workspace.
+// helpers require global `ej/ejs` before the Reactive runtime boots.
 var syncfusionPackageDir = Path.GetFullPath(
     Path.Combine(app.Environment.ContentRootPath, "..", "node_modules", "@syncfusion", "ej2"));
 if (!Directory.Exists(syncfusionPackageDir))
