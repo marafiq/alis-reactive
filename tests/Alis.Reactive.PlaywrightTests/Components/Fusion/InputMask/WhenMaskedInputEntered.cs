@@ -87,7 +87,6 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
 
         await PhoneNumber.FillAndBlur("9876543210");
 
-        // When(args, x => x.Value).NotEmpty() => Then branch
         await Expect(Page.Locator("#args-condition"))
             .ToHaveTextAsync("phone entered", new() { Timeout = 5000 });
         AssertNoConsoleErrors();

@@ -85,7 +85,6 @@ public class WhenRichTextEdited : PlaywrightTestBase
 
         await CarePlan.FillAndBlur("Discharge ready");
 
-        // When(args, x => x.Value).NotEmpty() => Then branch
         await Expect(Page.Locator("#args-condition"))
             .ToHaveTextAsync("content entered", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
