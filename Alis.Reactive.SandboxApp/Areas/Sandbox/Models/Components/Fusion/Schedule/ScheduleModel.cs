@@ -4,8 +4,6 @@ using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    // === View Model ===
-
     /// <summary>
     /// View model for the Point-in-Time Schedule sandbox page.
     /// Filters drive server-side data loading — the schedule never holds the full dataset.
@@ -14,8 +12,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public string? SelectedFacilityId { get; set; }
     }
-
-    // === API DTOs ===
 
     /// <summary>
     /// A single shift assignment shown as an event on the schedule.
@@ -30,7 +26,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public bool IsAllDay { get; set; }
         public int ShiftId { get; set; }
 
-        // Domain fields
         public string? StaffName { get; set; }
         public string? StaffRole { get; set; }
         public string? StaffPhone { get; set; }

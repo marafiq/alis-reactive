@@ -61,7 +61,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         {
             var assignments = new List<ShiftAssignment>();
 
-            // Walk through each week that overlaps the range
             var current = rangeStart.AddDays(-(int)rangeStart.DayOfWeek);
             while (current < rangeEnd)
             {
