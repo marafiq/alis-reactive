@@ -1,11 +1,6 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
-/// <summary>
-/// Verifies trace output proves two-phase boot ordering.
-/// The most important test here is trace_shows_phase_1_then_phase_2 — it catches
-/// the subtle bug where someone accidentally removes two-phase boot, causing dispatch
-/// chains to silently break (events fire before listeners exist).
-/// </summary>
+// Trace coverage protects two-phase boot: listeners must wire before dom-ready dispatches.
 [TestFixture]
 public class WhenTraceReportsExecution : PlaywrightTestBase
 {
@@ -14,9 +9,6 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
     [Test]
     public async Task boot_trace_appears_in_console()
     {
-        // data-trace="trace" on the plan element enables full tracing.
-        // If auto-boot fails to read data-trace, or trace.setLevel breaks,
-        // no [alis:boot] messages appear.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -32,38 +24,26 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
     [Test]
     public async Task trace_shows_phase_1_then_phase_2()
     {
-        // THIS IS THE CRITICAL TWO-PHASE BOOT REGRESSION TEST.
-        //
-        // Two-phase boot guarantees: document-event listeners wire BEFORE dom-ready executes.
-        // Without this, dom-ready dispatches "test" but nobody is listening yet — chain breaks silently.
-        //
-        // Phase 1: trigger.ts logs "[alis:trigger] document-event: listening" for each document-event behavior
-        // Phase 2: dom-ready executes, which triggers "[alis:execute] dispatch" for the first dispatch
-        //
-        // If someone refactors boot.ts to remove two-phase ordering, the dispatch trace would
-        // appear BEFORE the listening traces — and this test catches it.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
         var messages = _consoleMessages;
 
-        // Find the LAST document-event listener wiring (phase 1 must complete fully)
-        var lastWireIndex = -1;
+        var lastListenerTraceIndex = -1;
         for (var i = 0; i < messages.Count; i++)
         {
             if (messages[i].Contains("[alis:trigger]") && messages[i].Contains("document-event"))
-                lastWireIndex = i;
+                lastListenerTraceIndex = i;
         }
 
-        // Find the FIRST dispatch reaction (phase 2 starts when dom-ready executes)
-        var firstDispatchIndex = messages.FindIndex(m =>
+        var firstDispatchTraceIndex = messages.FindIndex(m =>
             m.Contains("[alis:execute] dispatch {"));
 
-        Assert.That(lastWireIndex, Is.GreaterThanOrEqualTo(0),
+        Assert.That(lastListenerTraceIndex, Is.GreaterThanOrEqualTo(0),
             "Document-event listener wiring must be traced (phase 1)");
-        Assert.That(firstDispatchIndex, Is.GreaterThanOrEqualTo(0),
+        Assert.That(firstDispatchTraceIndex, Is.GreaterThanOrEqualTo(0),
             "Dispatch reaction must be traced (phase 2)");
-        Assert.That(lastWireIndex, Is.LessThan(firstDispatchIndex),
+        Assert.That(lastListenerTraceIndex, Is.LessThan(firstDispatchTraceIndex),
             "All document-event listeners must wire (phase 1) BEFORE dom-ready dispatches (phase 2). " +
             "If this fails, two-phase boot is broken — dispatch chains will silently fail.");
     }
@@ -71,8 +51,6 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
     [Test]
     public async Task trace_captures_all_three_dispatch_events()
     {
-        // Every dispatch in the chain must produce a trace entry.
-        // If the runtime skips tracing for any dispatch, we lose observability.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -86,10 +64,6 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
     [Test]
     public async Task trace_captures_dispatch_event_names()
     {
-        // Verify each dispatched event name appears in trace.
-        // "test", "test-received", "final" should all be in console messages.
-        // Proves trace.ts captures dispatch metadata correctly — if the trace
-        // format changes or the dispatch scope stops emitting, this catches it.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -113,10 +87,6 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
     [Test]
     public async Task trace_captures_mutate_element_targets()
     {
-        // Verify mutation targets appear in trace (step-1, step-2, step-3, chain-status).
-        // Proves trace.ts captures set/call reaction details — if set/call stops
-        // logging the target field, we lose the ability to diagnose which element
-        // a mutation acted on in production traces.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
