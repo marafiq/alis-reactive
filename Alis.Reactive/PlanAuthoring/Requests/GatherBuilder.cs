@@ -48,7 +48,7 @@ namespace Alis.Reactive.Builders.Requests
 
         /// <summary>Adds a value from the triggering event payload to the request body.</summary>
         /// <typeparam name="TArgs">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <typeparam name="TProp">The event value type copied into the request body.</typeparam>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path to read.</param>
         /// <param name="param">The request body field name.</param>
@@ -95,7 +95,7 @@ namespace Alis.Reactive.Builders.Requests
 
         /// <summary>Adds a scalar HTTP header value from the triggering event payload.</summary>
         /// <typeparam name="TArgs">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <typeparam name="TProp">The event value type sent as the header value.</typeparam>
         /// <param name="name">The HTTP header name.</param>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path to send as a header.</param>
@@ -157,7 +157,7 @@ namespace Alis.Reactive.Builders.Requests
 
         /// <summary>Binds a route template parameter to a scalar value from the triggering event payload.</summary>
         /// <typeparam name="TArgs">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The selected property type.</typeparam>
+        /// <typeparam name="TProp">The event value type sent as the route value.</typeparam>
         /// <param name="paramName">The route template placeholder name without braces.</param>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path to use as the route value.</param>
