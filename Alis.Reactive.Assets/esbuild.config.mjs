@@ -1,14 +1,7 @@
 import * as esbuild from 'esbuild';
 
-// Builds the Alis.Reactive runtime bundle.
-//   input  : runtime/root.ts
-//   output : dist/scripts/alis-reactive.dev.js   (IIFE, global name __alisReactive)
-//
-//   node esbuild.config.mjs            one-shot, minified  (CI / build:all)
-//   node esbuild.config.mjs --watch    rebuild on change, unminified  (dev loop)
-//
-// Option parity with the former inline package.json CLI: --bundle --format=iife
-// --global-name=__alisReactive, --minify on build only.
+// Sandbox and NuGet consumers load the runtime as a plain script, so the bundle
+// stays an IIFE at dist/scripts/alis-reactive.dev.js.
 
 const watch = process.argv.includes('--watch');
 
