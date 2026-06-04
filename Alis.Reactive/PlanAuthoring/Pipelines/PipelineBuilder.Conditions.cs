@@ -7,12 +7,12 @@ namespace Alis.Reactive.Builders
 {
     public partial class PipelineBuilder<TModel> where TModel : class
     {
-        /// <summary>Starts a conditional branch from an event payload property.</summary>
-        /// <typeparam name="TPayload">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The payload value type compared by this branch.</typeparam>
+        /// <summary>Starts a branch whose guard reads from the current event payload.</summary>
+        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
+        /// <typeparam name="TProp">The selected payload value type.</typeparam>
         /// <param name="payload">The typed event payload placeholder supplied by the trigger callback.</param>
-        /// <param name="path">The payload property used as the condition source.</param>
-        /// <returns>A condition source builder for choosing the comparison operation.</returns>
+        /// <param name="path">Selects the payload value to compare at runtime.</param>
+        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
@@ -23,12 +23,12 @@ namespace Alis.Reactive.Builders
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
-        /// <summary>Starts a conditional branch from an HTTP response body property.</summary>
-        /// <typeparam name="TPayload">The HTTP response body type.</typeparam>
-        /// <typeparam name="TProp">The response value type compared by this branch.</typeparam>
+        /// <summary>Starts a branch whose guard reads from the current HTTP response body.</summary>
+        /// <typeparam name="TPayload">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TProp">The selected response value type.</typeparam>
         /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
-        /// <param name="path">The response property used as the condition source.</param>
-        /// <returns>A condition source builder for choosing the comparison operation.</returns>
+        /// <param name="path">Selects the response value to compare at runtime.</param>
+        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
             ResponseBody<TPayload> responseBody,
             Expression<Func<TPayload, TProp>> path)
@@ -40,19 +40,19 @@ namespace Alis.Reactive.Builders
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
-        /// <summary>Starts a conditional branch from a typed source (component, plugin, or URL value).</summary>
-        /// <typeparam name="TProp">The source value type.</typeparam>
-        /// <param name="source">The value source used by the condition.</param>
-        /// <returns>A condition source builder for choosing the comparison operation.</returns>
+        /// <summary>Starts a branch whose guard reads from a typed runtime value source.</summary>
+        /// <typeparam name="TProp">The runtime value type exposed by the source.</typeparam>
+        /// <param name="source">A typed value source accepted by conditions.</param>
+        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
             _draft.BeginBranch();
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
-        /// <summary>Adds a user confirmation guard before proceeding with the pipeline.</summary>
-        /// <param name="message">The confirmation message shown to the user.</param>
-        /// <returns>A guard builder for configuring the accepted and rejected branches.</returns>
+        /// <summary>Adds a user-decision guard before the pipeline continues.</summary>
+        /// <param name="message">The confirmation message shown at the user-decision runtime boundary.</param>
+        /// <returns>A guard builder for configuring accepted and rejected branches.</returns>
         public GuardBuilder<TModel> Confirm(string message)
         {
             _draft.BeginBranch();

@@ -5,14 +5,19 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
-    /// Entry point for building standalone condition expressions used in nested And/Or calls.
+    /// Entry point for nested condition expressions composed inside <c>And</c> and <c>Or</c> guards.
     /// </summary>
-    /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
+    /// <typeparam name="TModel">The view model that owns the condition being authored.</typeparam>
     public sealed class ConditionStart<TModel> where TModel : class
     {
         internal ConditionStart() { }
 
-        /// <summary>Starts a condition from an event payload property.</summary>
+        /// <summary>Starts a nested condition that reads from the current event payload.</summary>
+        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
+        /// <typeparam name="TProp">The selected payload value type.</typeparam>
+        /// <param name="payload">The typed event payload placeholder supplied by the trigger callback.</param>
+        /// <param name="path">Selects the payload value to compare at runtime.</param>
+        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
@@ -21,7 +26,12 @@ namespace Alis.Reactive.Builders.Conditions
             return new ConditionSourceBuilder<TModel, TProp>(source);
         }
 
-        /// <summary>Starts a condition from an HTTP response body property.</summary>
+        /// <summary>Starts a nested condition that reads from the current HTTP response body.</summary>
+        /// <typeparam name="TPayload">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TProp">The selected response value type.</typeparam>
+        /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
+        /// <param name="path">Selects the response value to compare at runtime.</param>
+        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
             ResponseBody<TPayload> responseBody,
             Expression<Func<TPayload, TProp>> path)
@@ -31,14 +41,18 @@ namespace Alis.Reactive.Builders.Conditions
             return new ConditionSourceBuilder<TModel, TProp>(source);
         }
 
-        /// <summary>Starts a condition from a typed source.</summary>
+        /// <summary>Starts a nested condition that reads from a typed runtime value source.</summary>
+        /// <typeparam name="TProp">The runtime value type exposed by the source.</typeparam>
+        /// <param name="source">A typed value source accepted by conditions.</param>
+        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
             return new ConditionSourceBuilder<TModel, TProp>(source);
         }
 
-        /// <summary>Creates a user confirmation guard that prompts before proceeding.</summary>
-        /// <param name="message">The confirmation message shown to the user.</param>
+        /// <summary>Creates a user-decision guard for a nested condition expression.</summary>
+        /// <param name="message">The confirmation message shown at the user-decision runtime boundary.</param>
+        /// <returns>A guard that can be composed with surrounding condition terms.</returns>
         public GuardBuilder<TModel> Confirm(string message)
         {
             return new GuardBuilder<TModel>(ConditionGraph.Confirm(message));
