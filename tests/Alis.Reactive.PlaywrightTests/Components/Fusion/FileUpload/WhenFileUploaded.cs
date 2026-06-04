@@ -1,7 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.FileUpload;
 
 /// <summary>
-/// Exercises FusionFileUpload form-mode gather, multipart FormData payloads,
+/// Proves <c>FusionFileUpload</c> form-mode gather, multipart <c>FormData</c> payloads,
 /// and server echo behavior for resident document uploads.
 /// </summary>
 /// <remarks>
@@ -11,20 +11,16 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.FileUpload;
 [TestFixture]
 public class WhenFileUploaded : PlaywrightTestBase
 {
-    private const string Path = "/Sandbox/Components/FileUpload";
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FileUploadModel__";
-    private const string DocumentsId = Scope + "Documents";
+    private const string PagePath = "/Sandbox/Components/FileUpload";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FileUploadModel__";
+    private const string DocumentsInputId = GeneratedTypeScope + "Documents";
 
     private async Task NavigateAndBoot()
     {
-        await NavigateToAndWaitForVisibleSignal(Path, ".e-upload");
+        await NavigateToAndWaitForVisibleSignal(PagePath, ".e-upload");
     }
 
-    /// <summary>
-    /// Sets files through DataTransfer and dispatches change so Syncfusion processes
-    /// <c>filesData[].rawFile</c>.
-    /// </summary>
-    private async Task SetFiles(params (string Name, string Content, string MimeType)[] files)
+    private async Task SetFilesThroughDataTransfer(params (string Name, string Content, string MimeType)[] files)
     {
         var fileSpecs = files.Select(f => new { f.Name, f.Content, f.MimeType }).ToArray();
         await Page.EvaluateAsync(
@@ -38,7 +34,7 @@ public class WhenFileUploaded : PlaywrightTestBase
                 el.files = dt.files;
                 el.dispatchEvent(new Event('change', { bubbles: true }));
             }",
-            new { elementId = DocumentsId, files = fileSpecs });
+            new { elementId = DocumentsInputId, files = fileSpecs });
     }
 
     [Test]
@@ -72,7 +68,7 @@ public class WhenFileUploaded : PlaywrightTestBase
     public async Task file_input_element_exists()
     {
         await NavigateAndBoot();
-        var fileInput = Page.Locator($"#{DocumentsId}");
+        var fileInput = Page.Locator($"#{DocumentsInputId}");
         await Expect(fileInput).ToBeAttachedAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -82,7 +78,7 @@ public class WhenFileUploaded : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await SetFiles(
+        await SetFilesThroughDataTransfer(
             ("medical-record.txt", "Patient vitals: BP 120/80", "text/plain"),
             ("consent-form.pdf", "%PDF-mock", "application/pdf"));
 
@@ -102,7 +98,7 @@ public class WhenFileUploaded : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await SetFiles(("photo.jpg", "fake-jpeg", "image/jpeg"));
+        await SetFilesThroughDataTransfer(("photo.jpg", "fake-jpeg", "image/jpeg"));
 
         await Page.Locator("#upload-btn").ClickAsync();
 
@@ -120,11 +116,11 @@ public class WhenFileUploaded : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var nameInput = Page.Locator($"#{Scope}ResidentName");
+        var nameInput = Page.Locator($"#{GeneratedTypeScope}ResidentName");
         await nameInput.ClearAsync();
         await nameInput.FillAsync("Eleanor Vance");
 
-        await SetFiles(("intake-form.txt", "Intake data", "text/plain"));
+        await SetFilesThroughDataTransfer(("intake-form.txt", "Intake data", "text/plain"));
 
         await Page.Locator("#upload-btn").ClickAsync();
 
