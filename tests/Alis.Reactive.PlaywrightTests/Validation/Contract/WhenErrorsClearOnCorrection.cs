@@ -6,11 +6,11 @@ namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 public class WhenErrorsClearOnCorrection : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Patterns/ComponentGather";
-    private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ComponentGatherModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ComponentGatherModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-json-btn");
-    private ILocator Input(string suffix) => Page.Locator($"#{R}{suffix}");
-    private ILocator ErrorFor(string suffix) => Page.Locator($"#{R}{suffix}_error");
+    private ILocator Input(string suffix) => Page.Locator($"#{ModelIdPrefix}{suffix}");
+    private ILocator ErrorFor(string suffix) => Page.Locator($"#{ModelIdPrefix}{suffix}_error");
 
     [Test]
     public async Task error_clears_when_user_types_valid_value()

@@ -6,12 +6,12 @@ namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
 public class WhenSpecializedRulesApply : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/SpecializedRules";
-    private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NewRuleTypesModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NewRuleTypesModel__";
 
     private ILocator ValidateBtn => Page.Locator("#validate-new-rules-btn");
     private ILocator Result => Page.Locator("#new-rules-result");
-    private ILocator Input(string prop) => Page.Locator($"#{R}{prop}");
-    private ILocator ErrorFor(string prop) => Page.Locator($"#{R}{prop}_error");
+    private ILocator Input(string prop) => Page.Locator($"#{ModelIdPrefix}{prop}");
+    private ILocator ErrorFor(string prop) => Page.Locator($"#{ModelIdPrefix}{prop}_error");
 
     [Test]
     public async Task when_billing_enters_invalid_card_number_error_shows()

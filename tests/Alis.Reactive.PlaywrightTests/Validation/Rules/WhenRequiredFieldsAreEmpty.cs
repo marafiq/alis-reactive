@@ -6,12 +6,12 @@ namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
 public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/AllRules";
-    private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ValidationShowcaseModel__";
 
     private ILocator AllRulesBtn => Page.Locator("#validate-all-btn");
     private ILocator AllRulesResult => Page.Locator("#all-rules-result");
-    private ILocator Input(string suffix) => Page.Locator($"#{R}{suffix}");
-    private ILocator ErrorFor(string suffix) => Page.Locator($"#{R}{suffix}_error");
+    private ILocator Input(string suffix) => Page.Locator($"#{ModelIdPrefix}{suffix}");
+    private ILocator ErrorFor(string suffix) => Page.Locator($"#{ModelIdPrefix}{suffix}_error");
 
     private ILocator ConditionalBtn => Page.Locator("#conditional-validate-btn");
     private ILocator ConditionalResult => Page.Locator("#conditional-result");

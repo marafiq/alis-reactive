@@ -4,9 +4,9 @@ namespace Alis.Reactive.PlaywrightTests.Validation.NestedBugs;
 public class WhenNewOperatorConditionsWork : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/NestedBugs/OperatorConditions";
-    private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Validation_NestedBugs_OperatorConditionModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Validation_NestedBugs_OperatorConditionModel__";
 
-    private ILocator Input(string field) => Page.Locator($"#{R}{field}");
+    private ILocator Input(string field) => Page.Locator($"#{ModelIdPrefix}{field}");
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator ErrorFor(string field) =>
         Page.Locator($"#op-form span[data-valmsg-for='{field}']");

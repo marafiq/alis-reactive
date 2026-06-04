@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/Contract/ServerPartial";
-    private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator SummaryDiv => Page.Locator("[data-reactive-validation-summary]");
@@ -13,7 +13,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     private ILocator ErrorFor(string fieldName) =>
         Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
 
-    private ILocator Input(string suffix) => Page.Locator($"#{R}{suffix}");
+    private ILocator Input(string suffix) => Page.Locator($"#{ModelIdPrefix}{suffix}");
 
     private async Task FillAllRequired()
     {

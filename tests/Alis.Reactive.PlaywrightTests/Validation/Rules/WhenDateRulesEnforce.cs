@@ -6,13 +6,13 @@ namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
 public class WhenDateRulesEnforce : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/DateRules";
-    private const string R = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DateValidationModel__";
+    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DateValidationModel__";
 
     private ILocator ValidateBtn => Page.Locator("#validate-dates-btn");
     private ILocator Result => Page.Locator("#date-result");
-    private ILocator ErrorFor(string suffix) => Page.Locator($"#{R}{suffix}_error");
+    private ILocator ErrorFor(string suffix) => Page.Locator($"#{ModelIdPrefix}{suffix}_error");
 
-    private DatePickerLocator DatePicker(string suffix) => new(Page, R + suffix);
+    private DatePickerLocator DatePicker(string suffix) => new(Page, ModelIdPrefix + suffix);
 
     [Test]
     public async Task empty_dates_show_required_errors_on_submit()
