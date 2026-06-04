@@ -6,7 +6,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public ResidentValidator()
         {
-            // Unconditional
             ClientRule(x => x.Name)
                 .Required("'Name' is required.")
                 .MinLength(2, "'Name' must have a minimum length of 2.");
@@ -56,10 +55,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
     }
 
-    /// <summary>
-    /// Scoped validator for the ServerPartial page — excludes MemoryAssessmentScore
-    /// and PhysicianName which are not rendered on that page.
-    /// </summary>
+    // ServerPartial omits rules for fields that page does not render.
     public class ServerPartialValidator : ReactiveValidator<ResidentModel>
     {
         public ServerPartialValidator()
@@ -101,11 +97,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
     }
 
-    /// <summary>
-    /// Scoped validator for AjaxPartial — parent fields + address.
-    /// Address fields are unenriched at boot (partial not loaded yet) → skipped.
-    /// After partial loads and merges components, enrichment activates address fields.
-    /// </summary>
+    // AjaxPartial keeps address validation wired across Active Plan partial enrichment.
     public class AjaxPartialValidator : ReactiveValidator<ResidentModel>
     {
         public AjaxPartialValidator()
@@ -121,10 +113,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .Required("'Confirm Email' is required.")
                 .EqualTo(x => x.Email, "'Confirm Email' must match 'Email'.");
 
-            // Address rules conditional on user selecting "Custom Address".
-            // When Facility Address or nothing selected → rules skipped.
-            // When Custom Address selected but partial not loaded → unenriched → summary.
-            // When Custom Address selected and partial loaded → enriched → inline.
+            // Custom Address reports summary errors until the partial loads address fields, then inline errors.
             WhenField(x => x.AddressType, "Custom Address", () =>
             {
                 ClientRule(x => x.Address, new ResidentAddressValidator());
