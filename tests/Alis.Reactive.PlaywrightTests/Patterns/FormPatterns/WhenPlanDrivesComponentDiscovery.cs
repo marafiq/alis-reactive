@@ -3,15 +3,7 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.FormPatterns;
 
-/// <summary>
-/// Strongly-typed plan-driven locators.
-///
-/// View:  Html.InputField(plan, m => m.Physician, ...)
-/// Test:  plan.AutoComplete(m => m.Physician)
-///
-/// Same expression. Same compile-time safety.
-/// Rename Physician → PrimaryPhysician: both break at build.
-/// </summary>
+// Model expressions are the join key between view components and test locators.
 [TestFixture]
 public class WhenPlanDrivesComponentDiscovery : PlaywrightTestBase
 {
@@ -31,7 +23,6 @@ public class WhenPlanDrivesComponentDiscovery : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Expression-based lookup — compile-time checked
         var physician = _plan.FindComponent(m => m.Physician);
         Assert.That(physician, Is.Not.Null);
         Assert.That(physician!.Vendor, Is.EqualTo("fusion"));
@@ -48,7 +39,6 @@ public class WhenPlanDrivesComponentDiscovery : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Same expression as the view: m => m.Physician
         var physician = _plan.AutoComplete(m => m.Physician);
 
         await Page.Locator("#show-popup-btn").ClickAsync();
