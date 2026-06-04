@@ -13,15 +13,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions
             return View("~/Areas/Sandbox/Views/Conditions/HttpMixing/Index.cshtml", new HttpMixingModel());
         }
 
-        // ── Section 1: POST echo — returns posted name ──
-
         [HttpPost("Save")]
         public IActionResult Save([FromBody] SaveRequest? request)
         {
             return Ok(new { receivedName = request?.Name ?? "", saved = true });
         }
-
-        // ── Section 2: POST audit — returns audit result ──
 
         [HttpPost("Audit")]
         public IActionResult Audit([FromBody] AuditRequest? request)
@@ -54,8 +50,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions
             });
         }
 
-        // ── Section 3: POST classify — returns tier based on count ──
-
         [HttpPost("Classify")]
         public IActionResult Classify([FromBody] ClassifyRequest? request)
         {
@@ -69,15 +63,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions
             return Ok(new { tier });
         }
 
-        // ── Section 4: POST that returns 400 — for OnError condition testing ──
-
         [HttpPost("FailValidation")]
         public IActionResult FailValidation()
         {
             return BadRequest(new { errorSummary = "Name is required" });
         }
-
-        // ── DTOs ──
 
         public class SaveRequest
         {

@@ -126,11 +126,9 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
 
         await Page.Locator("#s3-btn-all-false").ClickAsync();
 
-        // Commands always fire regardless of conditions
         await Expect(Page.Locator("#s3-header")).ToHaveTextAsync("start", new() { Timeout = 5000 });
         await Expect(Page.Locator("#s3-pre-badge")).ToBeHiddenAsync();
         await Expect(Page.Locator("#s3-loading")).ToHaveTextAsync("please wait");
-        // HTTP still fires
         await Expect(Page.Locator("#s3-http-result")).ToHaveTextAsync("Bob", new() { Timeout = 5000 });
         await Expect(Page.Locator("#s3-count")).ToBeHiddenAsync();
         await Expect(Page.Locator("#s3-footer")).ToHaveTextAsync("done");
@@ -163,7 +161,6 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
 
         await Expect(Page.Locator("#s4-status")).ToHaveTextAsync("saved", new() { Timeout = 5000 });
         await Expect(Page.Locator("#s4-inner-badge")).ToBeHiddenAsync();
-        // Commands after inner condition still fire
         await Expect(Page.Locator("#s4-timestamp")).ToHaveTextAsync("now");
         await Expect(Page.Locator("#s4-footer")).ToHaveTextAsync("done");
 
@@ -249,11 +246,9 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
         await Page.Locator("#s5-btn-enterprise").ClickAsync();
         await Expect(Page.Locator("#s5-client-tier")).ToHaveTextAsync("gold", new() { Timeout = 5000 });
 
-        // Switch to 75 — first branch (>100) fails, second (>50) matches
         await Page.Locator("#s5-btn-business").ClickAsync();
         await Expect(Page.Locator("#s5-client-tier")).ToHaveTextAsync("silver", new() { Timeout = 5000 });
 
-        // Switch back to 200 — confirms branch exclusivity is stable
         await Page.Locator("#s5-btn-enterprise").ClickAsync();
         await Expect(Page.Locator("#s5-client-tier")).ToHaveTextAsync("gold", new() { Timeout = 5000 });
 
