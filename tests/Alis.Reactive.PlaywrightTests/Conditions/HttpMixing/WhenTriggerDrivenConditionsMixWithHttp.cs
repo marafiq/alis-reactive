@@ -79,7 +79,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
         await Page.Locator("#s2-btn-inactive-zero").ClickAsync();
 
         await Expect(Page.Locator("#s2-active-status")).ToHaveTextAsync("inactive", new() { Timeout = 5000 });
-        // HTTP still fires regardless of conditions
+        // The HTTP segment is independent of the surrounding condition branches.
         await Expect(Page.Locator("#s2-audit-result")).ToHaveTextAsync("audited:login", new() { Timeout = 5000 });
         await Expect(Page.Locator("#s2-count-badge")).ToBeHiddenAsync();
 
@@ -242,7 +242,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // count=200 satisfies BOTH >100 AND >50 — only first branch fires
+        // First matching ElseIf branch wins even when later guards would also match.
         await Page.Locator("#s5-btn-enterprise").ClickAsync();
         await Expect(Page.Locator("#s5-client-tier")).ToHaveTextAsync("gold", new() { Timeout = 5000 });
 
@@ -293,7 +293,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
         await Page.Locator("#s6-btn-inactive-premium").ClickAsync();
 
         await Expect(Page.Locator("#s6-saved")).ToHaveTextAsync("Dave", new() { Timeout = 5000 });
-        // active=false → badge stays hidden (Then-only, no Else)
+        // Then-only conditions leave the previous/default state untouched when the guard fails.
         await Expect(Page.Locator("#s6-active-badge")).ToBeHiddenAsync();
         await Expect(Page.Locator("#s6-premium-label")).ToBeVisibleAsync();
         await Expect(Page.Locator("#s6-footer")).ToHaveTextAsync("complete");
@@ -309,7 +309,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
         await Page.Locator("#s7-btn-required").ClickAsync();
 
         await Expect(Page.Locator("#s7-error-msg")).ToHaveTextAsync("missing required fields", new() { Timeout = 5000 });
-        // OnSuccess route should not have fired
+        // Error routing must leave success-route mutations untouched.
         await Expect(Page.Locator("#s7-status")).ToHaveTextAsync("\u2014");
 
         AssertNoConsoleErrorsExcept("400");
