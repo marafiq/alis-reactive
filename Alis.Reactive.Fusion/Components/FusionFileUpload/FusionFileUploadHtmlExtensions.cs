@@ -22,7 +22,7 @@ namespace Alis.Reactive.Fusion.Components
         /// Renders a FusionFileUpload bound to the field's model property.
         /// </summary>
         /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
-        /// <typeparam name="TProp">The bound property type.</typeparam>
+        /// <typeparam name="TProp">The model value type represented by the file upload input.</typeparam>
         /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Callback to build the Uploader (allowed extensions, max size, etc.).</param>
         public static void FusionFileUpload<TModel, TProp>(
