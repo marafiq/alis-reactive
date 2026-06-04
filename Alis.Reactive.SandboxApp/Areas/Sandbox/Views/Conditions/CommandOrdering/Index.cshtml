@@ -8,15 +8,7 @@
 
     var plan = Html.ReactivePlan<CommandOrderingModel>();
 
-    // Bug reproduction: commands between two conditions must execute
-    // in declaration order — before condition, THEN condition, THEN after.
-    //
-    // Pipeline: SetText("before") → When(level).Eq("high").Then(SetText("conditional")) → SetText("after")
-    //
-    // If ordering is CORRECT: "proof" shows "after" (post-condition overwrites conditional)
-    // If ordering is BUGGY:   "proof" shows "conditional" (condition fires after "after" because
-    //                          "after" was bundled with "before" before the branch)
-
+    // Declaration order matters across condition boundaries; the final SetText must win.
     Html.On(plan, t => t.CustomEvent<CommandOrderingPayload>("ordering-test", (args, p) =>
     {
         p.Element("proof").SetText("before");
