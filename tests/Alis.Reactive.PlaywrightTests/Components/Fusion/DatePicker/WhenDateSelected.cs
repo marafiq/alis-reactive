@@ -14,7 +14,6 @@ public class WhenDateSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionDatePicker";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionDatePickerModel";
     private const string AdmissionDateId = GeneratedTypeScope + "__AdmissionDate";
     private const string DischargeDateId = GeneratedTypeScope + "__DischargeDate";

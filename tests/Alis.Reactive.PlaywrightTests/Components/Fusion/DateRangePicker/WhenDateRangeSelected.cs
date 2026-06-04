@@ -15,7 +15,6 @@ public class WhenDateRangeSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/DateRangePicker";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DateRangePickerModel";
     private const string StayStartId = GeneratedTypeScope + "__StayPeriod";
 

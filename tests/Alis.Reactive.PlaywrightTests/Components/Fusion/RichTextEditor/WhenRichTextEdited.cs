@@ -15,7 +15,6 @@ public class WhenRichTextEdited : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/RichTextEditor";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_RichTextEditorModel";
     private const string CarePlanId = GeneratedTypeScope + "__CarePlan";
 

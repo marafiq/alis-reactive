@@ -14,7 +14,6 @@ public class WhenTimeSelected : PlaywrightTestBase
 {
     private const string PagePath = "/Sandbox/Components/TimePicker";
 
-    // IdGenerator produces: {TypeScope}__{PropertyName}
     private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TimePickerModel";
     private const string MedicationTimeId = GeneratedTypeScope + "__MedicationTime";
     private const string WakeUpTimeId = GeneratedTypeScope + "__WakeUpTime";
