@@ -36,8 +36,6 @@ namespace Alis.Reactive.Fusion.AppLevel
         private static readonly ComponentMethod HideMethod =
             ComponentMethod.Named("hide");
 
-        // ── Fluent setters (all optional) ──
-
         public static ComponentRef<FusionToast, TModel> SetTitle<TModel>(
             this ComponentRef<FusionToast, TModel> self, string title)
             where TModel : class
@@ -63,8 +61,6 @@ namespace Alis.Reactive.Fusion.AppLevel
             where TModel : class
             => self.EmitSet(ShowProgressBarProperty, ValueExpression.Literal(true));
 
-        // ── Type convenience methods ──
-
         public static ComponentRef<FusionToast, TModel> Success<TModel>(
             this ComponentRef<FusionToast, TModel> self)
             where TModel : class
@@ -85,8 +81,6 @@ namespace Alis.Reactive.Fusion.AppLevel
             where TModel : class
             => self.EmitSet(CssClassProperty, ValueExpression.Literal("e-toast-info"));
 
-        // ── Actions ──
-
         public static ComponentRef<FusionToast, TModel> Show<TModel>(
             this ComponentRef<FusionToast, TModel> self)
             where TModel : class
@@ -97,8 +91,6 @@ namespace Alis.Reactive.Fusion.AppLevel
             this ComponentRef<FusionToast, TModel> self)
             where TModel : class
             => self.EmitCall(HideMethod);
-
-        // ── Layout renderer ──
 
         public static IHtmlContent FusionToast(this IHtmlHelper html)
         {
