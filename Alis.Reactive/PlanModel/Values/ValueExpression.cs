@@ -40,11 +40,7 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression Null() =>
             new LiteralExpression(null, Shape.None);
 
-        /// <summary>
-        /// Creates a literal with any JSON-serializable value.
-        /// System.Text.Json handles serialization at Render time.
-        /// No reflection. No type inspection. The serializer does the work.
-        /// </summary>
+        /// <summary>Stores a literal value without inspecting it; callers provide the plan shape explicitly.</summary>
         internal static ValueExpression LiteralRaw(object? value, Shape shape) =>
             new LiteralExpression(value, shape);
 
@@ -55,16 +51,17 @@ namespace Alis.Reactive.PlanModel
             return LiteralRaw(value, Shape.FromValue(value));
         }
 
-        /// <summary>Creates a ReadExpression that reads a URL query parameter by name.
-        /// Default shape is String because URL params are inherently strings.</summary>
+        /// <summary>Reads a URL query parameter; untyped URL reads default to string shape.</summary>
         internal static ValueExpression ReadUrl(string paramName) =>
             Read(UrlSource.Instance, paramName, Shape.String);
 
         internal static ValueExpression ReadUrl(string paramName, Shape shape) =>
             Read(UrlSource.Instance, paramName, shape);
 
-        /// <summary>Reads a member from a DOM element resolved via getElementById. The member path is
-        /// carried in the read so the runtime reaches it with RuntimePath — no contract needed.</summary>
+        /// <summary>
+        /// Reads a DOM member by element ID. The path is carried so <c>RuntimePath</c>
+        /// can traverse without a component contract.
+        /// </summary>
         internal static ValueExpression ReadDom(string elementId, string member, Shape shape) =>
             Read(DomSource.Of(elementId), member, Path.Parse(member), shape);
 
@@ -102,9 +99,10 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueExpression> args) =>
             new ReadExpression(ValueRead.Method(from, method, returns, args));
 
-        /// <summary>Invokes a method on the current array element (element scope), reusing the same
-        /// RuntimePath.call engine as component/plugin method reads. The path carries the receiver
-        /// traversal plus the method name, so the runtime walks to the owner before calling.</summary>
+        /// <summary>
+        /// Invokes a method on the current array element. The path carries receiver
+        /// traversal plus method name so <c>RuntimePath.call</c> binds the correct owner.
+        /// </summary>
         internal static ValueExpression InvokeElement(string receiverPath, string method, Shape returns, IReadOnlyList<ValueExpression> args)
         {
             var fullPath = string.IsNullOrEmpty(receiverPath) ? method : receiverPath + "." + method;
@@ -135,36 +133,31 @@ namespace Alis.Reactive.PlanModel
             return new ArrayExpression(arrayItems.Items, shape);
         }
 
-        /// <summary>Counts the elements produced by <paramref name="source"/> (a value of array shape).</summary>
         internal static ValueExpression ArrayCount(ValueExpression source, Shape itemShape) =>
             new ArrayOperationExpression("count", source, itemShape, Shape.Number);
 
-        /// <summary>Filters the elements of <paramref name="source"/> by a per-element sync predicate.</summary>
         internal static ValueExpression ArrayFilter(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
             new ArrayOperationExpression("filter", source, itemShape, Shape.ArrayOf(itemShape), predicate);
 
-        /// <summary>Projects each element through a per-element value expression.</summary>
         internal static ValueExpression ArrayMap(ValueExpression source, ValueExpression projection, Shape itemShape, Shape resultItemShape) =>
             new ArrayOperationExpression("map", source, itemShape, Shape.ArrayOf(resultItemShape), predicate: null, projection: projection);
 
-        /// <summary>Sums a numeric per-element projection (or the elements themselves when projection is null).</summary>
+        /// <summary>Sums a selector result, or the numeric elements themselves when projection is null.</summary>
         internal static ValueExpression ArraySum(ValueExpression source, ValueExpression? projection, Shape itemShape) =>
             new ArrayOperationExpression("sum", source, itemShape, Shape.Number, predicate: null, projection: projection);
 
-        /// <summary>True when any element matches the predicate (or the array is non-empty when predicate is null).</summary>
+        /// <summary>A null predicate means non-empty; otherwise this tests each element.</summary>
         internal static ValueExpression ArrayAny(ValueExpression source, ConditionGraph? predicate, Shape itemShape) =>
             new ArrayOperationExpression("any", source, itemShape, Shape.Boolean, predicate: predicate);
 
-        /// <summary>True when every element matches the predicate.</summary>
         internal static ValueExpression ArrayAll(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
             new ArrayOperationExpression("all", source, itemShape, Shape.Boolean, predicate: predicate);
 
-        /// <summary>Returns the first matching element (optionally projected), or null when none match.</summary>
+        /// <summary>Returns the first matching element or projection; runtime returns null when none match.</summary>
         internal static ValueExpression ArrayFind(
             ValueExpression source, ConditionGraph? predicate, ValueExpression? projection, Shape itemShape, Shape resultShape) =>
             new ArrayOperationExpression("find", source, itemShape, resultShape, predicate: predicate, projection: projection);
 
-        /// <summary>Orders elements by a per-element key projection (ascending or descending).</summary>
         internal static ValueExpression ArrayOrderBy(ValueExpression source, ValueExpression key, Shape itemShape, bool descending) =>
             new ArrayOperationExpression(
                 descending ? "orderByDescending" : "orderBy", source, itemShape, Shape.ArrayOf(itemShape), predicate: null, projection: key);
@@ -299,8 +292,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the kind. Always <c>"read"</c>.</summary>
         public string Kind => "read";
         /// <summary>
-        /// Gets the value source: <see cref="ComponentSource"/>, <see cref="PluginSource"/>,
-        /// <see cref="UrlSource"/>, or <see cref="PayloadSource"/>.
+        /// Gets the value source for this read, such as a component or payload scope.
         /// </summary>
         public Source From => _read.From;
         /// <summary>Gets the property or method name to read on the source.</summary>
@@ -465,7 +457,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Gets the kind. Always <c>"method"</c>.</summary>
         public override string Kind => "method";
 
-        /// <summary>Gets method arguments.</summary>
+        /// <summary>Gets the method argument expressions in call order.</summary>
         public IReadOnlyList<ValueExpression> Args => _args;
 
         private static IReadOnlyList<ValueExpression> OrderedArguments(IReadOnlyList<ValueExpression> items)
@@ -531,37 +523,39 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>A deterministic operation over the elements of an array-shaped value.</summary>
     /// <remarks>
-    /// One node, op sub-discriminator (mirrors <c>CompareCondition</c>). The runtime
-    /// iterates the source array — normalizing array-like or iterable runtime values at the
-    /// input boundary — and produces the declared output. Predicate and projection
-    /// operands are added by the ops that use them (filter/map/sum/find/...).
+    /// One node with an <c>Op</c> sub-discriminator. The runtime normalizes
+    /// array-like or iterable source values at the input boundary, then produces
+    /// the declared output. Predicate and projection are present only for
+    /// operations that need them.
     /// </remarks>
     public sealed class ArrayOperationExpression : ValueExpression
     {
         /// <summary>Gets the kind. Always <c>"array-op"</c>.</summary>
         public string Kind => "array-op";
-        /// <summary>Gets the operation: <c>count</c>, <c>filter</c> (and, as ops land, map/sum/...).</summary>
+        /// <summary>Gets the operation name, such as <c>count</c> or <c>filter</c>.</summary>
         public string Op { get; }
         /// <summary>Gets the value expression that produces the source array.</summary>
         public ValueExpression Source { get; }
-        /// <summary>Gets the per-element predicate for filtering ops, or null when the op takes no predicate.</summary>
+        /// <summary>Gets the per-element predicate, or null when the operation does not use one.</summary>
         /// <remarks>
-        /// Nullable by design: count/map carry no predicate while filter/any/all/find do. An
-        /// "always true" sentinel would conflate "no predicate" with "match all" and muddy count
-        /// semantics, so absence is modeled as null and omitted from the JSON. The predicate is the
-        /// SYNC condition subset (compare/all/any/not) — never a confirm — so per-element evaluation
-        /// stays on the immediate lane.
+        /// Nullable by design: count, map, sum, and ordering do not use a
+        /// predicate; any may omit it for non-empty checks; filter, all, and find
+        /// require one. Absence is modeled as null and omitted from JSON instead
+        /// of using an "always true" sentinel, because "no predicate" and
+        /// "match all" are different plan states. Predicates use the sync
+        /// condition subset, never confirm, so per-element evaluation stays on
+        /// the immediate lane.
         /// </remarks>
-        // audited null-ignore exception (see remarks): justified, do not "clean up".
+        // Null omission is part of the JSON contract; keep it aligned with the remarks.
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ConditionGraph? Predicate { get; }
-        /// <summary>Gets the per-element projection for map/sum/find/orderBy, or null when unused.</summary>
+        /// <summary>Gets the per-element projection, or null when the operation does not use one.</summary>
         /// <remarks>
-        /// Nullable by design (Rule 6): absent for count/filter/any/all; present for map (the
-        /// projected shape), sum/orderBy (the numeric/key selector), and find (optional field
-        /// fold). It is a value expression evaluated against the element scope.
+        /// Nullable by design: count, filter, any, and all omit projection; map,
+        /// sum, and ordering require a selector; find includes one only for field
+        /// projection. It is evaluated against the element scope.
         /// </remarks>
-        // audited null-ignore exception (see remarks): justified, do not "clean up".
+        // Null omission is part of the JSON contract; keep it aligned with the remarks.
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ValueExpression? Projection { get; }
         /// <summary>Gets the declared element shape of the source array.</summary>
