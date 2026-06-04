@@ -1,18 +1,12 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
-/// The array DSL over NATIVE DOM, end-to-end in the browser. A DOM element resolved by
-/// getElementById is a JS object; its classList (DOMTokenList) and children (HTMLCollection)
-/// are array-likes the runtime normalizes, so the closed array ops apply directly:
-///   p.FromDom("dom-card", "classList").Count()
-///   p.FromDom("dom-card", "classList").Where(x => x.StartsWith("risk-")).Count()
-///   p.FromDom("dom-list", "children").Count()
-///   p.FromDom("dom-card", "classList").Any(x => x == "care-memory")  -> guard
-/// and DOM mutation + recompute in one tick (AddClass then re-count).
-/// No plugin, no hand-written JS.
-///
-/// Page under test: /Sandbox/Components/DomOps. Isolated slice.
+/// Exercises array DSL operations over DOM array-like values.
 /// </summary>
+/// <remarks>
+/// DOM <c>classList</c> and <c>children</c> are normalized so <c>Count</c>,
+/// <c>Where</c>, etc. work without a plugin or hand-written JavaScript.
+/// </remarks>
 [TestFixture]
 public class WhenDomOpsTransformElements : PlaywrightTestBase
 {

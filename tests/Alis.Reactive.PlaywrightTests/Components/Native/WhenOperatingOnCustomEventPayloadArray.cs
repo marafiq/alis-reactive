@@ -1,14 +1,12 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
-/// The array DSL operating on a CUSTOM event payload, end-to-end in the browser. A button loads the
-/// alert roster, then dispatches the custom event <c>shift-report</c> whose payload carries
-/// ResidentAlert[]; the listener runs filter/aggregate/find/guard over the payload's element members
-/// (p.From(payload, x =&gt; x.Alerts)). Proves a developer-defined event payload array is fully operable.
-///
-/// Alerts: Maple(critical,9,unack), Birch(stable,2), Cedar(critical,7), Aspen(urgent,5), Oak(critical,4,unack).
-/// Page under test: /Sandbox/Components/ShiftReport. Isolated slice.
+/// Exercises array DSL operations over a developer-defined custom event payload.
 /// </summary>
+/// <remarks>
+/// The <c>shift-report</c> payload carries <c>ResidentAlert[]</c>, and
+/// <c>p.From(payload, x =&gt; x.Alerts)</c> drives filter, aggregate, find, and guard behavior.
+/// </remarks>
 [TestFixture]
 public class WhenOperatingOnCustomEventPayloadArray : PlaywrightTestBase
 {

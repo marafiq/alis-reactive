@@ -1,13 +1,8 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
 /// <summary>
-/// Multi-select ChipList as a filter, end-to-end in the browser. The chip selection is broadcast as
-/// a custom event whose payload carries getSelectedChips().data (the selected chip objects); the
-/// array DSL counts and guards them by member (p.From(payload, x => x.Selection.Data)), and the
-/// selected texts gather into a POST that filters the resident grid server-side.
-///
-/// Roster: Ada/Cy/Gus = Memory Care, Bo/Fay = Assisted, Di = Skilled Nursing, Ed = Independent (7).
-/// Page under test: /Sandbox/Components/ChipFilter. Isolated slice.
+/// Exercises a multi-select ChipList filter whose selected chip objects drive array DSL conditions
+/// and server-side resident grid filtering.
 /// </summary>
 [TestFixture]
 public class WhenFilteringWithChips : PlaywrightTestBase

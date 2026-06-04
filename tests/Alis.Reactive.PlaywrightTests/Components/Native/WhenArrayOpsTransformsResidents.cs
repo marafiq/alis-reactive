@@ -1,19 +1,11 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
-/// Complex array operations over an object array, end-to-end in the browser — a deterministic
-/// replacement for the ArrayManager plugin. On DomReady the plan loads a resident roster via HTTP
-/// then, in OnSuccess, operates on the array entirely in the closed DSL:
-///   residents.Count()                                                 -> total
-///   residents.Count(x => x.Status == "active")                        -> member predicate
-///   residents.Count(x => x.Status == "active" && x.Age >= 65)         -> compound predicate
-///   residents.Where(x => x.Status == "active").Sum(x => x.Age)        -> chained filter -> sum
-///   residents.Where(active).OrderByDescending(x => x.Age).Find(.., x => x.Name) -> filter/order/find/project
-///   residents.Any(x => x.Status == "critical")                        -> predicate guard
-/// No plugin, no hand-written JS.
-///
-/// Page under test: /Sandbox/Components/ArrayOps. Isolated slice.
+/// Exercises closed array DSL operations over an HTTP-loaded resident roster.
 /// </summary>
+/// <remarks>
+/// Examples include <c>Count</c>, <c>Where(...).Sum(...)</c>, etc.; no plugin or hand-written JavaScript.
+/// </remarks>
 [TestFixture]
 public class WhenArrayOpsTransformsResidents : PlaywrightTestBase
 {

@@ -1,15 +1,12 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
 /// <summary>
-/// The array DSL routed into a component data source, end-to-end in the browser. A roster loads
-/// once over HTTP, then a client-side ReactiveArray transform feeds the grid via
-/// SetDataSource(TypedSource&lt;T[]&gt;) — the same value-routing law that already binds When/SetText/
-/// gather, now reaching a component's dataSource member. Re-filtering reads the grid's own
-/// dataSource member (the read counterpart) and rebinds, with no HTTP round-trip.
-///
-/// Roster: Ada(active), Bo(discharged), Cy(active), Di(critical), Ed(active) — 5 rows, 3 active.
-/// Page under test: /Sandbox/Components/ArrayGrid. Isolated slice.
+/// Exercises array DSL values routed into a FusionGrid data source.
 /// </summary>
+/// <remarks>
+/// A roster loads once over HTTP, then client-side transforms feed <c>SetDataSource</c>.
+/// Re-filtering reads the grid's own <c>dataSource</c> member with no HTTP round trip.
+/// </remarks>
 [TestFixture]
 public class WhenBindingArrayToGrid : PlaywrightTestBase
 {
