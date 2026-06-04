@@ -5,10 +5,10 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Arrays
 {
     /// <summary>
-    /// A scalar value produced by an array operation (count, sum, any, find, ...). It is a
-    /// <see cref="TypedSource{TValue}"/>, so it plugs into the places that accept the base
-    /// <c>TypedSource&lt;T&gt;</c> — <c>SetText</c>, <c>When</c>, and dispatch payloads — with no new
-    /// overloads. (Gather intake is typed to component/plugin sources, not the base source.)
+    /// A scalar value produced by an array operation, such as <c>Count</c> or <c>Sum</c>.
+    /// It is a <see cref="TypedSource{TValue}"/>, so it can feed DSL members that read typed
+    /// sources, including <c>SetText</c>, <c>When</c>, and dispatch payloads.
+    /// Gather intake remains limited to component and plugin sources.
     /// </summary>
     public sealed class ReactiveValue<TValue> : TypedSource<TValue>
     {
