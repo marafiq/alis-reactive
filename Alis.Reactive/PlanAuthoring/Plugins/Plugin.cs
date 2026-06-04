@@ -7,8 +7,8 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// Declares a Reactive Plan plugin: a named runtime object the DSL does not model,
-    /// exposing typed readable properties, value-returning functions, and void
-    /// commands. A plugin is the intentional escape hatch for runtime behavior
+    /// exposing typed readable properties, value-returning functions, and commands
+    /// with no return value. A plugin is the intentional escape hatch for runtime behavior
     /// that does not need a first-class deterministic DSL primitive. Subclass it,
     /// name the plugin in the base constructor, and declare members in the body.
     /// </summary>
@@ -74,7 +74,7 @@ namespace Alis.Reactive
             Action<PluginArgumentTypes> arguments) =>
             Command(member).Args(arguments);
 
-        /// <summary>Declares the plugin root function as a command that returns no value.</summary>
+        /// <summary>Declares the plugin root command with no return value.</summary>
         protected PluginCommand Command()
         {
             var command = new PluginCommand(Name);

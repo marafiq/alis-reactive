@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Configures the methods and properties a Reactive Plan may use on a named plugin.
+    /// Configures the functions, properties, and commands a Reactive Plan may use on a named plugin.
     /// For example, <c>plan.RegisterPlugin("auth", p =&gt; p.Method&lt;string&gt;("getToken"))</c>.
     /// Use the argument builder when a plugin method has fixed argument types.
     /// </summary>
@@ -66,19 +66,19 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
-        /// <summary>Declares a plugin method command with no return value.</summary>
+        /// <summary>Declares a plugin command member with no return value.</summary>
         /// <param name="name">The registered plugin method name.</param>
         public PluginTypeBuilder Void(string name)
         {
             return AddVoid(name, MethodArgumentContract.Open);
         }
 
-        /// <summary>Alias for <c>Void(name)</c> using command vocabulary.</summary>
+        /// <summary>Declares a plugin command member with no return value.</summary>
         /// <param name="name">The registered plugin method name.</param>
         public PluginTypeBuilder Command(string name) =>
             Void(name);
 
-        /// <summary>Declares a plugin method command with an exact argument contract.</summary>
+        /// <summary>Declares a plugin command member with an exact argument contract.</summary>
         /// <param name="name">The registered plugin method name.</param>
         /// <param name="arguments">The ordered argument types accepted by the plugin method.</param>
         public PluginTypeBuilder Void(string name, Action<PluginArgumentTypes> arguments)
@@ -88,19 +88,19 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
-        /// <summary>Alias for <c>Void(name, arguments)</c> using command vocabulary.</summary>
+        /// <summary>Declares a plugin command member with an exact argument contract.</summary>
         /// <param name="name">The registered plugin method name.</param>
         /// <param name="arguments">The ordered argument types accepted by the plugin method.</param>
         public PluginTypeBuilder Command(string name, Action<PluginArgumentTypes> arguments) =>
             Void(name, arguments);
 
-        /// <summary>Declares the plugin root function as a void command.</summary>
+        /// <summary>Declares the plugin root command with no return value.</summary>
         public PluginTypeBuilder Void()
         {
             return AddVoid(PluginOperationId.Root(_pluginName), MethodArgumentContract.Open);
         }
 
-        /// <summary>Alias for <c>Void()</c> using command vocabulary.</summary>
+        /// <summary>Declares the plugin root command with no return value.</summary>
         public PluginTypeBuilder Command() =>
             Void();
 
@@ -113,7 +113,7 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
-        /// <summary>Alias for <c>Void(arguments)</c> using command vocabulary.</summary>
+        /// <summary>Declares the plugin root command with an exact argument contract.</summary>
         /// <param name="arguments">The ordered argument types accepted by the root command.</param>
         public PluginTypeBuilder Command(Action<PluginArgumentTypes> arguments) =>
             Void(arguments);
