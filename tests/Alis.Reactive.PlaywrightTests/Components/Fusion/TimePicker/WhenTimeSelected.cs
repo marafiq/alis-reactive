@@ -3,27 +3,27 @@ using Alis.Reactive.Playwright.Extensions;
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TimePicker;
 
 /// <summary>
-/// Exercises FusionTimePicker property writes, reads, events, conditions, and gather behavior.
+/// Proves <c>FusionTimePicker</c> property writes, reads, events, conditions, and gather behavior.
 /// </summary>
 /// <remarks>
-/// Syncfusion renders the visible input inside the wrapper that receives the generated component ID.
-/// Tests use TimePickerLocator where popup gestures are part of the behavior under test.
+/// Syncfusion renders the visible input inside the wrapper that receives the generated component ID;
+/// <c>TimePickerLocator</c> is used when popup gestures are part of the behavior under test.
 /// </remarks>
 [TestFixture]
 public class WhenTimeSelected : PlaywrightTestBase
 {
-    private const string Path = "/Sandbox/Components/TimePicker";
+    private const string PagePath = "/Sandbox/Components/TimePicker";
 
     // IdGenerator produces: {TypeScope}__{PropertyName}
-    private const string Scope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TimePickerModel";
-    private const string MedicationTimeId = Scope + "__MedicationTime";
-    private const string WakeUpTimeId = Scope + "__WakeUpTime";
+    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TimePickerModel";
+    private const string MedicationTimeId = GeneratedTypeScope + "__MedicationTime";
+    private const string WakeUpTimeId = GeneratedTypeScope + "__WakeUpTime";
 
     private TimePickerLocator MedicationTime => new(Page, MedicationTimeId);
 
     private async Task NavigateAndBoot()
     {
-        await NavigateToAndWaitForTextSignal(Path, "#value-echo");
+        await NavigateToAndWaitForTextSignal(PagePath, "#value-echo");
     }
 
     [Test]
@@ -94,10 +94,8 @@ public class WhenTimeSelected : PlaywrightTestBase
         var input = Page.Locator($"#{WakeUpTimeId}");
         await input.ClickAsync();
         await input.FillAsync("10:30 AM");
-        // Tab commits the Syncfusion time value and raises change.
         await input.PressAsync("Tab");
 
-        // When(args, x => x.Value).NotNull() -> Then branch
         await Expect(Page.Locator("#time-status"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Page.Locator("#time-status"))
@@ -125,7 +123,7 @@ public class WhenTimeSelected : PlaywrightTestBase
         var changeValue = Page.Locator("#change-value");
         var timeStatus = Page.Locator("#time-status");
 
-        // Repeated Tab commits prove the condition re-evaluates after later Syncfusion changes.
+        // Each Tab commits the filled value before the condition re-evaluates.
         await input.ClickAsync();
         await input.FillAsync("10:30 AM");
         await input.PressAsync("Tab");
