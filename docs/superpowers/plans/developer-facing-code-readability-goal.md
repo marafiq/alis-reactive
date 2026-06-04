@@ -404,6 +404,11 @@ Review cycle before every commit:
   visibility in a readability-only pass. A later API-visibility slice should
   verify external compatibility and whether the shared descriptor base should
   stay public or be removed from the public inheritance model.
+- TODO: `Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs`: public plugin
+  registration exposes synonym pairs (`Method`/`Function`, `Void`/`Command`) that
+  design notes already flag as a naming collision. Do not collapse them in this
+  readability pass; make it an explicit public API naming slice with source and
+  binary compatibility review.
 - TODO: `Alis.Reactive/PlanModel/BrowserObjects/*` still carries the
   historical `BrowserObject*` domain names because they are serialized/generated
   plan-contract terms. Do not rename them in readability cleanup. A later
