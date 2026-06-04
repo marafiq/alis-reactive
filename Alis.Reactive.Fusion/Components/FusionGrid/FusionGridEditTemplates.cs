@@ -81,22 +81,22 @@ namespace Alis.Reactive.Fusion.Components
         private static string BuildSelect(string fieldName, IEnumerable<(string Text, string Value)> options)
         {
             var encoder = HtmlEncoder.Default;
-            var sb = new StringBuilder();
-            sb.Append("<select name=\"")
+            var html = new StringBuilder();
+            html.Append("<select name=\"")
               .Append(encoder.Encode(fieldName))
               .Append("\" class=\"e-field e-input\" style=\"width:100%\">");
 
             foreach (var (text, value) in options)
             {
-                sb.Append("<option value=\"")
+                html.Append("<option value=\"")
                   .Append(encoder.Encode(value))
                   .Append("\">")
                   .Append(encoder.Encode(text))
                   .Append("</option>");
             }
 
-            sb.Append("</select>");
-            return sb.ToString();
+            html.Append("</select>");
+            return html.ToString();
         }
     }
 
@@ -142,25 +142,25 @@ namespace Alis.Reactive.Fusion.Components
         private static string BuildSelect(string name, IEnumerable<string> options)
         {
             var encoder = HtmlEncoder.Default;
-            var sb = new StringBuilder();
-            sb.Append("<select name=\"").Append(name).Append("\" class=\"e-field e-input\">");
+            var html = new StringBuilder();
+            html.Append("<select name=\"").Append(name).Append("\" class=\"e-field e-input\">");
             foreach (var option in options)
             {
                 if (string.IsNullOrEmpty(option)) continue;
                 var encoded = encoder.Encode(option);
-                sb.Append("<option value=\"").Append(encoded).Append("\">").Append(encoded).Append("</option>");
+                html.Append("<option value=\"").Append(encoded).Append("\">").Append(encoded).Append("</option>");
             }
-            sb.Append("</select>");
-            return sb.ToString();
+            html.Append("</select>");
+            return html.ToString();
         }
 
         internal string Render()
         {
-            var sb = new StringBuilder();
-            sb.Append("<div class=\"grid grid-cols-1 gap-3 p-2 text-sm\">");
-            foreach (var field in _fields) sb.Append(field);
-            sb.Append("</div>");
-            return sb.ToString();
+            var html = new StringBuilder();
+            html.Append("<div class=\"grid grid-cols-1 gap-3 p-2 text-sm\">");
+            foreach (var field in _fields) html.Append(field);
+            html.Append("</div>");
+            return html.ToString();
         }
     }
 }
