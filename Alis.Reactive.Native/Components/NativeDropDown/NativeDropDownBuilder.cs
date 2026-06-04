@@ -44,7 +44,7 @@ namespace Alis.Reactive.Native.Components
         private bool _enabled = true;
         private string? _cssClass;
 
-        // Keep internal: the factory also registers this input component in the Reactive Plan.
+        // Internal because the factory also registers this input component in the Reactive Plan.
         internal NativeDropDownBuilder(
 #if NET48
             HtmlHelper<TModel> html,
@@ -120,15 +120,15 @@ namespace Alis.Reactive.Native.Components
         /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
-            var attrs = new Dictionary<string, object> { ["id"] = _elementId };
-            if (!_enabled) attrs["disabled"] = "disabled";
-            if (_cssClass != null) attrs["class"] = _cssClass;
+            var selectAttributes = new Dictionary<string, object> { ["id"] = _elementId };
+            if (!_enabled) selectAttributes["disabled"] = "disabled";
+            if (_cssClass != null) selectAttributes["class"] = _cssClass;
 
             var result = _html.DropDownListFor(
                 _expression,
                 _items ?? Enumerable.Empty<SelectListItem>(),
                 _placeholder,
-                attrs);
+                selectAttributes);
 #if NET48
             writer.Write(result.ToHtmlString());
 #else
