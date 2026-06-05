@@ -23,7 +23,7 @@ namespace Alis.Reactive
             _name = PluginName.Of(name);
         }
 
-        /// <summary>Gets the plugin name used by the runtime.</summary>
+        /// <summary>Plugin registration name resolved by the runtime.</summary>
         public string Name => _name.Value;
 
         /// <summary>Declares a plugin function that returns a value.</summary>
@@ -174,10 +174,10 @@ namespace Alis.Reactive
             _returns = returns ?? throw new ArgumentNullException(nameof(returns));
         }
 
-        /// <summary>Gets the plugin registration name.</summary>
+        /// <summary>Plugin registration name resolved by the runtime.</summary>
         public string PluginName => _pluginName.Value;
 
-        /// <summary>Gets the declared plugin target name; root functions and commands report <c>root</c>.</summary>
+        /// <summary>Declared plugin target name; root functions and commands report <c>root</c>.</summary>
         public string Member => _operation.TargetLabel;
 
         internal PluginOperationId OperationId => _operation;
@@ -225,10 +225,10 @@ namespace Alis.Reactive
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
-        /// <summary>Gets the plugin registration name.</summary>
+        /// <summary>Plugin registration name resolved by the runtime.</summary>
         public string PluginName => _property.PluginNameValue;
 
-        /// <summary>Gets the readable plugin property name.</summary>
+        /// <summary>Readable plugin property name declared in the plan contract.</summary>
         public string Member => _property.PlanMemberNameValue;
 
         internal PluginPropertyId PropertyId => _property;

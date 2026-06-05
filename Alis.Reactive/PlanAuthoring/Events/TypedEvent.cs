@@ -11,10 +11,10 @@ namespace Alis.Reactive
     /// <typeparam name="TArgs">The event payload contract exposed to the reaction pipeline.</typeparam>
     public sealed class TypedEvent<TArgs>
     {
-        /// <summary>Gets the component-object event name written into the Reactive Plan.</summary>
+        /// <summary>Component-object event name written into the Reactive Plan.</summary>
         public string ObjectEvent { get; }
 
-        /// <summary>Gets the typed payload placeholder used to author event-argument reads.</summary>
+        /// <summary>Typed payload placeholder used to author event-argument reads.</summary>
         public TArgs Args { get; }
 
         internal TypedEvent(string jsEvent, TArgs args)

@@ -40,9 +40,9 @@ namespace Alis.Reactive
             _context = new PlanBuildContext(planIdentity, _registeredInputComponents);
         }
 
-        /// <summary>Gets the unique plan identifier, derived from the model type's full name.</summary>
+        /// <summary>Unique plan identifier derived from the model type's full name.</summary>
         public string PlanId => _planId.Value;
-        /// <summary>Gets whether this plan represents a partial view that merges into a parent plan.</summary>
+        /// <summary>Whether this plan represents a partial view that merges into a parent plan.</summary>
         public bool IsPartial => _scope.IsPartial;
         internal bool RendersValidationSummary => _scope.RendersValidationSummary;
         internal IReadOnlyDictionary<string, ComponentRegistration> RegisteredInputComponents =>
