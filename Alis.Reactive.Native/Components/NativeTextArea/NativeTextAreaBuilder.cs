@@ -66,7 +66,7 @@ namespace Alis.Reactive.Native.Components
         internal string BindingPath => _bindingPath;
 
         /// <summary>
-        /// Sets the visible row count. Defaults to 4.
+        /// Controls the visible row count. Defaults to 4.
         /// </summary>
         /// <param name="rows">Number of visible text rows.</param>
         public NativeTextAreaBuilder<TModel, TProp> Rows(int rows)
@@ -76,7 +76,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Adds CSS classes to the textarea element.
+        /// Replaces the CSS classes on the textarea element.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
         public NativeTextAreaBuilder<TModel, TProp> CssClass(string css)
@@ -86,7 +86,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets the placeholder text shown when the textarea is empty.
+        /// Replaces the placeholder text shown when the textarea is empty.
         /// </summary>
         /// <param name="placeholder">The placeholder text.</param>
         public NativeTextAreaBuilder<TModel, TProp> Placeholder(string placeholder)

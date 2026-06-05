@@ -19,7 +19,7 @@ namespace Alis.Reactive.Native.Components
             ComponentMethod.Named("focus");
 
         /// <summary>
-        /// Sets the textarea value through the component contract.
+        /// Writes the textarea value through the component contract.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <param name="self">The textarea component reference.</param>
