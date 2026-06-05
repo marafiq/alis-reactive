@@ -4,10 +4,9 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Typed reference to a component instance on the page.
-    /// Returned by p.Component&lt;T&gt;(). Vendor-specific extensions add
-    /// mutation methods such as <c>SetValue</c> or <c>Focus</c> that emit
-    /// Set/Call reactions on the component's source.
+    /// Authoring handle for a plan-registered component target. Native and Fusion
+    /// extension methods consume it to declare component property sets, method calls,
+    /// and value reads in the Reactive Plan.
     /// </summary>
     public class ComponentRef<TComponent, TModel>
         where TComponent : IComponent, new()
