@@ -8,10 +8,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionAutoCompleteChangeArgs
     {
-        /// <summary>Gets or sets the selected value.</summary>
+        /// <summary>Selected value.</summary>
         public string? Value { get; set; }
 
-        /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
+        /// <summary>Whether user interaction triggered the change.</summary>
         public bool IsInteracted { get; set; }
     }
 }
