@@ -1118,10 +1118,10 @@ namespace Alis.Reactive.PlanModel
             {
                 writer.Line("export type " + aliasName + " =");
                 writer.Indent();
-                for (var i = 0; i < _members.Count; i++)
+                for (var memberIndex = 0; memberIndex < _members.Count; memberIndex++)
                 {
-                    var suffix = i == _members.Count - 1 ? ";" : string.Empty;
-                    writer.Line("| " + _members[i] + suffix);
+                    var suffix = memberIndex == _members.Count - 1 ? ";" : string.Empty;
+                    writer.Line("| " + _members[memberIndex] + suffix);
                 }
                 writer.Outdent();
             }
@@ -1148,7 +1148,7 @@ namespace Alis.Reactive.PlanModel
 
         internal void Line(string text)
         {
-            for (var i = 0; i < _indent; i++)
+            for (var indentLevel = 0; indentLevel < _indent; indentLevel++)
                 _content.Append("  ");
 
             _content.AppendLine(text);

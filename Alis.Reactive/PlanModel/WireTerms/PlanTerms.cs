@@ -175,9 +175,9 @@ namespace Alis.Reactive.PlanModel
 
         private static bool HasWhitespace(string value)
         {
-            for (var i = 0; i < value.Length; i++)
+            for (var characterIndex = 0; characterIndex < value.Length; characterIndex++)
             {
-                if (char.IsWhiteSpace(value[i])) return true;
+                if (char.IsWhiteSpace(value[characterIndex])) return true;
             }
 
             return false;
