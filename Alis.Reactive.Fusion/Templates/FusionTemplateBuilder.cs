@@ -23,8 +23,8 @@ namespace Alis.Reactive.Fusion.Templates
     /// <remarks>
     /// The rendered string is consumed by Syncfusion's template engine. It is not a
     /// Reactive Plan, and it does not mutate live DOM until Syncfusion renders it.
-    /// Caller-provided literal text, attributes, CSS classes, URLs, and raw HTML are
-    /// emitted as supplied.
+    /// Caller-provided literal text, attributes, CSS classes, URLs, inline JavaScript,
+    /// and raw HTML are emitted as supplied; use trusted developer-authored values.
     /// </remarks>
     /// <typeparam name="TModel">The object shape exposed by the Syncfusion template context.</typeparam>
     public class FusionTemplateBuilder<TModel>
@@ -76,7 +76,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds literal text to the template output.
         /// </summary>
-        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionTemplateBuilder<TModel> Text(string text)
         {
             _childRenderers.Add(() => text);
@@ -104,14 +103,12 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a <c>span</c> with literal text.
         /// </summary>
-        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionTemplateBuilder<TModel> Span(string text) =>
             Span(text, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled <c>span</c> with literal text.
         /// </summary>
-        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionTemplateBuilder<TModel> Span(string text, string css) =>
             Span(text, TemplateCss.Class(css));
 
@@ -171,7 +168,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a badge with literal text.
         /// </summary>
-        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionTemplateBuilder<TModel> Badge(string text, string css = "e-badge")
         {
             _childRenderers.Add(() => TemplateElements.Badge(text, css));
