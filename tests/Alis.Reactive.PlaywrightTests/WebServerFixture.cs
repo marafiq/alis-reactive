@@ -11,6 +11,8 @@ namespace Alis.Reactive.PlaywrightTests;
 public class WebServerFixture
 {
     private const int CapturedServerOutputLines = 200;
+    private const int SandboxReadinessAttempts = 60;
+    private const int SandboxReadinessDelayMs = 500;
     private static Process? _server;
     private static readonly string[] RequiredBootAssets =
     [
@@ -105,7 +107,7 @@ public class WebServerFixture
 
     private static async Task<bool> WaitForSandboxReadiness(HttpClient http, ServerOutputBuffer output)
     {
-        for (var i = 0; i < 60; i++)
+        for (var readinessAttempt = 0; readinessAttempt < SandboxReadinessAttempts; readinessAttempt++)
         {
             if (_server is { HasExited: true })
                 throw new Exception(
@@ -114,7 +116,7 @@ public class WebServerFixture
             if (await AllBootAssetsRespond(http))
                 return true;
 
-            await Task.Delay(500);
+            await Task.Delay(SandboxReadinessDelayMs);
         }
 
         return false;
