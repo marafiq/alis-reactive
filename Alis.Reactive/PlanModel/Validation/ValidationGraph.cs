@@ -135,17 +135,18 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>Validation rules for a single component within a container scope.
-    /// The Value expression reads the component's current value via the shared evaluateValue path.</summary>
+    /// <summary>
+    /// Validation rules and value source for one component within a validation container.
+    /// </summary>
     internal sealed class ComponentValidation
     {
         private readonly ComponentId _component;
         private readonly ValidationFieldPath _serverFieldName;
         private readonly ComponentValidationRules _rules;
 
-        /// <summary>Component ID — used for DOM error display and serverFieldName mapping.</summary>
+        /// <summary>Component ID used for DOM error display and server field matching.</summary>
         public string Component => _component.Value;
-        /// <summary>How to read this component's value for validation. Evaluated via evaluateValue().</summary>
+        /// <summary>Value expression evaluated before client validation runs.</summary>
         public ValueExpression Value { get; }
         public IReadOnlyList<ValidationRuleNode> Rules => _rules.ForJson;
 

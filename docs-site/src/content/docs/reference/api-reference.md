@@ -946,13 +946,12 @@ Kind { get; }  // Gets the kind. Always `"component"`.
 
 ### ComponentValidation
 
-Validation rules for a single component within a container scope.
-            The Value expression reads the component's current value via the shared evaluateValue path.
+Validation rules and value source for one component within a validation container.
 
 ```csharp
 // Properties
-Component { get; }  // Component ID — used for DOM error display and serverFieldName mapping.
-Value { get; }  // How to read this component's value for validation. Evaluated via evaluateValue().
+Component { get; }  // Component ID used for DOM error display and server field matching.
+Value { get; }  // Value expression evaluated before client validation runs.
 ```
 
 ### ConditionGraph
