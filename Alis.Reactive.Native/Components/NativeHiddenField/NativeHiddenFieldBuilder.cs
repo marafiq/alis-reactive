@@ -75,11 +75,11 @@ namespace Alis.Reactive.Native.Components
                 ["id"] = _elementId
             };
 
-            var result = _html.HiddenFor(_expression, hiddenInputAttributes);
+            var hiddenInputHtml = _html.HiddenFor(_expression, hiddenInputAttributes);
 #if NET48
-            writer.Write(result.ToHtmlString());
+            writer.Write(hiddenInputHtml.ToHtmlString());
 #else
-            result.WriteTo(writer, HtmlEncoder.Default);
+            hiddenInputHtml.WriteTo(writer, HtmlEncoder.Default);
 #endif
         }
     }

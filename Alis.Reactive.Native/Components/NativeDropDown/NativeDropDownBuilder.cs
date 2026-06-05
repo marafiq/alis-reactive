@@ -124,15 +124,15 @@ namespace Alis.Reactive.Native.Components
             if (!_enabled) selectAttributes["disabled"] = "disabled";
             if (_cssClass != null) selectAttributes["class"] = _cssClass;
 
-            var result = _html.DropDownListFor(
+            var dropdownHtml = _html.DropDownListFor(
                 _expression,
                 _items ?? Enumerable.Empty<SelectListItem>(),
                 _placeholder,
                 selectAttributes);
 #if NET48
-            writer.Write(result.ToHtmlString());
+            writer.Write(dropdownHtml.ToHtmlString());
 #else
-            result.WriteTo(writer, HtmlEncoder.Default);
+            dropdownHtml.WriteTo(writer, HtmlEncoder.Default);
 #endif
         }
     }

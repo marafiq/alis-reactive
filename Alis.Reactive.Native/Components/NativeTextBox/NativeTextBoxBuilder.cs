@@ -119,11 +119,11 @@ namespace Alis.Reactive.Native.Components
             if (_cssClass != null) inputAttributes["class"] = _cssClass;
             if (_placeholder != null) inputAttributes["placeholder"] = _placeholder;
 
-            var result = _html.TextBoxFor(_expression, inputAttributes);
+            var textBoxHtml = _html.TextBoxFor(_expression, inputAttributes);
 #if NET48
-            writer.Write(result.ToHtmlString());
+            writer.Write(textBoxHtml.ToHtmlString());
 #else
-            result.WriteTo(writer, HtmlEncoder.Default);
+            textBoxHtml.WriteTo(writer, HtmlEncoder.Default);
 #endif
         }
     }

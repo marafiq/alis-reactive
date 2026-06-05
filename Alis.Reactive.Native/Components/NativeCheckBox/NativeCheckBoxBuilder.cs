@@ -93,11 +93,11 @@ namespace Alis.Reactive.Native.Components
             };
             if (_cssClass != null) checkboxAttributes["class"] = _cssClass;
 
-            var result = _html.CheckBoxFor(_expression, checkboxAttributes);
+            var checkboxHtml = _html.CheckBoxFor(_expression, checkboxAttributes);
 #if NET48
-            writer.Write(result.ToHtmlString());
+            writer.Write(checkboxHtml.ToHtmlString());
 #else
-            result.WriteTo(writer, HtmlEncoder.Default);
+            checkboxHtml.WriteTo(writer, HtmlEncoder.Default);
 #endif
         }
     }

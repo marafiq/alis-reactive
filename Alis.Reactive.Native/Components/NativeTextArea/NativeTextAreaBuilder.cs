@@ -118,11 +118,11 @@ namespace Alis.Reactive.Native.Components
             if (_cssClass != null) textAreaAttributes["class"] = _cssClass;
             if (_placeholder != null) textAreaAttributes["placeholder"] = _placeholder;
 
-            var result = _html.TextAreaFor(_expression, textAreaAttributes);
+            var textAreaHtml = _html.TextAreaFor(_expression, textAreaAttributes);
 #if NET48
-            writer.Write(result.ToHtmlString());
+            writer.Write(textAreaHtml.ToHtmlString());
 #else
-            result.WriteTo(writer, HtmlEncoder.Default);
+            textAreaHtml.WriteTo(writer, HtmlEncoder.Default);
 #endif
         }
     }
