@@ -9,29 +9,23 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.Extensions
 {
     /// <summary>
-    /// Razor view extensions that open and close every reactive view: create the
-    /// <see cref="ReactivePlan{TModel}"/> at the top, render it at the bottom.
+    /// Razor view extensions for creating, resolving, and rendering Reactive Plans.
     /// </summary>
     /// <remarks>
-    /// Every view must call <see cref="ReactivePlan{TModel}(IHtmlHelper{TModel})"/> at the start of the view and
-    /// <see cref="RenderPlan{TModel}"/> at the end of the view. Partial views that share the same
-    /// model and need to merge into the same Reactive Plan use
-    /// <see cref="ResolvePlan{TModel}(IHtmlHelper{TModel})"/> instead.
-    /// If a partial has its own independent model, treat it as
-    /// its own view with <c>ReactivePlan</c> and <c>RenderPlan</c>.
-    /// Omitting either call produces no reactive behavior.
+    /// A root view calls <c>ReactivePlan</c> before authoring behavior and
+    /// <see cref="RenderPlan{TModel}"/> after all behavior has been declared. A partial view that
+    /// contributes to the same Reactive Plan uses <c>ResolvePlan</c> instead. Omitting the render call
+    /// leaves no plan JSON for the runtime to execute.
     /// </remarks>
     public static class PlanExtensions
     {
         /// <summary>
-        /// Creates a <see cref="ReactivePlan{TModel}"/> for a view.
+        /// Starts the <see cref="ReactivePlan{TModel}"/> for a root Razor view.
         /// </summary>
         /// <remarks>
-        /// This is the first call in a view. The returned plan is passed to
-        /// <see cref="HtmlExtensions.On{TModel}"/> to define behavior and to
-        /// <see cref="RenderPlan{TModel}"/> to render the generated plan JSON.
-        /// Partial views that share the same <typeparamref name="TModel"/> use
-        /// <see cref="ResolvePlan{TModel}"/> instead.
+        /// Call this once near the top of a root view, pass the result to
+        /// <see cref="HtmlExtensions.On{TModel}"/> while authoring behavior, then pass the same plan to
+        /// <see cref="RenderPlan{TModel}"/> at the end of the view.
         /// </remarks>
         /// <typeparam name="TModel">The view model type, providing compile-time expression paths.</typeparam>
         /// <returns>A new plan instance scoped to this view.</returns>
@@ -46,18 +40,17 @@ namespace Alis.Reactive.Native.Extensions
 #endif
 
         /// <summary>
-        /// Creates a <see cref="ReactivePlan{TModel}"/> for a partial view that merges
-        /// into an existing Reactive Plan.
+        /// Starts a partial-view <see cref="ReactivePlan{TModel}"/> that merges into the owning view's plan.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Partials follow the same create-at-top, render-at-bottom pattern as views:
-        /// call <c>ResolvePlan</c> at the top and <see cref="RenderPlan{TModel}"/> at the bottom.
-        /// Both calls are required for the partial's reactive behavior to work.
+        /// Call <c>ResolvePlan</c> at the top of a partial and <see cref="RenderPlan{TModel}"/> at the
+        /// bottom. The rendered partial contributes plan JSON without emitting its own validation
+        /// summary container.
         /// </para>
         /// <para>
-        /// The returned plan's behaviors merge with the owning view's plan and run
-        /// as a single runtime plan.
+        /// The returned plan's behaviors merge with the owning view's plan and run through the same
+        /// Active Plan state.
         /// </para>
         /// </remarks>
         /// <typeparam name="TModel">The view model type must match the view's model.</typeparam>
@@ -72,8 +65,6 @@ namespace Alis.Reactive.Native.Extensions
             CreatePlan(html, ReactivePlanScope.PartialView);
 #endif
 
-        // Shared plan creation for ReactivePlan (root view) and ResolvePlan (partial
-        // view): the public methods differ only by the scope they pass here.
 #if NET48
         // net48 / System.Web has no per-request IServiceProvider, so the plan is
         // created with services: null. Validation metadata is resolved at render
@@ -98,8 +89,8 @@ namespace Alis.Reactive.Native.Extensions
         /// </remarks>
         /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
         /// <param name="html">The Razor HTML helper.</param>
-        /// <param name="plan">The plan to render.</param>
-        /// <returns>HTML content that makes the plan available to the runtime when the page loads.</returns>
+        /// <param name="plan">The Reactive Plan whose generated JSON should be embedded.</param>
+        /// <returns>HTML content containing the plan JSON consumed by the runtime.</returns>
 #if NET48
         public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html,
             ReactivePlan<TModel> plan) where TModel : class
@@ -145,17 +136,8 @@ namespace Alis.Reactive.Native.Extensions
 #endif
     }
 
-    /// <summary>
-    /// Computes the DOM element id for a plan's rendered script element from its plan id.
-    /// </summary>
     internal static class PlanElementId
     {
-        /// <summary>
-        /// Sanitizes <paramref name="planId"/> into a DOM element id by replacing the
-        /// dot and plus characters with a hyphen.
-        /// </summary>
-        /// <param name="planId">The plan id to sanitize.</param>
-        /// <returns>The sanitized element id.</returns>
         public static string For(string planId) =>
             planId.Replace('.', '-').Replace('+', '-');
     }
