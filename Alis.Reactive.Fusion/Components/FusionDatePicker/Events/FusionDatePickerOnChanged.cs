@@ -10,10 +10,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionDatePickerChangeArgs
     {
-        /// <summary>Gets or sets the new date value.</summary>
+        /// <summary>New date value.</summary>
         public DateTime? Value { get; set; }
 
-        /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
+        /// <summary>Whether user interaction triggered the change.</summary>
         public bool IsInteracted { get; set; }
     }
 }
