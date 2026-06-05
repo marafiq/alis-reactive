@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionBreadcrumbItemClickArgs
     {
-        /// <summary>Gets or sets the clicked item metadata from the Syncfusion event.</summary>
+        /// <summary>Clicked item metadata from the Syncfusion event.</summary>
         public FusionBreadcrumbItem Item { get; set; } = new FusionBreadcrumbItem();
     }
 
@@ -14,19 +14,19 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionBreadcrumbItem
     {
-        /// <summary>Gets or sets the clicked item's text.</summary>
+        /// <summary>Clicked item's text.</summary>
         public string Text { get; set; } = string.Empty;
 
-        /// <summary>Gets or sets the clicked item's id.</summary>
+        /// <summary>Clicked item's id.</summary>
         public string Id { get; set; } = string.Empty;
 
-        /// <summary>Gets or sets the clicked item's URL.</summary>
+        /// <summary>Clicked item's URL.</summary>
         public string Url { get; set; } = string.Empty;
 
-        /// <summary>Gets or sets the clicked item's icon CSS classes.</summary>
+        /// <summary>Clicked item's icon CSS classes.</summary>
         public string? IconCss { get; set; }
 
-        /// <summary>Gets or sets whether the clicked item is disabled.</summary>
+        /// <summary>Whether the clicked item is disabled.</summary>
         public bool Disabled { get; set; }
     }
 }
