@@ -219,8 +219,8 @@ namespace Alis.Reactive.PlanModel
                         "Use dot-separated property names without consecutive, leading, or trailing dots.",
                         nameof(dotPath));
 
-                if (int.TryParse(part, NumberStyles.Integer, CultureInfo.InvariantCulture, out var idx))
-                    segments.Add(PathSegment.AtIndex(idx));
+                if (int.TryParse(part, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedIndex))
+                    segments.Add(PathSegment.AtIndex(parsedIndex));
                 else
                     segments.Add(PathSegment.Property(part));
             }
@@ -234,9 +234,9 @@ namespace Alis.Reactive.PlanModel
             if (ReferenceEquals(this, other)) return true;
             if (Segments.Count != other.Segments.Count) return false;
 
-            for (var i = 0; i < Segments.Count; i++)
+            for (var segmentIndex = 0; segmentIndex < Segments.Count; segmentIndex++)
             {
-                if (!Segments[i].Equals(other.Segments[i])) return false;
+                if (!Segments[segmentIndex].Equals(other.Segments[segmentIndex])) return false;
             }
 
             return true;
@@ -252,9 +252,9 @@ namespace Alis.Reactive.PlanModel
         {
             if (Segments.Count > other.Segments.Count) return false;
 
-            for (var i = 0; i < Segments.Count; i++)
+            for (var segmentIndex = 0; segmentIndex < Segments.Count; segmentIndex++)
             {
-                if (!Segments[i].Equals(other.Segments[i])) return false;
+                if (!Segments[segmentIndex].Equals(other.Segments[segmentIndex])) return false;
             }
 
             return true;
