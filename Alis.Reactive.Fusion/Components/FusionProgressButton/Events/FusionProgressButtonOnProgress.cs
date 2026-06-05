@@ -5,13 +5,13 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionProgressButtonProgressArgs
     {
-        /// <summary>Gets or sets the current progress percentage.</summary>
+        /// <summary>Current progress percentage.</summary>
         public double Percent { get; set; }
 
-        /// <summary>Gets or sets the current progress duration in milliseconds.</summary>
+        /// <summary>Current progress duration in milliseconds.</summary>
         public double CurrentDuration { get; set; }
 
-        /// <summary>Gets or sets the progress step interval.</summary>
+        /// <summary>Progress step interval.</summary>
         public double Step { get; set; }
     }
 }

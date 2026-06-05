@@ -8,10 +8,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionFileUploadSelectedArgs
     {
-        /// <summary>Gets or sets the number of files selected.</summary>
+        /// <summary>Number of files selected.</summary>
         public int FilesCount { get; set; }
 
-        /// <summary>Gets or sets whether the selection was triggered by user interaction.</summary>
+        /// <summary>Whether user interaction triggered the selection.</summary>
         public bool IsInteracted { get; set; }
     }
 }
