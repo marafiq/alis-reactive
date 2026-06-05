@@ -26,10 +26,10 @@ namespace Alis.Reactive.Builders.Conditions
             _cases = cases;
         }
 
-        /// <summary>Starts an ordered <c>ElseIf</c> branch from the current event payload.</summary>
+        /// <summary>Adds the next ordered <c>ElseIf</c> branch from the current event payload.</summary>
         /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <typeparam name="TProp">The selected payload value type.</typeparam>
-        /// <param name="payload">The typed event payload placeholder supplied by the trigger callback.</param>
+        /// <param name="payload">The event payload placeholder supplied by the trigger callback.</param>
         /// <param name="path">Selects the payload value to compare at runtime.</param>
         /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> ElseIf<TPayload, TProp>(
@@ -42,16 +42,16 @@ namespace Alis.Reactive.Builders.Conditions
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
-        /// <summary>Starts an ordered <c>ElseIf</c> branch from the current HTTP response body.</summary>
-        /// <typeparam name="TPayload">The response body contract for the active response route.</typeparam>
+        /// <summary>Adds the next ordered <c>ElseIf</c> branch from the active HTTP response body.</summary>
+        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">The selected response value type.</typeparam>
         /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
         /// <returns>A builder for choosing the guard comparison.</returns>
-        public ConditionSourceBuilder<TModel, TProp> ElseIf<TPayload, TProp>(
-            ResponseBody<TPayload> responseBody,
-            Expression<Func<TPayload, TProp>> path)
-            where TPayload : class
+        public ConditionSourceBuilder<TModel, TProp> ElseIf<TResponse, TProp>(
+            ResponseBody<TResponse> responseBody,
+            Expression<Func<TResponse, TProp>> path)
+            where TResponse : class
         {
             EnsureElseIfCanBeAdded();
 
@@ -59,7 +59,7 @@ namespace Alis.Reactive.Builders.Conditions
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
-        /// <summary>Starts an ordered <c>ElseIf</c> branch from a typed runtime value source.</summary>
+        /// <summary>Adds the next ordered <c>ElseIf</c> branch from a typed runtime value source.</summary>
         /// <typeparam name="TProp">The runtime value type exposed by the source.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
         /// <returns>A builder for choosing the guard comparison.</returns>

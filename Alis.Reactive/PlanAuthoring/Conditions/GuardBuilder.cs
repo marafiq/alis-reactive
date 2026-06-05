@@ -40,10 +40,10 @@ namespace Alis.Reactive.Builders.Conditions
             _continuation = continuation ?? throw new ArgumentNullException(nameof(continuation));
         }
 
-        /// <summary>Requires this guard and an event-payload comparison to both pass.</summary>
+        /// <summary>Adds an all-of comparison against the current event payload.</summary>
         /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <typeparam name="TProp">The selected payload value type.</typeparam>
-        /// <param name="payload">The typed event payload placeholder supplied by the trigger callback.</param>
+        /// <param name="payload">The event payload placeholder supplied by the trigger callback.</param>
         /// <param name="path">Selects the payload value to compare at runtime.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> And<TPayload, TProp>(
@@ -54,25 +54,25 @@ namespace Alis.Reactive.Builders.Conditions
                 source, _continuation, ConditionComposition.All(ConditionGraph));
         }
 
-        /// <summary>Requires this guard and an HTTP response-body comparison to both pass.</summary>
-        /// <typeparam name="TPayload">The response body contract for the active response route.</typeparam>
+        /// <summary>Adds an all-of comparison against the active HTTP response body.</summary>
+        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">The selected response value type.</typeparam>
         /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
-        public ConditionSourceBuilder<TModel, TProp> And<TPayload, TProp>(
-            ResponseBody<TPayload> responseBody, Expression<Func<TPayload, TProp>> path)
-            where TPayload : class
+        public ConditionSourceBuilder<TModel, TProp> And<TResponse, TProp>(
+            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
+            where TResponse : class
         {
             var source = responseBody.Read(path);
             return new ConditionSourceBuilder<TModel, TProp>(
                 source, _continuation, ConditionComposition.All(ConditionGraph));
         }
 
-        /// <summary>Allows this guard or an event-payload comparison to pass.</summary>
+        /// <summary>Adds an any-of comparison against the current event payload.</summary>
         /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <typeparam name="TProp">The selected payload value type.</typeparam>
-        /// <param name="payload">The typed event payload placeholder supplied by the trigger callback.</param>
+        /// <param name="payload">The event payload placeholder supplied by the trigger callback.</param>
         /// <param name="path">Selects the payload value to compare at runtime.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> Or<TPayload, TProp>(
@@ -83,22 +83,22 @@ namespace Alis.Reactive.Builders.Conditions
                 source, _continuation, ConditionComposition.Any(ConditionGraph));
         }
 
-        /// <summary>Allows this guard or an HTTP response-body comparison to pass.</summary>
-        /// <typeparam name="TPayload">The response body contract for the active response route.</typeparam>
+        /// <summary>Adds an any-of comparison against the active HTTP response body.</summary>
+        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">The selected response value type.</typeparam>
         /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
-        public ConditionSourceBuilder<TModel, TProp> Or<TPayload, TProp>(
-            ResponseBody<TPayload> responseBody, Expression<Func<TPayload, TProp>> path)
-            where TPayload : class
+        public ConditionSourceBuilder<TModel, TProp> Or<TResponse, TProp>(
+            ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
+            where TResponse : class
         {
             var source = responseBody.Read(path);
             return new ConditionSourceBuilder<TModel, TProp>(
                 source, _continuation, ConditionComposition.Any(ConditionGraph));
         }
 
-        /// <summary>Requires this guard and a typed runtime value source comparison to both pass.</summary>
+        /// <summary>Adds an all-of comparison against a typed runtime value source.</summary>
         /// <typeparam name="TProp">The runtime value type exposed by the source.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
@@ -108,7 +108,7 @@ namespace Alis.Reactive.Builders.Conditions
                 source, _continuation, ConditionComposition.All(ConditionGraph));
         }
 
-        /// <summary>Allows this guard or a typed runtime value source comparison to pass.</summary>
+        /// <summary>Adds an any-of comparison against a typed runtime value source.</summary>
         /// <typeparam name="TProp">The runtime value type exposed by the source.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
@@ -118,8 +118,8 @@ namespace Alis.Reactive.Builders.Conditions
                 source, _continuation, ConditionComposition.Any(ConditionGraph));
         }
 
-        /// <summary>Requires this guard and a nested condition expression to both pass.</summary>
-        /// <param name="inner">Builds the nested condition expression to compose with this guard.</param>
+        /// <summary>Composes this guard with a grouped all-of condition.</summary>
+        /// <param name="inner">Builds the grouped condition to compose with this guard.</param>
         /// <returns>A guard containing the composed condition.</returns>
         public GuardBuilder<TModel> And(
             Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
@@ -131,8 +131,8 @@ namespace Alis.Reactive.Builders.Conditions
             return WrapCondition(PlanModel.ConditionGraph.All(terms.ToArray()));
         }
 
-        /// <summary>Allows this guard or a nested condition expression to pass.</summary>
-        /// <param name="inner">Builds the nested condition expression to compose with this guard.</param>
+        /// <summary>Composes this guard with a grouped any-of condition.</summary>
+        /// <param name="inner">Builds the grouped condition to compose with this guard.</param>
         /// <returns>A guard containing the composed condition.</returns>
         public GuardBuilder<TModel> Or(
             Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
@@ -144,14 +144,14 @@ namespace Alis.Reactive.Builders.Conditions
             return WrapCondition(PlanModel.ConditionGraph.Any(terms.ToArray()));
         }
 
-        /// <summary>Inverts the current condition.</summary>
+        /// <summary>Negates the current condition.</summary>
         /// <returns>A new guard with the negated condition.</returns>
         public GuardBuilder<TModel> Not()
         {
             return WrapCondition(PlanModel.ConditionGraph.Not(ConditionGraph));
         }
 
-        /// <summary>Starts the branch that executes when this guard evaluates to true.</summary>
+        /// <summary>Starts the branch that runs when this guard matches.</summary>
         /// <param name="pipeline">Builds the commands for the matching branch.</param>
         /// <returns>A branch builder for optional <c>ElseIf</c> and <c>Else</c> cases.</returns>
         public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> pipeline)
