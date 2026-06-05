@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionColorPickerChangeArgs
     {
-        /// <summary>Gets or sets the selected color as a hex+alpha string (e.g. "#1dc7e1ff").</summary>
+        /// <summary>Selected color value.</summary>
         public string? Value { get; set; }
     }
 }

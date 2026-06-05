@@ -5,13 +5,13 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionRatingValueChangedArgs
     {
-        /// <summary>Gets or sets the new rating value.</summary>
+        /// <summary>New rating value.</summary>
         public double Value { get; set; }
 
-        /// <summary>Gets or sets the previous rating value.</summary>
+        /// <summary>Previous rating value.</summary>
         public double PreviousValue { get; set; }
 
-        /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
+        /// <summary>Whether user interaction triggered the change.</summary>
         public bool IsInteracted { get; set; }
     }
 }
