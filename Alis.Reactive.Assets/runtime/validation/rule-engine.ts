@@ -175,10 +175,10 @@ function orderedComparisonFails(
   evaluation: OrderedRuleEvaluation,
   subject: ValidationSubject,
 ): boolean {
-  const target = "peerValue" in evaluation
+  const comparisonTarget = "peerValue" in evaluation
     ? ValidationScalarTarget.available(evaluation.peerValue)
     : constraint(evaluation.rule);
-  const comparison = subject.compareTo(target, comparisonShape(evaluation.rule));
+  const comparison = subject.compareTo(comparisonTarget, comparisonShape(evaluation.rule));
   const valueIsEmpty = subject.isEmpty;
 
   switch (evaluation.rule.name) {
@@ -227,20 +227,20 @@ function rangeFails(ruleName: RangeRuleName, subject: ValidationSubject, rule: R
 
 function equalityFails(evaluation: EqualityRuleEvaluation, subject: ValidationSubject): boolean {
   if ("peerValue" in evaluation) {
-    const target = ValidationScalarTarget.available(evaluation.peerValue);
+    const peerEqualityTarget = ValidationScalarTarget.available(evaluation.peerValue);
     if (evaluation.rule.name === "notEqualTo") {
-      return notEqualToFails(subject, target, comparisonShape(evaluation.rule));
+      return notEqualToFails(subject, peerEqualityTarget, comparisonShape(evaluation.rule));
     }
 
-    return equalToFails(subject, target, comparisonShape(evaluation.rule));
+    return equalToFails(subject, peerEqualityTarget, comparisonShape(evaluation.rule));
   }
 
-  const target = ValidationScalarTarget.fromLiteral(evaluation.rule.execution.value);
+  const literalEqualityTarget = ValidationScalarTarget.fromLiteral(evaluation.rule.execution.value);
   if (evaluation.rule.name === "notEqual") {
-    return notEqualFails(subject, target, comparisonShape(evaluation.rule));
+    return notEqualFails(subject, literalEqualityTarget, comparisonShape(evaluation.rule));
   }
 
-  return equalToFails(subject, target, comparisonShape(evaluation.rule));
+  return equalToFails(subject, literalEqualityTarget, comparisonShape(evaluation.rule));
 }
 
 function equalToFails(
