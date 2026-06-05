@@ -39,8 +39,8 @@ namespace Alis.Reactive.Native.Extensions
         /// trigger fires, the reactions declared in its callback execute in declaration order.
         /// </para>
         /// <para>
-        /// Avoid defining the same event twice in the same view. Duplicate listeners are
-        /// rarely needed and usually indicate the reaction should be combined into one block.
+        /// Each call appends behavior declarations to the same plan. Render the plan once,
+        /// after all triggers for the view have been declared.
         /// </para>
         /// </remarks>
         /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
