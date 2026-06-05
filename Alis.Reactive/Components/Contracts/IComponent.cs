@@ -5,7 +5,7 @@ namespace Alis.Reactive
     /// </summary>
     public interface IComponent
     {
-        /// <summary>Gets the vendor identifier for component resolution.</summary>
+        /// <summary>Vendor token written into the Reactive Plan for runtime component resolution.</summary>
         string Vendor { get; }
     }
 
@@ -15,7 +15,7 @@ namespace Alis.Reactive
     public interface IInputComponent : IComponent
     {
         /// <summary>
-        /// Gets the member name on the JavaScript component object that gather and validation read.
+        /// JavaScript component-object member read by gather and validation for model-bound inputs.
         /// </summary>
         string ValueMember { get; }
     }
@@ -25,7 +25,7 @@ namespace Alis.Reactive
     /// </summary>
     public interface IAppLevelComponent : IComponent
     {
-        /// <summary>Gets the default DOM element ID for this layout-owned component.</summary>
+        /// <summary>Well-known layout element ID used when the DSL references the app-level component without an explicit ID.</summary>
         string DefaultId { get; }
     }
 }
