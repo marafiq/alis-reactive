@@ -11,6 +11,8 @@ namespace Alis.Reactive.Playwright.Extensions;
 /// </remarks>
 public sealed class DateRangePickerLocator
 {
+    private const int MaxMonthNavigationAttempts = 24;
+
     private readonly IPage _page;
     private readonly string _componentId;
 
@@ -105,7 +107,7 @@ public sealed class DateRangePickerLocator
         var target = new DateTime(targetYear, targetMonth, 1);
         var title = calendar.Locator(".e-title");
 
-        for (var i = 0; i < 24; i++) // max 2 years of navigation
+        for (var navigationAttempt = 0; navigationAttempt < MaxMonthNavigationAttempts; navigationAttempt++)
         {
             var titleText = await title.TextContentAsync() ?? "";
 
