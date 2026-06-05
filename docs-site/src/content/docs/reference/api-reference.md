@@ -1611,19 +1611,7 @@ App-level confirm dialog backed by Syncfusion Dialog.
 
 ### FusionToast
 
-App-level toast notification backed by Syncfusion Toast.
-             Singleton per page — one Syncfusion Toast instance serves all notifications.
-
-             Implements IAppLevelComponent so it can be resolved without an explicit ID:
-               p.Component<FusionToast>().SetContent("Saved").Success().Show()
-
-### ToastPosition
-
-Maps to Syncfusion Toast position { X, Y } values.
-
-### ToastType
-
-Maps to Syncfusion Toast cssClass values.
+App-level Syncfusion Toast notification component.
 
 ---
 
