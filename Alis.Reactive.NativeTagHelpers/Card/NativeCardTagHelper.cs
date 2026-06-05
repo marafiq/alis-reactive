@@ -12,12 +12,12 @@ namespace Alis.Reactive.NativeTagHelpers.Card;
 public class NativeCardTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets how prominently the card lifts off the page. Defaults to <see cref="CardElevation.Low"/>.
+    /// Controls how prominently the card lifts off the page. Defaults to <see cref="CardElevation.Low"/>.
     /// </summary>
     public CardElevation Elevation { get; set; } = CardElevation.Low;
 
     /// <summary>
-    /// Gets or sets an optional accent color drawn as a left border on the card.
+    /// Optional accent color drawn as a left border on the card.
     /// </summary>
     public AccentColor? Accent { get; set; }
 

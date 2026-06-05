@@ -11,7 +11,7 @@ namespace Alis.Reactive.NativeTagHelpers.Card;
 public class NativeCardFooterTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets which edges of the footer show a separating border. Defaults to <see cref="CardDivider.None"/>.
+    /// Selects which footer edges show a separating border. Defaults to <see cref="CardDivider.None"/>.
     /// </summary>
     public CardDivider Divider { get; set; } = CardDivider.None;
 

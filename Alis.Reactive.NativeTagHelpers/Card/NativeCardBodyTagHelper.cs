@@ -11,7 +11,7 @@ namespace Alis.Reactive.NativeTagHelpers.Card;
 public class NativeCardBodyTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets the inner padding of the body section. Defaults to <see cref="CardPadding.Standard"/>.
+    /// Controls the inner padding of the body section. Defaults to <see cref="CardPadding.Standard"/>.
     /// </summary>
     public CardPadding Padding { get; set; } = CardPadding.Standard;
 
