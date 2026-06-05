@@ -1,5 +1,5 @@
 // Request input gathering uses the same ValueExpression resolver as execution.
-// Authored assignments and IncludeAll registered inputs share the same payload writer.
+// Authored assignments and IncludeAll registered inputs share the same request input writer.
 
 import type { PlanDocument, GatherRequestInput, RequestInputAssignment, HttpMethod, RequestInput } from "../../types/index";
 import type { ExecContext } from "../../types/index";
@@ -24,7 +24,7 @@ interface GatherExecution {
   readonly context: ExecContext;
 }
 
-type RequestPayloadWriter = ReturnType<typeof requestPayloadWriterFor>;
+type RequestInputWriter = ReturnType<typeof requestPayloadWriterFor>;
 
 function emptyRequestInput(): ResolvedRequestInput {
   return { urlParams: [], routeParams: {}, headers: {}, body: {} };
@@ -68,7 +68,7 @@ function resolveGatherRequestInput(
 function writeAuthoredAssignments(
   assignments: RequestInputAssignment[],
   resolvedInput: ResolvedRequestInput,
-  writer: RequestPayloadWriter,
+  writer: RequestInputWriter,
   execution: GatherExecution,
 ): void {
   for (const assignment of assignments) {
@@ -79,7 +79,7 @@ function writeAuthoredAssignments(
 function writeRequestInputAssignment(
   assignment: RequestInputAssignment,
   resolvedInput: ResolvedRequestInput,
-  writer: RequestPayloadWriter,
+  writer: RequestInputWriter,
   execution: GatherExecution,
 ): void {
   const rawValue = evaluateValue(assignment.source, execution.planDocument, execution.context);
@@ -139,7 +139,7 @@ function requestScalarWireValue(
 function writeRuntimeSelectedInputs(
   registeredInputs: GatherRequestInput["registeredInputs"],
   execution: GatherExecution,
-  writer: RequestPayloadWriter,
+  writer: RequestInputWriter,
 ): void {
   switch (registeredInputs.kind) {
     case "explicit":
@@ -156,7 +156,7 @@ function writeRuntimeSelectedInputs(
 
 function writeMountedRegisteredInput(
   component: RuntimeComponent,
-  writer: RequestPayloadWriter,
+  writer: RequestInputWriter,
 ): void {
   const binding = component.definition.binding;
   if (binding.kind === "none") return;

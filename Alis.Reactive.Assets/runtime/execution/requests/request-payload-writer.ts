@@ -1,4 +1,4 @@
-// Request payload writing is where gathered values cross into query string,
+// Request input writing is where gathered body-field assignments cross into query string,
 // JSON body, or FormData. File inputs may arrive as FileList or Syncfusion
 // items carrying the browser File in rawFile.
 
@@ -22,7 +22,7 @@ export interface ResolvedRequestInput {
   body: Record<string, unknown> | FormData;
 }
 
-interface RequestPayloadWriter {
+interface RequestInputWriter {
   emitScalar(target: RequestPayloadTarget, value: unknown, shape: RuntimeShape): void;
   emitArray(target: RequestPayloadTarget, items: unknown[], itemShape: RuntimeShape): void;
 }
@@ -31,7 +31,7 @@ export function requestPayloadWriterFor(
   requestInput: ResolvedRequestInput,
   bodyFormat: RequestBodyFormat,
   method: HttpMethod,
-): RequestPayloadWriter {
+): RequestInputWriter {
   if (sendsInputInQueryString(method)) {
     return createQueryStringWriter(requestInput.urlParams);
   }
@@ -65,7 +65,7 @@ export function writeRequestPayloadValue(
   target: RequestPayloadTarget,
   gatheredValue: unknown,
   shape: RuntimeShape,
-  writer: RequestPayloadWriter,
+  writer: RequestInputWriter,
 ): void {
   const browserFileListItems = filesFromBrowserFileList(gatheredValue);
   if (browserFileListItems !== undefined) {
@@ -82,7 +82,7 @@ export function writeRequestPayloadValue(
   writer.emitScalar(target, gatheredValue, shape);
 }
 
-function createQueryStringWriter(urlParams: string[]): RequestPayloadWriter {
+function createQueryStringWriter(urlParams: string[]): RequestInputWriter {
   return {
     emitScalar: (target, value, shape) => {
       const wire = shape.formatForWire(value);
@@ -96,7 +96,7 @@ function createQueryStringWriter(urlParams: string[]): RequestPayloadWriter {
   };
 }
 
-function createFormDataWriter(formData: FormData): RequestPayloadWriter {
+function createFormDataWriter(formData: FormData): RequestInputWriter {
   return {
     emitScalar: (target, value, shape) => {
       const wire = shape.formatForWire(value);
@@ -108,7 +108,7 @@ function createFormDataWriter(formData: FormData): RequestPayloadWriter {
   };
 }
 
-function createJsonBodyWriter(body: Record<string, unknown>): RequestPayloadWriter {
+function createJsonBodyWriter(body: Record<string, unknown>): RequestInputWriter {
   return {
     emitScalar: (target, value, shape) => {
       const wire = shape.formatForWire(value);
