@@ -101,10 +101,10 @@ function executeSequence(
   context: ExecutionContext,
 ): ReactionCompletion {
   for (const [index, step] of reaction.steps.entries()) {
-    const reactionCompletion = executeReactionWith(step, runtimePlan, context);
-    if (crossedAsyncBoundary(reactionCompletion)) {
+    const stepCompletion = executeReactionWith(step, runtimePlan, context);
+    if (isAsyncCompletion(stepCompletion)) {
       const remaining = reaction.steps.slice(index + 1);
-      return reactionCompletion.then(() => executeRemainingSequence(remaining, runtimePlan, context));
+      return stepCompletion.then(() => executeRemainingSequence(remaining, runtimePlan, context));
     }
   }
 }
@@ -115,8 +115,8 @@ async function executeRemainingSequence(
   context: ExecutionContext,
 ): Promise<void> {
   for (const step of steps) {
-    const reactionCompletion = executeReactionWith(step, runtimePlan, context);
-    if (crossedAsyncBoundary(reactionCompletion)) await reactionCompletion;
+    const stepCompletion = executeReactionWith(step, runtimePlan, context);
+    if (isAsyncCompletion(stepCompletion)) await stepCompletion;
   }
 }
 
@@ -134,7 +134,7 @@ async function executeParallel(
   context: ExecutionContext,
 ): Promise<void> {
   const settledSteps = await Promise.allSettled(
-    reaction.steps.map(step => reactionCompletion(executeReactionWith(step, runtimePlan, context))),
+    reaction.steps.map(step => completionAsPromise(executeReactionWith(step, runtimePlan, context))),
   );
   reportParallelStepFailures(settledSteps);
 
@@ -275,19 +275,19 @@ export function catchAsyncReactionFailure(
   completion: ReactionCompletion,
   onRejected: (error: unknown) => void,
 ): void {
-  if (crossedAsyncBoundary(completion)) completion.catch(onRejected);
+  if (isAsyncCompletion(completion)) completion.catch(onRejected);
 }
 
-function crossedAsyncBoundary(completion: ReactionCompletion): completion is Promise<void> {
+function isAsyncCompletion(completion: ReactionCompletion): completion is Promise<void> {
   return completion instanceof Promise;
 }
 
-function reactionCompletion(completion: ReactionCompletion): Promise<void> {
-  return crossedAsyncBoundary(completion) ? completion : Promise.resolve();
+function completionAsPromise(completion: ReactionCompletion): Promise<void> {
+  return isAsyncCompletion(completion) ? completion : Promise.resolve();
 }
 
 async function waitForAsyncBoundary(completion: ReactionCompletion): Promise<void> {
-  if (crossedAsyncBoundary(completion)) await completion;
+  if (isAsyncCompletion(completion)) await completion;
 }
 
 function dispatchPayload(reaction: DispatchReaction, planDocument: PlanDocument, context: ExecutionContext): unknown {
