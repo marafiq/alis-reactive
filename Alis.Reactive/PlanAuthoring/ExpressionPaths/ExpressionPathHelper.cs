@@ -76,7 +76,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Builds a camelCase path relative to the current HTTP response body scope.
+        /// Builds a camelCase path relative to the active HTTP response body scope.
         /// </summary>
         /// <typeparam name="TSource">The response body type.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>

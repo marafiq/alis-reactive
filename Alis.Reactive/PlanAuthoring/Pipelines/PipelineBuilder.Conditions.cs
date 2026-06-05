@@ -23,7 +23,7 @@ namespace Alis.Reactive.Builders
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
-        /// <summary>Starts a branch whose guard reads from the current HTTP response body.</summary>
+        /// <summary>Starts a branch whose guard reads from the active HTTP response body.</summary>
         /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">The selected response value type.</typeparam>
         /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
