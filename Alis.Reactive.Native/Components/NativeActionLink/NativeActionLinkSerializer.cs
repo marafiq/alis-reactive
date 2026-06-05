@@ -23,14 +23,14 @@ namespace Alis.Reactive.Native.Components
             var planIdentity = PlanIdentity.Root(PlanId.Of("action-link"));
             var context = new PlanBuildContext(
                 planIdentity, new RegisteredInputComponents());
-            var pb = new PipelineBuilder<TModel>(context);
-            pipeline(pb);
+            var pipelineBuilder = new PipelineBuilder<TModel>(context);
+            pipeline(pipelineBuilder);
 
             if (context.ValidationJobs.Count > 0)
                 throw new InvalidOperationException(
                     "NativeActionLink does not support validation.");
 
-            var reaction = pb.BuildReaction();
+            var reaction = pipelineBuilder.BuildReaction();
             var requestCount = 0;
             var actionLinkReaction = BuildActionLinkReaction(reaction, href, ref requestCount);
             if (requestCount != 1)
@@ -60,19 +60,19 @@ namespace Alis.Reactive.Native.Components
 
                 case BranchReaction conditional:
                     var actionLinkCases = new List<BranchCase>();
-                    foreach (var c in conditional.Cases)
-                        actionLinkCases.Add(c.WithReaction(BuildActionLinkReaction(c.Reaction, href, ref requestCount)));
+                    foreach (var branchCase in conditional.Cases)
+                        actionLinkCases.Add(branchCase.WithReaction(BuildActionLinkReaction(branchCase.Reaction, href, ref requestCount)));
                     return ReactionGraph.Branch(actionLinkCases);
 
-                case RequestReaction http:
+                case RequestReaction requestReaction:
                     requestCount++;
                     if (requestCount > 1)
                         throw new InvalidOperationException(
                             "NativeActionLink supports exactly one request.");
-                    if (!string.Equals(href, http.Request.Url, StringComparison.Ordinal))
+                    if (!string.Equals(href, requestReaction.Request.Url, StringComparison.Ordinal))
                         throw new InvalidOperationException(
                             "NativeActionLink href must match the request URL.");
-                    return ReactionGraph.Request(BuildActionLinkRequest(http.Request));
+                    return ReactionGraph.Request(BuildActionLinkRequest(requestReaction.Request));
 
                 case ParallelReaction _:
                     throw new InvalidOperationException(
