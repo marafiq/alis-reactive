@@ -14,30 +14,30 @@ interface SyncfusionGlobal {
   };
 }
 
-export function injectPartial(container: HTMLElement, html: string, slot: string): void {
-  const temp = document.createElement("div");
-  temp.innerHTML = html;
+export function injectPartial(container: HTMLElement, html: string, slotId: string): void {
+  const fragmentHost = document.createElement("div");
+  fragmentHost.innerHTML = html;
 
-  const planElements = temp.querySelectorAll<HTMLElement>("[data-reactive-plan]");
-  const plans: PlanDocument[] = [];
+  const planElements = fragmentHost.querySelectorAll<HTMLElement>("[data-reactive-plan]");
+  const slotPlans: PlanDocument[] = [];
   for (const planElement of planElements) {
-    const text = planElement.textContent?.trim();
-    if (!text) throw new Error("[alis] empty plan element in injected HTML");
-    plans.push(JSON.parse(text));
+    const planJson = planElement.textContent?.trim();
+    if (!planJson) throw new Error("[alis] empty plan element in injected HTML");
+    slotPlans.push(JSON.parse(planJson));
     planElement.remove();
   }
 
   container.innerHTML = "";
   const ej = (globalThis as SyncfusionGlobal).ej;
   if (ej?.base?.append) {
-    ej.base.append(Array.from(temp.childNodes), container, true);
+    ej.base.append(Array.from(fragmentHost.childNodes), container, true);
   } else {
-    container.append(...Array.from(temp.childNodes));
+    container.append(...Array.from(fragmentHost.childNodes));
   }
 
-  if (plans.length === 0) {
-    unloadPartialSlot(slot);
+  if (slotPlans.length === 0) {
+    unloadPartialSlot(slotId);
   } else {
-    loadPartialSlot(slot, plans);
+    loadPartialSlot(slotId, slotPlans);
   }
 }
