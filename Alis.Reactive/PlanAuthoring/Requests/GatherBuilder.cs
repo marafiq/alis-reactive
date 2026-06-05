@@ -75,7 +75,7 @@ namespace Alis.Reactive.Builders.Requests
             if (value == null)
                 throw new System.ArgumentNullException(nameof(value),
                     $"Header '{name}' value must not be null. Literal headers require a concrete value. " +
-                    "Use the TypedSource<T> or event-arg overload for dynamic/nullable values.");
+                    "Use the TypedSource<T> or event-payload overload for dynamic/nullable values.");
             _draft.AddHeader(header, ValueExpression.Literal(value));
             return this;
         }
@@ -130,7 +130,7 @@ namespace Alis.Reactive.Builders.Requests
             if (value == null)
                 throw new System.ArgumentNullException(nameof(value),
                     $"Route param '{paramName}' value must not be null. Literal route params require a concrete value. " +
-                    "Use the TypedSource<T> or event-arg overload for dynamic/nullable values.");
+                    "Use the TypedSource<T> or event-payload overload for dynamic/nullable values.");
             _draft.AddRouteParameter(routeParam, ValueExpression.Literal(value));
             return this;
         }
