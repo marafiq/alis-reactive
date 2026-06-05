@@ -53,7 +53,6 @@ public class WhenUrlParamsRead : PlaywrightTestBase
     {
         await NavigateWithParams();
 
-        // FromUrl("tab") matches medications, so the panel is visible.
         await Expect(Page.Locator("#url-cond-meds"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -64,7 +63,6 @@ public class WhenUrlParamsRead : PlaywrightTestBase
     {
         await NavigateWithParams();
 
-        // FromUrl<int>("page").Gt(1) is true for page=3.
         await Expect(Page.Locator("#url-cond-prev"))
             .ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -135,7 +133,6 @@ public class WhenUrlParamsRead : PlaywrightTestBase
     {
         await NavigateWithoutParams();
 
-        // Missing FromUrl("tab") evaluates the condition false.
         await Expect(Page.Locator("#url-cond-meds"))
             .ToBeHiddenAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
