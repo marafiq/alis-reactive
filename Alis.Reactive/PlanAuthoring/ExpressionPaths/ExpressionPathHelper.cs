@@ -53,10 +53,10 @@ namespace Alis.Reactive
         /// <summary>
         /// Builds a camelCase path relative to the current event payload scope.
         /// </summary>
-        /// <typeparam name="TSource">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload type.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>address.city</c>.</returns>
-        public static string ToEventPath<TSource>(Expression<Func<TSource, object?>> expression)
+        public static string ToEventPath<TPayload>(Expression<Func<TPayload, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return ToRuntimePath(members);
@@ -65,11 +65,11 @@ namespace Alis.Reactive
         /// <summary>
         /// Builds a camelCase event-payload path while preserving the selected value type.
         /// </summary>
-        /// <typeparam name="TSource">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload type.</typeparam>
         /// <typeparam name="TProp">The selected payload value type.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>facilityId</c>.</returns>
-        public static string ToEventPath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
+        public static string ToEventPath<TPayload, TProp>(Expression<Func<TPayload, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return ToRuntimePath(members);
@@ -78,10 +78,10 @@ namespace Alis.Reactive
         /// <summary>
         /// Builds a camelCase path relative to the active HTTP response body scope.
         /// </summary>
-        /// <typeparam name="TSource">The response body type.</typeparam>
+        /// <typeparam name="TResponse">The response body type.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>data.name</c>.</returns>
-        public static string ToResponsePath<TSource>(Expression<Func<TSource, object?>> expression)
+        public static string ToResponsePath<TResponse>(Expression<Func<TResponse, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return ToRuntimePath(members);
@@ -90,11 +90,11 @@ namespace Alis.Reactive
         /// <summary>
         /// Builds a camelCase response-body path while preserving the selected value type.
         /// </summary>
-        /// <typeparam name="TSource">The response body type.</typeparam>
+        /// <typeparam name="TResponse">The response body type.</typeparam>
         /// <typeparam name="TProp">The selected response value type.</typeparam>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>data.name</c>.</returns>
-        public static string ToResponsePath<TSource, TProp>(Expression<Func<TSource, TProp>> expression)
+        public static string ToResponsePath<TResponse, TProp>(Expression<Func<TResponse, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return ToRuntimePath(members);
