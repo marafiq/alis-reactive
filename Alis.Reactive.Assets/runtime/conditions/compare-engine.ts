@@ -398,8 +398,8 @@ function isEmpty(value: unknown): boolean {
 
 function asText(value: unknown): TextOperand {
   if (isMissingValue(value)) return missingText;
-  const result = toString(value);
-  if (result.ok) return { kind: "text", value: result.value };
+  const stringConversion = toString(value);
+  if (stringConversion.ok) return { kind: "text", value: stringConversion.value };
   return missingText;
 }
 

@@ -130,10 +130,10 @@ function requestScalarWireValue(
   shape: RuntimeShape,
 ): string {
   const wire = shape.formatForWire(value);
-  const result = toString(wire);
-  if (result.ok) return result.value;
+  const stringConversion = toString(wire);
+  if (stringConversion.ok) return stringConversion.value;
 
-  throw new Error(`[alis] ${targetKind} "${name}" cannot be serialized as a scalar: ${result.error}`);
+  throw new Error(`[alis] ${targetKind} "${name}" cannot be serialized as a scalar: ${stringConversion.error}`);
 }
 
 function writeRuntimeSelectedInputs(

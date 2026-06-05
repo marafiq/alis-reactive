@@ -101,10 +101,10 @@ function executeSequence(
   context: ExecutionContext,
 ): ReactionCompletion {
   for (const [index, step] of reaction.steps.entries()) {
-    const result = executeReactionWith(step, runtimePlan, context);
-    if (crossedAsyncBoundary(result)) {
+    const reactionCompletion = executeReactionWith(step, runtimePlan, context);
+    if (crossedAsyncBoundary(reactionCompletion)) {
       const remaining = reaction.steps.slice(index + 1);
-      return result.then(() => executeRemainingSequence(remaining, runtimePlan, context));
+      return reactionCompletion.then(() => executeRemainingSequence(remaining, runtimePlan, context));
     }
   }
 }
@@ -115,8 +115,8 @@ async function executeRemainingSequence(
   context: ExecutionContext,
 ): Promise<void> {
   for (const step of steps) {
-    const result = executeReactionWith(step, runtimePlan, context);
-    if (crossedAsyncBoundary(result)) await result;
+    const reactionCompletion = executeReactionWith(step, runtimePlan, context);
+    if (crossedAsyncBoundary(reactionCompletion)) await reactionCompletion;
   }
 }
 
@@ -272,22 +272,22 @@ function callPayloadMethod(
 }
 
 export function catchAsyncReactionFailure(
-  result: ReactionCompletion,
+  completion: ReactionCompletion,
   onRejected: (error: unknown) => void,
 ): void {
-  if (crossedAsyncBoundary(result)) result.catch(onRejected);
+  if (crossedAsyncBoundary(completion)) completion.catch(onRejected);
 }
 
-function crossedAsyncBoundary(result: ReactionCompletion): result is Promise<void> {
-  return result instanceof Promise;
+function crossedAsyncBoundary(completion: ReactionCompletion): completion is Promise<void> {
+  return completion instanceof Promise;
 }
 
-function reactionCompletion(result: ReactionCompletion): Promise<void> {
-  return crossedAsyncBoundary(result) ? result : Promise.resolve();
+function reactionCompletion(completion: ReactionCompletion): Promise<void> {
+  return crossedAsyncBoundary(completion) ? completion : Promise.resolve();
 }
 
-async function waitForAsyncBoundary(result: ReactionCompletion): Promise<void> {
-  if (crossedAsyncBoundary(result)) await result;
+async function waitForAsyncBoundary(completion: ReactionCompletion): Promise<void> {
+  if (crossedAsyncBoundary(completion)) await completion;
 }
 
 function dispatchPayload(reaction: DispatchReaction, planDocument: PlanDocument, context: ExecutionContext): unknown {

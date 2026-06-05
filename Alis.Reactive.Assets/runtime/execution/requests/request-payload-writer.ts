@@ -208,10 +208,10 @@ function rawArrayItemValue(item: RequestInputArrayItem): unknown {
 }
 
 function scalarWireValue(value: unknown, name: string): string {
-  const result = toString(value);
-  if (result.ok) return result.value;
+  const stringConversion = toString(value);
+  if (stringConversion.ok) return stringConversion.value;
 
-  throw new Error(`[alis] gather value "${name}" cannot be serialized as a scalar: ${result.error}`);
+  throw new Error(`[alis] gather value "${name}" cannot be serialized as a scalar: ${stringConversion.error}`);
 }
 
 function jsonBodyValue(wireValue: unknown): unknown {
