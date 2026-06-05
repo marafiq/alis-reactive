@@ -20,8 +20,8 @@ type HttpResponseBody =
 const missingResponseBody: HttpResponseBody = { kind: "missing" };
 
 type HttpExchangeOutcome =
-  | { readonly kind: "success"; readonly status: number; readonly body: HttpResponseBody }
-  | { readonly kind: "error"; readonly status: number; readonly body: HttpResponseBody }
+  | { readonly kind: "success"; readonly status: number; readonly responseBody: HttpResponseBody }
+  | { readonly kind: "error"; readonly status: number; readonly responseBody: HttpResponseBody }
   | { readonly kind: "response-unavailable" };
 
 export async function executeRequest(
@@ -94,11 +94,11 @@ async function sendHttpRequest(request: RequestPlan, fetchRequest: ResolvedFetch
   }
 }
 
-function exchangeOutcomeFromResponse(response: Response, body: HttpResponseBody): HttpExchangeOutcome {
+function exchangeOutcomeFromResponse(response: Response, responseBody: HttpResponseBody): HttpExchangeOutcome {
   const statusIsSuccessful = response.ok;
   return statusIsSuccessful
-    ? { kind: "success", status: response.status, body }
-    : { kind: "error", status: response.status, body };
+    ? { kind: "success", status: response.status, responseBody }
+    : { kind: "error", status: response.status, responseBody };
 }
 
 function exchangeOutcomeFromClientFailure(request: RequestPlan, error: unknown): HttpExchangeOutcome {
@@ -119,10 +119,10 @@ async function routeExchangeOutcome(
 ): Promise<void> {
   switch (outcome.kind) {
     case "success":
-      await routeSuccess(request, planDocument, context, outcome.status, outcome.body);
+      await routeSuccess(request, planDocument, context, outcome.status, outcome.responseBody);
       return;
     case "error":
-      await routeError(request, planDocument, context, outcome.status, outcome.body);
+      await routeError(request, planDocument, context, outcome.status, outcome.responseBody);
       return;
     case "response-unavailable":
       await routeResponseUnavailable(request, planDocument, context);
@@ -142,9 +142,9 @@ async function routeSuccess(
   planDocument: PlanDocument,
   context: ExecutionContext,
   status: number,
-  body: HttpResponseBody,
+  responseBody: HttpResponseBody,
 ): Promise<void> {
-  const responseContext = contextWithResponseBody(context, body);
+  const responseContext = contextWithResponseBody(context, responseBody);
   await routeAndComplete(request, planDocument, context, () =>
     routeResponseRoutes(request.success, status, planDocument, responseContext.asAvailable()));
   await runFollowUpRequest(request.chain, planDocument, responseContext);
@@ -155,10 +155,10 @@ async function routeError(
   planDocument: PlanDocument,
   context: ExecutionContext,
   status: number,
-  body: HttpResponseBody,
+  responseBody: HttpResponseBody,
 ): Promise<void> {
   await routeAndComplete(request, planDocument, context, () =>
-    routeResponseRoutes(request.error, status, planDocument, contextWithResponseBody(context, body).asAvailable()));
+    routeResponseRoutes(request.error, status, planDocument, contextWithResponseBody(context, responseBody).asAvailable()));
 }
 
 async function routeResponseUnavailable(
@@ -209,19 +209,19 @@ async function runRequestReactions(
   }
 }
 
-function contextWithResponseBody(context: ExecutionContext, body: HttpResponseBody): ExecutionContext {
-  const bodyCanBeReadByReactions = body.kind === "available";
+function contextWithResponseBody(context: ExecutionContext, responseBody: HttpResponseBody): ExecutionContext {
+  const bodyCanBeReadByReactions = responseBody.kind === "available";
   if (!bodyCanBeReadByReactions) return context;
 
-  return context.withResponse(body.value);
+  return context.withResponse(responseBody.value);
 }
 
 function requestPayloadSnapshotFrom(resolvedInput: ResolvedRequestInput): Record<string, unknown> {
-  const body = resolvedInput.body;
-  const bodyIsFormData = body instanceof FormData;
+  const requestBody = resolvedInput.body;
+  const bodyIsFormData = requestBody instanceof FormData;
   if (bodyIsFormData) return {};
 
-  return body;
+  return requestBody;
 }
 
 async function readResponseBody(response: Response): Promise<HttpResponseBody> {
