@@ -83,9 +83,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         /// </summary>
         public static ShiftAssignment? FindAssignment(int assignmentId)
         {
-            foreach (var kvp in Store)
+            foreach (var assignmentBucket in Store)
             {
-                var assignment = kvp.Value.FirstOrDefault(a => a.Id == assignmentId);
+                var assignment = assignmentBucket.Value.FirstOrDefault(a => a.Id == assignmentId);
                 if (assignment != null) return assignment;
             }
             return null;
@@ -100,9 +100,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             var staff = Staff.FirstOrDefault(s => s.Id == staffId);
             if (staff == null) return null;
 
-            foreach (var kvp in Store)
+            foreach (var assignmentBucket in Store)
             {
-                var assignment = kvp.Value.FirstOrDefault(a => a.Id == assignmentId);
+                var assignment = assignmentBucket.Value.FirstOrDefault(a => a.Id == assignmentId);
                 if (assignment != null)
                 {
                     assignment.StaffName = staff.Name;
@@ -125,9 +125,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         /// </summary>
         public static ShiftAssignment? UnassignStaff(int assignmentId)
         {
-            foreach (var kvp in Store)
+            foreach (var assignmentBucket in Store)
             {
-                var assignment = kvp.Value.FirstOrDefault(a => a.Id == assignmentId);
+                var assignment = assignmentBucket.Value.FirstOrDefault(a => a.Id == assignmentId);
                 if (assignment != null)
                 {
                     var shiftLabel = Shifts.FirstOrDefault(s => s.Id == assignment.ShiftId)?.Text?.Split(' ')[0] ?? "Shift";
