@@ -39,33 +39,33 @@ function handleClick(event: MouseEvent): void {
 
   event.preventDefault();
 
-  const payload = decodePayload(anchor);
-  bindHrefToClickRequest(payload.reaction, anchor.getAttribute("href") ?? anchor.href);
+  const actionLinkPayload = decodeActionLinkPayload(anchor);
+  bindHrefToClickRequest(actionLinkPayload.reaction, anchor.getAttribute("href") ?? anchor.href);
   log.debug("activated", { id: anchor.id, href: anchor.href });
-  const result = executeReaction(payload.reaction, payload.plan);
+  const result = executeReaction(actionLinkPayload.reaction, actionLinkPayload.plan);
   if (result instanceof Promise) {
     result.catch(executionError => log.error("reaction.failed", { id: anchor.id, error: toJavaScriptString(executionError) }));
   }
 }
 
-function decodePayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
-  const raw = anchor.dataset.reactiveLink;
-  if (!raw) {
+function decodeActionLinkPayload(anchor: HTMLAnchorElement): NativeActionLinkPayload {
+  const serializedPayload = anchor.dataset.reactiveLink;
+  if (!serializedPayload) {
     throw new Error("NativeActionLink is missing data-reactive-link.");
   }
 
   try {
-    return JSON.parse(raw) as NativeActionLinkPayload;
+    return JSON.parse(serializedPayload) as NativeActionLinkPayload;
   } catch (error) {
     throw new Error(`NativeActionLink payload is invalid JSON: ${toJavaScriptString(error)}`);
   }
 }
 
 function bindHrefToClickRequest(reaction: ReactionGraph, href: string): void {
-  firstDeclaredRequest(reaction)!.url = href;
+  clickRequestIn(reaction)!.url = href;
 }
 
-function firstDeclaredRequest(reaction: ReactionGraph): RequestPlan | undefined {
+function clickRequestIn(reaction: ReactionGraph): RequestPlan | undefined {
   switch (reaction.kind) {
     case "sequence":
       return firstRequestIn(reaction.steps);
@@ -73,12 +73,12 @@ function firstDeclaredRequest(reaction: ReactionGraph): RequestPlan | undefined 
     case "parallel":
       return firstRequestIn(reaction.steps)
         ?? (reaction.completion.kind === "on-settled"
-          ? firstDeclaredRequest(reaction.completion.reaction)
+          ? clickRequestIn(reaction.completion.reaction)
           : undefined);
 
     case "branch":
       for (const branchCase of reaction.cases) {
-        const request = firstDeclaredRequest(branchCase.reaction);
+        const request = clickRequestIn(branchCase.reaction);
         if (request) return request;
       }
       return undefined;
@@ -100,7 +100,7 @@ function firstDeclaredRequest(reaction: ReactionGraph): RequestPlan | undefined 
 
 function firstRequestIn(reactions: readonly ReactionGraph[]): RequestPlan | undefined {
   for (const reaction of reactions) {
-    const request = firstDeclaredRequest(reaction);
+    const request = clickRequestIn(reaction);
     if (request) return request;
   }
   return undefined;
