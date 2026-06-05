@@ -61,10 +61,8 @@ namespace Alis.Reactive.Native.Components
             _bindingPath = target.BindingName;
         }
 
-        /// <summary>Gets the resolved element ID for this dropdown.</summary>
         internal string ElementId => _elementId;
 
-        /// <summary>Gets the model binding path, such as <c>"Address.City"</c>.</summary>
         internal string BindingPath => _bindingPath;
 
         /// <summary>
