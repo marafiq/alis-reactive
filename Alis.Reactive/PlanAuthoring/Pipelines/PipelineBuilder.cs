@@ -164,7 +164,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Reads the result of a named function on a plan-registered plugin.</summary>
         /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
-        /// <param name="pluginName">The registered plugin key emitted into the generated plan.</param>
+        /// <param name="pluginName">The name used when the plugin was registered on the plan.</param>
         /// <param name="member">The function member to invoke on the host-provided plugin object.</param>
         /// <returns>A builder for supplying function arguments before the result becomes a typed source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName, string member)
@@ -182,7 +182,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Reads the result of a plugin whose registered object is itself callable.</summary>
         /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
-        /// <param name="pluginName">The registered plugin key emitted into the generated plan.</param>
+        /// <param name="pluginName">The name used when the plugin was registered on the plan.</param>
         /// <returns>A builder for supplying root-function arguments before the result becomes a typed source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName)
         {
@@ -198,7 +198,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Reads a named property from a plan-registered plugin.</summary>
         /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
-        /// <param name="pluginName">The registered plugin key emitted into the generated plan.</param>
+        /// <param name="pluginName">The name used when the plugin was registered on the plan.</param>
         /// <param name="member">The property member to read from the host-provided plugin object.</param>
         /// <returns>A typed plugin property value source.</returns>
         public Conditions.TypedPluginPropertySource<T> PluginProperty<T>(string pluginName, string member)
@@ -234,7 +234,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Starts a command reaction against a named member on a plan-registered plugin.</summary>
-        /// <param name="pluginName">The registered plugin key emitted into the generated plan.</param>
+        /// <param name="pluginName">The name used when the plugin was registered on the plan.</param>
         /// <param name="member">The command member to invoke on the host-provided plugin object.</param>
         /// <returns>A command builder for supplying arguments before emitting the plugin call with <c>Fire()</c>.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
@@ -250,7 +250,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Starts a command reaction against a plugin whose registered object is itself callable.</summary>
-        /// <param name="pluginName">The registered plugin key emitted into the generated plan.</param>
+        /// <param name="pluginName">The name used when the plugin was registered on the plan.</param>
         /// <returns>A command builder for supplying root-command arguments before emitting the call with <c>Fire()</c>.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName)
         {
