@@ -63,29 +63,25 @@
 
     <native-card><native-card-body>
         <native-heading level="H2">C# DSL</native-heading>
-        <pre class="rounded-md bg-slate-900 text-sky-400 p-4 font-mono text-xs overflow-x-auto"><code>// Entry 1: On page load, dispatch "test" event + update DOM
-Html.On(plan, t =&gt; t.DomReady(p =&gt;
+        <pre class="rounded-md bg-slate-900 text-sky-400 p-4 font-mono text-xs overflow-x-auto"><code>Html.On(plan, t =&gt; t.DomReady(p =&gt;
 {
     p.Element("step-1").AddClass("text-green-600");
     p.Element("step-1").SetText("dom-ready fired");
     p.Dispatch("test");
 }));
 
-// Entry 2: On "test" event, forward to "test-received"
 Html.On(plan, t =&gt; t.CustomEvent("test", p =&gt;
 {
     p.Element("step-2").AddClass("text-green-600");
     p.Dispatch("test-received");
 }));
 
-// Entry 3: On "test-received", dispatch "final" with payload
 Html.On(plan, t =&gt; t.CustomEvent&lt;EventsViewModel&gt;("test-received", (payload, p) =&gt;
 {
     p.Element("step-3").AddClass("text-green-600");
     p.Dispatch("final", new EventsViewModel { EventName = "done" });
 }));
 
-// Entry 4: On "final", mark chain complete
 Html.On(plan, t =&gt; t.CustomEvent("final", p =&gt;
 {
     p.Element("chain-status").RemoveClass("text-text-muted");
