@@ -1,5 +1,6 @@
-// Boot wires behaviors and validation for Active Plans.
-// Boot snapshots and partial-slot composition stay in applied plan state.
+// Boot applies the root PlanDocument and wires its behaviors and validation.
+// Active Plan composition stays in applied plan state: immutable boot snapshot
+// plus currently loaded partial slots.
 
 import type { PlanDocument, Behavior } from "../types/index";
 import { setLevel } from "../diagnostics/trace";
