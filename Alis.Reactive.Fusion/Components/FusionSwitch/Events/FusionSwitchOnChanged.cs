@@ -8,10 +8,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionSwitchChangeArgs
     {
-        /// <summary>Gets or sets the switch's checked state after the change.</summary>
+        /// <summary>Switch checked state after the change.</summary>
         public bool Checked { get; set; }
 
-        /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
+        /// <summary>Whether user interaction triggered the change.</summary>
         public bool IsInteracted { get; set; }
     }
 }
