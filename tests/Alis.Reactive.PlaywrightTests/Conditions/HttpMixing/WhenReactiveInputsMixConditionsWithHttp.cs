@@ -4,9 +4,8 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.HttpMixing;
 namespace Alis.Reactive.PlaywrightTests.Conditions.HttpMixing;
 
 /// <summary>
-/// As a UI author
-/// I want real component .Reactive() flows to mix HTTP and supported conditions cleanly
-/// So that page-visible outcomes stay correct across success, error, and reevaluation paths
+/// Proves component .Reactive() pipelines can mix conditions with HTTP success
+/// and error routes while recomputing page-visible branch state after each input change.
 /// </summary>
 [TestFixture]
 public class WhenReactiveInputsMixConditionsWithHttp : PlaywrightTestBase
