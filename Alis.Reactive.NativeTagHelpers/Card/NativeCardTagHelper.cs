@@ -22,7 +22,7 @@ public class NativeCardTagHelper : TagHelper
     public AccentColor? Accent { get; set; }
 
     /// <summary>
-    /// Additional HTML classes merged with the generated card classes.
+    /// Caller-supplied classes appended after the generated card classes.
     /// </summary>
     [HtmlAttributeName("class")]
     public string? CssClass { get; set; }
