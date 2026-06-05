@@ -75,7 +75,7 @@ namespace Alis.Reactive.Builders.Requests
             TypedComponentSource<TProp> source)
             where TModel : class
         {
-            self.Include(source, source.DefaultPayloadName);
+            self.Include(source, source.DefaultBodyFieldName);
             return self;
         }
 
