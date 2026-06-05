@@ -5,13 +5,13 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionOtpInputInputArgs
     {
-        /// <summary>Gets or sets the current OTP value.</summary>
+        /// <summary>Current OTP value.</summary>
         public string? Value { get; set; }
 
-        /// <summary>Gets or sets the previous OTP value.</summary>
+        /// <summary>Previous OTP value.</summary>
         public string? PreviousValue { get; set; }
 
-        /// <summary>Gets or sets the zero-based field index that changed.</summary>
+        /// <summary>Zero-based field index that changed.</summary>
         public int Index { get; set; }
     }
 }
