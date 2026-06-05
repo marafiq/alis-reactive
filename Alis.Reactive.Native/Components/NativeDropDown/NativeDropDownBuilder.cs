@@ -66,7 +66,7 @@ namespace Alis.Reactive.Native.Components
         internal string BindingPath => _bindingPath;
 
         /// <summary>
-        /// Sets the selectable options.
+        /// Replaces the selectable options.
         /// </summary>
         /// <param name="items">The list of options to display.</param>
         public NativeDropDownBuilder<TModel, TProp> Items(IEnumerable<SelectListItem> items)
@@ -76,7 +76,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets the empty-selection placeholder label (e.g. <c>"-- Select --"</c>).
+        /// Replaces the empty-selection placeholder label, such as <c>"-- Select --"</c>.
         /// </summary>
         /// <param name="optionLabel">The placeholder text for the empty option.</param>
         public NativeDropDownBuilder<TModel, TProp> Placeholder(string optionLabel)
@@ -96,7 +96,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Adds CSS classes to the select element.
+        /// Replaces the CSS classes on the select element.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
         public NativeDropDownBuilder<TModel, TProp> CssClass(string css)
