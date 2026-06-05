@@ -19,7 +19,7 @@ namespace Alis.Reactive.Native.Components
             ComponentMethod.Named("focus");
 
         /// <summary>
-        /// Sets the checkbox checked state through the component contract.
+        /// Writes the checkbox checked state through the component contract.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <param name="self">The checkbox component reference.</param>

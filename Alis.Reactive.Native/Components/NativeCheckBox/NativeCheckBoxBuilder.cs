@@ -65,7 +65,7 @@ namespace Alis.Reactive.Native.Components
         internal string BindingPath => _bindingPath;
 
         /// <summary>
-        /// Adds CSS classes to the checkbox element.
+        /// Replaces the CSS classes on the checkbox element.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
         public NativeCheckBoxBuilder<TModel, TProp> CssClass(string css)
