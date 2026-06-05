@@ -69,7 +69,8 @@ namespace Alis.Reactive.Native.Components
         internal IReadOnlyList<RadioButtonItem> Options => _options;
 
         /// <summary>
-        /// Adds radio options provided by the controller.
+        /// Adds radio options supplied outside the fluent builder, such as controller
+        /// or view-model option lists.
         /// </summary>
         /// <param name="items">The radio button items to display.</param>
         public NativeRadioGroupBuilder<TModel, TProp> Items(IEnumerable<RadioButtonItem> items)
@@ -80,7 +81,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Adds a radio option where the value is also used as the display text.
+        /// Adds a radio option whose submitted value is also its display text.
         /// </summary>
         /// <param name="value">The option value and display text.</param>
         public NativeRadioGroupBuilder<TModel, TProp> Option(string value)
@@ -90,7 +91,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Adds a radio option with a separate display text.
+        /// Adds a radio option with a submitted value and separate display text.
         /// </summary>
         /// <param name="value">The option value submitted in the form.</param>
         /// <param name="text">The display text shown next to the radio button.</param>
@@ -101,7 +102,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Adds a radio option with display text and a description.
+        /// Adds a radio option with submitted value, display text, and secondary description.
         /// </summary>
         /// <param name="value">The option value submitted in the form.</param>
         /// <param name="text">The display text shown next to the radio button.</param>
@@ -113,7 +114,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets CSS classes on the radio group container.
+        /// Replaces the CSS classes on the radio group container.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
         public NativeRadioGroupBuilder<TModel, TProp> CssClass(string css)
@@ -123,7 +124,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets CSS classes on each radio option wrapper label.
+        /// Replaces the CSS classes on each radio option wrapper.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
         public NativeRadioGroupBuilder<TModel, TProp> OptionCssClass(string css)

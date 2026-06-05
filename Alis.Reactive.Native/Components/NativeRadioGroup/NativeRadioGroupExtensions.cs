@@ -21,7 +21,7 @@ namespace Alis.Reactive.Native.Components
             ComponentMethod.Named("focus");
 
         /// <summary>
-        /// Sets the selected radio button value through the component contract.
+        /// Writes the selected radio value through the component contract.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <param name="self">The radio group component reference.</param>
@@ -34,7 +34,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets the selected radio button value from the current event payload.
+        /// Writes the selected radio value from the current event payload.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <typeparam name="TSource">The event payload type containing the value.</typeparam>

@@ -13,17 +13,17 @@ namespace Alis.Reactive.Native.Components
         private readonly OptionDescription _description;
 
         /// <summary>
-        /// Gets the option value submitted in the form.
+        /// Option value written to form posts and component reads.
         /// </summary>
         public string Value { get; }
 
         /// <summary>
-        /// Gets the display text shown next to the radio button or checkbox.
+        /// Display text shown next to the radio button or checkbox.
         /// </summary>
         public string Text { get; }
 
         /// <summary>
-        /// Gets the optional secondary description shown below the display text.
+        /// Optional secondary description shown below the display text.
         /// </summary>
         public string? Description => _description.ValueForRender;
 
