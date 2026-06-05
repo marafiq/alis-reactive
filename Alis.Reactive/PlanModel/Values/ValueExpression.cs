@@ -264,12 +264,12 @@ namespace Alis.Reactive.PlanModel
     /// </remarks>
     public sealed class LiteralExpression : ValueExpression
     {
-        /// <summary>Gets the kind. Always <c>"literal"</c>.</summary>
+        /// <summary>JSON discriminator for literal value nodes. Always <c>"literal"</c>.</summary>
         public string Kind => "literal";
-        /// <summary>Gets the constant value embedded in the plan.</summary>
+        /// <summary>Literal value serialized into the plan.</summary>
         [JsonInclude]
         public object? Value { get; }
-        /// <summary>Gets the expected type shape. Defaults to <see cref="PlanModel.Shape.None"/> when not specified.</summary>
+        /// <summary>Declared output shape, or <see cref="PlanModel.Shape.None"/> when not specified.</summary>
         public Shape Shape { get; }
 
         internal LiteralExpression(object? value, Shape shape)
@@ -289,19 +289,19 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly ValueRead _read;
 
-        /// <summary>Gets the kind. Always <c>"read"</c>.</summary>
+        /// <summary>JSON discriminator for runtime value reads. Always <c>"read"</c>.</summary>
         public string Kind => "read";
         /// <summary>
-        /// Gets the value source for this read, such as a component or payload scope.
+        /// Runtime source for this read, such as a component, plugin, or payload scope.
         /// </summary>
         public Source From => _read.From;
-        /// <summary>Gets the property or method name to read on the source.</summary>
+        /// <summary>Property or method name read from the source.</summary>
         public string Member => _read.Member.Value;
-        /// <summary>Gets the nested property path. Defaults to empty for direct reads.</summary>
+        /// <summary>Nested runtime path, or empty for direct reads.</summary>
         public Path Path => _read.Path;
-        /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
+        /// <summary>Declared output shape, or none when not specified.</summary>
         public Shape Shape => _read.Shape;
-        /// <summary>Gets whether the read accesses a property or invokes a method.</summary>
+        /// <summary>Whether the read accesses a property or invokes a method.</summary>
         public ValueReadAccess Access => _read.Access;
 
         internal ReadExpression(ValueRead read)
@@ -433,14 +433,14 @@ namespace Alis.Reactive.PlanModel
         internal static ValueReadAccess Method(IReadOnlyList<ValueExpression> args) =>
             new MethodValueReadAccess(args);
 
-        /// <summary>Gets the access kind.</summary>
+        /// <summary>JSON discriminator for the read access shape.</summary>
         public abstract string Kind { get; }
     }
 
     /// <summary>Reads a property value from the source.</summary>
     public sealed class PropertyValueReadAccess : ValueReadAccess
     {
-        /// <summary>Gets the kind. Always <c>"property"</c>.</summary>
+        /// <summary>JSON discriminator for property reads. Always <c>"property"</c>.</summary>
         public override string Kind => "property";
     }
 
@@ -454,10 +454,10 @@ namespace Alis.Reactive.PlanModel
             _args = OrderedArguments(args);
         }
 
-        /// <summary>Gets the kind. Always <c>"method"</c>.</summary>
+        /// <summary>JSON discriminator for method reads. Always <c>"method"</c>.</summary>
         public override string Kind => "method";
 
-        /// <summary>Gets the method argument expressions in call order.</summary>
+        /// <summary>Method argument expressions in call order.</summary>
         public IReadOnlyList<ValueExpression> Args => _args;
 
         private static IReadOnlyList<ValueExpression> OrderedArguments(IReadOnlyList<ValueExpression> items)
@@ -484,11 +484,11 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly IReadOnlyDictionary<string, ValueExpression> _fields;
 
-        /// <summary>Gets the kind. Always <c>"object"</c>.</summary>
+        /// <summary>JSON discriminator for object value nodes. Always <c>"object"</c>.</summary>
         public string Kind => "object";
-        /// <summary>Gets the named fields and their value expressions.</summary>
+        /// <summary>Named fields and their value expressions.</summary>
         public IReadOnlyDictionary<string, ValueExpression> Fields => _fields;
-        /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
+        /// <summary>Declared output shape, or none when not specified.</summary>
         public Shape Shape { get; }
 
         internal ObjectExpression(IReadOnlyDictionary<string, ValueExpression> fields, Shape shape)
@@ -505,11 +505,11 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly IReadOnlyList<ValueExpression> _items;
 
-        /// <summary>Gets the kind. Always <c>"array"</c>.</summary>
+        /// <summary>JSON discriminator for array value nodes. Always <c>"array"</c>.</summary>
         public string Kind => "array";
-        /// <summary>Gets the ordered item expressions.</summary>
+        /// <summary>Ordered item expressions.</summary>
         public IReadOnlyList<ValueExpression> Items => _items;
-        /// <summary>Gets the expected type shape. Defaults to none when not specified.</summary>
+        /// <summary>Declared output shape, or none when not specified.</summary>
         public Shape Shape { get; }
 
         internal ArrayExpression(IReadOnlyList<ValueExpression> items, Shape shape)
@@ -530,13 +530,13 @@ namespace Alis.Reactive.PlanModel
     /// </remarks>
     public sealed class ArrayOperationExpression : ValueExpression
     {
-        /// <summary>Gets the kind. Always <c>"array-op"</c>.</summary>
+        /// <summary>JSON discriminator for array operation nodes. Always <c>"array-op"</c>.</summary>
         public string Kind => "array-op";
-        /// <summary>Gets the operation name, such as <c>count</c> or <c>filter</c>.</summary>
+        /// <summary>Array operation name, such as <c>count</c> or <c>filter</c>.</summary>
         public string Op { get; }
-        /// <summary>Gets the value expression that produces the source array.</summary>
+        /// <summary>Value expression that produces the source array.</summary>
         public ValueExpression Source { get; }
-        /// <summary>Gets the per-element predicate, or null when the operation does not use one.</summary>
+        /// <summary>Per-element predicate, or null when the operation does not use one.</summary>
         /// <remarks>
         /// Nullable by design: count, map, sum, and ordering do not use a
         /// predicate; any may omit it for non-empty checks; filter, all, and find
@@ -548,7 +548,7 @@ namespace Alis.Reactive.PlanModel
         /// </remarks>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ConditionGraph? Predicate { get; }
-        /// <summary>Gets the per-element projection, or null when the operation does not use one.</summary>
+        /// <summary>Per-element projection, or null when the operation does not use one.</summary>
         /// <remarks>
         /// Nullable by design: count, filter, any, and all omit projection; map,
         /// sum, and ordering require a selector; find includes one only for field
@@ -556,9 +556,9 @@ namespace Alis.Reactive.PlanModel
         /// </remarks>
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ValueExpression? Projection { get; }
-        /// <summary>Gets the declared element shape of the source array.</summary>
+        /// <summary>Declared element shape of the source array.</summary>
         public Shape ItemShape { get; }
-        /// <summary>Gets the declared output shape of the operation.</summary>
+        /// <summary>Declared output shape of the operation.</summary>
         public Shape Shape { get; }
 
         internal ArrayOperationExpression(
