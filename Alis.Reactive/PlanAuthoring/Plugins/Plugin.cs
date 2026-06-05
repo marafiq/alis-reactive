@@ -149,7 +149,7 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>Base descriptor for a declared Reactive Plan plugin operation.</summary>
+    /// <summary>Base descriptor for a declared plugin function or command.</summary>
     public abstract class PluginOperation
     {
         private readonly PluginName _pluginName;
@@ -177,7 +177,7 @@ namespace Alis.Reactive
         /// <summary>Gets the plugin registration name.</summary>
         public string PluginName => _pluginName.Value;
 
-        /// <summary>Gets the declared plugin target name; root functions report <c>root</c>.</summary>
+        /// <summary>Gets the declared plugin target name; root functions and commands report <c>root</c>.</summary>
         public string Member => _operation.TargetLabel;
 
         internal PluginOperationId OperationId => _operation;

@@ -4,9 +4,9 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Configures the functions, properties, and commands a Reactive Plan may use on a named plugin.
+    /// Declares the functions, properties, and commands a Reactive Plan may use on a named plugin.
     /// For example, <c>plan.RegisterPlugin("auth", p =&gt; p.Method&lt;string&gt;("getToken"))</c>.
-    /// Use the argument builder when a plugin method has fixed argument types.
+    /// Use the argument builder when a host plugin member has fixed argument types.
     /// </summary>
     public sealed class PluginTypeBuilder
     {
@@ -18,17 +18,17 @@ namespace Alis.Reactive.Builders
             _pluginName = PluginName.Of(pluginName);
         }
 
-        /// <summary>Declares a plugin method whose return shape is inferred from <typeparamref name="T"/>.</summary>
-        /// <typeparam name="T">The method return type.</typeparam>
-        /// <param name="name">The registered plugin method name.</param>
+        /// <summary>Declares a value-returning plugin function with an open argument contract.</summary>
+        /// <typeparam name="T">The function return type.</typeparam>
+        /// <param name="name">The host plugin function name.</param>
         public PluginTypeBuilder Method<T>(string name)
         {
             return AddMethod<T>(name, MethodArgumentContract.Open);
         }
 
-        /// <summary>Declares a readable Reactive Plan plugin property.</summary>
+        /// <summary>Declares a readable plugin property.</summary>
         /// <typeparam name="T">The property value type.</typeparam>
-        /// <param name="name">The registered plugin property name.</param>
+        /// <param name="name">The host plugin property name.</param>
         public PluginTypeBuilder Property<T>(string name)
         {
             EnsureName(name);
@@ -38,10 +38,10 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Declares a plugin method with a return type and exact argument contract.</summary>
-        /// <typeparam name="TReturn">The method return type.</typeparam>
-        /// <param name="name">The registered plugin method name.</param>
-        /// <param name="arguments">The ordered argument types accepted by the plugin method.</param>
+        /// <summary>Declares a value-returning plugin function with an exact argument contract.</summary>
+        /// <typeparam name="TReturn">The function return type.</typeparam>
+        /// <param name="name">The host plugin function name.</param>
+        /// <param name="arguments">The ordered argument types accepted by the function.</param>
         public PluginTypeBuilder Method<TReturn>(string name, Action<PluginArgumentTypes> arguments)
         {
             return AddMethod<TReturn>(
@@ -66,21 +66,21 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
-        /// <summary>Declares a plugin command member with no return value.</summary>
-        /// <param name="name">The registered plugin method name.</param>
+        /// <summary>Declares a command member with no return value and an open argument contract.</summary>
+        /// <param name="name">The host plugin command name.</param>
         public PluginTypeBuilder Void(string name)
         {
             return AddVoid(name, MethodArgumentContract.Open);
         }
 
-        /// <summary>Declares a plugin command member with no return value.</summary>
-        /// <param name="name">The registered plugin method name.</param>
+        /// <summary>Declares a command member with no return value and an open argument contract.</summary>
+        /// <param name="name">The host plugin command name.</param>
         public PluginTypeBuilder Command(string name) =>
             Void(name);
 
-        /// <summary>Declares a plugin command member with an exact argument contract.</summary>
-        /// <param name="name">The registered plugin method name.</param>
-        /// <param name="arguments">The ordered argument types accepted by the plugin method.</param>
+        /// <summary>Declares a command member with an exact argument contract.</summary>
+        /// <param name="name">The host plugin command name.</param>
+        /// <param name="arguments">The ordered argument types accepted by the command.</param>
         public PluginTypeBuilder Void(string name, Action<PluginArgumentTypes> arguments)
         {
             return AddVoid(
@@ -88,9 +88,9 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
-        /// <summary>Declares a plugin command member with an exact argument contract.</summary>
-        /// <param name="name">The registered plugin method name.</param>
-        /// <param name="arguments">The ordered argument types accepted by the plugin method.</param>
+        /// <summary>Declares a command member with an exact argument contract.</summary>
+        /// <param name="name">The host plugin command name.</param>
+        /// <param name="arguments">The ordered argument types accepted by the command.</param>
         public PluginTypeBuilder Command(string name, Action<PluginArgumentTypes> arguments) =>
             Void(name, arguments);
 
