@@ -17,6 +17,10 @@ namespace Alis.Reactive.Fusion.Components
     /// Schedule is a non-input component: it exposes schedule state and event methods, not
     /// <c>Value()</c> or <c>SetValue()</c>. Data loading is server-driven via <c>SetDataSource</c>.
     /// </para>
+    /// <para>
+    /// These methods emit Reactive Plan reads, writes, or calls against the registered
+    /// Syncfusion Schedule instance.
+    /// </para>
     /// </remarks>
     public static class FusionScheduleExtensions
     {
@@ -62,7 +66,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("scrollTo").WithArgs<string>();
 
         /// <summary>
-        /// Reads Syncfusion's active view name, such as <c>Day</c>, <c>Week</c>, <c>WorkWeek</c>, <c>Month</c>, or <c>Agenda</c>.
+        /// Reads the active schedule view name, such as <c>Day</c> or <c>Week</c>.
         /// </summary>
         public static TypedComponentSource<string> CurrentView<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
@@ -70,7 +74,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.Read(CurrentViewProperty);
 
         /// <summary>
-        /// Reads Syncfusion's currently selected date.
+        /// Reads the currently selected schedule date.
         /// </summary>
         public static TypedComponentSource<DateTime> SelectedDate<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
@@ -78,7 +82,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.Read(SelectedDateProperty);
 
         /// <summary>
-        /// Calls Syncfusion's <c>getEvents()</c> and exposes the returned events as a typed source.
+        /// Exposes the rendered schedule events as a typed source.
         /// </summary>
         public static TypedComponentSource<FusionScheduleEventData[]> GetEvents<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
@@ -86,7 +90,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.Read<FusionScheduleEventData[]>(GetEventsMethod);
 
         /// <summary>
-        /// Sets <c>eventSettings.dataSource</c> from a response-body path, then calls <c>dataBind()</c>.
+        /// Replaces schedule event data from a response-body path and refreshes the schedule.
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> SetDataSource<TModel, TResponse>(
             this ComponentRef<FusionSchedule, TModel> self,
@@ -100,7 +104,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Sets <c>eventSettings.dataSource</c> from the entire HTTP response body, then calls <c>dataBind()</c>.
+        /// Replaces schedule event data from the entire HTTP response body and refreshes the schedule.
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> SetDataSource<TModel, TResponse>(
             this ComponentRef<FusionSchedule, TModel> self,
@@ -113,7 +117,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Calls Syncfusion's <c>addEvent</c> with one event or an event collection.
+        /// Adds one schedule event or an event collection from a value expression.
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> AddEvent<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, ValueExpression data)
@@ -121,7 +125,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(AddEventMethod, new System.Collections.Generic.List<ValueExpression> { data });
 
         /// <summary>
-        /// Calls Syncfusion's <c>saveEvent</c> to update an existing event.
+        /// Saves an existing schedule event from a value expression.
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> SaveEvent<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, ValueExpression data)
@@ -129,7 +133,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(SaveEventMethod, new System.Collections.Generic.List<ValueExpression> { data });
 
         /// <summary>
-        /// Calls Syncfusion's <c>deleteEvent</c> with the event identifier.
+        /// Deletes a schedule event by identifier.
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> DeleteEvent<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, ValueExpression eventId)
@@ -137,7 +141,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(DeleteEventMethod, new System.Collections.Generic.List<ValueExpression> { eventId });
 
         /// <summary>
-        /// Calls Syncfusion's <c>openEditor</c> with event data and an editor action.
+        /// Opens the built-in schedule editor for event data and an editor action.
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> OpenEditor<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, ValueExpression data, string action = "Add")
@@ -145,7 +149,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(OpenEditorMethod, new System.Collections.Generic.List<ValueExpression> { data, ValueExpression.Literal(action) });
 
         /// <summary>
-        /// Calls Syncfusion's <c>closeEditor</c>.
+        /// Closes the built-in schedule editor.
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> CloseEditor<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
@@ -153,7 +157,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(CloseEditorMethod);
 
         /// <summary>
-        /// Calls Syncfusion's <c>refreshEvents</c> to re-render schedule events.
+        /// Re-renders schedule events.
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> RefreshEvents<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
@@ -161,7 +165,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(RefreshEventsMethod);
 
         /// <summary>
-        /// Calls Syncfusion's <c>print</c> for the current schedule view.
+        /// Prints the current schedule view.
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> Print<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
@@ -169,7 +173,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(PrintMethod);
 
         /// <summary>
-        /// Calls Syncfusion's <c>scrollTo</c> with the target schedule time.
+        /// Scrolls the schedule to the target time.
         /// </summary>
         public static ComponentRef<FusionSchedule, TModel> ScrollTo<TModel>(
             this ComponentRef<FusionSchedule, TModel> self, string hour)
