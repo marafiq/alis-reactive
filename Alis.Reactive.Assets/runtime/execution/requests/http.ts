@@ -89,8 +89,8 @@ async function sendHttpRequest(request: RequestPlan, fetchRequest: ResolvedFetch
     });
 
     return exchangeOutcomeFromResponse(response, await readResponseBody(response));
-  } catch (err) {
-    return exchangeOutcomeFromClientFailure(request, err);
+  } catch (error) {
+    return exchangeOutcomeFromClientFailure(request, error);
   }
 }
 
@@ -101,12 +101,12 @@ function exchangeOutcomeFromResponse(response: Response, body: HttpResponseBody)
     : { kind: "error", status: response.status, body };
 }
 
-function exchangeOutcomeFromClientFailure(request: RequestPlan, err: unknown): HttpExchangeOutcome {
-  const traceEvent = clientRequestFailureTraceEvent(err);
+function exchangeOutcomeFromClientFailure(request: RequestPlan, error: unknown): HttpExchangeOutcome {
+  const traceEvent = clientRequestFailureTraceEvent(error);
   log.error(traceEvent, {
     method: request.method,
     url: request.url,
-    error: toJavaScriptString(err),
+    error: toJavaScriptString(error),
   });
   return { kind: "response-unavailable" };
 }

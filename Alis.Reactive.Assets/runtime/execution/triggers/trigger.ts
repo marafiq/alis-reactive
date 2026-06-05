@@ -18,10 +18,10 @@ function runReaction(reaction: ReactionGraph, planDocument: PlanDocument, contex
   try {
     catchAsyncReactionFailure(
       executeReaction(reaction, planDocument, context.raw),
-      err => log.error("reaction.failed", { source, sync: false, error: toJavaScriptString(err) }),
+      error => log.error("reaction.failed", { source, sync: false, error: toJavaScriptString(error) }),
     );
-  } catch (err) {
-    log.error("reaction.failed", { source, sync: true, error: toJavaScriptString(err) });
+  } catch (error) {
+    log.error("reaction.failed", { source, sync: true, error: toJavaScriptString(error) });
   }
 }
 
