@@ -47,22 +47,22 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds a value from the triggering event payload to the request body.</summary>
-        /// <typeparam name="TArgs">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload type.</typeparam>
         /// <typeparam name="TProp">The event value type copied into the request body.</typeparam>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path to read.</param>
         /// <param name="param">The request body field name.</param>
-        public GatherBuilder<TModel> FromEvent<TArgs, TProp>(
-            TArgs args,
-            Expression<Func<TArgs, TProp>> path,
+        public GatherBuilder<TModel> FromEvent<TPayload, TProp>(
+            TPayload args,
+            Expression<Func<TPayload, TProp>> path,
             string param)
         {
             var bodyPath = BindingPath.Of(param);
-            var eventPath = ExpressionPathHelper.ToEventPath(path);
+            var payloadPath = ExpressionPathHelper.ToEventPath(path);
             var shape = Shape.FromClrType(typeof(TProp));
             _draft.AddPayload(
                 bodyPath,
-                ValueExpression.ReadPayload(PayloadSource.Event(), eventPath, shape));
+                ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath, shape));
             return this;
         }
 
@@ -94,17 +94,20 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds a scalar HTTP header value from the triggering event payload.</summary>
-        /// <typeparam name="TArgs">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload type.</typeparam>
         /// <typeparam name="TProp">The event value type sent as the header value.</typeparam>
         /// <param name="name">The HTTP header name.</param>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path to send as a header.</param>
-        public GatherBuilder<TModel> Header<TArgs, TProp>(string name, TArgs args, Expression<Func<TArgs, TProp>> path)
+        public GatherBuilder<TModel> Header<TPayload, TProp>(
+            string name,
+            TPayload args,
+            Expression<Func<TPayload, TProp>> path)
         {
             var header = HeaderName.Of(name);
             var shape = RequestScalarTarget.Header<TProp>(header);
-            var eventPath = ExpressionPathHelper.ToEventPath(path);
-            _draft.AddHeader(header, ValueExpression.ReadPayload(PayloadSource.Event(), eventPath, shape));
+            var payloadPath = ExpressionPathHelper.ToEventPath(path);
+            _draft.AddHeader(header, ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath, shape));
             return this;
         }
 
@@ -156,18 +159,20 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Binds a route template parameter to a scalar value from the triggering event payload.</summary>
-        /// <typeparam name="TArgs">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload type.</typeparam>
         /// <typeparam name="TProp">The event value type sent as the route value.</typeparam>
         /// <param name="paramName">The route template placeholder name without braces.</param>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path to use as the route value.</param>
-        public GatherBuilder<TModel> RouteParam<TArgs, TProp>(
-            string paramName, TArgs args, Expression<Func<TArgs, TProp>> path)
+        public GatherBuilder<TModel> RouteParam<TPayload, TProp>(
+            string paramName,
+            TPayload args,
+            Expression<Func<TPayload, TProp>> path)
         {
             var routeParam = RouteParameterName.Of(paramName);
             var shape = RequestScalarTarget.RouteParameter<TProp>(routeParam);
-            var eventPath = ExpressionPathHelper.ToEventPath(path);
-            _draft.AddRouteParameter(routeParam, ValueExpression.ReadPayload(PayloadSource.Event(), eventPath, shape));
+            var payloadPath = ExpressionPathHelper.ToEventPath(path);
+            _draft.AddRouteParameter(routeParam, ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath, shape));
             return this;
         }
 
