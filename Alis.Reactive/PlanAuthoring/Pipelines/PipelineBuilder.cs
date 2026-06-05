@@ -158,11 +158,11 @@ namespace Alis.Reactive.Builders
             return new Conditions.TypedUrlSource<T>(paramName);
         }
 
-        /// <summary>Reads a value returned by a member function on a plan-registered plugin.</summary>
-        /// <typeparam name="T">The function return type exposed to downstream value expressions.</typeparam>
-        /// <param name="pluginName">The plugin name declared with <c>plan.RegisterPlugin(...)</c>.</param>
+        /// <summary>Reads the result of a named function on a plan-registered plugin.</summary>
+        /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
+        /// <param name="pluginName">The registered plugin key emitted into the generated plan.</param>
         /// <param name="member">The function member to invoke on the host-provided plugin object.</param>
-        /// <returns>A builder for supplying arguments before the function result becomes a typed source.</returns>
+        /// <returns>A builder for supplying function arguments before the result becomes a typed source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName, string member)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -176,10 +176,10 @@ namespace Alis.Reactive.Builders
                 signature.Arguments);
         }
 
-        /// <summary>Reads a value returned by the root function of a plan-registered plugin.</summary>
-        /// <typeparam name="T">The function return type exposed to downstream value expressions.</typeparam>
-        /// <param name="pluginName">The plugin name declared with <c>plan.RegisterPlugin(...)</c>.</param>
-        /// <returns>A builder for supplying arguments before the function result becomes a typed source.</returns>
+        /// <summary>Reads the result of a plugin whose registered object is itself callable.</summary>
+        /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
+        /// <param name="pluginName">The registered plugin key emitted into the generated plan.</param>
+        /// <returns>A builder for supplying root-function arguments before the result becomes a typed source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -192,9 +192,9 @@ namespace Alis.Reactive.Builders
                 signature.Arguments);
         }
 
-        /// <summary>Reads a property value from a plan-registered plugin.</summary>
-        /// <typeparam name="T">The property value type exposed to downstream value expressions.</typeparam>
-        /// <param name="pluginName">The plugin name declared with <c>plan.RegisterPlugin(...)</c>.</param>
+        /// <summary>Reads a named property from a plan-registered plugin.</summary>
+        /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
+        /// <param name="pluginName">The registered plugin key emitted into the generated plan.</param>
         /// <param name="member">The property member to read from the host-provided plugin object.</param>
         /// <returns>A typed plugin property value source.</returns>
         public Conditions.TypedPluginPropertySource<T> PluginProperty<T>(string pluginName, string member)
@@ -207,10 +207,10 @@ namespace Alis.Reactive.Builders
             return new Conditions.TypedPluginPropertySource<T>(property);
         }
 
-        /// <summary>Reads a value returned by a typed plugin function descriptor.</summary>
-        /// <typeparam name="T">The function return type exposed to downstream value expressions.</typeparam>
-        /// <param name="function">The descriptor carrying the plugin name, target member, argument contract, and return shape.</param>
-        /// <returns>A builder for supplying arguments before the function result becomes a typed source.</returns>
+        /// <summary>Reads the result of a reusable plugin function descriptor.</summary>
+        /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
+        /// <param name="function">The descriptor carrying the plugin key, target member, argument contract, and return shape.</param>
+        /// <returns>A builder for supplying function arguments before the result becomes a typed source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
         {
             if (function == null) throw new System.ArgumentNullException(nameof(function));
@@ -218,9 +218,9 @@ namespace Alis.Reactive.Builders
             return new PluginMemberBuilder<T, TModel>(function);
         }
 
-        /// <summary>Reads a property value described by a typed plugin descriptor.</summary>
-        /// <typeparam name="T">The property value type exposed to downstream value expressions.</typeparam>
-        /// <param name="property">The descriptor carrying the plugin name, property member, and value shape.</param>
+        /// <summary>Reads a property described by a reusable plugin property descriptor.</summary>
+        /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
+        /// <param name="property">The descriptor carrying the plugin key, property member, and value shape.</param>
         /// <returns>A typed plugin property value source.</returns>
         public Conditions.TypedPluginPropertySource<T> Plugin<T>(PluginProperty<T> property)
         {
@@ -229,8 +229,8 @@ namespace Alis.Reactive.Builders
             return new Conditions.TypedPluginPropertySource<T>(property.PropertyId);
         }
 
-        /// <summary>Starts a command reaction against a member on a plan-registered plugin.</summary>
-        /// <param name="pluginName">The plugin name declared with <c>plan.RegisterPlugin(...)</c>.</param>
+        /// <summary>Starts a command reaction against a named member on a plan-registered plugin.</summary>
+        /// <param name="pluginName">The registered plugin key emitted into the generated plan.</param>
         /// <param name="member">The command member to invoke on the host-provided plugin object.</param>
         /// <returns>A command builder for supplying arguments before emitting the plugin call with <c>Fire()</c>.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
@@ -245,9 +245,9 @@ namespace Alis.Reactive.Builders
                 signature.Arguments);
         }
 
-        /// <summary>Starts a command reaction against the root command of a plan-registered plugin.</summary>
-        /// <param name="pluginName">The plugin name declared with <c>plan.RegisterPlugin(...)</c>.</param>
-        /// <returns>A command builder for supplying arguments before emitting the plugin call with <c>Fire()</c>.</returns>
+        /// <summary>Starts a command reaction against a plugin whose registered object is itself callable.</summary>
+        /// <param name="pluginName">The registered plugin key emitted into the generated plan.</param>
+        /// <returns>A command builder for supplying root-command arguments before emitting the call with <c>Fire()</c>.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -259,8 +259,8 @@ namespace Alis.Reactive.Builders
                 signature.Arguments);
         }
 
-        /// <summary>Starts a command reaction described by a typed plugin descriptor.</summary>
-        /// <param name="command">The descriptor carrying the plugin name, target member, and argument contract.</param>
+        /// <summary>Starts a command reaction from a reusable plugin command descriptor.</summary>
+        /// <param name="command">The descriptor carrying the plugin key, target member, and argument contract.</param>
         /// <returns>A command builder for supplying arguments before emitting the plugin call with <c>Fire()</c>.</returns>
         public PluginCallBuilder<TModel> Plugin(PluginCommand command)
         {
