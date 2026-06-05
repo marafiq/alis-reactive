@@ -283,7 +283,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Appends a reaction that injects the previous HTTP success body as HTML.</summary>
-        /// <remarks>Must follow an HTTP request. The response body is read from the success payload.</remarks>
+        /// <remarks>Must follow an HTTP request. The injected HTML comes from the active success response body.</remarks>
         /// <param name="elementId">The target DOM element ID.</param>
         /// <returns>The current builder; chained reactions are appended after the injection.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
