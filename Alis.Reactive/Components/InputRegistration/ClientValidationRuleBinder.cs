@@ -41,8 +41,8 @@ namespace Alis.Reactive
         /// <summary>Binds every validation rule job declared during plan construction.</summary>
         internal void BindQueuedJobs()
         {
-            foreach (var job in _context.ValidationJobs)
-                BindJob(job);
+            foreach (var validationJob in _context.ValidationJobs)
+                BindJob(validationJob);
         }
 
         private void BindJob(ValidationJob job)

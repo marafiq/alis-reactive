@@ -147,8 +147,8 @@ namespace Alis.Reactive.Builders.Arrays
                         "projection. Side-effecting per-element calls need a reaction, not a projection. Got: " + node);
 
                 var methodArgs = new List<ValueExpression>();
-                foreach (var arg in call.Arguments)
-                    methodArgs.Add(CompileValue(Unwrap(arg), element));
+                foreach (var methodArgument in call.Arguments)
+                    methodArgs.Add(CompileValue(Unwrap(methodArgument), element));
 
                 return ValueExpression.InvokeElement(receiverPath, methodName, Shape.FromClrType(node.Type), methodArgs);
             }
