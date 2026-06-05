@@ -18,9 +18,9 @@ namespace Alis.Reactive.Native.Components
     /// Configures and renders a native HTML <c>&lt;input&gt;</c> element bound to a model property.
     /// </summary>
     /// <remarks>
-    /// Supports <c>type="text"</c> (default), <c>"number"</c>, <c>"email"</c>,
-    /// <c>"password"</c>, etc. Created by the <c>.NativeTextBox()</c> factory on
-    /// <see cref="InputBoundField{TModel,TProp}"/>.
+    /// Supports <c>type="text"</c> by default, plus native input types such as
+    /// <c>"email"</c>, <c>"password"</c>, etc. Created by the
+    /// <c>.NativeTextBox()</c> factory on <see cref="InputBoundField{TModel,TProp}"/>.
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">The model value type rendered through the text input.</typeparam>
@@ -67,7 +67,7 @@ namespace Alis.Reactive.Native.Components
         internal string BindingPath => _bindingPath;
 
         /// <summary>
-        /// Sets the HTML input type (e.g. <c>"email"</c>, <c>"password"</c>, <c>"number"</c>).
+        /// Selects the HTML input type, such as <c>"email"</c> or <c>"password"</c>.
         /// Defaults to <c>"text"</c>.
         /// </summary>
         /// <param name="type">The HTML <c>type</c> attribute value.</param>
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Adds CSS classes to the input element.
+        /// Replaces the CSS classes on the input element.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
         public NativeTextBoxBuilder<TModel, TProp> CssClass(string css)
@@ -88,7 +88,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets the placeholder text shown when the input is empty.
+        /// Replaces the placeholder text shown when the input is empty.
         /// </summary>
         /// <param name="placeholder">The placeholder text.</param>
         public NativeTextBoxBuilder<TModel, TProp> Placeholder(string placeholder)
