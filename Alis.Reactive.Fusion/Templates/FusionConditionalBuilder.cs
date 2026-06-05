@@ -37,14 +37,12 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a <c>span</c> with literal text.
         /// </summary>
-        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionConditionalBuilder<TModel> Span(string text) =>
             Span(text, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled <c>span</c> with literal text.
         /// </summary>
-        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionConditionalBuilder<TModel> Span(string text, string css) =>
             Span(text, TemplateCss.Class(css));
 
@@ -66,7 +64,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a badge with literal text.
         /// </summary>
-        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionConditionalBuilder<TModel> Badge(string text, string css = "e-badge")
         {
             _childRenderers.Add(() => TemplateElements.Badge(text, css));
