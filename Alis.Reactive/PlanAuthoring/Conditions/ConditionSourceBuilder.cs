@@ -10,6 +10,8 @@ namespace Alis.Reactive.Builders.Conditions
     /// Chain an operator such as <c>.Eq(5)</c> or <c>.Truthy()</c> to produce a
     /// <see cref="GuardBuilder{TModel}"/>. Operators are serialized into the
     /// Reactive Plan and evaluated by the runtime; they do not read values on the server.
+    /// Literal and source comparisons use <typeparamref name="TProp"/> and the source
+    /// shape for compile-time and runtime type context.
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns the guarded pipeline.</typeparam>
     /// <typeparam name="TProp">The source value type, providing compile-time operator type safety.</typeparam>
@@ -46,74 +48,74 @@ namespace Alis.Reactive.Builders.Conditions
             _composeCondition = composeCondition ?? throw new System.ArgumentNullException(nameof(composeCondition));
         }
 
-        /// <summary>True when the source value equals <paramref name="operand"/>.</summary>
+        /// <summary>Compares the source with a typed literal using equality.</summary>
         public GuardBuilder<TModel> Eq(TProp operand) => BuildLiteral(CompareOperator.Eq, operand);
-        /// <summary>True when the source value does not equal <paramref name="operand"/>.</summary>
+        /// <summary>Compares the source with a typed literal using inequality.</summary>
         public GuardBuilder<TModel> NotEq(TProp operand) => BuildLiteral(CompareOperator.Neq, operand);
-        /// <summary>True when the source value is greater than <paramref name="operand"/>.</summary>
+        /// <summary>Compares the source with a typed literal using an ordered greater-than check.</summary>
         public GuardBuilder<TModel> Gt(TProp operand) => BuildLiteral(CompareOperator.Gt, operand);
-        /// <summary>True when the source value is greater than or equal to <paramref name="operand"/>.</summary>
+        /// <summary>Compares the source with a typed literal using an ordered greater-than-or-equal check.</summary>
         public GuardBuilder<TModel> Gte(TProp operand) => BuildLiteral(CompareOperator.Gte, operand);
-        /// <summary>True when the source value is less than <paramref name="operand"/>.</summary>
+        /// <summary>Compares the source with a typed literal using an ordered less-than check.</summary>
         public GuardBuilder<TModel> Lt(TProp operand) => BuildLiteral(CompareOperator.Lt, operand);
-        /// <summary>True when the source value is less than or equal to <paramref name="operand"/>.</summary>
+        /// <summary>Compares the source with a typed literal using an ordered less-than-or-equal check.</summary>
         public GuardBuilder<TModel> Lte(TProp operand) => BuildLiteral(CompareOperator.Lte, operand);
 
-        /// <summary>True when the source value is truthy (non-null, non-zero, non-empty).</summary>
+        /// <summary>Evaluates runtime truthiness: non-null, non-zero, and non-empty.</summary>
         public GuardBuilder<TModel> Truthy() => BuildUnary(CompareOperator.Truthy);
-        /// <summary>True when the source value is falsy (null, zero, or empty).</summary>
+        /// <summary>Evaluates runtime falsiness: null, zero, or empty.</summary>
         public GuardBuilder<TModel> Falsy() => BuildUnary(CompareOperator.Falsy);
-        /// <summary>True when the source value is null.</summary>
+        /// <summary>Matches null source values.</summary>
         public GuardBuilder<TModel> IsNull() => BuildUnary(CompareOperator.IsNull);
-        /// <summary>True when the source value is not null.</summary>
+        /// <summary>Matches non-null source values.</summary>
         public GuardBuilder<TModel> NotNull() => BuildUnary(CompareOperator.NotNull);
-        /// <summary>True when the source value is empty (empty string or empty collection).</summary>
+        /// <summary>Matches empty source values, including empty strings and empty collections.</summary>
         public GuardBuilder<TModel> IsEmpty() => BuildUnary(CompareOperator.IsEmpty);
-        /// <summary>True when the source value is not empty.</summary>
+        /// <summary>Matches source values that are not empty.</summary>
         public GuardBuilder<TModel> NotEmpty() => BuildUnary(CompareOperator.NotEmpty);
 
-        /// <summary>True when the source value is in the specified set.</summary>
+        /// <summary>Compares the source against a typed literal set.</summary>
         public GuardBuilder<TModel> In(params TProp[] values) => BuildArray(CompareOperator.In, values);
-        /// <summary>True when the source value is not in the specified set.</summary>
+        /// <summary>Compares the source against values outside a typed literal set.</summary>
         public GuardBuilder<TModel> NotIn(params TProp[] values) => BuildArray(CompareOperator.NotIn, values);
 
-        /// <summary>True when the source value is between <paramref name="low"/> and <paramref name="high"/> inclusive.</summary>
+        /// <summary>Compares the source against an inclusive typed range.</summary>
         public GuardBuilder<TModel> Between(TProp low, TProp high) =>
             Build(CompareOperator.Between, RangeOperands(low, high));
 
-        /// <summary>True when the source string contains the substring.</summary>
+        /// <summary>Compares the source as text and matches when it contains <paramref name="substring"/>.</summary>
         public GuardBuilder<TModel> Contains(string substring) =>
             BuildTextLiteral(CompareOperator.Contains, substring);
-        /// <summary>True when the source string starts with the prefix.</summary>
+        /// <summary>Compares the source as text and matches when it starts with <paramref name="prefix"/>.</summary>
         public GuardBuilder<TModel> StartsWith(string prefix) =>
             BuildTextLiteral(CompareOperator.StartsWith, prefix);
-        /// <summary>True when the source string ends with the suffix.</summary>
+        /// <summary>Compares the source as text and matches when it ends with <paramref name="suffix"/>.</summary>
         public GuardBuilder<TModel> EndsWith(string suffix) =>
             BuildTextLiteral(CompareOperator.EndsWith, suffix);
-        /// <summary>True when the source string matches the regex pattern.</summary>
+        /// <summary>Compares the source as text and matches it with the regular expression <paramref name="pattern"/>.</summary>
         public GuardBuilder<TModel> Matches(string pattern) =>
             BuildTextLiteral(CompareOperator.Matches, pattern);
-        /// <summary>True when the source string length is at least <paramref name="length"/>.</summary>
+        /// <summary>Compares the source text length against the minimum <paramref name="length"/>.</summary>
         public GuardBuilder<TModel> MinLength(int length) =>
             Build(CompareOperator.MinLength, MinimumLengthOperands(length));
 
-        /// <summary>True when the source array contains the specified item.</summary>
+        /// <summary>Tests array membership using the source element shape for <paramref name="item"/>.</summary>
         public GuardBuilder<TModel> ArrayContains(object item)
         {
             return Build(CompareOperator.ArrayContains, CollectionItemOperands(item));
         }
 
-        /// <summary>True when the source value equals another typed source value.</summary>
+        /// <summary>Compares this source with another typed source using equality.</summary>
         public GuardBuilder<TModel> Eq(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Eq, right);
-        /// <summary>True when the source value does not equal another typed source value.</summary>
+        /// <summary>Compares this source with another typed source using inequality.</summary>
         public GuardBuilder<TModel> NotEq(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Neq, right);
-        /// <summary>True when the source value is greater than another typed source value.</summary>
+        /// <summary>Compares this source with another typed source using an ordered greater-than check.</summary>
         public GuardBuilder<TModel> Gt(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Gt, right);
-        /// <summary>True when the source value is greater than or equal to another typed source value.</summary>
+        /// <summary>Compares this source with another typed source using an ordered greater-than-or-equal check.</summary>
         public GuardBuilder<TModel> Gte(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Gte, right);
-        /// <summary>True when the source value is less than another typed source value.</summary>
+        /// <summary>Compares this source with another typed source using an ordered less-than check.</summary>
         public GuardBuilder<TModel> Lt(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Lt, right);
-        /// <summary>True when the source value is less than or equal to another typed source value.</summary>
+        /// <summary>Compares this source with another typed source using an ordered less-than-or-equal check.</summary>
         public GuardBuilder<TModel> Lte(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Lte, right);
 
         private GuardBuilder<TModel> BuildVsSource(CompareOperator op, TypedSource<TProp> right)
