@@ -267,12 +267,12 @@ namespace Alis.Reactive.PlanModel
                     $"but re-registered with {_shapes.Count} argument(s).");
 
             var merged = new List<Shape>(existing._shapes.Count);
-            for (var i = 0; i < existing._shapes.Count; i++)
+            for (var argumentIndex = 0; argumentIndex < existing._shapes.Count; argumentIndex++)
             {
-                if (!ShapeContractCompatibility.TryMergeContracts(existing._shapes[i], _shapes[i], out var mergedShape))
+                if (!ShapeContractCompatibility.TryMergeContracts(existing._shapes[argumentIndex], _shapes[argumentIndex], out var mergedShape))
                     throw new System.InvalidOperationException(
-                        $"Method '{name.Value}' argument {i} registered with shape '{existing._shapes[i].DescribeContract()}' " +
-                        $"but re-registered with conflicting shape '{_shapes[i].DescribeContract()}'.");
+                        $"Method '{name.Value}' argument {argumentIndex} registered with shape '{existing._shapes[argumentIndex].DescribeContract()}' " +
+                        $"but re-registered with conflicting shape '{_shapes[argumentIndex].DescribeContract()}'.");
                 merged.Add(mergedShape);
             }
 
@@ -292,9 +292,9 @@ namespace Alis.Reactive.PlanModel
             if (shapes == null) throw new System.ArgumentNullException(nameof(shapes));
             if (_shapes.Count != shapes.Count) return false;
 
-            for (var i = 0; i < _shapes.Count; i++)
+            for (var argumentIndex = 0; argumentIndex < _shapes.Count; argumentIndex++)
             {
-                if (_shapes[i] != shapes[i]) return false;
+                if (_shapes[argumentIndex] != shapes[argumentIndex]) return false;
             }
 
             return true;
