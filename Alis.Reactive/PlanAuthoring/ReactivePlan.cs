@@ -51,7 +51,7 @@ namespace Alis.Reactive
 
         /// <summary>Registers a plugin contract in the plan before pipelines reference it.</summary>
         /// <param name="pluginName">The plugin registration name used by <c>p.Plugin(...)</c>.</param>
-        /// <param name="configure">Declares the methods and properties the plan can reference.</param>
+        /// <param name="configure">Declares the functions, properties, and commands the plan can reference.</param>
         public void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder> configure)
         {
             if (string.IsNullOrWhiteSpace(pluginName))
