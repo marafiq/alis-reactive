@@ -39,7 +39,7 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly PathSegmentBody _body;
 
-        /// <summary>Gets the segment kind (property or index).</summary>
+        /// <summary>JSON discriminator for path segments: <c>property</c> or <c>index</c>.</summary>
         public string Kind => _body.KindForJson;
 
         private PathSegment(PathSegmentBody body)
@@ -178,7 +178,7 @@ namespace Alis.Reactive.PlanModel
     {
         internal static readonly Path None = new Path(Array.Empty<PathSegment>());
 
-        /// <summary>Gets the ordered path segments.</summary>
+        /// <summary>Ordered path segments used by runtime path traversal.</summary>
         [JsonIgnore]
         public IReadOnlyList<PathSegment> Segments { get; }
 

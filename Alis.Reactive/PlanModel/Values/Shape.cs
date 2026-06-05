@@ -212,7 +212,7 @@ namespace Alis.Reactive.PlanModel
             || definition == typeof(IDictionary<,>)
             || definition == typeof(IReadOnlyDictionary<,>);
 
-        /// <summary>Gets the shape kind (string, number, boolean, date, array, object, nullable, raw, any, or none).</summary>
+        /// <summary>JSON shape kind, such as <c>string</c>, <c>array</c>, <c>object</c>, or <c>nullable</c>.</summary>
         public string Kind { get; }
 
         internal bool IsNone => Kind == "none";

@@ -92,25 +92,25 @@ namespace Alis.Reactive.PlanModel
 
         internal static PlanScope Partial { get; } = new PartialPlanScope();
 
-        /// <summary>Gets the scope kind.</summary>
+        /// <summary>JSON discriminator for plan merge scope.</summary>
         public abstract string Kind { get; }
     }
 
-    /// <summary>Represents a root view plan.</summary>
+    /// <summary>Plan scope for the root view plan.</summary>
     public sealed class RootPlanScope : PlanScope
     {
         internal RootPlanScope() { }
 
-        /// <summary>Gets the kind. Always <c>"root"</c>.</summary>
+        /// <summary>JSON discriminator for root view plans. Always <c>"root"</c>.</summary>
         public override string Kind => "root";
     }
 
-    /// <summary>Represents a partial plan emitted by a view that can be loaded into a DOM slot.</summary>
+    /// <summary>Plan scope for a partial plan that can be loaded into a DOM slot.</summary>
     public sealed class PartialPlanScope : PlanScope
     {
         internal PartialPlanScope() { }
 
-        /// <summary>Gets the kind. Always <c>"partial"</c>.</summary>
+        /// <summary>JSON discriminator for partial plans. Always <c>"partial"</c>.</summary>
         public override string Kind => "partial";
     }
 
@@ -410,7 +410,7 @@ namespace Alis.Reactive.PlanModel
                 ?? throw new ArgumentException("Payload type must have a full name.", nameof(payloadType)));
         }
 
-        /// <summary>Gets the payload contract kind.</summary>
+        /// <summary>JSON discriminator for payload typing contracts.</summary>
         public abstract string Kind { get; }
 
         internal abstract string DisplayName { get; }
