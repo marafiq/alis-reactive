@@ -13,23 +13,23 @@ namespace Alis.Reactive.PlanModel
         private readonly ResponseRouting _responseRouting;
         private readonly RequestValidationTarget _validationTarget;
 
-        /// <summary>Gets the HTTP method (GET, POST, PUT, DELETE).</summary>
+        /// <summary>HTTP method to send, such as <c>GET</c>, <c>POST</c>, <c>PUT</c>, or <c>DELETE</c>.</summary>
         public string Method => _endpoint.Method.Value;
-        /// <summary>Gets the request URL, which may contain template placeholders like <c>{id}</c>.</summary>
+        /// <summary>Request URL, which may contain template placeholders such as <c>{id}</c>.</summary>
         public string Url => _endpoint.Url.Value;
-        /// <summary>Gets the validation target used before sending this request.</summary>
+        /// <summary>Client validation target evaluated before sending this request.</summary>
         public RequestValidationTarget Validation => _validationTarget;
-        /// <summary>Gets the request body strategy. Bodiless requests use <see cref="NoRequestInput"/>.</summary>
+        /// <summary>Request input strategy; bodiless requests use <see cref="NoRequestInput"/>.</summary>
         public RequestInput Input => _input;
-        /// <summary>Gets reactions to execute while the request is loading.</summary>
+        /// <summary>Reactions to execute while the request is loading.</summary>
         public IReadOnlyList<ReactionGraph> WhileLoading => _reactions.WhileLoading;
-        /// <summary>Gets the success response routes.</summary>
+        /// <summary>Response routes evaluated for successful HTTP responses.</summary>
         public IReadOnlyList<ResponseRoute> Success => _responseRouting.Success;
-        /// <summary>Gets the error response routes.</summary>
+        /// <summary>Response routes evaluated for failed HTTP responses.</summary>
         public IReadOnlyList<ResponseRoute> Error => _responseRouting.Error;
-        /// <summary>Gets reactions to execute after the request settles regardless of outcome.</summary>
+        /// <summary>Reactions to execute after the request settles, regardless of outcome.</summary>
         public IReadOnlyList<ReactionGraph> Finally => _reactions.Finally;
-        /// <summary>Gets the request chain: terminal or followed by another request.</summary>
+        /// <summary>Request chain behavior: terminal or followed by another request after success.</summary>
         public RequestChain Chain => _responseRouting.Chain;
         private RequestPlan(
             RequestEndpoint endpoint,
@@ -134,7 +134,7 @@ namespace Alis.Reactive.PlanModel
 
         internal static RequestChain Terminal { get; } = new TerminalRequestChain();
 
-        /// <summary>Gets the chain kind.</summary>
+        /// <summary>JSON discriminator for request chain behavior.</summary>
         public abstract string Kind { get; }
         internal abstract bool HasFollowUp { get; }
 
@@ -145,7 +145,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Represents a request with no chained follow-up request.</summary>
     public sealed class TerminalRequestChain : RequestChain
     {
-        /// <summary>Gets the kind. Always <c>"terminal"</c>.</summary>
+        /// <summary>JSON discriminator for terminal request chains. Always <c>"terminal"</c>.</summary>
         public override string Kind => "terminal";
         internal override bool HasFollowUp => false;
     }
@@ -160,11 +160,11 @@ namespace Alis.Reactive.PlanModel
             _next = next;
         }
 
-        /// <summary>Gets the kind. Always <c>"follow-up"</c>.</summary>
+        /// <summary>JSON discriminator for follow-up request chains. Always <c>"follow-up"</c>.</summary>
         public override string Kind => "follow-up";
         internal override bool HasFollowUp => true;
 
-        /// <summary>Gets the request to run after the current request succeeds.</summary>
+        /// <summary>Request to run after the current request succeeds.</summary>
         public RequestPlan Next => _next;
     }
 
@@ -177,7 +177,7 @@ namespace Alis.Reactive.PlanModel
         internal static RequestValidationTarget None { get; } =
             new NoRequestValidationTarget();
 
-        /// <summary>Gets the validation target kind.</summary>
+        /// <summary>JSON discriminator for request validation targets.</summary>
         public abstract string Kind { get; }
 
         internal static RequestValidationTarget DisplayIn(ComponentId container)
@@ -189,7 +189,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Represents a request that does not run client validation before sending.</summary>
     public sealed class NoRequestValidationTarget : RequestValidationTarget
     {
-        /// <summary>Gets the kind. Always <c>"none"</c>.</summary>
+        /// <summary>JSON discriminator for requests without client validation. Always <c>"none"</c>.</summary>
         public override string Kind => "none";
     }
 
@@ -203,19 +203,19 @@ namespace Alis.Reactive.PlanModel
             _container = container;
         }
 
-        /// <summary>Gets the kind. Always <c>"container"</c>.</summary>
+        /// <summary>JSON discriminator for container validation targets. Always <c>"container"</c>.</summary>
         public override string Kind => "container";
 
-        /// <summary>Gets the container component ID to validate.</summary>
+        /// <summary>Component container ID to validate before sending the request.</summary>
         public string Container => _container.Value;
     }
 
     /// <summary>Routes an HTTP response status match to a reaction.</summary>
     public sealed class ResponseRoute
     {
-        /// <summary>Gets the response status match that selects this route.</summary>
+        /// <summary>HTTP status match that selects this response route.</summary>
         public ResponseStatusMatch Match { get; }
-        /// <summary>Gets the reaction to execute when the status matches.</summary>
+        /// <summary>Reaction to execute when the status match succeeds.</summary>
         public ReactionGraph Reaction { get; }
 
         private ResponseRoute(ReactionGraph reaction, ResponseStatusMatch match)
@@ -242,7 +242,7 @@ namespace Alis.Reactive.PlanModel
         internal static ResponseStatusMatch Any { get; } =
             new AnyResponseStatusMatch();
 
-        /// <summary>Gets the response match kind.</summary>
+        /// <summary>JSON discriminator for HTTP response status matching.</summary>
         public abstract string Kind { get; }
 
         internal static ResponseStatusMatch Exact(HttpResponseStatusCode statusCode) =>
@@ -252,7 +252,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Matches any HTTP response status in the current success or error group.</summary>
     public sealed class AnyResponseStatusMatch : ResponseStatusMatch
     {
-        /// <summary>Gets the kind. Always <c>"any"</c>.</summary>
+        /// <summary>JSON discriminator for any-status matches. Always <c>"any"</c>.</summary>
         public override string Kind => "any";
     }
 
@@ -266,10 +266,10 @@ namespace Alis.Reactive.PlanModel
             _statusCode = statusCode;
         }
 
-        /// <summary>Gets the kind. Always <c>"status"</c>.</summary>
+        /// <summary>JSON discriminator for exact-status matches. Always <c>"status"</c>.</summary>
         public override string Kind => "status";
 
-        /// <summary>Gets the HTTP status code to match.</summary>
+        /// <summary>HTTP status code that selects this route.</summary>
         public int Status => _statusCode.Value;
     }
 }

@@ -15,7 +15,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Represents a request with no authored input.</summary>
     public sealed class NoRequestInput : RequestInput
     {
-        /// <summary>Gets the kind. Always <c>"none"</c>.</summary>
+        /// <summary>JSON discriminator for bodiless request input. Always <c>"none"</c>.</summary>
         public string Kind => "none";
     }
 
