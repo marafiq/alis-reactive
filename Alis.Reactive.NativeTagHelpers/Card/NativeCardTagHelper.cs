@@ -33,11 +33,11 @@ public class NativeCardTagHelper : TagHelper
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
 
-        var classes = CardCss.CardClasses(Elevation);
+        var cardClasses = CardCss.CardClasses(Elevation);
         if (Accent.HasValue)
-            classes = CssUtils.MergeClasses(classes, CardCss.AccentInnerClasses(Accent.Value));
-        classes = CssUtils.MergeClasses(classes, CssClass);
+            cardClasses = CssUtils.MergeClasses(cardClasses, CardCss.AccentInnerClasses(Accent.Value));
+        cardClasses = CssUtils.MergeClasses(cardClasses, CssClass);
 
-        output.Attributes.SetAttribute("class", classes);
+        output.Attributes.SetAttribute("class", cardClasses);
     }
 }
