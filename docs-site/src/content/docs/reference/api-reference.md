@@ -5245,10 +5245,6 @@ Vendor { get; }
 
 ## Native — AppLevel
 
-### DrawerPosition
-
-The edge of the viewport that the `NativeDrawer` slides in from.
-
 ### DrawerSize
 
 Controls the width of the `NativeDrawer` panel.
