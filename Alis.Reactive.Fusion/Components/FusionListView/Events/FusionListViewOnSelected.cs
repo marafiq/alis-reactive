@@ -8,19 +8,19 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionListViewSelectArgs
     {
-        /// <summary>Gets or sets the selected item's visible text.</summary>
+        /// <summary>Selected item's visible text.</summary>
         public string? Text { get; set; }
 
-        /// <summary>Gets or sets the selected item's zero-based index when the event came from user interaction.</summary>
+        /// <summary>Selected item's zero-based index when the event came from user interaction.</summary>
         public int? Index { get; set; }
 
-        /// <summary>Gets or sets whether the selection came from user interaction.</summary>
+        /// <summary>Whether the selection came from user interaction.</summary>
         public bool IsInteracted { get; set; }
 
-        /// <summary>Gets or sets the checkbox state for checkbox ListViews.</summary>
+        /// <summary>Checkbox state for checkbox ListViews.</summary>
         public bool? IsChecked { get; set; }
 
-        /// <summary>Gets or sets whether Syncfusion should cancel the selection.</summary>
+        /// <summary>Whether Syncfusion should cancel the selection.</summary>
         public bool Cancel { get; set; }
     }
 
