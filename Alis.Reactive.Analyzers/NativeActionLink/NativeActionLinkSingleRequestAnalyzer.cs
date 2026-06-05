@@ -89,17 +89,17 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
         {
             var requestStartCount = 0;
 
-            foreach (var inv in lambda.DescendantNodes().OfType<InvocationExpressionSyntax>())
+            foreach (var invocation in lambda.DescendantNodes().OfType<InvocationExpressionSyntax>())
             {
-                if (semanticModel.GetSymbolInfo(inv, cancellationToken).Symbol is not IMethodSymbol sym)
+                if (semanticModel.GetSymbolInfo(invocation, cancellationToken).Symbol is not IMethodSymbol methodSymbol)
                     continue;
 
-                var containingType = sym.ContainingType.OriginalDefinition;
+                var containingType = methodSymbol.ContainingType.OriginalDefinition;
 
-                if (IsProhibitedCall(sym.Name, containingType, types))
+                if (IsProhibitedCall(methodSymbol.Name, containingType, types))
                     return true;
 
-                if (AnalyzerHelpers.HttpMethodNames.Contains(sym.Name)
+                if (AnalyzerHelpers.HttpMethodNames.Contains(methodSymbol.Name)
                     && SymbolEqualityComparer.Default.Equals(containingType, types.PipelineBuilderType))
                 {
                     requestStartCount++;
