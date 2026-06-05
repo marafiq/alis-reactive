@@ -8,6 +8,9 @@ namespace Alis.Reactive.Fusion.Templates
     /// <summary>
     /// Builds the content emitted inside a Syncfusion template conditional block.
     /// </summary>
+    /// <remarks>
+    /// Caller-provided literal text, CSS classes, and raw HTML are emitted as supplied.
+    /// </remarks>
     /// <typeparam name="TModel">The object shape exposed by the Syncfusion template context.</typeparam>
     public class FusionConditionalBuilder<TModel>
     {
@@ -32,14 +35,16 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a <c>span</c> with static text.
+        /// Adds a <c>span</c> with literal text.
         /// </summary>
+        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionConditionalBuilder<TModel> Span(string text) =>
             Span(text, TemplateCss.None);
 
         /// <summary>
-        /// Adds a styled <c>span</c> with static text.
+        /// Adds a styled <c>span</c> with literal text.
         /// </summary>
+        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionConditionalBuilder<TModel> Span(string text, string css) =>
             Span(text, TemplateCss.Class(css));
 
@@ -59,8 +64,9 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a badge with static text.
+        /// Adds a badge with literal text.
         /// </summary>
+        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionConditionalBuilder<TModel> Badge(string text, string css = "e-badge")
         {
             _childRenderers.Add(() => TemplateElements.Badge(text, css));
