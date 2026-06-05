@@ -140,9 +140,9 @@ function requestInputArrayItems(items: unknown[]): RequestInputArrayItem[] {
 function requestInputArrayItem(item: unknown): RequestInputArrayItem {
   if (item instanceof File) return { kind: "file", file: item };
 
-  const wrapper = plainObjectRecordFrom(item);
-  if (wrapper !== undefined) {
-    const rawFile = wrapper["rawFile"];
+  const syncfusionFileItem = plainObjectRecordFrom(item);
+  if (syncfusionFileItem !== undefined) {
+    const rawFile = syncfusionFileItem["rawFile"];
     if (rawFile instanceof File) return { kind: "file", file: rawFile };
   }
 
@@ -235,8 +235,8 @@ function assignJsonBodyValue(
   const segments = target.path.map(bodySegment);
   let parent = body;
   for (const segment of segments.slice(0, -1)) {
-    const value = parent[segment];
-    const nestedObject = plainObjectRecordFrom(value);
+    const existingChild = parent[segment];
+    const nestedObject = plainObjectRecordFrom(existingChild);
     if (nestedObject !== undefined) {
       parent = nestedObject;
       continue;
