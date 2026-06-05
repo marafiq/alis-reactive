@@ -33,14 +33,14 @@ namespace Alis.Reactive.Builders
             return From(ValueExpression.ReadPayload(body.Scope, responsePath, shape));
         }
 
-        internal static PluginInvocationArgument FromEvent<TArgs, TProp>(
-            Expression<Func<TArgs, TProp>> path)
+        internal static PluginInvocationArgument FromEvent<TPayload, TProp>(
+            Expression<Func<TPayload, TProp>> path)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
 
-            var eventPath = ExpressionPathHelper.ToEventPath(path);
+            var payloadPath = ExpressionPathHelper.ToEventPath(path);
             var shape = Shape.FromClrType(typeof(TProp));
-            return From(ValueExpression.ReadPayload(PayloadSource.Event(), eventPath, shape));
+            return From(ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath, shape));
         }
 
         internal static PluginInvocationArgument FromSource<TArg>(TypedSource<TArg> source)

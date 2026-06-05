@@ -62,12 +62,12 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a value from the current event payload as a plugin argument.</summary>
-        /// <typeparam name="TArgs">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload type.</typeparam>
         /// <typeparam name="TProp">The event value type passed to the plugin.</typeparam>
-        /// <param name="args">A typed event payload marker used to infer <typeparamref name="TArgs"/>.</param>
+        /// <param name="args">A typed event payload marker used to infer <typeparamref name="TPayload"/>.</param>
         /// <param name="path">The event payload path to pass.</param>
-        public PluginMemberBuilder<TReturn, TModel> Arg<TArgs, TProp>(
-            TArgs args, Expression<Func<TArgs, TProp>> path)
+        public PluginMemberBuilder<TReturn, TModel> Arg<TPayload, TProp>(
+            TPayload args, Expression<Func<TPayload, TProp>> path)
         {
             _args.Add(PluginInvocationArgument.FromEvent(path));
             return this;
@@ -189,12 +189,12 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a value from the current event payload as a plugin argument.</summary>
-        /// <typeparam name="TArgs">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload type.</typeparam>
         /// <typeparam name="TProp">The event value type passed to the plugin command.</typeparam>
-        /// <param name="args">A typed event payload marker used to infer <typeparamref name="TArgs"/>.</param>
+        /// <param name="args">A typed event payload marker used to infer <typeparamref name="TPayload"/>.</param>
         /// <param name="path">The event payload path to pass.</param>
-        public PluginCallBuilder<TModel> Arg<TArgs, TProp>(
-            TArgs args, Expression<Func<TArgs, TProp>> path)
+        public PluginCallBuilder<TModel> Arg<TPayload, TProp>(
+            TPayload args, Expression<Func<TPayload, TProp>> path)
         {
             _args.Add(PluginInvocationArgument.FromEvent(path));
             return this;
