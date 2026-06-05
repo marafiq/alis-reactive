@@ -17,7 +17,7 @@ namespace Alis.Reactive.Native.Components
             ComponentProperty<string>.Named("value");
 
         /// <summary>
-        /// Sets the hidden input value through the component contract.
+        /// Writes the hidden input value through the component contract.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <param name="self">The hidden-field component reference.</param>
@@ -30,7 +30,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets the hidden input value from another component value source.
+        /// Writes the hidden input value from another component value source.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <param name="self">The hidden-field component reference.</param>
@@ -43,7 +43,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets the hidden input value from an HTTP response body path.
+        /// Writes the hidden input value from an HTTP response body path.
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <typeparam name="TResponse">The response DTO type used by the response body source.</typeparam>
