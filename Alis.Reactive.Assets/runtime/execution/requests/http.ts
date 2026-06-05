@@ -51,10 +51,10 @@ function requestCanSend(request: RequestPlan, planDocument: PlanDocument, contex
   const requestRequiresClientValidation = validation.kind === "container";
   if (!requestRequiresClientValidation) return true;
 
-  const valid = validateContainer(planDocument, validation.container, context.asAvailable());
-  if (!valid) log.debug("validation.aborted", { id: validation.container, url: request.url });
+  const containerIsValid = validateContainer(planDocument, validation.container, context.asAvailable());
+  if (!containerIsValid) log.debug("validation.aborted", { id: validation.container, url: request.url });
 
-  return valid;
+  return containerIsValid;
 }
 
 interface PreparedHttpRequest {
@@ -67,8 +67,8 @@ function prepareHttpRequest(
   planDocument: PlanDocument,
   context: ExecutionContext,
 ): PreparedHttpRequest {
-  const currentContext = context.asAvailable();
-  const resolvedInput = resolveRequestInput(request.input, request.method, planDocument, currentContext);
+  const requestInputContext = context.asAvailable();
+  const resolvedInput = resolveRequestInput(request.input, request.method, planDocument, requestInputContext);
   const requestContext = context.withRequest(requestPayloadSnapshotFrom(resolvedInput));
   const fetchRequest = resolveFetch(request, resolvedInput);
 
