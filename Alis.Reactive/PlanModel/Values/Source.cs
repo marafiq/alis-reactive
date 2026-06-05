@@ -42,7 +42,7 @@ namespace Alis.Reactive.PlanModel
         internal static ComponentSource Of(ComponentKey component) => new ComponentSource(component);
     }
 
-    /// <summary>Reads from the event or response payload of the current trigger.</summary>
+    /// <summary>Identifies an execution payload scope, such as event data or an HTTP response body.</summary>
     public sealed class PayloadSource : Source
     {
         private readonly PayloadScope _scope;
@@ -50,7 +50,7 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>JSON discriminator for payload sources. Always <c>"payload"</c>.</summary>
         public string Kind => "payload";
-        /// <summary>Payload scope, such as event, success, request, dispatch, or local.</summary>
+        /// <summary>Payload scope wire term, for example event or success.</summary>
         public string Scope => _scope.Value;
         /// <summary>Payload typing contract used when authoring typed value paths.</summary>
         public PayloadContract Type => _type;
