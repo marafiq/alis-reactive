@@ -27,8 +27,8 @@ namespace Alis.Reactive
     /// </code>
     /// </para>
     /// </remarks>
-    /// <typeparam name="T">The response body contract used to author expression paths.</typeparam>
-    public sealed class ResponseBody<T> where T : class
+    /// <typeparam name="TResponse">The response body contract used to author expression paths.</typeparam>
+    public sealed class ResponseBody<TResponse> where TResponse : class
     {
         internal PayloadSource Scope { get; }
 
@@ -38,14 +38,14 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Creates a typed source that reads a property from this response body scope.
+        /// Creates a typed source for a response-body property path.
         /// </summary>
         /// <typeparam name="TProp">The value type returned by the selected response-body path.</typeparam>
         /// <param name="expression">The response-body property path, for example <c>r =&gt; r.Data.Name</c>.</param>
         /// <returns>A typed source for conditions and plugin arguments.</returns>
-        public TypedSource<TProp> Read<TProp>(Expression<Func<T, TProp>> expression)
+        public TypedSource<TProp> Read<TProp>(Expression<Func<TResponse, TProp>> expression)
         {
-            return new PayloadTypedSource<T, TProp>(Scope, expression);
+            return new PayloadTypedSource<TResponse, TProp>(Scope, expression);
         }
     }
 }
