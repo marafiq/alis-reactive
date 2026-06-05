@@ -99,11 +99,9 @@ namespace Alis.Reactive.Native.Extensions
             var elementId = PlanElementId.For(plan.PlanId);
             var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{planJson}</script>";
 
-            // Validation errors display inline next to each field by default.
-            // The summary div is a fallback for errors that cannot be shown inline:
-            // hidden fields, unenriched fields (partial not yet loaded), or server
-            // errors with no matching error span. Only views emit it — partials
-            // rely on the view's summary div only if the partials are not rendered yet.
+            // Root views emit a fallback summary for errors that cannot bind to
+            // generated field spans: hidden fields, unloaded partial fields, or
+            // unmatched server fields.
             var planRendersValidationSummary = plan.RendersValidationSummary;
             if (!planRendersValidationSummary)
                 return new MvcHtmlString(planScript);
@@ -120,11 +118,9 @@ namespace Alis.Reactive.Native.Extensions
             var elementId = PlanElementId.For(plan.PlanId);
             var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{planJson}</script>";
 
-            // Validation errors display inline next to each field by default.
-            // The summary div is a fallback for errors that cannot be shown inline:
-            // hidden fields, unenriched fields (partial not yet loaded), or server
-            // errors with no matching error span. Only views emit it — partials
-            // rely on the view's summary div only if the partials are not rendered yet.
+            // Root views emit a fallback summary for errors that cannot bind to
+            // generated field spans: hidden fields, unloaded partial fields, or
+            // unmatched server fields.
             var planRendersValidationSummary = plan.RendersValidationSummary;
             if (!planRendersValidationSummary)
                 return new HtmlString(planScript);
