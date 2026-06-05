@@ -42,15 +42,15 @@ namespace Alis.Reactive.PlanModel
         private readonly CompareOperator _op;
         private readonly ComparisonOperands _operands;
 
-        /// <summary>Gets the kind. Always <c>"compare"</c>.</summary>
+        /// <summary>JSON discriminator for comparison conditions. Always <c>"compare"</c>.</summary>
         public string Kind => "compare";
-        /// <summary>Gets the left-hand operand.</summary>
+        /// <summary>Left-hand value expression evaluated before comparison.</summary>
         public ValueExpression Left => _operands.Left;
-        /// <summary>Gets the comparison operator (eq, neq, gt, gte, lt, lte, truthy, is-empty, contains, starts-with, ends-with).</summary>
+        /// <summary>Comparison operator: <c>eq</c>, <c>neq</c>, <c>gt</c>, <c>gte</c>, etc.</summary>
         public string Op => _op.Value;
-        /// <summary>Gets the expected type shape for comparison. <see cref="PlanModel.Shape.None"/> when not specified.</summary>
+        /// <summary>Declared comparison shape, or <see cref="PlanModel.Shape.None"/> when not specified.</summary>
         public Shape Shape => _operands.ShapeForJson;
-        /// <summary>Gets the element type shape used by collection operators such as <c>contains</c>. <see cref="PlanModel.Shape.None"/> for non-collection comparisons.</summary>
+        /// <summary>Declared collection item shape for operators such as <c>contains</c>; otherwise <see cref="PlanModel.Shape.None"/>.</summary>
         public Shape ItemShape => _operands.ItemShapeForJson;
 
         internal ComparisonRightOperand RightOperand => _operands.Right;
@@ -195,9 +195,9 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly IReadOnlyList<ConditionGraph> _terms;
 
-        /// <summary>Gets the kind. Always <c>"all"</c>.</summary>
+        /// <summary>JSON discriminator for logical AND conditions. Always <c>"all"</c>.</summary>
         public string Kind => "all";
-        /// <summary>Gets the child conditions that must all be true.</summary>
+        /// <summary>Child conditions that must all evaluate to true.</summary>
         public IReadOnlyList<ConditionGraph> Terms => _terms;
 
         internal AllCondition(IReadOnlyList<ConditionGraph> terms)
@@ -211,9 +211,9 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly IReadOnlyList<ConditionGraph> _terms;
 
-        /// <summary>Gets the kind. Always <c>"any"</c>.</summary>
+        /// <summary>JSON discriminator for logical OR conditions. Always <c>"any"</c>.</summary>
         public string Kind => "any";
-        /// <summary>Gets the child conditions where at least one must be true.</summary>
+        /// <summary>Child conditions where at least one must evaluate to true.</summary>
         public IReadOnlyList<ConditionGraph> Terms => _terms;
 
         internal AnyCondition(IReadOnlyList<ConditionGraph> terms)
@@ -225,9 +225,9 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Logical NOT: inverts a single child condition.</summary>
     public sealed class NotCondition : ConditionGraph
     {
-        /// <summary>Gets the kind. Always <c>"not"</c>.</summary>
+        /// <summary>JSON discriminator for logical NOT conditions. Always <c>"not"</c>.</summary>
         public string Kind => "not";
-        /// <summary>Gets the condition to invert.</summary>
+        /// <summary>Condition whose result is inverted.</summary>
         public ConditionGraph Term { get; }
 
         internal NotCondition(ConditionGraph term)
@@ -239,9 +239,9 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Prompts the user for confirmation before the reaction proceeds.</summary>
     public sealed class ConfirmCondition : ConditionGraph
     {
-        /// <summary>Gets the kind. Always <c>"confirm"</c>.</summary>
+        /// <summary>JSON discriminator for async confirmation conditions. Always <c>"confirm"</c>.</summary>
         public string Kind => "confirm";
-        /// <summary>Gets the confirmation message shown to the user.</summary>
+        /// <summary>Confirmation message shown at the user-decision boundary.</summary>
         public string Message { get; }
 
         internal ConfirmCondition(string message)
