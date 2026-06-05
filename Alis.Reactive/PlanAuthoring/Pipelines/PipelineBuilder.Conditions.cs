@@ -24,15 +24,15 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Starts a branch whose guard reads from the current HTTP response body.</summary>
-        /// <typeparam name="TPayload">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">The selected response value type.</typeparam>
         /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
         /// <returns>A builder for choosing the guard comparison.</returns>
-        public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
-            ResponseBody<TPayload> responseBody,
-            Expression<Func<TPayload, TProp>> path)
-            where TPayload : class
+        public ConditionSourceBuilder<TModel, TProp> When<TResponse, TProp>(
+            ResponseBody<TResponse> responseBody,
+            Expression<Func<TResponse, TProp>> path)
+            where TResponse : class
         {
             _draft.BeginBranch();
 
