@@ -10,7 +10,7 @@ namespace Alis.Reactive.Native.Components
     public class NativeHiddenFieldChangeArgs
     {
         /// <summary>
-        /// Gets or sets the hidden input value after the change event.
+        /// Hidden input value after the change event.
         /// </summary>
         public string? Value { get; set; }
     }

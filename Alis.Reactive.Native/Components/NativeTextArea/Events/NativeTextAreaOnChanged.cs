@@ -10,7 +10,7 @@ namespace Alis.Reactive.Native.Components
     public class NativeTextAreaChangeArgs
     {
         /// <summary>
-        /// Gets or sets the value captured from the change event.
+        /// Textarea value captured from the change event.
         /// </summary>
         public string? Value { get; set; }
     }

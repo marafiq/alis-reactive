@@ -10,7 +10,7 @@ namespace Alis.Reactive.Native.Components
     public class NativeCheckListChangeArgs
     {
         /// <summary>
-        /// Gets or sets the checked values after the change.
+        /// Checked values after the change event.
         /// </summary>
         public string[]? Value { get; set; }
     }

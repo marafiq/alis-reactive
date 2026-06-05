@@ -10,7 +10,7 @@ namespace Alis.Reactive.Native.Components
     public class NativeRadioGroupChangeArgs
     {
         /// <summary>
-        /// Gets or sets the selected radio button's value after the change.
+        /// Selected radio button value after the change event.
         /// </summary>
         public string? Value { get; set; }
     }

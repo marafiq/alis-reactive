@@ -10,7 +10,7 @@ namespace Alis.Reactive.Native.Components
     public class NativeCheckBoxChangeArgs
     {
         /// <summary>
-        /// Gets or sets the checked state after the change.
+        /// Checked state after the change event.
         /// </summary>
         public bool? Checked { get; set; }
     }

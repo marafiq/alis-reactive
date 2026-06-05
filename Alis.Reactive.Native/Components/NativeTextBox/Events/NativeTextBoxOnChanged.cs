@@ -10,7 +10,7 @@ namespace Alis.Reactive.Native.Components
     public class NativeTextBoxChangeArgs
     {
         /// <summary>
-        /// Gets or sets the value captured from the change event.
+        /// Text input value captured from the change event.
         /// </summary>
         public string? Value { get; set; }
     }
