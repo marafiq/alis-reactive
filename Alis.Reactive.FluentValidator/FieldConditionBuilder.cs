@@ -59,20 +59,20 @@ namespace Alis.Reactive.FluentValidator
 
         public FieldGuard<T> In(params TProp[] values)
         {
-            var set = ValueSet(values);
+            var allowedValues = ValueSet(values);
             return _field.GuardWithOperand(
                 CompareOperator.In,
                 FieldComparisonValue.Array(PlanValues(values)),
-                value => set.Contains(value));
+                value => allowedValues.Contains(value));
         }
 
         public FieldGuard<T> NotIn(params TProp[] values)
         {
-            var set = ValueSet(values);
+            var disallowedValues = ValueSet(values);
             return _field.GuardWithOperand(
                 CompareOperator.NotIn,
                 FieldComparisonValue.Array(PlanValues(values)),
-                value => !set.Contains(value));
+                value => !disallowedValues.Contains(value));
         }
 
         public FieldGuard<T> Between(TProp low, TProp high)
@@ -134,13 +134,13 @@ namespace Alis.Reactive.FluentValidator
         {
             if (value == null) return true;
             if (value is string text) return string.IsNullOrEmpty(text);
-            if (value is IEnumerable items) return IsEmptySequence(items);
+            if (value is IEnumerable sequence) return IsEmptySequence(sequence);
             return false;
         }
 
-        private static bool IsEmptySequence(IEnumerable items)
+        private static bool IsEmptySequence(IEnumerable sequence)
         {
-            var enumerator = items.GetEnumerator();
+            var enumerator = sequence.GetEnumerator();
             try
             {
                 return !enumerator.MoveNext();

@@ -64,8 +64,8 @@ namespace Alis.Reactive.FluentValidator
         {
             bool FieldSatisfiesGuard(TModel model)
             {
-                var value = _readValue(model);
-                return acceptsValue(value);
+                var fieldValue = _readValue(model);
+                return acceptsValue(fieldValue);
             }
 
             return new FieldGuard<TModel>(
