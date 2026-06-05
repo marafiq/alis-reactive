@@ -38,7 +38,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets the anchor's <c>class</c> attribute.
+        /// Replaces the anchor's <c>class</c> attribute.
         /// </summary>
         /// <param name="css">The CSS class string to render on the anchor.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="css"/> is <c>null</c>.</exception>
