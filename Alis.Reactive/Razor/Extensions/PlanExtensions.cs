@@ -104,9 +104,9 @@ namespace Alis.Reactive.Native.Extensions
         public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html,
             ReactivePlan<TModel> plan) where TModel : class
         {
-            var json = plan.Render();
+            var planJson = plan.Render();
             var elementId = PlanElementId.For(plan.PlanId);
-            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
+            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{planJson}</script>";
 
             // Validation errors display inline next to each field by default.
             // The summary div is a fallback for errors that cannot be shown inline:
@@ -125,9 +125,9 @@ namespace Alis.Reactive.Native.Extensions
         public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan) where TModel : class
         {
-            var json = plan.Render();
+            var planJson = plan.Render();
             var elementId = PlanElementId.For(plan.PlanId);
-            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{json}</script>";
+            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{planJson}</script>";
 
             // Validation errors display inline next to each field by default.
             // The summary div is a fallback for errors that cannot be shown inline:
