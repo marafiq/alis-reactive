@@ -12,22 +12,22 @@ namespace Alis.Reactive.NativeTagHelpers.HStack;
 public class NativeHStackTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets the spacing between children. Defaults to <see cref="SpacingScale.Base"/>.
+    /// Controls the spacing between children. Defaults to <see cref="SpacingScale.Base"/>.
     /// </summary>
     public SpacingScale Gap { get; set; } = SpacingScale.Base;
 
     /// <summary>
-    /// Gets or sets how children align on the cross axis. Defaults to <see cref="AlignItems.Center"/>.
+    /// Controls how children align on the cross axis. Defaults to <see cref="AlignItems.Center"/>.
     /// </summary>
     public AlignItems Align { get; set; } = AlignItems.Center;
 
     /// <summary>
-    /// Gets or sets how children are distributed along the row. Defaults to <see cref="JustifyContent.Start"/>.
+    /// Controls how children are distributed along the row. Defaults to <see cref="JustifyContent.Start"/>.
     /// </summary>
     public JustifyContent Justify { get; set; } = JustifyContent.Start;
 
     /// <summary>
-    /// Gets or sets whether children wrap onto multiple lines when they overflow the row.
+    /// Allows children to wrap onto multiple lines when they overflow the row.
     /// </summary>
     public bool Wrap { get; set; }
 

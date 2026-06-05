@@ -12,12 +12,12 @@ namespace Alis.Reactive.NativeTagHelpers.VStack;
 public class NativeVStackTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets the spacing between children. Defaults to <see cref="SpacingScale.Base"/>.
+    /// Controls the spacing between children. Defaults to <see cref="SpacingScale.Base"/>.
     /// </summary>
     public SpacingScale Gap { get; set; } = SpacingScale.Base;
 
     /// <summary>
-    /// Gets or sets whether a separating border is drawn between children.
+    /// Draws a separating border between adjacent children.
     /// </summary>
     public bool DivideY { get; set; }
 

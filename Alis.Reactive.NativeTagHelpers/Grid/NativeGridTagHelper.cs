@@ -12,17 +12,17 @@ namespace Alis.Reactive.NativeTagHelpers.Grid;
 public class NativeGridTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets the number of columns. Defaults to <see cref="GridCols.C2"/>.
+    /// Controls the number of grid columns. Defaults to <see cref="GridCols.C2"/>.
     /// </summary>
     public GridCols Cols { get; set; } = GridCols.C2;
 
     /// <summary>
-    /// Gets or sets the spacing between grid cells. Defaults to <see cref="SpacingScale.Md"/>.
+    /// Controls the spacing between grid cells. Defaults to <see cref="SpacingScale.Md"/>.
     /// </summary>
     public SpacingScale Gap { get; set; } = SpacingScale.Md;
 
     /// <summary>
-    /// Gets or sets whether the column count scales down on smaller screens. Defaults to <see langword="true"/>.
+    /// Scales the column count down on smaller screens. Defaults to <see langword="true"/>.
     /// </summary>
     public bool Responsive { get; set; } = true;
 
