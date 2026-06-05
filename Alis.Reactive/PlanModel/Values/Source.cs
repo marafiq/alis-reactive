@@ -23,9 +23,9 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly ComponentKey _component;
 
-        /// <summary>Gets the kind. Always <c>"component"</c>.</summary>
+        /// <summary>JSON discriminator for component sources. Always <c>"component"</c>.</summary>
         public string Kind => "component";
-        /// <summary>Gets the registered component name.</summary>
+        /// <summary>Plan-registered component key used for runtime object lookup.</summary>
         public string Component => _component.Value;
 
         internal ComponentSource(string component)
@@ -48,11 +48,11 @@ namespace Alis.Reactive.PlanModel
         private readonly PayloadScope _scope;
         private readonly PayloadContract _type;
 
-        /// <summary>Gets the kind. Always <c>"payload"</c>.</summary>
+        /// <summary>JSON discriminator for payload sources. Always <c>"payload"</c>.</summary>
         public string Kind => "payload";
-        /// <summary>Gets the payload scope: event (trigger payload), success or error (HTTP response), request (outgoing body), dispatch (custom event data), or local (view model).</summary>
+        /// <summary>Payload scope, such as event, success, request, dispatch, or local.</summary>
         public string Scope => _scope.Value;
-        /// <summary>Gets the payload typing contract.</summary>
+        /// <summary>Payload typing contract used when authoring typed value paths.</summary>
         public PayloadContract Type => _type;
 
         internal PayloadSource(string scope)
@@ -103,11 +103,11 @@ namespace Alis.Reactive.PlanModel
         private readonly PluginName _name;
         private readonly BrowserObjectId _type;
 
-        /// <summary>Gets the kind. Always <c>"plugin"</c>.</summary>
+        /// <summary>JSON discriminator for plugin sources. Always <c>"plugin"</c>.</summary>
         public string Kind => "plugin";
-        /// <summary>Gets the plan-registered plugin name.</summary>
+        /// <summary>Plan-registered plugin name used for runtime object lookup.</summary>
         public string Name => _name.Value;
-        /// <summary>Gets the plugin object contract type key.</summary>
+        /// <summary>Plugin object contract key declared in the generated plan.</summary>
         public string Type => _type.Value;
         private PluginSource(string name)
         {
@@ -120,7 +120,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Reads a value from the current page URL query string.</summary>
     public sealed class UrlSource : Source
     {
-        /// <summary>Gets the kind. Always <c>"url"</c>.</summary>
+        /// <summary>JSON discriminator for URL query sources. Always <c>"url"</c>.</summary>
         public string Kind => "url";
         private UrlSource() { }
         internal static UrlSource Instance { get; } = new UrlSource();
@@ -128,18 +128,17 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Identifies a DOM element (by id) whose members are read directly via getElementById.</summary>
     /// <remarks>
-    /// A DOM element is a JS object; its members are reached with the same RuntimePath primitive
-    /// that resolves component/plugin members. Element ids
-    /// are plan-carried (Rule 7: getElementById only, no scanning). The member name is stringly at
-    /// this DOM boundary, like plugin names.
+    /// A DOM element is a JavaScript object; its members are reached with the same RuntimePath
+    /// primitive that resolves component/plugin members. Element IDs are plan-carried, and the
+    /// runtime resolves them with <c>getElementById</c> only, without DOM scanning.
     /// </remarks>
     public sealed class DomSource : Source
     {
         private readonly string _element;
 
-        /// <summary>Gets the kind. Always <c>"dom"</c>.</summary>
+        /// <summary>JSON discriminator for direct DOM sources. Always <c>"dom"</c>.</summary>
         public string Kind => "dom";
-        /// <summary>Gets the element id resolved via getElementById.</summary>
+        /// <summary>Element ID resolved via <c>getElementById</c>.</summary>
         public string Element => _element;
 
         private DomSource(string element)
