@@ -207,28 +207,28 @@ namespace Alis.Reactive.FluentValidator
         internal static IReadOnlyList<ClientValidationFieldReference> From(IEnumerable<ClientValidationFieldReference> fields)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
-            var byPath = new Dictionary<string, ClientValidationFieldReference>(StringComparer.Ordinal);
+            var fieldsByPath = new Dictionary<string, ClientValidationFieldReference>(StringComparer.Ordinal);
 
             foreach (var field in fields)
             {
                 if (field == null) throw new ArgumentException("Client validation guard field must not be null.", nameof(fields));
 
-                if (byPath.TryGetValue(field.Path.Value, out var existing))
+                if (fieldsByPath.TryGetValue(field.Path.Value, out var existingField))
                 {
-                    if (!existing.Shape.Equals(field.Shape))
+                    if (!existingField.Shape.Equals(field.Shape))
                     {
                         throw new InvalidOperationException(
                             $"Client validation condition field '{field.Path.Value}' was declared with conflicting shapes: " +
-                            $"'{existing.Shape.Kind}' and '{field.Shape.Kind}'.");
+                            $"'{existingField.Shape.Kind}' and '{field.Shape.Kind}'.");
                     }
 
                     continue;
                 }
 
-                byPath.Add(field.Path.Value, field);
+                fieldsByPath.Add(field.Path.Value, field);
             }
 
-            return byPath.Values.ToArray();
+            return fieldsByPath.Values.ToArray();
         }
 
         internal static IReadOnlyList<ClientValidationFieldReference> Combine(
