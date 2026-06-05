@@ -127,20 +127,20 @@ export function validateContainer(
     return true;
   }
 
-  let valid = true;
-  let summaryHasErrors = false;
+  let containerIsValid = true;
+  let summaryReceivedErrors = false;
 
   for (const componentValidation of containerScope.validationRules) {
     if (!evaluateComponentRules(componentValidation, surface, container)) {
-      valid = false;
-      summaryHasErrors = summaryHasErrors || summaryHasError(surface.summary, componentValidation.component);
+      containerIsValid = false;
+      summaryReceivedErrors = summaryReceivedErrors || summaryHasError(surface.summary, componentValidation.component);
     }
   }
 
-  showSummaryWhen(surface.summary, summaryHasErrors);
+  showSummaryWhen(surface.summary, summaryReceivedErrors);
 
-  log.debug("validated", { id: containerId, valid });
-  return valid;
+  log.debug("validated", { id: containerId, valid: containerIsValid });
+  return containerIsValid;
 }
 
 export function showServerErrors(planDocument: PlanDocument, containerKey: string, serverPayload: unknown): void {
@@ -167,14 +167,14 @@ export function showServerErrors(planDocument: PlanDocument, containerKey: strin
   if (errors.kind !== "field-errors") return;
   if (errors.fields.length === 0) return;
 
-  let summaryHasErrors = false;
+  let summaryReceivedErrors = false;
 
   for (const error of errors.fields) {
     const addedToSummary = placeServerErrorOnFieldOrSummary(error, surface);
-    if (addedToSummary) summaryHasErrors = true;
+    if (addedToSummary) summaryReceivedErrors = true;
   }
 
-  showSummaryWhen(surface.summary, summaryHasErrors);
+  showSummaryWhen(surface.summary, summaryReceivedErrors);
   log.debug("server-errors.shown", { id: containerId, fieldCount: errors.fields.length });
 }
 
