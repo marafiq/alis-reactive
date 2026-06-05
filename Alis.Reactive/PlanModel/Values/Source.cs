@@ -12,13 +12,13 @@ namespace Alis.Reactive.PlanModel
         private protected Source() { }
     }
 
-    /// <summary>Identifies a plan object whose declared properties and methods can be evaluated at runtime.</summary>
+    /// <summary>Identifies a plan-declared object whose members can be evaluated at runtime.</summary>
     public abstract class RuntimeObjectSource : Source
     {
         private protected RuntimeObjectSource() { }
     }
 
-    /// <summary>Identifies a registered UI component as the value source.</summary>
+    /// <summary>Identifies a plan-registered component as the value source.</summary>
     public sealed class ComponentSource : RuntimeObjectSource
     {
         private readonly ComponentKey _component;
@@ -97,7 +97,7 @@ namespace Alis.Reactive.PlanModel
         internal static PayloadSource Element() => new PayloadSource(PayloadScope.Element, PayloadContract.Untyped);
     }
 
-    /// <summary>Reads a value from a named plugin object registered by the application.</summary>
+    /// <summary>Identifies a plan-registered plugin object as the value source.</summary>
     public sealed class PluginSource : RuntimeObjectSource
     {
         private readonly PluginName _name;
@@ -117,7 +117,7 @@ namespace Alis.Reactive.PlanModel
         internal static PluginSource Of(string name) => new PluginSource(name);
     }
 
-    /// <summary>Reads a value from the current page URL query string.</summary>
+    /// <summary>Reads from the browser <c>window.location</c> query string.</summary>
     public sealed class UrlSource : Source
     {
         /// <summary>JSON discriminator for URL query sources. Always <c>"url"</c>.</summary>
