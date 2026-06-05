@@ -137,14 +137,14 @@ export class AppliedPlans {
 export const appliedPlans = new AppliedPlans();
 
 export function composeInitialPlans(bootPlans: PlanDocument[]): PlanDocument[] {
-  const assembledPlans = new Map<PlanId, PlanDocument>();
+  const activePlans = new Map<PlanId, PlanDocument>();
   for (const bootPlan of bootPlans) {
-    const assembled = assembledPlans.get(bootPlan.planId) ?? emptyPlan(bootPlan.planId);
-    assembledPlans.set(bootPlan.planId, assembled);
-    MergePolicy.composeBootPlanInto(assembled, bootPlan);
+    const activePlan = activePlans.get(bootPlan.planId) ?? emptyPlan(bootPlan.planId);
+    activePlans.set(bootPlan.planId, activePlan);
+    MergePolicy.composeBootPlanInto(activePlan, bootPlan);
   }
 
-  return Array.from(assembledPlans.values());
+  return Array.from(activePlans.values());
 }
 
 function resetPlanDocument(planDocument: PlanDocument, planId: PlanId): void {

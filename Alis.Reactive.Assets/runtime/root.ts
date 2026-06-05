@@ -37,8 +37,8 @@ function startRuntime(): void {
   initConfirm();
   initNativeActionLinks();
 
-  for (const plan of composeInitialPlans(discoverPlans())) {
-    boot(plan);
+  for (const activePlan of composeInitialPlans(discoverBootPlans())) {
+    boot(activePlan);
   }
 }
 
@@ -53,22 +53,22 @@ function drainPluginQueue(): void {
   delete pluginQueue.__alisPlugins;
 }
 
-function discoverPlans(): PlanDocument[] {
+function discoverBootPlans(): PlanDocument[] {
   const planElements = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
-  const plans: PlanDocument[] = [];
+  const bootPlans: PlanDocument[] = [];
 
   for (const planElement of planElements) {
     const traceLevel = planElement.dataset.trace as TraceLevel | undefined;
     if (traceLevel) trace.setLevel(traceLevel);
 
     try {
-      const text = planElement.textContent?.trim();
-      if (!text) throw new Error("[alis] empty plan element");
-      plans.push(JSON.parse(text));
+      const planJson = planElement.textContent?.trim();
+      if (!planJson) throw new Error("[alis] empty plan element");
+      bootPlans.push(JSON.parse(planJson));
     } catch (error) {
       throw new Error(`[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(error as Error).message}`);
     }
   }
 
-  return plans;
+  return bootPlans;
 }
