@@ -94,10 +94,10 @@ namespace Alis.Reactive.Builders
             return new ElementBuilder<TModel>(this, elementId);
         }
 
-        /// <summary>Targets a model-bound component rendered for the current view model.</summary>
-        /// <typeparam name="TComponent">The typed component contract that controls available operations.</typeparam>
-        /// <param name="expr">The model property expression shared with the markup helper.</param>
-        /// <returns>A typed component reference bound to the generated component ID.</returns>
+        /// <summary>Targets a component whose rendered ID is generated from this plan's view model.</summary>
+        /// <typeparam name="TComponent">The component contract that determines available reads, writes, and calls.</typeparam>
+        /// <param name="expr">The model property expression used by the matching markup helper.</param>
+        /// <returns>A component reference joined to the generated component ID.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(
             Expression<Func<TModel, object>> expr)
             where TComponent : IComponent, new()
@@ -106,11 +106,11 @@ namespace Alis.Reactive.Builders
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
-        /// <summary>Targets a model-bound component rendered from another view model.</summary>
-        /// <typeparam name="TComponent">The typed component contract that controls available operations.</typeparam>
-        /// <typeparam name="TOtherModel">The model that owns the referenced component ID.</typeparam>
-        /// <param name="expr">The other model's property expression shared with the markup helper.</param>
-        /// <returns>A typed component reference bound to the other model's generated component ID.</returns>
+        /// <summary>Targets a component whose rendered ID is generated from another view model type.</summary>
+        /// <typeparam name="TComponent">The component contract that determines available reads, writes, and calls.</typeparam>
+        /// <typeparam name="TOtherModel">The view model type used when the component was rendered.</typeparam>
+        /// <param name="expr">The other model's property expression used by the matching markup helper.</param>
+        /// <returns>A component reference joined to the other model's generated component ID.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent, TOtherModel>(
             Expression<Func<TOtherModel, object>> expr)
             where TComponent : IComponent, new()
@@ -120,19 +120,19 @@ namespace Alis.Reactive.Builders
             return new ComponentRef<TComponent, TModel>(elementId, this);
         }
 
-        /// <summary>Targets a component whose ID is supplied outside model binding.</summary>
-        /// <typeparam name="TComponent">The typed component contract that controls available operations.</typeparam>
-        /// <param name="refId">The component ID already rendered in markup.</param>
-        /// <returns>A typed component reference bound to the explicit component ID.</returns>
+        /// <summary>Targets a component by an explicit rendered ID.</summary>
+        /// <typeparam name="TComponent">The component contract that determines available reads, writes, and calls.</typeparam>
+        /// <param name="refId">The component ID already present in markup.</param>
+        /// <returns>A component reference joined to the explicit component ID.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)
             where TComponent : IComponent, new()
         {
             return new ComponentRef<TComponent, TModel>(refId, this);
         }
 
-        /// <summary>Targets a layout-owned app component by its default ID.</summary>
-        /// <typeparam name="TComponent">The app-level component contract that controls available operations.</typeparam>
-        /// <returns>A typed component reference bound to the component's layout ID.</returns>
+        /// <summary>Targets a layout-owned app component by the ID declared by its component contract.</summary>
+        /// <typeparam name="TComponent">The app-level component contract that supplies its default ID.</typeparam>
+        /// <returns>A component reference joined to the layout component ID.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>()
             where TComponent : IAppLevelComponent, new()
         {
