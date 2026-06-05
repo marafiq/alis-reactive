@@ -113,11 +113,11 @@ public class IntakeController : Controller
             });
 
         var validator = new IntakeValidator();
-        var result = validator.Validate(model);
+        var validationResult = validator.Validate(model);
 
-        if (!result.IsValid)
+        if (!validationResult.IsValid)
         {
-            var errors = result.Errors
+            var errors = validationResult.Errors
                 .GroupBy(e => e.PropertyName)
                 .ToDictionary(
                     g => g.Key,
