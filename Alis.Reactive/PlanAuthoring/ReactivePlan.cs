@@ -7,7 +7,7 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// Collects reactive behavior for a view: triggers, reactions, and component registrations.
-    /// Renders the collected behavior as a Reactive Plan runtime document.
+    /// Renders the collected behavior as generated Reactive Plan JSON.
     /// </summary>
     public sealed class ReactivePlan<TModel> where TModel : class
     {

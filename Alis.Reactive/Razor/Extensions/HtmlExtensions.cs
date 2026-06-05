@@ -15,7 +15,7 @@ namespace Alis.Reactive.Native.Extensions
     {
         /// <summary>
         /// Adds behavior to <paramref name="plan"/> by configuring triggers
-        /// and the commands that run when each trigger fires.
+        /// and the reactions that run when each trigger fires.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -36,7 +36,7 @@ namespace Alis.Reactive.Native.Extensions
         /// A trigger is an event source that starts a reaction, such as page loading
         /// (<c>DomReady</c>) or a DOM custom event (<c>CustomEvent</c>). See
         /// <see cref="TriggerBuilder{TModel}"/> for the full trigger surface. When the
-        /// trigger fires, the commands declared in its callback execute in declaration order.
+        /// trigger fires, the reactions declared in its callback execute in declaration order.
         /// </para>
         /// <para>
         /// Avoid defining the same event twice in the same view. Duplicate listeners are
