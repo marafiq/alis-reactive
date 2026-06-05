@@ -16,7 +16,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionAutoCompleteFilteringArgs
     {
-        /// <summary>Gets or sets the search text the user typed.</summary>
+        /// <summary>Search text the user typed.</summary>
         public string Text { get; set; } = "";
     }
 
