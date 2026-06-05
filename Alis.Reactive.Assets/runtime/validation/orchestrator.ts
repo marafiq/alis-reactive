@@ -1,4 +1,4 @@
-// Validation, execution, and gather share evaluateValue so component reads stay consistent.
+// Validation uses the same ValueExpression resolver as execution and gather so component reads stay consistent.
 
 import type {
   PlanDocument, ValidationContainerScope, ComponentValidation,
@@ -66,7 +66,7 @@ function clearAndHideSummary(summary: ValidationSummary): void {
 
 interface ValidationSurface {
   readonly planDocument: PlanDocument;
-  readonly runtime: RuntimePlan;
+  readonly runtimePlan: RuntimePlan;
   readonly containerId: string;
   readonly containerScope: ValidationContainerScope;
   readonly summary: ValidationSummary;
@@ -77,7 +77,7 @@ interface FieldEvaluation {
   readonly componentValidation: ComponentValidation;
   readonly componentDomId: string;
   readonly value: unknown;
-  readonly hidden: boolean;
+  readonly inlineMessageHidden: boolean;
 }
 
 export function validateContainer(
@@ -85,8 +85,8 @@ export function validateContainer(
   containerKey: string,
   context?: ExecContext,
 ): boolean {
-  const runtime = RuntimePlan.from(planDocument);
-  const containerComponent = runtime.components.find(containerKey);
+  const runtimePlan = RuntimePlan.from(planDocument);
+  const containerComponent = runtimePlan.components.find(containerKey);
   if (!containerComponent) {
     log.warn("container.not-found", { id: containerKey });
     return false;
@@ -114,7 +114,7 @@ export function validateContainer(
   const summary = validationSummaryForPlan(planDocument.planId);
   const surface: ValidationSurface = {
     planDocument,
-    runtime,
+    runtimePlan,
     containerId,
     containerScope,
     summary,
@@ -144,8 +144,8 @@ export function validateContainer(
 }
 
 export function showServerErrors(planDocument: PlanDocument, containerKey: string, serverPayload: unknown): void {
-  const runtime = RuntimePlan.from(planDocument);
-  const containerComponent = runtime.components.find(containerKey);
+  const runtimePlan = RuntimePlan.from(planDocument);
+  const containerComponent = runtimePlan.components.find(containerKey);
   const containerScope = containerComponent?.containerScope;
   if (!containerComponent || !containerScope) return;
 
@@ -153,7 +153,7 @@ export function showServerErrors(planDocument: PlanDocument, containerKey: strin
   const summary = validationSummaryForPlan(planDocument.planId);
   const surface: ValidationSurface = {
     planDocument,
-    runtime,
+    runtimePlan,
     containerId,
     containerScope,
     summary,
@@ -186,7 +186,7 @@ function placeServerErrorOnFieldOrSummary(
   const validation = findComponentValidationByName(surface, error.name);
   if (validation === undefined) return addSummaryError(surface.summary, error.name, message);
 
-  const component = surface.runtime.components.find(validation.component);
+  const component = surface.runtimePlan.components.find(validation.component);
   if (component === undefined) return addSummaryError(surface.summary, error.name, message);
 
   const element = component.tryElement();
@@ -202,8 +202,8 @@ function placeServerErrorOnFieldOrSummary(
 }
 
 export function revalidateField(planDocument: PlanDocument, containerKey: string, componentKey: string): void {
-  const runtime = RuntimePlan.from(planDocument);
-  const containerComponent = runtime.components.find(containerKey);
+  const runtimePlan = RuntimePlan.from(planDocument);
+  const containerComponent = runtimePlan.components.find(containerKey);
   const containerScope = containerComponent?.containerScope;
   if (!containerComponent || !containerScope) return;
 
@@ -214,7 +214,7 @@ export function revalidateField(planDocument: PlanDocument, containerKey: string
 
   const containerId = containerComponent.id;
 
-  const component = runtime.components.find(componentKey);
+  const component = runtimePlan.components.find(componentKey);
   if (component) clearInline(component.id);
 
   let container: HTMLElement;
@@ -228,7 +228,7 @@ export function revalidateField(planDocument: PlanDocument, containerKey: string
   const summary = validationSummaryForPlan(planDocument.planId);
   const surface: ValidationSurface = {
     planDocument,
-    runtime,
+    runtimePlan,
     containerId,
     containerScope,
     summary,
@@ -239,8 +239,8 @@ export function revalidateField(planDocument: PlanDocument, containerKey: string
 }
 
 export function clearContainerValidation(planDocument: PlanDocument, containerKey: string): void {
-  const runtime = RuntimePlan.from(planDocument);
-  const containerComponent = runtime.components.find(containerKey);
+  const runtimePlan = RuntimePlan.from(planDocument);
+  const containerComponent = runtimePlan.components.find(containerKey);
   const containerScope = containerComponent?.containerScope;
   if (!containerComponent || !containerScope) return;
 
@@ -248,7 +248,7 @@ export function clearContainerValidation(planDocument: PlanDocument, containerKe
   const summary = validationSummaryForPlan(planDocument.planId);
   clearContainerErrors({
     planDocument,
-    runtime,
+    runtimePlan,
     containerId,
     containerScope,
     summary,
@@ -261,7 +261,7 @@ function evaluateComponentRules(
   surface: ValidationSurface,
   container: HTMLElement,
 ): boolean {
-  const component = surface.runtime.components.find(componentValidation.component);
+  const component = surface.runtimePlan.components.find(componentValidation.component);
   if (!component) return handleInactiveValidationField(componentValidation, surface);
 
   const resolved = resolveFieldElement(component, componentValidation, surface);
@@ -272,13 +272,13 @@ function evaluateComponentRules(
     return true;
   }
 
-  const hidden = isErrorSpanHidden(component.id);
+  const inlineMessageHidden = isErrorSpanHidden(component.id);
   const value = evaluateValue(componentValidation.value, surface.planDocument);
   const field: FieldEvaluation = {
     componentValidation,
     componentDomId: component.id,
     value,
-    hidden,
+    inlineMessageHidden,
   };
 
   return evaluateRulesForField(field, surface);
@@ -359,7 +359,7 @@ function reportRuleFailure(
 ): void {
   const component = field.componentValidation.component;
   log.trace("rule.failed", { component, rule: rule.name, value: field.value, message: rule.message });
-  if (field.hidden) {
+  if (field.inlineMessageHidden) {
     addSummaryError(surface.summary, component, rule.message);
   } else {
     showInline(field.componentDomId, rule.message);
@@ -429,7 +429,7 @@ function clearContainerErrors(
   surface: ValidationSurface,
 ): void {
   for (const componentValidation of surface.containerScope.validationRules) {
-    const component = surface.runtime.components.find(componentValidation.component);
+    const component = surface.runtimePlan.components.find(componentValidation.component);
     if (component) clearInline(component.id);
   }
   clearAndHideSummary(surface.summary);
