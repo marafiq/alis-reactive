@@ -263,8 +263,8 @@ static string SimplifyNamespace(string ns)
 
 static string CleanGenericNotation(string name)
 {
-    var idx = name.IndexOf('`');
-    if (idx >= 0) return $"{name[..idx]}<T>";
+    var genericArityMarkerIndex = name.IndexOf('`');
+    if (genericArityMarkerIndex >= 0) return $"{name[..genericArityMarkerIndex]}<T>";
     return name;
 }
 
@@ -356,8 +356,8 @@ record DocMember(string RawName, string Assembly, XElement Element)
 
     private static string CleanGeneric(string name)
     {
-        var idx = name.IndexOf('`');
-        if (idx >= 0) return $"{name[..idx]}<T>";
+        var genericArityMarkerIndex = name.IndexOf('`');
+        if (genericArityMarkerIndex >= 0) return $"{name[..genericArityMarkerIndex]}<T>";
         return name;
     }
 }
