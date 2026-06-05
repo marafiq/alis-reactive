@@ -118,9 +118,9 @@ class ValueEvaluation {
   // Element-scope methods use RuntimePath.call so owner binding and non-function
   // errors match component/plugin method reads.
   private readElementMethod(expression: ElementMethodReadExpression): unknown {
-    const payloadRoot = this.context.resolvePayload(expression.from);
+    const resolvedPayloadScope = this.context.resolvePayload(expression.from);
     const args = expression.access.args.map(arg => this.evaluate(arg));
-    const rawValue = RuntimePath.from(expression.path).call(payloadRoot, args, `element method "${expression.member}"`);
+    const rawValue = RuntimePath.from(expression.path).call(resolvedPayloadScope, args, `element method "${expression.member}"`);
     return applyShapeWhenPresent(rawValue, expression.shape);
   }
 
@@ -182,13 +182,13 @@ function readFromUrl(
   return applyShapeWhenPresent(rawValue, expression.shape);
 }
 
-/** Whole payload and whole element reads return the current payload scope; path reads follow RuntimePath. */
+/** Whole payload and whole element reads return the resolved payload scope; path reads follow RuntimePath. */
 function readFromPayload(
-  expression: PayloadReadExpression, payloadRoot: unknown,
+  expression: PayloadReadExpression, resolvedPayloadScope: unknown,
 ): unknown {
   const rawValue = isWholePayloadRead(expression) || isWholeElementRead(expression)
-    ? payloadRoot
-    : RuntimePath.from(expression.path).read(payloadRoot);
+    ? resolvedPayloadScope
+    : RuntimePath.from(expression.path).read(resolvedPayloadScope);
 
   return applyShapeWhenPresent(rawValue, expression.shape);
 }
