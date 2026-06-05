@@ -32,8 +32,8 @@ namespace Alis.Reactive.Native.Components
             where TModel : class
         {
             var items = new System.Collections.Generic.List<ValueExpression>();
-            foreach (var v in value)
-                items.Add(ValueExpression.Literal(v));
+            foreach (var selectedValue in value)
+                items.Add(ValueExpression.Literal(selectedValue));
             return self.EmitSet(ValueProperty, ValueExpression.Array(items));
         }
 
