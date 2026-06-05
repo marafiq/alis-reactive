@@ -8,9 +8,8 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Alis.Reactive.Analyzers.Validation
 {
     /// <summary>
-    /// Info diagnostic when FluentValidation methods that produce server-only rules are used
-    /// inside a <c>ReactiveValidator&lt;T&gt;</c>. These rules cannot be extracted for
-    /// client-side validation and will silently drop during extraction.
+    /// Reports FluentValidation rules inside <c>ReactiveValidator&lt;T&gt;</c> when the
+    /// rule cannot be serialized into a client-executable validation condition.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ServerOnlyValidationRuleAnalyzer : DiagnosticAnalyzer
