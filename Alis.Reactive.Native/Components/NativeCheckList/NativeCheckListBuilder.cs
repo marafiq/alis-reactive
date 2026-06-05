@@ -72,7 +72,8 @@ namespace Alis.Reactive.Native.Components
         internal IReadOnlyList<RadioButtonItem> Options => _options;
 
         /// <summary>
-        /// Adds checkbox options provided by the controller.
+        /// Adds checkbox options supplied outside the fluent builder, such as
+        /// controller or view-model option lists.
         /// </summary>
         /// <param name="items">The checkbox items to display.</param>
         public NativeCheckListBuilder<TModel, TProp> Items(IEnumerable<RadioButtonItem> items)
@@ -83,7 +84,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Adds a checkbox option where the value is also used as the display text.
+        /// Adds a checkbox option whose submitted value is also its display text.
         /// </summary>
         /// <param name="value">The option value and display text.</param>
         public NativeCheckListBuilder<TModel, TProp> Option(string value)
@@ -93,7 +94,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Adds a checkbox option with a separate display text.
+        /// Adds a checkbox option with a submitted value and separate display text.
         /// </summary>
         /// <param name="value">The option value submitted in the form.</param>
         /// <param name="text">The display text shown next to the checkbox.</param>
@@ -104,7 +105,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Adds a checkbox option with display text and a description.
+        /// Adds a checkbox option with submitted value, display text, and secondary description.
         /// </summary>
         /// <param name="value">The option value submitted in the form.</param>
         /// <param name="text">The display text shown next to the checkbox.</param>
@@ -116,7 +117,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets CSS classes on the checkbox list container.
+        /// Replaces the CSS classes on the checkbox list container.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
         public NativeCheckListBuilder<TModel, TProp> CssClass(string css)
@@ -126,7 +127,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Sets CSS classes on each checkbox option wrapper label.
+        /// Replaces the CSS classes on each checkbox option wrapper.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
         public NativeCheckListBuilder<TModel, TProp> OptionCssClass(string css)
