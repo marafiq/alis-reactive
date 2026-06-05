@@ -18,10 +18,10 @@ namespace Alis.Reactive.PlanTypeGenerator
 
         private static string ResolveOutputPath(string[] args)
         {
-            foreach (var arg in args)
+            foreach (var commandLineArgument in args)
             {
-                if (arg != "--check")
-                    return arg;
+                if (commandLineArgument != "--check")
+                    return commandLineArgument;
             }
 
             return System.IO.Path.Combine("Alis.Reactive.Assets", "runtime", "types", "plan.ts");

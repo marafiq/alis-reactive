@@ -78,19 +78,19 @@ foreach (var assemblyGroup in byAssembly)
         markdown.AppendLine($"## {SimplifyNamespace(nsGroup.Key)}");
         markdown.AppendLine();
 
-        foreach (var type in nsGroup)
+        foreach (var docType in nsGroup)
         {
-            markdown.AppendLine($"### {type.DisplayTypeName}");
+            markdown.AppendLine($"### {docType.DisplayTypeName}");
             markdown.AppendLine();
 
-            var summary = GetSummaryText(type.Element);
+            var summary = GetSummaryText(docType.Element);
             if (!string.IsNullOrWhiteSpace(summary))
             {
                 markdown.AppendLine(summary.Trim());
                 markdown.AppendLine();
             }
 
-            if (membersByType.TryGetValue(type.FullTypeName, out var members))
+            if (membersByType.TryGetValue(docType.FullTypeName, out var members))
             {
                 var properties = members.Where(m => m.Kind == MemberKind.Property).ToList();
                 var methods = members.Where(m => m.Kind == MemberKind.Method).ToList();
@@ -99,12 +99,12 @@ foreach (var assemblyGroup in byAssembly)
                 {
                     markdown.AppendLine("```csharp");
                     markdown.AppendLine("// Properties");
-                    foreach (var prop in properties)
+                    foreach (var property in properties)
                     {
-                        var propSummary = GetSummaryInline(prop.Element);
-                        markdown.AppendLine(string.IsNullOrWhiteSpace(propSummary)
-                            ? prop.DisplaySignature
-                            : $"{prop.DisplaySignature}  // {propSummary}");
+                        var propertySummary = GetSummaryInline(property.Element);
+                        markdown.AppendLine(string.IsNullOrWhiteSpace(propertySummary)
+                            ? property.DisplaySignature
+                            : $"{property.DisplaySignature}  // {propertySummary}");
                     }
                     markdown.AppendLine("```");
                     markdown.AppendLine();
@@ -196,50 +196,50 @@ static string NormalizeDocText(string text)
 static string CleanXmlText(XElement element)
 {
     var markdown = new StringBuilder();
-    foreach (var node in element.Nodes())
+    foreach (var xmlNode in element.Nodes())
     {
-        if (node is XText text)
+        if (xmlNode is XText text)
         {
             markdown.Append(text.Value);
         }
-        else if (node is XElement el)
+        else if (xmlNode is XElement xmlElement)
         {
-            switch (el.Name.LocalName)
+            switch (xmlElement.Name.LocalName)
             {
                 case "c":
-                    markdown.Append($"`{el.Value}`");
+                    markdown.Append($"`{xmlElement.Value}`");
                     break;
                 case "code":
                     markdown.AppendLine();
                     markdown.AppendLine("```csharp");
-                    markdown.AppendLine(el.Value.Trim());
+                    markdown.AppendLine(xmlElement.Value.Trim());
                     markdown.AppendLine("```");
                     break;
                 case "see":
-                    var cref = el.Attribute("cref")?.Value;
-                    var langword = el.Attribute("langword")?.Value;
+                    var cref = xmlElement.Attribute("cref")?.Value;
+                    var langword = xmlElement.Attribute("langword")?.Value;
                     if (langword != null)
                         markdown.Append($"`{langword}`");
                     else if (cref != null)
                         markdown.Append($"`{SimplifyCref(cref)}`");
                     else
-                        markdown.Append(el.Value);
+                        markdown.Append(xmlElement.Value);
                     break;
                 case "para":
                     markdown.AppendLine();
-                    markdown.Append(CleanXmlText(el));
+                    markdown.Append(CleanXmlText(xmlElement));
                     break;
                 case "paramref":
-                    markdown.Append($"`{el.Attribute("name")?.Value}`");
+                    markdown.Append($"`{xmlElement.Attribute("name")?.Value}`");
                     break;
                 case "typeparamref":
-                    markdown.Append($"`{el.Attribute("name")?.Value}`");
+                    markdown.Append($"`{xmlElement.Attribute("name")?.Value}`");
                     break;
                 case "b":
-                    markdown.Append($"**{el.Value}**");
+                    markdown.Append($"**{xmlElement.Value}**");
                     break;
                 default:
-                    markdown.Append(CleanXmlText(el));
+                    markdown.Append(CleanXmlText(xmlElement));
                     break;
             }
         }
@@ -290,8 +290,8 @@ record DocMember(string RawName, string Assembly, XElement Element)
         {
             if (Kind == MemberKind.Type) return FullName;
             var name = FullName;
-            var parenIdx = name.IndexOf('(');
-            if (parenIdx >= 0) name = name[..parenIdx];
+            var parameterListIndex = name.IndexOf('(');
+            if (parameterListIndex >= 0) name = name[..parameterListIndex];
             var lastDot = name.LastIndexOf('.');
             return lastDot >= 0 ? name[..lastDot] : name;
         }
@@ -303,8 +303,8 @@ record DocMember(string RawName, string Assembly, XElement Element)
         {
             var typeName = Kind == MemberKind.Type ? FullName : FullTypeName;
             var clean = typeName;
-            var btIdx = clean.IndexOf('`');
-            if (btIdx >= 0) clean = clean[..btIdx];
+            var genericArityMarkerIndex = clean.IndexOf('`');
+            if (genericArityMarkerIndex >= 0) clean = clean[..genericArityMarkerIndex];
             var lastDot = clean.LastIndexOf('.');
             return lastDot >= 0 ? clean[..lastDot] : "";
         }
@@ -329,8 +329,8 @@ record DocMember(string RawName, string Assembly, XElement Element)
         {
             if (Kind == MemberKind.Type) return TypeName;
             var name = FullName;
-            var parenIdx = name.IndexOf('(');
-            if (parenIdx >= 0) name = name[..parenIdx];
+            var parameterListIndex = name.IndexOf('(');
+            if (parameterListIndex >= 0) name = name[..parameterListIndex];
             var lastDot = name.LastIndexOf('.');
             return lastDot >= 0 ? CleanGeneric(name[(lastDot + 1)..]) : CleanGeneric(name);
         }
