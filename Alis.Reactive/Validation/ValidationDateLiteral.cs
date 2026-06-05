@@ -16,27 +16,27 @@ namespace Alis.Reactive.Validation
 
         private static object FromDateValue(object value)
         {
-            if (value is DateTime dt)
+            if (value is DateTime dateTime)
             {
-                var dateHasNoTimeComponent = dt.TimeOfDay == TimeSpan.Zero;
+                var dateHasNoTimeComponent = dateTime.TimeOfDay == TimeSpan.Zero;
                 if (dateHasNoTimeComponent)
-                    return dt.ToString("yyyy-MM-dd");
+                    return dateTime.ToString("yyyy-MM-dd");
 
-                return dt.ToString("s");
+                return dateTime.ToString("s");
             }
 
-            if (value is DateTimeOffset dto)
+            if (value is DateTimeOffset dateTimeOffset)
             {
-                var dateHasNoTimeComponent = dto.TimeOfDay == TimeSpan.Zero;
+                var dateHasNoTimeComponent = dateTimeOffset.TimeOfDay == TimeSpan.Zero;
                 if (dateHasNoTimeComponent)
-                    return dto.ToString("yyyy-MM-dd");
+                    return dateTimeOffset.ToString("yyyy-MM-dd");
 
-                return dto.ToString("s");
+                return dateTimeOffset.ToString("s");
             }
 
 #if NET6_0_OR_GREATER
-            if (value is DateOnly d)
-                return d.ToString("yyyy-MM-dd");
+            if (value is DateOnly dateOnly)
+                return dateOnly.ToString("yyyy-MM-dd");
 #endif
 
             return value;
