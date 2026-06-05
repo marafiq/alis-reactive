@@ -11,27 +11,27 @@ namespace Alis.Reactive.NativeTagHelpers.Text;
 public class NativeTextTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets the type size. Defaults to <see cref="TextSize.Base"/>.
+    /// Controls the rendered text size. Defaults to <see cref="TextSize.Base"/>.
     /// </summary>
     public TextSize Size { get; set; } = TextSize.Base;
 
     /// <summary>
-    /// Gets or sets the text color. Defaults to <see cref="TextColor.Primary"/>.
+    /// Controls the text color. Defaults to <see cref="TextColor.Primary"/>.
     /// </summary>
     public TextColor Color { get; set; } = TextColor.Primary;
 
     /// <summary>
-    /// Gets or sets whether the text is rendered with bold weight.
+    /// Renders the text with bold weight.
     /// </summary>
     public bool Bold { get; set; }
 
     /// <summary>
-    /// Gets or sets the bottom margin applied after the text. Defaults to <see cref="ElementSpacing.Base"/>.
+    /// Controls the bottom margin after the text. Defaults to <see cref="ElementSpacing.Base"/>.
     /// </summary>
     public ElementSpacing Spacing { get; set; } = ElementSpacing.Base;
 
     /// <summary>
-    /// Gets or sets whether the text renders as an inline <c>span</c> instead of a block <c>p</c>.
+    /// Renders an inline <c>span</c> instead of a block <c>p</c>.
     /// </summary>
     public bool AsSpan { get; set; }
 

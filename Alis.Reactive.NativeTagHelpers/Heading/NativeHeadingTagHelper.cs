@@ -13,18 +13,18 @@ namespace Alis.Reactive.NativeTagHelpers.Heading;
 public class NativeHeadingTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets the heading level, which selects both the tag (<c>h1</c> through
-    /// <c>h6</c>) and its type scale. Defaults to <see cref="HeadingLevel.H2"/>.
+    /// Selects both the heading tag (<c>h1</c> through <c>h6</c>) and its type
+    /// scale. Defaults to <see cref="HeadingLevel.H2"/>.
     /// </summary>
     public HeadingLevel Level { get; set; } = HeadingLevel.H2;
 
     /// <summary>
-    /// Gets or sets the bottom margin applied after the heading. Defaults to <see cref="ElementSpacing.Sm"/>.
+    /// Controls the bottom margin after the heading. Defaults to <see cref="ElementSpacing.Sm"/>.
     /// </summary>
     public ElementSpacing Spacing { get; set; } = ElementSpacing.Sm;
 
     /// <summary>
-    /// Gets or sets an optional small label shown above the heading.
+    /// Optional small label shown above the heading.
     /// </summary>
     public string? Overline { get; set; }
 

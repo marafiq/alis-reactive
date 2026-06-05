@@ -12,13 +12,13 @@ namespace Alis.Reactive.NativeTagHelpers.Divider;
 public class NativeDividerTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets the visual treatment of the rule. Defaults to <see cref="DividerStyle.Plain"/>.
+    /// Controls the visual treatment of the rule. Defaults to <see cref="DividerStyle.Plain"/>.
     /// </summary>
     public DividerStyle Style { get; set; } = DividerStyle.Plain;
 
     /// <summary>
-    /// Gets or sets an optional label shown centered on the rule. When set, the divider
-    /// renders as a labeled section break instead of a plain rule.
+    /// Optional centered label. When set, the divider renders as a labeled section
+    /// break instead of a plain rule.
     /// </summary>
     public string? Label { get; set; }
 

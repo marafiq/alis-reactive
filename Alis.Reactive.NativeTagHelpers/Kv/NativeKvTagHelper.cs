@@ -11,21 +11,21 @@ namespace Alis.Reactive.NativeTagHelpers.Kv;
 public class NativeKvTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets the label shown for the pair. This attribute is required: the tag
-    /// helper throws when it is missing or empty.
+    /// Required label shown for the pair. The tag helper throws when this attribute
+    /// is missing or empty.
     /// </summary>
     [HtmlAttributeName("label")]
     public string Label { get; set; } = "";
 
     /// <summary>
-    /// Gets or sets the value shown for the pair. This attribute is required: the tag
-    /// helper throws when it is missing or empty.
+    /// Required value shown for the pair. The tag helper throws when this attribute
+    /// is missing or empty.
     /// </summary>
     [HtmlAttributeName("value")]
     public string Value { get; set; } = "";
 
     /// <summary>
-    /// Gets or sets how the label and value are arranged. Defaults to <see cref="KvLayout.Stacked"/>.
+    /// Controls how the label and value are arranged. Defaults to <see cref="KvLayout.Stacked"/>.
     /// </summary>
     public KvLayout Layout { get; set; } = KvLayout.Stacked;
 

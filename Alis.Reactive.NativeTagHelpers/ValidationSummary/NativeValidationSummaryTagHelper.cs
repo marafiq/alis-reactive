@@ -10,8 +10,8 @@ namespace Alis.Reactive.NativeTagHelpers.ValidationSummary;
 public class NativeValidationSummaryTagHelper : TagHelper
 {
     /// <summary>
-    /// Gets or sets the id of the plan whose validation errors this summary displays.
-    /// This attribute is required: the tag helper throws when it is missing or empty.
+    /// Required plan ID whose validation errors this summary displays. The tag
+    /// helper throws when this attribute is missing or empty.
     /// </summary>
     [HtmlAttributeName("plan-id")]
     public string PlanId { get; set; } = "";
