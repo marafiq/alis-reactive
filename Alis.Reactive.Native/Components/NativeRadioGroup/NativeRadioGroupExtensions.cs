@@ -9,8 +9,7 @@ namespace Alis.Reactive.Native.Components
     /// Reactive Plan operations for <see cref="NativeRadioGroup"/> selected values and focus.
     /// </summary>
     /// <remarks>
-    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via
-    /// <see cref="Builders.PipelineBuilder{TModel}.Component{TComponent}(System.Linq.Expressions.Expression{System.Func{TModel, object}})"/>:
+    /// Use on a component reference resolved from a pipeline, for example:
     /// <code>p.Component&lt;NativeRadioGroup&gt;(m =&gt; m.Priority).SetValue("high")</code>
     /// </remarks>
     public static class NativeRadioGroupExtensions

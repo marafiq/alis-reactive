@@ -7,8 +7,7 @@ namespace Alis.Reactive.Native.Components
     /// Reactive Plan operations for <see cref="NativeTextArea"/> values and focus.
     /// </summary>
     /// <remarks>
-    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via
-    /// <see cref="Builders.PipelineBuilder{TModel}.Component{TComponent}(System.Linq.Expressions.Expression{System.Func{TModel, object}})"/>:
+    /// Use on a component reference resolved from a pipeline, for example:
     /// <code>p.Component&lt;NativeTextArea&gt;(m =&gt; m.Notes).SetValue("updated")</code>
     /// </remarks>
     public static class NativeTextAreaExtensions

@@ -9,8 +9,7 @@ namespace Alis.Reactive.Native.Components
     /// Reactive Plan operations for <see cref="NativeHiddenField"/> values.
     /// </summary>
     /// <remarks>
-    /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via
-    /// <see cref="Builders.PipelineBuilder{TModel}.Component{TComponent}(System.Linq.Expressions.Expression{System.Func{TModel, object}})"/>.
+    /// Use on a component reference resolved from a pipeline.
     /// </remarks>
     public static class NativeHiddenFieldExtensions
     {
