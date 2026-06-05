@@ -1,8 +1,7 @@
 namespace Alis.Reactive.Fusion.Templates
 {
     /// <summary>
-    /// Shared HTML element rendering for Syncfusion template builders.
-    /// Each method produces a single HTML element string using Syncfusion template binding syntax.
+    /// Internal element rendering shared by root and conditional Syncfusion template builders.
     /// </summary>
     internal static class TemplateElements
     {
@@ -32,8 +31,7 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Renders a button element. The <paramref name="onClick"/> value is injected
-        /// directly into the onclick attribute — callers must ensure it is safe.
+        /// Injects <paramref name="onClick"/> directly into the <c>onclick</c> attribute; callers must ensure it is safe.
         /// </summary>
         internal static string Button(string text, string onClick, TemplateCss css)
         {
