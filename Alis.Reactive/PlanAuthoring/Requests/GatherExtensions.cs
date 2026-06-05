@@ -6,18 +6,21 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Requests
 {
     /// <summary>
-    /// Adds component value sources to HTTP request bodies.
+    /// Provides component-source overloads for adding request body fields.
     /// </summary>
     public static class GatherExtensions
     {
         /// <summary>
-        /// Adds a model-bound input component's value to the request body.
-        /// The model property name becomes the body field name.
+        /// Adds a model-bound input component value to the request body.
         /// </summary>
-        /// <typeparam name="TComponent">The input component contract type.</typeparam>
-        /// <typeparam name="TModel">The view model that owns the component ID.</typeparam>
-        /// <param name="self">The gather builder being configured.</param>
-        /// <param name="expr">The model property expression used to generate the component ID and body field name.</param>
+        /// <remarks>
+        /// The model expression supplies both the generated component ID and the request
+        /// body field name. The component contract supplies the value member read at runtime.
+        /// </remarks>
+        /// <typeparam name="TComponent">The input component contract to read.</typeparam>
+        /// <typeparam name="TModel">The view model used to derive the generated component ID.</typeparam>
+        /// <param name="self">The request-input gather builder.</param>
+        /// <param name="expr">The model property expression for the component ID and body field.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             Expression<Func<TModel, object>> expr)
@@ -33,18 +36,17 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Adds a component value to the request body by explicit element ID
-        /// and field name.
+        /// Adds a component value to the request body by explicit component ID.
         /// </summary>
         /// <remarks>
-        /// Input components read their configured value member. Display components read the
-        /// named member directly.
+        /// Input components read their configured value member. Components without an
+        /// input-value contract read the member named by <paramref name="name"/>.
         /// </remarks>
-        /// <typeparam name="TComponent">The component contract type.</typeparam>
-        /// <typeparam name="TModel">The view model for the gather builder.</typeparam>
-        /// <param name="self">The gather builder being configured.</param>
+        /// <typeparam name="TComponent">The component contract to read.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the request pipeline.</typeparam>
+        /// <param name="self">The request-input gather builder.</param>
         /// <param name="refId">The explicit controlled component ID rendered in markup.</param>
-        /// <param name="name">The body field name and, for display components, the component member name.</param>
+        /// <param name="name">The request body field name; also the member name for non-input components.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             string refId,
@@ -62,12 +64,12 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Adds a typed component member value to the request body.
+        /// Adds a typed component member read to the request body.
         /// </summary>
-        /// <typeparam name="TModel">The view model for the gather builder.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the request pipeline.</typeparam>
         /// <typeparam name="TProp">The component member value type.</typeparam>
-        /// <param name="self">The gather builder being configured.</param>
-        /// <param name="source">The typed component value source. Its default body field name is used.</param>
+        /// <param name="self">The request-input gather builder.</param>
+        /// <param name="source">The component property or method source; its default payload name becomes the body field.</param>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
             this GatherBuilder<TModel> self,
             TypedComponentSource<TProp> source)
@@ -78,13 +80,12 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Adds a typed component member value to the request body with an
-        /// explicit field name.
+        /// Adds a typed component member read to an explicit request body field.
         /// </summary>
-        /// <typeparam name="TModel">The view model for the gather builder.</typeparam>
+        /// <typeparam name="TModel">The view model that owns the request pipeline.</typeparam>
         /// <typeparam name="TProp">The component member value type.</typeparam>
-        /// <param name="self">The gather builder being configured.</param>
-        /// <param name="source">The typed component value source to evaluate before the request is sent.</param>
+        /// <param name="self">The request-input gather builder.</param>
+        /// <param name="source">The component property or method source evaluated before the request is sent.</param>
         /// <param name="paramName">The request body field name.</param>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
             this GatherBuilder<TModel> self,
