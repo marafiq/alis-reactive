@@ -39,7 +39,7 @@ registeredPlugins.push({
 registeredPlugins.push({
   name: "analytics",
   instance: {
-    track: (_event: string) => { /* sandbox no-op */ },
+    track: (_event: string) => undefined,
   }
 });
 
