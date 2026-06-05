@@ -16,7 +16,7 @@ namespace Alis.Reactive.Native.Components
         };
 
         internal static NativeActionLinkContract CreateContract<TModel>(
-            string href,
+            string expectedRequestUrl,
             Action<PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
@@ -32,7 +32,7 @@ namespace Alis.Reactive.Native.Components
 
             var reaction = pipelineBuilder.BuildReaction();
             var requestCount = 0;
-            var actionLinkReaction = BuildActionLinkReaction(reaction, href, ref requestCount);
+            var actionLinkReaction = BuildActionLinkReaction(reaction, expectedRequestUrl, ref requestCount);
             if (requestCount != 1)
             {
                 throw new InvalidOperationException(
@@ -48,20 +48,23 @@ namespace Alis.Reactive.Native.Components
             return new NativeActionLinkContract(payloadJson);
         }
 
-        private static ReactionGraph BuildActionLinkReaction(ReactionGraph reaction, string href, ref int requestCount)
+        private static ReactionGraph BuildActionLinkReaction(
+            ReactionGraph reaction,
+            string expectedRequestUrl,
+            ref int requestCount)
         {
             switch (reaction)
             {
                 case SequenceReaction sequential:
                     var actionLinkSteps = new List<ReactionGraph>();
                     foreach (var step in sequential.Steps)
-                        actionLinkSteps.Add(BuildActionLinkReaction(step, href, ref requestCount));
+                        actionLinkSteps.Add(BuildActionLinkReaction(step, expectedRequestUrl, ref requestCount));
                     return ReactionGraph.Sequence(actionLinkSteps);
 
                 case BranchReaction conditional:
                     var actionLinkCases = new List<BranchCase>();
                     foreach (var branchCase in conditional.Cases)
-                        actionLinkCases.Add(branchCase.WithReaction(BuildActionLinkReaction(branchCase.Reaction, href, ref requestCount)));
+                        actionLinkCases.Add(branchCase.WithReaction(BuildActionLinkReaction(branchCase.Reaction, expectedRequestUrl, ref requestCount)));
                     return ReactionGraph.Branch(actionLinkCases);
 
                 case RequestReaction requestReaction:
@@ -69,7 +72,7 @@ namespace Alis.Reactive.Native.Components
                     if (requestCount > 1)
                         throw new InvalidOperationException(
                             "NativeActionLink supports exactly one request.");
-                    if (!string.Equals(href, requestReaction.Request.Url, StringComparison.Ordinal))
+                    if (!string.Equals(expectedRequestUrl, requestReaction.Request.Url, StringComparison.Ordinal))
                         throw new InvalidOperationException(
                             "NativeActionLink href must match the request URL.");
                     return ReactionGraph.Request(BuildActionLinkRequest(requestReaction.Request));
