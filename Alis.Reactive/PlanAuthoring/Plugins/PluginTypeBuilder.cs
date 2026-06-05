@@ -73,7 +73,7 @@ namespace Alis.Reactive.Builders
             return AddVoid(name, MethodArgumentContract.Open);
         }
 
-        /// <summary>Declares a command member with no return value and an open argument contract.</summary>
+        /// <summary>Alias for declaring a no-return plugin command member with an open argument contract.</summary>
         /// <param name="name">The host plugin command name.</param>
         public PluginTypeBuilder Command(string name) =>
             Void(name);
@@ -88,7 +88,7 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
-        /// <summary>Declares a command member with an exact argument contract.</summary>
+        /// <summary>Alias for declaring a no-return plugin command member with an exact argument contract.</summary>
         /// <param name="name">The host plugin command name.</param>
         /// <param name="arguments">The ordered argument types accepted by the command.</param>
         public PluginTypeBuilder Command(string name, Action<PluginArgumentTypes> arguments) =>
@@ -100,7 +100,7 @@ namespace Alis.Reactive.Builders
             return AddVoid(PluginOperationId.Root(_pluginName), MethodArgumentContract.Open);
         }
 
-        /// <summary>Declares the plugin root command with no return value.</summary>
+        /// <summary>Alias for declaring the plugin root command with no return value.</summary>
         public PluginTypeBuilder Command() =>
             Void();
 
@@ -113,7 +113,7 @@ namespace Alis.Reactive.Builders
                 ExactArguments(arguments));
         }
 
-        /// <summary>Declares the plugin root command with an exact argument contract.</summary>
+        /// <summary>Alias for declaring the plugin root command with an exact argument contract.</summary>
         /// <param name="arguments">The ordered argument types accepted by the root command.</param>
         public PluginTypeBuilder Command(Action<PluginArgumentTypes> arguments) =>
             Void(arguments);
