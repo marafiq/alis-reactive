@@ -23,6 +23,8 @@ namespace Alis.Reactive.Fusion.Templates
     /// <remarks>
     /// The rendered string is consumed by Syncfusion's template engine. It is not a
     /// Reactive Plan, and it does not mutate live DOM until Syncfusion renders it.
+    /// Caller-provided literal text, attributes, CSS classes, URLs, and raw HTML are
+    /// emitted as supplied.
     /// </remarks>
     /// <typeparam name="TModel">The object shape exposed by the Syncfusion template context.</typeparam>
     public class FusionTemplateBuilder<TModel>
@@ -52,9 +54,9 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds or replaces a raw HTML attribute on the root template <c>div</c>.
+        /// Adds or replaces an HTML attribute on the root template <c>div</c>.
         /// </summary>
-        /// <remarks>Attribute names and values are emitted as supplied.</remarks>
+        /// <remarks>Attribute names and values are emitted as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> Attr(string name, string value)
         {
             _attributes[name] = value;
@@ -72,8 +74,9 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds static text to the template output.
+        /// Adds literal text to the template output.
         /// </summary>
+        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionTemplateBuilder<TModel> Text(string text)
         {
             _childRenderers.Add(() => text);
@@ -99,14 +102,16 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a <c>span</c> with static text.
+        /// Adds a <c>span</c> with literal text.
         /// </summary>
+        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionTemplateBuilder<TModel> Span(string text) =>
             Span(text, TemplateCss.None);
 
         /// <summary>
-        /// Adds a styled <c>span</c> with static text.
+        /// Adds a styled <c>span</c> with literal text.
         /// </summary>
+        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionTemplateBuilder<TModel> Span(string text, string css) =>
             Span(text, TemplateCss.Class(css));
 
@@ -164,8 +169,9 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Adds a badge with static text.
+        /// Adds a badge with literal text.
         /// </summary>
+        /// <remarks>The <paramref name="text"/> value is emitted as supplied.</remarks>
         public FusionTemplateBuilder<TModel> Badge(string text, string css = "e-badge")
         {
             _childRenderers.Add(() => TemplateElements.Badge(text, css));
