@@ -22,7 +22,7 @@ public class RealTimeBroadcastService(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var counter = 0;
+        var broadcastCount = 0;
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -35,24 +35,24 @@ public class RealTimeBroadcastService(
                 break;
             }
 
-            counter++;
-            var now = DateTime.Now.ToString("HH:mm:ss");
-            var idx = counter % Residents.Length;
+            broadcastCount++;
+            var timestamp = DateTime.Now.ToString("HH:mm:ss");
+            var residentIndex = broadcastCount % Residents.Length;
 
             try
             {
                 await notificationHub.Clients.All.SendAsync("ReceiveNotification", new NotificationPayload
                 {
-                    Count = counter,
-                    Message = $"[{now}] #{counter} — {Residents[idx]} status update",
-                    Priority = counter % 3 == 0 ? "high" : "normal"
+                    Count = broadcastCount,
+                    Message = $"[{timestamp}] #{broadcastCount} — {Residents[residentIndex]} status update",
+                    Priority = broadcastCount % 3 == 0 ? "high" : "normal"
                 }, stoppingToken);
 
                 await residentHub.Clients.All.SendAsync("StatusChanged", new ResidentStatusPayload
                 {
-                    ResidentName = Residents[idx],
-                    Status = Statuses[idx],
-                    CareLevel = CareLevels[idx],
+                    ResidentName = Residents[residentIndex],
+                    Status = Statuses[residentIndex],
+                    CareLevel = CareLevels[residentIndex],
                     UpdatedAt = DateTime.UtcNow
                 }, stoppingToken);
             }
