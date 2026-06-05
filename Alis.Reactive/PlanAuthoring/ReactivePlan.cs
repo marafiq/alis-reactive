@@ -92,7 +92,7 @@ namespace Alis.Reactive
             _registeredInputComponents.Contains(bindingPath);
 
         /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as compact JSON.</summary>
-        /// <returns>Compact Reactive Plan JSON ready to embed in the page.</returns>
+        /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
         public string Render()
         {
             ResolveAll(_services);
@@ -101,7 +101,7 @@ namespace Alis.Reactive
 
         /// <summary>Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as compact JSON.</summary>
         /// <param name="services">Services used to resolve validation rule sources required by queued validation rules.</param>
-        /// <returns>Compact Reactive Plan JSON ready to embed in the page.</returns>
+        /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
         public string Render(IServiceProvider services)
         {
             ResolveAll(services);
