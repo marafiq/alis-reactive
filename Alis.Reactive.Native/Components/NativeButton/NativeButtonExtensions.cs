@@ -14,7 +14,7 @@ namespace Alis.Reactive.Native.Components
             ComponentMethod.Named("focus");
 
         /// <summary>
-        /// Sets the button text content through the component contract.
+        /// Writes the button text content through the component contract.
         /// </summary>
         /// <typeparam name="TModel">The view model type for the component reference.</typeparam>
         /// <param name="self">The button component reference.</param>

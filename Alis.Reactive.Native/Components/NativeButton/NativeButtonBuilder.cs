@@ -37,7 +37,7 @@ namespace Alis.Reactive.Native.Components
         internal string ElementId => _elementId;
 
         /// <summary>
-        /// Sets the button <c>type</c> attribute.
+        /// Selects the button <c>type</c> attribute.
         /// </summary>
         /// <param name="type">The HTML button type. Defaults to <c>button</c>.</param>
         public NativeButtonBuilder<TModel> Type(string type)
@@ -47,7 +47,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Adds CSS classes to the button element.
+        /// Replaces the CSS classes on the button element.
         /// </summary>
         /// <param name="css">One or more CSS class names.</param>
         public NativeButtonBuilder<TModel> CssClass(string css)
