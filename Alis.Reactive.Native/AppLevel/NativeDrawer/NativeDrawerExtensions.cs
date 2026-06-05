@@ -36,11 +36,11 @@ namespace Alis.Reactive.Native.AppLevel
             this ComponentRef<NativeDrawer, TModel> self, DrawerSize size)
             where TModel : class
         {
-            foreach (var cls in SizeClasses)
+            foreach (var sizeClass in SizeClasses)
                 self.EmitCall(ClassRemoveMethod,
-                    new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(cls) });
+                    new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(sizeClass) });
 
-            var sizeClass = size switch
+            var selectedSizeClass = size switch
             {
                 DrawerSize.Sm => "alis-drawer--sm",
                 DrawerSize.Md => "alis-drawer--md",
@@ -48,7 +48,7 @@ namespace Alis.Reactive.Native.AppLevel
                 _ => "alis-drawer--md"
             };
             self.EmitCall(ClassAddMethod,
-                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(sizeClass) });
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(selectedSizeClass) });
             return self;
         }
 
