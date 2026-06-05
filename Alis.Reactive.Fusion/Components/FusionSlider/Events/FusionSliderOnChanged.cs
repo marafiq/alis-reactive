@@ -5,19 +5,19 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionSliderChangeArgs
     {
-        /// <summary>Gets or sets the new slider value.</summary>
+        /// <summary>New slider value.</summary>
         public double Value { get; set; }
 
-        /// <summary>Gets or sets the previous slider value.</summary>
+        /// <summary>Previous slider value.</summary>
         public double PreviousValue { get; set; }
 
-        /// <summary>Gets or sets the formatted slider value text.</summary>
+        /// <summary>Formatted slider value text.</summary>
         public string? Text { get; set; }
 
-        /// <summary>Gets or sets the Syncfusion action name for the change.</summary>
+        /// <summary>Syncfusion action name for the change.</summary>
         public string? Action { get; set; }
 
-        /// <summary>Gets or sets whether the change was triggered by user interaction.</summary>
+        /// <summary>Whether user interaction triggered the change.</summary>
         public bool IsInteracted { get; set; }
     }
 }
