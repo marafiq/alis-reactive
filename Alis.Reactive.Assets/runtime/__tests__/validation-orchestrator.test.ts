@@ -219,7 +219,7 @@ describe("validation orchestrator server errors", () => {
       .toBe("Wrong server field");
   });
 
-  it("routes server errors for known fields to summary when the component is not in the current plan", () => {
+  it("routes server errors for known fields to summary when the component is not in the Active Plan", () => {
     renderValidationDom();
     const runtimePlan = validationRuntimePlan([
       requiredRule("notify-field", "ReceiveNotifications"),
