@@ -120,7 +120,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     }
 
     [Test]
-    public async Task full_interleave_commands_fire_even_when_conditions_false()
+    public async Task full_interleave_reactions_fire_even_when_conditions_false()
     {
         await NavigateAndBoot();
 
@@ -168,7 +168,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     }
 
     [Test]
-    public async Task condition_inside_on_success_surrounding_commands_always_fire()
+    public async Task condition_inside_on_success_surrounding_reactions_always_fire()
     {
         await NavigateAndBoot();
 
