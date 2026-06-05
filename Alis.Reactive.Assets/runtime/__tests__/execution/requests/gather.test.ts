@@ -111,7 +111,7 @@ afterEach(() => {
 });
 
 describe("resolveRequestInput", () => {
-  it("returns an empty payload for requests without gathered input", () => {
+  it("returns an empty request body for requests without gathered input", () => {
     expect(resolveRequestInput({ kind: "none" }, "POST", emptyPlan, {})).toEqual({
       urlParams: [],
       routeParams: {},
@@ -120,7 +120,7 @@ describe("resolveRequestInput", () => {
     });
   });
 
-  it("emits JSON bodies from explicit payload assignments", () => {
+  it("emits JSON bodies from explicit body field assignments", () => {
     const input = gatherInput([
       assignment("resident.scheduledFor", literal(isoDate, dateShape)),
       assignment("resident.metadata", literal({ acuity: "high" }, objectShape)),

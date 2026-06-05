@@ -29,9 +29,9 @@ function literal(value: string): ValueExpression {
   return { kind: "literal", value, shape: stringShape };
 }
 
-function gatherInput(sourcesByPayloadName: Record<string, ValueExpression>): RequestPlan["input"] {
+function gatherInput(sourcesByBodyFieldName: Record<string, ValueExpression>): RequestPlan["input"] {
   return requestInput(
-    Object.entries(sourcesByPayloadName).map(([name, value]) => payloadAssignment(name, value))
+    Object.entries(sourcesByBodyFieldName).map(([name, value]) => bodyFieldAssignment(name, value))
   );
 }
 
@@ -48,7 +48,7 @@ function target(name: string): RequestPayloadTarget {
   return { kind: "payload", name, path: structuredPath(name) };
 }
 
-function payloadAssignment(name: string, source: ValueExpression): RequestInputAssignment {
+function bodyFieldAssignment(name: string, source: ValueExpression): RequestInputAssignment {
   return { target: target(name), source };
 }
 
@@ -197,7 +197,7 @@ describe("executeRequest HTTP request lane", () => {
       input: requestInput([
         routeParamAssignment("residentId", literal("42")),
         headerAssignment("X-Unit", literal("memory-care")),
-        payloadAssignment("name", literal("Ada")),
+        bodyFieldAssignment("name", literal("Ada")),
       ]),
       whileLoading: [setText("before", literal("Started"))],
       success: [
@@ -359,7 +359,7 @@ describe("executeRequest HTTP request lane", () => {
     expect(secondUrl).toBe("/facilities/3/residents/42");
   });
 
-  it("lets success routes read a response before a chained request gathers route, header, and payload from that response", async () => {
+  it("lets success routes read a response before a chained request gathers route, header, and body fields from that response", async () => {
     document.body.innerHTML = `
       <span id="tier"></span>
       <span id="facility"></span>
@@ -379,7 +379,7 @@ describe("executeRequest HTTP request lane", () => {
       input: requestInput([
         routeParamAssignment("facilityId", payloadRead("success", "facilityId")),
         headerAssignment("X-Care-Unit", payloadRead("success", "careUnit")),
-        payloadAssignment("reason", payloadRead("success", "followUpReason")),
+        bodyFieldAssignment("reason", payloadRead("success", "followUpReason")),
       ]),
       success: [
         { match: { kind: "any" }, reaction: setText("facility", payloadRead("success", "name")) },

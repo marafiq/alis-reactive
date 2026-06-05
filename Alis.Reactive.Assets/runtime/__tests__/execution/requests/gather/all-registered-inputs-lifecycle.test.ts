@@ -58,7 +58,7 @@ describe("all registered input gather lifecycle", () => {
     });
   });
 
-  it("writes authored payload assignments before runtime selected registered inputs", () => {
+  it("writes authored body field assignments before runtime selected registered inputs", () => {
     document.body.innerHTML = `
       <input id="first-name" value="Ada" />
       <input id="address" value="12 Main" />
