@@ -61,9 +61,9 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly IReadOnlyList<ReactionGraph> _steps;
 
-        /// <summary>Gets the kind. Always <c>"sequence"</c>.</summary>
+        /// <summary>JSON discriminator for ordered reaction sequences. Always <c>"sequence"</c>.</summary>
         public string Kind => "sequence";
-        /// <summary>Gets the ordered reactions to execute.</summary>
+        /// <summary>Reactions executed in declaration order.</summary>
         public IReadOnlyList<ReactionGraph> Steps => _steps;
 
         internal SequenceReaction(IEnumerable<ReactionGraph> steps)
@@ -78,11 +78,11 @@ namespace Alis.Reactive.PlanModel
         private readonly IReadOnlyList<ReactionGraph> _steps;
         private readonly ParallelCompletion _completion;
 
-        /// <summary>Gets the kind. Always <c>"parallel"</c>.</summary>
+        /// <summary>JSON discriminator for concurrent reaction groups. Always <c>"parallel"</c>.</summary>
         public string Kind => "parallel";
-        /// <summary>Gets the reactions to execute concurrently.</summary>
+        /// <summary>Reactions started concurrently.</summary>
         public IReadOnlyList<ReactionGraph> Steps => _steps;
-        /// <summary>Gets the completion behavior to run after all steps settle.</summary>
+        /// <summary>Completion behavior to run after all steps settle.</summary>
         public ParallelCompletion Completion => _completion;
 
         internal ParallelReaction(IEnumerable<ReactionGraph> steps, ParallelCompletion completion)
@@ -100,7 +100,7 @@ namespace Alis.Reactive.PlanModel
 
         internal static ParallelCompletion None { get; } = new NoParallelCompletion();
 
-        /// <summary>Gets the completion kind.</summary>
+        /// <summary>JSON discriminator for parallel completion behavior.</summary>
         public abstract string Kind { get; }
 
         internal static ParallelCompletion OnSettled(ReactionGraph reaction)
@@ -112,7 +112,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Represents a parallel reaction with no completion reaction.</summary>
     public sealed class NoParallelCompletion : ParallelCompletion
     {
-        /// <summary>Gets the kind. Always <c>"none"</c>.</summary>
+        /// <summary>JSON discriminator for no completion reaction. Always <c>"none"</c>.</summary>
         public override string Kind => "none";
     }
 
@@ -126,10 +126,10 @@ namespace Alis.Reactive.PlanModel
             _reaction = reaction;
         }
 
-        /// <summary>Gets the kind. Always <c>"on-settled"</c>.</summary>
+        /// <summary>JSON discriminator for settled completion reactions. Always <c>"on-settled"</c>.</summary>
         public override string Kind => "on-settled";
 
-        /// <summary>Gets the reaction to run after all branches settle.</summary>
+        /// <summary>Reaction to run after all parallel branches settle.</summary>
         public ReactionGraph Reaction => _reaction;
     }
 
@@ -138,9 +138,9 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly IReadOnlyList<BranchCase> _cases;
 
-        /// <summary>Gets the kind. Always <c>"branch"</c>.</summary>
+        /// <summary>JSON discriminator for branch reactions. Always <c>"branch"</c>.</summary>
         public string Kind => "branch";
-        /// <summary>Gets the ordered cases to evaluate.</summary>
+        /// <summary>Branch cases evaluated in declaration order.</summary>
         public IReadOnlyList<BranchCase> Cases => _cases;
 
         internal BranchReaction(IEnumerable<BranchCase> cases)
@@ -158,9 +158,9 @@ namespace Alis.Reactive.PlanModel
     [JsonConverter(typeof(BranchCaseJsonConverter))]
     public sealed class BranchCase
     {
-        /// <summary>Gets the guard that decides whether this branch case runs.</summary>
+        /// <summary>Guard that decides whether this case runs.</summary>
         public BranchGuard Guard { get; }
-        /// <summary>Gets the reaction to execute when the condition is met.</summary>
+        /// <summary>Reaction to execute when the guard matches.</summary>
         public ReactionGraph Reaction { get; }
 
         private BranchCase(BranchGuard guard, ReactionGraph reaction)
@@ -257,13 +257,13 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly MemberName _property;
 
-        /// <summary>Gets the kind. Always <c>"set"</c>.</summary>
+        /// <summary>JSON discriminator for set reactions. Always <c>"set"</c>.</summary>
         public string Kind => "set";
-        /// <summary>Gets the target source to set the property on.</summary>
+        /// <summary>Runtime source whose property is set.</summary>
         public Source On { get; }
-        /// <summary>Gets the property name to set.</summary>
+        /// <summary>Property name to set on the target source.</summary>
         public string Property => _property.Value;
-        /// <summary>Gets the value to assign.</summary>
+        /// <summary>Value expression assigned to the target property.</summary>
         public ValueExpression Value { get; }
 
         internal SetReaction(Source on, string property, ValueExpression value)
@@ -280,13 +280,13 @@ namespace Alis.Reactive.PlanModel
         private readonly MemberName _method;
         private readonly IReadOnlyList<ValueExpression> _args;
 
-        /// <summary>Gets the kind. Always <c>"call"</c>.</summary>
+        /// <summary>JSON discriminator for call reactions. Always <c>"call"</c>.</summary>
         public string Kind => "call";
-        /// <summary>Gets the target source to call the method on.</summary>
+        /// <summary>Runtime source whose method is called.</summary>
         public Source On { get; }
-        /// <summary>Gets the method name to call.</summary>
+        /// <summary>Method name to call on the target source.</summary>
         public string Method => _method.Value;
-        /// <summary>Gets the method arguments. Empty when the method takes no arguments.</summary>
+        /// <summary>Method argument expressions in call order; empty when the method takes no arguments.</summary>
         public IReadOnlyList<ValueExpression> Args => _args;
 
         internal CallReaction(Source on, string method, IReadOnlyList<ValueExpression> args)
@@ -308,9 +308,9 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Sends an HTTP request as defined by the enclosed <see cref="RequestPlan"/>.</summary>
     public sealed class RequestReaction : ReactionGraph
     {
-        /// <summary>Gets the kind. Always <c>"request"</c>.</summary>
+        /// <summary>JSON discriminator for HTTP request reactions. Always <c>"request"</c>.</summary>
         public string Kind => "request";
-        /// <summary>Gets the HTTP request definition.</summary>
+        /// <summary>HTTP request definition to execute in the async lane.</summary>
         public new RequestPlan Request { get; }
 
         internal RequestReaction(RequestPlan request) { Request = request; }
@@ -323,9 +323,9 @@ namespace Alis.Reactive.PlanModel
         private readonly EventName _event;
         private readonly DispatchPayload _payload;
 
-        /// <summary>Gets the kind. Always <c>"dispatch"</c>.</summary>
+        /// <summary>JSON discriminator for custom event dispatch reactions. Always <c>"dispatch"</c>.</summary>
         public string Kind => "dispatch";
-        /// <summary>Gets the event name to dispatch.</summary>
+        /// <summary>Custom event name to dispatch.</summary>
         public string Event => _event.Value;
 
         internal DispatchPayload PayloadForJson => _payload;
@@ -425,11 +425,11 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly ComponentKey _slot;
 
-        /// <summary>Gets the kind. Always <c>"inject"</c>.</summary>
+        /// <summary>JSON discriminator for partial-slot injection reactions. Always <c>"inject"</c>.</summary>
         public string Kind => "inject";
-        /// <summary>Gets the partial slot that receives injected HTML.</summary>
+        /// <summary>Partial slot that receives injected HTML.</summary>
         public string Slot => _slot.Value;
-        /// <summary>Gets the value to inject.</summary>
+        /// <summary>Value expression that resolves to the HTML to inject.</summary>
         public ValueExpression Value { get; }
 
         internal InjectReaction(string slot, ValueExpression value)
@@ -444,9 +444,9 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly ComponentId _container;
 
-        /// <summary>Gets the kind. Always <c>"show-validation-errors"</c>.</summary>
+        /// <summary>JSON discriminator for validation error display reactions. Always <c>"show-validation-errors"</c>.</summary>
         public string Kind => "show-validation-errors";
-        /// <summary>Gets the element ID of the validation error container.</summary>
+        /// <summary>Element ID of the validation error container.</summary>
         public string Container => _container.Value;
 
         internal ShowValidationErrorsReaction(string container)
