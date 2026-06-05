@@ -51,8 +51,8 @@ export class RuntimePath {
 
     let owner = root;
     const finalSegmentIndex = this.segments.length - 1;
-    for (let i = 0; i < finalSegmentIndex; i++) {
-      owner = requireMemberOwner(owner, `${label} segment ${i}`)[segmentKey(this.segmentAt(i))];
+    for (let segmentIndex = 0; segmentIndex < finalSegmentIndex; segmentIndex++) {
+      owner = requireMemberOwner(owner, `${label} segment ${segmentIndex}`)[segmentKey(this.segmentAt(segmentIndex))];
     }
 
     return requireMember(
