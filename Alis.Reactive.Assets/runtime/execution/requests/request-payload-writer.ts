@@ -63,23 +63,23 @@ function sendsInputInQueryString(method: HttpMethod): boolean {
 
 export function writeRequestPayloadValue(
   target: RequestPayloadTarget,
-  raw: unknown,
+  gatheredValue: unknown,
   shape: RuntimeShape,
   writer: RequestPayloadWriter,
 ): void {
-  const files = browserFiles(raw);
-  if (files !== undefined) {
-    writer.emitArray(target, files, shape);
-    log.trace("file.emitted", { name: target.name, count: files.length });
+  const browserFileListItems = filesFromBrowserFileList(gatheredValue);
+  if (browserFileListItems !== undefined) {
+    writer.emitArray(target, browserFileListItems, shape);
+    log.trace("file.emitted", { name: target.name, count: browserFileListItems.length });
     return;
   }
 
-  if (Array.isArray(raw)) {
-    writer.emitArray(target, raw, shape.item());
+  if (Array.isArray(gatheredValue)) {
+    writer.emitArray(target, gatheredValue, shape.item());
     return;
   }
 
-  writer.emitScalar(target, raw, shape);
+  writer.emitScalar(target, gatheredValue, shape);
 }
 
 function createQueryStringWriter(urlParams: string[]): RequestPayloadWriter {
@@ -117,20 +117,20 @@ function createJsonBodyWriter(body: Record<string, unknown>): RequestPayloadWrit
     emitArray: (target, items, itemShape) => {
       const inputItems = requestInputArrayItems(items);
       if (arrayContainsFile(inputItems)) throw new Error("[alis] File objects require form-data body format");
-      const wireItems = jsonArrayBodyValue(inputItems.map(rawArrayItemValue), itemShape);
+      const wireItems = jsonArrayBodyValue(inputItems.map(requestInputArrayItemValue), itemShape);
       assignJsonBodyValue(body, target, wireItems);
     },
   };
 }
 
-function browserFiles(raw: unknown): File[] | undefined {
-  const browserExposesFileList = typeof FileList !== "undefined";
-  if (!browserExposesFileList) return undefined;
+function filesFromBrowserFileList(value: unknown): File[] | undefined {
+  const hasBrowserFileListConstructor = typeof FileList !== "undefined";
+  if (!hasBrowserFileListConstructor) return undefined;
 
-  const rawIsFileList = raw instanceof FileList;
-  if (!rawIsFileList) return undefined;
+  const valueIsFileList = value instanceof FileList;
+  if (!valueIsFileList) return undefined;
 
-  return Array.from(raw);
+  return Array.from(value);
 }
 
 function requestInputArrayItems(items: unknown[]): RequestInputArrayItem[] {
@@ -160,7 +160,7 @@ function appendArrayItemsToQueryString(
   urlParams: string[],
 ): void {
   for (const item of items) {
-    const wire = itemShape.formatForWire(rawArrayItemValue(item));
+    const wire = itemShape.formatForWire(requestInputArrayItemValue(item));
     urlParams.push(`${encodeURIComponent(name)}=${encodeURIComponent(scalarWireValue(wire, name))}`);
   }
 }
@@ -196,7 +196,7 @@ function appendArrayItemToFormData(
   }
 }
 
-function rawArrayItemValue(item: RequestInputArrayItem): unknown {
+function requestInputArrayItemValue(item: RequestInputArrayItem): unknown {
   switch (item.kind) {
     case "file":
       return item.file;
