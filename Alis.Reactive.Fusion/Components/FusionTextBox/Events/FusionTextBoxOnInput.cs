@@ -5,10 +5,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionTextBoxInputArgs
     {
-        /// <summary>Gets or sets the current text value.</summary>
+        /// <summary>Current text value.</summary>
         public string? Value { get; set; }
 
-        /// <summary>Gets or sets the previously input text value.</summary>
+        /// <summary>Previous input text value.</summary>
         public string? PreviousValue { get; set; }
     }
 }

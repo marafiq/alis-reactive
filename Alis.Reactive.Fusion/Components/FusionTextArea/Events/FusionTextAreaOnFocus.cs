@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionTextAreaFocusArgs
     {
-        /// <summary>Gets or sets the current text value.</summary>
+        /// <summary>Current text value.</summary>
         public string? Value { get; set; }
     }
 }
