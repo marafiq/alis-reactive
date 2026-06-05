@@ -117,8 +117,8 @@ namespace Alis.Reactive.PlanModel
 
         internal void RegisterInputComponents()
         {
-            foreach (var kvp in _registrations.Entries)
-                DeclareInputComponent(kvp.Value.PlanBinding);
+            foreach (var registrationEntry in _registrations.Entries)
+                DeclareInputComponent(registrationEntry.Value.PlanBinding);
         }
 
         internal ComponentRegistration RequireRegistrationById(
