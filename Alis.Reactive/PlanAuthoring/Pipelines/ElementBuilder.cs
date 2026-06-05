@@ -55,13 +55,13 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the text content from an event payload property.</summary>
-        /// <typeparam name="TSource">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload type.</typeparam>
         /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
         /// <param name="path">Expression selecting the event payload property to display.</param>
-        public PipelineBuilder<TModel> SetText<TSource>(TSource source, Expression<Func<TSource, object>> path)
+        public PipelineBuilder<TModel> SetText<TPayload>(TPayload source, Expression<Func<TPayload, object>> path)
         {
-            var eventPath = ExpressionPathHelper.ToEventPath<TSource, object>(path);
-            return Set(BrowserElementMembers.Text, ValueExpression.ReadPayload(PayloadSource.Event(), eventPath));
+            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, object>(path);
+            return Set(BrowserElementMembers.Text, ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath));
         }
 
         /// <summary>Sets the text content from an HTTP response body property.</summary>
@@ -93,13 +93,13 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the inner HTML from an event payload property.</summary>
-        /// <typeparam name="TSource">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload type.</typeparam>
         /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
         /// <param name="path">Expression selecting the event payload property containing HTML.</param>
-        public PipelineBuilder<TModel> SetHtml<TSource>(TSource source, Expression<Func<TSource, object>> path)
+        public PipelineBuilder<TModel> SetHtml<TPayload>(TPayload source, Expression<Func<TPayload, object>> path)
         {
-            var eventPath = ExpressionPathHelper.ToEventPath<TSource, object>(path);
-            return Set(BrowserElementMembers.Html, ValueExpression.ReadPayload(PayloadSource.Event(), eventPath));
+            var payloadPath = ExpressionPathHelper.ToEventPath<TPayload, object>(path);
+            return Set(BrowserElementMembers.Html, ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath));
         }
 
         /// <summary>Sets the inner HTML from a typed source.</summary>
