@@ -1,4 +1,5 @@
-// Keep every runtime value source on evaluateValue so reads share one resolver.
+// ValueExpression reads stay centralized here so execution, gather, validation,
+// and condition evaluation share one runtime resolver.
 
 import type {
   PlanDocument, ValueExpression, ExecContext, ReadExpression, RuntimeObjectSource,
