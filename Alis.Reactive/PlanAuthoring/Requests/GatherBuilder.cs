@@ -177,8 +177,8 @@ namespace Alis.Reactive.Builders.Requests
         {
             var urlParam = UrlParameterName.Of(paramName);
             var payloadPath = BindingPath.Of(urlParam.Value);
-            var value = ValueExpression.ReadUrl(urlParam.Value);
-            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, value));
+            var urlValue = ValueExpression.ReadUrl(urlParam.Value);
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, urlValue));
             return this;
         }
 
@@ -189,8 +189,8 @@ namespace Alis.Reactive.Builders.Requests
         {
             var urlParam = UrlParameterName.Of(paramName);
             var payloadPath = BindingPath.Of(asParam);
-            var value = ValueExpression.ReadUrl(urlParam.Value);
-            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, value));
+            var urlValue = ValueExpression.ReadUrl(urlParam.Value);
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, urlValue));
             return this;
         }
 
@@ -202,8 +202,8 @@ namespace Alis.Reactive.Builders.Requests
             var urlParam = UrlParameterName.Of(paramName);
             var payloadPath = BindingPath.Of(urlParam.Value);
             var shape = RequestScalarTarget.UrlQueryParameter<T>(urlParam);
-            var value = ValueExpression.ReadUrl(urlParam.Value, shape);
-            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, value));
+            var urlValue = ValueExpression.ReadUrl(urlParam.Value, shape);
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, urlValue));
             return this;
         }
 
@@ -216,8 +216,8 @@ namespace Alis.Reactive.Builders.Requests
             var urlParam = UrlParameterName.Of(paramName);
             var payloadPath = BindingPath.Of(asParam);
             var shape = RequestScalarTarget.UrlQueryParameter<T>(urlParam);
-            var value = ValueExpression.ReadUrl(urlParam.Value, shape);
-            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, value));
+            var urlValue = ValueExpression.ReadUrl(urlParam.Value, shape);
+            _draft.AddAssignment(RequestInputAssignment.Payload(payloadPath, urlValue));
             return this;
         }
 

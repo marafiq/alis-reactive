@@ -82,16 +82,16 @@ namespace Alis.Reactive.Builders.Requests
             if (endIndex < 0)
                 throw InvalidTemplate(url, "missing closing brace '}'");
 
-            var name = text.Substring(startIndex + 1, endIndex - startIndex - 1);
+            var placeholderName = text.Substring(startIndex + 1, endIndex - startIndex - 1);
             try
             {
-                names.Add(RouteParameterName.Of(name).Value);
+                names.Add(RouteParameterName.Of(placeholderName).Value);
             }
             catch (ArgumentException ex)
             {
                 throw InvalidTemplate(
                     url,
-                    $"invalid placeholder '{{{name}}}'. Names must match [a-zA-Z0-9_] (ASCII only)",
+                    $"invalid placeholder '{{{placeholderName}}}'. Names must match [a-zA-Z0-9_] (ASCII only)",
                     ex);
             }
 

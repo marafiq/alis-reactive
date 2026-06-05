@@ -115,12 +115,12 @@ namespace Alis.Reactive.Builders.Requests
         {
             var endpoint = _endpoint ?? throw new InvalidOperationException(
                 "HTTP request endpoint was not selected. Call Get, Post, Put, or Delete before the request is built.");
-            var input = ResolveInput(endpoint.Url);
+            var requestInput = ResolveInput(endpoint.Url);
             var validation = _validation;
 
             var request = RequestPlan.Create(
                 endpoint,
-                input,
+                requestInput,
                 RequestReactions.From(_whileLoading, _finally),
                 _response.Draft.BuildRouting(),
                 validation.HasValue
