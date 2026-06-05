@@ -23,9 +23,9 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         await Page.Locator($"#{ModelIdScope}__Status").SelectOptionAsync(new SelectOptionValue { Value = "active" });
 
-        var result = Page.Locator("#status-result");
-        await Expect(result).ToContainTextAsync("Active", new() { Timeout = 3000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
+        var statusResult = Page.Locator("#status-result");
+        await Expect(statusResult).ToContainTextAsync("Active", new() { Timeout = 3000 });
+        await Expect(statusResult).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
 
         var amountInput = Page.Locator($"#{ModelIdScope}__Amount").First;
         await Expect(amountInput).ToHaveValueAsync(new System.Text.RegularExpressions.Regex(@"^100(\.00)?$"), new() { Timeout = 3000 });
@@ -45,9 +45,9 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         await Page.Locator($"#{ModelIdScope}__Status").SelectOptionAsync(new SelectOptionValue { Value = "inactive" });
 
-        var result = Page.Locator("#status-result");
-        await Expect(result).ToContainTextAsync("Inactive", new() { Timeout = 3000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
+        var statusResult = Page.Locator("#status-result");
+        await Expect(statusResult).ToContainTextAsync("Inactive", new() { Timeout = 3000 });
+        await Expect(statusResult).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
 
         var amountInput = Page.Locator($"#{ModelIdScope}__Amount").First;
         await Expect(amountInput).ToHaveValueAsync(new System.Text.RegularExpressions.Regex(@"^0(\.00)?$"), new() { Timeout = 3000 });
@@ -62,29 +62,29 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator($"#{ModelIdScope}__Amount").First;
-        var tier = Page.Locator("#amount-tier");
+        var amountInput = Page.Locator($"#{ModelIdScope}__Amount").First;
+        var amountTier = Page.Locator("#amount-tier");
 
-        await input.ClickAsync();
-        await input.FillAsync("5500");
-        await input.PressAsync("Tab");
+        await amountInput.ClickAsync();
+        await amountInput.FillAsync("5500");
+        await amountInput.PressAsync("Tab");
 
-        await Expect(tier).ToHaveTextAsync("High value order", new() { Timeout = 3000 });
-        await Expect(tier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-rose-600"));
+        await Expect(amountTier).ToHaveTextAsync("High value order", new() { Timeout = 3000 });
+        await Expect(amountTier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-rose-600"));
 
-        await input.ClickAsync();
-        await input.FillAsync("2500");
-        await input.PressAsync("Tab");
+        await amountInput.ClickAsync();
+        await amountInput.FillAsync("2500");
+        await amountInput.PressAsync("Tab");
 
-        await Expect(tier).ToHaveTextAsync("Standard order", new() { Timeout = 3000 });
-        await Expect(tier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-sky-600"));
+        await Expect(amountTier).ToHaveTextAsync("Standard order", new() { Timeout = 3000 });
+        await Expect(amountTier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-sky-600"));
 
-        await input.ClickAsync();
-        await input.FillAsync("500");
-        await input.PressAsync("Tab");
+        await amountInput.ClickAsync();
+        await amountInput.FillAsync("500");
+        await amountInput.PressAsync("Tab");
 
-        await Expect(tier).ToHaveTextAsync("Small order", new() { Timeout = 3000 });
-        await Expect(tier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
+        await Expect(amountTier).ToHaveTextAsync("Small order", new() { Timeout = 3000 });
+        await Expect(amountTier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
 
         AssertNoConsoleErrors();
     }
@@ -124,34 +124,34 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         await NavigateAndBoot();
 
         var statusSelect = Page.Locator($"#{ModelIdScope}__Status");
-        var result = Page.Locator("#status-result");
+        var statusResult = Page.Locator("#status-result");
         var amountInput = Page.Locator($"#{ModelIdScope}__Amount").First;
         var citySelect = Page.Locator($"#{ModelIdScope}__Address_City");
         var addressSection = Page.Locator("#address-section");
         await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "active" });
 
-        await Expect(result).ToContainTextAsync("Active", new() { Timeout = 3000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
+        await Expect(statusResult).ToContainTextAsync("Active", new() { Timeout = 3000 });
+        await Expect(statusResult).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
         await Expect(amountInput).ToHaveValueAsync(
             new System.Text.RegularExpressions.Regex(@"^100(\.00)?$"), new() { Timeout = 3000 });
         await Expect(citySelect).ToHaveValueAsync("seattle", new() { Timeout = 3000 });
         await Expect(addressSection).ToBeVisibleAsync();
         await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "inactive" });
 
-        await Expect(result).ToContainTextAsync("Inactive", new() { Timeout = 3000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
+        await Expect(statusResult).ToContainTextAsync("Inactive", new() { Timeout = 3000 });
+        await Expect(statusResult).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
         // Branch re-evaluation must clear the prior active class.
-        await Expect(result).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
+        await Expect(statusResult).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
         await Expect(amountInput).ToHaveValueAsync(
             new System.Text.RegularExpressions.Regex(@"^0(\.00)?$"), new() { Timeout = 3000 });
         await Expect(addressSection).ToBeHiddenAsync();
         await statusSelect.SelectOptionAsync(new SelectOptionValue { Value = "pending" });
 
-        await Expect(result).ToContainTextAsync("Pending or empty", new() { Timeout = 3000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
+        await Expect(statusResult).ToContainTextAsync("Pending or empty", new() { Timeout = 3000 });
+        await Expect(statusResult).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
         // Pending branch must clear classes from earlier branches.
-        await Expect(result).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
-        await Expect(result).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
+        await Expect(statusResult).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
+        await Expect(statusResult).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
         await Expect(addressSection).ToBeVisibleAsync();
 
         AssertNoConsoleErrors();
@@ -262,26 +262,26 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        var input = Page.Locator($"#{ModelIdScope}__Amount").First;
-        var tier = Page.Locator("#amount-tier");
+        var amountInput = Page.Locator($"#{ModelIdScope}__Amount").First;
+        var amountTier = Page.Locator("#amount-tier");
 
-        await input.ClickAsync();
-        await input.FillAsync("5000");
-        await input.PressAsync("Tab");
-        await Expect(tier).ToHaveTextAsync("High value order", new() { Timeout = 3000 });
-        await Expect(tier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-rose-600"));
+        await amountInput.ClickAsync();
+        await amountInput.FillAsync("5000");
+        await amountInput.PressAsync("Tab");
+        await Expect(amountTier).ToHaveTextAsync("High value order", new() { Timeout = 3000 });
+        await Expect(amountTier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-rose-600"));
 
-        await input.ClickAsync();
-        await input.FillAsync("1000");
-        await input.PressAsync("Tab");
-        await Expect(tier).ToHaveTextAsync("Standard order", new() { Timeout = 3000 });
-        await Expect(tier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-sky-600"));
+        await amountInput.ClickAsync();
+        await amountInput.FillAsync("1000");
+        await amountInput.PressAsync("Tab");
+        await Expect(amountTier).ToHaveTextAsync("Standard order", new() { Timeout = 3000 });
+        await Expect(amountTier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-sky-600"));
 
-        await input.ClickAsync();
-        await input.FillAsync("999");
-        await input.PressAsync("Tab");
-        await Expect(tier).ToHaveTextAsync("Small order", new() { Timeout = 3000 });
-        await Expect(tier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
+        await amountInput.ClickAsync();
+        await amountInput.FillAsync("999");
+        await amountInput.PressAsync("Tab");
+        await Expect(amountTier).ToHaveTextAsync("Small order", new() { Timeout = 3000 });
+        await Expect(amountTier).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
 
         AssertNoConsoleErrors();
     }
@@ -293,9 +293,9 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         await Page.Locator($"#{ModelIdScope}__Status").SelectOptionAsync(new SelectOptionValue { Value = "pending" });
 
-        var result = Page.Locator("#status-result");
-        await Expect(result).ToContainTextAsync("Pending or empty", new() { Timeout = 3000 });
-        await Expect(result).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
+        var statusResult = Page.Locator("#status-result");
+        await Expect(statusResult).ToContainTextAsync("Pending or empty", new() { Timeout = 3000 });
+        await Expect(statusResult).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
 
         await Expect(Page.Locator("#address-section")).ToBeVisibleAsync();
 
