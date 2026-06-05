@@ -86,7 +86,7 @@ export function wireServerPush(
     log.debug("message.received", { url: trigger.url, event: eventName });
     catchAsyncReactionFailure(
       executeReaction(reaction, plan, ExecutionContext.event(eventPayload).raw),
-      err => log.error("reaction.failed", { url: trigger.url, event: eventName, error: toJavaScriptString(err) }),
+      executionError => log.error("reaction.failed", { url: trigger.url, event: eventName, error: toJavaScriptString(executionError) }),
     );
   };
   const wiredBehavior = { trigger, reaction, plan, handler: handler as EventListener };

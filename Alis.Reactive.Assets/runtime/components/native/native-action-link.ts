@@ -44,7 +44,7 @@ function handleClick(event: MouseEvent): void {
   log.debug("activated", { id: anchor.id, href: anchor.href });
   const result = executeReaction(payload.reaction, payload.plan);
   if (result instanceof Promise) {
-    result.catch(err => log.error("reaction.failed", { id: anchor.id, error: toJavaScriptString(err) }));
+    result.catch(executionError => log.error("reaction.failed", { id: anchor.id, error: toJavaScriptString(executionError) }));
   }
 }
 

@@ -120,7 +120,7 @@ export function wireSignalR(
     log.debug("method.received", { hubUrl: trigger.hubUrl, method: trigger.method });
     catchAsyncReactionFailure(
       executeReaction(reaction, plan, ExecutionContext.event(eventPayload).raw),
-      err => log.error("reaction.failed", { hubUrl: trigger.hubUrl, method: trigger.method, error: toJavaScriptString(err) }),
+      executionError => log.error("reaction.failed", { hubUrl: trigger.hubUrl, method: trigger.method, error: toJavaScriptString(executionError) }),
     );
   };
 
