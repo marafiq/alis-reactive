@@ -126,20 +126,20 @@ public sealed class PagePlan<TModel> where TModel : class
 
     private BoundComponent? FindBySuffix(string bindingPath)
     {
-        foreach (var kvp in _components)
+        foreach (var componentEntry in _components)
         {
-            if (kvp.Value.ComponentKey.EndsWith("__" + bindingPath, StringComparison.OrdinalIgnoreCase) ||
-                kvp.Value.ComponentKey.EndsWith(bindingPath, StringComparison.OrdinalIgnoreCase) ||
-                kvp.Key.EndsWith(bindingPath, StringComparison.OrdinalIgnoreCase))
-                return kvp.Value;
+            if (componentEntry.Value.ComponentKey.EndsWith("__" + bindingPath, StringComparison.OrdinalIgnoreCase) ||
+                componentEntry.Value.ComponentKey.EndsWith(bindingPath, StringComparison.OrdinalIgnoreCase) ||
+                componentEntry.Key.EndsWith(bindingPath, StringComparison.OrdinalIgnoreCase))
+                return componentEntry.Value;
         }
         return null;
     }
 
     private static string ExtractBindingPath(string componentKey)
     {
-        var idx = componentKey.LastIndexOf("__", StringComparison.Ordinal);
-        return idx >= 0 ? componentKey.Substring(idx + 2) : componentKey;
+        var separatorIndex = componentKey.LastIndexOf("__", StringComparison.Ordinal);
+        return separatorIndex >= 0 ? componentKey.Substring(separatorIndex + 2) : componentKey;
     }
 
     private static string ToBindingPath(Expression<Func<TModel, object?>> expr)
