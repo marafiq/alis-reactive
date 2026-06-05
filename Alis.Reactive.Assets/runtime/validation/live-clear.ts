@@ -68,9 +68,9 @@ function liveFieldEventsFor(field: LiveFieldWire): LiveFieldEvents {
 function resolveFieldElement(component: RuntimeComponent): HTMLElement | undefined {
   try {
     return component.element();
-  } catch (e) {
-    if (RuntimeResolutionError.is(e)) return undefined;
-    throw e;
+  } catch (error) {
+    if (RuntimeResolutionError.is(error)) return undefined;
+    throw error;
   }
 }
 
@@ -103,9 +103,9 @@ function wireComponentChangeEvent(
       () => events.revalidate(),
       events.listenerOptions,
     );
-  } catch (e) {
-    if (componentChangeEventCanBeDeferred(e)) return false;
-    throw e;
+  } catch (error) {
+    if (componentChangeEventCanBeDeferred(error)) return false;
+    throw error;
   }
 
   wiredFieldComponentChangeEvents.add(field.component.id);
