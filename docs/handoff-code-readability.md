@@ -523,6 +523,9 @@ Candidate cleanup:
   parameter docs now use concise button-text wording. The explicit element-ID
   and Reactive Plan component lookup docs remain because they describe the
   public join key.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
+  selected-value parameter docs now use the same concise selected-option wording
+  as the other Native value-write helpers.
 
 ### Implementation Inline Comments
 

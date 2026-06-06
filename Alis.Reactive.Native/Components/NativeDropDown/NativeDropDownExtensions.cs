@@ -21,7 +21,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the selected option value through the component contract.
         /// </summary>
-        /// <param name="value">The option value to select.</param>
+        /// <param name="value">Selected option value.</param>
         public static ComponentRef<NativeDropDown, TModel> SetValue<TModel>(
             this ComponentRef<NativeDropDown, TModel> self, string value)
             where TModel : class
