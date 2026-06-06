@@ -114,12 +114,8 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    /// <summary>
-    /// Exercises the Status ElseIf chain in sequence to catch branch state leakage
-    /// across class and visibility updates.
-    /// </summary>
     [Test]
-    public async Task full_status_lifecycle_active_then_inactive_then_pending()
+    public async Task status_branches_clear_prior_class_and_visibility_state()
     {
         await NavigateAndBoot();
 
@@ -140,7 +136,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         await Expect(statusResult).ToContainTextAsync("Inactive", new() { Timeout = 3000 });
         await Expect(statusResult).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
-        // Branch re-evaluation must clear the prior active class.
         await Expect(statusResult).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
         await Expect(amountInput).ToHaveValueAsync(
             new System.Text.RegularExpressions.Regex(@"^0(\.00)?$"), new() { Timeout = 3000 });
@@ -149,7 +144,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
         await Expect(statusResult).ToContainTextAsync("Pending or empty", new() { Timeout = 3000 });
         await Expect(statusResult).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-slate-500"));
-        // Pending branch must clear classes from earlier branches.
         await Expect(statusResult).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-amber-600"));
         await Expect(statusResult).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("text-emerald-700"));
         await Expect(addressSection).ToBeVisibleAsync();
@@ -157,10 +151,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    /// <summary>
-    /// Verifies hidden address fields keep explicitly selected values and Status
-    /// SetValue on City does not cascade through City's reactive pipeline.
-    /// </summary>
     [Test]
     public async Task city_autofill_then_status_inactive_hides_address_preserving_filled_values()
     {
@@ -218,10 +208,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    /// <summary>
-    /// Verifies the City Else branch clears the State dropdown and resets the
-    /// auto-fill text after a prior city selection.
-    /// </summary>
     [Test]
     public async Task selecting_empty_city_clears_state_and_resets_auto_text()
     {
@@ -302,9 +288,6 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    /// <summary>
-    /// Exercises every City ElseIf branch in sequence to catch stale sibling field values.
-    /// </summary>
     [Test]
     public async Task all_three_cities_autofill_correctly_in_sequence()
     {
@@ -333,12 +316,8 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    /// <summary>
-    /// Captures Fusion behavior where programmatic SetValue fires change events and
-    /// cascades into another reactive pipeline.
-    /// </summary>
     [Test]
-    public async Task programmatic_amount_set_cascades_into_tier_pipeline()
+    public async Task programmatic_fusion_amount_set_fires_change_and_cascades_into_tier_pipeline()
     {
         await NavigateAndBoot();
 
