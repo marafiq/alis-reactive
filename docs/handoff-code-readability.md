@@ -525,6 +525,10 @@ Candidate cleanup:
   expressions are "emitted." The class and method remarks still keep the
   emitted-as-supplied trust boundary because that is the public template
   authoring contract.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining Fusion template
+  parameter and type-parameter docs now keep Syncfusion template context,
+  DOM-event, JavaScript-function, and trust-boundary facts without repeating
+  "The ... to ..." phrasing across overloads.
 - Resolved on `tiny-safe-but-important-refactorings`: core plugin argument XML
   docs no longer describe response paths and typed value sources as values "to
   pass." The method summaries keep the plugin-argument DSL intent, while

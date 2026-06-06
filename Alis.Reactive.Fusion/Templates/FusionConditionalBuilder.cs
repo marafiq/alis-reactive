@@ -12,7 +12,7 @@ namespace Alis.Reactive.Fusion.Templates
     /// Caller-provided literal text, CSS classes, raw <c>onclick</c> values,
     /// event names, and raw HTML are emitted as supplied; use trusted developer-authored values.
     /// </remarks>
-    /// <typeparam name="TModel">The object shape exposed by the Syncfusion template context.</typeparam>
+    /// <typeparam name="TModel">Syncfusion template context shape.</typeparam>
     public class FusionConditionalBuilder<TModel>
     {
         private readonly List<Func<string>> _childRenderers = new List<Func<string>>();
@@ -84,14 +84,14 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a Syncfusion icon <c>span</c>.
         /// </summary>
-        /// <param name="iconName">The Syncfusion icon class name.</param>
+        /// <param name="iconName">Syncfusion icon CSS class.</param>
         public FusionConditionalBuilder<TModel> Icon(string iconName) =>
             Icon(iconName, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled Syncfusion icon <c>span</c>.
         /// </summary>
-        /// <param name="iconName">The Syncfusion icon class name.</param>
+        /// <param name="iconName">Syncfusion icon CSS class.</param>
         /// <param name="css">CSS class.</param>
         public FusionConditionalBuilder<TModel> Icon(string iconName, string css) =>
             Icon(iconName, TemplateCss.Class(css));
@@ -117,14 +117,14 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds an <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
-        /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
+        /// <param name="srcProperty">Template model property used for <c>src</c>.</param>
         public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty) =>
             Img(srcProperty, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
-        /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
+        /// <param name="srcProperty">Template model property used for <c>src</c>.</param>
         /// <param name="css">CSS class.</param>
         public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css) =>
             Img(srcProperty, TemplateCss.Class(css));
@@ -167,8 +167,8 @@ namespace Alis.Reactive.Fusion.Templates
         /// Adds a button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
         /// <param name="text">Button text.</param>
-        /// <param name="eventName">The DOM event name to dispatch.</param>
-        /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
+        /// <param name="eventName">DOM <c>CustomEvent</c> name.</param>
+        /// <param name="idProperty">Template model property emitted as <c>detail.id</c>.</param>
         public FusionConditionalBuilder<TModel> EventButton<TProperty>(
             string text,
             string eventName,
@@ -179,8 +179,8 @@ namespace Alis.Reactive.Fusion.Templates
         /// Adds a styled button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
         /// <param name="text">Button text.</param>
-        /// <param name="eventName">The DOM event name to dispatch.</param>
-        /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
+        /// <param name="eventName">DOM <c>CustomEvent</c> name.</param>
+        /// <param name="idProperty">Template model property emitted as <c>detail.id</c>.</param>
         /// <param name="css">CSS class.</param>
         public FusionConditionalBuilder<TModel> EventButton<TProperty>(
             string text,
