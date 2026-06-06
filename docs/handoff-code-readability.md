@@ -70,6 +70,11 @@ Examples and current status:
   "Exercises ..." summaries when the test names already enumerate the behavior.
   Comments remain where they explain change-event timing, hidden input scoping,
   or deliberate test ordering.
+- Resolved on `tiny-safe-but-important-refactorings`: selected Fusion component
+  tests no longer use XML summaries as coverage inventories. ColorPicker,
+  Switch, NumericTextBox, DatePicker, DateTimePicker, TimePicker, and InputMask
+  now keep only the comments that explain generated ID join keys or Syncfusion
+  popup/commit behavior.
 - `WhenAllComponentsGatherIntoOnePost.cs` has long form-fill flows, but helper
   extraction should happen only if it names a reusable domain action. Do not add
   private helper indirection that hides a one-off behavior proof.
