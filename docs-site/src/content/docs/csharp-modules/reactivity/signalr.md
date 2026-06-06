@@ -144,7 +144,7 @@ If the **first connection** fails (e.g., the server is starting up), the runtime
 
 ### Retry indicator
 
-When all retries are exhausted (both initial and reconnection), a retry indicator appears near the first mutated element — the same clickable button used by SSE. Clicking it creates a fresh connection attempt.
+When all retries are exhausted (both initial and reconnection), a retry indicator appears near the first element update target — the same clickable button used by SSE. Clicking it creates a fresh connection attempt.
 
 ### Handler persistence
 
@@ -190,4 +190,4 @@ You can branch on payload values, make HTTP requests, show toasts, update compon
 
 **Previous:** [Server-Sent Events](../server-push/) — SSE with native EventSource, zero library overhead.
 
-**Next:** [Element Mutations](../element-mutations/) — targeting DOM elements for text, HTML, classes, and visibility.
+**Next:** [Element Updates](../element-mutations/) — targeting DOM elements for text, HTML, classes, and visibility.

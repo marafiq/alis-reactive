@@ -98,9 +98,9 @@ The browser's `EventSource` spec handles transient errors automatically — if t
 
 ### Permanent close and retry
 
-When the browser determines the connection is permanently lost (`readyState === CLOSED`), the runtime shows a retry indicator near the first mutated element. The retry indicator is a small clickable button that:
+When the browser determines the connection is permanently lost (`readyState === CLOSED`), the runtime shows a retry indicator near the first element update target. The retry indicator is a small clickable button that:
 
-- Appears as an absolutely-positioned element on the mutation target's parent
+- Appears as an absolutely-positioned element on the update target's parent
 - Creates a fresh `EventSource` on click and re-wires all handlers for that URL
 - Is removed automatically when the new connection opens successfully
 

@@ -196,7 +196,7 @@ public async Task AlertStream(CancellationToken ct)
 The browser handles reconnection automatically via the `EventSource` spec. When the connection drops temporarily, the browser reconnects without any framework intervention. When the connection is permanently closed:
 
 - **Auto-reconnect**: Browser built-in — retries automatically on transient errors
-- **Permanent close**: When the browser determines the connection is unrecoverable, a retry indicator appears near the first mutated element — click to reconnect
+- **Permanent close**: When the browser determines the connection is unrecoverable, a retry indicator appears near the first element update target — click to reconnect
 - **Manual retry**: Clicking the retry icon creates a fresh `EventSource` and re-wires all handlers
 - **Connection pooling**: Multiple triggers on the same URL share one `EventSource`
 - **Intentional close**: Abort signals (e.g., page navigation) do not show retry indicators
@@ -278,7 +278,7 @@ The runtime handles everything automatically:
 - **Auto-reconnect**: `withAutomaticReconnect()` retries at 0s, 2s, 10s, 30s
 - **Initial retry**: If the first connection fails, retries 4 times with the same backoff
 - **Connection pooling**: Multiple triggers on the same `hubUrl` share one WebSocket
-- **Retry indicator**: When all retries are exhausted, a subtle retry icon appears near the first mutated element — click to reconnect
+- **Retry indicator**: When all retries are exhausted, a subtle retry icon appears near the first element update target — click to reconnect
 - **Handler persistence**: `.on()` handlers survive across reconnections — no re-registration needed
 - **Partial view support**: Partials with their own plan reuse the parent's connection via plan merging
 - **Cookie auth**: Connections use `withCredentials: true` by default — cookies are sent automatically
@@ -311,4 +311,4 @@ Html.On(plan, t => t.CustomEvent("loaded", pipeline =>
 }));
 ```
 
-Next: [Element Mutations](../element-mutations/) — what you can do inside a pipeline.
+Next: [Element Updates](../element-mutations/) — what you can do inside a pipeline.
