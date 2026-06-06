@@ -296,7 +296,7 @@ describe("executeReaction member targets", () => {
     expect(element.checked).toBe(true);
   });
 
-  it("writes array values to text properties using browser string semantics", () => {
+  it("writes array values to text properties using JavaScript string semantics", () => {
     document.body.innerHTML = `<span id="allergy-echo"></span>`;
     const type: BrowserObjectContract = {
       properties: {
