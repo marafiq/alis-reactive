@@ -56,8 +56,8 @@ Deterministic target for a component reference in the Reactive Plan.
 ### ComponentProperty<T>
 
 Describes a readable or writable JavaScript property on a reactive component.
-            Component onboarding uses these descriptors to declare the Reactive Plan
-            component contract that the runtime can read or update.
+            Component onboarding uses these members to declare the Reactive Plan contract
+            that the runtime can read or update.
 
 ```csharp
 Mapped()
@@ -107,20 +107,20 @@ ToResponsePath<T>(expression)
 
 ### IAppLevelComponent
 
-Marker interface for layout-owned app components with a well-known component id.
+Represents a layout-owned component that can be referenced without an explicit element ID.
 
 ```csharp
 // Properties
-DefaultId { get; }  // Well-known layout element ID used when the DSL references the app-level component without an explicit ID.
+DefaultId { get; }  // Element ID used when the DSL references the app-level component without an explicit ID.
 ```
 
 ### IComponent
 
-Marker interface for a component object that can be referenced in a Reactive Plan.
+Represents a component contract that can be registered in a Reactive Plan.
 
 ```csharp
 // Properties
-Vendor { get; }  // Vendor token written into the Reactive Plan for runtime component resolution.
+Vendor { get; }  // Vendor key used to resolve the component implementation at runtime.
 ```
 
 ### IdGenerator
@@ -136,11 +136,11 @@ TypeScope(type)
 
 ### IInputComponent
 
-Marker interface for model-bound input components that expose a readable value member.
+Represents a model-bound input component whose current value can be gathered or validated.
 
 ```csharp
 // Properties
-ValueMember { get; }  // JavaScript component-object member read by gather and validation for model-bound inputs.
+ValueMember { get; }  // Component member read by gather and validation for model-bound inputs.
 ```
 
 ### ModelBoundInputComponentSlot
@@ -176,7 +176,7 @@ Property<T>()
 
 ### PluginCommand
 
-Descriptor for a plugin command that returns no value. Chain
+Declares a plugin command that returns no value. Chain
             `.Arg<T>()` or `.Args(...)` to set the argument contract.
 
 ```csharp
@@ -186,7 +186,7 @@ Args()
 
 ### PluginFunction<T>
 
-Descriptor for a plugin function that returns a typed value. Chain
+Declares a plugin function that returns a typed value. Chain
             `.Arg<T>()` or `.Args(...)` to set the argument contract.
 
 ```csharp
@@ -196,7 +196,7 @@ Args()
 
 ### PluginOperation
 
-Base descriptor for a declared plugin function or command.
+Base declaration for a plugin function or command.
 
 ```csharp
 // Properties
@@ -206,7 +206,7 @@ PluginName { get; }  // Plugin registration name resolved by the runtime.
 
 ### PluginProperty<T>
 
-Descriptor for a readable Reactive Plan plugin property.
+Declaration for a readable Reactive Plan plugin property.
 
 ```csharp
 // Properties
@@ -245,12 +245,12 @@ Read<T>(expression)
 
 ### TypedEvent<T>
 
-Describes a component event selected by a component `.Reactive(...)` overload.
+Represents a component event selected by a component `.Reactive(...)` overload.
 
 ```csharp
 // Properties
-Args { get; }  // Typed payload placeholder used to author event-payload reads.
-ObjectEvent { get; }  // Component-object event name written into the Reactive Plan.
+Args { get; }  // Placeholder used to author reads from the event payload.
+ObjectEvent { get; }  // Event name emitted into the Reactive Plan.
 ```
 
 ---
@@ -1589,7 +1589,7 @@ Wraps rendered Syncfusion accordion markup while carrying plan metadata for `.Re
 
 ### FusionAccordionEvents
 
-Typed event descriptors for the `FusionAccordion` component.
+Typed events exposed by the `FusionAccordion` component.
 
 ```csharp
 // Properties
@@ -1695,7 +1695,7 @@ Value { get; }  // Selected value.
 
 ### FusionAutoCompleteEvents
 
-Typed event descriptors for the `FusionAutoComplete` component.
+Typed events exposed by the `FusionAutoComplete` component.
 
 ```csharp
 // Properties
@@ -1770,7 +1770,7 @@ Wraps rendered Syncfusion breadcrumb markup while carrying plan metadata for `.R
 
 ### FusionBreadcrumbEvents
 
-Typed event descriptors for the `FusionBreadcrumb` component.
+Typed events exposed by the `FusionBreadcrumb` component.
 
 ```csharp
 // Properties
@@ -1831,7 +1831,7 @@ Wraps BulletChartBuilder.Render() output and carries plan metadata for reactive 
 
 ### FusionBulletChartEvents
 
-Typed event descriptors for the `FusionBulletChart` component.
+Typed events exposed by the `FusionBulletChart` component.
 
 ```csharp
 // Properties
@@ -1946,7 +1946,7 @@ Wraps rendered Syncfusion carousel markup while carrying plan metadata for `.Rea
 
 ### FusionCarouselEvents
 
-Typed event descriptors for the `FusionCarousel` component.
+Typed events exposed by the `FusionCarousel` component.
 
 ```csharp
 // Properties
@@ -2029,7 +2029,7 @@ Checked { get; }  // Whether the checkbox is checked after the change.
 
 ### FusionCheckBoxEvents
 
-Typed event descriptors for the `FusionCheckBox` component.
+Typed events exposed by the `FusionCheckBox` component.
 
 ```csharp
 // Properties
@@ -2105,7 +2105,7 @@ Value { get; }  // Selected color value.
 
 ### FusionColorPickerEvents
 
-Typed event descriptors for the `FusionColorPicker` component.
+Typed events exposed by the `FusionColorPicker` component.
 
 ```csharp
 // Properties
@@ -2164,7 +2164,7 @@ Value { get; }  // Selected value.
 
 ### FusionComboBoxEvents
 
-Typed event descriptors for the `FusionComboBox` component.
+Typed events exposed by the `FusionComboBox` component.
 
 ```csharp
 // Properties
@@ -2243,7 +2243,7 @@ Wraps ContextMenuBuilder.Render() output and carries plan metadata for reactive 
 
 ### FusionContextMenuEvents
 
-Typed event descriptors for the `FusionContextMenu` component.
+Typed events exposed by the `FusionContextMenu` component.
 
 ```csharp
 // Properties
@@ -2309,7 +2309,7 @@ Value { get; }  // New date value.
 
 ### FusionDatePickerEvents
 
-Typed event descriptors for the `FusionDatePicker` component.
+Typed events exposed by the `FusionDatePicker` component.
 
 ```csharp
 // Properties
@@ -2366,7 +2366,7 @@ StartDate { get; }  // Start of the selected date range.
 
 ### FusionDateRangePickerEvents
 
-Typed event descriptors for the `FusionDateRangePicker` component.
+Typed events exposed by the `FusionDateRangePicker` component.
 
 ```csharp
 // Properties
@@ -2420,7 +2420,7 @@ Value { get; }  // New date-time value.
 
 ### FusionDateTimePickerEvents
 
-Typed event descriptors for the `FusionDateTimePicker` component.
+Typed events exposed by the `FusionDateTimePicker` component.
 
 ```csharp
 // Properties
@@ -2491,7 +2491,7 @@ Payload for FusionDialog.Closed.
 
 ### FusionDialogEvents
 
-Typed event descriptors for the `FusionDialog` component.
+Typed events exposed by the `FusionDialog` component.
 
 ```csharp
 // Properties
@@ -2550,7 +2550,7 @@ WriteTo()
 
 ### FusionDropDownButtonEvents
 
-Typed event descriptors for the `FusionDropDownButton` component.
+Typed events exposed by the `FusionDropDownButton` component.
 
 ```csharp
 // Properties
@@ -2635,7 +2635,7 @@ Value { get; }  // Selected value.
 
 ### FusionDropDownListEvents
 
-Typed event descriptors for the `FusionDropDownList` component.
+Typed events exposed by the `FusionDropDownList` component.
 
 ```csharp
 // Properties
@@ -2706,7 +2706,7 @@ Value { get; }  // Selected value IDs.
 
 ### FusionDropDownTreeEvents
 
-Typed event descriptors for the `FusionDropDownTree` component.
+Typed events exposed by the `FusionDropDownTree` component.
 
 ```csharp
 // Properties
@@ -2755,7 +2755,7 @@ ValueMember { get; }
 
 ### FusionFileUploadEvents
 
-Typed event descriptors for the `FusionFileUpload` component.
+Typed events exposed by the `FusionFileUpload` component.
 
 ```csharp
 // Properties
@@ -2862,7 +2862,7 @@ Select<T>()
 
 ### FusionGridEvents
 
-Typed event descriptors for the `FusionGrid` component.
+Typed events exposed by the `FusionGrid` component.
 
 ```csharp
 // Properties
@@ -3168,7 +3168,7 @@ PreventDefault(args, pipeline)
 
 ### FusionInPlaceEditorEvents
 
-Typed event descriptors for the `FusionInPlaceEditor` component.
+Typed events exposed by the `FusionInPlaceEditor` component.
 
 ```csharp
 // Properties
@@ -3242,7 +3242,7 @@ Value { get; }  // New masked value.
 
 ### FusionInputMaskEvents
 
-Typed event descriptors for the `FusionInputMask` component.
+Typed events exposed by the `FusionInputMask` component.
 
 ```csharp
 // Properties
@@ -3327,7 +3327,7 @@ Value { get; }  // Selected values.
 
 ### FusionListBoxEvents
 
-Typed event descriptors for the `FusionListBox` component.
+Typed events exposed by the `FusionListBox` component.
 
 ```csharp
 // Properties
@@ -3373,7 +3373,7 @@ Wraps Syncfusion ListView render output while carrying Reactive Plan context.
 
 ### FusionListViewEvents
 
-Typed event descriptors for the `FusionListView` component.
+Typed events exposed by the `FusionListView` component.
 
 ```csharp
 // Properties
@@ -3452,7 +3452,7 @@ Wraps MenuBuilder.Render() output and carries plan metadata for reactive chainin
 
 ### FusionMenuEvents
 
-Typed event descriptors for the `FusionMenu` component.
+Typed events exposed by the `FusionMenu` component.
 
 ```csharp
 // Properties
@@ -3518,7 +3518,7 @@ Value { get; }  // Selected value.
 
 ### FusionMultiColumnComboBoxEvents
 
-Typed event descriptors for the `FusionMultiColumnComboBox` component.
+Typed events exposed by the `FusionMultiColumnComboBox` component.
 
 ```csharp
 // Properties
@@ -3582,7 +3582,7 @@ Value { get; }  // Selected values.
 
 ### FusionMultiSelectEvents
 
-Typed event descriptors for the `FusionMultiSelect` component.
+Typed events exposed by the `FusionMultiSelect` component.
 
 ```csharp
 // Properties
@@ -3667,7 +3667,7 @@ Value { get; }  // New numeric value.
 
 ### FusionNumericTextBoxEvents
 
-Typed event descriptors for the `FusionNumericTextBox` component.
+Typed events exposed by the `FusionNumericTextBox` component.
 
 ```csharp
 // Properties
@@ -3732,7 +3732,7 @@ Value { get; }  // Current OTP value.
 
 ### FusionOtpInputEvents
 
-Typed event descriptors for the `FusionOtpInput` component.
+Typed events exposed by the `FusionOtpInput` component.
 
 ```csharp
 // Properties
@@ -3856,7 +3856,7 @@ WriteTo()
 
 ### FusionProgressButtonEvents
 
-Typed event descriptors for the `FusionProgressButton` component.
+Typed events exposed by the `FusionProgressButton` component.
 
 ```csharp
 // Properties
@@ -3935,7 +3935,7 @@ Value { get; }  // Selected radio button value from the Syncfusion change event.
 
 ### FusionRadioButtonEvents
 
-Typed event descriptors for the `FusionRadioButton` component.
+Typed events exposed by the `FusionRadioButton` component.
 
 ```csharp
 // Properties
@@ -3983,7 +3983,7 @@ ValueMember { get; }
 
 ### FusionRatingEvents
 
-Typed event descriptors for the `FusionRating` component.
+Typed events exposed by the `FusionRating` component.
 
 ```csharp
 // Properties
@@ -4048,7 +4048,7 @@ Value { get; }  // New HTML content value.
 
 ### FusionRichTextEditorEvents
 
-Typed event descriptors for the `FusionRichTextEditor` component.
+Typed events exposed by the `FusionRichTextEditor` component.
 
 ```csharp
 // Properties
@@ -4168,7 +4168,7 @@ Type { get; }  // Syncfusion render type, for example `event`.
 
 ### FusionScheduleEvents
 
-Typed event descriptors for the `FusionSchedule` component.
+Typed events exposed by the `FusionSchedule` component.
 
 ```csharp
 // Properties
@@ -4300,7 +4300,7 @@ Wraps rendered Syncfusion sidebar markup while carrying plan metadata for `.Reac
 
 ### FusionSidebarEvents
 
-Typed event descriptors for the `FusionSidebar` component.
+Typed events exposed by the `FusionSidebar` component.
 
 ```csharp
 // Properties
@@ -4368,7 +4368,7 @@ Value { get; }  // New slider value.
 
 ### FusionSliderEvents
 
-Typed event descriptors for the `FusionSlider` component.
+Typed events exposed by the `FusionSlider` component.
 
 ```csharp
 // Properties
@@ -4433,7 +4433,7 @@ Event payload delivered when a `FusionSplitButton` primary action is clicked.
 
 ### FusionSplitButtonEvents
 
-Typed event descriptors for the `FusionSplitButton` component.
+Typed events exposed by the `FusionSplitButton` component.
 
 ```csharp
 // Properties
@@ -4546,7 +4546,7 @@ PreviousStep { get; }  // The index of the previous step.
 
 ### FusionStepperEvents
 
-Typed event descriptors for the `FusionStepper` component.
+Typed events exposed by the `FusionStepper` component.
 
 ```csharp
 // Properties
@@ -4601,7 +4601,7 @@ IsInteracted { get; }  // Whether user interaction triggered the change.
 
 ### FusionSwitchEvents
 
-Typed event descriptors for the `FusionSwitch` component.
+Typed events exposed by the `FusionSwitch` component.
 
 ```csharp
 // Properties
@@ -4645,7 +4645,7 @@ Carries rendered Syncfusion Tab markup and the Reactive Plan for event wiring.
 
 ### FusionTabEvents
 
-Typed event descriptors for the `FusionTab` component.
+Typed events exposed by the `FusionTab` component.
 
 ```csharp
 // Properties
@@ -4725,7 +4725,7 @@ Value { get; }  // Current text value.
 
 ### FusionTextAreaEvents
 
-Typed event descriptors for the `FusionTextArea` component.
+Typed events exposed by the `FusionTextArea` component.
 
 ```csharp
 // Properties
@@ -4812,7 +4812,7 @@ Value { get; }  // Current text value.
 
 ### FusionTextBoxEvents
 
-Typed event descriptors for the `FusionTextBox` component.
+Typed events exposed by the `FusionTextBox` component.
 
 ```csharp
 // Properties
@@ -4890,7 +4890,7 @@ Value { get; }  // New time value.
 
 ### FusionTimePickerEvents
 
-Typed event descriptors for the `FusionTimePicker` component.
+Typed events exposed by the `FusionTimePicker` component.
 
 ```csharp
 // Properties
@@ -4944,7 +4944,7 @@ Item { get; }  // Toolbar item metadata from the Syncfusion click event.
 
 ### FusionToolbarEvents
 
-Typed event descriptors for the `FusionToolbar` component.
+Typed events exposed by the `FusionToolbar` component.
 
 ```csharp
 // Properties
@@ -5029,7 +5029,7 @@ Payload for FusionTooltip.Closed.
 
 ### FusionTooltipEvents
 
-Typed event descriptors for the `FusionTooltip` component.
+Typed events exposed by the `FusionTooltip` component.
 
 ```csharp
 // Properties
@@ -5268,7 +5268,7 @@ Event args for `Click`.
 
 ### NativeButtonEvents
 
-Typed event descriptors for `NativeButton`.
+Typed events exposed by `NativeButton`.
 
 ```csharp
 // Properties
@@ -5329,7 +5329,7 @@ Checked { get; }  // Checked state after the change event.
 
 ### NativeCheckBoxEvents
 
-Typed event descriptors for `NativeCheckBox`.
+Typed events exposed by `NativeCheckBox`.
 
 ```csharp
 // Properties
@@ -5396,7 +5396,7 @@ Value { get; }  // Checked values after the change event.
 
 ### NativeCheckListEvents
 
-Typed event descriptors for `NativeCheckList`.
+Typed events exposed by `NativeCheckList`.
 
 ```csharp
 // Properties
@@ -5462,7 +5462,7 @@ Value { get; }  // Selected option value after the change event.
 
 ### NativeDropDownEvents
 
-Typed event descriptors for `NativeDropDown`.
+Typed events exposed by `NativeDropDown`.
 
 ```csharp
 // Properties
@@ -5523,7 +5523,7 @@ Value { get; }  // Hidden input value after the change event.
 
 ### NativeHiddenFieldEvents
 
-Typed event descriptors for `NativeHiddenField`.
+Typed events exposed by `NativeHiddenField`.
 
 ```csharp
 // Properties
@@ -5591,7 +5591,7 @@ Value { get; }  // Selected radio button value after the change event.
 
 ### NativeRadioGroupEvents
 
-Typed event descriptors for `NativeRadioGroup`.
+Typed events exposed by `NativeRadioGroup`.
 
 ```csharp
 // Properties
@@ -5656,7 +5656,7 @@ Value { get; }  // Textarea value captured from the change event.
 
 ### NativeTextAreaEvents
 
-Typed event descriptors for `NativeTextArea`.
+Typed events exposed by `NativeTextArea`.
 
 ```csharp
 // Properties
@@ -5720,7 +5720,7 @@ Value { get; }  // Text input value captured from the change event.
 
 ### NativeTextBoxEvents
 
-Typed event descriptors for `NativeTextBox`.
+Typed events exposed by `NativeTextBox`.
 
 ```csharp
 // Properties
