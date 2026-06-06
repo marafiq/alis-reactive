@@ -57,7 +57,7 @@ Deterministic target for a component reference in the Reactive Plan.
 
 Describes a readable or writable JavaScript property on a reactive component.
             Component onboarding uses these descriptors to declare the Reactive Plan
-            component contract that the runtime can read or mutate.
+            component contract that the runtime can read or update.
 
 ```csharp
 Mapped()
@@ -1705,7 +1705,7 @@ Filtering { get; }  // Fires when the user types to filter.
 
 ### FusionAutoCompleteExtensions
 
-Reactive pipeline extensions for reading and mutating `FusionAutoComplete`.
+Reactive pipeline extensions for reading from and updating `FusionAutoComplete`.
 
 ```csharp
 DataBind<T>()
@@ -2646,7 +2646,7 @@ Focus { get; }  // Fires when the component receives focus.
 
 ### FusionDropDownListExtensions
 
-Reactive pipeline extensions for reading and mutating `FusionDropDownList`.
+Reactive pipeline extensions for reading from and updating `FusionDropDownList`.
 
 ```csharp
 DataBind<T>()
@@ -3183,7 +3183,7 @@ SubmitClick { get; }  // Fires on a user save click or Enter key. Fires even whe
 
 ### FusionInPlaceEditorExtensions
 
-Reactive pipeline extensions for reading and mutating `FusionInPlaceEditor`.
+Reactive pipeline extensions for reading from and updating `FusionInPlaceEditor`.
 
 ```csharp
 AddClass<T>(className)
@@ -3527,7 +3527,7 @@ Changed { get; }  // Fires when the selected value changes.
 
 ### FusionMultiColumnComboBoxExtensions
 
-Reactive pipeline extensions for reading and mutating `FusionMultiColumnComboBox`.
+Reactive pipeline extensions for reading from and updating `FusionMultiColumnComboBox`.
 
 ```csharp
 DataBind<T>()
@@ -3592,7 +3592,7 @@ Filtering { get; }  // Fires when the user types to filter.
 
 ### FusionMultiSelectExtensions
 
-Reactive pipeline extensions for reading and mutating `FusionMultiSelect`.
+Reactive pipeline extensions for reading from and updating `FusionMultiSelect`.
 
 ```csharp
 DataBind<T>()
@@ -4185,7 +4185,7 @@ PopupOpen { get; }  // Fires before a popup opens. Use `Type` to distinguish `Qu
 
 ### FusionScheduleExtensions
 
-Reactive pipeline extensions for reading and mutating `FusionSchedule`.
+Reactive pipeline extensions for reading from and updating `FusionSchedule`.
 
 ```csharp
 AddEvent<T>()

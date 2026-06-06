@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive pipeline extensions for reading and mutating <see cref="FusionAutoComplete"/>.
+    /// Reactive pipeline extensions for reading from and updating <see cref="FusionAutoComplete"/>.
     /// </summary>
     public static class FusionAutoCompleteExtensions
     {

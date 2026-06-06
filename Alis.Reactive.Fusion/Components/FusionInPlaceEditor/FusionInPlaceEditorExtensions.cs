@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive pipeline extensions for reading and mutating <see cref="FusionInPlaceEditor"/>.
+    /// Reactive pipeline extensions for reading from and updating <see cref="FusionInPlaceEditor"/>.
     /// </summary>
     /// <remarks>
     /// Use these from a <see cref="ComponentRef{TComponent, TModel}"/> resolved by the pipeline:
