@@ -462,6 +462,11 @@ Candidate cleanup:
   surface-component `.Reactive(...)` XML type-parameter docs now use the same
   concise event-args wording as the input components. Event-selector examples
   remain where they help developers pick the right component event.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion single-selection
+  component value docs now keep the public `null`-clears-selection contract
+  while dropping repeated "The value to select" and "current selected value"
+  phrasing. ComboBox read docs were tightened in the same pass for value, text,
+  and index.
 - Resolved on `tiny-safe-but-important-refactorings`: plugin argument builders
   no longer repeat `TValue` XML type-parameter docs on `ArgValue<TValue>()`;
   the summaries already explain that the plan shape is derived from the type.

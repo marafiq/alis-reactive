@@ -40,7 +40,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("hidePopup");
 
         /// <summary>Sets the selected value.</summary>
-        /// <param name="value">The value to select, or <see langword="null"/> to clear the selection.</param>
+        /// <param name="value">Selected value, or <see langword="null"/> to clear the selection.</param>
         public static ComponentRef<FusionAutoComplete, TModel> SetValue<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self, string? value)
             where TModel : class
@@ -134,7 +134,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitSet(EnabledProperty, ValueExpression.Literal(false));
 
-        /// <summary>Reads the current selected value for use in conditions or gather.</summary>
+        /// <summary>Reads the selected value for conditions or gather.</summary>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionAutoComplete, TModel> self)
             where TModel : class

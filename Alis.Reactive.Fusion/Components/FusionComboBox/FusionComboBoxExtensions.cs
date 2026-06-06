@@ -98,19 +98,19 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(ClearMethod);
 
-        /// <summary>Reads the current selected value for use in conditions or gather.</summary>
+        /// <summary>Reads the selected value for conditions or gather.</summary>
         public static TypedComponentSource<string?> Value<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.Read(ValueProperty);
 
-        /// <summary>Reads the current display text for use in conditions or gather.</summary>
+        /// <summary>Reads the display text for conditions or gather.</summary>
         public static TypedComponentSource<string?> Text<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.Read(TextProperty);
 
-        /// <summary>Reads the current selected index for use in conditions or gather.</summary>
+        /// <summary>Reads the selected index for conditions or gather.</summary>
         public static TypedComponentSource<int?> Index<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class

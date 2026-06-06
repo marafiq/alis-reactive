@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("hidePopup");
 
         /// <summary>Sets the selected value.</summary>
-        /// <param name="value">The value to select, or <see langword="null"/> to clear.</param>
+        /// <param name="value">Selected value, or <see langword="null"/> to clear.</param>
         public static ComponentRef<FusionDropDownList, TModel> SetValue<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self, string? value)
             where TModel : class
@@ -114,7 +114,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(HidePopupMethod);
 
-        /// <summary>Reads the current selected value for use in conditions or gather.</summary>
+        /// <summary>Reads the selected value for conditions or gather.</summary>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionDropDownList, TModel> self)
             where TModel : class
