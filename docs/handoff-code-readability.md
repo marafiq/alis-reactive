@@ -822,6 +822,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: AIAssistView prompt-request
   payload mutation docs now keep the event-pipeline mutation contract without
   repeating the `args` or `pipeline` parameter names.
+- Resolved on `tiny-safe-but-important-refactorings`: pipeline HTTP and array
+  builder return docs now keep the useful capability lists and DOM normalization
+  contract without article-led boilerplate.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

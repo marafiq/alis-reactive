@@ -14,7 +14,7 @@ namespace Alis.Reactive.Builders
         /// </summary>
         /// <typeparam name="TElement">Array element type carried through the transform chain.</typeparam>
         /// <param name="source">Typed value source that produces the array value.</param>
-        /// <returns>A reactive array builder for composing operations such as filtering and counting.</returns>
+        /// <returns>Reactive array builder for composing operations such as filtering and counting.</returns>
         public ReactiveArray<TElement> From<TElement>(TypedSource<TElement[]> source) =>
             new ReactiveArray<TElement>(source.ToValueExpression(), Shape.FromClrType(typeof(TElement)));
 
@@ -27,7 +27,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TElement">Selected array element type carried through the transform chain.</typeparam>
         /// <param name="args">Trigger payload placeholder.</param>
         /// <param name="selector">Selects the payload array value to read at runtime.</param>
-        /// <returns>A reactive array builder for composing operations such as filtering and counting.</returns>
+        /// <returns>Reactive array builder for composing operations such as filtering and counting.</returns>
         public ReactiveArray<TElement> From<TPayload, TElement>(
             TPayload args,
             Expression<Func<TPayload, TElement[]>> selector)
@@ -46,7 +46,7 @@ namespace Alis.Reactive.Builders
         /// </summary>
         /// <param name="elementId">DOM element ID to resolve at runtime.</param>
         /// <param name="member">Array-like DOM member to read.</param>
-        /// <returns>A string reactive array builder over the normalized DOM member values.</returns>
+        /// <returns>String reactive array builder over the normalized DOM member values.</returns>
         public ReactiveArray<string> FromDom(string elementId, string member) =>
             new ReactiveArray<string>(ValueExpression.ReadDom(elementId, member, Shape.None), Shape.String);
 
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TElement">Element type expected after runtime normalization.</typeparam>
         /// <param name="elementId">DOM element ID to resolve at runtime.</param>
         /// <param name="member">Array-like DOM member to read.</param>
-        /// <returns>A typed reactive array builder over the normalized DOM member values.</returns>
+        /// <returns>Typed reactive array builder over the normalized DOM member values.</returns>
         public ReactiveArray<TElement> FromDom<TElement>(string elementId, string member) =>
             new ReactiveArray<TElement>(ValueExpression.ReadDom(elementId, member, Shape.None), Shape.FromClrType(typeof(TElement)));
     }
