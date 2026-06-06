@@ -413,6 +413,10 @@ Candidate cleanup:
   XML docs no longer repeat generic type-parameter lines such as "The selected
   property type." Binding summaries, raw HTML/onclick trust warnings, and
   Syncfusion template-context remarks remain.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion template builder
+  XML docs now use short `css` parameter text instead of repeating "The CSS
+  class to emit..." on every styled overload. Parameter tags remain because the
+  API doc generator uses them to render overload signatures.
 
 ### Implementation Inline Comments
 
