@@ -352,20 +352,20 @@ pipeline.When(args, x => x.HasUnsavedChanges).Truthy()
     .Then(then => then.Dispatch("navigate-away"));
 ```
 
-## How do I model a single guarded command?
+## How do I model a single guarded reaction?
 
-Use the regular branch DSL. Put unconditional work before the condition, then keep the guarded command inside `Then(...)`:
+Use the regular branch DSL. Put the unguarded reaction before the condition, then keep the guarded reaction inside `Then(...)`:
 
 ```csharp
-Html.On(plan, t => t.CustomEvent<ScorePayload>("check-single-command-condition", (args, pipeline) =>
+Html.On(plan, t => t.CustomEvent<ScorePayload>("check-guarded-reaction", (args, pipeline) =>
 {
-    pipeline.Element("single-command-condition-result").SetText("Always runs");
+    pipeline.Element("guarded-reaction-result").SetText("Always runs");
     pipeline.When(args, x => x.Score).Gte(90)
-        .Then(then => then.Element("single-command-condition-bonus").SetText("Bonus!"));
+        .Then(then => then.Element("guarded-reaction-bonus").SetText("Bonus!"));
 }));
 ```
 
-The unconditional command always executes. The guarded command runs only when `Score >= 90`. This keeps all condition logic in the same `When(...).Then(...)` model as the rest of the framework.
+The unguarded reaction always executes. The guarded reaction runs only when `Score >= 90`. This keeps all condition logic in the same `When(...).Then(...)` model as the rest of the framework.
 
 ## Can I write multiple independent conditions in one pipeline?
 
