@@ -37,11 +37,10 @@ generated TS term, runtime executor behavior, sync/async lane, behavior proof,
 and exact commit boundary. If the row cannot be written from source, stop and
 read more source.
 
-Before implementation, update the source-grounded design artifacts:
-
-- `docs/archive-history/rc1-docs/reactive-plan-source-blueprint.md` — actual DSL inputs and outputs.
-- `docs/archive-history/rc1-docs/reactive-plan-domain-language.md` — active domain vocabulary.
-- `docs/archive-history/rc1-docs/design/dsl-graph-coverage-matrix.md` — matrix coverage and proof links.
+Before implementation, update the source-grounded graph and matrix for the
+current pass. Active pass notes may use archived design documents as historical
+context only after the DSL source has been checked; archive-history, redesign
+notes, and remembered plans are not requirements.
 
 Rich domain model means the smallest clear set of concepts that names real DSL
 behavior and removes confusion. It does not mean wrappers, registries, fallback
@@ -108,9 +107,9 @@ Layer 4  Browser Verification + Documentation
          Harness: sandbox-verified examples
 ```
 
-Detailed flows: `docs/archive-history/rc1-docs/reactive-plan-source-blueprint.md`,
-`docs/archive-history/rc1-docs/reactive-plan-domain-language.md`, `docs/archive-history/rc1-docs/design/dsl-graph-coverage-matrix.md`,
-and `docs/archive-history/rc1-docs/design/reactive-plan-domain-design.md`.
+Detailed flows must be derived from the current DSL source and kept with the
+active pass evidence. Archived flow documents are historical context, not the
+source of truth for new plan/runtime work.
 
 ## Plan-Driven IDs — No DOM Scanning
 
