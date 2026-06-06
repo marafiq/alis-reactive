@@ -5,12 +5,12 @@ using System.Linq.Expressions;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Converts lambda expressions like <c>x =&gt; x.Address.City</c> into runtime,
-    /// model-binding, or MVC element-ID paths used by Reactive Plan bindings.
+    /// Converts lambda expressions like <c>x =&gt; x.Address.City</c> into Reactive Plan
+    /// value paths, MVC model-binding names, or MVC element IDs.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>ToPath(...)</c> adds a caller-provided runtime scope prefix such as
+    /// <c>ToPath(...)</c> adds a caller-provided value-scope prefix such as
     /// <c>"evt"</c> or <c>"responseBody"</c>. Event and response helpers return
     /// scope-relative paths because the surrounding <c>PayloadSource</c> already
     /// identifies the value scope.
@@ -24,10 +24,10 @@ namespace Alis.Reactive
     public static class ExpressionPathHelper
     {
         /// <summary>
-        /// Builds a scoped camelCase runtime path from a property-access expression.
+        /// Builds a scoped camelCase Reactive Plan value path from a property-access expression.
         /// </summary>
         /// <typeparam name="TSource">The source type containing the property chain.</typeparam>
-        /// <param name="prefix">The runtime scope prefix to prepend, such as <c>"evt"</c> or <c>"responseBody"</c>.</param>
+        /// <param name="prefix">The value-scope prefix to prepend, such as <c>"evt"</c> or <c>"responseBody"</c>.</param>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>evt.address.city</c>.</returns>
         public static string ToPath<TSource>(string prefix, Expression<Func<TSource, object?>> expression)
@@ -37,11 +37,11 @@ namespace Alis.Reactive
         }
 
         /// <summary>
-        /// Builds a scoped camelCase runtime path while preserving the selected value type.
+        /// Builds a scoped camelCase Reactive Plan value path while preserving the selected value type.
         /// </summary>
         /// <typeparam name="TSource">The source type containing the property chain.</typeparam>
         /// <typeparam name="TProp">The selected value type.</typeparam>
-        /// <param name="prefix">The runtime scope prefix to prepend.</param>
+        /// <param name="prefix">The value-scope prefix to prepend.</param>
         /// <param name="expression">The property-access expression to convert.</param>
         /// <returns>A dot-path like <c>evt.facilityId</c>.</returns>
         public static string ToPath<TSource, TProp>(string prefix, Expression<Func<TSource, TProp>> expression)
