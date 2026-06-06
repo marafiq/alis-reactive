@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises NativeTextArea SetValue, Value reads, Changed-event conditions,
-/// and component-read conditions.
-/// </summary>
 [TestFixture]
 public class WhenMultilineTextEntered : PlaywrightTestBase
 {

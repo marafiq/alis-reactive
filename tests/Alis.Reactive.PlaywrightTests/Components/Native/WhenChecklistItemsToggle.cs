@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises NativeCheckList selection, form submission, component-read conditions,
-/// and pre-selected checkbox model binding through rendered output.
-/// </summary>
 [TestFixture]
 public class WhenChecklistItemsToggle : PlaywrightTestBase
 {
@@ -25,11 +21,10 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     }
 
     [Test]
-    public async Task clicking_checkbox_echoes_comma_separated_value()
+    public async Task clicking_shellfish_appends_to_preselected_allergies_echo()
     {
         await NavigateAndBoot();
 
-        // Peanuts and Dairy are pre-selected before Shellfish is clicked.
         await Page.Locator($"#{ModelIdPrefix}Allergies_c1").ClickAsync();
 
         var echo = Page.Locator("#allergy-echo");
@@ -109,20 +104,17 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
 
         await Page.Locator($"#{ModelIdPrefix}DietaryNeeds_c0").ClickAsync();
 
-        // Intercept the POST because the array payload shape is the behavior under test.
         var request = await Page.RunAndWaitForRequestAsync(
             async () => await Page.Locator("#submit-btn").ClickAsync(),
             "**/Sandbox/Components/NativeCheckList/Submit");
 
         var body = request.PostData ?? "";
-        // Pre-selected Allergies must stay an array in JSON.
         Assert.That(body, Does.Contain("\"Allergies\""),
             $"Body must contain Allergies key but was '{body}'");
         Assert.That(body, Does.Contain("Peanuts"),
             $"Body must contain Peanuts but was '{body}'");
         Assert.That(body, Does.Contain("Dairy"),
             $"Body must contain Dairy but was '{body}'");
-        // Newly selected DietaryNeeds must also stay an array in JSON.
         Assert.That(body, Does.Contain("\"DietaryNeeds\""),
             $"Body must contain DietaryNeeds key but was '{body}'");
         Assert.That(body, Does.Contain("LowSodium"),
