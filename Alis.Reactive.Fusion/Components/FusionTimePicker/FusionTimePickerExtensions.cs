@@ -26,7 +26,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("focusOut");
 
         /// <summary>Sets the selected time.</summary>
-        /// <param name="value">The time to set (only the time portion is used).</param>
+        /// <param name="value">Time to set; only the time portion is used.</param>
         public static ComponentRef<FusionTimePicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionTimePicker, TModel> self, DateTime value)
             where TModel : class
