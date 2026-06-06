@@ -515,6 +515,10 @@ Candidate cleanup:
   parameter tags now use concise request body, header, route, URL, and
   triggering-payload wording instead of narrating each read/write. Generated
   request-plan wording remains where it explains literal capture semantics.
+- Resolved on `tiny-safe-but-important-refactorings`: `GatherExtensions`
+  component-source XML parameter tags are shorter but still preserve the
+  important non-input component rule: the request body field name is also the
+  component member read when no input-value contract exists.
 
 ### Implementation Inline Comments
 

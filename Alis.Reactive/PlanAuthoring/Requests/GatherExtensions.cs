@@ -42,7 +42,7 @@ namespace Alis.Reactive.Builders.Requests
         /// </remarks>
         /// <typeparam name="TComponent">The component contract to read.</typeparam>
         /// <param name="refId">The explicit controlled component ID rendered in markup.</param>
-        /// <param name="name">The request body field to write; for non-input components, also the member to read.</param>
+        /// <param name="name">Request body field; for non-input components, also the member read.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             string refId,
@@ -62,7 +62,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Adds a typed component member read to the request body.
         /// </summary>
-        /// <param name="source">The component property or method source; its default body field name is used.</param>
+        /// <param name="source">Component property or method source; its default body field name is used.</param>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
             this GatherBuilder<TModel> self,
             TypedComponentSource<TProp> source)
@@ -75,7 +75,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Adds a typed component member read to an explicit request body field.
         /// </summary>
-        /// <param name="source">The component property or method source evaluated before the request is sent.</param>
+        /// <param name="source">Component property or method source evaluated before the request is sent.</param>
         /// <param name="paramName">The request body field that receives the component member value.</param>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
             this GatherBuilder<TModel> self,
