@@ -184,6 +184,11 @@ Candidate cleanup:
   public/protected surface. Internal implementation types such as
   `PluginArgumentCollector`, `BrowserObject`, `ContractDriftGate`, and
   `PlanContractGenerator` no longer appear on the public API page.
+- Resolved on `tiny-safe-but-important-refactorings`: the API reference
+  generator now simplifies XML `<see cref="...">` links after removing method
+  parameter lists and generic brace notation. Generated summaries show
+  `InputField<T>`, `FusionTextBox<T>`, and `NativeRadioGroup<T>` instead of
+  malformed artifacts such as `Func{<T>`, `Builder})`, or `Builder{<T>`.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
 

@@ -627,7 +627,7 @@ Required()
 ### InputBoundField<T>
 
 A model-bound input field returned by
-            `Func{<T>`, ready to receive
+            `InputField<T>`, ready to receive
             a component extension that renders inside the field wrapper.
 
 ---
@@ -1302,7 +1302,7 @@ DefaultId { get; }
 
 ### FusionToastExtensions
 
-Pipeline and layout extensions for the `IHtmlHelper)`.
+Pipeline and layout extensions for the `FusionToast`.
 
 ```csharp
 Danger<T>()
@@ -1522,7 +1522,7 @@ UpdateData<T>()
 
 ### FusionAutoCompleteHtmlExtensions
 
-Adds typed field mapping and rendering helpers for `AutoCompleteBuilder})`.
+Adds typed field mapping and rendering helpers for `FusionAutoComplete<T>`.
 
 ```csharp
 Fields<T>()
@@ -2447,7 +2447,7 @@ Event payload delivered when a `FusionDropDownList` receives focus.
 
 ### FusionDropDownListHtmlExtensions
 
-Adds typed field mapping and rendering helpers for `DropDownListBuilder})`.
+Adds typed field mapping and rendering helpers for `FusionDropDownList<T>`.
 
 ```csharp
 Fields<T>()
@@ -2862,7 +2862,7 @@ Event payload delivered before a `FusionInPlaceEditor` commits its value.
 
 ```csharp
 // Properties
-Cancel { get; }  // Whether Syncfusion's built-in submit has been cancelled. Set via `IReactionEmitter)`.
+Cancel { get; }  // Whether Syncfusion's built-in submit has been cancelled. Set via `PreventDefault`.
 Data { get; }  // The payload Syncfusion prepared for its built-in submit, keyed by the editor's `Name`.
 ```
 
@@ -3324,7 +3324,7 @@ Value<T>()
 
 ### FusionMultiColumnComboBoxHtmlExtensions
 
-Adds typed field mapping and rendering helpers for `MultiColumnComboBoxBuilder})`.
+Adds typed field mapping and rendering helpers for `FusionMultiColumnComboBox<T>`.
 
 ```csharp
 Fields<T>()
@@ -3475,7 +3475,7 @@ Event payload delivered when a `FusionNumericTextBox` receives focus.
 
 ### FusionNumericTextBoxHtmlExtensions
 
-Adds rendering helpers for `NumericTextBoxBuilder})`.
+Adds rendering helpers for `FusionNumericTextBox<T>`.
 
 ```csharp
 FusionNumericTextBox<T>()
@@ -3545,7 +3545,7 @@ Value { get; }  // Current OTP value.
 
 ### FusionOtpInputHtmlExtensions
 
-Adds rendering helpers for `OtpInputBuilder})`.
+Adds rendering helpers for `FusionOtpInput<T>`.
 
 ```csharp
 FusionOtpInput<T>()
@@ -4398,7 +4398,7 @@ Value<T>()
 
 ### FusionSwitchHtmlExtensions
 
-Adds rendering helpers for `SwitchBuilder})`.
+Adds rendering helpers for `FusionSwitch<T>`.
 
 ```csharp
 FusionSwitch<T>()
@@ -4536,7 +4536,7 @@ Value { get; }  // Current text value.
 
 ### FusionTextAreaHtmlExtensions
 
-Adds rendering helpers for `TextAreaBuilder})`.
+Adds rendering helpers for `FusionTextArea<T>`.
 
 ```csharp
 FusionTextArea<T>()
@@ -4624,7 +4624,7 @@ Value { get; }  // Current text value.
 
 ### FusionTextBoxHtmlExtensions
 
-Adds rendering helpers for `TextBoxBuilder})`.
+Adds rendering helpers for `FusionTextBox<T>`.
 
 ```csharp
 FusionTextBox<T>()
@@ -4960,7 +4960,7 @@ DefaultId { get; }
 
 ### NativeDrawerExtensions
 
-Pipeline and layout extensions for the `IHtmlHelper)`.
+Pipeline and layout extensions for the `NativeDrawer`.
 
 ```csharp
 Close<T>()
@@ -4980,7 +4980,7 @@ DefaultId { get; }
 
 ### NativeLoaderExtensions
 
-Pipeline and layout extensions for the `IHtmlHelper)`.
+Pipeline and layout extensions for the `NativeLoader`.
 
 ```csharp
 Hide<T>()
@@ -5112,7 +5112,7 @@ Value<T>()
 
 ### NativeCheckBoxHtmlExtensions
 
-`InputField` extension for choosing `Boolean}})` as the wrapper's rendered control.
+`InputField` extension for choosing `NativeCheckBox<T>` as the wrapper's rendered control.
 
 ```csharp
 NativeCheckBox<T>(setup, build)
@@ -5180,7 +5180,7 @@ Value<T>()
 
 ### NativeCheckListHtmlExtensions
 
-`InputField` extension for choosing `NativeCheckListBuilder{<T>` as the wrapper's rendered control.
+`InputField` extension for choosing `NativeCheckList<T>` as the wrapper's rendered control.
 
 ```csharp
 NativeCheckList<T>(setup, build)
@@ -5245,7 +5245,7 @@ Value<T>()
 
 ### NativeDropDownHtmlExtensions
 
-`InputField` extension for choosing `NativeDropDownBuilder{<T>` as the wrapper's rendered control.
+`InputField` extension for choosing `NativeDropDown<T>` as the wrapper's rendered control.
 
 ```csharp
 NativeDropDown<T>(setup, build)
@@ -5375,7 +5375,7 @@ Value<T>()
 
 ### NativeRadioGroupHtmlExtensions
 
-`InputField` extension for choosing `NativeRadioGroupBuilder{<T>` as the wrapper's rendered control.
+`InputField` extension for choosing `NativeRadioGroup<T>` as the wrapper's rendered control.
 
 ```csharp
 NativeRadioGroup<T>(setup, build)
@@ -5439,7 +5439,7 @@ Value<T>()
 
 ### NativeTextAreaHtmlExtensions
 
-`InputField` extension for choosing `NativeTextAreaBuilder{<T>` as the wrapper's rendered control.
+`InputField` extension for choosing `NativeTextArea<T>` as the wrapper's rendered control.
 
 ```csharp
 NativeTextArea<T>(setup, build)
@@ -5503,7 +5503,7 @@ Value<T>()
 
 ### NativeTextBoxHtmlExtensions
 
-`InputField` extension for choosing `NativeTextBoxBuilder{<T>` as the wrapper's rendered control.
+`InputField` extension for choosing `NativeTextBox<T>` as the wrapper's rendered control.
 
 ```csharp
 NativeTextBox<T>(setup, build)

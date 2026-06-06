@@ -262,6 +262,9 @@ static string SimplifyCref(string cref)
 {
     if (cref.Length > 2 && cref[1] == ':')
         cref = cref[2..];
+    var parameterListIndex = cref.IndexOf('(');
+    if (parameterListIndex >= 0)
+        cref = cref[..parameterListIndex];
     var lastDot = cref.LastIndexOf('.');
     if (lastDot >= 0) cref = cref[(lastDot + 1)..];
     return CleanGenericNotation(cref);
@@ -287,6 +290,8 @@ static IEnumerable<string> DisplayMethods(IReadOnlyList<DocMember> methods)
 
 static string CleanGenericNotation(string name)
 {
+    var genericBraceIndex = name.IndexOf('{');
+    if (genericBraceIndex >= 0) return $"{name[..genericBraceIndex]}<T>";
     var genericArityMarkerIndex = name.IndexOf('`');
     if (genericArityMarkerIndex >= 0) return $"{name[..genericArityMarkerIndex]}<T>";
     return name;
@@ -695,6 +700,8 @@ record DocMember(string RawName, string Assembly, XElement Element)
 
     private static string CleanGeneric(string name)
     {
+        var genericBraceIndex = name.IndexOf('{');
+        if (genericBraceIndex >= 0) return $"{name[..genericBraceIndex]}<T>";
         var genericArityMarkerIndex = name.IndexOf('`');
         if (genericArityMarkerIndex >= 0) return $"{name[..genericArityMarkerIndex]}<T>";
         return name;
