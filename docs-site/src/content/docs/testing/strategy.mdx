@@ -1,37 +1,40 @@
 ---
 title: Testing Strategy
-description: Three layers of tests, what each catches, and why all three are mandatory.
+description: Current verification layers, what each catches, and when browser proof is required.
 sidebar:
   order: 1
 ---
 
-Every feature is tested at three layers. Each layer catches a different category of bug.
+Reactive uses separate verification layers because each catches a different
+category of bug. `scripts/test.sh` is the full gate; `scripts/test.sh --no-e2e`
+is the non-browser gate for changes where browser behavior is intentionally out
+of scope.
 
 ```d2
 direction: down
 
-layer1: "C# Unit Tests\nJSON plan correctness\n~510 tests, milliseconds" {
+layer1: "Generated Contract + Typecheck\nC# plan domain -> TS contract\nseconds" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 20
 }
 
-layer2: "TypeScript Unit Tests\nRuntime execution in jsdom\n~944 tests, seconds" {
+layer2: "TypeScript Unit Tests\nRuntime execution in jsdom\nseconds" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 20
 }
 
-layer3: "Playwright Tests\nReal browser behavior\n~483 tests, ~75 seconds" {
+layer3: "Playwright Tests\nReal browser behavior\nobservable wrapper" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
   style.font-size: 20
 }
 
-layer1 -> layer2: "Plan JSON is correct.\nDoes the runtime execute it?" {
+layer1 -> layer2: "Generated shape compiles.\nDoes the runtime execute it?" {
   style.font-size: 16
   style.stroke: "#f9ab00"
 }
@@ -45,26 +48,17 @@ layer2 -> layer3: "Runtime logic works.\nDoes it work in a real browser?" {
 
 ## What does each layer catch?
 
-### Layer 1 -- C# Unit Tests
+### Layer 1 -- Generated Contract + Typecheck
 
-The C# DSL builds intent objects and serializes them to a JSON plan. These tests verify that the rendered JSON is correct.
+The C# plan domain generates `Alis.Reactive.Assets/runtime/types/plan.ts`.
+TypeScript compilation proves the runtime still matches the generated contract.
 
-**Tools:** NUnit + Verify.NUnit
+**Tools:** `npm run typecheck`
 
-Two patterns:
-- **Snapshot verification** -- `VerifyJson(plan.Render())` locks down exact JSON output.
-- **Generated contract verification** -- `npm run typecheck` regenerates `runtime/types/plan.ts` from the C# plan domain and compiles the runtime against it.
+The wrapper runs this first so plan-shape drift fails before slower browser work.
 
-**Catches:** Serialization regressions, missing `camelCase` mappings, generated type drift after adding new kinds, builder methods producing wrong output after refactoring.
-
-**Projects:**
-
-| Project | Covers |
-|---------|--------|
-| `Alis.Reactive.UnitTests` | Core plan rendering and generated contract behavior |
-| `Alis.Reactive.Native.UnitTests` | Native component vertical slices |
-| `Alis.Reactive.Fusion.UnitTests` | Syncfusion component vertical slices |
-| `Alis.Reactive.FluentValidator.UnitTests` | Validation rule extraction |
+**Catches:** Generated type drift after adding new kinds, stale runtime imports,
+and C# plan-domain changes that no longer match the TypeScript executor.
 
 ### Layer 2 -- TypeScript Unit Tests
 
@@ -72,7 +66,10 @@ The runtime reads a JSON plan and executes it against the DOM. These tests const
 
 **Tools:** Vitest + jsdom
 
-**Catches:** Mutation handlers writing to the wrong property, dot-path resolution stopping one level early, `"false"` coercing to `true`, two-phase boot regressions (listeners wired after dom-ready fires), guard evaluation comparing strings when it should compare numbers.
+**Catches:** Reaction handlers writing to the wrong property, path resolution
+stopping one level early, JavaScript string coercion mistakes, two-phase boot
+regressions (listeners wired after page-ready fires), and guard evaluation
+comparing strings when it should compare numbers.
 
 ### Layer 3 -- Playwright Tests
 
@@ -90,42 +87,46 @@ Speed and precision trade off against realism:
 
 | Layer | Speed | Diagnostic precision | Realism |
 |-------|-------|---------------------|---------|
-| C# Unit | Fastest (milliseconds) | Pinpoints exact serialization issue | No runtime |
+| Generated contract | Fastest | Pinpoints plan-shape drift | No runtime |
 | TS Unit | Fast (seconds) | Pinpoints exact runtime logic issue | No real browser |
-| Playwright | Slowest (~75s total) | Confirms end-to-end, harder to isolate | Full browser stack |
+| Playwright | Slowest | Confirms end-to-end, harder to isolate | Full browser stack |
 
-When a Playwright test fails, you know something is wrong but not *where*. Is the plan JSON wrong? Is a mutation handler broken? Is a component not initialized? The lower layers answer that question in milliseconds.
+When a Playwright test fails, you know something is wrong but not *where*. Is
+the generated plan shape wrong? Is a reaction handler broken? Is a component not
+initialized? The lower layers answer that question faster.
 
 ---
 
-## One feature across three layers
+## One behavior across the layers
 
-Here is `AddClass` tested at every layer:
+Here is a page-ready dispatch checked across the active layers:
 
-**C# Unit Test** -- plan JSON contains the correct mutation:
+**Generated contract** -- `PlanDocument`, `Behavior`, and `ReactionGraph` stay synchronized:
 
-```csharp
-[Test]
-public Task AddClass_produces_mutate_element_command() =>
-    VerifyJson(Build(p => p.Element("status").AddClass("active")).Render());
+```bash
+npm run typecheck
 ```
 
-**TS Unit Test** -- runtime applies the class to the DOM:
+**TS Unit Test** -- runtime executes the dispatch:
 
 ```typescript
-it("adds a class to an element", () => {
+it("executes a dispatch reaction when document is ready", () => {
+  let executed = false;
+  document.addEventListener("ready-evt", () => { executed = true; });
+
   boot({
-    planId: "Test.Model", components: {},
-    entries: [{
-      trigger: { kind: "dom-ready" },
-      reaction: { kind: "sequential", commands: [{
-        kind: "mutate-element", target: "status",
-        mutation: { kind: "call", method: "add", chain: "classList",
-          args: [{ kind: "literal", value: "active" }] }
-      }]}
-    }]
+    version: 3,
+    planId: "Test.Model",
+    scope: { kind: "root" },
+    types: {},
+    components: {},
+    behaviors: [{
+      startsWhen: { kind: "page-ready" },
+      reaction: { kind: "dispatch", event: "ready-evt", payload: { kind: "none" } },
+    }],
   });
-  expect(document.getElementById("status")!.classList.contains("active")).toBe(true);
+
+  expect(executed).toBe(true);
 });
 ```
 
@@ -135,7 +136,7 @@ it("adds a class to an element", () => {
 [Test]
 public async Task all_three_steps_have_green_class_after_chain_completes()
 {
-    await NavigateTo("/Sandbox/Events");
+    await NavigateTo("/Sandbox/CoreBehaviors/Events");
     await WaitForTraceMessage("booted", 5000);
 
     await Expect(Page.Locator("#step-1"))
@@ -148,4 +149,7 @@ public async Task all_three_steps_have_green_class_after_chain_completes()
 
 ## The rule
 
-Every new primitive (command kind, trigger kind, component, validation rule) needs tests at all three layers. No exceptions. All ~1,900+ tests must pass before every commit.
+Every new primitive (reaction kind, trigger kind, component, validation rule)
+needs generated-contract proof, focused runtime proof when runtime behavior
+changes, and Playwright proof when browser behavior changes. Before push or
+release work, run the full `scripts/test.sh` gate.
