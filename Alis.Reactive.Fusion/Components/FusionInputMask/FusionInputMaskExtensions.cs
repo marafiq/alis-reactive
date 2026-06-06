@@ -21,7 +21,6 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("focusIn");
 
         /// <summary>Sets the masked input value.</summary>
-        /// <param name="value">The value to set.</param>
         public static ComponentRef<FusionInputMask, TModel> SetValue<TModel>(
             this ComponentRef<FusionInputMask, TModel> self, string value)
             where TModel : class

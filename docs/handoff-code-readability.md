@@ -232,8 +232,15 @@ Candidate cleanup:
   docs no longer repeat Razor HTML helper or generic model boilerplate where the
   summaries already name the rendered element, action-link browser boundary, or
   returned builder behavior.
-- Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
-- Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
+- Resolved on `tiny-safe-but-important-refactorings`: the active Native
+  `*Builder.cs` scan no longer shows long XML examples. Remaining component
+  examples are short public DSL examples or explain runtime/browser boundaries.
+- Resolved on `tiny-safe-but-important-refactorings`: the active source scan no
+  longer shows repeated "Creates a new instance. Framework-internal..."
+  constructor docs.
+- Resolved on `tiny-safe-but-important-refactorings`: simple component
+  `SetValue(value)` docs no longer repeat the parameter name as "The value to
+  set." Summaries still name the component contract being written.
 
 ### Implementation Inline Comments
 

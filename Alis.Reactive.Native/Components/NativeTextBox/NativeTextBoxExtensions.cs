@@ -21,7 +21,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the text input value through the component contract.
         /// </summary>
-        /// <param name="value">The value to set.</param>
         public static ComponentRef<NativeTextBox, TModel> SetValue<TModel>(
             this ComponentRef<NativeTextBox, TModel> self, string value)
             where TModel : class
