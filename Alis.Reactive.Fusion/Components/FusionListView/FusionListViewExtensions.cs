@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive Plan pipeline extensions for <see cref="FusionListView"/>.
+    /// Updates rendered <see cref="FusionListView"/> selection and check state from a Reactive Plan pipeline.
     /// </summary>
     public static class FusionListViewExtensions
     {

@@ -5,7 +5,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive Plan pipeline extensions for <see cref="FusionCarousel"/>.
+    /// Reads and changes rendered <see cref="FusionCarousel"/> slide state from a Reactive Plan pipeline.
     /// </summary>
     public static class FusionCarouselExtensions
     {

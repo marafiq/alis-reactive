@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive Plan pipeline extensions for <see cref="FusionBulletChart"/>.
+    /// Reads rendered <see cref="FusionBulletChart"/> index calculations from a Reactive Plan pipeline.
     /// </summary>
     public static class FusionBulletChartExtensions
     {

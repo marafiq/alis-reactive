@@ -4,7 +4,7 @@ using Alis.Reactive.Builders.Conditions;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive Plan pipeline extensions for <see cref="FusionBreadcrumb"/>.
+    /// Reads and updates <see cref="FusionBreadcrumb"/> active-item state from a Reactive Plan pipeline.
     /// </summary>
     public static class FusionBreadcrumbExtensions
     {

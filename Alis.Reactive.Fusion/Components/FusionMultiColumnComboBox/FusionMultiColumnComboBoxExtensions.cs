@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive Plan pipeline extensions for reading from and updating <see cref="FusionMultiColumnComboBox"/>.
+    /// Reads and updates <see cref="FusionMultiColumnComboBox"/> values from a Reactive Plan pipeline.
     /// </summary>
     public static class FusionMultiColumnComboBoxExtensions
     {

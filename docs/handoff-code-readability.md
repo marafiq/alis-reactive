@@ -557,6 +557,11 @@ Candidate cleanup:
   parameter docs now use concise button-text wording. The explicit element-ID
   and Reactive Plan component lookup docs remain because they describe the
   public join key.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion component extension
+  class summaries now use concise Reactive Plan wording instead of generic
+  "typed component operations" or "pipeline extensions" phrases. Value
+  components say values, button-style components say rendered state, and
+  Schedule keeps its non-input schedule state/event distinction.
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
   selected-value parameter docs now use the same concise selected-option wording
   as the other Native value-write helpers.

@@ -3,7 +3,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive Plan pipeline extensions for <see cref="FusionToolbar"/>.
+    /// Updates rendered <see cref="FusionToolbar"/> enabled state from a Reactive Plan pipeline.
     /// </summary>
     public static class FusionToolbarExtensions
     {

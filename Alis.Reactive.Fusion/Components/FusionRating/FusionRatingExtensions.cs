@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed component operations and value reads for <see cref="FusionRating"/> in a Reactive Plan pipeline.
+    /// Reads and updates <see cref="FusionRating"/> values from a Reactive Plan pipeline.
     /// </summary>
     public static class FusionRatingExtensions
     {

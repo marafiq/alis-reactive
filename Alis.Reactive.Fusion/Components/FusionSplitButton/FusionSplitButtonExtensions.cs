@@ -7,7 +7,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed post-render component operations and reads for <see cref="FusionSplitButton"/>.
+    /// Reads and updates rendered <see cref="FusionSplitButton"/> state from a Reactive Plan pipeline.
     /// </summary>
     public static class FusionSplitButtonExtensions
     {

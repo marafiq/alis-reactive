@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive Plan pipeline extensions for reading from and updating <see cref="FusionDropDownList"/>.
+    /// Reads and updates <see cref="FusionDropDownList"/> values from a Reactive Plan pipeline.
     /// </summary>
     public static class FusionDropDownListExtensions
     {

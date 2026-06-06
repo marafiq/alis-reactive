@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive Plan pipeline extensions for reading from and updating <see cref="FusionSchedule"/>.
+    /// Reads schedule state and updates rendered schedule events from a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
     /// <para>

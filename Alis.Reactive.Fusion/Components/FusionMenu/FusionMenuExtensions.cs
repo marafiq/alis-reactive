@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive Plan pipeline extensions for <see cref="FusionMenu"/>.
+    /// Opens and closes the rendered <see cref="FusionMenu"/> from a Reactive Plan pipeline.
     /// </summary>
     public static class FusionMenuExtensions
     {
