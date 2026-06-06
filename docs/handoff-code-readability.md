@@ -1028,6 +1028,9 @@ Rewrite or delete:
   docs now use "criteria" instead of descriptor prose while preserving the
   public `FusionGridSearchDescriptor` type name; the generated API reference was
   refreshed with current XML readability wording.
+- Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
+  comparison operators now keep summary and parameter contract docs while
+  removing repeated fluent-return boilerplate that added no IntelliSense value.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
