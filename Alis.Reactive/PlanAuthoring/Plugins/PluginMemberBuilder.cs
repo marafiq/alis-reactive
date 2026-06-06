@@ -141,7 +141,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Creates the typed value source represented by the configured plugin method call.</summary>
         /// <param name="builder">Configured plugin member builder.</param>
-        /// <returns>A typed plugin value source that captures the configured arguments.</returns>
+        /// <returns>Typed plugin value source that captures the configured arguments.</returns>
         public static implicit operator TypedPluginSource<TReturn>(PluginMemberBuilder<TReturn, TModel> builder) =>
             new TypedPluginSource<TReturn>(
                 builder._operation,

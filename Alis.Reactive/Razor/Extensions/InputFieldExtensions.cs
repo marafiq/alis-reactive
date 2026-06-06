@@ -27,7 +27,7 @@ namespace Alis.Reactive.Native.Extensions
         /// <typeparam name="TProp">Model property type the field is bound to.</typeparam>
         /// <param name="plan">Reactive Plan that owns this field registration.</param>
         /// <param name="expression">Model property to bind the field to.</param>
-        /// <returns>A bound field ready to receive a component extension.</returns>
+        /// <returns>Bound field ready to receive a component extension.</returns>
         public static InputBoundField<TModel, TProp> InputField<TModel, TProp>(
 #if NET48
             this HtmlHelper<TModel> html,
@@ -48,7 +48,7 @@ namespace Alis.Reactive.Native.Extensions
         /// <param name="plan">Reactive Plan that owns this field registration.</param>
         /// <param name="expression">Model property to bind the field to.</param>
         /// <param name="configure">Configures label text and required marker.</param>
-        /// <returns>A bound field ready to receive a component extension.</returns>
+        /// <returns>Bound field ready to receive a component extension.</returns>
         public static InputBoundField<TModel, TProp> InputField<TModel, TProp>(
 #if NET48
             this HtmlHelper<TModel> html,

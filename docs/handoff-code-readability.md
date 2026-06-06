@@ -825,6 +825,11 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: pipeline HTTP and array
   builder return docs now keep the useful capability lists and DOM normalization
   contract without article-led boilerplate.
+- Resolved on `tiny-safe-but-important-refactorings`: final core source/builder
+  return docs in `ResponseBody`, `PluginMemberBuilder`, `InputField`, and
+  `PlanExtensions` now use concise typed-source, component-extension, disposable
+  scope, and Active Plan wording. Keep the remaining `FusionTemplateExpression`
+  and `IdGenerator` return examples because they show exact public output shape.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

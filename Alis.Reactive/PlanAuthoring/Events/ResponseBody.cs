@@ -42,7 +42,7 @@ namespace Alis.Reactive
         /// </summary>
         /// <typeparam name="TProp">Value type returned by the selected response-body path.</typeparam>
         /// <param name="expression">Response-body property path, for example <c>r =&gt; r.Data.Name</c>.</param>
-        /// <returns>A typed source for conditions and plugin arguments.</returns>
+        /// <returns>Typed source for conditions and plugin arguments.</returns>
         public TypedSource<TProp> Read<TProp>(Expression<Func<TResponse, TProp>> expression)
         {
             return new PayloadTypedSource<TResponse, TProp>(Scope, expression);

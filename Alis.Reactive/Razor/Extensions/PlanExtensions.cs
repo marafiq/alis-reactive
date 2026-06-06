@@ -28,7 +28,7 @@ namespace Alis.Reactive.Native.Extensions
         /// <see cref="RenderPlan{TModel}"/> at the end of the view.
         /// </remarks>
         /// <typeparam name="TModel">View model type, providing compile-time expression paths.</typeparam>
-        /// <returns>A new plan instance scoped to this view.</returns>
+        /// <returns>New plan instance scoped to this view.</returns>
 #if NET48
         public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
             where TModel : class =>
@@ -53,7 +53,7 @@ namespace Alis.Reactive.Native.Extensions
         /// </para>
         /// </remarks>
         /// <typeparam name="TModel">View model type must match the view's model.</typeparam>
-        /// <returns>A plan instance that merges into the owning view's Active Plan.</returns>
+        /// <returns>Plan instance that merges into the owning view's Active Plan.</returns>
 #if NET48
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this HtmlHelper<TModel> html)
             where TModel : class =>

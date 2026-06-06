@@ -34,7 +34,7 @@ namespace Alis.Reactive.InputField
         /// Writes the opening field wrapper HTML and returns a scope that writes closing
         /// tags (including the validation error placeholder) when disposed.
         /// </summary>
-        /// <returns>A disposable scope. Use with <c>using</c> to wrap the component content.</returns>
+        /// <returns>Disposable scope used with <c>using</c> to wrap the component content.</returns>
         internal InputFieldRenderScope Begin()
         {
             _writer.Write("<div class=\"flex flex-col gap-1.5\">");
