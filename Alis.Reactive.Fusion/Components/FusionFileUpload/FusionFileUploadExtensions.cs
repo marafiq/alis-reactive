@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed value reading for <see cref="FusionFileUpload"/> in a Reactive Plan pipeline.
+    /// Reads selected file metadata from <see cref="FusionFileUpload"/> in a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -12,7 +12,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.Document).Value()</c>.
     /// </para>
     /// <para>
-    /// No <c>SetValue()</c> is provided. Files are set by user interaction only.
+    /// No <c>SetValue()</c> is provided. Files are selected by user interaction and submitted through FormData.
     /// </para>
     /// </remarks>
     public static class FusionFileUploadExtensions
@@ -22,7 +22,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentProperty<string> ValueProperty =
             ComponentProperty<string>.Named(Component.ValueMember);
 
-        /// <summary>Reads the current file data for use in conditions or gather.</summary>
+        /// <summary>Reads selected file metadata for conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument for component operations:
         /// <c>p.When(p.Component&lt;FusionFileUpload&gt;(m =&gt; m.Document).Value()).NotNull().Then(p =&gt; { ... })</c>.

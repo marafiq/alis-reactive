@@ -446,6 +446,10 @@ Candidate cleanup:
   runtime boot behavior instead of using "browser boots/loads" as a broad
   placeholder. Wording that truly refers to browser APIs or stale browser
   assets remains.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionFileUpload` XML
+  docs now keep the form-mode/FormData boundary visible while trimming repeated
+  field-wrapper, event-args, and selected-file wording. No upload behavior or
+  Playwright file-injection flow changed.
 - Resolved on `tiny-safe-but-important-refactorings`: plugin argument builders
   no longer repeat `TValue` XML type-parameter docs on `ArgValue<TValue>()`;
   the summaries already explain that the plan shape is derived from the type.

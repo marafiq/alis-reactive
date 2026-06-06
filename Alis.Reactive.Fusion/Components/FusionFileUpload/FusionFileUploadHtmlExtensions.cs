@@ -10,7 +10,7 @@ using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionFileUp
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a FusionFileUpload inside a field wrapper, bound to a model property.
+    /// Renders the file upload component inside a bound input field.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.Document)</c>, then call
@@ -19,10 +19,10 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionFileUploadHtmlExtensions
     {
         /// <summary>
-        /// Renders a FusionFileUpload bound to the field's model property.
+        /// Renders the file upload component bound to the field's model property.
         /// </summary>
-        /// <typeparam name="TProp">The model value type represented by the file upload input.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <typeparam name="TProp">Model value type represented by the file upload input.</typeparam>
+        /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Callback to build the Uploader (allowed extensions, max size, etc.).</param>
         public static void FusionFileUpload<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,

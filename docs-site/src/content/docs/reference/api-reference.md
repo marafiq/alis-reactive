@@ -2470,7 +2470,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### FusionFileUpload
 
-A FusionFileUpload for selecting files in form mode (no auto-upload).
+Syncfusion Uploader configured for form-mode file selection without auto-upload.
 
 ```csharp
 // Properties
@@ -2488,7 +2488,7 @@ Selected { get; }  // Fires when files are selected.
 
 ### FusionFileUploadExtensions
 
-Typed value reading for `FusionFileUpload` in a Reactive Plan pipeline.
+Reads selected file metadata from `FusionFileUpload` in a Reactive Plan pipeline.
 
 ```csharp
 Value<T>()
@@ -2496,7 +2496,7 @@ Value<T>()
 
 ### FusionFileUploadHtmlExtensions
 
-Creates a FusionFileUpload inside a field wrapper, bound to a model property.
+Renders the file upload component inside a bound input field.
 
 ```csharp
 FusionFileUpload<T>(setup, build)

@@ -1,11 +1,11 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionFileUpload for selecting files in form mode (no auto-upload).
+    /// Syncfusion Uploader configured for form-mode file selection without auto-upload.
     /// </summary>
     /// <remarks>
-    /// Use as a type parameter in <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.Documents)</c>
-    /// to access FusionFileUpload-specific component operations and value reads.
+    /// Use as a component type in <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.Documents)</c>
+    /// to read selected file metadata for Reactive Plan conditions or gather.
     /// </remarks>
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
     {
