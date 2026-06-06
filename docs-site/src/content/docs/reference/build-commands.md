@@ -73,7 +73,7 @@ dotnet build             # All projects: core, native, fusion, sandbox, tests
 
 ### TypeScript unit tests
 
-Vitest + jsdom. Tests runtime execution: boot, triggers, commands, resolver, conditions, validation.
+Vitest + jsdom. Tests runtime execution: boot, triggers, reactions, resolver, conditions, validation.
 
 ```bash
 npm test                 # ~944 tests, runs in seconds

@@ -22,7 +22,7 @@ pipeline.Get(url) / .Post(url) / .Put(url) / .Delete(url)  § start a request
 │   └── g.Plugin(pluginSource, "param")                     § plugin method result
 ├── .AsFormData()                                           § multipart content type
 ├── .Validate<TValidator>("formId")                         § client-side validation
-├── .WhileLoading(l => { })                                 § commands during flight
+├── .WhileLoading(l => { })                                 § reactions during flight
 ├── .Response(r => { })                                     § response handlers
 │   ├── r.OnSuccess(pipeline => { })                        § handle 2xx
 │   ├── r.OnSuccess<T>((json, pipeline) => { })             § typed JSON response
@@ -169,7 +169,7 @@ pipeline.Post("/api/upload")
 
 ## How do I show a loading state during the request?
 
-`WhileLoading` accepts commands to execute while the request is in-flight:
+`WhileLoading` accepts reactions to execute while the request is in-flight:
 
 ```csharp
 pipeline.Post("/api/residents", g => g.IncludeAll())
@@ -186,7 +186,7 @@ pipeline.Post("/api/residents", g => g.IncludeAll())
     }));
 ```
 
-WhileLoading accepts the same reaction pipeline shape as other request slots. It can run element commands, component commands, dispatches, guarded branches, HTTP requests, and parallel reactions before the primary request is sent. Keep it focused on prerequisites and visible loading state so the request sequence stays readable.
+WhileLoading accepts the same reaction pipeline shape as other request slots. It can run element reactions, component reactions, dispatches, guarded branches, HTTP requests, and parallel reactions before the primary request is sent. Keep it focused on prerequisites and visible loading state so the request sequence stays readable.
 
 ## How do I guarantee cleanup regardless of the outcome?
 
@@ -204,7 +204,7 @@ pipeline.Post("/api/residents", g => g.IncludeAll())
 
 Without `Finally`, an unhandled error status (e.g. server returns 500 but only `OnError(400)` is registered) would leave the spinner visible indefinitely. `Finally` closes that gap — it executes even when no response handler matches, and even when the network fails entirely.
 
-`Finally` supports element commands, component commands, and condition guards. It does not provide response body access because the response may not exist on network failure.
+`Finally` supports element reactions, component reactions, and condition guards. It does not provide response body access because the response may not exist on network failure.
 
 ## How do I handle the response?
 
@@ -401,11 +401,11 @@ pipeline.Parallel(
 });
 ```
 
-It accepts sequential commands only -- no conditions, HTTP requests, or parallel branches inside it.
+It accepts the same reaction pipeline shape as other request slots. Keep it focused on all-settled cleanup so the parallel request flow stays readable.
 
-### Can I run commands before the parallel requests?
+### Can I run reactions before the parallel requests?
 
-Yes. Commands before `Parallel()` execute first:
+Yes. Reactions before `Parallel()` execute first:
 
 ```csharp
 pipeline.Element("loading").Show();           // runs first
