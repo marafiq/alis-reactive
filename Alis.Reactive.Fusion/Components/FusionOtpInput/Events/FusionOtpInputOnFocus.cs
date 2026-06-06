@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionOtpInputFocusArgs
     {
-        /// <summary>Current OTP value.</summary>
+        /// <summary>Full OTP value when the field receives focus.</summary>
         public string? Value { get; set; }
 
         /// <summary>Zero-based field index that received focus.</summary>

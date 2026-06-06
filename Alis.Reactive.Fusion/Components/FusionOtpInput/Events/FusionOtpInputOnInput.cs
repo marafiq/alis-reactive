@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionOtpInputInputArgs
     {
-        /// <summary>Current OTP value.</summary>
+        /// <summary>Full OTP value after the input event.</summary>
         public string? Value { get; set; }
 
         /// <summary>Previous OTP value.</summary>

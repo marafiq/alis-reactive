@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionTextAreaInputArgs
     {
-        /// <summary>Current text value.</summary>
+        /// <summary>Text value reported by the input event.</summary>
         public string? Value { get; set; }
 
         /// <summary>Previous input text value.</summary>

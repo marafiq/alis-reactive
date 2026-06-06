@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionTextBoxChangeArgs
     {
-        /// <summary>Current text value.</summary>
+        /// <summary>Text value after the change event.</summary>
         public string? Value { get; set; }
 
         /// <summary>Previous committed text value.</summary>

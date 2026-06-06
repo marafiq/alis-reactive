@@ -279,6 +279,10 @@ Candidate cleanup:
   summaries for breadcrumb and slider helpers now state whether they locate or
   read test-visible state instead of saying "The current...". Selectors and
   wait behavior were left unchanged.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion TextBox,
+  TextArea, and OtpInput event payload `Value` summaries now say when the
+  value is captured by the event instead of repeating "Current ... value."
+  Payload shape and event wiring remain unchanged.
 
 ### Implementation Inline Comments
 

@@ -3506,7 +3506,7 @@ Event payload delivered when a `FusionOtpInput` field loses focus.
 // Properties
 Index { get; }  // Zero-based field index that lost focus.
 IsInteracted { get; }  // Whether user interaction caused the blur.
-Value { get; }  // Current OTP value.
+Value { get; }  // Full OTP value when the field loses focus.
 ```
 
 ### FusionOtpInputEvents
@@ -3540,7 +3540,7 @@ Event payload delivered when a `FusionOtpInput` field receives focus.
 // Properties
 Index { get; }  // Zero-based field index that received focus.
 IsInteracted { get; }  // Whether user interaction caused the focus.
-Value { get; }  // Current OTP value.
+Value { get; }  // Full OTP value when the field receives focus.
 ```
 
 ### FusionOtpInputHtmlExtensions
@@ -3559,7 +3559,7 @@ Event payload delivered when a `FusionOtpInput` field changes.
 // Properties
 Index { get; }  // Zero-based field index that changed.
 PreviousValue { get; }  // Previous OTP value.
-Value { get; }  // Current OTP value.
+Value { get; }  // Full OTP value after the input event.
 ```
 
 ### FusionOtpInputReactiveExtensions
@@ -4488,7 +4488,7 @@ Event payload delivered when a `FusionTextArea` loses focus.
 
 ```csharp
 // Properties
-Value { get; }  // Current text value.
+Value { get; }  // Text value when the textarea loses focus.
 ```
 
 ### FusionTextAreaChangeArgs
@@ -4499,7 +4499,7 @@ Event payload delivered when a `FusionTextArea` value changes and focus leaves t
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
 PreviousValue { get; }  // Previous committed text value.
-Value { get; }  // Current text value.
+Value { get; }  // Text value after the change event.
 ```
 
 ### FusionTextAreaEvents
@@ -4531,7 +4531,7 @@ Event payload delivered when a `FusionTextArea` receives focus.
 
 ```csharp
 // Properties
-Value { get; }  // Current text value.
+Value { get; }  // Text value when the textarea receives focus.
 ```
 
 ### FusionTextAreaHtmlExtensions
@@ -4549,7 +4549,7 @@ Event payload delivered when a `FusionTextArea` value changes during input.
 ```csharp
 // Properties
 PreviousValue { get; }  // Previous input text value.
-Value { get; }  // Current text value.
+Value { get; }  // Text value reported by the input event.
 ```
 
 ### FusionTextAreaReactiveExtensions
@@ -4575,7 +4575,7 @@ Event payload delivered when a `FusionTextBox` loses focus.
 
 ```csharp
 // Properties
-Value { get; }  // Current text value.
+Value { get; }  // Text value when the input loses focus.
 ```
 
 ### FusionTextBoxChangeArgs
@@ -4586,7 +4586,7 @@ Event payload delivered when a `FusionTextBox` value changes and focus leaves th
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
 PreviousValue { get; }  // Previous committed text value.
-Value { get; }  // Current text value.
+Value { get; }  // Text value after the change event.
 ```
 
 ### FusionTextBoxEvents
@@ -4619,7 +4619,7 @@ Event payload delivered when a `FusionTextBox` receives focus.
 
 ```csharp
 // Properties
-Value { get; }  // Current text value.
+Value { get; }  // Text value when the input receives focus.
 ```
 
 ### FusionTextBoxHtmlExtensions
@@ -4637,7 +4637,7 @@ Event payload delivered when a `FusionTextBox` value changes during input.
 ```csharp
 // Properties
 PreviousValue { get; }  // Previous input text value.
-Value { get; }  // Current text value.
+Value { get; }  // Text value reported by the input event.
 ```
 
 ### FusionTextBoxReactiveExtensions
