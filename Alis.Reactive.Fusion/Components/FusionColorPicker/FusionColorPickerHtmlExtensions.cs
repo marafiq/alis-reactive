@@ -33,9 +33,9 @@ namespace Alis.Reactive.Fusion.Components
             var registration = ComponentRegistrationSource.Registration;
             setup.RegisterInputComponent(registration);
 
-            // CRITICAL: Pass htmlAttributes as a parameter to ColorPickerFor(), NOT as a fluent
+            // Pass htmlAttributes as a parameter to ColorPickerFor(), not as a fluent
             // .HtmlAttributes() call. The fluent method does not override the element ID on
-            // FusionColorPicker — passing as a parameter bakes the custom ID into both the HTML
+            // FusionColorPicker; passing as a parameter bakes the custom ID into both the HTML
             // output and the JS appendTo() target.
             var attrs = new Dictionary<string, object>
             {
