@@ -13,7 +13,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The value that was committed.</summary>
         public string? Value { get; set; }
 
-        /// <summary>The Syncfusion event name.</summary>
+        /// <summary>Syncfusion event token exposed as <c>args.name</c>.</summary>
         public string? Name { get; set; }
     }
 }

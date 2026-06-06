@@ -13,7 +13,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The previous value of the inner integrated component.</summary>
         public string? PreviousValue { get; set; }
 
-        /// <summary>The Syncfusion event name.</summary>
+        /// <summary>Syncfusion event token exposed as <c>args.name</c>.</summary>
         public string? Name { get; set; }
     }
 }

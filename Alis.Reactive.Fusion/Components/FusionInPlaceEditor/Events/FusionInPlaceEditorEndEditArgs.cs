@@ -15,7 +15,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The current editor mode ("Inline" or "Popup").</summary>
         public string? Mode { get; set; }
 
-        /// <summary>The Syncfusion event name.</summary>
+        /// <summary>Syncfusion event token exposed as <c>args.name</c>.</summary>
         public string? Name { get; set; }
     }
 

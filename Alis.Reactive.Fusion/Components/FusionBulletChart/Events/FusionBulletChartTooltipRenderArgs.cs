@@ -14,7 +14,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>The target values of the comparative bar.</summary>
         public string[] Target { get; set; } = System.Array.Empty<string>();
 
-        /// <summary>The event name.</summary>
+        /// <summary>Syncfusion event token exposed as <c>args.name</c>.</summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>The tooltip template markup, when template rendering is enabled.</summary>

@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionInPlaceEditorCancelClickArgs
     {
-        /// <summary>The Syncfusion event name.</summary>
+        /// <summary>Syncfusion event token exposed as <c>args.name</c>.</summary>
         public string? Name { get; set; }
     }
 }

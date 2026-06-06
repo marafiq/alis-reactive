@@ -1899,7 +1899,7 @@ Payload delivered before the BulletChart tooltip is rendered.
 
 ```csharp
 // Properties
-Name { get; }  // The event name.
+Name { get; }  // Syncfusion event token exposed as `args.name`.
 Target { get; }  // The target values of the comparative bar.
 Template { get; }  // The tooltip template markup, when template rendering is enabled.
 Text { get; }  // The tooltip text, when template rendering is not enabled.
@@ -3125,7 +3125,7 @@ Event payload delivered after a successful commit of a `FusionInPlaceEditor`.
 ```csharp
 // Properties
 Data { get; }  // Server response data when Syncfusion's UrlAdaptor is configured; empty `{}` when no url.
-Name { get; }  // The Syncfusion event name.
+Name { get; }  // Syncfusion event token exposed as `args.name`.
 Value { get; }  // The value that was committed.
 ```
 
@@ -3138,7 +3138,7 @@ Event payload delivered before a `FusionInPlaceEditor` enters edit mode.
 Cancel { get; }  // Whether opening the editor is cancelled.
 CancelFocus { get; }  // Whether focusing the inner input is cancelled.
 Mode { get; }  // The current editor mode ("Inline" or "Popup").
-Name { get; }  // The Syncfusion event name.
+Name { get; }  // Syncfusion event token exposed as `args.name`.
 ```
 
 ### FusionInPlaceEditorBeginEditArgsExtensions
@@ -3155,7 +3155,7 @@ Event payload delivered when the user clicks the Cancel button in a `FusionInPla
 
 ```csharp
 // Properties
-Name { get; }  // The Syncfusion event name.
+Name { get; }  // Syncfusion event token exposed as `args.name`.
 ```
 
 ### FusionInPlaceEditorChangeArgs
@@ -3164,7 +3164,7 @@ Event payload delivered when the inner editor's value changes.
 
 ```csharp
 // Properties
-Name { get; }  // The Syncfusion event name.
+Name { get; }  // Syncfusion event token exposed as `args.name`.
 PreviousValue { get; }  // The previous value of the inner integrated component.
 Value { get; }  // The current value of the inner integrated component (surfaced as string).
 ```
@@ -3178,7 +3178,7 @@ Event payload delivered when a `FusionInPlaceEditor` leaves edit mode.
 Action { get; }  // What ended the edit: `"submit"` on save, `"cancel"` on cancel click.
 Cancel { get; }  // Whether leaving edit mode is cancelled.
 Mode { get; }  // The current editor mode ("Inline" or "Popup").
-Name { get; }  // The Syncfusion event name.
+Name { get; }  // Syncfusion event token exposed as `args.name`.
 ```
 
 ### FusionInPlaceEditorEndEditArgsExtensions
@@ -3241,7 +3241,7 @@ Event payload delivered when the user clicks Save or presses Enter in a `FusionI
 
 ```csharp
 // Properties
-Name { get; }  // The Syncfusion event name.
+Name { get; }  // Syncfusion event token exposed as `args.name`.
 ```
 
 ### FusionInputMask
