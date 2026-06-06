@@ -90,7 +90,7 @@ b.Reactive(plan, evt => evt.CancelClick, (args, p) =>
 | Extension | Description |
 |---|---|
 | `SetValue(string?)` | Sets the committed value |
-| `Enable()` / `Disable()` | Toggles edit-mode entry (calls SF `disable(bool)`) |
+| `Enable()` / `Disable()` | Toggles edit-mode entry (calls Syncfusion `disable(bool)`) |
 | `Save()` | Programmatic commit (fires `ActionSuccess`, not `SubmitClick`) |
 | `Focus()` | Focuses the inner editor input |
 
@@ -107,7 +107,7 @@ b.Reactive(plan, evt => evt.CancelClick, (args, p) =>
 | `BeginEdit` | User opens the editor | `cancel`, `cancelFocus`, `mode` |
 | `Change` | Inner value changes while editing | `value`, `previousValue` |
 | `EndEdit` | Editor leaves edit mode | `cancel`, `action` (`"submit"` or `"cancel"`) |
-| `ActionBegin` | Before SF's submit lifecycle | `cancel`, `data` (`{ name, primaryKey, value }`) |
+| `ActionBegin` | Before Syncfusion's submit lifecycle | `cancel`, `data` (`{ name, primaryKey, value }`) |
 | `ActionSuccess` | After successful commit &mdash; **use as your reactive commit hook** | `value`, `data` |
 | `SubmitClick` | User clicked Save or pressed Enter | `name` only; fires even when validation blocked the commit |
 | `CancelClick` | User clicked Cancel | `name` only |
@@ -116,4 +116,4 @@ b.Reactive(plan, evt => evt.CancelClick, (args, p) =>
 
 | Extension | On which args | Purpose |
 |---|---|---|
-| `PreventDefault(pipeline)` | `BeginEditArgs`, `EndEditArgs`, `ActionBeginArgs` | Sets `args.cancel = true` so SF honors the block |
+| `PreventDefault(pipeline)` | `BeginEditArgs`, `EndEditArgs`, `ActionBeginArgs` | Sets `args.cancel = true` so Syncfusion honors the block |

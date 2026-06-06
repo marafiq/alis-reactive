@@ -40,5 +40,5 @@ p.Component<FusionToast>()
 | `ShowCloseButton()` | Shows the close button |
 | `ShowProgressBar()` | Shows the auto-dismiss progress bar |
 | `Success()` / `Warning()` / `Danger()` / `Info()` | Sets the toast type styling |
-| `Show()` | Displays the toast (calls `dataBind` + `show` on the SF instance) |
+| `Show()` | Displays the toast (calls `dataBind` + `show` on the Syncfusion instance) |
 | `Hide()` | Hides the toast |

@@ -80,7 +80,7 @@ These cover the majority of brand customization. Full defaults are populated in
 | `--color-sf-primary-dark` | `#4338ca` |
 | `--color-sf-primary-darker` | `#3730a3` |
 
-### Primary button (separate from brand — SF distinguishes them)
+### Primary button (separate from brand — Syncfusion distinguishes them)
 | Token | Default |
 |---|---|
 | `--color-sf-primary-bg-color` | `#4f46e5` |

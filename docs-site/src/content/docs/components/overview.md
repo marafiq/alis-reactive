@@ -50,7 +50,7 @@ All input components fire a `Changed` event. NativeButton fires `Click` instead.
 
 Syncfusion EJ2 components. Vendor is `"fusion"` -- the runtime reads via `el.ej2_instances[0]`.
 
-| Component | SF Control | ReadExpr | Value Type | Key Methods |
+| Component | Syncfusion Control | ReadExpr | Value Type | Key Methods |
 |-----------|-----------|----------|------------|-------------|
 | `FusionAutoComplete` | AutoComplete | `"value"` | `string` | `SetValue`, `SetText`, `SetDataSource`, `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup`, `Enable`, `Disable` |
 | `FusionNumericTextBox` | NumericTextBox | `"value"` | `decimal` | `SetValue`, `SetMin`, `FocusIn`, `FocusOut`, `Increment`, `Decrement` |

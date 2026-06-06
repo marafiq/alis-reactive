@@ -5,7 +5,7 @@
 
    Tokens set to their Tailwind3 defaults are scaffolded here so every
    high-leverage customization point is visible in one place. Edit values
-   below to rebrand; remove lines you want to keep at SF defaults (it changes
+   below to rebrand; remove lines you want to keep at Syncfusion defaults (it changes
    nothing, but shrinks the cascade footprint). */
 
 :root {
@@ -21,7 +21,7 @@
   --color-sf-primary-dark:         var(--alis-brand-primary-dark);
   --color-sf-primary-darker:       var(--alis-brand-primary-darker);
 
-  /* Primary button: SF treats this as distinct from brand above. */
+  /* Primary button: Syncfusion treats this as distinct from brand above. */
   --color-sf-primary-bg-color:              var(--alis-brand-primary);
   --color-sf-primary-bg-color-hover:        var(--alis-brand-primary-dark);
   --color-sf-primary-bg-color-pressed:      var(--alis-brand-primary-darker);

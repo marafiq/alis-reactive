@@ -56,7 +56,7 @@ p.Get("/api/physicians?dept=", g => g.Include(m => m.Department))
 | `SetValue(string?)` | Sets the selected value |
 | `SetText(string)` | Sets the display text |
 | `SetDataSource(source, path)` | Sets data source from event payload or response body |
-| `DataBind()` | Flushes pending property changes to the SF instance |
+| `DataBind()` | Flushes pending property changes to the Syncfusion instance |
 | `FocusIn()` / `FocusOut()` | Manage focus |
 | `ShowPopup()` / `HidePopup()` | Open or close the suggestion dropdown |
 | `Enable()` / `Disable()` | Enable or disable the component |

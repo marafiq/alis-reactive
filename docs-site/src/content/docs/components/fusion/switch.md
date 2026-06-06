@@ -5,7 +5,7 @@ sidebar:
   order: 11
 ---
 
-A toggle switch for boolean settings -- opt in to notifications, mark a resident as self-directed, enable a medication reminder. Same concept as NativeCheckBox but rendered as a Syncfusion Switch control. Note that the ReadExpr is `"checked"` (not `"value"`), matching SF's API.
+A toggle switch for boolean settings -- opt in to notifications, mark a resident as self-directed, enable a medication reminder. Same concept as NativeCheckBox but rendered as a Syncfusion Switch control. Note that the ReadExpr is `"checked"` (not `"value"`), matching Syncfusion's API.
 
 **Model type:** `bool` &nbsp; **ReadExpr:** `"checked"` &nbsp; **Events:** `Changed`
 

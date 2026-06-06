@@ -35,7 +35,7 @@ Ask one question: **Does this component have a form value that participates in v
 
 ## Before you start
 
-### 1. Read the SF API docs
+### 1. Read the Syncfusion API docs
 
 Find the component at `https://ej2.syncfusion.com/javascript/documentation/api/{component}/`. Identify:
 - **Properties** you need to write (e.g., `value`, `text`, `enabled`, `dataSource`)
@@ -45,7 +45,7 @@ Find the component at `https://ej2.syncfusion.com/javascript/documentation/api/{
 
 ### 2. Experiment in the browser console
 
-**Never onboard an API without verifying it works.** SF docs can be misleading.
+**Never onboard an API without verifying it works.** Syncfusion docs can be misleading.
 
 ```javascript
 const el = document.getElementById('{componentId}');
@@ -113,7 +113,7 @@ using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native.Extensions;     // for InputBoundField<TModel, TProp>
 using Syncfusion.EJ2;                       // for setup.Helper.EJS()
-using Syncfusion.EJ2.DropDowns;             // SF component namespace (varies)
+using Syncfusion.EJ2.DropDowns;             // Syncfusion component namespace (varies)
 ```
 
 ---
@@ -269,11 +269,11 @@ public static TypedComponentSource<DateTime> EndDate<TModel>(
 
 ## File 3: Factory method (Html extension)
 
-Registers the component in the plan's `ComponentsMap` and renders the SF builder HTML.
+Registers the component in the plan's `ComponentsMap` and renders the Syncfusion builder HTML.
 
 ```csharp
 using Syncfusion.EJ2;
-using Syncfusion.EJ2.DropDowns; // or the SF namespace for your component
+using Syncfusion.EJ2.DropDowns; // or the Syncfusion namespace for your component
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Native.Extensions;
 
@@ -295,9 +295,9 @@ public static class FusionXxxHtmlExtensions
             "xxx",                                           // component type label
             CoercionTypes.InferFromType(typeof(TProp))));    // auto-inferred
 
-        // 2. Create the SF EJ2 builder — pass htmlAttributes as a PARAMETER to XxxFor()
+        // 2. Create the Syncfusion EJ2 builder — pass htmlAttributes as a PARAMETER to XxxFor()
         // CRITICAL: Do NOT use the fluent .HtmlAttributes() method — it does not override
-        // the element ID on all SF components. Passing as a parameter to XxxFor() bakes the
+        // the element ID on all Syncfusion components. Passing as a parameter to XxxFor() bakes the
         // custom ID into both the rendered HTML and the JS appendTo() target.
         var attrs = new Dictionary<string, object>
         {
@@ -315,7 +315,7 @@ public static class FusionXxxHtmlExtensions
 }
 ```
 
-**How to find the SF builder type name:** The EJ2 tag helpers follow the pattern `setup.Helper.EJS().{ComponentName}For(expression)`. For DropDownList it's `DropDownListFor`, for DatePicker it's `DatePickerFor`, for ColorPicker it would be `ColorPickerFor`. The builder type is `{ComponentName}Builder` (e.g., `DropDownListBuilder`, `DatePickerBuilder`). Check the Syncfusion NuGet package for the exact type.
+**How to find the Syncfusion builder type name:** The EJ2 tag helpers follow the pattern `setup.Helper.EJS().{ComponentName}For(expression)`. For DropDownList it's `DropDownListFor`, for DatePicker it's `DatePickerFor`, for ColorPicker it would be `ColorPickerFor`. The builder type is `{ComponentName}Builder` (e.g., `DropDownListBuilder`, `DatePickerBuilder`). Check the Syncfusion NuGet package for the exact type.
 
 **ComponentRegistration fields explained:**
 
@@ -340,7 +340,7 @@ public static class FusionXxxHtmlExtensions
 
 ### Typed Fields helper (for list components)
 
-List components (DropDown, AutoComplete, MultiSelect) need a `Fields<TItem>()` method that maps item properties to SF field settings:
+List components (DropDown, AutoComplete, MultiSelect) need a `Fields<TItem>()` method that maps item properties to Syncfusion field settings:
 
 ```csharp
 public static XxxBuilder Fields<TItem>(
@@ -357,7 +357,7 @@ public static XxxBuilder Fields<TItem>(
 }
 ```
 
-SF uses camelCase field names. The helper extracts the member name from the expression and converts it.
+Syncfusion uses camelCase field names. The helper extracts the member name from the expression and converts it.
 
 ---
 
@@ -377,16 +377,16 @@ public sealed class FusionXxxEvents
 ```
 
 Each property creates a `TypedEvent` with:
-- **JS event name** — the string SF uses for `addEventListener` (e.g., `"change"`, `"filtering"`, `"focus"`, `"blur"`)
+- **JS event name** — the string Syncfusion uses for `addEventListener` (e.g., `"change"`, `"filtering"`, `"focus"`, `"blur"`)
 - **Phantom args instance** — used only for compile-time type inference, never read at runtime
 
-Add one property per event. The JS event name comes from the SF API docs.
+Add one property per event. The JS event name comes from the Syncfusion API docs.
 
 ---
 
 ## File 5: Reactive extensions (.Reactive() wiring)
 
-Thin bridge between the SF builder and the reactive plan:
+Thin bridge between the Syncfusion builder and the reactive plan:
 
 ```csharp
 private static readonly FusionXxx Component = new();
@@ -403,7 +403,7 @@ public static XxxBuilder Reactive<TModel, TArgs>(
     pipeline(descriptor.Args, pb);
 
     // IMPORTANT: use builder.model.HtmlAttributes — NOT builder.HtmlAttributes
-    // The .model property accesses the SF EJ2 control model where id/name are stored.
+    // The .model property accesses the Syncfusion EJ2 control model where id/name are stored.
     var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
     var componentId = (string)attrs["id"];
     var bindingPath = (string)attrs["name"];
@@ -432,7 +432,7 @@ public static XxxBuilder Reactive<TModel, TArgs>(
 
 ## File 6: Event args (simple — no methods on args)
 
-A plain class with properties matching the SF event object:
+A plain class with properties matching the Syncfusion event object:
 
 ```csharp
 public class FusionXxxChangeArgs
@@ -453,7 +453,7 @@ Properties become typed condition sources in the pipeline:
 })
 ```
 
-The expression `x => x.Value` compiles to `"evt.value"` in the plan. At runtime, the SF event's `value` property is walked at that path.
+The expression `x => x.Value` compiles to `"evt.value"` in the plan. At runtime, the Syncfusion event's `value` property is walked at that path.
 
 **Common event args patterns:**
 
@@ -469,7 +469,7 @@ The expression `x => x.Value` compiles to `"evt.value"` in the plan. At runtime,
 
 ## File 7: Event args with extensions (Filtering pattern)
 
-When the event args expose methods (like SF's `preventDefaultAction` or `updateData`), add extension methods in the same file:
+When the event args expose methods (like Syncfusion's `preventDefaultAction` or `updateData`), add extension methods in the same file:
 
 ```csharp
 public class FusionXxxFilteringArgs
@@ -650,12 +650,12 @@ Some components are set by user interaction only (FileUpload, DateRangePicker). 
 
 ```csharp
 // No SetValue() — DateRangePicker is set by user interaction only.
-// No SetStartDate()/SetEndDate() — SF has no API for setting individual dates.
+// No SetStartDate()/SetEndDate() — Syncfusion has no API for setting individual dates.
 ```
 
 ### Components without `XxxFor()` factory
 
-Some SF components (like Uploader) have no `For` helper. Use the ID-based constructor instead:
+Some Syncfusion components (like Uploader) have no `For` helper. Use the ID-based constructor instead:
 
 ```csharp
 // Standard (most components):
@@ -711,7 +711,7 @@ public static XxxBuilder Fields<TItem>(
 
 ### AllowFiltering requirement for non-AutoComplete components
 
-SF AutoComplete has filtering built-in. MultiSelect and DropDownList require `.AllowFiltering(true)` explicitly in the view — without it, the Filtering event **never fires** (silent failure, no errors):
+Syncfusion AutoComplete has filtering built-in. MultiSelect and DropDownList require `.AllowFiltering(true)` explicitly in the view — without it, the Filtering event **never fires** (silent failure, no errors):
 
 ```csharp
 // AutoComplete — filtering works out of the box
@@ -723,7 +723,7 @@ SF AutoComplete has filtering built-in. MultiSelect and DropDownList require `.A
 
 ### HtmlAttributes — parameter, not fluent method
 
-SF components have two ways to set HtmlAttributes. **Only one works reliably for the `id` attribute:**
+Syncfusion components have two ways to set HtmlAttributes. **Only one works reliably for the `id` attribute:**
 
 ```csharp
 // CORRECT — pass as parameter to XxxFor() (bakes ID into HTML + JS)
@@ -735,20 +735,20 @@ var builder = setup.Helper.EJS().XxxFor(setup.Expression)
     .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId });
 ```
 
-**Why:** The fluent `.HtmlAttributes()` method sets `model.HtmlAttributes` but does NOT update `model.Id` or regenerate the rendered HTML. Some SF JS components (like DropDownList) have a `setHTMLAttributes()` method that re-applies the ID at runtime, so it appears to work. Other components (like ColorPicker) lack this JS-side support, so the element renders with the wrong ID and the reactive runtime can't find it.
+**Why:** The fluent `.HtmlAttributes()` method sets `model.HtmlAttributes` but does NOT update `model.Id` or regenerate the rendered HTML. Some Syncfusion JS components (like DropDownList) have a `setHTMLAttributes()` method that re-applies the ID at runtime, so it appears to work. Other components (like ColorPicker) lack this JS-side support, so the element renders with the wrong ID and the reactive runtime can't find it.
 
 **The parameter overload** (`XxxFor(expression, htmlAttributes)`) calls `EJSUtil.GetHtmlId(htmlAttributes)` which correctly sets `model.Id` and bakes the custom ID into both the HTML output and the JS `appendTo()` target.
 
-**Rule: Always pass HtmlAttributes as a parameter to `XxxFor()`, never as a fluent method.** This ensures the framework controls the element ID regardless of which SF component you're onboarding.
+**Rule: Always pass HtmlAttributes as a parameter to `XxxFor()`, never as a fluent method.** This ensures the framework controls the element ID regardless of which Syncfusion component you're onboarding.
 
 ---
 
 ### Intentional API omissions
 
-When an SF API doesn't work as expected (verified in browser), omit it and document why as a comment in the extensions file:
+When a Syncfusion API doesn't work as expected (verified in browser), omit it and document why as a comment in the extensions file:
 
 ```csharp
-// NOTE: showSpinner/hideSpinner have no visible effect on SF AutoComplete.
+// NOTE: showSpinner/hideSpinner have no visible effect on Syncfusion AutoComplete.
 // refresh() causes focus loss mid-typing — not usable during filtering.
 // Both verified manually via browser console. Omitted intentionally.
 ```
@@ -764,7 +764,7 @@ This prevents future developers from adding broken APIs.
 Key things that only show up in the browser:
 - **`[object Object]`** in echo spans → event arg property is an object, not a primitive
 - **Element not found** errors in console → ID mismatch between plan and DOM (HtmlAttributes issue)
-- **No change event firing** → SF component needs `.AllowFiltering(true)` or similar configuration
+- **No change event firing** → Syncfusion component needs `.AllowFiltering(true)` or similar configuration
 - **Value reads returning wrong type** → ReadExpr points to wrong property on ej2 instance
 
 ---
@@ -774,9 +774,9 @@ Key things that only show up in the browser:
 | Mistake | Why it's wrong | Correct approach |
 |---------|---------------|-----------------|
 | `Static("q", args.Text)` for event args | Resolves at C# compile time → always `""` | `FromEvent(args, x => x.Text, "q")` |
-| `SetDataSource` for filtering events | SF lifecycle closes before async HTTP completes | `args.UpdateData(pipeline, json, path)` |
+| `SetDataSource` for filtering events | Syncfusion lifecycle closes before async HTTP completes | `args.UpdateData(pipeline, json, path)` |
 | `DataBind()` after `UpdateData` | `updateData` handles refresh internally | Only use `DataBind()` after `SetDataSource` in cascade patterns |
-| Forgetting `PreventDefault` on filtering | SF flashes "No records found" during async HTTP | Call `args.PreventDefault(pipeline)` first |
+| Forgetting `PreventDefault` on filtering | Syncfusion flashes "No records found" during async HTTP | Call `args.PreventDefault(pipeline)` first |
 | Modifying TS runtime for new component | Plan carries all behavior — runtime is a dumb executor | Zero runtime changes, always |
 | Extensions on a builder class for args | Loses compile-time type safety | Extensions go directly on the args class |
 | Using `showSpinner()`/`hideSpinner()` | Not built into dropdown components | Use DOM elements for loading indicators |
@@ -884,7 +884,7 @@ Non-input components render directly — no InputField wrapper, no label, no val
 
 ```csharp
 using Syncfusion.EJ2;
-using Syncfusion.EJ2.Navigations; // or the SF namespace for your component
+using Syncfusion.EJ2.Navigations; // or the Syncfusion namespace for your component
 
 public static class FusionXxxHtmlExtensions
 {
@@ -910,7 +910,7 @@ public static class FusionXxxHtmlExtensions
 - Takes explicit `string elementId` (not model-expression-derived)
 - Takes `ReactivePlan<TModel>` for passing to `.Reactive()`
 - NO `plan.AddToComponentsMap()` call
-- Returns a builder that wraps the SF content + allows `.Reactive()` chaining
+- Returns a builder that wraps the Syncfusion content + allows `.Reactive()` chaining
 
 ## NI-File 4: Events (same pattern)
 
@@ -925,7 +925,7 @@ public sealed class FusionXxxEvents
 }
 ```
 
-Same singleton pattern. The JS event name comes from SF docs.
+Same singleton pattern. The JS event name comes from Syncfusion docs.
 
 ## NI-File 5: Reactive extensions (same pattern)
 
@@ -956,7 +956,7 @@ public static FusionXxxBuilder<TModel> Reactive<TModel, TArgs>(
 }
 ```
 
-**Key difference:** The plan and elementId come from the builder (not from `builder.model.HtmlAttributes`) since non-input components use a custom wrapper builder, not the raw SF builder.
+**Key difference:** The plan and elementId come from the builder (not from `builder.model.HtmlAttributes`) since non-input components use a custom wrapper builder, not the raw Syncfusion builder.
 
 ## NI-File 6: Event args (same pattern)
 
