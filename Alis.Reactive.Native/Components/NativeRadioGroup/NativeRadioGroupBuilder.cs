@@ -159,7 +159,7 @@ namespace Alis.Reactive.Native.Components
 
             writer.Write($"<div class=\"{encoder.Encode(_cssClass)}\">");
 
-            // The hidden input is the Reactive Plan component target and intentionally omits a name attribute.
+            // Hidden input is the Reactive Plan component target and intentionally omits a name attribute.
             writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(selectedValue)}\" />");
 
             for (int i = 0; i < _options.Count; i++)

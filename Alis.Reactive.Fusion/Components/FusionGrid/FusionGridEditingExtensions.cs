@@ -46,7 +46,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Starts editing the selected row.
-        /// The builder-owned editSettings determine whether this is inline or dialog editing.
+        /// Builder-owned editSettings determine whether this is inline or dialog editing.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> StartEdit<TModel>(
             this ComponentRef<FusionGrid, TModel> self)

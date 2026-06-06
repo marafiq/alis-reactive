@@ -172,10 +172,10 @@ namespace Alis.Reactive.Native.Components
 
             var encodedId = encoder.Encode(_elementId);
 
-            // The container is the Reactive Plan component target and exposes string[] value semantics.
+            // Container is the Reactive Plan component target and exposes string[] value semantics.
             writer.Write($"<div id=\"{encodedId}\" class=\"{encoder.Encode(_cssClass)}\">");
 
-            // The hidden input keeps MVC form submission as CSV; it is not the component target.
+            // Hidden input keeps MVC form submission as CSV; it is not the component target.
             writer.Write($"<input type=\"hidden\" name=\"{encoder.Encode(_bindingPath)}\" value=\"{encoder.Encode(modelValue)}\" />");
 
             for (int i = 0; i < _options.Count; i++)

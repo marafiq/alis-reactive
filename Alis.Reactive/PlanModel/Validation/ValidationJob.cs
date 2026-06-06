@@ -3,7 +3,7 @@ using System;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// A validation source declared on an HTTP request during plan construction, awaiting
+    /// Validation source declared on an HTTP request during plan construction, awaiting
     /// resolution into its form's <see cref="ComponentValidation"/> rules.
     /// <para>
     /// Recorded when a request calls <c>.Validate&lt;T&gt;(formId)</c> and resolved once,

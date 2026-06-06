@@ -30,7 +30,7 @@ namespace Alis.Reactive.Native.Components
         {
             var typedEvent = eventSelector(NativeCheckListEvents.Instance);
 
-            // The container is the Reactive Plan-registered component; inline init syncs its value
+            // Container is the Reactive Plan-registered component; inline init syncs its value
             // before the bubbled change event reaches this trigger.
             ComponentEventOnboarding.Wire(plan, builder.ElementId, "native", typedEvent, pipeline);
 

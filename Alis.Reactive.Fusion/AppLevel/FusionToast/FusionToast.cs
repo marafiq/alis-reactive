@@ -10,7 +10,7 @@ namespace Alis.Reactive.Fusion.AppLevel
     public sealed class FusionToast : FusionComponent, IAppLevelComponent
     {
         /// <summary>
-        /// The well-known element ID used by the toast in the layout.
+        /// Well-known layout element ID for the toast.
         /// </summary>
         public const string ElementId = "alisFusionToast";
 

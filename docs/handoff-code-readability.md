@@ -1007,6 +1007,10 @@ Rewrite or delete:
   boundary comments now state native singleton ownership, plugin catalog
   ownership, sync-condition dependency shape, and page-ready listener ordering
   directly without removing the runtime-boundary facts.
+- Resolved on `tiny-safe-but-important-refactorings`: Remaining analyzer,
+  core, Fusion, and Native edge comments now keep fluent-chain, request,
+  validation-job, shape-coercion, app-level component, Syncfusion chip, grid
+  editSettings, and hidden-input boundary facts without leading narration.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

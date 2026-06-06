@@ -64,7 +64,7 @@ namespace Alis.Reactive.Analyzers
             return SymbolEqualityComparer.Default.Equals(named.ConstructedFrom, openGenericType);
         }
 
-        /// <summary>Returns the previous invocation in a fluent method chain.</summary>
+        /// <summary>Finds the previous invocation in a fluent method chain.</summary>
         internal static InvocationExpressionSyntax? GetReceiverInvocation(
             InvocationExpressionSyntax invocation)
         {

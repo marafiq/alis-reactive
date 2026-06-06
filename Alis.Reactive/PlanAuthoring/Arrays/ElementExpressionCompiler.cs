@@ -102,7 +102,7 @@ namespace Alis.Reactive.Builders.Arrays
             var left = Unwrap(binary.Left);
             var right = Unwrap(binary.Right);
 
-            // The runtime coerces BOTH operands to one Shape before comparing (sync-condition
+            // Runtime coerces BOTH operands to one Shape before comparing (sync-condition
             // applies condition.shape to each side, then ===), so the comparison Shape must come
             // from the typed member operand — never positionally from whichever side is written
             // first. This mirrors ConditionSourceBuilder, which derives its single shape from the
