@@ -9,10 +9,8 @@ namespace Alis.Reactive.InputField
     /// </remarks>
     public class InputFieldOptions
     {
-        /// <summary>Gets the label text, or <see langword="null"/> if no label was configured.</summary>
         internal string? LabelText { get; private set; }
 
-        /// <summary>Gets whether the required marker (<c>*</c>) should be shown.</summary>
         internal bool IsRequired { get; private set; }
 
         /// <summary>
