@@ -42,4 +42,5 @@ node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-arti
 
 Static discovery artifacts are not runtime proof. Raw EJ2 traces, primitive
 mapping, vertical slice design, Playwright proof, and audit closeout remain
-separate required stages.
+separate required stages. Final Playwright proof belongs on the typed Fusion DSL
+after the API row has been onboarded.

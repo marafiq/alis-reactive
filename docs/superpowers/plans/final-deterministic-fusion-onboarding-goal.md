@@ -38,6 +38,10 @@ not just process prose.
 - Blazor metadata is naming evidence only, never proof.
 - Playwright must prove user-visible behavior for every typed onboarded API
   member, not one representative behavior.
+- Raw HTML probe execution is vendor discovery evidence only. It may prove that
+  a trace row is true, but it is not final Playwright behavior proof.
+- Do not add product sandbox routes, public component APIs, or normal
+  Playwright tests only to make raw probe execution convenient.
 - All artifacts must hold shape end to end. A defect means at least one artifact
   row is missing, stale, or wrong.
 
@@ -175,6 +179,11 @@ Playwright tests must be behavior tests through `scripts/playwright.sh`. They
 must prove user-visible behavior, realistic request/response behavior, or
 visible runtime state. Internal plan JSON can support diagnosis, but cannot be
 the only proof.
+
+Tests over raw EJ2 HTML probes do not count toward typed API coverage. They are
+allowed only as disposable tooling checks or committed trace-generation tooling.
+Completion proof must run through the typed Fusion DSL after the row has
+discovery, mapping, C# naming, and vertical slice artifacts.
 
 If a test fails or a component issue is discovered, restart the affected row at
 zero discovery. Do not patch only the implementation or test. The failure means

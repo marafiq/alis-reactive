@@ -31,7 +31,7 @@ Playwright proof -> audit report
 |---|---|---|---|---|---|---|
 | component inventory | current Fusion source, sandbox, and tests inventoried | n/a | n/a | n/a | n/a | inventory committed |
 | shipped EJ2 static discovery | [public-api-surface.json](discovery/public-api-surface.json) | [event-payload-surface.json](discovery/event-payload-surface.json) | [mvc-builder-coverage.md](discovery/mvc-builder-coverage.md) | pending mapping | pending naming | static-discovery only |
-| raw EJ2 core probe | [raw-ej2-core.html](probes/raw-ej2-core.html) | pending runtime gesture traces | pending runtime confirmation | pending mapping | pending naming | trace not yet executed |
+| raw EJ2 core probe | [raw-ej2-core.html](probes/raw-ej2-core.html) | pending runtime gesture traces | pending runtime confirmation | pending mapping | pending naming | committed trace rows pending |
 
 ## Linked Artifacts
 
@@ -41,7 +41,7 @@ Playwright proof -> audit report
 - [Public API surface](discovery/public-api-surface.json)
 - [Event payload surface](discovery/event-payload-surface.json)
 - [Raw EJ2 core probe](probes/raw-ej2-core.html)
-- `traces/raw-ej2-core.trace.json` pending real browser execution
+- `traces/raw-ej2-core.trace.json` pending committed raw event/method trace rows
 - `mapping/primitive-map.md` pending authoritative primitive mapping
 - `mapping/csharp-name-decisions.md` pending Blazor candidate review and raw trace proof
 - `mapping/vertical-slice-plan.md` pending vertical slice design

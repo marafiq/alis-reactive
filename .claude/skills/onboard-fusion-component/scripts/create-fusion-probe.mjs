@@ -142,6 +142,14 @@ function template({ component, namespace, className, id, apiSet, traceFile }) {
         }
 
         function describePayload(args) {
+            if (args === null || args === undefined) {
+                return {
+                    ownKeys: [],
+                    functions: [],
+                    properties: {},
+                    value: args === undefined ? "undefined" : null
+                };
+            }
             const own = Object.keys(args).sort();
             const properties = {};
             own.forEach(key => {

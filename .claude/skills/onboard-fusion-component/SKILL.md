@@ -83,6 +83,12 @@ The component row is not fixed until those artifacts agree on the same member
 shape, payload shape, argument order, sync/async lane, C# API, runtime behavior,
 and Playwright proof.
 
+Keep the proof chain direct. Raw HTML probe execution is vendor discovery
+evidence, not final behavior proof. Do not add product sandbox routes, public
+Fusion APIs, or normal Playwright tests only to make probe execution convenient.
+Final Playwright tests must exercise the typed Fusion DSL after the row is
+mapped, named, implemented, and linked to the proof matrix.
+
 1. **Component inventory**
    - Pick the exact Fusion component and exact Syncfusion EJ2 class.
    - Inventory current repo state before discovery:
@@ -235,6 +241,9 @@ and Playwright proof.
    - For stateful components, make the sandbox HTTP-backed and SQLite-backed by default. Use normal verbs (`POST`, `PUT`, `DELETE`) and prove reload after create/update/delete/move so the test covers a real app workflow. Use in-memory storage only for throwaway probes, not for final onboarding proof.
    - Write behavior tests against visible behavior and trace output, not internal plan JSON shortcuts.
    - Prove every onboarded member. If a typed method/property/event is added, it gets a sandbox behavior and a Playwright assertion.
+   - Do not count raw EJ2 HTML probe checks as typed API behavior proof. Probe
+     checks may validate trace-generation tooling only; the proof matrix closes
+     on typed Fusion DSL behavior.
    - When a member is a value source for gather, conditions, or HTTP, prove at least one consumer path. A displayed raw value is useful, but a source is not fully onboarded until a realistic pipeline consumes it.
    - After changing sandbox views/controllers/component slices, run Playwright once with
      build enabled so the SandboxApp assembly is recopied to the test output. Use
