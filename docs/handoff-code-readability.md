@@ -550,6 +550,9 @@ Candidate cleanup:
   docs now keep host-page member mapping, root member behavior, return shape, and
   exact argument contract wording while removing repeated leading articles and
   self-narrating return text.
+- Resolved on `tiny-safe-but-important-refactorings`: condition builder XML
+  tags now use concise literal, range, branch, and active response-route wording
+  while preserving the Reactive Plan runtime-evaluation remarks.
 
 ### Implementation Inline Comments
 

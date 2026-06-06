@@ -13,8 +13,8 @@ namespace Alis.Reactive.Builders.Conditions
     /// Literal and source comparisons use <typeparamref name="TProp"/> and the source
     /// shape for compile-time and runtime type context.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns the guarded pipeline.</typeparam>
-    /// <typeparam name="TProp">The source value type, providing compile-time operator type safety.</typeparam>
+    /// <typeparam name="TModel">View model that owns the guarded pipeline.</typeparam>
+    /// <typeparam name="TProp">Source value type, providing compile-time operator type safety.</typeparam>
     public sealed class ConditionSourceBuilder<TModel, TProp> where TModel : class
     {
         private readonly TypedSource<TProp> _leftSource;
@@ -49,27 +49,27 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Compares the source with a typed literal using equality.</summary>
-        /// <param name="operand">The literal value to compare with the source value.</param>
+        /// <param name="operand">Literal value to compare with the source value.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Eq(TProp operand) => BuildLiteral(CompareOperator.Eq, operand);
         /// <summary>Compares the source with a typed literal using inequality.</summary>
-        /// <param name="operand">The literal value to compare with the source value.</param>
+        /// <param name="operand">Literal value to compare with the source value.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> NotEq(TProp operand) => BuildLiteral(CompareOperator.Neq, operand);
         /// <summary>Compares the source with a typed literal using an ordered greater-than check.</summary>
-        /// <param name="operand">The literal value to compare with the source value.</param>
+        /// <param name="operand">Literal value to compare with the source value.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Gt(TProp operand) => BuildLiteral(CompareOperator.Gt, operand);
         /// <summary>Compares the source with a typed literal using an ordered greater-than-or-equal check.</summary>
-        /// <param name="operand">The literal value to compare with the source value.</param>
+        /// <param name="operand">Literal value to compare with the source value.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Gte(TProp operand) => BuildLiteral(CompareOperator.Gte, operand);
         /// <summary>Compares the source with a typed literal using an ordered less-than check.</summary>
-        /// <param name="operand">The literal value to compare with the source value.</param>
+        /// <param name="operand">Literal value to compare with the source value.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Lt(TProp operand) => BuildLiteral(CompareOperator.Lt, operand);
         /// <summary>Compares the source with a typed literal using an ordered less-than-or-equal check.</summary>
-        /// <param name="operand">The literal value to compare with the source value.</param>
+        /// <param name="operand">Literal value to compare with the source value.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Lte(TProp operand) => BuildLiteral(CompareOperator.Lte, operand);
 
@@ -93,17 +93,17 @@ namespace Alis.Reactive.Builders.Conditions
         public GuardBuilder<TModel> NotEmpty() => BuildUnary(CompareOperator.NotEmpty);
 
         /// <summary>Compares the source against a typed literal set.</summary>
-        /// <param name="values">The literal values accepted by the comparison.</param>
+        /// <param name="values">Literal values accepted by the comparison.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> In(params TProp[] values) => BuildArray(CompareOperator.In, values);
         /// <summary>Compares the source against values outside a typed literal set.</summary>
-        /// <param name="values">The literal values rejected by the comparison.</param>
+        /// <param name="values">Literal values rejected by the comparison.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> NotIn(params TProp[] values) => BuildArray(CompareOperator.NotIn, values);
 
         /// <summary>Compares the source against an inclusive typed range.</summary>
-        /// <param name="low">The inclusive lower endpoint.</param>
-        /// <param name="high">The inclusive upper endpoint.</param>
+        /// <param name="low">Inclusive lower endpoint.</param>
+        /// <param name="high">Inclusive upper endpoint.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Between(TProp low, TProp high) =>
             Build(CompareOperator.Between, RangeOperands(low, high));

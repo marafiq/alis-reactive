@@ -12,7 +12,7 @@ namespace Alis.Reactive.Builders.Conditions
     /// Created after a comparison operator, for example
     /// <c>p.When(source).Gt(5).Then(...).Else(...)</c>.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns the pipeline being guarded.</typeparam>
+    /// <typeparam name="TModel">View model that owns the pipeline being guarded.</typeparam>
     public sealed class GuardBuilder<TModel> where TModel : class
     {
         internal ConditionGraph ConditionGraph { get; }
@@ -55,9 +55,9 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Adds an all-of comparison against the active HTTP response body.</summary>
-        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">Selected response-body value type.</typeparam>
-        /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
+        /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> And<TResponse, TProp>(
@@ -84,9 +84,9 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Adds an any-of comparison against the active HTTP response body.</summary>
-        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">Selected response-body value type.</typeparam>
-        /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
+        /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> Or<TResponse, TProp>(

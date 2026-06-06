@@ -12,7 +12,7 @@ namespace Alis.Reactive.Builders.Conditions
     /// Branch order is preserved in the Reactive Plan. Use <c>ElseIf(...)</c>
     /// for additional guards and <c>Else(...)</c> for the final default branch.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns the branch pipeline.</typeparam>
+    /// <typeparam name="TModel">View model that owns the branch pipeline.</typeparam>
     public sealed class BranchBuilder<TModel> where TModel : class
     {
         private readonly List<BranchCase> _cases;
@@ -43,9 +43,9 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Adds the next ordered <c>ElseIf</c> branch from the active HTTP response body.</summary>
-        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">Selected response-body value type.</typeparam>
-        /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
+        /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
         /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> ElseIf<TResponse, TProp>(

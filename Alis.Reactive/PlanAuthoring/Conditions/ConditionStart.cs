@@ -7,7 +7,7 @@ namespace Alis.Reactive.Builders.Conditions
     /// <summary>
     /// Entry point for nested condition expressions composed inside <c>And</c> and <c>Or</c> guards.
     /// </summary>
-    /// <typeparam name="TModel">The view model that owns the condition being authored.</typeparam>
+    /// <typeparam name="TModel">View model that owns the condition being authored.</typeparam>
     public sealed class ConditionStart<TModel> where TModel : class
     {
         internal ConditionStart() { }
@@ -27,9 +27,9 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Starts a nested condition from the active HTTP response body.</summary>
-        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">Selected response-body value type.</typeparam>
-        /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
+        /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
         /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TResponse, TProp>(
