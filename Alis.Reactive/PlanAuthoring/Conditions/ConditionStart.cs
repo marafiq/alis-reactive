@@ -51,7 +51,7 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Creates a user-decision guard for a nested condition expression.</summary>
-        /// <param name="message">The confirmation message shown at the user-decision runtime boundary.</param>
+        /// <param name="message">User-decision confirmation message.</param>
         /// <returns>A guard that can be composed with surrounding condition terms.</returns>
         public GuardBuilder<TModel> Confirm(string message)
         {

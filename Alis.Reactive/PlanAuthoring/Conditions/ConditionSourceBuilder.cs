@@ -135,7 +135,7 @@ namespace Alis.Reactive.Builders.Conditions
             Build(CompareOperator.MinLength, MinimumLengthOperands(length));
 
         /// <summary>Tests array membership using the source element shape for <paramref name="item"/>.</summary>
-        /// <param name="item">The item to find in the array source.</param>
+        /// <param name="item">Array item to find.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> ArrayContains(object item)
         {

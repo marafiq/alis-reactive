@@ -530,6 +530,9 @@ Candidate cleanup:
   `NativeActionLink` and `NativeHiddenField` XML parameter tags were shortened.
   ActionLink docs still preserve reserved attributes and encoded-rendering
   behavior because those are public HTML/runtime boundaries.
+- Resolved on `tiny-safe-but-important-refactorings`: condition XML parameter
+  tags now use concise array-item and user-decision confirmation wording. The
+  public summaries still keep the condition and runtime-boundary intent.
 
 ### Implementation Inline Comments
 

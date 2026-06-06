@@ -51,7 +51,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a user-decision guard before the pipeline continues.</summary>
-        /// <param name="message">The confirmation message shown at the user-decision runtime boundary.</param>
+        /// <param name="message">User-decision confirmation message.</param>
         /// <returns>A guard builder for configuring accepted and rejected branches.</returns>
         public GuardBuilder<TModel> Confirm(string message)
         {
