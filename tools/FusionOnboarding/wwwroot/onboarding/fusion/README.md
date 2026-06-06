@@ -44,3 +44,13 @@ Static discovery artifacts are not runtime proof. Raw EJ2 traces, primitive
 mapping, vertical slice design, Playwright proof, and audit closeout remain
 separate required stages. Final Playwright proof belongs on the typed Fusion DSL
 after the API row has been onboarded.
+
+Before claiming a component is onboarded or audited, run:
+
+```bash
+node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs \
+  --component grid
+```
+
+The verifier is fail-closed. Missing trace, mapping, proof, or audit artifacts
+mean the component is incomplete.

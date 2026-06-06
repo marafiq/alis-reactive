@@ -58,6 +58,29 @@ proof/
 
 The workflow is a deterministic state machine. Do not skip stages, and do not design C# before the discovery, trace, mapping, and name-decision artifacts exist.
 
+Each row must advance through this exact gate chain:
+
+```text
+raw EJ2 HTML -> raw EJ2 trace JSON -> committed artifact row ->
+typed Fusion C# DSL vertical slice -> authoritative primitive mapping ->
+Playwright behavior over typed Fusion DSL -> audit report
+```
+
+Gate rule: a later gate cannot start until the previous gate has a committed
+artifact and the `master-usecases-index.md` row links it. A console observation,
+temporary scratch file, generated stdout, or passing test without a linked
+artifact is not progress for the row.
+
+Before claiming a component audit/onboarding is closed, run:
+
+```bash
+node .claude/skills/onboard-fusion-component/scripts/verify-fusion-artifact-gates.mjs \
+  --component grid
+```
+
+The verifier must pass. A failure means the row is incomplete, even if some
+code compiles or a focused test passes.
+
 All artifacts must hold shape end to end. If a defect is found in a Fusion
 component, do not patch the C# slice, sandbox, or Playwright test in isolation.
 Restart the affected row from zero discovery, prove what went wrong in raw EJ2
@@ -139,7 +162,12 @@ mapped, named, implemented, and linked to the proof matrix.
        --api-set prompts
      ```
    - The probe must load the same EJ2 assets used by the sandbox, instantiate `new ej.{namespace}.{ClassName}(options)`, expose `window.__fusionProbe.ej2`, group APIs by use case, and record argument order, return shape, payload keys, nested paths, array element shapes, lifecycle timing, and visible effect.
-   - Output one `probes/raw-ej2-{api-set}.html` and one `traces/raw-ej2-{api-set}.trace.json` per API set.
+   - Execute the probe with browser tooling or focused trace-generation tooling
+     before mapping. Save the exact browser-observed output as
+     `traces/raw-ej2-{api-set}.trace.json`.
+   - Output one `probes/raw-ej2-{api-set}.html` and one committed
+     `traces/raw-ej2-{api-set}.trace.json` per accepted API set. If the trace is
+     missing, the row is not ready for primitive mapping.
 
 3. **Shipped JS/d.ts/XML discovery**
    - Generate the source-grounded candidate surface before designing the slice:
@@ -169,7 +197,10 @@ mapped, named, implemented, and linked to the proof matrix.
      ```
    - Capture every gesture the typed event claims to support. Grid `dataStateChange` is the reference case: sorting, paging, filtering, searching, and grouping can produce different nested payload shapes.
    - If a payload property is an array, keep it typed as `List<T>` or a typed array in the C# event contract. Prove it through the proper array primitive, a typed whole-array gather, or a typed array source consumed by behavior. Do not add untyped element accessors or index-path shortcuts to component slices.
-   - Output `discovery/event-payload-surface.json` and raw trace links.
+   - Output `discovery/event-payload-surface.json` and raw trace links. Every
+     payload property, writable property, payload method, nested payload, and
+     array source that appears in the typed API must have a trace row before the
+     C# event contract is designed.
 
 5. **Blazor NuGet naming candidate review**
    - When Syncfusion ships a matching Blazor package, inspect its XML and IL with ILSpy before finalizing C# names:
@@ -203,7 +234,9 @@ mapped, named, implemented, and linked to the proof matrix.
    - JS event/callback: `TypedEvent<TArgs>` + `ComponentEventOnboarding.Wire(...)`.
    - Event arg mutation/call: emit `ReactionGraph.Set/Call` on `PayloadSource.Event()`.
    - JS overloaded methods: use distinct typed C# methods and distinct plan member names mapped to the same JS path, so contract merge remains deterministic.
-   - Output `mapping/primitive-map.md`. Unresolved conflicts or stop conditions go in `proof/audit-report.md`.
+   - Output `mapping/primitive-map.md`. Each row must link back to
+     `traces/raw-ej2-{api-set}.trace.json` and forward to the intended typed C#
+     member. Unresolved conflicts or stop conditions go in `proof/audit-report.md`.
 
 7. **Vertical slice design**
    - Keep initial render options on `Syncfusion.EJ2.*Builder`.
@@ -217,11 +250,16 @@ mapped, named, implemented, and linked to the proof matrix.
      Keep that helper typed and bounded to real options, endpoints, and event payloads;
      do not expose raw JavaScript strings/functions as a public configuration surface.
    - Complex components may split extension partials by use case, such as query, editing, selection, row-data, tooling, and columns. Do not collapse a large slice into one flat file.
-   - Output `mapping/vertical-slice-plan.md`.
+   - Output `mapping/vertical-slice-plan.md`. The plan must name the exact
+     vertical slice file for every accepted C# member and the primitive-map row
+     that permits it.
 
 8. **Implementation rules**
    - Implement only accepted mapped surface. Each public C# member must trace back to:
      `raw trace row -> discovery classification -> Blazor/name decision if used -> primitive-map row -> vertical slice file`.
+   - If the implementation needs a member not already present in trace,
+     primitive map, and vertical-slice plan artifacts, stop and go back to raw
+     EJ2 discovery instead of adding code.
    - Do not implement unproven candidates.
    - Do not preserve dead helpers because old tests reference them.
    - Do not add public `string memberName`, broad `object`, or escape hatches unless the API is intentionally a plugin boundary.
@@ -230,6 +268,9 @@ mapped, named, implemented, and linked to the proof matrix.
 9. **100 percent typed API proof matrix**
    - Generate `proof/typed-api-coverage-matrix.md` from the implemented public API.
    - Every onboarded public member must have one row and a behavior proof.
+   - The matrix must fail closed: any public typed Fusion member without a
+     linked trace row, primitive-map row, vertical-slice row, and Playwright
+     behavior row keeps the component unaudited.
    - A source member must be consumed by condition, gather, HTTP payload/header/route, DOM text/html, plugin argument, array transform, or component binding.
    - A write or void method must visibly change component/runtime state.
    - A method return source must be consumed by a realistic pipeline.
@@ -249,6 +290,10 @@ mapped, named, implemented, and linked to the proof matrix.
      build enabled so the SandboxApp assembly is recopied to the test output. Use
      `--no-build` only for repeat runs after that rebuilt output is known current.
    - Before closing the slice, run through [Automation gates](references/automation-gates.md).
+   - If Playwright fails, do not patch only the test or implementation. Return
+     to the earliest contradicted artifact in this order: raw EJ2 trace,
+     shipped source discovery, event payload discovery, Blazor/name decision,
+     primitive map, vertical-slice plan, implementation, sandbox proof.
 
 11. **Audit report**
    - Write `proof/audit-report.md`.
@@ -307,6 +352,7 @@ mapped, named, implemented, and linked to the proof matrix.
 - `scripts/create-fusion-probe.mjs` - creates a temporary raw HTML probe.
 - `scripts/inventory-fusion-components.mjs` - creates Stage 1 inventory artifacts for every current Fusion component audit.
 - `scripts/write-fusion-discovery-artifacts.mjs` - writes component-scoped static discovery artifacts and a raw EJ2 probe shell from exact current d.ts/JS/XML evidence.
+- `scripts/verify-fusion-artifact-gates.mjs` - fail-closed component artifact gate verifier; use before claiming onboarding/audit completion.
 - `references/source-discovery.md` - deterministic source-finding workflow.
 - `references/blazor-metadata.md` - how to use Blazor packages as typed candidate maps without copying bridge-only behavior.
 - `references/js-object-dsl-primitive-matrix.md` - authoritative JS object to DSL primitive mapping for component members, events, event payloads, methods, arrays, and stop conditions.

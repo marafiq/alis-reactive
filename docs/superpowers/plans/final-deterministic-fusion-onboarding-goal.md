@@ -94,6 +94,17 @@ The skill must enforce this order:
 Do not design or edit C# before the discovery, trace, mapping, and name-decision
 artifacts exist for the affected rows.
 
+For each row, the non-skippable proof chain is:
+
+```text
+raw EJ2 HTML -> raw EJ2 trace JSON -> committed artifact row ->
+typed Fusion C# DSL vertical slice -> authoritative primitive mapping ->
+Playwright behavior over typed Fusion DSL -> audit report
+```
+
+No later step can claim progress unless the previous artifact exists, is
+committed, and is linked from `master-usecases-index.md`.
+
 ## Reviewer Simulation
 
 Before implementation, run multiple skeptical reviewer passes and capture their
@@ -175,6 +186,10 @@ not add indirection for small components.
 Generate `proof/typed-api-coverage-matrix.md` from the implemented public API.
 Every typed public Fusion member must have a behavior proof row.
 
+The coverage matrix must fail closed. Any typed public member without a linked
+raw trace row, primitive-map row, vertical-slice row, and Playwright behavior
+row keeps the component unaudited.
+
 Playwright tests must be behavior tests through `scripts/playwright.sh`. They
 must prove user-visible behavior, realistic request/response behavior, or
 visible runtime state. Internal plan JSON can support diagnosis, but cannot be
@@ -184,6 +199,11 @@ Tests over raw EJ2 HTML probes do not count toward typed API coverage. They are
 allowed only as disposable tooling checks or committed trace-generation tooling.
 Completion proof must run through the typed Fusion DSL after the row has
 discovery, mapping, C# naming, and vertical slice artifacts.
+
+If Playwright fails, restart at the earliest contradicted artifact in this
+order: raw EJ2 trace, shipped source discovery, event payload discovery,
+Blazor/name decision, primitive map, vertical-slice plan, implementation,
+sandbox proof. Do not patch only the test or implementation.
 
 If a test fails or a component issue is discovered, restart the affected row at
 zero discovery. Do not patch only the implementation or test. The failure means
