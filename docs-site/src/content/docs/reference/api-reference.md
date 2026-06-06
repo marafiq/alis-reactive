@@ -1248,7 +1248,7 @@ DefaultId { get; }
 
 ### FusionToastExtensions
 
-Pipeline and layout extensions for the `FusionToast`.
+Configures, shows, hides, and renders the page-level `FusionToast`.
 
 ```csharp
 Danger<T>()
@@ -4905,7 +4905,7 @@ DefaultId { get; }
 
 ### NativeDrawerExtensions
 
-Pipeline and layout extensions for the `NativeDrawer`.
+Sizes, opens, closes, and renders the page-level `NativeDrawer`.
 
 ```csharp
 Close<T>()
@@ -4925,7 +4925,7 @@ DefaultId { get; }
 
 ### NativeLoaderExtensions
 
-Pipeline and layout extensions for the `NativeLoader`.
+Targets, shows, hides, and renders the page-level `NativeLoader`.
 
 ```csharp
 Hide<T>()

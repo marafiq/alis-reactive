@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.AppLevel
 {
     /// <summary>
-    /// Pipeline and layout extensions for the <see cref="NativeDrawer"/>.
+    /// Sizes, opens, closes, and renders the page-level <see cref="NativeDrawer"/>.
     /// </summary>
     public static class NativeDrawerExtensions
     {

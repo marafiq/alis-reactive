@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native.AppLevel
 {
     /// <summary>
-    /// Pipeline and layout extensions for the <see cref="NativeLoader"/>.
+    /// Targets, shows, hides, and renders the page-level <see cref="NativeLoader"/>.
     /// </summary>
     public static class NativeLoaderExtensions
     {

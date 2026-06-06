@@ -8,7 +8,7 @@ using Syncfusion.EJ2.Notifications;
 namespace Alis.Reactive.Fusion.AppLevel
 {
     /// <summary>
-    /// Pipeline and layout extensions for the <see cref="FusionToast"/>.
+    /// Configures, shows, hides, and renders the page-level <see cref="FusionToast"/>.
     /// </summary>
     public static class FusionToastExtensions
     {
