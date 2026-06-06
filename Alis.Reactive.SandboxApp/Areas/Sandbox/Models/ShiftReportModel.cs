@@ -1,13 +1,12 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>Model for the ShiftReport sandbox: operating on a custom event payload's array.</summary>
+    /// <summary>ShiftReport page model for custom-event payload array operations.</summary>
     public sealed class ShiftReportModel
     {
     }
 
     /// <summary>
-    /// A developer-defined custom event payload that carries an array of objects. The
-    /// <c>shift-report</c> custom event delivers this; the array DSL operates on
+    /// Custom event payload for <c>shift-report</c>; the array DSL reads
     /// <see cref="Alerts"/> by element members in the handler.
     /// </summary>
     public sealed class ShiftReportPayload
@@ -15,13 +14,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public ResidentAlert[] Alerts { get; set; } = System.Array.Empty<ResidentAlert>();
     }
 
-    /// <summary>HTTP response that seeds the custom event payload's array.</summary>
+    /// <summary>HTTP response used to seed the custom event payload array.</summary>
     public sealed class AlertsResponse
     {
         public ResidentAlert[] Alerts { get; set; } = System.Array.Empty<ResidentAlert>();
     }
 
-    /// <summary>An alert element with members the per-element predicates/selectors read.</summary>
+    /// <summary>Alert array element read by per-element predicates and selectors.</summary>
     public sealed class ResidentAlert
     {
         public string Resident { get; set; } = string.Empty;

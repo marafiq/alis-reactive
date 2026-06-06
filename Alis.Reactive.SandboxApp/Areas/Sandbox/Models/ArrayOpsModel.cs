@@ -1,18 +1,18 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>Model for the ArrayOps sandbox: a multi-select of care activities.</summary>
+    /// <summary>ArrayOps page model carrying the selected care activities.</summary>
     public class ArrayOpsModel
     {
         public string[]? SelectedActivities { get; set; }
     }
 
-    /// <summary>HTTP response for the resident roster — the object array the DSL operates on.</summary>
+    /// <summary>HTTP response carrying the resident object array used by the array DSL.</summary>
     public class ResidentRosterResponse
     {
         public ResidentRow[] Residents { get; set; } = System.Array.Empty<ResidentRow>();
     }
 
-    /// <summary>A resident element with members the per-element predicates/selectors read.</summary>
+    /// <summary>Resident array element read by per-element predicates and selectors.</summary>
     public class ResidentRow
     {
         public string Name { get; set; } = string.Empty;

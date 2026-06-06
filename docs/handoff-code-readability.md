@@ -962,6 +962,10 @@ Rewrite or delete:
   comments now name Step 1 snapshot copying, Reactive Plan branch/save-result
   fields, and review-summary rebuilds instead of generic "populated" or
   "set by" narration.
+- Resolved on `tiny-safe-but-important-refactorings`: array/custom-event
+  sandbox model XML docs now state the array source, event-payload, per-element
+  predicate, and NativeButton model-binding boundaries without generic "model
+  for" or article-led wording.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
