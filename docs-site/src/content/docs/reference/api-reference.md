@@ -35,24 +35,6 @@ ValueMember { get; }  // Component-object member read for the registered input v
 Vendor { get; }  // Vendor token, such as `native` or `fusion`, written for runtime component resolution.
 ```
 
-### ExpressionPathHelper
-
-Converts lambda expressions like `x => x.Address.City` into Reactive Plan
-value paths, MVC model-binding names, or MVC element IDs.
-
-```csharp
-ToElementId<T>(Expression<Func<TModel, object>> expression)
-ToElementId<T>(Expression<Func<TModel, TProp>> expression)
-ToEventPath<T>(Expression<Func<TPayload, object>> expression)
-ToEventPath<T>(Expression<Func<TPayload, TProp>> expression)
-ToPath<T>(string prefix, Expression<Func<TSource, object>> expression)
-ToPath<T>(string prefix, Expression<Func<TSource, TProp>> expression)
-ToPropertyName<T>(Expression<Func<TModel, object>> expression)
-ToPropertyName<T>(Expression<Func<TModel, TProp>> expression)
-ToResponsePath<T>(Expression<Func<TResponse, object>> expression)
-ToResponsePath<T>(Expression<Func<TResponse, TProp>> expression)
-```
-
 ### IAppLevelComponent
 
 Represents a layout-owned component that can be referenced without an explicit element ID.

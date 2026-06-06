@@ -21,7 +21,7 @@ namespace Alis.Reactive
     /// <see cref="InvalidOperationException"/>.
     /// </para>
     /// </remarks>
-    public static class ExpressionPathHelper
+    internal static class ExpressionPathHelper
     {
         /// <summary>
         /// Builds a scoped camelCase Reactive Plan value path from a property-access expression.

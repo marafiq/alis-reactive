@@ -338,6 +338,10 @@ Candidate cleanup:
   is no longer public API surface. Component packages still use it through
   friend-assembly access, while generated public docs no longer teach
   application developers to append raw `ReactionGraph` nodes.
+- Resolved on `tiny-safe-but-important-refactorings`: `ExpressionPathHelper`
+  is no longer public API surface. It remains shared framework plumbing for
+  friend assemblies, while public developers use the DSL, `IdGenerator`, and
+  component/gather helpers instead of raw expression-path conversion.
 
 ### Implementation Inline Comments
 
