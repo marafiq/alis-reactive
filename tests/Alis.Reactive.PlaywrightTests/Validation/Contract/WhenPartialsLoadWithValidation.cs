@@ -140,7 +140,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await Input("Address_ZipCode").PressSequentiallyAsync("90210");
         await Page.Keyboard.PressAsync("Tab");
 
-        // Wait for the dispatch chain from change to dispatch("zipcode-validated") to custom-event listener.
+        // Wait for the change-triggered dispatch to reach the matching CustomEvent behavior.
         var status = Page.Locator("#zipcode-status");
         await Expect(status).ToContainTextAsync("Zip validated", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -163,7 +163,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     }
 
     [Test]
-    public async Task partial_reactive_entries_do_not_interfere_with_parent_validation()
+    public async Task partial_reactive_behaviors_do_not_interfere_with_parent_validation()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
