@@ -133,7 +133,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a literal argument whose plan shape is derived from <typeparamref name="TValue"/>.</summary>
-        /// <typeparam name="TValue">The literal value type.</typeparam>
         public PluginMemberBuilder<TReturn, TModel> ArgValue<TValue>(TValue value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -260,7 +259,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a literal argument whose plan shape is derived from <typeparamref name="TValue"/>.</summary>
-        /// <typeparam name="TValue">The literal value type.</typeparam>
         public PluginCallBuilder<TModel> ArgValue<TValue>(TValue value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
