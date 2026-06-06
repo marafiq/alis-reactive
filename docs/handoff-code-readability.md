@@ -467,6 +467,11 @@ Candidate cleanup:
   while dropping repeated "The value to select" and "current selected value"
   phrasing. ComboBox read docs were tightened in the same pass for value, text,
   and index.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion input value-read
+  XML summaries now keep component-specific value shapes, including scalar
+  versus range slider and MultiSelect arrays, while dropping repeated "current"
+  and "for use in conditions or gather" phrasing. Text input `SetValue` docs
+  still keep the `null`-clears contract.
 - Resolved on `tiny-safe-but-important-refactorings`: plugin argument builders
   no longer repeat `TValue` XML type-parameter docs on `ArgValue<TValue>()`;
   the summaries already explain that the plan shape is derived from the type.

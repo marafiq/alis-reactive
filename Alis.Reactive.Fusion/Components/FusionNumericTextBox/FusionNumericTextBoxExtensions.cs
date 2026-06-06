@@ -68,7 +68,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(DecrementMethod);
 
-        /// <summary>Reads the current numeric value for use in conditions or gather.</summary>
+        /// <summary>Reads the numeric value for conditions or gather.</summary>
         public static TypedComponentSource<decimal> Value<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class

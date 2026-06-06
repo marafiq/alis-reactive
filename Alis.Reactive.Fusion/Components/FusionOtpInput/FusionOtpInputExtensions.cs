@@ -43,7 +43,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(FocusOutMethod);
 
-        /// <summary>Reads the current OTP value for use in conditions or gather.</summary>
+        /// <summary>Reads the OTP value for conditions or gather.</summary>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionOtpInput, TModel> self)
             where TModel : class

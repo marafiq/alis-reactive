@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
             return self.EmitSet(ValueProperty, ValueExpression.Literal(isChecked));
         }
 
-        /// <summary>Reads the current checked state for use in conditions or gather.</summary>
+        /// <summary>Reads the checked state for conditions or gather.</summary>
         public static TypedComponentSource<bool> Value<TModel>(
             this ComponentRef<FusionSwitch, TModel> self)
             where TModel : class

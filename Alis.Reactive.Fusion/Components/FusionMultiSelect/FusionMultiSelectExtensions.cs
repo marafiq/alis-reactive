@@ -97,7 +97,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(HidePopupMethod);
 
-        /// <summary>Reads the current selected value array for use in conditions or gather.</summary>
+        /// <summary>Reads the selected value array for conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument for component operations:
         /// <c>p.When(p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Skills).Value()).NotNull().Then(p =&gt; { ... })</c>.

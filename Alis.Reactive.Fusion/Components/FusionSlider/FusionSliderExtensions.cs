@@ -43,13 +43,13 @@ namespace Alis.Reactive.Fusion.Components
                     ValueExpression.LiteralRaw(new[] { start, end }, Shape.ArrayOf(Shape.Number)))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Reads the current scalar value for use in conditions or gather.</summary>
+        /// <summary>Reads the scalar value for conditions or gather.</summary>
         public static TypedComponentSource<double> Value<TModel>(
             this ComponentRef<FusionSlider, TModel> self)
             where TModel : class
             => self.Read(ValueProperty);
 
-        /// <summary>Reads the current range value for use in gather or display pipelines.</summary>
+        /// <summary>Reads the range value for gather or display pipelines.</summary>
         public static TypedComponentSource<double[]> RangeValue<TModel>(
             this ComponentRef<FusionSlider, TModel> self)
             where TModel : class

@@ -35,7 +35,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(ResetMethod);
 
-        /// <summary>Reads the current rating value for use in conditions or gather.</summary>
+        /// <summary>Reads the rating value for conditions or gather.</summary>
         public static TypedComponentSource<double> Value<TModel>(
             this ComponentRef<FusionRating, TModel> self)
             where TModel : class

@@ -27,7 +27,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Mapped("addAppendIcon", "addIcon").WithArgs<string, string>();
 
         /// <summary>Sets the visible textbox value.</summary>
-        /// <param name="value">The text to set, or <see langword="null"/> to clear.</param>
+        /// <param name="value">Text value, or <see langword="null"/> to clear.</param>
         public static ComponentRef<FusionTextBox, TModel> SetValue<TModel>(
             this ComponentRef<FusionTextBox, TModel> self, string? value)
             where TModel : class
@@ -61,7 +61,7 @@ namespace Alis.Reactive.Fusion.Components
                     ValueExpression.Literal(iconCssClass)
                 });
 
-        /// <summary>Reads the current text value for use in conditions or gather.</summary>
+        /// <summary>Reads the text value for conditions or gather.</summary>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<FusionTextBox, TModel> self)
             where TModel : class
