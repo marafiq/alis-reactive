@@ -22,8 +22,8 @@ namespace Alis.Reactive.Native.Components
     /// Uses the Reactive Plan-owned render target for element ID and MVC binding name.
     /// No label or validation slot is rendered.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The model value type rendered through the hidden input.</typeparam>
+    /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+    /// <typeparam name="TProp">Model value type rendered through the hidden input.</typeparam>
     public class NativeHiddenFieldBuilder<TModel, TProp> :
 #if NET48
         IHtmlString

@@ -41,7 +41,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the hidden input value from an HTTP response body path.
         /// </summary>
-        /// <typeparam name="TResponse">The response DTO type used by the response body source.</typeparam>
+        /// <typeparam name="TResponse">Response DTO type used by the response body source.</typeparam>
         /// <param name="source">Response body scope.</param>
         /// <param name="path">Response DTO member path.</param>
         public static ComponentRef<NativeHiddenField, TModel> SetValue<TModel, TResponse>(
