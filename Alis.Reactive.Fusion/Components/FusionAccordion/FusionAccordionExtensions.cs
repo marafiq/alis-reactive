@@ -3,7 +3,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Mutation extensions for <see cref="FusionAccordion"/> in a reactive pipeline.
+    /// Component operation extensions for <see cref="FusionAccordion"/> in a reactive pipeline.
     /// </summary>
     /// <remarks>
     /// <para>

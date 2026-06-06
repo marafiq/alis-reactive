@@ -1612,7 +1612,7 @@ IsExpanded { get; }  // True if the panel was expanded, false if collapsed.
 
 ### FusionAccordionExtensions
 
-Mutation extensions for `FusionAccordion` in a reactive pipeline.
+Component operation extensions for `FusionAccordion` in a reactive pipeline.
 
 ```csharp
 EnableItem<T>()
@@ -2504,7 +2504,7 @@ OverlayClick { get; }  // Fires when the modal overlay is clicked.
 
 ### FusionDialogExtensions
 
-Mutation extensions for `FusionDialog` in a reactive pipeline.
+Component operation extensions for `FusionDialog` in a reactive pipeline.
 
 ```csharp
 Hide<T>()
@@ -4654,7 +4654,7 @@ Selected { get; }  // Fires when a tab is selected.
 
 ### FusionTabExtensions
 
-Mutation extensions for `FusionTab` in a reactive pipeline.
+Component operation extensions for `FusionTab` in a reactive pipeline.
 
 ```csharp
 HideTab<T>()
@@ -5042,7 +5042,7 @@ Opened { get; }  // Fires after the tooltip is visible.
 
 ### FusionTooltipExtensions
 
-Mutation extensions for `FusionTooltip` in a reactive pipeline.
+Component operation extensions for `FusionTooltip` in a reactive pipeline.
 
 ```csharp
 Close<T>()
