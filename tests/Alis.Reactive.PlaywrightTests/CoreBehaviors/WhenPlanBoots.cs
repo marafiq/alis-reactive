@@ -34,7 +34,7 @@ public class WhenPlanBoots : PlaywrightTestBase
         Assert.That(text, Does.Contain("\"behaviors\""), "Plan must have behaviors array");
         Assert.That(text, Does.Contain("\"page-ready\""), "Plan must contain page-ready trigger");
         Assert.That(text, Does.Contain("\"document-event\""), "Plan must contain document-event triggers");
-        Assert.That(text, Does.Contain("\"dispatch\""), "Plan must contain dispatch commands");
+        Assert.That(text, Does.Contain("\"dispatch\""), "Plan must contain dispatch reactions");
         Assert.That(text, Does.Contain("\"set\""), "Plan must contain set reactions");
 
         AssertNoConsoleErrors();
