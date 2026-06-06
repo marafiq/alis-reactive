@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed runtime extensions for <see cref="FusionGrid"/> in reactive pipelines.
+    /// Reactive pipeline extensions for <see cref="FusionGrid"/>.
     /// </summary>
     /// <remarks>
     /// Keep Syncfusion MVC builder configuration on the builder. These partial

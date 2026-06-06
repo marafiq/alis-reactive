@@ -3,7 +3,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed post-render runtime behavior for <see cref="FusionContextMenu"/>.
+    /// Reactive pipeline extensions for <see cref="FusionContextMenu"/>.
     /// </summary>
     public static class FusionContextMenuExtensions
     {

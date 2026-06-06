@@ -5,7 +5,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed post-render runtime behavior for <see cref="FusionCarousel"/>.
+    /// Reactive pipeline extensions for <see cref="FusionCarousel"/>.
     /// </summary>
     public static class FusionCarouselExtensions
     {
