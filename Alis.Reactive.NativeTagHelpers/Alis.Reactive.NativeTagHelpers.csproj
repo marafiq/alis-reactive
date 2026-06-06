@@ -8,7 +8,7 @@
     <PackageId>AlisReactive.NativeTagHelpers</PackageId>
     <IsPackable>true</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageDescription>ASP.NET Core Tag Helpers for Alis.Reactive native components — declarative HTML authoring with reactive plan integration.</PackageDescription>
+    <PackageDescription>ASP.NET Core Tag Helpers for Alis.Reactive native components — declarative HTML authoring with Reactive Plan integration.</PackageDescription>
     <PackageTags>reactive;aspnetcore;taghelpers;native-components</PackageTags>
   </PropertyGroup>
   <ItemGroup>

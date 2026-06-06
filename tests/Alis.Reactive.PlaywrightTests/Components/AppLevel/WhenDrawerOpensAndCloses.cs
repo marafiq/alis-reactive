@@ -44,7 +44,7 @@ public class WhenDrawerOpensAndCloses : PlaywrightTestBase
         await Expect(DrawerTitle).ToHaveTextAsync("Resident Details", new() { Timeout = 5000 });
 
         // Content is loaded from a partial through HTTP GET into the drawer.
-        await Expect(DrawerContent).ToContainTextAsync("This drawer was opened via the reactive plan", new() { Timeout = 5000 });
+        await Expect(DrawerContent).ToContainTextAsync("This drawer was opened via the Reactive Plan", new() { Timeout = 5000 });
 
         await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--sm"));
 

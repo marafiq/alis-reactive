@@ -24,7 +24,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         /// <summary>
         /// Returns shift assignments for a facility and week.
         /// Parameter names match the model property and event arg names used by
-        /// Include and FromEvent gather in the reactive plan.
+        /// Include and FromEvent gather in the Reactive Plan.
         /// </summary>
         [HttpGet("~/api/schedule/assignments")]
         public IActionResult GetAssignments(string? selectedFacilityId, string? currentDate, string? currentView)
