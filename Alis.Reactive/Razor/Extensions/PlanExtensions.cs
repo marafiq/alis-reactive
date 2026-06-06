@@ -87,7 +87,6 @@ namespace Alis.Reactive.Native.Extensions
         /// produces no runtime behavior.
         /// </remarks>
         /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
-        /// <param name="html">The Razor HTML helper.</param>
         /// <param name="plan">The Reactive Plan whose generated JSON should be embedded.</param>
         /// <returns>HTML content containing the plan JSON consumed by the runtime.</returns>
 #if NET48

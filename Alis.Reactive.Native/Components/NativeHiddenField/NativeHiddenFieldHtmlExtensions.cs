@@ -27,7 +27,6 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The model value type registered as the hidden input value.</typeparam>
-        /// <param name="html">The Razor HTML helper used to render the hidden input.</param>
         /// <param name="plan">The Reactive Plan that receives the hidden-field registration.</param>
         /// <param name="expression">The model property expression used for MVC binding and component registration.</param>
         /// <returns>A builder that renders the hidden input directly in the view.</returns>

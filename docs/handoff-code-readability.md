@@ -241,6 +241,10 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: simple component
   `SetValue(value)` docs no longer repeat the parameter name as "The value to
   set." Summaries still name the component contract being written.
+- Resolved on `tiny-safe-but-important-refactorings`: active Razor helper XML
+  docs no longer repeat extension receiver parameters such as "The Razor HTML
+  helper." Plan, expression, controlled ID, and builder callback docs remain
+  because they describe the DSL contract.
 
 ### Implementation Inline Comments
 

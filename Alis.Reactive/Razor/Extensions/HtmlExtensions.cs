@@ -44,7 +44,6 @@ namespace Alis.Reactive.Native.Extensions
         /// </para>
         /// </remarks>
         /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
-        /// <param name="html">The Razor HTML helper.</param>
         /// <param name="plan">The Reactive Plan that receives the trigger declarations.</param>
         /// <param name="trigger">
         /// Configures one or more triggers via the fluent <see cref="TriggerBuilder{TModel}"/> API.

@@ -25,7 +25,6 @@ namespace Alis.Reactive.Native.Extensions
         /// </remarks>
         /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
-        /// <param name="html">The Razor HTML helper.</param>
         /// <param name="plan">The Reactive Plan that owns this field registration.</param>
         /// <param name="expression">The model property to bind the field to.</param>
         /// <returns>A bound field ready to receive a component extension.</returns>
@@ -46,7 +45,6 @@ namespace Alis.Reactive.Native.Extensions
         /// </summary>
         /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
-        /// <param name="html">The Razor HTML helper.</param>
         /// <param name="plan">The Reactive Plan that owns this field registration.</param>
         /// <param name="expression">The model property to bind the field to.</param>
         /// <param name="configure">Configures label text and required marker.</param>
