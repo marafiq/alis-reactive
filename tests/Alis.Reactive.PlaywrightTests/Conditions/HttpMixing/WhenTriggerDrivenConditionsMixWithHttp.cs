@@ -308,7 +308,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
         await Page.Locator("#s7-btn-required").ClickAsync();
 
         await Expect(Page.Locator("#s7-error-msg")).ToHaveTextAsync("missing required fields", new() { Timeout = 5000 });
-        // Error routing must leave success-route mutations untouched.
+        // Error routing must leave success-route updates untouched.
         await Expect(Page.Locator("#s7-status")).ToHaveTextAsync("\u2014");
 
         AssertNoConsoleErrorsExcept("400");

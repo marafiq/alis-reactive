@@ -11,10 +11,10 @@
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care Level Cascade — Condition-Gated Component Mutations</native-heading>
+    <native-heading level="H1">Care Level Cascade — Condition-Gated Component Updates</native-heading>
     <native-text color="Secondary">
         Realistic nurse workflow: selecting a care level auto-populates related fields.
-        Conditions mutate OTHER components — not just element text.
+        Conditions write to other components, not just element text.
     </native-text>
 
     <native-card><native-card-body>
@@ -70,7 +70,7 @@
             Button reads the care level dropdown and toggles the "Requires Escort" switch:
             Memory Care or Skilled Nursing → escort required (checked),
             anything else → not required (unchecked).
-            Proves conditions can mutate across component types (dropdown reads → switch writes).
+            Proves conditions can write across component types (dropdown reads → switch writes).
         </p>
         <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.RequiresEscort, o => o.Label("Requires Escort"))

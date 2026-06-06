@@ -3,7 +3,7 @@ using Alis.Reactive.Playwright.Extensions;
 namespace Alis.Reactive.PlaywrightTests.Conditions.CareLevelCascade;
 
 /// <summary>
-/// Exercises condition branches that mutate other components through SetValue and SetChecked.
+/// Exercises condition branches that write to other components through SetValue and SetChecked.
 /// </summary>
 [TestFixture]
 public class WhenCareLevelCascades : PlaywrightTestBase

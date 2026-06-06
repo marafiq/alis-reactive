@@ -116,7 +116,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 
     /// <summary>
     /// Exercises the Status ElseIf chain in sequence to catch branch state leakage
-    /// across class and visibility mutations.
+    /// across class and visibility updates.
     /// </summary>
     [Test]
     public async Task full_status_lifecycle_active_then_inactive_then_pending()
