@@ -65,8 +65,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the text content from an HTTP response body property.</summary>
-        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
-        /// <param name="source">The typed response body scope from <c>OnSuccess</c> or <c>OnError</c>.</param>
+        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
+        /// <param name="source">Typed response body scope from <c>OnSuccess</c> or <c>OnError</c>.</param>
         /// <param name="path">Expression selecting the response body property to display.</param>
         public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, object>> path)
             where TResponse : class
@@ -77,7 +77,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Sets the text content from a typed source (component, plugin, or URL value).</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
-        /// <param name="source">The typed value source evaluated when the reaction executes.</param>
+        /// <param name="source">Typed value source evaluated when the reaction executes.</param>
         /// <returns>This element builder for chaining additional element updates.</returns>
         public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
         {
@@ -104,7 +104,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Sets the inner HTML from a typed source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
-        /// <param name="source">The typed value source evaluated when the reaction executes.</param>
+        /// <param name="source">Typed value source evaluated when the reaction executes.</param>
         /// <returns>This element builder for chaining additional element updates.</returns>
         public ElementBuilder<TModel> SetHtml<TProp>(TypedSource<TProp> source)
         {
