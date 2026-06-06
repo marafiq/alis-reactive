@@ -97,11 +97,10 @@ public class WhenRichTextEdited : PlaywrightTestBase
     }
 
     [Test]
-    public async Task component_value_condition_shows_warning_when_empty()
+    public async Task component_value_condition_shows_warning_after_clearing_seeded_value()
     {
         await NavigateAndBoot();
 
-        // DomReady seeds a value, so clear before checking the empty branch.
         await CarePlan.Clear();
         await CarePlan.Blur();
 

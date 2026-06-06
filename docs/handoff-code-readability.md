@@ -849,6 +849,9 @@ Rewrite or delete:
   DateTimePicker, and InputMask initial-value tests now use `visibleInputValue`
   instead of comments explaining that the visible input proves the Syncfusion
   value write. The locator-level Syncfusion gesture comments remain.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion RichTextEditor,
+  InputMask, and DateTimePicker empty-branch tests now say they clear the seeded
+  value in the test name, so repeated DomReady-seeding comments were removed.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
