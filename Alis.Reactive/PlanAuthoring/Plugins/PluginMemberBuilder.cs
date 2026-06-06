@@ -30,7 +30,7 @@ namespace Alis.Reactive.Builders
     /// Collects arguments for a value-returning plan-registered plugin method or root function.
     /// Use the builder where a <see cref="TypedPluginSource{TReturn}"/> is expected.
     /// </summary>
-    /// <typeparam name="TReturn">The plugin method return type exposed to downstream value expressions.</typeparam>
+    /// <typeparam name="TReturn">The CLR type returned by the plugin call and exposed to downstream value expressions.</typeparam>
     /// <typeparam name="TModel">The model type for the pipeline that owns the plugin read.</typeparam>
     public sealed class PluginMemberBuilder<TReturn, TModel> where TModel : class
     {
@@ -49,8 +49,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a value from an HTTP response body as a plugin argument.</summary>
-        /// <typeparam name="TResponse">The response body type.</typeparam>
-        /// <typeparam name="TProp">The response value type passed to the plugin.</typeparam>
+        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TProp">The CLR type used to shape the selected response-body argument.</typeparam>
         /// <param name="body">The success or error response body scope.</param>
         /// <param name="path">The response property path to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TResponse, TProp>(
@@ -62,8 +62,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a value from the current event payload as a plugin argument.</summary>
-        /// <typeparam name="TPayload">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The event value type passed to the plugin.</typeparam>
+        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
+        /// <typeparam name="TProp">The CLR type used to shape the selected event-payload argument.</typeparam>
         /// <param name="args">A typed event payload marker used to infer <typeparamref name="TPayload"/>.</param>
         /// <param name="path">The event payload path to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TPayload, TProp>(
@@ -74,7 +74,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds another typed value source as a plugin argument.</summary>
-        /// <typeparam name="TArg">The source value type.</typeparam>
+        /// <typeparam name="TArg">The CLR type carried by the typed value source.</typeparam>
         /// <param name="source">The component, URL, response, or plugin value source to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TArg>(TypedSource<TArg> source)
         {
@@ -176,8 +176,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a value from an HTTP response body as a plugin argument.</summary>
-        /// <typeparam name="TResponse">The response body type.</typeparam>
-        /// <typeparam name="TProp">The response value type passed to the plugin command.</typeparam>
+        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TProp">The CLR type used to shape the selected response-body argument.</typeparam>
         /// <param name="body">The success or error response body scope.</param>
         /// <param name="path">The response property path to pass.</param>
         public PluginCallBuilder<TModel> Arg<TResponse, TProp>(
@@ -189,8 +189,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a value from the current event payload as a plugin argument.</summary>
-        /// <typeparam name="TPayload">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The event value type passed to the plugin command.</typeparam>
+        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
+        /// <typeparam name="TProp">The CLR type used to shape the selected event-payload argument.</typeparam>
         /// <param name="args">A typed event payload marker used to infer <typeparamref name="TPayload"/>.</param>
         /// <param name="path">The event payload path to pass.</param>
         public PluginCallBuilder<TModel> Arg<TPayload, TProp>(
@@ -201,7 +201,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a typed value source as a plugin argument.</summary>
-        /// <typeparam name="TArg">The source value type.</typeparam>
+        /// <typeparam name="TArg">The CLR type carried by the typed value source.</typeparam>
         /// <param name="source">The component, URL, response, or plugin value source to pass.</param>
         public PluginCallBuilder<TModel> Arg<TArg>(TypedSource<TArg> source)
         {
