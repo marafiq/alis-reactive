@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ColorPicker;
 
-/// <summary>
-/// Exercises FusionColorPicker SetValue, Value reads, component-read conditions,
-/// method calls, and emitted Reactive Plan metadata.
-/// </summary>
 [TestFixture]
 public class WhenColorPicked : PlaywrightTestBase
 {
