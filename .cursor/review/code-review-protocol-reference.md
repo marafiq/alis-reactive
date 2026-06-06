@@ -38,23 +38,23 @@ See fenced block in [code-review-protocol.mdc](../rules/code-review-protocol.mdc
 
 | Layer | Command / artifact |
 |--------|-------------------|
-| C# plan / descriptors | `dotnet test tests/Alis.Reactive.UnitTests`, `dotnet build` |
-| JSON contract | `Alis.Reactive/Schemas/reactive-plan.schema.json` + schema test |
-| TS runtime | `npm test`, `npm run typecheck`, `npm run lint`; tests under `Alis.Reactive.SandboxApp/Scripts/__tests__/` ([vitest.config.ts](../../vitest.config.ts)) |
+| C# plan model / builders | `scripts/test.sh --no-e2e` for build, generated contract, Vitest, and non-browser .NET tests |
+| Generated TS contract | `npm run typecheck` and `Alis.Reactive.Assets/runtime/types/plan.ts` generated from the C# plan domain |
+| TS runtime | `npm test`, `npm run typecheck`, `npm run lint`; tests under `Alis.Reactive.Assets/runtime/__tests__/` |
 | JS/CSS bundles | `npm run build:all` then `dotnet build` |
-| Native / Fusion / FV | `dotnet test tests/Alis.Reactive.Native.UnitTests` (+ Fusion, FluentValidator) as touched |
-| Browser | `dotnet test tests/Alis.Reactive.PlaywrightTests` + `TestResults/` (TRX/HTML per repo scripts) |
+| Native / Fusion / FV | `scripts/test.sh --no-e2e`; add focused project tests only when a touched project has a separate non-Playwright test suite |
+| Browser | `scripts/playwright.sh --filter "..."` + `TestResults/observable/` (TRX/HTML/diag from the repo wrapper) |
 
 ---
 
 ## Primitive checklist (wire / command / trigger change)
 
-1. C# descriptor + JSON polymorphism as repo does (`Serialization/`, `[JsonDerivedType]`, …)  
+1. C# plan-domain node + JSON polymorphism as the current PlanModel does (`[JsonDerivedType]`, generated TS contract)
 2. Builder surface  
-3. Schema + `AssertSchemaValid` (or equivalent)  
-4. TS types (`…/Scripts/types/` — layout per branch)  
+3. Generated contract drift check through `npm run typecheck`
+4. TS types (`Alis.Reactive.Assets/runtime/types/plan.ts`)
 5. Runtime handler + exhaustiveness (`assertNever` or repo pattern)  
-6. C# `VerifyJson` + schema test  
+6. C# plan/domain proof or generated-contract proof
 7. TS `boot()` / vitest  
 8. Playwright if user-visible  
 9. Sandbox demo if applicable  
@@ -65,12 +65,12 @@ See fenced block in [code-review-protocol.mdc](../rules/code-review-protocol.mdc
 
 | Gate | Check |
 |------|--------|
-| Plan = contract | No manual JS / `addEventListener` in `.cshtml` / `window.alis` / inline script; boot = esbuild entry ([root.ts](../../Alis.Reactive.SandboxApp/Scripts/root.ts) on this layout). |
+| Plan = contract | No manual JS / `addEventListener` in `.cshtml` / `window.alis` / inline script; boot = esbuild entry ([root.ts](../../Alis.Reactive.Assets/runtime/root.ts)). |
 | Vendor | Vendor logic in **one** canonical module; `rg` to find boundary before accusing; no sprawl. |
 | IDs | Plan-driven IDs; no new DOM-wide scans / `querySelectorAll` for discovery. |
 | Fail fast | No silent fallbacks for missing registration/vendor without explicit waiver + rationale. |
 | Slices | No new shared **behavioral** base classes across vertical slices. |
-| C# | Libraries = **C# 8.0** (per csproj); apps/tests may use newer language version. |
+| C# | Repository language level is **C# 14**; use modern syntax only when it clarifies the DSL, plan domain, or runtime contract. |
 | Public API | Treat visibility/surface changes as high risk; honor any repo hook or policy that blocks API edits **if present**. |
 
 ---
