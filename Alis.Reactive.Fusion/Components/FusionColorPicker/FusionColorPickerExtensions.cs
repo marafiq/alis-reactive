@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("toggle");
 
         /// <summary>Sets the color value (hex string, e.g. "#ff0000").</summary>
-        /// <param name="value">The hex color string to set, or <see langword="null"/> to clear.</param>
+        /// <param name="value">Hex color string to set, or <see langword="null"/> to clear.</param>
         public static ComponentRef<FusionColorPicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, string? value)
             where TModel : class

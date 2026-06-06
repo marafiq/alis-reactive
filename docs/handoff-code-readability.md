@@ -611,6 +611,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `FusionDateRangePicker`
   XML tags now use concise field-wrapper, model-value, event-args, and Reactive
   Plan wording. Start/end date examples and no-`SetValue()` contract remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionColorPicker` XML
+  tags now use concise field-wrapper, model-value, event-args, Reactive Plan,
+  and hex-value wording. Syncfusion `ColorPickerFor` attribute quirk remains.
 
 ### Implementation Inline Comments
 
