@@ -16,7 +16,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <param name="html">The Razor HTML helper.</param>
         /// <param name="plan">The Reactive Plan that receives context menu event wiring.</param>
-        /// <param name="elementId">The controlled component ID shared by markup and plan entries.</param>
+        /// <param name="elementId">The controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the underlying Syncfusion context menu builder.</param>
         public static FusionContextMenuBuilder<TModel> FusionContextMenu<TModel>(
             this IHtmlHelper<TModel> html,

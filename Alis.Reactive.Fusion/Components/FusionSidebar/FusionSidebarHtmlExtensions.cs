@@ -17,7 +17,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <param name="html">The Razor HTML helper.</param>
         /// <param name="plan">The Reactive Plan that receives sidebar event wiring.</param>
-        /// <param name="elementId">The controlled component ID shared by markup and plan entries.</param>
+        /// <param name="elementId">The controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the underlying Syncfusion sidebar builder.</param>
         public static FusionSidebarBuilder<TModel> FusionSidebar<TModel>(
             this IHtmlHelper<TModel> html,
