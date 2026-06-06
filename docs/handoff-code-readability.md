@@ -562,6 +562,10 @@ Candidate cleanup:
   "typed component operations" or "pipeline extensions" phrases. Value
   components say values, button-style components say rendered state, and
   Schedule keeps its non-input schedule state/event distinction.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion AutoComplete,
+  DropDownList, and MultiColumnComboBox value/text setter summaries now
+  distinguish item selection from display-text writes instead of repeating
+  "sets the selected value" across all three APIs.
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
   selected-value parameter docs now use the same concise selected-option wording
   as the other Native value-write helpers.
