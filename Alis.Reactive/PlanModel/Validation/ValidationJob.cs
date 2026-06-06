@@ -15,15 +15,15 @@ namespace Alis.Reactive.PlanModel
     /// </summary>
     internal sealed class ValidationJob
     {
-        /// <summary>The declaring request's URL. Used only for error context.</summary>
+        /// <summary>Declaring request URL, used only for error context.</summary>
         public string RequestUrl { get; }
 
         private readonly ComponentId _container;
 
-        /// <summary>The form element id whose components this validation source covers.</summary>
+        /// <summary>Form element id whose components this validation source covers.</summary>
         public string Container => _container.Value;
 
-        /// <summary>The source type whose metadata declares deterministic client validation rules.</summary>
+        /// <summary>Source type whose metadata declares deterministic client validation rules.</summary>
         public Type ValidationSourceType { get; }
 
         internal ValidationJob(string requestUrl, ComponentId container, Type validationSourceType)

@@ -184,6 +184,11 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: remaining Fusion event
   payload field summaries in ChipList, BulletChart, and InPlaceEditor action
   begin now keep Syncfusion field meaning without article-led phrasing.
+- Resolved on `tiny-safe-but-important-refactorings`: internal validation job
+  metadata summaries now keep request URL, form element id, and validation
+  source semantics without article-led wording. The class invariant comment was
+  kept because it explains why the job carries values instead of a request
+  reference.
 - Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
   operator docs now include the parameter tags needed for generated API
   signatures such as `Eq(operand)` versus `Eq(right)`. This keeps the public DSL
