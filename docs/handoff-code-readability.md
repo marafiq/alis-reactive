@@ -608,6 +608,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `FusionDateTimePicker`
   XML tags now use concise field-wrapper, model-value, event-args, Reactive Plan,
   and date-time value wording. Public examples remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionDateRangePicker`
+  XML tags now use concise field-wrapper, model-value, event-args, and Reactive
+  Plan wording. Start/end date examples and no-`SetValue()` contract remain.
 
 ### Implementation Inline Comments
 
