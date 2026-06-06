@@ -25,7 +25,7 @@ const stringArrayShape: Shape = { kind: "array", item: stringShape };
 const numberArrayShape: Shape = { kind: "array", item: numberShape };
 const rawShape: Shape = { kind: "raw" };
 
-function valueEvaluationPlan(entries: {
+function valueEvaluationPlan(planParts: {
   readonly types?: Record<string, BrowserObjectContract>;
   readonly components?: Record<string, ComponentObject>;
 } = {}): PlanDocument {
@@ -33,8 +33,8 @@ function valueEvaluationPlan(entries: {
     version: 3,
     planId: "Runtime.ValueEvaluation",
     scope: { kind: "root" },
-    types: entries.types ?? {},
-    components: entries.components ?? {},
+    types: planParts.types ?? {},
+    components: planParts.components ?? {},
     behaviors: [],
   };
 }

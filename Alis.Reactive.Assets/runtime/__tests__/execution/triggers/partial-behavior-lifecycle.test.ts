@@ -68,15 +68,15 @@ function rootPlan(planId: string, components: Record<string, ComponentObject>): 
 
 function partialPlan(
   planId: string,
-  entries: Partial<Pick<PlanDocument, "components" | "behaviors" | "types">>,
+  planParts: Partial<Pick<PlanDocument, "components" | "behaviors" | "types">>,
 ): PlanDocument {
   return {
     version: 3,
     planId,
     scope: { kind: "partial" },
-    types: entries.types ?? {},
-    components: entries.components ?? {},
-    behaviors: entries.behaviors ?? [],
+    types: planParts.types ?? {},
+    components: planParts.components ?? {},
+    behaviors: planParts.behaviors ?? [],
   };
 }
 

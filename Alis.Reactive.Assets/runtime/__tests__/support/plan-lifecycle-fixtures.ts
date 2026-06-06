@@ -175,7 +175,7 @@ export function rootPlan(planId: string): PlanDocument {
 
 export function partialPlan(
   planId: string,
-  entries: {
+  planParts: {
     readonly types?: Record<string, BrowserObjectContract>;
     readonly components?: Record<string, ComponentObject>;
     readonly behaviors?: Behavior[];
@@ -185,9 +185,9 @@ export function partialPlan(
     version: 3,
     planId,
     scope: { kind: "partial" },
-    types: entries.types ?? {},
-    components: entries.components ?? {},
-    behaviors: entries.behaviors ?? [],
+    types: planParts.types ?? {},
+    components: planParts.components ?? {},
+    behaviors: planParts.behaviors ?? [],
   };
 }
 

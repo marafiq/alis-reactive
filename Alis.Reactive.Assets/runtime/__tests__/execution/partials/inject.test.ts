@@ -77,29 +77,29 @@ function allRegisteredInputs(): Extract<RequestInput, { kind: "gather" }> {
 
 function rootPlan(
   planId: string,
-  entries: Partial<Pick<PlanDocument, "components" | "behaviors" | "types">> = {},
+  planParts: Partial<Pick<PlanDocument, "components" | "behaviors" | "types">> = {},
 ): PlanDocument {
   return {
     version: 3,
     planId,
     scope: { kind: "root" },
-    types: entries.types ?? {},
-    components: entries.components ?? {},
-    behaviors: entries.behaviors ?? [],
+    types: planParts.types ?? {},
+    components: planParts.components ?? {},
+    behaviors: planParts.behaviors ?? [],
   };
 }
 
 function partialPlan(
   planId: string,
-  entries: Partial<Pick<PlanDocument, "components" | "behaviors" | "types">> = {},
+  planParts: Partial<Pick<PlanDocument, "components" | "behaviors" | "types">> = {},
 ): PlanDocument {
   return {
     version: 3,
     planId,
     scope: { kind: "partial" },
-    types: entries.types ?? { "native.element.address-line": objectContract() },
-    components: entries.components ?? { "address-line": component("address-line") },
-    behaviors: entries.behaviors ?? [],
+    types: planParts.types ?? { "native.element.address-line": objectContract() },
+    components: planParts.components ?? { "address-line": component("address-line") },
+    behaviors: planParts.behaviors ?? [],
   };
 }
 
