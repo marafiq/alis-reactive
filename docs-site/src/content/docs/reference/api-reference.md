@@ -32,10 +32,6 @@ Binds client-side validation rules declared by request validation gates
             `ContainerScope`. Normal validator execution is separate; this binder
             handles only the client-side rules.
 
-```csharp
-BindQueuedJobs()
-```
-
 ### ComponentEventOnboarding
 
 Shared component-event onboarding path for vertical slices.
@@ -47,16 +43,8 @@ Shared component-event onboarding path for vertical slices.
 Describes a JavaScript method on a reactive component.
 
 ```csharp
-// Properties
-Member { get; }  // Gets the plan member name used by call reactions.
-```
-
-```csharp
 Mapped()
 Named()
-WithArgs<T>()
-WithArgs<T>()
-WithArgs<T>()
 ```
 
 ### ComponentObjectTarget
@@ -70,11 +58,6 @@ Deterministic target for a component reference in the Reactive Plan.
 Describes a readable or writable JavaScript property on a reactive component.
             Component onboarding uses these descriptors to declare the Reactive Plan
             component contract that the runtime can read or mutate.
-
-```csharp
-// Properties
-Member { get; }  // Gets the plan member name used by reactions and value reads.
-```
 
 ```csharp
 Mapped()
@@ -730,12 +713,6 @@ Begin()
 ### InputFieldOptions
 
 Configures the label and required marker for an input field wrapper.
-
-```csharp
-// Properties
-IsRequired { get; }  // Gets whether the required marker (`*`) should be shown.
-LabelText { get; }  // Gets the label text, or `null` if no label was configured.
-```
 
 ```csharp
 Label(label)
@@ -4665,12 +4642,6 @@ Represents a Syncfusion Tab navigation component.
 
 Carries rendered Syncfusion Tab markup and the Reactive Plan for event wiring.
             Non-input component: no InputField wrapper, label, or validation slot.
-
-```csharp
-// Properties
-ElementId { get; }  // The element ID used by `.Reactive()` to wire events.
-Plan { get; }  // The Reactive Plan used by `.Reactive()` to add event triggers.
-```
 
 ### FusionTabEvents
 
