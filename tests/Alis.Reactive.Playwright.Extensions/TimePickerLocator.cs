@@ -50,7 +50,7 @@ public sealed class TimePickerLocator
     /// Selects a popup item so Syncfusion updates <c>ej2.value</c>.
     /// </summary>
     /// <remarks>
-    /// The helper assumes the default 30-minute popup interval.
+    /// Assumes the default 30-minute popup interval.
     /// </remarks>
     public async Task SelectTime(string timeText)
     {

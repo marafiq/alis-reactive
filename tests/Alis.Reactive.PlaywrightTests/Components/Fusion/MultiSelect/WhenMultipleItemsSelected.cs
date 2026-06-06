@@ -203,7 +203,7 @@ public class WhenMultipleItemsSelected : PlaywrightTestBase
     /// </summary>
     private async Task TypeInSupplies(string searchText)
     {
-        // The filtering input is a sibling of the generated component input.
+        // Filtering input is a sibling of the generated component input.
         var filterInput = Page.Locator($"#{SuppliesId}").Locator("xpath=preceding-sibling::input[contains(@class,'e-dropdownbase')]");
         await Expect(filterInput).ToBeVisibleAsync(new() { Timeout = 5000 });
         await filterInput.ClickAsync();

@@ -168,7 +168,7 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // The partial dispatch should run before the parent validation submit path.
+        // Partial dispatch should run before the parent validation submit path.
         await Input("Address_ZipCode").ClickAsync();
         await Input("Address_ZipCode").PressSequentiallyAsync("90210");
         await Page.Keyboard.PressAsync("Tab");

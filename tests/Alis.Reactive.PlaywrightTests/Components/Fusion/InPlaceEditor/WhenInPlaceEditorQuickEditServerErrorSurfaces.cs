@@ -34,7 +34,7 @@ public class WhenInPlaceEditorQuickEditServerErrorSurfaces : PlaywrightTestBase
         await Expect(Page.Locator("#card-nickname-error-message"))
             .ToContainTextAsync("Nickname rejected by server", new() { Timeout = 5000 });
 
-        // The 500 response surfaces as a "Failed to load resource" console error — that's the
+        // HTTP 500 surfaces as a "Failed to load resource" console error; that is the
         // whole point of this scenario. Do not call AssertNoConsoleErrors() here.
     }
 }

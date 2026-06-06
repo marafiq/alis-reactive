@@ -131,7 +131,7 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
 
         await SubmitBtn.ClickAsync();
 
-        // A required-field error proves validation ran before optional fields are checked.
+        // Required-field error proves validation ran before optional fields are checked.
         await Expect(_plan.ErrorFor(m => m.ResidentName))
             .ToContainTextAsync("required", new() { Timeout = 5000 });
 

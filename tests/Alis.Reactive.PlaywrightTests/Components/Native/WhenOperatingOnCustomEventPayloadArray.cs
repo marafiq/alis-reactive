@@ -1,6 +1,6 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-// The shift-report payload carries ResidentAlert[]; p.From(payload, x => x.Alerts)
+// Shift-report payload carries ResidentAlert[]; p.From(payload, x => x.Alerts)
 // drives filter, aggregate, find, and guard behavior.
 [TestFixture]
 public class WhenOperatingOnCustomEventPayloadArray : PlaywrightTestBase

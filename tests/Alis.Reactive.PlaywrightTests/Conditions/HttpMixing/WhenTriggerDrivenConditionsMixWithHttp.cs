@@ -75,7 +75,7 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
         await Page.Locator("#s2-btn-inactive-zero").ClickAsync();
 
         await Expect(Page.Locator("#s2-active-status")).ToHaveTextAsync("inactive", new() { Timeout = 5000 });
-        // The HTTP segment is independent of the surrounding condition branches.
+        // HTTP segment is independent of the surrounding condition branches.
         await Expect(Page.Locator("#s2-audit-result")).ToHaveTextAsync("audited:login", new() { Timeout = 5000 });
         await Expect(Page.Locator("#s2-count-badge")).ToBeHiddenAsync();
 

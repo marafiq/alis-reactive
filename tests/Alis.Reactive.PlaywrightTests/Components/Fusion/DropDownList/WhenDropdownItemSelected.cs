@@ -114,7 +114,7 @@ public class WhenDropdownItemSelected : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // The Syncfusion wrapper owns pointer focus; the generated input has tabindex="-1".
+        // Syncfusion wrapper owns pointer focus; the generated input has tabindex="-1".
         var wrapper = Page.Locator($"span.e-ddl:has(#{CategoryId})");
         await wrapper.ClickAsync();
 

@@ -29,7 +29,7 @@ public class WhenInPlaceEditorQuickEditCommitsDropDown : PlaywrightTestBase
             && matchingRequest.Method == "POST",
             new() { Timeout = 10000 });
 
-        // The Save button is the user commit path for this inner editor type.
+        // Save button is the user commit path for this inner editor type.
         await Page.Locator("#card-care-level .e-btn-save").First.ClickAsync();
 
         var request = await requestTask;

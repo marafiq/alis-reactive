@@ -104,7 +104,7 @@ public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 
         await Page.Locator($"#{PlaygroundSyntaxModelIdPrefix}__Category").SelectOptionAsync(new SelectOptionValue { Value = "A" });
 
-        // A non-reactive control must remain inert even after the browser event settles.
+        // Non-reactive control must remain inert even after the browser event settles.
         await Expect(statusEcho).ToHaveTextAsync("\u2014", new() { Timeout = 1000 });
         await Expect(amountEcho).ToHaveTextAsync("\u2014", new() { Timeout = 1000 });
 

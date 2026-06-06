@@ -59,7 +59,7 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         await editor.SelectOptionAsync("Night Float Team");
 
         // Save directly with the editor still OPEN (no intermediate cell click).
-        // The Save-All pipeline must call grid.SaveCell() to commit the open cell
+        // Save-All must call grid.SaveCell() to commit the open cell
         // into the batch before getBatchChanges — regression guard for the bug
         // where changing a select then clicking Save did not persist.
         await ClickWhenStable(Page.Locator("#careops-save-all"));

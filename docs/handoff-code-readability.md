@@ -1016,6 +1016,11 @@ Rewrite or delete:
   data-source binding, custom-event payload arrays, same-reaction DOM reads,
   and SignalR partial reuse directly without adding helpers or changing
   behavior.
+- Resolved on `tiny-safe-but-important-refactorings`: Playwright boundary
+  comments now state regression contracts directly for Syncfusion focus,
+  filtering, open-cell save, injected partials, validation ordering, custom
+  event arrays, and expected HTTP 500 console behavior without changing test
+  flow or extracting helpers.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

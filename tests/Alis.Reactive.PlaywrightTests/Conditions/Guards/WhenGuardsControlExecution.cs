@@ -375,7 +375,7 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         await Expect(always).ToHaveTextAsync("Always runs");
         await Expect(bonus).ToHaveTextAsync("Bonus!");
 
-        // A failed guard skips only the guarded reaction; unguarded reactions still run.
+        // Failed guard skips only the guarded reaction; unguarded reactions still run.
         await Page.Locator("#btn-single-command-condition-low").ClickAsync();
         await Expect(always).ToHaveTextAsync("Always runs");
         // Bonus keeps the previous successful branch value; the fresh-page test covers the default state.

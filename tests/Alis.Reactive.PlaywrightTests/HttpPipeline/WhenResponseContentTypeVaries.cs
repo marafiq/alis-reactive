@@ -52,7 +52,7 @@ public class WhenResponseContentTypeVaries : PlaywrightTestBase
 
         await Expect(Page.Locator($"#{ContentTypeModelScope}__NativeValue")).ToHaveValueAsync("native-partial-value");
 
-        // The Syncfusion wrapper proves Into() used ej.base.append so ScriptManager output ran.
+        // Syncfusion wrapper proves Into() used ej.base.append so ScriptManager output ran.
         await Expect(Page.Locator("#partial-container .e-numerictextbox")).ToBeVisibleAsync(new() { Timeout = 5000 });
 
         await Expect(Page.Locator("#partial-spinner")).ToBeHiddenAsync();

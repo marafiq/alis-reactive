@@ -242,7 +242,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     [Test]
     public async Task care_level_placeholder_has_empty_value()
     {
-        // The placeholder option must have value="" so clearing the dropdown
+        // Placeholder option must have value="" so clearing the dropdown
         // via SelectOptionAsync("") works for the component-read condition test.
         await NavigateAndBoot();
 
