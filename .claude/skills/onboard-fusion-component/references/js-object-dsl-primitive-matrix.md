@@ -55,7 +55,7 @@ adding public API.
 | Component properties | scalar/object/array reads, scalar/object/array writes, nested paths, writes that require a follow-up method |
 | Component methods | no args, one arg, two args, three args, four-plus args, void return, value return, overloads, object args, array args |
 | Component events | empty payload events, typed payload events, generic row-shaped payloads, builder `.Reactive(...)` wiring |
-| Event payload reads | scalar, nested object, indexed array element, whole typed array/list |
+| Event payload reads | scalar, nested object, whole typed array/list consumed through the array primitive |
 | Event payload writes | literal value, response-derived value, lifecycle-sensitive vendor flags |
 | Event payload calls | no args, one arg, multiple args, visible lifecycle effect |
 | Event payload consumers | conditions, HTTP body/header/route gather, plugin args, array transforms, DOM text/html helpers |
@@ -104,8 +104,7 @@ contracts.
 |---|---|---|---|
 | `args.prop` read | property on event args type + `PayloadTypedSource<TPayload, TProp>.FromEvent(...)` through public DSL | `args.Prop` in `.Reactive(...)` lambda | Public consumers use condition/gather/plugin/array overloads that accept the typed args placeholder. |
 | `args.a.b` read | nested event args type + expression path | `args.Action.RequestType` | `ExpressionPathHelper.ToEventPath` lowers to runtime path such as `action.requestType`. |
-| `args.items[0].name` read | `List<T>`/array property on args + constant index expression | `args.Items[0].Name` | Index paths are supported for constant indexes. |
-| whole `args.items` read | `p.From(args, e => e.Items)` or `GatherBuilder.FromEvent(args, e => e.Items, "...")` | typed array/list property | Use for array transforms or request body gather. |
+| `args.items` array read | `p.From(args, e => e.Items)` or `GatherBuilder.FromEvent(args, e => e.Items, "...")` | typed array/list property | Use the array primitive for element-level behavior, or whole-array gather when the server owns projection. Do not model array behavior as index-path extraction. |
 | `args.prop = literal` | `ReactionGraph.Set(PayloadSource.Event(), "prop", ValueExpression.Literal(...))` | event-args extension method such as `Cancel(p)` or `PreventDefault(p)` | Run inside the event pipeline before vendor code observes the value. |
 | `args.prop = response.value` | `ReactionGraph.Set(PayloadSource.Event(), "prop", ValueExpression.Read(response.Scope, path))` | event-args extension accepting `ResponseBody<T>` and expression path | Use for event payload writes driven by HTTP response data. |
 | `args.method()` | `ReactionGraph.Call(PayloadSource.Event(), "method", [])` | event-args extension method | Payload commands are not component commands. |

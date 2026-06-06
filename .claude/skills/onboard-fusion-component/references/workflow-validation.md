@@ -96,7 +96,7 @@ The deterministic workflow therefore validates two paths:
 | writable payload props | Grid edit args `cancel`; Kanban cancellable args `cancel`; Schedule popup args `cancel` |
 | payload methods | Kanban data-source changed args `endEdit` and `cancelEdit`; workflow requires raw lifecycle proof for any new payload method |
 | nested payloads | Grid `action.*`; Schedule `popupOpen.data.*`; Kanban generic card payloads |
-| arrays/indexed paths | Grid `sorted[]`, `where[]`, `search[]`, batch changes; Kanban `List<TCard>` payloads; Schedule event collections through `GetEvents` |
+| array primitives and typed array sources | Grid `sorted[]`, `where[]`, `search[]`, batch changes; Kanban `List<TCard>` payloads; Schedule event collections through `GetEvents` |
 | builder-owned exclusions | Grid edit settings/export/column setup, Kanban initial board setup, Schedule event settings stay on Syncfusion MVC builders unless post-render behavior is proven |
 | vertical-slice files | Grid use-case partials, Kanban isolated slice, Schedule isolated slice with event files |
 | 100 percent typed API proof expectations | `proof/typed-api-coverage-matrix.md` must have one row per public Fusion API member before a component audit or onboarding closes |

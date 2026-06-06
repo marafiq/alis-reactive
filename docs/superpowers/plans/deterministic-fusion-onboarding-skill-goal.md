@@ -1,5 +1,10 @@
 # Deterministic Fusion Onboarding Skill Goal
 
+> Superseded by `docs/superpowers/plans/final-deterministic-fusion-onboarding-goal.md`.
+> Use the final goal document as the authority. This earlier draft is historical
+> reviewer context only; do not use any stale array wording here to override the
+> current proper array primitive rule.
+
 ## Objective
 
 Create a deterministic, auditable Fusion onboarding workflow that can onboard a
@@ -470,7 +475,7 @@ Minimum proof rules:
 | event payload property | visible text or HTTP payload from typed event read |
 | event payload mutation | visible Syncfusion lifecycle behavior changes |
 | event payload method | visible popup/data/component behavior changes |
-| array member/source | typed indexed path, whole-array gather, or array transform consumed by behavior |
+| array member/source | proper array primitive, whole-array gather, or typed array source consumed by behavior |
 | stateful workflow | HTTP-backed create/update/delete/move/reload proof when applicable |
 
 Playwright tests must be behavior tests. They must run through

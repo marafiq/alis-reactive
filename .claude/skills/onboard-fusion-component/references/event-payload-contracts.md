@@ -91,7 +91,7 @@ Each event payload member needs a consumer proof:
 |---|---|
 | readable scalar | displayed in sandbox or sent via gather |
 | readable object | nested property displayed or posted to server |
-| readable typed array | typed indexed member displayed, or whole typed array posted to server |
+| readable typed array | proper array primitive consumed by behavior, or whole typed array posted to server |
 | writable property | visible behavior changes because of the mutation |
 | callable method | visible behavior changes because the method ran |
 

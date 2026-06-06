@@ -88,7 +88,7 @@ and prove the rendered template in Playwright instead of raw template strings.
 | property write | visible DOM/component state change |
 | event payload property | visible text or HTTP payload from `FromEvent` |
 | event payload method | visible popup/data/component behavior |
-| array/indexed payload | typed indexed path, whole-array gather, or array transform consumed by behavior |
+| array payload | proper array primitive, whole-array gather, or typed array source consumed by behavior |
 | builder-owned exclusion | builder XML or source row linked from the audit report |
 
 ## Gate 6: Stateful App Proof

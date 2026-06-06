@@ -131,7 +131,7 @@ and Playwright proof.
      node .claude/skills/onboard-fusion-component/scripts/inspect-syncfusion-event-payload.mjs --type FilteringEventArgs
      ```
    - Capture every gesture the typed event claims to support. Grid `dataStateChange` is the reference case: sorting, paging, filtering, searching, and grouping can produce different nested payload shapes.
-   - If a payload property is an array, keep it typed as `List<T>` or a typed array in the C# event contract. Prove it through a typed indexed read, a whole-array gather, or a typed array transform consumed by behavior. Do not add untyped element accessors to component slices.
+   - If a payload property is an array, keep it typed as `List<T>` or a typed array in the C# event contract. Prove it through the proper array primitive, a typed whole-array gather, or a typed array source consumed by behavior. Do not add untyped element accessors or index-path shortcuts to component slices.
    - Output `discovery/event-payload-surface.json` and raw trace links.
 
 5. **Blazor NuGet naming candidate review**
@@ -196,7 +196,7 @@ and Playwright proof.
    - A source member must be consumed by condition, gather, HTTP payload/header/route, DOM text/html, plugin argument, array transform, or component binding.
    - A write or void method must visibly change component/runtime state.
    - A method return source must be consumed by a realistic pipeline.
-   - Event payload properties, writable payload properties, payload methods, nested payloads, arrays, and indexed paths must be proven through the typed event contract.
+   - Event payload properties, writable payload properties, payload methods, nested payloads, and arrays through the proper array primitive must be proven through the typed event contract.
    - Builder-owned exclusions must be listed with the builder evidence that owns initial render configuration.
 
 10. **Playwright behavior proof**
@@ -227,7 +227,7 @@ and Playwright proof.
 | `ej2.method(arg1, arg2, arg3)` | Yes | `ComponentMethod.WithArgs<T1,T2,T3>()` + `EmitCall` |
 | `ej2.method(...) -> value` | Yes | `self.Read<TReturn>(ComponentMethod, args)` |
 | `eventArgs.prop` read | Yes | typed event args + `FromEvent` / conditions |
-| `eventArgs.array[index].prop` read | Yes | typed event args with `List<T>` and expression index path |
+| event payload array read | Yes | typed event args with `List<T>` or typed arrays consumed through the array primitive or whole-array gather |
 | `eventArgs.prop = value` | Yes | `ReactionGraph.Set(PayloadSource.Event(), ...)` |
 | `eventArgs.method(args)` | Yes | `ReactionGraph.Call(PayloadSource.Event(), ...)` |
 | builder-only static option | No | keep on Syncfusion MVC builder |
