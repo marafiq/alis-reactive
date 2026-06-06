@@ -1,8 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionTooltip.BeforeClose.
-    /// Fires before the tooltip closes. Set cancel to true to prevent closing.
+    /// Carries the cancel flag for a tooltip close request.
     /// </summary>
     public class FusionTooltipBeforeCloseArgs
     {

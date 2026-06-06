@@ -1,8 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionTooltip.Closed.
-    /// Fires after the tooltip is hidden. Notification only — no actionable fields.
+    /// Notification payload for a tooltip that has been hidden.
     /// </summary>
     public class FusionTooltipClosedArgs
     {

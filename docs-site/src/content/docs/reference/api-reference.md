@@ -1648,6 +1648,13 @@ Carries rendered Syncfusion AIAssistView markup and the Reactive Plan for event 
 
 Typed AIAssistView events available to Reactive Plans.
 
+```csharp
+// Properties
+PromptChanged { get; }  // Fires when the prompt text changes.
+PromptRequest { get; }  // Fires before a submitted prompt starts its request.
+StopRespondingClick { get; }  // Fires when the user stops an active response.
+```
+
 ### FusionAIAssistViewExtensions
 
 Runtime behavior for Syncfusion AIAssistView. Initial render options remain on
@@ -1660,11 +1667,32 @@ Factory extension for rendering Syncfusion AIAssistView with reactive event supp
 
 ### FusionAIAssistViewPromptChangedArgs
 
-Payload for AIAssistView promptChanged.
+Carries the current and previous prompt text when the prompt changes.
+
+```csharp
+// Properties
+PreviousValue { get; }  // Prompt text before the change.
+Value { get; }  // Current prompt text.
+```
 
 ### FusionAIAssistViewPromptRequestArgs
 
-Payload for AIAssistView promptRequest.
+Carries a submitted prompt before the AIAssistView request is sent.
+
+```csharp
+// Properties
+Cancel { get; }  // Whether the request should be canceled.
+Prompt { get; }  // Submitted prompt text.
+PromptSuggestions { get; }  // Prompt suggestions available when the request was submitted.
+```
+
+### FusionAIAssistViewPromptRequestArgsExtensions
+
+Reactive Plan helpers for mutating an AIAssistView prompt request payload.
+
+```csharp
+CancelRequest(args, pipeline)
+```
 
 ### FusionAIAssistViewReactiveExtensions
 
@@ -1672,7 +1700,13 @@ Wires `FusionAIAssistView` events into the Reactive Plan.
 
 ### FusionAIAssistViewStopRespondingClickArgs
 
-Payload for AIAssistView stopRespondingClick.
+Carries the prompt and response index when the user stops a response.
+
+```csharp
+// Properties
+DataIndex { get; }  // Index of the response item being stopped.
+Prompt { get; }  // Prompt text associated with the stopped response.
+```
 
 ### FusionAutoComplete
 
@@ -4989,8 +5023,7 @@ Represents a Syncfusion Tooltip display component.
 
 ### FusionTooltipBeforeCloseArgs
 
-Payload for FusionTooltip.BeforeClose.
-            Fires before the tooltip closes. Set cancel to true to prevent closing.
+Carries the cancel flag for a tooltip close request.
 
 ```csharp
 // Properties
@@ -4999,8 +5032,7 @@ Cancel { get; }  // Set to true to prevent the tooltip from closing.
 
 ### FusionTooltipBeforeOpenArgs
 
-Payload for FusionTooltip.BeforeOpen.
-            Fires before the tooltip opens. Set cancel to true to prevent opening.
+Carries the cancel flag for a tooltip open request.
 
 ```csharp
 // Properties
@@ -5009,9 +5041,7 @@ Cancel { get; }  // Set to true to prevent the tooltip from opening.
 
 ### FusionTooltipBeforeRenderArgs
 
-Payload for FusionTooltip.BeforeRender.
-            Fires before tooltip content renders. Used for dynamic content injection.
-            Set cancel to true to prevent rendering.
+Carries the cancel flag before tooltip content renders.
 
 ```csharp
 // Properties
@@ -5024,8 +5054,7 @@ Wraps rendered Syncfusion tooltip markup while carrying plan metadata for `.Reac
 
 ### FusionTooltipClosedArgs
 
-Payload for FusionTooltip.Closed.
-            Fires after the tooltip is hidden. Notification only — no actionable fields.
+Notification payload for a tooltip that has been hidden.
 
 ### FusionTooltipEvents
 
@@ -5060,8 +5089,7 @@ FusionTooltip<T>(html, plan, elementId, build)
 
 ### FusionTooltipOpenedArgs
 
-Payload for FusionTooltip.Opened.
-            Fires after the tooltip becomes visible. Notification only — no actionable fields.
+Notification payload for a tooltip that has become visible.
 
 ### FusionTooltipReactiveExtensions
 
