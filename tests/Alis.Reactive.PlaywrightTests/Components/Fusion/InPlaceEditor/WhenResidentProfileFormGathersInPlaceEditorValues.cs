@@ -2,11 +2,7 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-/// <summary>
-/// §A mixed form: click "Save Profile" → the Gather(IncludeAll()) includes every field in the plan,
-/// including the three InPlaceEditor fields (Nickname, DateOfBirth, Allergies) alongside the other
-/// Fusion inputs. Proves InPlaceEditor participates in the standard component-registration / gather path.
-/// </summary>
+// InPlaceEditor fields must participate in IncludeAll gather with the other registered Fusion inputs.
 [TestFixture]
 public class WhenResidentProfileFormGathersInPlaceEditorValues : PlaywrightTestBase
 {

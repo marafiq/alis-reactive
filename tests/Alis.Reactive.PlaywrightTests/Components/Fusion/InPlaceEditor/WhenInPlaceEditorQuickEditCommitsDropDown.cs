@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-/// <summary>
-/// CareLevel card: DropDownList inner type. Pick an option → Enter → POST fires with chosen id.
-/// </summary>
 [TestFixture]
 public class WhenInPlaceEditorQuickEditCommitsDropDown : PlaywrightTestBase
 {

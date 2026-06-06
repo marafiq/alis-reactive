@@ -2,11 +2,7 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-/// <summary>
-/// §A mixed form: commit an overlong Nickname (>50 chars, ResidentProfileValidator.MaximumLength(50))
-/// through the InPlaceEditor, then click Save Profile. Client validation rules should block
-/// the outbound POST. Proves InPlaceEditor participates in validation like any other input.
-/// </summary>
+// InPlaceEditor profile fields must use the same client validation path as other inputs.
 [TestFixture]
 public class WhenResidentProfileFormValidatesInPlaceEditorFields : PlaywrightTestBase
 {

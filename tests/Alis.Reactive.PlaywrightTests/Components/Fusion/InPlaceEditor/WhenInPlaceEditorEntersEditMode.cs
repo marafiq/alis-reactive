@@ -2,10 +2,7 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-/// <summary>
-/// Proves the DOB card opens Syncfusion edit mode with visible action buttons.
-/// Verified against real Syncfusion DOM (e-editable-value-wrapper → e-editable-action-buttons).
-/// </summary>
+// Edit-mode proof targets real Syncfusion DOM: value wrapper opens action buttons.
 [TestFixture]
 public class WhenInPlaceEditorEntersEditMode : PlaywrightTestBase
 {

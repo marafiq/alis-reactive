@@ -2,10 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-/// <summary>
-/// Nickname card: type "boom" → Enter → editor closes → ActionSuccess fires → our Post returns 500
-/// → reactive pipeline's <c>OnError&lt;InPlaceEditorCommitError&gt;</c> populates the error element.
-/// </summary>
 [TestFixture]
 public class WhenInPlaceEditorQuickEditServerErrorSurfaces : PlaywrightTestBase
 {

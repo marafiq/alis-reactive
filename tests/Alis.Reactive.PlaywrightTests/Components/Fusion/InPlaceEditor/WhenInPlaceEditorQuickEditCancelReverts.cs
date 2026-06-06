@@ -2,10 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-/// <summary>
-/// Cancel card: proves a real cancel-button click fires CancelClick, closes the editor,
-/// and does not submit.
-/// </summary>
 [TestFixture]
 public class WhenInPlaceEditorQuickEditCancelReverts : PlaywrightTestBase
 {

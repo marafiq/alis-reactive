@@ -2,10 +2,7 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-/// <summary>
-/// Event tracer card: proves every onboarded lifecycle event surfaces its typed args-props
-/// into a dedicated trace cell through page-visible behavior.
-/// </summary>
+// Lifecycle event tests prove typed Syncfusion args reach page-visible trace cells.
 [TestFixture]
 public class WhenInPlaceEditorEventTracerFiresLifecycle : PlaywrightTestBase
 {

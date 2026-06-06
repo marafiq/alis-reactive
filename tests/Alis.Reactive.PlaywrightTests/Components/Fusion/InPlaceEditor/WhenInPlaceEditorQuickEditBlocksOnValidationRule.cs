@@ -2,10 +2,7 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-/// <summary>
-/// Proves MonthlyRate <c>FusionInPlaceEditor</c> validation uses the framework
-/// validation path for both client-declared rules and server-only errors.
-/// </summary>
+// MonthlyRate validation uses the framework field slot for client-declared rules and server-only errors.
 [TestFixture]
 public class WhenInPlaceEditorQuickEditBlocksOnValidationRule : PlaywrightTestBase
 {
