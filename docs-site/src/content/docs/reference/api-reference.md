@@ -634,10 +634,10 @@ Static(param, value)
 Provides component-source overloads for adding request body fields.
 
 ```csharp
-Include<T>(self, expr)
-Include<T>(self, refId, name)
-Include<T>(self, source)
-Include<T>(self, source, paramName)
+Include<T>(expr)
+Include<T>(refId, name)
+Include<T>(source)
+Include<T>(source, paramName)
 ```
 
 ### HttpRequestBuilder<T>
@@ -742,7 +742,7 @@ A model-bound input field returned by
 Razor view extensions for adding behavior to a Reactive Plan.
 
 ```csharp
-On<T>(html, plan, trigger)
+On<T>(plan, trigger)
 ```
 
 ### InputFieldExtensions
@@ -750,8 +750,8 @@ On<T>(html, plan, trigger)
 Razor view extension for starting a model-bound input field.
 
 ```csharp
-InputField<T>(html, plan, expression)
-InputField<T>(html, plan, expression, configure)
+InputField<T>(plan, expression)
+InputField<T>(plan, expression, configure)
 ```
 
 ### PlanExtensions
@@ -760,7 +760,7 @@ Razor view extensions for creating, resolving, and rendering Reactive Plans.
 
 ```csharp
 ReactivePlan<T>()
-RenderPlan<T>(html, plan)
+RenderPlan<T>(plan)
 ResolvePlan<T>()
 ```
 
@@ -1624,7 +1624,7 @@ ExpandItem<T>()
 Creates typed `FusionAccordionBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionAccordion<T>(html, plan, elementId, build)
+FusionAccordion<T>(plan, elementId, build)
 ```
 
 ### FusionAccordionReactiveExtensions
@@ -1632,7 +1632,7 @@ FusionAccordion<T>(html, plan, elementId, build)
 Wires `FusionAccordion` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, eventSelector, pipeline)
+Reactive<T>(eventSelector, pipeline)
 ```
 
 ### FusionAIAssistView
@@ -1691,7 +1691,7 @@ PromptSuggestions { get; }  // Prompt suggestions available when the request was
 Reactive Plan helpers for mutating an AIAssistView prompt request payload.
 
 ```csharp
-CancelRequest(args, pipeline)
+CancelRequest(pipeline)
 ```
 
 ### FusionAIAssistViewReactiveExtensions
@@ -1825,7 +1825,7 @@ SetActiveItem<T>()
 Creates typed `FusionBreadcrumbBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionBreadcrumb<T>(html, plan, elementId, build)
+FusionBreadcrumb<T>(plan, elementId, build)
 ```
 
 ### FusionBreadcrumbItem
@@ -1886,7 +1886,7 @@ GetActualIndex<T>()
 Creates typed `FusionBulletChartBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionBulletChart<T>(html, plan, elementId, build)
+FusionBulletChart<T>(plan, elementId, build)
 ```
 
 ### FusionBulletChartMouseClickArgs
@@ -1962,7 +1962,7 @@ SetToggle<T>()
 Creates a FusionButton with Syncfusion MVC builder-owned initial render.
 
 ```csharp
-FusionButton<T>(html, plan, elementId, build)
+FusionButton<T>(plan, elementId, build)
 ```
 
 ### FusionButtonIconPosition
@@ -2003,7 +2003,7 @@ SelectedIndex<T>()
 Creates typed `FusionCarouselBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionCarousel<T>(html, plan, elementId, build)
+FusionCarousel<T>(plan, elementId, build)
 ```
 
 ### FusionCarouselReactiveExtensions
@@ -2170,7 +2170,7 @@ FusionColorPicker<T>(setup, build)
 Wires `FusionColorPicker` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionComboBox
@@ -2243,7 +2243,7 @@ FusionComboBox<T>(setup, build)
 Wires `FusionComboBox` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionContextMenu
@@ -2303,7 +2303,7 @@ Open<T>()
 Creates typed `FusionContextMenuBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionContextMenu<T>(html, plan, elementId, build)
+FusionContextMenu<T>(plan, elementId, build)
 ```
 
 ### FusionContextMenuItem
@@ -2374,7 +2374,7 @@ FusionDatePicker<T>(setup, build)
 Wires `FusionDatePicker` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionDateRangePicker
@@ -2430,7 +2430,7 @@ FusionDateRangePicker<T>(setup, build)
 Wires `FusionDateRangePicker` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionDateTimePicker
@@ -2485,7 +2485,7 @@ FusionDateTimePicker<T>(setup, build)
 Wires `FusionDateTimePicker` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionDialog
@@ -2551,7 +2551,7 @@ Show<T>()
 Creates typed `FusionDialogBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionDialog<T>(html, plan, elementId, build)
+FusionDialog<T>(plan, elementId, build)
 ```
 
 ### FusionDialogOpenedArgs
@@ -2775,7 +2775,7 @@ FusionDropDownTree<T>(setup, build)
 Wires `FusionDropDownTree` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionFileUpload
@@ -2817,7 +2817,7 @@ FusionFileUpload<T>(setup, build)
 Wires `FusionFileUpload` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionFileUploadSelectedArgs
@@ -2984,7 +2984,7 @@ Field<T>()
 Creates typed `FusionGridBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionGrid<T>(html, plan, elementId, build)
+FusionGrid<T>(plan, elementId, build)
 ```
 
 ### FusionGridReactiveExtensions
@@ -2992,7 +2992,7 @@ FusionGrid<T>(html, plan, elementId, build)
 Wires `FusionGrid` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, eventSelector, pipeline)
+Reactive<T>(eventSelector, pipeline)
 ```
 
 ### FusionGridRecordClickArgs<T>
@@ -3126,7 +3126,7 @@ Data { get; }  // The payload Syncfusion prepared for its built-in submit, keyed
 Typed event-payload operations for the actionBegin event args of `FusionInPlaceEditor`.
 
 ```csharp
-PreventDefault(args, pipeline)
+PreventDefault(pipeline)
 ```
 
 ### FusionInPlaceEditorActionSuccessArgs
@@ -3157,7 +3157,7 @@ Name { get; }  // Syncfusion event token exposed as `args.name`.
 Typed event-payload operations for the beginEdit event args of `FusionInPlaceEditor`.
 
 ```csharp
-PreventDefault(args, pipeline)
+PreventDefault(pipeline)
 ```
 
 ### FusionInPlaceEditorCancelClickArgs
@@ -3197,7 +3197,7 @@ Name { get; }  // Syncfusion event token exposed as `args.name`.
 Typed event-payload operations for the endEdit event args of `FusionInPlaceEditor`.
 
 ```csharp
-PreventDefault(args, pipeline)
+PreventDefault(pipeline)
 ```
 
 ### FusionInPlaceEditorEvents
@@ -3243,7 +3243,7 @@ FusionInPlaceEditor<T>(setup, build)
 Wires `FusionInPlaceEditor` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionInPlaceEditorSubmitClickArgs
@@ -3306,7 +3306,7 @@ FusionInputMask<T>(setup, build)
 Wires `FusionInputMask` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionKanban
@@ -3389,7 +3389,7 @@ Value<T>()
 Creates a FusionListBox with Syncfusion MVC builder-owned static configuration.
 
 ```csharp
-FusionListBox<T>(html, plan, elementId, build)
+FusionListBox<T>(plan, elementId, build)
 ```
 
 ### FusionListBoxReactiveExtensions
@@ -3430,7 +3430,7 @@ UnselectText<T>()
 Creates a FusionListView with Syncfusion MVC builder-owned static configuration.
 
 ```csharp
-FusionListView<T>(html, plan, elementId, build)
+FusionListView<T>(plan, elementId, build)
 ```
 
 ### FusionListViewReactiveExtensions
@@ -3512,7 +3512,7 @@ Open<T>()
 Creates typed `FusionMenuBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionMenu<T>(html, plan, elementId, build)
+FusionMenu<T>(plan, elementId, build)
 ```
 
 ### FusionMenuItem
@@ -3653,8 +3653,8 @@ Text { get; }  // Search text the user typed.
 Typed event-payload operations for the filtering event args of `FusionMultiSelect`.
 
 ```csharp
-PreventDefault(args, pipeline)
-UpdateData<T>(args, pipeline, source, path)
+PreventDefault(pipeline)
+UpdateData<T>(pipeline, source, path)
 ```
 
 ### FusionMultiSelectHtmlExtensions
@@ -3662,8 +3662,8 @@ UpdateData<T>(args, pipeline, source, path)
 Creates a FusionMultiSelect inside a field wrapper, bound to a model property.
 
 ```csharp
-Fields<T>(builder, text, value)
-Fields<T>(builder, text, value, groupBy)
+Fields<T>(text, value)
+Fields<T>(text, value, groupBy)
 FusionMultiSelect<T>(setup, build)
 ```
 
@@ -3672,7 +3672,7 @@ FusionMultiSelect<T>(setup, build)
 Wires `FusionMultiSelect` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionNumericTextBox
@@ -4047,7 +4047,7 @@ FusionRating<T>(setup, build)
 Wires `FusionRating` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionRatingValueChangedArgs
@@ -4112,7 +4112,7 @@ FusionRichTextEditor<T>(setup, build)
 Wires `FusionRichTextEditor` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionSchedule
@@ -4242,7 +4242,7 @@ SetDataSource<T>()
 Creates typed `FusionScheduleBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionSchedule<T>(html, plan, elementId, build)
+FusionSchedule<T>(plan, elementId, build)
 ```
 
 ### FusionScheduleNavigatingArgs
@@ -4305,7 +4305,7 @@ PreventDefault()
 Wires `FusionSchedule` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, eventSelector, pipeline)
+Reactive<T>(eventSelector, pipeline)
 ```
 
 ### FusionSelectedChips
@@ -4358,7 +4358,7 @@ Toggle<T>()
 Creates typed `FusionSidebarBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionSidebar<T>(html, plan, elementId, build)
+FusionSidebar<T>(plan, elementId, build)
 ```
 
 ### FusionSidebarReactiveExtensions
@@ -4366,7 +4366,7 @@ FusionSidebar<T>(html, plan, elementId, build)
 Wires `FusionSidebar` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, eventSelector, pipeline)
+Reactive<T>(eventSelector, pipeline)
 ```
 
 ### FusionSidebarTransitionArgs
@@ -4434,7 +4434,7 @@ FusionSlider<T>(setup, build)
 Wires `FusionSlider` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionSmartPasteButton
@@ -4607,7 +4607,7 @@ SetActiveStep<T>()
 Creates typed `FusionStepperBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionStepper<T>(html, plan, elementId, build)
+FusionStepper<T>(plan, elementId, build)
 ```
 
 ### FusionStepperReactiveExtensions
@@ -4701,7 +4701,7 @@ SetSelectedItem<T>()
 Creates typed `FusionTabBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionTab<T>(html, plan, elementId, build)
+FusionTab<T>(plan, elementId, build)
 ```
 
 ### FusionTabReactiveExtensions
@@ -4709,7 +4709,7 @@ FusionTab<T>(html, plan, elementId, build)
 Wires `FusionTab` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, eventSelector, pipeline)
+Reactive<T>(eventSelector, pipeline)
 ```
 
 ### FusionTabSelectedArgs
@@ -4955,7 +4955,7 @@ FusionTimePicker<T>(setup, build)
 Wires `FusionTimePicker` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionToolbar
@@ -4998,7 +4998,7 @@ Disable<T>()
 Creates typed `FusionToolbarBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionToolbar<T>(html, plan, elementId, build)
+FusionToolbar<T>(plan, elementId, build)
 ```
 
 ### FusionToolbarItem
@@ -5084,7 +5084,7 @@ Refresh<T>()
 Creates typed `FusionTooltipBuilder<T>` instances for Reactive Plan wiring.
 
 ```csharp
-FusionTooltip<T>(html, plan, elementId, build)
+FusionTooltip<T>(plan, elementId, build)
 ```
 
 ### FusionTooltipOpenedArgs
@@ -5096,7 +5096,7 @@ Notification payload for a tooltip that has become visible.
 Wires `FusionTooltip` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, eventSelector, pipeline)
+Reactive<T>(eventSelector, pipeline)
 ```
 
 ---
@@ -5230,7 +5230,7 @@ Pipeline and layout extensions for the `IHtmlHelper)`.
 Close<T>()
 NativeDrawer()
 Open<T>()
-SetSize<T>(self, size)
+SetSize<T>(size)
 ```
 
 ### NativeLoader
@@ -5249,8 +5249,8 @@ Pipeline and layout extensions for the `IHtmlHelper)`.
 ```csharp
 Hide<T>()
 NativeLoader()
-SetTarget<T>(self, targetId)
-SetTimeout<T>(self, ms)
+SetTarget<T>(targetId)
+SetTimeout<T>(ms)
 Show<T>()
 ```
 
@@ -5273,7 +5273,7 @@ WriteTo()
 HTML helper extensions for links that execute reactive request pipelines.
 
 ```csharp
-NativeActionLink<T>(html, linkText, url, pipeline)
+NativeActionLink<T>(linkText, url, pipeline)
 ```
 
 ### NativeButton
@@ -5309,7 +5309,7 @@ Reactive Plan operations for `NativeButton` text content and focus.
 
 ```csharp
 FocusIn<T>()
-SetText<T>(self, text)
+SetText<T>(text)
 ```
 
 ### NativeButtonHtmlExtensions
@@ -5317,7 +5317,7 @@ SetText<T>(self, text)
 Factory extension for rendering explicit-ID native buttons directly in a Razor view.
 
 ```csharp
-NativeButton<T>(html, elementId, text)
+NativeButton<T>(elementId, text)
 ```
 
 ### NativeButtonReactiveExtensions
@@ -5325,7 +5325,7 @@ NativeButton<T>(html, elementId, text)
 Adds Reactive Plan event wiring to rendered `NativeButton` builders.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### NativeCheckBox
@@ -5370,7 +5370,7 @@ Reactive Plan operations for `NativeCheckBox` checked state and focus.
 
 ```csharp
 FocusIn<T>()
-SetChecked<T>(self, isChecked)
+SetChecked<T>(isChecked)
 Value<T>()
 ```
 
@@ -5387,7 +5387,7 @@ NativeCheckBox<T>(setup, build)
 Wires `NativeCheckBox` DOM events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### NativeCheckList
@@ -5437,8 +5437,8 @@ Reactive Plan operations for `NativeCheckList` checked values and focus.
 
 ```csharp
 FocusIn<T>()
-SetValue<T>(self, value)
-SetValue<T>(self, source, path)
+SetValue<T>(value)
+SetValue<T>(source, path)
 Value<T>()
 ```
 
@@ -5455,7 +5455,7 @@ NativeCheckList<T>(setup, build)
 Wires `NativeCheckList` DOM events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### NativeDropDown
@@ -5503,7 +5503,7 @@ Reactive Plan operations for `NativeDropDown` selected value and focus.
 
 ```csharp
 FocusIn<T>()
-SetValue<T>(self, value)
+SetValue<T>(value)
 Value<T>()
 ```
 
@@ -5520,7 +5520,7 @@ NativeDropDown<T>(setup, build)
 Wires `NativeDropDown` DOM events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### NativeHiddenField
@@ -5563,9 +5563,9 @@ Changed { get; }  // Fires when a DOM `change` event is dispatched for the hidde
 Reactive Plan operations for `NativeHiddenField` values.
 
 ```csharp
-SetValue<T>(self, value)
-SetValue<T>(self, source)
-SetValue<T>(self, source, path)
+SetValue<T>(value)
+SetValue<T>(source)
+SetValue<T>(source, path)
 Value<T>()
 ```
 
@@ -5574,7 +5574,7 @@ Value<T>()
 Factory extension for rendering model-bound hidden fields directly in a Razor view.
 
 ```csharp
-HiddenFieldFor<T>(html, plan, expression)
+HiddenFieldFor<T>(plan, expression)
 ```
 
 ### NativeHiddenFieldReactiveExtensions
@@ -5582,7 +5582,7 @@ HiddenFieldFor<T>(html, plan, expression)
 Wires `NativeHiddenField` DOM events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### NativeRadioGroup
@@ -5632,8 +5632,8 @@ Reactive Plan operations for `NativeRadioGroup` selected value and focus.
 
 ```csharp
 FocusIn<T>()
-SetValue<T>(self, value)
-SetValue<T>(self, source, path)
+SetValue<T>(value)
+SetValue<T>(source, path)
 Value<T>()
 ```
 
@@ -5650,7 +5650,7 @@ NativeRadioGroup<T>(setup, build)
 Adds Reactive Plan event wiring to rendered `NativeRadioGroup` builders.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### NativeTextArea
@@ -5697,7 +5697,7 @@ Reactive Plan operations for `NativeTextArea` values and focus.
 
 ```csharp
 FocusIn<T>()
-SetValue<T>(self, value)
+SetValue<T>(value)
 Value<T>()
 ```
 
@@ -5714,7 +5714,7 @@ NativeTextArea<T>(setup, build)
 Wires `NativeTextArea` DOM events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### NativeTextBox
@@ -5761,7 +5761,7 @@ Reactive Plan operations for `NativeTextBox` values and focus.
 
 ```csharp
 FocusIn<T>()
-SetValue<T>(self, value)
+SetValue<T>(value)
 Value<T>()
 ```
 
@@ -5778,7 +5778,7 @@ NativeTextBox<T>(setup, build)
 Wires `NativeTextBox` DOM events into the Reactive Plan.
 
 ```csharp
-Reactive<T>(builder, plan, eventSelector, pipeline)
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### RadioButtonItem
@@ -5802,7 +5802,7 @@ Gather shorthand that defaults to `NativeTextBox` when no component
             type is specified.
 
 ```csharp
-Include<T>(self, expr)
+Include<T>(expr)
 ```
 
 ---

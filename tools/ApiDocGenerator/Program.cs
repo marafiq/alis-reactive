@@ -345,7 +345,7 @@ record DocMember(string RawName, string Assembly, XElement Element)
 
             if (Kind == MemberKind.Method)
             {
-                var paramElements = Element.Elements("param").ToList();
+                var paramElements = DisplayParameterElements();
                 var paramList = string.Join(", ", paramElements.Select(p => p.Attribute("name")?.Value ?? "?"));
                 return $"{MemberName}({paramList})";
             }
@@ -353,6 +353,24 @@ record DocMember(string RawName, string Assembly, XElement Element)
             return MemberName;
         }
     }
+
+    private List<XElement> DisplayParameterElements()
+    {
+        var paramElements = Element.Elements("param").ToList();
+        if (!IsExtensionContainer() || paramElements.Count == 0)
+            return paramElements;
+
+        var firstParamName = paramElements[0].Attribute("name")?.Value;
+        return IsExtensionReceiverName(firstParamName)
+            ? paramElements.Skip(1).ToList()
+            : paramElements;
+    }
+
+    private bool IsExtensionContainer() =>
+        TypeName.EndsWith("Extensions", StringComparison.Ordinal);
+
+    private static bool IsExtensionReceiverName(string? parameterName) =>
+        parameterName is "html" or "self" or "builder" or "services" or "args";
 
     private static string CleanGeneric(string name)
     {

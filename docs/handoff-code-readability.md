@@ -164,6 +164,11 @@ Candidate cleanup:
   comment-only pass unless the API generator starts rendering method summaries;
   its remaining XML exists to support public DSL IntelliSense and generated
   overload signatures.
+- Resolved on `tiny-safe-but-important-refactorings`: the API reference
+  generator now omits extension-method receiver parameters from display
+  signatures. Generated docs show calls such as `On<T>(plan, trigger)`,
+  `SetValue<T>(value)`, and `PreventDefault(pipeline)` instead of exposing
+  implementation receivers like `html`, `self`, `builder`, or event `args`.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
 
