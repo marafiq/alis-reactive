@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod ClassRemoveMethod =
             ComponentMethod.Mapped("classRemove", "element.classList.remove").WithArgs<string>();
 
-        /// <summary>Sets the committed value.</summary>
+        /// <summary>Sets committed value.</summary>
         /// <remarks>
         /// Writes to Syncfusion's <c>value</c> property. Updates the displayed text immediately
         /// without firing <c>change</c>.
@@ -71,7 +71,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(FocusMethod);
 
-        /// <summary>Adds a CSS class to the editor's outer wrapper.</summary>
+        /// <summary>Adds CSS class to the editor's outer wrapper.</summary>
         /// <remarks>
         /// The class persists across edit/close cycles; typical use is a visual commit signal
         /// wired on <c>ActionSuccess</c> and removed on <c>BeginEdit</c>.
@@ -89,7 +89,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(ClassRemoveMethod, new List<ValueExpression> { ValueExpression.Literal(className) });
 
-        /// <summary>Reads the committed value for conditions or gather.</summary>
+        /// <summary>Reads committed value for conditions or gather.</summary>
         /// <remarks>
         /// Reads the registered editor value using the shape captured at render time by
         /// <see cref="FusionInPlaceEditorHtmlExtensions"/> (i.e. <c>Shape.FromClrType(typeof(TProp))</c>).

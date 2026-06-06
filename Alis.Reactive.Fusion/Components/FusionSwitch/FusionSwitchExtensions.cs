@@ -13,7 +13,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentProperty<bool> ValueProperty =
             ComponentProperty<bool>.Named(Component.ValueMember);
 
-        /// <summary>Sets the checked state of the switch.</summary>
+        /// <summary>Sets switch checked state.</summary>
         public static ComponentRef<FusionSwitch, TModel> SetChecked<TModel>(
             this ComponentRef<FusionSwitch, TModel> self, bool isChecked)
             where TModel : class
@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
             return self.EmitSet(ValueProperty, ValueExpression.Literal(isChecked));
         }
 
-        /// <summary>Reads the checked state for conditions or gather.</summary>
+        /// <summary>Reads checked state for conditions or gather.</summary>
         public static TypedComponentSource<bool> Value<TModel>(
             this ComponentRef<FusionSwitch, TModel> self)
             where TModel : class

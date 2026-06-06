@@ -213,6 +213,10 @@ Candidate cleanup:
   selection summaries now keep selected value, display text, index, value-array,
   value-ID, ListView visible text, and selection event semantics without
   article-led phrasing. Data-source and Syncfusion mapping docs remain.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion InPlaceEditor and
+  Switch summaries now keep committed value, wrapper CSS class, and checked
+  state semantics without article-led phrasing. InPlaceEditor registration and
+  value-shape remarks remain because they document public behavior.
 - Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
   operator docs now include the parameter tags needed for generated API
   signatures such as `Eq(operand)` versus `Eq(right)`. This keeps the public DSL
