@@ -113,9 +113,9 @@ foreach (var assemblyGroup in byAssembly)
                 if (methods.Count > 0)
                 {
                     markdown.AppendLine("```csharp");
-                    foreach (var method in methods)
+                    foreach (var method in DisplayMethods(methods))
                     {
-                        markdown.AppendLine(method.DisplaySignature);
+                        markdown.AppendLine(method);
                     }
                     markdown.AppendLine("```");
                     markdown.AppendLine();
@@ -261,6 +261,19 @@ static string SimplifyNamespace(string ns)
     return ns.Replace("Alis.Reactive.", "").Replace(".", " — ");
 }
 
+static IEnumerable<string> DisplayMethods(IReadOnlyList<DocMember> methods)
+{
+    var duplicateSignatures = methods
+        .GroupBy(method => method.DisplaySignature)
+        .Where(group => group.Count() > 1)
+        .Select(group => group.Key)
+        .ToHashSet(StringComparer.Ordinal);
+
+    return methods.Select(method => duplicateSignatures.Contains(method.DisplaySignature) && method.CanDisplaySimpleParameterTypes
+        ? method.DisplaySignatureWithParameterTypes
+        : method.DisplaySignature);
+}
+
 static string CleanGenericNotation(string name)
 {
     var genericArityMarkerIndex = name.IndexOf('`');
@@ -354,6 +367,31 @@ record DocMember(string RawName, string Assembly, XElement Element)
         }
     }
 
+    public string DisplaySignatureWithParameterTypes
+    {
+        get
+        {
+            if (Kind != MemberKind.Method)
+                return DisplaySignature;
+
+            var paramElements = DisplayParameterElements();
+            var parameterTypes = DisplaySimpleParameterTypes();
+            var parameters = paramElements
+                .Select((parameter, index) =>
+                {
+                    var name = parameter.Attribute("name")?.Value ?? "?";
+                    return index < parameterTypes.Count
+                        ? $"{parameterTypes[index]} {name}"
+                        : name;
+                });
+
+            return $"{MemberName}({string.Join(", ", parameters)})";
+        }
+    }
+
+    public bool CanDisplaySimpleParameterTypes =>
+        DisplaySimpleParameterTypes().Count == DisplayParameterElements().Count;
+
     private List<XElement> DisplayParameterElements()
     {
         var paramElements = Element.Elements("param").ToList();
@@ -364,6 +402,85 @@ record DocMember(string RawName, string Assembly, XElement Element)
         return IsExtensionReceiverName(firstParamName)
             ? paramElements.Skip(1).ToList()
             : paramElements;
+    }
+
+    private List<string> DisplaySimpleParameterTypes()
+    {
+        var parameterTypes = RawParameterTypes();
+        if (!IsExtensionContainer() || parameterTypes.Count == 0)
+            return SimplifySimpleParameterTypes(parameterTypes);
+
+        var firstParamName = Element.Elements("param").FirstOrDefault()?.Attribute("name")?.Value;
+        parameterTypes = IsExtensionReceiverName(firstParamName)
+            ? parameterTypes.Skip(1).ToList()
+            : parameterTypes;
+
+        return SimplifySimpleParameterTypes(parameterTypes);
+    }
+
+    private static List<string> SimplifySimpleParameterTypes(IEnumerable<string> parameterTypes)
+    {
+        var simpleTypes = new List<string>();
+        foreach (var parameterType in parameterTypes)
+        {
+            var simpleType = SimplifySimpleParameterType(parameterType);
+            if (simpleType == null)
+                return new List<string>();
+            simpleTypes.Add(simpleType);
+        }
+
+        return simpleTypes;
+    }
+
+    private List<string> RawParameterTypes()
+    {
+        var start = FullName.IndexOf('(');
+        if (start < 0 || !FullName.EndsWith(")", StringComparison.Ordinal))
+            return new List<string>();
+
+        var parameters = FullName[(start + 1)..^1];
+        if (string.IsNullOrWhiteSpace(parameters))
+            return new List<string>();
+
+        return SplitParameterTypes(parameters).ToList();
+    }
+
+    private static IEnumerable<string> SplitParameterTypes(string parameters)
+    {
+        var start = 0;
+        var depth = 0;
+        for (var i = 0; i < parameters.Length; i++)
+        {
+            var ch = parameters[i];
+            if (ch == '{')
+                depth++;
+            else if (ch == '}')
+                depth--;
+            else if (ch == ',' && depth == 0)
+            {
+                yield return parameters[start..i];
+                start = i + 1;
+            }
+        }
+
+        yield return parameters[start..];
+    }
+
+    private static string? SimplifySimpleParameterType(string type)
+    {
+        type = type.Trim();
+
+        return type switch
+        {
+            "System.String" => "string",
+            "System.Int32" => "int",
+            "System.Int64" => "long",
+            "System.Boolean" => "bool",
+            "System.Decimal" => "decimal",
+            "System.Double" => "double",
+            "System.DateTime" => "DateTime",
+            _ => null,
+        };
     }
 
     private bool IsExtensionContainer() =>

@@ -173,6 +173,12 @@ Candidate cleanup:
   XML docs now include standard parameter tags, so generated template-builder
   API signatures show real overloads such as `Span<T>(property)` and
   `Button(text, onClick, css)` instead of repeated empty calls.
+- Resolved on `tiny-safe-but-important-refactorings`: plugin argument builder
+  XML docs now include standard parameter and return tags, and the API reference
+  generator disambiguates duplicate simple overload signatures. Generated docs
+  now show `Arg(string value)`, `Arg(int value)`, and
+  `RouteParam(string paramName, long value)` instead of repeated empty or
+  same-name calls.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
 
