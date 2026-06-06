@@ -55,7 +55,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Reads the current hidden input value for use in conditions or gather.
+        /// Reads the hidden input value for conditions or gather.
         /// </summary>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeHiddenField, TModel> self)

@@ -39,7 +39,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Reads the current text input value for use in conditions or gather.
+        /// Reads the text input value for conditions or gather.
         /// </summary>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeTextBox, TModel> self)

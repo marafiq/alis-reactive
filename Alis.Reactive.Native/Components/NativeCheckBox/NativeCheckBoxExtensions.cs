@@ -40,7 +40,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Reads the current checked state for use in conditions or gather.
+        /// Reads the checked state for conditions or gather.
         /// </summary>
         public static TypedComponentSource<bool> Value<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self)

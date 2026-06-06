@@ -472,6 +472,10 @@ Candidate cleanup:
   versus range slider and MultiSelect arrays, while dropping repeated "current"
   and "for use in conditions or gather" phrasing. Text input `SetValue` docs
   still keep the `null`-clears contract.
+- Resolved on `tiny-safe-but-important-refactorings`: Native component value-read
+  XML summaries now match the concise Fusion wording while preserving the
+  component-specific value path: text input, textarea, checkbox checked state,
+  and hidden input value.
 - Resolved on `tiny-safe-but-important-refactorings`: plugin argument builders
   no longer repeat `TValue` XML type-parameter docs on `ArgValue<TValue>()`;
   the summaries already explain that the plan shape is derived from the type.
