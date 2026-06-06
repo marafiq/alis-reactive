@@ -236,6 +236,9 @@ Candidate cleanup:
   event-wiring XML docs no longer repeat generic `TModel` ownership or the
   extension receiver. Event selector, pipeline, and Reactive Plan parameters
   remain documented because they describe the public DSL wiring contract.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionDropDownList`
+  event selector docs now stop at two event examples and use "etc." rather
+  than listing every available event in the method remarks.
 - Resolved on `tiny-safe-but-important-refactorings`: Fusion render-factory XML
   docs no longer repeat generic `TModel` ownership or the Razor HTML helper
   receiver. Bound value types, field wrappers, Reactive Plan, controlled IDs,

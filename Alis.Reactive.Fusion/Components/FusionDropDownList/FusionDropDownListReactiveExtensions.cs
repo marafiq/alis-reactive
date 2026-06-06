@@ -17,7 +17,7 @@ namespace Alis.Reactive.Fusion.Components
         /// Wires a <see cref="FusionDropDownList"/> event into a Reactive Plan pipeline.
         /// </summary>
         /// <remarks>
-        /// Select the event with <c>evt =&gt; evt.Changed</c>, <c>evt =&gt; evt.Focus</c>, or <c>evt =&gt; evt.Blur</c>.
+        /// Select the event with <c>evt =&gt; evt.Changed</c>, <c>evt =&gt; evt.Focus</c>, etc.
         /// </remarks>
         public static DropDownListBuilder Reactive<TModel, TArgs>(
             this DropDownListBuilder builder,
