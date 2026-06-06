@@ -4,14 +4,13 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Authors trigger-to-reaction behaviors for a Reactive Plan.
+    /// Authors trigger-to-reaction entries for a Reactive Plan.
     /// </summary>
     /// <remarks>
     /// Accessed via <c>Html.On(plan, t =&gt; t.DomReady(...).CustomEvent(...))</c>.
-    /// Trigger methods record plan behaviors; the generated runtime wires the DOM,
-    /// EventSource, or SignalR listener when the plan boots.
-    /// Each trigger call appends an independent behavior; chaining does not combine
-    /// multiple triggers into one reaction.
+    /// Each trigger method appends an independent <c>Behavior</c> entry. Chaining
+    /// does not combine multiple triggers into one reaction. The generated runtime
+    /// wires DOM, EventSource, or SignalR listeners only when the plan boots.
     /// </remarks>
     /// <typeparam name="TModel">The view model that owns model-bound component IDs.</typeparam>
     public sealed class TriggerBuilder<TModel> where TModel : class
@@ -29,7 +28,7 @@ namespace Alis.Reactive.Builders
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(reactionPipeline);
-            AddBehaviors(StartsWhen.PageReady(), reactionPipeline);
+            AddBehavior(StartsWhen.PageReady(), reactionPipeline);
             return this;
         }
 
@@ -40,7 +39,7 @@ namespace Alis.Reactive.Builders
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(reactionPipeline);
-            AddBehaviors(StartsWhen.DocumentEvent(eventName), reactionPipeline);
+            AddBehavior(StartsWhen.DocumentEvent(eventName), reactionPipeline);
             return this;
         }
 
@@ -54,7 +53,7 @@ namespace Alis.Reactive.Builders
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(new TPayload(), reactionPipeline);
-            AddBehaviors(
+            AddBehavior(
                 StartsWhen.DocumentEvent(eventName, PayloadContract.ForPayload(typeof(TPayload))),
                 reactionPipeline);
             return this;
@@ -67,7 +66,7 @@ namespace Alis.Reactive.Builders
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(reactionPipeline);
-            AddBehaviors(StartsWhen.ServerPush(url), reactionPipeline);
+            AddBehavior(StartsWhen.ServerPush(url), reactionPipeline);
             return this;
         }
 
@@ -79,7 +78,7 @@ namespace Alis.Reactive.Builders
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(reactionPipeline);
-            AddBehaviors(StartsWhen.ServerPush(url, eventType), reactionPipeline);
+            AddBehavior(StartsWhen.ServerPush(url, eventType), reactionPipeline);
             return this;
         }
 
@@ -94,7 +93,7 @@ namespace Alis.Reactive.Builders
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(new TPayload(), reactionPipeline);
-            AddBehaviors(
+            AddBehavior(
                 StartsWhen.ServerPush(url, eventType, PayloadContract.ForPayload(typeof(TPayload))),
                 reactionPipeline);
             return this;
@@ -109,7 +108,7 @@ namespace Alis.Reactive.Builders
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(reactionPipeline);
-            AddBehaviors(StartsWhen.SignalR(hubUrl, methodName), reactionPipeline);
+            AddBehavior(StartsWhen.SignalR(hubUrl, methodName), reactionPipeline);
             return this;
         }
 
@@ -124,13 +123,13 @@ namespace Alis.Reactive.Builders
         {
             var reactionPipeline = new PipelineBuilder<TModel>(_context);
             pipeline(new TPayload(), reactionPipeline);
-            AddBehaviors(
+            AddBehavior(
                 StartsWhen.SignalR(hubUrl, methodName, PayloadContract.ForPayload(typeof(TPayload))),
                 reactionPipeline);
             return this;
         }
 
-        private void AddBehaviors(StartsWhen trigger, PipelineBuilder<TModel> reactionPipeline)
+        private void AddBehavior(StartsWhen trigger, PipelineBuilder<TModel> reactionPipeline)
         {
             _context.AddBehavior(Behavior.On(trigger, reactionPipeline.BuildReaction()));
         }

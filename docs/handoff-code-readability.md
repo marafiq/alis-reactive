@@ -461,6 +461,10 @@ Candidate cleanup:
   docs no longer claim generated IDs are collision-free. The docs now describe
   stable model/property-scoped IDs and call out repeated-form sharing without
   changing the ID algorithm.
+- Resolved on `tiny-safe-but-important-refactorings`: `TriggerBuilder` public
+  XML docs now describe independent Reactive Plan `Behavior` entries without
+  broad "plan behavior" wording, and the private append helper is singular
+  because each trigger call adds one behavior.
 
 ### Implementation Inline Comments
 

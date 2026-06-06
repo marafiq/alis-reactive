@@ -314,7 +314,7 @@ Void(arguments)
 
 ### TriggerBuilder<T>
 
-Authors trigger-to-reaction behaviors for a Reactive Plan.
+Authors trigger-to-reaction entries for a Reactive Plan.
 
 ```csharp
 CustomEvent(eventName, pipeline)
