@@ -17,7 +17,7 @@ namespace Alis.Reactive.Native.Components
         /// Renders an anchor whose unmodified left click executes a reactive request pipeline.
         /// </summary>
         /// <remarks>
-        /// The pipeline must contain exactly one HTTP request, and that request URL must
+        /// Pipeline must contain exactly one HTTP request, and that request URL must
         /// match <paramref name="url"/>. The rendered anchor keeps the URL in
         /// <c>href</c> so modifier-clicks remain browser-owned; the runtime copies
         /// the clicked href into the serialized request before ordinary click execution.

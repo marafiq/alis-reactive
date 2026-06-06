@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// A native HTML multi-line text input (<c>&lt;textarea&gt;</c>).
+    /// Native HTML <c>&lt;textarea&gt;</c> component for model-bound multi-line text.
     /// </summary>
     /// <remarks>
     /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the

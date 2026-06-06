@@ -12,7 +12,7 @@ namespace Alis.Reactive.Native.AppLevel
     public sealed class NativeLoader : NativeComponent, IAppLevelComponent
     {
         /// <summary>
-        /// The well-known element ID used by the loader in the layout.
+        /// Well-known layout element ID for the loader.
         /// </summary>
         public const string ElementId = "alis-loader";
 

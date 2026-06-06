@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// A native HTML radio button group.
+    /// Native radio-group component backed by a hidden input value.
     /// </summary>
     /// <remarks>
     /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the

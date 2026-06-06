@@ -983,6 +983,10 @@ Rewrite or delete:
   controller/model XML docs now name the Schedule data-source, assignment
   dialog, NativeDrawer partial, FusionDialog partial, and Active Plan merge
   boundaries instead of generic "returns" and "model for" narration.
+- Resolved on `tiny-safe-but-important-refactorings`: Native component XML
+  summaries now state their component contract directly while preserving the
+  factory remarks, hidden-input boundaries, net48 form-value notes, and Reactive
+  Plan target comments.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

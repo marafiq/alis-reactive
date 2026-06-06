@@ -17,8 +17,8 @@ namespace Alis.Reactive.Native.Extensions
     /// call adds one component's value to the request body.
     /// </para>
     /// <para>
-    /// This class provides a convenience overload that assumes <see cref="NativeTextBox"/>.
-    /// For other component types, use the typed
+    /// Shorthand assumes <see cref="NativeTextBox"/>. For other component
+    /// types, use the typed
     /// <see cref="Builders.Requests.GatherExtensions"/> overload:
     /// <c>g.Include&lt;NativeDropDown, MyModel&gt;(m =&gt; m.Status)</c>.
     /// </para>

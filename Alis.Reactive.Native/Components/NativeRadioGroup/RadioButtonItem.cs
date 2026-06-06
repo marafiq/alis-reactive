@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// A single radio or checkbox option with a value, display text, and optional description.
+    /// Shared option item for native radio groups and checkbox lists.
     /// </summary>
     /// <remarks>
     /// Created in the controller and passed to the builder via <c>.Items()</c>.

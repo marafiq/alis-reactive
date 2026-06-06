@@ -14,7 +14,7 @@ namespace Alis.Reactive.Native.AppLevel
     public sealed class NativeDrawer : NativeComponent, IAppLevelComponent
     {
         /// <summary>
-        /// The well-known element ID used by the drawer in the layout.
+        /// Well-known layout element ID for the drawer.
         /// </summary>
         public const string ElementId = "alis-drawer";
 

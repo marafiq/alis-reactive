@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// A native HTML dropdown (<c>&lt;select&gt;</c>).
+    /// Native HTML <c>&lt;select&gt;</c> component for model-bound dropdowns.
     /// </summary>
     /// <remarks>
     /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the

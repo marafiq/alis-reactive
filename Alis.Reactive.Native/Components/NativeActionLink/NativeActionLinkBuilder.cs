@@ -52,7 +52,7 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <remarks>
         /// Use <c>Attr("class", value)</c> or <see cref="CssClass"/> for CSS classes.
-        /// The generated <c>id</c>, <c>href</c>, and <c>data-reactive-link</c> attributes
+        /// Generated <c>id</c>, <c>href</c>, and <c>data-reactive-link</c> attributes
         /// are reserved because they bind the anchor to the reactive runtime.
         /// </remarks>
         /// <param name="name">Attribute name.</param>

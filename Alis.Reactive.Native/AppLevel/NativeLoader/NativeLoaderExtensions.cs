@@ -31,7 +31,7 @@ namespace Alis.Reactive.Native.AppLevel
         /// Sets which element the loader should cover.
         /// </summary>
         /// <remarks>
-        /// The loader moves inside the target element and covers it fully.
+        /// Loader moves inside the target element and covers it fully.
         /// If not called, the loader covers the entire viewport.
         /// </remarks>
         /// <param name="targetId">Container element ID.</param>

@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// A native HTML checkbox list for multi-select scenarios.
+    /// Native checkbox-list component with <c>string[]</c> value semantics.
     /// </summary>
     /// <remarks>
     /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the

@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// A native HTML checkbox (<c>&lt;input type="checkbox"&gt;</c>).
+    /// Native HTML checkbox component for model-bound Boolean values.
     /// </summary>
     /// <remarks>
     /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the

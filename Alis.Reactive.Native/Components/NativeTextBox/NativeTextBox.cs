@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// A native HTML text input (<c>&lt;input type="text"&gt;</c>).
+    /// Native HTML <c>&lt;input type="text"&gt;</c> component for model-bound text entry.
     /// </summary>
     /// <remarks>
     /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the
