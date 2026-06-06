@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises NativeCheckBox SetChecked, Value reads, Changed-event conditions,
-/// and component-read conditions.
-/// </summary>
 [TestFixture]
 public class WhenCheckboxToggles : PlaywrightTestBase
 {
@@ -37,9 +33,8 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     }
 
     [Test]
-    public async Task domready_unchecks_medication_checkbox()
+    public async Task domready_overrides_checked_model_value_for_medication_checkbox()
     {
-        // ReceivesMedication starts checked in the model, but DomReady calls SetChecked(false).
         await NavigateAndBoot();
 
         var medicationCheckbox = Page.Locator($"#{ModelIdPrefix}ReceivesMedication");
@@ -167,9 +162,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task plan_carries_native_vendor_for_checkbox_set_reactions()
     {
-        // The plan must declare vendor "native" so the runtime resolves
-        // the raw DOM element (not ej2_instances). If vendor is missing or wrong,
-        // resolveRoot returns the wrong object and SetChecked silently breaks.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -182,9 +174,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task plan_carries_checked_value_member_for_component_source()
     {
-        // NativeCheckBox valueMember is "checked" — the plan's ComponentSource must
-        // carry this so the runtime reads el.checked (not el.value).
-        // If valueMember changes or is lost, component value reads return wrong data.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -197,9 +186,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task plan_carries_boolean_coerce_for_setchecked()
     {
-        // SetChecked emits coerce:"boolean" so the runtime coerces the string "false"
-        // to boolean false before assigning to el.checked. Without coerce, the string
-        // "false" is truthy and the checkbox stays checked.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -212,8 +198,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task plan_carries_prop_checked_for_setchecked_reaction()
     {
-        // SetChecked writes to prop "checked" (not "value"). If prop changes,
-        // the runtime writes to the wrong DOM property.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -226,8 +210,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task all_three_checkboxes_render_with_correct_element_ids()
     {
-        // IdGenerator creates scoped IDs from the model namespace + property name.
-        // If IdGenerator changes, these elements vanish and all reactive wiring breaks.
+        // Generated IDs are the DOM/Reactive Plan join keys.
         await NavigateAndBoot();
 
         await Expect(Page.Locator($"#{ModelIdPrefix}ReceivesMedication")).ToBeVisibleAsync();
@@ -239,8 +222,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task all_checkboxes_render_as_input_type_checkbox()
     {
-        // NativeCheckBoxBuilder renders <input type="checkbox">. If the HTML element
-        // type changes, the runtime's el.checked read/write path breaks silently.
+        // Native checkbox runtime reads and writes el.checked.
         await NavigateAndBoot();
 
         var medication = Page.Locator($"#{ModelIdPrefix}ReceivesMedication");
@@ -256,8 +238,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task restrictions_panel_starts_hidden_before_any_interaction()
     {
-        // The restrictions panel has hidden attribute in markup. If the attribute
-        // is removed or the element ID changes, the show/hide reactive chain breaks.
         await NavigateAndBoot();
 
         var panel = Page.Locator("#restrictions-panel");
@@ -269,8 +249,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task boot_trace_is_emitted_on_page_load()
     {
-        // Runtime boot emits a "booted" trace message. If boot fails silently,
-        // no reactive behavior works and tests pass vacuously.
         await NavigateAndBoot();
 
         var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));

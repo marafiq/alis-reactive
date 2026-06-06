@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises NativeDropDown SetValue, Value reads, Changed-event conditions,
-/// and component-read conditions.
-/// </summary>
 [TestFixture]
 public class WhenDropdownSelectionChanges : PlaywrightTestBase
 {
@@ -159,9 +155,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     [Test]
     public async Task plan_carries_native_vendor_for_dropdown_set_reactions()
     {
-        // The plan must declare vendor "native" so the runtime resolves
-        // the raw DOM element (not ej2_instances). If vendor is wrong,
-        // resolveRoot returns undefined and SetValue silently fails.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -174,9 +167,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     [Test]
     public async Task plan_carries_value_value_member_for_component_source()
     {
-        // NativeDropDown valueMember is "value" — the plan's ComponentSource must
-        // carry this so the runtime reads el.value (not el.checked or el.textContent).
-        // If valueMember changes or is lost, component value reads return wrong data.
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
@@ -203,8 +193,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     [Test]
     public async Task both_dropdowns_render_with_correct_element_ids()
     {
-        // IdGenerator creates scoped IDs from the model namespace + property name.
-        // If IdGenerator changes, these elements vanish and all reactive wiring breaks.
+        // Generated IDs are the DOM/Reactive Plan join keys.
         await NavigateAndBoot();
 
         await Expect(Page.Locator($"#{ModelIdPrefix}CareLevel")).ToBeVisibleAsync();
@@ -215,8 +204,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     [Test]
     public async Task both_dropdowns_render_as_select_elements()
     {
-        // NativeDropDownBuilder renders <select>. If the HTML element type changes,
-        // the runtime's el.value read/write path breaks silently.
+        // Native dropdown runtime reads and writes el.value.
         await NavigateAndBoot();
 
         var careLevel = Page.Locator($"select#{ModelIdPrefix}CareLevel");
@@ -265,8 +253,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     [Test]
     public async Task boot_trace_is_emitted_on_page_load()
     {
-        // Runtime boot emits a "booted" trace message. If boot fails silently,
-        // no reactive behavior works and tests pass vacuously.
         await NavigateAndBoot();
 
         var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
