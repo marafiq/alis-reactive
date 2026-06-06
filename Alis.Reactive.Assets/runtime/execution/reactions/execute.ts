@@ -168,7 +168,7 @@ function executeSet(reaction: SetReaction, runtimePlan: RuntimePlan, context: Ex
 }
 
 function executeCall(reaction: CallReaction, runtimePlan: RuntimePlan, context: ExecutionContext): void {
-  const args = reaction.args.map(arg => evaluateValue(arg, runtimePlan.document, context.raw));
+  const argumentValues = reaction.args.map(arg => evaluateValue(arg, runtimePlan.document, context.raw));
 
   switch (reaction.on.kind) {
     case "component":
@@ -176,18 +176,18 @@ function executeCall(reaction: CallReaction, runtimePlan: RuntimePlan, context: 
       log.trace("call", {
         target: reaction.on.kind === "component" ? reaction.on.component : reaction.on.name,
         method: reaction.method,
-        args,
+        args: argumentValues,
       });
-      runtimePlan.objectForSource(reaction.on).call(reaction.method, args);
+      runtimePlan.objectForSource(reaction.on).call(reaction.method, argumentValues);
       return;
 
     case "payload":
-      log.trace("call", { target: reaction.on.scope, method: reaction.method, args });
+      log.trace("call", { target: reaction.on.scope, method: reaction.method, args: argumentValues });
       callPayloadMethod(
         requireMutablePayload(reaction.on, context, "call method"),
         reaction.on.scope,
         reaction.method,
-        args,
+        argumentValues,
       );
       return;
   }

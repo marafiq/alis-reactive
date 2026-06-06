@@ -74,7 +74,7 @@ namespace Alis.Reactive.Native.Extensions
             InputFieldConfiguration configuration)
             where TModel : class
         {
-            var opts = configuration.CreateOptions();
+            var options = configuration.CreateOptions();
 #if NET48
             // System.Web.Mvc NameFor honors HtmlFieldPrefix and returns MvcHtmlString; the slot stores a string binding path.
             var bindingName = html.NameFor(expression).ToHtmlString();
@@ -87,7 +87,7 @@ namespace Alis.Reactive.Native.Extensions
             var boundField = BoundInputField<TModel, TProp>.Create(
                 plan,
                 expression,
-                opts,
+                options,
                 componentSlot);
 
             return new InputBoundField<TModel, TProp>(

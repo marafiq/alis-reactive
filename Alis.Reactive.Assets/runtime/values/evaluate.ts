@@ -106,8 +106,8 @@ class ValueEvaluation {
         return runtimeObject.read(expression.member);
 
       case "method": {
-        const args = expression.access.args.map(arg => this.evaluate(arg));
-        return runtimeObject.call(expression.member, args);
+        const argumentValues = expression.access.args.map(arg => this.evaluate(arg));
+        return runtimeObject.call(expression.member, argumentValues);
       }
 
       default:
@@ -119,8 +119,8 @@ class ValueEvaluation {
   // errors match component/plugin method reads.
   private readElementMethod(expression: ElementMethodReadExpression): unknown {
     const resolvedPayloadScope = this.context.resolvePayload(expression.from);
-    const args = expression.access.args.map(arg => this.evaluate(arg));
-    const rawValue = RuntimePath.from(expression.path).call(resolvedPayloadScope, args, `element method "${expression.member}"`);
+    const argumentValues = expression.access.args.map(arg => this.evaluate(arg));
+    const rawValue = RuntimePath.from(expression.path).call(resolvedPayloadScope, argumentValues, `element method "${expression.member}"`);
     return applyShapeWhenPresent(rawValue, expression.shape);
   }
 
