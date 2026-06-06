@@ -2,14 +2,7 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.RichTextEditor;
 
-/// <summary>
-/// Exercises FusionRichTextEditor property writes, value reads, changed-event conditions,
-/// and component-read conditions for care plan documentation.
-/// </summary>
-/// <remarks>
-/// Syncfusion hides the textarea and commits edits through the contenteditable editor.
-/// RichTextEditorLocator fills and blurs that editor so Syncfusion raises <c>change</c>.
-/// </remarks>
+// RichTextEditorLocator edits Syncfusion's contenteditable surface so change events commit.
 [TestFixture]
 public class WhenRichTextEdited : PlaywrightTestBase
 {
@@ -50,7 +43,6 @@ public class WhenRichTextEdited : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Syncfusion RTE hides the textarea; the contenteditable editor proves the value applied.
         var rte = CarePlan;
         await Expect(rte.Editor).Not.ToHaveTextAsync("", new() { Timeout = 5000 });
 

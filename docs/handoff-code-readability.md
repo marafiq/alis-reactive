@@ -75,6 +75,9 @@ Examples and current status:
   Switch, NumericTextBox, DatePicker, DateTimePicker, TimePicker, and InputMask
   now keep only the comments that explain generated ID join keys or Syncfusion
   popup/commit behavior.
+- Resolved on `tiny-safe-but-important-refactorings`: RichTextEditor test
+  comments no longer duplicate a coverage inventory. The remaining class-level
+  note names the Syncfusion contenteditable commit boundary.
 - Resolved on `tiny-safe-but-important-refactorings`: InPlaceEditor date and
   masked-MRN commit tests no longer carry XML narrative summaries. The remaining
   notes are concise inline comments for Syncfusion Enter-key submit behavior,
