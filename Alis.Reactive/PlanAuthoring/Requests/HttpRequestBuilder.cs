@@ -73,7 +73,7 @@ namespace Alis.Reactive.Builders.Requests
 
         /// <summary>Runs reactions after the HTTP request settles, regardless of success, error, or network failure.</summary>
         /// <remarks>
-        /// <para>Supports element commands, component commands, and condition guards.
+        /// <para>Supports element reactions, component reactions, and condition guards.
         /// Does not provide response body access because the response may not
         /// exist on network failure.</para>
         /// <para>Typical use: hide a loading spinner that <see cref="WhileLoading"/> showed.</para>

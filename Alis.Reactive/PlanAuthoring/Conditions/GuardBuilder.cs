@@ -152,7 +152,7 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Starts the branch that runs when this guard matches.</summary>
-        /// <param name="pipeline">Builds the commands for the matching branch.</param>
+        /// <param name="pipeline">Builds the reactions for the matching branch.</param>
         /// <returns>A branch builder for optional <c>ElseIf</c> and <c>Else</c> cases.</returns>
         public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> pipeline)
         {

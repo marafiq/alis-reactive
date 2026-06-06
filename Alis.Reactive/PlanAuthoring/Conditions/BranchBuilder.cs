@@ -71,7 +71,7 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Adds the default branch that runs when no earlier branch matched.</summary>
-        /// <param name="pipeline">Builds the commands for the default branch.</param>
+        /// <param name="pipeline">Builds the reactions for the default branch.</param>
         public void Else(Action<PipelineBuilder<TModel>> pipeline)
         {
             EnsureDefaultCanBeAdded();
