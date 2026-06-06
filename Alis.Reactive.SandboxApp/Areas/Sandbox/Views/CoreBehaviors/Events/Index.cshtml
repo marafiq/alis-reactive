@@ -6,7 +6,7 @@
 
     var plan = Html.ReactivePlan<EventsViewModel>();
 
-    // DomReady dispatches after custom-event listeners are wired, so this chain runs in order.
+    // DomReady dispatches after CustomEvent listeners are wired, so this chain runs in order.
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Element("step-1").AddClass("text-green-600");

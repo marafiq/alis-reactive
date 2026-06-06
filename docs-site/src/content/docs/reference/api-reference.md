@@ -259,9 +259,9 @@ ObjectEvent { get; }  // Component-object event name written into the Reactive P
 
 ### DispatchPayloadBuilder<T>
 
-Composes a custom-event dispatch payload from Reactive Plan value sources and literals.
+Composes a CustomEvent dispatch payload from Reactive Plan value sources and literals.
             Each field is set via a typed expression on `TPayload`,
-            matching the event-payload contract consumed by typed custom-event triggers.
+            matching the event-payload contract consumed by typed CustomEvent triggers.
 
 ```csharp
 Set(field, value)
@@ -367,7 +367,7 @@ Arg<T>()
 ### PluginCallBuilder<T>
 
 Collects arguments for a Reactive Plan plugin command. Call `Fire`
-            to append the command to the current pipeline.
+            to append the plugin-call reaction to the current pipeline.
 
 ```csharp
 Arg()
