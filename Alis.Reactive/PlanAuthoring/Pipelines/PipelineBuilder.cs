@@ -34,7 +34,7 @@ namespace Alis.Reactive.Builders
 
         internal void AddStep(ReactionGraph step)
         {
-            _draft.AddCommand(step);
+            _draft.AddReaction(step);
         }
 
         /// <summary>Queues a <c>CustomEvent</c> reaction without a payload.</summary>
