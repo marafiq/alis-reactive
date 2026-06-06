@@ -5,13 +5,13 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionStepperChangedArgs
     {
-        /// <summary>The index of the previous step.</summary>
+        /// <summary>Zero-based index of the step that was active before the change.</summary>
         public int PreviousStep { get; set; }
 
-        /// <summary>The index of the current step.</summary>
+        /// <summary>Zero-based index of the active step after the change.</summary>
         public int ActiveStep { get; set; }
 
-        /// <summary>Whether the change was triggered by user interaction.</summary>
+        /// <summary>Whether user interaction triggered the completed step change.</summary>
         public bool IsInteracted { get; set; }
     }
 }

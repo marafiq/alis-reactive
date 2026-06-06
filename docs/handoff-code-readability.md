@@ -303,6 +303,10 @@ Candidate cleanup:
   selection, toolbar click, and text-filter payload summaries now identify the
   event source or criterion role instead of terse labels such as "Selected row
   data" or "The clicked toolbar item." Payload shape remains unchanged.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion Stepper event
+  payload index summaries now state zero-based indexing and distinguish
+  clicked, pending-transition, and completed-change timing. Payload shape
+  remains unchanged.
 
 ### Implementation Inline Comments
 

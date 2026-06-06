@@ -4288,9 +4288,9 @@ Event payload delivered after a Stepper step changes.
 
 ```csharp
 // Properties
-ActiveStep { get; }  // The index of the current step.
-IsInteracted { get; }  // Whether the change was triggered by user interaction.
-PreviousStep { get; }  // The index of the previous step.
+ActiveStep { get; }  // Zero-based index of the active step after the change.
+IsInteracted { get; }  // Whether user interaction triggered the completed step change.
+PreviousStep { get; }  // Zero-based index of the step that was active before the change.
 ```
 
 ### FusionStepperChangingArgs
@@ -4299,10 +4299,10 @@ Event payload delivered before a Stepper step changes.
 
 ```csharp
 // Properties
-ActiveStep { get; }  // The index of the target step.
+ActiveStep { get; }  // Zero-based index of the step targeted by the pending transition.
 Cancel { get; }  // Whether Syncfusion should cancel the step transition.
-IsInteracted { get; }  // Whether the change was triggered by user interaction.
-PreviousStep { get; }  // The index of the previous step.
+IsInteracted { get; }  // Whether user interaction triggered the pending step transition.
+PreviousStep { get; }  // Zero-based index of the step that is active before the transition.
 ```
 
 ### FusionStepperChangingArgsExtensions
@@ -4319,8 +4319,8 @@ Event payload delivered when a Stepper step is clicked.
 
 ```csharp
 // Properties
-ActiveStep { get; }  // The index of the current step.
-PreviousStep { get; }  // The index of the previous step.
+ActiveStep { get; }  // Zero-based index of the step associated with the click.
+PreviousStep { get; }  // Zero-based index of the step that was active before the click.
 ```
 
 ### FusionStepperEvents

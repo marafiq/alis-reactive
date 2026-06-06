@@ -8,13 +8,13 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionStepperChangingArgs
     {
-        /// <summary>The index of the previous step.</summary>
+        /// <summary>Zero-based index of the step that is active before the transition.</summary>
         public int PreviousStep { get; set; }
 
-        /// <summary>The index of the target step.</summary>
+        /// <summary>Zero-based index of the step targeted by the pending transition.</summary>
         public int ActiveStep { get; set; }
 
-        /// <summary>Whether the change was triggered by user interaction.</summary>
+        /// <summary>Whether user interaction triggered the pending step transition.</summary>
         public bool IsInteracted { get; set; }
 
         /// <summary>Whether Syncfusion should cancel the step transition.</summary>

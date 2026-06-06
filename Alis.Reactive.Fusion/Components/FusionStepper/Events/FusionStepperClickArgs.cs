@@ -5,10 +5,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionStepperClickArgs
     {
-        /// <summary>The index of the previous step.</summary>
+        /// <summary>Zero-based index of the step that was active before the click.</summary>
         public int PreviousStep { get; set; }
 
-        /// <summary>The index of the current step.</summary>
+        /// <summary>Zero-based index of the step associated with the click.</summary>
         public int ActiveStep { get; set; }
     }
 }
