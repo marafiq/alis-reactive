@@ -116,6 +116,8 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         await Expect(Page.Locator("#careops-action-rows a").First)
             .ToBeVisibleAsync(new() { Timeout = 10000 });
 
+        const string firstSeedResident = "Amina Patel";
+
         await ClickWhenStable(Page.Locator("#careops-action-rows")
             .GetByRole(AriaRole.Link, new() { Name = "Discharge" }).First);
 
@@ -125,9 +127,8 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
 
         await Expect(Page.Locator("#careops-rows-status"))
             .ToContainTextAsync("discharged", new() { Timeout = 10000 });
-        // Amina Patel is the seed first resident; the confirm-gated link removed her.
         await Expect(Page.Locator("#careops-action-rows"))
-            .Not.ToContainTextAsync("Amina Patel", new() { Timeout = 10000 });
+            .Not.ToContainTextAsync(firstSeedResident, new() { Timeout = 10000 });
 
         AssertNoConsoleErrors();
     }
@@ -137,8 +138,8 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
     {
         await NavigateCareOps();
 
-        // Open Tasks is the aria-colindex 8 column; edit the first row's cell.
-        var openTasksCells = Page.Locator($"#{GridId} td[aria-colindex='8']");
+        const string openTasksColumnIndex = "8";
+        var openTasksCells = Page.Locator($"#{GridId} td[aria-colindex='{openTasksColumnIndex}']");
         await openTasksCells.First.DblClickAsync();
 
         var editor = Page.Locator("#careops-gridopenTasks");
