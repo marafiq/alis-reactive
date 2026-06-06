@@ -4,96 +4,44 @@ using System.Linq.Expressions;
 
 namespace Alis.Reactive
 {
-    /// <summary>
-    /// Converts lambda expressions like <c>x =&gt; x.Address.City</c> into Reactive Plan
-    /// value paths, MVC model-binding names, or MVC element IDs.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <c>ToPath(...)</c> adds a caller-provided value-scope prefix such as
-    /// <c>"evt"</c> or <c>"responseBody"</c>. Event and response helpers return
-    /// scope-relative paths because the surrounding <c>PayloadSource</c> already
-    /// identifies the value scope.
-    /// </para>
-    /// <para>
-    /// Property-access chains and MVC-style constant indexer paths are
-    /// supported. Computed expressions such as method calls or arithmetic throw
-    /// <see cref="InvalidOperationException"/>.
-    /// </para>
-    /// </remarks>
+    // Converts property expressions into the three framework path shapes:
+    // Reactive Plan value paths, MVC model-binding names, and MVC element IDs.
+    // Scoped paths add an explicit prefix such as "evt" or "responseBody";
+    // event and response helpers stay scope-relative because PayloadSource
+    // already identifies the value scope.
+    // Only property chains and MVC-style constant indexers are valid.
     internal static class ExpressionPathHelper
     {
-        /// <summary>
-        /// Builds a scoped camelCase Reactive Plan value path from a property-access expression.
-        /// </summary>
-        /// <typeparam name="TSource">The source type containing the property chain.</typeparam>
-        /// <param name="prefix">The value-scope prefix to prepend, such as <c>"evt"</c> or <c>"responseBody"</c>.</param>
-        /// <param name="expression">The property-access expression to convert.</param>
-        /// <returns>A dot-path like <c>evt.address.city</c>.</returns>
         public static string ToPath<TSource>(string prefix, Expression<Func<TSource, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return prefix + "." + ToRuntimePath(members);
         }
 
-        /// <summary>
-        /// Builds a scoped camelCase Reactive Plan value path while preserving the selected value type.
-        /// </summary>
-        /// <typeparam name="TSource">The source type containing the property chain.</typeparam>
-        /// <typeparam name="TProp">The CLR type selected by the property-access expression.</typeparam>
-        /// <param name="prefix">The value-scope prefix to prepend.</param>
-        /// <param name="expression">The property-access expression to convert.</param>
-        /// <returns>A dot-path like <c>evt.facilityId</c>.</returns>
         public static string ToPath<TSource, TProp>(string prefix, Expression<Func<TSource, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return prefix + "." + ToRuntimePath(members);
         }
 
-        /// <summary>
-        /// Builds a camelCase path relative to the current event payload scope.
-        /// </summary>
-        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
-        /// <param name="expression">The property-access expression to convert.</param>
-        /// <returns>A dot-path like <c>address.city</c>.</returns>
         public static string ToEventPath<TPayload>(Expression<Func<TPayload, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return ToRuntimePath(members);
         }
 
-        /// <summary>
-        /// Builds a camelCase event-payload path while preserving the selected value type.
-        /// </summary>
-        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
-        /// <typeparam name="TProp">The CLR type selected from the event payload contract.</typeparam>
-        /// <param name="expression">The property-access expression to convert.</param>
-        /// <returns>A dot-path like <c>facilityId</c>.</returns>
         public static string ToEventPath<TPayload, TProp>(Expression<Func<TPayload, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return ToRuntimePath(members);
         }
 
-        /// <summary>
-        /// Builds a camelCase path relative to the active HTTP response body scope.
-        /// </summary>
-        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
-        /// <param name="expression">The property-access expression to convert.</param>
-        /// <returns>A dot-path like <c>data.name</c>.</returns>
         public static string ToResponsePath<TResponse>(Expression<Func<TResponse, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return ToRuntimePath(members);
         }
 
-        /// <summary>
-        /// Builds a camelCase response-body path while preserving the selected value type.
-        /// </summary>
-        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
-        /// <typeparam name="TProp">The CLR type selected from the response body contract.</typeparam>
-        /// <param name="expression">The property-access expression to convert.</param>
-        /// <returns>A dot-path like <c>data.name</c>.</returns>
         public static string ToResponsePath<TResponse, TProp>(Expression<Func<TResponse, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
@@ -130,17 +78,7 @@ namespace Alis.Reactive
                 $"(e.g. m => m.Address.City or m => m.Items[0].Sku). Got unsupported expression node: {expr.NodeType}.");
         }
 
-        /// <summary>
-        /// Extracts the MVC model-binding path from a model expression.
-        /// </summary>
-        /// <remarks>
-        /// <c>m =&gt; m.FacilityId</c> becomes <c>"FacilityId"</c>,
-        /// <c>m =&gt; m.Address.City</c> becomes <c>"Address.City"</c>.
-        /// Dot-notation preserves the model structure for HTTP gather.
-        /// </remarks>
-        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
-        /// <param name="expression">The model property expression.</param>
-        /// <returns>A dot-separated binding path like <c>"Address.City"</c>.</returns>
+        // HTTP gather needs MVC model-binding names such as "Address.City".
         public static string ToPropertyName<TModel>(Expression<Func<TModel, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
@@ -153,43 +91,19 @@ namespace Alis.Reactive
             return UnwrapConvert(expression.Body).Type;
         }
 
-        /// <summary>
-        /// Extracts the MVC model-binding path while preserving the selected value type.
-        /// </summary>
-        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
-        /// <typeparam name="TProp">The CLR type selected from the model property path.</typeparam>
-        /// <param name="expression">The model property expression.</param>
-        /// <returns>A dot-separated binding path like <c>"Address.City"</c>.</returns>
         public static string ToPropertyName<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return string.Join(".", members.ConvertAll(PascalRestore));
         }
 
-        /// <summary>
-        /// Converts a model expression to the MVC DOM element ID generated by <c>Html.IdFor()</c>.
-        /// </summary>
-        /// <remarks>
-        /// <c>m =&gt; m.FacilityId</c> becomes <c>"FacilityId"</c>,
-        /// <c>m =&gt; m.Address.City</c> becomes <c>"Address_City"</c>.
-        /// Underscores match the <c>Html.IdFor()</c> convention.
-        /// </remarks>
-        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
-        /// <param name="expression">The model property expression.</param>
-        /// <returns>An underscore-separated element ID like <c>"Address_City"</c>.</returns>
+        // Component IDs must match MVC Html.IdFor(), including nested-property underscores.
         public static string ToElementId<TModel>(Expression<Func<TModel, object?>> expression)
         {
             var members = ExtractMemberChain(expression.Body);
             return ToMvcElementId(string.Join(".", members.ConvertAll(PascalRestore)));
         }
 
-        /// <summary>
-        /// Converts a model expression to the MVC DOM element ID while preserving the selected value type.
-        /// </summary>
-        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
-        /// <typeparam name="TProp">The CLR type selected from the model property path.</typeparam>
-        /// <param name="expression">The model property expression.</param>
-        /// <returns>An underscore-separated element ID like <c>"Address_City"</c>.</returns>
         public static string ToElementId<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
         {
             var members = ExtractMemberChain(expression.Body);

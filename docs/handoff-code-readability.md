@@ -452,6 +452,11 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: gather builder XML docs
   no longer repeat generic type-parameter lines for typed component reads and
   typed URL reads; the method summaries and parameter docs carry the contract.
+- Resolved on `tiny-safe-but-important-refactorings`: internal
+  `ExpressionPathHelper` overload docs no longer use public-API XML scaffolding
+  for helper methods. Concise plain comments keep the Reactive Plan path,
+  MVC binding-name, and MVC element-ID invariants because those are the parts
+  framework developers can accidentally break.
 
 ### Implementation Inline Comments
 
