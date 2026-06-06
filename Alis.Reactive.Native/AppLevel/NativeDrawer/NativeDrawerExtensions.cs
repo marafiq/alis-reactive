@@ -27,9 +27,9 @@ namespace Alis.Reactive.Native.AppLevel
             ComponentMethod.Mapped("classRemove", "classList.remove").WithArgs<string>();
 
         /// <summary>
-        /// Applies the drawer panel width class through the component contract.
+        /// Sets the drawer panel size through the component contract.
         /// </summary>
-        /// <param name="size">The panel width class to apply.</param>
+        /// <param name="size">Drawer size.</param>
         public static ComponentRef<NativeDrawer, TModel> SetSize<TModel>(
             this ComponentRef<NativeDrawer, TModel> self, DrawerSize size)
             where TModel : class

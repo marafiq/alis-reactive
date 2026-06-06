@@ -476,6 +476,10 @@ Candidate cleanup:
   XML summaries now match the concise Fusion wording while preserving the
   component-specific value path: text input, textarea, checkbox checked state,
   and hidden input value.
+- Resolved on `tiny-safe-but-important-refactorings`: residual Native/Core
+  parameter docs now use concise label, model-property, target-ID, drawer-size,
+  and shape-comparison wording. Drawer docs also describe panel size as the
+  public contract instead of leading with CSS-class mechanics.
 - Resolved on `tiny-safe-but-important-refactorings`: Fusion and Native event
   selector singleton XML docs now use one concise "Selector instance for
   `.Reactive()` event lambdas" wording instead of repeating "Shared instance

@@ -284,7 +284,7 @@ namespace Alis.Reactive.PlanModel
             _structure.WriteContractDetails(writer, options);
 
         /// <summary>Determines whether two <see cref="Shape"/> instances represent the same type contract.</summary>
-        /// <param name="other">The shape to compare with.</param>
+        /// <param name="other">Shape to compare.</param>
         /// <returns><see langword="true"/> if the shapes are structurally equal.</returns>
         public bool Equals(Shape? other)
         {

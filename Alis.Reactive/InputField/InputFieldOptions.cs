@@ -21,7 +21,7 @@ namespace Alis.Reactive.InputField
         /// <summary>
         /// Sets the label text displayed above the input component.
         /// </summary>
-        /// <param name="label">The label text to display.</param>
+        /// <param name="label">Label text.</param>
         public InputFieldOptions Label(string label) { LabelText = label; return this; }
     }
 }
