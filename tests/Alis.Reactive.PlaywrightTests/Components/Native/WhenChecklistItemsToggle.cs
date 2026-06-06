@@ -135,7 +135,6 @@ public class WhenChecklistItemsToggle : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // Allergies are pre-selected.
         await Page.Locator("#check-allergy-btn").ClickAsync();
 
         var status = Page.Locator("#allergy-confirmation");

@@ -97,7 +97,6 @@ public class WhenMultilineTextEntered : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // DomReady already set the value under test.
         await Page.Locator("#check-notes-btn").ClickAsync();
 
         var warning = Page.Locator("#notes-warning");
