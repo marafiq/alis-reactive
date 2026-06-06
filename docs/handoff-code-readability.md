@@ -499,6 +499,10 @@ Candidate cleanup:
   value-write XML parameter tags no longer repeat the write mechanics already
   described by the overload summaries. The docs still distinguish literal,
   component-source, and response-body-path writes.
+- Resolved on `tiny-safe-but-important-refactorings`: core builder XML docs no
+  longer repeat "CLR type carried by the typed value source" across condition,
+  gather, element, and plugin overloads. Type-parameter tags remain, but now use
+  concise source-value or plugin-argument wording.
 
 ### Implementation Inline Comments
 

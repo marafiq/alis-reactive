@@ -76,7 +76,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the text content from a typed source (component, plugin, or URL value).</summary>
-        /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
+        /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">The typed value source evaluated when the reaction executes.</param>
         /// <returns>This element builder for chaining additional element updates.</returns>
         public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
@@ -103,7 +103,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the inner HTML from a typed source.</summary>
-        /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
+        /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">The typed value source evaluated when the reaction executes.</param>
         /// <returns>This element builder for chaining additional element updates.</returns>
         public ElementBuilder<TModel> SetHtml<TProp>(TypedSource<TProp> source)

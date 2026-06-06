@@ -81,7 +81,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds a scalar HTTP header value from a typed source.</summary>
-        /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
+        /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="name">The HTTP header that receives the source value.</param>
         /// <param name="source">The typed value source to evaluate before the request is sent.</param>
         public GatherBuilder<TModel> Header<TProp>(string name, TypedSource<TProp> source)
@@ -146,7 +146,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Binds a route template parameter to a scalar typed source.</summary>
-        /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
+        /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="paramName">The route template placeholder name without braces.</param>
         /// <param name="source">The typed value source to evaluate before the request is sent.</param>
         public GatherBuilder<TModel> RouteParam<TProp>(string paramName, TypedSource<TProp> source)

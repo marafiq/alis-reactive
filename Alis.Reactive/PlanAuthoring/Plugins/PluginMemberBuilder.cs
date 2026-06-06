@@ -74,7 +74,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds another typed value source as a plugin argument.</summary>
-        /// <typeparam name="TArg">The CLR type carried by the typed value source.</typeparam>
+        /// <typeparam name="TArg">Plugin argument value type.</typeparam>
         /// <param name="source">Component, URL, response, or plugin value source.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TArg>(TypedSource<TArg> source)
         {
@@ -200,7 +200,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a typed value source as a plugin argument.</summary>
-        /// <typeparam name="TArg">The CLR type carried by the typed value source.</typeparam>
+        /// <typeparam name="TArg">Plugin argument value type.</typeparam>
         /// <param name="source">Component, URL, response, or plugin value source.</param>
         public PluginCallBuilder<TModel> Arg<TArg>(TypedSource<TArg> source)
         {

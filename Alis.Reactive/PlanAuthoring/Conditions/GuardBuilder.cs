@@ -99,7 +99,7 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Adds an all-of comparison against a typed value source.</summary>
-        /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
+        /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> And<TProp>(TypedSource<TProp> source)
@@ -109,7 +109,7 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Adds an any-of comparison against a typed value source.</summary>
-        /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
+        /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> Or<TProp>(TypedSource<TProp> source)
