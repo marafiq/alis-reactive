@@ -272,7 +272,7 @@ Set<T>(field, source)
 
 ### ElementBuilder<T>
 
-Builds DOM mutations on a target element: text, HTML, CSS classes, and visibility.
+Builds DOM updates on a target element: text, HTML, CSS classes, and visibility.
 
 ```csharp
 AddClass(className)
@@ -305,7 +305,7 @@ AddStep()
 
 ### PipelineBuilder<T>
 
-Builds the ordered reactions that execute when a trigger fires: element mutations,
+Builds the ordered reactions that execute when a trigger fires: element updates,
             event dispatches, HTTP calls, component interactions, and conditional logic.
 
 ```csharp
@@ -1152,7 +1152,7 @@ Element()
 
 Construction boundary used by the public DSL builders.
             It delegates domain decisions to the plan authoring state and only exposes the
-            narrow mutation verbs the DSL needs while authoring a plan.
+            narrow authoring operations the DSL needs while building a Reactive Plan.
 
 ### PlanContractGenerator
 

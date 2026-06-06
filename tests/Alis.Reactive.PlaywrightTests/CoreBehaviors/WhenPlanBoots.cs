@@ -43,7 +43,7 @@ public class WhenPlanBoots : PlaywrightTestBase
     [Test]
     public async Task events_page_shows_all_three_steps()
     {
-        // These controlled element IDs are the mutation targets for the event chain.
+        // These controlled element IDs are the set reaction targets for the event chain.
         await NavigateTo("/Sandbox/CoreBehaviors/Events");
 
         await Expect(Page.Locator("#step-1")).ToBeVisibleAsync();

@@ -7,12 +7,12 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Builds DOM mutations on a target element: text, HTML, CSS classes, and visibility.
+    /// Builds DOM updates on a target element: text, HTML, CSS classes, and visibility.
     /// </summary>
     /// <remarks>
     /// Obtained via <c>p.Element("elementId")</c>. Literal and payload overloads return
     /// the parent <see cref="PipelineBuilder{TModel}"/>; typed-source overloads keep
-    /// the element builder active for additional element mutations.
+    /// the element builder active for additional element updates.
     /// </remarks>
     /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
     public class ElementBuilder<TModel> where TModel : class
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Sets the text content from a typed source (component, plugin, or URL value).</summary>
         /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
         /// <param name="source">The typed value source evaluated when the reaction executes.</param>
-        /// <returns>This element builder for chaining additional element mutations.</returns>
+        /// <returns>This element builder for chaining additional element updates.</returns>
         public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
         {
             Set(BrowserElementMembers.Text, source.ToValueExpression());
@@ -105,7 +105,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Sets the inner HTML from a typed source.</summary>
         /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
         /// <param name="source">The typed value source evaluated when the reaction executes.</param>
-        /// <returns>This element builder for chaining additional element mutations.</returns>
+        /// <returns>This element builder for chaining additional element updates.</returns>
         public ElementBuilder<TModel> SetHtml<TProp>(TypedSource<TProp> source)
         {
             Set(BrowserElementMembers.Html, source.ToValueExpression());

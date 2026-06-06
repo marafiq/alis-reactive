@@ -6,7 +6,7 @@ namespace Alis.Reactive.PlanModel
     /// <summary>
     /// Construction boundary used by the public DSL builders.
     /// It delegates domain decisions to the plan authoring state and only exposes the
-    /// narrow mutation verbs the DSL needs while authoring a plan.
+    /// narrow authoring operations the DSL needs while building a Reactive Plan.
     /// </summary>
     public sealed class PlanBuildContext
     {

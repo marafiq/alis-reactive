@@ -85,23 +85,23 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
     }
 
     [Test]
-    public async Task trace_captures_mutate_element_targets()
+    public async Task trace_captures_element_reaction_targets()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var mutateMessages = _consoleMessages
+        var elementReactionMessages = _consoleMessages
             .Where(m => m.Contains("[alis:execute]") && (m.Contains("set {") || m.Contains("call {")))
             .ToList();
 
-        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-1\"")), Is.True,
-            "Mutation trace must include target 'step-1'");
-        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-2\"")), Is.True,
-            "Mutation trace must include target 'step-2'");
-        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"step-3\"")), Is.True,
-            "Mutation trace must include target 'step-3'");
-        Assert.That(mutateMessages.Any(m => m.Contains("\"target\":\"chain-status\"")), Is.True,
-            "Mutation trace must include target 'chain-status'");
+        Assert.That(elementReactionMessages.Any(m => m.Contains("\"target\":\"step-1\"")), Is.True,
+            "Element reaction trace must include target 'step-1'");
+        Assert.That(elementReactionMessages.Any(m => m.Contains("\"target\":\"step-2\"")), Is.True,
+            "Element reaction trace must include target 'step-2'");
+        Assert.That(elementReactionMessages.Any(m => m.Contains("\"target\":\"step-3\"")), Is.True,
+            "Element reaction trace must include target 'step-3'");
+        Assert.That(elementReactionMessages.Any(m => m.Contains("\"target\":\"chain-status\"")), Is.True,
+            "Element reaction trace must include target 'chain-status'");
 
         AssertNoConsoleErrors();
     }

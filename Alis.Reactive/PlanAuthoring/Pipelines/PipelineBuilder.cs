@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Builds the ordered reactions that execute when a trigger fires: element mutations,
+    /// Builds the ordered reactions that execute when a trigger fires: element updates,
     /// event dispatches, HTTP calls, component interactions, and conditional logic.
     /// </summary>
     /// <remarks>
@@ -86,9 +86,9 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Targets a controlled DOM element for mutations in the current pipeline.</summary>
+        /// <summary>Targets a controlled DOM element for updates in the current pipeline.</summary>
         /// <param name="elementId">The markup ID resolved directly by the runtime.</param>
-        /// <returns>A builder for appending DOM mutations to this pipeline.</returns>
+        /// <returns>A builder for appending element updates to this pipeline.</returns>
         public ElementBuilder<TModel> Element(string elementId)
         {
             return new ElementBuilder<TModel>(this, elementId);

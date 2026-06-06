@@ -76,7 +76,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task all_properties_resolved_shows_success_status()
     {
-        // The status mutation runs after every source binding. If any SetText throws on a bad path,
+        // The status SetText reaction runs after every source binding. If any SetText throws on a bad path,
         // the sequence aborts before this element turns green.
         await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
