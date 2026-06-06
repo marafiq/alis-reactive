@@ -6,7 +6,7 @@ namespace Alis.Reactive
     /// <summary>
     /// Describes a readable or writable JavaScript property on a reactive component.
     /// Component onboarding uses these descriptors to declare the Reactive Plan
-    /// component contract that the runtime can read or mutate.
+    /// component contract that the runtime can read or update.
     /// </summary>
     internal sealed class ComponentProperty<TValue>
     {

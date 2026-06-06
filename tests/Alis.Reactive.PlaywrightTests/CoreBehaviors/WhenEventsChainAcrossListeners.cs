@@ -64,7 +64,7 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
     }
 
     [Test]
-    public async Task dom_mutations_preserve_class_coherence()
+    public async Task dom_updates_preserve_class_coherence()
     {
         // Text assertions do not expose stale classes; this catches remove/add drift.
         await NavigateTo(Path);
@@ -135,7 +135,7 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
 
         Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
             "RemoveClass('text-text-muted') must have executed on #chain-status — " +
-            "proves the 'final' event arrived AND the mutation pipeline ran in order");
+            "proves the 'final' event arrived AND the element update pipeline ran in order");
 
         AssertNoConsoleErrors();
     }

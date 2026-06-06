@@ -123,7 +123,7 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
             "AddClass('font-semibold') must have applied — emphasis styling");
         Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
             "RemoveClass('text-text-muted') must have removed the initial muted class — " +
-            "proves the remove+add+add mutation chain executed in correct order");
+            "proves the remove+add+add class update chain executed in correct order");
 
         AssertNoConsoleErrors();
     }

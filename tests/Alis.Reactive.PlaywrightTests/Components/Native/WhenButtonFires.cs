@@ -69,7 +69,7 @@ public class WhenButtonFires : PlaywrightTestBase
         var transferStatus = Page.Locator("#transfer-status");
         await Expect(transferStatus).ToHaveTextAsync("transfer confirmed", new() { Timeout = 3000 });
 
-        // Reset status so the re-click must produce a visible mutation.
+        // Reset status so the re-click must produce a visible update.
         await admitStatus.EvaluateAsync("el => el.textContent = 'reset'");
         await Page.Locator("#btn-admit").ClickAsync();
         await Expect(admitStatus).ToHaveTextAsync("Admit Resident clicked", new() { Timeout = 3000 });
