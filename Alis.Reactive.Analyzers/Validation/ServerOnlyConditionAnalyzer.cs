@@ -8,9 +8,8 @@ namespace Alis.Reactive.Analyzers.Validation
 {
     /// <summary>
     /// Reports FluentValidation <c>.When()</c> and <c>.Unless()</c> calls inside
-    /// <c>ReactiveValidator&lt;T&gt;</c> because their arbitrary C# predicates cannot
-    /// become client-executable validation conditions. Reactive Plan
-    /// <c>PipelineBuilder.When()</c> conditions stay outside this diagnostic.
+    /// <c>ReactiveValidator&lt;T&gt;</c> because arbitrary C# predicates cannot become
+    /// client-executable validation conditions.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ServerOnlyConditionAnalyzer : DiagnosticAnalyzer
@@ -81,9 +80,8 @@ namespace Alis.Reactive.Analyzers.Validation
         }
 
         /// <summary>
-        /// Walks the receiver chain to find a <c>RuleFor</c> or <c>RuleForEach</c> call.
-        /// This distinguishes FluentValidation <c>.When()</c> from Reactive Plan
-        /// <c>PipelineBuilder.When()</c>, which has no rule-builder ancestor.
+        /// Finds a rule-builder ancestor so Reactive Plan <c>PipelineBuilder.When()</c>
+        /// stays outside this FluentValidation diagnostic.
         /// </summary>
         private static bool IsOnRuleForChain(ExpressionSyntax expression)
         {

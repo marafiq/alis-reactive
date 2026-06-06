@@ -8,8 +8,8 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Alis.Reactive.Analyzers.Validation
 {
     /// <summary>
-    /// Reports FluentValidation rules inside <c>ReactiveValidator&lt;T&gt;</c> when the
-    /// rule cannot be serialized into a client-executable validation condition.
+    /// Reports <c>ReactiveValidator&lt;T&gt;</c> rules that cannot be serialized for
+    /// client-side validation.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ServerOnlyValidationRuleAnalyzer : DiagnosticAnalyzer

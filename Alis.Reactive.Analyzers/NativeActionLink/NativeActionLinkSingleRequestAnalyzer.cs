@@ -78,8 +78,8 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
         }
 
         /// <summary>
-        /// Scans the lambda body for patterns that are prohibited in NativeActionLink:
-        /// Parallel, Chained, IncludeAll, Validate, or != 1 HTTP request start.
+        /// Detects NativeActionLink lambdas that are not exactly one request chain
+        /// or include unsupported request features.
         /// </summary>
         private static bool HasProhibitedPattern(
             LambdaExpressionSyntax lambda,
@@ -109,10 +109,7 @@ namespace Alis.Reactive.Analyzers.NativeActionLink
             return requestStartCount != 1;
         }
 
-        /// <summary>
-        /// Returns true for Parallel, Chained, IncludeAll, or Validate calls
-        /// on their respective builder types.
-        /// </summary>
+        /// <summary>Identifies request features that cannot fit in NativeActionLink markup.</summary>
         private static bool IsProhibitedCall(
             string methodName, INamedTypeSymbol containingType, CachedTypes types)
         {

@@ -7,9 +7,8 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Alis.Reactive.Analyzers.HttpPipeline
 {
     /// <summary>
-    /// Error when .Chained() is called more than once on the same ResponseBuilder fluent chain.
-    /// Only the last .Chained() survives — earlier ones are silently overwritten.
-    /// Separate ResponseBuilder chains are independent.
+    /// Reports duplicate <c>.Chained()</c> calls on one response route because
+    /// each route keeps only one follow-up request.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DuplicateChainedRequestAnalyzer : DiagnosticAnalyzer

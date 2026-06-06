@@ -7,9 +7,8 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Alis.Reactive.Analyzers.ReactiveEvent
 {
     /// <summary>
-    /// Error when .Reactive() is called multiple times for the same event on the same builder chain.
-    /// Each event should have ONE .Reactive() call containing all the logic for that event.
-    /// Different events and separate component builders are allowed.
+    /// Reports duplicate <c>.Reactive()</c> calls for the same event on one builder chain.
+    /// Different events and separate component builders are valid independent wiring.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DuplicateReactiveEventAnalyzer : DiagnosticAnalyzer

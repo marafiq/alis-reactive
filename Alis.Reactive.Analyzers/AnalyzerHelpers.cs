@@ -10,11 +10,7 @@ namespace Alis.Reactive.Analyzers
         internal static readonly ImmutableHashSet<string> HttpMethodNames =
             ImmutableHashSet.Create("Get", "Post", "Put", "Delete");
 
-        /// <summary>
-        /// Returns true when the syntax tree represents a Razor-generated file
-        /// (.cshtml or .cshtml.g.cs). Framework analyzers that only target views
-        /// should gate on this before doing any semantic work.
-        /// </summary>
+        /// <summary>Identifies Razor-generated files that view-only analyzers should inspect.</summary>
         internal static bool IsRazorGeneratedFile(SyntaxTree tree)
         {
             var path = tree.FilePath;
@@ -24,10 +20,6 @@ namespace Alis.Reactive.Analyzers
                 || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
         }
 
-        /// <summary>
-        /// Returns the innermost <see cref="ClassDeclarationSyntax"/> containing
-        /// the given node, or null if not inside a class.
-        /// </summary>
         internal static ClassDeclarationSyntax? FindContainingClass(SyntaxNode node)
         {
             var current = node.Parent;
@@ -40,11 +32,7 @@ namespace Alis.Reactive.Analyzers
             return null;
         }
 
-        /// <summary>
-        /// Returns true when the class inherits from <c>ReactiveValidator&lt;T&gt;</c>,
-        /// walking the base-type chain via the semantic model. Handles qualified names,
-        /// aliases, and indirect inheritance.
-        /// </summary>
+        /// <summary>Checks direct or indirect <c>ReactiveValidator&lt;T&gt;</c> inheritance.</summary>
         internal static bool InheritsFromReactiveValidator(
             ClassDeclarationSyntax classDecl,
             SemanticModel semanticModel,
@@ -67,11 +55,7 @@ namespace Alis.Reactive.Analyzers
             return false;
         }
 
-        /// <summary>
-        /// Returns true when the <paramref name="type"/> is a closed generic
-        /// whose unbound definition matches <paramref name="openGenericType"/>.
-        /// Safe against null: returns false when either argument is null.
-        /// </summary>
+        /// <summary>Matches a closed generic type against its unbound generic definition.</summary>
         internal static bool IsClosedGenericOf(ITypeSymbol? type, INamedTypeSymbol? openGenericType)
         {
             if (openGenericType == null) return false;
@@ -80,10 +64,7 @@ namespace Alis.Reactive.Analyzers
             return SymbolEqualityComparer.Default.Equals(named.ConstructedFrom, openGenericType);
         }
 
-        /// <summary>
-        /// Walks a fluent method-chain backwards: given <c>a.B().C()</c>, returns the
-        /// <c>a.B()</c> invocation that <c>.C()</c> was called on.
-        /// </summary>
+        /// <summary>Returns the previous invocation in a fluent method chain.</summary>
         internal static InvocationExpressionSyntax? GetReceiverInvocation(
             InvocationExpressionSyntax invocation)
         {

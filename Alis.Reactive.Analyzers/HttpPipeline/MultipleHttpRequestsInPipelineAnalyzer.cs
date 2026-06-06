@@ -83,10 +83,7 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
             }
         }
 
-        /// <summary>
-        /// Unwraps a fluent chain (a.Post("/url").Response(r => ...)) to find the root
-        /// invocation, then checks if it is an HTTP method call on the pipeline parameter.
-        /// </summary>
+        /// <summary>Checks whether a fluent chain starts with an HTTP call on the pipeline parameter.</summary>
         private static bool StartsHttpChainOnParameter(
             ExpressionSyntax expression,
             string parameterName,

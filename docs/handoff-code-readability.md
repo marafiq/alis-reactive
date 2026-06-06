@@ -947,6 +947,11 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: NativeTagHelpers enum
   value XML summaries for divider style and key-value layout now use terse
   IntelliSense wording without changing public enum values.
+- Resolved on `tiny-safe-but-important-refactorings`: analyzer XML comments now
+  describe the diagnostic boundary or protected Reactive Plan rule without
+  narrating helper mechanics. The Razor-generated-file, fluent-chain,
+  NativeActionLink, validation, duplicate event, and chained request comments
+  remain only where they prevent analyzer-scope confusion.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
