@@ -44,7 +44,7 @@ export class ExecutionContext {
     return new ExecutionContext({ ...this.asAvailable(), response });
   }
 
-  /** Push an array element onto the element scope stack for per-element evaluation. */
+  // Push an array element onto the element scope stack for per-element evaluation.
   withElement(item: unknown): ExecutionContext {
     const current = this.asAvailable();
     return new ExecutionContext({ ...current, element: [...(current.element ?? []), item] });

@@ -1,4 +1,4 @@
-/** Exhaustiveness check for discriminated union switches. Compile-time error if a case is missing. */
+// Exhaustiveness check for discriminated union switches. Compile-time error if a case is missing.
 export function assertNever(value: never, context: string): never {
   const unhandled = value as unknown;
   const description = hasKind(unhandled) ? `${unhandled.kind}` : `${unhandled}`;

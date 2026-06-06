@@ -387,6 +387,10 @@ Candidate cleanup:
   cancellation XML docs no longer say "current Syncfusion popup" in the public
   helper summary. The remarks still keep the popup lifecycle boundary because it
   explains why the cancellation mutation must happen before the callback returns.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining non-API TS
+  helper comments in `assertNever` and `ExecutionContext.withElement` now use
+  plain comments instead of JSDoc blocks. Exported runtime type field docs remain
+  JSDoc because they describe payload scopes for TypeScript consumers.
 
 ### Implementation Inline Comments
 
