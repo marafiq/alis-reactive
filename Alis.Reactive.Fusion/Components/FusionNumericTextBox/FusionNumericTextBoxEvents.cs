@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionNumericTextBoxEvents Instance = new FusionNumericTextBoxEvents();
         private FusionNumericTextBoxEvents() { }
 
-        /// <summary>Fires when the numeric value changes.</summary>
+        /// <summary>Fires when numeric value changes.</summary>
         public TypedEvent<FusionNumericTextBoxChangeArgs> Changed =>
             new TypedEvent<FusionNumericTextBoxChangeArgs>(
                 "change", new FusionNumericTextBoxChangeArgs());

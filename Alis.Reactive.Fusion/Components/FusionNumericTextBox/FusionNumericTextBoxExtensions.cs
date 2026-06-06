@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod DecrementMethod =
             ComponentMethod.Named("decrement");
 
-        /// <summary>Sets the numeric value.</summary>
+        /// <summary>Sets numeric value.</summary>
         public static ComponentRef<FusionNumericTextBox, TModel> SetValue<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self, decimal value)
             where TModel : class
@@ -36,7 +36,7 @@ namespace Alis.Reactive.Fusion.Components
             return self.EmitSet(ValueProperty, ValueExpression.Literal(value));
         }
 
-        /// <summary>Sets the minimum allowed value.</summary>
+        /// <summary>Sets minimum allowed value.</summary>
         public static ComponentRef<FusionNumericTextBox, TModel> SetMin<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self, decimal min)
             where TModel : class
@@ -68,7 +68,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(DecrementMethod);
 
-        /// <summary>Reads the numeric value for conditions or gather.</summary>
+        /// <summary>Reads numeric value for conditions or gather.</summary>
         public static TypedComponentSource<decimal> Value<TModel>(
             this ComponentRef<FusionNumericTextBox, TModel> self)
             where TModel : class

@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionRatingEvents Instance = new FusionRatingEvents();
         private FusionRatingEvents() { }
 
-        /// <summary>Fires when the rating value changes.</summary>
+        /// <summary>Fires when rating value changes.</summary>
         public TypedEvent<FusionRatingValueChangedArgs> ValueChanged =>
             new TypedEvent<FusionRatingValueChangedArgs>(
                 "valueChanged", new FusionRatingValueChangedArgs());

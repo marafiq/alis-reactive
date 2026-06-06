@@ -19,8 +19,8 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod DataBindMethod =
             ComponentMethod.Named("dataBind");
 
-        /// <summary>Sets the visible scalar slider value.</summary>
-        /// <param name="value">Numeric value to set.</param>
+        /// <summary>Sets visible scalar slider value.</summary>
+        /// <param name="value">Scalar slider value.</param>
         public static ComponentRef<FusionSlider, TModel> SetValue<TModel>(
             this ComponentRef<FusionSlider, TModel> self,
             double value)
@@ -29,7 +29,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(ValueProperty, ValueExpression.Literal(value))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets the visible two-value slider range.</summary>
+        /// <summary>Sets visible two-value slider range.</summary>
         /// <param name="start">First range value.</param>
         /// <param name="end">Second range value.</param>
         public static ComponentRef<FusionSlider, TModel> SetRangeValue<TModel>(
@@ -43,13 +43,13 @@ namespace Alis.Reactive.Fusion.Components
                     ValueExpression.LiteralRaw(new[] { start, end }, Shape.ArrayOf(Shape.Number)))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Reads the scalar value for conditions or gather.</summary>
+        /// <summary>Reads scalar value for conditions or gather.</summary>
         public static TypedComponentSource<double> Value<TModel>(
             this ComponentRef<FusionSlider, TModel> self)
             where TModel : class
             => self.Read(ValueProperty);
 
-        /// <summary>Reads the range value for gather or display pipelines.</summary>
+        /// <summary>Reads range value for gather or display pipelines.</summary>
         public static TypedComponentSource<double[]> RangeValue<TModel>(
             this ComponentRef<FusionSlider, TModel> self)
             where TModel : class

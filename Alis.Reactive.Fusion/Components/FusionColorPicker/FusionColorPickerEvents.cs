@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionColorPickerEvents Instance = new FusionColorPickerEvents();
         private FusionColorPickerEvents() { }
 
-        /// <summary>Fires when the color value changes.</summary>
+        /// <summary>Fires when color value changes.</summary>
         public TypedEvent<FusionColorPickerChangeArgs> Changed =>
             new TypedEvent<FusionColorPickerChangeArgs>(
                 "change", new FusionColorPickerChangeArgs());

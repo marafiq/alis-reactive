@@ -205,6 +205,10 @@ Candidate cleanup:
   component summaries now keep selected date, date-time, time, and range-read
   semantics without article-led phrasing. DateRangePicker remarks still keep
   the no-SetValue and individual-date versus array-read guidance.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion numeric, rating,
+  slider, and color value summaries now keep scalar, range, minimum, visible
+  rating, hex color, and change-event semantics without article-led phrasing.
+  The color hex+alpha remark remains because it documents payload shape.
 - Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
   operator docs now include the parameter tags needed for generated API
   signatures such as `Eq(operand)` versus `Eq(right)`. This keeps the public DSL

@@ -23,27 +23,27 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod ToggleMethod =
             ComponentMethod.Named("toggle");
 
-        /// <summary>Sets the color value (hex string, e.g. "#ff0000").</summary>
-        /// <param name="value">Hex color string to set, or <see langword="null"/> to clear.</param>
+        /// <summary>Sets color value as a hex string, e.g. <c>#ff0000</c>.</summary>
+        /// <param name="value">Hex color string, or <see langword="null"/> to clear.</param>
         public static ComponentRef<FusionColorPicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, string? value)
             where TModel : class
             => self.EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String));
 
-        /// <summary>Toggles the ColorPicker popup open/closed.</summary>
+        /// <summary>Toggles ColorPicker popup open or closed.</summary>
         public static ComponentRef<FusionColorPicker, TModel> Toggle<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self)
             where TModel : class
             => self.EmitCall(ToggleMethod);
 
-        /// <summary>Sets the disabled state of the ColorPicker.</summary>
+        /// <summary>Sets ColorPicker disabled state.</summary>
         /// <param name="disabled"><see langword="true"/> to disable, <see langword="false"/> to enable.</param>
         public static ComponentRef<FusionColorPicker, TModel> Disable<TModel>(
             this ComponentRef<FusionColorPicker, TModel> self, bool disabled = true)
             where TModel : class
             => self.EmitSet(DisabledProperty, ValueExpression.Literal(disabled));
 
-        /// <summary>Reads the color value for conditions or gather.</summary>
+        /// <summary>Reads color value for conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument for component operations:
         /// <c>p.When(p.Component&lt;FusionColorPicker&gt;(m =&gt; m.ThemeColor).Value()).NotNull().Then(p =&gt; { ... })</c>.
