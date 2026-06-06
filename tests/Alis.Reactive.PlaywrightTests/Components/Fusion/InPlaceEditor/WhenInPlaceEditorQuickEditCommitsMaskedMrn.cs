@@ -43,7 +43,7 @@ public class WhenInPlaceEditorQuickEditCommitsMaskedMrn : PlaywrightTestBase
         Assert.That(body, Does.Contain("MRN1234"),
             "POST body must carry the raw (mask-literal-stripped) value");
         Assert.That(body, Does.Not.Contain("MRN-1234"),
-            "SF Mask strips literals on commit; the wire payload must not include the dash");
+            "Syncfusion Mask strips literals on commit; the wire payload must not include the dash");
         Assert.That(body, Does.Contain("resident-42"),
             "POST body must carry the ResidentId identity from the hidden field");
 
