@@ -26,8 +26,8 @@ namespace Alis.Reactive.Native.Components
     /// handles MVC form submission as a comma-separated string.
     /// </para>
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The model value type represented by the checked option values.</typeparam>
+    /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+    /// <typeparam name="TProp">Model value type represented by the checked option values.</typeparam>
     public class NativeCheckListBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
@@ -75,7 +75,7 @@ namespace Alis.Reactive.Native.Components
         /// Adds checkbox options supplied outside the fluent builder, such as
         /// controller or view-model option lists.
         /// </summary>
-        /// <param name="items">The checkbox items to display.</param>
+        /// <param name="items">Checkbox items to display.</param>
         public NativeCheckListBuilder<TModel, TProp> Items(IEnumerable<RadioButtonItem> items)
         {
             foreach (var item in items)
@@ -109,7 +109,7 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <param name="value">Submitted option value.</param>
         /// <param name="text">Checkbox display text.</param>
-        /// <param name="description">A secondary description shown below the text.</param>
+        /// <param name="description">Secondary description shown below the text.</param>
         public NativeCheckListBuilder<TModel, TProp> Option(string value, string text, string description)
         {
             _options.Add(new RadioButtonItem(value, text, description));

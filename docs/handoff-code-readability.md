@@ -593,6 +593,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown` XML tags
   now use concise model, option-list, placeholder, field-wrapper, Reactive Plan,
   and event-args wording. Component-reference examples remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeCheckList` XML tags
+  now use concise model, option-list, field-wrapper, Reactive Plan, and
+  event-payload wording. Container, CSV, `NameFor`, and inline-sync notes remain.
 
 ### Implementation Inline Comments
 

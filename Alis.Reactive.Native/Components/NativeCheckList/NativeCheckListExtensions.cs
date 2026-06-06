@@ -37,7 +37,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes checked values from the triggering event payload.
         /// </summary>
-        /// <typeparam name="TSource">The event payload type containing the values.</typeparam>
+        /// <typeparam name="TSource">Event payload type containing the values.</typeparam>
         /// <param name="source">Trigger payload placeholder.</param>
         /// <param name="path">Expression selecting the event payload property to read.</param>
         public static ComponentRef<NativeCheckList, TModel> SetValue<TModel, TSource>(
