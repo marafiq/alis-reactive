@@ -1,298 +1,166 @@
 ---
 title: The JSON Plan Contract
-description: What the plan looks like — every trigger, reaction, command, and source shape with real examples.
+description: Current Reactive Plan JSON shape generated from the C# plan domain.
 sidebar:
   order: 5
 ---
 
-You've seen the fluent C# — `.Reactive()`, `.Post()`, `.When()`. You know the builders capture intent into a JSON plan. But what does that plan actually look like?
+You've seen the fluent C# — `.Reactive()`, `.Post()`, `.When()`. The builders capture intent into a Reactive Plan. This page shows the current generated JSON contract at the level framework developers usually need when changing plan or runtime code.
 
-It's structured. Every piece has a `"kind"` field that tells the runtime exactly what to do. Let's trace through every plan shape the framework produces.
+The authority is the generated TypeScript contract in `Alis.Reactive.Assets/runtime/types/plan.ts`, which is generated from the C# plan domain.
 
-## The top-level structure
+## Top-level structure
 
-Every plan has three sections:
+Every plan document has the same top-level shape:
 
 ```json
 {
+  "version": 3,
   "planId": "MyApp.Models.ResidentModel",
-  "components": { ... },
-  "entries": [ ... ]
+  "scope": { "kind": "root" },
+  "types": { },
+  "components": { },
+  "behaviors": [ ]
 }
 ```
 
-`planId` is the model's full type name — used as the merge key for partial views. `components` is the registry of all input components. `entries` is the list of trigger + reaction pairs.
+`planId` is the model's full type name. `scope` identifies root versus partial plan JSON. `types` declares browser object contracts, `components` registers component objects, and `behaviors` is the ordered list of trigger/reaction pairs.
 
-## Triggers — what fires
+## Behaviors — what starts and what runs
 
-### dom-ready
-
-```json
-{ "kind": "dom-ready" }
-```
-
-Fires once when the page loads. The simplest trigger.
-
-### custom-event
-
-```json
-{ "kind": "custom-event", "event": "resident-loaded" }
-```
-
-Fires when `pipeline.Dispatch("resident-loaded")` is called from any pipeline.
-
-### component-event
+Each behavior has two fields:
 
 ```json
 {
-  "kind": "component-event",
-  "componentId": "IsUrgent",
-  "jsEvent": "change",
-  "vendor": "native",
-  "bindingPath": "IsUrgent",
-  "readExpr": "checked"
+  "startsWhen": { "kind": "page-ready" },
+  "reaction": {
+    "kind": "set",
+    "on": { "kind": "payload", "scope": "local" },
+    "property": "status",
+    "value": { "kind": "literal", "value": "ready" }
+  }
 }
 ```
 
-Fires when the component's DOM event fires. The trigger carries the vendor and readExpr so the runtime knows how to construct the execution context — for native components it reads the element property, for fusion it passes the event object directly.
+`startsWhen` says when the behavior starts. `reaction` is the executable `ReactionGraph` node.
 
-### server-push
+## StartsWhen — what fires
 
-```json
-{
-  "kind": "server-push",
-  "url": "/api/notifications/stream",
-  "eventType": "notification"
-}
-```
+| Kind | Key fields | DSL source |
+|------|------------|------------|
+| `page-ready` | none | `t.DomReady(...)` |
+| `document-event` | `event`, `payloadType` | `t.CustomEvent(...)` |
+| `component-event` | `component`, `event` | component `.Reactive(...)` |
+| `server-push` | `url`, `eventFilter` | `t.ServerPush(...)` |
+| `signalr` | `hubUrl`, `method`, `payloadType` | `t.SignalR(...)` |
 
-Fires when the server pushes data via Server-Sent Events (SSE). The `url` points to the SSE endpoint. The optional `eventType` filters to a specific SSE event type — omit it to receive all messages.
-
-### signalr
-
-```json
-{
-  "kind": "signalr",
-  "hubUrl": "/hubs/notifications",
-  "methodName": "ReceiveNotification"
-}
-```
-
-Fires when a SignalR hub method is invoked. The `hubUrl` identifies the hub connection (shared across triggers with the same URL). The `methodName` maps to the handler registered on the connection.
+Public DSL names are developer-facing. Wire names are generated plan contract terms.
 
 ## Reactions — what happens
 
-### sequential
+The runtime executes a `ReactionGraph`:
 
-The simplest reaction — run commands in order:
+| Kind | Purpose |
+|------|---------|
+| `sequence` | Execute `steps[]` in declaration order. |
+| `parallel` | Execute `steps[]` concurrently and optionally run a completion reaction. |
+| `branch` | Evaluate `cases[]` and run the first matching reaction. |
+| `set` | Assign a property on a component or payload target. |
+| `call` | Invoke a method on a component, payload target, or plugin. |
+| `request` | Execute an HTTP `RequestPlan`. |
+| `dispatch` | Dispatch a `CustomEvent` with optional payload. |
+| `inject` | Inject HTML into a partial slot. |
+| `show-validation-errors` | Render server validation errors into a validation container. |
+
+There is no separate command layer in the current contract. Element updates, plugin calls, event dispatch, HTTP, and partial injection are all reactions.
+
+## Branches
+
+Branch reactions pair guards with reactions:
 
 ```json
 {
-  "kind": "sequential",
-  "commands": [
-    { "kind": "mutate-element", "target": "status",
-      "mutation": { "kind": "set-prop", "prop": "textContent" },
-      "value": "Ready" }
-  ]
-}
-```
-
-### conditional
-
-Evaluate guards, pick the first matching branch:
-
-```json
-{
-  "kind": "conditional",
-  "branches": [
+  "kind": "branch",
+  "cases": [
     {
-      "guard": { "kind": "value",
-        "source": { "kind": "event", "path": "evt.checked" },
-        "op": "truthy" },
-      "reaction": { "kind": "sequential", "commands": [
-        { "kind": "mutate-element", "target": "section",
-          "mutation": { "kind": "call", "method": "removeAttribute",
-            "args": [{ "kind": "literal", "value": "hidden" }] } }
-      ] }
+      "guard": {
+        "kind": "when",
+        "condition": { "kind": "truthy", "left": { "kind": "payload-path", "scope": "event", "path": { "segments": ["checked"] } } }
+      },
+      "reaction": { "kind": "set", "...": "..." }
     },
     {
-      "reaction": { "kind": "sequential", "commands": [
-        { "kind": "mutate-element", "target": "section",
-          "mutation": { "kind": "call", "method": "setAttribute",
-            "args": [{ "kind": "literal", "value": "hidden" },
-                     { "kind": "literal", "value": "" }] } }
-      ] }
+      "guard": { "kind": "default" },
+      "reaction": { "kind": "set", "...": "..." }
     }
   ]
 }
 ```
 
-A branch with no `guard` is the else — always matches if reached. The optional top-level `commands` field (not shown here) runs before branch evaluation.
+The default guard is the `else` case. Conditions stay in the sync lane unless a reached confirm guard crosses the user-decision boundary.
 
-### http
+## Requests
 
-A single HTTP request with gather, validation, and response handlers:
+HTTP is represented as a request reaction:
 
 ```json
 {
-  "kind": "http",
+  "kind": "request",
   "request": {
-    "verb": "POST",
+    "method": "POST",
     "url": "/api/save",
-    "gather": [
-      { "kind": "all" }
-    ],
-    "validation": {
-      "formId": "intake-form",
-      "planId": "MyApp.Models.ResidentModel",
-      "fields": [
-        {
-          "fieldName": "Name",
-          "rules": [
-            { "rule": "required", "message": "Name is required" }
-          ]
-        },
-        {
-          "fieldName": "Email",
-          "rules": [
-            { "rule": "required", "message": "Email is required" },
-            { "rule": "email", "message": "Must be a valid email" }
-          ]
-        }
-      ]
+    "validation": { "kind": "container", "container": "intake-form" },
+    "input": {
+      "kind": "gather",
+      "assignments": [],
+      "bodyFormat": "json",
+      "registeredInputs": { "kind": "all-registered-inputs" }
     },
-    "onSuccess": [
-      {
-        "commands": [
-          { "kind": "mutate-element", "target": "status",
-            "mutation": { "kind": "set-prop", "prop": "textContent" },
-            "value": "Saved" }
-        ]
-      }
-    ],
-    "onError": [
-      {
-        "statusCode": 400,
-        "commands": [
-          { "kind": "validation-errors", "formId": "intake-form" }
-        ]
-      }
-    ]
+    "whileLoading": [],
+    "success": [],
+    "error": [],
+    "finally": [],
+    "chain": { "kind": "terminal" }
   }
 }
 ```
 
-The request carries everything: HTTP verb, URL, what to gather, how to validate, what to do on success, what to do on error. The runtime follows the instructions — it never decides what to post or how to handle errors.
+The request carries method, URL, validation target, gathered input assignments, response routes, final reactions, and optional follow-up request chaining. The runtime follows the generated plan; it does not infer what to post or how to route errors.
 
-### parallel-http
+## Values — where data comes from
 
-Multiple requests fired concurrently:
+Reactions and request input assignments use `ValueExpression` nodes:
 
-```json
-{
-  "kind": "parallel-http",
-  "requests": [
-    {
-      "verb": "GET",
-      "url": "/api/facilities",
-      "onSuccess": [{ "commands": [ ... ] }]
-    },
-    {
-      "verb": "GET",
-      "url": "/api/care-levels",
-      "onSuccess": [{ "commands": [ ... ] }]
-    }
-  ],
-  "onAllSettled": [
-    { "kind": "mutate-element", "target": "spinner",
-      "mutation": { "kind": "call", "method": "setAttribute",
-        "args": [{ "kind": "literal", "value": "hidden" },
-                 { "kind": "literal", "value": "" }] } }
-  ]
-}
-```
+| Family | Examples |
+|--------|----------|
+| literals | strings, numbers, booleans, null, arrays, objects |
+| reads | component properties/methods, plugin properties/methods, URL parameters, payload paths, DOM properties, element methods |
+| objects and arrays | structured payloads for dispatch and request bodies |
+| array operations | filter, map, count, first, ordering projections |
 
-Each request has its own response handlers. `onAllSettled` fires after all requests complete — regardless of individual success or failure.
+Shape metadata is generated by the C# plan domain. The runtime applies the declared shape at value-read, validation, condition, and assignment boundaries.
 
-## Commands — what to do
+## Components and browser object contracts
 
-Five command kinds:
+`components` registers runtime objects by key. Each component carries a role, object contract, binding metadata, and optional validation container metadata. `types` declares reusable browser object contracts for component and plugin access.
 
-| Kind | Purpose | Key fields |
-|------|---------|-----------|
-| `mutate-element` | Change a DOM element or component | `target`, `mutation`, `value?`, `source?`, `vendor?` |
-| `dispatch` | Fire a custom event | `event`, `payload?` |
-| `mutate-event` | Modify the event args | `mutation` |
-| `validation-errors` | Route server errors to form fields | `formId` |
-| `into` | Inject response HTML into container | `target` |
-
-## Mutations — how to change
-
-Two primitives. The [Runtime](../runtime/) page explains how they execute via bracket notation.
-
-| Kind | Plan shape |
-|------|-----------|
-| `set-prop` | `{ "prop": "textContent" }` |
-| `call` | `{ "method": "add", "chain": "classList", "args": [...] }` |
-
-## Sources — where values come from
-
-| Kind | Plan shape | What it reads |
-|------|-----------|---------------|
-| `event` | `{ "path": "evt.address.city" }` | Event payload, HTTP response |
-| `component` | `{ "componentId": "Country", "vendor": "fusion", "readExpr": "value" }` | DOM element or vendor component |
-| `url` | `{ "param": "tab" }` | Browser URL query string |
-| `plugin` | `{ "plugin": "array", "member": "count", "args": [...] }` | User-registered JS plugin object |
-
-How these resolve at runtime is covered in [Runtime — Value resolution](../runtime/#value-resolution--resolverts--walkts).
-
-## Gather — what goes in the request
-
-| Kind | Plan shape | What it collects |
-|------|-----------|-----------------|
-| `all` | `{ "kind": "all" }` | Every registered component's value |
-| `static` | `{ "kind": "static", "param": "action", "value": "create" }` | Fixed value |
-| `component` | `{ "kind": "component", "componentId": "...", "vendor": "...", "readExpr": "..." }` | One component's live value |
-| `event` | `{ "kind": "event", "param": "q", "path": "evt.text" }` | Value from event payload |
-| `url` | `{ "kind": "url", "param": "tab" }` | URL query parameter |
-| `plugin` | `{ "kind": "plugin", "plugin": "...", "member": "...", "args": [...] }` | Plugin method result |
-| `header` | `{ "name": "X-Api-Key", "value": "..." }` | Custom HTTP request header |
-| `route-param` | `{ "name": "id", "value": ... }` | URL template substitution |
-
-`all` is a placeholder — expanded at C# render time to concrete `component` items from the plan's ComponentsMap.
-
-## Components registry — what's on the page
-
-```json
-{
-  "components": {
-    "Name":      { "id": "Name", "vendor": "native", "readExpr": "value", "componentType": "textbox" },
-    "IsUrgent":  { "id": "IsUrgent", "vendor": "native", "readExpr": "checked", "componentType": "checkbox" },
-    "DueDate":   { "id": "DueDate", "vendor": "fusion", "readExpr": "value", "componentType": "datepicker" }
-  }
-}
-```
-
-Every `Html.InputField` call registers here. The runtime uses this for gather (`IncludeAll`) and validation field-to-component binding.
+This is why component IDs are absolute join keys: markup, plan JSON, validation, gather, partial composition, and runtime lookup all meet at the same key.
 
 ## Why structure matters
 
 Every plan shape is owned by the C# plan domain and mirrored into generated TypeScript. If a builder adds a new `kind` without updating the generated contract and runtime executor, `npm run typecheck` fails before any browser is involved.
 
 | Concept | Valid kinds |
-|---------|-----------|
-| Triggers | `dom-ready`, `custom-event`, `component-event`, `server-push`, `signalr` |
-| Reactions | `sequential`, `conditional`, `http`, `parallel-http` |
-| Commands | `mutate-element`, `dispatch`, `mutate-event`, `validation-errors`, `into` |
-| Mutations | `set-prop`, `call` |
-| Sources | `event`, `component`, `url`, `plugin` |
-| Gather | `all`, `static`, `component`, `event`, `url`, `plugin`, `header`, `route-param` |
+|---------|-------------|
+| StartsWhen | `page-ready`, `document-event`, `component-event`, `server-push`, `signalr` |
+| Reactions | `sequence`, `parallel`, `branch`, `set`, `call`, `request`, `dispatch`, `inject`, `show-validation-errors` |
+| Request input | `none`, `gather` |
+| Request targets | `payload`, `header`, `route-param` |
+| Response match | `any`, `status` |
 
-If you need a new capability — say a new reaction kind — it starts in the C# plan domain, regenerates `plan.ts`, and then gets a focused runtime executor. The generated contract is the gatekeeper. Both sides agree on the shape, and neither reaches beyond it.
-
-Now that you know what the plan looks like, the next question is: how do you add new things to it?
+If you need a new capability, start in the C# plan domain, regenerate `plan.ts`, and add a focused runtime executor. The generated contract is the gatekeeper. Both sides agree on the shape, and neither reaches beyond it.
 
 ## Next
 
-- [The Vertical Slice](../vertical-slice/) — the 7-file pattern for adding a component
-- [Runtime](../runtime/) — how the runtime boots, executes commands, and resolves values
+- [The Vertical Slice](../vertical-slice/) — the file pattern for adding a component
+- [Runtime](../runtime/) — how the runtime boots, executes reactions, and resolves values

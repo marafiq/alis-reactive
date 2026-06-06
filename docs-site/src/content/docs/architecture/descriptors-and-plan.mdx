@@ -1,152 +1,155 @@
 ---
 title: Plan Model & Plan
-description: The plan model hierarchy — Entry, Trigger, Reaction, Command, Mutation — and how the plan collects and serializes them.
+description: The current plan model hierarchy — Behavior, trigger, reaction, value, request, and component contract.
 sidebar:
   order: 4
 ---
 
-Every fluent builder call creates a **plan model** — a plain C# object that describes what must happen without executing it. The plan collects these plan models and serializes them to JSON. This page explains the plan model hierarchy and the plan's role.
+Every fluent builder call creates a **plan model**: a plain C# object that describes what must happen without executing it. `ReactivePlan<TModel>` collects those models and renders a JSON **Reactive Plan**. The generated TypeScript contract mirrors the C# plan domain, so the runtime can execute the plan without guessing.
 
-## Entry — the atomic unit
+## Behavior — the atomic unit
 
-An `Entry` pairs a `Trigger` with a `Reaction`. The plan is a list of entries.
+A `Behavior` pairs a `StartsWhen` trigger with a `ReactionGraph`. The plan is a list of behaviors.
 
 ```d2
 direction: right
 
-trigger: "Trigger\ndom-ready | custom-event |\ncomponent-event" {
+trigger: "StartsWhen\npage-ready | document-event |\ncomponent-event | server-push | signalr" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 18
 }
-reaction: "Reaction\nsequential | conditional |\nhttp | parallel-http" {
+reaction: "ReactionGraph\nsequence | branch | parallel |\nrequest | set | call | dispatch | inject" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 18
 }
-entry: "Entry\ntrigger + reaction" {
+behavior: "Behavior\nstartsWhen + reaction" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
   style.font-size: 18
 }
 
-trigger -> entry {
+trigger -> behavior {
   style.stroke: "#4285f4"
 }
-reaction -> entry {
+reaction -> behavior {
   style.stroke: "#f9ab00"
 }
 ```
 
 ## Plan model hierarchy
 
-Every plan model class is polymorphic — serialized with a `"kind"` discriminator. The runtime switches on `kind` to decide what to do.
+Every discriminated plan node carries a `"kind"` field. The runtime switches on generated union types, not inferred shape.
 
-```
-Trigger (kind)
-├── DomReadyTrigger              "dom-ready"
-├── CustomEventTrigger           "custom-event"    + event name
-└── ComponentEventTrigger        "component-event" + componentId, jsEvent, vendor
-
-Reaction (kind)
-├── SequentialReaction           "sequential"       + commands[]
-├── ConditionalReaction          "conditional"      + commands? + branches[] (guard + reaction)
-├── HttpReaction                 "http"             + request model
-└── ParallelHttpReaction         "parallel-http"    + request models[]
-
-Command (kind)
-├── DispatchCommand              "dispatch"         + event name, payload?
-├── MutateElementCommand         "mutate-element"   + target, mutation, value?, source?, vendor?
-├── MutateEventCommand           "mutate-event"     + mutation (modifies event args)
-├── ValidationErrorsCommand      "validation-errors" + formId
-└── IntoCommand                  "into"             + target (injects HTML)
-
-Mutation (kind)
-├── SetPropMutation              "set-prop"         + prop, coerce?
-└── CallMutation                 "call"             + method, chain?, args[]
-
-MethodArg (kind)
-├── LiteralArg                   "literal"          + value
-└── SourceArg                    "source"           + BindSource, coerce?
-
-BindSource (kind)
-├── EventSource                  "event"            + path (dot-notation)
-└── ComponentSource              "component"        + componentId, vendor, readExpr
+```text
+PlanDocument
+├── version
+├── planId
+├── scope
+├── types
+├── components
+└── behaviors[]
+    ├── startsWhen
+    │   ├── page-ready
+    │   ├── document-event
+    │   ├── component-event
+    │   ├── server-push
+    │   └── signalr
+    └── reaction
+        ├── sequence                  steps[]
+        ├── parallel                  steps[] + completion
+        ├── branch                    cases[] (when/default + reaction)
+        ├── set                       target + property + value
+        ├── call                      target + method + args[]
+        ├── request                   RequestPlan
+        ├── dispatch                  CustomEvent name + payload
+        ├── inject                    slot + HTML value
+        └── show-validation-errors    validation container
 ```
 
-Every object in the plan is self-describing. The runtime never guesses — it reads `kind` and dispatches.
+The model is recursive. A branch case can contain a request reaction, a request response route can contain a sequence, and a sequence can contain another branch.
 
 ## The plan — collector and serializer
 
 `ReactivePlan<TModel>` has two responsibilities:
 
-**Collecting entries** — `Html.On()` calls `plan.AddEntry()`. `Html.InputField()` calls `plan.AddToComponentsMap()`. By the time `Html.RenderPlan(plan)` is called (which invokes `plan.Render()`), the plan holds every entry and every component registration.
+**Collecting behavior** — `Html.On()` and component `.Reactive()` calls append behaviors. `Html.InputField()` and component builders register component objects. By the time `Html.RenderPlan(plan)` calls `plan.Render()`, the plan holds every behavior and component registration for the view.
 
-**Serializing to JSON** — `plan.Render()` produces the complete JSON plan:
+**Serializing to JSON** — `plan.Render()` produces the complete Reactive Plan JSON:
 
 ```d2
 direction: right
 
-entries: "Entries\ntrigger + reaction pairs" {
+behaviors: "Behaviors\nstartsWhen + reaction" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 18
 }
-components: "ComponentsMap\nbindingPath → vendor,\nreadExpr, componentType" {
+components: "Components\ncomponent key → object,\nbinding, validation container" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 18
 }
-render: "plan.Render()\nSerializes both\nto JSON" {
+types: "Browser object contracts\nproperties, methods,\nevents" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 18
+}
+render: "plan.Render()\nserializes to JSON" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
   style.font-size: 18
 }
 
-entries -> render {
+behaviors -> render {
   style.stroke: "#4285f4"
 }
 components -> render {
   style.stroke: "#f9ab00"
 }
+types -> render {
+  style.stroke: "#ea4335"
+}
 ```
 
-At render time, two late-binding resolutions happen:
-- **IncludeAll** gather items expand to concrete component references from the ComponentsMap
-- **Validate\<T\>** rules are extracted from the FluentValidation validator and attached to the HTTP request model
+At render time, late-bound pieces are resolved into explicit plan data:
+
+- `IncludeAll()` expands to request input assignments for registered inputs.
+- `Validate<T>()` extracts declared client rules from FluentValidation metadata.
+- Component references use the registered component key and browser object contract.
 
 ## Expression paths — compile-time to runtime
 
-C# expressions like `m => m.Address.City` are walked by `ExpressionPathHelper` at build time. Each member is camelCased and joined with dots. A prefix identifies the source context:
+C# expressions like `m => m.Address.City` are walked at build time. Each member path is preserved in the plan as structured path data or as an element/component ID, depending on the DSL call.
 
-| Source | Prefix | Example expression | Plan path |
-|--------|--------|-------------------|-----------|
-| Event payload | `evt.` | `x => x.Address.City` | `evt.address.city` |
-| Response body | `responseBody.` | `x => x.FullName` | `responseBody.fullName` |
-| Component read | (none) | `ReadExpr = "value"` | `value` |
-| Model ID | (none) | `m => m.Address.City` | Element ID `Address_City` |
+| Source | Example expression | Runtime plan role |
+|--------|--------------------|-------------------|
+| Event payload | `x => x.Address.City` | `PayloadSource` read from trigger payload |
+| Response body | `x => x.FullName` | `PayloadSource` read from response route body |
+| Component value | `.Value()` | `ComponentSource` read from a plan-registered component |
+| Model field | `m => m.Address.City` | component key, DOM ID, validation field binding |
 
-The expression tree gives compile-time type safety. The dot-path gives the runtime a way to walk the object. The plan bridges the two.
+The expression tree gives compile-time type safety. The generated plan gives the runtime a concrete value path.
 
-## ComponentsMap — the component registry
+## Components — the component registry
 
-When `Html.InputField(plan, m => m.Country).FusionDropDownList(...)` runs, the builder registers:
+When `Html.InputField(plan, m => m.Country).FusionDropDownList(...)` runs, the builder registers a component object with its key, role, vendor object contract, input binding, and optional validation container metadata.
 
-| Binding Path | Component ID | Vendor | ReadExpr | ComponentType |
-|-------------|-------------|--------|----------|---------------|
-| `Country` | `Country` | `fusion` | `value` | `dropdownlist` |
+The runtime uses component registrations for:
 
-The runtime uses this registry for:
-- **Gather** — `IncludeAll()` iterates the map, resolves each component's value
-- **Validation** — maps field names to component IDs for error display
-- **Enrichment** — resolves component references in plan entries before trigger wiring
+- **Gather** — `IncludeAll()` and explicit gather read registered input values.
+- **Validation** — server field names map to component error slots.
+- **Execution** — component `set` and `call` reactions resolve the right browser object.
+- **Partial composition** — loaded partial slots add and remove component registrations in the Active Plan.
 
-The developer registers once. Every downstream consumer reads from the registry.
+The developer registers once. Every downstream consumer reads from the same plan data.
 
 **Next:** [The JSON Plan Contract](../the-contract/) — what these plan models look like as serialized JSON
