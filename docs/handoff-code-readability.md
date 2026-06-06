@@ -1011,6 +1011,11 @@ Rewrite or delete:
   core, Fusion, and Native edge comments now keep fluent-chain, request,
   validation-job, shape-coercion, app-level component, Syncfusion chip, grid
   editSettings, and hidden-input boundary facts without leading narration.
+- Resolved on `tiny-safe-but-important-refactorings`: Sandbox view/model
+  boundary comments now state Active Plan hidden-field reads, ReactiveArray
+  data-source binding, custom-event payload arrays, same-reaction DOM reads,
+  and SignalR partial reuse directly without adding helpers or changing
+  behavior.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

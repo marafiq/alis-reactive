@@ -30,7 +30,7 @@ public class AdmissionAssessmentController : Controller
         step2 ??= new Step2ClinicalModel();
         step3 ??= new Step3FunctionalModel();
 
-        // Later step plans read Step 1 values through hidden fields in the Active Plan.
+        // Later-step plans read Step 1 values through Active Plan hidden fields.
         step2.PrimaryDiagnosis = step1.PrimaryDiagnosis;
         step2.ResidentName = step1.ResidentName;
         step3.Age = step1.Age;

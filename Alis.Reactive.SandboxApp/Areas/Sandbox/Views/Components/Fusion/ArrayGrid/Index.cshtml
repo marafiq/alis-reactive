@@ -10,7 +10,7 @@
 
     var plan = Html.ReactivePlan<ArrayGridModel>();
 
-    // The HTTP array flows through ReactiveArray ordering before binding the grid dataSource.
+    // HTTP array flows through ReactiveArray ordering before binding the grid dataSource.
     Html.On(plan, t => t.DomReady(p =>
         p.Get("/Sandbox/Components/ArrayGrid/Residents")
          .Response(r => r.OnSuccess<ResidentRosterResponse>((json, s) =>
@@ -21,7 +21,7 @@
              s.Element("grid-status").SetText("roster loaded");
          }))));
 
-    // This stays client-side by reading and rebinding the grid's current dataSource.
+    // Client-side path reads and rebinds the grid's current dataSource.
     Html.NativeButton("show-active-btn", "Show Active Only")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {

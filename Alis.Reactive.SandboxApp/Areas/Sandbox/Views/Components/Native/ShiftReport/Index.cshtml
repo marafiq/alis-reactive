@@ -8,7 +8,7 @@
 
     var plan = Html.ReactivePlan<ShiftReportModel>();
 
-    // The custom event payload array is queried through element members inside the Reactive Plan.
+    // Custom-event payload array is queried through element members inside the Reactive Plan.
     Html.On(plan, t => t.CustomEvent<ShiftReportPayload>("shift-report", (payload, p) =>
     {
         var alerts = p.From(payload, x => x.Alerts);

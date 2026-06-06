@@ -8,7 +8,7 @@
     var plan = Html.ReactivePlan<ArrayOpsModel>();
     var activityItems = (RadioButtonItem[])ViewBag.ActivityItems;
 
-    // The roster proves array operators compile to plan nodes instead of plugin calls.
+    // Roster proves array operators compile to plan nodes instead of plugin calls.
     Html.On(plan, t => t.DomReady(p =>
         p.Get("/Sandbox/Components/ArrayOps/Residents")
          .Response(r => r.OnSuccess<ResidentRosterResponse>((json, s) =>

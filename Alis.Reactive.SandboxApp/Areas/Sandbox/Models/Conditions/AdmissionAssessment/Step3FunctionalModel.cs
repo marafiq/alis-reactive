@@ -2,7 +2,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAsse
 
 public class Step3FunctionalModel
 {
-    // Step 1 snapshot fields copied before the functional partial renders.
+    // Functional partial receives the Step 1 snapshot before rendering.
     public string ScreeningId { get; set; } = "";
     public decimal Age { get; set; }
     public string ResidentName { get; set; } = "";

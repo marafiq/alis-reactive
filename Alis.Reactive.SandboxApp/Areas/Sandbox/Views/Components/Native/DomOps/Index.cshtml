@@ -24,7 +24,7 @@
             p.FromDom<DomChild>("risk-list", "children").Count(x => x.GetAttribute("data-risk") == "high"));
     }));
 
-    // The follow-up read observes the class added earlier in the same reaction.
+    // Follow-up read observes the class added earlier in the same reaction.
     Html.NativeButton("dom-add-risk-btn", "Add Risk Flag")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {

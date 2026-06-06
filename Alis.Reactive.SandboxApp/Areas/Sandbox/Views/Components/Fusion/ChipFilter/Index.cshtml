@@ -19,7 +19,7 @@
         new() { Text = "Skilled Nursing", Value = "skilled" },
     };
 
-    // The custom event carries selected chip objects for ReactiveArray guards and selected texts for server filtering.
+    // Custom event carries selected chip objects for ReactiveArray guards and selected texts for server filtering.
     Html.On(plan, t => t.CustomEvent<ChipFilterPayload>("filters-applied", (payload, p) =>
     {
         var selected = p.From(payload, x => x.Selection.Data);

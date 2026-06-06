@@ -64,7 +64,7 @@
                 {
                     var diag = p.Component<FusionDropDownList>(m => m.PrimaryDiagnosis);
 
-                    // Step 2 conditions read this hidden field from the shared Active Plan.
+                    // Shared Active Plan hidden field feeds Step 2 conditions.
                     p.Component<NativeHiddenField, Step2ClinicalModel>(m => m.PrimaryDiagnosis)
                         .SetValue(diag.Value());
 
@@ -143,7 +143,7 @@
                  .Response(r => r
                     .OnSuccess<SaveStepResponse>((json, s) =>
                     {
-                        // Later step saves use the Step 1 draft key from the Active Plan.
+                        // Later-step saves use the Step 1 draft key from the Active Plan.
                         s.Component<NativeHiddenField, Step2ClinicalModel>(m => m.ScreeningId)
                             .SetValue(json, x => x.ScreeningId);
                         s.Component<NativeHiddenField, Step3FunctionalModel>(m => m.ScreeningId)

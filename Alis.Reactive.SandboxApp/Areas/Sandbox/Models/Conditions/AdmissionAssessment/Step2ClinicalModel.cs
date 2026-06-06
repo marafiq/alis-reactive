@@ -2,7 +2,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAsse
 
 public class Step2ClinicalModel
 {
-    // Step 1 snapshot fields copied before the clinical partial renders.
+    // Clinical partial receives the Step 1 snapshot before rendering.
     public string ScreeningId { get; set; } = "";
     public string PrimaryDiagnosis { get; set; } = "";
     public string ResidentName { get; set; } = "";

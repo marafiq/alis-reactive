@@ -5,7 +5,7 @@
 @{
     var plan = Html.ReactivePlan<ResidentPanelModel>();
 
-    // The partial uses the same hub method so the runtime reuses the parent SignalR connection.
+    // Partial uses the same hub method so runtime reuses the parent SignalR connection.
     Html.On(plan, t => t.SignalR<ResidentStatusPayload>("/hubs/resident-status", "StatusChanged",
         (payload, p) =>
     {
