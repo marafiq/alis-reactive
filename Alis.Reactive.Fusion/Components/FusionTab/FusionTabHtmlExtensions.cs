@@ -15,7 +15,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         /// <param name="plan">The Reactive Plan that receives tab event wiring.</param>
         /// <param name="elementId">The controlled component ID shared by markup and Reactive Plan behavior.</param>
-        /// <param name="build">Configures the underlying Syncfusion tab builder.</param>
+        /// <param name="build">Configures the component before rendering.</param>
         public static FusionTabBuilder<TModel> FusionTab<TModel>(
             this IHtmlHelper<TModel> html,
             ReactivePlan<TModel> plan,

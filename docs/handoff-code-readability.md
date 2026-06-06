@@ -290,6 +290,10 @@ Candidate cleanup:
   fluent return docs no longer use repeated "current builder" phrasing. The
   ordering facts remain because chained reaction order is part of the public
   authoring contract.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion HTML extension
+  `build` parameter docs now describe the public setup callback without the
+  repeated "underlying Syncfusion builder" wording. The component vertical
+  slices remain unchanged.
 - Resolved on `tiny-safe-but-important-refactorings`: plugin declaration
   `Arg<T>()` and `Args(...)` XML docs no longer repeat the fluent return type,
   and the typed plugin-source conversion parameter is named `builder` instead
