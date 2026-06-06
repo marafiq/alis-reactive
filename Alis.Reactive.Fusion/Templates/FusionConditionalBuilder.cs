@@ -9,7 +9,8 @@ namespace Alis.Reactive.Fusion.Templates
     /// Builds the content emitted inside a Syncfusion template conditional block.
     /// </summary>
     /// <remarks>
-    /// Caller-provided literal text, CSS classes, and raw HTML are emitted as supplied.
+    /// Caller-provided literal text, CSS classes, raw <c>onclick</c> values,
+    /// event names, and raw HTML are emitted as supplied; use trusted developer-authored values.
     /// </remarks>
     /// <typeparam name="TModel">The object shape exposed by the Syncfusion template context.</typeparam>
     public class FusionConditionalBuilder<TModel>
