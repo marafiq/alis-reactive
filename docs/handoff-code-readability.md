@@ -519,6 +519,10 @@ Candidate cleanup:
   component-source XML parameter tags are shorter but still preserve the
   important non-input component rule: the request body field name is also the
   component member read when no input-value contract exists.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeButton` text
+  parameter docs now use concise button-text wording. The explicit element-ID
+  and Reactive Plan component lookup docs remain because they describe the
+  public join key.
 
 ### Implementation Inline Comments
 

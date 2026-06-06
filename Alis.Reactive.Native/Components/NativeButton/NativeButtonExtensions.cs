@@ -16,7 +16,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the button text content through the component contract.
         /// </summary>
-        /// <param name="text">The text content to write to the button.</param>
+        /// <param name="text">Button text content.</param>
         public static ComponentRef<NativeButton, TModel> SetText<TModel>(
             this ComponentRef<NativeButton, TModel> self, string text)
             where TModel : class
