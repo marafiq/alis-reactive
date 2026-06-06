@@ -7,7 +7,7 @@ sidebar:
 
 A multi-select dropdown. Use it when a record can belong to several categories -- resident allergies, staff certifications, care-plan goals. Selected values are a `string[]`.
 
-**Model type:** `string[]` &nbsp; **ReadExpr:** `"value"` &nbsp; **Events:** `Changed`, `Filtering`
+**Model type:** `string[]` &nbsp; **ValueMember:** `"value"` &nbsp; **Events:** `Changed`, `Filtering`
 
 ## How do I render one?
 

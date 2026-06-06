@@ -7,7 +7,7 @@ sidebar:
 
 A masked text input that enforces a format character by character. Use it for phone numbers, SSNs, zip codes, medical-record IDs -- any field where the shape of the data is constant and you want the field to guide the typist.
 
-**Model type:** `string` &nbsp; **ReadExpr:** `"value"` &nbsp; **Events:** `Changed`
+**Model type:** `string` &nbsp; **ValueMember:** `"value"` &nbsp; **Events:** `Changed`
 
 ## How do I render one?
 

@@ -7,7 +7,7 @@ sidebar:
 
 A single-select dropdown with search and filtering. Use it when the candidate list is short enough to enumerate up-front -- a care level, a facility wing, a staff role -- but long enough that radio buttons would be cramped.
 
-**Model type:** `string` &nbsp; **ReadExpr:** `"value"` &nbsp; **Events:** `Changed`, `Focus`, `Blur`
+**Model type:** `string` &nbsp; **ValueMember:** `"value"` &nbsp; **Events:** `Changed`, `Focus`, `Blur`
 
 ## How do I render one?
 

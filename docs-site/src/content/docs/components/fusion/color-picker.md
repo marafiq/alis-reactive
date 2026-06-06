@@ -7,7 +7,7 @@ sidebar:
 
 A color picker for facility branding -- theme color, accent color, palette choices. Bound to a `string?` that holds a hex value like `"#e11d48ff"`.
 
-**Model type:** `string?` &nbsp; **ReadExpr:** `"value"` &nbsp; **Events:** `Changed`
+**Model type:** `string?` &nbsp; **ValueMember:** `"value"` &nbsp; **Events:** `Changed`
 
 ## How do I render one and react to changes?
 

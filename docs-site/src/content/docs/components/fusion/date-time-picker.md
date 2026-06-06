@@ -7,7 +7,7 @@ sidebar:
 
 Use DateTimePicker when the scheduled moment matters to the minute -- appointment slots, medication administration windows, shift start times. The value is serialized as `"yyyy-MM-ddTHH:mm"` in the plan.
 
-**Model type:** `DateTime` &nbsp; **ReadExpr:** `"value"` &nbsp; **Events:** `Changed`
+**Model type:** `DateTime` &nbsp; **ValueMember:** `"value"` &nbsp; **Events:** `Changed`
 
 ## How do I render one?
 

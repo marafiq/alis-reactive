@@ -7,7 +7,7 @@ sidebar:
 
 A file upload component in form mode -- no auto-upload. The user picks files; the framework can read `filesData` into a gather payload; your controller receives the files when the form submits. Read-only from the plan side: files are set by user interaction only, there is no `SetValue` method.
 
-**Model type:** `List<IFormFile>` &nbsp; **ReadExpr:** `"filesData"` &nbsp; **Events:** `Selected`
+**Model type:** `List<IFormFile>` &nbsp; **ValueMember:** `"filesData"` &nbsp; **Events:** `Selected`
 
 ## How do I render one?
 

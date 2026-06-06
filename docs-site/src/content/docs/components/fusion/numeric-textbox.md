@@ -7,7 +7,7 @@ sidebar:
 
 A numeric input with spin buttons, formatting, and min/max constraints. Bind it to any numeric model property (`decimal`, `int`, `double`). The framework coerces the value to `"number"` in the plan so you can write typed math in conditions.
 
-**Model type:** `decimal` &nbsp; **ReadExpr:** `"value"` &nbsp; **Events:** `Changed`, `Focus`, `Blur`
+**Model type:** `decimal` &nbsp; **ValueMember:** `"value"` &nbsp; **Events:** `Changed`, `Focus`, `Blur`
 
 ## How do I render one?
 

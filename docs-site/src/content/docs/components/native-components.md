@@ -17,7 +17,7 @@ Renders an `<input type="text">` element.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMember | `"value"` |
 | Events | `Changed` (DOM `"change"`) |
 | EventArgs | `NativeTextBoxChangeArgs` -- `Value: string?` |
 | Extensions | `SetValue(string)`, `FocusIn()`, `.Value()` |
@@ -92,7 +92,7 @@ Renders an `<input type="checkbox">` element.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"checked"` |
+| ValueMember | `"checked"` |
 | Events | `Changed` (DOM `"change"`) |
 | EventArgs | `NativeCheckBoxChangeArgs` -- `Checked: bool?` |
 | Extensions | `SetChecked(bool)`, `FocusIn()`, `.Value()` |
@@ -151,7 +151,7 @@ Renders a `<select>` element with `<option>` children.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMember | `"value"` |
 | Events | `Changed` (DOM `"change"`) |
 | EventArgs | `NativeDropDownChangeArgs` -- `Value: string?` |
 | Extensions | `SetValue(string)`, `FocusIn()`, `.Value()` |
@@ -206,7 +206,7 @@ Renders a `<textarea>` element. Same API shape as NativeTextBox, with multi-line
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMember | `"value"` |
 | Events | `Changed` (DOM `"change"`) |
 | EventArgs | `NativeTextAreaChangeArgs` -- `Value: string?` |
 | Extensions | `SetValue(string)`, `FocusIn()`, `.Value()` |
@@ -260,7 +260,7 @@ Renders a group of checkboxes for multi-select. The canonical element is a conta
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMember | `"value"` |
 | Events | `Changed` |
 | EventArgs | `NativeCheckListChangeArgs` -- `Value: string[]?` |
 | Extensions | `SetValue(string[])`, `SetValue(source, path)`, `FocusIn()`, `.Value()` |
@@ -311,7 +311,7 @@ Renders a group of radio buttons for single-select. The canonical element is a h
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMember | `"value"` |
 | Events | `Changed` |
 | EventArgs | `NativeRadioGroupChangeArgs` -- `Value: string?` |
 | Extensions | `SetValue(string)`, `SetValue(source, path)`, `FocusIn()`, `.Value()` |
@@ -361,7 +361,7 @@ Html.InputField(plan, m => m.RoomType, o => o.Required().Label("Room Type"))
 
 ## NativeButton
 
-Renders a `<button>` element. **Not an input component** -- buttons have no form value, no `ReadExpr`, no `.Value()` source. They exist to trigger pipelines.
+Renders a `<button>` element. **Not an input component** -- buttons have no form value, no `ValueMember`, no `.Value()` source. They exist to trigger pipelines.
 
 | Property | Value |
 |----------|-------|
@@ -421,7 +421,7 @@ Html.On(plan, t => t.DomReady(p =>
 
 ## NativeActionLink
 
-Renders an `<a>` element that triggers an HTTP pipeline on click. **Not an input component** -- action links have no form value, no `ReadExpr`, no `.Value()` source. They exist to make links that execute server requests declaratively.
+Renders an `<a>` element that triggers an HTTP pipeline on click. **Not an input component** -- action links have no form value, no `ValueMember`, no `.Value()` source. They exist to make links that execute server requests declaratively.
 
 | Property | Value |
 |----------|-------|
@@ -474,11 +474,11 @@ Wrap the HTTP request in a `Confirm` guard:
 
 ## NativeHiddenField
 
-Renders an `<input type="hidden">` element. No label, no validation slot, no visible presence. Participates in `ComponentsMap` so `IncludeAll()` gathers its value.
+Renders an `<input type="hidden">` element. No label, no validation slot, no visible presence. Registers as an input component so `IncludeAll()` gathers its value.
 
 | Property | Value |
 |----------|-------|
-| ReadExpr | `"value"` |
+| ValueMember | `"value"` |
 | Extensions | `SetValue(string)`, `.Value()` |
 | Typed Source | `TypedComponentSource<string>` |
 

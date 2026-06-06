@@ -7,7 +7,7 @@ sidebar:
 
 Reach for AutoComplete when a free-text field has thousands of candidate values and the server is the source of truth -- selecting a physician, a medication, a room number, a diagnosis code. The user types, you query, Syncfusion shows the matches.
 
-**Model type:** `string` &nbsp; **ReadExpr:** `"value"` &nbsp; **Events:** `Changed`, `Filtering`
+**Model type:** `string` &nbsp; **ValueMember:** `"value"` &nbsp; **Events:** `Changed`, `Filtering`
 
 ## How do I render one?
 

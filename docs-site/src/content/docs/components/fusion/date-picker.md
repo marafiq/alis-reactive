@@ -7,7 +7,7 @@ sidebar:
 
 A date-only picker with calendar popup. Use it for admission dates, birthdays, scheduled visit dates -- anything where time-of-day is not meaningful. The `DateTime` you set is serialized as `"yyyy-MM-dd"` in the plan.
 
-**Model type:** `DateTime` &nbsp; **ReadExpr:** `"value"` &nbsp; **Events:** `Changed`
+**Model type:** `DateTime` &nbsp; **ValueMember:** `"value"` &nbsp; **Events:** `Changed`
 
 ## How do I render one and react to picks?
 

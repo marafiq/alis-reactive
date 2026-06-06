@@ -443,7 +443,7 @@ If a field is hidden (e.g., inside a collapsed section), errors go to the **vali
 
 ### Unenriched fields with rules
 
-If a field has rules but was not registered in the plan's `ComponentsMap` (not rendered via `Html.InputField`), the first rule's error message appears in the summary. This is fail-closed — the validation blocks rather than silently skipping.
+If a field has rules but was not registered as an input component (not rendered via `Html.InputField`), the first rule's error message appears in the summary. This is fail-closed — the validation blocks rather than silently skipping.
 
 ### Missing form container
 

@@ -1,13 +1,13 @@
 ---
 title: FusionSwitch
-description: Toggle switch bound to a bool. ReadExpr is "checked".
+description: Toggle switch bound to a bool. ValueMember is "checked".
 sidebar:
   order: 11
 ---
 
-A toggle switch for boolean settings -- opt in to notifications, mark a resident as self-directed, enable a medication reminder. Same concept as NativeCheckBox but rendered as a Syncfusion Switch control. Note that the ReadExpr is `"checked"` (not `"value"`), matching Syncfusion's API.
+A toggle switch for boolean settings -- opt in to notifications, mark a resident as self-directed, enable a medication reminder. Same concept as NativeCheckBox but rendered as a Syncfusion Switch control. Note that the ValueMember is `"checked"` (not `"value"`), matching Syncfusion's API.
 
-**Model type:** `bool` &nbsp; **ReadExpr:** `"checked"` &nbsp; **Events:** `Changed`
+**Model type:** `bool` &nbsp; **ValueMember:** `"checked"` &nbsp; **Events:** `Changed`
 
 ## How do I render one?
 

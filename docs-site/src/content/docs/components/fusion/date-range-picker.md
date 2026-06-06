@@ -7,7 +7,7 @@ sidebar:
 
 Use DateRangePicker when the input represents a span -- a resident's stay period, a compliance-audit date range, a report filter. This component is unique: the Syncfusion ej2 instance's `.value` returns `[Date, Date]` -- an array of two dates -- so your model property is `DateTime[]?`, not `DateTime`.
 
-**Model type:** `DateTime[]?` &nbsp; **ReadExpr:** `"value"` (returns `[Date, Date]`) &nbsp; **Events:** `Changed`
+**Model type:** `DateTime[]?` &nbsp; **ValueMember:** `"value"` (returns `[Date, Date]`) &nbsp; **Events:** `Changed`
 
 ## How do I render one?
 
@@ -23,7 +23,7 @@ Html.InputField(plan, m => m.StayPeriod, o => o.Required().Label("Stay Period"))
 
 ## How do I read just the start or end date in a condition?
 
-`StartDate()` and `EndDate()` use hardcoded readExpr `"startDate"` / `"endDate"` -- independent of the component's `ReadExpr`. They return individual `DateTime` values for typed condition comparison, so you can compare them separately without unpacking the array yourself.
+`StartDate()` and `EndDate()` read explicit component members `"startDate"` and `"endDate"` -- independent of the component's registered `ValueMember`. They return individual `DateTime` values for typed condition comparison, so you can compare them separately without unpacking the array yourself.
 
 ```csharp
 var stay = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
@@ -45,10 +45,10 @@ p.When(stay.EndDate()).NotNull()
 
 ## Source extensions
 
-| Extension | Returns | ReadExpr | Use case |
+| Extension | Returns | Component member | Use case |
 |---|---|---|---|
-| `StartDate()` | `TypedComponentSource<DateTime>` | `"startDate"` | Individual date for conditions/mutations |
-| `EndDate()` | `TypedComponentSource<DateTime>` | `"endDate"` | Individual date for conditions/mutations |
+| `StartDate()` | `TypedComponentSource<DateTime>` | `"startDate"` | Individual date for conditions |
+| `EndDate()` | `TypedComponentSource<DateTime>` | `"endDate"` | Individual date for conditions |
 | `Value()` | `TypedComponentSource<DateTime[]>` | `"value"` | Full array for gather/validation |
 
 No `SetValue()` is provided -- the DateRangePicker is set by user interaction only.

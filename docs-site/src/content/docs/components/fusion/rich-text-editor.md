@@ -7,7 +7,7 @@ sidebar:
 
 A WYSIWYG rich text editor for long-form notes -- care plan narratives, incident descriptions, admissions letters. The value is HTML, not plain text, so store it in a field that accepts markup.
 
-**Model type:** `string` (HTML) &nbsp; **ReadExpr:** `"value"` &nbsp; **Events:** `Changed`
+**Model type:** `string` (HTML) &nbsp; **ValueMember:** `"value"` &nbsp; **Events:** `Changed`
 
 ## How do I render one?
 

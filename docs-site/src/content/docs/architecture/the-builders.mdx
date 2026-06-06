@@ -92,14 +92,14 @@ The builder is internal — devs can't construct it directly. It exists only as 
 
 ## ComponentRef — type-constrained reactions
 
-`pipeline.Component<T>(m => m.Prop)` creates a `ComponentRef<T, TModel>`. It caches a static instance of `T` to read `Vendor` and `ReadExpr` — resolved once, reused for every component reaction.
+`pipeline.Component<T>(m => m.Prop)` creates a `ComponentRef<T, TModel>` for the rendered component. Component-specific extension methods use that reference to declare BrowserObject properties, methods, and reads in the Reactive Plan.
 
 Extension methods on `ComponentRef` are constrained by `T`. A `ComponentRef<FusionDropDownList>` has `SetValue(string?)`, `DataBind()`, `ShowPopup()`. A `ComponentRef<NativeCheckBox>` has `SetChecked(bool)`. The compiler enforces this — you can't call `ShowPopup()` on a checkbox.
 
 ```d2
 direction: right
 
-ref: "ComponentRef<FusionDropDownList>\ncaches Vendor='fusion'\ncaches ReadExpr='value'" {
+ref: "ComponentRef<FusionDropDownList>\ntargets rendered component" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"

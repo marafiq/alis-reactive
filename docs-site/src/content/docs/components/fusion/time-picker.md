@@ -7,7 +7,7 @@ sidebar:
 
 Time-only picker for things like medication administration windows, shift handover times, or recurring daily reminders. The value is serialized as `"HH:mm"` in the plan.
 
-**Model type:** `DateTime` &nbsp; **ReadExpr:** `"value"` &nbsp; **Events:** `Changed`
+**Model type:** `DateTime` &nbsp; **ValueMember:** `"value"` &nbsp; **Events:** `Changed`
 
 ## How do I render one?
 
