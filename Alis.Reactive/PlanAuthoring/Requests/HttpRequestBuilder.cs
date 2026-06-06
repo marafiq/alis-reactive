@@ -43,7 +43,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         public HttpRequestBuilder<TModel> Delete(string url) { SelectEndpoint(HttpMethodName.Delete, url); return this; }
 
-        /// <summary>Collects runtime values for request body fields, headers, and route template parameters.</summary>
+        /// <summary>Configures request body fields, headers, and route template parameters.</summary>
         /// <param name="gather">Builds the values to resolve immediately before the request is sent.</param>
         public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel>> gather)
         {

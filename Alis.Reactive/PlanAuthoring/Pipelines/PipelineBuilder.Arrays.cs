@@ -13,7 +13,7 @@ namespace Alis.Reactive.Builders
         /// <c>p.From(p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Tags).Value())</c>.
         /// </summary>
         /// <typeparam name="TElement">The array element type carried through the transform chain.</typeparam>
-        /// <param name="source">The typed runtime source that produces the array value.</param>
+        /// <param name="source">The typed value source that produces the array value.</param>
         /// <returns>A reactive array builder for composing operations such as filtering and counting.</returns>
         public ReactiveArray<TElement> From<TElement>(TypedSource<TElement[]> source) =>
             new ReactiveArray<TElement>(source.ToValueExpression(), Shape.FromClrType(typeof(TElement)));
