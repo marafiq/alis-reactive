@@ -117,7 +117,7 @@ runtime: "JS Runtime\nExecutes intent" {
   style.font-size: 20
 }
 
-builders -> plan: plan.Render() {
+builders -> plan: Html.RenderPlan(plan) {
   style.font-size: 16
   style.stroke: "#4285f4"
 }

@@ -249,7 +249,7 @@ await Expect(plan.ErrorFor(m => m.Physician))
 | `TextBox(m => m.Prop)` | `NativeTextBoxLocator` |
 | `Element(id)` | `ILocator` |
 | `ErrorFor(m => m.Prop)` | `ILocator` |
-| `FindComponent(m => m.Prop)` | `ComponentEntry?` |
+| `FindComponent(m => m.Prop)` | `BoundComponent?` |
 
 If a model property is renamed, both the view and the test break at compile time.
 

@@ -77,9 +77,9 @@ The model is recursive. A branch case can contain a request reaction, a request 
 
 `ReactivePlan<TModel>` has two responsibilities:
 
-**Collecting behavior** — `Html.On()` and component `.Reactive()` calls append behaviors. `Html.InputField()` and component builders register component objects. By the time `Html.RenderPlan(plan)` calls `plan.Render()`, the plan holds every behavior and component registration for the view.
+**Collecting behavior** — `Html.On()` and component `.Reactive()` calls append behaviors. `Html.InputField()` and component builders register component objects. By the time `Html.RenderPlan(plan)` serializes the plan, it holds every behavior and component registration for the view.
 
-**Serializing to JSON** — `plan.Render()` produces the complete Reactive Plan JSON:
+**Serializing to JSON** — `Html.RenderPlan(plan)` emits the complete Reactive Plan JSON:
 
 ```d2
 direction: right
@@ -102,7 +102,7 @@ types: "Browser object contracts\nproperties, methods,\nevents" {
   style.stroke: "#ea4335"
   style.font-size: 18
 }
-render: "plan.Render()\nserializes to JSON" {
+render: "Html.RenderPlan(plan)\nemits JSON" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
