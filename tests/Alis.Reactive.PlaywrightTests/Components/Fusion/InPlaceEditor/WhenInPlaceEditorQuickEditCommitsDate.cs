@@ -2,13 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-/// <summary>
-/// DOB card: Type → Enter key → Syncfusion closes editor → ActionSuccess fires → our reactive pipeline
-/// runs a Post that includes the committed Value. Display element updates from response.
-///
-/// Why Enter-key: the playground proved synthetic <c>.click()</c> on <c>.e-btn-save</c> doesn't
-/// reliably trigger Syncfusion's submit path, but a dispatched Enter keydown on the inner input does.
-/// </summary>
 [TestFixture]
 public class WhenInPlaceEditorQuickEditCommitsDate : PlaywrightTestBase
 {
@@ -29,6 +22,7 @@ public class WhenInPlaceEditorQuickEditCommitsDate : PlaywrightTestBase
             && matchingRequest.Method == "POST",
             new() { Timeout = 10000 });
 
+        // Enter keydown follows Syncfusion's submit path more reliably than a synthetic save-button click.
         await inner.PressAsync("Enter");
 
         var request = await requestTask;

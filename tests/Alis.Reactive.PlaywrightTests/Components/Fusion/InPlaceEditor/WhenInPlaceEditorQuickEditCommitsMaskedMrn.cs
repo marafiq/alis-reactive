@@ -2,13 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-/// <summary>
-/// MRN card: proves the Mask inner type commits cleanly with the raw (literal-stripped) value.
-///
-/// Syncfusion Mask stores only the user-entered characters in the outer <c>value</c> —
-/// mask literals (the dash in <c>LLL-0000</c>) are a display formatter. The domain value,
-/// the regex in the FluentValidator, and the wire payload all deal in the 7 raw characters.
-/// </summary>
 [TestFixture]
 public class WhenInPlaceEditorQuickEditCommitsMaskedMrn : PlaywrightTestBase
 {
@@ -19,8 +12,7 @@ public class WhenInPlaceEditorQuickEditCommitsMaskedMrn : PlaywrightTestBase
     {
         await NavigateToAndWaitForVisibleSignal(Path, "#card-mrn .e-editable-value-wrapper");
 
-        // Syncfusion Mask stores the raw characters in `.value` and applies the LLL-0000 format only
-        // inside the live editor input — the collapsed display span shows the raw value as-is.
+        // Syncfusion Mask stores raw characters in value; LLL-0000 is display formatting.
         await Expect(Page.Locator("#card-mrn .e-editable-value").First)
             .ToHaveTextAsync("MRN1234", new() { Timeout = 5000 });
 
