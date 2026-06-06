@@ -202,7 +202,7 @@ must preserve first-match behavior. Do not invent nested branch behavior unless
 the DSL source supports it.
 
 **Partial slots.** SSR composition joins plan scripts by `PlanId`. Browser
-partial injection uses `SlotId` as the load/unload handle. Active plans are
+partial injection uses `SlotId` as the load/unload handle. Active Plans are
 recomposed from the boot snapshot plus currently loaded slots. Component id,
 vendor, and type remain runtime object join keys. Slot unload aborts slot-owned
 behavior and validation wiring, removes slot-owned components/rules, and keeps
@@ -498,7 +498,7 @@ module before the current module has a focused proof and a commit.
 1. Read the public DSL source for the row.
 2. Draw/update the graph: trigger -> pipeline -> reaction, condition -> branch,
    request -> gather, gather target <- value source, response -> scope,
-   partial slot load/unload -> active plan composition.
+   partial slot load/unload -> Active Plan composition.
 3. Fill the input/output matrix: DSL call -> developer intent -> C# domain ->
    JSON/generated TS -> runtime executor -> proof.
 4. Delete stale helpers/tests that do not map to the graph.

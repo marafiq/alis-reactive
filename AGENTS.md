@@ -100,8 +100,8 @@ Graph edges:
 - response -> success/error scope
 - response -> chained request
 - component event/callback -> payload scope
-- partial slot load -> merged plan state
-- partial slot unload -> remove loaded state
+- partial slot load -> Active Plan composition
+- partial slot unload -> remove slot-owned Active Plan state
 
 If a behavior is not in the graph, do not implement it from inference.
 
