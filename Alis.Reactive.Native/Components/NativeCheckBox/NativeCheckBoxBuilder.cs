@@ -22,8 +22,8 @@ namespace Alis.Reactive.Native.Components
     /// Created by the <c>.NativeCheckBox()</c> factory on
     /// <see cref="InputBoundField{TModel,TProp}"/>.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The model value type represented by the checked state, typically <see cref="bool"/>.</typeparam>
+    /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+    /// <typeparam name="TProp">Model value type represented by the checked state, typically <see cref="bool"/>.</typeparam>
     public class NativeCheckBoxBuilder<TModel, TProp> :
 #if NET48
         IHtmlString

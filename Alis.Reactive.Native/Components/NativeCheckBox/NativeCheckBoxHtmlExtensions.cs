@@ -14,8 +14,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Registers the checkbox with the Reactive Plan and renders it inside the field wrapper.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+        /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Configures the checkbox (CSS, reactive events).</param>
         public static void NativeCheckBox<TModel>(
             this InputBoundField<TModel, bool> setup,

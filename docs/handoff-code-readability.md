@@ -578,6 +578,9 @@ Candidate cleanup:
   tags now use concise model, Reactive Plan, event-args, and response DTO wording.
   Hidden-input registration behavior, `net48` `NameFor`, and programmatic change
   event boundary notes remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeCheckBox` XML tags
+  now use concise model, field-wrapper, Reactive Plan, and event-args wording.
+  The component-reference example and registration invariant remain.
 
 ### Implementation Inline Comments
 
