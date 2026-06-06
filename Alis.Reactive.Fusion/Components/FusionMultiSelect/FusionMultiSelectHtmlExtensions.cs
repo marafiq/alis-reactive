@@ -23,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
         /// Configures text and value field mappings using typed expressions.
         /// </summary>
         /// <typeparam name="TItem">Data source item contract used for field mapping.</typeparam>
-        /// <param name="builder">Syncfusion MultiSelect builder being configured.</param>
+        /// <param name="builder">MultiSelect builder that receives the typed field mappings.</param>
         /// <param name="text">Expression selecting the display text property.</param>
         /// <param name="value">Expression selecting the value property.</param>
         public static MultiSelectBuilder Fields<TItem>(
@@ -42,7 +42,7 @@ namespace Alis.Reactive.Fusion.Components
         /// Configures text, value, and group-by field mappings using typed expressions.
         /// </summary>
         /// <typeparam name="TItem">Data source item contract used for field mapping.</typeparam>
-        /// <param name="builder">Syncfusion MultiSelect builder being configured.</param>
+        /// <param name="builder">MultiSelect builder that receives the typed field mappings.</param>
         /// <param name="text">Expression selecting the display text property.</param>
         /// <param name="value">Expression selecting the value property.</param>
         /// <param name="groupBy">Expression selecting the grouping property.</param>

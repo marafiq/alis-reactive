@@ -574,6 +574,9 @@ Candidate cleanup:
   and Loader extension class summaries now describe the layout singleton
   behavior they render and control instead of the generic "pipeline and layout
   extensions" category label.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionMultiSelect`
+  typed field-mapping helpers now document the receiver as the builder that
+  receives typed field mappings instead of repeating "builder being configured."
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
   selected-value parameter docs now use the same concise selected-option wording
   as the other Native value-write helpers.
