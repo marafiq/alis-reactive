@@ -109,27 +109,27 @@ namespace Alis.Reactive.Builders.Conditions
             Build(CompareOperator.Between, RangeOperands(low, high));
 
         /// <summary>Compares the source as text and matches when it contains <paramref name="substring"/>.</summary>
-        /// <param name="substring">The text that must appear in the source value.</param>
+        /// <param name="substring">Text that must appear in the source value.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Contains(string substring) =>
             BuildTextLiteral(CompareOperator.Contains, substring);
         /// <summary>Compares the source as text and matches when it starts with <paramref name="prefix"/>.</summary>
-        /// <param name="prefix">The text that must appear at the start of the source value.</param>
+        /// <param name="prefix">Text that must appear at the start of the source value.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> StartsWith(string prefix) =>
             BuildTextLiteral(CompareOperator.StartsWith, prefix);
         /// <summary>Compares the source as text and matches when it ends with <paramref name="suffix"/>.</summary>
-        /// <param name="suffix">The text that must appear at the end of the source value.</param>
+        /// <param name="suffix">Text that must appear at the end of the source value.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> EndsWith(string suffix) =>
             BuildTextLiteral(CompareOperator.EndsWith, suffix);
         /// <summary>Compares the source as text and matches it with the regular expression <paramref name="pattern"/>.</summary>
-        /// <param name="pattern">The regular expression pattern matched against the source value.</param>
+        /// <param name="pattern">Regular expression pattern matched against the source value.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Matches(string pattern) =>
             BuildTextLiteral(CompareOperator.Matches, pattern);
         /// <summary>Compares the source text length against the minimum <paramref name="length"/>.</summary>
-        /// <param name="length">The minimum accepted text length.</param>
+        /// <param name="length">Minimum accepted text length.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> MinLength(int length) =>
             Build(CompareOperator.MinLength, MinimumLengthOperands(length));
@@ -143,27 +143,27 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Compares this source with another typed source using equality.</summary>
-        /// <param name="right">The right-side source read at runtime.</param>
+        /// <param name="right">Right-side source read at runtime.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Eq(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Eq, right);
         /// <summary>Compares this source with another typed source using inequality.</summary>
-        /// <param name="right">The right-side source read at runtime.</param>
+        /// <param name="right">Right-side source read at runtime.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> NotEq(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Neq, right);
         /// <summary>Compares this source with another typed source using an ordered greater-than check.</summary>
-        /// <param name="right">The right-side source read at runtime.</param>
+        /// <param name="right">Right-side source read at runtime.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Gt(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Gt, right);
         /// <summary>Compares this source with another typed source using an ordered greater-than-or-equal check.</summary>
-        /// <param name="right">The right-side source read at runtime.</param>
+        /// <param name="right">Right-side source read at runtime.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Gte(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Gte, right);
         /// <summary>Compares this source with another typed source using an ordered less-than check.</summary>
-        /// <param name="right">The right-side source read at runtime.</param>
+        /// <param name="right">Right-side source read at runtime.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Lt(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Lt, right);
         /// <summary>Compares this source with another typed source using an ordered less-than-or-equal check.</summary>
-        /// <param name="right">The right-side source read at runtime.</param>
+        /// <param name="right">Right-side source read at runtime.</param>
         /// <returns>A guard for composing or attaching the comparison.</returns>
         public GuardBuilder<TModel> Lte(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Lte, right);
 
