@@ -142,7 +142,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// Adds a button with a raw <c>onclick</c> expression.
         /// </summary>
         /// <param name="text">Button text.</param>
-        /// <param name="onClick">The raw <c>onclick</c> expression to emit.</param>
+        /// <param name="onClick">Raw <c>onclick</c> expression.</param>
         /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
         public FusionConditionalBuilder<TModel> Button(string text, string onClick) =>
             Button(text, onClick, TemplateCss.None);
@@ -151,7 +151,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// Adds a styled button with a raw <c>onclick</c> expression.
         /// </summary>
         /// <param name="text">Button text.</param>
-        /// <param name="onClick">The raw <c>onclick</c> expression to emit.</param>
+        /// <param name="onClick">Raw <c>onclick</c> expression.</param>
         /// <param name="css">CSS class.</param>
         /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
         public FusionConditionalBuilder<TModel> Button(string text, string onClick, string css) =>

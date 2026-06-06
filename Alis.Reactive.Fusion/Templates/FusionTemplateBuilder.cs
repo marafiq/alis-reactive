@@ -38,7 +38,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Sets the root <c>div</c> ID emitted into the template string.
         /// </summary>
-        /// <param name="id">The literal ID to emit on the root template element.</param>
+        /// <param name="id">Root template element ID.</param>
         public FusionTemplateBuilder<TModel> Id(string id)
         {
             _id = TemplateElementId.Of(id);
@@ -150,7 +150,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
         /// <param name="css">CSS class.</param>
-        /// <param name="alt">The literal alt text to emit.</param>
+        /// <param name="alt">Static alt text.</param>
         public FusionTemplateBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css, string alt) =>
             Img(srcProperty, TemplateCss.Class(css), TemplateAltText.Text(alt));
 
@@ -222,7 +222,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// Adds a button with a raw <c>onclick</c> expression.
         /// </summary>
         /// <param name="text">Button text.</param>
-        /// <param name="onClick">The raw <c>onclick</c> expression to emit.</param>
+        /// <param name="onClick">Raw <c>onclick</c> expression.</param>
         /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> Button(string text, string onClick) =>
             Button(text, onClick, TemplateCss.None);
@@ -231,7 +231,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// Adds a styled button with a raw <c>onclick</c> expression.
         /// </summary>
         /// <param name="text">Button text.</param>
-        /// <param name="onClick">The raw <c>onclick</c> expression to emit.</param>
+        /// <param name="onClick">Raw <c>onclick</c> expression.</param>
         /// <param name="css">CSS class.</param>
         /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> Button(string text, string onClick, string css) =>

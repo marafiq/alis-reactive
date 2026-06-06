@@ -486,6 +486,11 @@ Candidate cleanup:
   XML type and parameter tags now use concise "Trigger payload contract,"
   "Trigger payload placeholder," and selected-value wording across core
   condition, gather, element, array, plugin, and Native payload helpers.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion template public XML
+  parameter tags no longer repeat that IDs, alt text, and raw `onclick`
+  expressions are "emitted." The class and method remarks still keep the
+  emitted-as-supplied trust boundary because that is the public template
+  authoring contract.
 
 ### Implementation Inline Comments
 
