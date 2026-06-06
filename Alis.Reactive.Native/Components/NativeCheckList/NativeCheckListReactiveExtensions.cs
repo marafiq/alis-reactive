@@ -29,11 +29,11 @@ namespace Alis.Reactive.Native.Components
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(NativeCheckListEvents.Instance);
+            var typedEvent = eventSelector(NativeCheckListEvents.Instance);
 
             // The container is the Reactive Plan-registered component; inline init syncs its value
             // before the bubbled change event reaches this trigger.
-            ComponentEventOnboarding.Wire(plan, builder.ElementId, "native", descriptor, pipeline);
+            ComponentEventOnboarding.Wire(plan, builder.ElementId, "native", typedEvent, pipeline);
 
             return builder;
         }

@@ -30,9 +30,9 @@ namespace Alis.Reactive.Native.Components
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(NativeHiddenFieldEvents.Instance);
+            var typedEvent = eventSelector(NativeHiddenFieldEvents.Instance);
 
-            ComponentEventOnboarding.Wire(plan, builder.ElementId, "native", descriptor, pipeline);
+            ComponentEventOnboarding.Wire(plan, builder.ElementId, "native", typedEvent, pipeline);
 
             return builder;
         }

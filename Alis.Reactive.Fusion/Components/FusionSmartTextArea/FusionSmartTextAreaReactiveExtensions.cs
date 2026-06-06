@@ -15,8 +15,8 @@ namespace Alis.Reactive.Fusion.Components
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = on(FusionSmartTextAreaEvents.Instance);
-            ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, descriptor, pipeline);
+            var typedEvent = on(FusionSmartTextAreaEvents.Instance);
+            ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, typedEvent, pipeline);
         }
 
         public static void Reactive<TModel, TProp, TArgs>(

@@ -16,9 +16,9 @@ namespace Alis.Reactive.Fusion.Components
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(FusionBulletChartEvents.Instance);
+            var typedEvent = eventSelector(FusionBulletChartEvents.Instance);
 
-            ComponentEventOnboarding.Wire(builder.Plan, builder.ElementId, Component.Vendor, descriptor, pipeline);
+            ComponentEventOnboarding.Wire(builder.Plan, builder.ElementId, Component.Vendor, typedEvent, pipeline);
 
             return builder;
         }

@@ -28,11 +28,11 @@ namespace Alis.Reactive.Fusion.Components
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(FusionFileUploadEvents.Instance);
+            var typedEvent = eventSelector(FusionFileUploadEvents.Instance);
 
             var componentId = builder.model.Id;
 
-            ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, descriptor, pipeline);
+            ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, typedEvent, pipeline);
 
             return builder;
         }

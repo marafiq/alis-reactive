@@ -33,12 +33,12 @@ namespace Alis.Reactive.Native.Components
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(NativeRadioGroupEvents.Instance);
+            var typedEvent = eventSelector(NativeRadioGroupEvents.Instance);
 
             for (int i = 0; i < builder.Options.Count; i++)
             {
                 var radioId = $"{builder.ElementId}_r{i}";
-                ComponentEventOnboarding.Wire(plan, radioId, "native", descriptor, pipeline);
+                ComponentEventOnboarding.Wire(plan, radioId, "native", typedEvent, pipeline);
             }
 
             return builder;

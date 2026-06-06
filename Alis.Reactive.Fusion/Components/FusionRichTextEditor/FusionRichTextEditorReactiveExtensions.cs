@@ -28,14 +28,14 @@ namespace Alis.Reactive.Fusion.Components
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
-            var descriptor = eventSelector(FusionRichTextEditorEvents.Instance);
+            var typedEvent = eventSelector(FusionRichTextEditorEvents.Instance);
 
             // RTE uses model.Id (set by FusionRichTextEditorHtmlExtensions) instead
             // of HtmlAttributes["id"] because Syncfusion RTE Render() uses model.Id for the
             // textarea's id attribute, not HtmlAttributes.
             var componentId = builder.model.Id;
 
-            ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, descriptor, pipeline);
+            ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, typedEvent, pipeline);
 
             return builder;
         }
