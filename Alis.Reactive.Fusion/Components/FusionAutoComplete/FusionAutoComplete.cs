@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionAutoComplete&gt;(m =&gt; m.Physician)</c>
-    /// to access FusionAutoComplete-specific mutations and value reading.
+    /// to access FusionAutoComplete-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionAutoComplete : FusionComponent, IInputComponent
     {

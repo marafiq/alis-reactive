@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionMultiColumnComboBox&gt;(m =&gt; m.Facility)</c>
-    /// to access FusionMultiColumnComboBox-specific mutations and value reading.
+    /// to access FusionMultiColumnComboBox-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionMultiColumnComboBox : FusionComponent, IInputComponent
     {

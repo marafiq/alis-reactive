@@ -25,7 +25,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>
-    /// Typed mutations on the slideChanging event args for <see cref="FusionCarousel"/>.
+    /// Typed event-payload operations for the slideChanging event args of <see cref="FusionCarousel"/>.
     /// </summary>
     public static class FusionCarouselSlideChangingArgsExtensions
     {

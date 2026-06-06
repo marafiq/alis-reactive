@@ -5,7 +5,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed post-render mutations, reads, and methods for <see cref="FusionProgressButton"/>.
+    /// Typed post-render component operations and reads for <see cref="FusionProgressButton"/>.
     /// </summary>
     public static class FusionProgressButtonExtensions
     {

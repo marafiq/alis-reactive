@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionSwitch&gt;(m =&gt; m.ReceiveNotifications)</c>
-    /// to access FusionSwitch-specific mutations and value reading.
+    /// to access FusionSwitch-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionSwitch : FusionComponent, IInputComponent
     {

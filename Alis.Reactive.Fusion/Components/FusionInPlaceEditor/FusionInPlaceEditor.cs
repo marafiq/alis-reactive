@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionInPlaceEditor&gt;(m =&gt; m.DateOfBirth)</c>
-    /// to access FusionInPlaceEditor-specific mutations and value reading.
+    /// to access FusionInPlaceEditor-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionInPlaceEditor : FusionComponent, IInputComponent
     {

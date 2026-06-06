@@ -58,7 +58,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Reads both dates as an array for use in conditions or gather.</summary>
         /// <remarks>
         /// <para>
-        /// Pass to a <c>When()</c> condition guard or use as a source argument in component mutations.
+        /// Pass to a <c>When()</c> condition guard or use as a source argument for component operations.
         /// </para>
         /// <para>
         /// Use <see cref="StartDate{TModel}"/> or <see cref="EndDate{TModel}"/>

@@ -1581,7 +1581,7 @@ Translates a field's client rules into the EJ2 FormValidator object shape
 ### FusionAccordion
 
 Represents a Syncfusion Accordion container component.
-            Exposes panel mutation methods and item events; it is not an input component.
+            Exposes panel operations and item events; it is not an input component.
 
 ### FusionAccordionBuilder<T>
 
@@ -1734,7 +1734,7 @@ Text { get; }  // Search text the user typed.
 
 ### FusionAutoCompleteFilteringArgsExtensions
 
-Typed mutations on the filtering event args for `FusionAutoComplete`.
+Typed event-payload operations for the filtering event args of `FusionAutoComplete`.
 
 ```csharp
 PreventDefault()
@@ -1885,7 +1885,7 @@ Value { get; }  // The actual value of the feature bar.
 
 ### FusionBulletChartTooltipRenderArgsExtensions
 
-Typed mutations on the tooltip render event args for `FusionBulletChart`.
+Typed event-payload operations for the tooltip render event args of `FusionBulletChart`.
 
 ```csharp
 SetText()
@@ -1905,7 +1905,7 @@ WriteTo()
 
 ### FusionButtonExtensions
 
-Typed post-render mutations, reads, and methods for `FusionButton`.
+Typed post-render component operations and reads for `FusionButton`.
 
 ```csharp
 Click<T>()
@@ -2003,7 +2003,7 @@ SlideDirection { get; }  // Slide direction: Previous or Next.
 
 ### FusionCarouselSlideChangingArgsExtensions
 
-Typed mutations on the slideChanging event args for `FusionCarousel`.
+Typed event-payload operations for the slideChanging event args of `FusionCarousel`.
 
 ```csharp
 PreventTransition()
@@ -2038,7 +2038,7 @@ Changed { get; }  // Fires when the checkbox state changes.
 
 ### FusionCheckBoxExtensions
 
-Typed post-render mutations, reads, and methods for `FusionCheckBox`.
+Typed post-render component operations and reads for `FusionCheckBox`.
 
 ```csharp
 Checked<T>()
@@ -2114,7 +2114,7 @@ Changed { get; }  // Fires when the color value changes.
 
 ### FusionColorPickerExtensions
 
-Typed mutations and value reading for `FusionColorPicker` in a reactive pipeline.
+Typed component operations and value reads for `FusionColorPicker` in a reactive pipeline.
 
 ```csharp
 Disable<T>(disabled)
@@ -2175,7 +2175,7 @@ Focus { get; }  // Fires when the component receives focus.
 
 ### FusionComboBoxExtensions
 
-Typed mutations and value reading for `FusionComboBox` in a reactive pipeline.
+Typed component operations and value reads for `FusionComboBox` in a reactive pipeline.
 
 ```csharp
 Clear<T>()
@@ -2223,7 +2223,7 @@ Payload delivered before the context menu closes.
 
 ### FusionContextMenuBeforeCloseArgsExtensions
 
-Typed mutations on the beforeClose event args for `FusionContextMenu`.
+Typed event-payload operations for the beforeClose event args of `FusionContextMenu`.
 
 ### FusionContextMenuBeforeItemRenderArgs
 
@@ -2235,7 +2235,7 @@ Payload delivered before the context menu opens.
 
 ### FusionContextMenuBeforeOpenArgsExtensions
 
-Typed mutations on the beforeOpen event args for `FusionContextMenu`.
+Typed event-payload operations for the beforeOpen event args of `FusionContextMenu`.
 
 ### FusionContextMenuBuilder<T>
 
@@ -2318,7 +2318,7 @@ Changed { get; }  // Fires when the date value changes.
 
 ### FusionDatePickerExtensions
 
-Typed mutations and value reading for `FusionDatePicker` in a reactive pipeline.
+Typed component operations and value reads for `FusionDatePicker` in a reactive pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -2429,7 +2429,7 @@ Changed { get; }  // Fires when the date-time value changes.
 
 ### FusionDateTimePickerExtensions
 
-Typed mutations and value reading for `FusionDateTimePicker` in a reactive pipeline.
+Typed component operations and value reads for `FusionDateTimePicker` in a reactive pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -2559,7 +2559,7 @@ Selected { get; }  // Fires after an action item is selected.
 
 ### FusionDropDownButtonExtensions
 
-Typed post-render mutations, reads, and methods for `FusionDropDownButton`.
+Typed post-render component operations and reads for `FusionDropDownButton`.
 
 ```csharp
 Content<T>()
@@ -2715,7 +2715,7 @@ Changed { get; }  // Fires when the selected value ID array changes.
 
 ### FusionDropDownTreeExtensions
 
-Typed mutations and value reading for `FusionDropDownTree` in a reactive pipeline.
+Typed component operations and value reads for `FusionDropDownTree` in a reactive pipeline.
 
 ```csharp
 Clear<T>()
@@ -3089,7 +3089,7 @@ Data { get; }  // The payload Syncfusion prepared for its built-in submit, keyed
 
 ### FusionInPlaceEditorActionBeginArgsExtensions
 
-Typed mutations on the actionBegin event args for `FusionInPlaceEditor`.
+Typed event-payload operations for the actionBegin event args of `FusionInPlaceEditor`.
 
 ```csharp
 PreventDefault(args, pipeline)
@@ -3120,7 +3120,7 @@ Name { get; }  // Syncfusion event token exposed as `args.name`.
 
 ### FusionInPlaceEditorBeginEditArgsExtensions
 
-Typed mutations on the beginEdit event args for `FusionInPlaceEditor`.
+Typed event-payload operations for the beginEdit event args of `FusionInPlaceEditor`.
 
 ```csharp
 PreventDefault(args, pipeline)
@@ -3160,7 +3160,7 @@ Name { get; }  // Syncfusion event token exposed as `args.name`.
 
 ### FusionInPlaceEditorEndEditArgsExtensions
 
-Typed mutations on the endEdit event args for `FusionInPlaceEditor`.
+Typed event-payload operations for the endEdit event args of `FusionInPlaceEditor`.
 
 ```csharp
 PreventDefault(args, pipeline)
@@ -3251,7 +3251,7 @@ Changed { get; }  // Fires when the masked value changes.
 
 ### FusionInputMaskExtensions
 
-Typed mutations and value reading for `FusionInputMask` in a reactive pipeline.
+Typed component operations and value reads for `FusionInputMask` in a reactive pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -3292,7 +3292,7 @@ Typed Kanban events available to Reactive Plans.
 
 Runtime behavior for Syncfusion Kanban. Initial board setup remains on
             Syncfusion's KanbanBuilder; these members cover post-render reads,
-            mutations, and method-return sources.
+            component operations, and method-return sources.
 
 ```csharp
 SetDataSource<T>()
@@ -3432,7 +3432,7 @@ Payload delivered before the menu closes.
 
 ### FusionMenuBeforeCloseArgsExtensions
 
-Typed mutations on the beforeClose event args for `FusionMenu`.
+Typed event-payload operations for the beforeClose event args of `FusionMenu`.
 
 ### FusionMenuBeforeItemRenderArgs
 
@@ -3444,7 +3444,7 @@ Payload delivered before the menu opens.
 
 ### FusionMenuBeforeOpenArgsExtensions
 
-Typed mutations on the beforeOpen event args for `FusionMenu`.
+Typed event-payload operations for the beforeOpen event args of `FusionMenu`.
 
 ### FusionMenuBuilder<T>
 
@@ -3616,7 +3616,7 @@ Text { get; }  // Search text the user typed.
 
 ### FusionMultiSelectFilteringArgsExtensions
 
-Typed mutations on the filtering event args for `FusionMultiSelect`.
+Typed event-payload operations for the filtering event args of `FusionMultiSelect`.
 
 ```csharp
 PreventDefault(args, pipeline)
@@ -3678,7 +3678,7 @@ Focus { get; }  // Fires when the component receives focus.
 
 ### FusionNumericTextBoxExtensions
 
-Typed mutations and value reading for `FusionNumericTextBox` in a reactive pipeline.
+Typed component operations and value reads for `FusionNumericTextBox` in a reactive pipeline.
 
 ```csharp
 Decrement<T>()
@@ -3744,7 +3744,7 @@ ValueChanged { get; }  // Fires after the complete OTP value changes.
 
 ### FusionOtpInputExtensions
 
-Typed mutations, methods, and value reading for `FusionOtpInput` in a reactive pipeline.
+Typed component operations and value reads for `FusionOtpInput` in a reactive pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -3867,7 +3867,7 @@ Progressed { get; }  // Fires as progress advances.
 
 ### FusionProgressButtonExtensions
 
-Typed post-render mutations, reads, and methods for `FusionProgressButton`.
+Typed post-render component operations and reads for `FusionProgressButton`.
 
 ```csharp
 Content<T>()
@@ -3944,7 +3944,7 @@ Changed { get; }  // Fires when this radio button becomes selected.
 
 ### FusionRadioButtonExtensions
 
-Typed post-render mutations, reads, and methods for `FusionRadioButton`.
+Typed post-render component operations and reads for `FusionRadioButton`.
 
 ```csharp
 Checked<T>()
@@ -3992,7 +3992,7 @@ ValueChanged { get; }  // Fires when the rating value changes.
 
 ### FusionRatingExtensions
 
-Typed mutations, methods, and value reading for `FusionRating` in a reactive pipeline.
+Typed component operations and value reads for `FusionRating` in a reactive pipeline.
 
 ```csharp
 Reset<T>()
@@ -4057,7 +4057,7 @@ Changed { get; }  // Fires when the rich text content changes.
 
 ### FusionRichTextEditorExtensions
 
-Typed mutations and value reading for `FusionRichTextEditor` in a reactive pipeline.
+Typed component operations and value reads for `FusionRichTextEditor` in a reactive pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -4260,7 +4260,7 @@ Type { get; }  // Popup type, for example `QuickInfo` or `Editor`.
 
 ### FusionSchedulePopupOpenArgsExtensions
 
-Typed mutations for Syncfusion Schedule `popupOpen` event args.
+Typed event-payload operations for Syncfusion Schedule `popupOpen` event args.
 
 ```csharp
 PreventDefault()
@@ -4378,7 +4378,7 @@ Changed { get; }  // Fires after the scalar slider value changes.
 
 ### FusionSliderExtensions
 
-Typed mutations and value reading for `FusionSlider` in a reactive pipeline.
+Typed component operations and value reads for `FusionSlider` in a reactive pipeline.
 
 ```csharp
 RangeValue<T>()
@@ -4443,7 +4443,7 @@ Selected { get; }  // Fires after a secondary action item is selected.
 
 ### FusionSplitButtonExtensions
 
-Typed post-render mutations, reads, and methods for `FusionSplitButton`.
+Typed post-render component operations and reads for `FusionSplitButton`.
 
 ```csharp
 Content<T>()
@@ -4528,7 +4528,7 @@ PreviousStep { get; }  // The index of the previous step.
 
 ### FusionStepperChangingArgsExtensions
 
-Typed mutations on the stepChanging event args for `FusionStepper`.
+Typed event-payload operations for the stepChanging event args of `FusionStepper`.
 
 ```csharp
 PreventDefault()
@@ -4610,7 +4610,7 @@ Changed { get; }  // Fires when the switch state changes.
 
 ### FusionSwitchExtensions
 
-Typed mutations and value reading for `FusionSwitch` in a reactive pipeline.
+Typed component operations and value reads for `FusionSwitch` in a reactive pipeline.
 
 ```csharp
 SetChecked<T>()
@@ -4737,7 +4737,7 @@ Input { get; }  // Fires as the text changes while editing.
 
 ### FusionTextAreaExtensions
 
-Typed mutations and value reading for `FusionTextArea` in a reactive pipeline.
+Typed component operations and value reads for `FusionTextArea` in a reactive pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -4824,7 +4824,7 @@ Input { get; }  // Fires as the text changes while editing.
 
 ### FusionTextBoxExtensions
 
-Typed mutations and value reading for `FusionTextBox` in a reactive pipeline.
+Typed component operations and value reads for `FusionTextBox` in a reactive pipeline.
 
 ```csharp
 AddAppendIcon<T>(iconCssClass)
@@ -4899,7 +4899,7 @@ Changed { get; }  // Fires when the time value changes.
 
 ### FusionTimePickerExtensions
 
-Typed mutations and value reading for `FusionTimePicker` in a reactive pipeline.
+Typed component operations and value reads for `FusionTimePicker` in a reactive pipeline.
 
 ```csharp
 FocusIn<T>()

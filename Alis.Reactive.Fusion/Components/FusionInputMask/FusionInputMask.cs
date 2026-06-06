@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionInputMask&gt;(m =&gt; m.PhoneNumber)</c>
-    /// to access FusionInputMask-specific mutations and value reading.
+    /// to access FusionInputMask-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionInputMask : FusionComponent, IInputComponent
     {

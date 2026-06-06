@@ -6,7 +6,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <remarks>
     /// <para>
     /// Use as a type parameter in <c>p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayPeriod)</c>
-    /// to access FusionDateRangePicker-specific mutations and value reading.
+    /// to access FusionDateRangePicker-specific component operations and value reads.
     /// </para>
     /// <para>
     /// The full value is a <c>DateTime[]</c> containing both dates. For targeted access to

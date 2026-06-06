@@ -23,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>
-    /// Typed mutations on the beforeOpen event args for <see cref="FusionMenu"/>.
+    /// Typed event-payload operations for the beforeOpen event args of <see cref="FusionMenu"/>.
     /// </summary>
     public static class FusionMenuBeforeOpenArgsExtensions
     {

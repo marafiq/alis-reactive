@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionDatePicker&gt;(m =&gt; m.AdmissionDate)</c>
-    /// to access FusionDatePicker-specific mutations and value reading.
+    /// to access FusionDatePicker-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionDatePicker : FusionComponent, IInputComponent
     {

@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionFileUpload&gt;(m =&gt; m.Documents)</c>
-    /// to access FusionFileUpload-specific mutations and value reading.
+    /// to access FusionFileUpload-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionFileUpload : FusionComponent, IInputComponent
     {

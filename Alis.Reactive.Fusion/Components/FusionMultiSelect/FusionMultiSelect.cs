@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionMultiSelect&gt;(m =&gt; m.Allergies)</c>
-    /// to access FusionMultiSelect-specific mutations and value reading.
+    /// to access FusionMultiSelect-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionMultiSelect : FusionComponent, IInputComponent
     {

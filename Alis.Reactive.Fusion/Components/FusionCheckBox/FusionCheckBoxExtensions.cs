@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed post-render mutations, reads, and methods for <see cref="FusionCheckBox"/>.
+    /// Typed post-render component operations and reads for <see cref="FusionCheckBox"/>.
     /// </summary>
     public static class FusionCheckBoxExtensions
     {

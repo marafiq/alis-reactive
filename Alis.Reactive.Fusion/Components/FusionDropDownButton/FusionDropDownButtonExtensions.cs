@@ -7,7 +7,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed post-render mutations, reads, and methods for <see cref="FusionDropDownButton"/>.
+    /// Typed post-render component operations and reads for <see cref="FusionDropDownButton"/>.
     /// </summary>
     public static class FusionDropDownButtonExtensions
     {

@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionRichTextEditor&gt;(m =&gt; m.CarePlan)</c>
-    /// to access FusionRichTextEditor-specific mutations and value reading.
+    /// to access FusionRichTextEditor-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionRichTextEditor : FusionComponent, IInputComponent
     {

@@ -19,7 +19,7 @@ namespace Alis.Reactive.Fusion.Components
         public string? Name { get; set; }
     }
 
-    /// <summary>Typed mutations on the beginEdit event args for <see cref="FusionInPlaceEditor"/>.</summary>
+    /// <summary>Typed event-payload operations for the beginEdit event args of <see cref="FusionInPlaceEditor"/>.</summary>
     public static class FusionInPlaceEditorBeginEditArgsExtensions
     {
         /// <summary>Cancels entering edit mode. The pencil click is ignored.</summary>

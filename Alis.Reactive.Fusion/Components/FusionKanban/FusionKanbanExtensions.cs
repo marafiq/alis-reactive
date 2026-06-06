@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Runtime behavior for Syncfusion Kanban. Initial board setup remains on
     /// Syncfusion's KanbanBuilder; these members cover post-render reads,
-    /// mutations, and method-return sources.
+    /// component operations, and method-return sources.
     /// </summary>
     public static class FusionKanbanExtensions
     {

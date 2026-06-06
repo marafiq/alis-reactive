@@ -32,7 +32,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>
-    /// Typed mutations for Syncfusion Schedule <c>popupOpen</c> event args.
+    /// Typed event-payload operations for Syncfusion Schedule <c>popupOpen</c> event args.
     /// </summary>
     public static class FusionSchedulePopupOpenArgsExtensions
     {

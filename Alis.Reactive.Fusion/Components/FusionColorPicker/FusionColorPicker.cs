@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionColorPicker&gt;(m =&gt; m.ThemeColor)</c>
-    /// to access FusionColorPicker-specific mutations and value reading.
+    /// to access FusionColorPicker-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionColorPicker : FusionComponent, IInputComponent
     {

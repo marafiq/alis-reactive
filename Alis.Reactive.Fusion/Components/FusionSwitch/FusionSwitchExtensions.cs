@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed mutations and value reading for <see cref="FusionSwitch"/> in a reactive pipeline.
+    /// Typed component operations and value reads for <see cref="FusionSwitch"/> in a reactive pipeline.
     /// </summary>
     public static class FusionSwitchExtensions
     {

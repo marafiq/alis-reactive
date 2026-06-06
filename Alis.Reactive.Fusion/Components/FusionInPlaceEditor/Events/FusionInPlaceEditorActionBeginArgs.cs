@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
         public bool Cancel { get; set; }
     }
 
-    /// <summary>Typed mutations on the actionBegin event args for <see cref="FusionInPlaceEditor"/>.</summary>
+    /// <summary>Typed event-payload operations for the actionBegin event args of <see cref="FusionInPlaceEditor"/>.</summary>
     public static class FusionInPlaceEditorActionBeginArgsExtensions
     {
         /// <summary>

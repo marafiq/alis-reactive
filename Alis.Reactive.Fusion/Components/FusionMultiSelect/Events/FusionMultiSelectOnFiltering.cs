@@ -26,7 +26,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>
-    /// Typed mutations on the filtering event args for <see cref="FusionMultiSelect"/>.
+    /// Typed event-payload operations for the filtering event args of <see cref="FusionMultiSelect"/>.
     /// </summary>
     /// <remarks>
     /// These extensions mutate Syncfusion's filtering event object, such as suppressing

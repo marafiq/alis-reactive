@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed mutations and value reading for <see cref="FusionComboBox"/> in a reactive pipeline.
+    /// Typed component operations and value reads for <see cref="FusionComboBox"/> in a reactive pipeline.
     /// </summary>
     /// <remarks>
     /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:

@@ -25,7 +25,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>
-    /// Typed mutations on the tooltip render event args for <see cref="FusionBulletChart"/>.
+    /// Typed event-payload operations for the tooltip render event args of <see cref="FusionBulletChart"/>.
     /// </summary>
     public static class FusionBulletChartTooltipRenderArgsExtensions
     {

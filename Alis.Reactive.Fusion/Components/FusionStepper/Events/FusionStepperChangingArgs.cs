@@ -22,7 +22,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>
-    /// Typed mutations on the stepChanging event args for <see cref="FusionStepper"/>.
+    /// Typed event-payload operations for the stepChanging event args of <see cref="FusionStepper"/>.
     /// </summary>
     public static class FusionStepperChangingArgsExtensions
     {

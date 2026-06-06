@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionTimePicker&gt;(m =&gt; m.MedicationTime)</c>
-    /// to access FusionTimePicker-specific mutations and value reading.
+    /// to access FusionTimePicker-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionTimePicker : FusionComponent, IInputComponent
     {

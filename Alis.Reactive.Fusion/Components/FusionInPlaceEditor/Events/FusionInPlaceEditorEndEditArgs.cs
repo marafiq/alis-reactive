@@ -19,7 +19,7 @@ namespace Alis.Reactive.Fusion.Components
         public string? Name { get; set; }
     }
 
-    /// <summary>Typed mutations on the endEdit event args for <see cref="FusionInPlaceEditor"/>.</summary>
+    /// <summary>Typed event-payload operations for the endEdit event args of <see cref="FusionInPlaceEditor"/>.</summary>
     public static class FusionInPlaceEditorEndEditArgsExtensions
     {
         /// <summary>Keeps the editor in edit mode even though a save or cancel was attempted.</summary>

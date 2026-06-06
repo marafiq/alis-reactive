@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Amount)</c>
-    /// to access FusionNumericTextBox-specific mutations and value reading.
+    /// to access FusionNumericTextBox-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
     {

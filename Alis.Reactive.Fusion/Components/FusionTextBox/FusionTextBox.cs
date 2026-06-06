@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionTextBox&gt;(m =&gt; m.ResidentName)</c>
-    /// to access FusionTextBox-specific mutations and value reading.
+    /// to access FusionTextBox-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionTextBox : FusionComponent, IInputComponent
     {

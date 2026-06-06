@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed post-render mutations, reads, and methods for <see cref="FusionRadioButton"/>.
+    /// Typed post-render component operations and reads for <see cref="FusionRadioButton"/>.
     /// </summary>
     public static class FusionRadioButtonExtensions
     {

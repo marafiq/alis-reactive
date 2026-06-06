@@ -6,7 +6,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Non-input component: no form value, no <see cref="IInputComponent"/>.
-    /// Use <c>p.Component&lt;FusionGrid&gt;("grid-id")</c> to access mutations.
+    /// Use <c>p.Component&lt;FusionGrid&gt;("grid-id")</c> to access component operations.
     /// </remarks>
     public sealed class FusionGrid : FusionComponent
     {

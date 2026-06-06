@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionDropDownList&gt;(m =&gt; m.Country)</c>
-    /// to access FusionDropDownList-specific mutations and value reading.
+    /// to access FusionDropDownList-specific component operations and value reads.
     /// </remarks>
     public sealed class FusionDropDownList : FusionComponent, IInputComponent
     {
