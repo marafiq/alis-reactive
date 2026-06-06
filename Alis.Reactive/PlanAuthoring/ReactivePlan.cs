@@ -42,7 +42,7 @@ namespace Alis.Reactive
 
         /// <summary>Unique plan identifier derived from the model type's full name.</summary>
         public string PlanId => _planId.Value;
-        /// <summary>Whether this plan represents a partial view that merges into a parent plan.</summary>
+        /// <summary>Whether this plan is rendered by a partial view and merges into the owning view's Active Plan.</summary>
         public bool IsPartial => _scope.IsPartial;
         internal bool RendersValidationSummary => _scope.RendersValidationSummary;
         internal IReadOnlyDictionary<string, ComponentRegistration> RegisteredInputComponents =>

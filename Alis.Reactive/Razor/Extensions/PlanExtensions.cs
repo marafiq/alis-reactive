@@ -40,7 +40,7 @@ namespace Alis.Reactive.Native.Extensions
 #endif
 
         /// <summary>
-        /// Starts a partial-view <see cref="ReactivePlan{TModel}"/> that merges into the owning view's plan.
+        /// Starts a partial-view <see cref="ReactivePlan{TModel}"/> that merges into the owning view's Active Plan.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -49,12 +49,11 @@ namespace Alis.Reactive.Native.Extensions
         /// summary container.
         /// </para>
         /// <para>
-        /// The returned plan's behaviors merge with the owning view's plan and run through the same
-        /// Active Plan state.
+        /// The returned plan's behaviors merge into the owning view's Active Plan state.
         /// </para>
         /// </remarks>
         /// <typeparam name="TModel">The view model type must match the view's model.</typeparam>
-        /// <returns>A plan instance that merges into the view's Reactive Plan.</returns>
+        /// <returns>A plan instance that merges into the owning view's Active Plan.</returns>
 #if NET48
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this HtmlHelper<TModel> html)
             where TModel : class =>

@@ -221,7 +221,7 @@ Collects reactive behavior for a view: triggers, reactions, and component regist
 
 ```csharp
 // Properties
-IsPartial { get; }  // Whether this plan represents a partial view that merges into a parent plan.
+IsPartial { get; }  // Whether this plan is rendered by a partial view and merges into the owning view's Active Plan.
 PlanId { get; }  // Unique plan identifier derived from the model type's full name.
 ```
 
