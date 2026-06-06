@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionCheckBoxChangeArgs
     {
-        /// <summary>Whether the checkbox is checked after the change.</summary>
+        /// <summary>Checkbox checked state after the change.</summary>
         public bool Checked { get; set; }
     }
 }

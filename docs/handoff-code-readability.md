@@ -193,6 +193,10 @@ Candidate cleanup:
   extension summaries now keep rendered-state and Syncfusion styling semantics
   while removing repetitive article-led wording across Button, DropDownButton,
   SplitButton, and ProgressButton.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion checkbox and
+  radio-button extension/event summaries now keep checked, indeterminate,
+  disabled, click/focus, selected group value, and change-event semantics
+  without repetitive "whether the rendered..." wording.
 - Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
   operator docs now include the parameter tags needed for generated API
   signatures such as `Eq(operand)` versus `Eq(right)`. This keeps the public DSL

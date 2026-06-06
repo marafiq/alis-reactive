@@ -26,7 +26,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusInMethod =
             ComponentMethod.Named("focusIn");
 
-        /// <summary>Sets whether this radio button is checked.</summary>
+        /// <summary>Sets this radio button checked state.</summary>
         public static ComponentRef<FusionRadioButton, TModel> SetChecked<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self,
             bool isChecked)
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(CheckedProperty, ValueExpression.Literal(isChecked))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether this radio button is disabled.</summary>
+        /// <summary>Sets this radio button disabled state.</summary>
         public static ComponentRef<FusionRadioButton, TModel> SetDisabled<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self,
             bool disabled)
@@ -44,31 +44,31 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(DisabledProperty, ValueExpression.Literal(disabled))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Invokes the rendered radio button click.</summary>
+        /// <summary>Invokes rendered radio button click.</summary>
         public static ComponentRef<FusionRadioButton, TModel> Click<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self)
             where TModel : class
             => self.EmitCall(ClickMethod);
 
-        /// <summary>Moves focus into the rendered radio button.</summary>
+        /// <summary>Moves focus into rendered radio button.</summary>
         public static ComponentRef<FusionRadioButton, TModel> FocusIn<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads whether this rendered radio button is checked.</summary>
+        /// <summary>Reads this rendered radio button checked state.</summary>
         public static TypedComponentSource<bool> Checked<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self)
             where TModel : class
             => self.Read(CheckedProperty);
 
-        /// <summary>Reads whether this rendered radio button is disabled.</summary>
+        /// <summary>Reads this rendered radio button disabled state.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self)
             where TModel : class
             => self.Read(DisabledProperty);
 
-        /// <summary>Reads the selected value from this radio button's named group.</summary>
+        /// <summary>Reads selected value from this radio button's named group.</summary>
         public static TypedComponentSource<string> SelectedValue<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self)
             where TModel : class

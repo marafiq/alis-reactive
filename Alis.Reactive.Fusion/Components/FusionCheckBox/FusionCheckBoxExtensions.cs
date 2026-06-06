@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusInMethod =
             ComponentMethod.Named("focusIn");
 
-        /// <summary>Sets whether the checkbox is checked.</summary>
+        /// <summary>Sets checkbox checked state.</summary>
         public static ComponentRef<FusionCheckBox, TModel> SetChecked<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self,
             bool isChecked)
@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(CheckedProperty, ValueExpression.Literal(isChecked))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the checkbox is indeterminate.</summary>
+        /// <summary>Sets checkbox indeterminate state.</summary>
         public static ComponentRef<FusionCheckBox, TModel> SetIndeterminate<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self,
             bool isIndeterminate)
@@ -46,7 +46,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(IndeterminateProperty, ValueExpression.Literal(isIndeterminate))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the checkbox is disabled.</summary>
+        /// <summary>Sets checkbox disabled state.</summary>
         public static ComponentRef<FusionCheckBox, TModel> SetDisabled<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self,
             bool disabled)
@@ -55,31 +55,31 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(DisabledProperty, ValueExpression.Literal(disabled))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Invokes the rendered checkbox click.</summary>
+        /// <summary>Invokes rendered checkbox click.</summary>
         public static ComponentRef<FusionCheckBox, TModel> Click<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self)
             where TModel : class
             => self.EmitCall(ClickMethod);
 
-        /// <summary>Moves focus into the rendered checkbox.</summary>
+        /// <summary>Moves focus into rendered checkbox.</summary>
         public static ComponentRef<FusionCheckBox, TModel> FocusIn<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads whether the rendered checkbox is checked.</summary>
+        /// <summary>Reads rendered checkbox checked state.</summary>
         public static TypedComponentSource<bool> Checked<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self)
             where TModel : class
             => self.Read(CheckedProperty);
 
-        /// <summary>Reads whether the rendered checkbox is indeterminate.</summary>
+        /// <summary>Reads rendered checkbox indeterminate state.</summary>
         public static TypedComponentSource<bool> Indeterminate<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self)
             where TModel : class
             => self.Read(IndeterminateProperty);
 
-        /// <summary>Reads whether the rendered checkbox is disabled.</summary>
+        /// <summary>Reads rendered checkbox disabled state.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self)
             where TModel : class
