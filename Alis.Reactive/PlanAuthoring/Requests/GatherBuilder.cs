@@ -12,7 +12,7 @@ namespace Alis.Reactive.Builders.Requests
     /// <remarks>
     /// Obtained from request builders through <c>.Gather(g =&gt; ...)</c>.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns model-bound component IDs.</typeparam>
+    /// <typeparam name="TModel">View model that owns model-bound component IDs.</typeparam>
     public class GatherBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds a literal request body field.</summary>
-        /// <param name="param">The request body field that receives the literal value.</param>
+        /// <param name="param">Request body field that receives the literal value.</param>
         /// <param name="value">Literal body value captured into the generated request plan.</param>
         public GatherBuilder<TModel> Static(string param, object value)
         {
@@ -51,7 +51,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <typeparam name="TProp">Selected event-payload body value type.</typeparam>
         /// <param name="args">Trigger payload placeholder.</param>
         /// <param name="path">Event payload path.</param>
-        /// <param name="param">The request body field that receives the payload value.</param>
+        /// <param name="param">Request body field that receives the payload value.</param>
         public GatherBuilder<TModel> FromEvent<TPayload, TProp>(
             TPayload args,
             Expression<Func<TPayload, TProp>> path,
@@ -112,7 +112,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Binds a route template parameter to an int literal.</summary>
-        /// <param name="paramName">The route template placeholder name without braces.</param>
+        /// <param name="paramName">Route template placeholder name without braces.</param>
         /// <param name="value">Route value captured into the generated request plan.</param>
         public GatherBuilder<TModel> RouteParam(string paramName, int value)
         {
@@ -122,7 +122,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Binds a route template parameter to a non-null string literal.</summary>
-        /// <param name="paramName">The route template placeholder name without braces.</param>
+        /// <param name="paramName">Route template placeholder name without braces.</param>
         /// <param name="value">Route value captured into the generated request plan.</param>
         public GatherBuilder<TModel> RouteParam(string paramName, string value)
         {
@@ -136,7 +136,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Binds a route template parameter to a long literal.</summary>
-        /// <param name="paramName">The route template placeholder name without braces.</param>
+        /// <param name="paramName">Route template placeholder name without braces.</param>
         /// <param name="value">Route value captured into the generated request plan.</param>
         public GatherBuilder<TModel> RouteParam(string paramName, long value)
         {
@@ -147,7 +147,7 @@ namespace Alis.Reactive.Builders.Requests
 
         /// <summary>Binds a route template parameter to a scalar typed source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
-        /// <param name="paramName">The route template placeholder name without braces.</param>
+        /// <param name="paramName">Route template placeholder name without braces.</param>
         /// <param name="source">Typed value source evaluated before the request is sent.</param>
         public GatherBuilder<TModel> RouteParam<TProp>(string paramName, TypedSource<TProp> source)
         {
@@ -161,7 +161,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>Binds a route template parameter to a scalar value from the triggering event payload.</summary>
         /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
         /// <typeparam name="TProp">Selected event-payload route value type.</typeparam>
-        /// <param name="paramName">The route template placeholder name without braces.</param>
+        /// <param name="paramName">Route template placeholder name without braces.</param>
         /// <param name="args">Trigger payload placeholder.</param>
         /// <param name="path">Event payload route path.</param>
         public GatherBuilder<TModel> RouteParam<TPayload, TProp>(
@@ -188,8 +188,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Reads a URL query parameter into an explicit request body field.</summary>
-        /// <param name="paramName">The URL query parameter name to read.</param>
-        /// <param name="asParam">The request body field that receives the URL value.</param>
+        /// <param name="paramName">URL query parameter name to read.</param>
+        /// <param name="asParam">Request body field that receives the URL value.</param>
         public GatherBuilder<TModel> FromUrl(string paramName, string asParam)
         {
             var urlParam = UrlParameterName.Of(paramName);
@@ -212,8 +212,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Reads a typed URL query parameter into an explicit request body field.</summary>
-        /// <param name="paramName">The URL query parameter name to read.</param>
-        /// <param name="asParam">The request body field that receives the typed URL value.</param>
+        /// <param name="paramName">URL query parameter name to read.</param>
+        /// <param name="asParam">Request body field that receives the typed URL value.</param>
         public GatherBuilder<TModel> FromUrl<T>(string paramName, string asParam)
         {
             var urlParam = UrlParameterName.Of(paramName);
@@ -227,7 +227,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>Adds a plan-registered plugin method result to the request body.</summary>
         /// <typeparam name="T">The CLR type returned by the plugin call.</typeparam>
         /// <param name="source">Typed plugin value source, including configured arguments.</param>
-        /// <param name="paramName">The request body field that receives the plugin result.</param>
+        /// <param name="paramName">Request body field that receives the plugin result.</param>
         public GatherBuilder<TModel> Plugin<T>(Conditions.TypedPluginSource<T> source, string paramName)
         {
             if (source == null) throw new System.ArgumentNullException(nameof(source));

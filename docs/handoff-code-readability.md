@@ -543,6 +543,9 @@ Candidate cleanup:
   element-update XML parameter tags now drop repeated leading articles while
   preserving compile-time literal capture, active response-route scope, and
   reaction-time source evaluation semantics.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining `GatherBuilder`
+  XML parameter tags now use concise request body, route-template, and URL-read
+  wording without changing the public request-input contract.
 
 ### Implementation Inline Comments
 
