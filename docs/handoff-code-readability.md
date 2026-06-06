@@ -142,10 +142,11 @@ Rewrite or delete:
   assertions. The touched waits are now marked with `TODO:`; a later slice should
   replace them with visible commit signals or a shared behavior-focused no-POST
   proof.
-- `scripts/build.sh` hung once on this branch while running
-  `vite build --config vite.design-system.config.ts`; the focused Playwright
-  test project build completed afterward. TODO: capture logs/process state if it
-  repeats and decide whether the wrapper needs timeout or progress diagnostics.
+- `scripts/test.sh --no-e2e` hung once on this branch while running
+  `vite build --config vite.design-system.config.ts`. The stuck process tree was
+  cleaned up, `npm run build:design-system` completed normally, and the full
+  non-e2e gate passed on rerun. TODO: capture logs/process state if this repeats
+  and decide whether the wrapper needs timeout or progress diagnostics.
 - Native and Fusion component files are intentional vertical slices. Do not sweep
   every component just because a repeated XML-doc phrase appears; finish one
   component or one non-component concept at a time and keep the commit boundary
@@ -156,9 +157,10 @@ Rewrite or delete:
   rename this page during comment cleanup; a later docs-model slice should
   verify the current C# plan domain and generated TS contract, then update the
   page title, route/link text, diagrams, and examples together.
-- `docs-site/src/content/docs/architecture/onboarding-component.md` still teaches
-  component onboarding with older internal examples such as `SetPropMutation`,
-  `CallMutation`, `MutateEventCommand`, `ICommandEmitter`, and `pipeline.AddCommand`.
-  Do not patch one snippet in isolation; a later component-onboarding docs slice
-  should verify current `ComponentRef.EmitSet` / `EmitCall`, event-args extension
-  APIs, generated plan JSON, and runtime terms, then update the guide end to end.
+- `docs-site/src/content/docs/architecture/onboarding-component.md` now uses
+  typed-event wording for `.Reactive(...)`, but still teaches component onboarding
+  with older internal examples such as `SetPropMutation`, `CallMutation`,
+  `MutateEventCommand`, `ICommandEmitter`, and `pipeline.AddCommand`. Do not
+  patch one snippet in isolation; a later component-onboarding docs slice should
+  verify current `ComponentRef.EmitSet` / `EmitCall`, event-args extension APIs,
+  generated plan JSON, and runtime terms, then update the guide end to end.
