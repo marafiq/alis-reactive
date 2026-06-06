@@ -129,7 +129,7 @@ describe("partial slot composition", () => {
     expect(appliedPlans.get(billingPlanId)).toBeUndefined();
   });
 
-  it("wires validation once per active plan when one slot contains multiple fragments for the same plan", () => {
+  it("wires validation once per Active Plan when one slot contains multiple fragments for the same plan", () => {
     const appliedPlans = new AppliedPlans();
     const { wiring } = testPlanWiring();
     const planId = "Resident.Root";
@@ -149,7 +149,7 @@ describe("partial slot composition", () => {
     expect(wiring.wireContainerValidation).toHaveBeenCalledTimes(1);
   });
 
-  it("keeps an active plan with only slot-owned entries", () => {
+  it("keeps an Active Plan with only slot-owned entries", () => {
     const appliedPlans = new AppliedPlans();
     const { wiring } = testPlanWiring();
     const planId = "Resident.Dynamic";

@@ -37,7 +37,7 @@ describe("runtime boot state", () => {
     expect(documentClickRegistrations).toHaveLength(2);
   });
 
-  it("clears the active execution plan during boot reset", () => {
+  it("clears the Active Plan during boot reset", () => {
     boot(emptyPlan("Runtime.ActivePlanReset"));
 
     resetBootStateForTests();
