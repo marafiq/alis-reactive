@@ -458,6 +458,10 @@ Candidate cleanup:
   XML docs now keep the event-order, UrlAdaptor, edit-mode, CSS-class, and
   registered-shape invariants while trimming repeated field-wrapper, model-type,
   and event-arg parameter wording.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining Fusion
+  surface-component `.Reactive(...)` XML type-parameter docs now use the same
+  concise event-args wording as the input components. Event-selector examples
+  remain where they help developers pick the right component event.
 - Resolved on `tiny-safe-but-important-refactorings`: plugin argument builders
   no longer repeat `TValue` XML type-parameter docs on `ArgValue<TValue>()`;
   the summaries already explain that the plan shape is derived from the type.

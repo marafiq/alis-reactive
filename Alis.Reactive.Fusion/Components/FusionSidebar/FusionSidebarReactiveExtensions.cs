@@ -13,7 +13,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Wires a <see cref="FusionSidebar"/> event into a Reactive Plan pipeline.
         /// </summary>
-        /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
+        /// <typeparam name="TArgs">Event args type inferred from the event selector.</typeparam>
         /// <param name="eventSelector">Selects the component event.</param>
         /// <param name="pipeline">Reactive Plan pipeline for the selected event.</param>
         public static FusionSidebarBuilder<TModel> Reactive<TModel, TArgs>(
