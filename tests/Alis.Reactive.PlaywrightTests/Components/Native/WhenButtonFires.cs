@@ -1,7 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 /// <summary>
-/// Exercises NativeButton click events, SetText mutations, and dispatch chains.
+/// Exercises NativeButton click events, SetText DOM updates, and dispatch chains.
 /// </summary>
 [TestFixture]
 public class WhenButtonFires : PlaywrightTestBase
