@@ -22,7 +22,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Configures text and value field mappings using typed expressions.
         /// </summary>
-        /// <typeparam name="TItem">The data source item type.</typeparam>
+        /// <typeparam name="TItem">The data source item contract used for field mapping.</typeparam>
         /// <param name="builder">The Fusion builder.</param>
         /// <param name="text">Expression selecting the display text property.</param>
         /// <param name="value">Expression selecting the value property.</param>
@@ -41,7 +41,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Configures text, value, and group-by field mappings using typed expressions.
         /// </summary>
-        /// <typeparam name="TItem">The data source item type.</typeparam>
+        /// <typeparam name="TItem">The data source item contract used for field mapping.</typeparam>
         /// <param name="builder">The Fusion builder.</param>
         /// <param name="text">Expression selecting the display text property.</param>
         /// <param name="value">Expression selecting the value property.</param>

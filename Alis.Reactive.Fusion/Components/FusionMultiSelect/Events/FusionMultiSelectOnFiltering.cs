@@ -59,7 +59,7 @@ namespace Alis.Reactive.Fusion.Components
         /// data source directly does not work because the popup rendering lifecycle must
         /// be re-entered via <c>updateData()</c>.
         /// </remarks>
-        /// <typeparam name="TResponse">The HTTP response body type.</typeparam>
+        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <param name="args">The filtering event args.</param>
         /// <param name="pipeline">The current pipeline builder.</param>
         /// <param name="source">The response body instance.</param>
