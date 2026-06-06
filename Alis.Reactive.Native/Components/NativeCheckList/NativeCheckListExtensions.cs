@@ -62,7 +62,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Reads the currently checked values for use in conditions or gather.
         /// </summary>
-        /// <returns>A typed source representing the check list's selected values as a string array.</returns>
         public static TypedComponentSource<string[]> Value<TModel>(
             this ComponentRef<NativeCheckList, TModel> self)
             where TModel : class

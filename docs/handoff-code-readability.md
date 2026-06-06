@@ -391,6 +391,9 @@ Candidate cleanup:
   helper comments in `assertNever` and `ExecutionContext.withElement` now use
   plain comments instead of JSDoc blocks. Exported runtime type field docs remain
   JSDoc because they describe payload scopes for TypeScript consumers.
+- Resolved on `tiny-safe-but-important-refactorings`: Native component value-read
+  XML docs no longer repeat `<returns>A typed source representing ...</returns>`
+  where the summary already states the read contract for conditions and gather.
 
 ### Implementation Inline Comments
 

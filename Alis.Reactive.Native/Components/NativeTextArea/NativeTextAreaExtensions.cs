@@ -41,7 +41,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Reads the current textarea value for use in conditions or gather.
         /// </summary>
-        /// <returns>A typed source representing the textarea's current value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeTextArea, TModel> self)
             where TModel : class
