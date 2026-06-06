@@ -1,397 +1,167 @@
 ---
 title: Onboarding a Syncfusion Component
-description: Step-by-step guide for adding a new Syncfusion EJ2 component to the framework — the 7-file vertical slice, mutations, events, and testing.
+description: Current-source guide for adding a typed Syncfusion EJ2 component slice without changing the runtime.
 sidebar:
   order: 10
 ---
 
-Adding a new Syncfusion component requires zero runtime changes and zero generated-contract changes when existing object members cover it. The plan carries all behavior — the runtime is a dumb executor.
+Adding a Syncfusion component is a vertical-slice change. The slice declares the
+component type, the public component-specific methods, the HTML factory, events,
+Reactive Plan wiring, and behavior tests. The TypeScript runtime should not need
+new component-specific branches when existing BrowserObject members cover the
+component.
 
-This guide covers two distinct patterns. Read the decision section first to know which one you need.
+## Pick The Component Shape
 
-## Which pattern do I follow?
+Ask one question first: **does this component expose a form value that
+participates in validation or request gather?**
 
-Ask one question: **Does this component have a form value that participates in validation and gather?**
+| Shape | Use when | Contract | Examples |
+|-------|----------|----------|----------|
+| Input component | The user edits a value such as `value`, `checked`, or `filesData`. | `FusionComponent, IInputComponent` | DropDownList, DatePicker, CheckBox, FileUpload |
+| Non-input component | The component is a container, navigation surface, template host, or interaction target. | `FusionComponent` | Accordion, Tab, Dialog, Tooltip |
+| App-level component | The component has a well-known layout instance. | `IAppLevelComponent` plus app-level extensions | Toast, Confirm |
 
-| Answer | Pattern | Interface | Example components | Files |
-|--------|---------|-----------|-------------------|-------|
-| **Yes** — it has a `value`, `checked`, or similar readable property that users fill in | **Input component** | `IInputComponent` | ColorPicker, DatePicker, NumericTextBox, DropDown, AutoComplete, Switch | 7 files |
-| **No** — it's a container, layout, or interaction component with no form value | **Non-input component** | `IComponent` only | Accordion, Tab, Toolbar, Sidebar, TreeView | 5-6 files |
+Input components are rendered through `Html.InputField(...)`, register a value
+member, participate in validation and `IncludeAll()` gather, and normally expose
+a `Value()` typed source. Non-input components render directly through
+`Html.FusionXxx(...)`, take an explicit controlled element ID, and do not expose
+`Value()` unless there is a real readable component value.
 
-**Input components** (ColorPicker, etc.):
-- Wrap in `Html.InputField()` — get label + validation slot
-- Register in `ComponentsMap` — participate in `IncludeAll()` gather and `.Validate<T>()`
-- Have `ReadExpr` — runtime reads their value via `ej2[readExpr]`
-- Have `Value()` — typed source for conditions
+## Verify Syncfusion First
 
-**Non-input components** (Accordion, Tab, etc.):
-- Render directly via `Html.FusionXxx()` — no InputField wrapper
-- NOT in ComponentsMap — not in validation, not in gather
-- NO `ReadExpr` — nothing to read
-- Have events + methods — `.Reactive()` for interaction, mutations for control
-- Need an explicit element ID (not model-expression-derived)
-
----
-
-## Before you start
-
-### 1. Read the Syncfusion API docs
-
-Find the component at `https://ej2.syncfusion.com/javascript/documentation/api/{component}/`. Identify:
-- **Properties** you need to write (e.g., `value`, `text`, `enabled`, `dataSource`)
-- **Methods** you need to call (e.g., `focusIn()`, `showPopup()`, `dataBind()`)
-- **Events** you need to wire (e.g., `change`, `filtering`, `focus`, `blur`)
-- **Event args** properties available on each event object
-
-### 2. Experiment in the browser console
-
-**Never onboard an API without verifying it works.** Syncfusion docs can be misleading.
+Before adding API surface, verify the Syncfusion member in a sandbox or browser
+console:
 
 ```javascript
-const el = document.getElementById('{componentId}');
+const el = document.getElementById("ComponentId");
 const ej2 = el.ej2_instances[0];
 
-ej2.enabled = false;     // Does it disable?
-ej2.showPopup();         // Does popup appear?
-typeof ej2.someMethod;   // "function" or "undefined"?
+ej2.enabled = false;
+typeof ej2.showPopup;
 ```
 
-Document what works and what doesn't. Some methods exist but have no effect (e.g., `showSpinner` on AutoComplete). Omit those intentionally and comment why.
+Add only members that work in the browser. If a documented Syncfusion method is
+present but unusable for this framework, omit it and leave a short source comment
+near the extension. Keep quirks encapsulated in the component slice; do not leak
+vendor internals into public docs unless the developer must know them to avoid
+misuse.
 
----
+## Input Component Slice
 
-## The 7-file vertical slice
-
-Every Syncfusion component is exactly 7 files (plus one per event type):
+Use the existing input components as the template. `FusionDropDownList` is a
+good current example.
 
 ```
 Alis.Reactive.Fusion/Components/FusionXxx/
-├── FusionXxx.cs                      ← 1. Component type marker
-├── FusionXxxExtensions.cs            ← 2. Mutations (SetValue, Focus, Value)
-├── FusionXxxHtmlExtensions.cs        ← 3. Factory method (Html.Xxx())
-├── FusionXxxEvents.cs                ← 4. Event registry
-├── FusionXxxReactiveExtensions.cs    ← 5. .Reactive() wiring
+├── FusionXxx.cs
+├── FusionXxxExtensions.cs
+├── FusionXxxHtmlExtensions.cs
+├── FusionXxxEvents.cs
+├── FusionXxxReactiveExtensions.cs
 └── Events/
-    ├── FusionXxxOnChanged.cs         ← 6. Changed event args
-    └── FusionXxxOnFiltering.cs       ← 7. (Optional) Filtering args + extensions
+    └── FusionXxxOnChanged.cs
 ```
 
-No other files are needed. The gather extension is shared across all components — `GatherExtensions.Include<TComponent, TModel>()` works for any `TComponent : IComponent, IInputComponent, new()`.
+### Component Type
 
-### Project and namespace
-
-All files go in the `Alis.Reactive.Fusion` project under `Components/FusionXxx/`:
-
-```
-Alis.Reactive.Fusion/
-└── Components/
-    └── FusionXxx/
-        ├── FusionXxx.cs
-        ├── FusionXxxExtensions.cs
-        ├── FusionXxxHtmlExtensions.cs
-        ├── FusionXxxEvents.cs
-        ├── FusionXxxReactiveExtensions.cs
-        └── Events/
-            └── FusionXxxOnChanged.cs
-```
-
-Namespace: `Alis.Reactive.Fusion.Components` (same as all other Fusion components).
-
-Event args files go in an `Events/` subfolder and are named `FusionXxxOn{EventName}.cs` (e.g., `FusionColorPickerOnChanged.cs`). This matches the convention across all existing components.
-
-### Required using statements
-
-Every file needs a subset of these (copy what you need):
-
-```csharp
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq.Expressions;
-using Alis.Reactive.Builders;
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.PlanModel;
-using Alis.Reactive.Native.Extensions;     // for InputBoundField<TModel, TProp>
-using Syncfusion.EJ2;                       // for setup.Helper.EJS()
-using Syncfusion.EJ2.DropDowns;             // Syncfusion component namespace (varies)
-```
-
----
-
----
-
-# Input Component Pattern (IInputComponent)
-
-> ColorPicker, DatePicker, NumericTextBox, DropDown, AutoComplete, Switch, etc.
-
-## File 1: Component type marker
+The component type is a sealed marker used by `ComponentRef<TComponent, TModel>`.
+It declares the Fusion vendor through `FusionComponent` and the readable value
+member through `IInputComponent`.
 
 ```csharp
 public sealed class FusionXxx : FusionComponent, IInputComponent
 {
-    public string ReadExpr => "value";
+    internal static InputComponentRegistrationProfile Registration { get; } =
+        InputComponentRegistrationProfile.For(new FusionXxx(), "xxx");
+
+    public string ValueMember => "value";
 }
 ```
 
-This file declares two things:
-- **Vendor** — inherited from `FusionComponent` → `"fusion"`. The runtime uses this to resolve `el.ej2_instances[0]` instead of the raw DOM element.
-- **ReadExpr** — the property path to read the component's current value. Common values:
+Use `"checked"` for boolean-style controls and the exact Syncfusion member for
+special cases such as FileUpload's `"filesData"`.
 
-| ReadExpr | Component types | Runtime reads |
-|----------|----------------|---------------|
-| `"value"` | TextBox, DropDown, DatePicker, NumericTextBox, AutoComplete | `ej2.value` |
-| `"checked"` | Switch, CheckBox | `ej2.checked` |
-| `"value"` | DateRangePicker | `ej2.value` (returns `[Date, Date]`; use `StartDate()`/`EndDate()` extensions for individual reads) |
-| `"filesData"` | FileUpload | `ej2.filesData` |
+### Component Reactions And Reads
 
-The class is sealed, has no state, and a parameterless constructor. It exists only as a type parameter — `ComponentRef<FusionXxx, TModel>` uses it to resolve vendor and readExpr at compile time via a static `new FusionXxx()` instance.
-
----
-
-## File 2: Mutation extensions
-
-Extensions on `ComponentRef<FusionXxx, TModel>`. Each method emits one command into the plan.
-
-### Property writes — `SetPropMutation`
-
-Sets a property on the ej2 instance at runtime: `ej2[prop] = value`.
+Extensions on `ComponentRef<FusionXxx, TModel>` declare public component API.
+Use `ComponentProperty<T>` for readable/writable members, `ComponentMethod` for
+method calls, and `ValueExpression` for literal or sourced values.
 
 ```csharp
-private static readonly FusionXxx Component = new();
+private static readonly FusionXxx Component = new FusionXxx();
+private static readonly ComponentProperty<string> ValueProperty =
+    ComponentProperty<string>.Named(Component.ValueMember);
+private static readonly ComponentMethod DataBindMethod =
+    ComponentMethod.Named("dataBind");
 
-// String property
 public static ComponentRef<FusionXxx, TModel> SetValue<TModel>(
-    this ComponentRef<FusionXxx, TModel> self, string? value) where TModel : class
-    => self.Emit(new SetPropMutation("value"), value: value);
+    this ComponentRef<FusionXxx, TModel> self,
+    string? value)
+    where TModel : class
+    => self.EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String));
 
-// Boolean property (with coercion) — always accept a parameter for both directions
-public static ComponentRef<FusionXxx, TModel> SetChecked<TModel>(
-    this ComponentRef<FusionXxx, TModel> self, bool isChecked) where TModel : class
-    => self.Emit(new SetPropMutation("checked", coerce: "boolean"),
-        value: isChecked ? "true" : "false");
+public static ComponentRef<FusionXxx, TModel> DataBind<TModel>(
+    this ComponentRef<FusionXxx, TModel> self)
+    where TModel : class
+    => self.EmitCall(DataBindMethod);
 
-// Disable/Enable — same pattern, parameterized (never hardcode one direction)
-public static ComponentRef<FusionXxx, TModel> Disable<TModel>(
-    this ComponentRef<FusionXxx, TModel> self, bool disabled = true) where TModel : class
-    => self.Emit(new SetPropMutation("disabled", coerce: "boolean"),
-        value: disabled ? "true" : "false");
-
-// Decimal property (with coercion)
-public static ComponentRef<FusionXxx, TModel> SetValue<TModel>(
-    this ComponentRef<FusionXxx, TModel> self, decimal value) where TModel : class
-    => self.Emit(new SetPropMutation("value", coerce: "number"),
-        value: value.ToString(CultureInfo.InvariantCulture));
-
-// DateTime property
-public static ComponentRef<FusionXxx, TModel> SetValue<TModel>(
-    this ComponentRef<FusionXxx, TModel> self, DateTime value) where TModel : class
-    => self.Emit(new SetPropMutation("value"), value: value.ToString("yyyy-MM-dd"));
+public static TypedComponentSource<string> Value<TModel>(
+    this ComponentRef<FusionXxx, TModel> self)
+    where TModel : class
+    => self.Read(ValueProperty);
 ```
 
-**Key:** The `coerce` parameter tells the runtime to parse the string value before assignment. Without it, `ej2.value = "42"` sets a string. With `coerce: "number"`, the runtime does `ej2.value = Number("42")`.
+Use `EmitSet()` and `EmitCall()` only through component-specific extension
+methods. Do not add stringly public APIs just to reach Syncfusion dynamically.
+If there are many similar events or members, document two representative
+examples and let IntelliSense show the full surface.
 
-### Property writes from source — `SetPropMutation` + `EventSource`
+### HTML Factory
 
-Sets a property from an HTTP response or event payload:
+The HTML extension registers the input component before rendering. That
+registration is what makes validation and gather see the component.
 
 ```csharp
-// From HTTP response
-public static ComponentRef<FusionXxx, TModel> SetDataSource<TModel, TResponse>(
-    this ComponentRef<FusionXxx, TModel> self,
-    ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)
-    where TModel : class where TResponse : class
-{
-    var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-    return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
-}
-
-// From event payload
-public static ComponentRef<FusionXxx, TModel> SetDataSource<TModel, TSource>(
-    this ComponentRef<FusionXxx, TModel> self,
-    TSource source, Expression<Func<TSource, object?>> path)
+public static void FusionXxx<TModel, TProp>(
+    this InputBoundField<TModel, TProp> setup,
+    Action<XxxBuilder> build)
     where TModel : class
 {
-    var sourcePath = ExpressionPathHelper.ToEventPath(path);
-    return self.Emit(new SetPropMutation("dataSource"), source: new EventSource(sourcePath));
-}
-```
+    setup.RegisterInputComponent(FusionXxx.Registration);
 
-### Method calls — `CallMutation`
-
-Calls a method on the ej2 instance: `ej2[method]()`.
-
-```csharp
-// Void method (no arguments)
-public static ComponentRef<FusionXxx, TModel> DataBind<TModel>(
-    this ComponentRef<FusionXxx, TModel> self) where TModel : class
-    => self.Emit(new CallMutation("dataBind"));
-
-public static ComponentRef<FusionXxx, TModel> FocusIn<TModel>(
-    this ComponentRef<FusionXxx, TModel> self) where TModel : class
-    => self.Emit(new CallMutation("focusIn"));
-
-public static ComponentRef<FusionXxx, TModel> ShowPopup<TModel>(
-    this ComponentRef<FusionXxx, TModel> self) where TModel : class
-    => self.Emit(new CallMutation("showPopup"));
-```
-
-### Value read — `TypedComponentSource`
-
-Returns a typed source for use in conditions or `SetText`:
-
-```csharp
-public static TypedComponentSource<string> Value<TModel>(
-    this ComponentRef<FusionXxx, TModel> self) where TModel : class
-    => new TypedComponentSource<string>(self.TargetId, Component.Vendor, Component.ReadExpr);
-```
-
-The type parameter (`string`, `bool`, `decimal`, `DateTime`) matches the component's semantic type. This flows through `When()` conditions with full compile-time type safety:
-
-```csharp
-pipeline.When(comp.Value()).Eq("some-value")  // compiler enforces string
-```
-
-### Dual-property reads (DateRangePicker pattern)
-
-When a component exposes multiple readable properties, create separate read methods with hardcoded readExpr:
-
-```csharp
-public static TypedComponentSource<DateTime> StartDate<TModel>(
-    this ComponentRef<FusionDateRangePicker, TModel> self) where TModel : class
-    => new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "startDate");
-
-public static TypedComponentSource<DateTime> EndDate<TModel>(
-    this ComponentRef<FusionDateRangePicker, TModel> self) where TModel : class
-    => new TypedComponentSource<DateTime>(self.TargetId, Component.Vendor, "endDate");
-```
-
----
-
-## File 3: Factory method (Html extension)
-
-Registers the component in the plan's `ComponentsMap` and renders the Syncfusion builder HTML.
-
-```csharp
-using Syncfusion.EJ2;
-using Syncfusion.EJ2.DropDowns; // or the Syncfusion namespace for your component
-using Alis.Reactive.PlanModel;
-using Alis.Reactive.Native.Extensions;
-
-public static class FusionXxxHtmlExtensions
-{
-    private static readonly FusionXxx Component = new();
-
-    public static void FusionXxx<TModel, TProp>(
-        this InputBoundField<TModel, TProp> setup,
-        Action<XxxBuilder> build)
-        where TModel : class
-    {
-        // 1. Register in ComponentsMap
-        setup.Plan.AddToComponentsMap(setup.BindingPath, new ComponentRegistration(
-            setup.ElementId,
-            Component.Vendor,                                // "fusion"
-            setup.BindingPath,
-            Component.ReadExpr,                              // "value" or "checked"
-            "xxx",                                           // component type label
-            CoercionTypes.InferFromType(typeof(TProp))));    // auto-inferred
-
-        // 2. Create the Syncfusion EJ2 builder. Pass htmlAttributes as a parameter
-        // to XxxFor() rather than using fluent .HtmlAttributes(), because the
-        // fluent method does not override the element ID on all Syncfusion components.
-        // Passing as a parameter to XxxFor() bakes the
-        // custom ID into both the rendered HTML and the JS appendTo() target.
-        var attrs = new Dictionary<string, object>
+    var builder = setup.Helper.EJS().XxxFor(setup.Expression)
+        .HtmlAttributes(new Dictionary<string, object>
         {
             ["id"] = setup.ElementId,
             ["name"] = setup.BindingPath
-        };
-        var builder = setup.Helper.EJS().XxxFor(setup.Expression, attrs);
+        });
 
-        // 3. Let the user build (DataSource, Placeholder, etc.)
-        build(builder);
-
-        // 4. Render — pass builder.Render() which returns IHtmlContent
-        setup.Render(builder.Render());
-    }
+    build(builder);
+    setup.Render(builder.Render());
 }
 ```
 
-**How to find the Syncfusion builder type name:** The EJ2 tag helpers follow the pattern `setup.Helper.EJS().{ComponentName}For(expression)`. For DropDownList it's `DropDownListFor`, for DatePicker it's `DatePickerFor`, for ColorPicker it would be `ColorPickerFor`. The builder type is `{ComponentName}Builder` (e.g., `DropDownListBuilder`, `DatePickerBuilder`). Check the Syncfusion NuGet package for the exact type.
+Some Syncfusion components need a different factory shape. Follow the existing
+component with the closest Syncfusion API rather than inventing a shared helper.
 
-**ComponentRegistration fields explained:**
+### Events And Reactive Wiring
 
-| Field | Source | Purpose |
-|-------|--------|---------|
-| `componentId` | `setup.ElementId` | DOM element ID for runtime lookup |
-| `vendor` | `Component.Vendor` | `"fusion"` — runtime resolves `ej2_instances[0]` |
-| `bindingPath` | `setup.BindingPath` | Model property name — key in `ComponentsMap` |
-| `readExpr` | `Component.ReadExpr` | Property path for reading value |
-| `componentType` | Literal string | Descriptive label (e.g., `"autocomplete"`, `"datepicker"`) |
-| `shape` | `Shape.FromClrType(typeof(TProp))` | Type contract auto-inferred from model property type |
-
-**Shape inference:** `Shape.FromClrType()` maps C# types to the plan's type contract:
-
-| C# type | shape.kind |
-|---------|------------|
-| `string` | `"string"` |
-| `int`, `decimal`, `double`, `long` | `"number"` |
-| `bool` | `"boolean"` |
-| `DateTime`, `DateTimeOffset`, `DateOnly` | `"date"` |
-| `string[]`, `List<string>` | `"array"` (with element shape) |
-
-### Typed Fields helper (for list components)
-
-List components (DropDown, AutoComplete, MultiSelect) need a `Fields<TItem>()` method that maps item properties to Syncfusion field settings:
-
-```csharp
-public static XxxBuilder Fields<TItem>(
-    this XxxBuilder builder,
-    Expression<Func<TItem, object?>> text,
-    Expression<Func<TItem, object?>> value)
-{
-    builder.Fields = new XxxFieldSettings
-    {
-        Text = ToCamelCase(GetMemberName(text)),    // "Text" → "text"
-        Value = ToCamelCase(GetMemberName(value))   // "Value" → "value"
-    };
-    return builder;
-}
-```
-
-Syncfusion uses camelCase field names. The helper extracts the member name from the expression and converts it.
-
----
-
-## File 4: Event registry
-
-A singleton that maps event names to typed event definitions:
+`FusionXxxEvents` exposes typed event descriptors. `.Reactive()` selects one of
+those descriptors and delegates to `ComponentEventOnboarding.Wire(...)`.
 
 ```csharp
 public sealed class FusionXxxEvents
 {
-    public static readonly FusionXxxEvents Instance = new();
+    public static readonly FusionXxxEvents Instance = new FusionXxxEvents();
     private FusionXxxEvents() { }
 
-    public TypedEvent<FusionXxxChangeArgs> Changed =>
-        new("change", new FusionXxxChangeArgs());
+    public TypedEvent<FusionXxxChangedArgs> Changed =>
+        new TypedEvent<FusionXxxChangedArgs>("change", new FusionXxxChangedArgs());
 }
 ```
 
-Each property creates a `TypedEvent` with:
-- **JS event name** — the string Syncfusion uses for `addEventListener` (e.g., `"change"`, `"filtering"`, `"focus"`, `"blur"`)
-- **Phantom args instance** — used only for compile-time type inference, never read at runtime
-
-Add one property per event. The JS event name comes from the Syncfusion API docs.
-
----
-
-## File 5: Reactive extensions (.Reactive() wiring)
-
-Thin bridge between the Syncfusion builder and the Reactive Plan:
-
 ```csharp
-private static readonly FusionXxx Component = new();
-
 public static XxxBuilder Reactive<TModel, TArgs>(
     this XxxBuilder builder,
     ReactivePlan<TModel> plan,
@@ -400,592 +170,109 @@ public static XxxBuilder Reactive<TModel, TArgs>(
     where TModel : class
 {
     var descriptor = eventSelector(FusionXxxEvents.Instance);
-    var pb = new PipelineBuilder<TModel>();
-    pipeline(descriptor.Args, pb);
-
-    // Use builder.model.HtmlAttributes rather than builder.HtmlAttributes.
-    // The .model property accesses the Syncfusion EJ2 control model where id/name are stored.
     var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
     var componentId = (string)attrs["id"];
-    var bindingPath = (string)attrs["name"];
 
-    var trigger = new ComponentEventTrigger(
+    ComponentEventOnboarding.Wire(
+        plan,
         componentId,
-        descriptor.JsEvent,      // "change", "filtering", etc.
-        Component.Vendor,         // "fusion"
-        bindingPath,
-        Component.ReadExpr);      // "value", "checked", etc.
-
-    foreach (var reaction in pb.BuildReactions())
-        plan.AddEntry(new Entry(trigger, reaction));
+        new FusionXxx().Vendor,
+        descriptor,
+        pipeline);
 
     return builder;
 }
 ```
 
-**This file is identical across all components** except for the type names. The generic `TArgs` parameter makes it work with any event args class. You only need to change:
-- Class name: `FusionXxxReactiveExtensions`
-- Builder type: `XxxBuilder`
-- Events type: `FusionXxxEvents`
-- Component type: `FusionXxx`
+Event args are plain typed payload classes. Put event-specific payload helper
+methods next to the args only when they express real Syncfusion behavior.
 
----
+## Non-Input Component Slice
 
-## File 6: Event args (simple — no methods on args)
-
-A plain class with properties matching the Syncfusion event object:
-
-```csharp
-public class FusionXxxChangeArgs
-{
-    public string? Value { get; set; }
-    public bool IsInteracted { get; set; }
-    public FusionXxxChangeArgs() { }
-}
-```
-
-Properties become typed condition sources in the pipeline:
-
-```csharp
-.Reactive(plan, evt => evt.Changed, (args, p) =>
-{
-    p.When(args, x => x.Value).Eq("selected-value")
-        .Then(t => t.Element("status").SetText("matched"));
-})
-```
-
-The expression `x => x.Value` compiles to `"evt.value"` in the plan. At runtime, the Syncfusion event's `value` property is walked at that path.
-
-**Common event args patterns:**
-
-| Event | Properties | Notes |
-|-------|-----------|-------|
-| Changed | `Value` (string/bool/DateTime?), `IsInteracted` (bool) | Most common |
-| Focus | (empty) | Marker class, no properties |
-| Blur | (empty) | Marker class, no properties |
-| Filtering | `Text` (string) | User's typed text |
-| Selected | `FilesCount` (int), `IsInteracted` (bool) | File upload |
-
----
-
-## File 7: Event args with extensions (Filtering pattern)
-
-When the event args expose methods (like Syncfusion's `preventDefaultAction` or `updateData`), add extension methods in the same file:
-
-```csharp
-public class FusionXxxFilteringArgs
-{
-    public string Text { get; set; } = "";
-    public FusionXxxFilteringArgs() { }
-}
-
-public static class FusionXxxFilteringArgsExtensions
-{
-    public static void PreventDefault(
-        this FusionXxxFilteringArgs args,
-        ICommandEmitter pipeline)
-    {
-        pipeline.AddCommand(new MutateEventCommand(
-            new SetPropMutation("preventDefaultAction"), value: true));
-    }
-
-    public static void UpdateData<TResponse>(
-        this FusionXxxFilteringArgs args,
-        ICommandEmitter pipeline,
-        ResponseBody<TResponse> source,
-        Expression<Func<TResponse, object?>> path)
-        where TResponse : class
-    {
-        var sourcePath = ExpressionPathHelper.ToResponsePath(path);
-        pipeline.AddCommand(new MutateEventCommand(
-            new CallMutation("updateData", args: new MethodArg[]
-            {
-                new SourceArg(new EventSource(sourcePath))
-            })));
-    }
-}
-```
-
-**Key distinction — MutateEventCommand vs MutateElementCommand:**
-
-| Command | Target | When to use |
-|---------|--------|-------------|
-| `MutateElementCommand` | DOM element / ej2 instance | Property sets, method calls on the component |
-| `MutateEventCommand` | Event args object (`ctx.evt`) | Setting properties or calling methods on the triggering event |
-
-`MutateEventCommand` is used for event args extensions because the target is the event object, not a DOM element. At runtime, `ctx.evt.preventDefaultAction = true` and `ctx.evt.updateData(data)` operate on the event args.
-
-**Why `ICommandEmitter pipeline` parameter?** The `args` object is a phantom shared across the entire `.Reactive()` lambda. Unlike `ComponentRef` (created per-pipeline via `p.Component<T>()`), `args` has no pipeline binding. The pipeline must be passed explicitly so the extension can emit commands.
-
----
-
-## What does NOT change
-
-When onboarding any component — **none of these change:**
-
-| Layer | Files | Why |
-|-------|-------|-----|
-| TS runtime | `trigger.ts`, `commands.ts`, `element.ts`, `gather.ts` | Plan carries vendor + readExpr, runtime resolves via bracket notation |
-| Generated plan contract | `runtime/types/plan.ts` | Existing object member primitives cover all component APIs |
-| TS types | `types/*.ts` | No new command kinds or trigger kinds |
-| Core plan models | `Alis.Reactive/` project | Existing mutation algebra handles everything |
-
-**If you find yourself modifying any of these, stop. You're doing it wrong.**
-
----
-
-## Gather — no per-component file needed
-
-The shared `GatherExtensions` works for any Fusion component:
-
-```csharp
-g.Include<FusionXxx, TModel>(m => m.Property)
-```
-
-It resolves the component from `ComponentsMap` using the binding path and reads via the registered `readExpr`. No per-component gather extension needed.
-
----
-
-## Testing checklist
-
-Every onboarded component needs tests at three layers. Test classes use BDD naming: `When{Scenario}`.
-
-### C# unit tests (`Alis.Reactive.Fusion.UnitTests`)
-
-Snapshot-verify each mutation. One test class per component:
-
-```csharp
-[TestFixture]
-public class WhenMutatingAFusionXxx : FusionTestBase
-{
-    [Test]
-    public Task SetValue_produces_correct_plan()
-    {
-        var plan = CreatePlan<TestModel>();
-        Html.On(plan, t => t.DomReady(p =>
-            p.Component<FusionXxx>(m => m.Property).SetValue("test")));
-        return VerifyJson(plan.Render());
-    }
-}
-```
-
-`FusionTestBase` provides `CreatePlan<T>()` and `Html` (mocked `IHtmlHelper`). `VerifyJson` locks down exact JSON output via Verify.NUnit.
-
-### Sandbox demo
-
-Three files — model, controller, and view:
-
-- **Model:** `Areas/Sandbox/Models/Xxx/XxxModel.cs` — property for each capability
-- **Controller:** `Areas/Sandbox/Controllers/Xxx/XxxController.cs` — GET action returning the view, plus any HTTP endpoints for filtering/cascade
-- **View:** `Areas/Sandbox/Views/Xxx/Index.cshtml` — numbered sections with `<span id="...">` echo elements for Playwright assertions
-
-### Playwright tests
-
-Navigate to the sandbox page, interact, assert DOM state:
-
-```csharp
-[TestFixture]
-public class WhenUsingFusionXxx : PlaywrightTestBase
-{
-    private const string Path = "/Sandbox/Xxx";
-
-    [Test]
-    public async Task selecting_a_value_updates_the_echo()
-    {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-
-        // interact with component
-        var input = Page.Locator("#Property");
-        await input.ClickAsync();
-        // ... select value ...
-
-        // assert visible result
-        await Expect(Page.Locator("#change-value"))
-            .ToHaveTextAsync("expected-value");
-        AssertNoConsoleErrors();
-    }
-}
-```
-
-### Run all tests
-
-```bash
-dotnet test tests/Alis.Reactive.Fusion.UnitTests     # C# mutations serialize correctly
-scripts/playwright.sh --filter "FullyQualifiedName~FusionXxx"  # Browser behavior verified
-```
-
----
-
-## Variations and edge cases
-
-Not every component follows the standard template. These patterns appear in the codebase and you may need them.
-
-### Multiple events on one component
-
-Some components have Changed + Focus + Blur. Add one `TypedEvent` per event:
-
-```csharp
-public TypedEvent<FusionXxxChangeArgs> Changed =>
-    new("change", new FusionXxxChangeArgs());
-
-public TypedEvent<FusionXxxFocusArgs> Focus =>
-    new("focus", new FusionXxxFocusArgs());
-
-public TypedEvent<FusionXxxBlurArgs> Blur =>
-    new("blur", new FusionXxxBlurArgs());
-```
-
-Focus and Blur args are empty marker classes — no properties, just a parameterless constructor:
-
-```csharp
-public class FusionXxxFocusArgs
-{
-    public FusionXxxFocusArgs() { }
-}
-```
-
-### Read-only components (no SetValue)
-
-Some components are set by user interaction only (FileUpload, DateRangePicker). Provide `Value()` reads but intentionally omit write mutations. Document why:
-
-```csharp
-// No SetValue() — DateRangePicker is set by user interaction only.
-// No SetStartDate()/SetEndDate() — Syncfusion has no API for setting individual dates.
-```
-
-### Components without `XxxFor()` factory
-
-Some Syncfusion components (like Uploader) have no `For` helper. Use the ID-based constructor instead:
-
-```csharp
-// Standard (most components):
-var builder = setup.Helper.EJS().DropDownListFor(setup.Expression)
-    .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
-
-// Components without XxxFor() (e.g., Uploader, RichTextEditor):
-var builder = setup.Helper.EJS().Uploader(setup.ElementId)
-    .HtmlAttributes(new Dictionary<string, object> { ["name"] = setup.BindingPath });
-```
-
-When using the ID-based constructor, the reactive extension reads `componentId` from `builder.model.Id` instead of `HtmlAttributes["id"]`:
-
-```csharp
-// Standard: var componentId = (string)attrs["id"];
-// ID-based: var componentId = builder.model.Id;
-```
-
-### Array-typed values (MultiSelect, CheckList)
-
-For multi-select components, `SetValue` accepts `string[]?` and `Value()` returns `TypedComponentSource<string[]>`:
-
-```csharp
-public static ComponentRef<FusionMultiSelect, TModel> SetValue<TModel>(
-    this ComponentRef<FusionMultiSelect, TModel> self, string[]? value)
-    where TModel : class
-    => self.Emit(new SetPropMutation("value"), value: value);
-
-public static TypedComponentSource<string[]> Value<TModel>(
-    this ComponentRef<FusionMultiSelect, TModel> self) where TModel : class
-    => new TypedComponentSource<string[]>(self.TargetId, Component.Vendor, Component.ReadExpr);
-```
-
-### Fields with GroupBy (3-argument overload)
-
-For grouped dropdown items, add a 3-argument `Fields<TItem>` overload:
-
-```csharp
-public static XxxBuilder Fields<TItem>(
-    this XxxBuilder builder,
-    Expression<Func<TItem, object?>> text,
-    Expression<Func<TItem, object?>> value,
-    Expression<Func<TItem, object?>> groupBy)
-{
-    return builder.Fields(new XxxFieldSettings
-    {
-        Text = ToCamelCase(GetMemberName(text)),
-        Value = ToCamelCase(GetMemberName(value)),
-        GroupBy = ToCamelCase(GetMemberName(groupBy))
-    });
-}
-```
-
-### AllowFiltering requirement for non-AutoComplete components
-
-Syncfusion AutoComplete has filtering built-in. MultiSelect and DropDownList require `.AllowFiltering(true)` explicitly in the view — without it, the Filtering event **never fires** (silent failure, no errors):
-
-```csharp
-// AutoComplete — filtering works out of the box
-.FusionAutoComplete(b => b.Reactive(plan, evt => evt.Filtering, ...))
-
-// MultiSelect/DropDownList — MUST set AllowFiltering
-.FusionMultiSelect(b => b.AllowFiltering(true).Reactive(plan, evt => evt.Filtering, ...))
-```
-
-### HtmlAttributes — parameter, not fluent method
-
-Syncfusion components have two ways to set HtmlAttributes. **Only one works reliably for the `id` attribute:**
-
-```csharp
-// CORRECT — pass as parameter to XxxFor() (bakes ID into HTML + JS)
-var attrs = new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath };
-var builder = setup.Helper.EJS().XxxFor(setup.Expression, attrs);
-
-// WRONG — fluent .HtmlAttributes() (does NOT override ID on all components)
-var builder = setup.Helper.EJS().XxxFor(setup.Expression)
-    .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId });
-```
-
-**Why:** The fluent `.HtmlAttributes()` method sets `model.HtmlAttributes` but does NOT update `model.Id` or regenerate the rendered HTML. Some Syncfusion JS components (like DropDownList) have a `setHTMLAttributes()` method that re-applies the ID at runtime, so it appears to work. Other components (like ColorPicker) lack this JS-side support, so the element renders with the wrong ID and the reactive runtime can't find it.
-
-**The parameter overload** (`XxxFor(expression, htmlAttributes)`) calls `EJSUtil.GetHtmlId(htmlAttributes)` which correctly sets `model.Id` and bakes the custom ID into both the HTML output and the JS `appendTo()` target.
-
-**Rule: Always pass HtmlAttributes as a parameter to `XxxFor()`, never as a fluent method.** This ensures the framework controls the element ID regardless of which Syncfusion component you're onboarding.
-
----
-
-### Intentional API omissions
-
-When a Syncfusion API doesn't work as expected (verified in browser), omit it and document why as a comment in the extensions file:
-
-```csharp
-// showSpinner/hideSpinner have no visible effect on Syncfusion AutoComplete.
-// refresh() causes focus loss mid-typing — not usable during filtering.
-// Both verified manually via browser console. Omitted intentionally.
-```
-
-This prevents future developers from adding broken APIs.
-
----
-
-## Verify in browser after onboarding — mandatory
-
-`dotnet build` passing is necessary but NOT sufficient. You must run the sandbox page and verify every section works in a real browser. See the [Sandbox Demo guide](../sandbox-demo/#verify-in-the-browser--mandatory) for the full checklist.
-
-Key things that only show up in the browser:
-- **`[object Object]`** in echo spans → event arg property is an object, not a primitive
-- **Element not found** errors in console → ID mismatch between plan and DOM (HtmlAttributes issue)
-- **No change event firing** → Syncfusion component needs `.AllowFiltering(true)` or similar configuration
-- **Value reads returning wrong type** → ReadExpr points to wrong property on ej2 instance
-
----
-
-## Common mistakes
-
-| Mistake | Why it's wrong | Correct approach |
-|---------|---------------|-----------------|
-| `Static("q", args.Text)` for event args | Resolves at C# compile time → always `""` | `FromEvent(args, x => x.Text, "q")` |
-| `SetDataSource` for filtering events | Syncfusion lifecycle closes before async HTTP completes | `args.UpdateData(pipeline, json, path)` |
-| `DataBind()` after `UpdateData` | `updateData` handles refresh internally | Only use `DataBind()` after `SetDataSource` in cascade patterns |
-| Forgetting `PreventDefault` on filtering | Syncfusion flashes "No records found" during async HTTP | Call `args.PreventDefault(pipeline)` first |
-| Modifying TS runtime for new component | Plan carries all behavior — runtime is a dumb executor | Zero runtime changes, always |
-| Extensions on a builder class for args | Loses compile-time type safety | Extensions go directly on the args class |
-| Using `showSpinner()`/`hideSpinner()` | Not built into dropdown components | Use DOM elements for loading indicators |
-
----
-
-## Quick reference — mutation to plan JSON mapping
-
-| C# extension | Mutation | Plan JSON | Runtime |
-|--------------|----------|-----------|---------|
-| `SetValue("x")` | `SetPropMutation("value")` | `{ kind: "set-prop", prop: "value" }` | `ej2.value = "x"` |
-| `SetChecked(true)` | `SetPropMutation("checked", coerce: "boolean")` | `{ kind: "set-prop", prop: "checked", coerce: "boolean" }` | `ej2.checked = true` |
-| `SetValue(42m)` | `SetPropMutation("value", coerce: "number")` | `{ kind: "set-prop", prop: "value", coerce: "number" }` | `ej2.value = 42` |
-| `DataBind()` | `CallMutation("dataBind")` | `{ kind: "call", method: "dataBind" }` | `ej2.dataBind()` |
-| `FocusIn()` | `CallMutation("focusIn")` | `{ kind: "call", method: "focusIn" }` | `ej2.focusIn()` |
-| `ShowPopup()` | `CallMutation("showPopup")` | `{ kind: "call", method: "showPopup" }` | `ej2.showPopup()` |
-| `Enable()` | `SetPropMutation("enabled")` | `{ kind: "set-prop", prop: "enabled" }` | `ej2.enabled = true` |
-| `SetDataSource(json, x => x.Items)` | `SetPropMutation("dataSource")` + `EventSource` | `{ kind: "set-prop", prop: "dataSource", source: {...} }` | `ej2.dataSource = resolved` |
-| `args.PreventDefault(p)` | `MutateEventCommand(SetPropMutation)` | `{ kind: "mutate-event", mutation: { kind: "set-prop", prop: "preventDefaultAction" } }` | `ctx.evt.preventDefaultAction = true` |
-| `args.UpdateData(p, json, x => x.Items)` | `MutateEventCommand(CallMutation)` | `{ kind: "mutate-event", mutation: { kind: "call", method: "updateData" } }` | `ctx.evt.updateData(resolved)` |
-| `comp.Value()` | Returns `TypedComponentSource<T>` | `{ kind: "component", componentId: "...", vendor: "fusion", readExpr: "value" }` | `ej2.value` (read) |
-
----
-
-# Non-Input Component Pattern (IComponent only)
-
-> Accordion, Tab, Toolbar, Sidebar, TreeView — components with events and methods but no form value.
-
-Non-input components do NOT implement `IInputComponent`. They have no `ReadExpr`, no `Value()` read, no ComponentsMap registration, no validation, no gather participation.
-
-## Differences from input components
-
-| Aspect | Input component | Non-input component |
-|--------|----------------|-------------------|
-| Interface | `IInputComponent` (has `ReadExpr`) | `IComponent` only (no `ReadExpr`) |
-| View factory | `Html.InputField(plan, m => m.Prop).Xxx(...)` | `Html.FusionXxx(plan, "elementId", ...)` |
-| ComponentsMap | Registered (gather + validation) | NOT registered |
-| Element ID | Derived from model expression | Explicit string parameter |
-| `Value()` method | Yes — `TypedComponentSource<T>` | No — nothing to read |
-| Wrapper HTML | Label + validation slot (InputField) | No wrapper — renders directly |
-
-## Non-input file structure (5-6 files)
+Use `FusionAccordion` as the current template.
 
 ```
 Alis.Reactive.Fusion/Components/FusionXxx/
-├── FusionXxx.cs                      ← 1. Component type marker (IComponent, NOT IInputComponent)
-├── FusionXxxExtensions.cs            ← 2. Mutations (methods + properties)
-├── FusionXxxHtmlExtensions.cs        ← 3. Factory (NO InputField, NO ComponentsMap)
-├── FusionXxxEvents.cs                ← 4. Event registry
-├── FusionXxxReactiveExtensions.cs    ← 5. .Reactive() wiring
+├── FusionXxx.cs
+├── FusionXxxExtensions.cs
+├── FusionXxxHtmlExtensions.cs
+├── FusionXxxBuilder.cs
+├── FusionXxxEvents.cs
+├── FusionXxxReactiveExtensions.cs
 └── Events/
-    └── FusionXxxOnSelected.cs        ← 6. Event args
+    └── FusionXxxOnSelected.cs
 ```
 
-## NI-File 1: Component type marker (NO IInputComponent)
+The component marker does not implement `IInputComponent`:
 
 ```csharp
 public sealed class FusionXxx : FusionComponent
 {
-    // NO ReadExpr — this component has no form value to read
 }
 ```
 
-Note: implements `FusionComponent` (which gives `IComponent` + `Vendor => "fusion"`) but does NOT implement `IInputComponent`. This means:
-- `ComponentRef<FusionXxx, TModel>` works for mutations (SetPropMutation, CallMutation)
-- `Value()` method is NOT available — nothing to read
-- Component is NOT registered in ComponentsMap
-
-## NI-File 2: Mutations (same patterns as input)
-
-Extensions on `ComponentRef<FusionXxx, TModel>` work identically:
+The HTML factory takes the plan and an explicit controlled element ID, renders
+the Syncfusion builder, and returns a small wrapper builder that carries the plan
+and element ID for `.Reactive()` chaining.
 
 ```csharp
-private static readonly FusionXxx Component = new();
-
-// Method call
-public static ComponentRef<FusionXxx, TModel> Select<TModel>(
-    this ComponentRef<FusionXxx, TModel> self, int index) where TModel : class
-    => self.Emit(new CallMutation("select", args: new MethodArg[]
-    {
-        new LiteralArg(index)
-    }));
-
-// Void method
-public static ComponentRef<FusionXxx, TModel> ExpandAll<TModel>(
-    this ComponentRef<FusionXxx, TModel> self) where TModel : class
-    => self.Emit(new CallMutation("expandAll"));
-
-// Property set
-public static ComponentRef<FusionXxx, TModel> EnableTab<TModel>(
-    this ComponentRef<FusionXxx, TModel> self, int index, bool enabled = true)
-    where TModel : class
-    => self.Emit(new CallMutation("enableTab", args: new MethodArg[]
-    {
-        new LiteralArg(index),
-        new LiteralArg(enabled)
-    }));
-```
-
-**No `Value()` method** — non-input components have nothing to read.
-
-## NI-File 3: Factory (NO InputField, NO ComponentsMap)
-
-Non-input components render directly — no InputField wrapper, no label, no validation slot, no ComponentsMap registration:
-
-```csharp
-using Syncfusion.EJ2;
-using Syncfusion.EJ2.Navigations; // or the Syncfusion namespace for your component
-
-public static class FusionXxxHtmlExtensions
-{
-    public static FusionXxxBuilder<TModel> FusionXxx<TModel>(
-        this IHtmlHelper<TModel> html,
-        ReactivePlan<TModel> plan,
-        string elementId,
-        Action<XxxBuilder> build)
-        where TModel : class
-    {
-        // NO ComponentsMap registration — this is NOT an input component
-
-        var builder = html.EJS().Xxx(elementId);
-        build(builder);
-
-        return new FusionXxxBuilder<TModel>(plan, elementId, builder.Render());
-    }
-}
-```
-
-**Key differences from input component factory:**
-- Takes `IHtmlHelper<TModel>` directly (not `InputBoundField`)
-- Takes explicit `string elementId` (not model-expression-derived)
-- Takes `ReactivePlan<TModel>` for passing to `.Reactive()`
-- NO `plan.AddToComponentsMap()` call
-- Returns a builder that wraps the Syncfusion content + allows `.Reactive()` chaining
-
-## NI-File 4: Events (same pattern)
-
-```csharp
-public sealed class FusionXxxEvents
-{
-    public static readonly FusionXxxEvents Instance = new();
-    private FusionXxxEvents() { }
-
-    public TypedEvent<FusionXxxSelectedArgs> Selected =>
-        new("selected", new FusionXxxSelectedArgs());
-}
-```
-
-Same singleton pattern. The JS event name comes from Syncfusion docs.
-
-## NI-File 5: Reactive extensions (same pattern)
-
-```csharp
-private static readonly FusionXxx Component = new();
-
-public static FusionXxxBuilder<TModel> Reactive<TModel, TArgs>(
-    this FusionXxxBuilder<TModel> builder,
-    Func<FusionXxxEvents, TypedEvent<TArgs>> eventSelector,
-    Action<TArgs, PipelineBuilder<TModel>> pipeline)
+public static FusionXxxBuilder<TModel> FusionXxx<TModel>(
+    this IHtmlHelper<TModel> html,
+    ReactivePlan<TModel> plan,
+    string elementId,
+    Action<XxxBuilder> build)
     where TModel : class
 {
-    var descriptor = eventSelector(FusionXxxEvents.Instance);
-    var pb = new PipelineBuilder<TModel>();
-    pipeline(descriptor.Args, pb);
+    var builder = html.EJS().Xxx(elementId);
+    build(builder);
 
-    var trigger = new ComponentEventTrigger(
-        builder.ElementId,
-        descriptor.JsEvent,
-        Component.Vendor,
-        builder.ElementId,        // bindingPath = elementId for non-input
-        "value");                  // readExpr placeholder (not used for non-input reads)
-
-    foreach (var reaction in pb.BuildReactions())
-        builder.Plan.AddEntry(new Entry(trigger, reaction));
-
-    return builder;
+    return new FusionXxxBuilder<TModel>(plan, elementId, builder.Render());
 }
 ```
 
-**Key difference:** The plan and elementId come from the builder (not from `builder.model.HtmlAttributes`) since non-input components use a custom wrapper builder, not the raw Syncfusion builder.
+Non-input component extensions still use `ComponentRef<TComponent, TModel>` and
+`EmitCall()` / `EmitSet()`. They do not register validation, do not participate
+in gather, and normally do not expose `Value()`.
 
-## NI-File 6: Event args (same pattern)
+## What Should Not Change
 
-```csharp
-public class FusionXxxSelectedArgs
-{
-    public int SelectedIndex { get; set; }
-    public bool IsInteracted { get; set; }
-    public FusionXxxSelectedArgs() { }
-}
-```
+Do not change these layers for a normal component onboarding:
 
-Same pattern as input components — properties become condition sources in the pipeline.
+| Layer | Why |
+|-------|-----|
+| `Alis.Reactive.Assets/runtime/execution/reactions/execute.ts` | Existing `set`, `call`, `dispatch`, `request`, `branch`, and related reaction nodes already execute component behavior. |
+| `Alis.Reactive.Assets/runtime/browser-objects/` | BrowserObject contracts centralize component/plugin property and method access. |
+| `Alis.Reactive.Assets/runtime/types/plan.ts` | Generated from the C# plan domain; component slices should use existing contract nodes. |
+| Core plan model | Add a plan concept only when the public DSL graph proves a new framework behavior, not because one Syncfusion component needs a convenience wrapper. |
 
-## Non-input component usage in views
+If a component appears to need runtime changes, stop and write down the missing
+DSL concept first. Most Syncfusion onboarding work should stay inside the
+component slice and its behavior tests.
 
-```csharp
-@(Html.FusionXxx(plan, "my-accordion", b => b
-    .DataSource(items)
-    .Reactive(evt => evt.Selected, (args, p) =>
-    {
-        p.When(args, x => x.SelectedIndex).Eq(2)
-            .Then(t => t.Element("status").SetText("Third panel selected"));
-    })))
-```
+## Behavior Proof
 
-**No `Html.InputField()` wrapper.** No label. No validation slot. The component renders directly as `IHtmlContent`.
+Each component needs focused proof at the surfaces it changes:
 
----
+| Surface | Proof |
+|---------|-------|
+| C# plan/API | Unit or snapshot test that the public extension writes the expected `ReactionGraph` and BrowserObject contract. |
+| Sandbox view | A real Razor example that uses the public API naturally. |
+| Browser behavior | Focused Playwright test through `scripts/playwright.sh --filter "..."` for the user-visible behavior. |
+
+Run `scripts/build.sh` or the narrower command from `docs/developer-cli.md`
+after C# changes. Run Playwright only when behavior, markup, runtime assets, or
+the sandbox page changed. Comment/prose-only documentation changes do not need
+Playwright.
+
+## Common Mistakes
+
+| Mistake | Correct approach |
+|---------|------------------|
+| Adding a generic shared component base because slices look similar. | Keep the vertical slice unless repeated code hides a real invariant. |
+| Registering a non-input component for gather. | Only `IInputComponent` with a real `ValueMember` belongs in input registration. |
+| Exposing every Syncfusion method. | Expose the small set that has proven framework value. |
+| Leaking Syncfusion quirks into public docs. | Encapsulate quirks in the slice; public docs should name behavior, not vendor workaround mechanics. |
+| Adding runtime branches for a component. | Use BrowserObject contracts and existing reaction nodes. |
+| Writing a helper that makes one test shorter but hides the behavior. | Prefer direct test flow unless the helper is truly reusable and intent-revealing. |
 
 **Previous:** [Plan Composition](../plan-composition/) — how multiple plans merge and compose on a single page.
