@@ -7,7 +7,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>AlisReactive</PackageId>
         <IsPackable>true</IsPackable>
-        <PackageDescription>Core reactive framework for building plan-driven browser UIs with C# fluent builders and JSON-serialized reactive plans.</PackageDescription>
+        <PackageDescription>Core reactive framework for building plan-driven browser UIs with C# fluent builders and JSON-serialized Reactive Plans.</PackageDescription>
         <PackageTags>reactive;aspnetcore;mvc;fluent-api;plan-driven</PackageTags>
     </PropertyGroup>
 

@@ -6,7 +6,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>AlisReactive.Fusion</PackageId>
         <IsPackable>true</IsPackable>
-        <PackageDescription>Syncfusion EJ2 component integration for Alis.Reactive — rich UI components through the reactive plan DSL.</PackageDescription>
+        <PackageDescription>Syncfusion EJ2 component integration for Alis.Reactive; rich UI components through the Reactive Plan DSL.</PackageDescription>
         <PackageTags>reactive;aspnetcore;syncfusion;ej2;components</PackageTags>
     </PropertyGroup>
 

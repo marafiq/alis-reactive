@@ -1,6 +1,6 @@
 ---
 title: Plans and Rendering
-description: How to create a reactive plan, add behavior to it, and render Reactive Plan JSON.
+description: How to create a Reactive Plan, add behavior to it, and render Reactive Plan JSON.
 sidebar:
   order: 1
 ---

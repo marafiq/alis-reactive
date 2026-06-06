@@ -386,7 +386,7 @@ Add one property per event. The JS event name comes from the Syncfusion API docs
 
 ## File 5: Reactive extensions (.Reactive() wiring)
 
-Thin bridge between the Syncfusion builder and the reactive plan:
+Thin bridge between the Syncfusion builder and the Reactive Plan:
 
 ```csharp
 private static readonly FusionXxx Component = new();
