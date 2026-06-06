@@ -7,12 +7,12 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Composes a custom-event dispatch payload from live sources and literals.
+    /// Composes a custom-event dispatch payload from runtime value sources and literals.
     /// Each field is set via a typed expression on <typeparamref name="TPayload"/>,
-    /// matching the shape that <see cref="Builders.TriggerBuilder{TModel}.CustomEvent{TPayload}"/>
-    /// listeners consume.
+    /// matching the event-payload contract consumed by
+    /// <see cref="Builders.TriggerBuilder{TModel}.CustomEvent{TPayload}"/> triggers.
     /// </summary>
-    /// <typeparam name="TPayload">The payload type that the listener will consume via <c>CustomEvent&lt;TPayload&gt;</c>.</typeparam>
+    /// <typeparam name="TPayload">The event-payload contract consumed by matching <c>CustomEvent&lt;TPayload&gt;</c> triggers.</typeparam>
     /// <typeparam name="TModel">The view model type providing component registrations.</typeparam>
     public class DispatchPayloadBuilder<TPayload, TModel>
         where TPayload : class
@@ -22,7 +22,7 @@ namespace Alis.Reactive.Builders
 
         internal DispatchPayloadBuilder() { }
 
-        /// <summary>Sets a payload field from a live source resolved at dispatch time.</summary>
+        /// <summary>Sets a payload field from a runtime value source resolved at dispatch time.</summary>
         /// <typeparam name="TProp">The field value type, inferred from the expression.</typeparam>
         /// <param name="field">The payload property to populate.</param>
         /// <param name="source">A component value, URL param, or plugin read that provides the runtime value.</param>
