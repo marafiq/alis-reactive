@@ -33,19 +33,24 @@ public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
         var physician = scope.AutoComplete("PhysicianName");
         await physician.TypeAndSelect("Smith", "Dr. Smith");
 
-        // Use the current month so the date picker does not need calendar navigation.
-        var now = DateTime.Now;
+        var currentCalendarPage = DateTime.Now;
         var admissionDate = scope.DatePicker("AdmissionDate");
-        await admissionDate.SelectDate(now.Year, now.Month, 15);
+        await admissionDate.SelectDate(currentCalendarPage.Year, currentCalendarPage.Month, 15);
 
         var medTime = scope.TimePicker("MedicationTime");
         await medTime.SelectTime("8:30 AM");
 
         var aptTime = scope.DateTimePicker("AppointmentTime");
-        await aptTime.Select(now.Year, now.Month, 10, "2:00 PM");
+        await aptTime.Select(currentCalendarPage.Year, currentCalendarPage.Month, 10, "2:00 PM");
 
         var stay = scope.DateRangePicker("StayPeriod");
-        await stay.SelectRange(now.Year, now.Month, 5, now.Year, now.Month, 20);
+        await stay.SelectRange(
+            currentCalendarPage.Year,
+            currentCalendarPage.Month,
+            5,
+            currentCalendarPage.Year,
+            currentCalendarPage.Month,
+            20);
 
         var insurance = scope.MultiColumnComboBox("InsuranceProvider");
         await insurance.Select("Blue Cross");

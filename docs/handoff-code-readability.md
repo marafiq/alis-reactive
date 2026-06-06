@@ -852,6 +852,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: Fusion RichTextEditor,
   InputMask, and DateTimePicker empty-branch tests now say they clear the seeded
   value in the test name, so repeated DomReady-seeding comments were removed.
+- Resolved on `tiny-safe-but-important-refactorings`: the all-components gather
+  workflow now names `currentCalendarPage` instead of commenting why the current
+  month is used for popup date selections.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
