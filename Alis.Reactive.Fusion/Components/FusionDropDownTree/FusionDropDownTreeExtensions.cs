@@ -72,13 +72,13 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(ClearMethod);
 
-        /// <summary>Reads the selected value IDs for use in conditions or gather.</summary>
+        /// <summary>Reads the selected value IDs.</summary>
         public static TypedComponentSource<string[]> Value<TModel>(
             this ComponentRef<FusionDropDownTree, TModel> self)
             where TModel : class
             => self.Read(ValueProperty);
 
-        /// <summary>Reads the display text for use in conditions or gather.</summary>
+        /// <summary>Reads the displayed selection text.</summary>
         public static TypedComponentSource<string?> Text<TModel>(
             this ComponentRef<FusionDropDownTree, TModel> self)
             where TModel : class

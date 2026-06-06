@@ -580,6 +580,10 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: Native checklist,
   dropdown, and radio-group `Value()` summaries now name the value read
   directly instead of repeating "for use in conditions or gather."
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion DropDownTree,
+  ListBox, and DateRangePicker value-read summaries now name the selected
+  value/text/date shape directly. DateRangePicker remarks still keep the
+  condition examples and no-`SetValue()` invariant.
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
   selected-value parameter docs now use the same concise selected-option wording
   as the other Native value-write helpers.
