@@ -19,7 +19,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Declares a value-returning plugin function with an open argument contract.</summary>
-        /// <typeparam name="T">The function return type.</typeparam>
+        /// <typeparam name="T">The CLR type declared as the plugin function's return shape.</typeparam>
         /// <param name="name">The host-page plugin member to call for this method.</param>
         public PluginTypeBuilder Method<T>(string name)
         {
@@ -27,7 +27,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Declares a readable plugin property.</summary>
-        /// <typeparam name="T">The property value type.</typeparam>
+        /// <typeparam name="T">The CLR type declared as the readable property shape.</typeparam>
         /// <param name="name">The host-page plugin member to read for this property.</param>
         public PluginTypeBuilder Property<T>(string name)
         {
@@ -39,7 +39,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Declares a value-returning plugin function with an exact argument contract.</summary>
-        /// <typeparam name="TReturn">The function return type.</typeparam>
+        /// <typeparam name="TReturn">The CLR type declared as the plugin function's return shape.</typeparam>
         /// <param name="name">The host-page plugin member to call for this method.</param>
         /// <param name="arguments">The ordered argument types accepted by the function.</param>
         public PluginTypeBuilder Method<TReturn>(string name, Action<PluginArgumentTypes> arguments)
@@ -50,14 +50,14 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Declares the plugin root function as returning a typed value.</summary>
-        /// <typeparam name="T">The root function return type.</typeparam>
+        /// <typeparam name="T">The CLR type declared as the plugin root function's return shape.</typeparam>
         public PluginTypeBuilder Function<T>()
         {
             return AddMethod<T>(PluginOperationId.Root(_pluginName), MethodArgumentContract.Open);
         }
 
         /// <summary>Declares the plugin root function with a return type and exact argument contract.</summary>
-        /// <typeparam name="TReturn">The root function return type.</typeparam>
+        /// <typeparam name="TReturn">The CLR type declared as the plugin root function's return shape.</typeparam>
         /// <param name="arguments">The ordered argument types accepted by the root function.</param>
         public PluginTypeBuilder Function<TReturn>(Action<PluginArgumentTypes> arguments)
         {
