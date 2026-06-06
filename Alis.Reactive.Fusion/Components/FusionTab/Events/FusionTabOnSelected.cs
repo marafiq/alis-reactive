@@ -10,10 +10,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionTabSelectedArgs
     {
-        /// <summary>The zero-based index of the newly selected tab.</summary>
+        /// <summary>Zero-based index of the newly selected tab.</summary>
         public int SelectedIndex { get; set; }
 
-        /// <summary>The zero-based index of the previously selected tab.</summary>
+        /// <summary>Zero-based index of the previously selected tab.</summary>
         public int PreviousIndex { get; set; }
 
         /// <summary>Whether the selection was triggered by a swipe gesture.</summary>

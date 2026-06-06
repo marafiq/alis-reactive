@@ -10,7 +10,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Server response data when Syncfusion's UrlAdaptor is configured; empty <c>{}</c> when no url.</summary>
         public object? Data { get; set; }
 
-        /// <summary>The value that was committed.</summary>
+        /// <summary>Committed editor value.</summary>
         public string? Value { get; set; }
 
         /// <summary>Syncfusion event token exposed as <c>args.name</c>.</summary>
