@@ -1,0 +1,1488 @@
+[
+  {
+    "componentType": "FusionAIAssistView",
+    "componentName": "AIAssistView",
+    "artifactName": "ai-assist-view",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionAIAssistView/Events/FusionAIAssistViewPromptChangedArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionAIAssistView/Events/FusionAIAssistViewPromptRequestArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionAIAssistView/Events/FusionAIAssistViewStopRespondingClickArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistView.cs",
+      "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/AIAssistView/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/AIAssistViewController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/AIAssistView/AIAssistViewModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/AIAssistView/WhenUsingFusionAIAssistView.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionAccordion",
+    "componentName": "Accordion",
+    "artifactName": "accordion",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionAccordion/Events/FusionAccordionOnExpanded.cs",
+      "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordion.cs",
+      "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Accordion/Index.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Accordion/_CareLevelsPartial.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Accordion/_ContactPartial.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Accordion/_OverviewPartial.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/AccordionController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Accordion/AccordionModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Accordion/WhenAccordionPanelExpands.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionAutoComplete",
+    "componentName": "AutoComplete",
+    "artifactName": "auto-complete",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionAutoComplete/Events/FusionAutoCompleteOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionAutoComplete/Events/FusionAutoCompleteOnFiltering.cs",
+      "Alis.Reactive.Fusion/Components/FusionAutoComplete/FusionAutoComplete.cs",
+      "Alis.Reactive.Fusion/Components/FusionAutoComplete/FusionAutoCompleteEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionAutoComplete/FusionAutoCompleteExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionAutoComplete/FusionAutoCompleteHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionAutoComplete/FusionAutoCompleteReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/AutoCompleteController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/AutoComplete/AutoCompleteModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/AutoComplete/WhenAutoCompleteFiltersRemotely.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/AutoComplete/WhenAutoCompleteSuggests.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionBreadcrumb",
+    "componentName": "Breadcrumb",
+    "artifactName": "breadcrumb",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionBreadcrumb/Events/FusionBreadcrumbOnItemClick.cs",
+      "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumb.cs",
+      "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Breadcrumb/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/BreadcrumbController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Breadcrumb/FusionBreadcrumbModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Breadcrumb/WhenUsingFusionBreadcrumb.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionBulletChart",
+    "componentName": "BulletChart",
+    "artifactName": "bullet-chart",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionBulletChart/Events/FusionBulletChartMouseClickArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionBulletChart/Events/FusionBulletChartTooltipRenderArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs",
+      "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/BulletChart/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/BulletChartController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/BulletChart/BulletChartModel.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/BulletChart/BulletChartPoint.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/BulletChart/WhenUsingFusionBulletChart.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionButton",
+    "componentName": "Button",
+    "artifactName": "button",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionButton/FusionButton.cs",
+      "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonIconPosition.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Button/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/ButtonController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Button/ButtonModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Button/WhenUsingFusionButton.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionCarousel",
+    "componentName": "Carousel",
+    "artifactName": "carousel",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionCarousel/Events/FusionCarouselOnSlideChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionCarousel/Events/FusionCarouselOnSlideChanging.cs",
+      "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarousel.cs",
+      "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Carousel/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/CarouselController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Carousel/FusionCarouselModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Carousel/WhenUsingFusionCarousel.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionCheckBox",
+    "componentName": "CheckBox",
+    "artifactName": "check-box",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionCheckBox/Events/FusionCheckBoxOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBox.cs",
+      "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/CheckBox/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/FusionCheckBoxController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/CheckBox/FusionCheckBoxModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/CheckBox/WhenUsingFusionCheckBox.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionChipList",
+    "componentName": "ChipList",
+    "artifactName": "chip-list",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionChipData.cs",
+      "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionChipItem.cs",
+      "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionChipListClickArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionChipListDeletedArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionSelectedChips.cs",
+      "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipList.cs",
+      "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ChipFilter/Index.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ChipList/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/ChipListController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/ChipList/ChipListModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/ChipList/WhenUsingFusionChipList.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionColorPicker",
+    "componentName": "ColorPicker",
+    "artifactName": "color-picker",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionColorPicker/Events/FusionColorPickerOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs",
+      "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ColorPicker/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/ColorPickerController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/ColorPicker/ColorPickerModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/ColorPicker/WhenColorPicked.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionComboBox",
+    "componentName": "ComboBox",
+    "artifactName": "combo-box",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionComboBox/Events/FusionComboBoxOnBlur.cs",
+      "Alis.Reactive.Fusion/Components/FusionComboBox/Events/FusionComboBoxOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionComboBox/Events/FusionComboBoxOnFocus.cs",
+      "Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBox.cs",
+      "Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBoxEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBoxExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBoxHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBoxReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ComboBox/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/ComboBoxController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/ComboBox/FusionComboBoxModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/ComboBox/WhenUsingFusionComboBox.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionContextMenu",
+    "componentName": "ContextMenu",
+    "artifactName": "context-menu",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuBeforeCloseArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuBeforeItemRenderArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuBeforeOpenArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuItem.cs",
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuOpenCloseArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuSelectArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenu.cs",
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ContextMenu/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/ContextMenuController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/ContextMenu/FusionContextMenuModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/ContextMenu/WhenUsingFusionContextMenu.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionDatePicker",
+    "componentName": "DatePicker",
+    "artifactName": "date-picker",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionDatePicker/Events/FusionDatePickerOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs",
+      "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionDatePicker/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/FusionDatePickerController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/FusionDatePicker/FusionDatePickerModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/DatePicker/WhenDateSelected.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionDateRangePicker",
+    "componentName": "DateRangePicker",
+    "artifactName": "date-range-picker",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionDateRangePicker/Events/FusionDateRangePickerOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs",
+      "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/DateRangePicker/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/DateRangePickerController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/DateRangePicker/DateRangePickerModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/DateRangePicker/WhenDateRangeSelected.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionDateTimePicker",
+    "componentName": "DateTimePicker",
+    "artifactName": "date-time-picker",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionDateTimePicker/Events/FusionDateTimePickerOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs",
+      "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/DateTimePicker/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/DateTimePickerController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/DateTimePicker/DateTimePickerModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/DateTimePicker/WhenDateTimeSelected.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionDialog",
+    "componentName": "Dialog",
+    "artifactName": "dialog",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionDialog/Events/FusionDialogOnBeforeClose.cs",
+      "Alis.Reactive.Fusion/Components/FusionDialog/Events/FusionDialogOnBeforeOpen.cs",
+      "Alis.Reactive.Fusion/Components/FusionDialog/Events/FusionDialogOnClosed.cs",
+      "Alis.Reactive.Fusion/Components/FusionDialog/Events/FusionDialogOnOpened.cs",
+      "Alis.Reactive.Fusion/Components/FusionDialog/Events/FusionDialogOnOverlayClick.cs",
+      "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialog.cs",
+      "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Dialog/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/DialogController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Dialog/DialogModel.cs"
+    ],
+    "playwrightTests": [],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionDropDownButton",
+    "componentName": "DropDownButton",
+    "artifactName": "drop-down-button",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionDropDownButton/Events/FusionDropDownButtonOnSelected.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButton.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/DropDownButton/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/DropDownButtonController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/DropDownButton/FusionDropDownButtonModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/DropDownButton/WhenUsingFusionDropDownButton.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionDropDownList",
+    "componentName": "DropDownList",
+    "artifactName": "drop-down-list",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionDropDownList/Events/FusionDropDownListOnBlur.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownList/Events/FusionDropDownListOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownList/Events/FusionDropDownListOnFocus.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownList.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownListEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownListExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownListHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownListReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/DropDownList/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/DropDownListController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/DropDownList/DropDownListModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/DropDownList/WhenDropdownItemSelected.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionDropDownTree",
+    "componentName": "DropDownTree",
+    "artifactName": "drop-down-tree",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionDropDownTree/Events/FusionDropDownTreeOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTree.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTreeEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTreeExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTreeHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTreeReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/DropDownTree/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/DropDownTreeController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/DropDownTree/FusionDropDownTreeModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/DropDownTree/WhenUsingFusionDropDownTree.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionFileUpload",
+    "componentName": "FileUpload",
+    "artifactName": "file-upload",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionFileUpload/Events/FusionFileUploadOnSelected.cs",
+      "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs",
+      "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FileUpload/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/FileUploadController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/FileUpload/FileUploadModel.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/FileUpload/FileUploadValidator.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/FileUpload/WhenFileUploaded.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionGrid",
+    "componentName": "Grid",
+    "artifactName": "grid",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnDataStateChange.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnEditing.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnRecordClick.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnRowSelected.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnToolbarClick.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridColumnExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridDataSourceExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditingExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridQueryExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridReactiveExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridRowDataExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridSelectionExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridSortDirection.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridTextFilterOperator.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridToolingExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ArrayGrid/Index.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/Billing.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/CareOps.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/Directory.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/Editing.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/Index.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/Operations.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/_CareOpsActionRows.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/GridController.Billing.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/GridController.CareOps.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/GridController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Grid/BillingModel.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Grid/CareOpsModel.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Grid/GridModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Grid/WhenBindingArrayToGrid.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Grid/WhenFilteringWithChips.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Grid/WhenUsingFusionGrid.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Grid/WhenUsingFusionGridBilling.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Grid/WhenUsingFusionGridCareOps.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Grid/WhenUsingFusionGridDirectory.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Grid/WhenUsingFusionGridEditing.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Grid/WhenUsingFusionGridOperations.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionInPlaceEditor",
+    "componentName": "InPlaceEditor",
+    "artifactName": "in-place-editor",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorActionBeginArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorActionSuccessArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorBeginEditArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorCancelClickArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorChangeArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorEndEditArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorSubmitClickArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs",
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Index.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_AllergiesQuickEditCard.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_CancelDemoQuickEditCard.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_CareLevelQuickEditCard.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_ControlPanelCard.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_DobQuickEditCard.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_EventTracerCard.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_LastAdmissionQuickEditCard.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_MedicalRecordNumberQuickEditCard.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_MonthlyRateQuickEditCard.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_NicknameQuickEditCard.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/FusionInPlaceEditorController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/InPlaceEditor/InPlaceEditorModel.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/InPlaceEditor/InPlaceEditorValidators.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenInPlaceEditorControlPanelExercisesApi.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenInPlaceEditorEntersEditMode.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenInPlaceEditorEventTracerFiresLifecycle.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenInPlaceEditorQuickEditBlocksOnValidationRule.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenInPlaceEditorQuickEditCancelReverts.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenInPlaceEditorQuickEditCommitsDate.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenInPlaceEditorQuickEditCommitsDropDown.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenInPlaceEditorQuickEditCommitsMaskedMrn.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenInPlaceEditorQuickEditServerErrorSurfaces.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenInPlaceEditorShowsSavedIndicator.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenResidentProfileFormGathersInPlaceEditorValues.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InPlaceEditor/WhenResidentProfileFormValidatesInPlaceEditorFields.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionInputMask",
+    "componentName": "InputMask",
+    "artifactName": "input-mask",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionInputMask/Events/FusionInputMaskOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs",
+      "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/InputMask/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/InputMaskController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/InputMask/InputMaskModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/InputMask/WhenMaskedInputEntered.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionKanban",
+    "componentName": "Kanban",
+    "artifactName": "kanban",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionKanban/Events/FusionKanbanEventArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs",
+      "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Kanban/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/KanbanController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Kanban/KanbanModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Kanban/WhenUsingFusionKanban.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionListBox",
+    "componentName": "ListBox",
+    "artifactName": "list-box",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionListBox/Events/FusionListBoxOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionListBox/FusionListBox.cs",
+      "Alis.Reactive.Fusion/Components/FusionListBox/FusionListBoxBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionListBox/FusionListBoxEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionListBox/FusionListBoxExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionListBox/FusionListBoxHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionListBox/FusionListBoxReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ListBox/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/ListBoxController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/ListBox/FusionListBoxModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/ListBox/WhenUsingFusionListBox.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionListView",
+    "componentName": "ListView",
+    "artifactName": "list-view",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionListView/Events/FusionListViewOnSelected.cs",
+      "Alis.Reactive.Fusion/Components/FusionListView/FusionListView.cs",
+      "Alis.Reactive.Fusion/Components/FusionListView/FusionListViewBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionListView/FusionListViewEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionListView/FusionListViewExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionListView/FusionListViewHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionListView/FusionListViewReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ListView/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/ListViewController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/ListView/FusionListViewModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/ListView/WhenUsingFusionListView.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionMention",
+    "componentName": "Mention",
+    "artifactName": "mention",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionMention/Events/FusionMentionChangedArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionMention/Events/FusionMentionPopupArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionMention/FusionMention.cs",
+      "Alis.Reactive.Fusion/Components/FusionMention/FusionMentionBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionMention/FusionMentionEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionMention/FusionMentionExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionMention/FusionMentionHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionMention/FusionMentionReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Mention/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/MentionController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Mention/MentionModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Mention/WhenUsingFusionMention.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionMenu",
+    "componentName": "Menu",
+    "artifactName": "menu",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuBeforeCloseArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuBeforeItemRenderArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuBeforeOpenArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuItem.cs",
+      "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuOpenCloseArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuSelectArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenu.cs",
+      "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Menu/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/MenuController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Menu/FusionMenuModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Menu/WhenUsingFusionMenu.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionMultiColumnComboBox",
+    "componentName": "MultiColumnComboBox",
+    "artifactName": "multi-column-combo-box",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/Events/FusionMultiColumnComboBoxOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/FusionMultiColumnComboBox.cs",
+      "Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/FusionMultiColumnComboBoxEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/FusionMultiColumnComboBoxExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/FusionMultiColumnComboBoxHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/FusionMultiColumnComboBoxReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/MultiColumnComboBox/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/MultiColumnComboBoxController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/MultiColumnComboBox/MultiColumnComboBoxModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/MultiColumnComboBox/WhenMultiColumnItemSelected.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionMultiSelect",
+    "componentName": "MultiSelect",
+    "artifactName": "multi-select",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionMultiSelect/Events/FusionMultiSelectOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionMultiSelect/Events/FusionMultiSelectOnFiltering.cs",
+      "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs",
+      "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/MultiSelect/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/MultiSelectController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/MultiSelect/MultiSelectModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/MultiSelect/WhenMultipleItemsSelected.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionNumericTextBox",
+    "componentName": "NumericTextBox",
+    "artifactName": "numeric-text-box",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionNumericTextBox/Events/FusionNumericTextBoxOnBlur.cs",
+      "Alis.Reactive.Fusion/Components/FusionNumericTextBox/Events/FusionNumericTextBoxOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionNumericTextBox/Events/FusionNumericTextBoxOnFocus.cs",
+      "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs",
+      "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/NumericTextBox/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/NumericTextBoxController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/NumericTextBox/NumericTextBoxModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/NumericTextBox/WhenNumericValueEntered.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionOtpInput",
+    "componentName": "OtpInput",
+    "artifactName": "otp-input",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionOtpInput/Events/FusionOtpInputOnBlur.cs",
+      "Alis.Reactive.Fusion/Components/FusionOtpInput/Events/FusionOtpInputOnFocus.cs",
+      "Alis.Reactive.Fusion/Components/FusionOtpInput/Events/FusionOtpInputOnInput.cs",
+      "Alis.Reactive.Fusion/Components/FusionOtpInput/Events/FusionOtpInputOnValueChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInput.cs",
+      "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/OtpInput/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/OtpInputController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/OtpInput/OtpInputModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/OtpInput/WhenUsingFusionOtpInput.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionPivotView",
+    "componentName": "PivotView",
+    "artifactName": "pivot-view",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionPivotView/Events/FusionPivotViewCellSelectingArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionPivotView/Events/FusionPivotViewDataBoundArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs",
+      "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/PivotView/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/PivotViewController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/PivotView/PivotViewModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/PivotView/WhenUsingFusionPivotView.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionProgressButton",
+    "componentName": "ProgressButton",
+    "artifactName": "progress-button",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionProgressButton/Events/FusionProgressButtonOnProgress.cs",
+      "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButton.cs",
+      "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/ProgressButton/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/ProgressButtonController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/ProgressButton/FusionProgressButtonModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/ProgressButton/WhenUsingFusionProgressButton.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionRadioButton",
+    "componentName": "RadioButton",
+    "artifactName": "radio-button",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionRadioButton/Events/FusionRadioButtonOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButton.cs",
+      "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/RadioButton/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/RadioButtonController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/RadioButton/FusionRadioButtonModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/RadioButton/WhenUsingFusionRadioButton.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionRating",
+    "componentName": "Rating",
+    "artifactName": "rating",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionRating/Events/FusionRatingOnValueChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionRating/FusionRating.cs",
+      "Alis.Reactive.Fusion/Components/FusionRating/FusionRatingEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionRating/FusionRatingExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionRating/FusionRatingHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionRating/FusionRatingReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Rating/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/RatingController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Rating/RatingModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Rating/WhenUsingFusionRating.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionRichTextEditor",
+    "componentName": "RichTextEditor",
+    "artifactName": "rich-text-editor",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionRichTextEditor/Events/FusionRichTextEditorOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs",
+      "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/RichTextEditor/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/RichTextEditorController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/RichTextEditor/RichTextEditorModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/RichTextEditor/WhenRichTextEdited.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionSchedule",
+    "componentName": "Schedule",
+    "artifactName": "schedule",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnActionBegin.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnActionComplete.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnCellClick.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnDataBound.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventClick.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnNavigating.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnPopupClose.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnPopupOpen.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Schedule/Index.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Schedule/_EditAssignmentForm.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Schedule/_NewAssignmentForm.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/ScheduleController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Schedule/EditAssignmentModel.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Schedule/EditAssignmentValidator.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Schedule/FakeScheduleData.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Schedule/NewAssignmentValidator.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Schedule/ScheduleModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Schedule/WhenUsingFusionSchedule.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionSidebar",
+    "componentName": "Sidebar",
+    "artifactName": "sidebar",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionSidebar/Events/FusionSidebarTransitionArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebar.cs",
+      "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Sidebar/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/SidebarController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Sidebar/FusionSidebarModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Sidebar/WhenUsingFusionSidebar.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionSlider",
+    "componentName": "Slider",
+    "artifactName": "slider",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionSlider/Events/FusionSliderOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs",
+      "Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Slider/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/SliderController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Slider/SliderModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Slider/WhenUsingFusionSlider.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionSmartPasteButton",
+    "componentName": "SmartPasteButton",
+    "artifactName": "smart-paste-button",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButton.cs",
+      "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonOptions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/SmartComponents/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/SmartComponentsController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/SmartComponents/SmartComponentsModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/SmartComponents/WhenUsingFusionSmartComponents.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionSmartTextArea",
+    "componentName": "SmartTextArea",
+    "artifactName": "smart-text-area",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionSmartTextArea/Events/FusionSmartTextAreaAfterSuggestionInsertArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionSmartTextArea/Events/FusionSmartTextAreaBeforeSuggestionInsertArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs",
+      "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaOptions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/SmartComponents/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/SmartComponentsController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/SmartComponents/SmartComponentsModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/SmartComponents/WhenUsingFusionSmartComponents.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionSplitButton",
+    "componentName": "SplitButton",
+    "artifactName": "split-button",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionSplitButton/Events/FusionSplitButtonOnClicked.cs",
+      "Alis.Reactive.Fusion/Components/FusionSplitButton/Events/FusionSplitButtonOnSelected.cs",
+      "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButton.cs",
+      "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/SplitButton/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/SplitButtonController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/SplitButton/FusionSplitButtonModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/SplitButton/WhenUsingFusionSplitButton.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionStepper",
+    "componentName": "Stepper",
+    "artifactName": "stepper",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionStepper/Events/FusionStepperChangedArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionStepper/Events/FusionStepperChangingArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionStepper/Events/FusionStepperClickArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepper.cs",
+      "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Stepper/Index.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Stepper/Wizard.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Stepper/_WizardCareStep.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Stepper/_WizardContactStep.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Stepper/_WizardIntakeStep.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Stepper/_WizardReviewStep.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/StepperController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Stepper/FusionStepperModel.cs",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Stepper/FusionStepperWizardModels.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Stepper/WhenUsingFusionStepper.cs",
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Stepper/WhenUsingFusionStepperLazyWizard.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionSwitch",
+    "componentName": "Switch",
+    "artifactName": "switch",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionSwitch/Events/FusionSwitchOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitch.cs",
+      "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitchEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitchExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitchHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitchReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Switch/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/SwitchController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Switch/SwitchModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Switch/WhenSwitchToggles.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionTab",
+    "componentName": "Tab",
+    "artifactName": "tab",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionTab/Events/FusionTabOnSelected.cs",
+      "Alis.Reactive.Fusion/Components/FusionTab/FusionTab.cs",
+      "Alis.Reactive.Fusion/Components/FusionTab/FusionTabBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionTab/FusionTabEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionTab/FusionTabExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionTab/FusionTabHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionTab/FusionTabReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Tab/Index.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Tab/_FacilitiesPartial.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Tab/_ResidentsPartial.cshtml",
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Tab/_StaffPartial.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/TabController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Tab/TabModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Tab/WhenTabSwitches.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionTextArea",
+    "componentName": "TextArea",
+    "artifactName": "text-area",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionTextArea/Events/FusionTextAreaOnBlur.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextArea/Events/FusionTextAreaOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextArea/Events/FusionTextAreaOnFocus.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextArea/Events/FusionTextAreaOnInput.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/TextArea/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/TextAreaController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/TextArea/TextAreaModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/TextArea/WhenUsingFusionTextArea.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionTextBox",
+    "componentName": "TextBox",
+    "artifactName": "text-box",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionTextBox/Events/FusionTextBoxOnBlur.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextBox/Events/FusionTextBoxOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextBox/Events/FusionTextBoxOnFocus.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextBox/Events/FusionTextBoxOnInput.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/TextBox/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/TextBoxController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/TextBox/TextBoxModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/TextBox/WhenUsingFusionTextBox.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionTimePicker",
+    "componentName": "TimePicker",
+    "artifactName": "time-picker",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionTimePicker/Events/FusionTimePickerOnChanged.cs",
+      "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs",
+      "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/TimePicker/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/TimePickerController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/TimePicker/TimePickerModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/TimePicker/WhenTimeSelected.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionToolbar",
+    "componentName": "Toolbar",
+    "artifactName": "toolbar",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionToolbar/Events/FusionToolbarClickedArgs.cs",
+      "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbar.cs",
+      "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Toolbar/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/ToolbarController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Toolbar/FusionToolbarModel.cs"
+    ],
+    "playwrightTests": [
+      "tests/Alis.Reactive.PlaywrightTests/Components/Fusion/Toolbar/WhenUsingFusionToolbar.cs"
+    ],
+    "status": "inventory-only"
+  },
+  {
+    "componentType": "FusionTooltip",
+    "componentName": "Tooltip",
+    "artifactName": "tooltip",
+    "fusionFiles": [
+      "Alis.Reactive.Fusion/Components/FusionTooltip/Events/FusionTooltipOnBeforeClose.cs",
+      "Alis.Reactive.Fusion/Components/FusionTooltip/Events/FusionTooltipOnBeforeOpen.cs",
+      "Alis.Reactive.Fusion/Components/FusionTooltip/Events/FusionTooltipOnBeforeRender.cs",
+      "Alis.Reactive.Fusion/Components/FusionTooltip/Events/FusionTooltipOnClosed.cs",
+      "Alis.Reactive.Fusion/Components/FusionTooltip/Events/FusionTooltipOnOpened.cs",
+      "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltip.cs",
+      "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipBuilder.cs",
+      "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipEvents.cs",
+      "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipHtmlExtensions.cs",
+      "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipReactiveExtensions.cs"
+    ],
+    "sandboxViews": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Tooltip/Index.cshtml"
+    ],
+    "sandboxControllers": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/Fusion/TooltipController.cs"
+    ],
+    "sandboxModels": [
+      "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Tooltip/TooltipModel.cs"
+    ],
+    "playwrightTests": [],
+    "status": "inventory-only"
+  }
+]

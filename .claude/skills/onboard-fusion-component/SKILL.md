@@ -90,6 +90,10 @@ and Playwright proof.
      - sandbox controller/model/view files
      - Playwright files under `tests/Alis.Reactive.PlaywrightTests/Components/Fusion/{Component}/`
      - existing `tools/FusionOnboarding/wwwroot/onboarding/fusion/{componentName}/`
+   - For an existing-component audit sweep, generate deterministic inventory artifacts first:
+     ```bash
+     node .claude/skills/onboard-fusion-component/scripts/inventory-fusion-components.mjs --write
+     ```
    - State whether this is new onboarding or an audit.
    - Output `discovery/source-inventory.md` and update `master-usecases-index.md`.
 
@@ -265,6 +269,7 @@ and Playwright proof.
 - `scripts/inspect-syncfusion-event-payload.mjs` - extracts event payload properties/methods from Syncfusion d.ts files.
 - `scripts/discover-syncfusion-component.mjs` - finds class package, d.ts, JS source, MVC builder, and next commands.
 - `scripts/create-fusion-probe.mjs` - creates a temporary raw HTML probe.
+- `scripts/inventory-fusion-components.mjs` - creates Stage 1 inventory artifacts for every current Fusion component audit.
 - `references/source-discovery.md` - deterministic source-finding workflow.
 - `references/blazor-metadata.md` - how to use Blazor packages as typed candidate maps without copying bridge-only behavior.
 - `references/js-object-dsl-primitive-matrix.md` - authoritative JS object to DSL primitive mapping for component members, events, event payloads, methods, arrays, and stop conditions.
