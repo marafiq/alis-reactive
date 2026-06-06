@@ -1327,8 +1327,8 @@ Reactive<T>(eventSelector, pipeline)
 
 ### FusionAIAssistView
 
-Syncfusion EJ2 AIAssistView. Non-input component; reactive behavior is exposed
-through typed methods, state reads, and events.
+Syncfusion EJ2 AIAssistView with typed prompt state reads, component methods,
+and events for Reactive Plan wiring.
 
 ### FusionAIAssistViewBuilder<T>
 

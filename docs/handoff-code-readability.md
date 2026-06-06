@@ -356,6 +356,9 @@ Candidate cleanup:
   docs now explain missing form-value/input-field behavior directly instead of
   leading with non-input component labels or `IInputComponent` implementation
   vocabulary.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionAIAssistView` XML
+  docs now name the typed prompt reads, component methods, and events instead
+  of leading with a "non-input component" category label.
 
 ### Implementation Inline Comments
 
