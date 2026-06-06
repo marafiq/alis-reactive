@@ -346,7 +346,7 @@ describe("browser object contract merging", () => {
       .toEqual(["html"]);
   });
 
-  it("scopes component and type loads to the runtime plan document", () => {
+  it("scopes component and type loads to their Active Plan document", () => {
     const appliedPlans = new AppliedPlans();
     const { wiring } = testPlanWiring();
     const rootPlanId = "Drawer.Root";
