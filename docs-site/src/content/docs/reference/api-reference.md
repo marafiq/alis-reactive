@@ -41,16 +41,16 @@ Converts lambda expressions like `x => x.Address.City` into Reactive Plan
 value paths, MVC model-binding names, or MVC element IDs.
 
 ```csharp
-ToElementId<T>(expression)
-ToElementId<T>(expression)
-ToEventPath<T>(expression)
-ToEventPath<T>(expression)
-ToPath<T>(prefix, expression)
-ToPath<T>(prefix, expression)
-ToPropertyName<T>(expression)
-ToPropertyName<T>(expression)
-ToResponsePath<T>(expression)
-ToResponsePath<T>(expression)
+ToElementId<T>(Expression<Func<TModel, object>> expression)
+ToElementId<T>(Expression<Func<TModel, TProp>> expression)
+ToEventPath<T>(Expression<Func<TPayload, object>> expression)
+ToEventPath<T>(Expression<Func<TPayload, TProp>> expression)
+ToPath<T>(string prefix, Expression<Func<TSource, object>> expression)
+ToPath<T>(string prefix, Expression<Func<TSource, TProp>> expression)
+ToPropertyName<T>(Expression<Func<TModel, object>> expression)
+ToPropertyName<T>(Expression<Func<TModel, TProp>> expression)
+ToResponsePath<T>(Expression<Func<TResponse, object>> expression)
+ToResponsePath<T>(Expression<Func<TResponse, TProp>> expression)
 ```
 
 ### IAppLevelComponent
@@ -77,8 +77,8 @@ Generates collision-free HTML element IDs from model type and property expressio
 
 ```csharp
 For(modelType, propertyPath)
-For<T>(expression)
-For<T>(expression)
+For<T>(Expression<Func<TModel, object>> expression)
+For<T>(Expression<Func<TModel, TProp>> expression)
 TypeScope(type)
 ```
 
@@ -206,9 +206,9 @@ Each field is set via a typed expression on `TPayload`,
 matching the event-payload contract consumed by typed CustomEvent triggers.
 
 ```csharp
-Set(field, value)
-Set(field, value)
-Set(field, value)
+Set(Expression<Func<TPayload, string>> field, string value)
+Set(Expression<Func<TPayload, int>> field, int value)
+Set(Expression<Func<TPayload, bool>> field, bool value)
 Set<T>(field, source)
 ```
 
@@ -224,8 +224,8 @@ SetHtml(html)
 SetHtml<T>(source, path)
 SetHtml<T>(source)
 SetText(text)
-SetText<T>(source, path)
-SetText<T>(source, path)
+SetText<T>(TPayload source, Expression<Func<TPayload, object>> path)
+SetText<T>(ResponseBody<TResponse> source, Expression<Func<TResponse, object>> path)
 SetText<T>(source)
 Show()
 ToggleClass(className)
@@ -242,7 +242,7 @@ BuildContext { get; }  // Plan build context used for component registration.
 ```
 
 ```csharp
-AddStep()
+AddStep(step)
 ```
 
 ### PipelineBuilder<T>
@@ -251,8 +251,8 @@ Builds the ordered reactions that execute when a trigger fires: element updates,
 event dispatches, HTTP calls, component interactions, and conditional logic.
 
 ```csharp
-Component<T>(expr)
-Component<T>(expr)
+Component<T>(Expression<Func<TModel, object>> expr)
+Component<T>(Expression<Func<TOtherModel, object>> expr)
 Component<T>(refId)
 Component<T>()
 Confirm(message)
@@ -384,21 +384,21 @@ are not candidates (no collision) and lambdas are captured, not invoked. Per-ele
 predicates and selectors read the element scope; chains compose as plan nodes.
 
 ```csharp
-All()
+All(predicate)
 Any()
-Any()
+Any(predicate)
 AsSource()
 Count()
-Count()
-Find()
-Find<T>()
-OrderBy<T>()
-OrderByDescending<T>()
-Select<T>()
-Sum()
-Sum()
-Sum()
-Where()
+Count(predicate)
+Find(predicate)
+Find<T>(predicate, selector)
+OrderBy<T>(key)
+OrderByDescending<T>(key)
+Select<T>(selector)
+Sum(Expression<Func<TElement, int>> selector)
+Sum(Expression<Func<TElement, decimal>> selector)
+Sum(Expression<Func<TElement, double>> selector)
+Where(predicate)
 ```
 
 ### ReactiveValue<T>
@@ -1155,10 +1155,10 @@ Kind { get; }  // JSON shape kind, such as `string`, `array`, `object`, or `null
 
 ```csharp
 Equals(other)
-Equals()
+Equals(obj)
 GetHashCode()
-op_Equality()
-op_Inequality()
+op_Equality(left, right)
+op_Inequality(left, right)
 ```
 
 ### ShowValidationErrorsReaction
@@ -1217,8 +1217,8 @@ node's own `Kind` property becomes the JSON discriminator. The single discrimina
 mechanism for every plan node family; reading is unsupported because plans are write-only.
 
 ```csharp
-Read()
-Write()
+Read(reader, typeToConvert, options)
+Write(writer, value, options)
 ```
 
 ---
@@ -1309,9 +1309,9 @@ Danger<T>()
 FusionToast()
 Hide<T>()
 Info<T>()
-SetContent<T>()
+SetContent<T>(content)
 SetTimeout<T>(ms)
-SetTitle<T>()
+SetTitle<T>(title)
 Show<T>()
 ShowCloseButton<T>()
 ShowProgressBar<T>()
@@ -1360,8 +1360,8 @@ IsExpanded { get; }  // True if the panel was expanded, false if collapsed.
 Component operation extensions for `FusionAccordion` in a reactive pipeline.
 
 ```csharp
-EnableItem<T>()
-ExpandItem<T>()
+EnableItem<T>(index, isEnable)
+ExpandItem<T>(isExpand, index)
 ```
 
 ### FusionAccordionHtmlExtensions
@@ -1493,10 +1493,10 @@ Enable<T>()
 FocusIn<T>()
 FocusOut<T>()
 HidePopup<T>()
-SetDataSource<T>()
-SetDataSource<T>()
-SetDataSource<T>()
-SetText<T>()
+SetDataSource<T>(TSource source, Expression<Func<TSource, object>> path)
+SetDataSource<T>(ResponseBody<TResponse> source, Expression<Func<TResponse, object>> path)
+SetDataSource<T>(source)
+SetText<T>(text)
 SetValue<T>(value)
 ShowPopup<T>()
 Value<T>()
@@ -1516,8 +1516,8 @@ Text { get; }  // Search text the user typed.
 Typed event-payload operations for the filtering event args of `FusionAutoComplete`.
 
 ```csharp
-PreventDefault()
-UpdateData<T>()
+PreventDefault(pipeline)
+UpdateData<T>(pipeline, source, path)
 ```
 
 ### FusionAutoCompleteHtmlExtensions
@@ -1525,9 +1525,9 @@ UpdateData<T>()
 Adds typed field mapping and rendering helpers for `FusionAutoComplete<T>`.
 
 ```csharp
-Fields<T>()
-Fields<T>()
-FusionAutoComplete<T>()
+Fields<T>(text, value)
+Fields<T>(text, value, groupBy)
+FusionAutoComplete<T>(setup, build)
 ```
 
 ### FusionAutoCompleteReactiveExtensions
@@ -1535,7 +1535,7 @@ FusionAutoComplete<T>()
 Wires `FusionAutoComplete` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionBreadcrumb
@@ -1562,7 +1562,7 @@ Reactive pipeline extensions for `FusionBreadcrumb`.
 
 ```csharp
 ActiveItem<T>()
-SetActiveItem<T>()
+SetActiveItem<T>(activeItem)
 ```
 
 ### FusionBreadcrumbHtmlExtensions
@@ -1623,7 +1623,7 @@ TooltipRender { get; }  // Fires before the tooltip renders.
 Reactive pipeline extensions for `FusionBulletChart`.
 
 ```csharp
-GetActualIndex<T>()
+GetActualIndex<T>(index, totalLength)
 ```
 
 ### FusionBulletChartHtmlExtensions
@@ -1667,7 +1667,7 @@ Value { get; }  // The actual value of the feature bar.
 Typed event-payload operations for the tooltip render event args of `FusionBulletChart`.
 
 ```csharp
-SetText()
+SetText(pipeline, text)
 ```
 
 ### FusionButton
@@ -1679,7 +1679,7 @@ A FusionButton backed by Syncfusion EJ2 Button.
 Wraps Syncfusion ButtonBuilder output while carrying the component id.
 
 ```csharp
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### FusionButtonExtensions
@@ -1694,12 +1694,12 @@ Disabled<T>()
 FocusIn<T>()
 IsPrimary<T>()
 IsToggle<T>()
-SetContent<T>()
-SetCssClass<T>()
-SetDisabled<T>()
-SetIcon<T>()
-SetPrimary<T>()
-SetToggle<T>()
+SetContent<T>(content)
+SetCssClass<T>(cssClass)
+SetDisabled<T>(disabled)
+SetIcon<T>(iconCss, position)
+SetPrimary<T>(isPrimary)
+SetToggle<T>(isToggle)
 ```
 
 ### FusionButtonHtmlExtensions
@@ -1785,7 +1785,7 @@ SlideDirection { get; }  // Slide direction: Previous or Next.
 Typed event-payload operations for the slideChanging event args of `FusionCarousel`.
 
 ```csharp
-PreventTransition()
+PreventTransition(pipeline)
 ```
 
 ### FusionCheckBox
@@ -1825,9 +1825,9 @@ Click<T>()
 Disabled<T>()
 FocusIn<T>()
 Indeterminate<T>()
-SetChecked<T>()
-SetDisabled<T>()
-SetIndeterminate<T>()
+SetChecked<T>(isChecked)
+SetDisabled<T>(disabled)
+SetIndeterminate<T>(isIndeterminate)
 ```
 
 ### FusionCheckBoxHtmlExtensions
@@ -1835,7 +1835,7 @@ SetIndeterminate<T>()
 Creates a FusionCheckBox inside a field wrapper, bound to a boolean model property.
 
 ```csharp
-FusionCheckBox<T>()
+FusionCheckBox<T>(setup, build)
 ```
 
 ### FusionCheckBoxReactiveExtensions
@@ -1843,7 +1843,7 @@ FusionCheckBox<T>()
 Wires `FusionCheckBox` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionChipItem
@@ -2040,7 +2040,7 @@ Reactive pipeline extensions for `FusionContextMenu`.
 
 ```csharp
 Close<T>()
-Open<T>()
+Open<T>(top, left)
 ```
 
 ### FusionContextMenuHtmlExtensions
@@ -2324,7 +2324,7 @@ this type scopes typed post-render behavior and event wiring.
 Wraps Syncfusion DropDownButtonBuilder output while carrying the component id.
 
 ```csharp
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### FusionDropDownButtonEvents
@@ -2345,11 +2345,11 @@ Content<T>()
 CssClass<T>()
 Disabled<T>()
 FocusIn<T>()
-RemoveItemsById<T>()
-RemoveItemsByText<T>()
-SetContent<T>()
-SetCssClass<T>()
-SetDisabled<T>()
+RemoveItemsById<T>(itemIds)
+RemoveItemsByText<T>(itemTexts)
+SetContent<T>(content)
+SetCssClass<T>(cssClass)
+SetDisabled<T>(disabled)
 Toggle<T>()
 ```
 
@@ -2358,7 +2358,7 @@ Toggle<T>()
 Creates a FusionDropDownButton with Syncfusion MVC builder-owned initial render.
 
 ```csharp
-FusionDropDownButton<T>()
+FusionDropDownButton<T>(plan, elementId, build)
 ```
 
 ### FusionDropDownButtonItem
@@ -2377,7 +2377,7 @@ Text { get; }  // Selected item's display text.
 Wires `FusionDropDownButton` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(eventSelector, pipeline)
 ```
 
 ### FusionDropDownButtonSelectArgs
@@ -2432,10 +2432,10 @@ DataBind<T>()
 FocusIn<T>()
 FocusOut<T>()
 HidePopup<T>()
-SetDataSource<T>()
-SetDataSource<T>()
-SetDataSource<T>()
-SetText<T>()
+SetDataSource<T>(TSource source, Expression<Func<TSource, object>> path)
+SetDataSource<T>(ResponseBody<TResponse> source, Expression<Func<TResponse, object>> path)
+SetDataSource<T>(source)
+SetText<T>(text)
 SetValue<T>(value)
 ShowPopup<T>()
 Value<T>()
@@ -2450,9 +2450,9 @@ Event payload delivered when a `FusionDropDownList` receives focus.
 Adds typed field mapping and rendering helpers for `FusionDropDownList<T>`.
 
 ```csharp
-Fields<T>()
-Fields<T>()
-FusionDropDownList<T>()
+Fields<T>(text, value)
+Fields<T>(text, value, groupBy)
+FusionDropDownList<T>(setup, build)
 ```
 
 ### FusionDropDownListReactiveExtensions
@@ -2460,7 +2460,7 @@ FusionDropDownList<T>()
 Wires `FusionDropDownList` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionDropDownTree
@@ -2621,10 +2621,10 @@ field is declared from a typed row expression; the editing row's current value
 binds through the Syncfusion `${field}` template token.
 
 ```csharp
-Date<T>()
-Number<T>()
-Select<T>()
-Text<T>()
+Date<T>(field, label)
+Number<T>(field, label)
+Select<T>(field, label, options)
+Text<T>(field, label)
 ```
 
 ### FusionGridEditTemplates
@@ -2633,10 +2633,10 @@ Creates typed `FusionGrid` cell editors rendered as Syncfusion
 `EditTemplate` markup.
 
 ```csharp
-DateInput<T>()
-DialogForm<T>()
-Select<T>()
-Select<T>()
+DateInput<T>(field)
+DialogForm<T>(build)
+Select<T>(field, options)
+Select<T>(field, items, text, value)
 ```
 
 ### FusionGridEvents
@@ -2665,9 +2665,9 @@ RowSelected<T>()
 Reactive pipeline extensions for `FusionGrid`.
 
 ```csharp
-AddRecord<T>()
-AddRecord<T>()
-AutoFitColumn<T>()
+AddRecord<T>(row, index)
+AddRecord<T>(source, path, index)
+AutoFitColumn<T>(field)
 AutoFitColumns<T>()
 BatchChanges<T>()
 ClearFiltering<T>()
@@ -2680,39 +2680,39 @@ CsvExport<T>()
 CurrentViewRecords<T>()
 Data<T>()
 DeleteSelectedRecord<T>()
-EditCell<T>()
+EditCell<T>(rowIndex, field)
 EndEdit<T>()
 ExcelExport<T>()
-FilterTextBy<T>()
-GoToPage<T>()
-GroupBy<T>()
-HideColumn<T>()
+FilterTextBy<T>(field, filterOperator, value)
+GoToPage<T>(pageNumber)
+GroupBy<T>(field)
+HideColumn<T>(field)
 PdfExport<T>()
 Print<T>()
 Refresh<T>()
-ReorderColumnBefore<T>()
-RowIndexByPrimaryKey<T>()
+ReorderColumnBefore<T>(fromField, beforeField)
+RowIndexByPrimaryKey<T>(primaryKey)
 SaveCell<T>()
-Search<T>()
+Search<T>(searchText)
 SelectedRecords<T>()
 SelectedRowIndexes<T>()
-SelectRow<T>()
-SelectRowsByRange<T>()
-SetCellValue<T>()
-SetCellValue<T>()
-SetDataSource<T>()
-SetDataSource<T>()
-SetDataSource<T>()
-SetDataSource<T>()
-SetRowData<T>()
-SetRowData<T>()
-ShowColumn<T>()
+SelectRow<T>(rowIndex)
+SelectRowsByRange<T>(startIndex, endIndex)
+SetCellValue<T>(int primaryKey, Expression<Func<TRow, string>> field, string value)
+SetCellValue<T>(int primaryKey, Expression<Func<TRow, int>> field, int value)
+SetDataSource<T>(ResponseBody<TResponse> source, Expression<Func<TResponse, TValue>> path)
+SetDataSource<T>(ResponseBody<TResponse> source)
+SetDataSource<T>(TSource source, Expression<Func<TSource, TValue>> path)
+SetDataSource<T>(TypedSource<TElement[]> source)
+SetRowData<T>(primaryKey, row)
+SetRowData<T>(primaryKey, source, path)
+ShowColumn<T>(field)
 ShowColumnChooser<T>()
-SortBy<T>()
+SortBy<T>(field, direction, keepExistingSorts)
 StartEdit<T>()
-UngroupBy<T>()
-UpdateRow<T>()
-UpdateRow<T>()
+UngroupBy<T>(field)
+UpdateRow<T>(rowIndex, row)
+UpdateRow<T>(rowIndex, source, path)
 ```
 
 ### FusionGridFieldValidation<T>
@@ -2721,7 +2721,7 @@ Per-field bridge from `ReactiveValidator` client metadata to an EJ2 column
 `validationRules` object, keyed by typed row field.
 
 ```csharp
-Field<T>()
+Field<T>(field)
 ```
 
 ### FusionGridHtmlExtensions
@@ -2844,7 +2844,7 @@ validation source stays single (the validator), and EJ2's own `FormValidator`
 runs the rule on cell save.
 
 ```csharp
-From<T>()
+From<T>(source)
 ```
 
 ### FusionInPlaceEditor
@@ -3074,7 +3074,7 @@ Syncfusion's KanbanBuilder; these members cover post-render reads,
 component operations, and method-return sources.
 
 ```csharp
-SetDataSource<T>()
+SetDataSource<T>(source)
 ```
 
 ### FusionKanbanHtmlExtensions
@@ -3119,13 +3119,13 @@ Reactive pipeline extensions for `FusionListBox`.
 
 ```csharp
 DataBind<T>()
-DisableValues<T>()
-EnableValues<T>()
+DisableValues<T>(values)
+EnableValues<T>(values)
 SelectAll<T>()
-SelectValues<T>()
-SetValue<T>()
+SelectValues<T>(values)
+SetValue<T>(value)
 UnselectAll<T>()
-UnselectValues<T>()
+UnselectValues<T>(values)
 Value<T>()
 ```
 
@@ -3165,9 +3165,9 @@ Reactive pipeline extensions for `FusionListView`.
 
 ```csharp
 CheckAllItems<T>()
-SelectText<T>()
+SelectText<T>(text)
 UncheckAllItems<T>()
-UnselectText<T>()
+UnselectText<T>(text)
 ```
 
 ### FusionListViewHtmlExtensions
@@ -3313,10 +3313,10 @@ DataBind<T>()
 FocusIn<T>()
 FocusOut<T>()
 HidePopup<T>()
-SetDataSource<T>()
-SetDataSource<T>()
-SetDataSource<T>()
-SetText<T>()
+SetDataSource<T>(TSource source, Expression<Func<TSource, object>> path)
+SetDataSource<T>(ResponseBody<TResponse> source, Expression<Func<TResponse, object>> path)
+SetDataSource<T>(source)
+SetText<T>(text)
 SetValue<T>(value)
 ShowPopup<T>()
 Value<T>()
@@ -3327,9 +3327,9 @@ Value<T>()
 Adds typed field mapping and rendering helpers for `FusionMultiColumnComboBox<T>`.
 
 ```csharp
-Fields<T>()
-Fields<T>()
-FusionMultiColumnComboBox<T>()
+Fields<T>(text, value)
+Fields<T>(text, value, groupBy)
+FusionMultiColumnComboBox<T>(setup, build)
 ```
 
 ### FusionMultiColumnComboBoxReactiveExtensions
@@ -3337,7 +3337,7 @@ FusionMultiColumnComboBox<T>()
 Wires `FusionMultiColumnComboBox` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionMultiSelect
@@ -3376,8 +3376,8 @@ Reactive pipeline extensions for reading from and updating `FusionMultiSelect`.
 ```csharp
 DataBind<T>()
 HidePopup<T>()
-SetDataSource<T>(source, path)
-SetDataSource<T>(source, path)
+SetDataSource<T>(TSource source, Expression<Func<TSource, object>> path)
+SetDataSource<T>(ResponseBody<TResponse> source, Expression<Func<TResponse, object>> path)
 SetDataSource<T>(source)
 SetValue<T>(value)
 ShowPopup<T>()
@@ -3464,8 +3464,8 @@ Decrement<T>()
 FocusIn<T>()
 FocusOut<T>()
 Increment<T>()
-SetMin<T>()
-SetValue<T>()
+SetMin<T>(min)
+SetValue<T>(value)
 Value<T>()
 ```
 
@@ -3478,7 +3478,7 @@ Event payload delivered when a `FusionNumericTextBox` receives focus.
 Adds rendering helpers for `FusionNumericTextBox<T>`.
 
 ```csharp
-FusionNumericTextBox<T>()
+FusionNumericTextBox<T>(setup, build)
 ```
 
 ### FusionNumericTextBoxReactiveExtensions
@@ -3486,7 +3486,7 @@ FusionNumericTextBox<T>()
 Wires `FusionNumericTextBox` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionOtpInput
@@ -3528,7 +3528,7 @@ Typed component operations and value reads for `FusionOtpInput` in a reactive pi
 ```csharp
 FocusIn<T>()
 FocusOut<T>()
-SetValue<T>()
+SetValue<T>(value)
 Value<T>()
 ```
 
@@ -3548,7 +3548,7 @@ Value { get; }  // Current OTP value.
 Adds rendering helpers for `FusionOtpInput<T>`.
 
 ```csharp
-FusionOtpInput<T>()
+FusionOtpInput<T>(setup, build)
 ```
 
 ### FusionOtpInputInputArgs
@@ -3567,7 +3567,7 @@ Value { get; }  // Current OTP value.
 Wires `FusionOtpInput` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionOtpInputValueChangedArgs
@@ -3630,7 +3630,7 @@ this type scopes typed post-render progress behavior and event wiring.
 Wraps Syncfusion ProgressButtonBuilder output while carrying the component id.
 
 ```csharp
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### FusionProgressButtonEvents
@@ -3655,12 +3655,12 @@ Disabled<T>()
 FocusIn<T>()
 ProgressComplete<T>()
 ProgressEnabled<T>()
-SetContent<T>()
-SetCssClass<T>()
-SetDisabled<T>()
-SetProgressEnabled<T>()
+SetContent<T>(content)
+SetCssClass<T>(cssClass)
+SetDisabled<T>(disabled)
+SetProgressEnabled<T>(enabled)
 Start<T>()
-StartAt<T>()
+StartAt<T>(percent)
 ```
 
 ### FusionProgressButtonHtmlExtensions
@@ -3668,7 +3668,7 @@ StartAt<T>()
 Creates a FusionProgressButton with Syncfusion MVC builder-owned initial render.
 
 ```csharp
-FusionProgressButton<T>()
+FusionProgressButton<T>(plan, elementId, build)
 ```
 
 ### FusionProgressButtonProgressArgs
@@ -3687,7 +3687,7 @@ Step { get; }  // Progress step interval.
 Wires `FusionProgressButton` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(eventSelector, pipeline)
 ```
 
 ### FusionRadioButton
@@ -3700,7 +3700,7 @@ this type scopes typed post-render behavior and event wiring.
 Wraps Syncfusion RadioButtonBuilder output while carrying the component id.
 
 ```csharp
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### FusionRadioButtonChangeArgs
@@ -3731,8 +3731,8 @@ Click<T>()
 Disabled<T>()
 FocusIn<T>()
 SelectedValue<T>()
-SetChecked<T>()
-SetDisabled<T>()
+SetChecked<T>(isChecked)
+SetDisabled<T>(disabled)
 ```
 
 ### FusionRadioButtonHtmlExtensions
@@ -3740,7 +3740,7 @@ SetDisabled<T>()
 Creates a FusionRadioButton with Syncfusion MVC builder-owned initial render.
 
 ```csharp
-FusionRadioButton<T>()
+FusionRadioButton<T>(plan, elementId, build)
 ```
 
 ### FusionRadioButtonReactiveExtensions
@@ -3748,7 +3748,7 @@ FusionRadioButton<T>()
 Wires `FusionRadioButton` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(eventSelector, pipeline)
 ```
 
 ### FusionRating
@@ -3967,19 +3967,19 @@ PopupOpen { get; }  // Fires before a popup opens. Use `Type` to distinguish `Qu
 Reactive pipeline extensions for reading from and updating `FusionSchedule`.
 
 ```csharp
-AddEvent<T>()
+AddEvent<T>(data)
 CloseEditor<T>()
 CurrentView<T>()
-DeleteEvent<T>()
+DeleteEvent<T>(eventId)
 GetEvents<T>()
-OpenEditor<T>()
+OpenEditor<T>(data, action)
 Print<T>()
 RefreshEvents<T>()
-SaveEvent<T>()
-ScrollTo<T>()
+SaveEvent<T>(data)
+ScrollTo<T>(hour)
 SelectedDate<T>()
-SetDataSource<T>()
-SetDataSource<T>()
+SetDataSource<T>(source, path)
+SetDataSource<T>(source)
 ```
 
 ### FusionScheduleHtmlExtensions
@@ -4042,7 +4042,7 @@ Type { get; }  // Popup type, for example `QuickInfo` or `Editor`.
 Typed event-payload operations for Syncfusion Schedule `popupOpen` event args.
 
 ```csharp
-PreventDefault()
+PreventDefault(pipeline)
 ```
 
 ### FusionScheduleReactiveExtensions
@@ -4202,7 +4202,7 @@ this type scopes typed post-render behavior and event wiring.
 Wraps Syncfusion SplitButtonBuilder output while carrying the component id.
 
 ```csharp
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### FusionSplitButtonClickArgs
@@ -4229,11 +4229,11 @@ Content<T>()
 CssClass<T>()
 Disabled<T>()
 FocusIn<T>()
-RemoveItemsById<T>()
-RemoveItemsByText<T>()
-SetContent<T>()
-SetCssClass<T>()
-SetDisabled<T>()
+RemoveItemsById<T>(itemIds)
+RemoveItemsByText<T>(itemTexts)
+SetContent<T>(content)
+SetCssClass<T>(cssClass)
+SetDisabled<T>(disabled)
 Toggle<T>()
 ```
 
@@ -4242,7 +4242,7 @@ Toggle<T>()
 Creates a FusionSplitButton with Syncfusion MVC builder-owned initial render.
 
 ```csharp
-FusionSplitButton<T>()
+FusionSplitButton<T>(plan, elementId, build)
 ```
 
 ### FusionSplitButtonItem
@@ -4261,7 +4261,7 @@ Text { get; }  // Selected item's display text.
 Wires `FusionSplitButton` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(eventSelector, pipeline)
 ```
 
 ### FusionSplitButtonSelectArgs
@@ -4310,7 +4310,7 @@ PreviousStep { get; }  // The index of the previous step.
 Typed event-payload operations for the stepChanging event args of `FusionStepper`.
 
 ```csharp
-PreventDefault()
+PreventDefault(pipeline)
 ```
 
 ### FusionStepperClickArgs
@@ -4344,7 +4344,7 @@ NextStep<T>()
 PreviousStep<T>()
 RefreshProgressbar<T>()
 Reset<T>()
-SetActiveStep<T>()
+SetActiveStep<T>(activeStep)
 ```
 
 ### FusionStepperHtmlExtensions
@@ -4392,7 +4392,7 @@ Changed { get; }  // Fires when the switch state changes.
 Typed component operations and value reads for `FusionSwitch` in a reactive pipeline.
 
 ```csharp
-SetChecked<T>()
+SetChecked<T>(isChecked)
 Value<T>()
 ```
 
@@ -4401,7 +4401,7 @@ Value<T>()
 Adds rendering helpers for `FusionSwitch<T>`.
 
 ```csharp
-FusionSwitch<T>()
+FusionSwitch<T>(setup, build)
 ```
 
 ### FusionSwitchReactiveExtensions
@@ -4409,7 +4409,7 @@ FusionSwitch<T>()
 Wires `FusionSwitch` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionTab
@@ -4436,9 +4436,9 @@ Selected { get; }  // Fires when a tab is selected.
 Component operation extensions for `FusionTab` in a reactive pipeline.
 
 ```csharp
-HideTab<T>()
-Select<T>()
-SetSelectedItem<T>()
+HideTab<T>(index, isHidden)
+Select<T>(index)
+SetSelectedItem<T>(index)
 ```
 
 ### FusionTabHtmlExtensions
@@ -4539,7 +4539,7 @@ Value { get; }  // Current text value.
 Adds rendering helpers for `FusionTextArea<T>`.
 
 ```csharp
-FusionTextArea<T>()
+FusionTextArea<T>(setup, build)
 ```
 
 ### FusionTextAreaInputArgs
@@ -4557,7 +4557,7 @@ Value { get; }  // Current text value.
 Wires `FusionTextArea` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionTextBox
@@ -4627,7 +4627,7 @@ Value { get; }  // Current text value.
 Adds rendering helpers for `FusionTextBox<T>`.
 
 ```csharp
-FusionTextBox<T>()
+FusionTextBox<T>(setup, build)
 ```
 
 ### FusionTextBoxInputArgs
@@ -4645,7 +4645,7 @@ Value { get; }  // Current text value.
 Wires `FusionTextBox` events into the Reactive Plan.
 
 ```csharp
-Reactive<T>()
+Reactive<T>(plan, eventSelector, pipeline)
 ```
 
 ### FusionTimePicker
@@ -4735,7 +4735,7 @@ Clicked { get; }  // Fires when a toolbar item is clicked.
 Reactive pipeline extensions for `FusionToolbar`.
 
 ```csharp
-Disable<T>()
+Disable<T>(value)
 ```
 
 ### FusionToolbarHtmlExtensions
@@ -5001,7 +5001,7 @@ Builds the anchor element returned by `NativeActionLink`.
 ```csharp
 Attr(name, value)
 CssClass(css)
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### NativeActionLinkHtmlExtensions
@@ -5023,7 +5023,7 @@ Configures and renders a native HTML `<button>` element with an explicit ID.
 ```csharp
 CssClass(css)
 Type(type)
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### NativeButtonClickArgs
@@ -5079,7 +5079,7 @@ Configures and renders a native HTML `<input type="checkbox">` bound to a model 
 
 ```csharp
 CssClass(css)
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### NativeCheckBoxChangeArgs
@@ -5146,7 +5146,7 @@ Option(value)
 Option(value, text)
 Option(value, text, description)
 OptionCssClass(css)
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### NativeCheckListChangeArgs
@@ -5212,7 +5212,7 @@ CssClass(css)
 Enabled(enabled)
 Items(items)
 Placeholder(optionLabel)
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### NativeDropDownChangeArgs
@@ -5273,7 +5273,7 @@ ValueMember { get; }
 Renders a native HTML `<input type="hidden">` bound to a model property.
 
 ```csharp
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### NativeHiddenFieldChangeArgs
@@ -5341,7 +5341,7 @@ Option(value)
 Option(value, text)
 Option(value, text, description)
 OptionCssClass(css)
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### NativeRadioGroupChangeArgs
@@ -5406,7 +5406,7 @@ Configures and renders a native HTML `<textarea>` element bound to a model prope
 CssClass(css)
 Placeholder(placeholder)
 Rows(rows)
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### NativeTextAreaChangeArgs
@@ -5470,7 +5470,7 @@ Configures and renders a native HTML `<input>` element bound to a model property
 CssClass(css)
 Placeholder(placeholder)
 Type(type)
-WriteTo()
+WriteTo(writer, encoder)
 ```
 
 ### NativeTextBoxChangeArgs

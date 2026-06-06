@@ -198,6 +198,12 @@ Candidate cleanup:
   prose no longer preserves XML indentation from source comments. Two Fusion
   summaries that previously relied on manual indentation now use inline
   `<c>...</c>` examples so generated docs stay readable.
+- Resolved on `tiny-safe-but-important-refactorings`: the API reference
+  generator now falls back to compiled parameter names when XML docs omit
+  parameter tags, and uses simplified reflected parameter types only when
+  duplicate overload signatures would otherwise be ambiguous. This removes
+  repeated empty method calls across core, Fusion, and Native generated API
+  sections without adding boilerplate XML comment noise.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
 

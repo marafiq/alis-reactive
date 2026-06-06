@@ -39,7 +39,12 @@ foreach (var input in docInputs)
         var name = member.Attribute("name")?.Value;
         if (string.IsNullOrEmpty(name)) continue;
 
-        allMembers.Add(new DocMember(name, assemblyName, member));
+        allMembers.Add(new DocMember(
+            name,
+            assemblyName,
+            member,
+            publicSurface.ParameterNames(name),
+            publicSurface.ParameterTypes(name)));
     }
 }
 
@@ -283,7 +288,7 @@ static IEnumerable<string> DisplayMethods(IReadOnlyList<DocMember> methods)
         .Select(group => group.Key)
         .ToHashSet(StringComparer.Ordinal);
 
-    return methods.Select(method => duplicateSignatures.Contains(method.DisplaySignature) && method.CanDisplaySimpleParameterTypes
+    return methods.Select(method => duplicateSignatures.Contains(method.DisplaySignature) && method.CanDisplayParameterTypes
         ? method.DisplaySignatureWithParameterTypes
         : method.DisplaySignature);
 }
@@ -303,16 +308,16 @@ record ApiDocInput(string XmlFile, string AssemblyFile);
 
 sealed class PublicSurface
 {
-    private readonly HashSet<string> _memberIds;
+    private readonly Dictionary<string, PublicMemberMetadata> _members;
 
-    private PublicSurface(HashSet<string> memberIds)
+    private PublicSurface(Dictionary<string, PublicMemberMetadata> members)
     {
-        _memberIds = memberIds;
+        _members = members;
     }
 
     public static PublicSurface Load(IEnumerable<ApiDocInput> inputs)
     {
-        var memberIds = new HashSet<string>(StringComparer.Ordinal);
+        var members = new Dictionary<string, PublicMemberMetadata>(StringComparer.Ordinal);
 
         foreach (var input in inputs)
         {
@@ -323,15 +328,25 @@ sealed class PublicSurface
             var assembly = Assembly.LoadFrom(input.AssemblyFile);
             foreach (var type in GetLoadableTypes(assembly).Where(IsVisibleType))
             {
-                memberIds.Add("T:" + type.FullName);
-                AddVisibleMembers(memberIds, type);
+                members["T:" + type.FullName] = PublicMemberMetadata.None;
+                AddVisibleMembers(members, type);
             }
         }
 
-        return new PublicSurface(memberIds);
+        return new PublicSurface(members);
     }
 
-    public bool Contains(DocMember member) => _memberIds.Contains(member.RawName);
+    public bool Contains(DocMember member) => _members.ContainsKey(member.RawName);
+
+    public IReadOnlyList<string> ParameterNames(string memberId) =>
+        _members.TryGetValue(memberId, out var metadata)
+            ? metadata.ParameterNames
+            : Array.Empty<string>();
+
+    public IReadOnlyList<string> ParameterTypes(string memberId) =>
+        _members.TryGetValue(memberId, out var metadata)
+            ? metadata.ParameterTypes
+            : Array.Empty<string>();
 
     private static void RegisterAssemblyResolver(string assemblyFile)
     {
@@ -413,7 +428,7 @@ sealed class PublicSurface
     private static bool IsVisibleType(Type type) =>
         type.IsVisible;
 
-    private static void AddVisibleMembers(HashSet<string> memberIds, Type type)
+    private static void AddVisibleMembers(Dictionary<string, PublicMemberMetadata> members, Type type)
     {
         const BindingFlags flags =
             BindingFlags.Instance |
@@ -423,19 +438,31 @@ sealed class PublicSurface
             BindingFlags.DeclaredOnly;
 
         foreach (var constructor in type.GetConstructors(flags).Where(IsVisibleMethod))
-            memberIds.Add(MethodId(type, constructor));
+            AddMethod(members, type, constructor);
 
         foreach (var method in type.GetMethods(flags).Where(IsVisibleMethod))
-            memberIds.Add(MethodId(type, method));
+            AddMethod(members, type, method);
 
         foreach (var property in type.GetProperties(flags).Where(IsVisibleProperty))
-            memberIds.Add("P:" + type.FullName + "." + property.Name);
+            members["P:" + type.FullName + "." + property.Name] = PublicMemberMetadata.None;
 
         foreach (var field in type.GetFields(flags).Where(IsVisibleField))
-            memberIds.Add("F:" + type.FullName + "." + field.Name);
+            members["F:" + type.FullName + "." + field.Name] = PublicMemberMetadata.None;
 
         foreach (var eventInfo in type.GetEvents(flags).Where(IsVisibleEvent))
-            memberIds.Add("E:" + type.FullName + "." + eventInfo.Name);
+            members["E:" + type.FullName + "." + eventInfo.Name] = PublicMemberMetadata.None;
+    }
+
+    private static void AddMethod(Dictionary<string, PublicMemberMetadata> members, Type type, MethodBase method)
+    {
+        var parameters = method.GetParameters();
+        var parameterNames = parameters
+            .Select(parameter => parameter.Name ?? "?")
+            .ToArray();
+        var parameterTypes = parameters
+            .Select(parameter => DisplayParameterType(parameter.ParameterType))
+            .ToArray();
+        members[MethodId(type, method)] = new PublicMemberMetadata(parameterNames, parameterTypes);
     }
 
     private static bool IsVisibleMethod(MethodBase method) =>
@@ -490,9 +517,66 @@ sealed class PublicSurface
 
         return genericDefinitionName + "{" + string.Join(",", type.GetGenericArguments().Select(TypeId)) + "}";
     }
+
+    private static string DisplayParameterType(Type type)
+    {
+        if (type.IsByRef)
+            return DisplayParameterType(type.GetElementType()!) + "&";
+
+        if (type.IsArray)
+            return DisplayParameterType(type.GetElementType()!) + "[]";
+
+        if (type.IsGenericParameter)
+            return type.Name;
+
+        if (!type.IsGenericType)
+            return SimplifyKnownType(type) ?? StripNamespace(type.FullName ?? type.Name);
+
+        var genericDefinitionName = type.GetGenericTypeDefinition().FullName ?? type.Name;
+        var genericMarker = genericDefinitionName.IndexOf('`');
+        if (genericMarker >= 0)
+            genericDefinitionName = genericDefinitionName[..genericMarker];
+
+        return StripNamespace(genericDefinitionName) +
+            "<" + string.Join(", ", type.GetGenericArguments().Select(DisplayParameterType)) + ">";
+    }
+
+    private static string? SimplifyKnownType(Type type) =>
+        type.FullName switch
+        {
+            "System.String" => "string",
+            "System.Int32" => "int",
+            "System.Int64" => "long",
+            "System.Boolean" => "bool",
+            "System.Decimal" => "decimal",
+            "System.Double" => "double",
+            "System.DateTime" => "DateTime",
+            "System.Object" => "object",
+            _ => null,
+        };
+
+    private static string StripNamespace(string name)
+    {
+        var nestedTypeMarker = name.LastIndexOf('+');
+        if (nestedTypeMarker >= 0)
+            name = name[(nestedTypeMarker + 1)..];
+
+        var lastDot = name.LastIndexOf('.');
+        return lastDot >= 0 ? name[(lastDot + 1)..] : name;
+    }
 }
 
-record DocMember(string RawName, string Assembly, XElement Element)
+record PublicMemberMetadata(IReadOnlyList<string> ParameterNames, IReadOnlyList<string> ParameterTypes)
+{
+    public static PublicMemberMetadata None { get; } = new(Array.Empty<string>(), Array.Empty<string>());
+}
+
+record DocMember(
+    string RawName,
+    string Assembly,
+    XElement Element,
+    IReadOnlyList<string> ReflectedParameterNames,
+    IReadOnlyList<string> ReflectedParameterTypes)
 {
     public MemberKind Kind => RawName[0] switch
     {
@@ -567,8 +651,7 @@ record DocMember(string RawName, string Assembly, XElement Element)
 
             if (Kind == MemberKind.Method)
             {
-                var paramElements = DisplayParameterElements();
-                var paramList = string.Join(", ", paramElements.Select(p => p.Attribute("name")?.Value ?? "?"));
+                var paramList = string.Join(", ", DisplayParameterNames());
                 return $"{MemberName}({paramList})";
             }
 
@@ -583,12 +666,11 @@ record DocMember(string RawName, string Assembly, XElement Element)
             if (Kind != MemberKind.Method)
                 return DisplaySignature;
 
-            var paramElements = DisplayParameterElements();
-            var parameterTypes = DisplaySimpleParameterTypes();
-            var parameters = paramElements
-                .Select((parameter, index) =>
+            var parameterNames = DisplayParameterNames();
+            var parameterTypes = DisplayParameterTypes();
+            var parameters = parameterNames
+                .Select((name, index) =>
                 {
-                    var name = parameter.Attribute("name")?.Value ?? "?";
                     return index < parameterTypes.Count
                         ? $"{parameterTypes[index]} {name}"
                         : name;
@@ -598,19 +680,32 @@ record DocMember(string RawName, string Assembly, XElement Element)
         }
     }
 
-    public bool CanDisplaySimpleParameterTypes =>
-        DisplaySimpleParameterTypes().Count == DisplayParameterElements().Count;
+    public bool CanDisplayParameterTypes =>
+        DisplayParameterTypes().Count == DisplayParameterNames().Count;
 
-    private List<XElement> DisplayParameterElements()
+    private List<string> DisplayParameterNames()
     {
-        var paramElements = Element.Elements("param").ToList();
-        if (!IsExtensionContainer() || paramElements.Count == 0)
-            return paramElements;
+        var parameterNames = ParameterNames();
+        if (!IsExtensionContainer() || parameterNames.Count == 0)
+            return parameterNames;
 
-        var firstParamName = paramElements[0].Attribute("name")?.Value;
+        var firstParamName = parameterNames[0];
         return IsExtensionReceiverName(firstParamName)
-            ? paramElements.Skip(1).ToList()
-            : paramElements;
+            ? parameterNames.Skip(1).ToList()
+            : parameterNames;
+    }
+
+    private List<string> ParameterNames()
+    {
+        var xmlNames = Element.Elements("param")
+            .Select(parameter => parameter.Attribute("name")?.Value)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name!)
+            .ToList();
+
+        return xmlNames.Count > 0 || ReflectedParameterNames.Count == 0
+            ? xmlNames
+            : ReflectedParameterNames.ToList();
     }
 
     private List<string> DisplaySimpleParameterTypes()
@@ -619,12 +714,30 @@ record DocMember(string RawName, string Assembly, XElement Element)
         if (!IsExtensionContainer() || parameterTypes.Count == 0)
             return SimplifySimpleParameterTypes(parameterTypes);
 
-        var firstParamName = Element.Elements("param").FirstOrDefault()?.Attribute("name")?.Value;
+        var firstParamName = ParameterNames().FirstOrDefault();
         parameterTypes = IsExtensionReceiverName(firstParamName)
             ? parameterTypes.Skip(1).ToList()
             : parameterTypes;
 
         return SimplifySimpleParameterTypes(parameterTypes);
+    }
+
+    private List<string> DisplayParameterTypes()
+    {
+        if (ReflectedParameterTypes.Count > 0)
+        {
+            var parameterTypes = ReflectedParameterTypes.ToList();
+            if (IsExtensionContainer() &&
+                parameterTypes.Count > 0 &&
+                IsExtensionReceiverName(ReflectedParameterNames.FirstOrDefault()))
+            {
+                parameterTypes = parameterTypes.Skip(1).ToList();
+            }
+
+            return parameterTypes;
+        }
+
+        return DisplaySimpleParameterTypes();
     }
 
     private static List<string> SimplifySimpleParameterTypes(IEnumerable<string> parameterTypes)
