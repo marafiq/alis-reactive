@@ -45,7 +45,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
         /// <param name="payload">Trigger payload placeholder.</param>
         /// <param name="path">Payload value compared at runtime.</param>
-        /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> And<TPayload, TProp>(
             TPayload payload, Expression<Func<TPayload, TProp>> path)
         {
@@ -59,7 +58,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <typeparam name="TProp">Selected response-body value type.</typeparam>
         /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
-        /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> And<TResponse, TProp>(
             ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
             where TResponse : class
@@ -74,7 +72,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
         /// <param name="payload">Trigger payload placeholder.</param>
         /// <param name="path">Payload value compared at runtime.</param>
-        /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> Or<TPayload, TProp>(
             TPayload payload, Expression<Func<TPayload, TProp>> path)
         {
@@ -88,7 +85,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <typeparam name="TProp">Selected response-body value type.</typeparam>
         /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
-        /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> Or<TResponse, TProp>(
             ResponseBody<TResponse> responseBody, Expression<Func<TResponse, TProp>> path)
             where TResponse : class
@@ -101,7 +97,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>Adds an all-of comparison against a typed value source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
-        /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> And<TProp>(TypedSource<TProp> source)
         {
             return new ConditionSourceBuilder<TModel, TProp>(
@@ -111,7 +106,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>Adds an any-of comparison against a typed value source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
-        /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> Or<TProp>(TypedSource<TProp> source)
         {
             return new ConditionSourceBuilder<TModel, TProp>(
@@ -120,7 +114,6 @@ namespace Alis.Reactive.Builders.Conditions
 
         /// <summary>Composes this guard with a grouped all-of condition.</summary>
         /// <param name="inner">Builds the grouped condition to compose with this guard.</param>
-        /// <returns>A guard containing the composed condition.</returns>
         public GuardBuilder<TModel> And(
             Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
         {
@@ -133,7 +126,6 @@ namespace Alis.Reactive.Builders.Conditions
 
         /// <summary>Composes this guard with a grouped any-of condition.</summary>
         /// <param name="inner">Builds the grouped condition to compose with this guard.</param>
-        /// <returns>A guard containing the composed condition.</returns>
         public GuardBuilder<TModel> Or(
             Func<ConditionStart<TModel>, GuardBuilder<TModel>> inner)
         {
@@ -145,7 +137,6 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         /// <summary>Negates the current condition.</summary>
-        /// <returns>A new guard with the negated condition.</returns>
         public GuardBuilder<TModel> Not()
         {
             return WrapCondition(PlanModel.ConditionGraph.Not(ConditionGraph));
@@ -153,7 +144,6 @@ namespace Alis.Reactive.Builders.Conditions
 
         /// <summary>Starts the branch that runs when this guard matches.</summary>
         /// <param name="pipeline">Builds the reactions for the matching branch.</param>
-        /// <returns>A branch builder for optional <c>ElseIf</c> and <c>Else</c> cases.</returns>
         public BranchBuilder<TModel> Then(Action<PipelineBuilder<TModel>> pipeline)
         {
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));

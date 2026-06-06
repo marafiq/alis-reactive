@@ -625,6 +625,10 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: condition XML parameter
   tags now use concise array-item and user-decision confirmation wording. The
   public summaries still keep the condition and runtime-boundary intent.
+- Resolved on `tiny-safe-but-important-refactorings`: Core condition
+  `GuardBuilder`, `BranchBuilder`, and `ConditionStart` no longer repeat fluent
+  builder return mechanics in `<returns>` tags. Summaries, parameter docs, and
+  method return types still expose the public DSL contract.
 - Resolved on `tiny-safe-but-important-refactorings`: text and source-vs-source
   condition operator parameter tags now drop repeated leading articles while
   keeping source-value and runtime-read wording.

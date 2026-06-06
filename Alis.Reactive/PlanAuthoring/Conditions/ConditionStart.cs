@@ -17,7 +17,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
         /// <param name="payload">Trigger payload placeholder.</param>
         /// <param name="path">Payload value compared at runtime.</param>
-        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
@@ -31,7 +30,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <typeparam name="TProp">Selected response-body value type.</typeparam>
         /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
-        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TResponse, TProp>(
             ResponseBody<TResponse> responseBody,
             Expression<Func<TResponse, TProp>> path)
@@ -44,7 +42,6 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>Starts a nested condition from a typed value source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
-        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
             return new ConditionSourceBuilder<TModel, TProp>(source);
@@ -52,7 +49,6 @@ namespace Alis.Reactive.Builders.Conditions
 
         /// <summary>Creates a user-decision guard for a nested condition expression.</summary>
         /// <param name="message">User-decision confirmation message.</param>
-        /// <returns>A guard that can be composed with surrounding condition terms.</returns>
         public GuardBuilder<TModel> Confirm(string message)
         {
             return new GuardBuilder<TModel>(ConditionGraph.Confirm(message));
