@@ -25,8 +25,8 @@ namespace Alis.Reactive
         /// <summary>
         /// Generates an element ID from a model expression using an untyped <c>object?</c> lambda.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
-        /// <param name="expression">The model property expression (e.g. <c>m =&gt; m.Address.City</c>).</param>
+        /// <typeparam name="TModel">View model that owns the property path.</typeparam>
+        /// <param name="expression">Model property expression, for example <c>m =&gt; m.Address.City</c>.</param>
         /// <returns>A scoped element ID like <c>Namespace_Model__Address_City</c>.</returns>
         public static string For<TModel>(Expression<Func<TModel, object?>> expression)
         {
@@ -38,9 +38,9 @@ namespace Alis.Reactive
         /// <summary>
         /// Generates an element ID from a typed model expression, avoiding boxing for value types.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the property path.</typeparam>
-        /// <typeparam name="TProp">The property type, preserving type safety for value types.</typeparam>
-        /// <param name="expression">The model property expression (e.g. <c>m =&gt; m.FacilityId</c>).</param>
+        /// <typeparam name="TModel">View model that owns the property path.</typeparam>
+        /// <typeparam name="TProp">Property type, preserving type safety for value types.</typeparam>
+        /// <param name="expression">Model property expression, for example <c>m =&gt; m.FacilityId</c>.</param>
         /// <returns>A scoped element ID like <c>Namespace_Model__FacilityId</c>.</returns>
         public static string For<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
         {
@@ -56,8 +56,8 @@ namespace Alis.Reactive
         /// Matches the format of <see cref="For{TModel, TProp}"/>: <c>{Scope}__{PropertyPath}</c>.
         /// Dots in the property path become underscores, matching the <c>Html.IdFor</c> convention.
         /// </remarks>
-        /// <param name="modelType">The model type used to derive the scope prefix.</param>
-        /// <param name="propertyPath">The dot-separated property path (e.g. <c>"Address.City"</c>).</param>
+        /// <param name="modelType">Model type used to derive the scope prefix.</param>
+        /// <param name="propertyPath">Dot-separated property path, for example <c>"Address.City"</c>.</param>
         /// <returns>A scoped element ID like <c>Namespace_Model__Address_City</c>.</returns>
         public static string For(Type modelType, string propertyPath)
         {
@@ -72,7 +72,7 @@ namespace Alis.Reactive
         /// Dots and plus signs become underscores:
         /// <c>Alis.Reactive.Models.OrderModel</c> becomes <c>Alis_Reactive_Models_OrderModel</c>.
         /// </remarks>
-        /// <param name="type">The type whose full name provides the scope.</param>
+        /// <param name="type">Type whose full name provides the scope.</param>
         /// <returns>An HTML-safe scope string with dots and plus signs replaced by underscores.</returns>
         public static string TypeScope(Type type)
         {

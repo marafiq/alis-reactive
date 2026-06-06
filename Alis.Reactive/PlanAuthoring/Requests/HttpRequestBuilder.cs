@@ -90,8 +90,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Runs client validation for the target container before sending the request.</summary>
-        /// <typeparam name="TValidationSource">The source type whose metadata declares the client validation rules.</typeparam>
-        /// <param name="formId">The DOM element ID of the form container for error display.</param>
+        /// <typeparam name="TValidationSource">Source type whose metadata declares the client validation rules.</typeparam>
+        /// <param name="formId">DOM element ID of the form container for error display.</param>
         public HttpRequestBuilder<TModel> Validate<TValidationSource>(string formId)
             where TValidationSource : class
         {

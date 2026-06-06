@@ -17,8 +17,8 @@ namespace Alis.Reactive.Builders.Requests
         /// The model expression supplies both the generated component ID and the request
         /// body field name. The component contract supplies the value member read at runtime.
         /// </remarks>
-        /// <typeparam name="TComponent">The input component contract to read.</typeparam>
-        /// <param name="expr">The model property expression for the component ID and body field.</param>
+        /// <typeparam name="TComponent">Input component contract to read.</typeparam>
+        /// <param name="expr">Model property expression for the component ID and body field.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
             Expression<Func<TModel, object>> expr)
@@ -40,8 +40,8 @@ namespace Alis.Reactive.Builders.Requests
         /// Input components read their configured value member. Components without an
         /// input-value contract read the member named by <paramref name="name"/>.
         /// </remarks>
-        /// <typeparam name="TComponent">The component contract to read.</typeparam>
-        /// <param name="refId">The explicit controlled component ID rendered in markup.</param>
+        /// <typeparam name="TComponent">Component contract to read.</typeparam>
+        /// <param name="refId">Explicit controlled component ID rendered in markup.</param>
         /// <param name="name">Request body field; for non-input components, also the member read.</param>
         public static GatherBuilder<TModel> Include<TComponent, TModel>(
             this GatherBuilder<TModel> self,
@@ -76,7 +76,7 @@ namespace Alis.Reactive.Builders.Requests
         /// Adds a typed component member read to an explicit request body field.
         /// </summary>
         /// <param name="source">Component property or method source evaluated before the request is sent.</param>
-        /// <param name="paramName">The request body field that receives the component member value.</param>
+        /// <param name="paramName">Request body field that receives the component member value.</param>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
             this GatherBuilder<TModel> self,
             TypedComponentSource<TProp> source,

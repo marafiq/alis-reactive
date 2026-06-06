@@ -12,7 +12,7 @@ namespace Alis.Reactive.Builders.Arrays
     /// are not candidates (no collision) and lambdas are captured, not invoked. Per-element
     /// predicates and selectors read the element scope; chains compose as plan nodes.
     /// </summary>
-    /// <typeparam name="TElement">The element type, carried through transforms.</typeparam>
+    /// <typeparam name="TElement">Element type carried through transforms.</typeparam>
     public sealed class ReactiveArray<TElement>
     {
         private readonly ValueExpression _source;

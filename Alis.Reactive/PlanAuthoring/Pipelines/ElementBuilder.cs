@@ -14,7 +14,7 @@ namespace Alis.Reactive.Builders
     /// the parent <see cref="PipelineBuilder{TModel}"/>; typed-source overloads keep
     /// the element builder active for additional element updates.
     /// </remarks>
-    /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
+    /// <typeparam name="TModel">View model used to author typed expression paths.</typeparam>
     public class ElementBuilder<TModel> where TModel : class
     {
         private readonly PipelineBuilder<TModel> _pipeline;

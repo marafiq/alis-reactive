@@ -569,6 +569,11 @@ Candidate cleanup:
   tags now use concise view-model, property, and Reactive Plan wording. The
   `net48` `NameFor`, component-slot ownership, and render-plan boundary comments
   remain because they prevent real integration mistakes.
+- Resolved on `tiny-safe-but-important-refactorings`: final core XML tags in
+  `IdGenerator`, `ReactiveArray`, `GatherExtensions`, `HttpRequestBuilder`, and
+  `ElementBuilder` now use concise property-path, array-transform, component-read,
+  validation metadata, and typed-expression wording while preserving runtime and
+  repeated-form invariants.
 
 ### Implementation Inline Comments
 
