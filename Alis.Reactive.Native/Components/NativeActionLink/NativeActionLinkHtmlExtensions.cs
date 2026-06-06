@@ -25,8 +25,6 @@ namespace Alis.Reactive.Native.Components
         /// @Html.NativeActionLink("Delete", "/residents/42/delete", p =&gt; p.Post("/residents/42/delete"))
         /// </code>
         /// </remarks>
-        /// <typeparam name="TModel">The view model type for the Razor view.</typeparam>
-        /// <param name="html">The Razor HTML helper.</param>
         /// <param name="linkText">The text rendered inside the anchor.</param>
         /// <param name="url">The anchor href and the URL expected by the single request in <paramref name="pipeline"/>.</param>
         /// <param name="pipeline">The click pipeline. It must emit exactly one request and cannot use validation, parallel requests, or chained requests.</param>

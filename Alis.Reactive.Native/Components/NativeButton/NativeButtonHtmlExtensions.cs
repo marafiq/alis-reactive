@@ -14,7 +14,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Creates a native button builder with the element ID used by Reactive Plan event wiring.
         /// </summary>
-        /// <param name="html">The Razor HTML helper.</param>
         /// <param name="elementId">The element ID rendered on the button and used for component lookup.</param>
         /// <param name="text">The button text content.</param>
         /// <returns>A builder that renders the button directly in the view.</returns>

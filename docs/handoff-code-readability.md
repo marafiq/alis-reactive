@@ -228,6 +228,10 @@ Candidate cleanup:
   docs no longer repeat generic `TModel` ownership or the Razor HTML helper
   receiver. Bound value types, field wrappers, Reactive Plan, controlled IDs,
   and Syncfusion builder callbacks remain documented.
+- Resolved on `tiny-safe-but-important-refactorings`: Native render-factory XML
+  docs no longer repeat Razor HTML helper or generic model boilerplate where the
+  summaries already name the rendered element, action-link browser boundary, or
+  returned builder behavior.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
 
