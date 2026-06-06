@@ -267,7 +267,7 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Appends the configured plugin command as a reaction in the current pipeline.</summary>
+        /// <summary>Appends the configured plugin command as a plugin-call reaction in the current pipeline.</summary>
         public void Fire()
         {
             _emitter.AddStep(ReactionGraph.Call(

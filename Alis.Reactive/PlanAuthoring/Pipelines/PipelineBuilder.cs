@@ -233,10 +233,10 @@ namespace Alis.Reactive.Builders
             return new Conditions.TypedPluginPropertySource<T>(property.PropertyId);
         }
 
-        /// <summary>Emits a command reaction against a named member on a plan-registered plugin.</summary>
+        /// <summary>Emits a plugin-call reaction against a named member on a plan-registered plugin.</summary>
         /// <param name="pluginName">The registered plugin key.</param>
         /// <param name="member">The command member invoked on the host-provided plugin object.</param>
-        /// <returns>A command builder for supplying arguments before emitting the plugin call with <c>Fire()</c>.</returns>
+        /// <returns>A plugin-call builder for supplying arguments before <c>Fire()</c> appends the reaction.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -249,9 +249,9 @@ namespace Alis.Reactive.Builders
                 signature.Arguments);
         }
 
-        /// <summary>Emits a command reaction against a plan-registered plugin object that is itself callable.</summary>
+        /// <summary>Emits a plugin-call reaction against a plan-registered plugin object that is itself callable.</summary>
         /// <param name="pluginName">The registered plugin key.</param>
-        /// <returns>A command builder for supplying root-command arguments before emitting the call with <c>Fire()</c>.</returns>
+        /// <returns>A plugin-call builder for supplying root-command arguments before <c>Fire()</c> appends the reaction.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName)
         {
             if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
@@ -263,9 +263,9 @@ namespace Alis.Reactive.Builders
                 signature.Arguments);
         }
 
-        /// <summary>Emits a command reaction from a reusable plugin command descriptor.</summary>
+        /// <summary>Emits a plugin-call reaction from a reusable plugin command descriptor.</summary>
         /// <param name="command">The descriptor carrying the plugin key, target member, and argument contract.</param>
-        /// <returns>A command builder for supplying arguments before emitting the plugin call with <c>Fire()</c>.</returns>
+        /// <returns>A plugin-call builder for supplying arguments before <c>Fire()</c> appends the reaction.</returns>
         public PluginCallBuilder<TModel> Plugin(PluginCommand command)
         {
             if (command == null) throw new System.ArgumentNullException(nameof(command));
