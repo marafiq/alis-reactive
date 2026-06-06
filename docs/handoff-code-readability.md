@@ -249,6 +249,10 @@ Candidate cleanup:
   helper XML docs no longer repeat the extension `args` receiver or describe
   pipeline parameters as only "current builder." The remaining parameter docs
   name the event-arg mutation added to the Reactive Plan.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionConditionalBuilder`
+  fluent XML docs no longer repeat "The current conditional builder" on every
+  append method. Parameter docs and raw `onclick`/HTML trust boundary remarks
+  remain because they carry the template authoring contract.
 
 ### Implementation Inline Comments
 

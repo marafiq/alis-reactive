@@ -22,7 +22,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="property">The template model property to bind.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property) =>
             Span(property, TemplateCss.None);
 
@@ -32,7 +31,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="property">The template model property to bind.</param>
         /// <param name="css">The CSS class to emit on the <c>span</c>.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, string css) =>
             Span(property, TemplateCss.Class(css));
 
@@ -46,7 +44,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// Adds a <c>span</c> with literal text.
         /// </summary>
         /// <param name="text">The literal text to emit inside the <c>span</c>.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Span(string text) =>
             Span(text, TemplateCss.None);
 
@@ -55,7 +52,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         /// <param name="text">The literal text to emit inside the <c>span</c>.</param>
         /// <param name="css">The CSS class to emit on the <c>span</c>.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Span(string text, string css) =>
             Span(text, TemplateCss.Class(css));
 
@@ -71,7 +67,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="property">The template model property to bind.</param>
         /// <param name="css">The CSS class to emit on the badge.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Badge<TProperty>(Expression<Func<TModel, TProperty>> property, string css = "e-badge")
         {
             _childRenderers.Add(() => TemplateElements.Badge(FusionTemplateExpression.ToBinding(property), css));
@@ -83,7 +78,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         /// <param name="text">The literal text to emit inside the badge.</param>
         /// <param name="css">The CSS class to emit on the badge.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Badge(string text, string css = "e-badge")
         {
             _childRenderers.Add(() => TemplateElements.Badge(text, css));
@@ -94,7 +88,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// Adds a Syncfusion icon <c>span</c>.
         /// </summary>
         /// <param name="iconName">The Syncfusion icon class name.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Icon(string iconName) =>
             Icon(iconName, TemplateCss.None);
 
@@ -103,7 +96,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         /// <param name="iconName">The Syncfusion icon class name.</param>
         /// <param name="css">The CSS class to append to the icon <c>span</c>.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Icon(string iconName, string css) =>
             Icon(iconName, TemplateCss.Class(css));
 
@@ -117,7 +109,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// Adds a nested template <c>div</c> over the same Syncfusion model context.
         /// </summary>
         /// <param name="configure">Configures the nested template content.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Div(Action<FusionTemplateBuilder<TModel>> configure)
         {
             var nestedTemplate = new FusionTemplateBuilder<TModel>();
@@ -131,7 +122,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty) =>
             Img(srcProperty, TemplateCss.None);
 
@@ -141,7 +131,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <typeparam name="TProperty">The selected property type.</typeparam>
         /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
         /// <param name="css">The CSS class to emit on the <c>img</c>.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css) =>
             Img(srcProperty, TemplateCss.Class(css));
 
@@ -160,7 +149,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <param name="text">The literal button text.</param>
         /// <param name="onClick">The raw <c>onclick</c> expression to emit.</param>
         /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Button(string text, string onClick) =>
             Button(text, onClick, TemplateCss.None);
 
@@ -171,7 +159,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <param name="onClick">The raw <c>onclick</c> expression to emit.</param>
         /// <param name="css">The CSS class to emit on the button.</param>
         /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Button(string text, string onClick, string css) =>
             Button(text, onClick, TemplateCss.Class(css));
 
@@ -188,7 +175,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <param name="text">The literal button text.</param>
         /// <param name="eventName">The DOM event name to dispatch.</param>
         /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> EventButton<TProperty>(
             string text,
             string eventName,
@@ -203,7 +189,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// <param name="eventName">The DOM event name to dispatch.</param>
         /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
         /// <param name="css">The CSS class to emit on the button.</param>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> EventButton<TProperty>(
             string text,
             string eventName,
@@ -226,7 +211,6 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         /// <param name="html">The raw HTML to emit.</param>
         /// <remarks>The <paramref name="html"/> value is emitted without escaping; do not pass untrusted input.</remarks>
-        /// <returns>The current conditional builder.</returns>
         public FusionConditionalBuilder<TModel> Raw(string html)
         {
             _childRenderers.Add(() => html);
