@@ -2,13 +2,7 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DateTimePicker;
 
-/// <summary>
-/// Exercises FusionDateTimePicker property writes, value reads, changed-event conditions,
-/// and component-read conditions for medication schedule times.
-/// </summary>
-/// <remarks>
-/// DateTimePickerLocator uses calendar and time popup gestures so Syncfusion updates <c>ej2.value</c>.
-/// </remarks>
+// DateTimePickerLocator uses calendar and time popup gestures so Syncfusion updates ej2.value.
 [TestFixture]
 public class WhenDateTimeSelected : PlaywrightTestBase
 {

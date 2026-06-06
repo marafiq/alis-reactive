@@ -2,13 +2,7 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DatePicker;
 
-/// <summary>
-/// Exercises FusionDatePicker property writes, value reads, changed-event conditions,
-/// and component-read conditions for resident admission and discharge dates.
-/// </summary>
-/// <remarks>
-/// DatePickerLocator uses calendar popup gestures so Syncfusion updates <c>ej2.value</c>.
-/// </remarks>
+// DatePickerLocator uses calendar popup gestures so Syncfusion updates ej2.value.
 [TestFixture]
 public class WhenDateSelected : PlaywrightTestBase
 {

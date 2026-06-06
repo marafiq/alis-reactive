@@ -2,13 +2,8 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TimePicker;
 
-/// <summary>
-/// Proves <c>FusionTimePicker</c> property writes, reads, events, conditions, and gather behavior.
-/// </summary>
-/// <remarks>
-/// Syncfusion renders the visible input inside the wrapper that receives the generated component ID;
-/// <c>TimePickerLocator</c> is used when popup gestures are part of the behavior under test.
-/// </remarks>
+// Syncfusion renders the visible input inside the wrapper that receives the generated component ID.
+// TimePickerLocator is used when popup gestures are part of the behavior under test.
 [TestFixture]
 public class WhenTimeSelected : PlaywrightTestBase
 {

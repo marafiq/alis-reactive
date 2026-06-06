@@ -2,13 +2,7 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InputMask;
 
-/// <summary>
-/// Exercises FusionInputMask property writes, value reads, changed-event conditions,
-/// and component-read conditions for phone numbers, SSNs, and insurance IDs.
-/// </summary>
-/// <remarks>
-/// InputMaskLocator fills and blurs so Syncfusion commits the masked value and raises <c>change</c>.
-/// </remarks>
+// InputMaskLocator fills and blurs so Syncfusion commits the masked value and raises change.
 [TestFixture]
 public class WhenMaskedInputEntered : PlaywrightTestBase
 {
