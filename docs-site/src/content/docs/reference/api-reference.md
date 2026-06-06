@@ -2710,7 +2710,7 @@ Typed event descriptors for the `FusionDropDownTree` component.
 
 ```csharp
 // Properties
-Changed { get; }  // Fires when the selected value changes.
+Changed { get; }  // Fires when the selected value ID array changes.
 ```
 
 ### FusionDropDownTreeExtensions
