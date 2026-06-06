@@ -14,7 +14,7 @@ namespace Alis.Reactive
         /// <summary>Component-object event name written into the Reactive Plan.</summary>
         public string ObjectEvent { get; }
 
-        /// <summary>Typed payload placeholder used to author event-argument reads.</summary>
+        /// <summary>Typed payload placeholder used to author event-payload reads.</summary>
         public TArgs Args { get; }
 
         internal TypedEvent(string jsEvent, TArgs args)
