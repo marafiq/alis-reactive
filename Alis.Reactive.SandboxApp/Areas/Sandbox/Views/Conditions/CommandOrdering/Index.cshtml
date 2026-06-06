@@ -4,7 +4,7 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.CommandOrdering
 @{
-    ViewData["Title"] = "Command Ordering Around Conditions";
+    ViewData["Title"] = "Reaction Ordering Around Conditions";
 
     var plan = Html.ReactivePlan<CommandOrderingModel>();
 
@@ -19,7 +19,7 @@
 }
 
 <native-vstack gap="Base" class="p-6">
-    <h1 class="text-xl font-bold text-text">Command Ordering Around Conditions</h1>
+    <h1 class="text-xl font-bold text-text">Reaction Ordering Around Conditions</h1>
 
     <native-hstack gap="Sm">
         @(Html.NativeButton("btn-high", "Trigger with level=high")

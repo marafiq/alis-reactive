@@ -22,7 +22,7 @@
         <p class="text-sm text-text-secondary mb-4">
             Select a care level. The protocol dropdown auto-populates based on the selection:
             Memory Care → "Enhanced Monitoring", Skilled Nursing → "Full Clinical",
-            anything else → cleared. Commands before/after always run.
+            anything else → cleared. Reactions before/after always run.
         </p>
         <native-grid cols="C2" gap="Base" class="mb-4">
             @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))

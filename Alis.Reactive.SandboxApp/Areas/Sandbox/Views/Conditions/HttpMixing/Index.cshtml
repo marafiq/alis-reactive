@@ -347,8 +347,7 @@
         <native-text color="Secondary">
             Exercises pipeline mode fix: conditions compose freely with HTTP blocks in both
             trigger-driven and real component <code>.Reactive()</code> flows.
-            Each section mirrors a unit test scenario from WhenMixingConditionsWithHttp,
-            WhenMixingCommandsAndConditions, and WhenUsingConditionsInsideResponseHandlers.
+            Each section mirrors condition, reaction-ordering, and response-handler test scenarios.
         </native-text>
     </div>
 
@@ -398,7 +397,7 @@
     <native-card>
     <native-card-body>
         <native-heading level="H2">3. Full interleaving</native-heading>
-        <p class="text-sm text-text-secondary mb-3">Commands &rarr; Condition &rarr; Commands &rarr; HTTP &rarr; Condition &rarr; Commands.</p>
+        <p class="text-sm text-text-secondary mb-3">Reactions &rarr; Condition &rarr; Reactions &rarr; HTTP &rarr; Condition &rarr; Reactions.</p>
         <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s3-btn-all-true", "active=true, count=3")
                 .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
@@ -551,7 +550,7 @@
     <native-card-body>
         <native-heading level="H2">12. Ordered mixed modules around HTTP</native-heading>
         <p class="text-sm text-text-secondary mb-3">
-            Branch, HTTP, dispatch, plugin source, element commands, and a second branch run in declaration order.
+            Branch, HTTP, dispatch, plugin source, element reactions, and a second branch run in declaration order.
         </p>
         <native-hstack gap="Sm" class="mb-3">
             @(Html.NativeButton("s12-btn-run", "run ordered mix")
@@ -623,10 +622,10 @@
 
     <native-card>
     <native-card-body>
-        <native-heading level="H2">9. Reactive input with HTTP between shared commands and an outer condition</native-heading>
+        <native-heading level="H2">9. Reactive input with HTTP between shared reactions and an outer condition</native-heading>
         <p class="text-sm text-text-secondary mb-3">
             Type a resident name, blur the field, and the real component <code>.Reactive()</code> path will run:
-            pre-command &rarr; POST echo &rarr; outer <code>When/Then/Else</code> &rarr; tail command.
+            pre-reaction &rarr; POST echo &rarr; outer <code>When/Then/Else</code> &rarr; tail reaction.
         </p>
         <native-grid cols="C2" gap="Base" class="mb-3">
             @{
@@ -663,7 +662,7 @@
         <native-heading level="H2">10. Reactive input with condition inside OnSuccess</native-heading>
         <p class="text-sm text-text-secondary mb-3">
             Type a follow-up label and blur. The component change posts to the server, then
-            <code>OnSuccess</code> runs shared commands around an inner <code>When/Then/Else</code>.
+            <code>OnSuccess</code> runs shared reactions around an inner <code>When/Then/Else</code>.
         </p>
         <native-grid cols="C2" gap="Base" class="mb-3">
             @{

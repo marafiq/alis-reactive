@@ -396,8 +396,8 @@
         <native-hstack gap="None" justify="Between" class="text-xs font-mono"><span class="text-text-secondary">Result</span><span id="confirm-result">&mdash;</span></native-hstack>
     </native-card-body></native-card>
     <native-card><native-card-body>
-        <native-heading level="H2">Single-Command Condition — When/Then</native-heading>
-        <p class="text-xs text-text-secondary mb-3">Unconditional command runs first &bull; guarded command executes when Score &ge; 90</p>
+        <native-heading level="H2">Single-Reaction Condition — When/Then</native-heading>
+        <p class="text-xs text-text-secondary mb-3">Unguarded reaction runs first &bull; guarded reaction executes when Score &ge; 90</p>
         <native-hstack gap="Sm" class="mb-4">
             @DispatchButton("btn-single-command-condition-high", "95", "check-single-command-condition", new ScorePayload { Score = 95, Status = "" }, "px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
             @DispatchButton("btn-single-command-condition-low", "50", "check-single-command-condition", new ScorePayload { Score = 50, Status = "" }, "px-3 py-1.5 rounded bg-rose-600 text-white text-xs font-medium")
