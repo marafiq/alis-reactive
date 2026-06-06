@@ -330,6 +330,10 @@ Candidate cleanup:
   longer public API surface. It has only internal construction and internal
   members, and is now kept out of generated public API docs as an implementation
   boundary between DSL builders and Reactive Plan domain state.
+- Resolved on `tiny-safe-but-important-refactorings`: `IReactionEmitter`
+  remains public because component event helper methods accept it, but its XML
+  docs now describe the event-helper append contract instead of exposing
+  implementation vocabulary such as `ComponentRef`.
 
 ### Implementation Inline Comments
 

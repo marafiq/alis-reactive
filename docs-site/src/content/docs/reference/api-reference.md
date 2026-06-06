@@ -233,8 +233,7 @@ ToggleClass(className)
 
 ### IReactionEmitter
 
-Narrow interface for emitting reactions into a pipeline.
-Used by vendor-specific extensions (Fusion, Native) and ComponentRef.
+Pipeline append handle passed to component event-args helper methods.
 
 ```csharp
 AddStep(step)

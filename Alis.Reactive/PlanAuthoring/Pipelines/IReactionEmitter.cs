@@ -3,12 +3,17 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Narrow interface for emitting reactions into a pipeline.
-    /// Used by vendor-specific extensions (Fusion, Native) and ComponentRef.
+    /// Pipeline append handle passed to component event-args helper methods.
     /// </summary>
+    /// <remarks>
+    /// Component packages use this to append event-argument mutations, such as
+    /// canceling a vendor event or feeding server-filtered data back into a popup,
+    /// to the current Reactive Plan pipeline.
+    /// </remarks>
     public interface IReactionEmitter
     {
-        /// <summary>Adds a reaction step to the current pipeline.</summary>
+        /// <summary>Appends a low-level reaction emitted by a component event helper.</summary>
+        /// <param name="step">Reaction graph node appended to the current pipeline.</param>
         void AddStep(ReactionGraph step);
         /// <summary>Plan build context used for component registration.</summary>
         internal PlanBuildContext BuildContext { get; }
