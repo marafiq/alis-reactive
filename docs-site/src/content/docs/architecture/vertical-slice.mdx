@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-Every component in Reactive is a **vertical slice** — a self-contained set of files that owns everything about that component: its type metadata, events, mutations, builder, and view integration. No shared base classes for behavior. No cross-slice dependencies.
+Every component in Reactive is a **vertical slice** — a self-contained set of files that owns everything about that component: its type metadata, events, component reactions, builder, and view integration. No shared base classes for behavior. No cross-slice dependencies.
 
 ## The 7-file pattern
 
@@ -17,7 +17,7 @@ NativeTextBox/
 ├── NativeTextBoxEvents.cs            event registry — Changed, Focus, Blur
 ├── Events/
 │   └── NativeTextBoxOnChanged.cs     event args — { string? Value }
-├── NativeTextBoxExtensions.cs        mutation extensions — SetValue, FocusIn, Value
+├── NativeTextBoxExtensions.cs        component reaction extensions — SetValue, FocusIn, Value
 ├── NativeTextBoxReactiveExtensions.cs .Reactive() wiring
 ├── NativeTextBoxBuilder.cs           renders HTML, config methods (Placeholder, Type, CssClass)
 └── NativeTextBoxHtmlExtensions.cs    Html.InputField().NativeTextBox() factory
@@ -88,13 +88,13 @@ A singleton class with `TypedEvent<TArgs>` properties. The `.Reactive()` lambda 
 
 A class with properties like `Value : string?`, `Checked : bool?`, `IsInteracted : bool`. The compiler enforces which properties exist on `args` inside the `.Reactive()` lambda. Filtering args may also have extension methods (`PreventDefault`, `UpdateData`).
 
-### 4. Mutation extensions — what you can do in the pipeline
+### 4. Component reaction extensions — what you can do in the pipeline
 
-Static extension methods on `ComponentRef<TComponent, TModel>`. Each method creates a structured `Mutation` (SetPropMutation or CallMutation) and calls `ref.Emit()` to add it to the pipeline. `.Value()` returns a `TypedComponentSource<TProp>` for conditions.
+Static extension methods on `ComponentRef<TComponent, TModel>`. Each method emits a `SetReaction` or `CallReaction` through `EmitSet()` or `EmitCall()`. `.Value()` returns a `TypedComponentSource<TProp>` for conditions.
 
 ### 5. Reactive extensions — wiring events to pipelines
 
-A static extension method on the builder that takes `plan`, an event selector, and a pipeline lambda. Creates a `ComponentEventTrigger` with the component's vendor, jsEvent, and bindingPath, then adds the entry to the plan.
+A static extension method on the builder that takes `plan`, an event selector, and a pipeline lambda. Creates a component-event `StartsWhen` node, then adds a `Behavior` to the plan.
 
 ### 6. Builder — renders HTML and accepts configuration
 

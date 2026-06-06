@@ -29,7 +29,7 @@ layer3: "JS Runtime\nExecutes intent" {
   style.font-size: 20
 }
 
-layer1 -> layer2: plan.Render() {
+layer1 -> layer2: Html.RenderPlan(plan) {
   style.font-size: 16
   style.stroke: "#4285f4"
 }
@@ -41,21 +41,21 @@ layer2 -> layer3: boot {
 
 ## Layer 1 — C# Fluent Builders
 
-The developer writes fluent C# in `.cshtml` views. Every call builds a plan model — a data structure that captures what must happen. Nothing executes. The builders are the API surface: triggers, mutations, conditions, HTTP, components.
+The developer writes fluent C# in `.cshtml` views. Every call builds a plan model — a data structure that captures what must happen. Nothing executes. The builders are the API surface: triggers, element changes, component calls, conditions, HTTP, and components.
 
 The compiler checks model bindings, event arg types, and response types at build time. Rename a property → compiler error.
 
 ## Layer 2 — JSON Plan
 
-`plan.Render()` serializes all plan models to JSON. This JSON is the **Reactive Plan contract** — the only thing that crosses from C# authoring to the JS runtime. The C# side never executes behavior. The JS side never invents behavior. Both agree on the plan's shape.
+`Html.RenderPlan(plan)` serializes all plan models to JSON. This JSON is the **Reactive Plan contract** — the only thing that crosses from C# authoring to the JS runtime. The C# side never executes behavior. The JS side never invents behavior. Both agree on the plan's shape.
 
 The plan is emitted as a `<script type="application/json">` element in the page. It is inert data until the runtime reads it.
 
 ## Layer 3 — JS Runtime
 
-An ESM module loaded once via `_Layout.cshtml`. On page load, it discovers all plan elements, parses them, and executes the described behavior. The runtime is a **plan interpreter** — it reads structured commands and applies them via bracket notation on DOM elements and component instances.
+An ESM module loaded once via `_Layout.cshtml`. On page load, it discovers all plan elements, parses them, and executes the described behavior. The runtime is a **Reactive Plan interpreter** — it reads structured reactions and applies them through BrowserObject contracts, DOM boundaries, HTTP, validation, and partial slots.
 
-The runtime does not know what a "checkbox" is or what "cascading dropdowns" means. It knows how to set a property, call a method, attach a listener, and make an HTTP request. The plan tells it which ones.
+The runtime does not know what a "checkbox" is or what "cascading dropdowns" means. It knows how to set a property, call a method, attach a listener, inject a partial, and make an HTTP request. The Reactive Plan tells it which ones.
 
 ## How a user action flows through all three layers
 
@@ -70,7 +70,7 @@ write: "Developer writes C#\npipeline.Element('section').Show()" {
   style.stroke: "#4285f4"
   style.font-size: 18
 }
-serialize: "plan.Render() serializes to JSON\n{ kind: 'mutate-element', target: 'section' }" {
+serialize: "Html.RenderPlan(plan) serializes to JSON\n{ kind: 'set', property: 'hidden' }" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
@@ -175,10 +175,10 @@ Every feature follows the same three-layer pattern:
 
 | Feature | C# captures | Plan carries | Runtime executes |
 |---------|------------|-------------|-----------------|
-| Events | `.Reactive(evt => evt.Changed)` | trigger + reaction | wires listener, runs commands |
-| Mutations | `pipeline.Element("id").Show()` | target + mutation | bracket notation on DOM |
-| Components | `pipeline.Component<T>(m => m.Prop)` | vendor + readExpr | resolves root, reads/writes |
-| Conditions | `pipeline.When(...).Eq(val)` | guard + branches | evaluates, picks branch |
+| Events | `.Reactive(evt => evt.Changed)` | `startsWhen` + `reaction` | wires listener, runs reaction |
+| Element changes | `pipeline.Element("id").Show()` | `set` / `call` reaction | applies the BrowserObject member |
+| Components | `pipeline.Component<T>(m => m.Prop)` | component object contract + reaction | resolves root, reads/writes |
+| Conditions | `pipeline.When(...).Eq(val)` | branch cases | evaluates, picks branch |
 | HTTP | `pipeline.Post(url).Gather(...)` | request + handlers | fetches, routes response |
 
 One idea, five features, zero JavaScript in your views.
@@ -195,4 +195,4 @@ One idea, five features, zero JavaScript in your views.
 
 - [Fluent Builders](../fluent-builders/) — how plan models, builders, and the plan compose
 - [The JSON Plan Contract](../the-contract/) — what the serialized plan looks like
-- [Runtime](../runtime/) — how the runtime boots and executes commands
+- [Runtime](../runtime/) — how the runtime boots and executes reactions

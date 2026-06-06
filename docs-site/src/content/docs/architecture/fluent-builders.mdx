@@ -16,13 +16,13 @@ call: "Developer writes\nfluent C# in .cshtml" {
   style.stroke: "#4285f4"
   style.font-size: 18
 }
-descriptor: "Plan models created\nTrigger, Reaction,\nCommand, Mutation" {
+descriptor: "Plan models created\nStartsWhen + ReactionGraph" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 18
 }
-plan: "Plan collects\nEntries + ComponentsMap" {
+plan: "Plan collects\nBehaviors + components" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
@@ -48,7 +48,7 @@ plan -> json: serializes {
 
 ## The boundary rule
 
-The C# side builds plan models. It never touches the DOM, never calls `fetch`, never evaluates conditions. The JS side reads the plan and executes it. It never creates new commands, never extends the generated contract, never invents behavior.
+The C# side builds plan models. It never touches the DOM, never calls `fetch`, never evaluates conditions. The JS side reads the plan and executes it. It never creates new reaction kinds, never extends the generated contract, never invents behavior.
 
 If a feature can't be expressed as a plan model, it doesn't exist in the framework. The plan is the only contract.
 
@@ -61,6 +61,6 @@ This also means the C# API is compile-time checked. Rename a model property → 
 ## What's inside
 
 - [**The Builders**](../the-builders/) — TriggerBuilder, PipelineBuilder, ElementBuilder, ComponentRef — the type-safe chain that narrows context at every step
-- [**Plan Model & Plan**](../descriptors-and-plan/) — Entry, Trigger, Reaction, Command, Mutation — the plan model hierarchy and how the plan serializes them
+- [**Plan Model & Plan**](../descriptors-and-plan/) — Behavior, StartsWhen, ReactionGraph, ValueExpression, RequestPlan — the plan model hierarchy and how the plan serializes them
 - [**The JSON Plan Contract**](../the-contract/) — what the serialized plan actually looks like — paired C#/JSON examples
 - [**The Vertical Slice**](../vertical-slice/) — the 7-file pattern for adding a component with zero runtime changes

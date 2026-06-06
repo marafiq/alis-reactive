@@ -56,7 +56,7 @@ compref -> pipeline: returns pipeline {
 
 ## TriggerBuilder — what fires the pipeline
 
-`Html.On(plan, t => ...)` gives you a `TriggerBuilder`. Each method takes a pipeline lambda and adds an `Entry` (trigger + reaction) to the plan.
+`Html.On(plan, t => ...)` gives you a `TriggerBuilder`. Each method takes a pipeline lambda and adds a `Behavior` (`startsWhen` + `reaction`) to the plan.
 
 | Method | Trigger created | Lambda receives |
 |--------|----------------|-----------------|
@@ -73,26 +73,26 @@ TriggerBuilder returns itself — you can chain multiple triggers in one `Html.O
 
 ## PipelineBuilder — the composition core
 
-The pipeline accumulates commands. It operates in one of four modes, determined by the first structural call:
+The pipeline accumulates `ReactionGraph` nodes. It operates in one of four modes, determined by the first structural call:
 
 | Mode | Activated by | What it builds |
 |------|-------------|---------------|
-| Sequential | `Element()`, `Dispatch()`, `Component()` | `SequentialReaction` |
-| Conditional | `When()`, `Confirm()` | `ConditionalReaction` |
-| HTTP | `Get()`, `Post()`, `Put()`, `Delete()` | `HttpReaction` |
-| Parallel | `Parallel()` | `ParallelHttpReaction` |
+| Sequential | `Element()`, `Dispatch()`, `Component()` | `SequenceReaction` |
+| Conditional | `When()`, `Confirm()` | `BranchReaction` |
+| HTTP | `Get()`, `Post()`, `Put()`, `Delete()` | `RequestReaction` |
+| Parallel | `Parallel()` | `ParallelReaction` |
 
 Once a mode is set, mixing modes throws at build time — you can't call `When()` after `Post()` in the same pipeline. Each `↻` (Then, OnSuccess, WhileLoading) creates a **new** PipelineBuilder for that scope, so modes don't conflict across nesting levels.
 
-## ElementBuilder — DOM element mutations
+## ElementBuilder — DOM element reactions
 
-`pipeline.Element("id")` creates an `ElementBuilder`. Every method on it adds a `MutateElementCommand` to the pipeline's command list, then returns either the pipeline (for terminal calls like `SetText("x")`) or the builder itself for additional element mutations. For conditional execution, use `pipeline.When(...).Then(t => t.Element("id").Show())`.
+`pipeline.Element("id")` creates an `ElementBuilder`. Each method adds a `SetReaction` or `CallReaction` to the pipeline. Literal and payload overloads return the pipeline; typed-source overloads keep the element builder active for additional element changes. For conditional execution, use `pipeline.When(...).Then(t => t.Element("id").Show())`.
 
 The builder is internal — devs can't construct it directly. It exists only as the return of `pipeline.Element()`.
 
-## ComponentRef — type-constrained mutations
+## ComponentRef — type-constrained reactions
 
-`pipeline.Component<T>(m => m.Prop)` creates a `ComponentRef<T, TModel>`. It caches a static instance of `T` to read `Vendor` and `ReadExpr` — resolved once, reused for every command.
+`pipeline.Component<T>(m => m.Prop)` creates a `ComponentRef<T, TModel>`. It caches a static instance of `T` to read `Vendor` and `ReadExpr` — resolved once, reused for every component reaction.
 
 Extension methods on `ComponentRef` are constrained by `T`. A `ComponentRef<FusionDropDownList>` has `SetValue(string?)`, `DataBind()`, `ShowPopup()`. A `ComponentRef<NativeCheckBox>` has `SetChecked(bool)`. The compiler enforces this — you can't call `ShowPopup()` on a checkbox.
 
@@ -105,13 +105,13 @@ ref: "ComponentRef<FusionDropDownList>\ncaches Vendor='fusion'\ncaches ReadExpr=
   style.stroke: "#4285f4"
   style.font-size: 18
 }
-ext: "Extension method\n.SetValue('US')\ncreates SetPropMutation" {
+ext: "Extension method\n.SetValue('US')\ncreates SetReaction" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 18
 }
-emit: "ref.Emit(mutation, value)\nAdds MutateElementCommand\nto pipeline with vendor" {
+emit: "ref.EmitSet(property, value)\nAdds SetReaction\nto pipeline with vendor" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
@@ -126,7 +126,7 @@ ext -> emit: calls Emit() {
 }
 ```
 
-All extension methods call `Emit()` internally — they never add commands to the pipeline directly. `Emit()` wraps the mutation with the cached vendor string and target element ID.
+All extension methods call `EmitSet()` or `EmitCall()` internally — they never add raw reaction nodes to the pipeline directly. The emit methods wrap the member with the cached vendor string and target element ID.
 
 ## HTTP builders — a sub-chain
 
