@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionFileUpload"/> component.
+    /// Typed events exposed by the <see cref="FusionFileUpload"/> component.
     /// </summary>
     public sealed class FusionFileUploadEvents
     {

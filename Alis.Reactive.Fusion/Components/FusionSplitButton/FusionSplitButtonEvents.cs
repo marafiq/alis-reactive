@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionSplitButton"/> component.
+    /// Typed events exposed by the <see cref="FusionSplitButton"/> component.
     /// </summary>
     public sealed class FusionSplitButtonEvents
     {

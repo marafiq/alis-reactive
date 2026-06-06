@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionToolbar"/> component.
+    /// Typed events exposed by the <see cref="FusionToolbar"/> component.
     /// </summary>
     public sealed class FusionToolbarEvents
     {

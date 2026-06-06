@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionInPlaceEditor"/> component.
+    /// Typed events exposed by the <see cref="FusionInPlaceEditor"/> component.
     /// </summary>
     /// <remarks>
     /// Commit flow (<c>url</c> not set): <c>beginEdit → change → endEdit → actionBegin → actionSuccess → submitClick</c>.

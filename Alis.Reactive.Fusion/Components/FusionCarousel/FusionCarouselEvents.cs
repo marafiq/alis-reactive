@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionCarousel"/> component.
+    /// Typed events exposed by the <see cref="FusionCarousel"/> component.
     /// </summary>
     public sealed class FusionCarouselEvents
     {

@@ -3,7 +3,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionSidebar"/> component.
+    /// Typed events exposed by the <see cref="FusionSidebar"/> component.
     /// </summary>
     public sealed class FusionSidebarEvents
     {

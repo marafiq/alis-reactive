@@ -1,10 +1,10 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Typed event descriptors for <see cref="NativeDropDown"/>.
+    /// Typed events exposed by <see cref="NativeDropDown"/>.
     /// </summary>
     /// <remarks>
-    /// <c>.Reactive()</c> uses these descriptors to select the DOM event name
+    /// <c>.Reactive()</c> uses these events to select the DOM event name
     /// and the payload type passed to the pipeline lambda.
     /// </remarks>
     public sealed class NativeDropDownEvents

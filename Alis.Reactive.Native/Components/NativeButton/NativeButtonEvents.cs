@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Typed event descriptors for <see cref="NativeButton"/>.
+    /// Typed events exposed by <see cref="NativeButton"/>.
     /// </summary>
     public sealed class NativeButtonEvents
     {

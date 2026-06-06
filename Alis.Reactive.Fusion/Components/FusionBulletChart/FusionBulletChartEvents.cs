@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed event descriptors for the <see cref="FusionBulletChart"/> component.
+    /// Typed events exposed by the <see cref="FusionBulletChart"/> component.
     /// </summary>
     public sealed class FusionBulletChartEvents
     {
