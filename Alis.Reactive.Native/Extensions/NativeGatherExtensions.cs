@@ -34,8 +34,6 @@ namespace Alis.Reactive.Native.Extensions
         /// Shorthand for <see cref="NativeTextBox"/>. Use the typed overload
         /// when gathering from a different component type.
         /// </remarks>
-        /// <typeparam name="TModel">The view model that owns the gathered property.</typeparam>
-        /// <param name="self">The gather builder.</param>
         /// <param name="expr">The model property bound to the text input.</param>
         public static GatherBuilder<TModel> Include<TModel>(
             this GatherBuilder<TModel> self,
