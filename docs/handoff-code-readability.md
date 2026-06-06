@@ -150,3 +150,9 @@ Rewrite or delete:
   every component just because a repeated XML-doc phrase appears; finish one
   component or one non-component concept at a time and keep the commit boundary
   reviewable.
+- Active docs under `docs-site/src/content/docs/architecture/` still include
+  `descriptors-and-plan.mdx` and related links that explain an older plan model
+  shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
+  rename this page during comment cleanup; a later docs-model slice should
+  verify the current C# plan domain and generated TS contract, then update the
+  page title, route/link text, diagrams, and examples together.
