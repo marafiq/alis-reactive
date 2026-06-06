@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionProgressButtonEvents
     {
-        /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
+        /// <summary>Selector instance for <c>.Reactive()</c> event lambdas.</summary>
         public static readonly FusionProgressButtonEvents Instance = new FusionProgressButtonEvents();
         private FusionProgressButtonEvents() { }
 

@@ -10,7 +10,7 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeTextBoxEvents
     {
         /// <summary>
-        /// Shared instance used by the <c>.Reactive()</c> extension.
+        /// Selector instance for <c>.Reactive()</c> event lambdas.
         /// </summary>
         public static readonly NativeTextBoxEvents Instance = new NativeTextBoxEvents();
         private NativeTextBoxEvents() { }

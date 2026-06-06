@@ -10,7 +10,7 @@ namespace Alis.Reactive.Native.Components
     public sealed class NativeDropDownEvents
     {
         /// <summary>
-        /// Shared instance used by the <c>.Reactive()</c> extension.
+        /// Selector instance for <c>.Reactive()</c> event lambdas.
         /// </summary>
         public static readonly NativeDropDownEvents Instance = new NativeDropDownEvents();
         private NativeDropDownEvents() { }

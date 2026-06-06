@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionNumericTextBoxEvents
     {
-        /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
+        /// <summary>Selector instance for <c>.Reactive()</c> event lambdas.</summary>
         public static readonly FusionNumericTextBoxEvents Instance = new FusionNumericTextBoxEvents();
         private FusionNumericTextBoxEvents() { }
 
