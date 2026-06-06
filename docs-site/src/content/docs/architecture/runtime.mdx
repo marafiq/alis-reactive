@@ -211,7 +211,7 @@ step3: "addr['city']\n→ 'Portland'" {
 path -> split -> step1 -> step2 -> step3
 ```
 
-Split on dots, walk each segment with bracket notation. If any segment is null, return `undefined`. This is how the C# expression `x => x.Address.City` reaches the browser value — `ExpressionPathHelper` converts it to `"evt.address.city"` at build time, `walk()` traverses it at runtime.
+Split on dots, walk each segment with bracket notation. If any segment is null, return `undefined`. This is how the C# expression `x => x.Address.City` reaches the runtime value — `ExpressionPathHelper` converts it to `"evt.address.city"` at build time, `walk()` traverses it at runtime.
 
 ## Coercion — `coerce.ts`
 
