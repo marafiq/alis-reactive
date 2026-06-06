@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Fires when a data row is clicked.
         /// </summary>
-        /// <typeparam name="TRow">The row DTO type bound to the grid.</typeparam>
+        /// <typeparam name="TRow">Grid row DTO type.</typeparam>
         public TypedEvent<FusionGridRecordClickArgs<TRow>> RecordClick<TRow>()
             where TRow : class
             => new TypedEvent<FusionGridRecordClickArgs<TRow>>(
@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Fires when a data row is selected.
         /// </summary>
-        /// <typeparam name="TRow">The row DTO type bound to the grid.</typeparam>
+        /// <typeparam name="TRow">Grid row DTO type.</typeparam>
         public TypedEvent<FusionGridRowSelectedArgs<TRow>> RowSelected<TRow>()
             where TRow : class
             => new TypedEvent<FusionGridRowSelectedArgs<TRow>>(

@@ -3,7 +3,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <summary>
     /// Event args for the Syncfusion Grid "recordClick" event.
     /// </summary>
-    /// <typeparam name="TRow">The row DTO type bound to the grid.</typeparam>
+    /// <typeparam name="TRow">Grid row DTO type.</typeparam>
     public class FusionGridRecordClickArgs<TRow>
         where TRow : class
     {

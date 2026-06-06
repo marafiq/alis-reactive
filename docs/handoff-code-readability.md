@@ -601,6 +601,10 @@ Candidate cleanup:
   Schedule, and InPlaceEditor read/edit summaries no longer use vague
   "current/currently" wording. They now name selected schedule dates, visible
   Grid records, selected Grid records, and active edit state directly.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion Grid event XML
+  type-parameter docs now use the concise row DTO contract phrase instead of
+  repeating "The row DTO type bound to the grid" across selector and payload
+  APIs.
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
   selected-value parameter docs now use the same concise selected-option wording
   as the other Native value-write helpers.
