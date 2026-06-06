@@ -187,7 +187,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_carries_prop_value_for_setvalue_mutation()
+    public async Task plan_carries_prop_value_for_setvalue_reaction()
     {
         // TODO: This raw JSON assertion can match DOM text updates instead of NativeDropDown SetValue.
         // Replace it with a focused value-property proof in a test-design slice.

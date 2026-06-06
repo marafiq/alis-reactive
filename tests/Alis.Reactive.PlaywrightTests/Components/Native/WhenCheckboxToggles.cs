@@ -210,7 +210,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_carries_prop_checked_for_setchecked_mutation()
+    public async Task plan_carries_prop_checked_for_setchecked_reaction()
     {
         // SetChecked writes to prop "checked" (not "value"). If prop changes,
         // the runtime writes to the wrong DOM property.

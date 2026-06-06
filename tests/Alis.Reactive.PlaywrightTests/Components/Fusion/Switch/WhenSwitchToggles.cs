@@ -226,7 +226,7 @@ public class WhenSwitchToggles : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_carries_prop_checked_for_setchecked_mutation()
+    public async Task plan_carries_prop_checked_for_setchecked_reaction()
     {
         await NavigateAndBoot();
 
