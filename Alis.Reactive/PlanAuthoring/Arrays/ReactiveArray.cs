@@ -49,7 +49,7 @@ namespace Alis.Reactive.Builders.Arrays
 
         private ReactiveArray<TElement> Order<TKey>(Expression<Func<TElement, TKey>> key, bool descending)
         {
-            // A sort key must coerce to a comparable scalar. A non-scalar key (object/collection)
+            // Sort keys must coerce to comparable scalars. Non-scalar keys (object/collection)
             // serializes as Shape.Any, and the runtime would fall back to lexicographic
             // String(value) order, where every object becomes "[object Object]".
             // Reject it where it is authored rather than emit a silently wrong runtime sort.

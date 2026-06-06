@@ -1021,6 +1021,9 @@ Rewrite or delete:
   filtering, open-cell save, injected partials, validation ordering, custom
   event arrays, and expected HTTP 500 console behavior without changing test
   flow or extracting helpers.
+- Resolved on `tiny-safe-but-important-refactorings`: ReactiveArray sort-key
+  invariant now states the scalar-key requirement directly while preserving the
+  browser-runtime reason object keys are rejected at authoring time.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
