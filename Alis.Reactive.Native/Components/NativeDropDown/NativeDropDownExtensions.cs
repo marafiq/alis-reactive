@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Reactive Plan operations for <see cref="NativeDropDown"/> selected values and focus.
+    /// Reactive Plan operations for <see cref="NativeDropDown"/> selected value and focus.
     /// </summary>
     /// <remarks>
     /// Use on a component reference resolved from a pipeline, for example:

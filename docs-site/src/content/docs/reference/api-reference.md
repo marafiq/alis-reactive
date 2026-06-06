@@ -5471,7 +5471,7 @@ Changed { get; }  // Fires when the user selects a different option.
 
 ### NativeDropDownExtensions
 
-Reactive Plan operations for `NativeDropDown` selected values and focus.
+Reactive Plan operations for `NativeDropDown` selected value and focus.
 
 ```csharp
 FocusIn<T>()
@@ -5600,7 +5600,7 @@ Changed { get; }  // Fires when the user selects a different radio option.
 
 ### NativeRadioGroupExtensions
 
-Reactive Plan operations for `NativeRadioGroup` selected values and focus.
+Reactive Plan operations for `NativeRadioGroup` selected value and focus.
 
 ```csharp
 FocusIn<T>()
