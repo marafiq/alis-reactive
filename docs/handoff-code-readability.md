@@ -294,6 +294,10 @@ Candidate cleanup:
   `build` parameter docs now describe the public setup callback without the
   repeated "underlying Syncfusion builder" wording. The component vertical
   slices remain unchanged.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion `.Reactive(...)`
+  `pipeline` parameter docs now name the selected event's Reactive Plan
+  pipeline directly instead of repeating callback mechanics across every
+  component vertical slice.
 - Resolved on `tiny-safe-but-important-refactorings`: plugin declaration
   `Arg<T>()` and `Args(...)` XML docs no longer repeat the fluent return type,
   and the typed plugin-source conversion parameter is named `builder` instead

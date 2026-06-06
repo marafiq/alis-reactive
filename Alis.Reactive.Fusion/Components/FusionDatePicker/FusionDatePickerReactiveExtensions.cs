@@ -19,7 +19,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
         /// <param name="plan">The Reactive Plan that receives the component event trigger.</param>
         /// <param name="eventSelector">Selects the component event, for example <c>evt =&gt; evt.Changed</c>.</param>
-        /// <param name="pipeline">Configures the reactions to run when the event fires.</param>
+        /// <param name="pipeline">Reactive Plan pipeline for the selected event.</param>
         public static DatePickerBuilder Reactive<TModel, TArgs>(
             this DatePickerBuilder builder,
             ReactivePlan<TModel> plan,

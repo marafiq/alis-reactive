@@ -16,7 +16,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
         /// <param name="eventSelector">Selects the component event, for example <c>evt =&gt; evt.BeforeOpen</c>.</param>
-        /// <param name="pipeline">Configures the reactions to run when the event fires.</param>
+        /// <param name="pipeline">Reactive Plan pipeline for the selected event.</param>
         public static FusionTooltipBuilder<TModel> Reactive<TModel, TArgs>(
             this FusionTooltipBuilder<TModel> builder,
             Func<FusionTooltipEvents, TypedEvent<TArgs>> eventSelector,
