@@ -18,7 +18,7 @@ public sealed class FusionRatingLocator
     public async Task<string?> ValueAttribute() =>
         await Input.GetAttributeAsync("value");
 
-    /// <summary>The visible rating list's ARIA value.</summary>
+    /// <summary>ARIA value from the visible rating list.</summary>
     public async Task<string?> AriaValue() =>
         await _page.EvaluateAsync<string?>(
             @"id => {

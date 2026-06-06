@@ -16,7 +16,7 @@ public sealed class SwitchLocator
     /// <summary>Clickable wrapper; the component ID belongs to the hidden checkbox.</summary>
     public ILocator Wrapper => _page.Locator($".e-switch-wrapper:has(#{_componentId})");
 
-    /// <summary>The hidden checkbox input.</summary>
+    /// <summary>Hidden checkbox input.</summary>
     public ILocator Input => _page.Locator($"#{_componentId}");
 
     public async Task Toggle() => await Wrapper.ClickWhenStableAsync(_page);

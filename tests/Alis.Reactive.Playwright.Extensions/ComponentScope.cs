@@ -13,14 +13,14 @@ public sealed class ComponentScope
     private readonly IPage _page;
     private readonly string _componentIdPrefix;
 
-    /// <summary>Uses the framework's model-type prefix for model-bound component IDs.</summary>
+    /// <summary>Model-type prefix for generated component IDs.</summary>
     public ComponentScope(IPage page, Type modelType)
     {
         _page = page;
         _componentIdPrefix = modelType.FullName!.Replace(".", "_") + "__";
     }
 
-    /// <summary>Uses an already-computed component ID prefix, including its separator.</summary>
+    /// <summary>Precomputed component ID prefix, including its separator.</summary>
     public ComponentScope(IPage page, string prefix)
     {
         _page = page;
