@@ -19,7 +19,7 @@ Html.InputField(plan, m => m.Amount, o => o.Label("Amount"))
 
 ## How do I set its value?
 
-The `decimal` type flows through the plan as a JSON number; the runtime writes it straight to the Syncfusion instance's `value` property.
+The `decimal` type flows through the Reactive Plan as a JSON number and is applied to the rendered numeric value.
 
 ```csharp
 p.Component<FusionNumericTextBox>(m => m.Amount).SetValue(42m);

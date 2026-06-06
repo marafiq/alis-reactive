@@ -18,8 +18,8 @@ namespace Alis.Reactive.Fusion.Components
     /// <c>Value()</c> or <c>SetValue()</c>. Data loading is server-driven via <c>SetDataSource</c>.
     /// </para>
     /// <para>
-    /// These methods emit Reactive Plan reads, writes, or calls against the registered
-    /// Syncfusion Schedule instance.
+    /// These methods emit Reactive Plan reads, writes, or calls against the rendered
+    /// Schedule component.
     /// </para>
     /// </remarks>
     public static class FusionScheduleExtensions

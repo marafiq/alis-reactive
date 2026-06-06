@@ -41,8 +41,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Enables the editor, restoring edit-mode entry.</summary>
         /// <remarks>
-        /// Calls Syncfusion's <c>disable(false)</c> method. A plain write to <c>disabled</c> does
-        /// not apply the <c>.e-disable</c> CSS class that suppresses clicks.
+        /// Restores the rendered enabled state and clears the <c>.e-disable</c> click-suppression class.
         /// </remarks>
         public static ComponentRef<FusionInPlaceEditor, TModel> Enable<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
@@ -50,7 +49,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(DisableMethod, new List<ValueExpression> { ValueExpression.Literal(false) });
 
         /// <summary>Disables the editor, blocking edit-mode entry.</summary>
-        /// <remarks>Calls Syncfusion's <c>disable(true)</c> method. Applies the <c>.e-disable</c> CSS class.</remarks>
+        /// <remarks>Applies the disabled state and the rendered <c>.e-disable</c> CSS class.</remarks>
         public static ComponentRef<FusionInPlaceEditor, TModel> Disable<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
@@ -58,7 +57,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Programmatically commits the current edit.</summary>
         /// <remarks>
-        /// Calls Syncfusion's <c>save()</c> method. Fires <c>beginEdit → change → endEdit → actionBegin → actionSuccess</c>.
+        /// Fires <c>beginEdit → change → endEdit → actionBegin → actionSuccess</c>.
         /// Does not fire <c>submitClick</c>, which is user-gesture only.
         /// </remarks>
         public static ComponentRef<FusionInPlaceEditor, TModel> Save<TModel>(
@@ -67,7 +66,6 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(SaveMethod);
 
         /// <summary>Moves focus into the inner editor input.</summary>
-        /// <remarks>Calls Syncfusion's <c>setFocus()</c> method.</remarks>
         public static ComponentRef<FusionInPlaceEditor, TModel> Focus<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self)
             where TModel : class
@@ -75,10 +73,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Adds a CSS class to the editor's outer wrapper.</summary>
         /// <remarks>
-        /// Emits a call on Syncfusion's <c>element.classList.add</c>. The Fusion vendor resolver
-        /// returns the ej2 instance, so the path reaches through <c>ej.element</c> (Syncfusion's reference
-        /// back to the editor's outer DOM element). The class persists across Syncfusion's edit/close
-        /// cycles; typical use is a visual commit signal (e.g. a CSS <c>::after</c> check mark)
+        /// The class persists across edit/close cycles; typical use is a visual commit signal
         /// wired on <c>ActionSuccess</c> and removed on <c>BeginEdit</c>.
         /// </remarks>
         /// <param name="className">The class name to add.</param>
@@ -88,7 +83,6 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(ClassAddMethod, new List<ValueExpression> { ValueExpression.Literal(className) });
 
         /// <summary>Removes a CSS class from the editor's outer wrapper.</summary>
-        /// <remarks>Emits a call on Syncfusion's <c>element.classList.remove</c>.</remarks>
         /// <param name="className">The class name to remove.</param>
         public static ComponentRef<FusionInPlaceEditor, TModel> RemoveClass<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string className)
@@ -97,8 +91,8 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Reads the current committed value for use in conditions or gather.</summary>
         /// <remarks>
-        /// Reads Syncfusion's outer <c>value</c> property using the shape registered at render time
-        /// by <see cref="FusionInPlaceEditorHtmlExtensions"/> (i.e. <c>Shape.FromClrType(typeof(TProp))</c>).
+        /// Reads the registered editor value using the shape captured at render time by
+        /// <see cref="FusionInPlaceEditorHtmlExtensions"/> (i.e. <c>Shape.FromClrType(typeof(TProp))</c>).
         /// A <c>DateTime?</c>-bound editor reads as date, a <c>decimal</c>-bound editor reads as number,
         /// a <c>string</c>-bound editor reads as string. The component must be registered via
         /// <c>Html.InputField(plan, m => m.X).FusionInPlaceEditor(...)</c> before this read is built

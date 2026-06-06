@@ -49,6 +49,6 @@ Same pattern as AutoComplete -- the `Filtering` event fires per keystroke, cance
 |---|---|
 | `SetValue(string[]?)` | Sets the selected values |
 | `SetDataSource(source, path)` | Sets the data source |
-| `DataBind()` | Flushes pending changes |
+| `DataBind()` | Applies pending property changes to the rendered component |
 | `ShowPopup()` / `HidePopup()` | Open or close the popup |
 | `Value()` | Reads the current selected values as a typed source (`TypedComponentSource<string[]>`) for conditions and gather |

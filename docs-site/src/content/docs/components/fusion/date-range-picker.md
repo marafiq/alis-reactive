@@ -5,7 +5,7 @@ sidebar:
   order: 7
 ---
 
-Use DateRangePicker when the input represents a span -- a resident's stay period, a compliance-audit date range, a report filter. This component is unique: the Syncfusion ej2 instance's `.value` returns `[Date, Date]` -- an array of two dates -- so your model property is `DateTime[]?`, not `DateTime`.
+Use DateRangePicker when the input represents a span -- a resident's stay period, a compliance-audit date range, a report filter. This component uses a two-date value, so your model property is `DateTime[]?`, not `DateTime`.
 
 **Model type:** `DateTime[]?` &nbsp; **ValueMember:** `"value"` (returns `[Date, Date]`) &nbsp; **Events:** `Changed`
 

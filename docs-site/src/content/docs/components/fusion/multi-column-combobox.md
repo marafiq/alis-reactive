@@ -18,6 +18,6 @@ Shares the same data-source + cascade vocabulary as [DropDownList](./dropdown-li
 | `SetValue(string?)` | Sets the selected value |
 | `SetText(string)` | Sets the display text |
 | `SetDataSource(source, path)` | Sets data source from event payload or response body |
-| `DataBind()` | Flushes pending changes |
+| `DataBind()` | Applies pending property changes to the rendered component |
 | `FocusIn()` / `FocusOut()` | Manage focus |
 | `ShowPopup()` / `HidePopup()` | Open or close the dropdown |

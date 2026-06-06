@@ -5,7 +5,7 @@ sidebar:
   order: 0
 ---
 
-Fusion components wrap [Syncfusion EJ2](https://ej2.syncfusion.com/) controls. The C# vertical slice declares property and method names; the plan carries them as data; the runtime executes on `el.ej2_instances[0]`. You never write Syncfusion-specific JavaScript.
+Fusion components wrap [Syncfusion EJ2](https://ej2.syncfusion.com/) controls. The C# vertical slice declares the component contract; the Reactive Plan carries it as data; the runtime applies it to rendered controls. You never write Syncfusion-specific JavaScript.
 
 **Package:** `Alis.Reactive.Fusion`
 

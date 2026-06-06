@@ -90,7 +90,7 @@ b.Reactive(plan, evt => evt.CancelClick, (args, p) =>
 | Extension | Description |
 |---|---|
 | `SetValue(string?)` | Sets the committed value |
-| `Enable()` / `Disable()` | Toggles edit-mode entry (calls Syncfusion `disable(bool)`) |
+| `Enable()` / `Disable()` | Toggles edit-mode entry |
 | `Save()` | Programmatic commit (fires `ActionSuccess`, not `SubmitClick`) |
 | `Focus()` | Focuses the inner editor input |
 

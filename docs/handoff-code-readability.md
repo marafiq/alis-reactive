@@ -402,6 +402,13 @@ Candidate cleanup:
   Fusion `DataBind()` docs no longer describe "flush" or Syncfusion instance
   mechanics. Framework onboarding docs still name `dataBind` where the reader is
   implementing a component contract.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion component overview
+  and value docs now describe the Reactive Plan contract and rendered component
+  behavior instead of `ej2_instances`, Syncfusion instance writes, or public
+  method-table call mechanics.
+- Resolved on `tiny-safe-but-important-refactorings`: InPlaceEditor public XML
+  docs now keep event-order, CSS-class, and registered-shape invariants while
+  removing Syncfusion method/path narration from consumer IntelliSense.
 
 ### Implementation Inline Comments
 
