@@ -1,7 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline;
 
 /// <summary>
-/// .Finally() cleanup commands execute after HTTP success, routed errors,
+/// .Finally() cleanup reactions execute after HTTP success, routed errors,
 /// unmatched statuses, and network failures.
 /// </summary>
 [TestFixture]

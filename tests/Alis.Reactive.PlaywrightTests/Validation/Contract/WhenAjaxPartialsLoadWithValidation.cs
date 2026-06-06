@@ -148,7 +148,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
     }
 
     [Test]
-    public async Task partial_zipcode_change_fires_own_reactive_entry()
+    public async Task partial_zipcode_change_fires_own_reactive_behavior()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
