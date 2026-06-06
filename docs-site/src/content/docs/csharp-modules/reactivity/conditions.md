@@ -192,7 +192,7 @@ pipeline.When(selectedServices.Value()).ArrayContains("physical-therapy")
 
 ### Source-vs-source comparison
 
-Both sides can be runtime sources. Compare two component values directly:
+Both sides can be value sources. Compare two component values directly:
 
 ```csharp
 var startDate = pipeline.Component<FusionDatePicker>(m => m.AdmissionDate);
