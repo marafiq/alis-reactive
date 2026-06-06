@@ -85,7 +85,7 @@ MyApp/
 │       └── Views/
 │           └── Resident/
 │               ├── Index.cshtml             ← Html.ReactivePlan<ResidentModel>(), Html.InputField, .Reactive()
-│               └── _AddressPartial.cshtml   ← Html.ResolvePlan<ResidentModel>() (merges into parent plan)
+│               └── _AddressPartial.cshtml   ← Html.ResolvePlan<ResidentModel>() (merges into Active Plan)
 └── wwwroot/
     ├── scripts/
     │   └── alis-reactive.{version}.js       ← framework runtime (copied from NuGet by AlisReactive.targets)
@@ -149,7 +149,7 @@ Every view starts from `Html.` — plan setup at the top, triggers and component
 ```
 Html.
 ├── ReactivePlan<TModel>()                          create a plan
-├── ResolvePlan<TModel>()                           partial plan (merges into parent)
+├── ResolvePlan<TModel>()                           partial plan (merges into Active Plan)
 ├── RenderPlan(plan)                                emit at bottom of view
 │
 ├── On(plan, t => ...)                              § Triggers (what fires the pipeline)

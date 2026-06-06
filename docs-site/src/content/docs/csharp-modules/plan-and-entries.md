@@ -62,7 +62,7 @@ See the full [Grammar Tree](../mental-model/#the-grammar-tree) for what's availa
 
 ## Partial views
 
-**Same model** — the partial is part of the parent form. `Html.ResolvePlan<TModel>()` creates a plan that the runtime merges into the parent by matching the model type:
+**Same model** — the partial is part of the parent form. `Html.ResolvePlan<TModel>()` creates a plan that the runtime merges into the parent Active Plan by matching the model type:
 
 ```csharp
 @* _AddressPartial.cshtml *@
@@ -71,7 +71,7 @@ See the full [Grammar Tree](../mental-model/#the-grammar-tree) for what's availa
     var plan = Html.ResolvePlan<ResidentIntakeModel>();
 }
 
-@* InputField, .Reactive() — same plan, same model *@
+@* InputField, .Reactive() — same Active Plan, same model *@
 
 @Html.RenderPlan(plan)
 ```

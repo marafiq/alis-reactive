@@ -59,7 +59,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 	<Card title="Dynamic Partials" icon="puzzle">
 		Load a server-rendered partial with input fields via `Into()`. Plan merging enriches validation automatically.
 		```csharp
-		// Partial uses ResolvePlan — merges into parent
+		// Partial uses ResolvePlan — merges into Active Plan
 		var plan = Html.ResolvePlan<Model>();
 		Html.InputField(plan, m => m.Room,
 		    o => o.Required().Label("Room"))
