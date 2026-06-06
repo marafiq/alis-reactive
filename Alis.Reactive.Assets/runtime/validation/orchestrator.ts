@@ -284,7 +284,7 @@ function evaluateComponentRules(
   return evaluateRulesForField(field, surface);
 }
 
-/** Unmounted partial fields fail unless every active rule is skipped. */
+// Unmounted partial fields fail unless every active rule is skipped.
 function handleInactiveValidationField(
   componentValidation: ComponentValidation,
   surface: ValidationSurface,
@@ -300,7 +300,7 @@ function handleInactiveValidationField(
 
 type FieldResolution = { done: false; element: HTMLElement } | { done: true; result: boolean };
 
-/** Missing partial field elements use the same skipped-rule invariant as unregistered fields. */
+// Missing partial field elements use the same skipped-rule invariant as unregistered fields.
 function resolveFieldElement(
   component: RuntimeComponent,
   componentValidation: ComponentValidation,

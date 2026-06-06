@@ -102,11 +102,9 @@ function projectedOrSelf(
   return projection === undefined ? item : evaluateElementValue(projection, item);
 }
 
-/**
- * Normalize array-op input after runtime-object, DOM, or vendor reads, where C# T[]
- * cannot constrain the JavaScript value. This boundary normalization is not a plan fallback;
- * non-iterable objects fail fast instead of being guessed into arrays.
- */
+// Normalize array-op input after runtime-object, DOM, or vendor reads, where C# T[]
+// cannot constrain the JavaScript value. This boundary normalization is not a plan fallback;
+// non-iterable objects fail fast instead of being guessed into arrays.
 function normalizeToArray(value: unknown, label: string): unknown[] {
   if (Array.isArray(value)) return value;
   if (value === null || value === undefined) return [];

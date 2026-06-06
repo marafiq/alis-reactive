@@ -43,10 +43,8 @@ export function boot(bootPlan: PlanDocument): void {
   log.info("booted", { planId: bootPlan.planId });
 }
 
-/**
- * Two-phase wiring: wire all non-page-ready listeners first, then execute page-ready.
- * This ensures document-event listeners exist before page-ready dispatches into them.
- */
+// Two-phase wiring: wire all non-page-ready listeners first, then execute page-ready.
+// This ensures document-event listeners exist before page-ready dispatches into them.
 function wireBehaviors(behaviors: Behavior[], activePlan: PlanDocument, signal?: AbortSignal): void {
   const deferred: Behavior[] = [];
   for (const behavior of behaviors) {

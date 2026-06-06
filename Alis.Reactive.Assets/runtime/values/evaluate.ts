@@ -132,7 +132,7 @@ class ValueEvaluation {
     return result;
   }
 
-  /** Array predicates run in the immediate lane; confirm is not legal in this scope. */
+  // Array predicates run in the immediate lane; confirm is not legal in this scope.
   private elementMatches(predicate: ArrayOperationExpression["predicate"], item: unknown): boolean {
     if (predicate === undefined) {
       throw new Error("[alis] array-op predicate is required for this operation");
@@ -165,7 +165,7 @@ function isDomRead(expression: ReadExpression): expression is DomPropertyReadExp
   return expression.from.kind === "dom";
 }
 
-/** DOM reads cross the DOM boundary by id; they are not component-contract reads. */
+// DOM reads cross the DOM boundary by id; they are not component-contract reads.
 function readFromDom(expression: DomPropertyReadExpression): unknown {
   const element = document.getElementById(expression.from.element);
   if (element === null) {
@@ -182,7 +182,7 @@ function readFromUrl(
   return applyShapeWhenPresent(rawValue, expression.shape);
 }
 
-/** Whole payload and whole element reads return the resolved payload scope; path reads follow RuntimePath. */
+// Whole payload and whole element reads return the resolved payload scope; path reads follow RuntimePath.
 function readFromPayload(
   expression: PayloadReadExpression, resolvedPayloadScope: unknown,
 ): unknown {

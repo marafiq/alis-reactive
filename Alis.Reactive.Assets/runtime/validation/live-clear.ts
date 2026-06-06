@@ -116,7 +116,7 @@ function componentChangeEventCanBeDeferred(error: unknown): boolean {
   return RuntimeResolutionError.is(error) || RuntimeComponentReadinessError.is(error);
 }
 
-/** Partial reloads unmount fields; clear wiring so remounted fields can wire again. */
+// Partial reloads unmount fields; clear wiring so remounted fields can wire again.
 export function unwireField(componentDomId: string): void {
   forgetFieldWiring(componentDomId);
 }

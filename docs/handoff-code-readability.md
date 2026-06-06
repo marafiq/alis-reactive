@@ -108,6 +108,14 @@ Comments worth keeping in tests are the ones that explain unstable DOM/event
 timing or vendor behavior, such as duplicate Syncfusion inputs, required popup
 sequencing, or why a test must be non-parallel.
 
+### TypeScript Runtime Comments
+
+- Resolved on `tiny-safe-but-important-refactorings`: private runtime helper
+  invariants in validation, value evaluation, array operations, and boot wiring
+  now use plain comments instead of JSDoc blocks. The kept comments still name
+  partial-unmount validation behavior, DOM/value boundaries, array normalization,
+  and two-phase page-ready wiring.
+
 ### Builder XML Documentation
 
 Several public builder APIs have method-by-method XML comments that mostly
