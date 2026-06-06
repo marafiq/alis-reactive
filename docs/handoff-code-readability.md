@@ -299,6 +299,10 @@ Candidate cleanup:
   payload `Value` summaries now identify the after-change value instead of
   terse "Selected value" or "New value" wording. `PreviousValue` and
   interaction metadata docs remain unchanged.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion Grid row
+  selection, toolbar click, and text-filter payload summaries now identify the
+  event source or criterion role instead of terse labels such as "Selected row
+  data" or "The clicked toolbar item." Payload shape remains unchanged.
 
 ### Implementation Inline Comments
 

@@ -2758,10 +2758,10 @@ Event args for the Syncfusion Grid "rowSelected" event.
 
 ```csharp
 // Properties
-Data { get; }  // Selected row data.
-IsInteracted { get; }  // Whether selection came from user interaction.
-PreviousRowIndex { get; }  // Previously selected row index.
-RowIndex { get; }  // Selected row index.
+Data { get; }  // Row data carried by the selected row event.
+IsInteracted { get; }  // Whether user interaction triggered the row selection.
+PreviousRowIndex { get; }  // Zero-based index of the previously selected row.
+RowIndex { get; }  // Zero-based index of the row after selection.
 ```
 
 ### FusionGridSearchDescriptor
@@ -2806,7 +2806,7 @@ MatchCase { get; }  // Whether the filter is case-sensitive.
 Operator { get; }  // Filter operator such as `contains`, `equal`, or `startswith`.
 Predicate { get; }  // Predicate joining this criterion to the next criterion.
 Predicates { get; }  // Nested predicates when Syncfusion emits a composite Predicate.
-Value { get; }  // Text value being filtered.
+Value { get; }  // Filter text supplied by this criterion.
 ```
 
 ### FusionGridTextFilterOperator
@@ -2822,7 +2822,7 @@ Read `Item` to branch on which button was pressed.
 ```csharp
 // Properties
 Cancel { get; }  // Set true to cancel the default toolbar action.
-Item { get; }  // The clicked toolbar item.
+Item { get; }  // Toolbar item that raised the click event.
 ```
 
 ### FusionGridToolbarItem
@@ -2832,8 +2832,8 @@ Custom items expose the id and text declared on the builder Toolbar.
 
 ```csharp
 // Properties
-Id { get; }  // The toolbar item id (e.g. a custom command id, or "{gridId}_excelexport").
-Text { get; }  // The toolbar item display text.
+Id { get; }  // Toolbar item id, such as a custom command id or `{gridId}_excelexport`.
+Text { get; }  // Toolbar item display text.
 ```
 
 ### FusionGridValidation

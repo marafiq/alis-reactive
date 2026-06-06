@@ -58,7 +58,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Filter operator such as <c>contains</c>, <c>equal</c>, or <c>startswith</c>.</summary>
         public string? Operator { get; set; }
 
-        /// <summary>Text value being filtered.</summary>
+        /// <summary>Filter text supplied by this criterion.</summary>
         public string? Value { get; set; }
 
         /// <summary>Composite predicate condition such as <c>and</c> or <c>or</c>.</summary>

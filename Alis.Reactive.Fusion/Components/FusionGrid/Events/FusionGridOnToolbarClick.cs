@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionGridToolbarClickArgs
     {
-        /// <summary>The clicked toolbar item.</summary>
+        /// <summary>Toolbar item that raised the click event.</summary>
         public FusionGridToolbarItem Item { get; set; } = new FusionGridToolbarItem();
 
         /// <summary>Set true to cancel the default toolbar action.</summary>
@@ -20,10 +20,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionGridToolbarItem
     {
-        /// <summary>The toolbar item id (e.g. a custom command id, or "{gridId}_excelexport").</summary>
+        /// <summary>Toolbar item id, such as a custom command id or <c>{gridId}_excelexport</c>.</summary>
         public string? Id { get; set; }
 
-        /// <summary>The toolbar item display text.</summary>
+        /// <summary>Toolbar item display text.</summary>
         public string? Text { get; set; }
     }
 }

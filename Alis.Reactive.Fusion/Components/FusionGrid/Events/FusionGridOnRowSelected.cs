@@ -7,16 +7,16 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionGridRowSelectedArgs<TRow>
         where TRow : class
     {
-        /// <summary>Selected row data.</summary>
+        /// <summary>Row data carried by the selected row event.</summary>
         public TRow Data { get; set; } = default!;
 
-        /// <summary>Selected row index.</summary>
+        /// <summary>Zero-based index of the row after selection.</summary>
         public int RowIndex { get; set; }
 
-        /// <summary>Previously selected row index.</summary>
+        /// <summary>Zero-based index of the previously selected row.</summary>
         public int PreviousRowIndex { get; set; }
 
-        /// <summary>Whether selection came from user interaction.</summary>
+        /// <summary>Whether user interaction triggered the row selection.</summary>
         public bool IsInteracted { get; set; }
     }
 }
