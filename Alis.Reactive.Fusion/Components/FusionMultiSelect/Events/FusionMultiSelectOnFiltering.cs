@@ -42,8 +42,7 @@ namespace Alis.Reactive.Fusion.Components
         /// Without this, the component briefly shows "No records found" while the
         /// server request is in flight. Call before issuing an HTTP request.
         /// </remarks>
-        /// <param name="args">The filtering event args.</param>
-        /// <param name="pipeline">The current pipeline builder.</param>
+        /// <param name="pipeline">The pipeline that receives the event-arg filtering mutation.</param>
         public static void PreventDefault(
             this FusionMultiSelectFilteringArgs args,
             IReactionEmitter pipeline)
@@ -60,8 +59,7 @@ namespace Alis.Reactive.Fusion.Components
         /// rendering lifecycle.
         /// </remarks>
         /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
-        /// <param name="args">The filtering event args.</param>
-        /// <param name="pipeline">The current pipeline builder.</param>
+        /// <param name="pipeline">The pipeline that receives the event-arg updateData call.</param>
         /// <param name="source">The response body instance.</param>
         /// <param name="path">Expression selecting the items collection from the response.</param>
         public static void UpdateData<TResponse>(

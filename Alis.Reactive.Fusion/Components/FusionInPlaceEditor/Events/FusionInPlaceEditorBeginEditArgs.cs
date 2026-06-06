@@ -23,8 +23,7 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionInPlaceEditorBeginEditArgsExtensions
     {
         /// <summary>Cancels entering edit mode. The pencil click is ignored.</summary>
-        /// <param name="args">The beginEdit event args.</param>
-        /// <param name="pipeline">The current pipeline builder.</param>
+        /// <param name="pipeline">The pipeline that receives the event-arg cancellation mutation.</param>
         public static void PreventDefault(
             this FusionInPlaceEditorBeginEditArgs args,
             IReactionEmitter pipeline)

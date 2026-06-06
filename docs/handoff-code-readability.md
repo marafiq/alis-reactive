@@ -245,6 +245,10 @@ Candidate cleanup:
   docs no longer repeat extension receiver parameters such as "The Razor HTML
   helper." Plan, expression, controlled ID, and builder callback docs remain
   because they describe the DSL contract.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion event-payload
+  helper XML docs no longer repeat the extension `args` receiver or describe
+  pipeline parameters as only "current builder." The remaining parameter docs
+  name the event-arg mutation added to the Reactive Plan.
 
 ### Implementation Inline Comments
 

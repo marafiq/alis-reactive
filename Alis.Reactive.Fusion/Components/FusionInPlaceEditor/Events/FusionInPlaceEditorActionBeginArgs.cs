@@ -31,8 +31,7 @@ namespace Alis.Reactive.Fusion.Components
         /// Call before issuing <c>p.Post(...)...</c>. Without this, the editor performs its configured
         /// <c>UrlAdaptor</c> POST alongside the reactive pipeline, duplicating the request.
         /// </remarks>
-        /// <param name="args">The actionBegin event args.</param>
-        /// <param name="pipeline">The current pipeline builder.</param>
+        /// <param name="pipeline">The pipeline that receives the event-arg cancellation mutation.</param>
         public static void PreventDefault(
             this FusionInPlaceEditorActionBeginArgs args,
             IReactionEmitter pipeline)
