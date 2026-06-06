@@ -45,10 +45,9 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         var wrapper = Page.Locator($"#{MedicationTimeId}");
         await Expect(wrapper).ToBeVisibleAsync();
 
-        // The visible input proves the set-prop reached Syncfusion's ej2 value.
-        var inputValue = await MedicationTime.Input.InputValueAsync();
-        Assert.That(inputValue, Is.Not.Null.And.Not.Empty,
-            $"Expected FusionDateTimePicker input to have a value but got '{inputValue}'");
+        var visibleInputValue = await MedicationTime.Input.InputValueAsync();
+        Assert.That(visibleInputValue, Is.Not.Null.And.Not.Empty,
+            $"Expected FusionDateTimePicker input to have a value but got '{visibleInputValue}'");
 
         AssertNoConsoleErrors();
     }

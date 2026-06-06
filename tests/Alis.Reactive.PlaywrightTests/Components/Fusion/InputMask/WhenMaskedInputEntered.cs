@@ -45,10 +45,9 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         var wrapper = Page.Locator($"#{PhoneNumberId}");
         await Expect(wrapper).ToBeVisibleAsync();
 
-        // Set-prop writes Syncfusion ej2.value; the visible input proves it applied.
-        var inputValue = await PhoneNumber.Input.InputValueAsync();
-        Assert.That(inputValue, Is.Not.Null.And.Not.Empty,
-            $"Expected FusionInputMask input to have a value but got '{inputValue}'");
+        var visibleInputValue = await PhoneNumber.Input.InputValueAsync();
+        Assert.That(visibleInputValue, Is.Not.Null.And.Not.Empty,
+            $"Expected FusionInputMask input to have a value but got '{visibleInputValue}'");
 
         AssertNoConsoleErrors();
     }
