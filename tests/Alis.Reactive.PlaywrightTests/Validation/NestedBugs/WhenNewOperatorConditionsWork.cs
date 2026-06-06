@@ -5,6 +5,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/NestedBugs/OperatorConditions";
     private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Validation_NestedBugs_OperatorConditionModel__";
+    private const string AdultAgeOutsideLessThanRule = "25";
 
     private ILocator Input(string field) => Page.Locator($"#{ModelIdPrefix}{field}");
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
@@ -16,7 +17,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
-        await Input("Age").FillAsync("25");
+        await Input("Age").FillAsync(AdultAgeOutsideLessThanRule);
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("JobTitle")).ToContainTextAsync("Adults must provide job title");
@@ -52,7 +53,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
-        await Input("Age").FillAsync("25");
+        await Input("Age").FillAsync(AdultAgeOutsideLessThanRule);
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Name")).Not.ToContainTextAsync("Guardian");
@@ -110,10 +111,9 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     [Test]
     public async Task not_empty_condition_fires_when_email_filled()
     {
-        // Age stays adult so the lt condition does not also require Name.
         await NavigateToAndWaitForBoot(Path);
 
-        await Input("Age").FillAsync("25");
+        await Input("Age").FillAsync(AdultAgeOutsideLessThanRule);
         await Input("Email").FillAsync("jane@care.com");
         await ClickWhenStable(SubmitBtn);
 

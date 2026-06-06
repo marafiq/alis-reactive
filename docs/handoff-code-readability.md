@@ -861,6 +861,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: the SmartComponents index
   test now names the shared sandbox link locator instead of commenting that
   several discovery cards point to the same page.
+- Resolved on `tiny-safe-but-important-refactorings`: nested validation tests now
+  name `AdultAgeOutsideLessThanRule` instead of commenting that age must stay out
+  of the less-than condition while the not-empty email rule is exercised.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
