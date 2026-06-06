@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed component operations and value reads for <see cref="FusionDateTimePicker"/> in a reactive pipeline.
+    /// Typed component operations and value reads for <see cref="FusionDateTimePicker"/> in a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
     /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:

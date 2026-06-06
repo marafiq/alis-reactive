@@ -84,7 +84,7 @@ namespace Alis.Reactive.Native.AppLevel
         /// </summary>
         /// <remarks>
         /// Call this once in <c>_Layout.cshtml</c>. The loader is hidden by default
-        /// and shown via <see cref="Show{TModel}"/> in a reactive pipeline.
+        /// and shown via <see cref="Show{TModel}"/> in a Reactive Plan pipeline.
         /// </remarks>
 #if NET48
         public static IHtmlString NativeLoader(this HtmlHelper html)

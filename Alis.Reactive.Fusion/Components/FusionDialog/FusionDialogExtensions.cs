@@ -3,7 +3,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Component operation extensions for <see cref="FusionDialog"/> in a reactive pipeline.
+    /// Component operation extensions for <see cref="FusionDialog"/> in a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
     /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:

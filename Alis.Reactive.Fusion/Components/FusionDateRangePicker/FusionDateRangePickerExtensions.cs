@@ -5,7 +5,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed value reading for <see cref="FusionDateRangePicker"/> in a reactive pipeline.
+    /// Typed value reading for <see cref="FusionDateRangePicker"/> in a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
     /// <para>

@@ -178,7 +178,7 @@ public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
         // State and PostalCode retain their portland-autofilled values because:
         // - The active branch only sets City (not State/PostalCode)
         // - Programmatic SetValue("seattle") does NOT fire City's change event,
-        //   so City's reactive pipeline does NOT re-autofill State and PostalCode
+        //   so City's Reactive Plan pipeline does NOT re-autofill State and PostalCode
         await Expect(stateSelect).ToHaveValueAsync("OR", new() { Timeout = 3000 });
         await Expect(postalInput).ToHaveValueAsync(
             new System.Text.RegularExpressions.Regex("97.?201"), new() { Timeout = 3000 });

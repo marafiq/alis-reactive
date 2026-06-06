@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed value reading for <see cref="FusionFileUpload"/> in a reactive pipeline.
+    /// Typed value reading for <see cref="FusionFileUpload"/> in a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
     /// <para>

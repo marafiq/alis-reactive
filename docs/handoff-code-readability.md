@@ -369,6 +369,11 @@ Candidate cleanup:
   updates. Text input, OTP, slider, rating, breadcrumb, radio, and checkbox docs
   now name the rendered value/state contract instead of the internal refresh
   mechanism.
+- Resolved on `tiny-safe-but-important-refactorings`: lowercase "reactive
+  pipeline" wording was normalized to "Reactive Plan pipeline" in active Fusion
+  and app-level Native public docs, the InPlaceEditor docs page, and the one
+  Playwright invariant comment that described generated plan wiring. This keeps
+  authored plan vocabulary consistent without changing pipeline behavior.
 
 ### Implementation Inline Comments
 

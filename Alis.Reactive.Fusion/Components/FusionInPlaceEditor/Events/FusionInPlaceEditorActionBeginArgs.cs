@@ -10,7 +10,7 @@ namespace Alis.Reactive.Fusion.Components
     /// <remarks>
     /// Syncfusion fires <c>actionBegin</c> immediately before issuing its built-in <c>UrlAdaptor</c>
     /// POST. Call <see cref="FusionInPlaceEditorActionBeginArgsExtensions.PreventDefault"/> to suppress
-    /// that default submit so the reactive pipeline owns the commit flow.
+    /// that default submit so the Reactive Plan pipeline owns the commit flow.
     /// </remarks>
     public class FusionInPlaceEditorActionBeginArgs
     {
@@ -29,7 +29,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         /// <remarks>
         /// Call before issuing <c>p.Post(...)...</c>. Without this, the editor performs its configured
-        /// <c>UrlAdaptor</c> POST alongside the reactive pipeline, duplicating the request.
+        /// <c>UrlAdaptor</c> POST alongside the Reactive Plan pipeline, duplicating the request.
         /// </remarks>
         /// <param name="pipeline">The pipeline that receives the event-arg cancellation mutation.</param>
         public static void PreventDefault(

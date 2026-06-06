@@ -1302,7 +1302,7 @@ IsExpanded { get; }  // True if the panel was expanded, false if collapsed.
 
 ### FusionAccordionExtensions
 
-Component operation extensions for `FusionAccordion` in a reactive pipeline.
+Component operation extensions for `FusionAccordion` in a Reactive Plan pipeline.
 
 ```csharp
 EnableItem<T>(index, isEnable)
@@ -1429,7 +1429,7 @@ Filtering { get; }  // Fires when the user types to filter.
 
 ### FusionAutoCompleteExtensions
 
-Reactive pipeline extensions for reading from and updating `FusionAutoComplete`.
+Reactive Plan pipeline extensions for reading from and updating `FusionAutoComplete`.
 
 ```csharp
 DataBind<T>()
@@ -1503,7 +1503,7 @@ ItemClick { get; }  // Fires when a breadcrumb item is clicked.
 
 ### FusionBreadcrumbExtensions
 
-Reactive pipeline extensions for `FusionBreadcrumb`.
+Reactive Plan pipeline extensions for `FusionBreadcrumb`.
 
 ```csharp
 ActiveItem<T>()
@@ -1565,7 +1565,7 @@ TooltipRender { get; }  // Fires before the tooltip renders.
 
 ### FusionBulletChartExtensions
 
-Reactive pipeline extensions for `FusionBulletChart`.
+Reactive Plan pipeline extensions for `FusionBulletChart`.
 
 ```csharp
 GetActualIndex<T>(index, totalLength)
@@ -1680,7 +1680,7 @@ SlideChanging { get; }  // Fires before the slide changes.
 
 ### FusionCarouselExtensions
 
-Reactive pipeline extensions for `FusionCarousel`.
+Reactive Plan pipeline extensions for `FusionCarousel`.
 
 ```csharp
 Next<T>()
@@ -1838,7 +1838,7 @@ Changed { get; }  // Fires when the color value changes.
 
 ### FusionColorPickerExtensions
 
-Typed component operations and value reads for `FusionColorPicker` in a reactive pipeline.
+Typed component operations and value reads for `FusionColorPicker` in a Reactive Plan pipeline.
 
 ```csharp
 Disable<T>(disabled)
@@ -1899,7 +1899,7 @@ Focus { get; }  // Fires when the component receives focus.
 
 ### FusionComboBoxExtensions
 
-Typed component operations and value reads for `FusionComboBox` in a reactive pipeline.
+Typed component operations and value reads for `FusionComboBox` in a Reactive Plan pipeline.
 
 ```csharp
 Clear<T>()
@@ -1981,7 +1981,7 @@ Select { get; }  // Fires when a menu item is selected.
 
 ### FusionContextMenuExtensions
 
-Reactive pipeline extensions for `FusionContextMenu`.
+Reactive Plan pipeline extensions for `FusionContextMenu`.
 
 ```csharp
 Close<T>()
@@ -2042,7 +2042,7 @@ Changed { get; }  // Fires when the date value changes.
 
 ### FusionDatePickerExtensions
 
-Typed component operations and value reads for `FusionDatePicker` in a reactive pipeline.
+Typed component operations and value reads for `FusionDatePicker` in a Reactive Plan pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -2099,7 +2099,7 @@ Changed { get; }  // Fires when the date range value changes.
 
 ### FusionDateRangePickerExtensions
 
-Typed value reading for `FusionDateRangePicker` in a reactive pipeline.
+Typed value reading for `FusionDateRangePicker` in a Reactive Plan pipeline.
 
 ```csharp
 EndDate<T>()
@@ -2153,7 +2153,7 @@ Changed { get; }  // Fires when the date-time value changes.
 
 ### FusionDateTimePickerExtensions
 
-Typed component operations and value reads for `FusionDateTimePicker` in a reactive pipeline.
+Typed component operations and value reads for `FusionDateTimePicker` in a Reactive Plan pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -2228,7 +2228,7 @@ OverlayClick { get; }  // Fires when the modal overlay is clicked.
 
 ### FusionDialogExtensions
 
-Component operation extensions for `FusionDialog` in a reactive pipeline.
+Component operation extensions for `FusionDialog` in a Reactive Plan pipeline.
 
 ```csharp
 Hide<T>()
@@ -2370,7 +2370,7 @@ Focus { get; }  // Fires when the component receives focus.
 
 ### FusionDropDownListExtensions
 
-Reactive pipeline extensions for reading from and updating `FusionDropDownList`.
+Reactive Plan pipeline extensions for reading from and updating `FusionDropDownList`.
 
 ```csharp
 DataBind<T>()
@@ -2439,7 +2439,7 @@ Changed { get; }  // Fires when the selected value ID array changes.
 
 ### FusionDropDownTreeExtensions
 
-Typed component operations and value reads for `FusionDropDownTree` in a reactive pipeline.
+Typed component operations and value reads for `FusionDropDownTree` in a Reactive Plan pipeline.
 
 ```csharp
 Clear<T>()
@@ -2488,7 +2488,7 @@ Selected { get; }  // Fires when files are selected.
 
 ### FusionFileUploadExtensions
 
-Typed value reading for `FusionFileUpload` in a reactive pipeline.
+Typed value reading for `FusionFileUpload` in a Reactive Plan pipeline.
 
 ```csharp
 Value<T>()
@@ -2607,7 +2607,7 @@ RowSelected<T>()
 
 ### FusionGridExtensions
 
-Reactive pipeline extensions for `FusionGrid`.
+Reactive Plan pipeline extensions for `FusionGrid`.
 
 ```csharp
 AddRecord<T>(row, index)
@@ -2907,7 +2907,7 @@ SubmitClick { get; }  // Fires on a user save click or Enter key. Fires even whe
 
 ### FusionInPlaceEditorExtensions
 
-Reactive pipeline extensions for reading from and updating `FusionInPlaceEditor`.
+Reactive Plan pipeline extensions for reading from and updating `FusionInPlaceEditor`.
 
 ```csharp
 AddClass<T>(className)
@@ -2975,7 +2975,7 @@ Changed { get; }  // Fires when the masked value changes.
 
 ### FusionInputMaskExtensions
 
-Typed component operations and value reads for `FusionInputMask` in a reactive pipeline.
+Typed component operations and value reads for `FusionInputMask` in a Reactive Plan pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -3060,7 +3060,7 @@ Changed { get; }  // Fires when selected values change.
 
 ### FusionListBoxExtensions
 
-Reactive pipeline extensions for `FusionListBox`.
+Reactive Plan pipeline extensions for `FusionListBox`.
 
 ```csharp
 DataBind<T>()
@@ -3106,7 +3106,7 @@ Selected { get; }  // Fires when a ListView item is selected.
 
 ### FusionListViewExtensions
 
-Reactive pipeline extensions for `FusionListView`.
+Reactive Plan pipeline extensions for `FusionListView`.
 
 ```csharp
 CheckAllItems<T>()
@@ -3190,7 +3190,7 @@ Select { get; }  // Fires when a menu item is selected.
 
 ### FusionMenuExtensions
 
-Reactive pipeline extensions for `FusionMenu`.
+Reactive Plan pipeline extensions for `FusionMenu`.
 
 ```csharp
 Close<T>()
@@ -3251,7 +3251,7 @@ Changed { get; }  // Fires when the selected value changes.
 
 ### FusionMultiColumnComboBoxExtensions
 
-Reactive pipeline extensions for reading from and updating `FusionMultiColumnComboBox`.
+Reactive Plan pipeline extensions for reading from and updating `FusionMultiColumnComboBox`.
 
 ```csharp
 DataBind<T>()
@@ -3316,7 +3316,7 @@ Filtering { get; }  // Fires when the user types to filter.
 
 ### FusionMultiSelectExtensions
 
-Reactive pipeline extensions for reading from and updating `FusionMultiSelect`.
+Reactive Plan pipeline extensions for reading from and updating `FusionMultiSelect`.
 
 ```csharp
 DataBind<T>()
@@ -3402,7 +3402,7 @@ Focus { get; }  // Fires when the component receives focus.
 
 ### FusionNumericTextBoxExtensions
 
-Typed component operations and value reads for `FusionNumericTextBox` in a reactive pipeline.
+Typed component operations and value reads for `FusionNumericTextBox` in a Reactive Plan pipeline.
 
 ```csharp
 Decrement<T>()
@@ -3468,7 +3468,7 @@ ValueChanged { get; }  // Fires after the complete OTP value changes.
 
 ### FusionOtpInputExtensions
 
-Typed component operations and value reads for `FusionOtpInput` in a reactive pipeline.
+Typed component operations and value reads for `FusionOtpInput` in a Reactive Plan pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -3716,7 +3716,7 @@ ValueChanged { get; }  // Fires when the rating value changes.
 
 ### FusionRatingExtensions
 
-Typed component operations and value reads for `FusionRating` in a reactive pipeline.
+Typed component operations and value reads for `FusionRating` in a Reactive Plan pipeline.
 
 ```csharp
 Reset<T>()
@@ -3781,7 +3781,7 @@ Changed { get; }  // Fires when the rich text content changes.
 
 ### FusionRichTextEditorExtensions
 
-Typed component operations and value reads for `FusionRichTextEditor` in a reactive pipeline.
+Typed component operations and value reads for `FusionRichTextEditor` in a Reactive Plan pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -3909,7 +3909,7 @@ PopupOpen { get; }  // Fires before a popup opens. Use `Type` to distinguish `Qu
 
 ### FusionScheduleExtensions
 
-Reactive pipeline extensions for reading from and updating `FusionSchedule`.
+Reactive Plan pipeline extensions for reading from and updating `FusionSchedule`.
 
 ```csharp
 AddEvent<T>(data)
@@ -4102,7 +4102,7 @@ Changed { get; }  // Fires after the scalar slider value changes.
 
 ### FusionSliderExtensions
 
-Typed component operations and value reads for `FusionSlider` in a reactive pipeline.
+Typed component operations and value reads for `FusionSlider` in a Reactive Plan pipeline.
 
 ```csharp
 RangeValue<T>()
@@ -4334,7 +4334,7 @@ Changed { get; }  // Fires when the switch state changes.
 
 ### FusionSwitchExtensions
 
-Typed component operations and value reads for `FusionSwitch` in a reactive pipeline.
+Typed component operations and value reads for `FusionSwitch` in a Reactive Plan pipeline.
 
 ```csharp
 SetChecked<T>(isChecked)
@@ -4378,7 +4378,7 @@ Selected { get; }  // Fires when a tab is selected.
 
 ### FusionTabExtensions
 
-Component operation extensions for `FusionTab` in a reactive pipeline.
+Component operation extensions for `FusionTab` in a Reactive Plan pipeline.
 
 ```csharp
 HideTab<T>(index, isHidden)
@@ -4461,7 +4461,7 @@ Input { get; }  // Fires as the text changes while editing.
 
 ### FusionTextAreaExtensions
 
-Typed component operations and value reads for `FusionTextArea` in a reactive pipeline.
+Typed component operations and value reads for `FusionTextArea` in a Reactive Plan pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -4548,7 +4548,7 @@ Input { get; }  // Fires as the text changes while editing.
 
 ### FusionTextBoxExtensions
 
-Typed component operations and value reads for `FusionTextBox` in a reactive pipeline.
+Typed component operations and value reads for `FusionTextBox` in a Reactive Plan pipeline.
 
 ```csharp
 AddAppendIcon<T>(iconCssClass)
@@ -4623,7 +4623,7 @@ Changed { get; }  // Fires when the time value changes.
 
 ### FusionTimePickerExtensions
 
-Typed component operations and value reads for `FusionTimePicker` in a reactive pipeline.
+Typed component operations and value reads for `FusionTimePicker` in a Reactive Plan pipeline.
 
 ```csharp
 FocusIn<T>()
@@ -4677,7 +4677,7 @@ Clicked { get; }  // Fires when a toolbar item is clicked.
 
 ### FusionToolbarExtensions
 
-Reactive pipeline extensions for `FusionToolbar`.
+Reactive Plan pipeline extensions for `FusionToolbar`.
 
 ```csharp
 Disable<T>(value)
@@ -4761,7 +4761,7 @@ Opened { get; }  // Fires after the tooltip is visible.
 
 ### FusionTooltipExtensions
 
-Component operation extensions for `FusionTooltip` in a reactive pipeline.
+Component operation extensions for `FusionTooltip` in a Reactive Plan pipeline.
 
 ```csharp
 Close<T>()

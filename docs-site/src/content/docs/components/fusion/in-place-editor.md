@@ -5,7 +5,7 @@ sidebar:
   order: 15
 ---
 
-A click-to-edit editor. Displays a value as plain text; user clicks the pencil; an inner editor (Text, DropDownList, NumericTextBox, DatePicker, ...) opens with OK/Cancel; on OK, the reactive pipeline commits to your server. Use it for quick-edit UX on detail pages — "change this resident's DOB without leaving the profile view".
+A click-to-edit editor. Displays a value as plain text; user clicks the pencil; an inner editor (Text, DropDownList, NumericTextBox, DatePicker, ...) opens with OK/Cancel; on OK, the Reactive Plan pipeline commits to your server. Use it for quick-edit UX on detail pages — "change this resident's DOB without leaving the profile view".
 
 **Model type:** `string` (the outer `value` surfaces every inner type as string) &nbsp; **ValueMember:** `"value"` &nbsp; **Commit event:** `ActionSuccess`
 

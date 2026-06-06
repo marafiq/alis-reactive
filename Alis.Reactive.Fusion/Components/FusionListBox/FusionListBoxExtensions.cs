@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive pipeline extensions for <see cref="FusionListBox"/>.
+    /// Reactive Plan pipeline extensions for <see cref="FusionListBox"/>.
     /// </summary>
     public static class FusionListBoxExtensions
     {

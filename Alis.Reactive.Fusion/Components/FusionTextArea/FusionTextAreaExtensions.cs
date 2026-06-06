@@ -4,7 +4,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Typed component operations and value reads for <see cref="FusionTextArea"/> in a reactive pipeline.
+    /// Typed component operations and value reads for <see cref="FusionTextArea"/> in a Reactive Plan pipeline.
     /// </summary>
     public static class FusionTextAreaExtensions
     {
