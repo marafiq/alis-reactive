@@ -5,9 +5,9 @@ namespace Alis.Reactive.NativeTagHelpers.Kv;
 /// </summary>
 public enum KvLayout
 {
-    /// <summary>The label sits above the value.</summary>
+    /// <summary>Label above value.</summary>
     Stacked,
 
-    /// <summary>The label and value sit on one line, separated by a colon.</summary>
+    /// <summary>Label and value on one colon-separated line.</summary>
     Inline
 }

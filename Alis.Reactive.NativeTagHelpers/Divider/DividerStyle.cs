@@ -5,9 +5,9 @@ namespace Alis.Reactive.NativeTagHelpers.Divider;
 /// </summary>
 public enum DividerStyle
 {
-    /// <summary>A solid horizontal rule.</summary>
+    /// <summary>Solid horizontal rule.</summary>
     Plain,
 
-    /// <summary>A dashed horizontal rule.</summary>
+    /// <summary>Dashed horizontal rule.</summary>
     Dashed
 }

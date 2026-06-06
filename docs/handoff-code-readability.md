@@ -897,6 +897,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: remaining article-led
   Playwright extension locator summaries were tightened while preserving
   Syncfusion wrapper, hidden-textarea, append-icon, and Reactive Plan facts.
+- Resolved on `tiny-safe-but-important-refactorings`: NativeTagHelpers enum
+  value XML summaries for divider style and key-value layout now use terse
+  IntelliSense wording without changing public enum values.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
