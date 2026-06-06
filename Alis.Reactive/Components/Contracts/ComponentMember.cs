@@ -33,7 +33,6 @@ namespace Alis.Reactive
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
-        /// <summary>Gets the plan member name used by reactions and value reads.</summary>
         internal string Member => _member.Value;
 
         internal Shape Shape => _shape;
@@ -85,7 +84,6 @@ namespace Alis.Reactive
             _arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
         }
 
-        /// <summary>Gets the plan member name used by call reactions.</summary>
         internal string Member => _member.Value;
 
         internal ObjectMethodContract ContractReturning(Shape returns)
