@@ -4,8 +4,8 @@ namespace Alis.Reactive.Native.Components
     /// Event args for <see cref="NativeRadioGroupEvents.Changed"/>.
     /// </summary>
     /// <remarks>
-    /// The properties are typed markers for event-payload paths; <c>x => x.Value</c>
-    /// resolves to <c>evt.value</c> in condition expressions.
+    /// Use <c>x =&gt; x.Value</c> in typed event conditions; the Reactive Plan
+    /// reads the value from <c>evt.value</c>.
     /// </remarks>
     public class NativeRadioGroupChangeArgs
     {

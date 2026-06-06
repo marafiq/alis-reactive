@@ -228,6 +228,10 @@ Candidate cleanup:
   event-wiring XML docs no longer repeat the extension receiver as "builder
   being wired." `NativeButton` also dropped generic model boilerplate where the
   summary already explains the explicit-ID event target.
+- Resolved on `tiny-safe-but-important-refactorings`: Native changed-event
+  payload remarks now describe typed Reactive Plan event-payload reads instead
+  of calling the public properties "typed markers." Payload shape remains
+  unchanged.
 - Resolved on `tiny-safe-but-important-refactorings`: Fusion component
   event-wiring XML docs no longer repeat generic `TModel` ownership or the
   extension receiver. Event selector, pipeline, and Reactive Plan parameters
