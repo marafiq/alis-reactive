@@ -14,7 +14,7 @@ namespace Alis.Reactive.Builders
     {
         /// <summary>Appends a low-level reaction emitted by a component event helper.</summary>
         /// <param name="step">Reaction graph node appended to the current pipeline.</param>
-        void AddStep(ReactionGraph step);
+        internal void AddStep(ReactionGraph step);
         /// <summary>Plan build context used for component registration.</summary>
         internal PlanBuildContext BuildContext { get; }
     }

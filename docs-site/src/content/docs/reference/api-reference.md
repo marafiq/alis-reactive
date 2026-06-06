@@ -235,10 +235,6 @@ ToggleClass(className)
 
 Pipeline append handle passed to component event-args helper methods.
 
-```csharp
-AddStep(step)
-```
-
 ### PipelineBuilder<T>
 
 Builds the ordered reactions that execute when a trigger fires: element updates,

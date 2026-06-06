@@ -334,6 +334,10 @@ Candidate cleanup:
   remains public because component event helper methods accept it, but its XML
   docs now describe the event-helper append contract instead of exposing
   implementation vocabulary such as `ComponentRef`.
+- Resolved on `tiny-safe-but-important-refactorings`: `IReactionEmitter.AddStep`
+  is no longer public API surface. Component packages still use it through
+  friend-assembly access, while generated public docs no longer teach
+  application developers to append raw `ReactionGraph` nodes.
 
 ### Implementation Inline Comments
 
