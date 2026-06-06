@@ -3,12 +3,8 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.Cascading;
 
-/// <summary>
-/// Proves the cascading dropdown DSL path: parent Fusion selection gathers only <c>Country</c>,
-/// loads the child DataSource over HTTP, then save gathers <c>Country</c> and <c>City</c>.
-/// Selection helpers use Playwright user gestures rather than Syncfusion instance APIs
-/// so Syncfusion raises the user-facing change event.
-/// </summary>
+// Cascading DSL path: parent selection gathers Country, loads child data, then save gathers Country and City.
+// Selection helpers use user gestures so Syncfusion raises the user-facing change event.
 [TestFixture]
 public class WhenParentSelectionFiltersDependentList : PlaywrightTestBase
 {
