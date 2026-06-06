@@ -3,27 +3,27 @@ using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>Model for the ChipFilter sandbox: multi-select chips as a filter over a resident grid.</summary>
+    /// <summary>ChipFilter page model for multi-select chip filtering over a resident grid.</summary>
     public sealed class ChipFilterModel
     {
     }
 
     /// <summary>
-    /// Custom event payload carrying the chip selection. <see cref="FusionSelectedChips.Data"/> is the
-    /// array of selected chip objects the array DSL operates on.
+    /// Custom event payload carrying selected chips; <see cref="FusionSelectedChips.Data"/>
+    /// supplies the chip objects used by the array DSL.
     /// </summary>
     public sealed class ChipFilterPayload
     {
         public FusionSelectedChips Selection { get; set; } = new FusionSelectedChips();
     }
 
-    /// <summary>The resident roster (and filtered result) bound to the grid.</summary>
+    /// <summary>Resident roster response bound to the grid before and after filtering.</summary>
     public sealed class CareResidentResponse
     {
         public CareResident[] Residents { get; set; } = Array.Empty<CareResident>();
     }
 
-    /// <summary>A resident with a care level matching the chip texts.</summary>
+    /// <summary>Resident row matched against selected care-level chip text.</summary>
     public sealed class CareResident
     {
         public string Name { get; set; } = "";

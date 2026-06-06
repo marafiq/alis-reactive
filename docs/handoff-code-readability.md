@@ -966,6 +966,9 @@ Rewrite or delete:
   sandbox model XML docs now state the array source, event-payload, per-element
   predicate, and NativeButton model-binding boundaries without generic "model
   for" or article-led wording.
+- Resolved on `tiny-safe-but-important-refactorings`: ChipFilter sandbox
+  model/controller XML docs now name the selected-chip payload, grid roster, and
+  care-level filter contracts without generic "model for" or roster narration.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

@@ -34,7 +34,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new ChipFilterModel());
         }
 
-        /// <summary>The full roster shown on load.</summary>
+        /// <summary>Returns the unfiltered resident roster loaded on page boot.</summary>
         [HttpGet("Residents")]
         public IActionResult Residents() => Ok(new CareResidentResponse { Residents = All });
 
