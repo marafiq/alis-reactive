@@ -149,7 +149,7 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>Base descriptor for a declared plugin function or command.</summary>
+    /// <summary>Base declaration for a plugin function or command.</summary>
     public abstract class PluginOperation
     {
         private readonly PluginName _pluginName;
@@ -207,7 +207,7 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>Descriptor for a readable Reactive Plan plugin property.</summary>
+    /// <summary>Declaration for a readable Reactive Plan plugin property.</summary>
     /// <typeparam name="TValue">The property value type exposed to downstream value expressions.</typeparam>
     public sealed class PluginProperty<TValue>
     {
@@ -241,7 +241,7 @@ namespace Alis.Reactive
     }
 
     /// <summary>
-    /// Descriptor for a plugin function that returns a typed value. Chain
+    /// Declares a plugin function that returns a typed value. Chain
     /// <c>.Arg&lt;T&gt;()</c> or <c>.Args(...)</c> to set the argument contract.
     /// </summary>
     /// <typeparam name="TReturn">The function return type exposed to downstream value expressions.</typeparam>
@@ -273,7 +273,7 @@ namespace Alis.Reactive
     }
 
     /// <summary>
-    /// Descriptor for a plugin command that returns no value. Chain
+    /// Declares a plugin command that returns no value. Chain
     /// <c>.Arg&lt;T&gt;()</c> or <c>.Args(...)</c> to set the argument contract.
     /// </summary>
     public sealed class PluginCommand : PluginOperation

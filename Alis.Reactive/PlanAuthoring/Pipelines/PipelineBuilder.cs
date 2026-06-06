@@ -211,9 +211,9 @@ namespace Alis.Reactive.Builders
             return new Conditions.TypedPluginPropertySource<T>(property);
         }
 
-        /// <summary>Reads the return value described by a reusable plugin function descriptor.</summary>
+        /// <summary>Reads the return value declared by a reusable plugin function.</summary>
         /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="function">The descriptor carrying the plugin key, target member, argument contract, and return shape.</param>
+        /// <param name="function">The plugin function carrying the plugin key, target member, argument contract, and return shape.</param>
         /// <returns>A builder for supplying function arguments before the result becomes a typed source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
         {
@@ -222,9 +222,9 @@ namespace Alis.Reactive.Builders
             return new PluginMemberBuilder<T, TModel>(function);
         }
 
-        /// <summary>Reads the value described by a reusable plugin property descriptor.</summary>
+        /// <summary>Reads the value declared by a reusable plugin property.</summary>
         /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="property">The descriptor carrying the plugin key, property member, and value shape.</param>
+        /// <param name="property">The plugin property carrying the plugin key, property member, and value shape.</param>
         /// <returns>A typed plugin property value source.</returns>
         public Conditions.TypedPluginPropertySource<T> Plugin<T>(PluginProperty<T> property)
         {
@@ -263,8 +263,8 @@ namespace Alis.Reactive.Builders
                 signature.Arguments);
         }
 
-        /// <summary>Emits a plugin-call reaction from a reusable plugin command descriptor.</summary>
-        /// <param name="command">The descriptor carrying the plugin key, target member, and argument contract.</param>
+        /// <summary>Emits a plugin-call reaction from a reusable plugin command.</summary>
+        /// <param name="command">The plugin command carrying the plugin key, target member, and argument contract.</param>
         /// <returns>A plugin-call builder for supplying arguments before <c>Fire()</c> appends the reaction.</returns>
         public PluginCallBuilder<TModel> Plugin(PluginCommand command)
         {

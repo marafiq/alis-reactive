@@ -64,7 +64,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Registers a typed plugin contract in the plan.</summary>
-        /// <param name="plugin">The plugin descriptor whose name and members define the contract.</param>
+        /// <param name="plugin">The plugin instance whose name and members define the contract.</param>
         public void RegisterPlugin(Plugin plugin)
         {
             if (plugin == null) throw new ArgumentNullException(nameof(plugin));
@@ -72,8 +72,8 @@ namespace Alis.Reactive
         }
 
         /// <summary>Creates and registers a typed plugin contract in the plan.</summary>
-        /// <typeparam name="TPlugin">The plugin descriptor type to instantiate and register.</typeparam>
-        /// <returns>The registered plugin descriptor for use in pipeline calls.</returns>
+        /// <typeparam name="TPlugin">The plugin type to instantiate and register.</typeparam>
+        /// <returns>The registered plugin instance for use in pipeline calls.</returns>
         public TPlugin RegisterPlugin<TPlugin>()
             where TPlugin : Plugin, new()
         {
