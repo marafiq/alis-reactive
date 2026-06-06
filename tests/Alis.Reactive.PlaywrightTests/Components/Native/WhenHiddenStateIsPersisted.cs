@@ -1,8 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises NativeHiddenField seeded values, Value reads, and IncludeAll gather behavior.
-/// </summary>
 [TestFixture]
 public class WhenHiddenStateIsPersisted : PlaywrightTestBase
 {
