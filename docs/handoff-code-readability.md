@@ -136,6 +136,10 @@ sequencing, or why a test must be non-parallel.
   invariants now use plain comments instead of JSDoc blocks. The comments remain
   because validation and branch execution depend on sync behavior until confirm
   crosses the async boundary.
+- Resolved on `tiny-safe-but-important-refactorings`: shape-conversion runtime
+  invariants now use plain comments instead of JSDoc blocks. The comments remain
+  because best-effort runtime reads and strict validation comparisons intentionally
+  have different failure behavior.
 
 ### Builder XML Documentation
 

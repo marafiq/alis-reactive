@@ -10,7 +10,7 @@ function ok<T>(value: T): ShapeConversionResult<T> { return { ok: true, value };
 function err<T>(error: string): ShapeConversionResult<T> { return { ok: false, error }; }
 function isMissingInput(value: unknown): boolean { return value === null || value === undefined; }
 
-/** Best-effort shape application for runtime reads; failed conversions leave the original value intact. */
+// Best-effort shape application for runtime reads; failed conversions leave the original value intact.
 export function applyShape(value: unknown, shape: Shape): unknown {
   switch (shape.kind) {
     case "string":   return applyScalar(value, toString);
@@ -58,7 +58,7 @@ function applyObjectShape(value: unknown, shape: Extract<Shape, { kind: "object"
   return applyObjectFields(record.value, shape);
 }
 
-/** Strict conversion for validation comparisons; callers receive conversion errors instead of fallback values. */
+// Strict conversion for validation comparisons; callers receive conversion errors instead of fallback values.
 export function convertByShape(value: unknown, shape: Shape): ShapeConversionResult<unknown> {
   switch (shape.kind) {
     case "string":   return toString(value);
