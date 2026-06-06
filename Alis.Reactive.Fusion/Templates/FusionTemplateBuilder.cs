@@ -70,7 +70,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a Syncfusion binding for a template model property.
         /// </summary>
-        /// <param name="property">The template model property to bind.</param>
+        /// <param name="property">Template model property.</param>
         public FusionTemplateBuilder<TModel> Text<TProperty>(Expression<Func<TModel, TProperty>> property)
         {
             var binding = FusionTemplateExpression.ToBinding(property);
@@ -91,14 +91,14 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a <c>span</c> bound to a template model property.
         /// </summary>
-        /// <param name="property">The template model property to bind.</param>
+        /// <param name="property">Template model property.</param>
         public FusionTemplateBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property) =>
             Span(property, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled <c>span</c> bound to a template model property.
         /// </summary>
-        /// <param name="property">The template model property to bind.</param>
+        /// <param name="property">Template model property.</param>
         /// <param name="css">CSS class.</param>
         public FusionTemplateBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, string css) =>
             Span(property, TemplateCss.Class(css));
@@ -178,7 +178,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a badge whose content is bound to a template model property.
         /// </summary>
-        /// <param name="property">The template model property to bind.</param>
+        /// <param name="property">Template model property.</param>
         /// <param name="css">CSS class.</param>
         public FusionTemplateBuilder<TModel> Badge<TProperty>(Expression<Func<TModel, TProperty>> property, string css = "e-badge")
         {

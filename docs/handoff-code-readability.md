@@ -278,7 +278,7 @@ Candidate cleanup:
   remain because they carry the template authoring contract.
 - Resolved on `tiny-safe-but-important-refactorings`: `FusionTemplateBuilder`
   and `FusionConditionalBuilder` literal-text and nested-template parameter
-  docs, plus root class and attribute parameter docs, now keep
+  docs, property-binding parameter docs, plus root class and attribute docs, now keep
   generator-required XML tags while dropping prose that repeated the method
   name. Trust-boundary remarks for raw HTML, attributes, events, and `onclick`
   remain.
