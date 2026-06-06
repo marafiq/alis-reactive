@@ -629,6 +629,10 @@ Candidate cleanup:
   `GuardBuilder`, `BranchBuilder`, and `ConditionStart` no longer repeat fluent
   builder return mechanics in `<returns>` tags. Summaries, parameter docs, and
   method return types still expose the public DSL contract.
+- Resolved on `tiny-safe-but-important-refactorings`: `PipelineBuilder`
+  condition entrypoints now follow the same rule: branch summaries and
+  source-parameter docs remain, while return tags no longer repeat fluent
+  builder mechanics.
 - Resolved on `tiny-safe-but-important-refactorings`: text and source-vs-source
   condition operator parameter tags now drop repeated leading articles while
   keeping source-value and runtime-read wording.

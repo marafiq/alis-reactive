@@ -12,7 +12,6 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
         /// <param name="payload">Typed event payload placeholder supplied by the trigger callback.</param>
         /// <param name="path">Payload value compared at runtime.</param>
-        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
             TPayload payload,
             Expression<Func<TPayload, TProp>> path)
@@ -28,7 +27,6 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TProp">Selected response-body value type.</typeparam>
         /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
-        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TResponse, TProp>(
             ResponseBody<TResponse> responseBody,
             Expression<Func<TResponse, TProp>> path)
@@ -43,7 +41,6 @@ namespace Alis.Reactive.Builders
         /// <summary>Starts a branch whose guard reads from a typed value source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
-        /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
             _draft.BeginBranch();
@@ -52,7 +49,6 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Adds a user-decision guard before the pipeline continues.</summary>
         /// <param name="message">User-decision confirmation message.</param>
-        /// <returns>A guard builder for configuring accepted and rejected branches.</returns>
         public GuardBuilder<TModel> Confirm(string message)
         {
             _draft.BeginBranch();
