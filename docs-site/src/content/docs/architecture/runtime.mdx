@@ -1,357 +1,189 @@
 ---
 title: Runtime
-description: How the JS runtime discovers plans, boots in two phases, and executes commands — traced through every module.
+description: How the TypeScript runtime boots Reactive Plans, composes the Active Plan, and executes reactions.
 sidebar:
   order: 7
 ---
 
-The runtime is a plan interpreter. It reads the JSON plan that C# builders produce and executes the described behavior. It does not invent behavior — it follows instructions.
+The runtime is a Reactive Plan interpreter. It reads the JSON plan produced by the
+C# builders, composes the current Active Plan, wires declared triggers, and
+executes the declared reactions. It does not infer missing plan shape or add
+fallback behavior.
 
 ## Module structure
 
 ```
-Scripts/
-├── root.ts                          entry point — discovers [data-reactive-plan], calls boot()
+Alis.Reactive.Assets/runtime/
+├── root.ts                         waits for DOM readiness, registers host plugins, boots discovered plans
 ├── lifecycle/
-│   ├── boot.ts                      live validation wiring, two-phase behavior wiring, slot load/unload
-│   ├── merge-plan.ts                Active Plan composition, initial boot plan, partial slot replacement
-│   ├── component-contribution.ts     component ownership and contribution intent
-│   ├── partial-slot.ts              applied slot contribution records
-│   └── object-contract-fragment.ts  type fragment ownership and recomposition
+│   ├── boot.ts                     wires validation and behaviors; runs page-ready after listeners exist
+│   ├── applied-plans.ts            owns boot snapshots, loaded partial slots, and Active Plan recomposition
+│   ├── merge-policy.ts             composes boot and slot plans into one Active Plan
+│   ├── component-merge.ts          merges component records by role and slot ownership
+│   └── object-contracts.ts         merges BrowserObjectContract fragments
 ├── execution/
-│   ├── execute.ts                   reaction dispatcher — sequential, conditional, http, parallel
-│   ├── commands.ts                  command dispatcher — dispatch, mutate-element, mutate-event, into
-│   ├── element.ts                   bracket notation — root[prop] = val, root[method](args)
-│   ├── trigger.ts                   wires page-ready, custom-event, component-event listeners
-│   ├── gather.ts                    collects component + event values for HTTP requests
-│   ├── http.ts                      builds and executes fetch(), routes responses
-│   ├── pipeline.ts                  orchestrates: pre-fetch → validate → request → parallel
-│   └── inject.ts                    injects HTML into containers, loads or unloads embedded partial plans
-├── resolution/
-│   ├── resolver.ts                  walks BindSource — event paths or component reads
-│   └── component.ts                 vendor root resolution (see Component Model)
-├── conditions/                      evaluates guards — value, all, any, not, confirm
-├── validation/                      client-side validation from plan models
-├── components/                      component-specific side effects (drawer, loader, confirm)
-├── core/                            walk.ts, coerce.ts, trace.ts, assert-never.ts
-└── types/                           generated TypeScript interfaces from the C# plan domain
+│   ├── triggers/trigger.ts         wires page-ready, document, component, server-push, and SignalR triggers
+│   ├── reactions/execute.ts        dispatches reaction graphs
+│   ├── requests/http.ts            validates, gathers input, fetches, and routes responses
+│   ├── requests/gather.ts          resolves RequestInput values
+│   ├── partials/inject.ts          injects HTML and loads or unloads embedded partial plans
+│   └── realtime/                   server-push and SignalR connection handling
+├── browser-objects/                component/plugin runtime object access, paths, shapes, and execution context
+├── values/evaluate.ts              evaluates ValueExpression from literal, read, object, array, and array-op nodes
+├── conditions/                     evaluates ConditionGraph nodes
+├── validation/                     live validation and server validation display
+├── events/                         native and Fusion component event resolution
+├── plugins/                        host plugin catalog
+├── shared/                         assertNever, shape conversion, and wire helpers
+└── types/plan.ts                   generated TypeScript contract from the C# plan domain
 ```
 
-## Boot — `root.ts` → `boot.ts`
+## Boot Flow
 
-`root.ts` runs on every page load. It finds all `[data-reactive-plan]` elements, parses their JSON, composes first-DOM plan documents by `planId` via `composeInitialPlans()`, and calls `boot()` for each. No global state. No `window.alis` (one exception: `window.alis.confirm` for the confirm guard dialog).
+`root.ts` starts once the document is ready. It drains queued host-page plugins,
+initializes built-in browser objects such as confirm and native action links,
+parses every `[data-reactive-plan]` script, composes boot plans by `planId`, and
+passes each Active Plan to `boot()`.
 
-`boot()` wires the already-declared plan:
+`boot.ts` wires two things:
 
-```d2
-direction: right
+1. Live validation for components that declare a validation container.
+2. Behaviors from the Active Plan.
 
-validation: "wireContainerValidation()\nWire live validation\nfor container scopes" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 16
-}
-wire: "wireBehaviors()\nTwo-phase behavior wiring" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
+Behavior wiring is intentionally two-phase. Non-`page-ready` triggers are wired
+first, then `page-ready` behaviors run. That preserves event chains where a
+page-ready reaction dispatches a document event that another behavior listens
+for.
 
-validation -> wire
-```
+## Active Plan Composition
 
-Validation metadata is already in the plan. `wireContainerValidation()` only attaches live validation callbacks for components that declare a validation container scope.
+`applied-plans.ts` owns the runtime plan state:
 
-**Two-phase boot** guarantees event chains work regardless of declaration order. Phase 1 wires all CustomEvent and component-event listeners. Phase 2 runs page-ready reactions — which may dispatch events that Phase 1 listeners catch. Without this, a page-ready dispatch would fire before the listener exists and vanish silently.
+| State | Purpose |
+|-------|---------|
+| Boot snapshot | Immutable copy of the plan discovered during first boot. |
+| Partial slot load | Plans loaded into one partial slot, plus the slot's `AbortController`. |
+| Active Plan | Recomposition of the boot snapshot plus currently loaded slot plans. |
 
-At this point, the page is live. Listeners are attached. The runtime is waiting.
+When a partial slot loads, the runtime snapshots the incoming plans, recomposes
+affected Active Plans, wires the new slot behaviors, and wires validation for
+components introduced by the slot. When a slot unloads, its `AbortController`
+removes the slot's listeners and the affected Active Plans are recomposed
+without that slot.
 
-## When a trigger fires — `trigger.ts` → `execute.ts` → `element.ts`
+## Trigger Wiring
 
-The user checks a checkbox. The `change` listener fires. The runtime makes three decisions — each one narrowing scope until the DOM changes.
+Each `Behavior` has `startsWhen` plus a `reaction`. `trigger.ts` wires the
+current trigger kinds:
 
-```d2
-direction: right
+| Trigger kind | Runtime behavior |
+|--------------|------------------|
+| `page-ready` | Runs immediately or on `DOMContentLoaded`. |
+| `document-event` | Adds a `document` listener and uses `CustomEvent.detail` when present. |
+| `component-event` | Resolves the component event channel and wires the component event source. |
+| `server-push` | Opens an SSE stream through `EventSource`. |
+| `signalr` | Wires a SignalR hub method. |
 
-trigger: "trigger.ts\nEvent fires" {
-  shape: rectangle
-  style.fill: "#fce8e6"
-  style.stroke: "#ea4335"
-  style.font-size: 16
-}
-reaction: "execute.ts\nReaction kind?" {
-  shape: diamond
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 16
-}
-command: "commands.ts\nCommand kind?" {
-  shape: diamond
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 16
-}
-mutation: "element.ts\nMutation kind?" {
-  shape: diamond
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-dom: "DOM changes" {
-  shape: rectangle
-  style.fill: "#d4edda"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
+`trigger.ts` is also the reaction error boundary. Sync failures are logged
+inside the event turn; async failures are logged when their promise rejects.
+Pure sync reactions must stay sync so component event payload mutations remain
+visible to the vendor event handler.
 
-trigger -> reaction -> command -> mutation -> dom
-```
+## Reaction Execution
 
-### Trigger wiring — `trigger.ts`
+`execute.ts` dispatches the current `ReactionGraph` kinds:
 
-Attaches listeners based on `trigger.kind`. Each creates an execution context and calls `executeReaction()`.
+| Reaction kind | Runtime behavior | Sync/async expectation |
+|---------------|------------------|------------------------|
+| `set` | Sets a component/plugin/payload property. | Sync |
+| `call` | Calls a component/plugin/payload method. | Sync |
+| `dispatch` | Dispatches a document `CustomEvent`. | Sync |
+| `inject` | Injects HTML into a partial slot and applies embedded plans. | Sync boundary, may load plan state |
+| `show-validation-errors` | Renders server validation errors into the validation container. | Sync |
+| `sequence` | Executes each child reaction in order, awaiting only after the first async child. | Sync until an async child appears |
+| `branch` | Evaluates cases in order and runs the matching reaction. | Sync unless a condition or selected reaction is async |
+| `request` | Validates, gathers request input, sends fetch, and routes the response. | Async |
+| `parallel` | Runs child reactions concurrently and optionally runs an `on-settled` reaction. | Async |
 
-| Trigger kind | What it wires | Context |
-|-------------|---------------|---------|
-| `page-ready` | Immediate execution (or `DOMContentLoaded`) | `{ components }` |
-| `custom-event` | `document.addEventListener(eventName)` | `{ evt: detail, components }` |
-| `component-event` | `resolveRoot(el, vendor).addEventListener(jsEvent)` | `{ evt: payload, components }` |
-| `server-push` | `new EventSource(url)` — SSE stream listener | `{ evt: parsed data, components }` |
-| `signalr` | `HubConnection.on(methodName)` — SignalR hub listener | `{ evt: method args, components }` |
+This is one reaction graph, not a command layer. Component writes, method calls,
+document dispatch, partial injection, requests, and validation display are all
+reaction nodes.
 
-For component events, `trigger.ts` contains vendor-specific logic: native components read `readExpr` from the element and package it into the detail, fusion components pass the event object directly. All listeners use `AbortSignal` for clean teardown.
+## Value Evaluation
 
-For server-push and signalr, the runtime manages persistent connections shared by triggers with the same endpoint/hub URL. SSE uses the browser's native `EventSource` with automatic reconnection. SignalR uses `@microsoft/signalr` with `withAutomaticReconnect()`. Both show a retry indicator when all retries are exhausted.
+`values/evaluate.ts` is the shared `ValueExpression` evaluator used by
+execution, gather, validation, and condition evaluation.
 
-### Decision 1 — Reaction kind (`execute.ts`)
+| Value expression | Runtime behavior |
+|------------------|------------------|
+| `literal` | Applies the declared shape to the literal value. |
+| `read` | Reads from component/plugin object contracts, URL parameters, payload scopes, DOM sources, or element scope. |
+| `object` | Evaluates fields and applies the declared object shape. |
+| `array` | Evaluates items and applies the declared array shape. |
+| `array-op` | Runs the declared array operation with element-scoped predicates. |
 
-| Kind | Behavior | Sync/Async |
-|------|----------|-----------|
-| `sequential` | Execute each command in order | Sync |
-| `conditional` | Evaluate guards, pick matching branch (if/elseif/else) | Async (guards) |
-| `http` | Validate → gather → fetch → route response | Async (fetch) |
-| `parallel-http` | `Promise.all` on requests, then `OnAllSettled` | Async |
+DOM reads are the explicit DOM boundary. Component and plugin reads go through
+`RuntimePlan.objectForSource()`, so contract access stays centralized.
 
-The tree is recursive — a conditional branch can contain an HTTP reaction, and vice versa — but at each node the dispatch is a flat switch on `kind`.
+## Request Input
 
-### Decision 2 — Command kind (`commands.ts`)
+`requests/gather.ts` resolves `RequestInput` through the same `evaluateValue`
+path used by reactions and conditions. Authored assignments write to payload,
+header, or route-param targets. `all-registered-inputs` walks mounted registered
+inputs in the Active Plan and writes their bound values through
+`request-payload-writer.ts`.
 
-| Kind | Module | What it does |
-|------|--------|-------------|
-| `dispatch` | inline | Fires `CustomEvent` on `document` |
-| `mutate-element` | `element.ts` | Bracket notation on DOM element or component root |
-| `mutate-event` | inline | Modifies `ctx.evt` (e.g., `preventDefaultAction = true`) |
-| `validation-errors` | `validation/` | Routes server-side errors to form fields |
-| `into` | `inject.ts` | Injects response HTML, replaces or unloads the target partial slot |
+Route params and headers must serialize to scalar wire values. Missing mounted
+registered inputs are skipped because unloaded partial slots are valid Active
+Plan state.
 
-Each command can carry an optional `when` guard — if it fails, the command is skipped but the pipeline continues.
+## Exhaustiveness
 
-### Decision 3 — Mutation kind (`element.ts` / `commands.ts`)
+The runtime uses `assertNever()` where generated union kinds cross module
+boundaries. If the C# plan model adds a new kind without a TypeScript handler,
+the TypeScript compiler and runtime both point to the missing handler.
 
-Two primitives, three targets:
+Important exhaustiveness points:
 
-- **`set-prop`** — `root[prop] = val`
-- **`call`** — `root[method](args)`
-
-| Target | Module | How root is resolved |
-|--------|--------|---------------------|
-| DOM element | `element.ts` | `getElementById(target)` |
-| Component | `element.ts` | `resolveRoot(el, vendor)` |
-| Event args | `commands.ts` | `ctx.evt` |
-
-The plan carries every name as a string. The runtime applies it via bracket notation — no catalog, no switch on method names.
-
-## Value resolution — `resolver.ts` → `walk.ts`
-
-Commands and conditions need dynamic values. `resolver.ts` dispatches by `source.kind`:
-
-| Source | Resolution path |
+| Module | Union checked |
 |--------|---------------|
-| `event` | `walk(ctx, "evt.address.city")` |
-| `component` | `resolveRoot(el, vendor)` → `walk(root, readExpr)` via `evalRead()` in `component.ts` |
+| `execution/triggers/trigger.ts` | `startsWhen.kind` |
+| `execution/reactions/execute.ts` | `reaction.kind`, `parallel.completion.kind` |
+| `values/evaluate.ts` | `valueExpression.kind`, `readExpression` source/access |
+| `execution/requests/gather.ts` | `requestInput.kind`, assignment target, registered input selection |
+| `conditions/conditions.ts` | condition graph kinds |
 
-Both converge on `walk()` — the most important function in the runtime:
-
-```d2
-direction: right
-
-path: "'evt.address.city'" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 16
-}
-split: "split('.')\n['evt','address','city']" {
-  shape: rectangle
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 16
-}
-step1: "ctx['evt']" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-step2: "evt['address']" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-step3: "addr['city']\n→ 'Portland'" {
-  shape: rectangle
-  style.fill: "#d4edda"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-
-path -> split -> step1 -> step2 -> step3
-```
-
-Split on dots, walk each segment with bracket notation. If any segment is null, return `undefined`. This is how the C# expression `x => x.Address.City` reaches the runtime value — `ExpressionPathHelper` converts it to `"evt.address.city"` at build time, `walk()` traverses it at runtime.
-
-## Coercion — `coerce.ts`
-
-The coerce module serves two distinct operations that share the type system but never mix:
-
-| Operation | Function | Purpose | Used by |
-|-----------|----------|---------|---------|
-| **Comparison** | `coerce(raw, type)` | Convert to typed value for operators | Conditions, Mutations, Validation comparison rules |
-| **Serialization** | `toString(raw)` | Convert to string for HTTP transport | Gather (FormData, GET). JSON uses `JSON.stringify` on raw values. |
-
-Every coerce function returns `CoerceResult<T>` — a discriminated union `{ ok: true, value: T } | { ok: false, error: string }`. Functions never throw. Callers decide how to handle `Err`:
-
-| Consumer | On Err | Why |
-|----------|--------|-----|
-| Conditions | Guard → false, else branch runs | User interaction must not crash |
-| Validation | Rule fails, shows error message | User sees field error, not app crash |
-| Mutations | `coerceOrThrow()` — throws with stack trace | Developer error in plan needs debugging |
-| Gather | Log warning, skip field | Don't crash entire HTTP request |
-
-Supported coercion types (inferred from C# `typeof(TProp)` via `CoercionTypes.InferFromType`):
-
-| CoercionType | C# types | Comparison result | Serialization result |
-|-------------|----------|-------------------|---------------------|
-| `"string"` | `string`, `Enum` | identity | identity |
-| `"number"` | `int`, `decimal`, `double`, ... | number | `"4250"` |
-| `"boolean"` | `bool` | `true`/`false` | `"true"`/`"false"` |
-| `"date"` | `DateTime`, `DateTimeOffset`, `DateOnly` | Unix ms (getTime) | ISO 8601 (toISOString) |
-| `"array"` | `T[]`, `List<T>`, ... | identity | JSON.stringify |
-| `"raw"` | everything else | pass-through | Err (plain objects) |
-
-The plan carries `shape` on `ComponentEntry` (from `typeof(TProp)`), `ValueGuard` (from conditions), `SetPropMutation` (from mutations), and `ValidationRule` (from FluentValidation). The runtime never infers or guesses a type — it reads the shape from the plan.
-
-## Condition evaluation — `conditions.ts`
-
-```d2
-direction: right
-
-guard: "guard.kind?" {
-  shape: diamond
-  style.fill: "#fef7e0"
-  style.stroke: "#f9ab00"
-  style.font-size: 16
-}
-value: "value\nresolve → coerce → operator" {
-  shape: rectangle
-  style.fill: "#e8f0fe"
-  style.stroke: "#4285f4"
-  style.font-size: 16
-}
-all: "all — AND" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-any: "any — OR" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-not: "not — invert" {
-  shape: rectangle
-  style.fill: "#e6f4ea"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-confirm: "confirm — dialog" {
-  shape: rectangle
-  style.fill: "#fce8e6"
-  style.stroke: "#ea4335"
-  style.font-size: 16
-}
-result: "true / false" {
-  shape: rectangle
-  style.fill: "#d4edda"
-  style.stroke: "#34a853"
-  style.font-size: 16
-}
-
-guard -> value
-guard -> all
-guard -> any
-guard -> not
-guard -> confirm
-value -> result
-all -> result
-any -> result
-not -> result
-confirm -> result
-```
-
-`value` guards resolve via `resolver.ts`, coerce both sides, apply the operator (20+ operators). `all`/`any`/`not` compose recursively. `confirm` is the only async guard — shows a browser dialog via `window.alis.confirm`.
-
-## Module dependency graph
+## Dependency Shape
 
 ```d2
 direction: right
 
 root: "root.ts" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke: "#4285f4"; style.font-size: 14 }
 boot: "boot.ts" { shape: rectangle; style.fill: "#fef7e0"; style.stroke: "#f9ab00"; style.font-size: 14 }
+plans: "applied-plans.ts" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "#34a853"; style.font-size: 14 }
 trigger: "trigger.ts" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "#34a853"; style.font-size: 14 }
 execute: "execute.ts" { shape: rectangle; style.fill: "#fef7e0"; style.stroke: "#f9ab00"; style.font-size: 14 }
-commands: "commands.ts" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke: "#4285f4"; style.font-size: 14 }
-element: "element.ts" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "#34a853"; style.font-size: 14 }
-gather: "gather.ts" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "#34a853"; style.font-size: 14 }
-component: "component.ts" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
-resolver: "resolver.ts" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
-coerce: "coerce.ts" { shape: rectangle; style.fill: "#f0f0f0"; style.stroke: "#666"; style.font-size: 14 }
-walk: "walk.ts" { shape: rectangle; style.fill: "#f0f0f0"; style.stroke: "#666"; style.font-size: 14 }
-conditions: "conditions.ts" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke: "#4285f4"; style.font-size: 14 }
+values: "evaluate.ts" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke: "#4285f4"; style.font-size: 14 }
+objects: "browser-objects/" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
+requests: "requests/" { shape: rectangle; style.fill: "#e6f4ea"; style.stroke: "#34a853"; style.font-size: 14 }
+conditions: "conditions/" { shape: rectangle; style.fill: "#e8f0fe"; style.stroke: "#4285f4"; style.font-size: 14 }
 validation: "validation/" { shape: rectangle; style.fill: "#fce8e6"; style.stroke: "#ea4335"; style.font-size: 14 }
 
 root -> boot
+boot -> plans
 boot -> trigger
 trigger -> execute
-execute -> commands
+execute -> values
+execute -> objects
+execute -> requests
+execute -> validation
 execute -> conditions
-commands -> element
-commands -> resolver
-commands -> conditions
-commands -> coerce
-element -> component
-element -> resolver
-element -> coerce
-gather -> component
-gather -> coerce
-gather -> walk
-resolver -> component
-resolver -> walk
-resolver -> coerce
-component -> walk
-conditions -> resolver
-conditions -> coerce
-validation -> coerce
-validation -> component
+requests -> values
+conditions -> values
+values -> objects
 ```
 
-Every arrow is a function call. No circular dependencies. Any user action follows this graph — only the reaction kind and command kind change.
-
-For how `resolveRoot()` works for different vendors, see [Component Model](../component-model/).
+Every arrow is a runtime dependency that exists in active source. For component
+object resolution details, see [Component Model](../component-model/).
 
 **Previous:** [The Vertical Slice](../vertical-slice/)

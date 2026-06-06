@@ -1,81 +1,108 @@
 ---
 title: Error Behavior
-description: How the runtime handles failures — fail-fast, error boundaries, and exhaustiveness checks.
+description: How the runtime handles failures at browser boundaries and generated-contract boundaries.
 sidebar:
   order: 9
 ---
 
-The runtime follows one principle: **fail fast, no fallbacks.** If something is wrong — a missing element, an unknown vendor, a corrupted plan — the runtime throws immediately with a clear message. It never guesses, never silently skips, never falls back to a default.
+The runtime follows one principle: **fail fast at real boundaries, no invented
+fallbacks.** The C# framework owns generated plan shape. The TypeScript runtime
+executes that plan and reports failures when execution crosses browser,
+component, plugin, network, payload, or generated-union boundaries.
 
-## Error boundaries
+## Error Boundary
 
-The runtime has exactly one error boundary: `trigger.ts`. Every event listener wraps `executeReaction()` in `.catch()`:
+`execution/triggers/trigger.ts` is the reaction error boundary. Each trigger
+runs its reaction inside `runReaction()`:
 
 ```d2
 direction: right
 
-listener: "Event fires\n(change, click, DomReady)" {
+trigger: "trigger fires" {
   shape: rectangle
   style.fill: "#e8f0fe"
   style.stroke: "#4285f4"
   style.font-size: 16
 }
-execute: "executeReaction()\nRuns the full pipeline" {
+execute: "executeReaction()" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
   style.font-size: 16
 }
-catch: ".catch()\nLogs error, continues\nOther listeners unaffected" {
+sync: "sync throw\nlogged in current event turn" {
+  shape: rectangle
+  style.fill: "#fce8e6"
+  style.stroke: "#ea4335"
+  style.font-size: 16
+}
+async: "promise rejection\nlogged when rejected" {
   shape: rectangle
   style.fill: "#fce8e6"
   style.stroke: "#ea4335"
   style.font-size: 16
 }
 
-listener -> execute
-execute -> catch: if rejected {
-  style.stroke: "#ea4335"
-  style.stroke-dash: 3
-}
+trigger -> execute
+execute -> sync: sync failure
+execute -> async: async failure
 ```
 
-This means: if one reaction fails (a target element is missing, a vendor root isn't initialized), that reaction's error is logged but **other listeners continue to work**. A broken conditional on field A does not prevent field B's cascade from firing.
+This boundary protects other listeners from one failed behavior. It also keeps
+sync reactions sync: a Syncfusion event payload mutation such as setting cancel
+state must complete before the vendor event handler continues.
 
-## Fail-fast errors
+## Fail-Fast Boundary Errors
 
-Every error throws with an `[alis]` prefix and a specific message. Here's what triggers each:
+Examples of current boundary errors:
 
-| Module | Condition | Error message |
-|--------|-----------|--------------|
-| `element.ts` | Target element not in DOM | `[alis] target not found: {id}` |
-| `component.ts` | Syncfusion instance not initialized | `[alis] no vendor root for "{id}" (vendor: fusion) — is the component initialized?` |
-| `component.ts` | Unknown vendor string | `[alis] unknown vendor: "{vendor}"` |
-| `component.ts` | Component element not in DOM | `[alis] element not found: {id}` |
-| `trigger.ts` | Component element not in DOM at wire time | `[alis] element not found: {componentId}` |
-| `root.ts` | Malformed plan JSON | `[alis] failed to parse plan JSON from [data-reactive-plan] element: {parseError}` |
+| Module | Boundary | Example message |
+|--------|----------|-----------------|
+| `root.ts` | Empty or malformed `[data-reactive-plan]` script. | `[alis] failed to parse plan JSON from [data-reactive-plan] element: ...` |
+| `browser-objects/runtime-plan.ts` | Component key missing from the Active Plan. | `[alis] component not active in Active Plan: {componentKey}` |
+| `browser-objects/runtime-plan.ts` | Component element missing from the DOM. | `[alis] element not found: {componentId}` |
+| `browser-objects/component-driver.ts` | Vendor driver missing or duplicate. | `[alis] component runtime already registered for vendor "{vendor}"` |
+| `plugins/catalog.ts` | Plugin not registered, duplicate, invalid name, or invalid instance. | `[alis] plugin not found: "{name}"` |
+| `values/evaluate.ts` | DOM source element missing. | `[alis] dom source element "{id}" not found` |
+| `execution/reactions/execute.ts` | Payload mutation targets null or non-object payload scope. | `[alis] cannot set property on null payload (scope: ...)` |
+| `execution/requests/gather.ts` | Route parameter is null or cannot serialize as a scalar. | `[alis] route param "{name}" evaluated to null; cannot build URL` |
+| `execution/requests/request-payload-writer.ts` | File object sent through an unsupported body format. | `[alis] File objects require form-data body format` |
+| `conditions/conditions.ts` | Confirm guard used without the confirm dialog helper. | `[alis] confirm condition requires @Html.FusionConfirmDialog() in layout` |
 
-These errors are actionable — each one tells the developer exactly what's missing and where to look.
+These errors point at the boundary that failed instead of hiding the issue behind
+a fallback path.
 
-## Exhaustiveness checks
+## Exhaustiveness Checks
 
-The runtime uses `assertNever()` from `core/assert-never.ts` to catch unhandled `kind` values at both compile time (TypeScript) and runtime:
+The runtime uses `assertNever()` from `shared/assert-never.ts` for generated
+union kinds. If the C# plan model adds a new kind without a TypeScript handler,
+the missing handler fails with `[alis] Unhandled {context}: {kind}`.
 
-| Module | What it checks |
-|--------|---------------|
-| `execute.ts` | `reaction.kind` — must be sequential, conditional, http, or parallel-http |
-| `commands.ts` | `command.kind` — must be dispatch, mutate-element, mutate-event, validation-errors, or into |
-| `element.ts` | `mutation.kind` — must be set-prop or call |
-| `element.ts` | `arg.kind` — must be literal or source |
-| `trigger.ts` | `trigger.kind` — must be dom-ready, custom-event, or component-event |
+Current exhaustiveness points include:
 
-If a new `kind` is added to the C# plan model classes without a corresponding runtime handler, `assertNever()` throws: `[alis] Unhandled {context}: {kind}`.
+| Module | Generated union checked |
+|--------|-------------------------|
+| `execution/triggers/trigger.ts` | `startsWhen.kind` |
+| `execution/reactions/execute.ts` | `reaction.kind`, `parallel.completion.kind`, branch guard kind |
+| `values/evaluate.ts` | `valueExpression.kind`, read source/access kinds |
+| `execution/requests/gather.ts` | request input kind, assignment target, registered input selection |
+| `execution/requests/request-payload-writer.ts` | request body format, HTTP method, request input item/path segment |
+| `conditions/compare-engine.ts` | condition kinds and comparison operators |
+| `validation/rule-engine.ts` | validation rule and comparison kinds |
 
-## What the runtime does NOT do
+## What The Runtime Does Not Do
 
-- **No retry logic.** A failed `fetch()` is not retried. The `OnError` handler fires once.
-- **No partial recovery.** One malformed plan element in `root.ts` stops the entire boot. Plans are all-or-nothing.
-- **No silent skipping.** If `walk()` hits undefined midway through a path, it returns `undefined` — but this is not an error. The calling code (resolver, conditions) handles undefined as a valid "no value" result.
-- **No global error handler.** Errors surface through browser console via the `.catch()` boundary in `trigger.ts`. There is no `window.onerror` hook or custom error reporting.
+- **No generated-plan validation layer.** Generated plan shape is owned by the
+  C# plan domain and generated TypeScript contract.
+- **No fallback component/plugin lookup.** Runtime object access uses the Active
+  Plan and registered browser object contracts.
+- **No HTTP retry policy.** A failed `fetch()` follows the declared request error
+  route. Realtime transports are different: SSE and SignalR use their transport
+  reconnect behavior.
+- **No silent component mutation skipping.** Missing components, missing DOM
+  elements, missing plugins, and invalid payload mutation targets are developer
+  errors.
+- **No global `window.onerror` handling.** Trigger wiring logs reaction failures
+  through the runtime trace boundary.
 
 **Previous:** [Component Model](../component-model/)
