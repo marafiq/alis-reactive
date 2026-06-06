@@ -1,10 +1,8 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// Model for the ArrayGrid sandbox: a non-input FusionGrid whose data source is driven by a
-    /// client-side <c>ReactiveArray</c> transform — the array DSL routed into a component's
-    /// <c>dataSource</c> member via <c>SetDataSource(TypedSource&lt;T[]&gt;)</c>. Reuses
-    /// <see cref="ResidentRosterResponse"/> / <see cref="ResidentRow"/> as the roster.
+    /// ArrayGrid page model for routing a client-side <c>ReactiveArray</c> transform
+    /// into a non-input FusionGrid <c>dataSource</c>.
     /// </summary>
     public class ArrayGridModel
     {

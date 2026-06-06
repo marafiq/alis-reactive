@@ -969,6 +969,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: ChipFilter sandbox
   model/controller XML docs now name the selected-chip payload, grid roster, and
   care-level filter contracts without generic "model for" or roster narration.
+- Resolved on `tiny-safe-but-important-refactorings`: ArrayGrid sandbox
+  model/controller XML docs now state the client-side ReactiveArray-to-grid
+  dataSource contract without repeating the full route walkthrough.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
