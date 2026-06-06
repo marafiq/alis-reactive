@@ -59,7 +59,7 @@ namespace Alis.Reactive.Builders.Conditions
 
         /// <summary>Adds the next ordered <c>ElseIf</c> branch from a typed value source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
-        /// <param name="source">A typed value source accepted by conditions.</param>
+        /// <param name="source">Typed condition value source.</param>
         public ConditionSourceBuilder<TModel, TProp> ElseIf<TProp>(TypedSource<TProp> source)
         {
             EnsureElseIfCanBeAdded();

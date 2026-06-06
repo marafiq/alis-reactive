@@ -41,7 +41,7 @@ namespace Alis.Reactive.Builders.Conditions
 
         /// <summary>Starts a nested condition from a typed value source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
-        /// <param name="source">A typed value source accepted by conditions.</param>
+        /// <param name="source">Typed condition value source.</param>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
         {
             return new ConditionSourceBuilder<TModel, TProp>(source);

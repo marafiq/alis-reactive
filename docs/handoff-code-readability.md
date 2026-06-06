@@ -633,6 +633,10 @@ Candidate cleanup:
   condition entrypoints now follow the same rule: branch summaries and
   source-parameter docs remain, while return tags no longer repeat fluent
   builder mechanics.
+- Resolved on `tiny-safe-but-important-refactorings`: typed condition-source
+  parameters outside `ConditionSourceBuilder` now use one concise "Typed
+  condition value source" phrase instead of repeating a full sentence on every
+  branch/guard entrypoint.
 - Resolved on `tiny-safe-but-important-refactorings`: text and source-vs-source
   condition operator parameter tags now drop repeated leading articles while
   keeping source-value and runtime-read wording.
