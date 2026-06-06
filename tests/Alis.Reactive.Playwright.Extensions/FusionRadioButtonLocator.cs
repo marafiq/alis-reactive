@@ -15,7 +15,7 @@ public sealed class FusionRadioButtonLocator
 
     public ILocator Input => _page.Locator($"#{_componentId}");
 
-    /// <summary>The Syncfusion wrapper around the radio input.</summary>
+    /// <summary>Syncfusion wrapper around the radio input.</summary>
     public ILocator Wrapper => Input.Locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' e-radio-wrapper ')][1]");
 
     public async Task<bool> IsChecked() => await Input.IsCheckedAsync();

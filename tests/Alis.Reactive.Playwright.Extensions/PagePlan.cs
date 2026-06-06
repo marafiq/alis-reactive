@@ -169,7 +169,7 @@ public sealed class PagePlan<TModel> where TModel : class
     }
 }
 
-/// <summary>A component resolved from the emitted Reactive Plan.</summary>
+/// <summary>Component resolved from the emitted Reactive Plan.</summary>
 public sealed record BoundComponent(
     string ElementId,
     string BindingPath,

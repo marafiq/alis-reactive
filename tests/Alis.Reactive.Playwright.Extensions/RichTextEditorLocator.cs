@@ -13,10 +13,10 @@ public sealed class RichTextEditorLocator
         _componentId = componentId;
     }
 
-    /// <summary>The outer wrapper div (.e-richtexteditor — parent of the hidden textarea).</summary>
+    /// <summary>Outer <c>.e-richtexteditor</c> wrapper, parent of the hidden textarea.</summary>
     public ILocator Container => _page.Locator($"#{_componentId}").Locator("xpath=..");
 
-    /// <summary>The contenteditable editing area inside the wrapper.</summary>
+    /// <summary>Contenteditable editing area inside the wrapper.</summary>
     public ILocator Editor => Container.Locator("[contenteditable='true']");
 
     public async Task Focus() => await Editor.ClickWhenStableAsync(_page);

@@ -15,7 +15,7 @@ public sealed class FusionTextBoxLocator
 
     public ILocator Input => _page.Locator($"#{_componentId}");
 
-    /// <summary>The wrapper generated around the input, where append icons render.</summary>
+    /// <summary>Generated input wrapper where append icons render.</summary>
     public ILocator Wrapper => _page.Locator($"#{_componentId}").Locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' e-input-group ')][1]");
 
     public async Task Fill(string value)

@@ -15,10 +15,10 @@ public sealed class FusionCheckBoxLocator
 
     public ILocator Input => _page.Locator($"#{_componentId}");
 
-    /// <summary>The Syncfusion wrapper around the checkbox input.</summary>
+    /// <summary>Syncfusion wrapper around the checkbox input.</summary>
     public ILocator Wrapper => Input.Locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' e-checkbox-wrapper ')][1]");
 
-    /// <summary>The visible Syncfusion checkbox frame.</summary>
+    /// <summary>Visible Syncfusion checkbox frame.</summary>
     public ILocator Frame => Wrapper.Locator(".e-frame");
 
     public async Task<bool> IsChecked() => await Input.IsCheckedAsync();
