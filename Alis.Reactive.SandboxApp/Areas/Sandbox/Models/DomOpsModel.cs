@@ -1,6 +1,6 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>DomOps page model for array operations over native DOM collections.</summary>
+    /// <summary>Native DOM collection state for array-operation flows.</summary>
     public class DomOpsModel
     {
     }

@@ -1,6 +1,6 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>ArrayOps page model carrying the selected care activities.</summary>
+    /// <summary>Selected care activities used by array-operator flows.</summary>
     public class ArrayOpsModel
     {
         public string[]? SelectedActivities { get; set; }

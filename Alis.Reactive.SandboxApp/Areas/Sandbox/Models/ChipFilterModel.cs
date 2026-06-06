@@ -3,7 +3,7 @@ using Alis.Reactive.Fusion.Components;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>ChipFilter page model for multi-select chip filtering over a resident grid.</summary>
+    /// <summary>Selected-chip filter state for a resident grid.</summary>
     public sealed class ChipFilterModel
     {
     }

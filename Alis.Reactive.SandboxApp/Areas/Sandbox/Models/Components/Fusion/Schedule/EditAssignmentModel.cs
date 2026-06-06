@@ -1,8 +1,7 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// Model for the assignment edit form partial.
-    /// Loaded into a NativeDrawer when user clicks an assignment on the schedule.
+    /// Assignment edit form partial loaded into a NativeDrawer from schedule clicks.
     /// </summary>
     public class EditAssignmentModel
     {

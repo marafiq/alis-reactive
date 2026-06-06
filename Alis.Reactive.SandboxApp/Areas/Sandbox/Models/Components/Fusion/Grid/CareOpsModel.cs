@@ -6,7 +6,7 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// Care Operations page model carrying the templated admit-resident inputs.
+    /// Care Operations state carries the templated admit-resident inputs.
     /// Fast filters come from chips, so no filter fields live here.
     /// </summary>
     public class CareOpsViewModel

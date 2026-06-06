@@ -1,6 +1,6 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>ShiftReport page model for custom-event payload array operations.</summary>
+    /// <summary>Custom-event alert payload state for array operations.</summary>
     public sealed class ShiftReportModel
     {
     }

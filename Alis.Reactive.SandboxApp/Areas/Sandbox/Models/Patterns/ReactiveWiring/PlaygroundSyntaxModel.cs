@@ -1,9 +1,8 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// View model for the PlaygroundSyntax page.
-    /// Exercises both Fusion (Syncfusion) and Native (DOM) components
-    /// through the unified p.Component&lt;T&gt;() pipeline.
+    /// Playground syntax state shared by Fusion and Native components
+    /// through the unified <c>p.Component&lt;T&gt;()</c> pipeline.
     /// </summary>
     public class PlaygroundSyntaxModel
     {

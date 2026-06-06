@@ -6,7 +6,7 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// Month-end billing page model carrying server-side filter inputs and the
+    /// Month-end billing state carries server-side filter inputs and the
     /// templated add-charge dialog inputs.
     /// </summary>
     public class ResidentBillingViewModel

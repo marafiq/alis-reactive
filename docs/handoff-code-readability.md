@@ -1031,6 +1031,10 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
   comparison operators now keep summary and parameter contract docs while
   removing repeated fluent-return boilerplate that added no IntelliSense value.
+- Resolved on `tiny-safe-but-important-refactorings`: Sandbox model summaries
+  no longer use generic "page model", "view model", or "model for" wording;
+  they now name the ReactiveArray, component, grid, drawer, and ID-binding
+  behavior carried by each model.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
