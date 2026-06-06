@@ -22,8 +22,8 @@ namespace Alis.Reactive.Native.Components
     /// <c>"email"</c>, <c>"password"</c>, etc. Created by the
     /// <c>.NativeTextBox()</c> factory on <see cref="InputBoundField{TModel,TProp}"/>.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The model value type rendered through the text input.</typeparam>
+    /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+    /// <typeparam name="TProp">Model value type rendered through the text input.</typeparam>
     public class NativeTextBoxBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
@@ -70,7 +70,7 @@ namespace Alis.Reactive.Native.Components
         /// Selects the HTML input type, such as <c>"email"</c> or <c>"password"</c>.
         /// Defaults to <c>"text"</c>.
         /// </summary>
-        /// <param name="type">The HTML <c>type</c> attribute value.</param>
+        /// <param name="type">HTML <c>type</c> attribute value.</param>
         public NativeTextBoxBuilder<TModel, TProp> Type(string type)
         {
             _type = type;
@@ -90,7 +90,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Replaces the placeholder text shown when the input is empty.
         /// </summary>
-        /// <param name="placeholder">The placeholder text.</param>
+        /// <param name="placeholder">Placeholder text.</param>
         public NativeTextBoxBuilder<TModel, TProp> Placeholder(string placeholder)
         {
             _placeholder = placeholder;

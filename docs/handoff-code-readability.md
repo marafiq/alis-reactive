@@ -581,6 +581,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeCheckBox` XML tags
   now use concise model, field-wrapper, Reactive Plan, and event-args wording.
   The component-reference example and registration invariant remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeTextBox` XML tags
+  now use concise model, field-wrapper, HTML attribute, placeholder, Reactive
+  Plan, and event-args wording. The two-example input-type note remains.
 
 ### Implementation Inline Comments
 
