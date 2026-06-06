@@ -295,9 +295,10 @@ public static class FusionXxxHtmlExtensions
             "xxx",                                           // component type label
             CoercionTypes.InferFromType(typeof(TProp))));    // auto-inferred
 
-        // 2. Create the Syncfusion EJ2 builder — pass htmlAttributes as a PARAMETER to XxxFor()
-        // CRITICAL: Do NOT use the fluent .HtmlAttributes() method — it does not override
-        // the element ID on all Syncfusion components. Passing as a parameter to XxxFor() bakes the
+        // 2. Create the Syncfusion EJ2 builder. Pass htmlAttributes as a parameter
+        // to XxxFor() rather than using fluent .HtmlAttributes(), because the
+        // fluent method does not override the element ID on all Syncfusion components.
+        // Passing as a parameter to XxxFor() bakes the
         // custom ID into both the rendered HTML and the JS appendTo() target.
         var attrs = new Dictionary<string, object>
         {
@@ -402,7 +403,7 @@ public static XxxBuilder Reactive<TModel, TArgs>(
     var pb = new PipelineBuilder<TModel>();
     pipeline(descriptor.Args, pb);
 
-    // IMPORTANT: use builder.model.HtmlAttributes — NOT builder.HtmlAttributes
+    // Use builder.model.HtmlAttributes rather than builder.HtmlAttributes.
     // The .model property accesses the Syncfusion EJ2 control model where id/name are stored.
     var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
     var componentId = (string)attrs["id"];
@@ -748,7 +749,7 @@ var builder = setup.Helper.EJS().XxxFor(setup.Expression)
 When a Syncfusion API doesn't work as expected (verified in browser), omit it and document why as a comment in the extensions file:
 
 ```csharp
-// NOTE: showSpinner/hideSpinner have no visible effect on Syncfusion AutoComplete.
+// showSpinner/hideSpinner have no visible effect on Syncfusion AutoComplete.
 // refresh() causes focus loss mid-typing — not usable during filtering.
 // Both verified manually via browser console. Omitted intentionally.
 ```

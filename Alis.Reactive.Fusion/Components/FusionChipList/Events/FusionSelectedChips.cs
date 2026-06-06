@@ -20,11 +20,13 @@ namespace Alis.Reactive.Fusion.Components
         public FusionChipItem[] Data { get; set; } = Array.Empty<FusionChipItem>();
 
         /// <summary>
-        /// The selected chips' indexes. NOTE: Syncfusion emits this key as <c>Indexes</c> (capital I,
-        /// chip-list.js), so the camelCased read path resolves to empty. Reading the selected indexes
-        /// requires a read-path name override (a framework capability, recorded as follow-up). Use
-        /// <see cref="Data"/>/<see cref="Texts"/> until then.
+        /// Gets or sets the selected chip indexes.
         /// </summary>
+        /// <remarks>
+        /// Syncfusion emits this key as <c>Indexes</c> (capital I, chip-list.js), so the
+        /// camelCased Reactive Plan read path resolves to empty. Use <see cref="Data"/> or
+        /// <see cref="Texts"/> until the framework supports an explicit read-path name override.
+        /// </remarks>
         public int[] Indexes { get; set; } = Array.Empty<int>();
     }
 }
