@@ -34,7 +34,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a literal request body field.</summary>
+        /// <summary>Adds literal request body field.</summary>
         /// <param name="param">Request body field that receives the literal value.</param>
         /// <param name="value">Literal body value captured into the generated request plan.</param>
         public GatherBuilder<TModel> Static(string param, object value)
@@ -46,7 +46,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a value from the triggering event payload to the request body.</summary>
+        /// <summary>Adds triggering event payload value to the request body.</summary>
         /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
         /// <typeparam name="TProp">Selected event-payload body value type.</typeparam>
         /// <param name="args">Trigger payload placeholder.</param>
@@ -66,7 +66,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a literal string header to the HTTP request.</summary>
+        /// <summary>Adds literal string header to the HTTP request.</summary>
         /// <param name="name">HTTP header name.</param>
         /// <param name="value">Non-null header value serialized into the generated plan.</param>
         public GatherBuilder<TModel> Header(string name, string value)
@@ -80,7 +80,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a scalar HTTP header value from a typed source.</summary>
+        /// <summary>Adds scalar HTTP header value from a typed source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="name">HTTP header name.</param>
         /// <param name="source">Typed value source evaluated before the request is sent.</param>
@@ -93,7 +93,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a scalar HTTP header value from the triggering event payload.</summary>
+        /// <summary>Adds scalar HTTP header value from the triggering event payload.</summary>
         /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
         /// <typeparam name="TProp">Selected event-payload header value type.</typeparam>
         /// <param name="name">HTTP header name.</param>
@@ -176,7 +176,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Reads a URL query parameter into a request body field with the same name.</summary>
+        /// <summary>Reads URL query parameter into a request body field with the same name.</summary>
         /// <param name="paramName">URL query parameter and request body field.</param>
         public GatherBuilder<TModel> FromUrl(string paramName)
         {
@@ -187,7 +187,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Reads a URL query parameter into an explicit request body field.</summary>
+        /// <summary>Reads URL query parameter into an explicit request body field.</summary>
         /// <param name="paramName">URL query parameter name to read.</param>
         /// <param name="asParam">Request body field that receives the URL value.</param>
         public GatherBuilder<TModel> FromUrl(string paramName, string asParam)
@@ -199,7 +199,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Reads a typed URL query parameter into a request body field with the same name.</summary>
+        /// <summary>Reads typed URL query parameter into a request body field with the same name.</summary>
         /// <param name="paramName">URL query parameter and request body field.</param>
         public GatherBuilder<TModel> FromUrl<T>(string paramName)
         {
@@ -211,7 +211,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Reads a typed URL query parameter into an explicit request body field.</summary>
+        /// <summary>Reads typed URL query parameter into an explicit request body field.</summary>
         /// <param name="paramName">URL query parameter name to read.</param>
         /// <param name="asParam">Request body field that receives the typed URL value.</param>
         public GatherBuilder<TModel> FromUrl<T>(string paramName, string asParam)
@@ -224,7 +224,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a plan-registered plugin method result to the request body.</summary>
+        /// <summary>Adds plan-registered plugin method result to the request body.</summary>
         /// <typeparam name="T">The CLR type returned by the plugin call.</typeparam>
         /// <param name="source">Typed plugin value source, including configured arguments.</param>
         /// <param name="paramName">Request body field that receives the plugin result.</param>

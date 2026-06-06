@@ -24,7 +24,7 @@ namespace Alis.Reactive.Builders.Requests
 
         internal ResponseRoutingDraft Draft => _draft;
 
-        /// <summary>Adds a route for any successful 2xx HTTP response.</summary>
+        /// <summary>Adds route for any successful 2xx HTTP response.</summary>
         /// <param name="pipeline">Builds the reaction graph to execute on success.</param>
         public ResponseBuilder<TModel> OnSuccess(Action<PipelineBuilder<TModel>> pipeline)
         {
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Adds a route for any successful 2xx HTTP response with typed
+        /// Adds route for any successful 2xx HTTP response with typed
         /// response-body access.
         /// </summary>
         /// <typeparam name="TResponse">Response body type exposed to downstream value sources.</typeparam>
@@ -52,7 +52,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a route for any non-2xx response or response-unavailable failure.</summary>
+        /// <summary>Adds route for any non-2xx response or response-unavailable failure.</summary>
         /// <param name="pipeline">Builds the reaction graph to execute for the error route.</param>
         public ResponseBuilder<TModel> OnError(Action<PipelineBuilder<TModel>> pipeline)
         {
@@ -62,7 +62,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Adds a route for a non-2xx response with a specific status code.</summary>
+        /// <summary>Adds route for a non-2xx response with a specific status code.</summary>
         /// <param name="statusCode">HTTP status code to match.</param>
         /// <param name="pipeline">Builds the reaction graph to execute for the matching status code.</param>
         public ResponseBuilder<TModel> OnError(int statusCode, Action<PipelineBuilder<TModel>> pipeline)
@@ -74,7 +74,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Adds a route for any error outcome with typed error-body access when
+        /// Adds route for any error outcome with typed error-body access when
         /// a response body is available.
         /// </summary>
         /// <typeparam name="TError">Error body type exposed to downstream value sources.</typeparam>
@@ -92,7 +92,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Adds a route for a non-2xx response with a specific status code and
+        /// Adds route for a non-2xx response with a specific status code and
         /// typed error-body access.
         /// </summary>
         /// <typeparam name="TError">Error body type exposed to downstream value sources.</typeparam>

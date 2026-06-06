@@ -30,16 +30,16 @@ namespace Alis.Reactive.Builders.Requests
             _response = new ResponseBuilder<TModel>(_context);
         }
 
-        /// <summary>Uses GET for this request builder's endpoint.</summary>
+        /// <summary>Selects GET for this request endpoint.</summary>
         /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         public HttpRequestBuilder<TModel> Get(string url) { SelectEndpoint(HttpMethodName.Get, url); return this; }
-        /// <summary>Uses POST for this request builder's endpoint.</summary>
+        /// <summary>Selects POST for this request endpoint.</summary>
         /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         public HttpRequestBuilder<TModel> Post(string url) { SelectEndpoint(HttpMethodName.Post, url); return this; }
-        /// <summary>Uses PUT for this request builder's endpoint.</summary>
+        /// <summary>Selects PUT for this request endpoint.</summary>
         /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         public HttpRequestBuilder<TModel> Put(string url) { SelectEndpoint(HttpMethodName.Put, url); return this; }
-        /// <summary>Uses DELETE for this request builder's endpoint.</summary>
+        /// <summary>Selects DELETE for this request endpoint.</summary>
         /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         public HttpRequestBuilder<TModel> Delete(string url) { SelectEndpoint(HttpMethodName.Delete, url); return this; }
 
@@ -101,7 +101,7 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Configures success routes, error routes, and follow-up requests for the response.</summary>
+        /// <summary>Configures response success routes, error routes, and follow-up requests.</summary>
         /// <param name="response">Builds the response routing graph for this request.</param>
         public HttpRequestBuilder<TModel> Response(Action<ResponseBuilder<TModel>> response)
         {

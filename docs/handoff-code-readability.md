@@ -730,6 +730,10 @@ Candidate cleanup:
   pipeline-builder pass tightened `ElementBuilder` and `DispatchPayloadBuilder`
   summaries while keeping literal, event-payload, response-body, typed-source,
   and dispatch-time evaluation distinctions visible in IntelliSense.
+- Resolved on `tiny-safe-but-important-refactorings`: a second HTTP DSL XML
+  pass tightened request endpoint, gather body/header/route, URL-read, plugin
+  value, and response-route summaries while preserving typed response/error
+  body and response-unavailable distinctions.
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeHiddenField` XML
   tags now use concise model, Reactive Plan, event-args, and response DTO wording.
   Hidden-input registration behavior, `net48` `NameFor`, and programmatic change
