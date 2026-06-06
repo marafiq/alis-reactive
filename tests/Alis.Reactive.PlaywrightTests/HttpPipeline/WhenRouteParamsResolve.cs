@@ -128,13 +128,12 @@ public class WhenRouteParamsResolve : PlaywrightTestBase
     }
 
     [Test]
-    public async Task route_param_with_space_is_uri_encoded()
+    public async Task route_param_with_space_is_uri_encoded_and_decoded_by_server()
     {
         await NavigateAndWaitForBoot();
 
         await ClickButton("Load Resident by Name");
 
-        // Server receives "John Doe" after URL-decoding the path segment "John%20Doe".
         await Expect(Page.Locator("#route-encoded-name"))
             .ToHaveTextAsync("John Doe", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
