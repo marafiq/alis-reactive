@@ -11,7 +11,7 @@ public class WhenNumericValueEntered : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NumericTextBox";
 
-    // Generated component IDs are the DOM/plan join keys under test.
+    // Generated component IDs are the DOM/Reactive Plan join keys under test.
     private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NumericTextBoxModel";
     private const string AmountId = GeneratedTypeScope + "__Amount";
     private const string TemperatureId = GeneratedTypeScope + "__Temperature";

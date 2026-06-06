@@ -11,7 +11,7 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/AutoComplete";
 
-    // Generated component IDs are the DOM/plan join keys under test.
+    // Generated component IDs are the DOM/Reactive Plan join keys under test.
     private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_AutoCompleteModel";
     private const string PhysicianId = GeneratedTypeScope + "__Physician";
     private const string MedicationId = GeneratedTypeScope + "__MedicationType";
