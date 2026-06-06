@@ -465,6 +465,10 @@ Candidate cleanup:
   XML docs now describe independent Reactive Plan `Behavior` entries without
   broad "plan behavior" wording, and the private append helper is singular
   because each trigger call adds one behavior.
+- Resolved on `tiny-safe-but-important-refactorings`: the active triggers
+  guide now uses the same "Reactive Plan behavior entry" wording for
+  `Html.On()` placement. This keeps the source XML, generated API reference,
+  and developer guide aligned without touching broader architecture pages.
 
 ### Implementation Inline Comments
 
