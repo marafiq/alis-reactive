@@ -95,9 +95,8 @@ public sealed class DateRangePickerLocator
                 .ClickWhenStableAsync(_page);
         }
 
-        // Wait for the Apply button to be stable after EJ2 re-renders the popup,
-        // then click to confirm the range selection.
         await ApplyButton.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
+        // TODO: Replace this fixed post-render pause with a Syncfusion Apply button stability signal.
         await _page.WaitForTimeoutAsync(150);
         await ApplyButton.ClickAsync(new() { Timeout = 5000 });
     }

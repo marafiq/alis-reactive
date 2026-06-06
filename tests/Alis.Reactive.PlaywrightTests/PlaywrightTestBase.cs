@@ -243,6 +243,7 @@ public abstract class PlaywrightTestBase : PageTest
         {
             TestContext.Out.WriteLine(
                 $"ClickWhenStable retrying after timeout for locator '{locator}': {ex.Message}");
+            // TODO: Replace this fixed retry pause with a behavior-focused locator stability signal.
             await Page.WaitForTimeoutAsync(250);
             await locator.ClickAsync(new() { Timeout = timeoutMs });
         }
