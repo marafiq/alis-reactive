@@ -140,6 +140,12 @@ sequencing, or why a test must be non-parallel.
   invariants now use plain comments instead of JSDoc blocks. The comments remain
   because best-effort runtime reads and strict validation comparisons intentionally
   have different failure behavior.
+- Resolved on `tiny-safe-but-important-refactorings`: current
+  `Alis.Reactive.Assets/runtime` TypeScript comments were re-scanned after the
+  Fusion XML cleanup. Remaining comments explain generated contract ownership,
+  Active Plan composition, sync/async lanes, DOM/vendor boundaries, side-effect
+  imports, or test-facing diagnostics; no mechanical TS comment deletion is
+  pending from this pass.
 
 ### Builder XML Documentation
 
