@@ -21,8 +21,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the textarea value through the component contract.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
-        /// <param name="self">The textarea component reference.</param>
         /// <param name="value">The value to set.</param>
         public static ComponentRef<NativeTextArea, TModel> SetValue<TModel>(
             this ComponentRef<NativeTextArea, TModel> self, string value)
@@ -34,7 +32,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Moves keyboard focus into the textarea.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeTextArea, TModel> FocusIn<TModel>(
             this ComponentRef<NativeTextArea, TModel> self)
             where TModel : class
@@ -45,7 +42,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Reads the current textarea value for use in conditions or gather.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <returns>A typed source representing the textarea's current value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeTextArea, TModel> self)

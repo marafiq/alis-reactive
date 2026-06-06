@@ -23,8 +23,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes checked values through the component contract.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
-        /// <param name="self">The check list component reference.</param>
         /// <param name="value">The array of option values to check.</param>
         public static ComponentRef<NativeCheckList, TModel> SetValue<TModel>(
             this ComponentRef<NativeCheckList, TModel> self, string[] value)
@@ -39,9 +37,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes checked values from the current event payload.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <typeparam name="TSource">The event payload type containing the values.</typeparam>
-        /// <param name="self">The check list component reference.</param>
         /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
         /// <param name="path">Expression selecting the event payload property to read.</param>
         public static ComponentRef<NativeCheckList, TModel> SetValue<TModel, TSource>(
@@ -56,7 +52,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Moves keyboard focus into the check list.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeCheckList, TModel> FocusIn<TModel>(
             this ComponentRef<NativeCheckList, TModel> self)
             where TModel : class
@@ -67,7 +62,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Reads the currently checked values for use in conditions or gather.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <returns>A typed source representing the check list's selected values as a string array.</returns>
         public static TypedComponentSource<string[]> Value<TModel>(
             this ComponentRef<NativeCheckList, TModel> self)

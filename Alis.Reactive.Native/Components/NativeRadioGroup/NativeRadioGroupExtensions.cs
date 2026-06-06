@@ -23,8 +23,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the selected radio value through the component contract.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
-        /// <param name="self">The radio group component reference.</param>
         /// <param name="value">The radio option value to select.</param>
         public static ComponentRef<NativeRadioGroup, TModel> SetValue<TModel>(
             this ComponentRef<NativeRadioGroup, TModel> self, string value)
@@ -36,9 +34,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the selected radio value from the current event payload.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <typeparam name="TSource">The event payload type containing the value.</typeparam>
-        /// <param name="self">The radio group component reference.</param>
         /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
         /// <param name="path">Expression selecting the event payload property to read.</param>
         public static ComponentRef<NativeRadioGroup, TModel> SetValue<TModel, TSource>(
@@ -53,7 +49,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Moves keyboard focus into the radio group.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeRadioGroup, TModel> FocusIn<TModel>(
             this ComponentRef<NativeRadioGroup, TModel> self)
             where TModel : class
@@ -64,7 +59,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Reads the currently selected value for use in conditions or gather.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <returns>A typed source representing the radio group's selected value.</returns>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeRadioGroup, TModel> self)

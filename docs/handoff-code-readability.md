@@ -204,6 +204,11 @@ Candidate cleanup:
   duplicate overload signatures would otherwise be ambiguous. This removes
   repeated empty method calls across core, Fusion, and Native generated API
   sections without adding boilerplate XML comment noise.
+- Resolved on `tiny-safe-but-important-refactorings`: Native component and
+  app-level extension XML docs no longer repeat generic `TModel` and extension
+  receiver `self` descriptions that only restated the component reference. The
+  remaining docs keep user-facing parameters, value-source details, and runtime
+  behavior notes.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
 

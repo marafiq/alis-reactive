@@ -21,8 +21,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the checkbox checked state through the component contract.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
-        /// <param name="self">The checkbox component reference.</param>
         /// <param name="isChecked"><see langword="true"/> to check, <see langword="false"/> to uncheck.</param>
         public static ComponentRef<NativeCheckBox, TModel> SetChecked<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self, bool isChecked)
@@ -34,7 +32,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Moves keyboard focus into the checkbox.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeCheckBox, TModel> FocusIn<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self)
             where TModel : class
@@ -45,7 +42,6 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Reads the current checked state for use in conditions or gather.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         /// <returns>A typed source representing the checkbox's current checked state.</returns>
         public static TypedComponentSource<bool> Value<TModel>(
             this ComponentRef<NativeCheckBox, TModel> self)

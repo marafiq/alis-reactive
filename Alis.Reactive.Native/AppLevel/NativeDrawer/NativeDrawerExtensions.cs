@@ -29,8 +29,6 @@ namespace Alis.Reactive.Native.AppLevel
         /// <summary>
         /// Applies the drawer panel width class through the component contract.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
-        /// <param name="self">The drawer component reference.</param>
         /// <param name="size">The panel width class to apply.</param>
         public static ComponentRef<NativeDrawer, TModel> SetSize<TModel>(
             this ComponentRef<NativeDrawer, TModel> self, DrawerSize size)
@@ -55,7 +53,6 @@ namespace Alis.Reactive.Native.AppLevel
         /// <summary>
         /// Opens the drawer, making it visible and accessible.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeDrawer, TModel> Open<TModel>(
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
@@ -70,7 +67,6 @@ namespace Alis.Reactive.Native.AppLevel
         /// <summary>
         /// Closes the drawer, hiding the panel.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the component reference.</typeparam>
         public static ComponentRef<NativeDrawer, TModel> Close<TModel>(
             this ComponentRef<NativeDrawer, TModel> self)
             where TModel : class
