@@ -146,14 +146,14 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression ArraySum(ValueExpression source, ValueExpression? projection, Shape itemShape) =>
             new ArrayOperationExpression("sum", source, itemShape, Shape.Number, predicate: null, projection: projection);
 
-        /// <summary>A null predicate means non-empty; otherwise this tests each element.</summary>
+        /// <summary>Null predicate means non-empty; otherwise evaluate against each element.</summary>
         internal static ValueExpression ArrayAny(ValueExpression source, ConditionGraph? predicate, Shape itemShape) =>
             new ArrayOperationExpression("any", source, itemShape, Shape.Boolean, predicate: predicate);
 
         internal static ValueExpression ArrayAll(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
             new ArrayOperationExpression("all", source, itemShape, Shape.Boolean, predicate: predicate);
 
-        /// <summary>Returns the first matching element or projection; runtime returns null when none match.</summary>
+        /// <summary>Finds the first matching element or projection; runtime returns null when none match.</summary>
         internal static ValueExpression ArrayFind(
             ValueExpression source, ConditionGraph? predicate, ValueExpression? projection, Shape itemShape, Shape resultShape) =>
             new ArrayOperationExpression("find", source, itemShape, resultShape, predicate: predicate, projection: projection);
@@ -258,7 +258,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>A plan value node whose value is serialized directly into generated JSON.</summary>
+    /// <summary>Literal value node serialized directly into generated plan JSON.</summary>
     /// <remarks>
     /// Created when a literal is passed to a builder such as <c>p.Element("id").SetText("hello")</c>.
     /// </remarks>
@@ -281,7 +281,7 @@ namespace Alis.Reactive.PlanModel
         internal override Shape OutputShape => Shape;
     }
 
-    /// <summary>A plan value node that reads from a value source when the Reactive Plan executes.</summary>
+    /// <summary>Value-read node resolved from a source when the Reactive Plan executes.</summary>
     /// <remarks>
     /// Created by source-reading builders such as <c>p.Plugin&lt;int&gt;("array", "count").Arg(json, x =&gt; x.Items)</c>.
     /// </remarks>
@@ -479,7 +479,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>A plan value node that assembles an object from named field expressions.</summary>
+    /// <summary>Object value node assembled from named field expressions.</summary>
     public sealed class ObjectExpression : ValueExpression
     {
         private readonly IReadOnlyDictionary<string, ValueExpression> _fields;
@@ -500,7 +500,7 @@ namespace Alis.Reactive.PlanModel
         internal override Shape OutputShape => Shape;
     }
 
-    /// <summary>A plan value node that assembles an array from ordered item expressions.</summary>
+    /// <summary>Array value node assembled from ordered item expressions.</summary>
     public sealed class ArrayExpression : ValueExpression
     {
         private readonly IReadOnlyList<ValueExpression> _items;
@@ -521,7 +521,7 @@ namespace Alis.Reactive.PlanModel
         internal override Shape OutputShape => Shape;
     }
 
-    /// <summary>A deterministic operation over the elements of an array-shaped value.</summary>
+    /// <summary>Deterministic operation over the elements of an array-shaped value.</summary>
     /// <remarks>
     /// One node with an <c>Op</c> sub-discriminator. The runtime normalizes
     /// array-like or iterable source values at the input boundary, then produces

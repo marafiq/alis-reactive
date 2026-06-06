@@ -223,7 +223,7 @@ namespace Alis.Reactive.PlanModel
             _structure.TryGetObjectContract(out contract);
 
         /// <summary>
-        /// Returns true if this shape represents a value that can be meaningfully serialized
+        /// True when this shape represents a value that can be meaningfully serialized
         /// to a single string. Suitable for HTTP headers, route params, and query strings.
         /// Scalars: string, number, boolean, date. Nullable wrapping a scalar is also scalar.
         /// Non-scalars: array, object, raw, any, none.
@@ -313,9 +313,9 @@ namespace Alis.Reactive.PlanModel
 #endif
         }
 
-        /// <summary>Returns <see langword="true"/> if both shapes are structurally equal.</summary>
+        /// <summary>Compares two shapes for structural equality.</summary>
         public static bool operator ==(Shape? left, Shape? right) => Equals(left, right);
-        /// <summary>Returns <see langword="true"/> if the shapes are not structurally equal.</summary>
+        /// <summary>Compares two shapes for structural inequality.</summary>
         public static bool operator !=(Shape? left, Shape? right) => !Equals(left, right);
     }
 

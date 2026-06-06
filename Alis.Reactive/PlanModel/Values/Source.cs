@@ -93,7 +93,7 @@ namespace Alis.Reactive.PlanModel
 
         internal static PayloadSource Local() => new PayloadSource(PayloadScope.Local, PayloadContract.Untyped);
 
-        /// <summary>The current array element under an array operation (top of the element scope stack).</summary>
+        /// <summary>Current array element under an array operation (top of the element scope stack).</summary>
         internal static PayloadSource Element() => new PayloadSource(PayloadScope.Element, PayloadContract.Untyped);
     }
 
@@ -128,7 +128,7 @@ namespace Alis.Reactive.PlanModel
 
     /// <summary>Identifies a DOM element (by id) whose members are read directly via getElementById.</summary>
     /// <remarks>
-    /// A DOM element is a JavaScript object; its members are reached with the same RuntimePath
+    /// DOM element is a JavaScript object; its members are reached with the same RuntimePath
     /// primitive that resolves component/plugin members. Element IDs are plan-carried, and the
     /// runtime resolves them with <c>getElementById</c> only, without DOM scanning.
     /// </remarks>

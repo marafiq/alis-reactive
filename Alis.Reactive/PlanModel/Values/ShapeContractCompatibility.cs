@@ -5,7 +5,7 @@ namespace Alis.Reactive.PlanModel
 {
     /// <summary>
     /// Picks the most specific compatible shape from producer and consumer contracts.
-    /// Returns an explicit conflict when no merged shape can satisfy both contracts.
+    /// Reports an explicit conflict when no merged shape can satisfy both contracts.
     /// </summary>
     internal static class ShapeContractCompatibility
     {

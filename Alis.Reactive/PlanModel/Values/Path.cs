@@ -33,7 +33,7 @@ namespace Alis.Reactive.PlanModel
             => throw new NotSupportedException("Plan types are write-only.");
     }
 
-    /// <summary>One step in a property navigation path: a property name or array index.</summary>
+    /// <summary>Property navigation segment: a property name or array index.</summary>
     [JsonConverter(typeof(PathSegmentJsonConverter))]
     public sealed class PathSegment : IEquatable<PathSegment>
     {
@@ -172,7 +172,7 @@ namespace Alis.Reactive.PlanModel
         public static bool operator !=(PathIndex left, PathIndex right) => !left.Equals(right);
     }
 
-    /// <summary>An ordered sequence of segments for navigating nested properties on a value.</summary>
+    /// <summary>Ordered path segments for navigating nested properties on a value.</summary>
     [JsonConverter(typeof(PathJsonConverter))]
     public sealed class Path : IEquatable<Path>
     {

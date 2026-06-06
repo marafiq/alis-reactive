@@ -991,6 +991,10 @@ Rewrite or delete:
   summaries now use direct component-contract wording while keeping IntelliSense
   examples, value-shape notes, template runtime boundaries, and Syncfusion
   event payload facts.
+- Resolved on `tiny-safe-but-important-refactorings`: Core value/array XML
+  docs now name literal, read, object, array, array-op, path, shape, and
+  ReactiveArray contracts directly while preserving wire-format and runtime
+  boundary facts.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

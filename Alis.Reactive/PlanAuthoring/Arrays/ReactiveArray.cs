@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Arrays
 {
     /// <summary>
-    /// A typed, deferred array transform. Operators capture authoring intent as
+    /// Typed, deferred array transform. Operators capture authoring intent as
     /// Reactive Plan <c>array-op</c> nodes; they do not execute on the server. Deliberately not
     /// <see cref="System.Collections.IEnumerable"/>/<c>IQueryable</c>, so LINQ extension methods
     /// are not candidates (no collision) and lambdas are captured, not invoked. Per-element
@@ -98,12 +98,12 @@ namespace Alis.Reactive.Builders.Arrays
         public ReactiveValue<double> Sum(Expression<Func<TElement, double>> selector) =>
             new ReactiveValue<double>(ValueExpression.ArraySum(_source, Projection(selector), _elementShape));
 
-        /// <summary>Returns the first element matching the predicate (or null when none match).</summary>
+        /// <summary>Finds the first element matching the predicate, or null when none match.</summary>
         public ReactiveValue<TElement> Find(Expression<Func<TElement, bool>> predicate) =>
             new ReactiveValue<TElement>(
                 ValueExpression.ArrayFind(_source, Predicate(predicate), projection: null, _elementShape, _elementShape));
 
-        /// <summary>Returns a per-element field of the first element matching the predicate.</summary>
+        /// <summary>Finds a per-element field from the first element matching the predicate.</summary>
         public ReactiveValue<TField> Find<TField>(
             Expression<Func<TElement, bool>> predicate, Expression<Func<TElement, TField>> selector)
         {
@@ -133,7 +133,7 @@ namespace Alis.Reactive.Builders.Arrays
         }
     }
 
-    /// <summary>An array-op result exposed as a typed source for component data-source binding.</summary>
+    /// <summary>Array-op result exposed as a typed source for component data-source binding.</summary>
     internal sealed class ReactiveArraySource<TElement> : TypedSource<TElement[]>
     {
         private readonly ValueExpression _value;
