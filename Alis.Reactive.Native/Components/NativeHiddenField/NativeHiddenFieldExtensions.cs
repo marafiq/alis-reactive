@@ -19,7 +19,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the hidden input value through the component contract.
         /// </summary>
-        /// <param name="value">The value to write to the hidden input.</param>
+        /// <param name="value">Hidden input value.</param>
         public static ComponentRef<NativeHiddenField, TModel> SetValue<TModel>(
             this ComponentRef<NativeHiddenField, TModel> self, string value)
             where TModel : class
@@ -30,7 +30,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the hidden input value from another component value source.
         /// </summary>
-        /// <param name="source">The component value source to write from.</param>
+        /// <param name="source">Component value source.</param>
         public static ComponentRef<NativeHiddenField, TModel> SetValue<TModel>(
             this ComponentRef<NativeHiddenField, TModel> self, TypedComponentSource<string> source)
             where TModel : class
@@ -43,7 +43,7 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <typeparam name="TResponse">The response DTO type used by the response body source.</typeparam>
         /// <param name="source">The response body scope to read from.</param>
-        /// <param name="path">The response DTO member path to write into the hidden input.</param>
+        /// <param name="path">Response DTO member path.</param>
         public static ComponentRef<NativeHiddenField, TModel> SetValue<TModel, TResponse>(
             this ComponentRef<NativeHiddenField, TModel> self,
             ResponseBody<TResponse> source, Expression<Func<TResponse, object?>> path)

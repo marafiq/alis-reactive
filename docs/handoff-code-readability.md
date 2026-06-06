@@ -495,6 +495,10 @@ Candidate cleanup:
   docs no longer describe response paths and typed value sources as values "to
   pass." The method summaries keep the plugin-argument DSL intent, while
   parameter tags name only the selected path or source category.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeHiddenField`
+  value-write XML parameter tags no longer repeat the write mechanics already
+  described by the overload summaries. The docs still distinguish literal,
+  component-source, and response-body-path writes.
 
 ### Implementation Inline Comments
 
