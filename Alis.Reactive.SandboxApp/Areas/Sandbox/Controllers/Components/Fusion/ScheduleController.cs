@@ -22,7 +22,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         /// <summary>
-        /// Returns shift assignments for a facility and week.
+        /// Loads the Schedule data source for the selected facility and visible range.
         /// Parameter names match the model property and event arg names used by
         /// Include and FromEvent gather in the Reactive Plan.
         /// </summary>
@@ -105,8 +105,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         /// <summary>
-        /// Assigns a staff member to a shift slot. Mutates in-memory store.
-        /// After this POST, a subsequent GET returns the updated assignment.
+        /// Assigns staff to a shift slot in the in-memory schedule store.
+        /// A subsequent data-source load returns the updated assignment.
         /// </summary>
         [HttpPost("~/api/schedule/assign")]
         public IActionResult AssignStaff([FromBody] AssignStaffRequest request)
@@ -127,7 +127,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         /// <summary>
-        /// Removes staff from a shift slot (makes it unassigned). Mutates in-memory store.
+        /// Clears the staff assignment for a shift slot in the in-memory schedule store.
         /// </summary>
         [HttpPost("~/api/schedule/unassign")]
         public IActionResult UnassignStaff([FromBody] AssignStaffRequest request)
@@ -145,8 +145,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         /// <summary>
-        /// Returns the edit assignment form partial.
-        /// Loaded into the NativeDrawer when user clicks an event on the schedule.
+        /// Loads the event-edit partial into the NativeDrawer after a schedule event click.
         /// The partial has its own Reactive Plan that merges into the page's Active Plan.
         /// </summary>
         [HttpGet("EditForm")]
@@ -169,8 +168,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         /// <summary>
-        /// Returns the new assignment form partial.
-        /// Loaded into FusionDialog when user clicks an empty cell on the schedule.
+        /// Loads the empty-cell assignment partial into the FusionDialog.
         /// GroupIndex (0-based) is mapped to ShiftId (1-based).
         /// </summary>
         [HttpGet("NewAssignmentForm")]
@@ -189,7 +187,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         /// <summary>
-        /// Creates a new shift assignment. Called from the new assignment dialog form.
+        /// Creates a shift assignment from the new-assignment dialog payload.
         /// </summary>
         [HttpPost("~/api/schedule/create-assignment")]
         public IActionResult CreateAssignment([FromBody] NewAssignmentModel? model)
@@ -219,7 +217,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         /// <summary>
-        /// Returns available staff for the assignment dialog dropdown.
+        /// Loads staff options for assignment dialog dropdowns.
         /// </summary>
         [HttpGet("~/api/schedule/staff")]
         public IActionResult GetStaff()
@@ -228,7 +226,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         /// <summary>
-        /// Returns facility list for the facility filter dropdown.
+        /// Loads facility options for the Schedule filter dropdown.
         /// </summary>
         [HttpGet("~/api/schedule/facilities")]
         public IActionResult GetFacilities()

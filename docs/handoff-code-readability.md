@@ -979,6 +979,10 @@ Rewrite or delete:
   Billing model XML docs now keep Syncfusion custom-binding and validation
   contracts while removing generic page-model, one-row, and "client + server"
   phrasing.
+- Resolved on `tiny-safe-but-important-refactorings`: Schedule sandbox
+  controller/model XML docs now name the Schedule data-source, assignment
+  dialog, NativeDrawer partial, FusionDialog partial, and Active Plan merge
+  boundaries instead of generic "returns" and "model for" narration.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

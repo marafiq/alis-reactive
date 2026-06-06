@@ -5,8 +5,8 @@ using Alis.Reactive.Fusion.Components;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// View model for the Point-in-Time Schedule sandbox page.
-    /// Filters drive server-side data loading — the schedule never holds the full dataset.
+    /// Point-in-Time Schedule state for server-filtered data loading.
+    /// Filters drive each data-source request; the schedule never holds the full dataset.
     /// </summary>
     public class PointInTimeScheduleModel
     {
@@ -14,7 +14,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// A single shift assignment shown as an event on the schedule.
+    /// Shift assignment event rendered by the Schedule data source.
     /// Maps to Syncfusion Schedule eventSettings.dataSource items.
     /// </summary>
     public class ShiftAssignment
@@ -48,7 +48,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// Facility for the facility filter dropdown.
+    /// Facility option for the Schedule filter dropdown.
     /// </summary>
     public class Facility
     {
@@ -57,7 +57,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// Staff member for the assignment dialog dropdown.
+    /// Staff option for assignment dialog dropdowns.
     /// </summary>
     public class StaffMember
     {
@@ -68,7 +68,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// Response from GET /api/schedule/assignments — server-driven data loading.
+    /// Schedule data-source response for server-filtered assignment loading.
     /// </summary>
     public class ScheduleDataResponse
     {
@@ -112,7 +112,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// Request to POST /api/schedule/assign — assign staff to a shift slot.
+    /// Assign-staff request for a shift slot.
     /// </summary>
     public class AssignStaffRequest
     {
@@ -122,7 +122,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// Model for the new assignment form loaded into FusionDialog via Into().
+    /// New-assignment form model loaded into FusionDialog via Into().
     /// CellClicked provides startTime/endTime/groupIndex — controller maps groupIndex to shiftId.
     /// </summary>
     public class NewAssignmentModel
