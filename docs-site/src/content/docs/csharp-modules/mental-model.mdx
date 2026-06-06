@@ -275,7 +275,8 @@ pipeline.Component<TComponent>()                     § app-level (no model bind
 
 #### Dispatch
 
-Fire a named event that other triggers are listening for. This is how dom-ready chains into custom events, and how components communicate across the page.
+Fire a named event that other triggers are listening for. This is how `DomReady`
+chains into `CustomEvent` triggers, and how components communicate across the page.
 
 ```
 pipeline.Dispatch("event-name")                      fire a named event
@@ -340,7 +341,7 @@ pipeline.When(pipeline.Plugin<int>("arr", "count").Arg(src)).Gt(0)
 pipeline.Confirm("message")                          § ask user before proceeding
 └── .Then(then => { ... }) / .Else(otherwise => { ... })
 
-Unconditional commands mix freely around branches:
+Unconditional reactions mix freely around branches:
 ├── pipeline.Element("id").SetText("Always runs")    § before the branch
 ├── pipeline.When(...).Then(...).Else(...)            § the branch
 ├── pipeline.Element("id").SetText("Also runs")      § after the branch
