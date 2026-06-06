@@ -1,15 +1,14 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Payload for FusionAccordion.Expanded.
-    /// Fires after a panel expands or collapses.
-    /// Properties are typed markers for expression-based condition sources, for example
-    /// <c>p.When(args, x => x.IsExpanded).Truthy()</c>.
-    /// ExpressionPathHelper resolves x => x.IsExpanded to "evt.isExpanded".
+    /// Event payload delivered after a FusionAccordion panel expands or collapses.
+    /// Use properties such as <c>IsExpanded</c> in typed event conditions; the
+    /// Reactive Plan reads them from the event payload, for example
+    /// <c>evt.isExpanded</c>.
     /// </summary>
     public class FusionAccordionExpandedArgs
     {
-        /// <summary>The zero-based index of the panel that was expanded/collapsed.</summary>
+        /// <summary>Zero-based index of the panel that expanded or collapsed.</summary>
         public int Index { get; set; }
 
         /// <summary>True if the panel was expanded, false if collapsed.</summary>

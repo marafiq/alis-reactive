@@ -1343,15 +1343,14 @@ Expanded { get; }  // Fires after a panel expands or collapses.
 
 ### FusionAccordionExpandedArgs
 
-Payload for FusionAccordion.Expanded.
-Fires after a panel expands or collapses.
-Properties are typed markers for expression-based condition sources, for example
-`p.When(args, x => x.IsExpanded).Truthy()`.
-ExpressionPathHelper resolves x => x.IsExpanded to "evt.isExpanded".
+Event payload delivered after a FusionAccordion panel expands or collapses.
+Use properties such as `IsExpanded` in typed event conditions; the
+Reactive Plan reads them from the event payload, for example
+`evt.isExpanded`.
 
 ```csharp
 // Properties
-Index { get; }  // The zero-based index of the panel that was expanded/collapsed.
+Index { get; }  // Zero-based index of the panel that expanded or collapsed.
 IsExpanded { get; }  // True if the panel was expanded, false if collapsed.
 ```
 

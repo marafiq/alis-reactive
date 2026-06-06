@@ -307,6 +307,10 @@ Candidate cleanup:
   payload index summaries now state zero-based indexing and distinguish
   clicked, pending-transition, and completed-change timing. Payload shape
   remains unchanged.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion Accordion expanded
+  payload docs now describe the public Reactive Plan event-payload path instead
+  of exposing `ExpressionPathHelper` implementation vocabulary. Payload shape
+  remains unchanged.
 
 ### Implementation Inline Comments
 
