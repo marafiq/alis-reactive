@@ -253,6 +253,10 @@ Candidate cleanup:
   fluent XML docs no longer repeat "The current conditional builder" on every
   append method. Parameter docs and raw `onclick`/HTML trust boundary remarks
   remain because they carry the template authoring contract.
+- Resolved on `tiny-safe-but-important-refactorings`: plugin argument builder
+  XML docs no longer repeat "current plugin member/call builder" on every
+  fluent argument method. Source, response-body, event-payload, and literal
+  parameter docs remain because they describe the plugin argument contract.
 
 ### Implementation Inline Comments
 
