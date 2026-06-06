@@ -1216,7 +1216,7 @@ Kind { get; }  // Wire discriminator for property reads. Always `"property"`.
 
 ### ReactionGraph
 
-Base class for all executable actions in a Reactive Plan. Not constructed in application code.
+Base class for executable reactions in a Reactive Plan. Not constructed in application code.
 
 ### ReadExpression
 
