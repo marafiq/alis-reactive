@@ -3,7 +3,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Component operation extensions for <see cref="FusionAccordion"/> in a Reactive Plan pipeline.
+    /// Updates rendered <see cref="FusionAccordion"/> panel state from a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -24,7 +24,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Expands or collapses a panel by index.
-        /// Runtime: ej2.expandItem(isExpand, index)
         /// </summary>
         public static ComponentRef<FusionAccordion, TModel> ExpandItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, bool isExpand, int index)
@@ -33,7 +32,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Enables or disables a panel by index.
-        /// Runtime: ej2.enableItem(index, isEnable)
         /// </summary>
         public static ComponentRef<FusionAccordion, TModel> EnableItem<TModel>(
             this ComponentRef<FusionAccordion, TModel> self, int index, bool isEnable = true)

@@ -3,7 +3,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Component operation extensions for <see cref="FusionTooltip"/> in a Reactive Plan pipeline.
+    /// Opens, closes, and refreshes the rendered <see cref="FusionTooltip"/> from a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
     /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
@@ -22,8 +22,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("refresh");
 
         /// <summary>
-        /// Opens the tooltip programmatically on the target element.
-        /// Runtime: ej2.open(targetElement)
+        /// Opens the tooltip on its target element.
         /// </summary>
         public static ComponentRef<FusionTooltip, TModel> Open<TModel>(
             this ComponentRef<FusionTooltip, TModel> self)
@@ -32,7 +31,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Closes the tooltip.
-        /// Runtime: ej2.close()
         /// </summary>
         public static ComponentRef<FusionTooltip, TModel> Close<TModel>(
             this ComponentRef<FusionTooltip, TModel> self)
@@ -41,7 +39,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Refreshes the tooltip position and content.
-        /// Runtime: ej2.refresh()
         /// </summary>
         public static ComponentRef<FusionTooltip, TModel> Refresh<TModel>(
             this ComponentRef<FusionTooltip, TModel> self)

@@ -566,6 +566,10 @@ Candidate cleanup:
   DropDownList, and MultiColumnComboBox value/text setter summaries now
   distinguish item selection from display-text writes instead of repeating
   "sets the selected value" across all three APIs.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining public Fusion
+  Accordion, Dialog, Tab, Tooltip, and Toast XML docs no longer expose
+  `ej2.*` call syntax or "flush" wording. The docs now describe rendered
+  component behavior while the runtime still maps to the same Syncfusion calls.
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
   selected-value parameter docs now use the same concise selected-option wording
   as the other Native value-write helpers.

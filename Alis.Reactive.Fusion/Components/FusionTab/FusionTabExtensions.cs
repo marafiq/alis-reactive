@@ -3,7 +3,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Component operation extensions for <see cref="FusionTab"/> in a Reactive Plan pipeline.
+    /// Updates rendered <see cref="FusionTab"/> selection and visibility from a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -26,14 +26,14 @@ namespace Alis.Reactive.Fusion.Components
             ComponentProperty<int>.Named("selectedItem");
 
         /// <summary>
-        /// Selects a tab by index: ej2.select(index).
+        /// Selects a tab by index.
         /// </summary>
         public static ComponentRef<FusionTab, TModel> Select<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index) where TModel : class
             => self.EmitCall(SelectMethod, new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(index) });
 
         /// <summary>
-        /// Shows or hides a tab by index: ej2.hideTab(index, isHidden).
+        /// Shows or hides a tab by index.
         /// </summary>
         public static ComponentRef<FusionTab, TModel> HideTab<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index, bool isHidden = true)
@@ -41,7 +41,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(HideTabMethod, new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(index), ValueExpression.Literal(isHidden) });
 
         /// <summary>
-        /// Sets the selected tab index via property: ej2.selectedItem = index.
+        /// Writes the selected tab index.
         /// </summary>
         public static ComponentRef<FusionTab, TModel> SetSelectedItem<TModel>(
             this ComponentRef<FusionTab, TModel> self, int index) where TModel : class

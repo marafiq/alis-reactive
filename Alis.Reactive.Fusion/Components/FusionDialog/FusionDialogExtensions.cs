@@ -3,7 +3,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Component operation extensions for <see cref="FusionDialog"/> in a Reactive Plan pipeline.
+    /// Shows and hides the rendered <see cref="FusionDialog"/> from a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
     /// Obtain a <see cref="ComponentRef{TComponent, TModel}"/> via the pipeline:
@@ -23,7 +23,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Shows the dialog.
-        /// Runtime: ej2.show()
         /// </summary>
         public static ComponentRef<FusionDialog, TModel> Show<TModel>(
             this ComponentRef<FusionDialog, TModel> self)
@@ -32,7 +31,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Hides the dialog.
-        /// Runtime: ej2.hide()
         /// </summary>
         public static ComponentRef<FusionDialog, TModel> Hide<TModel>(
             this ComponentRef<FusionDialog, TModel> self)
@@ -41,7 +39,6 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>
         /// Refreshes the dialog position and dimensions.
-        /// Runtime: ej2.refreshPosition()
         /// </summary>
         public static ComponentRef<FusionDialog, TModel> RefreshPosition<TModel>(
             this ComponentRef<FusionDialog, TModel> self)

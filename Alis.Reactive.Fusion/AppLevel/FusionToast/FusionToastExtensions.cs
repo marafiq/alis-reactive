@@ -113,7 +113,7 @@ namespace Alis.Reactive.Fusion.AppLevel
             => self.EmitSet(CssClassProperty, ValueExpression.Literal("e-toast-info"));
 
         /// <summary>
-        /// Flushes pending Syncfusion Toast property updates and shows the toast.
+        /// Applies pending Toast property updates and shows the toast.
         /// </summary>
         public static ComponentRef<FusionToast, TModel> Show<TModel>(
             this ComponentRef<FusionToast, TModel> self)
