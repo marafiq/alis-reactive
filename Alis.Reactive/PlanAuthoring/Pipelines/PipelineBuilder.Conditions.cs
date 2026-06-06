@@ -40,8 +40,8 @@ namespace Alis.Reactive.Builders
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
-        /// <summary>Starts a branch whose guard reads from a typed runtime value source.</summary>
-        /// <typeparam name="TProp">The runtime value type exposed by the source.</typeparam>
+        /// <summary>Starts a branch whose guard reads from a typed value source.</summary>
+        /// <typeparam name="TProp">The value type exposed by the source.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
         /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)

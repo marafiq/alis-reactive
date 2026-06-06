@@ -98,8 +98,8 @@ namespace Alis.Reactive.Builders.Conditions
                 source, _continuation, ConditionComposition.Any(ConditionGraph));
         }
 
-        /// <summary>Adds an all-of comparison against a typed runtime value source.</summary>
-        /// <typeparam name="TProp">The runtime value type exposed by the source.</typeparam>
+        /// <summary>Adds an all-of comparison against a typed value source.</summary>
+        /// <typeparam name="TProp">The value type exposed by the source.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> And<TProp>(TypedSource<TProp> source)
@@ -108,8 +108,8 @@ namespace Alis.Reactive.Builders.Conditions
                 source, _continuation, ConditionComposition.All(ConditionGraph));
         }
 
-        /// <summary>Adds an any-of comparison against a typed runtime value source.</summary>
-        /// <typeparam name="TProp">The runtime value type exposed by the source.</typeparam>
+        /// <summary>Adds an any-of comparison against a typed value source.</summary>
+        /// <typeparam name="TProp">The value type exposed by the source.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
         /// <returns>A builder for choosing the added comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> Or<TProp>(TypedSource<TProp> source)

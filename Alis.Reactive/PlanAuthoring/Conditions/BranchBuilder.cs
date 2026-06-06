@@ -59,8 +59,8 @@ namespace Alis.Reactive.Builders.Conditions
             return new ConditionSourceBuilder<TModel, TProp>(source, this);
         }
 
-        /// <summary>Adds the next ordered <c>ElseIf</c> branch from a typed runtime value source.</summary>
-        /// <typeparam name="TProp">The runtime value type exposed by the source.</typeparam>
+        /// <summary>Adds the next ordered <c>ElseIf</c> branch from a typed value source.</summary>
+        /// <typeparam name="TProp">The value type exposed by the source.</typeparam>
         /// <param name="source">A typed value source accepted by conditions.</param>
         /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> ElseIf<TProp>(TypedSource<TProp> source)
