@@ -48,7 +48,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitSet(TextProperty, ValueExpression.LiteralRaw(text, Shape.String));
 
-        /// <summary>Flushes pending property changes through the Syncfusion DropDownTree instance.</summary>
+        /// <summary>Applies pending DropDownTree property changes to the rendered component.</summary>
         public static ComponentRef<FusionDropDownTree, TModel> DataBind<TModel>(
             this ComponentRef<FusionDropDownTree, TModel> self)
             where TModel : class

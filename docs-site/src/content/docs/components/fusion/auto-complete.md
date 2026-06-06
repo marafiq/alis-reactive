@@ -37,7 +37,7 @@ The `Filtering` event fires on every keystroke. Cancel Syncfusion's built-in cli
 
 ## How do I cascade from another component?
 
-When a parent selection (department, wing) should reload this AutoComplete's suggestions, call `SetDataSource(...).DataBind()` inside the parent's `Changed` handler. You're setting a property and need to flush the change -- that's what `DataBind` does.
+When a parent selection (department, wing) should reload this AutoComplete's suggestions, call `SetDataSource(...).DataBind()` inside the parent's `Changed` handler. `DataBind` applies the new data source to the rendered component.
 
 ```csharp
 p.Get("/api/physicians?dept=", g => g.Include(m => m.Department))
@@ -56,7 +56,7 @@ p.Get("/api/physicians?dept=", g => g.Include(m => m.Department))
 | `SetValue(string?)` | Sets the selected value |
 | `SetText(string)` | Sets the display text |
 | `SetDataSource(source, path)` | Sets data source from event payload or response body |
-| `DataBind()` | Flushes pending property changes to the Syncfusion instance |
+| `DataBind()` | Applies pending property changes to the rendered component |
 | `FocusIn()` / `FocusOut()` | Manage focus |
 | `ShowPopup()` / `HidePopup()` | Open or close the suggestion dropdown |
 | `Enable()` / `Disable()` | Enable or disable the component |

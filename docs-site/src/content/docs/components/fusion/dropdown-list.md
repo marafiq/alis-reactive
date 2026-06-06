@@ -62,6 +62,6 @@ When parent selection (facility) should reload child options (wings inside that 
 | `SetValue(string?)` | Sets the selected value |
 | `SetText(string)` | Sets the display text |
 | `SetDataSource(source, path)` | Sets data source from event payload or response body |
-| `DataBind()` | Flushes pending property changes |
+| `DataBind()` | Applies pending property changes to the rendered component |
 | `FocusIn()` / `FocusOut()` | Manage focus |
 | `ShowPopup()` / `HidePopup()` | Open or close the dropdown |

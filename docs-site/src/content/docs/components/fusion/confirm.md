@@ -21,6 +21,6 @@ p.Component<FusionConfirm>()
 
 | Extension | Description |
 |---|---|
-| `SetContent(string)` | Sets the dialog message (calls `dataBind` after setting) |
+| `SetContent(string)` | Sets the dialog message |
 | `Show()` | Opens the dialog |
 | `Hide()` | Closes the dialog |

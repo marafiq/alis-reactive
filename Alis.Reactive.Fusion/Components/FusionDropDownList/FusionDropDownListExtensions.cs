@@ -80,7 +80,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitSet(DataSourceProperty, source.ToValueExpression());
 
-        /// <summary>Flushes pending property changes through the Syncfusion DropDownList instance.</summary>
+        /// <summary>Applies pending DropDownList property changes to the rendered component.</summary>
         /// <remarks>
         /// Call after <see cref="SetDataSource{TModel,TSource}"/> or
         /// <see cref="SetDataSource{TModel,TResponse}"/> to make the new items appear.

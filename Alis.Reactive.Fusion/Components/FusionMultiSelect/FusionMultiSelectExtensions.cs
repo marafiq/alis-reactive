@@ -79,7 +79,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitSet(DataSourceProperty, source.ToValueExpression());
 
-        /// <summary>Flushes pending property changes through the Syncfusion MultiSelect instance.</summary>
+        /// <summary>Applies pending MultiSelect property changes to the rendered component.</summary>
         public static ComponentRef<FusionMultiSelect, TModel> DataBind<TModel>(
             this ComponentRef<FusionMultiSelect, TModel> self)
             where TModel : class

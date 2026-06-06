@@ -80,7 +80,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitSet(DataSourceProperty, source.ToValueExpression());
 
-        /// <summary>Flushes pending property changes through the Syncfusion MultiColumnComboBox instance.</summary>
+        /// <summary>Applies pending MultiColumnComboBox property changes to the rendered component.</summary>
         public static ComponentRef<FusionMultiColumnComboBox, TModel> DataBind<TModel>(
             this ComponentRef<FusionMultiColumnComboBox, TModel> self)
             where TModel : class

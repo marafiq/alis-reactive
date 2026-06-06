@@ -398,6 +398,10 @@ Candidate cleanup:
   XML docs no longer repeat `<returns>A typed source representing ...</returns>`
   where the summary already names the value being read. Usage remarks and
   date-range shape guidance remain where they add IntelliSense value.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining consumer-facing
+  Fusion `DataBind()` docs no longer describe "flush" or Syncfusion instance
+  mechanics. Framework onboarding docs still name `dataBind` where the reader is
+  implementing a component contract.
 
 ### Implementation Inline Comments
 
