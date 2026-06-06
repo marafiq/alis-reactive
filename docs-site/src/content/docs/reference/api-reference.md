@@ -4284,7 +4284,7 @@ The result of `ChipList.getSelectedChips()` for a multiple-selection chip list. 
 ```csharp
 // Properties
 Data { get; }  // The selected chips' bound data objects (`data`) — the array DSL source for operating on the selection by member (text/value).
-Indexes { get; }  // The selected chips' indexes. NOTE: Syncfusion emits this key as `Indexes` (capital I, chip-list.js), so the camelCased read path resolves to empty. Reading the selected indexes requires a read-path name override (a framework capability, recorded as follow-up). Use `Data`/`Texts` until then.
+Indexes { get; }  // The selected chip positions from Syncfusion's selection payload.
 Texts { get; }  // The selected chips' display text (`texts`).
 ```
 
