@@ -53,7 +53,7 @@ build, test, Playwright, and packaging order explicit:
 
 Every wrapper supports `--help`. See **[docs/developer-cli.md](docs/developer-cli.md)**
 for filtered Playwright examples, first-time browser install, packaging, and the
-change-to-command matrix.
+command to run for each change type.
 
 ## Developing
 
