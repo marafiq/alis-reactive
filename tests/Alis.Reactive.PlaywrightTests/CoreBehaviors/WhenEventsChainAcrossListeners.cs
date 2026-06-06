@@ -1,10 +1,6 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
-/// <summary>
-/// Verifies the three-hop dispatch chain: dom-ready -> "test" -> "test-received" -> "final".
-/// DOM assertions prove listener wiring and reaction execution; trace assertions prove
-/// the final literal payload survives dispatch serialization.
-/// </summary>
+// Dispatch chain under test: dom-ready -> "test" -> "test-received" -> "final".
 [TestFixture]
 public class WhenEventsChainAcrossListeners : PlaywrightTestBase
 {
@@ -143,7 +139,6 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
     [Test]
     public async Task chain_status_has_semibold_and_green_and_no_muted_class()
     {
-        // Keep the complete final class invariant in one assertion block.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 

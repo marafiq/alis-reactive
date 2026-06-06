@@ -1,9 +1,6 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
-/// <summary>
-/// Proves <c>DomReady</c> dispatch payloads can be read by a typed
-/// <c>CustomEvent</c> and rendered from expression paths.
-/// </summary>
+// DomReady dispatch payloads must flow into typed CustomEvent paths and rendered text.
 [TestFixture]
 public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
 {

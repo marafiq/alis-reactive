@@ -79,6 +79,10 @@ Examples and current status:
   masked-MRN commit tests no longer carry XML narrative summaries. The remaining
   notes are concise inline comments for Syncfusion Enter-key submit behavior,
   mask display formatting, validation input shape, and the fixed-wait TODO.
+- Resolved on `tiny-safe-but-important-refactorings`: CoreBehaviors event and
+  payload tests no longer use XML summaries for test-class navigation. Concise
+  comments remain only for dispatch-chain intent, payload casing, trace/order
+  invariants, and class-update drift.
 - `WhenAllComponentsGatherIntoOnePost.cs` has long form-fill flows, but helper
   extraction should happen only if it names a reusable domain action. Do not add
   private helper indirection that hides a one-off behavior proof.

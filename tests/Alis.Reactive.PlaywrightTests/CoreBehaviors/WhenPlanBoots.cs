@@ -1,8 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
-/// <summary>
-/// Precondition coverage for the Events page before event-chain behavior tests run.
-/// </summary>
 [TestFixture]
 public class WhenPlanBoots : PlaywrightTestBase
 {
