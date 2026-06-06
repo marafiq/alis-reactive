@@ -360,7 +360,7 @@ Html.On(plan, t => t.CustomEvent("intake-saved", pipeline =>
 
 ## What is the plan?
 
-Every C# fluent call above compiles down to a JSON plan. The plan is the **only** contract between server and browser. No C# code reaches the browser, no JavaScript was hand-written.
+Every C# fluent call above compiles down to a JSON plan. The plan is the **only** contract between C# authoring and the JS runtime. No C# code runs after page load, no JavaScript was hand-written.
 
 The view renders the plan at the bottom of the page so you can inspect it:
 

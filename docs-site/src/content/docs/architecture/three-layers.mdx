@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-Reactive is built on one idea: **express intent in C#, carry it as structured data, execute it in the browser.** Three layers, each with a clear boundary.
+Reactive is built on one idea: **express intent in C#, carry it as structured data, execute it through the JS runtime.** Three layers, each with a clear boundary.
 
 ```d2
 direction: right
@@ -47,7 +47,7 @@ The compiler checks model bindings, event arg types, and response types at build
 
 ## Layer 2 — JSON Plan
 
-`plan.Render()` serializes all plan models to JSON. This JSON is the **contract** — the only thing that crosses from server to browser. The C# side never executes behavior. The JS side never invents behavior. Both agree on the plan's shape.
+`plan.Render()` serializes all plan models to JSON. This JSON is the **Reactive Plan contract** — the only thing that crosses from C# authoring to the JS runtime. The C# side never executes behavior. The JS side never invents behavior. Both agree on the plan's shape.
 
 The plan is emitted as a `<script type="application/json">` element in the page. It is inert data until the runtime reads it.
 
@@ -109,7 +109,7 @@ fire -> execute: plan lookup {
 }
 ```
 
-The C# never runs in the browser. The runtime never guesses what to do. The plan connects them.
+The C# never runs after page load. The runtime never guesses what to do. The Reactive Plan connects them.
 
 ## How an HTTP request flows through all three layers
 
