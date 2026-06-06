@@ -25,10 +25,10 @@ namespace Alis.Reactive.Native.Components
         /// @Html.NativeActionLink("Delete", "/residents/42/delete", p =&gt; p.Post("/residents/42/delete"))
         /// </code>
         /// </remarks>
-        /// <param name="linkText">The text rendered inside the anchor.</param>
-        /// <param name="url">The anchor href and the URL expected by the single request in <paramref name="pipeline"/>.</param>
-        /// <param name="pipeline">The click pipeline. It must emit exactly one request and cannot use validation, parallel requests, or chained requests.</param>
-        /// <returns>A builder for adding CSS classes or custom attributes before rendering the anchor.</returns>
+        /// <param name="linkText">Anchor text.</param>
+        /// <param name="url">Anchor href; must match the single request URL in <paramref name="pipeline"/>.</param>
+        /// <param name="pipeline">Single-request click pipeline; validation, parallel requests, and chained requests are rejected.</param>
+        /// <returns>Anchor builder for CSS classes or custom attributes.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="html"/> or <paramref name="pipeline"/> is <c>null</c>.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the pipeline violates the NativeActionLink request constraints.</exception>
         public static NativeActionLinkBuilder<TModel> NativeActionLink<TModel>(

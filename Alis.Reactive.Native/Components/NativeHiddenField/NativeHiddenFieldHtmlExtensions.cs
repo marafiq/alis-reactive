@@ -29,7 +29,7 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TProp">Model value type registered as the hidden input value.</typeparam>
         /// <param name="plan">Reactive Plan that receives the hidden-field registration.</param>
         /// <param name="expression">Model property expression used for MVC binding and component registration.</param>
-        /// <returns>A builder that renders the hidden input directly in the view.</returns>
+        /// <returns>Hidden input builder for inline rendering.</returns>
         public static NativeHiddenFieldBuilder<TModel, TProp> HiddenFieldFor<TModel, TProp>(
 #if NET48
             this HtmlHelper<TModel> html,

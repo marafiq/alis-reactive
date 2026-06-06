@@ -16,7 +16,7 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <param name="elementId">Element ID rendered on the button and used for component lookup.</param>
         /// <param name="text">Button text content.</param>
-        /// <returns>A builder that renders the button directly in the view.</returns>
+        /// <returns>Button builder for inline rendering.</returns>
         public static NativeButtonBuilder<TModel> NativeButton<TModel>(
 #if NET48
             this HtmlHelper<TModel> html, string elementId, string text)

@@ -261,6 +261,10 @@ Candidate cleanup:
   docs no longer repeat Razor HTML helper or generic model boilerplate where the
   summaries already name the rendered element, action-link browser boundary, or
   returned builder behavior.
+- Resolved on `tiny-safe-but-important-refactorings`: Native direct-render
+  helper docs now use concise ActionLink, Button, and HiddenField parameter and
+  return wording while keeping the ActionLink single-request URL contract and
+  the HiddenField registration boundary visible.
 - Resolved on `tiny-safe-but-important-refactorings`: the active Native
   `*Builder.cs` scan no longer shows long XML examples. Remaining component
   examples are short public DSL examples or explain runtime/browser boundaries.
