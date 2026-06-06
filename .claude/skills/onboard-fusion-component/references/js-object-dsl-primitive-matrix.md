@@ -17,6 +17,12 @@ Do not expose arbitrary member strings in a public Fusion slice. Public Fusion
 APIs stay typed even though internal plan members and JavaScript paths are
 strings.
 
+Component onboarding cannot change DSL primitives. If a member appears
+unmappable, assume discovery or mapping is wrong first, re-read the current DSL
+source, and record the unresolved row in the component audit report. Any real
+primitive/helper gap is a separate plan/runtime design pass, not part of the
+component slice.
+
 ## Grilled Matrix Checks
 
 Before writing a component slice, answer every applicable row in the trace
@@ -70,7 +76,7 @@ adding public API.
 | `ej2.method(arg)` returns `void` | `ComponentMethod.Named("method").WithArgs<TArg>()` + `EmitCall(method, args)` | Typed method parameter | Use `ValueExpression.Literal(...)` for literals or reads for dynamic values. |
 | `ej2.method(arg1, arg2)` returns `void` | `WithArgs<T1, T2>()` + ordered `ValueExpression` list | Typed parameters in JS order | Do not reorder for nicer C# names. |
 | `ej2.method(arg1, arg2, arg3)` returns `void` | `WithArgs<T1, T2, T3>()` + ordered `ValueExpression` list | Typed parameters in JS order | Existing helper surface covers three arguments. |
-| `ej2.method(arg1, arg2, arg3, ...)` | Extend `ComponentMethod.WithArgs<...>()` for the exact shape before onboarding | Typed parameters in JS order | The plan/runtime support argument lists; the C# helper must remain typed. |
+| `ej2.method(arg1, arg2, arg3, ...)` | Stop component onboarding and prove whether the current DSL helper surface has the exact typed shape | Typed parameters in JS order only after separate DSL work closes | The current component helper surface covers up to three typed arguments. Four-plus support is plan/runtime design work, not an onboarding shortcut. |
 | `ej2.method(...)` returns value | `ComponentMethod...` + `self.Read<TReturn>(method, args)` | `TypedComponentSource<TReturn>` | Prove the return shape and at least one real consumer. |
 | overloaded `ej2.method(...)` | `ComponentMethod.Mapped("methodForShape", "method").WithArgs<...>()` per shape | Distinct C# overloads or method names | Plan member names must not collide when signatures differ. |
 | method takes object arg | `ValueExpression.Object(...)` or `LiteralRaw(value, Shape.FromClrType(...))` | Domain-shaped argument type or explicit object builder | Confirm browser JSON casing and fields in rendered plan/probe. |
@@ -143,7 +149,7 @@ Stop onboarding that member and write a follow-up note instead when:
 - the member is already fully covered by the Syncfusion MVC builder as static initial render configuration;
 - the d.ts type is broad but runtime proof does not narrow it;
 - a payload method return is needed as a value source;
-- a component method needs more typed arguments than the current internal helper surface exposes;
+- a component method needs more typed arguments than the current helper surface exposes;
 - the only working path requires hidden/internal Syncfusion members;
 - the API would require public string member names, unbounded `object`, or an escape hatch that is not intentionally a plugin.
 

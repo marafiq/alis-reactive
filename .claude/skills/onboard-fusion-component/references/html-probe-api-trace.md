@@ -6,7 +6,9 @@ The raw HTML probe answers what to onboard. It must prove the Syncfusion JS obje
 
 For Fusion components, the question is not "what exists on the component?" The question is "what runtime behavior is missing after the Syncfusion MVC builder has already configured initial render?"
 
-The expected output is an API trace matrix in the HTML page, not a prose summary hidden in chat.
+The expected output is an API trace matrix in the HTML page and a matching
+trace JSON file under the Fusion artifact tree, not a prose summary hidden in
+chat.
 
 ## Probe Checklist
 
@@ -16,7 +18,7 @@ The expected output is an API trace matrix in the HTML page, not a prose summary
 2. Instantiate the exact object:
    - `new ej.{namespace}.{ClassName}(options).appendTo("#{id}")`
 3. Expose the instance:
-   - `window.__sfProbe.ej2`
+   - `window.__fusionProbe.ej2`
 4. Read the shipped JS source and d.ts for the exact class.
 5. Compare against the Syncfusion MVC builder surface.
 6. Trace:
@@ -31,7 +33,9 @@ The expected output is an API trace matrix in the HTML page, not a prose summary
    - visible DOM effect
 7. Record one row per candidate member.
 8. Render the trace matrix in the HTML page.
-9. Onboard only proven rows that are runtime gaps, not builder-only static options.
+9. Write `traces/raw-ej2-{api-set}.trace.json`.
+10. Link the trace from `master-usecases-index.md`.
+11. Onboard only proven rows that are runtime gaps, not builder-only static options.
 
 ## Trace Matrix
 
@@ -76,7 +80,7 @@ The implementation may include only `implement` rows and intentionally selected 
 ## Browser Console Commands
 
 ```javascript
-const probe = window.__sfProbe;
+const probe = window.__fusionProbe;
 const ej2 = probe.ej2;
 
 probe.member("prompt", () => ej2.prompt);
@@ -222,6 +226,14 @@ Literal objects passed as runtime method arguments also serialize through the
 plan serializer. Confirm their browser shape in the rendered plan before using
 them for methods like `addColumn(...)` or `openDialog(...)`.
 
-## Temporary Probe Policy
+## Probe Artifact Policy
 
-Probe HTML may be committed only if it is useful as a permanent vendor API fixture. Otherwise delete it after the typed vertical slice and Playwright coverage exist.
+Raw EJ2 probes for accepted API sets are durable workflow artifacts and belong
+under:
+
+```text
+tools/FusionOnboarding/wwwroot/onboarding/fusion/{componentName}/probes/
+```
+
+Throwaway experiments outside that tree may be deleted after the accepted probe
+and trace artifacts exist.

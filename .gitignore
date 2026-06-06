@@ -10,11 +10,14 @@ node_modules/
 *.user
 .vs/
 .worktrees/
-tools/
-!tools/md-viewer/
-!tools/ApiDocGenerator/
-!tools/PlanTypeGenerator/
+/tools/*
+!/tools/md-viewer/
+!/tools/ApiDocGenerator/
+!/tools/PlanTypeGenerator/
+!/tools/FusionOnboarding/
+!/tools/FusionOnboarding/**
 tools/md-viewer/node_modules/
+tools/md-viewer/reader.db*
 tools/md-viewer-mockup.html
 
 # docs-site (Starlight)

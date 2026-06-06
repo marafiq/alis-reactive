@@ -19,6 +19,12 @@ The output gives:
 | MVC builder | builder coverage gate |
 | JS global guess | raw HTML constructor |
 
+Write the accepted facts into:
+
+```text
+tools/FusionOnboarding/wwwroot/onboarding/fusion/{componentName}/discovery/source-inventory.md
+```
+
 ## Source Priority
 
 | Priority | Source | Use |
@@ -28,6 +34,9 @@ The output gives:
 | 3 | Syncfusion d.ts | identifies public members, event payload types, args, returns |
 | 4 | Syncfusion MVC XML/builder | decides what remains builder-owned |
 | 5 | Syncfusion docs/skills | accelerates setup only; never replaces proof |
+
+`tools/SyncfusionOnboarding` is not a source of truth for the workflow. Use it
+only when a current proof pass validates a specific file as vendor evidence.
 
 ## Hard Rule
 

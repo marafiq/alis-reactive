@@ -9,8 +9,15 @@ const component = requireArg(args, "component");
 const namespace = requireArg(args, "namespace");
 const className = requireArg(args, "class");
 const id = args.id ?? component;
+const apiSet = args["api-set"] ?? "core";
+const artifactComponent = args["artifact-component"] ?? component;
 
-const file = resolve(`Alis.Reactive.SandboxApp/wwwroot/sf-${component}-probe.html`);
+const file = resolve(
+  `tools/FusionOnboarding/wwwroot/onboarding/fusion/${artifactComponent}/probes/raw-ej2-${apiSet}.html`,
+);
+const traceFile = resolve(
+  `tools/FusionOnboarding/wwwroot/onboarding/fusion/${artifactComponent}/traces/raw-ej2-${apiSet}.trace.json`,
+);
 
 if (existsSync(file)) {
   console.error(`Probe already exists: ${file}`);
@@ -18,8 +25,10 @@ if (existsSync(file)) {
 }
 
 mkdirSync(dirname(file), { recursive: true });
-writeFileSync(file, template({ component, namespace, className, id }), "utf8");
+mkdirSync(dirname(traceFile), { recursive: true });
+writeFileSync(file, template({ component, namespace, className, id, apiSet, traceFile }), "utf8");
 console.log(file);
+console.log(`Trace output target: ${traceFile}`);
 
 function parseArgs(items) {
   const result = {};
@@ -45,12 +54,12 @@ function requireArg(args, name) {
   process.exit(1);
 }
 
-function template({ component, namespace, className, id }) {
+function template({ component, namespace, className, id, apiSet, traceFile }) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>SF ${className} API Probe</title>
+    <title>Fusion ${className} Raw EJ2 API Probe</title>
     <link rel="stylesheet" href="/vendor/syncfusion/material.css" />
     <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
     <style>
@@ -64,8 +73,8 @@ function template({ component, namespace, className, id }) {
     </style>
 </head>
 <body>
-    <h1>SF ${className} API Probe</h1>
-    <p>This page is temporary. Use it to discover the exact JS object API before onboarding typed C# members.</p>
+    <h1>Fusion ${className} Raw EJ2 API Probe</h1>
+    <p>Use this page to discover the exact Syncfusion EJ2 JS object API before onboarding typed Fusion C# members.</p>
     <div id="host">
         <div id="${id}"></div>
     </div>
@@ -213,7 +222,7 @@ function template({ component, namespace, className, id }) {
             }
         };
 
-        window.__sfProbe = probe;
+        window.__fusionProbe = probe;
 
         const ej2 = new ej.${namespace}.${className}({
             // Add real component options and event handlers here while tracing.
@@ -236,9 +245,11 @@ function template({ component, namespace, className, id }) {
 
         record("ready", {
             component: "${component}",
+            apiSet: "${apiSet}",
             namespace: "ej.${namespace}",
             className: "${className}",
-            id: "${id}"
+            id: "${id}",
+            traceFile: "${traceFile}"
         });
         proposal({
             candidate: "replace this row",
