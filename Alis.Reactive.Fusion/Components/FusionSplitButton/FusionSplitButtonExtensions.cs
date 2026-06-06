@@ -85,19 +85,19 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(RemoveItemsMethod, RemoveItemsArgs(itemIds, isUniqueId: true));
 
-        /// <summary>Reads the current rendered SplitButton content.</summary>
+        /// <summary>Reads the rendered SplitButton content.</summary>
         public static TypedComponentSource<string> Content<TModel>(
             this ComponentRef<FusionSplitButton, TModel> self)
             where TModel : class
             => self.Read(ContentProperty);
 
-        /// <summary>Reads whether the SplitButton is currently disabled.</summary>
+        /// <summary>Reads whether the rendered SplitButton is disabled.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionSplitButton, TModel> self)
             where TModel : class
             => self.Read(DisabledProperty);
 
-        /// <summary>Reads the current rendered SplitButton CSS classes.</summary>
+        /// <summary>Reads the rendered SplitButton CSS classes.</summary>
         public static TypedComponentSource<string> CssClass<TModel>(
             this ComponentRef<FusionSplitButton, TModel> self)
             where TModel : class

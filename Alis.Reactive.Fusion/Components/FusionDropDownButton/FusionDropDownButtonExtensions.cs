@@ -85,19 +85,19 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(RemoveItemsMethod, RemoveItemsArgs(itemIds, isUniqueId: true));
 
-        /// <summary>Reads the current rendered dropdown button content.</summary>
+        /// <summary>Reads the rendered dropdown button content.</summary>
         public static TypedComponentSource<string> Content<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self)
             where TModel : class
             => self.Read(ContentProperty);
 
-        /// <summary>Reads whether the dropdown button is currently disabled.</summary>
+        /// <summary>Reads whether the rendered dropdown button is disabled.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self)
             where TModel : class
             => self.Read(DisabledProperty);
 
-        /// <summary>Reads the current rendered dropdown button CSS classes.</summary>
+        /// <summary>Reads the rendered dropdown button CSS classes.</summary>
         public static TypedComponentSource<string> CssClass<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self)
             where TModel : class

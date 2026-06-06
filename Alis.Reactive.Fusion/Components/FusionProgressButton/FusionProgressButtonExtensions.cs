@@ -99,19 +99,19 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads the current rendered progress button content.</summary>
+        /// <summary>Reads the rendered progress button content.</summary>
         public static TypedComponentSource<string> Content<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class
             => self.Read(ContentProperty);
 
-        /// <summary>Reads whether the progress button is currently disabled.</summary>
+        /// <summary>Reads whether the rendered progress button is disabled.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class
             => self.Read(DisabledProperty);
 
-        /// <summary>Reads the current rendered progress button CSS classes.</summary>
+        /// <summary>Reads the rendered progress button CSS classes.</summary>
         public static TypedComponentSource<string> CssClass<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class

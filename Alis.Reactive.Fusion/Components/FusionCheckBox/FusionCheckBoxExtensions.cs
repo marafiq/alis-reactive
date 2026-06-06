@@ -67,19 +67,19 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads whether the checkbox is currently checked.</summary>
+        /// <summary>Reads whether the rendered checkbox is checked.</summary>
         public static TypedComponentSource<bool> Checked<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self)
             where TModel : class
             => self.Read(CheckedProperty);
 
-        /// <summary>Reads whether the checkbox is currently indeterminate.</summary>
+        /// <summary>Reads whether the rendered checkbox is indeterminate.</summary>
         public static TypedComponentSource<bool> Indeterminate<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self)
             where TModel : class
             => self.Read(IndeterminateProperty);
 
-        /// <summary>Reads whether the checkbox is currently disabled.</summary>
+        /// <summary>Reads whether the rendered checkbox is disabled.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self)
             where TModel : class

@@ -56,13 +56,13 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads whether this radio button is currently checked.</summary>
+        /// <summary>Reads whether this rendered radio button is checked.</summary>
         public static TypedComponentSource<bool> Checked<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self)
             where TModel : class
             => self.Read(CheckedProperty);
 
-        /// <summary>Reads whether this radio button is currently disabled.</summary>
+        /// <summary>Reads whether this rendered radio button is disabled.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self)
             where TModel : class

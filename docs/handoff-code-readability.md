@@ -584,6 +584,11 @@ Candidate cleanup:
   ListBox, and DateRangePicker value-read summaries now name the selected
   value/text/date shape directly. DateRangePicker remarks still keep the
   condition examples and no-`SetValue()` invariant.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion Button,
+  DropDownButton, SplitButton, ProgressButton, CheckBox, and RadioButton read
+  summaries now describe rendered content, disabled state, CSS classes, and
+  styling/state flags directly instead of using vague "current/currently"
+  wording.
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
   selected-value parameter docs now use the same concise selected-option wording
   as the other Native value-write helpers.

@@ -106,31 +106,31 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads the current rendered button content.</summary>
+        /// <summary>Reads the rendered button content.</summary>
         public static TypedComponentSource<string> Content<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.Read(ContentProperty);
 
-        /// <summary>Reads whether the button is currently disabled.</summary>
+        /// <summary>Reads whether the rendered button is disabled.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.Read(DisabledProperty);
 
-        /// <summary>Reads the current CSS class property.</summary>
+        /// <summary>Reads the rendered button CSS classes.</summary>
         public static TypedComponentSource<string> CssClass<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.Read(CssClassProperty);
 
-        /// <summary>Reads whether the button is currently primary.</summary>
+        /// <summary>Reads whether the rendered button uses primary styling.</summary>
         public static TypedComponentSource<bool> IsPrimary<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.Read(IsPrimaryProperty);
 
-        /// <summary>Reads whether the button currently toggles active state.</summary>
+        /// <summary>Reads whether the rendered button toggles active state.</summary>
         public static TypedComponentSource<bool> IsToggle<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
