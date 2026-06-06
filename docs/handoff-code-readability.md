@@ -491,6 +491,10 @@ Candidate cleanup:
   expressions are "emitted." The class and method remarks still keep the
   emitted-as-supplied trust boundary because that is the public template
   authoring contract.
+- Resolved on `tiny-safe-but-important-refactorings`: core plugin argument XML
+  docs no longer describe response paths and typed value sources as values "to
+  pass." The method summaries keep the plugin-argument DSL intent, while
+  parameter tags name only the selected path or source category.
 
 ### Implementation Inline Comments
 

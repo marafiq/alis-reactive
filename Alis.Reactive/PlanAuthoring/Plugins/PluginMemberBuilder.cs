@@ -52,7 +52,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">Selected response-body argument type.</typeparam>
         /// <param name="body">The success or error response body scope.</param>
-        /// <param name="path">The response property path to pass.</param>
+        /// <param name="path">Response property path.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TResponse, TProp>(
             ResponseBody<TResponse> body, Expression<Func<TResponse, TProp>> path)
             where TResponse : class
@@ -75,7 +75,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Adds another typed value source as a plugin argument.</summary>
         /// <typeparam name="TArg">The CLR type carried by the typed value source.</typeparam>
-        /// <param name="source">The component, URL, response, or plugin value source to pass.</param>
+        /// <param name="source">Component, URL, response, or plugin value source.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TArg>(TypedSource<TArg> source)
         {
             _args.Add(PluginInvocationArgument.FromSource(source));
@@ -178,7 +178,7 @@ namespace Alis.Reactive.Builders
         /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">Selected response-body argument type.</typeparam>
         /// <param name="body">The success or error response body scope.</param>
-        /// <param name="path">The response property path to pass.</param>
+        /// <param name="path">Response property path.</param>
         public PluginCallBuilder<TModel> Arg<TResponse, TProp>(
             ResponseBody<TResponse> body, Expression<Func<TResponse, TProp>> path)
             where TResponse : class
@@ -201,7 +201,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Adds a typed value source as a plugin argument.</summary>
         /// <typeparam name="TArg">The CLR type carried by the typed value source.</typeparam>
-        /// <param name="source">The component, URL, response, or plugin value source to pass.</param>
+        /// <param name="source">Component, URL, response, or plugin value source.</param>
         public PluginCallBuilder<TModel> Arg<TArg>(TypedSource<TArg> source)
         {
             _args.Add(PluginInvocationArgument.FromSource(source));
