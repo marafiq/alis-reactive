@@ -287,25 +287,22 @@ Playwright tests run against the live application. If you changed TypeScript or 
 ```bash
 npm run build:all          # Rebuild JS + CSS
 dotnet build               # Rebuild C# (picks up new bundle hash)
-dotnet test tests/Alis.Reactive.PlaywrightTests
+scripts/playwright.sh --no-build
 ```
 
 ---
 
 ## Running the full suite
 
-Before every commit:
+Before push or release work:
 
 ```bash
-npm test                                                    # TS unit tests
-dotnet test tests/Alis.Reactive.UnitTests                   # Core C# tests
-dotnet test tests/Alis.Reactive.Native.UnitTests            # Native tests
-dotnet test tests/Alis.Reactive.Fusion.UnitTests            # Fusion tests
-dotnet test tests/Alis.Reactive.FluentValidator.UnitTests   # Validation tests
-dotnet test tests/Alis.Reactive.PlaywrightTests             # Browser tests
+scripts/test.sh
 ```
 
-All must pass. No exceptions.
+For focused commits, run the narrow proof that matches the touched surface.
+Use `scripts/playwright.sh --filter "..."` for browser behavior and
+`scripts/test.sh --no-e2e` when browser behavior is intentionally out of scope.
 
 ---
 

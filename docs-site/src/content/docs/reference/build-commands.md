@@ -95,31 +95,29 @@ dotnet test tests/Alis.Reactive.FluentValidator.UnitTests   # Validation extract
 Playwright.NUnit against the live SandboxApp. The test fixture starts the app automatically on port 5220.
 
 ```bash
-dotnet test tests/Alis.Reactive.PlaywrightTests             # ~483 tests, ~75 seconds
+scripts/playwright.sh                                      # observable browser test run
 ```
 
 ### All tests in sequence
 
 ```bash
-npm test
-dotnet test tests/Alis.Reactive.UnitTests
-dotnet test tests/Alis.Reactive.Native.UnitTests
-dotnet test tests/Alis.Reactive.Fusion.UnitTests
-dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
-dotnet test tests/Alis.Reactive.PlaywrightTests
+scripts/test.sh
 ```
 
-All must pass before every commit. No exceptions.
+Run the full gate before push or release work. For a focused edit, use the
+narrow proof from `docs/developer-cli.md`, such as `scripts/test.sh --no-e2e`
+when browser behavior is intentionally out of scope.
 
 ---
 
 ## How do I run the sandbox app?
 
 ```bash
-dotnet run --project Alis.Reactive.SandboxApp
+scripts/run.sh
 ```
 
-Starts Kestrel on `http://localhost:5220`. The sandbox serves framework bundles
+Builds browser assets, then starts Kestrel on `http://localhost:5220`. The
+sandbox serves framework bundles
 (`/scripts/alis-reactive.dev.js`, `/css/design-system.dev.css`) directly from
 `Alis.Reactive.Assets/dist/` via a `CompositeFileProvider` configured in
 `Alis.Reactive.SandboxApp/Program.cs` — no copy into sandbox `wwwroot/` required.
@@ -173,7 +171,7 @@ Ensures everything compiles, including the sandbox app.
 ### 5. Run Playwright tests
 
 ```bash
-dotnet test tests/Alis.Reactive.PlaywrightTests
+scripts/playwright.sh --no-build
 ```
 
 The test fixture starts the app automatically. These tests navigate real pages, interact with components, and assert DOM state.
@@ -189,7 +187,7 @@ Fix:
 ```bash
 npm run build:all          # Rebuild JS + CSS
 dotnet build               # Rebuild C# (refreshes asp-append-version hash)
-dotnet test tests/Alis.Reactive.PlaywrightTests
+scripts/playwright.sh --no-build
 ```
 
 If you skip `npm run build:all`, the browser loads old JS. If you skip `dotnet build`, the server computes hashes on old files. Both cause confusing failures.
@@ -212,6 +210,6 @@ If you skip `npm run build:all`, the browser loads old JS. If you skip `dotnet b
 | Native component tests | `dotnet test tests/Alis.Reactive.Native.UnitTests` |
 | Fusion component tests | `dotnet test tests/Alis.Reactive.Fusion.UnitTests` |
 | Validation tests | `dotnet test tests/Alis.Reactive.FluentValidator.UnitTests` |
-| Browser tests | `dotnet test tests/Alis.Reactive.PlaywrightTests` |
+| Browser tests | `scripts/playwright.sh` |
 | Build all C# | `dotnet build` |
-| Run sandbox | `dotnet run --project Alis.Reactive.SandboxApp` |
+| Run sandbox | `scripts/run.sh` |

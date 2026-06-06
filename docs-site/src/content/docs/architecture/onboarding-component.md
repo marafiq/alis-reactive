@@ -611,7 +611,7 @@ public class WhenUsingFusionXxx : PlaywrightTestBase
 
 ```bash
 dotnet test tests/Alis.Reactive.Fusion.UnitTests     # C# mutations serialize correctly
-dotnet test tests/Alis.Reactive.PlaywrightTests       # Browser behavior verified
+scripts/playwright.sh --filter "FullyQualifiedName~FusionXxx"  # Browser behavior verified
 ```
 
 ---

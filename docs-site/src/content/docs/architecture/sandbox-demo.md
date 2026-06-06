@@ -316,9 +316,7 @@ After creating all files, you MUST verify in the browser before considering the 
 ### 1. Build and run
 
 ```bash
-npm run build:all        # Rebuild JS + CSS
-dotnet build             # Rebuild C#
-dotnet run --project Alis.Reactive.SandboxApp
+scripts/run.sh
 ```
 
 ### 2. Open the sandbox page
