@@ -16,10 +16,7 @@ public class VitalsAlertController : Controller
         });
     }
 
-    /// <summary>
-    /// Simple alert — called when heart rate exceeds threshold.
-    /// Returns confirmation with server timestamp.
-    /// </summary>
+    /// <summary>Returns the high-rate alert response used by the condition-gated HTTP branch.</summary>
     [HttpPost("Alert")]
     public IActionResult Alert([FromBody] AlertRequest? request)
     {
@@ -31,9 +28,7 @@ public class VitalsAlertController : Controller
         });
     }
 
-    /// <summary>
-    /// Critical alert — called when heart rate >= 180 (crisis tier).
-    /// </summary>
+    /// <summary>Returns the crisis-tier response for heart rates at or above 180.</summary>
     [HttpPost("Critical")]
     public IActionResult Critical([FromBody] AlertRequest? request)
     {
@@ -45,9 +40,7 @@ public class VitalsAlertController : Controller
         });
     }
 
-    /// <summary>
-    /// Warning alert — called when heart rate 140–179 (elevated tier).
-    /// </summary>
+    /// <summary>Returns the elevated-tier response for heart rates from 140 through 179.</summary>
     [HttpPost("Warning")]
     public IActionResult Warning([FromBody] AlertRequest? request)
     {

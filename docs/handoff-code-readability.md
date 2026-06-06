@@ -955,6 +955,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: design-system helper XML
   docs now keep the CSS override-order contract while shortening repeated class
   string, wrapper, and caller-supplied wording.
+- Resolved on `tiny-safe-but-important-refactorings`: VitalsAlert sandbox
+  controller XML docs now describe the condition-gated HTTP branch contracts
+  instead of narrating which endpoint is called for each heart-rate tier.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
