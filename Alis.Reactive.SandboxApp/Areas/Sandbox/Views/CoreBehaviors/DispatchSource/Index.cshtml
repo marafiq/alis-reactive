@@ -13,7 +13,7 @@
     Html.InputField(plan, m => m.Address.City, o => o.Label("City"))
         .NativeTextBox(b => b.Placeholder("Type a city..."));
 
-    // DispatchWith mixes live component sources, literals, and nested paths in one payload.
+    // DispatchWith mixes runtime value sources, literals, and nested paths in one payload.
     Html.On(plan, t => t.CustomEvent("do-transfer", p =>
     {
         p.DispatchWith<DispatchSourceModel>("transfer", d => d
