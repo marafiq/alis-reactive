@@ -284,10 +284,10 @@ Candidate cleanup:
   remain because they carry the template authoring contract.
 - Resolved on `tiny-safe-but-important-refactorings`: `FusionTemplateBuilder`
   and `FusionConditionalBuilder` literal-text and nested-template parameter
-  docs, property-binding parameter docs, plus root class and attribute docs, now keep
-  generator-required XML tags while dropping prose that repeated the method
-  name. Trust-boundary remarks for raw HTML, attributes, events, and `onclick`
-  remain.
+  docs, property-binding parameter docs, button/raw-HTML parameter docs, plus
+  root class and attribute docs, now keep generator-required XML tags while
+  dropping prose that repeated the method name. Trust-boundary remarks for raw
+  HTML, attributes, events, and `onclick` remain.
 - Resolved on `tiny-safe-but-important-refactorings`: plugin argument builder
   XML docs no longer repeat "current plugin member/call builder" on every
   fluent argument method. Source, response-body, event-payload, and literal

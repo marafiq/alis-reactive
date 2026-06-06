@@ -221,7 +221,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button with a raw <c>onclick</c> expression.
         /// </summary>
-        /// <param name="text">The literal button text.</param>
+        /// <param name="text">Button text.</param>
         /// <param name="onClick">The raw <c>onclick</c> expression to emit.</param>
         /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> Button(string text, string onClick) =>
@@ -230,7 +230,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled button with a raw <c>onclick</c> expression.
         /// </summary>
-        /// <param name="text">The literal button text.</param>
+        /// <param name="text">Button text.</param>
         /// <param name="onClick">The raw <c>onclick</c> expression to emit.</param>
         /// <param name="css">CSS class.</param>
         /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
@@ -246,7 +246,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button that calls a JavaScript function with a bound model value.
         /// </summary>
-        /// <param name="text">The literal button text.</param>
+        /// <param name="text">Button text.</param>
         /// <param name="idProperty">The template model property passed to the JavaScript function.</param>
         /// <param name="onClickFn">The JavaScript function name to call.</param>
         /// <remarks>The function name is emitted into <c>onclick</c> as supplied; do not pass untrusted input.</remarks>
@@ -259,7 +259,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled button that calls a JavaScript function with a bound model value.
         /// </summary>
-        /// <param name="text">The literal button text.</param>
+        /// <param name="text">Button text.</param>
         /// <param name="idProperty">The template model property passed to the JavaScript function.</param>
         /// <param name="onClickFn">The JavaScript function name to call.</param>
         /// <param name="css">CSS class.</param>
@@ -288,7 +288,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
-        /// <param name="text">The literal button text.</param>
+        /// <param name="text">Button text.</param>
         /// <param name="eventName">The DOM event name to dispatch.</param>
         /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
         public FusionTemplateBuilder<TModel> EventButton<TProperty>(
@@ -300,7 +300,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
-        /// <param name="text">The literal button text.</param>
+        /// <param name="text">Button text.</param>
         /// <param name="eventName">The DOM event name to dispatch.</param>
         /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
         /// <param name="css">CSS class.</param>
@@ -413,7 +413,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds raw HTML to the template output.
         /// </summary>
-        /// <param name="html">The raw HTML to emit.</param>
+        /// <param name="html">Raw HTML.</param>
         /// <remarks>The <paramref name="html"/> value is emitted without escaping; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> Raw(string html)
         {
