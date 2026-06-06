@@ -503,6 +503,10 @@ Candidate cleanup:
   longer repeat "CLR type carried by the typed value source" across condition,
   gather, element, and plugin overloads. Type-parameter tags remain, but now use
   concise source-value or plugin-argument wording.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeRadioGroup` option
+  XML parameter tags now use concise submitted-value/display-text wording. The
+  builder comments that explain the hidden-input Reactive Plan target and the
+  `net48` MVC encoding constraint remain because they protect real boundaries.
 
 ### Implementation Inline Comments
 

@@ -23,7 +23,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the selected radio value through the component contract.
         /// </summary>
-        /// <param name="value">The radio option value to select.</param>
+        /// <param name="value">Selected radio option value.</param>
         public static ComponentRef<NativeRadioGroup, TModel> SetValue<TModel>(
             this ComponentRef<NativeRadioGroup, TModel> self, string value)
             where TModel : class

@@ -30,8 +30,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Creates a new option without secondary description text.
         /// </summary>
-        /// <param name="value">The option value submitted in the form.</param>
-        /// <param name="text">The display text shown to the user.</param>
+        /// <param name="value">Submitted option value.</param>
+        /// <param name="text">Display text.</param>
         public RadioButtonItem(string value, string text)
             : this(value, text, OptionDescription.None)
         {
@@ -40,8 +40,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Creates a new option with secondary description text.
         /// </summary>
-        /// <param name="value">The option value submitted in the form.</param>
-        /// <param name="text">The display text shown to the user.</param>
+        /// <param name="value">Submitted option value.</param>
+        /// <param name="text">Display text.</param>
         /// <param name="description">Secondary description text.</param>
         public RadioButtonItem(string value, string text, string description)
             : this(value, text, OptionDescription.Text(description))

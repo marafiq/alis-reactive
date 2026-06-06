@@ -83,7 +83,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Adds a radio option whose submitted value is also its display text.
         /// </summary>
-        /// <param name="value">The option value and display text.</param>
+        /// <param name="value">Option value and display text.</param>
         public NativeRadioGroupBuilder<TModel, TProp> Option(string value)
         {
             _options.Add(new RadioButtonItem(value, value));
@@ -93,8 +93,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Adds a radio option with a submitted value and separate display text.
         /// </summary>
-        /// <param name="value">The option value submitted in the form.</param>
-        /// <param name="text">The display text shown next to the radio button.</param>
+        /// <param name="value">Submitted option value.</param>
+        /// <param name="text">Radio button display text.</param>
         public NativeRadioGroupBuilder<TModel, TProp> Option(string value, string text)
         {
             _options.Add(new RadioButtonItem(value, text));
@@ -104,8 +104,8 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Adds a radio option with submitted value, display text, and secondary description.
         /// </summary>
-        /// <param name="value">The option value submitted in the form.</param>
-        /// <param name="text">The display text shown next to the radio button.</param>
+        /// <param name="value">Submitted option value.</param>
+        /// <param name="text">Radio button display text.</param>
         /// <param name="description">A secondary description shown below the text.</param>
         public NativeRadioGroupBuilder<TModel, TProp> Option(string value, string text, string description)
         {
