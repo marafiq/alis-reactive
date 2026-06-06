@@ -425,6 +425,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: plugin argument builders
   no longer repeat `TValue` XML type-parameter docs on `ArgValue<TValue>()`;
   the summaries already explain that the plan shape is derived from the type.
+- Resolved on `tiny-safe-but-important-refactorings`: gather builder XML docs
+  no longer repeat generic type-parameter lines for typed component reads and
+  typed URL reads; the method summaries and parameter docs carry the contract.
 
 ### Implementation Inline Comments
 

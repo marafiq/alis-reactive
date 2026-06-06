@@ -200,7 +200,6 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Reads a typed URL query parameter into a request body field with the same name.</summary>
-        /// <typeparam name="T">The expected query parameter value type.</typeparam>
         /// <param name="paramName">The URL query parameter to read and body field to write.</param>
         public GatherBuilder<TModel> FromUrl<T>(string paramName)
         {
@@ -213,7 +212,6 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Reads a typed URL query parameter into an explicit request body field.</summary>
-        /// <typeparam name="T">The expected query parameter value type.</typeparam>
         /// <param name="paramName">The URL query parameter name to read.</param>
         /// <param name="asParam">The request body field that receives the typed URL value.</param>
         public GatherBuilder<TModel> FromUrl<T>(string paramName, string asParam)

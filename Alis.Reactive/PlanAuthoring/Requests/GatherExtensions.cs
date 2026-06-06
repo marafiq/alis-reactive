@@ -62,7 +62,6 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Adds a typed component member read to the request body.
         /// </summary>
-        /// <typeparam name="TProp">The component member value type.</typeparam>
         /// <param name="source">The component property or method source; its default body field name is used.</param>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
             this GatherBuilder<TModel> self,
@@ -76,7 +75,6 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>
         /// Adds a typed component member read to an explicit request body field.
         /// </summary>
-        /// <typeparam name="TProp">The component member value type.</typeparam>
         /// <param name="source">The component property or method source evaluated before the request is sent.</param>
         /// <param name="paramName">The request body field that receives the component member value.</param>
         public static GatherBuilder<TModel> Include<TModel, TProp>(
