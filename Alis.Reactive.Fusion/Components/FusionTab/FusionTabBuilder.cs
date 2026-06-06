@@ -21,12 +21,9 @@ namespace Alis.Reactive.Fusion.Components
             _inner = inner;
         }
 
-        /// <summary>The Reactive Plan used by <c>.Reactive()</c> to add event triggers.</summary>
         internal ReactivePlan<TModel> Plan { get; }
 
-        /// <summary>The element ID used by <c>.Reactive()</c> to wire events.</summary>
         internal string ElementId { get; }
-
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
