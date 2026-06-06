@@ -197,6 +197,10 @@ Candidate cleanup:
   radio-button extension/event summaries now keep checked, indeterminate,
   disabled, click/focus, selected group value, and change-event semantics
   without repetitive "whether the rendered..." wording.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion text-like value
+  component summaries now keep visible text, OTP, masked input, and HTML content
+  semantics while removing article-led phrasing. Usage examples and remarks were
+  kept where they clarify API consumption.
 - Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
   operator docs now include the parameter tags needed for generated API
   signatures such as `Eq(operand)` versus `Eq(right)`. This keeps the public DSL

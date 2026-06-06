@@ -20,7 +20,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusInMethod =
             ComponentMethod.Named("focusIn");
 
-        /// <summary>Sets the masked input value.</summary>
+        /// <summary>Sets masked input value.</summary>
         public static ComponentRef<FusionInputMask, TModel> SetValue<TModel>(
             this ComponentRef<FusionInputMask, TModel> self, string value)
             where TModel : class
@@ -34,7 +34,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads the masked value for conditions or gather.</summary>
+        /// <summary>Reads masked value for conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument for component operations:
         /// <c>p.When(p.Component&lt;FusionInputMask&gt;(m =&gt; m.Phone).Value()).NotNull().Then(p =&gt; { ... })</c>.

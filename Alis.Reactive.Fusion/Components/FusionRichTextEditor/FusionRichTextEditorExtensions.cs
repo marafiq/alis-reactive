@@ -20,8 +20,8 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusInMethod =
             ComponentMethod.Named("focusIn");
 
-        /// <summary>Sets the HTML content value.</summary>
-        /// <param name="value">HTML content to set.</param>
+        /// <summary>Sets HTML content value.</summary>
+        /// <param name="value">HTML fragment assigned to the editor.</param>
         public static ComponentRef<FusionRichTextEditor, TModel> SetValue<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self, string value)
             where TModel : class
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads the HTML content for conditions or gather.</summary>
+        /// <summary>Reads HTML content for conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument for component operations:
         /// <c>p.When(p.Component&lt;FusionRichTextEditor&gt;(m =&gt; m.Notes).Value()).NotNull().Then(p =&gt; { ... })</c>.
