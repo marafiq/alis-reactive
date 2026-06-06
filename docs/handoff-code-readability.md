@@ -855,6 +855,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: the all-components gather
   workflow now names `currentCalendarPage` instead of commenting why the current
   month is used for popup date selections.
+- Resolved on `tiny-safe-but-important-refactorings`: the native button sequence
+  test now names the re-click proof in the test method, so the reset-status
+  narration was removed without changing the click/assertion sequence.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

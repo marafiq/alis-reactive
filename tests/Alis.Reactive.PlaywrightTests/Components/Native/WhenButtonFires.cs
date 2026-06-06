@@ -54,7 +54,7 @@ public class WhenButtonFires : PlaywrightTestBase
     }
 
     [Test]
-    public async Task clicking_multiple_buttons_in_sequence_updates_each_status()
+    public async Task clicking_multiple_buttons_then_reclicking_admit_updates_status_again()
     {
         await NavigateAndBoot();
 
@@ -66,7 +66,6 @@ public class WhenButtonFires : PlaywrightTestBase
         var transferStatus = Page.Locator("#transfer-status");
         await Expect(transferStatus).ToHaveTextAsync("transfer confirmed", new() { Timeout = 3000 });
 
-        // Reset status so the re-click must produce a visible update.
         await admitStatus.EvaluateAsync("el => el.textContent = 'reset'");
         await Page.Locator("#btn-admit").ClickAsync();
         await Expect(admitStatus).ToHaveTextAsync("Admit Resident clicked", new() { Timeout = 3000 });
