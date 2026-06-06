@@ -518,7 +518,7 @@ describe("executeRequest HTTP request lane", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("preserves the request snapshot when the browser fails before a response is available", async () => {
+  it("preserves the request snapshot when fetch fails before a response is available", async () => {
     document.body.innerHTML = `
       <span id="error"></span>
       <span id="complete"></span>
