@@ -157,7 +157,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_carries_native_vendor_for_dropdown_mutations()
+    public async Task plan_carries_native_vendor_for_dropdown_set_reactions()
     {
         // The plan must declare vendor "native" so the runtime resolves
         // the raw DOM element (not ej2_instances). If vendor is wrong,
@@ -166,7 +166,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"vendor\": \"native\""),
-            "Plan must carry vendor 'native' for dropdown mutations — " +
+            "Plan must carry vendor 'native' for dropdown set reactions — " +
             "runtime uses this to choose resolveRoot strategy");
         AssertNoConsoleErrors();
     }
@@ -195,7 +195,7 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"property\": \"text\""),
-            "Plan must carry property .text. for SetValue mutation — " +
+            "Plan must carry property .text. for SetValue reaction — " +
             "runtime uses bracket notation root[prop] = val");
         AssertNoConsoleErrors();
     }

@@ -190,13 +190,13 @@ public class WhenSwitchToggles : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_carries_fusion_vendor_for_switch_mutations()
+    public async Task plan_carries_fusion_vendor_for_switch_set_reactions()
     {
         await NavigateAndBoot();
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""),
-            "Plan must carry vendor 'fusion' for switch mutations — " +
+            "Plan must carry vendor 'fusion' for switch set reactions — " +
             "runtime uses this to choose resolveRoot strategy (ej2_instances)");
         AssertNoConsoleErrors();
     }
@@ -232,7 +232,7 @@ public class WhenSwitchToggles : PlaywrightTestBase
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"property\": \"checked\""),
-            "Plan must carry property .checked. for SetChecked mutation — " +
+            "Plan must carry property .checked. for SetChecked reaction — " +
             "runtime uses bracket notation root[prop] = val");
         AssertNoConsoleErrors();
     }

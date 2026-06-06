@@ -165,7 +165,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     }
 
     [Test]
-    public async Task plan_carries_native_vendor_for_checkbox_mutations()
+    public async Task plan_carries_native_vendor_for_checkbox_set_reactions()
     {
         // The plan must declare vendor "native" so the runtime resolves
         // the raw DOM element (not ej2_instances). If vendor is missing or wrong,
@@ -174,7 +174,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"vendor\": \"native\""),
-            "Plan must carry vendor 'native' for checkbox mutations — " +
+            "Plan must carry vendor 'native' for checkbox set reactions — " +
             "runtime uses this to choose resolveRoot strategy");
         AssertNoConsoleErrors();
     }
@@ -218,7 +218,7 @@ public class WhenCheckboxToggles : PlaywrightTestBase
 
         var planJson = await Page.Locator("#plan-json").TextContentAsync();
         Assert.That(planJson, Does.Contain("\"property\": \"checked\""),
-            "Plan must carry property .checked. for SetChecked mutation — " +
+            "Plan must carry property .checked. for SetChecked reaction — " +
             "runtime uses bracket notation root[prop] = val");
         AssertNoConsoleErrors();
     }
