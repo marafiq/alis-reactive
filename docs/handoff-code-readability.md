@@ -858,6 +858,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: the native button sequence
   test now names the re-click proof in the test method, so the reset-status
   narration was removed without changing the click/assertion sequence.
+- Resolved on `tiny-safe-but-important-refactorings`: the SmartComponents index
+  test now names the shared sandbox link locator instead of commenting that
+  several discovery cards point to the same page.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
