@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionSchedulePopupOpenArgsExtensions
     {
         /// <summary>
-        /// Prevents the current Syncfusion popup from opening.
+        /// Prevents this popup-open event from opening its popup.
         /// Use inside a branch such as <c>When(args.Type).Eq("Editor")</c> when
         /// replacing the built-in editor with a custom form. This sets the event
         /// payload's <c>cancel</c> member before Syncfusion resumes its popup lifecycle.

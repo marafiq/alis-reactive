@@ -383,6 +383,10 @@ Candidate cleanup:
   payload XML docs now describe the event moment for change and edit-mode
   values instead of vague "current/previous inner integrated component"
   wording. The public payload shape remains unchanged.
+- Resolved on `tiny-safe-but-important-refactorings`: Schedule popup
+  cancellation XML docs no longer say "current Syncfusion popup" in the public
+  helper summary. The remarks still keep the popup lifecycle boundary because it
+  explains why the cancellation mutation must happen before the callback returns.
 
 ### Implementation Inline Comments
 
