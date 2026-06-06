@@ -507,6 +507,10 @@ Candidate cleanup:
   XML parameter tags now use concise submitted-value/display-text wording. The
   builder comments that explain the hidden-input Reactive Plan target and the
   `net48` MVC encoding constraint remain because they protect real boundaries.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeCheckList` option
+  XML parameter tags now match the concise submitted-value/display-text wording
+  used by radio groups. Model-binding, CSV/string-array, and `net48` field-name
+  comments remain because they explain runtime and compatibility boundaries.
 
 ### Implementation Inline Comments
 

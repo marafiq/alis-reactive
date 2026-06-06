@@ -23,7 +23,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes checked values through the component contract.
         /// </summary>
-        /// <param name="value">The array of option values to check.</param>
+        /// <param name="value">Checked option values.</param>
         public static ComponentRef<NativeCheckList, TModel> SetValue<TModel>(
             this ComponentRef<NativeCheckList, TModel> self, string[] value)
             where TModel : class
