@@ -126,8 +126,8 @@ fetch -> inject -> merge
 | Scenario | API | Result |
 |----------|-----|--------|
 | Main view form | `Html.ReactivePlan<TModel>()` | New plan with own planId |
-| Partial view, same model | `Html.ResolvePlan<TModel>()` | Merges into parent plan |
+| Partial view, same model | `Html.ResolvePlan<TModel>()` | Merges into parent Active Plan |
 | Partial view, different model | `Html.ReactivePlan<TOtherModel>()` | Independent plan |
-| AJAX-loaded content | `into` command | Runtime slot replacement via `loadPartialSlot()` |
+| AJAX-loaded content | `Into` reaction | Runtime slot replacement via `loadPartialSlot()` |
 
 **Previous:** [Error Behavior](../error-behavior/)

@@ -51,7 +51,7 @@
          }));
     }));
 
-    // FusionTemplate.EventButton dispatches detail.id for the parent plan to load the drawer form.
+    // FusionTemplate.EventButton dispatches detail.id for the parent Active Plan to load the drawer form.
     Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>("schedule:edit", (payload, p) =>
     {
         p.Element("alis-drawer-title").SetText("Edit Shift Assignment");

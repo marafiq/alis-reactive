@@ -15,7 +15,7 @@ One page, zero JavaScript — every behavior below is expressed entirely in C# f
 
 1. **Parallel data loading** — on page load, facility and care level lookups fire as concurrent GET requests; the form reveals itself only when both complete
 2. **Cascading dropdowns** — selecting a facility triggers three parallel requests: available units populate a child dropdown, a facility info card appears, and a requirements section loads with its own input fields and validation
-3. **Dynamic partial with plan merging** — the facility requirements section is a server-rendered partial (`ResolvePlan`) injected via `Into()`; its components merge into the parent plan at runtime, enriching validation rules that were declared but unenriched at initial render
+3. **Dynamic partial with plan merging** — the facility requirements section is a server-rendered partial (`ResolvePlan`) injected via `Into()`; its components merge into the parent Active Plan at runtime, enriching validation rules that were declared but unenriched at initial render
 4. **Conditional visibility** — care level "Memory Care" reveals a cognitive assessment date field; the medication management checkbox reveals a physician field; both toggle via `When().Then().Else()`
 5. **Masked input** — the phone field uses `FusionInputMask` with pattern `(000) 000-0000` — only digits pass through
 6. **Client-side validation** — `ReactiveValidator<T>` rules run before any POST fires; errors appear inline on every required field without a round trip
@@ -191,7 +191,7 @@ The facility requirements partial uses `Html.ResolvePlan<T>()` — a partial Rea
 </TabItem>
 </Tabs>
 
-The key insight: the parent plan's validator and the partial components use the same model-driven component ids. When the partial loads into its slot, those ids become part of the Active Plan — and validation just works.
+The key insight: the parent Reactive Plan's validator and the partial components use the same model-driven component ids. When the partial loads into its slot, those ids become part of the Active Plan — and validation just works.
 
 ## How do conditional sections work?
 

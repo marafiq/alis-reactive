@@ -12,7 +12,7 @@ From the [Grammar Tree](../mental-model/#the-grammar-tree) — the plan-related 
 ```
 Html.
 ├── ReactivePlan<TModel>()                          create a plan scoped to your model
-├── ResolvePlan<TModel>()                           partial plan (merges into parent)
+├── ResolvePlan<TModel>()                           partial plan (merges into Active Plan)
 ├── RenderPlan(plan)                                serialize and emit at bottom of view
 │
 ├── On(plan, t => ...)                              add triggers to the plan
