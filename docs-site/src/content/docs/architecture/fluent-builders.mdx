@@ -16,7 +16,7 @@ call: "Developer writes\nfluent C# in .cshtml" {
   style.stroke: "#4285f4"
   style.font-size: 18
 }
-descriptor: "Plan models created\nStartsWhen + ReactionGraph" {
+model: "Plan models created\nStartsWhen + ReactionGraph" {
   shape: rectangle
   style.fill: "#fef7e0"
   style.stroke: "#f9ab00"
@@ -35,10 +35,10 @@ json: "Html.RenderPlan(plan)\nJSON in the page" {
   style.font-size: 18
 }
 
-call -> descriptor: builds {
+call -> model: builds {
   style.stroke: "#4285f4"
 }
-descriptor -> plan: collects {
+model -> plan: collects {
   style.stroke: "#f9ab00"
 }
 plan -> json: serializes {
