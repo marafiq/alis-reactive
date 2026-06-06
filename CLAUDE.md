@@ -183,7 +183,7 @@ snapshot, literal, object, and array. If a module needs a value, it should use
 the shared value path instead of creating a second resolver.
 
 **Sync and async lanes.** Sync reactions stay sync: property set, method call,
-dispatch, branch evaluation, and ordinary component mutation. Async boundaries
+dispatch, branch evaluation, and ordinary component update. Async boundaries
 are HTTP, parallel HTTP, remote triggers, confirm/user decision, and partial
 injection. Do not make the whole runtime async for convenience.
 

@@ -99,7 +99,7 @@ Current exhaustiveness points include:
 - **No HTTP retry policy.** A failed `fetch()` follows the declared request error
   route. Realtime transports are different: SSE and SignalR use their transport
   reconnect behavior.
-- **No silent component mutation skipping.** Missing components, missing DOM
+- **No silent component update skipping.** Missing components, missing DOM
   elements, missing plugins, and invalid payload mutation targets are developer
   errors.
 - **No global `window.onerror` handling.** Trigger wiring logs reaction failures

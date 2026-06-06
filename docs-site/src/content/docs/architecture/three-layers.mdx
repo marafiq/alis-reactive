@@ -142,7 +142,7 @@ route: "Route response\nOnSuccess or OnError by status code" {
   style.stroke: "#4285f4"
   style.font-size: 18
 }
-mutate: "Execute response pipeline\nShow toast, route validation errors, update DOM" {
+update: "Execute response pipeline\nShow toast, route validation errors, update DOM" {
   shape: rectangle
   style.fill: "#e6f4ea"
   style.stroke: "#34a853"
@@ -155,14 +155,14 @@ gather -> validate: values collected {
 validate -> fetch: rules pass {
   style.stroke: "#f9ab00"
 }
-validate -> mutate: rules fail — show errors, abort request {
+validate -> update: rules fail — show errors, abort request {
   style.stroke: "#ea4335"
   style.font-size: 14
 }
 fetch -> route: response arrives {
   style.stroke: "#34a853"
 }
-route -> mutate: matched handler {
+route -> update: matched handler {
   style.stroke: "#4285f4"
 }
 ```
