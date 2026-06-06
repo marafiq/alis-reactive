@@ -870,6 +870,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: Fusion grid dialog editing
   now names the builder-template field proof in the test name, so the inline
   DialogForm field narration was removed without adding helper indirection.
+- Resolved on `tiny-safe-but-important-refactorings`: drawer Playwright tests
+  now name the HTTP partial-load and page-level plan-close paths in test names.
+  Server-delay and close-transition comments remain because they explain timing.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

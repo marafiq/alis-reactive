@@ -30,7 +30,7 @@ public class WhenDrawerOpensAndCloses : PlaywrightTestBase
     }
 
     [Test]
-    public async Task clicking_small_button_opens_drawer_with_resident_details()
+    public async Task clicking_small_button_loads_resident_details_http_partial_into_drawer()
     {
         await NavigateAndBoot();
 
@@ -40,7 +40,6 @@ public class WhenDrawerOpensAndCloses : PlaywrightTestBase
 
         await Expect(DrawerTitle).ToHaveTextAsync("Resident Details", new() { Timeout = 5000 });
 
-        // Content is loaded from a partial through HTTP GET into the drawer.
         await Expect(DrawerContent).ToContainTextAsync("This drawer was opened via the Reactive Plan", new() { Timeout = 5000 });
 
         await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--sm"));
@@ -85,14 +84,13 @@ public class WhenDrawerOpensAndCloses : PlaywrightTestBase
     }
 
     [Test]
-    public async Task close_button_closes_the_drawer()
+    public async Task page_level_plan_close_button_closes_the_drawer()
     {
         await NavigateAndBoot();
 
         await Page.Locator("#btn-open-sm").ClickAsync();
         await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 5000 });
 
-        // The page-level close button is plan-driven, unlike the drawer header close button.
         await Page.Locator("#btn-close-drawer").ClickAsync();
 
         await Expect(Drawer).Not.ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 5000 });
