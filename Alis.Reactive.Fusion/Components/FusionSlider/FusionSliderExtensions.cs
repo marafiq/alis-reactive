@@ -29,9 +29,9 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(ValueProperty, ValueExpression.Literal(value))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets the range slider value and flushes it into the visible slider.</summary>
-        /// <param name="start">The lower range value.</param>
-        /// <param name="end">The upper range value.</param>
+        /// <summary>Sets the two-value slider range and flushes it into the visible slider.</summary>
+        /// <param name="start">The first value written into Syncfusion's range value.</param>
+        /// <param name="end">The second value written into Syncfusion's range value.</param>
         public static ComponentRef<FusionSlider, TModel> SetRangeValue<TModel>(
             this ComponentRef<FusionSlider, TModel> self,
             double start,
