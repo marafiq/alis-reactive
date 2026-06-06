@@ -3,12 +3,11 @@ using Alis.Reactive;
 namespace Alis.Reactive.Native.AppLevel
 {
     /// <summary>
-    /// App-level slide-out drawer panel.
+    /// App-level slide-out drawer panel that can be referenced without an explicit ID.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// One drawer exists per page. Because it implements <see cref="IAppLevelComponent"/>,
-    /// you can reference it without an explicit ID:
+    /// One drawer exists per page and can be referenced without an explicit ID:
     /// </para>
     /// <code>p.Component&lt;NativeDrawer&gt;().Open()</code>
     /// </remarks>

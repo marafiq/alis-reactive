@@ -346,6 +346,9 @@ Candidate cleanup:
   is no longer public API surface. It remains internal component registration
   plumbing between HtmlExtensions, gather, validation, and generated Reactive
   Plan component metadata.
+- Resolved on `tiny-safe-but-important-refactorings`: app-level component XML
+  docs now explain the public behavior, "can be referenced without an explicit
+  ID," instead of leading with `IAppLevelComponent` implementation mechanics.
 
 ### Implementation Inline Comments
 

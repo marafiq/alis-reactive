@@ -1235,15 +1235,11 @@ Vendor { get; }
 
 ### FusionConfirm
 
-App-level confirm dialog backed by Syncfusion Dialog.
-Singleton per page — one Syncfusion Dialog instance serves all confirm condition evaluations.
-
-Implements IAppLevelComponent so it can be resolved without an explicit ID,
-for example `p.Component<FusionConfirm>().Show()`.
+App-level confirm dialog backed by Syncfusion Dialog that can be referenced without an explicit ID.
 
 ### FusionToast
 
-App-level Syncfusion Toast notification component.
+App-level Syncfusion Toast notification component that can be referenced without an explicit ID.
 
 ```csharp
 // Properties
@@ -4900,7 +4896,7 @@ Controls the width of the `NativeDrawer` panel.
 
 ### NativeDrawer
 
-App-level slide-out drawer panel.
+App-level slide-out drawer panel that can be referenced without an explicit ID.
 
 ```csharp
 // Properties
@@ -4920,7 +4916,7 @@ SetSize<T>(size)
 
 ### NativeLoader
 
-App-level loading overlay that covers its target container or the viewport.
+App-level loading overlay that covers its target container or the viewport and can be referenced without an explicit ID.
 
 ```csharp
 // Properties
