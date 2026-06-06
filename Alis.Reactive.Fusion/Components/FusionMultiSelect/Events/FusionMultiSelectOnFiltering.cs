@@ -55,9 +55,9 @@ namespace Alis.Reactive.Fusion.Components
         /// Feeds server-filtered data into the dropdown popup from an HTTP response.
         /// </summary>
         /// <remarks>
-        /// This is the only correct approach for async server-side filtering. Setting the
-        /// data source directly does not work because the popup rendering lifecycle must
-        /// be re-entered via <c>updateData()</c>.
+        /// For async server-side filtering, route returned items through this method.
+        /// Assigning the data source directly does not re-enter Syncfusion's popup
+        /// rendering lifecycle.
         /// </remarks>
         /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <param name="args">The filtering event args.</param>
