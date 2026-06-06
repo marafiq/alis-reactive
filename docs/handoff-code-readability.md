@@ -220,6 +220,10 @@ Candidate cleanup:
   event-wiring XML docs no longer repeat the extension receiver as "builder
   being wired." `NativeButton` also dropped generic model boilerplate where the
   summary already explains the explicit-ID event target.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion component
+  event-wiring XML docs no longer repeat generic `TModel` ownership or the
+  extension receiver. Event selector, pipeline, and Reactive Plan parameters
+  remain documented because they describe the public DSL wiring contract.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
 
