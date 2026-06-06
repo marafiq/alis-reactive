@@ -26,7 +26,7 @@ namespace Alis.Reactive.Builders
             _elementKey = pipeline.Context.DeclareElement(elementId);
         }
 
-        /// <summary>Adds a CSS class to the element.</summary>
+        /// <summary>Adds CSS class to the element.</summary>
         /// <param name="className">CSS class token to add.</param>
         public PipelineBuilder<TModel> AddClass(string className)
         {
@@ -47,14 +47,14 @@ namespace Alis.Reactive.Builders
             return Call(BrowserElementMembers.ToggleClass, ValueExpression.Literal(className));
         }
 
-        /// <summary>Sets the text content of the element to a literal string.</summary>
+        /// <summary>Sets element text content to a literal string.</summary>
         /// <param name="text">Literal text content serialized into the Reactive Plan.</param>
         public PipelineBuilder<TModel> SetText(string text)
         {
             return Set(BrowserElementMembers.Text, ValueExpression.Literal(text));
         }
 
-        /// <summary>Sets the text content from an event payload property.</summary>
+        /// <summary>Sets element text content from an event payload property.</summary>
         /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
         /// <param name="source">Trigger payload placeholder.</param>
         /// <param name="path">Expression selecting the event payload property to display.</param>
@@ -64,7 +64,7 @@ namespace Alis.Reactive.Builders
             return Set(BrowserElementMembers.Text, ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath));
         }
 
-        /// <summary>Sets the text content from an HTTP response body property.</summary>
+        /// <summary>Sets element text content from an HTTP response body property.</summary>
         /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
         /// <param name="source">Typed response body scope from <c>OnSuccess</c> or <c>OnError</c>.</param>
         /// <param name="path">Expression selecting the response body property to display.</param>
@@ -75,7 +75,7 @@ namespace Alis.Reactive.Builders
             return Set(BrowserElementMembers.Text, ValueExpression.ReadPayload(source.Scope, responsePath));
         }
 
-        /// <summary>Sets the text content from a typed source (component, plugin, or URL value).</summary>
+        /// <summary>Sets element text content from a typed source: component, plugin, or URL value.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">Typed value source evaluated when the reaction executes.</param>
         /// <returns>This element builder for chaining additional element updates.</returns>
@@ -85,14 +85,14 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Sets the inner HTML of the element to a literal string.</summary>
+        /// <summary>Sets element inner HTML to a literal string.</summary>
         /// <param name="html">Literal HTML content serialized into the Reactive Plan.</param>
         public PipelineBuilder<TModel> SetHtml(string html)
         {
             return Set(BrowserElementMembers.Html, ValueExpression.Literal(html));
         }
 
-        /// <summary>Sets the inner HTML from an event payload property.</summary>
+        /// <summary>Sets element inner HTML from an event payload property.</summary>
         /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
         /// <param name="source">Trigger payload placeholder.</param>
         /// <param name="path">Expression selecting the event payload property containing HTML.</param>
@@ -102,7 +102,7 @@ namespace Alis.Reactive.Builders
             return Set(BrowserElementMembers.Html, ValueExpression.ReadPayload(PayloadSource.Event(), payloadPath));
         }
 
-        /// <summary>Sets the inner HTML from a typed source.</summary>
+        /// <summary>Sets element inner HTML from a typed source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">Typed value source evaluated when the reaction executes.</param>
         /// <returns>This element builder for chaining additional element updates.</returns>

@@ -21,7 +21,7 @@ namespace Alis.Reactive.Builders
 
         internal DispatchPayloadBuilder() { }
 
-        /// <summary>Sets a payload field from a value source evaluated when the dispatch runs.</summary>
+        /// <summary>Sets payload field from a value source evaluated when the dispatch runs.</summary>
         /// <typeparam name="TProp">Field value type, inferred from the expression.</typeparam>
         /// <param name="field">Payload property to populate.</param>
         /// <param name="source">Component value, URL parameter, or plugin read that supplies the field value.</param>
@@ -34,7 +34,7 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Sets a payload field to a literal string value.</summary>
+        /// <summary>Sets payload field to a literal string value.</summary>
         /// <param name="field">Payload property to populate.</param>
         /// <param name="value">Compile-time constant embedded in the Reactive Plan.</param>
         public DispatchPayloadBuilder<TPayload, TModel> Set(
@@ -46,7 +46,7 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Sets a payload field to a literal int value.</summary>
+        /// <summary>Sets payload field to a literal int value.</summary>
         /// <param name="field">Payload property to populate.</param>
         /// <param name="value">Compile-time constant embedded in the Reactive Plan.</param>
         public DispatchPayloadBuilder<TPayload, TModel> Set(
@@ -58,7 +58,7 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Sets a payload field to a literal bool value.</summary>
+        /// <summary>Sets payload field to a literal bool value.</summary>
         /// <param name="field">Payload property to populate.</param>
         /// <param name="value">Compile-time constant embedded in the Reactive Plan.</param>
         public DispatchPayloadBuilder<TPayload, TModel> Set(

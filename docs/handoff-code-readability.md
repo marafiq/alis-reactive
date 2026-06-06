@@ -726,6 +726,10 @@ Candidate cleanup:
   `ElementBuilder` now use concise property-path, array-transform, component-read,
   validation metadata, and typed-expression wording while preserving runtime and
   repeated-form invariants.
+- Resolved on `tiny-safe-but-important-refactorings`: a second core
+  pipeline-builder pass tightened `ElementBuilder` and `DispatchPayloadBuilder`
+  summaries while keeping literal, event-payload, response-body, typed-source,
+  and dispatch-time evaluation distinctions visible in IntelliSense.
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeHiddenField` XML
   tags now use concise model, Reactive Plan, event-args, and response DTO wording.
   Hidden-input registration behavior, `net48` `NameFor`, and programmatic change
