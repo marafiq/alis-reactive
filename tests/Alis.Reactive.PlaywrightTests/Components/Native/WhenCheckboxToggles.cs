@@ -96,7 +96,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // DomReady unchecked the value under test.
         await Page.Locator($"#{ModelIdPrefix}ReceivesMedication").CheckAsync();
 
         await Page.Locator("#check-medication-btn").ClickAsync();
@@ -111,7 +110,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // DomReady already unchecked the value under test.
         await Page.Locator("#check-medication-btn").ClickAsync();
 
         var warning = Page.Locator("#medication-warning");
@@ -122,7 +120,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task checking_then_unchecking_toggles_extras_visibility_both_ways()
     {
-        // The full show-hide-show cycle catches stale visibility state.
         await NavigateAndBoot();
 
         var dietaryRestrictionsCheckbox = Page.Locator($"#{ModelIdPrefix}HasDietaryRestrictions");
@@ -147,7 +144,6 @@ public class WhenCheckboxToggles : PlaywrightTestBase
     [Test]
     public async Task toggling_medication_checkbox_updates_condition_result_each_time()
     {
-        // The component-read condition must re-evaluate after each checkbox state change.
         await NavigateAndBoot();
 
         var medicationCheckbox = Page.Locator($"#{ModelIdPrefix}ReceivesMedication");
