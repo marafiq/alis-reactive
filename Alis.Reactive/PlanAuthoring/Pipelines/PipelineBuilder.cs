@@ -147,23 +147,23 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Reads a string value from the current URL query string at runtime.</summary>
         /// <param name="paramName">The query parameter name to read at runtime.</param>
-        /// <returns>A URL value source for downstream conditions, mutations, or gather.</returns>
+        /// <returns>A URL value source for downstream conditions, reactions, or gather.</returns>
         public Conditions.TypedUrlSource<string> FromUrl(string paramName)
         {
             return new Conditions.TypedUrlSource<string>(paramName);
         }
 
         /// <summary>Reads a typed value from the current URL query string at runtime.</summary>
-        /// <typeparam name="T">The value type expected by downstream conditions, mutations, or gather.</typeparam>
+        /// <typeparam name="T">The value type expected by downstream conditions, reactions, or gather.</typeparam>
         /// <param name="paramName">The query parameter name to read at runtime.</param>
-        /// <returns>A URL value source for downstream conditions, mutations, or gather.</returns>
+        /// <returns>A URL value source for downstream conditions, reactions, or gather.</returns>
         public Conditions.TypedUrlSource<T> FromUrl<T>(string paramName)
         {
             return new Conditions.TypedUrlSource<T>(paramName);
         }
 
         /// <summary>Reads the return value from a named function member on a plan-registered plugin.</summary>
-        /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
+        /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
         /// <param name="pluginName">The registered plugin key.</param>
         /// <param name="member">The function member invoked on the host-provided plugin object.</param>
         /// <returns>A builder for supplying function arguments before the result becomes a typed source.</returns>
@@ -181,7 +181,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads the return value from a plan-registered plugin object that is itself callable.</summary>
-        /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
+        /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
         /// <param name="pluginName">The registered plugin key.</param>
         /// <returns>A builder for supplying root-function arguments before the result becomes a typed source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName)
@@ -197,7 +197,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads a property value from a plan-registered plugin.</summary>
-        /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
+        /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
         /// <param name="pluginName">The registered plugin key.</param>
         /// <param name="member">The property member read from the host-provided plugin object.</param>
         /// <returns>A typed plugin property value source.</returns>
@@ -212,7 +212,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads the return value described by a reusable plugin function descriptor.</summary>
-        /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
+        /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
         /// <param name="function">The descriptor carrying the plugin key, target member, argument contract, and return shape.</param>
         /// <returns>A builder for supplying function arguments before the result becomes a typed source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
@@ -223,7 +223,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads the value described by a reusable plugin property descriptor.</summary>
-        /// <typeparam name="T">The value type exposed to downstream conditions, mutations, or gather.</typeparam>
+        /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
         /// <param name="property">The descriptor carrying the plugin key, property member, and value shape.</param>
         /// <returns>A typed plugin property value source.</returns>
         public Conditions.TypedPluginPropertySource<T> Plugin<T>(PluginProperty<T> property)

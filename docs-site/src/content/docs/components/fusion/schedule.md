@@ -5,7 +5,7 @@ sidebar:
   order: 18
 ---
 
-A calendar-style schedule for booking senior-living resources -- staff shift rosters, activity calendars, medical appointments. Fires a full family of action and navigation events and exposes mutation methods for data loading and CRUD. Non-input component: no `InputField` wrapper.
+A calendar-style schedule for booking senior-living resources -- staff shift rosters, activity calendars, medical appointments. Fires a full family of action and navigation events and exposes component methods for data loading and CRUD. Non-input component: no `InputField` wrapper.
 
 **Render as:** `@(Html.FusionSchedule(plan, "id", b => ...))` &nbsp; **Events:** `CellClicked`, `EventClicked`, `ActionBegin`, `ActionComplete`, `Navigating`, `PopupOpen`, `PopupClose`, `DataBound`, `EventRendered`
 

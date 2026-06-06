@@ -582,16 +582,16 @@ A typed value source produced by a registered component member.
 
 ### TypedPluginPropertySource<T>
 
-Represents a readable plan-registered plugin property in conditions, mutations, or gather.
+Represents a readable plan-registered plugin property in conditions, reactions, or gather.
 
 ### TypedPluginSource<T>
 
 Represents the value produced by a plan-registered plugin method call in conditions,
-            mutations, or gather.
+            reactions, or gather.
 
 ### TypedSource<T>
 
-Preserves the property type through the condition and mutation pipeline
+Preserves the property type through condition and reaction authoring
             for compile-time type safety.
 
 ### TypedUrlSource<T>

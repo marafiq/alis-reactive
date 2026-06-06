@@ -5,7 +5,7 @@ namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
     /// Represents the value produced by a plan-registered plugin method call in conditions,
-    /// mutations, or gather.
+    /// reactions, or gather.
     /// </summary>
     /// <typeparam name="TProp">The CLR type returned by the plugin call.</typeparam>
     public sealed class TypedPluginSource<TProp> : TypedSource<TProp>
@@ -27,7 +27,7 @@ namespace Alis.Reactive.Builders.Conditions
                 _args);
     }
 
-    /// <summary>Represents a readable plan-registered plugin property in conditions, mutations, or gather.</summary>
+    /// <summary>Represents a readable plan-registered plugin property in conditions, reactions, or gather.</summary>
     /// <typeparam name="TProp">The CLR type exposed by the readable plugin property.</typeparam>
     public sealed class TypedPluginPropertySource<TProp> : TypedSource<TProp>
     {

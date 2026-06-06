@@ -18,4 +18,4 @@ Html.InputField(plan, m => m.Documents, o => o.Label("Supporting Documents"))
 
 ## Reference
 
-No mutation extensions -- files are chosen by the user, gathered into the request payload on submit, and received by the controller as `IFormFile[]`.
+No component write extensions -- files are chosen by the user, gathered into the request payload on submit, and received by the controller as `IFormFile[]`.

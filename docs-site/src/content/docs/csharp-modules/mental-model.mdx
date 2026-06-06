@@ -213,7 +213,7 @@ pipeline.Element("id")                               target a DOM element by ID
 
 #### Input Components API in Views
 
-When you need to programmatically change a component's value, refresh its data, or read its current state for a condition — `Component<TComponent>(m => m.Prop)` gives you typed access. You target the same model expression you used to render it with `InputField`, so the binding is natural. `TComponent` is the component type, so IntelliSense constrains exactly which mutations are available. Three patterns: write a property, call a method, or read a value for conditions.
+When you need to programmatically change a component's value, refresh its data, or read its current state for a condition — `Component<TComponent>(m => m.Prop)` gives you typed access. You target the same model expression you used to render it with `InputField`, so the binding is natural. `TComponent` is the component type, so IntelliSense constrains exactly which operations are available. Three patterns: write a property, call a method, or read a value for conditions.
 
 ```
 pipeline.Component<TComponent>(m => m.Prop)             § TModel inferred from plan
