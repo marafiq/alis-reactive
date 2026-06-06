@@ -1,11 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// Exercises FusionGrid server-side custom binding end-to-end:
-/// initial data load, sorting with column echo, paging with skip echo,
-/// external filtering, and plan JSON verification.
-/// Server: 200 resident records, 10 per page.
-/// </summary>
 [TestFixture]
 public class WhenUsingFusionGrid : PlaywrightTestBase
 {

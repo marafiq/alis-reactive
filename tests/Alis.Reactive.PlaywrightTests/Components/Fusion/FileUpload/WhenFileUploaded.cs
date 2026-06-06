@@ -1,13 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.FileUpload;
 
-/// <summary>
-/// Proves <c>FusionFileUpload</c> form-mode gather, multipart <c>FormData</c> payloads,
-/// and server echo behavior for resident document uploads.
-/// </summary>
-/// <remarks>
-/// File injection uses DataTransfer on the native input so Syncfusion populates
-/// <c>filesData[].rawFile</c>; gather then reads <c>filesData</c> for FormData.
-/// </remarks>
+// File injection uses DataTransfer on the native input so Syncfusion populates
+// filesData[].rawFile; gather then reads filesData for FormData.
 [TestFixture]
 public class WhenFileUploaded : PlaywrightTestBase
 {

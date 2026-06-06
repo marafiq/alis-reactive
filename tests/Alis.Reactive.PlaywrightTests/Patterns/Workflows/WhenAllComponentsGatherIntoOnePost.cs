@@ -3,10 +3,6 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
 
-/// <summary>
-/// Exercises IncludeAll() gather across JSON, FormData, validation, and explicit
-/// component-ID submit paths on the ComponentGather sandbox page.
-/// </summary>
 // TODO: Replace NonParallelizable once Syncfusion popup interactions use stable component-ready signals.
 // Under parallel load, 14+ popup interactions can overlap with other browser instances.
 [TestFixture, NonParallelizable]

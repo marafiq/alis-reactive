@@ -97,6 +97,11 @@ Examples and current status:
   class-level coverage inventories were trimmed from selected condition,
   reactive-wiring, workflow, drawer, grid, date-range, and multiselect tests.
   Syncfusion gesture and duplicate-input notes were kept as plain comments.
+- Resolved on `tiny-safe-but-important-refactorings`: a second pass removed
+  remaining Playwright class XML inventories from selected HTTP, array, grid,
+  tab, accordion, autocomplete, dropdown, file-upload, and component-gather
+  tests. Boundary notes for DataTransfer, DOM array normalization, grid
+  re-filtering, custom payload arrays, and non-parallel popup behavior remain.
 - `WhenAllComponentsGatherIntoOnePost.cs` has long form-fill flows, but helper
   extraction should happen only if it names a reusable domain action. Do not add
   private helper indirection that hides a one-off behavior proof.

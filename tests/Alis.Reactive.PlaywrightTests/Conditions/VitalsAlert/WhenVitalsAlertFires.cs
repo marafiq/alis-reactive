@@ -2,10 +2,6 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.VitalsAlert;
 
-/// <summary>
-/// Exercises condition branches that mix FusionNumericTextBox input with HTTP
-/// requests, severity tiers, and before/after reaction sequencing.
-/// </summary>
 [TestFixture]
 public class WhenVitalsAlertFires : PlaywrightTestBase
 {

@@ -2,10 +2,6 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.AutoComplete;
 
-/// <summary>
-/// Proves FusionAutoComplete property writes, reads, events, conditions,
-/// gather, and server-filtered suggestions through page-visible behavior.
-/// </summary>
 [TestFixture]
 public class WhenAutoCompleteSuggests : PlaywrightTestBase
 {

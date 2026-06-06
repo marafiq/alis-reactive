@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises the array-operation DSL for NativeCheckList Changed payloads:
-/// <c>p.From(args, e => e.Value).Count()</c> to <c>SetText(count)</c>.
-/// </summary>
 [TestFixture]
 public class WhenArrayOpsCountsSelection : PlaywrightTestBase
 {

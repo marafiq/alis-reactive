@@ -2,10 +2,6 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.AutoComplete;
 
-/// <summary>
-/// Proves the AutoComplete locator helpers against the same page-visible
-/// property, event, condition, gather, and filtering behavior.
-/// </summary>
 [TestFixture]
 public class WhenAutoCompleteFiltersRemotely : PlaywrightTestBase
 {

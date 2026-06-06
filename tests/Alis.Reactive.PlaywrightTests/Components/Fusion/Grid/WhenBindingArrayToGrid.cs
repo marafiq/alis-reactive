@@ -1,12 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// Exercises array DSL values routed into a FusionGrid data source.
-/// </summary>
-/// <remarks>
-/// A roster loads once over HTTP, then client-side transforms feed <c>SetDataSource</c>.
-/// Re-filtering reads the grid's own <c>dataSource</c> member with no HTTP round trip.
-/// </remarks>
+// A roster loads once over HTTP, then client-side transforms feed SetDataSource.
+// Re-filtering reads the grid's own dataSource member with no HTTP round trip.
 [TestFixture]
 public class WhenBindingArrayToGrid : PlaywrightTestBase
 {

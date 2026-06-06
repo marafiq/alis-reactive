@@ -2,10 +2,6 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DropDownList;
 
-/// <summary>
-/// Proves FusionDropDownList property writes, reads, methods, events,
-/// conditions, and gather through page-visible behavior.
-/// </summary>
 [TestFixture]
 public class WhenDropdownItemSelected : PlaywrightTestBase
 {

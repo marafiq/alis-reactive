@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline;
 
-/// <summary>
-/// .Finally() cleanup reactions execute after HTTP success, routed errors,
-/// unmatched statuses, and network failures.
-/// </summary>
 [TestFixture]
 public class WhenFinallyExecutes : PlaywrightTestBase
 {

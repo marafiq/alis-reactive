@@ -1,12 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// Exercises array DSL operations over a developer-defined custom event payload.
-/// </summary>
-/// <remarks>
-/// The <c>shift-report</c> payload carries <c>ResidentAlert[]</c>, and
-/// <c>p.From(payload, x =&gt; x.Alerts)</c> drives filter, aggregate, find, and guard behavior.
-/// </remarks>
+// The shift-report payload carries ResidentAlert[]; p.From(payload, x => x.Alerts)
+// drives filter, aggregate, find, and guard behavior.
 [TestFixture]
 public class WhenOperatingOnCustomEventPayloadArray : PlaywrightTestBase
 {

@@ -1,8 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline;
 
-/// <summary>
-/// Proves response routing for flat JSON, nested JSON, and injected HTML partials.
-/// </summary>
 [TestFixture]
 public class WhenResponseContentTypeVaries : PlaywrightTestBase
 {

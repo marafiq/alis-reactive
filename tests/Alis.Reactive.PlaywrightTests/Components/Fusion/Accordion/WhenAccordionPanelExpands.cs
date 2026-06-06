@@ -1,10 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Accordion;
 
-/// <summary>
-/// Exercises FusionAccordion behaviors end-to-end:
-/// DomReady expand, event args echo, condition branching,
-/// button-triggered disable, and lazy-load via HTTP + Into.
-/// </summary>
 [TestFixture]
 public class WhenAccordionPanelExpands : PlaywrightTestBase
 {

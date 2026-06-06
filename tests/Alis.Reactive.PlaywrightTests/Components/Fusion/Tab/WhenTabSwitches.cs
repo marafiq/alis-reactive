@@ -1,11 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Tab;
 
-/// <summary>
-/// Exercises FusionTab behaviors end-to-end:
-/// DomReady SetSelectedItem, tab selection event with condition branching,
-/// programmatic Select via button, HideTab/ShowTab toggle,
-/// and lazy-load tab content via HTTP + Into.
-/// </summary>
 [TestFixture]
 public class WhenTabSwitches : PlaywrightTestBase
 {
