@@ -1,4 +1,4 @@
-/* ── Root scope ── */
+/* Root scope */
 .alis-root {
   background-color: var(--color-surface);
   color: var(--color-text-primary);
@@ -9,8 +9,8 @@
   letter-spacing: -0.011em;
 }
 
-/* ── Form customization (on top of @tailwindcss/forms baseline) ── */
-/* Exclude checkbox/radio — forms plugin handles those with their own shape */
+/* Form customization on top of @tailwindcss/forms baseline */
+/* Exclude checkbox/radio; the forms plugin handles those with its own shape. */
 .alis-root input:not([type="checkbox"]):not([type="radio"]),
 .alis-root select,
 .alis-root textarea {
@@ -50,7 +50,7 @@
   cursor: not-allowed;
 }
 
-/* ── Labels ── */
+/* Labels */
 .alis-root label {
   display: block;
   font-size: 0.8125rem;
@@ -59,12 +59,12 @@
   margin-bottom: 0.375rem;
 }
 
-/* ── Code blocks ── */
+/* Code blocks */
 .alis-root pre { border-radius: 0.75rem; overflow-x: auto; }
 .alis-root code { font-family: var(--font-mono); font-size: 0.8125rem; }
 .alis-root pre code { font-size: 0.75rem; line-height: 1.7; }
 
-/* ── Card hover + button press ── */
+/* Card hover + button press */
 .alis-root .card-hover {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -78,11 +78,11 @@
   transform: scale(0.97);
 }
 
-/* ── Scrollbar hide ── */
+/* Scrollbar hide */
 .scrollbar-hide { scrollbar-width: none; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-/* ── Reduced motion ── */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .alis-root *, .alis-root *::before, .alis-root *::after {
     animation-duration: 0.01ms !important;

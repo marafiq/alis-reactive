@@ -1,4 +1,4 @@
-/* ── Field-level error indicator ── */
+/* Field-level error indicator */
 .alis-root .alis-has-error input,
 .alis-root .alis-has-error select,
 .alis-root .alis-has-error textarea,
@@ -7,7 +7,7 @@
   --tw-ring-color: var(--color-error);
 }
 
-/* ── Inline error message ── */
+/* Inline error message */
 .alis-root span[data-valmsg-for] {
   display: block;
   font-size: 0.75rem;
@@ -16,7 +16,7 @@
   line-height: 1.4;
 }
 
-/* ── Validation summary box ── */
+/* Validation summary box */
 .alis-root [data-reactive-validation-summary] {
   background-color: var(--color-error-light, #FEE2E2);
   border: 1px solid var(--color-error);

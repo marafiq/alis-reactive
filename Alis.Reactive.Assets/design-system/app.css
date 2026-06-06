@@ -1,7 +1,7 @@
 @import "tailwindcss" source(none);
 @plugin "@tailwindcss/forms";
 
-/* ── Source scanning — framework C# only ──
+/* Source scanning: framework C# only.
    Consumers scan their own views via their own tailwind config;
    this file compiles classes emitted from framework C# code only. */
 @source "../../Alis.Reactive.DesignSystem/**/*.cs";
@@ -24,12 +24,12 @@
 @source inline("border-l-4");
 @source inline("rounded-2xl ring-1");
 
-/* ── Brand — single source of truth, see brand.css ── */
+/* Brand: single source of truth, see brand.css. */
 @import "./brand.css";
 
-/* ── Theme tokens — registered as Tailwind utilities ── */
+/* Theme tokens registered as Tailwind utilities. */
 @theme {
-  /* Brand — sourced from brand.css */
+  /* Brand: sourced from brand.css */
   --color-primary: var(--alis-brand-primary);
   --color-primary-light: var(--alis-brand-primary-light);
   --color-primary-dark: var(--alis-brand-primary-dark);
@@ -70,7 +70,7 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 }
 
-/* ── Layers ── */
+/* Layers */
 @import "./base.css";
 @import "./validation.css";
 @import "./components/drawer.css";
