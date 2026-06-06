@@ -557,6 +557,10 @@ Candidate cleanup:
   tags now use concise event payload, response-body, URL-template, and status-code
   wording. The `ResponseBody` usage example remains because it explains a common
   authoring-handle-to-Reactive-Plan-read workflow.
+- Resolved on `tiny-safe-but-important-refactorings`: pipeline and trigger
+  entrypoint XML tags now use concise HTTP URL-template, CustomEvent, SSE,
+  SignalR, component, plugin, and array-source wording while preserving the
+  runtime boundary terms developers need.
 
 ### Implementation Inline Comments
 

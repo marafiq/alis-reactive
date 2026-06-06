@@ -10,7 +10,7 @@ namespace Alis.Reactive.Builders
         /// <summary>Starts a branch whose guard reads from the triggering event payload.</summary>
         /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
         /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
-        /// <param name="payload">The typed event payload placeholder supplied by the trigger callback.</param>
+        /// <param name="payload">Typed event payload placeholder supplied by the trigger callback.</param>
         /// <param name="path">Payload value compared at runtime.</param>
         /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
@@ -24,9 +24,9 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Starts a branch whose guard reads from the active HTTP response body.</summary>
-        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">Selected response-body value type.</typeparam>
-        /// <param name="responseBody">The response body placeholder supplied by the response route callback.</param>
+        /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
         /// <param name="path">Selects the response value to compare at runtime.</param>
         /// <returns>A builder for choosing the guard comparison.</returns>
         public ConditionSourceBuilder<TModel, TProp> When<TResponse, TProp>(

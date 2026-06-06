@@ -14,7 +14,7 @@ namespace Alis.Reactive.Builders
     /// <c>t.DomReady(p =&gt; { p.Element("id").AddClass("x"); p.Dispatch("ready"); })</c>.
     /// Reactions execute in declaration order.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns model-bound component IDs and validation/gather fields.</typeparam>
+    /// <typeparam name="TModel">View model that owns model-bound component IDs and validation/gather fields.</typeparam>
     public partial class PipelineBuilder<TModel> : IReactionEmitter where TModel : class
     {
         internal PlanBuildContext Context { get; }
@@ -38,7 +38,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Queues a <c>CustomEvent</c> reaction without a payload.</summary>
-        /// <param name="eventName">The event name matched by <c>t.CustomEvent(...)</c> triggers.</param>
+        /// <param name="eventName">Event name matched by <c>t.CustomEvent(...)</c> triggers.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch(string eventName)
         {
@@ -47,9 +47,9 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Queues a <c>CustomEvent</c> reaction with a build-time payload literal.</summary>
-        /// <typeparam name="TPayload">The payload contract consumed by matching custom event triggers.</typeparam>
-        /// <param name="eventName">The event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
-        /// <param name="payload">The payload object serialized into the generated plan.</param>
+        /// <typeparam name="TPayload">Payload contract consumed by matching custom event triggers.</typeparam>
+        /// <param name="eventName">Event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
+        /// <param name="payload">Payload object serialized into the generated plan.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
         {
@@ -68,8 +68,8 @@ namespace Alis.Reactive.Builders
         /// <para>Use <see cref="Dispatch{TPayload}(string, TPayload)"/> for a fixed build-time
         /// payload object.</para>
         /// </remarks>
-        /// <typeparam name="TPayload">The payload contract consumed by matching custom event triggers.</typeparam>
-        /// <param name="eventName">The event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
+        /// <typeparam name="TPayload">Payload contract consumed by matching custom event triggers.</typeparam>
+        /// <param name="eventName">Event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
         /// <param name="configure">Maps payload fields to value sources or literals.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
         public PipelineBuilder<TModel> DispatchWith<TPayload>(
@@ -95,9 +95,9 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Targets the component registered for a property on this plan's view model.</summary>
-        /// <typeparam name="TComponent">The component contract that determines available reads, writes, and calls.</typeparam>
+        /// <typeparam name="TComponent">Component contract that determines available reads, writes, and calls.</typeparam>
         /// <param name="expr">
-        /// The model property expression used to compute the same controlled ID as the markup helper.
+        /// Model property expression used to compute the same controlled ID as the markup helper.
         /// </param>
         /// <returns>An authoring handle joined to the generated component ID.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(
@@ -109,10 +109,10 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Targets the component registered for a property on another view model type.</summary>
-        /// <typeparam name="TComponent">The component contract that determines available reads, writes, and calls.</typeparam>
-        /// <typeparam name="TOtherModel">The view model type used when the component was rendered.</typeparam>
+        /// <typeparam name="TComponent">Component contract that determines available reads, writes, and calls.</typeparam>
+        /// <typeparam name="TOtherModel">View model type used when the component was rendered.</typeparam>
         /// <param name="expr">
-        /// The other model's property expression used to compute the same controlled ID as the markup helper.
+        /// Other model's property expression used to compute the same controlled ID as the markup helper.
         /// </param>
         /// <returns>An authoring handle joined to the other model's generated component ID.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent, TOtherModel>(
@@ -125,7 +125,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Targets a component registered with an explicit markup ID.</summary>
-        /// <typeparam name="TComponent">The component contract that determines available reads, writes, and calls.</typeparam>
+        /// <typeparam name="TComponent">Component contract that determines available reads, writes, and calls.</typeparam>
         /// <param name="refId">The controlled component ID already present in markup.</param>
         /// <returns>An authoring handle joined to the explicit component ID.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)
@@ -135,7 +135,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Targets a layout-owned app component by the ID declared by its component contract.</summary>
-        /// <typeparam name="TComponent">The app-level component contract that supplies its default ID.</typeparam>
+        /// <typeparam name="TComponent">App-level component contract that supplies its default ID.</typeparam>
         /// <returns>An authoring handle joined to the contract's default component ID.</returns>
         public ComponentRef<TComponent, TModel> Component<TComponent>()
             where TComponent : IAppLevelComponent, new()
@@ -154,7 +154,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads a typed value from the current URL query string at runtime.</summary>
-        /// <typeparam name="T">The value type expected by downstream conditions, reactions, or gather.</typeparam>
+        /// <typeparam name="T">Value type expected by downstream conditions, reactions, or gather.</typeparam>
         /// <param name="paramName">Query parameter name read at runtime.</param>
         /// <returns>A URL value source for downstream conditions, reactions, or gather.</returns>
         public Conditions.TypedUrlSource<T> FromUrl<T>(string paramName)
@@ -163,9 +163,9 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads the return value from a named function member on a plan-registered plugin.</summary>
-        /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="pluginName">The registered plugin key.</param>
-        /// <param name="member">The function member invoked on the host-provided plugin object.</param>
+        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
+        /// <param name="pluginName">Registered plugin key.</param>
+        /// <param name="member">Function member invoked on the host-provided plugin object.</param>
         /// <returns>A builder for supplying function arguments before the result becomes a typed source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName, string member)
         {
@@ -181,8 +181,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads the return value from a plan-registered plugin object that is itself callable.</summary>
-        /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="pluginName">The registered plugin key.</param>
+        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
+        /// <param name="pluginName">Registered plugin key.</param>
         /// <returns>A builder for supplying root-function arguments before the result becomes a typed source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName)
         {
@@ -197,9 +197,9 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads a property value from a plan-registered plugin.</summary>
-        /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="pluginName">The registered plugin key.</param>
-        /// <param name="member">The property member read from the host-provided plugin object.</param>
+        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
+        /// <param name="pluginName">Registered plugin key.</param>
+        /// <param name="member">Property member read from the host-provided plugin object.</param>
         /// <returns>A typed plugin property value source.</returns>
         public Conditions.TypedPluginPropertySource<T> PluginProperty<T>(string pluginName, string member)
         {
@@ -212,8 +212,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads the return value declared by a reusable plugin function.</summary>
-        /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="function">The plugin function carrying the plugin key, target member, argument contract, and return shape.</param>
+        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
+        /// <param name="function">Plugin function carrying the plugin key, target member, argument contract, and return shape.</param>
         /// <returns>A builder for supplying function arguments before the result becomes a typed source.</returns>
         public PluginMemberBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
         {
@@ -223,8 +223,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Reads the value declared by a reusable plugin property.</summary>
-        /// <typeparam name="T">The value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="property">The plugin property carrying the plugin key, property member, and value shape.</param>
+        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
+        /// <param name="property">Plugin property carrying the plugin key, property member, and value shape.</param>
         /// <returns>A typed plugin property value source.</returns>
         public Conditions.TypedPluginPropertySource<T> Plugin<T>(PluginProperty<T> property)
         {
@@ -234,8 +234,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Emits a plugin-call reaction against a named member on a plan-registered plugin.</summary>
-        /// <param name="pluginName">The registered plugin key.</param>
-        /// <param name="member">The command member invoked on the host-provided plugin object.</param>
+        /// <param name="pluginName">Registered plugin key.</param>
+        /// <param name="member">Command member invoked on the host-provided plugin object.</param>
         /// <returns>A plugin-call builder for supplying arguments before <c>Fire()</c> appends the reaction.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
         {
@@ -250,7 +250,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Emits a plugin-call reaction against a plan-registered plugin object that is itself callable.</summary>
-        /// <param name="pluginName">The registered plugin key.</param>
+        /// <param name="pluginName">Registered plugin key.</param>
         /// <returns>A plugin-call builder for supplying root-command arguments before <c>Fire()</c> appends the reaction.</returns>
         public PluginCallBuilder<TModel> Plugin(string pluginName)
         {
@@ -264,7 +264,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Emits a plugin-call reaction from a reusable plugin command.</summary>
-        /// <param name="command">The plugin command carrying the plugin key, target member, and argument contract.</param>
+        /// <param name="command">Plugin command carrying the plugin key, target member, and argument contract.</param>
         /// <returns>A plugin-call builder for supplying arguments before <c>Fire()</c> appends the reaction.</returns>
         public PluginCallBuilder<TModel> Plugin(PluginCommand command)
         {
