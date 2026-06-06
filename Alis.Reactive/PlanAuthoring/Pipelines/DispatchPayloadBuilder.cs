@@ -9,8 +9,7 @@ namespace Alis.Reactive.Builders
     /// <summary>
     /// Composes a custom-event dispatch payload from Reactive Plan value sources and literals.
     /// Each field is set via a typed expression on <typeparamref name="TPayload"/>,
-    /// matching the event-payload contract consumed by
-    /// <see cref="Builders.TriggerBuilder{TModel}.CustomEvent{TPayload}"/> triggers.
+    /// matching the event-payload contract consumed by typed custom-event triggers.
     /// </summary>
     /// <typeparam name="TPayload">The event-payload contract consumed by matching <c>CustomEvent&lt;TPayload&gt;</c> triggers.</typeparam>
     /// <typeparam name="TModel">The view model type providing component registrations.</typeparam>
