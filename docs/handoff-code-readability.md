@@ -614,6 +614,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `FusionColorPicker` XML
   tags now use concise field-wrapper, model-value, event-args, Reactive Plan,
   and hex-value wording. Syncfusion `ColorPickerFor` attribute quirk remains.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionSlider` XML tags
+  now use concise field-wrapper, model-value, event-args, Reactive Plan, and
+  scalar/range value wording. Scalar and range semantics remain visible.
 
 ### Implementation Inline Comments
 
