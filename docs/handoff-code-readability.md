@@ -876,6 +876,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: the Events plan-count
   test now uses `ExpectedEventsViewBehaviorCount` instead of a comment explaining
   the magic behavior count before asserting the generated plan JSON.
+- Resolved on `tiny-safe-but-important-refactorings`: the dispatch-chain payload
+  test now names the final trace proof directly, removing stale page-visible
+  wording while keeping the same trace assertion.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

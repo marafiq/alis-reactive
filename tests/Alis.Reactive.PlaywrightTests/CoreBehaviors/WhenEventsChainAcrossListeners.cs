@@ -24,10 +24,8 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
     }
 
     [Test]
-    public async Task payload_survives_dispatch_chain()
+    public async Task final_dispatch_trace_contains_chained_literal_payload()
     {
-        // Entry 3 dispatches "final" with a literal payload; trace output is the
-        // page-visible surface for that payload.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
