@@ -271,6 +271,10 @@ Candidate cleanup:
   public property summaries now explain their component-rendering and
   registration roles instead of repeating "Gets the..." boilerplate. The render
   invariant comment remains because it protects validation/gather behavior.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionMultiSelect`
+  filtering `UpdateData` XML now describes the `ResponseBody<T>` argument as
+  the response-body scope that supplies popup items instead of a vague
+  "response body instance." Syncfusion popup lifecycle remarks remain.
 
 ### Implementation Inline Comments
 

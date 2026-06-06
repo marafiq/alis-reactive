@@ -60,7 +60,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <param name="pipeline">The pipeline that receives the event-arg updateData call.</param>
-        /// <param name="source">The response body instance.</param>
+        /// <param name="source">The success or error response body scope that supplies popup items.</param>
         /// <param name="path">Expression selecting the items collection from the response.</param>
         public static void UpdateData<TResponse>(
             this FusionMultiSelectFilteringArgs args,
