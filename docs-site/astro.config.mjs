@@ -67,7 +67,7 @@ export default defineConfig({
 								{ label: 'Triggers', slug: 'csharp-modules/reactivity/triggers-and-reactions' },
 								{ label: 'Server-Sent Events', slug: 'csharp-modules/reactivity/server-push' },
 								{ label: 'SignalR', slug: 'csharp-modules/reactivity/signalr' },
-								{ label: 'Element Mutations', slug: 'csharp-modules/reactivity/element-mutations' },
+								{ label: 'Element Updates', slug: 'csharp-modules/reactivity/element-mutations' },
 								{ label: 'Component API', slug: 'csharp-modules/reactivity/component-api' },
 								{ label: 'Conditions', slug: 'csharp-modules/reactivity/conditions' },
 								{ label: 'HTTP Pipeline', slug: 'csharp-modules/reactivity/http-pipeline' },

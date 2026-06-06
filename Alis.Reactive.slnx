@@ -55,38 +55,49 @@
   </Folder>
   <Folder Name="/docs-site/content/getting-started/">
     <File Path="docs-site/src/content/docs/getting-started/your-first-plan.md" />
-    <File Path="docs-site/src/content/docs/getting-started/running-the-sandbox.md" />
   </Folder>
   <Folder Name="/docs-site/content/architecture/">
-    <File Path="docs-site/src/content/docs/architecture/the-problem.md" />
+    <File Path="docs-site/src/content/docs/architecture/component-model.mdx" />
+    <File Path="docs-site/src/content/docs/architecture/descriptors-and-plan.mdx" />
+    <File Path="docs-site/src/content/docs/architecture/error-behavior.mdx" />
+    <File Path="docs-site/src/content/docs/architecture/fluent-builders.mdx" />
+    <File Path="docs-site/src/content/docs/architecture/onboarding-component.md" />
+    <File Path="docs-site/src/content/docs/architecture/plan-composition.mdx" />
+    <File Path="docs-site/src/content/docs/architecture/runtime.mdx" />
+    <File Path="docs-site/src/content/docs/architecture/sandbox-demo.md" />
+    <File Path="docs-site/src/content/docs/architecture/the-builders.mdx" />
     <File Path="docs-site/src/content/docs/architecture/the-contract.mdx" />
     <File Path="docs-site/src/content/docs/architecture/three-layers.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/two-phase-boot.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/solid-loop.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/component-model.md" />
+    <File Path="docs-site/src/content/docs/architecture/vertical-slice.mdx" />
   </Folder>
   <Folder Name="/docs-site/content/csharp-modules/">
+    <File Path="docs-site/src/content/docs/csharp-modules/mental-model.mdx" />
     <File Path="docs-site/src/content/docs/csharp-modules/plan-and-entries.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/triggers-and-reactions.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/element-mutations.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/conditions.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/http-pipeline.md" />
   </Folder>
-  <Folder Name="/docs-site/content/runtime/">
-    <File Path="docs-site/src/content/docs/runtime/overview.md" />
-    <File Path="docs-site/src/content/docs/runtime/modules.md" />
+  <Folder Name="/docs-site/content/csharp-modules/reactivity/">
+    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/component-api.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/conditions.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/element-mutations.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/http-pipeline.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/http-pipeline-extensions.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/plugins.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/server-push.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/signalr.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/triggers-and-reactions.md" />
+    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/validation.md" />
   </Folder>
   <Folder Name="/docs-site/content/components/">
     <File Path="docs-site/src/content/docs/components/overview.md" />
     <File Path="docs-site/src/content/docs/components/native-components.md" />
-    <File Path="docs-site/src/content/docs/components/fusion-components.md" />
+    <File Path="docs-site/src/content/docs/components/design-system.md" />
+    <File Path="docs-site/src/content/docs/components/fusion/index.md" />
   </Folder>
   <Folder Name="/docs-site/content/testing/">
     <File Path="docs-site/src/content/docs/testing/strategy.mdx" />
     <File Path="docs-site/src/content/docs/testing/writing-tests.md" />
   </Folder>
   <Folder Name="/docs-site/content/reference/">
-    <File Path="docs-site/src/content/docs/reference/json-schema.md" />
+    <File Path="docs-site/src/content/docs/reference/api-reference.md" />
     <File Path="docs-site/src/content/docs/reference/guard-operators.md" />
     <File Path="docs-site/src/content/docs/reference/build-commands.md" />
   </Folder>
