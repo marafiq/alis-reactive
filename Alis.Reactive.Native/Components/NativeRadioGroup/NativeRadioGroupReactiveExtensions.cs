@@ -22,7 +22,6 @@ namespace Alis.Reactive.Native.Components
         /// <typeparam name="TModel">Model that owns the bound component value.</typeparam>
         /// <typeparam name="TProp">Bound value type for the component.</typeparam>
         /// <typeparam name="TArgs">Payload type selected by <paramref name="eventSelector"/>.</typeparam>
-        /// <param name="builder">The NativeRadioGroup builder being wired.</param>
         /// <param name="plan">The Reactive Plan that receives the component event triggers.</param>
         /// <param name="eventSelector">Selects which event to listen for, such as <c>evt => evt.Changed</c>.</param>
         /// <param name="pipeline">Defines the reaction graph that runs when the event fires.</param>

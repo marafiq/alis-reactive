@@ -14,7 +14,6 @@ namespace Alis.Reactive.Native.Components
     /// Buttons are not model-bound and do not participate in gather. The explicit
     /// element ID is the Reactive Plan event target.
     /// </remarks>
-    /// <typeparam name="TModel">The view model type for the current Razor view.</typeparam>
     public class NativeButtonBuilder<TModel> :
 #if NET48
         IHtmlString
