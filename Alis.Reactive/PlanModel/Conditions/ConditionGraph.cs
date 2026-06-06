@@ -7,7 +7,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Base class for conditional predicates evaluated when the plan executes. Not constructed in application code.
+    /// Wire base for Reactive Plan predicates authored through condition builders.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ConditionGraph>))]
     public abstract class ConditionGraph

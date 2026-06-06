@@ -7,7 +7,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Base class for executable reactions in a Reactive Plan. Not constructed in application code.
+    /// Wire base for Reactive Plan reactions authored through pipeline builders.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ReactionGraph>))]
     public abstract class ReactionGraph
@@ -92,7 +92,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>Base class for parallel completion behavior. Not constructed in application code.</summary>
+    /// <summary>Wire base for parallel completion behavior authored by request/parallel builders.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ParallelCompletion>))]
     public abstract class ParallelCompletion
     {

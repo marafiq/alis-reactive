@@ -4,7 +4,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Base class for value source identifiers in a Reactive Plan. Not constructed in application code.
+    /// Wire base for value source identifiers authored through DSL value reads.
     /// </summary>
     [System.Text.Json.Serialization.JsonConverter(typeof(PlanNodeDiscriminator<Source>))]
     public abstract class Source

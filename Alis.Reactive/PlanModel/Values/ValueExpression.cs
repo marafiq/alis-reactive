@@ -7,7 +7,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// Base class for all value nodes in a Reactive Plan. Not constructed in application code.
+    /// Wire base for Reactive Plan value nodes authored through DSL value expressions.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ValueExpression>))]
     public abstract class ValueExpression

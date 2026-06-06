@@ -733,7 +733,7 @@ Kind { get; }  // JSON discriminator for component sources. Always `"component"`
 
 ### ConditionGraph
 
-Base class for conditional predicates evaluated when the plan executes. Not constructed in application code.
+Wire base for Reactive Plan predicates authored through condition builders.
 
 ### ConfirmCondition
 
@@ -877,7 +877,7 @@ Shape { get; }  // Output shape declared by the authoring layer, or `None` when 
 
 ### ParallelCompletion
 
-Base class for parallel completion behavior. Not constructed in application code.
+Wire base for parallel completion behavior authored by request/parallel builders.
 
 ```csharp
 // Properties
@@ -924,7 +924,7 @@ Kind { get; }  // JSON discriminator for path segments: `property` or `index`.
 
 ### PayloadContract
 
-Base class for payload typing contracts. Not constructed in application code.
+Wire base for payload typing contracts authored by typed triggers.
 
 ```csharp
 // Properties
@@ -944,7 +944,7 @@ Type { get; }  // Payload typing contract used when authoring typed value paths.
 
 ### PlanScope
 
-Base class for plan merge scope. Not constructed in application code.
+Wire base for plan merge scope emitted by root and partial plans.
 
 ```csharp
 // Properties
@@ -973,7 +973,7 @@ Kind { get; }  // Wire discriminator for property reads. Always `"property"`.
 
 ### ReactionGraph
 
-Base class for executable reactions in a Reactive Plan. Not constructed in application code.
+Wire base for Reactive Plan reactions authored through pipeline builders.
 
 ### ReadExpression
 
@@ -991,7 +991,7 @@ Shape { get; }  // Output shape declared by the authoring layer, or `None` when 
 
 ### RequestInput
 
-Base class for request input strategies. Not constructed in application code.
+Wire base for request input strategies authored through gather builders.
 
 ### RequestPlan
 
@@ -1022,7 +1022,7 @@ Request { get; }  // HTTP request definition to execute in the async lane.
 
 ### RequestValidationTarget
 
-Base class for request validation targets. Not constructed in application code.
+Wire base for request validation targets authored through request builders.
 
 ```csharp
 // Properties
@@ -1041,7 +1041,7 @@ Reaction { get; }  // Reaction to execute when the status match succeeds.
 
 ### ResponseStatusMatch
 
-Base class for HTTP response status matching. Not constructed in application code.
+Wire base for HTTP response status matches authored through response routes.
 
 ```csharp
 // Properties
@@ -1123,7 +1123,7 @@ Kind { get; }  // JSON discriminator for validation error display reactions. Alw
 
 ### Source
 
-Base class for value source identifiers in a Reactive Plan. Not constructed in application code.
+Wire base for value source identifiers authored through DSL value reads.
 
 ### TerminalRequestChain
 
@@ -1145,7 +1145,7 @@ Kind { get; }  // JSON discriminator for URL query sources. Always `"url"`.
 
 ### ValueExpression
 
-Base class for all value nodes in a Reactive Plan. Not constructed in application code.
+Wire base for Reactive Plan value nodes authored through DSL value expressions.
 
 ### ValueReadAccess
 

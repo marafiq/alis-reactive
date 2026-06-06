@@ -168,7 +168,7 @@ namespace Alis.Reactive.PlanModel
         public RequestPlan Next => _next;
     }
 
-    /// <summary>Base class for request validation targets. Not constructed in application code.</summary>
+    /// <summary>Wire base for request validation targets authored through request builders.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<RequestValidationTarget>))]
     public abstract class RequestValidationTarget
     {
@@ -233,7 +233,7 @@ namespace Alis.Reactive.PlanModel
                 ResponseStatusMatch.Exact(HttpResponseStatusCode.FromDeveloperStatus(statusCode)));
     }
 
-    /// <summary>Base class for HTTP response status matching. Not constructed in application code.</summary>
+    /// <summary>Wire base for HTTP response status matches authored through response routes.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ResponseStatusMatch>))]
     public abstract class ResponseStatusMatch
     {

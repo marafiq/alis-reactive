@@ -82,7 +82,7 @@ namespace Alis.Reactive.PlanModel
             new PlanIdentity(planId, PlanScope.Partial);
     }
 
-    /// <summary>Base class for plan merge scope. Not constructed in application code.</summary>
+    /// <summary>Wire base for plan merge scope emitted by root and partial plans.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<PlanScope>))]
     public abstract class PlanScope
     {
@@ -393,7 +393,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>Base class for payload typing contracts. Not constructed in application code.</summary>
+    /// <summary>Wire base for payload typing contracts authored by typed triggers.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<PayloadContract>))]
     public abstract class PayloadContract
     {

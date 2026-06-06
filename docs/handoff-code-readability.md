@@ -469,6 +469,11 @@ Candidate cleanup:
   guide now uses the same "Reactive Plan behavior entry" wording for
   `Html.On()` placement. This keeps the source XML, generated API reference,
   and developer guide aligned without touching broader architecture pages.
+- Resolved on `tiny-safe-but-important-refactorings`: public wire-base XML
+  summaries for conditions, reactions, request inputs, request routes, value
+  sources, value expressions, plan scopes, and payload contracts now say which
+  DSL builders author them instead of repeating "not constructed in application
+  code" across generated API docs.
 
 ### Implementation Inline Comments
 
