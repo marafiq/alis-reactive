@@ -201,6 +201,10 @@ Candidate cleanup:
   component summaries now keep visible text, OTP, masked input, and HTML content
   semantics while removing article-led phrasing. Usage examples and remarks were
   kept where they clarify API consumption.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion date/time value
+  component summaries now keep selected date, date-time, time, and range-read
+  semantics without article-led phrasing. DateRangePicker remarks still keep
+  the no-SetValue and individual-date versus array-read guidance.
 - Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
   operator docs now include the parameter tags needed for generated API
   signatures such as `Eq(operand)` versus `Eq(right)`. This keeps the public DSL

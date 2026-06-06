@@ -25,8 +25,8 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusOutMethod =
             ComponentMethod.Named("focusOut");
 
-        /// <summary>Sets the selected date and time.</summary>
-        /// <param name="value">Date-time to set.</param>
+        /// <summary>Sets selected date and time.</summary>
+        /// <param name="value">Selected date and time.</param>
         public static ComponentRef<FusionDateTimePicker, TModel> SetValue<TModel>(
             this ComponentRef<FusionDateTimePicker, TModel> self, DateTime value)
             where TModel : class
@@ -47,7 +47,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(FocusOutMethod);
 
-        /// <summary>Reads the date-time value for conditions or gather.</summary>
+        /// <summary>Reads date-time value for conditions or gather.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard or use as a source argument for component operations:
         /// <c>p.When(p.Component&lt;FusionDateTimePicker&gt;(m =&gt; m.AppointmentTime).Value()).NotNull().Then(p =&gt; { ... })</c>.

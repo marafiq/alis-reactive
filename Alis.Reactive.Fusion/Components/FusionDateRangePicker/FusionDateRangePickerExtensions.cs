@@ -33,7 +33,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentProperty<DateTime[]> ValueProperty =
             ComponentProperty<DateTime[]>.Named(Component.ValueMember);
 
-        /// <summary>Reads the selected range start date.</summary>
+        /// <summary>Reads selected range start date.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard:
         /// <c>p.When(p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).StartDate()).NotNull().Then(p =&gt; { ... })</c>.
@@ -43,7 +43,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.Read(StartDateProperty);
 
-        /// <summary>Reads the selected range end date.</summary>
+        /// <summary>Reads selected range end date.</summary>
         /// <remarks>
         /// Pass to a <c>When()</c> condition guard:
         /// <c>p.When(p.Component&lt;FusionDateRangePicker&gt;(m =&gt; m.StayDates).EndDate()).NotNull().Then(p =&gt; { ... })</c>.
@@ -53,7 +53,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.Read(EndDateProperty);
 
-        /// <summary>Reads the selected start and end dates as an array.</summary>
+        /// <summary>Reads selected start and end dates as an array.</summary>
         /// <remarks>
         /// <para>
         /// Pass to a <c>When()</c> condition guard or use as a source argument for component operations.
