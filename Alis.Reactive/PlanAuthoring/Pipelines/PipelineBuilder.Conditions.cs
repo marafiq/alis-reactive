@@ -7,7 +7,7 @@ namespace Alis.Reactive.Builders
 {
     public partial class PipelineBuilder<TModel> where TModel : class
     {
-        /// <summary>Starts a branch whose guard reads from the current event payload.</summary>
+        /// <summary>Starts a branch whose guard reads from the triggering event payload.</summary>
         /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <typeparam name="TProp">The CLR type used to shape the selected event payload value.</typeparam>
         /// <param name="payload">The typed event payload placeholder supplied by the trigger callback.</param>

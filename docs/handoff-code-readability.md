@@ -478,6 +478,10 @@ Candidate cleanup:
   say "this/owning Reactive Plan pipeline" instead of generic "current
   pipeline" for element targeting, HTTP reactions, plugin command firing, and
   component event helper emissions.
+- Resolved on `tiny-safe-but-important-refactorings`: core condition/plugin
+  argument docs and Native event-payload write docs now say "triggering event
+  payload" instead of generic "current event payload," matching existing gather
+  terminology.
 
 ### Implementation Inline Comments
 

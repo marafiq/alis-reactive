@@ -26,7 +26,7 @@ namespace Alis.Reactive.Builders.Conditions
             _cases = cases;
         }
 
-        /// <summary>Adds the next ordered <c>ElseIf</c> branch from the current event payload.</summary>
+        /// <summary>Adds the next ordered <c>ElseIf</c> branch from the triggering event payload.</summary>
         /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <typeparam name="TProp">The CLR type used to shape the selected event payload value.</typeparam>
         /// <param name="payload">The event payload placeholder supplied by the trigger callback.</param>

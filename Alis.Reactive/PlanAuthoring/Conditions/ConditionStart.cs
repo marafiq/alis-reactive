@@ -12,7 +12,7 @@ namespace Alis.Reactive.Builders.Conditions
     {
         internal ConditionStart() { }
 
-        /// <summary>Starts a nested condition from the current event payload.</summary>
+        /// <summary>Starts a nested condition from the triggering event payload.</summary>
         /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <typeparam name="TProp">The CLR type used to shape the selected event payload value.</typeparam>
         /// <param name="payload">The event payload placeholder supplied by the trigger callback.</param>

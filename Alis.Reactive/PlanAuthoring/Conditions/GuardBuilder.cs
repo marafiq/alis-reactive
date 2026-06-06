@@ -40,7 +40,7 @@ namespace Alis.Reactive.Builders.Conditions
             _continuation = continuation ?? throw new ArgumentNullException(nameof(continuation));
         }
 
-        /// <summary>Adds an all-of comparison against the current event payload.</summary>
+        /// <summary>Adds an all-of comparison against the triggering event payload.</summary>
         /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <typeparam name="TProp">The CLR type used to shape the selected event payload value.</typeparam>
         /// <param name="payload">The event payload placeholder supplied by the trigger callback.</param>
@@ -69,7 +69,7 @@ namespace Alis.Reactive.Builders.Conditions
                 source, _continuation, ConditionComposition.All(ConditionGraph));
         }
 
-        /// <summary>Adds an any-of comparison against the current event payload.</summary>
+        /// <summary>Adds an any-of comparison against the triggering event payload.</summary>
         /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <typeparam name="TProp">The CLR type used to shape the selected event payload value.</typeparam>
         /// <param name="payload">The event payload placeholder supplied by the trigger callback.</param>

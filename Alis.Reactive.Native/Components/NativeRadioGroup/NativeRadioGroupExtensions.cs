@@ -32,7 +32,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Writes the selected radio value from the current event payload.
+        /// Writes the selected radio value from the triggering event payload.
         /// </summary>
         /// <typeparam name="TSource">The event payload type containing the value.</typeparam>
         /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>

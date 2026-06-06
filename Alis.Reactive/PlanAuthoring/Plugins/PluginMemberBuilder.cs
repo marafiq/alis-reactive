@@ -61,7 +61,7 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Adds a value from the current event payload as a plugin argument.</summary>
+        /// <summary>Adds a value from the triggering event payload as a plugin argument.</summary>
         /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <typeparam name="TProp">The CLR type used to shape the selected event-payload argument.</typeparam>
         /// <param name="args">A typed event payload marker used to infer <typeparamref name="TPayload"/>.</param>
@@ -187,7 +187,7 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Adds a value from the current event payload as a plugin argument.</summary>
+        /// <summary>Adds a value from the triggering event payload as a plugin argument.</summary>
         /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <typeparam name="TProp">The CLR type used to shape the selected event-payload argument.</typeparam>
         /// <param name="args">A typed event payload marker used to infer <typeparamref name="TPayload"/>.</param>

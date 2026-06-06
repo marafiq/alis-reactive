@@ -35,7 +35,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Writes checked values from the current event payload.
+        /// Writes checked values from the triggering event payload.
         /// </summary>
         /// <typeparam name="TSource">The event payload type containing the values.</typeparam>
         /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
