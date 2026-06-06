@@ -94,7 +94,7 @@ artifact layout where all discovered public API facts live.
 Why it matters for developers:
 For Grid, Kanban, and Schedule, the public surface is too large to keep in chat,
 scratch files, an existing onboarding folder, or one Playwright test. If
-discovery output is not indexed by component and API set, later work will miss
+discovery output is not organized by component and API set, later work will miss
 events, payload variants, overloads, or builder-owned members.
 
 Recommended action:
@@ -382,7 +382,8 @@ Mapping must cover:
 - component overloads;
 - component object and array arguments;
 - component events;
-- event payload scalar/nested/indexed/whole-array reads;
+- event payload scalar, nested object, proper array primitive, typed array
+  source, and whole-array reads;
 - event payload writes;
 - event payload method calls with no arg, one arg, and multiple args;
 - event payload consumer path: condition, gather body/header/route, plugin arg,

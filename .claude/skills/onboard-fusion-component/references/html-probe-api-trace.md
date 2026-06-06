@@ -45,9 +45,9 @@ chat.
 | `ej2.executePrompt("hello")` | method call | not builder-covered | `string` | `void` | `promptRequest.prompt` | event fires, prompt rendered | `ExecutePrompt("hello")` |
 | `ej2.addPromptResponse("ok", true)` | method call | not builder-covered | `string`, `bool` | `void` | n/a | response rendered | `AddPromptResponse(...)` |
 | `ej2.getEvents()` | method read | not builder-covered | none | array | n/a | returned array count logged | `GetEvents()` |
-| `ej2.selectedChips` | property read/write | builder sets initial `SelectedChips(...)`; runtime read/write still useful | `string[]` for chip values, `number[]` for index chips | selected ids/indexes | n/a | property reflects selected chips; index writes require `dataBind()` to update DOM; value writes are not stable on delete-enabled chips | `SelectedChipValues()` / `SelectedChipIndexes()` / `SetSelectedChipIndexes(...)` |
-| `ej2.select([0, 2])` | method call | not builder-covered | `number[]` | `void` | n/a | both indexed chips become active | `SelectByIndexes(...)` |
-| `ej2.remove([0, 2])` | method call | not builder-covered | `number[]` | `void` | deleted event per chip | indexed chips are removed | `RemoveByIndexes(...)` |
+| `ej2.selectedChips` | property read/write | builder sets initial `SelectedChips(...)`; runtime read/write still useful | `string[]` for chip values, `number[]` for vendor position values | selected chip values or vendor position values | n/a | property reflects selected chips; position-value writes require `dataBind()` to update DOM; value writes are not stable on delete-enabled chips | `SelectedChipValues()` / `SelectedChipPositions()` / `SetSelectedChipPositions(...)` |
+| `ej2.select([0, 2])` | method call | not builder-covered | `number[]` as a typed array argument | `void` | n/a | chips at those vendor positions become active | `SelectByPositions(...)` |
+| `ej2.remove([0, 2])` | method call | not builder-covered | `number[]` as a typed array argument | `void` | deleted event per chip | chips at those vendor positions are removed | `RemoveByPositions(...)` |
 
 Rows above are examples. Replace them with actual observed rows from the running component.
 
