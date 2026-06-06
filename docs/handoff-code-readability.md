@@ -169,6 +169,10 @@ Candidate cleanup:
   signatures. Generated docs show calls such as `On<T>(plan, trigger)`,
   `SetValue<T>(value)`, and `PreventDefault(pipeline)` instead of exposing
   implementation receivers like `html`, `self`, `builder`, or event `args`.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionConditionalBuilder`
+  XML docs now include standard parameter tags, so generated template-builder
+  API signatures show real overloads such as `Span<T>(property)` and
+  `Button(text, onClick, css)` instead of repeated empty calls.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
 
