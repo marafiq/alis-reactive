@@ -262,6 +262,11 @@ Candidate cleanup:
   and the typed plugin-source conversion parameter is named `builder` instead
   of `b`. Argument-contract docs remain because they describe the public DSL
   shape.
+- Resolved on `tiny-safe-but-important-refactorings`: plugin literal overload
+  XML docs no longer repeat `value` as "the literal value to pass" for every
+  primitive type. Summaries still name the literal DSL action, and response,
+  event-payload, source, and DateTime formatting docs remain where they carry
+  contract or runtime meaning.
 
 ### Implementation Inline Comments
 

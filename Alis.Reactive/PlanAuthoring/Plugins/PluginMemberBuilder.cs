@@ -83,7 +83,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a string literal argument.</summary>
-        /// <param name="value">The literal string value to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg(string value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
@@ -92,7 +91,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds an int literal argument.</summary>
-        /// <param name="value">The literal int value to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg(int value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -100,7 +98,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a bool literal argument.</summary>
-        /// <param name="value">The literal bool value to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg(bool value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -108,7 +105,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a long literal argument.</summary>
-        /// <param name="value">The literal long value to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg(long value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -116,7 +112,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a decimal literal argument.</summary>
-        /// <param name="value">The literal decimal value to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg(decimal value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -124,7 +119,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a double literal argument.</summary>
-        /// <param name="value">The literal double value to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg(double value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -132,7 +126,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a <see cref="DateTime"/> literal argument formatted for runtime date comparison.</summary>
-        /// <param name="value">The literal date and time value to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg(DateTime value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -141,7 +134,6 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Adds a literal argument whose plan shape is derived from <typeparamref name="TValue"/>.</summary>
         /// <typeparam name="TValue">The literal value type.</typeparam>
-        /// <param name="value">The literal value to pass.</param>
         public PluginMemberBuilder<TReturn, TModel> ArgValue<TValue>(TValue value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -218,7 +210,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a string literal argument.</summary>
-        /// <param name="value">The literal string value to pass.</param>
         public PluginCallBuilder<TModel> Arg(string value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
@@ -227,7 +218,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds an int literal argument.</summary>
-        /// <param name="value">The literal int value to pass.</param>
         public PluginCallBuilder<TModel> Arg(int value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -235,7 +225,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a bool literal argument.</summary>
-        /// <param name="value">The literal bool value to pass.</param>
         public PluginCallBuilder<TModel> Arg(bool value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -243,7 +232,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a long literal argument.</summary>
-        /// <param name="value">The literal long value to pass.</param>
         public PluginCallBuilder<TModel> Arg(long value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -251,7 +239,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a decimal literal argument.</summary>
-        /// <param name="value">The literal decimal value to pass.</param>
         public PluginCallBuilder<TModel> Arg(decimal value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -259,7 +246,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a double literal argument.</summary>
-        /// <param name="value">The literal double value to pass.</param>
         public PluginCallBuilder<TModel> Arg(double value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -267,7 +253,6 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a <see cref="DateTime"/> literal argument formatted for runtime date comparison.</summary>
-        /// <param name="value">The literal date and time value to pass.</param>
         public PluginCallBuilder<TModel> Arg(DateTime value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
@@ -276,7 +261,6 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Adds a literal argument whose plan shape is derived from <typeparamref name="TValue"/>.</summary>
         /// <typeparam name="TValue">The literal value type.</typeparam>
-        /// <param name="value">The literal value to pass.</param>
         public PluginCallBuilder<TModel> ArgValue<TValue>(TValue value)
         {
             _args.Add(PluginInvocationArgument.Literal(value));
