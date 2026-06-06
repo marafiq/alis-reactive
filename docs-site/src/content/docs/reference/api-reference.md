@@ -2794,7 +2794,7 @@ From<T>(source)
 
 ### FusionInPlaceEditor
 
-A FusionInPlaceEditor for click-to-edit single-field commit flows and mixed-form inputs.
+Syncfusion in-place editor for click-to-edit single-field commit flows and mixed-form inputs.
 
 ```csharp
 // Properties
@@ -2907,7 +2907,7 @@ SubmitClick { get; }  // Fires on a user save click or Enter key. Fires even whe
 
 ### FusionInPlaceEditorExtensions
 
-Reactive Plan pipeline extensions for reading from and updating `FusionInPlaceEditor`.
+Reads and updates a registered `FusionInPlaceEditor` from a Reactive Plan pipeline.
 
 ```csharp
 AddClass<T>(className)
@@ -2922,7 +2922,7 @@ Value<T>()
 
 ### FusionInPlaceEditorHtmlExtensions
 
-Creates a FusionInPlaceEditor inside a field wrapper, bound to a model property.
+Renders the in-place editor component inside a bound input field.
 
 ```csharp
 FusionInPlaceEditor<T>(setup, build)

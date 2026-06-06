@@ -10,7 +10,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public sealed class FusionInPlaceEditorEvents
     {
-        /// <summary>Shared instance used by the <c>.Reactive()</c> event selector.</summary>
+        /// <summary>Selector instance for <c>.Reactive()</c> event lambdas.</summary>
         public static readonly FusionInPlaceEditorEvents Instance = new FusionInPlaceEditorEvents();
         private FusionInPlaceEditorEvents() { }
 

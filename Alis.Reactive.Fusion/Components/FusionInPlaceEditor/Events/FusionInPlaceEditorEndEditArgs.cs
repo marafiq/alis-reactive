@@ -23,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionInPlaceEditorEndEditArgsExtensions
     {
         /// <summary>Keeps the editor in edit mode even though a save or cancel was attempted.</summary>
-        /// <param name="pipeline">The pipeline that receives the event-arg cancellation mutation.</param>
+        /// <param name="pipeline">Pipeline that records the event-arg cancellation mutation.</param>
         public static void PreventDefault(
             this FusionInPlaceEditorEndEditArgs args,
             IReactionEmitter pipeline)

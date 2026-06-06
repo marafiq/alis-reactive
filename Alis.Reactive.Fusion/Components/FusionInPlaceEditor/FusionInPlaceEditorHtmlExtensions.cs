@@ -10,7 +10,7 @@ using ComponentRegistrationSource = Alis.Reactive.Fusion.Components.FusionInPlac
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Creates a FusionInPlaceEditor inside a field wrapper, bound to a model property.
+    /// Renders the in-place editor component inside a bound input field.
     /// </summary>
     /// <remarks>
     /// Start the chain with <c>Html.InputField(plan, m =&gt; m.DateOfBirth)</c>, then call
@@ -21,10 +21,10 @@ namespace Alis.Reactive.Fusion.Components
     public static class FusionInPlaceEditorHtmlExtensions
     {
         /// <summary>
-        /// Renders a FusionInPlaceEditor bound to the field's model property.
+        /// Renders the in-place editor component bound to the field's model property.
         /// </summary>
-        /// <typeparam name="TProp">The model value type rendered by the in-place editor.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <typeparam name="TProp">Model value type rendered by the in-place editor.</typeparam>
+        /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Callback to configure the editor (type, mode, inner model, reactive events).</param>
         public static void FusionInPlaceEditor<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,

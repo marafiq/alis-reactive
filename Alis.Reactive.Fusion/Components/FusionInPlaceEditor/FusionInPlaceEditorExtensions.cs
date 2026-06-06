@@ -6,7 +6,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Reactive Plan pipeline extensions for reading from and updating <see cref="FusionInPlaceEditor"/>.
+    /// Reads and updates a registered <see cref="FusionInPlaceEditor"/> from a Reactive Plan pipeline.
     /// </summary>
     /// <remarks>
     /// Use these from a <see cref="ComponentRef{TComponent, TModel}"/> resolved by the pipeline:
@@ -33,7 +33,7 @@ namespace Alis.Reactive.Fusion.Components
         /// Writes to Syncfusion's <c>value</c> property. Updates the displayed text immediately
         /// without firing <c>change</c>.
         /// </remarks>
-        /// <param name="value">The value to commit, or <see langword="null"/> to clear.</param>
+        /// <param name="value">Committed value, or <see langword="null"/> to clear.</param>
         public static ComponentRef<FusionInPlaceEditor, TModel> SetValue<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string? value)
             where TModel : class
@@ -76,20 +76,20 @@ namespace Alis.Reactive.Fusion.Components
         /// The class persists across edit/close cycles; typical use is a visual commit signal
         /// wired on <c>ActionSuccess</c> and removed on <c>BeginEdit</c>.
         /// </remarks>
-        /// <param name="className">The class name to add.</param>
+        /// <param name="className">CSS class to add.</param>
         public static ComponentRef<FusionInPlaceEditor, TModel> AddClass<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string className)
             where TModel : class
             => self.EmitCall(ClassAddMethod, new List<ValueExpression> { ValueExpression.Literal(className) });
 
         /// <summary>Removes a CSS class from the editor's outer wrapper.</summary>
-        /// <param name="className">The class name to remove.</param>
+        /// <param name="className">CSS class to remove.</param>
         public static ComponentRef<FusionInPlaceEditor, TModel> RemoveClass<TModel>(
             this ComponentRef<FusionInPlaceEditor, TModel> self, string className)
             where TModel : class
             => self.EmitCall(ClassRemoveMethod, new List<ValueExpression> { ValueExpression.Literal(className) });
 
-        /// <summary>Reads the current committed value for use in conditions or gather.</summary>
+        /// <summary>Reads the committed value for conditions or gather.</summary>
         /// <remarks>
         /// Reads the registered editor value using the shape captured at render time by
         /// <see cref="FusionInPlaceEditorHtmlExtensions"/> (i.e. <c>Shape.FromClrType(typeof(TProp))</c>).
