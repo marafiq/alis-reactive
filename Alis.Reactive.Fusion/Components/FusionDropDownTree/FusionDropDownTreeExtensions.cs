@@ -33,7 +33,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("clear");
 
         /// <summary>Sets the selected value IDs.</summary>
-        /// <param name="value">The selected IDs, or <see langword="null"/> to clear.</param>
+        /// <param name="value">Selected IDs, or <see langword="null"/> to clear.</param>
         public static ComponentRef<FusionDropDownTree, TModel> SetValue<TModel>(
             this ComponentRef<FusionDropDownTree, TModel> self, string[]? value)
             where TModel : class
@@ -42,7 +42,7 @@ namespace Alis.Reactive.Fusion.Components
                 : ValueExpression.LiteralRaw(value, Shape.ArrayOf(Shape.String)));
 
         /// <summary>Sets the display text and lets Syncfusion map it back to the selected value ID.</summary>
-        /// <param name="text">The display text to select, or <see langword="null"/> to clear.</param>
+        /// <param name="text">Display text to select, or <see langword="null"/> to clear.</param>
         public static ComponentRef<FusionDropDownTree, TModel> SetText<TModel>(
             this ComponentRef<FusionDropDownTree, TModel> self, string? text)
             where TModel : class

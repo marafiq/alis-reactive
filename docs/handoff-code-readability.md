@@ -617,6 +617,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `FusionSlider` XML tags
   now use concise field-wrapper, model-value, event-args, Reactive Plan, and
   scalar/range value wording. Scalar and range semantics remain visible.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionDropDownTree` XML
+  tags now use concise field-wrapper, model-value, event-args, Reactive Plan,
+  selected-ID, and display-text wording. Syncfusion value-shape notes remain.
 
 ### Implementation Inline Comments
 
