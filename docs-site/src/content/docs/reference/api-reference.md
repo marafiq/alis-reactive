@@ -13,58 +13,6 @@ For usage and examples, see the [Grammar Tree](../../csharp-modules/mental-model
 
 ## Alis — Reactive
 
-### BrowserElementMembers
-
-The DOM element contract used by `p.Element(...)`.
-            This keeps native DOM onboarding explicit without changing the public DSL.
-
-### ClientValidationRuleBinder
-
-Binds client-side validation rules declared by request validation gates
-            into the plan's component-level validation rules.
-
-
-            Each `ValidationJob` names a form and a validation source type. The registered
-            `IClientValidationRuleSource` returns the deterministic client rules for
-            that source. This binder maps each model field to the component that
-            renders it, or to the deterministic component id a partial will render later, and
-            attaches the resulting `ComponentValidation` rules to the form's
-            `ContainerScope`. Normal validator execution is separate; this binder
-            handles only the client-side rules.
-
-### ComponentEventOnboarding
-
-Shared component event onboarding path for vertical slices.
-            The slice selects a typed event and a rendered component id; this helper builds the
-            reaction pipeline and wires the event against the plan-registered component.
-
-### ComponentMethod
-
-Describes a JavaScript method on a reactive component.
-
-```csharp
-Mapped()
-Named()
-```
-
-### ComponentObjectTarget
-
-Deterministic target for a component reference in the Reactive Plan.
-            The target owns the component id and vendor before any property, method, or event
-            contract is declared against the runtime object.
-
-### ComponentProperty<T>
-
-Describes a readable or writable JavaScript property on a reactive component.
-            Component onboarding uses these members to declare the Reactive Plan contract
-            that the runtime can read or update.
-
-```csharp
-Mapped()
-Named()
-WithShape()
-```
-
 ### ComponentRef<T>
 
 Authoring handle for a plan-registered component target. Native and Fusion
@@ -142,12 +90,6 @@ Represents a model-bound input component whose current value can be gathered or 
 // Properties
 ValueMember { get; }  // Component member read by gather and validation for model-bound inputs.
 ```
-
-### ModelBoundInputComponentSlot
-
-The deterministic slot where a Razor-rendered input component joins the Reactive Plan.
-            Its controlled component id is the join key across DOM rendering, plan registration,
-            validation, gather, partial load/unload, and runtime component lookup.
 
 ### Plugin
 
@@ -309,12 +251,6 @@ Builds the ordered reactions that execute when a trigger fires: element updates,
             event dispatches, HTTP calls, component interactions, and conditional logic.
 
 ```csharp
-// Properties
-Alis#Reactive#Builders#IReactionEmitter#BuildContext { get; }
-```
-
-```csharp
-Alis#Reactive#Builders#IReactionEmitter#AddStep()
 Component<T>(expr)
 Component<T>(expr)
 Component<T>(refId)
@@ -350,11 +286,6 @@ When<T>(payload, path)
 When<T>(responseBody, path)
 When<T>(source)
 ```
-
-### PluginArgumentCollector
-
-Centralizes plugin argument lowering so value reads and commands enforce
-            the same argument contract.
 
 ### PluginArgumentTypes
 
@@ -401,7 +332,6 @@ Arg<T>(body, path)
 Arg<T>(args, path)
 Arg<T>(source)
 ArgValue<T>(value)
-op_Implicit(b)
 ```
 
 ### PluginTypeBuilder
@@ -445,18 +375,6 @@ SignalR<T>(hubUrl, methodName, pipeline)
 
 ## Builders — Arrays
 
-### ElementExpressionCompiler
-
-Compiles a captured per-element lambda into the closed plan-node algebra. A predicate
-            becomes a SYNC `ConditionGraph` (compare/all/any/not) whose leaves read the
-            element scope; reads rooted at the lambda parameter become element reads, everything else
-            is evaluated to a literal. Anything outside the supported set throws at plan render time
-            (when the Razor view is first requested) — keeping the captured DSL deterministic.
-
-```csharp
-CompileProjection()
-```
-
 ### ReactiveArray<T>
 
 A typed, deferred array transform. Operators capture authoring intent as
@@ -482,10 +400,6 @@ Sum()
 Sum()
 Where()
 ```
-
-### ReactiveArraySource<T>
-
-An array-op result exposed as a typed source for component data-source binding.
 
 ### ReactiveValue<T>
 
@@ -618,7 +532,6 @@ FromUrl<T>(paramName, asParam)
 Header(name, value)
 Header<T>(name, source)
 Header<T>(name, args, path)
-Include()
 IncludeAll()
 Plugin<T>(source, paramName)
 RouteParam(string paramName, int value)
@@ -698,18 +611,6 @@ Options { get; }  // Gets the label and required options for this field.
 Plan { get; }  // Gets the Reactive Plan that owns this field registration.
 ```
 
-```csharp
-Render()
-```
-
-### InputFieldBuilder
-
-Writes the shared field wrapper around a registered input component.
-
-```csharp
-Begin()
-```
-
 ### InputFieldOptions
 
 Configures the label and required marker for an input field wrapper.
@@ -718,10 +619,6 @@ Configures the label and required marker for an input field wrapper.
 Label(label)
 Required()
 ```
-
-### InputFieldRenderScope
-
-Writes closing HTML tags when disposed. Pure BCL.
 
 ---
 
@@ -843,20 +740,6 @@ Cases { get; }  // Branch cases evaluated in declaration order.
 Kind { get; }  // JSON discriminator for branch reactions. Always `"branch"`.
 ```
 
-### BrowserObject
-
-A plan-registered object target: an id, a vendor, a contract type, a role,
-            and, for inputs, a model binding.
-
-```csharp
-WithBindingIfAbsent()
-```
-
-### BrowserObjectId
-
-Identifies the plan contract key for a DOM element, component, layout object,
-            or plugin.
-
 ### CallReaction
 
 Calls a method on a component or DOM element.
@@ -882,13 +765,6 @@ Op { get; }  // Comparison operator: `eq`, `neq`, `gt`, `gte`, etc.
 Shape { get; }  // Declared comparison shape, or `None` when not specified.
 ```
 
-### CompareOp
-
-String constants for all compare-condition operators.
-            Prevents typos when building conditions — callers use
-            `CompareOperator.Eq` where a domain value object is available.
-            The constants remain the JSON tokens shared with generated TypeScript.
-
 ### ComponentSource
 
 Identifies a plan-registered component as the value source.
@@ -897,16 +773,6 @@ Identifies a plan-registered component as the value source.
 // Properties
 Component { get; }  // Plan-registered component key used for runtime object lookup.
 Kind { get; }  // JSON discriminator for component sources. Always `"component"`.
-```
-
-### ComponentValidation
-
-Validation rules and value source for one component within a validation container.
-
-```csharp
-// Properties
-Component { get; }  // Component ID used for DOM error display and server field matching.
-Value { get; }  // Value expression evaluated before client validation runs.
 ```
 
 ### ConditionGraph
@@ -931,25 +797,6 @@ Represents a request that validates a component container before sending.
 // Properties
 Container { get; }  // Component container ID to validate before sending the request.
 Kind { get; }  // JSON discriminator for container validation targets. Always `"container"`.
-```
-
-### ContractDriftGate
-
-Fails when the committed `plan.ts` disagrees with what
-            `PlanContractGenerator` would emit, proving the generated contract is regenerated
-            whenever the C# plan node families change.
-
-```csharp
-Check()
-```
-
-### ContractDriftResult
-
-The outcome of a drift check: whether the on-disk contract matches the generator.
-
-```csharp
-// Properties
-Diff { get; }  // First divergence; empty when there is no drift (the empty string is the "no divergence" value).
 ```
 
 ### DispatchReaction
@@ -1110,11 +957,6 @@ An ordered sequence of segments for navigating nested properties on a value.
 Segments { get; }  // Ordered path segments used by runtime path traversal.
 ```
 
-### PathJsonConverter
-
-Serializes Path as a bare JSON array of PathSegments.
-            Plan wire format: [{ "kind": "property", "name": "value" }]
-
 ### PathSegment
 
 One step in a property navigation path: a property name or array index.
@@ -1144,36 +986,11 @@ Scope { get; }  // Payload scope wire term, for example event or success.
 Type { get; }  // Payload typing contract used when authoring typed value paths.
 ```
 
-```csharp
-Element()
-```
-
 ### PlanBuildContext
 
 Construction boundary used by the public DSL builders.
             It delegates domain decisions to the plan authoring state and only exposes the
             narrow authoring operations the DSL needs while building a Reactive Plan.
-
-### PlanContractGenerator
-
-The single source of the TypeScript plan contract (`plan.ts`): one discriminated union per
-            polymorphic base, one interface per concrete node carrying its `kind` literal, camelCase members
-            matching `PlanSerializer`, and a `LiteralUnion` per token value object's `.Values`.
-            The variant set is curated, not reflected: several plan nodes intentionally narrow one C# class into
-            many TS variants (for example `CompareCondition` into one interface per operator) so the runtime
-            can switch over an exhaustive union — a CLR property reflection cannot express those splits without
-            dropping kinds. `ContractDriftGate` is what keeps this contract honest against the C# model.
-
-### PlanDocument
-
-Immutable plan document: the serialized contract between C# authoring and the Reactive Plan runtime.
-            Produced by `BuildPlan` once construction is complete.
-
-### PlanJsonWriter
-
-Stateless serialization mechanics shared by the plan model JSON converters. Writes a named
-            property by emitting its name and delegating the value to `JsonSerializer`, in the
-            same category as `PlanNodeDiscriminator<T>`. Carries no domain branch.
 
 ### PlanScope
 
@@ -1182,16 +999,6 @@ Base class for plan merge scope. Not constructed in application code.
 ```csharp
 // Properties
 Kind { get; }  // JSON discriminator for plan merge scope.
-```
-
-### PlanSerializer
-
-The single owner of plan-document to JSON. Emits camelCase property names; node `kind`
-            values pass through verbatim. Compact for transport, formatted for debugging.
-
-```csharp
-Serialize()
-SerializeFormatted()
 ```
 
 ### PluginSource
@@ -1343,7 +1150,6 @@ Declares the expected type for a value in the Reactive Plan, such as string or n
 
 ```csharp
 // Properties
-IsScalar { get; }  // Returns true if this shape represents a value that can be meaningfully serialized to a single string. Suitable for HTTP headers, route params, and query strings. Scalars: string, number, boolean, date. Nullable wrapping a scalar is also scalar. Non-scalars: array, object, raw, any, none.
 Kind { get; }  // JSON shape kind, such as `string`, `array`, `object`, or `nullable`.
 ```
 
@@ -1354,11 +1160,6 @@ GetHashCode()
 op_Equality()
 op_Inequality()
 ```
-
-### ShapeContractCompatibility
-
-Picks the most specific compatible shape from producer and consumer contracts.
-            Returns an explicit conflict when no merged shape can satisfy both contracts.
 
 ### ShowValidationErrorsReaction
 
@@ -1392,39 +1193,9 @@ Reads from the browser `window.location` query string.
 Kind { get; }  // JSON discriminator for URL query sources. Always `"url"`.
 ```
 
-### ValidationJob
-
-A validation source declared on an HTTP request during plan construction, awaiting
-            resolution into its form's `ComponentValidation` rules.
-
-
-            Recorded when a request calls `.Validate<T>(formId)` and resolved once,
-            during Reactive Plan rendering, after plan-registered input components have been
-            collected. The job carries only the values resolution needs — never a
-            `RequestPlan` reference, so it cannot outlive or drift from the request
-            instance it was declared on.
-
-```csharp
-// Properties
-Container { get; }  // The form element id whose components this validation source covers.
-RequestUrl { get; }  // The declaring request's URL. Used only for error context.
-ValidationSourceType { get; }  // The source type whose metadata declares deterministic client validation rules.
-```
-
 ### ValueExpression
 
 Base class for all value nodes in a Reactive Plan. Not constructed in application code.
-
-```csharp
-ArrayAny()
-ArrayFind()
-ArraySum()
-InvokeElement()
-LiteralRaw()
-ReadDom()
-ReadUrl()
-ReadWholeElement()
-```
 
 ### ValueReadAccess
 
@@ -1453,11 +1224,6 @@ Write()
 ---
 
 ## Validation
-
-### ClientRule
-
-One client validation rule a developer records. Lowers to a plan
-            `ValidationRuleNode` at render time.
 
 ### ClientValidationCondition<T>
 
@@ -1488,16 +1254,6 @@ Opaque typed reference to a model field used by client validation rules.
 
 Builds one model's deterministic client validation rules.
 
-### FieldCompare
-
-A single field comparison: read field, apply operator, and optionally compare to a right operand.
-
-### FieldCondition
-
-A symbolic condition tree built from client validation field paths.
-            Resolved to `ConditionGraph` at render time when
-            the component map is available.
-
 ### IClientValidationRuleSource
 
 Provides deterministic client validation rules for a validation source type.
@@ -1509,11 +1265,6 @@ Registers app-level client validation metadata keyed by validation source type.
 ### ReactiveClientValidationServiceCollectionExtensions
 
 Registers explicit client validation metadata for Reactive Plans.
-
-### RuleName
-
-The single source of the client validation rule names. Projected into the
-            TypeScript `ValidationRuleName` union by the plan contract generator.
 
 ---
 
@@ -1571,12 +1322,6 @@ Warning<T>()
 ---
 
 ## Fusion — Components
-
-### Ej2ColumnRules
-
-Translates a field's client rules into the EJ2 FormValidator object shape
-            `{ rule: [value, message] }`. The validator rule names are already EJ2-shaped
-            (`required`, `minLength`, `range`, ...), so each maps by name.
 
 ### FusionAccordion
 
@@ -5181,15 +4926,6 @@ Converts supported C# expressions to Syncfusion template syntax.
 ToBinding<T>(expression)
 ToCondition<T>(predicate)
 ToPropertyPath<T>(expression)
-```
-
-### TemplateElements
-
-Internal element rendering shared by root and conditional Syncfusion template builders.
-
-```csharp
-Button()
-EventButton()
 ```
 
 ---

@@ -1,27 +1,37 @@
+using System.Reflection;
+using System.Runtime.Loader;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml.Linq;
 
 var config = args.Length > 0 ? args[0] : "Debug";
 var repoRoot = FindRepoRoot();
-var xmlFiles = new[]
+var docInputs = new[]
 {
-    Path.Combine(repoRoot, $"Alis.Reactive/bin/{config}/net10.0/Alis.Reactive.xml"),
-    Path.Combine(repoRoot, $"Alis.Reactive.Native/bin/{config}/net10.0/Alis.Reactive.Native.xml"),
-    Path.Combine(repoRoot, $"Alis.Reactive.Fusion/bin/{config}/net10.0/Alis.Reactive.Fusion.xml"),
+    new ApiDocInput(
+        Path.Combine(repoRoot, $"Alis.Reactive/bin/{config}/net10.0/Alis.Reactive.xml"),
+        Path.Combine(repoRoot, $"Alis.Reactive/bin/{config}/net10.0/Alis.Reactive.dll")),
+    new ApiDocInput(
+        Path.Combine(repoRoot, $"Alis.Reactive.Native/bin/{config}/net10.0/Alis.Reactive.Native.xml"),
+        Path.Combine(repoRoot, $"Alis.Reactive.Native/bin/{config}/net10.0/Alis.Reactive.Native.dll")),
+    new ApiDocInput(
+        Path.Combine(repoRoot, $"Alis.Reactive.Fusion/bin/{config}/net10.0/Alis.Reactive.Fusion.xml"),
+        Path.Combine(repoRoot, $"Alis.Reactive.Fusion/bin/{config}/net10.0/Alis.Reactive.Fusion.dll")),
 };
 var outputPath = Path.Combine(repoRoot, "docs-site/src/content/docs/reference/api-reference.md");
+var publicSurface = PublicSurface.Load(docInputs);
 
 var allMembers = new List<DocMember>();
-foreach (var xmlFile in xmlFiles)
+foreach (var input in docInputs)
 {
-    if (!File.Exists(xmlFile))
+    if (!File.Exists(input.XmlFile))
     {
-        Console.Error.WriteLine($"WARNING: XML file not found: {xmlFile}");
+        Console.Error.WriteLine($"WARNING: XML file not found: {input.XmlFile}");
         Console.Error.WriteLine("Run 'dotnet build' first to generate XML documentation files.");
         continue;
     }
 
-    var doc = XDocument.Load(xmlFile);
+    var doc = XDocument.Load(input.XmlFile);
     var assemblyName = doc.Root?.Element("assembly")?.Element("name")?.Value ?? "Unknown";
 
     foreach (var member in doc.Descendants("member"))
@@ -40,6 +50,7 @@ if (allMembers.Count == 0)
 }
 
 var publicMembers = allMembers
+    .Where(publicSurface.Contains)
     .Where(m => !IsInternal(m))
     .ToList();
 
@@ -135,7 +146,7 @@ File.WriteAllText(outputPath, markdown.ToString().TrimEnd() + Environment.NewLin
 Console.WriteLine($"Generated API reference: {outputPath}");
 Console.WriteLine($"  Types: {types.Count}");
 Console.WriteLine($"  Members: {publicMembers.Count - types.Count}");
-Console.WriteLine($"  From: {xmlFiles.Length} XML files");
+Console.WriteLine($"  From: {docInputs.Length} XML files");
 
 return 0;
 
@@ -282,6 +293,199 @@ static string CleanGenericNotation(string name)
 }
 
 enum MemberKind { Type, Method, Property, Field, Event }
+
+record ApiDocInput(string XmlFile, string AssemblyFile);
+
+sealed class PublicSurface
+{
+    private readonly HashSet<string> _memberIds;
+
+    private PublicSurface(HashSet<string> memberIds)
+    {
+        _memberIds = memberIds;
+    }
+
+    public static PublicSurface Load(IEnumerable<ApiDocInput> inputs)
+    {
+        var memberIds = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var input in inputs)
+        {
+            if (!File.Exists(input.AssemblyFile))
+                continue;
+
+            RegisterAssemblyResolver(input.AssemblyFile);
+            var assembly = Assembly.LoadFrom(input.AssemblyFile);
+            foreach (var type in GetLoadableTypes(assembly).Where(IsVisibleType))
+            {
+                memberIds.Add("T:" + type.FullName);
+                AddVisibleMembers(memberIds, type);
+            }
+        }
+
+        return new PublicSurface(memberIds);
+    }
+
+    public bool Contains(DocMember member) => _memberIds.Contains(member.RawName);
+
+    private static void RegisterAssemblyResolver(string assemblyFile)
+    {
+        var resolver = new AssemblyDependencyResolver(assemblyFile);
+        AssemblyLoadContext.Default.Resolving += (_, assemblyName) =>
+        {
+            var resolvedPath = resolver.ResolveAssemblyToPath(assemblyName)
+                ?? ResolveFromTrustedPlatformAssemblies(assemblyName)
+                ?? ResolveFromNuGetPackages(assemblyName)
+                ?? ResolveFromAnyNuGetPackage(assemblyName)
+                ?? ResolveFromDotNetSharedFramework(assemblyName);
+            return resolvedPath == null ? null : Assembly.LoadFrom(resolvedPath);
+        };
+    }
+
+    private static string? ResolveFromTrustedPlatformAssemblies(AssemblyName assemblyName)
+    {
+        var trustedAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string;
+        if (trustedAssemblies == null)
+            return null;
+
+        var assemblyFileName = assemblyName.Name + ".dll";
+        return trustedAssemblies
+            .Split(Path.PathSeparator)
+            .FirstOrDefault(path => string.Equals(Path.GetFileName(path), assemblyFileName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string? ResolveFromNuGetPackages(AssemblyName assemblyName)
+    {
+        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var packageRoot = Path.Combine(home, ".nuget", "packages", assemblyName.Name!.ToLowerInvariant());
+        if (!Directory.Exists(packageRoot))
+            return null;
+
+        return Directory
+            .EnumerateFiles(packageRoot, assemblyName.Name + ".dll", SearchOption.AllDirectories)
+            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+            .LastOrDefault();
+    }
+
+    private static string? ResolveFromAnyNuGetPackage(AssemblyName assemblyName)
+    {
+        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var packagesRoot = Path.Combine(home, ".nuget", "packages");
+        if (!Directory.Exists(packagesRoot))
+            return null;
+
+        return Directory
+            .EnumerateFiles(packagesRoot, assemblyName.Name + ".dll", SearchOption.AllDirectories)
+            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+            .LastOrDefault();
+    }
+
+    private static string? ResolveFromDotNetSharedFramework(AssemblyName assemblyName)
+    {
+        var runtimeDirectory = RuntimeEnvironment.GetRuntimeDirectory();
+        var sharedRoot = Directory.GetParent(runtimeDirectory)?.Parent?.FullName;
+        if (sharedRoot == null || !Directory.Exists(sharedRoot))
+            return null;
+
+        return Directory
+            .EnumerateFiles(sharedRoot, assemblyName.Name + ".dll", SearchOption.AllDirectories)
+            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+            .LastOrDefault();
+    }
+
+    private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+    {
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            return ex.Types.Where(type => type != null)!;
+        }
+    }
+
+    private static bool IsVisibleType(Type type) =>
+        type.IsVisible;
+
+    private static void AddVisibleMembers(HashSet<string> memberIds, Type type)
+    {
+        const BindingFlags flags =
+            BindingFlags.Instance |
+            BindingFlags.Static |
+            BindingFlags.Public |
+            BindingFlags.NonPublic |
+            BindingFlags.DeclaredOnly;
+
+        foreach (var constructor in type.GetConstructors(flags).Where(IsVisibleMethod))
+            memberIds.Add(MethodId(type, constructor));
+
+        foreach (var method in type.GetMethods(flags).Where(IsVisibleMethod))
+            memberIds.Add(MethodId(type, method));
+
+        foreach (var property in type.GetProperties(flags).Where(IsVisibleProperty))
+            memberIds.Add("P:" + type.FullName + "." + property.Name);
+
+        foreach (var field in type.GetFields(flags).Where(IsVisibleField))
+            memberIds.Add("F:" + type.FullName + "." + field.Name);
+
+        foreach (var eventInfo in type.GetEvents(flags).Where(IsVisibleEvent))
+            memberIds.Add("E:" + type.FullName + "." + eventInfo.Name);
+    }
+
+    private static bool IsVisibleMethod(MethodBase method) =>
+        method.IsPublic || method.IsFamily || method.IsFamilyOrAssembly;
+
+    private static bool IsVisibleProperty(PropertyInfo property)
+    {
+        var accessors = property.GetAccessors(nonPublic: true);
+        return accessors.Any(IsVisibleMethod);
+    }
+
+    private static bool IsVisibleField(FieldInfo field) =>
+        field.IsPublic || field.IsFamily || field.IsFamilyOrAssembly;
+
+    private static bool IsVisibleEvent(EventInfo eventInfo)
+    {
+        var add = eventInfo.GetAddMethod(nonPublic: true);
+        var remove = eventInfo.GetRemoveMethod(nonPublic: true);
+        return (add != null && IsVisibleMethod(add)) || (remove != null && IsVisibleMethod(remove));
+    }
+
+    private static string MethodId(Type declaringType, MethodBase method)
+    {
+        var name = method.IsConstructor ? "#ctor" : method.Name;
+        if (method is MethodInfo { IsGenericMethod: true } methodInfo)
+            name += "``" + methodInfo.GetGenericArguments().Length;
+
+        var parameters = method.GetParameters();
+        return parameters.Length == 0
+            ? $"M:{declaringType.FullName}.{name}"
+            : $"M:{declaringType.FullName}.{name}({string.Join(",", parameters.Select(parameter => TypeId(parameter.ParameterType)))})";
+    }
+
+    private static string TypeId(Type type)
+    {
+        if (type.IsGenericParameter)
+            return (type.DeclaringMethod == null ? "`" : "``") + type.GenericParameterPosition;
+
+        if (type.IsByRef)
+            return TypeId(type.GetElementType()!) + "@";
+
+        if (type.IsArray)
+            return TypeId(type.GetElementType()!) + "[]";
+
+        if (!type.IsGenericType)
+            return type.FullName ?? type.Name;
+
+        var genericDefinitionName = type.GetGenericTypeDefinition().FullName!;
+        var genericMarker = genericDefinitionName.IndexOf('`');
+        if (genericMarker >= 0)
+            genericDefinitionName = genericDefinitionName[..genericMarker];
+
+        return genericDefinitionName + "{" + string.Join(",", type.GetGenericArguments().Select(TypeId)) + "}";
+    }
+}
 
 record DocMember(string RawName, string Assembly, XElement Element)
 {

@@ -179,6 +179,11 @@ Candidate cleanup:
   now show `Arg(string value)`, `Arg(int value)`, and
   `RouteParam(string paramName, long value)` instead of repeated empty or
   same-name calls.
+- Resolved on `tiny-safe-but-important-refactorings`: the API reference
+  generator now filters XML documentation through the compiled assemblies'
+  public/protected surface. Internal implementation types such as
+  `PluginArgumentCollector`, `BrowserObject`, `ContractDriftGate`, and
+  `PlanContractGenerator` no longer appear on the public API page.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
 
@@ -231,11 +236,13 @@ Rewrite or delete:
   assertions. The touched waits are now marked with `TODO:`; a later slice should
   replace them with visible commit signals or a shared behavior-focused no-POST
   proof.
-- `scripts/test.sh --no-e2e` hung once on this branch while running
-  `vite build --config vite.design-system.config.ts`. The stuck process tree was
-  cleaned up, `npm run build:design-system` completed normally, and the full
-  non-e2e gate passed on rerun. TODO: capture logs/process state if this repeats
-  and decide whether the wrapper needs timeout or progress diagnostics.
+- `scripts/test.sh --no-e2e` has hung on this branch while running Vite asset
+  builds: once at `vite.design-system.config.ts`, and again at
+  `vite.fusion.config.ts` with process `node .../vite build --config
+  vite.fusion.config.ts` stuck for more than 90 seconds after printing
+  `build:fusion`. The stuck process tree was cleaned up and the gate passed on
+  rerun after the first occurrence. TODO: add wrapper timeout/progress
+  diagnostics and capture Vite process state if this repeats.
 - Native and Fusion component files are intentional vertical slices. Do not sweep
   every component just because a repeated XML-doc phrase appears; finish one
   component or one non-component concept at a time and keep the commit boundary
