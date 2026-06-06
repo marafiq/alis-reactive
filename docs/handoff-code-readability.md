@@ -342,6 +342,10 @@ Candidate cleanup:
   is no longer public API surface. It remains shared framework plumbing for
   friend assemblies, while public developers use the DSL, `IdGenerator`, and
   component/gather helpers instead of raw expression-path conversion.
+- Resolved on `tiny-safe-but-important-refactorings`: `ComponentRegistration`
+  is no longer public API surface. It remains internal component registration
+  plumbing between HtmlExtensions, gather, validation, and generated Reactive
+  Plan component metadata.
 
 ### Implementation Inline Comments
 

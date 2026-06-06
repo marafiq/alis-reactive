@@ -19,22 +19,6 @@ Authoring handle for a plan-registered component target. Native and Fusion
 extension methods consume it to declare component property sets, method calls,
 and value reads in the Reactive Plan.
 
-### ComponentRegistration
-
-Immutable registration of a component in the Reactive Plan.
-Populated at view render time by each vertical slice's HtmlExtensions.
-Consumed by gather (HTTP serialization) and validation field binding.
-
-```csharp
-// Properties
-BindingPath { get; }  // Model binding path used as the join key for gather, validation, and payload serialization.
-ComponentId { get; }  // Controlled DOM element ID used as the component key in the Reactive Plan.
-ComponentType { get; }  // Component kind recorded for duplicate-registration diagnostics and component-specific metadata.
-Shape { get; }  // Shape inferred from `typeof(TProp)` at registration time. Flows to plan JSON and is consumed by gather serialization and validation binding.
-ValueMember { get; }  // Component-object member read for the registered input value, such as `value` or `checked`.
-Vendor { get; }  // Vendor token, such as `native` or `fusion`, written for runtime component resolution.
-```
-
 ### IAppLevelComponent
 
 Represents a layout-owned component that can be referenced without an explicit element ID.

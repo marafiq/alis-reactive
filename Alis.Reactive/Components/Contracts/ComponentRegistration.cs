@@ -7,7 +7,7 @@ namespace Alis.Reactive
     /// Populated at view render time by each vertical slice's HtmlExtensions.
     /// Consumed by gather (HTTP serialization) and validation field binding.
     /// </summary>
-    public sealed class ComponentRegistration
+    internal sealed class ComponentRegistration
     {
         private readonly RegisteredComponentIdentity _identity;
         private readonly RegisteredInputBinding _binding;
