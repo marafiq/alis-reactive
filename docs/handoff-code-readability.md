@@ -511,6 +511,10 @@ Candidate cleanup:
   XML parameter tags now match the concise submitted-value/display-text wording
   used by radio groups. Model-binding, CSV/string-array, and `net48` field-name
   comments remain because they explain runtime and compatibility boundaries.
+- Resolved on `tiny-safe-but-important-refactorings`: `GatherBuilder` XML
+  parameter tags now use concise request body, header, route, URL, and
+  triggering-payload wording instead of narrating each read/write. Generated
+  request-plan wording remains where it explains literal capture semantics.
 
 ### Implementation Inline Comments
 
