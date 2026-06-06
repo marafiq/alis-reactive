@@ -4,7 +4,7 @@ using Alis.Reactive.Serialization;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// A plan-registered object target: an id, a vendor, a contract type, a role,
+    /// Plan-registered object target: id, vendor, contract type, role,
     /// and, for inputs, a model binding.
     /// </summary>
     internal sealed class BrowserObject
@@ -70,7 +70,7 @@ namespace Alis.Reactive.PlanModel
                 binding,
                 ValidationContainerBinding.None);
 
-        /// <summary>Returns a copy with binding info filled where currently absent (first registration wins).</summary>
+        /// <summary>Copies the object with binding info filled where currently absent (first registration wins).</summary>
         internal BrowserObject WithBindingIfAbsent(InputBinding binding) =>
             new BrowserObject(_id, _vendor, _type, ComponentRole.PlanInput, _binding.FillIfAbsent(binding), _container);
 

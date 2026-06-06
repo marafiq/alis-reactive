@@ -5,7 +5,7 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// Deterministic target for a component reference in the Reactive Plan.
-    /// The target owns the component id and vendor before any property, method, or event
+    /// Target owns the component id and vendor before any property, method, or event
     /// contract is declared against the runtime object.
     /// </summary>
     internal abstract class ComponentObjectTarget

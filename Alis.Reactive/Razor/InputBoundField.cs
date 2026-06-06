@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Alis.Reactive.Native
 {
     /// <summary>
-    /// A model-bound input field returned by
+    /// Model-bound input field returned by
     /// <see cref="Extensions.InputFieldExtensions.InputField{TModel,TProp}"/>, ready to receive
     /// a component extension that renders inside the field wrapper.
     /// </summary>

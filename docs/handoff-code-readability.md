@@ -995,6 +995,10 @@ Rewrite or delete:
   docs now name literal, read, object, array, array-op, path, shape, and
   ReactiveArray contracts directly while preserving wire-format and runtime
   boundary facts.
+- Resolved on `tiny-safe-but-important-refactorings`: Core plan/component
+  contract XML docs now put component targets, model-bound slots, generated
+  TypeScript contracts, Active Plan merging, request gather, and validation
+  field contracts first while preserving boundary and generated-contract facts.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

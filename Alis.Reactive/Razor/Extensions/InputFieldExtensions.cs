@@ -21,7 +21,7 @@ namespace Alis.Reactive.Native.Extensions
         /// </summary>
         /// <remarks>
         /// Chain a component extension on the result to choose the rendered control.
-        /// The field wrapper owns label display and validation error placement.
+        /// Field wrapper owns label display and validation error placement.
         /// </remarks>
         /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">Model property type the field is bound to.</typeparam>

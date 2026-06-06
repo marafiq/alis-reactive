@@ -117,8 +117,8 @@ namespace Alis.Reactive
     }
 
     /// <summary>
-    /// The DOM element contract used by <c>p.Element(...)</c>.
-    /// This keeps native DOM onboarding explicit without changing the public DSL.
+    /// DOM element contract used by <c>p.Element(...)</c>.
+    /// Native DOM onboarding stays explicit without changing the public DSL.
     /// </summary>
     internal static class BrowserElementMembers
     {

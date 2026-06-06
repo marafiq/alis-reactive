@@ -59,7 +59,7 @@ namespace Alis.Reactive.PlanModel
             new ContainerScope(ContainerValidations.Empty);
 
         /// <summary>
-        /// Returns a copy whose validation rules are merged with <paramref name="incoming"/>.
+        /// Copies the container with validation rules merged from <paramref name="incoming"/>.
         /// Rules for an already-present component are replaced; rules for components not yet
         /// present are appended. Used when more than one request validates the same container.
         /// </summary>

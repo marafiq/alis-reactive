@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlanModel
     /// String constants for all compare-condition operators.
     /// Prevents typos when building conditions — callers use
     /// <c>CompareOperator.Eq</c> where a domain value object is available.
-    /// The constants remain the JSON tokens shared with generated TypeScript.
+    /// Constants remain the JSON tokens shared with generated TypeScript.
     /// </summary>
     internal static class CompareOp
     {

@@ -14,7 +14,7 @@ namespace Alis.Reactive.Builders.Requests
         /// Adds a model-bound input component value to the request body.
         /// </summary>
         /// <remarks>
-        /// The model expression supplies both the generated component ID and the request
+        /// Model expression supplies both the generated component ID and the request
         /// body field name. The component contract supplies the value member read at runtime.
         /// </remarks>
         /// <typeparam name="TComponent">Input component contract to read.</typeparam>

@@ -2,7 +2,7 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
-    /// <summary>A typed value source produced by a registered component member.</summary>
+    /// <summary>Typed value source produced by a registered component member.</summary>
     public sealed class TypedComponentSource<TProp> : TypedSource<TProp>
     {
         private readonly ValueExpression _value;

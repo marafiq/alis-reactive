@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// The single source of the client validation rule names. Projected into the
+    /// Single source of client validation rule names. Projected into the
     /// TypeScript <c>ValidationRuleName</c> union by the plan contract generator.
     /// </summary>
     internal sealed class RuleName : IEquatable<RuleName>

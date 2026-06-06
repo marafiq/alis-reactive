@@ -47,7 +47,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>The outcome of a drift check: whether the on-disk contract matches the generator.</summary>
+    /// <summary>Drift-check outcome for comparing the on-disk contract to the generator.</summary>
     internal readonly struct ContractDriftResult
     {
         internal bool HasDrift { get; }

@@ -33,7 +33,7 @@ namespace Alis.Reactive.Native.Extensions
         /// @Html.RenderPlan(plan)
         /// </code>
         /// <para>
-        /// A trigger is an event source that starts a reaction, such as page loading
+        /// Trigger is an event source that starts a reaction, such as page loading
         /// (<c>DomReady</c>) or a DOM custom event (<c>CustomEvent</c>). See
         /// <see cref="TriggerBuilder{TModel}"/> for the full trigger surface. When the
         /// trigger fires, the reactions declared in its callback execute in declaration order.

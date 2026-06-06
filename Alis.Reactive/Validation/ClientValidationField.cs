@@ -8,7 +8,7 @@ namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// Describes a single field's validation rules within a form.
-    /// The rule source declares the field path and shape before render-time binding.
+    /// Rule source declares the field path and shape before render-time binding.
     /// </summary>
     public sealed class ClientValidationField
     {

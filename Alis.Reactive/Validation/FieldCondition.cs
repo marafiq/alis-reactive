@@ -7,7 +7,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// A symbolic condition tree built from client validation field paths.
+    /// Symbolic condition tree built from client validation field paths.
     /// Resolved to <see cref="PlanModel.ConditionGraph"/> at render time when
     /// the component map is available.
     /// </summary>
@@ -47,7 +47,7 @@ namespace Alis.Reactive.Validation
     }
 
     /// <summary>
-    /// A single field comparison: read field, apply operator, and optionally compare to a right operand.
+    /// Field comparison: read field, apply operator, and optionally compare to a right operand.
     /// </summary>
     internal sealed class FieldCompare : FieldCondition
     {

@@ -12,7 +12,7 @@ namespace Alis.Reactive.Native.Extensions
     /// Razor view extensions for creating, resolving, and rendering Reactive Plans.
     /// </summary>
     /// <remarks>
-    /// A root view calls <c>ReactivePlan</c> before authoring behavior and
+    /// Root view calls <c>ReactivePlan</c> before authoring behavior and
     /// <see cref="RenderPlan{TModel}"/> after all behavior has been declared. A partial view that
     /// contributes to the same Reactive Plan uses <c>ResolvePlan</c> instead. Omitting the render call
     /// leaves no plan JSON for the runtime to execute.
@@ -49,7 +49,7 @@ namespace Alis.Reactive.Native.Extensions
         /// summary container.
         /// </para>
         /// <para>
-        /// The returned plan's behaviors merge into the owning view's Active Plan state.
+        /// Returned plan's behaviors merge into the owning view's Active Plan state.
         /// </para>
         /// </remarks>
         /// <typeparam name="TModel">View model type must match the view's model.</typeparam>
@@ -83,7 +83,7 @@ namespace Alis.Reactive.Native.Extensions
         /// Renders the generated plan JSON for all behaviors defined in <paramref name="plan"/>.
         /// </summary>
         /// <remarks>
-        /// This must be the last call in every view. A plan that is not rendered
+        /// Must be the last call in every view. A plan that is not rendered
         /// produces no runtime behavior.
         /// </remarks>
         /// <typeparam name="TModel">View model used to author typed expression paths.</typeparam>
