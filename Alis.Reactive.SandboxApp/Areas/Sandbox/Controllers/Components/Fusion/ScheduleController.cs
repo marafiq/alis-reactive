@@ -106,7 +106,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         /// <summary>
         /// Assigns staff to a shift slot in the in-memory schedule store.
-        /// A subsequent data-source load returns the updated assignment.
+        /// Subsequent data-source loads return the updated assignment.
         /// </summary>
         [HttpPost("~/api/schedule/assign")]
         public IActionResult AssignStaff([FromBody] AssignStaffRequest request)
@@ -146,7 +146,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         /// <summary>
         /// Loads the event-edit partial into the NativeDrawer after a schedule event click.
-        /// The partial has its own Reactive Plan that merges into the page's Active Plan.
+        /// Partial has its own Reactive Plan that merges into the page's Active Plan.
         /// </summary>
         [HttpGet("EditForm")]
         public IActionResult EditForm(int assignmentId)

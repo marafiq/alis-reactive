@@ -22,7 +22,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new ArrayGridModel());
         }
 
-        /// <summary>Returns the resident object array transformed before grid binding.</summary>
+        /// <summary>Loads the resident object array transformed before grid binding.</summary>
         [HttpGet("Residents")]
         public IActionResult Residents()
         {

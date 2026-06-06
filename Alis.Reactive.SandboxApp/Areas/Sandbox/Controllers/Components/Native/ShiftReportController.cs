@@ -21,7 +21,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
                 new ShiftReportModel());
         }
 
-        /// <summary>Returns the alert array dispatched as the custom event payload.</summary>
+        /// <summary>Loads the alert array dispatched as the custom event payload.</summary>
         [HttpGet("Alerts")]
         public IActionResult Alerts()
         {
@@ -38,7 +38,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
             });
         }
 
-        /// <summary>Returns the all-clear alert array used by the custom-event Else guard.</summary>
+        /// <summary>Loads the all-clear alert array used by the custom-event Else guard.</summary>
         [HttpGet("AlertsAllClear")]
         public IActionResult AlertsAllClear()
         {

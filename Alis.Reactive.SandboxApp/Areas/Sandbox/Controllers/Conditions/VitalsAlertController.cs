@@ -16,7 +16,7 @@ public class VitalsAlertController : Controller
         });
     }
 
-    /// <summary>Returns the high-rate alert response used by the condition-gated HTTP branch.</summary>
+    /// <summary>Creates the high-rate alert response used by the condition-gated HTTP branch.</summary>
     [HttpPost("Alert")]
     public IActionResult Alert([FromBody] AlertRequest? request)
     {
@@ -28,7 +28,7 @@ public class VitalsAlertController : Controller
         });
     }
 
-    /// <summary>Returns the crisis-tier response for heart rates at or above 180.</summary>
+    /// <summary>Creates the crisis-tier response for heart rates at or above 180.</summary>
     [HttpPost("Critical")]
     public IActionResult Critical([FromBody] AlertRequest? request)
     {
@@ -40,7 +40,7 @@ public class VitalsAlertController : Controller
         });
     }
 
-    /// <summary>Returns the elevated-tier response for heart rates from 140 through 179.</summary>
+    /// <summary>Creates the elevated-tier response for heart rates from 140 through 179.</summary>
     [HttpPost("Warning")]
     public IActionResult Warning([FromBody] AlertRequest? request)
     {

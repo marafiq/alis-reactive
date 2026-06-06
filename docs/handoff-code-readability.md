@@ -999,6 +999,10 @@ Rewrite or delete:
   contract XML docs now put component targets, model-bound slots, generated
   TypeScript contracts, Active Plan merging, request gather, and validation
   field contracts first while preserving boundary and generated-contract facts.
+- Resolved on `tiny-safe-but-important-refactorings`: Sandbox endpoint docs now
+  name boot rosters, custom-event payload arrays, condition-gated alert
+  responses, Syncfusion custom-binding payloads, and Active Plan partial merge
+  boundaries instead of generic "returns" narration.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
