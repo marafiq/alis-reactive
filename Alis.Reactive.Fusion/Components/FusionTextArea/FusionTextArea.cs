@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionTextArea for long-form text entry.
+    /// Fusion text area component for long-form text entry.
     /// </summary>
     public sealed class FusionTextArea : FusionComponent, IInputComponent
     {

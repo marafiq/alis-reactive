@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionDropDownList for selecting a single value from a list.
+    /// Fusion dropdown list component for selecting one list value.
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionDropDownList&gt;(m =&gt; m.Country)</c>

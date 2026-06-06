@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionDateRangePicker for selecting a start and end date pair.
+    /// Fusion date-range picker component for selecting start and end dates.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
     /// to access FusionDateRangePicker-specific component operations and value reads.
     /// </para>
     /// <para>
-    /// The full value is a <c>DateTime[]</c> containing both dates. For targeted access to
+    /// Full value is a <c>DateTime[]</c> containing both dates. For targeted access to
     /// individual dates, use <c>comp.StartDate()</c> or <c>comp.EndDate()</c> in conditions.
     /// </para>
     /// </remarks>

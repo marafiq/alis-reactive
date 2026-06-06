@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionNumericTextBox for entering and validating numeric values.
+    /// Fusion numeric text box component for entering numeric values.
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Amount)</c>

@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Templates
     /// Builds a Syncfusion template HTML string with typed property bindings.
     /// </summary>
     /// <remarks>
-    /// The rendered string is consumed by Syncfusion's template engine. It is not a
+    /// Rendered string is consumed by Syncfusion's template engine. It is not a
     /// Reactive Plan, and it does not mutate live DOM until Syncfusion renders it.
     /// Caller-provided literal text, attributes, CSS classes, URLs, inline JavaScript,
     /// and raw HTML are emitted as supplied; use trusted developer-authored values.

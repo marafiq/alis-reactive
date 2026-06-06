@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionDatePicker for selecting a single date.
+    /// Fusion date picker component for selecting a single date.
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionDatePicker&gt;(m =&gt; m.AdmissionDate)</c>

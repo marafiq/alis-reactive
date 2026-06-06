@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionComboBox for selecting or entering a single string value.
+    /// Fusion combo box component for selecting or entering one string value.
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionComboBox&gt;(m =&gt; m.Resident)</c>

@@ -57,7 +57,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// The EJ2 <c>column.validationRules</c> object for a typed row field, or
+        /// EJ2 <c>column.validationRules</c> object for a typed row field, or
         /// <see langword="null"/> when no declared rule maps client-side (every rule on
         /// the field is conditional, cross-field, or otherwise server-only).
         /// </summary>

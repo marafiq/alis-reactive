@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionSlider for selecting a numeric value or numeric range.
+    /// Fusion slider component for selecting a numeric value or range.
     /// </summary>
     public sealed class FusionSlider : FusionComponent, IInputComponent
     {

@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionColorPicker for selecting a color value.
+    /// Fusion color picker component for selecting a color value.
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionColorPicker&gt;(m =&gt; m.ThemeColor)</c>

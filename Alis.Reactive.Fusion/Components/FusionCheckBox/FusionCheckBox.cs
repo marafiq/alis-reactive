@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionCheckBox backed by Syncfusion EJ2 CheckBox.
+    /// Fusion checkbox component backed by Syncfusion EJ2 CheckBox.
     /// </summary>
     public sealed class FusionCheckBox : FusionComponent, IInputComponent
     {

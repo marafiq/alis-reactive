@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionDateTimePicker for selecting a date and time together.
+    /// Fusion date-time picker component for selecting a date and time together.
     /// </summary>
     /// <remarks>
     /// Use as a type parameter in <c>p.Component&lt;FusionDateTimePicker&gt;(m =&gt; m.AppointmentTime)</c>

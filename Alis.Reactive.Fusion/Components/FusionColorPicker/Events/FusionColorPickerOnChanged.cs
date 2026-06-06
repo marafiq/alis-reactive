@@ -4,7 +4,7 @@ namespace Alis.Reactive.Fusion.Components
     /// Event payload delivered when a <see cref="FusionColorPicker"/> color changes.
     /// </summary>
     /// <remarks>
-    /// The value is a hex+alpha string (e.g. <c>"#1dc7e1ff"</c>).
+    /// Hex+alpha color value, such as <c>"#1dc7e1ff"</c>.
     /// Access it in conditions: <c>p.When(args, x =&gt; x.Value).NotNull()</c>.
     /// </remarks>
     public class FusionColorPickerChangeArgs

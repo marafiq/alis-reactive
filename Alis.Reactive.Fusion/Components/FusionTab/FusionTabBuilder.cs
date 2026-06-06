@@ -6,7 +6,7 @@ namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
     /// Carries rendered Syncfusion Tab markup and the Reactive Plan for event wiring.
-    /// The tab renders without an input field wrapper, label, or validation slot.
+    /// Tab renders without an input field wrapper, label, or validation slot.
     /// </summary>
     public class FusionTabBuilder<TModel> :
         IHtmlContent

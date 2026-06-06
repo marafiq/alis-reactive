@@ -73,7 +73,7 @@ namespace Alis.Reactive.Fusion.Components
 
         /// <summary>Adds CSS class to the editor's outer wrapper.</summary>
         /// <remarks>
-        /// The class persists across edit/close cycles; typical use is a visual commit signal
+        /// Class persists across edit/close cycles; typical use is a visual commit signal
         /// wired on <c>ActionSuccess</c> and removed on <c>BeginEdit</c>.
         /// </remarks>
         /// <param name="className">CSS class to add.</param>
@@ -93,7 +93,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <remarks>
         /// Reads the registered editor value using the shape captured at render time by
         /// <see cref="FusionInPlaceEditorHtmlExtensions"/> (i.e. <c>Shape.FromClrType(typeof(TProp))</c>).
-        /// A <c>DateTime?</c>-bound editor reads as date, a <c>decimal</c>-bound editor reads as number,
+        /// <c>DateTime?</c>-bound editor reads as date, a <c>decimal</c>-bound editor reads as number,
         /// a <c>string</c>-bound editor reads as string. The component must be registered via
         /// <c>Html.InputField(plan, m => m.X).FusionInPlaceEditor(...)</c> before this read is built
         /// into the plan: no hardcoded shape, no fallback.

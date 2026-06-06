@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionRating for selecting a numeric rating value.
+    /// Fusion rating component for selecting a numeric rating value.
     /// </summary>
     public sealed class FusionRating : FusionComponent, IInputComponent
     {

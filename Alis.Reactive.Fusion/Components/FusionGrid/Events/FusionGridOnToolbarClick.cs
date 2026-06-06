@@ -15,7 +15,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>
-    /// The toolbar item carried by a Grid "toolbarClick" event.
+    /// Toolbar item carried by a Grid "toolbarClick" event.
     /// Custom items expose the id and text declared on the builder Toolbar.
     /// </summary>
     public class FusionGridToolbarItem

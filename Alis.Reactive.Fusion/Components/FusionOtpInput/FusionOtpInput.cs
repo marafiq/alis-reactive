@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionOtpInput for entering a one-time passcode value.
+    /// Fusion OTP input component for entering a one-time passcode value.
     /// </summary>
     public sealed class FusionOtpInput : FusionComponent, IInputComponent
     {

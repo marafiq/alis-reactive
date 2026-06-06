@@ -1,10 +1,10 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// A FusionDropDownTree for selecting values from hierarchical data.
+    /// Fusion dropdown tree component for selecting values from hierarchical data.
     /// </summary>
     /// <remarks>
-    /// The Syncfusion runtime value is an array of selected string IDs, even in
+    /// Syncfusion runtime value is an array of selected string IDs, even in
     /// single-selection mode.
     /// </remarks>
     public sealed class FusionDropDownTree : FusionComponent, IInputComponent
