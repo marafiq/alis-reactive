@@ -331,7 +331,7 @@ Navigate to `http://localhost:5220/Sandbox/Components/{ComponentName}` and check
 - [ ] Section 4 (Events): interact with the component — do echo spans update?
   - **Check for `[object Object]`** — this means the event arg property is an object, not a primitive. Go back to the Syncfusion docs or browser console to find the correct property name
 - [ ] Section 5 (Conditions): do Then/Else branches fire correctly?
-- [ ] Plan JSON section: JSON is rendered, contains `"vendor": "fusion"` and correct mutation kinds
+- [ ] Plan JSON section: JSON is rendered, contains `"vendor": "fusion"` and correct set/call reaction kinds
 
 ### 3. Check event arg shapes in console
 

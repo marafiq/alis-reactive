@@ -298,7 +298,7 @@ A condition reads like a sentence: *When this value meets this test, do this, ot
 pipeline.When(args, x => x.Value).Eq("Medical")     test args property against a literal
     .Then(then =>
     {
-        then.Element("notice").SetText("selected");  ↻ full pipeline — mutations, HTTP, ...
+        then.Element("notice").SetText("selected");  ↻ full pipeline — element updates, HTTP, ...
     })
     .Else(otherwise =>
     {
