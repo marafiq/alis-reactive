@@ -41,8 +41,8 @@ function runtimePlanFor(planDocument: PlanDocument | undefined): RuntimePlan {
 }
 
 // Immediate reactions must stay synchronous so Syncfusion event arg mutations happen
-// in the same event-handler turn. request/parallel/confirm, or sequence/branch paths that
-// reach one, return Promise<void>.
+// in the same event-handler turn. request, parallel, confirm, and sequence/branch
+// paths that reach one return Promise<void>.
 
 export function executeReaction(
   reaction: ReactionGraph,
