@@ -128,7 +128,7 @@ Two hub URLs, two WebSockets. Each is managed independently.
 
 ### Lazy connections
 
-Writing `t.SignalR(...)` in C# does **not** open a WebSocket. It produces a JSON plan model. The connection only opens when the browser boots and processes the plan.
+Writing `t.SignalR(...)` in C# does **not** open a WebSocket. It produces Reactive Plan JSON. The connection opens when the page boots that plan in the runtime.
 
 ### Connection pooling
 

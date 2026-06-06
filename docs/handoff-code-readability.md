@@ -417,6 +417,11 @@ Candidate cleanup:
   XML docs now use short `css` parameter text instead of repeating "The CSS
   class to emit..." on every styled overload. Parameter tags remain because the
   API doc generator uses them to render overload signatures.
+- Resolved on `tiny-safe-but-important-refactorings`: current reactivity docs
+  now describe lazy realtime connections and plan execution as Reactive Plan
+  runtime boot behavior instead of using "browser boots/loads" as a broad
+  placeholder. Wording that truly refers to browser APIs or stale browser
+  assets remains.
 
 ### Implementation Inline Comments
 

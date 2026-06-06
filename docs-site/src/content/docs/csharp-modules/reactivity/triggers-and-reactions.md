@@ -23,18 +23,18 @@ A trigger defines *when* a pipeline executes. Every reactive behavior starts wit
 
 <!-- HTML here — the triggers above don't care about their position relative to markup -->
 
-@Html.RenderPlan(plan)  @* Serializes all behaviors to JSON — nothing connects until the browser boots *@
+@Html.RenderPlan(plan)  @* Serializes all behaviors to JSON — nothing connects until runtime boot *@
 ```
 
-### Lazy connections — no connection until the browser boots
+### Lazy connections — no connection until runtime boot
 
-Writing `t.SignalR(...)` or `t.ServerPush(...)` in C# does **not** open a WebSocket or EventSource. It produces a JSON plan model — data, not execution. The actual connection only happens when the browser loads the page and the JS runtime processes the plan during boot.
+Writing `t.SignalR(...)` or `t.ServerPush(...)` in C# does **not** open a WebSocket or EventSource. It produces Reactive Plan JSON — data, not execution. The connection opens when the page boots that plan in the runtime.
 
 - **No page load = no connection.** If the view is never rendered, no resources are consumed.
 - **Partial views are lazy too.** A partial loaded via `.Into()` only connects when the partial arrives and its plan merges.
 - **Connection pooling is automatic.** Multiple triggers on the same SSE URL or SignalR hub URL share one connection — the runtime deduplicates.
 
-This means real-time triggers are safe to declare unconditionally. They cost nothing until the page actually loads in a browser.
+This means real-time triggers are safe to declare unconditionally. They cost nothing until the page boots their Reactive Plan.
 
 From the [Grammar Tree](../../mental-model/#the-grammar-tree) — the trigger-related API:
 
