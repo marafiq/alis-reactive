@@ -218,23 +218,24 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
     [Test]
     public async Task care_level_dropdown_has_all_expected_options()
     {
-        // Controller provides 4 care level items plus 1 placeholder.
-        // Missing options prevent SelectOptionAsync and SetValue from matching "Memory Care".
         await NavigateAndBoot();
 
-        var options = Page.Locator($"#{ModelIdPrefix}CareLevel option");
-        await Expect(options).ToHaveCountAsync(5);
+        var careLevelOptions = Page.Locator($"#{ModelIdPrefix}CareLevel option");
+        const int expectedOptionsIncludingPlaceholder = 5;
+
+        await Expect(careLevelOptions).ToHaveCountAsync(expectedOptionsIncludingPlaceholder);
         AssertNoConsoleErrors();
     }
 
     [Test]
     public async Task facility_type_dropdown_has_all_expected_options()
     {
-        // Controller provides 3 facility type items plus 1 placeholder.
         await NavigateAndBoot();
 
-        var options = Page.Locator($"#{ModelIdPrefix}FacilityType option");
-        await Expect(options).ToHaveCountAsync(4);
+        var facilityTypeOptions = Page.Locator($"#{ModelIdPrefix}FacilityType option");
+        const int expectedOptionsIncludingPlaceholder = 4;
+
+        await Expect(facilityTypeOptions).ToHaveCountAsync(expectedOptionsIncludingPlaceholder);
         AssertNoConsoleErrors();
     }
 

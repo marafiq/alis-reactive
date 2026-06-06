@@ -835,6 +835,10 @@ Rewrite or delete:
   stack-push narration was deleted. Remaining runtime comments inspected in this
   area explain runtime boundaries, Active Plan invariants, or JavaScript edge
   cases and should not be removed without a replacement name/structure.
+- Resolved on `tiny-safe-but-important-refactorings`: native dropdown option-count
+  tests now use locator and expected-count names instead of comments narrating
+  controller item counts. The placeholder-value and DOM/Reactive Plan join-key
+  comments remain because they explain behavior constraints.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
