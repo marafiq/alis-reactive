@@ -281,7 +281,7 @@ namespace Alis.Reactive.PlanModel
         internal override Shape OutputShape => Shape;
     }
 
-    /// <summary>A plan value node that reads from a runtime source when the Reactive Plan executes.</summary>
+    /// <summary>A plan value node that reads from a value source when the Reactive Plan executes.</summary>
     /// <remarks>
     /// Created by source-reading builders such as <c>p.Plugin&lt;int&gt;("array", "count").Arg(json, x =&gt; x.Items)</c>.
     /// </remarks>
@@ -289,13 +289,13 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly ValueRead _read;
 
-        /// <summary>Wire discriminator for runtime value reads. Always <c>"read"</c>.</summary>
+        /// <summary>Wire discriminator for value read nodes. Always <c>"read"</c>.</summary>
         public string Kind => "read";
         /// <summary>
-        /// Runtime source for this read, such as a component, plugin, or payload scope.
+        /// Source object or payload scope for this read, such as a component, plugin, or event payload.
         /// </summary>
         public Source From => _read.From;
-        /// <summary>Plan member name resolved against the runtime source.</summary>
+        /// <summary>Plan member name resolved against the value source.</summary>
         public string Member => _read.Member.Value;
         /// <summary>Nested runtime traversal path, or empty for direct member reads.</summary>
         public Path Path => _read.Path;
@@ -421,7 +421,7 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    /// <summary>Base wire contract for how a runtime value read accesses its target member.</summary>
+    /// <summary>Base wire contract for how a value read accesses its target member.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ValueReadAccess>))]
     public abstract class ValueReadAccess
     {

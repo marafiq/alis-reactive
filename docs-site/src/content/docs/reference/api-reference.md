@@ -1243,14 +1243,14 @@ Base class for all executable actions in a Reactive Plan. Not constructed in app
 
 ### ReadExpression
 
-A plan value node that reads from a runtime source when the Reactive Plan executes.
+A plan value node that reads from a value source when the Reactive Plan executes.
 
 ```csharp
 // Properties
 Access { get; }  // Access contract that tells the runtime whether to read a property or invoke a method.
-From { get; }  // Runtime source for this read, such as a component, plugin, or payload scope.
-Kind { get; }  // Wire discriminator for runtime value reads. Always `"read"`.
-Member { get; }  // Plan member name resolved against the runtime source.
+From { get; }  // Source object or payload scope for this read, such as a component, plugin, or event payload.
+Kind { get; }  // Wire discriminator for value read nodes. Always `"read"`.
+Member { get; }  // Plan member name resolved against the value source.
 Path { get; }  // Nested runtime traversal path, or empty for direct member reads.
 Shape { get; }  // Output shape declared by the authoring layer, or `None` when unspecified.
 ```
@@ -1451,7 +1451,7 @@ ReadWholeElement()
 
 ### ValueReadAccess
 
-Base wire contract for how a runtime value read accesses its target member.
+Base wire contract for how a value read accesses its target member.
 
 ```csharp
 // Properties
