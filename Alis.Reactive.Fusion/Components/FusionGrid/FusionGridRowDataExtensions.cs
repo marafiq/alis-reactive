@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("setRowData").WithArgs<int, object>();
 
         /// <summary>
-        /// Reads the Grid's current rendered view records through Syncfusion's public getCurrentViewRecords method.
+        /// Reads the Grid's current rendered view records.
         /// </summary>
         public static TypedComponentSource<TRow[]> CurrentViewRecords<TModel, TRow>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -33,7 +33,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.Read<TRow[]>(GetCurrentViewRecordsMethod);
 
         /// <summary>
-        /// Reads the visible row index for a numeric primary key through Syncfusion's public getRowIndexByPrimaryKey method.
+        /// Reads the visible row index for a numeric primary key.
         /// </summary>
         public static TypedComponentSource<int> RowIndexByPrimaryKey<TModel>(
             this ComponentRef<FusionGrid, TModel> self,

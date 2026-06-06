@@ -36,7 +36,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("clearGrouping");
 
         /// <summary>
-        /// Navigates the grid to a page through Syncfusion's public goToPage method.
+        /// Navigates the grid to a page.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> GoToPage<TModel>(
             this ComponentRef<FusionGrid, TModel> self,
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(GoToPageMethod, new List<ValueExpression> { ValueExpression.Literal(pageNumber) });
 
         /// <summary>
-        /// Sorts a typed row field through Syncfusion's public sortColumn method.
+        /// Sorts a typed row field.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> SortBy<TModel, TRow, TField>(
             this ComponentRef<FusionGrid, TModel> self,
@@ -65,7 +65,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Clears all grid sorting through Syncfusion's public clearSorting method.
+        /// Clears all grid sorting.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> ClearSorting<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -73,7 +73,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(ClearSortingMethod);
 
         /// <summary>
-        /// Searches grid records through Syncfusion's public search method.
+        /// Searches grid records.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> Search<TModel>(
             this ComponentRef<FusionGrid, TModel> self,
@@ -82,7 +82,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(SearchMethod, new List<ValueExpression> { ValueExpression.Literal(searchText) });
 
         /// <summary>
-        /// Clears grid search by invoking Syncfusion's public search method with an empty term.
+        /// Clears the current grid search.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> ClearSearch<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -90,7 +90,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.Search(string.Empty);
 
         /// <summary>
-        /// Applies a text filter to a typed row field through Syncfusion's public filterByColumn method.
+        /// Applies a text filter to a typed row field.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> FilterTextBy<TModel, TRow, TField>(
             this ComponentRef<FusionGrid, TModel> self,
@@ -110,7 +110,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Clears all grid filtering through Syncfusion's public clearFiltering method.
+        /// Clears all grid filtering.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> ClearFiltering<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -118,7 +118,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(ClearFilteringMethod);
 
         /// <summary>
-        /// Groups a typed row field through Syncfusion's public groupColumn method.
+        /// Groups a typed row field.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> GroupBy<TModel, TRow, TField>(
             this ComponentRef<FusionGrid, TModel> self,
@@ -131,7 +131,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Ungroups a typed row field through Syncfusion's public ungroupColumn method.
+        /// Ungroups a typed row field.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> UngroupBy<TModel, TRow, TField>(
             this ComponentRef<FusionGrid, TModel> self,
@@ -144,7 +144,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Clears all grouping through Syncfusion's public clearGrouping method.
+        /// Clears all grouping.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> ClearGrouping<TModel>(
             this ComponentRef<FusionGrid, TModel> self)

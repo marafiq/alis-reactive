@@ -374,6 +374,11 @@ Candidate cleanup:
   and app-level Native public docs, the InPlaceEditor docs page, and the one
   Playwright invariant comment that described generated plan wiring. This keeps
   authored plan vocabulary consistent without changing pipeline behavior.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion Grid command and
+  read XML docs no longer expose Syncfusion method names such as
+  `sortColumn`, `addRecord`, or `getSelectedRecords` in public
+  IntelliSense text. The docs now describe the rendered Grid behavior while
+  preserving public builder prerequisites such as export and column chooser flags.
 
 ### Implementation Inline Comments
 

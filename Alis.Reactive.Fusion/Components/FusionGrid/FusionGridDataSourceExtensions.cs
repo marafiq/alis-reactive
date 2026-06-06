@@ -76,7 +76,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.Read(ComponentProperty<TRow[]>.Named("dataSource"));
 
         /// <summary>
-        /// Triggers a grid refresh through Syncfusion's public refresh method.
+        /// Refreshes the rendered grid after data or state changes.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> Refresh<TModel>(
             this ComponentRef<FusionGrid, TModel> self)

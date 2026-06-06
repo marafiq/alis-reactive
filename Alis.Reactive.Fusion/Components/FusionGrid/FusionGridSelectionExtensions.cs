@@ -45,7 +45,7 @@ namespace Alis.Reactive.Fusion.Components
             });
 
         /// <summary>
-        /// Clears grid selection through Syncfusion's public clearSelection method.
+        /// Clears grid selection.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> ClearSelection<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -53,7 +53,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(ClearSelectionMethod);
 
         /// <summary>
-        /// Reads selected row indexes through Syncfusion's public getSelectedRowIndexes method.
+        /// Reads selected row indexes.
         /// </summary>
         public static TypedComponentSource<int[]> SelectedRowIndexes<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -61,7 +61,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.Read<int[]>(GetSelectedRowIndexesMethod);
 
         /// <summary>
-        /// Reads selected row records through Syncfusion's public getSelectedRecords method.
+        /// Reads selected row records.
         /// </summary>
         public static TypedComponentSource<TRow[]> SelectedRecords<TModel, TRow>(
             this ComponentRef<FusionGrid, TModel> self)

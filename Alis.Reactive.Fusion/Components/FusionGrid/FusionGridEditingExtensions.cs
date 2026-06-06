@@ -45,7 +45,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("getBatchChanges");
 
         /// <summary>
-        /// Starts editing the selected row through Syncfusion's public startEdit method.
+        /// Starts editing the selected row.
         /// The builder-owned editSettings determine whether this is inline or dialog editing.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> StartEdit<TModel>(
@@ -62,7 +62,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(EndEditMethod);
 
         /// <summary>
-        /// Cancels the current edit state through Syncfusion's public closeEdit method.
+        /// Cancels the current edit state.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> CloseEdit<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -70,7 +70,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(CloseEditMethod);
 
         /// <summary>
-        /// Adds a typed row through Syncfusion's public addRecord method.
+        /// Adds a typed row.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> AddRecord<TModel, TRow>(
             this ComponentRef<FusionGrid, TModel> self,
@@ -86,7 +86,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Adds a typed row from an HTTP response through Syncfusion's public addRecord method.
+        /// Adds a typed row from an HTTP response.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> AddRecord<TModel, TResponse, TRow>(
             this ComponentRef<FusionGrid, TModel> self,
@@ -105,7 +105,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Deletes the currently selected record through Syncfusion's public deleteRecord method.
+        /// Deletes the currently selected record.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> DeleteSelectedRecord<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -113,7 +113,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(DeleteRecordMethod);
 
         /// <summary>
-        /// Updates one rendered row with a typed row through Syncfusion's public updateRow method.
+        /// Updates one rendered row with a typed row.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> UpdateRow<TModel, TRow>(
             this ComponentRef<FusionGrid, TModel> self,
@@ -131,7 +131,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Updates one rendered row from an HTTP response through Syncfusion's public updateRow method.
+        /// Updates one rendered row from an HTTP response.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> UpdateRow<TModel, TResponse, TRow>(
             this ComponentRef<FusionGrid, TModel> self,
@@ -170,7 +170,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Saves the currently edited batch cell through Syncfusion's public saveCell method.
+        /// Saves the currently edited batch cell.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> SaveCell<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -196,7 +196,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.UpdateCell(rowIndex, field, ValueExpression.Literal(value), UpdateIntCellMethod);
 
         /// <summary>
-        /// Reads typed batch edit changes through Syncfusion's public getBatchChanges method.
+        /// Reads typed batch edit changes.
         /// </summary>
         public static TypedComponentSource<FusionGridBatchChanges<TRow>> BatchChanges<TModel, TRow>(
             this ComponentRef<FusionGrid, TModel> self)

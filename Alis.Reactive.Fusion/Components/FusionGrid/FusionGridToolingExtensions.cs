@@ -30,7 +30,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("autoFitColumns").WithArgs<string>();
 
         /// <summary>
-        /// Exports the grid to Excel through Syncfusion's public excelExport method.
+        /// Exports the grid to Excel.
         /// Requires <c>AllowExcelExport(true)</c> on the builder.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> ExcelExport<TModel>(
@@ -39,7 +39,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(ExcelExportMethod);
 
         /// <summary>
-        /// Exports the grid to CSV through Syncfusion's public csvExport method.
+        /// Exports the grid to CSV.
         /// Requires <c>AllowExcelExport(true)</c> on the builder.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> CsvExport<TModel>(
@@ -48,7 +48,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(CsvExportMethod);
 
         /// <summary>
-        /// Exports the grid to PDF through Syncfusion's public pdfExport method.
+        /// Exports the grid to PDF.
         /// Requires <c>AllowPdfExport(true)</c> on the builder.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> PdfExport<TModel>(
@@ -57,7 +57,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(PdfExportMethod);
 
         /// <summary>
-        /// Opens the browser print dialog for the grid through Syncfusion's public print method.
+        /// Opens the browser print dialog for the grid.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> Print<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -65,7 +65,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(PrintMethod);
 
         /// <summary>
-        /// Opens the column chooser through Syncfusion's public openColumnChooser method.
+        /// Opens the column chooser.
         /// Requires <c>ShowColumnChooser(true)</c> on the builder.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> ShowColumnChooser<TModel>(
@@ -74,7 +74,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(OpenColumnChooserMethod);
 
         /// <summary>
-        /// Auto-fits every grid column to its content through Syncfusion's public autoFitColumns method.
+        /// Auto-fits every grid column to its content.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> AutoFitColumns<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -82,7 +82,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(AutoFitAllColumnsMethod);
 
         /// <summary>
-        /// Auto-fits one grid column by typed row field through Syncfusion's public autoFitColumns method.
+        /// Auto-fits one grid column by typed row field.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> AutoFitColumn<TModel, TRow, TField>(
             this ComponentRef<FusionGrid, TModel> self,
