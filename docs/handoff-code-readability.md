@@ -156,7 +156,14 @@ Candidate cleanup:
   tooltip event names. The generated API reference also picked up the
   `FusionAIAssistView` event member docs after rebuilding the Fusion XML
   documentation output before `npm run build:api-docs`.
-- `ConditionSourceBuilder<TModel,TProp>` has short XML on nearly every operator plus inline category comments. The method names already describe most operators. Keep shape/type-safety guidance at the class level and trim repetitive member summaries.
+- Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
+  operator docs now include the parameter tags needed for generated API
+  signatures such as `Eq(operand)` versus `Eq(right)`. This keeps the public DSL
+  IntelliSense standard without adding examples or changing condition behavior.
+- `ConditionSourceBuilder<TModel,TProp>` should not be revisited for another
+  comment-only pass unless the API generator starts rendering method summaries;
+  its remaining XML exists to support public DSL IntelliSense and generated
+  overload signatures.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
 
