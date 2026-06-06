@@ -22,6 +22,7 @@ public class WhenManagingTodoItems : PlaywrightTestBase
     private ILocator Result => _plan.Element("todo-result");
     private ILocator DueDateSection => Page.Locator("#due-date-section");
     private ILocator UrgentCheckbox => Page.Locator($"#{ModelIdPrefix}IsUrgent");
+    private ILocator SaveToast => Page.Locator(".e-toast").First;
 
     [Test]
     public async Task page_loads_with_empty_form_and_save_button()
@@ -98,8 +99,7 @@ public class WhenManagingTodoItems : PlaywrightTestBase
 
         await SaveBtn.ClickAsync();
 
-        // Save feedback is rendered through the Syncfusion toast surface.
-        await Expect(Page.Locator(".e-toast").First)
+        await Expect(SaveToast)
             .ToContainTextAsync("Todo saved successfully", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
@@ -116,8 +116,7 @@ public class WhenManagingTodoItems : PlaywrightTestBase
 
         await SaveBtn.ClickAsync();
 
-        // Save feedback is rendered through the Syncfusion toast surface.
-        await Expect(Page.Locator(".e-toast").First)
+        await Expect(SaveToast)
             .ToContainTextAsync("Todo saved successfully", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }

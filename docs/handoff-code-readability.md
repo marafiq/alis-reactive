@@ -842,6 +842,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: vitals alert tests now name
   the normal heart-rate value that differs from the initial component value, so
   repeated "raises change" comments were removed without hiding the event reason.
+- Resolved on `tiny-safe-but-important-refactorings`: Todo workflow tests now use
+  a `SaveToast` locator property instead of repeating the Syncfusion toast proof
+  comment and selector in each save-success assertion.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
