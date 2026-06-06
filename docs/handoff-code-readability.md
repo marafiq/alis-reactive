@@ -276,6 +276,12 @@ Candidate cleanup:
   fluent XML docs no longer repeat "The current conditional builder" on every
   append method. Parameter docs and raw `onclick`/HTML trust boundary remarks
   remain because they carry the template authoring contract.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionTemplateBuilder`
+  and `FusionConditionalBuilder` literal-text and nested-template parameter
+  docs, plus root class and attribute parameter docs, now keep
+  generator-required XML tags while dropping prose that repeated the method
+  name. Trust-boundary remarks for raw HTML, attributes, events, and `onclick`
+  remain.
 - Resolved on `tiny-safe-but-important-refactorings`: plugin argument builder
   XML docs no longer repeat "current plugin member/call builder" on every
   fluent argument method. Source, response-body, event-payload, and literal

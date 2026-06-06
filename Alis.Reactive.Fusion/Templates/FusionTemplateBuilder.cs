@@ -48,7 +48,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a CSS class to the root template <c>div</c>.
         /// </summary>
-        /// <param name="cssClass">The CSS class to append.</param>
+        /// <param name="cssClass">CSS class.</param>
         public FusionTemplateBuilder<TModel> Class(string cssClass)
         {
             _cssClasses.Add(cssClass);
@@ -58,8 +58,8 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds or replaces an HTML attribute on the root template <c>div</c>.
         /// </summary>
-        /// <param name="name">The attribute name to emit.</param>
-        /// <param name="value">The attribute value to emit.</param>
+        /// <param name="name">HTML attribute name.</param>
+        /// <param name="value">HTML attribute value.</param>
         /// <remarks>Attribute names and values are emitted as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> Attr(string name, string value)
         {
@@ -81,7 +81,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds literal text to the template output.
         /// </summary>
-        /// <param name="text">The literal text to emit.</param>
+        /// <param name="text">Literal template text.</param>
         public FusionTemplateBuilder<TModel> Text(string text)
         {
             _childRenderers.Add(() => text);
@@ -112,14 +112,14 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a <c>span</c> with literal text.
         /// </summary>
-        /// <param name="text">The literal text to emit inside the <c>span</c>.</param>
+        /// <param name="text">Literal span text.</param>
         public FusionTemplateBuilder<TModel> Span(string text) =>
             Span(text, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled <c>span</c> with literal text.
         /// </summary>
-        /// <param name="text">The literal text to emit inside the <c>span</c>.</param>
+        /// <param name="text">Literal span text.</param>
         /// <param name="css">CSS class.</param>
         public FusionTemplateBuilder<TModel> Span(string text, string css) =>
             Span(text, TemplateCss.Class(css));
@@ -166,7 +166,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a nested template <c>div</c> over the same Syncfusion model context.
         /// </summary>
-        /// <param name="configure">Configures the nested template content.</param>
+        /// <param name="configure">Nested template content.</param>
         public FusionTemplateBuilder<TModel> Div(Action<FusionTemplateBuilder<TModel>> configure)
         {
             var nestedTemplate = new FusionTemplateBuilder<TModel>();
@@ -189,7 +189,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a badge with literal text.
         /// </summary>
-        /// <param name="text">The literal text to emit inside the badge.</param>
+        /// <param name="text">Literal badge text.</param>
         /// <param name="css">CSS class.</param>
         public FusionTemplateBuilder<TModel> Badge(string text, string css = "e-badge")
         {

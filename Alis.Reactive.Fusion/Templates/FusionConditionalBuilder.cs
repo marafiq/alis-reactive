@@ -41,14 +41,14 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a <c>span</c> with literal text.
         /// </summary>
-        /// <param name="text">The literal text to emit inside the <c>span</c>.</param>
+        /// <param name="text">Literal span text.</param>
         public FusionConditionalBuilder<TModel> Span(string text) =>
             Span(text, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled <c>span</c> with literal text.
         /// </summary>
-        /// <param name="text">The literal text to emit inside the <c>span</c>.</param>
+        /// <param name="text">Literal span text.</param>
         /// <param name="css">CSS class.</param>
         public FusionConditionalBuilder<TModel> Span(string text, string css) =>
             Span(text, TemplateCss.Class(css));
@@ -73,7 +73,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a badge with literal text.
         /// </summary>
-        /// <param name="text">The literal text to emit inside the badge.</param>
+        /// <param name="text">Literal badge text.</param>
         /// <param name="css">CSS class.</param>
         public FusionConditionalBuilder<TModel> Badge(string text, string css = "e-badge")
         {
@@ -105,7 +105,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a nested template <c>div</c> over the same Syncfusion model context.
         /// </summary>
-        /// <param name="configure">Configures the nested template content.</param>
+        /// <param name="configure">Nested template content.</param>
         public FusionConditionalBuilder<TModel> Div(Action<FusionTemplateBuilder<TModel>> configure)
         {
             var nestedTemplate = new FusionTemplateBuilder<TModel>();
@@ -213,7 +213,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Renders the conditional content to an HTML string.
         /// </summary>
-        /// <returns>The generated template HTML.</returns>
+        /// <returns>Template HTML.</returns>
         public string Render()
         {
             var html = new StringBuilder();
