@@ -1,5 +1,5 @@
 // Native drawer markup is a layout singleton rendered by @Html.NativeDrawer().
-// This side-effect module uses its well-known DOM IDs directly; DSL open/close
+// Side-effect module uses its well-known DOM IDs directly; DSL open/close
 // calls still target the app-level component through native set reactions.
 export {};
 

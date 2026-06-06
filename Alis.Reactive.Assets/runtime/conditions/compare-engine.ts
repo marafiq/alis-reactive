@@ -1,5 +1,5 @@
 // Compare/all/any/not stay synchronous here and receive evaluateValue from callers.
-// That dependency shape prevents values/evaluate -> conditions -> values/evaluate cycles.
+// Dependency shape prevents values/evaluate -> conditions -> values/evaluate cycles.
 
 import type {
   CompareCondition,

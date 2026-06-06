@@ -1,5 +1,5 @@
 // ConditionGraph stays in the current lane until a reached confirm term crosses async.
-// The sync subset delegates to compare-engine so evaluateValue remains the only resolver.
+// Sync subset delegates to compare-engine so evaluateValue remains the only resolver.
 
 import type {
   ConditionGraph,

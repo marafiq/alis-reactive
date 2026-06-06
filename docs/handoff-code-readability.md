@@ -1003,6 +1003,10 @@ Rewrite or delete:
   name boot rosters, custom-event payload arrays, condition-gated alert
   responses, Syncfusion custom-binding payloads, and Active Plan partial merge
   boundaries instead of generic "returns" narration.
+- Resolved on `tiny-safe-but-important-refactorings`: TypeScript runtime
+  boundary comments now state native singleton ownership, plugin catalog
+  ownership, sync-condition dependency shape, and page-ready listener ordering
+  directly without removing the runtime-boundary facts.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

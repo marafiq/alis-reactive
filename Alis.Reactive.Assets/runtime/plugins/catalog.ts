@@ -1,5 +1,5 @@
 // Plugins bridge host-page functions that are outside the Reactive Plan DSL.
-// The plan still declares the callable contract; this catalog only owns the
+// Plan still declares the callable contract; this catalog only owns the
 // host-provided implementation objects.
 
 type PluginFunction = (...args: unknown[]) => unknown;

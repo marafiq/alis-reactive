@@ -1,5 +1,5 @@
 // Native loader markup is a layout singleton rendered by @Html.NativeLoader().
-// This side-effect module uses its well-known DOM IDs directly; DSL show/hide
+// Side-effect module uses its well-known DOM IDs directly; DSL show/hide
 // calls still target the app-level component through native set reactions.
 export {};
 
