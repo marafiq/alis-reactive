@@ -253,7 +253,7 @@ public class WhenMultiColumnItemSelected : PlaywrightTestBase
         await Expect(Page.Locator("#args-condition"))
             .ToHaveTextAsync("sunrise manor selected", new() { Timeout = 5000 });
 
-        // Wait for popup close animation to complete before re-opening.
+        // Syncfusion leaves the closing popup in the DOM; wait until it is hidden before re-opening.
         await Expect(Page.Locator(".e-multicolumn-list.e-popup"))
             .ToBeHiddenAsync(new() { Timeout = 5000 });
 
@@ -265,7 +265,7 @@ public class WhenMultiColumnItemSelected : PlaywrightTestBase
         await Expect(Page.Locator("#args-condition"))
             .ToHaveTextAsync("other facility", new() { Timeout = 5000 });
 
-        // Wait for popup close animation to complete before re-opening.
+        // Syncfusion leaves the closing popup in the DOM; wait until it is hidden before re-opening.
         await Expect(Page.Locator(".e-multicolumn-list.e-popup"))
             .ToBeHiddenAsync(new() { Timeout = 5000 });
 

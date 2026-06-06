@@ -267,7 +267,7 @@ public class WhenAutoCompleteSuggests : PlaywrightTestBase
             $"First selection should contain Dr. Johnson but was '{johnsonChangeText}'");
         await Expect(argsCondition).ToHaveTextAsync("other physician", new() { Timeout = 3000 });
 
-        // Wait for popup close animation to complete before re-opening
+        // Syncfusion leaves the closing popup in the DOM; wait until it is hidden before re-opening.
         await Expect(Page.Locator(".e-ddl.e-popup")).ToBeHiddenAsync(new() { Timeout = 5000 });
         await showPopupButton.ClickAsync();
         await Expect(Page.Locator(".e-ddl.e-popup"))
