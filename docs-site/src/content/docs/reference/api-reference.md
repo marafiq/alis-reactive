@@ -333,7 +333,7 @@ SignalR<T>(hubUrl, methodName, pipeline)
 
 ### ReactiveArray<T>
 
-A typed, deferred array transform. Operators capture authoring intent as
+Typed, deferred array transform. Operators capture authoring intent as
 Reactive Plan `array-op` nodes; they do not execute on the server. Deliberately not
 `IEnumerable`/`IQueryable`, so LINQ extension methods
 are not candidates (no collision) and lambdas are captured, not invoked. Per-element
@@ -359,7 +359,7 @@ Where(predicate)
 
 ### ReactiveValue<T>
 
-A scalar value produced by an array operation, such as `Count` or `Sum`.
+Scalar value produced by an array operation, such as `Count` or `Sum`.
 It is a `TypedSource<T>`, so it can feed DSL members that read typed
 sources, including `SetText`, `When`, and dispatch payloads.
 Gather intake remains limited to component and plugin sources.
@@ -448,7 +448,7 @@ success, error, or dispatch.
 
 ### TypedComponentSource<T>
 
-A typed value source produced by a registered component member.
+Typed value source produced by a registered component member.
 
 ### TypedPluginPropertySource<T>
 
@@ -466,7 +466,7 @@ for compile-time type safety.
 
 ### TypedUrlSource<T>
 
-A typed source whose runtime value is read from the browser `window.location` query string.
+Typed source whose runtime value is read from the browser `window.location` query string.
 Returned by `PipelineBuilder.FromUrl()` and `PipelineBuilder.FromUrl<T>()`.
 Can be used anywhere a `TypedSource<T>` is accepted, including conditions and request inputs.
 
@@ -582,7 +582,7 @@ Required()
 
 ### InputBoundField<T>
 
-A model-bound input field returned by
+Model-bound input field returned by
 `InputField<T>`, ready to receive
 a component extension that renders inside the field wrapper.
 
@@ -652,7 +652,7 @@ Kind { get; }  // JSON discriminator for any-status matches. Always `"any"`.
 
 ### ArrayExpression
 
-A plan value node that assembles an array from ordered item expressions.
+Array value node assembled from ordered item expressions.
 
 ```csharp
 // Properties
@@ -663,7 +663,7 @@ Shape { get; }  // Output shape declared by the authoring layer, or `None` when 
 
 ### ArrayOperationExpression
 
-A deterministic operation over the elements of an array-shaped value.
+Deterministic operation over the elements of an array-shaped value.
 
 ```csharp
 // Properties
@@ -808,7 +808,7 @@ Value { get; }  // Value expression that resolves to the HTML to inject.
 
 ### LiteralExpression
 
-A plan value node whose value is serialized directly into generated JSON.
+Literal value node serialized directly into generated plan JSON.
 
 ```csharp
 // Properties
@@ -866,7 +866,7 @@ Term { get; }  // Condition whose result is inverted.
 
 ### ObjectExpression
 
-A plan value node that assembles an object from named field expressions.
+Object value node assembled from named field expressions.
 
 ```csharp
 // Properties
@@ -906,7 +906,7 @@ Kind { get; }  // JSON discriminator for partial plans. Always `"partial"`.
 
 ### Path
 
-An ordered sequence of segments for navigating nested properties on a value.
+Ordered path segments for navigating nested properties on a value.
 
 ```csharp
 // Properties
@@ -915,7 +915,7 @@ Segments { get; }  // Ordered path segments used by runtime path traversal.
 
 ### PathSegment
 
-One step in a property navigation path: a property name or array index.
+Property navigation segment: a property name or array index.
 
 ```csharp
 // Properties
@@ -977,7 +977,7 @@ Wire base for Reactive Plan reactions authored through pipeline builders.
 
 ### ReadExpression
 
-A plan value node that reads from a value source when the Reactive Plan executes.
+Value-read node resolved from a source when the Reactive Plan executes.
 
 ```csharp
 // Properties
@@ -995,7 +995,7 @@ Wire base for request input strategies authored through gather builders.
 
 ### RequestPlan
 
-An HTTP request definition in a Reactive Plan.
+HTTP request definition in a Reactive Plan.
 
 ```csharp
 // Properties
@@ -1186,7 +1186,7 @@ Builds typed field conditions for client validation rules.
 ### ClientValidationField
 
 Describes a single field's validation rules within a form.
-The rule source declares the field path and shape before render-time binding.
+Rule source declares the field path and shape before render-time binding.
 
 ### ClientValidationFieldConditionStart<T>
 
@@ -1400,7 +1400,7 @@ Prompt { get; }  // Prompt text associated with the stopped response.
 
 ### FusionAutoComplete
 
-A FusionAutoComplete for typing and filtering suggestions from a data source.
+Fusion autocomplete component for typed suggestions from a data source.
 
 ```csharp
 // Properties
@@ -1423,7 +1423,7 @@ Typed events exposed by the `FusionAutoComplete` component.
 
 ```csharp
 // Properties
-Changed { get; }  // Fires when the selected value changes.
+Changed { get; }  // Fires when selected value changes.
 Filtering { get; }  // Fires when the user types to filter.
 ```
 
@@ -1601,10 +1601,10 @@ Payload delivered before the BulletChart tooltip is rendered.
 ```csharp
 // Properties
 Name { get; }  // Syncfusion event token exposed as `args.name`.
-Target { get; }  // The target values of the comparative bar.
-Template { get; }  // The tooltip template markup, when template rendering is enabled.
-Text { get; }  // The tooltip text, when template rendering is not enabled.
-Value { get; }  // The actual value of the feature bar.
+Target { get; }  // Target values of the comparative bar.
+Template { get; }  // Tooltip template markup when template rendering is enabled.
+Text { get; }  // Tooltip text when template rendering is not enabled.
+Value { get; }  // Actual value of the feature bar.
 ```
 
 ### FusionBulletChartTooltipRenderArgsExtensions
@@ -1617,7 +1617,7 @@ SetText(pipeline, text)
 
 ### FusionButton
 
-A FusionButton backed by Syncfusion EJ2 Button.
+Fusion button component backed by Syncfusion EJ2 Button.
 
 ### FusionButtonBuilder<T>
 
@@ -1735,7 +1735,7 @@ PreventTransition(pipeline)
 
 ### FusionCheckBox
 
-A FusionCheckBox backed by Syncfusion EJ2 CheckBox.
+Fusion checkbox component backed by Syncfusion EJ2 CheckBox.
 
 ```csharp
 // Properties
@@ -1748,7 +1748,7 @@ Event payload delivered when a `FusionCheckBox` checked state changes.
 
 ```csharp
 // Properties
-Checked { get; }  // Whether the checkbox is checked after the change.
+Checked { get; }  // Checkbox checked state after the change.
 ```
 
 ### FusionCheckBoxEvents
@@ -1757,7 +1757,7 @@ Typed events exposed by the `FusionCheckBox` component.
 
 ```csharp
 // Properties
-Changed { get; }  // Fires when the checkbox state changes.
+Changed { get; }  // Fires when checkbox state changes.
 ```
 
 ### FusionCheckBoxExtensions
@@ -1793,15 +1793,15 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### FusionChipItem
 
-A selected chip's bound data, as returned in `getSelectedChips().data` (proven in
+Selected chip bound data returned in `getSelectedChips().data` (proven in
 `@syncfusion/ej2-buttons``chip-list.js`: `selectedItems.data.push(this.chips[index])`).
 Each element is the chip model the developer bound, so the array DSL can operate on the
 selection by member — e.g. `p.From(payload, x => x.Selection.Data).Where(c => c.Value == "memory")`.
 
 ```csharp
 // Properties
-Text { get; }  // The chip's display text (`data[i].text`).
-Value { get; }  // The chip's bound value (`data[i].value`).
+Text { get; }  // Chip display text (`data[i].text`).
+Value { get; }  // Chip bound value (`data[i].value`).
 ```
 
 ### FusionChipList
@@ -1811,7 +1811,7 @@ this type scopes typed post-render behavior and event wiring.
 
 ### FusionColorPicker
 
-A FusionColorPicker for selecting a color value.
+Fusion color picker component for selecting a color value.
 
 ```csharp
 // Properties
@@ -1833,7 +1833,7 @@ Typed events exposed by the `FusionColorPicker` component.
 
 ```csharp
 // Properties
-Changed { get; }  // Fires when the color value changes.
+Changed { get; }  // Fires when color value changes.
 ```
 
 ### FusionColorPickerExtensions
@@ -1865,7 +1865,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### FusionComboBox
 
-A FusionComboBox for selecting or entering a single string value.
+Fusion combo box component for selecting or entering one string value.
 
 ```csharp
 // Properties
@@ -1893,7 +1893,7 @@ Typed events exposed by the `FusionComboBox` component.
 ```csharp
 // Properties
 Blur { get; }  // Fires when the component loses focus.
-Changed { get; }  // Fires when the selected value changes.
+Changed { get; }  // Fires when selected value changes.
 Focus { get; }  // Fires when the component receives focus.
 ```
 
@@ -2014,7 +2014,7 @@ Payload delivered when a context menu item is selected.
 
 ### FusionDatePicker
 
-A FusionDatePicker for selecting a single date.
+Fusion date picker component for selecting a single date.
 
 ```csharp
 // Properties
@@ -2069,7 +2069,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### FusionDateRangePicker
 
-A FusionDateRangePicker for selecting a start and end date pair.
+Fusion date-range picker component for selecting start and end dates.
 
 ```csharp
 // Properties
@@ -2125,7 +2125,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### FusionDateTimePicker
 
-A FusionDateTimePicker for selecting a date and time together.
+Fusion date-time picker component for selecting a date and time together.
 
 ```csharp
 // Properties
@@ -2336,7 +2336,7 @@ Item { get; }  // Selected item metadata from the Syncfusion select event.
 
 ### FusionDropDownList
 
-A FusionDropDownList for selecting a single value from a list.
+Fusion dropdown list component for selecting one list value.
 
 ```csharp
 // Properties
@@ -2364,7 +2364,7 @@ Typed events exposed by the `FusionDropDownList` component.
 ```csharp
 // Properties
 Blur { get; }  // Fires when the component loses focus.
-Changed { get; }  // Fires when the selected value changes.
+Changed { get; }  // Fires when selected value changes.
 Focus { get; }  // Fires when the component receives focus.
 ```
 
@@ -2410,7 +2410,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### FusionDropDownTree
 
-A FusionDropDownTree for selecting values from hierarchical data.
+Fusion dropdown tree component for selecting values from hierarchical data.
 
 ```csharp
 // Properties
@@ -2552,7 +2552,7 @@ Event args for Syncfusion Grid's `dataStateChange` event.
 // Properties
 Action { get; }  // Action details such as request type, column name, direction, and current page.
 Group { get; }  // Active group fields. Empty when ungrouped. Supports nested grouping.
-Search { get; }  // Active search descriptors from Grid toolbar or public search method.
+Search { get; }  // Active search criteria from Grid toolbar or public search method.
 Skip { get; }  // Paging offset (0-based). Always present.
 Sorted { get; }  // Active sort columns. Empty when unsorted. Supports multi-sort.
 Take { get; }  // Page size. Always present.
@@ -2711,7 +2711,7 @@ RowIndex { get; }  // Zero-based index of the row after selection.
 
 ### FusionGridSearchDescriptor
 
-Search descriptor emitted by Grid dataStateChange for toolbar/search method operations.
+Search criteria emitted by Grid dataStateChange for toolbar/search method operations.
 
 ```csharp
 // Properties
@@ -2772,7 +2772,7 @@ Item { get; }  // Toolbar item that raised the click event.
 
 ### FusionGridToolbarItem
 
-The toolbar item carried by a Grid "toolbarClick" event.
+Toolbar item carried by a Grid "toolbarClick" event.
 Custom items expose the id and text declared on the builder Toolbar.
 
 ```csharp
@@ -2808,7 +2808,7 @@ Event payload delivered before a `FusionInPlaceEditor` commits its value.
 ```csharp
 // Properties
 Cancel { get; }  // Whether Syncfusion's built-in submit has been cancelled. Set via `PreventDefault`.
-Data { get; }  // The payload Syncfusion prepared for its built-in submit, keyed by the editor's `Name`.
+Data { get; }  // Payload Syncfusion prepared for its built-in submit, keyed by the editor's `Name`.
 ```
 
 ### FusionInPlaceEditorActionBeginArgsExtensions
@@ -2827,7 +2827,7 @@ Event payload delivered after a successful commit of a `FusionInPlaceEditor`.
 // Properties
 Data { get; }  // Server response data when Syncfusion's UrlAdaptor is configured; empty `{}` when no url.
 Name { get; }  // Syncfusion event token exposed as `args.name`.
-Value { get; }  // The value that was committed.
+Value { get; }  // Committed editor value.
 ```
 
 ### FusionInPlaceEditorBeginEditArgs
@@ -3223,7 +3223,7 @@ Payload delivered when a menu item is selected.
 
 ### FusionMultiColumnComboBox
 
-A FusionMultiColumnComboBox for selecting a value with a multi-column dropdown.
+Fusion multi-column combo box component for selecting a row value.
 
 ```csharp
 // Properties
@@ -3246,7 +3246,7 @@ Typed events exposed by the `FusionMultiColumnComboBox` component.
 
 ```csharp
 // Properties
-Changed { get; }  // Fires when the selected value changes.
+Changed { get; }  // Fires when selected value changes.
 ```
 
 ### FusionMultiColumnComboBoxExtensions
@@ -3287,7 +3287,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### FusionMultiSelect
 
-A FusionMultiSelect for choosing multiple values from a list.
+Fusion multi-select component for choosing multiple list values.
 
 ```csharp
 // Properties
@@ -3310,7 +3310,7 @@ Typed events exposed by the `FusionMultiSelect` component.
 
 ```csharp
 // Properties
-Changed { get; }  // Fires when the selected value array changes.
+Changed { get; }  // Fires when selected value array changes.
 Filtering { get; }  // Fires when the user types to filter.
 ```
 
@@ -3367,7 +3367,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### FusionNumericTextBox
 
-A FusionNumericTextBox for entering and validating numeric values.
+Fusion numeric text box component for entering numeric values.
 
 ```csharp
 // Properties
@@ -3396,7 +3396,7 @@ Typed events exposed by the `FusionNumericTextBox` component.
 ```csharp
 // Properties
 Blur { get; }  // Fires when the component loses focus.
-Changed { get; }  // Fires when the numeric value changes.
+Changed { get; }  // Fires when numeric value changes.
 Focus { get; }  // Fires when the component receives focus.
 ```
 
@@ -3436,7 +3436,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### FusionOtpInput
 
-A FusionOtpInput for entering a one-time passcode value.
+Fusion OTP input component for entering a one-time passcode value.
 
 ```csharp
 // Properties
@@ -3698,7 +3698,7 @@ Reactive<T>(eventSelector, pipeline)
 
 ### FusionRating
 
-A FusionRating for selecting a numeric rating value.
+Fusion rating component for selecting a numeric rating value.
 
 ```csharp
 // Properties
@@ -3711,7 +3711,7 @@ Typed events exposed by the `FusionRating` component.
 
 ```csharp
 // Properties
-ValueChanged { get; }  // Fires when the rating value changes.
+ValueChanged { get; }  // Fires when rating value changes.
 ```
 
 ### FusionRatingExtensions
@@ -3753,7 +3753,7 @@ Value { get; }  // Rating value after the value-changed event.
 
 ### FusionRichTextEditor
 
-A FusionRichTextEditor for editing HTML content.
+Fusion rich text editor component for editing HTML content.
 
 ```csharp
 // Properties
@@ -4000,16 +4000,16 @@ Reactive<T>(eventSelector, pipeline)
 
 ### FusionSelectedChips
 
-The result of `ChipList.getSelectedChips()` for a multiple-selection chip list. Mirrors
+Result of `ChipList.getSelectedChips()` for a multiple-selection chip list. Mirrors
 the shipped shape `{ texts, Indexes, data, elements }` (chip-list.js). `Data`
 carries the selected chip objects, so the array DSL can filter/aggregate the selection by
 member; `Texts` carries the selected display strings.
 
 ```csharp
 // Properties
-Data { get; }  // The selected chips' bound data objects (`data`) — the array DSL source for operating on the selection by member (text/value).
-Indexes { get; }  // The selected chip positions from Syncfusion's selection payload.
-Texts { get; }  // The selected chips' display text (`texts`).
+Data { get; }  // Selected chips' bound data objects (`data`) — the array DSL source for operating on the selection by member (text/value).
+Indexes { get; }  // Selected chip positions from Syncfusion's selection payload.
+Texts { get; }  // Selected chip display texts (`texts`).
 ```
 
 ### FusionSidebar
@@ -4070,7 +4070,7 @@ IsInteracted { get; }  // Whether Syncfusion reports user interaction for this t
 
 ### FusionSlider
 
-A FusionSlider for selecting a numeric value or numeric range.
+Fusion slider component for selecting a numeric value or range.
 
 ```csharp
 // Properties
@@ -4306,7 +4306,7 @@ Wires `FusionStepper` events into the Reactive Plan.
 
 ### FusionSwitch
 
-A FusionSwitch for toggling a boolean on/off.
+Fusion switch component for toggling a Boolean value.
 
 ```csharp
 // Properties
@@ -4365,7 +4365,7 @@ Exposes selected-tab state, tab visibility methods, and selection events; it is 
 ### FusionTabBuilder<T>
 
 Carries rendered Syncfusion Tab markup and the Reactive Plan for event wiring.
-The tab renders without an input field wrapper, label, or validation slot.
+Tab renders without an input field wrapper, label, or validation slot.
 
 ### FusionTabEvents
 
@@ -4414,13 +4414,13 @@ as they would serialize as [object Object].
 ```csharp
 // Properties
 IsSwiped { get; }  // Whether the selection was triggered by a swipe gesture.
-PreviousIndex { get; }  // The zero-based index of the previously selected tab.
-SelectedIndex { get; }  // The zero-based index of the newly selected tab.
+PreviousIndex { get; }  // Zero-based index of the previously selected tab.
+SelectedIndex { get; }  // Zero-based index of the newly selected tab.
 ```
 
 ### FusionTextArea
 
-A FusionTextArea for long-form text entry.
+Fusion text area component for long-form text entry.
 
 ```csharp
 // Properties
@@ -4507,7 +4507,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### FusionTextBox
 
-A FusionTextBox for short text entry.
+Fusion text box component for short text entry.
 
 ```csharp
 // Properties
@@ -4595,7 +4595,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### FusionTimePicker
 
-A FusionTimePicker for selecting a time value.
+Fusion time picker component for selecting a time value.
 
 ```csharp
 // Properties
@@ -5011,7 +5011,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### NativeCheckBox
 
-A native HTML checkbox (`<input type="checkbox">`).
+Native HTML checkbox component for model-bound Boolean values.
 
 ```csharp
 // Properties
@@ -5073,7 +5073,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### NativeCheckList
 
-A native HTML checkbox list for multi-select scenarios.
+Native checkbox-list component with `string[]` value semantics.
 
 ```csharp
 // Properties
@@ -5141,7 +5141,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### NativeDropDown
 
-A native HTML dropdown (`<select>`).
+Native HTML `<select>` component for model-bound dropdowns.
 
 ```csharp
 // Properties
@@ -5268,7 +5268,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### NativeRadioGroup
 
-A native HTML radio button group.
+Native radio-group component backed by a hidden input value.
 
 ```csharp
 // Properties
@@ -5336,7 +5336,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### NativeTextArea
 
-A native HTML multi-line text input (`<textarea>`).
+Native HTML `<textarea>` component for model-bound multi-line text.
 
 ```csharp
 // Properties
@@ -5400,7 +5400,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### NativeTextBox
 
-A native HTML text input (`<input type="text">`).
+Native HTML `<input type="text">` component for model-bound text entry.
 
 ```csharp
 // Properties
@@ -5464,7 +5464,7 @@ Reactive<T>(plan, eventSelector, pipeline)
 
 ### RadioButtonItem
 
-A single radio or checkbox option with a value, display text, and optional description.
+Shared option item for native radio groups and checkbox lists.
 
 ```csharp
 // Properties

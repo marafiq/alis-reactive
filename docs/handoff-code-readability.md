@@ -1024,6 +1024,10 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: ReactiveArray sort-key
   invariant now states the scalar-key requirement directly while preserving the
   browser-runtime reason object keys are rejected at authoring time.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion Grid search XML
+  docs now use "criteria" instead of descriptor prose while preserving the
+  public `FusionGridSearchDescriptor` type name; the generated API reference was
+  refreshed with current XML readability wording.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

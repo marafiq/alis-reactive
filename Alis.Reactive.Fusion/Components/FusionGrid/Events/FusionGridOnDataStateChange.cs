@@ -27,7 +27,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Active text filter criteria from Grid filter UI.</summary>
         public List<FusionGridTextFilterCriterion>? Where { get; set; }
 
-        /// <summary>Active search descriptors from Grid toolbar or public search method.</summary>
+        /// <summary>Active search criteria from Grid toolbar or public search method.</summary>
         public List<FusionGridSearchDescriptor>? Search { get; set; }
 
         /// <summary>Action details such as request type, column name, direction, and current page.</summary>
@@ -81,7 +81,7 @@ namespace Alis.Reactive.Fusion.Components
     }
 
     /// <summary>
-    /// Search descriptor emitted by Grid dataStateChange for toolbar/search method operations.
+    /// Search criteria emitted by Grid dataStateChange for toolbar/search method operations.
     /// </summary>
     public class FusionGridSearchDescriptor
     {
