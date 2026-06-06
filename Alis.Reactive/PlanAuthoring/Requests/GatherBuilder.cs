@@ -47,8 +47,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds a value from the triggering event payload to the request body.</summary>
-        /// <typeparam name="TPayload">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The event value type copied into the request body.</typeparam>
+        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
+        /// <typeparam name="TProp">The CLR type used to shape the selected event-payload body value.</typeparam>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path to read.</param>
         /// <param name="param">The request body field that receives the payload value.</param>
@@ -81,7 +81,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds a scalar HTTP header value from a typed source.</summary>
-        /// <typeparam name="TProp">The source value type.</typeparam>
+        /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
         /// <param name="name">The HTTP header that receives the source value.</param>
         /// <param name="source">The typed value source to evaluate before the request is sent.</param>
         public GatherBuilder<TModel> Header<TProp>(string name, TypedSource<TProp> source)
@@ -94,8 +94,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds a scalar HTTP header value from the triggering event payload.</summary>
-        /// <typeparam name="TPayload">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The event value type sent as the header value.</typeparam>
+        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
+        /// <typeparam name="TProp">The CLR type used to shape the selected event-payload header value.</typeparam>
         /// <param name="name">The HTTP header that receives the payload value.</param>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path to send as a header.</param>
@@ -146,7 +146,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Binds a route template parameter to a scalar typed source.</summary>
-        /// <typeparam name="TProp">The source value type.</typeparam>
+        /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
         /// <param name="paramName">The route template placeholder name without braces.</param>
         /// <param name="source">The typed value source to evaluate before the request is sent.</param>
         public GatherBuilder<TModel> RouteParam<TProp>(string paramName, TypedSource<TProp> source)
@@ -159,8 +159,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Binds a route template parameter to a scalar value from the triggering event payload.</summary>
-        /// <typeparam name="TPayload">The event payload type.</typeparam>
-        /// <typeparam name="TProp">The event value type sent as the route value.</typeparam>
+        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
+        /// <typeparam name="TProp">The CLR type used to shape the selected event-payload route value.</typeparam>
         /// <param name="paramName">The route template placeholder name without braces.</param>
         /// <param name="args">The typed event payload parameter from the trigger callback.</param>
         /// <param name="path">The event payload property path captured as the route value.</param>
@@ -227,7 +227,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds a plan-registered plugin method result to the request body.</summary>
-        /// <typeparam name="T">The plugin method return type.</typeparam>
+        /// <typeparam name="T">The CLR type returned by the plugin call.</typeparam>
         /// <param name="source">The typed plugin value source, including any arguments already configured.</param>
         /// <param name="paramName">The request body field that receives the plugin result.</param>
         public GatherBuilder<TModel> Plugin<T>(Conditions.TypedPluginSource<T> source, string paramName)
