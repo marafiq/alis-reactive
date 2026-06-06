@@ -38,6 +38,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Sets the root <c>div</c> ID emitted into the template string.
         /// </summary>
+        /// <param name="id">The literal ID to emit on the root template element.</param>
         public FusionTemplateBuilder<TModel> Id(string id)
         {
             _id = TemplateElementId.Of(id);
@@ -47,6 +48,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a CSS class to the root template <c>div</c>.
         /// </summary>
+        /// <param name="cssClass">The CSS class to append.</param>
         public FusionTemplateBuilder<TModel> Class(string cssClass)
         {
             _cssClasses.Add(cssClass);
@@ -56,6 +58,8 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds or replaces an HTML attribute on the root template <c>div</c>.
         /// </summary>
+        /// <param name="name">The attribute name to emit.</param>
+        /// <param name="value">The attribute value to emit.</param>
         /// <remarks>Attribute names and values are emitted as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> Attr(string name, string value)
         {
@@ -66,6 +70,8 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a Syncfusion binding for a template model property.
         /// </summary>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="property">The template model property to bind.</param>
         public FusionTemplateBuilder<TModel> Text<TProperty>(Expression<Func<TModel, TProperty>> property)
         {
             var binding = FusionTemplateExpression.ToBinding(property);
@@ -76,6 +82,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds literal text to the template output.
         /// </summary>
+        /// <param name="text">The literal text to emit.</param>
         public FusionTemplateBuilder<TModel> Text(string text)
         {
             _childRenderers.Add(() => text);
@@ -85,12 +92,17 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a <c>span</c> bound to a template model property.
         /// </summary>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="property">The template model property to bind.</param>
         public FusionTemplateBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property) =>
             Span(property, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled <c>span</c> bound to a template model property.
         /// </summary>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="property">The template model property to bind.</param>
+        /// <param name="css">The CSS class to emit on the <c>span</c>.</param>
         public FusionTemplateBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, string css) =>
             Span(property, TemplateCss.Class(css));
 
@@ -103,12 +115,15 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a <c>span</c> with literal text.
         /// </summary>
+        /// <param name="text">The literal text to emit inside the <c>span</c>.</param>
         public FusionTemplateBuilder<TModel> Span(string text) =>
             Span(text, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled <c>span</c> with literal text.
         /// </summary>
+        /// <param name="text">The literal text to emit inside the <c>span</c>.</param>
+        /// <param name="css">The CSS class to emit on the <c>span</c>.</param>
         public FusionTemplateBuilder<TModel> Span(string text, string css) =>
             Span(text, TemplateCss.Class(css));
 
@@ -121,18 +136,27 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds an <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
         public FusionTemplateBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty) =>
             Img(srcProperty, TemplateCss.None, TemplateAltText.None);
 
         /// <summary>
         /// Adds a styled <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
+        /// <param name="css">The CSS class to emit on the <c>img</c>.</param>
         public FusionTemplateBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css) =>
             Img(srcProperty, TemplateCss.Class(css), TemplateAltText.None);
 
         /// <summary>
         /// Adds a styled <c>img</c> with bound <c>src</c> and static alt text.
         /// </summary>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="srcProperty">The template model property used for <c>src</c>.</param>
+        /// <param name="css">The CSS class to emit on the <c>img</c>.</param>
+        /// <param name="alt">The literal alt text to emit.</param>
         public FusionTemplateBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css, string alt) =>
             Img(srcProperty, TemplateCss.Class(css), TemplateAltText.Text(alt));
 
@@ -148,6 +172,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a nested template <c>div</c> over the same Syncfusion model context.
         /// </summary>
+        /// <param name="configure">Configures the nested template content.</param>
         public FusionTemplateBuilder<TModel> Div(Action<FusionTemplateBuilder<TModel>> configure)
         {
             var nestedTemplate = new FusionTemplateBuilder<TModel>();
@@ -159,6 +184,9 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a badge whose content is bound to a template model property.
         /// </summary>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="property">The template model property to bind.</param>
+        /// <param name="css">The CSS class to emit on the badge.</param>
         public FusionTemplateBuilder<TModel> Badge<TProperty>(Expression<Func<TModel, TProperty>> property, string css = "e-badge")
         {
             _childRenderers.Add(() => TemplateElements.Badge(FusionTemplateExpression.ToBinding(property), css));
@@ -168,6 +196,8 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a badge with literal text.
         /// </summary>
+        /// <param name="text">The literal text to emit inside the badge.</param>
+        /// <param name="css">The CSS class to emit on the badge.</param>
         public FusionTemplateBuilder<TModel> Badge(string text, string css = "e-badge")
         {
             _childRenderers.Add(() => TemplateElements.Badge(text, css));
@@ -177,12 +207,15 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a Syncfusion icon <c>span</c>.
         /// </summary>
+        /// <param name="iconName">The Syncfusion icon class name.</param>
         public FusionTemplateBuilder<TModel> Icon(string iconName) =>
             Icon(iconName, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled Syncfusion icon <c>span</c>.
         /// </summary>
+        /// <param name="iconName">The Syncfusion icon class name.</param>
+        /// <param name="css">The CSS class to append to the icon <c>span</c>.</param>
         public FusionTemplateBuilder<TModel> Icon(string iconName, string css) =>
             Icon(iconName, TemplateCss.Class(css));
 
@@ -195,6 +228,8 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button with a raw <c>onclick</c> expression.
         /// </summary>
+        /// <param name="text">The literal button text.</param>
+        /// <param name="onClick">The raw <c>onclick</c> expression to emit.</param>
         /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> Button(string text, string onClick) =>
             Button(text, onClick, TemplateCss.None);
@@ -202,6 +237,9 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled button with a raw <c>onclick</c> expression.
         /// </summary>
+        /// <param name="text">The literal button text.</param>
+        /// <param name="onClick">The raw <c>onclick</c> expression to emit.</param>
+        /// <param name="css">The CSS class to emit on the button.</param>
         /// <remarks>The <paramref name="onClick"/> value is emitted as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> Button(string text, string onClick, string css) =>
             Button(text, onClick, TemplateCss.Class(css));
@@ -215,6 +253,10 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button that calls a JavaScript function with a bound model value.
         /// </summary>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="text">The literal button text.</param>
+        /// <param name="idProperty">The template model property passed to the JavaScript function.</param>
+        /// <param name="onClickFn">The JavaScript function name to call.</param>
         /// <remarks>The function name is emitted into <c>onclick</c> as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> ButtonFor<TProperty>(
             string text,
@@ -225,6 +267,11 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled button that calls a JavaScript function with a bound model value.
         /// </summary>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="text">The literal button text.</param>
+        /// <param name="idProperty">The template model property passed to the JavaScript function.</param>
+        /// <param name="onClickFn">The JavaScript function name to call.</param>
+        /// <param name="css">The CSS class to emit on the button.</param>
         /// <remarks>The function name is emitted into <c>onclick</c> as supplied; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> ButtonFor<TProperty>(
             string text,
@@ -250,6 +297,10 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="text">The literal button text.</param>
+        /// <param name="eventName">The DOM event name to dispatch.</param>
+        /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
         public FusionTemplateBuilder<TModel> EventButton<TProperty>(
             string text,
             string eventName,
@@ -259,6 +310,11 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.
         /// </summary>
+        /// <typeparam name="TProperty">The selected property type.</typeparam>
+        /// <param name="text">The literal button text.</param>
+        /// <param name="eventName">The DOM event name to dispatch.</param>
+        /// <param name="idProperty">The template model property emitted as <c>detail.id</c>.</param>
+        /// <param name="css">The CSS class to emit on the button.</param>
         public FusionTemplateBuilder<TModel> EventButton<TProperty>(
             string text,
             string eventName,
@@ -279,6 +335,10 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a link whose <c>href</c> and text are bound to template model properties.
         /// </summary>
+        /// <typeparam name="THref">The selected href property type.</typeparam>
+        /// <typeparam name="TText">The selected text property type.</typeparam>
+        /// <param name="hrefProperty">The template model property used for <c>href</c>.</param>
+        /// <param name="textProperty">The template model property used for link text.</param>
         public FusionTemplateBuilder<TModel> Link<THref, TText>(
             Expression<Func<TModel, THref>> hrefProperty,
             Expression<Func<TModel, TText>> textProperty) =>
@@ -287,6 +347,11 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a styled link whose <c>href</c> and text are bound to template model properties.
         /// </summary>
+        /// <typeparam name="THref">The selected href property type.</typeparam>
+        /// <typeparam name="TText">The selected text property type.</typeparam>
+        /// <param name="hrefProperty">The template model property used for <c>href</c>.</param>
+        /// <param name="textProperty">The template model property used for link text.</param>
+        /// <param name="css">The CSS class to emit on the link.</param>
         public FusionTemplateBuilder<TModel> Link<THref, TText>(
             Expression<Func<TModel, THref>> hrefProperty,
             Expression<Func<TModel, TText>> textProperty,
@@ -308,6 +373,8 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Emits a Syncfusion <c>${if(...)}...${/if}</c> block for a typed condition.
         /// </summary>
+        /// <param name="condition">The typed template condition.</param>
+        /// <param name="then">Configures content emitted when the condition is true.</param>
         public FusionTemplateBuilder<TModel> When(
             Expression<Func<TModel, bool>> condition,
             Action<FusionConditionalBuilder<TModel>> then) =>
@@ -316,6 +383,9 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Emits a Syncfusion <c>${if(...)}...${else}...${/if}</c> block.
         /// </summary>
+        /// <param name="condition">The typed template condition.</param>
+        /// <param name="then">Configures content emitted when the condition is true.</param>
+        /// <param name="else">Configures content emitted when the condition is false.</param>
         public FusionTemplateBuilder<TModel> When(
             Expression<Func<TModel, bool>> condition,
             Action<FusionConditionalBuilder<TModel>> then,
@@ -348,6 +418,8 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds conditional content when the typed condition is true.
         /// </summary>
+        /// <param name="condition">The typed template condition.</param>
+        /// <param name="content">Configures content emitted when the condition is true.</param>
         public FusionTemplateBuilder<TModel> ShowIf(Expression<Func<TModel, bool>> condition, Action<FusionConditionalBuilder<TModel>> content)
         {
             return When(condition, content);
@@ -356,6 +428,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds raw HTML to the template output.
         /// </summary>
+        /// <param name="html">The raw HTML to emit.</param>
         /// <remarks>The <paramref name="html"/> value is emitted without escaping; do not pass untrusted input.</remarks>
         public FusionTemplateBuilder<TModel> Raw(string html)
         {

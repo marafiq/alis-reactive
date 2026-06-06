@@ -127,6 +127,10 @@ Top XML-heavy source files:
 
 Candidate cleanup:
 
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionTemplateBuilder<T>`
+  public XML docs now include concise parameter and type-parameter tags for all
+  public overloads. The generated API reference now shows overload signatures
+  with real parameter names instead of repeated empty method calls.
 - `ConditionSourceBuilder<TModel,TProp>` has short XML on nearly every operator plus inline category comments. The method names already describe most operators. Keep shape/type-safety guidance at the class level and trim repetitive member summaries.
 - Native component builders include long XML examples. Keep the user-facing factory summary and move multi-line usage examples to docs or sandbox guidance.
 - Event payload constructors often say "Creates a new instance. Framework-internal..." repeatedly. Prefer one concise convention across event payload types.
