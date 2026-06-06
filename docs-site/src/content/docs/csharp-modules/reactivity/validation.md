@@ -78,7 +78,7 @@ Inside a pipeline, call `.Validate<TValidator>("formId")` on the HTTP request:
     }))
 ```
 
-At render time, the framework reads browser metadata from `ResidentIntakeValidator` and embeds it in the plan JSON. At runtime, the browser evaluates those rules before sending the request. If validation fails, the request is aborted and errors appear at each field.
+At render time, the framework reads client-validation rules from `ResidentIntakeValidator` and embeds them in the plan JSON. At runtime, the browser evaluates those rules before sending the request. If validation fails, the request is aborted and errors appear at each field.
 
 The `"intake-form"` string is the form ID — it must match the `id` attribute on the form container element. Errors display in each field's validation slot (rendered by `Html.InputField`).
 
