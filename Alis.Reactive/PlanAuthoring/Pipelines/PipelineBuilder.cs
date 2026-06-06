@@ -60,17 +60,17 @@ namespace Alis.Reactive.Builders
             return this;
         }
 
-        /// <summary>Dispatches a <c>CustomEvent</c> whose payload fields are resolved from value sources at runtime.</summary>
+        /// <summary>Dispatches a <c>CustomEvent</c> whose payload fields come from value sources.</summary>
         /// <remarks>
-        /// <para>Use this when the payload needs current state from runtime sources,
-        /// such as component values or URL parameters. The listener consumes the
+        /// <para>Use this when the payload needs current state from Reactive Plan
+        /// value sources, such as component values or URL parameters. The listener consumes the
         /// payload via <c>t.CustomEvent&lt;TPayload&gt;(name, (payload, p) =&gt; ...)</c>.</para>
         /// <para>Use <see cref="Dispatch{TPayload}(string, TPayload)"/> for a fixed build-time
         /// payload object.</para>
         /// </remarks>
         /// <typeparam name="TPayload">The payload contract consumed by matching custom event triggers.</typeparam>
         /// <param name="eventName">The event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
-        /// <param name="configure">Maps payload fields to runtime value sources or literals.</param>
+        /// <param name="configure">Maps payload fields to value sources or literals.</param>
         /// <returns>The current builder; chained reactions are appended after the dispatch.</returns>
         public PipelineBuilder<TModel> DispatchWith<TPayload>(
             string eventName,

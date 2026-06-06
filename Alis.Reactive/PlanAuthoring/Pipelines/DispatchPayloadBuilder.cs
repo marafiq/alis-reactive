@@ -7,7 +7,7 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders
 {
     /// <summary>
-    /// Composes a custom-event dispatch payload from runtime value sources and literals.
+    /// Composes a custom-event dispatch payload from Reactive Plan value sources and literals.
     /// Each field is set via a typed expression on <typeparamref name="TPayload"/>,
     /// matching the event-payload contract consumed by
     /// <see cref="Builders.TriggerBuilder{TModel}.CustomEvent{TPayload}"/> triggers.
@@ -22,10 +22,10 @@ namespace Alis.Reactive.Builders
 
         internal DispatchPayloadBuilder() { }
 
-        /// <summary>Sets a payload field from a runtime value source resolved at dispatch time.</summary>
+        /// <summary>Sets a payload field from a value source evaluated when the dispatch runs.</summary>
         /// <typeparam name="TProp">The field value type, inferred from the expression.</typeparam>
         /// <param name="field">The payload property to populate.</param>
-        /// <param name="source">A component value, URL param, or plugin read that provides the runtime value.</param>
+        /// <param name="source">A component value, URL parameter, or plugin read that provides the field value.</param>
         public DispatchPayloadBuilder<TPayload, TModel> Set<TProp>(
             Expression<Func<TPayload, TProp>> field,
             TypedSource<TProp> source)
