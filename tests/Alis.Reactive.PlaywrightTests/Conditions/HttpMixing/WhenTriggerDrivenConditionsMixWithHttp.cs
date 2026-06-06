@@ -242,7 +242,6 @@ public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // First matching ElseIf branch wins even when later guards would also match.
         await Page.Locator("#s5-btn-enterprise").ClickAsync();
         await Expect(Page.Locator("#s5-client-tier")).ToHaveTextAsync("gold", new() { Timeout = 5000 });
 
