@@ -620,6 +620,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `FusionDropDownTree` XML
   tags now use concise field-wrapper, model-value, event-args, Reactive Plan,
   selected-ID, and display-text wording. Syncfusion value-shape notes remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionRating` XML tags
+  now use concise field-wrapper, event-args, Reactive Plan, and rating-value
+  wording.
 
 ### Implementation Inline Comments
 
