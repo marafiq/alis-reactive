@@ -14,8 +14,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Stepper and carries its controlled component ID into the Reactive Plan.
         /// </summary>
-        /// <param name="plan">The Reactive Plan that receives stepper event wiring.</param>
-        /// <param name="elementId">The controlled component ID shared by markup and Reactive Plan behavior.</param>
+        /// <param name="plan">Reactive Plan receiving stepper event wiring.</param>
+        /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>
         public static FusionStepperBuilder<TModel> FusionStepper<TModel>(
             this IHtmlHelper<TModel> html,

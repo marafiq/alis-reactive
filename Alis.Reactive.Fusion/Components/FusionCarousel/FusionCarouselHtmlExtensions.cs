@@ -13,8 +13,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Carousel and carries its controlled component ID into the Reactive Plan.
         /// </summary>
-        /// <param name="plan">The Reactive Plan that receives carousel event wiring.</param>
-        /// <param name="elementId">The controlled component ID shared by markup and Reactive Plan behavior.</param>
+        /// <param name="plan">Reactive Plan receiving carousel event wiring.</param>
+        /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>
         public static FusionCarouselBuilder<TModel> FusionCarousel<TModel>(
             this IHtmlHelper<TModel> html,

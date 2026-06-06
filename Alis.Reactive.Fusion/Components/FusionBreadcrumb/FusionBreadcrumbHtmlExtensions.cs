@@ -13,8 +13,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Breadcrumb and carries its controlled component ID into the Reactive Plan.
         /// </summary>
-        /// <param name="plan">The Reactive Plan that receives breadcrumb event wiring.</param>
-        /// <param name="elementId">The controlled component ID shared by markup and Reactive Plan behavior.</param>
+        /// <param name="plan">Reactive Plan receiving breadcrumb event wiring.</param>
+        /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>
         public static FusionBreadcrumbBuilder<TModel> FusionBreadcrumb<TModel>(
             this IHtmlHelper<TModel> html,

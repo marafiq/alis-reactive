@@ -257,6 +257,10 @@ Candidate cleanup:
   docs no longer repeat generic `TModel` ownership or the Razor HTML helper
   receiver. Bound value types, field wrappers, Reactive Plan, controlled IDs,
   and Syncfusion builder callbacks remain documented.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion event-surface HTML
+  helper `plan` and `elementId` parameter docs now use shorter Reactive Plan
+  wiring and controlled-ID wording across component vertical slices. The join-key
+  contract remains visible.
 - Resolved on `tiny-safe-but-important-refactorings`: Native render-factory XML
   docs no longer repeat Razor HTML helper or generic model boilerplate where the
   summaries already name the rendered element, action-link browser boundary, or
