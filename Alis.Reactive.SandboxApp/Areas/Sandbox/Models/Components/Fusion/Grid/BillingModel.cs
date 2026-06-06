@@ -6,8 +6,8 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// Page model for the resident month-end billing board.
-    /// Carries the server-side filter panel inputs plus the templated "Add charge" dialog inputs.
+    /// Month-end billing page model carrying server-side filter inputs and the
+    /// templated add-charge dialog inputs.
     /// </summary>
     public class ResidentBillingViewModel
     {
@@ -21,9 +21,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public decimal? NewAddOnCharges { get; set; }
     }
 
-    /// <summary>
-    /// One resident's monthly billing row. Used both as the server store record and the grid DTO.
-    /// </summary>
+    /// <summary>Resident monthly billing row used as both server store record and grid DTO.</summary>
     public class ResidentBillingItem
     {
         public int ResidentId { get; set; }
@@ -36,7 +34,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string BillingStatus { get; set; } = "";
     }
 
-    /// <summary>Server-side billing response. Syncfusion Grid custom binding expects {result, count}.</summary>
+    /// <summary>Billing grid response shaped for Syncfusion custom binding: {result, count}.</summary>
     public class ResidentBillingResponse
     {
         public List<ResidentBillingItem> Result { get; set; } = new();
@@ -44,7 +42,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Summary { get; set; } = "";
     }
 
-    /// <summary>One-row response for the templated dialog add and per-row server patches.</summary>
+    /// <summary>Single-row response for templated dialog adds and per-row server patches.</summary>
     public class ResidentBillingRowResponse
     {
         public ResidentBillingItem Row { get; set; } = new ResidentBillingItem();
@@ -74,7 +72,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// Client + server validation for the templated "Add charge" dialog.
+    /// Client and server validation for the templated add-charge dialog.
     /// Only the New* fields participate; the filter inputs are untouched.
     /// </summary>
     public class ResidentBillingAddValidator : ReactiveValidator<ResidentBillingViewModel>

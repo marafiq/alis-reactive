@@ -6,8 +6,8 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// Page model for the Care Operations board. Carries the templated "Admit resident"
-    /// dialog inputs. Fast filters come from chips, so no filter fields live here.
+    /// Care Operations page model carrying the templated admit-resident inputs.
+    /// Fast filters come from chips, so no filter fields live here.
     /// </summary>
     public class CareOpsViewModel
     {
@@ -18,7 +18,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public decimal? NewOpenTasks { get; set; }
     }
 
-    /// <summary>One resident's care row. Server store record and grid DTO.</summary>
+    /// <summary>Resident care row used as both server store record and grid DTO.</summary>
     public class ResidentCareItem
     {
         public int ResidentId { get; set; }
@@ -31,7 +31,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string NextReview { get; set; } = "";
     }
 
-    /// <summary>Server-side care response. Syncfusion Grid custom binding expects {result, count}.</summary>
+    /// <summary>Care grid response shaped for Syncfusion custom binding: {result, count}.</summary>
     public class CareOpsResponse
     {
         public List<ResidentCareItem> Result { get; set; } = new();
@@ -60,7 +60,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public FusionGridBatchChanges<ResidentCareItem>? BatchChanges { get; set; }
     }
 
-    /// <summary>Client + server validation for the templated "Admit resident" dialog.</summary>
+    /// <summary>Client and server validation for the templated admit-resident dialog.</summary>
     public class CareOpsAdmitValidator : ReactiveValidator<CareOpsViewModel>
     {
         public CareOpsAdmitValidator()
@@ -89,7 +89,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>
-    /// Client + server validation for an in-cell care row edit. The same
+    /// Client and server validation for an in-cell care row edit. The same
     /// <c>ClientRule</c> metadata drives EJ2-native column validation in the grid
     /// (via <c>FusionGridValidation</c>) and a full server check on save.
     /// </summary>

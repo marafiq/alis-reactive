@@ -975,6 +975,10 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: ShiftReport controller
   endpoint XML docs now describe the custom-event alert array and all-clear
   Else-guard payload contracts without roster narration.
+- Resolved on `tiny-safe-but-important-refactorings`: Grid sandbox CareOps and
+  Billing model XML docs now keep Syncfusion custom-binding and validation
+  contracts while removing generic page-model, one-row, and "client + server"
+  phrasing.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
