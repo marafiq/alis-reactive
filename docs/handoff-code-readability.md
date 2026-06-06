@@ -75,6 +75,10 @@ Examples and current status:
   Switch, NumericTextBox, DatePicker, DateTimePicker, TimePicker, and InputMask
   now keep only the comments that explain generated ID join keys or Syncfusion
   popup/commit behavior.
+- Resolved on `tiny-safe-but-important-refactorings`: InPlaceEditor date and
+  masked-MRN commit tests no longer carry XML narrative summaries. The remaining
+  notes are concise inline comments for Syncfusion Enter-key submit behavior,
+  mask display formatting, validation input shape, and the fixed-wait TODO.
 - `WhenAllComponentsGatherIntoOnePost.cs` has long form-fill flows, but helper
   extraction should happen only if it names a reusable domain action. Do not add
   private helper indirection that hides a one-off behavior proof.
