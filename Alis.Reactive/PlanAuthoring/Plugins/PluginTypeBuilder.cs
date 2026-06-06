@@ -20,7 +20,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Declares a value-returning plugin function with an open argument contract.</summary>
         /// <typeparam name="T">The function return type.</typeparam>
-        /// <param name="name">The host plugin function name.</param>
+        /// <param name="name">The host-page plugin member to call for this method.</param>
         public PluginTypeBuilder Method<T>(string name)
         {
             return AddMethod<T>(name, MethodArgumentContract.Open);
@@ -28,7 +28,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Declares a readable plugin property.</summary>
         /// <typeparam name="T">The property value type.</typeparam>
-        /// <param name="name">The host plugin property name.</param>
+        /// <param name="name">The host-page plugin member to read for this property.</param>
         public PluginTypeBuilder Property<T>(string name)
         {
             EnsureName(name);
@@ -40,7 +40,7 @@ namespace Alis.Reactive.Builders
 
         /// <summary>Declares a value-returning plugin function with an exact argument contract.</summary>
         /// <typeparam name="TReturn">The function return type.</typeparam>
-        /// <param name="name">The host plugin function name.</param>
+        /// <param name="name">The host-page plugin member to call for this method.</param>
         /// <param name="arguments">The ordered argument types accepted by the function.</param>
         public PluginTypeBuilder Method<TReturn>(string name, Action<PluginArgumentTypes> arguments)
         {
@@ -67,19 +67,19 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Declares a command member with no return value and an open argument contract.</summary>
-        /// <param name="name">The host plugin command name.</param>
+        /// <param name="name">The host-page plugin member to invoke for this command.</param>
         public PluginTypeBuilder Void(string name)
         {
             return AddVoid(name, MethodArgumentContract.Open);
         }
 
         /// <summary>Alias for declaring a no-return plugin command member with an open argument contract.</summary>
-        /// <param name="name">The host plugin command name.</param>
+        /// <param name="name">The host-page plugin member to invoke for this command.</param>
         public PluginTypeBuilder Command(string name) =>
             Void(name);
 
         /// <summary>Declares a command member with an exact argument contract.</summary>
-        /// <param name="name">The host plugin command name.</param>
+        /// <param name="name">The host-page plugin member to invoke for this command.</param>
         /// <param name="arguments">The ordered argument types accepted by the command.</param>
         public PluginTypeBuilder Void(string name, Action<PluginArgumentTypes> arguments)
         {
@@ -89,7 +89,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Alias for declaring a no-return plugin command member with an exact argument contract.</summary>
-        /// <param name="name">The host plugin command name.</param>
+        /// <param name="name">The host-page plugin member to invoke for this command.</param>
         /// <param name="arguments">The ordered argument types accepted by the command.</param>
         public PluginTypeBuilder Command(string name, Action<PluginArgumentTypes> arguments) =>
             Void(name, arguments);
