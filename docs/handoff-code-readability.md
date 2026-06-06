@@ -179,6 +179,11 @@ Candidate cleanup:
   now show `Arg(string value)`, `Arg(int value)`, and
   `RouteParam(string paramName, long value)` instead of repeated empty or
   same-name calls.
+- Resolved on `tiny-safe-but-important-refactorings`: plugin declaration XML
+  docs now include standard parameter, type-parameter, and return tags for
+  protected declaration helpers. Generated docs now show
+  `Function<T>(member, arguments)`, `Command(arguments)`, and `Args(arguments)`
+  instead of repeated empty calls.
 - Resolved on `tiny-safe-but-important-refactorings`: the API reference
   generator now filters XML documentation through the compiled assemblies'
   public/protected surface. Internal implementation types such as

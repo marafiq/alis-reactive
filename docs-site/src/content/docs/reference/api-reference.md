@@ -105,15 +105,15 @@ Name { get; }  // Plugin registration name resolved by the runtime.
 ```
 
 ```csharp
+Command(member)
+Command(member, arguments)
 Command()
-Command()
-Command()
-Command()
+Command(arguments)
+Function<T>(member)
+Function<T>(member, arguments)
 Function<T>()
-Function<T>()
-Function<T>()
-Function<T>()
-Property<T>()
+Function<T>(arguments)
+Property<T>(member)
 ```
 
 ### PluginCommand
@@ -123,7 +123,7 @@ Declares a plugin command that returns no value. Chain
 
 ```csharp
 Arg<T>()
-Args()
+Args(arguments)
 ```
 
 ### PluginFunction<T>
@@ -133,7 +133,7 @@ Declares a plugin function that returns a typed value. Chain
 
 ```csharp
 Arg<T>()
-Args()
+Args(arguments)
 ```
 
 ### PluginOperation
