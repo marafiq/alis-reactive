@@ -54,7 +54,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(StartEditMethod);
 
         /// <summary>
-        /// Saves the current edit. In batch mode this commits pending batch changes.
+        /// Saves the active edit. In batch mode this commits pending batch changes.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> EndEdit<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -62,7 +62,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.EmitCall(EndEditMethod);
 
         /// <summary>
-        /// Cancels the current edit state.
+        /// Cancels the active edit state.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> CloseEdit<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -105,7 +105,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Deletes the currently selected record.
+        /// Deletes the selected Grid record.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> DeleteSelectedRecord<TModel>(
             this ComponentRef<FusionGrid, TModel> self)
@@ -170,7 +170,7 @@ namespace Alis.Reactive.Fusion.Components
         }
 
         /// <summary>
-        /// Saves the currently edited batch cell.
+        /// Saves the edited batch cell.
         /// </summary>
         public static ComponentRef<FusionGrid, TModel> SaveCell<TModel>(
             this ComponentRef<FusionGrid, TModel> self)

@@ -55,7 +55,7 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(DisableMethod, new List<ValueExpression> { ValueExpression.Literal(true) });
 
-        /// <summary>Programmatically commits the current edit.</summary>
+        /// <summary>Programmatically commits the active edit.</summary>
         /// <remarks>
         /// Fires <c>beginEdit → change → endEdit → actionBegin → actionSuccess</c>.
         /// Does not fire <c>submitClick</c>, which is user-gesture only.

@@ -24,7 +24,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("setRowData").WithArgs<int, object>();
 
         /// <summary>
-        /// Reads the Grid's current rendered view records.
+        /// Reads the Grid records visible in the rendered view.
         /// </summary>
         public static TypedComponentSource<TRow[]> CurrentViewRecords<TModel, TRow>(
             this ComponentRef<FusionGrid, TModel> self)

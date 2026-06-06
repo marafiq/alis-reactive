@@ -593,6 +593,10 @@ Candidate cleanup:
   input-style HTML factory `build` parameter docs now use concise
   "configures initial options before rendering" wording. Longer setup examples
   remain in remarks where they help public DSL users.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining Fusion Grid,
+  Schedule, and InPlaceEditor read/edit summaries no longer use vague
+  "current/currently" wording. They now name selected schedule dates, visible
+  Grid records, selected Grid records, and active edit state directly.
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
   selected-value parameter docs now use the same concise selected-option wording
   as the other Native value-write helpers.

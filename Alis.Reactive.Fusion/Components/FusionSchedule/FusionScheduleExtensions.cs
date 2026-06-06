@@ -74,7 +74,7 @@ namespace Alis.Reactive.Fusion.Components
             => self.Read(CurrentViewProperty);
 
         /// <summary>
-        /// Reads the currently selected schedule date.
+        /// Reads the selected schedule date.
         /// </summary>
         public static TypedComponentSource<DateTime> SelectedDate<TModel>(
             this ComponentRef<FusionSchedule, TModel> self)
