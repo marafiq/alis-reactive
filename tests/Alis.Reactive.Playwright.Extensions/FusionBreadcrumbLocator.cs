@@ -15,7 +15,7 @@ public sealed class FusionBreadcrumbLocator
 
     public ILocator Root => _page.Locator($"#{_componentId}");
 
-    /// <summary>The current breadcrumb item rendered with aria-current.</summary>
+    /// <summary>Locates the breadcrumb item marked as the current page.</summary>
     public ILocator CurrentItem => Root.Locator("[aria-current='page']");
 
     /// <summary>Locates a clickable breadcrumb link by its visible text.</summary>

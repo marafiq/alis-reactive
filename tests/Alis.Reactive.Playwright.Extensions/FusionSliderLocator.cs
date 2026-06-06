@@ -17,7 +17,7 @@ public sealed class FusionSliderLocator
 
     public ILocator Handle(int index) => Host.Locator(".e-handle").Nth(index);
 
-    /// <summary>The current ARIA value for a slider handle.</summary>
+    /// <summary>Reads the ARIA value from the selected slider handle.</summary>
     public async Task<string?> ValueNow(int index = 0) =>
         await Handle(index).GetAttributeAsync("aria-valuenow");
 }

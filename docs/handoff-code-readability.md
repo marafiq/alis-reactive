@@ -275,6 +275,10 @@ Candidate cleanup:
   filtering `UpdateData` XML now describes the `ResponseBody<T>` argument as
   the response-body scope that supplies popup items instead of a vague
   "response body instance." Syncfusion popup lifecycle remarks remain.
+- Resolved on `tiny-safe-but-important-refactorings`: Playwright extension
+  summaries for breadcrumb and slider helpers now state whether they locate or
+  read test-visible state instead of saying "The current...". Selectors and
+  wait behavior were left unchanged.
 
 ### Implementation Inline Comments
 
