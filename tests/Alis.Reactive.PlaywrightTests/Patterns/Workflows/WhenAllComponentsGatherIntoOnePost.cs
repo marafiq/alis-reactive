@@ -7,8 +7,8 @@ namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
 /// Exercises IncludeAll() gather across JSON, FormData, validation, and explicit
 /// component-ID submit paths on the ComponentGather sandbox page.
 /// </summary>
-// Heavy form-fill tests (14+ Syncfusion popup interactions) — cannot run in parallel reliably.
-// Under parallel load, Syncfusion popup animations overlap with other browser instances.
+// TODO: Replace NonParallelizable once Syncfusion popup interactions use stable component-ready signals.
+// Under parallel load, 14+ popup interactions can overlap with other browser instances.
 [TestFixture, NonParallelizable]
 public class WhenAllComponentsGatherIntoOnePost : PlaywrightTestBase
 {
