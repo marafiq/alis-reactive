@@ -1035,6 +1035,9 @@ Rewrite or delete:
   no longer use generic "page model", "view model", or "model for" wording;
   they now name the ReactiveArray, component, grid, drawer, and ID-binding
   behavior carried by each model.
+- Resolved on `tiny-safe-but-important-refactorings`: Remaining article-led XML
+  boilerplate in Fusion template/Grid helpers and core plan serialization/gather
+  docs was tightened while keeping useful Syncfusion template examples.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

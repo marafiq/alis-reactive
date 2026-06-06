@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <typeparam name="TModel">Syncfusion template item contract.</typeparam>
         /// <typeparam name="TProperty">Template value type emitted by the binding token.</typeparam>
         /// <param name="expression">Property-access expression to bind.</param>
-        /// <returns>A binding token such as <c>${propertyName}</c>.</returns>
+        /// <returns>Binding token such as <c>${propertyName}</c>.</returns>
         public static string ToBinding<TModel, TProperty>(Expression<Func<TModel, TProperty>> expression)
         {
             var propertyPath = GetPropertyPath(expression.Body);
@@ -34,7 +34,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <typeparam name="TModel">Syncfusion template item contract.</typeparam>
         /// <typeparam name="TProperty">Template value type at the selected property path.</typeparam>
         /// <param name="expression">Property-access expression to convert.</param>
-        /// <returns>A property path without the surrounding binding token.</returns>
+        /// <returns>Property path without the surrounding binding token.</returns>
         public static string ToPropertyPath<TModel, TProperty>(Expression<Func<TModel, TProperty>> expression)
         {
             return GetPropertyPath(expression.Body);
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         /// <typeparam name="TModel">Syncfusion template item contract.</typeparam>
         /// <param name="predicate">Predicate expression to convert.</param>
-        /// <returns>A Syncfusion condition expression such as <c>status === 'Active'</c>.</returns>
+        /// <returns>Syncfusion condition expression such as <c>status === 'Active'</c>.</returns>
         public static string ToCondition<TModel>(Expression<Func<TModel, bool>> predicate)
         {
             return ConvertToCondition(predicate.Body);

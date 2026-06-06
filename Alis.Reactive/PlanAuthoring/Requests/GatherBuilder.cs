@@ -225,7 +225,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds plan-registered plugin method result to the request body.</summary>
-        /// <typeparam name="T">The CLR type returned by the plugin call.</typeparam>
+        /// <typeparam name="T">CLR type returned by the plugin call.</typeparam>
         /// <param name="source">Typed plugin value source, including configured arguments.</param>
         /// <param name="paramName">Request body field that receives the plugin result.</param>
         public GatherBuilder<TModel> Plugin<T>(Conditions.TypedPluginSource<T> source, string paramName)

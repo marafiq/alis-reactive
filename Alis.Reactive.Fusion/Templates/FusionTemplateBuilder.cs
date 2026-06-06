@@ -13,7 +13,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Starts a template for rows, cards, list items, or other Syncfusion template contexts.
         /// </summary>
-        /// <typeparam name="TModel">The object shape exposed by the Syncfusion template context.</typeparam>
+        /// <typeparam name="TModel">Object shape exposed by the Syncfusion template context.</typeparam>
         public static FusionTemplateBuilder<TModel> Create<TModel>() => new FusionTemplateBuilder<TModel>();
     }
 
@@ -26,7 +26,7 @@ namespace Alis.Reactive.Fusion.Templates
     /// Caller-provided literal text, attributes, CSS classes, URLs, inline JavaScript,
     /// and raw HTML are emitted as supplied; use trusted developer-authored values.
     /// </remarks>
-    /// <typeparam name="TModel">The object shape exposed by the Syncfusion template context.</typeparam>
+    /// <typeparam name="TModel">Object shape exposed by the Syncfusion template context.</typeparam>
     public class FusionTemplateBuilder<TModel>
     {
         internal FusionTemplateBuilder() { }

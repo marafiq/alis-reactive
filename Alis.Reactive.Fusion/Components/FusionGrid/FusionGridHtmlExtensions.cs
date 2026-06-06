@@ -13,7 +13,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Creates a Syncfusion Grid and carries its controlled component ID into the Reactive Plan.
         /// </summary>
-        /// <typeparam name="TRow">The grid row model used by the Syncfusion builder.</typeparam>
+        /// <typeparam name="TRow">Grid row model used by the Syncfusion builder.</typeparam>
         /// <param name="plan">Reactive Plan registering Grid behavior.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Callback to configure columns, paging, sorting, etc.</param>

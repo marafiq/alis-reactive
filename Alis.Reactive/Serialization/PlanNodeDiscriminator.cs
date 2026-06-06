@@ -9,7 +9,7 @@ namespace Alis.Reactive.Serialization
     /// node's own <c>Kind</c> property becomes the JSON discriminator. The single discriminator
     /// mechanism for every plan node family; reading is unsupported because plans are write-only.
     /// </summary>
-    /// <typeparam name="T">The abstract plan-node base (for example <c>ReactionGraph</c>).</typeparam>
+    /// <typeparam name="T">Abstract plan-node base, for example <c>ReactionGraph</c>.</typeparam>
     public sealed class PlanNodeDiscriminator<T> : JsonConverter<T>
     {
         /// <inheritdoc/>
