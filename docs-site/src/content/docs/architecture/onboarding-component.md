@@ -147,8 +147,8 @@ component with the closest Syncfusion API rather than inventing a shared helper.
 
 ### Events And Reactive Wiring
 
-`FusionXxxEvents` exposes typed event descriptors. `.Reactive()` selects one of
-those descriptors and delegates to `ComponentEventOnboarding.Wire(...)`.
+`FusionXxxEvents` exposes typed events. `.Reactive()` selects one of those
+events and delegates to `ComponentEventOnboarding.Wire(...)`.
 
 ```csharp
 public sealed class FusionXxxEvents
@@ -169,7 +169,7 @@ public static XxxBuilder Reactive<TModel, TArgs>(
     Action<TArgs, PipelineBuilder<TModel>> pipeline)
     where TModel : class
 {
-    var descriptor = eventSelector(FusionXxxEvents.Instance);
+    var typedEvent = eventSelector(FusionXxxEvents.Instance);
     var attrs = (IDictionary<string, object>)builder.model.HtmlAttributes;
     var componentId = (string)attrs["id"];
 
@@ -177,7 +177,7 @@ public static XxxBuilder Reactive<TModel, TArgs>(
         plan,
         componentId,
         new FusionXxx().Vendor,
-        descriptor,
+        typedEvent,
         pipeline);
 
     return builder;
