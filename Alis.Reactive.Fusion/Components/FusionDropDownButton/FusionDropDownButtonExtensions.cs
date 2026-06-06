@@ -32,7 +32,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod RemoveItemsMethod =
             ComponentMethod.Named("removeItems").WithArgs<string[], bool>();
 
-        /// <summary>Sets the visible dropdown button content.</summary>
+        /// <summary>Sets visible dropdown button content.</summary>
         public static ComponentRef<FusionDropDownButton, TModel> SetContent<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self,
             string content)
@@ -41,7 +41,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(ContentProperty, ValueExpression.Literal(content))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the rendered dropdown button is disabled.</summary>
+        /// <summary>Sets rendered dropdown button disabled state.</summary>
         public static ComponentRef<FusionDropDownButton, TModel> SetDisabled<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self,
             bool disabled)
@@ -50,7 +50,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(DisabledProperty, ValueExpression.Literal(disabled))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets the rendered CSS classes on the dropdown button and popup.</summary>
+        /// <summary>Sets rendered CSS classes on the dropdown button and popup.</summary>
         public static ComponentRef<FusionDropDownButton, TModel> SetCssClass<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self,
             string cssClass)
@@ -59,13 +59,13 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(CssClassProperty, ValueExpression.Literal(cssClass))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Toggles the DropDownButton popup between open and closed states.</summary>
+        /// <summary>Toggles DropDownButton popup between open and closed states.</summary>
         public static ComponentRef<FusionDropDownButton, TModel> Toggle<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self)
             where TModel : class
             => self.EmitCall(ToggleMethod);
 
-        /// <summary>Moves focus into the rendered dropdown button.</summary>
+        /// <summary>Moves focus into rendered dropdown button.</summary>
         public static ComponentRef<FusionDropDownButton, TModel> FocusIn<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self)
             where TModel : class
@@ -85,19 +85,19 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(RemoveItemsMethod, RemoveItemsArgs(itemIds, isUniqueId: true));
 
-        /// <summary>Reads the rendered dropdown button content.</summary>
+        /// <summary>Reads rendered dropdown button content.</summary>
         public static TypedComponentSource<string> Content<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self)
             where TModel : class
             => self.Read(ContentProperty);
 
-        /// <summary>Reads whether the rendered dropdown button is disabled.</summary>
+        /// <summary>Reads rendered dropdown button disabled state.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self)
             where TModel : class
             => self.Read(DisabledProperty);
 
-        /// <summary>Reads the rendered dropdown button CSS classes.</summary>
+        /// <summary>Reads rendered dropdown button CSS classes.</summary>
         public static TypedComponentSource<string> CssClass<TModel>(
             this ComponentRef<FusionDropDownButton, TModel> self)
             where TModel : class

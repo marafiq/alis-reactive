@@ -32,7 +32,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod RemoveItemsMethod =
             ComponentMethod.Named("removeItems").WithArgs<string[], bool>();
 
-        /// <summary>Sets the visible primary button content.</summary>
+        /// <summary>Sets visible primary button content.</summary>
         public static ComponentRef<FusionSplitButton, TModel> SetContent<TModel>(
             this ComponentRef<FusionSplitButton, TModel> self,
             string content)
@@ -41,7 +41,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(ContentProperty, ValueExpression.Literal(content))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether both rendered SplitButton buttons are disabled.</summary>
+        /// <summary>Sets disabled state for both rendered SplitButton buttons.</summary>
         public static ComponentRef<FusionSplitButton, TModel> SetDisabled<TModel>(
             this ComponentRef<FusionSplitButton, TModel> self,
             bool disabled)
@@ -59,13 +59,13 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(CssClassProperty, ValueExpression.Literal(cssClass))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Toggles the SplitButton secondary popup between open and closed states.</summary>
+        /// <summary>Toggles SplitButton secondary popup between open and closed states.</summary>
         public static ComponentRef<FusionSplitButton, TModel> Toggle<TModel>(
             this ComponentRef<FusionSplitButton, TModel> self)
             where TModel : class
             => self.EmitCall(ToggleMethod);
 
-        /// <summary>Moves focus into the rendered SplitButton primary button.</summary>
+        /// <summary>Moves focus into rendered SplitButton primary button.</summary>
         public static ComponentRef<FusionSplitButton, TModel> FocusIn<TModel>(
             this ComponentRef<FusionSplitButton, TModel> self)
             where TModel : class
@@ -85,19 +85,19 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(RemoveItemsMethod, RemoveItemsArgs(itemIds, isUniqueId: true));
 
-        /// <summary>Reads the rendered SplitButton content.</summary>
+        /// <summary>Reads rendered SplitButton content.</summary>
         public static TypedComponentSource<string> Content<TModel>(
             this ComponentRef<FusionSplitButton, TModel> self)
             where TModel : class
             => self.Read(ContentProperty);
 
-        /// <summary>Reads whether the rendered SplitButton is disabled.</summary>
+        /// <summary>Reads rendered SplitButton disabled state.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionSplitButton, TModel> self)
             where TModel : class
             => self.Read(DisabledProperty);
 
-        /// <summary>Reads the rendered SplitButton CSS classes.</summary>
+        /// <summary>Reads rendered SplitButton CSS classes.</summary>
         public static TypedComponentSource<string> CssClass<TModel>(
             this ComponentRef<FusionSplitButton, TModel> self)
             where TModel : class

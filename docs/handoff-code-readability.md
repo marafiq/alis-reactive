@@ -189,6 +189,10 @@ Candidate cleanup:
   source semantics without article-led wording. The class invariant comment was
   kept because it explains why the job carries values instead of a request
   reference.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion button-family
+  extension summaries now keep rendered-state and Syncfusion styling semantics
+  while removing repetitive article-led wording across Button, DropDownButton,
+  SplitButton, and ProgressButton.
 - Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
   operator docs now include the parameter tags needed for generated API
   signatures such as `Eq(operand)` versus `Eq(right)`. This keeps the public DSL

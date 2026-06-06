@@ -36,7 +36,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusInMethod =
             ComponentMethod.Named("focusIn");
 
-        /// <summary>Sets the visible progress button content.</summary>
+        /// <summary>Sets visible progress button content.</summary>
         public static ComponentRef<FusionProgressButton, TModel> SetContent<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self,
             string content)
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(ContentProperty, ValueExpression.Literal(content))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the rendered progress button is disabled.</summary>
+        /// <summary>Sets rendered progress button disabled state.</summary>
         public static ComponentRef<FusionProgressButton, TModel> SetDisabled<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self,
             bool disabled)
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(CssClassProperty, ValueExpression.Literal(cssClass))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the rendered progress filler is enabled.</summary>
+        /// <summary>Sets rendered progress filler enabled state.</summary>
         public static ComponentRef<FusionProgressButton, TModel> SetProgressEnabled<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self,
             bool enabled)
@@ -93,31 +93,31 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(ProgressCompleteMethod);
 
-        /// <summary>Moves focus into the rendered progress button.</summary>
+        /// <summary>Moves focus into rendered progress button.</summary>
         public static ComponentRef<FusionProgressButton, TModel> FocusIn<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads the rendered progress button content.</summary>
+        /// <summary>Reads rendered progress button content.</summary>
         public static TypedComponentSource<string> Content<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class
             => self.Read(ContentProperty);
 
-        /// <summary>Reads whether the rendered progress button is disabled.</summary>
+        /// <summary>Reads rendered progress button disabled state.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class
             => self.Read(DisabledProperty);
 
-        /// <summary>Reads the rendered progress button CSS classes.</summary>
+        /// <summary>Reads rendered progress button CSS classes.</summary>
         public static TypedComponentSource<string> CssClass<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class
             => self.Read(CssClassProperty);
 
-        /// <summary>Reads whether the rendered progress filler is enabled.</summary>
+        /// <summary>Reads rendered progress filler enabled state.</summary>
         public static TypedComponentSource<bool> ProgressEnabled<TModel>(
             this ComponentRef<FusionProgressButton, TModel> self)
             where TModel : class

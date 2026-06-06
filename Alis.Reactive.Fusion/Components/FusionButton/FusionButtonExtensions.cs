@@ -38,7 +38,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusInMethod =
             ComponentMethod.Named("focusIn");
 
-        /// <summary>Sets the visible button content.</summary>
+        /// <summary>Sets visible button content.</summary>
         public static ComponentRef<FusionButton, TModel> SetContent<TModel>(
             this ComponentRef<FusionButton, TModel> self,
             string content)
@@ -47,7 +47,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(ContentProperty, ValueExpression.Literal(content))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the rendered button is disabled.</summary>
+        /// <summary>Sets rendered button disabled state.</summary>
         public static ComponentRef<FusionButton, TModel> SetDisabled<TModel>(
             this ComponentRef<FusionButton, TModel> self,
             bool disabled)
@@ -56,7 +56,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(DisabledProperty, ValueExpression.Literal(disabled))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets the rendered button icon CSS and position.</summary>
+        /// <summary>Sets rendered button icon CSS and position.</summary>
         public static ComponentRef<FusionButton, TModel> SetIcon<TModel>(
             this ComponentRef<FusionButton, TModel> self,
             string iconCss,
@@ -67,7 +67,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(IconPositionProperty, ValueExpression.Literal(ToSyncfusion(position)))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets the rendered button CSS classes.</summary>
+        /// <summary>Sets rendered button CSS classes.</summary>
         public static ComponentRef<FusionButton, TModel> SetCssClass<TModel>(
             this ComponentRef<FusionButton, TModel> self,
             string cssClass)
@@ -76,7 +76,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(CssClassProperty, ValueExpression.Literal(cssClass))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the button has Syncfusion primary styling.</summary>
+        /// <summary>Sets Syncfusion primary styling.</summary>
         public static ComponentRef<FusionButton, TModel> SetPrimary<TModel>(
             this ComponentRef<FusionButton, TModel> self,
             bool isPrimary)
@@ -85,7 +85,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(IsPrimaryProperty, ValueExpression.Literal(isPrimary))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the button toggles active state when clicked.</summary>
+        /// <summary>Sets button active-state toggling on click.</summary>
         public static ComponentRef<FusionButton, TModel> SetToggle<TModel>(
             this ComponentRef<FusionButton, TModel> self,
             bool isToggle)
@@ -94,43 +94,43 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(IsToggleProperty, ValueExpression.Literal(isToggle))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Invokes the rendered button click.</summary>
+        /// <summary>Invokes rendered button click.</summary>
         public static ComponentRef<FusionButton, TModel> Click<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.EmitCall(ClickMethod);
 
-        /// <summary>Moves focus into the rendered button.</summary>
+        /// <summary>Moves focus into rendered button.</summary>
         public static ComponentRef<FusionButton, TModel> FocusIn<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.EmitCall(FocusInMethod);
 
-        /// <summary>Reads the rendered button content.</summary>
+        /// <summary>Reads rendered button content.</summary>
         public static TypedComponentSource<string> Content<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.Read(ContentProperty);
 
-        /// <summary>Reads whether the rendered button is disabled.</summary>
+        /// <summary>Reads rendered button disabled state.</summary>
         public static TypedComponentSource<bool> Disabled<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.Read(DisabledProperty);
 
-        /// <summary>Reads the rendered button CSS classes.</summary>
+        /// <summary>Reads rendered button CSS classes.</summary>
         public static TypedComponentSource<string> CssClass<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.Read(CssClassProperty);
 
-        /// <summary>Reads whether the rendered button uses primary styling.</summary>
+        /// <summary>Reads rendered button primary styling state.</summary>
         public static TypedComponentSource<bool> IsPrimary<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
             => self.Read(IsPrimaryProperty);
 
-        /// <summary>Reads whether the rendered button toggles active state.</summary>
+        /// <summary>Reads rendered button active-state toggle setting.</summary>
         public static TypedComponentSource<bool> IsToggle<TModel>(
             this ComponentRef<FusionButton, TModel> self)
             where TModel : class
