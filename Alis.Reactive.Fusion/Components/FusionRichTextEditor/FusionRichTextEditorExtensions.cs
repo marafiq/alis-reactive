@@ -21,7 +21,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("focusIn");
 
         /// <summary>Sets the HTML content value.</summary>
-        /// <param name="value">The HTML content to set.</param>
+        /// <param name="value">HTML content to set.</param>
         public static ComponentRef<FusionRichTextEditor, TModel> SetValue<TModel>(
             this ComponentRef<FusionRichTextEditor, TModel> self, string value)
             where TModel : class

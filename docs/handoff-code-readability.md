@@ -631,6 +631,9 @@ Candidate cleanup:
   tags now use concise event-args, Reactive Plan, field-mapping, selected-value,
   response-scope, typed-source, and field-wrapper wording. Selected value array,
   server-filtering lifecycle, and public examples remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `FusionRichTextEditor`
+  XML tags now use concise field-wrapper, model-value, event-args, Reactive Plan,
+  and HTML-content wording. Syncfusion `model.Id` and output-writer notes remain.
 
 ### Implementation Inline Comments
 
