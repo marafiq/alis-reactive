@@ -26,7 +26,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod AddAppendIconMethod =
             ComponentMethod.Mapped("addAppendIcon", "addIcon").WithArgs<string, string>();
 
-        /// <summary>Sets the text value and flushes it into the visible input.</summary>
+        /// <summary>Sets the visible textbox value.</summary>
         /// <param name="value">The text to set, or <see langword="null"/> to clear.</param>
         public static ComponentRef<FusionTextBox, TModel> SetValue<TModel>(
             this ComponentRef<FusionTextBox, TModel> self, string? value)

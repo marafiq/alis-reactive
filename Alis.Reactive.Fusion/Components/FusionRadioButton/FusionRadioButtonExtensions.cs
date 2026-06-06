@@ -26,7 +26,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusInMethod =
             ComponentMethod.Named("focusIn");
 
-        /// <summary>Sets the selected state and flushes the Syncfusion view.</summary>
+        /// <summary>Sets whether this radio button is checked.</summary>
         public static ComponentRef<FusionRadioButton, TModel> SetChecked<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self,
             bool isChecked)
@@ -35,7 +35,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(CheckedProperty, ValueExpression.Literal(isChecked))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the radio button is disabled and flushes the Syncfusion view.</summary>
+        /// <summary>Sets whether this radio button is disabled.</summary>
         public static ComponentRef<FusionRadioButton, TModel> SetDisabled<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self,
             bool disabled)
@@ -44,13 +44,13 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(DisabledProperty, ValueExpression.Literal(disabled))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Invokes the radio button's native click through Syncfusion's public method.</summary>
+        /// <summary>Invokes the rendered radio button click.</summary>
         public static ComponentRef<FusionRadioButton, TModel> Click<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self)
             where TModel : class
             => self.EmitCall(ClickMethod);
 
-        /// <summary>Moves focus into the radio button through Syncfusion's public method.</summary>
+        /// <summary>Moves focus into the rendered radio button.</summary>
         public static ComponentRef<FusionRadioButton, TModel> FocusIn<TModel>(
             this ComponentRef<FusionRadioButton, TModel> self)
             where TModel : class

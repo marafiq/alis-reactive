@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusInMethod =
             ComponentMethod.Named("focusIn");
 
-        /// <summary>Sets the checked state and flushes the Syncfusion view.</summary>
+        /// <summary>Sets whether the checkbox is checked.</summary>
         public static ComponentRef<FusionCheckBox, TModel> SetChecked<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self,
             bool isChecked)
@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(CheckedProperty, ValueExpression.Literal(isChecked))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets the indeterminate state and flushes the Syncfusion view.</summary>
+        /// <summary>Sets whether the checkbox is indeterminate.</summary>
         public static ComponentRef<FusionCheckBox, TModel> SetIndeterminate<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self,
             bool isIndeterminate)
@@ -46,7 +46,7 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(IndeterminateProperty, ValueExpression.Literal(isIndeterminate))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Sets whether the checkbox is disabled and flushes the Syncfusion view.</summary>
+        /// <summary>Sets whether the checkbox is disabled.</summary>
         public static ComponentRef<FusionCheckBox, TModel> SetDisabled<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self,
             bool disabled)
@@ -55,13 +55,13 @@ namespace Alis.Reactive.Fusion.Components
                 .EmitSet(DisabledProperty, ValueExpression.Literal(disabled))
                 .EmitCall(DataBindMethod);
 
-        /// <summary>Invokes the checkbox's native click through Syncfusion's public method.</summary>
+        /// <summary>Invokes the rendered checkbox click.</summary>
         public static ComponentRef<FusionCheckBox, TModel> Click<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self)
             where TModel : class
             => self.EmitCall(ClickMethod);
 
-        /// <summary>Moves focus into the checkbox through Syncfusion's public method.</summary>
+        /// <summary>Moves focus into the rendered checkbox.</summary>
         public static ComponentRef<FusionCheckBox, TModel> FocusIn<TModel>(
             this ComponentRef<FusionCheckBox, TModel> self)
             where TModel : class

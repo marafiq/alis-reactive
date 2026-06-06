@@ -22,7 +22,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusOutMethod =
             ComponentMethod.Named("focusOut");
 
-        /// <summary>Sets the text value and flushes it into the visible textarea.</summary>
+        /// <summary>Sets the visible textarea value.</summary>
         /// <param name="value">The text to set, or <see langword="null"/> to clear.</param>
         public static ComponentRef<FusionTextArea, TModel> SetValue<TModel>(
             this ComponentRef<FusionTextArea, TModel> self, string? value)

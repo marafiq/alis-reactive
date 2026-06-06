@@ -364,6 +364,11 @@ Candidate cleanup:
   IntelliSense wording. Button, DropDownButton, SplitButton, and ProgressButton
   operations now describe rendered component behavior; Syncfusion wording remains
   only where it names a public component concept such as item IDs.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining Fusion
+  component extension XML docs no longer use "flush" wording for visible value
+  updates. Text input, OTP, slider, rating, breadcrumb, radio, and checkbox docs
+  now name the rendered value/state contract instead of the internal refresh
+  mechanism.
 
 ### Implementation Inline Comments
 

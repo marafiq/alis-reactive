@@ -17,7 +17,7 @@ namespace Alis.Reactive.Fusion.Components
             ComponentMethod.Named("dataBind");
 
         /// <summary>
-        /// Sets the active breadcrumb item URL or text and flushes the rendered state.
+        /// Sets the active breadcrumb item URL or text.
         /// </summary>
         public static ComponentRef<FusionBreadcrumb, TModel> SetActiveItem<TModel>(
             this ComponentRef<FusionBreadcrumb, TModel> self,

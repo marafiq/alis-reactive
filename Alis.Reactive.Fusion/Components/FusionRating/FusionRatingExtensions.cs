@@ -19,7 +19,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod ResetMethod =
             ComponentMethod.Named("reset");
 
-        /// <summary>Sets the rating value and flushes it into the visible rating.</summary>
+        /// <summary>Sets the visible rating value.</summary>
         /// <param name="value">The rating value to set.</param>
         public static ComponentRef<FusionRating, TModel> SetValue<TModel>(
             this ComponentRef<FusionRating, TModel> self,

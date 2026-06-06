@@ -22,7 +22,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod FocusOutMethod =
             ComponentMethod.Named("focusOut");
 
-        /// <summary>Sets the OTP value and flushes it into the visible fields.</summary>
+        /// <summary>Sets the visible OTP value.</summary>
         public static ComponentRef<FusionOtpInput, TModel> SetValue<TModel>(
             this ComponentRef<FusionOtpInput, TModel> self,
             string value)
