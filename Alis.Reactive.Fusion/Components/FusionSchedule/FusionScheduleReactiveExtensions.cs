@@ -16,7 +16,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         /// <typeparam name="TModel">The view model used to author the Reactive Plan.</typeparam>
         /// <typeparam name="TArgs">The event args type, inferred from the event selector.</typeparam>
-        /// <param name="builder">The schedule builder.</param>
+        /// <param name="builder">The FusionSchedule builder being wired.</param>
         /// <param name="eventSelector">Selects the component event, for example <c>evt =&gt; evt.CellClicked</c>.</param>
         /// <param name="pipeline">Configures the commands to run when the event fires.</param>
         public static FusionScheduleBuilder<TModel> Reactive<TModel, TArgs>(
