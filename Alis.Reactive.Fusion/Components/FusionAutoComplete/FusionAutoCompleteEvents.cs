@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionAutoCompleteEvents Instance = new FusionAutoCompleteEvents();
         private FusionAutoCompleteEvents() { }
 
-        /// <summary>Fires when the selected value changes.</summary>
+        /// <summary>Fires when selected value changes.</summary>
         public TypedEvent<FusionAutoCompleteChangeArgs> Changed =>
             new TypedEvent<FusionAutoCompleteChangeArgs>(
                 "change", new FusionAutoCompleteChangeArgs());

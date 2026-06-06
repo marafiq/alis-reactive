@@ -119,7 +119,7 @@ namespace Alis.Reactive.Fusion.Components
                     ValueExpression.Literal(true)
                 });
 
-        /// <summary>Reads the selected string values.</summary>
+        /// <summary>Reads selected string values.</summary>
         public static TypedComponentSource<string[]> Value<TModel>(
             this ComponentRef<FusionListBox, TModel> self)
             where TModel : class

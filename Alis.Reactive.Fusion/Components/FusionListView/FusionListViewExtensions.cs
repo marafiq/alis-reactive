@@ -20,7 +20,7 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod UncheckAllItemsMethod =
             ComponentMethod.Named("uncheckAllItems");
 
-        /// <summary>Selects an item by visible text for a primitive string ListView data source.</summary>
+        /// <summary>Selects item by visible text for a primitive string ListView data source.</summary>
         public static ComponentRef<FusionListView, TModel> SelectText<TModel>(
             this ComponentRef<FusionListView, TModel> self,
             string text)
@@ -29,7 +29,7 @@ namespace Alis.Reactive.Fusion.Components
                 SelectTextMethod,
                 new List<ValueExpression> { ValueExpression.Literal(text) });
 
-        /// <summary>Clears selection for an item by visible text for a primitive string ListView data source.</summary>
+        /// <summary>Clears selection for item by visible text in a primitive string ListView data source.</summary>
         public static ComponentRef<FusionListView, TModel> UnselectText<TModel>(
             this ComponentRef<FusionListView, TModel> self,
             string text)

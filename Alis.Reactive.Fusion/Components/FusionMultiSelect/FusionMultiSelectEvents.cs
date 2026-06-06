@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionMultiSelectEvents Instance = new FusionMultiSelectEvents();
         private FusionMultiSelectEvents() { }
 
-        /// <summary>Fires when the selected value array changes.</summary>
+        /// <summary>Fires when selected value array changes.</summary>
         public TypedEvent<FusionMultiSelectChangeArgs> Changed =>
             new TypedEvent<FusionMultiSelectChangeArgs>(
                 "change", new FusionMultiSelectChangeArgs());

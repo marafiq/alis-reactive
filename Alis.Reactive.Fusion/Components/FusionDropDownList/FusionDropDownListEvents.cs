@@ -9,7 +9,7 @@ namespace Alis.Reactive.Fusion.Components
         public static readonly FusionDropDownListEvents Instance = new FusionDropDownListEvents();
         private FusionDropDownListEvents() { }
 
-        /// <summary>Fires when the selected value changes.</summary>
+        /// <summary>Fires when selected value changes.</summary>
         public TypedEvent<FusionDropDownListChangeArgs> Changed =>
             new TypedEvent<FusionDropDownListChangeArgs>(
                 "change", new FusionDropDownListChangeArgs());

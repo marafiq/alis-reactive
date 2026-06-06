@@ -41,22 +41,22 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod ClearMethod =
             ComponentMethod.Named("clear");
 
-        /// <summary>Sets the selected value, or clears it with <see langword="null"/>.</summary>
-        /// <param name="value">String value to select.</param>
+        /// <summary>Sets selected value, or clears it with <see langword="null"/>.</summary>
+        /// <param name="value">Selected string value.</param>
         public static ComponentRef<FusionComboBox, TModel> SetValue<TModel>(
             this ComponentRef<FusionComboBox, TModel> self, string? value)
             where TModel : class
             => self.EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String));
 
-        /// <summary>Sets the displayed text, or clears it with <see langword="null"/>.</summary>
-        /// <param name="text">Display text to select.</param>
+        /// <summary>Sets displayed text, or clears it with <see langword="null"/>.</summary>
+        /// <param name="text">Displayed text.</param>
         public static ComponentRef<FusionComboBox, TModel> SetText<TModel>(
             this ComponentRef<FusionComboBox, TModel> self, string? text)
             where TModel : class
             => self.EmitSet(TextProperty, ValueExpression.LiteralRaw(text, Shape.String));
 
-        /// <summary>Sets the selected list index.</summary>
-        /// <param name="index">Zero-based list index to select.</param>
+        /// <summary>Sets selected list index.</summary>
+        /// <param name="index">Zero-based selected list index.</param>
         public static ComponentRef<FusionComboBox, TModel> SetIndex<TModel>(
             this ComponentRef<FusionComboBox, TModel> self, int index)
             where TModel : class
@@ -92,25 +92,25 @@ namespace Alis.Reactive.Fusion.Components
             where TModel : class
             => self.EmitCall(HidePopupMethod);
 
-        /// <summary>Clears the selected value, text, and index.</summary>
+        /// <summary>Clears selected value, text, and index.</summary>
         public static ComponentRef<FusionComboBox, TModel> Clear<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.EmitCall(ClearMethod);
 
-        /// <summary>Reads the selected value for conditions or gather.</summary>
+        /// <summary>Reads selected value for conditions or gather.</summary>
         public static TypedComponentSource<string?> Value<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.Read(ValueProperty);
 
-        /// <summary>Reads the display text for conditions or gather.</summary>
+        /// <summary>Reads display text for conditions or gather.</summary>
         public static TypedComponentSource<string?> Text<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class
             => self.Read(TextProperty);
 
-        /// <summary>Reads the selected index for conditions or gather.</summary>
+        /// <summary>Reads selected index for conditions or gather.</summary>
         public static TypedComponentSource<int?> Index<TModel>(
             this ComponentRef<FusionComboBox, TModel> self)
             where TModel : class

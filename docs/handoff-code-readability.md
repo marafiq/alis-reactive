@@ -209,6 +209,10 @@ Candidate cleanup:
   slider, and color value summaries now keep scalar, range, minimum, visible
   rating, hex color, and change-event semantics without article-led phrasing.
   The color hex+alpha remark remains because it documents payload shape.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion dropdown/list
+  selection summaries now keep selected value, display text, index, value-array,
+  value-ID, ListView visible text, and selection event semantics without
+  article-led phrasing. Data-source and Syncfusion mapping docs remain.
 - Resolved on `tiny-safe-but-important-refactorings`: `ConditionSourceBuilder`
   operator docs now include the parameter tags needed for generated API
   signatures such as `Eq(operand)` versus `Eq(right)`. This keeps the public DSL
