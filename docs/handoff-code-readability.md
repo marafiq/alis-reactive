@@ -972,6 +972,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: ArrayGrid sandbox
   model/controller XML docs now state the client-side ReactiveArray-to-grid
   dataSource contract without repeating the full route walkthrough.
+- Resolved on `tiny-safe-but-important-refactorings`: ShiftReport controller
+  endpoint XML docs now describe the custom-event alert array and all-clear
+  Else-guard payload contracts without roster narration.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

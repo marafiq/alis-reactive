@@ -21,7 +21,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
                 new ShiftReportModel());
         }
 
-        /// <summary>The alert roster that seeds the custom event payload's array.</summary>
+        /// <summary>Returns the alert array dispatched as the custom event payload.</summary>
         [HttpGet("Alerts")]
         public IActionResult Alerts()
         {
@@ -38,7 +38,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
             });
         }
 
-        /// <summary>A roster where every critical alert is acknowledged — exercises the clear (Else) guard.</summary>
+        /// <summary>Returns the all-clear alert array used by the custom-event Else guard.</summary>
         [HttpGet("AlertsAllClear")]
         public IActionResult AlertsAllClear()
         {
