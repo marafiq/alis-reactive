@@ -237,11 +237,6 @@ Narrow interface for emitting reactions into a pipeline.
 Used by vendor-specific extensions (Fusion, Native) and ComponentRef.
 
 ```csharp
-// Properties
-BuildContext { get; }  // Plan build context used for component registration.
-```
-
-```csharp
 AddStep(step)
 ```
 
@@ -985,12 +980,6 @@ Kind { get; }  // JSON discriminator for payload sources. Always `"payload"`.
 Scope { get; }  // Payload scope wire term, for example event or success.
 Type { get; }  // Payload typing contract used when authoring typed value paths.
 ```
-
-### PlanBuildContext
-
-Construction boundary used by the public DSL builders.
-It delegates domain decisions to the plan authoring state and only exposes the
-narrow authoring operations the DSL needs while building a Reactive Plan.
 
 ### PlanScope
 

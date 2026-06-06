@@ -11,6 +11,6 @@ namespace Alis.Reactive.Builders
         /// <summary>Adds a reaction step to the current pipeline.</summary>
         void AddStep(ReactionGraph step);
         /// <summary>Plan build context used for component registration.</summary>
-        PlanBuildContext BuildContext { get; }
+        internal PlanBuildContext BuildContext { get; }
     }
 }

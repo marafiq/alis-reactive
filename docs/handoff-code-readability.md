@@ -326,6 +326,10 @@ Candidate cleanup:
   payload docs now describe the public Reactive Plan event-payload path instead
   of exposing `ExpressionPathHelper` implementation vocabulary. Payload shape
   remains unchanged.
+- Resolved on `tiny-safe-but-important-refactorings`: `PlanBuildContext` is no
+  longer public API surface. It has only internal construction and internal
+  members, and is now kept out of generated public API docs as an implementation
+  boundary between DSL builders and Reactive Plan domain state.
 
 ### Implementation Inline Comments
 

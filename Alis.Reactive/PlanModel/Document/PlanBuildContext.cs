@@ -8,7 +8,7 @@ namespace Alis.Reactive.PlanModel
     /// It delegates domain decisions to the plan authoring state and only exposes the
     /// narrow authoring operations the DSL needs while building a Reactive Plan.
     /// </summary>
-    public sealed class PlanBuildContext
+    internal sealed class PlanBuildContext
     {
         private readonly PlanIdentity _identity;
         private readonly BrowserObjectContracts _objectContracts;
