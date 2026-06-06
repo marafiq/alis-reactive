@@ -819,6 +819,9 @@ Rewrite or delete:
   `FusionButton` helper now keep the runtime join-key and Reactive Plan facts
   without "The/A..." narration. Treat the remaining ID docs as contract wording,
   not generic comment noise.
+- Resolved on `tiny-safe-but-important-refactorings`: AIAssistView prompt-request
+  payload mutation docs now keep the event-pipeline mutation contract without
+  repeating the `args` or `pipeline` parameter names.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

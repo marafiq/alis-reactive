@@ -27,8 +27,8 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>
         /// Cancels the pending AIAssistView request by setting the event payload's cancel flag.
         /// </summary>
-        /// <param name="args">The prompt request payload selected by the event pipeline.</param>
-        /// <param name="pipeline">The reaction pipeline that receives the payload mutation.</param>
+        /// <param name="args">Prompt request payload selected by the event pipeline.</param>
+        /// <param name="pipeline">Reaction pipeline receiving the payload mutation.</param>
         public static void CancelRequest(
             this FusionAIAssistViewPromptRequestArgs args,
             IReactionEmitter pipeline)
