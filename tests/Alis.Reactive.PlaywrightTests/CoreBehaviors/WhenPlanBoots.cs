@@ -3,6 +3,8 @@ namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 [TestFixture]
 public class WhenPlanBoots : PlaywrightTestBase
 {
+    private const int ExpectedEventsViewBehaviorCount = 4;
+
     [Test]
     public async Task home_page_links_to_sandbox_events()
     {
@@ -62,7 +64,6 @@ public class WhenPlanBoots : PlaywrightTestBase
     [Test]
     public async Task plan_json_has_correct_entry_count()
     {
-        // The Events view declares four Html.On calls: page-ready, test, test-received, final.
         await NavigateTo("/Sandbox/CoreBehaviors/Events");
 
         var planJson = Page.Locator("#plan-json");
@@ -71,8 +72,8 @@ public class WhenPlanBoots : PlaywrightTestBase
 
         var doc = System.Text.Json.JsonDocument.Parse(text!);
         var entries = doc.RootElement.GetProperty("behaviors");
-        Assert.That(entries.GetArrayLength(), Is.EqualTo(4),
-            "Plan must have exactly 4 behaviors (1 page-ready + 3 document-event)");
+        Assert.That(entries.GetArrayLength(), Is.EqualTo(ExpectedEventsViewBehaviorCount),
+            $"Plan must have exactly {ExpectedEventsViewBehaviorCount} behaviors (1 page-ready + 3 document-event)");
 
         AssertNoConsoleErrors();
     }

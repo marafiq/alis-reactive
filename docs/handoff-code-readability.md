@@ -873,6 +873,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: drawer Playwright tests
   now name the HTTP partial-load and page-level plan-close paths in test names.
   Server-delay and close-transition comments remain because they explain timing.
+- Resolved on `tiny-safe-but-important-refactorings`: the Events plan-count
+  test now uses `ExpectedEventsViewBehaviorCount` instead of a comment explaining
+  the magic behavior count before asserting the generated plan JSON.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
