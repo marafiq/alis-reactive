@@ -65,6 +65,11 @@ Examples and current status:
 - Resolved on `tiny-safe-but-important-refactorings`: Native checkbox/dropdown
   tests no longer repeat plan-shape explanations in both comments and assertion
   messages; only DOM/Reactive Plan join-key and native DOM value-path notes remain.
+- Resolved on `tiny-safe-but-important-refactorings`: Native textbox, textarea,
+  checklist, radio, hidden-field, and button tests no longer carry class-level
+  "Exercises ..." summaries when the test names already enumerate the behavior.
+  Comments remain where they explain change-event timing, hidden input scoping,
+  or deliberate test ordering.
 - `WhenAllComponentsGatherIntoOnePost.cs` has long form-fill flows, but helper
   extraction should happen only if it names a reusable domain action. Do not add
   private helper indirection that hides a one-off behavior proof.
