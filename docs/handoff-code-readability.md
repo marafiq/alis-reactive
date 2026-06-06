@@ -156,3 +156,9 @@ Rewrite or delete:
   rename this page during comment cleanup; a later docs-model slice should
   verify the current C# plan domain and generated TS contract, then update the
   page title, route/link text, diagrams, and examples together.
+- `docs-site/src/content/docs/architecture/onboarding-component.md` still teaches
+  component onboarding with older internal examples such as `SetPropMutation`,
+  `CallMutation`, `MutateEventCommand`, `ICommandEmitter`, and `pipeline.AddCommand`.
+  Do not patch one snippet in isolation; a later component-onboarding docs slice
+  should verify current `ComponentRef.EmitSet` / `EmitCall`, event-args extension
+  APIs, generated plan JSON, and runtime terms, then update the guide end to end.
