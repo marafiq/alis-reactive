@@ -1,56 +1,19 @@
 ---
 title: Writing Tests
-description: Practical patterns for writing tests at all three layers.
+description: Practical patterns for writing tests in the active test layers.
 sidebar:
   order: 2
 ---
 
-This page covers the conventions, base classes, and patterns for each test layer. Read [Testing Strategy](../strategy/) first for the overall approach.
+This page covers the conventions, base classes, and patterns for the active test layers. Read [Testing Strategy](../strategy/) first for the overall approach.
 
 ---
 
-## C# Unit Tests
+## Current Test Surfaces
 
-### PlanTestBase
-
-All core unit tests extend `PlanTestBase`, which provides:
-
-| Method | Purpose |
-|--------|---------|
-| `CreatePlan()` | Creates a `ReactivePlan<TestModel>` |
-| `Trigger(plan)` | Returns a `TriggerBuilder` to wire triggers on the plan |
-
-A typical test class defines a private `Build` helper that wires a dom-ready trigger:
-
-```csharp
-[TestFixture]
-public class WhenDispatchingAnEvent : PlanTestBase
-{
-    [Test]
-    public Task Event_name_flows_to_plan() =>
-        VerifyJson(Build(p => p.Dispatch("user-saved")).Render());
-
-    [Test]
-    public Task Payload_flows_when_provided() =>
-        VerifyJson(Build(p => p.Dispatch("saved", new TestModel { Id = "abc" })).Render());
-
-    private static ReactivePlan<TestModel> Build(
-        Action<Builders.PipelineBuilder<TestModel>> configure)
-    {
-        var plan = CreatePlan();
-        Trigger(plan).DomReady(configure);
-        return plan;
-    }
-}
-```
-
-### Snapshot verification
-
-`VerifyJson()` captures exact JSON output in a `.verified.txt` file. On subsequent runs, any diff causes a test failure.
-
-**Critical rule:** Call `VerifyJson()` directly in the test method, never through a base class helper. Verify uses `[CallerFilePath]` to locate the snapshot file. If the call originates from a base class, the snapshot lands in the wrong folder.
-
-**Co-location:** `.verified.txt` files live next to their test class. Move both together.
+The current repo keeps runtime behavior tests in Vitest and browser behavior
+tests in Playwright. `scripts/test.sh` also discovers non-Playwright .NET test
+projects under `tests/` and runs them when present.
 
 ### Generated contract verification
 
@@ -60,21 +23,18 @@ the runtime still matches the generated contract.
 
 ### Test naming
 
-BDD style. The class is `When{Scenario}`, the method is the expected behavior:
+BDD style. Name the test around the behavior under proof:
 
 ```
-WhenMutatingAnElement.AddClass_produces_mutate_element_command
-WhenMutatingAnElement.Show_and_hide_produce_correct_actions
-WhenDispatchingAnEvent.Multiple_commands_in_sequence
+WhenPlanBoots.events_page_renders_plan_json
+WhenMultipleItemsSelected.gather_posts_selected_values
+executeReaction.calls_a_plugin_command_through_the_declared_js_object_contract
 ```
 
 ### Running
 
 ```bash
-dotnet test tests/Alis.Reactive.UnitTests
-dotnet test tests/Alis.Reactive.Native.UnitTests
-dotnet test tests/Alis.Reactive.Fusion.UnitTests
-dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
+scripts/test.sh --no-e2e
 ```
 
 ---
@@ -83,52 +43,62 @@ dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
 
 ### Configuration
 
-Tests live in `Scripts/__tests__/`. Vitest is configured in `vitest.config.ts`:
+Tests live in `Alis.Reactive.Assets/runtime/__tests__/`. Vitest is configured in
+`Alis.Reactive.Assets/vitest.config.ts`:
 
 - **Environment:** jsdom
-- **Include pattern:** `Scripts/__tests__/**/*.test.ts`
-- **Setup file:** `Scripts/__tests__/vitest.setup.ts` -- runs `resetBootStateForTests()`, restores mocks, and clears `document.body.innerHTML` after every test.
+- **Include pattern:** `runtime/__tests__/**/*.test.ts`
 
-Because the setup file handles cleanup, individual test files do not need `afterEach` blocks unless they have extra teardown.
+Most runtime tests reset boot state and `document.body.innerHTML` in `afterEach`
+so Active Plan state does not leak between tests.
 
 ### Integration tests (boot pattern)
 
 For end-to-end runtime behavior, construct a plan and call `boot()`:
 
 ```typescript
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect } from "vitest";
 import { boot } from "../lifecycle/boot";
+import { resetBootStateForTests } from "../lifecycle/boot";
+import type { PlanDocument } from "../types/index";
 
-describe("when triggering on dom-ready", () => {
-  it("executes commands immediately when document is ready", () => {
+afterEach(() => {
+  resetBootStateForTests();
+  document.body.innerHTML = "";
+});
+
+describe("when triggering on page-ready", () => {
+  it("executes a dispatch reaction when document is ready", () => {
     let executed = false;
     document.addEventListener("ready-evt", () => { executed = true; });
 
-    boot({
+    const plan: PlanDocument = {
+      version: 3,
       planId: "Test.Model",
+      scope: { kind: "root" },
+      types: {},
       components: {},
-      entries: [{
-        trigger: { kind: "dom-ready" },
-        reaction: {
-          kind: "sequential",
-          commands: [{ kind: "dispatch", event: "ready-evt" }],
-        },
+      behaviors: [{
+        startsWhen: { kind: "page-ready" },
+        reaction: { kind: "dispatch", event: "ready-evt", payload: { kind: "none" } },
       }],
-    });
+    };
+
+    boot(plan);
 
     expect(executed).toBe(true);
   });
 });
 ```
 
-This exercises the full path: trigger wiring, reaction execution, command dispatch.
+This exercises the full path: trigger wiring, reaction execution, and event dispatch.
 
 ### DOM setup with JSDOM
 
 When tests need specific HTML elements, create a JSDOM instance in `beforeEach`:
 
 ```typescript
-let boot: (plan: Plan) => void;
+let boot: (plan: PlanDocument) => void;
 
 beforeEach(async () => {
   const dom = new JSDOM(`<!DOCTYPE html><html><body>
@@ -151,44 +121,47 @@ Re-importing `boot` after setting up the DOM ensures the module binds to the new
 When testing a specific module in isolation, import the function directly:
 
 ```typescript
-import { resolveEventPath, coerce } from "../resolution/resolver";
-import type { ExecContext } from "../types";
+import { toJavaScriptString } from "../shared/javascript-string";
 
-it("resolves a nested property", () => {
-  const ctx: ExecContext = { evt: { address: { city: "Seattle" } } };
-  expect(resolveEventPath("evt.address.city", ctx)).toBe("Seattle");
-});
-
-it("coerces 'false' string to boolean false", () => {
-  expect(coerce("false", "boolean")).toBe(false);
+it("formats thrown values for diagnostics", () => {
+  expect(toJavaScriptString(new Error("boom"))).toContain("boom");
 });
 ```
 
-### Custom event tests
+### Document event tests
 
-For custom-event triggers, boot the plan (which wires the listener), then fire the event:
+For `document-event` triggers, boot the plan (which wires the listener), then
+fire the event:
 
 ```typescript
-it("resolves payload source to element text", () => {
-  document.body.innerHTML = '<span id="city">unknown</span>';
+it("dispatches a document event payload", () => {
+  let handled = false;
+  document.addEventListener("loaded:handled", () => { handled = true; });
 
-  boot({
-    planId: "Test", components: {},
-    entries: [{
-      trigger: { kind: "custom-event", event: "loaded" },
-      reaction: { kind: "sequential", commands: [{
-        kind: "mutate-element", target: "city",
-        mutation: { kind: "set-prop", prop: "textContent" },
-        source: { kind: "event", path: "evt.address.city" }
-      }]}
-    }]
-  });
+  const plan: PlanDocument = {
+    version: 3,
+    planId: "Test.DocumentEvent",
+    scope: { kind: "root" },
+    types: {},
+    components: {},
+    behaviors: [{
+      startsWhen: {
+        kind: "document-event",
+        event: "loaded",
+        payloadType: { kind: "untyped" },
+      },
+      reaction: {
+        kind: "dispatch",
+        event: "loaded:handled",
+        payload: { kind: "none" },
+      },
+    }],
+  };
 
-  document.dispatchEvent(
-    new CustomEvent("loaded", { detail: { address: { city: "Seattle" } } })
-  );
+  boot(plan);
+  document.dispatchEvent(new CustomEvent("loaded"));
 
-  expect(document.getElementById("city")!.textContent).toBe("Seattle");
+  expect(handled).toBe(true);
 });
 ```
 
@@ -229,7 +202,7 @@ public class WhenEventChainFires : PlaywrightTestBase
     [Test]
     public async Task three_hop_chain_completes_in_order()
     {
-        await NavigateTo("/Sandbox/Events");
+        await NavigateTo("/Sandbox/CoreBehaviors/Events");
         await WaitForTraceMessage("booted", 5000);
 
         await Expect(Page.Locator("#step-1")).ToContainTextAsync("dom-ready fired");
@@ -308,14 +281,14 @@ Use `scripts/playwright.sh --filter "..."` for browser behavior and
 
 ## Checklist for new primitives
 
-When adding a new command kind, trigger kind, component, or validation rule:
+When adding a new reaction kind, trigger kind, component, or validation rule:
 
 1. C# intent class with `[JsonDerivedType]`
 2. Builder method on the appropriate builder
 3. C# plan-domain update
 4. Runtime handler in the appropriate execution module
 5. TS types in `types/`
-6. C# unit test -- behavior snapshot when it adds useful signal
+6. C# or plan-domain proof when it adds useful signal
 7. TS unit test -- runtime behavior in jsdom
 8. Playwright test -- browser behavior verification
 9. Sandbox view -- usage demonstration in the SandboxApp

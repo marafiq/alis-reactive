@@ -79,15 +79,14 @@ Vitest + jsdom. Tests runtime execution: boot, triggers, reactions, resolver, co
 npm test                 # ~944 tests, runs in seconds
 ```
 
-### C# unit tests
+### Non-Playwright .NET tests
 
-NUnit + Verify.NUnit. Tests plan rendering, generated-contract behavior, and component vertical slices.
+The test wrapper discovers non-Playwright test projects under `tests/` and runs
+them when present. If none exist, it prints that no non-Playwright dotnet test
+projects were found.
 
 ```bash
-dotnet test tests/Alis.Reactive.UnitTests                   # Core
-dotnet test tests/Alis.Reactive.Native.UnitTests            # Native components
-dotnet test tests/Alis.Reactive.Fusion.UnitTests            # Fusion components
-dotnet test tests/Alis.Reactive.FluentValidator.UnitTests   # Validation extraction
+scripts/test.sh --no-e2e   # includes typecheck, assets, vitest, dotnet build, and non-Playwright tests
 ```
 
 ### Playwright browser tests
@@ -149,16 +148,14 @@ npm test
 
 Catches runtime logic errors without a browser.
 
-### 3. Run C# unit tests
+### 3. Run non-Playwright .NET tests
 
 ```bash
-dotnet test tests/Alis.Reactive.UnitTests
-dotnet test tests/Alis.Reactive.Native.UnitTests
-dotnet test tests/Alis.Reactive.Fusion.UnitTests
-dotnet test tests/Alis.Reactive.FluentValidator.UnitTests
+scripts/test.sh --no-e2e
 ```
 
-Catches serialization regressions and plan-domain drift.
+Runs the full non-browser gate, including any non-Playwright test projects the
+wrapper discovers.
 
 ### 4. Build all C# projects
 
@@ -206,10 +203,7 @@ If you skip `npm run build:all`, the browser loads old JS. If you skip `dotnet b
 | TypeScript typecheck | `npm run typecheck` |
 | Lint | `npm run lint` |
 | TS unit tests | `npm test` |
-| C# core tests | `dotnet test tests/Alis.Reactive.UnitTests` |
-| Native component tests | `dotnet test tests/Alis.Reactive.Native.UnitTests` |
-| Fusion component tests | `dotnet test tests/Alis.Reactive.Fusion.UnitTests` |
-| Validation tests | `dotnet test tests/Alis.Reactive.FluentValidator.UnitTests` |
+| Non-browser gate | `scripts/test.sh --no-e2e` |
 | Browser tests | `scripts/playwright.sh` |
 | Build all C# | `dotnet build` |
 | Run sandbox | `scripts/run.sh` |
