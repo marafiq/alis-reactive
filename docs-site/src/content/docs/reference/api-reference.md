@@ -2522,7 +2522,7 @@ IsInteracted { get; }  // Whether user interaction triggered the selection.
 
 ### FusionGrid
 
-FusionGrid — non-input data grid component with server-side custom binding.
+FusionGrid data grid component with server-side custom binding.
 Supports sort, page, and filter via the DataStateChange event.
 
 ### FusionGridAction
@@ -4365,7 +4365,7 @@ Exposes selected-tab state, tab visibility methods, and selection events; it is 
 ### FusionTabBuilder<T>
 
 Carries rendered Syncfusion Tab markup and the Reactive Plan for event wiring.
-Non-input component: no InputField wrapper, label, or validation slot.
+The tab renders without an input field wrapper, label, or validation slot.
 
 ### FusionTabEvents
 

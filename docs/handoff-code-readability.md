@@ -352,6 +352,10 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: Native loader/drawer TS
   runtime comments now keep the layout-singleton boundary note without naming
   the C# `IAppLevelComponent` interface in runtime-side prose.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion grid and tab XML
+  docs now explain missing form-value/input-field behavior directly instead of
+  leading with non-input component labels or `IInputComponent` implementation
+  vocabulary.
 
 ### Implementation Inline Comments
 
