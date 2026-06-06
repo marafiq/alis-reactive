@@ -1,0 +1,5679 @@
+{
+  "component": "grid",
+  "counts": {
+    "builderMethods": 173,
+    "events": 85,
+    "members": 484,
+    "methods": 240,
+    "properties": 159
+  },
+  "fusionType": "FusionGrid",
+  "members": [
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionBegin",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "PageEventArgs | GroupEventArgs | FilterEventArgs | SearchEventArgs | SortEventArgs | AddEventArgs | SaveEventArgs | EditEventArgs | DeleteEventArgs | ActionEventArgs | NotifyArgs | ReorderEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionComplete",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "PageEventArgs | GroupEventArgs | FilterEventArgs | SearchEventArgs | SortEventArgs | AddEventArgs | SaveEventArgs | EditEventArgs | DeleteEventArgs | ActionEventArgs | NotifyArgs | ReorderEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "actionFailure",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "FailureEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "adaptiveDlgTarget",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "HTMLElement"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.AdaptiveMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "adaptiveUIMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "AdaptiveMode"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addListener",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addMovableRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "fRows: HTMLElement[], mrows: HTMLElement[]) => HTMLElement[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "addNewRowFocus",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addRecord",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "data?: Object, index?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "addShimmerEffect",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "aggregateModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Aggregate"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Collections.Generic.List{Syncfusion.EJ2.Grids.GridAggregate}"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "aggregates",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "AggregateRowModel[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowExcelExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowFiltering",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowGrouping",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowKeyboard",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowMultiSorting",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowPaging",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowPdfExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowReordering",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowResizing",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowRowDragAndDrop",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowSorting",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "allowTextWrap",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "applyBiggerTheme",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "element: Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "applyTextWrap",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "ariaService",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "AriaService"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "asyncTimeOut",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "autoFit",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "autoFitColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "fieldNames?: string | string[], startRowIndex?: number, endRowIndex?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "batchAdd",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BatchAddArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "batchAsyncUpdate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "changes: BatchChanges) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "batchCancel",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BatchCancelArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "batchDelete",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BatchDeleteArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "batchUpdate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "changes: BatchChanges) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeAutoFill",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BeforeAutoFillEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeBatchAdd",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BeforeBatchAddArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeBatchDelete",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BeforeBatchDeleteArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeBatchSave",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BeforeBatchSaveArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeCopy",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BeforeCopyEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeCustomFilterOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BeforeCustomFilterOpenEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeDataBound",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BeforeDataBoundArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeDetailTemplateDetach",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "DetailTemplateDetachArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeExcelExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeOpenAdaptiveDialog",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "AdaptiveDialogEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforeOpenColumnChooser",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnChooserEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforePaste",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BeforePasteEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforePdfExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beforePrint",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "PrintEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "beginEdit",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "BeginEditArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "calculatePageSizeByParentHeight",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "containerHeight: number | string) => number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cellDeselected",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "CellDeselectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cellDeselecting",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "CellDeselectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cellEdit",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "CellEditArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cellSave",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "CellSaveArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cellSaved",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "CellSaveArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cellSelected",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "CellSelectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "cellSelecting",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "CellSelectingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "changeDataSource",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "dataSource?: Object | DataManager | DataResult, columns?: Column[] | string[] | ColumnModel[], properties?: Object) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "checkAllRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "CheckState"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "checkBoxChange",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "CheckBoxChangeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "childGrid",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "GridModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clearCellSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clearFiltering",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "fields?: string[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clearGridActions",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clearGrouping",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clearRowSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clearSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "clearSorting",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "clipboardModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Clipboard"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.ClipMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "clipMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ClipMode"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "closeEdit",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "columnChooserModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnChooser"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridColumnChooserSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "columnChooserSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnChooserSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "columnDataStateChange",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnDataStateChangeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "columnDeselected",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnDeselectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "columnDeselecting",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnDeselectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "columnDrag",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnDragEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "columnDragStart",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnDragEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "columnDrop",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnDragEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "columnMenuClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "MenuEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "columnMenuClose",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnMenuOpenEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "columnMenuItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnMenuItem[] | ColumnMenuItemModel[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "columnMenuModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnMenu"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "columnMenuOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnMenuOpenEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.ColumnQueryModeType"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "columnQueryMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnQueryModeType"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object",
+          "System.Collections.Generic.List{Syncfusion.EJ2.Grids.GridColumn}",
+          "System.String[]"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "columns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Column[] | string[] | ColumnModel[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "columnSelected",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnSelectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "columnSelecting",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnSelectingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "commandClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "CommandClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "commandDelIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "commonQuery",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Query"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "contentModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "IRenderer"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "contextMenuClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ContextMenuClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "contextMenuClose",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ContextMenuOpenEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "contextMenuItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ContextMenuItem[] | ContextMenuItemModel[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "contextMenuModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ContextMenu"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "contextMenuOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ContextMenuOpenEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "copy",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "withHeader?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "createColumnchooser",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "x: number, y: number, target: Element) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "created",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "createTooltip",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "cssClass",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "csvExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "excelExportProperties?: ExcelExportProperties, isMultipleExport?: boolean, workbook?: Workbook, isBlob?: boolean) => Promise<any>"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "currentAction",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ActionArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "currentViewData",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "dataBound",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "dataReady",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "dataSource",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object | DataManager | DataResult"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "dataSourceChanged",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "DataSourceChangedEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "dataStateChange",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "DataStateChangeEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "defaultChartLocale",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "deleteRecord",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "fieldname?: string, data?: Object) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "deleteRow",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "tr: HTMLTableRowElement) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "skip: lifecycle cleanup, not Fusion plan behavior",
+      "kind": "method",
+      "name": "destroy",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "destroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "destroyTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "propertyNames?: string[], index?: any, callback?: Function) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "detailCollapse",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "DetailExpandCollapseArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "detailCollapseAll",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "detailDataBound",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "DetailDataBoundEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "detailExpand",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "DetailExpandCollapseArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "detailExpandAll",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "detailRowModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "DetailRow"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "detailTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "disableRowDD",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "enable: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "disableSelectedRecords",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "editCell",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number, field: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "editModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Edit"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridEditSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "editSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "EditSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "ej2StatePersistenceVersion",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "emptyRecordTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableAdaptiveUI",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableAltRow",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableAutoFill",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableColumnSpan",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableColumnVirtualization",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "enableDeepCompare",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHeaderFocus",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHover",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableHtmlSanitizer",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableImmutableMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableInfiniteScrolling",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableRowSpan",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableStickyHeader",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "enableToolbarItems",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "items: string[], isEnable: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableVirtualization",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "enableVirtualMaskRow",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "endEdit",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "ensureModuleInjected",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "module: Function) => boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "excelAggregateQueryCellInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "AggregateQueryCellInfoEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "excelExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "excelExportProperties?: ExcelExportProperties, isMultipleExport?: boolean, workbook?: Workbook, isBlob?: boolean) => Promise<any>"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "excelExportComplete",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ExcelExportCompleteArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "excelExportModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ExcelExport"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "excelHeaderQueryCellInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ExcelHeaderQueryCellInfoEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "excelQueryCellInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ExcelQueryCellInfoEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "exportDetailDataBound",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ExportDetailDataBoundEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "exportDetailTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ExportDetailTemplateEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "exportGrid",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "url: string, headers?: ExportHeaders) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String[]"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "exportGrids",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "string[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "exportGroupCaption",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ExportGroupCaptionEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "extendRequiredModules",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "modules: ModuleDeclaration[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "filterByColumn",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "fieldName: string, filterOperator: string, filterValue: string | number | Date | boolean | number[] | string[] | Date[] | boolean[] | null, predicate?: string, matchCase?: boolean, ignoreAccent?: boolean, actualFilterValue?: string, actualOperator?: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "filterModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Filter"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "filterOperators",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "IFilterOperator"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridFilterSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "filterSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "FilterSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "focusModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "FocusStrategy"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "freezeRefresh",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "frozenColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "frozenRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getAllDataRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "includeAdd?: boolean) => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getAllFrozenDataRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "includeAdd?: boolean) => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getAllFrozenRightDataRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "includeAdd?: boolean) => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getAllMovableDataRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "includeAdd?: boolean) => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getBatchChanges",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getCellFromIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "rowIndex: number, columnIndex: number) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnByField",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "field: string) => Column"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnByIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number) => Column"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnByUid",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "uid: string, isColumns?: boolean) => Column"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnChooserFooterTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnChooserHeaderTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnChooserTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnFieldNames",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => string[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnHeaderByField",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "field: string) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnHeaderByIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnHeaderByUid",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "uid: string) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnIndexByField",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "field: string) => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnIndexByUid",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "uid: string) => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumnIndexesInView",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "isRefresh?: boolean) => Column[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getContent",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getContentTable",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getCurrentViewRecords",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Object[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getCurrentVisibleColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "isColVirtualization?: boolean) => Column[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getDataModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Data"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getDataRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getDetailTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getEditFooterTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getEditHeaderTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getEditTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getEmptyRecordTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFilteredRecords",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Object[] | Promise<Object>"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFilterUIInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => FilterUI"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFooterContent",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFooterContentTable",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getForeignKeyColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Column[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenDataRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenHeaderTbody",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenLeftColumnHeaderByIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenLeftColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Column[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenLeftColumnsCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenLeftContentTbody",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenLeftCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => freezeMode"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightCellFromIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "rowIndex: number, columnIndex: number) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightColumnHeaderByIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Column[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightColumnsCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightContent",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightContentTbody",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightDataRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightHeader",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightHeaderTbody",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightRowByIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRightRowsObject",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Row<Column>[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getFrozenRowByIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getHeaderContent",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getHeaderTable",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getHeight",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "height: string | number) => number | string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getHiddenColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Column[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getIndentCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getLocaleConstants",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMediaColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMovableCellFromIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "rowIndex: number, columnIndex: number) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMovableColumnHeaderByIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMovableColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Column[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMovableColumnsCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMovableContentTbody",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMovableDataRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMovableHeaderTbody",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMovableRowByIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMovableRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getMovableRowsObject",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Row<Column>[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getNormalizedColumnIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "uid: string) => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getPager",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getPinnedRowObjectByKey",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "value: string | Object) => Row<Column> | undefined"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getPreviousRowData",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Object"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getPrimaryKeyFieldNames",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => string[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getQuery",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Query"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRowByIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRowElementByUID",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "uid: string) => Element"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRowHeight",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "accurateHeight?: boolean) => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRowIndexByPrimaryKey",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "value: string | Object | number) => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRowInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "target: Element | EventTarget) => RowInfo"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRowObjectFromUID",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "uid: string) => Row<Column>"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRowsObject",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Row<Column>[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRowTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getRowUid",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "prefix: string) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getSelectedColumnsUid",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => string[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getSelectedRecords",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Object[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getSelectedRowCellIndexes",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => ISelectedCell[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getSelectedRowIndexes",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getSelectedRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Element[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getStackedColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "columns: Column[], stackedColumn?: Column[]) => Column[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getStackedHeaderColumnByHeaderText",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "stackedHeader: string, col: Column[]) => Column"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getSummaryValues",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "summaryCol: AggregateColumnModel, summaryData: Object) => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getTablesCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getUidByColumnField",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "field: string) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getVisibleColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => Column[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getVisibleFrozenColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getVisibleFrozenLeftCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getVisibleFrozenRightCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "getVisibleMovableCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "goToPage",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "pageNo: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "grabColumnByFieldFromAllCols",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "field: string, isForeignKey?: boolean) => Column"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "grabColumnByUidFromAllCols",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "uid: string) => Column"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridLine"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "gridLines",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "GridLine"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "groupCollapseAll",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "groupColumn",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "columnName: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "groupExpandAll",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "groupModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Group"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridGroupSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "groupSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "GroupSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "headerCellInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "HeaderCellInfoEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "headerModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "IRenderer"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "height",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "keys: string | string[], hideBy?: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideScroll",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "hideSpinner",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.HierarchyGridPrintMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "hierarchyPrintMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "HierarchyGridPrintMode"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "infiniteScrollModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "InfiniteScroll"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridInfiniteScrollSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "infiniteScrollSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "InfiniteScrollSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "invokedFromMedia",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isAddNewRow",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isAutoFitColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isAutoGen",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isAutoGenerateColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isCheckBoxSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "isCollapseStateEnabled",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "isContextMenuOpen",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "isDetail",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isEdit",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isExportGrid",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "isFrozenGrid",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isInitialLoad",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isLastCellPrimaryKey",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "islazyloadRequest",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isManualRefresh",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isPersistSelection",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isPreventScrollEvent",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "isRemote",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "isRowDragable",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "isRowPinned",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "PinRow | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object",
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "isRowSelectable",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowSelectable | string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isSelectedRowIndexUpdating",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isSpan",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isVirtualAdaptive",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "isWidgetsDestroyed",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "keyboardModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "KeyboardEvents"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "keyPressed",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "KeyboardEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "lazyLoadGroupCollapse",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "LazyLoadArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "lazyLoadGroupExpand",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "LazyLoadArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "lazyLoadRender",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "IRenderer"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "leftrightColumnWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "position?: string) => number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "load",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridLoadingIndicator"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "loadingIndicator",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "LoadingIndicatorModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "localeObj",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "L10n"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "lockcolPositionCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "log",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "type: string | string[], args?: Object) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "mediaQueryUpdate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "columnIndex: number, e?: MediaQueryList) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "mergePersistGridData",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "persistedData?: Object) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "openColumnChooser",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "x?: number, y?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pageRequireRefresh",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pagerModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Page"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "pagerTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridPageSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "pageSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "PageSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pageTemplateChange",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "parentDetails",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ParentDetails"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "partialSelectedIndexes",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "partialSelectedRecords",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "pdfAggregateQueryCellInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "AggregateQueryCellInfoEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "pdfExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "pdfExportProperties?: PdfExportProperties, isMultipleExport?: boolean, pdfDoc?: Object, isBlob?: boolean) => Promise<Object>"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "pdfExportComplete",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "PdfExportCompleteArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pdfExportModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "PdfExport"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "pdfHeaderQueryCellInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "PdfHeaderQueryCellInfoEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "pdfQueryCellInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "PdfQueryCellInfoEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pinnedTopRecords",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Object[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "pinnedTopRowModels",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Row<Column>[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "pinRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "data: Object[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "preventAdjustColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "preventAutoFit",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "prevPageMoving",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "print",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "printComplete",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "PrintEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "printGridParent",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "IGrid"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.PrintMode"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "printMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "PrintMode"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "printModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Print"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "query",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Query"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "queryCellInfo",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "QueryCellInfoEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "queryString",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "recalcIndentWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "recordClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RecordClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "recordDoubleClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RecordDoubleClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "recordsCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refresh",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshDataSource",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "e: ReturnType) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshGroupCaptionFooterTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshHeader",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshReactColumnTemplateByUid",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "columnUid: string, renderTemplates?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshReactHeaderTemplateByUid",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "columnUid: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "refreshReactTemplateTD",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "rows?: Element[] | NodeListOf<Element>, isChildGrid?: boolean, isFrozen?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeFilteredColsByField",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "field: string, isClearFilterBar?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeListener",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeMaskRow",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeSortColumn",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "field: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "removeTextWrap",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "renderModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Render"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "renderTemplates",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "callBack?: any) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "reorderColumnByIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "fromIndex: number, toIndex: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "reorderColumnByModel",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "fromColumn: Column, toColumn: Column) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "reorderColumnByTargetIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "fieldName: string | string[], toIndex: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "reorderColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "fromFName: string | string[], toFName: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "reorderModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Reorder"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "reorderRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "fromIndexes: number[], toIndex: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "requiredModules",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => ModuleDeclaration[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "requireTemplateRef",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "resetFilterDlgPosition",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "field: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "resetIndentWidth",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "resizeModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Resize"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridResizeSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "resizeSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ResizeSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "resizeStart",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ResizeArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "resizeStop",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ResizeArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "resizing",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ResizeArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rowDataBound",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowDataBoundEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rowDeselected",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowDeselectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rowDeselecting",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowDeselectingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rowDrag",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowDragEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "rowDragAndDropModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowDD"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rowDragStart",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowDragEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rowDragStartHelper",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowDragEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rowDrop",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowDragEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridRowDropSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "rowDropSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowDropSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "rowHeight",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.RowRenderingDirection"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "rowRenderingMode",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowRenderingDirection"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rowSelected",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowSelectEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "rowSelecting",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "RowSelectingEventArgs"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "rowTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "sanitize",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "value: string) => string"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "saveCell",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "scrollModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Scroll"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "scrollPosition",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ScrollPositionType"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "search",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "searchString: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "searchModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Search"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridSearchSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "searchSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "SearchSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "selectCell",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "cellIndex: IIndex, isToggle?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "selectCells",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "rowCellIndexes: ISelectedCell[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "selectCellsByRange",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "startIndex: IIndex, endIndex?: IIndex) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "selectedRowIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "selectionModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Selection"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridSelectionSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "selectionSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "SelectionSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "selectRow",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number, isToggle?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "selectRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "rowIndexes: number[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "selectRowsByRange",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "startIndex: number, endIndex?: number) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "selectVirtualRowOnAdd",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "serverCsvExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "url: string, headers?: ExportHeaders) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "serverExcelExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "url: string, headers?: ExportHeaders) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "serverPdfExport",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "url: string, headers?: ExportHeaders) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "serviceLocator",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ServiceLocator"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setCellValue",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "key: string | number, field: string, value: string | number | boolean | Date | null) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setColumnIndexesInView",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "indexes: number[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setForeignKeyData",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setFrozenCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setGridContent",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "element: Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setGridContentTable",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "element: Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setGridHeaderContent",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "element: Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setGridHeaderTable",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "element: Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setGridPager",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "element: Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setHeaderText",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "columns: Column[], include: string[]) => Column[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setInjectedModules",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "modules: Function[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setProperties",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "prop: Object, muteOnChange?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "setRowData",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "key: string | number, rowData?: Object) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showAdaptiveFilterDialog",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showAdaptiveSortDialog",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showColumnChooser",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Boolean"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showColumnMenu",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "boolean"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "keys: string | string[], showBy?: string) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "showHider",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ShowHide"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showMaskRow",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "axisDirection?: string, dialogElement?: Element) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showResponsiveCustomColumnChooser",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "isCustom?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showResponsiveCustomFilter",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "isCustom?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showResponsiveCustomSort",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "isCustom?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "showSpinner",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "sortColumn",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "columnName: string, direction: SortDirection, isMultiSort?: boolean) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "sortModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Sort"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridSortSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "sortSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "SortSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "startEdit",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "tableIndex",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "tapEvent",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "e: TouchEventArgs) => void"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "Syncfusion.EJ2.Grids.GridTextWrapSettings"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "textWrapSettings",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "TextWrapSettingsModel"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.Object"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "toolbar",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "(ToolbarItems | string | ItemModel | ToolbarItem)[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "candidate: typed event; payload and browser gesture proof required",
+      "kind": "event",
+      "name": "toolbarClick",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ClickEventArgs"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "toolbarModule",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Toolbar"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "toolbarTemplate",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "string | Function"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "totalDataRecordsCount",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "translateX",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "ungroupColumn",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "columnName: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "unpinRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "data: Object[]) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "unwireEvents",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updateCell",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "rowIndex: number, field: string, value: string | number | boolean | Date) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updateDefaultCursor",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updateExternalMessage",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "message: string) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updateMediaColumns",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "col: Column) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updateRow",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "index: number, data: Object) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updateRowValue",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "key: number, rowData: Object) => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "updateVisibleExpandCollapseRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "valueFormatterService",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "IValueFormatter"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "vcRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Row<Column>[]"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "vRows",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "Row<Column>[]"
+    },
+    {
+      "builder": {
+        "covered": true,
+        "overloads": [
+          "System.String",
+          "System.Double"
+        ]
+      },
+      "discoveryDecision": "builder-owned unless post-render read/write behavior is proven necessary",
+      "kind": "property",
+      "name": "width",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "string | number"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime property source/write only if raw EJ2 proof shows useful behavior",
+      "kind": "property",
+      "name": "widthService",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": "ColumnWidthService"
+    },
+    {
+      "builder": {
+        "covered": false,
+        "overloads": []
+      },
+      "discoveryDecision": "candidate: runtime method or method return source; raw EJ2 visible effect proof required",
+      "kind": "method",
+      "name": "wireEvents",
+      "sourcePath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+      "type": ") => void"
+    }
+  ],
+  "status": "static-discovery",
+  "syncfusion": {
+    "builderName": "GridBuilder",
+    "className": "Grid",
+    "dtsPath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts",
+    "jsPath": "node_modules/@syncfusion/ej2-grids/src/grid/base/grid.js",
+    "namespace": "ej.grids",
+    "xmlPath": "/Users/muhammadadnanrafiq/.nuget/packages/syncfusion.ej2.aspnet.core/33.2.10/lib/net10.0/Syncfusion.EJ2.xml"
+  }
+}

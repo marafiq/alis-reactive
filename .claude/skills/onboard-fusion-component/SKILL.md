@@ -105,7 +105,25 @@ and Playwright proof.
      ```bash
      node .claude/skills/onboard-fusion-component/scripts/discover-syncfusion-component.mjs --class ChipList
      ```
-   - Generate raw HTML under `probes/`, using EJ2 JavaScript directly, not Alis wrappers:
+  - Generate raw HTML under `probes/`, using EJ2 JavaScript directly, not Alis wrappers.
+    Prefer the artifact writer when exact source paths are known because it writes
+    the required discovery files and a probe shell in one deterministic pass:
+     ```bash
+     node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs \
+       --component grid \
+       --fusion-type FusionGrid \
+       --class Grid \
+       --namespace grids \
+       --dts node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts \
+       --js node_modules/@syncfusion/ej2-grids/src/grid/base/grid.js \
+       --xml ~/.nuget/packages/syncfusion.ej2.aspnet.core/33.2.10/lib/net10.0/Syncfusion.EJ2.xml \
+       --blazor-package Syncfusion.Blazor.Grids \
+       --blazor-version 33.2.10 \
+       --write
+     ```
+   - Use `create-fusion-probe.mjs` only for a focused additional API-set probe
+     after the component-level artifact writer has established the source
+     inventory and candidate surfaces:
      ```bash
      node .claude/skills/onboard-fusion-component/scripts/create-fusion-probe.mjs \
        --component ai-assistview \
@@ -120,12 +138,21 @@ and Playwright proof.
 3. **Shipped JS/d.ts/XML discovery**
    - Generate the source-grounded candidate surface before designing the slice:
      ```bash
-     node .claude/skills/onboard-fusion-component/scripts/inspect-syncfusion-surface.mjs \
-       --class AIAssistView \
-       --dts node_modules/@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts \
-       --xml ~/.nuget/packages/syncfusion.ej2.aspnet.core/32.2.8/lib/netstandard2.0/Syncfusion.EJ2.xml
+     node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs \
+       --component grid \
+       --fusion-type FusionGrid \
+       --class Grid \
+       --namespace grids \
+       --dts node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts \
+       --js node_modules/@syncfusion/ej2-grids/src/grid/base/grid.js \
+       --xml ~/.nuget/packages/syncfusion.ej2.aspnet.core/33.2.10/lib/net10.0/Syncfusion.EJ2.xml \
+       --blazor-package Syncfusion.Blazor.Grids \
+       --blazor-version 33.2.10 \
+       --write
      ```
    - Treat the output as a candidate matrix. The final decision still depends on runtime need and raw browser proof.
+   - `inspect-syncfusion-surface.mjs` remains a read-only diagnostic for a single
+     class file. Do not use broad discovery output as the committed artifact.
    - Classify every candidate as `builder-owned`, `runtime property source`, `runtime property write`, `runtime method`, `method return source`, `event`, `payload read`, `payload mutation/call`, `skip`, or `deferred proof`.
    - Output `discovery/public-api-surface.json`, `discovery/mvc-builder-coverage.md`, and updated `master-usecases-index.md`.
 
@@ -270,6 +297,7 @@ and Playwright proof.
 - `scripts/discover-syncfusion-component.mjs` - finds class package, d.ts, JS source, MVC builder, and next commands.
 - `scripts/create-fusion-probe.mjs` - creates a temporary raw HTML probe.
 - `scripts/inventory-fusion-components.mjs` - creates Stage 1 inventory artifacts for every current Fusion component audit.
+- `scripts/write-fusion-discovery-artifacts.mjs` - writes component-scoped static discovery artifacts and a raw EJ2 probe shell from exact current d.ts/JS/XML evidence.
 - `references/source-discovery.md` - deterministic source-finding workflow.
 - `references/blazor-metadata.md` - how to use Blazor packages as typed candidate maps without copying bridge-only behavior.
 - `references/js-object-dsl-primitive-matrix.md` - authoritative JS object to DSL primitive mapping for component members, events, event payloads, methods, arrays, and stop conditions.

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FusionGrid Raw EJ2 core Probe</title>
+    <link rel="stylesheet" href="/css/syncfusion.dev.css" />
+    <script src="/vendor/syncfusion/dist/ej2.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 20px; }
+        #grid-host { border: 1px solid #d0d7de; padding: 16px; margin-bottom: 16px; }
+        table { border-collapse: collapse; margin: 16px 0; width: 100%; }
+        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: #f6f8fa; }
+        pre { background: #111827; color: #e5e7eb; padding: 12px; overflow: auto; }
+        button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <h1>FusionGrid Raw EJ2 core Probe</h1>
+    <p>Status: generated static probe. Execute in the sandbox/browser, interact with the component, then save <code>window.__fusionProbe.trace</code> as <code>traces/raw-ej2-core.trace.json</code>.</p>
+    <div id="grid-host">
+        <div id="grid"></div>
+    </div>
+
+    <button id="dump">Dump Keys</button>
+    <button id="clear">Clear Trace</button>
+
+    <h2>Candidate Rows</h2>
+    <table>
+        <thead><tr><th>JS Member</th><th>Kind</th><th>Type</th><th>Builder</th><th>Decision</th></tr></thead>
+        <tbody>
+<tr><td><code>actionBegin</code></td><td>event</td><td>PageEventArgs | GroupEventArgs | FilterEventArgs | SearchEventArgs | SortEventArgs | AddEventArgs | SaveEventArgs | EditEventArgs | DeleteEventArgs | ActionEventArgs | NotifyArgs | ReorderEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>actionComplete</code></td><td>event</td><td>PageEventArgs | GroupEventArgs | FilterEventArgs | SearchEventArgs | SortEventArgs | AddEventArgs | SaveEventArgs | EditEventArgs | DeleteEventArgs | ActionEventArgs | NotifyArgs | ReorderEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>actionFailure</code></td><td>event</td><td>FailureEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>adaptiveDlgTarget</code></td><td>property</td><td>HTMLElement</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>addListener</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>addMovableRows</code></td><td>method</td><td>fRows: HTMLElement[], mrows: HTMLElement[]) =&gt; HTMLElement[]</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>addNewRowFocus</code></td><td>property</td><td>boolean</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>addRecord</code></td><td>method</td><td>data?: Object, index?: number) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>addShimmerEffect</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>aggregateModule</code></td><td>property</td><td>Aggregate</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>applyBiggerTheme</code></td><td>method</td><td>element: Element) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>applyTextWrap</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>ariaService</code></td><td>property</td><td>AriaService</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>asyncTimeOut</code></td><td>property</td><td>number</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>autoFitColumns</code></td><td>method</td><td>fieldNames?: string | string[], startRowIndex?: number, endRowIndex?: number) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>batchAdd</code></td><td>event</td><td>BatchAddArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>batchAsyncUpdate</code></td><td>method</td><td>changes: BatchChanges) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>batchCancel</code></td><td>event</td><td>BatchCancelArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>batchDelete</code></td><td>event</td><td>BatchDeleteArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>batchUpdate</code></td><td>method</td><td>changes: BatchChanges) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>beforeAutoFill</code></td><td>event</td><td>BeforeAutoFillEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeBatchAdd</code></td><td>event</td><td>BeforeBatchAddArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeBatchDelete</code></td><td>event</td><td>BeforeBatchDeleteArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeBatchSave</code></td><td>event</td><td>BeforeBatchSaveArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeCopy</code></td><td>event</td><td>BeforeCopyEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeCustomFilterOpen</code></td><td>event</td><td>BeforeCustomFilterOpenEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeDataBound</code></td><td>event</td><td>BeforeDataBoundArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeDetailTemplateDetach</code></td><td>event</td><td>DetailTemplateDetachArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeExcelExport</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeOpenAdaptiveDialog</code></td><td>event</td><td>AdaptiveDialogEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforeOpenColumnChooser</code></td><td>event</td><td>ColumnChooserEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforePaste</code></td><td>event</td><td>BeforePasteEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforePdfExport</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beforePrint</code></td><td>event</td><td>PrintEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>beginEdit</code></td><td>event</td><td>BeginEditArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>calculatePageSizeByParentHeight</code></td><td>method</td><td>containerHeight: number | string) =&gt; number</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>cellDeselected</code></td><td>event</td><td>CellDeselectEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>cellDeselecting</code></td><td>event</td><td>CellDeselectEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>cellEdit</code></td><td>event</td><td>CellEditArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>cellSave</code></td><td>event</td><td>CellSaveArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>cellSaved</code></td><td>event</td><td>CellSaveArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>cellSelected</code></td><td>event</td><td>CellSelectEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>cellSelecting</code></td><td>event</td><td>CellSelectingEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>changeDataSource</code></td><td>method</td><td>dataSource?: Object | DataManager | DataResult, columns?: Column[] | string[] | ColumnModel[], properties?: Object) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>checkAllRows</code></td><td>property</td><td>CheckState</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>checkBoxChange</code></td><td>event</td><td>CheckBoxChangeEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>clearCellSelection</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clearFiltering</code></td><td>method</td><td>fields?: string[]) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clearGridActions</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clearGrouping</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clearRowSelection</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clearSelection</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clearSorting</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>clipboardModule</code></td><td>property</td><td>Clipboard</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>closeEdit</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>columnChooserModule</code></td><td>property</td><td>ColumnChooser</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>columnDataStateChange</code></td><td>event</td><td>ColumnDataStateChangeEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>columnDeselected</code></td><td>event</td><td>ColumnDeselectEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>columnDeselecting</code></td><td>event</td><td>ColumnDeselectEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>columnDrag</code></td><td>event</td><td>ColumnDragEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>columnDragStart</code></td><td>event</td><td>ColumnDragEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>columnDrop</code></td><td>event</td><td>ColumnDragEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>columnMenuClick</code></td><td>event</td><td>MenuEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>columnMenuClose</code></td><td>event</td><td>ColumnMenuOpenEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>columnMenuModule</code></td><td>property</td><td>ColumnMenu</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>columnMenuOpen</code></td><td>event</td><td>ColumnMenuOpenEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>columnSelected</code></td><td>event</td><td>ColumnSelectEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>columnSelecting</code></td><td>event</td><td>ColumnSelectingEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>commandClick</code></td><td>event</td><td>CommandClickEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>commandDelIndex</code></td><td>property</td><td>number</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>commonQuery</code></td><td>property</td><td>Query</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>contentModule</code></td><td>property</td><td>IRenderer</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>contextMenuClick</code></td><td>event</td><td>ContextMenuClickEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>contextMenuClose</code></td><td>event</td><td>ContextMenuOpenEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>contextMenuModule</code></td><td>property</td><td>ContextMenu</td><td>no</td><td>candidate: runtime property source/write only if raw EJ2 proof shows useful behavior</td></tr>
+<tr><td><code>contextMenuOpen</code></td><td>event</td><td>ContextMenuOpenEventArgs</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>copy</code></td><td>method</td><td>withHeader?: boolean) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>createColumnchooser</code></td><td>method</td><td>x: number, y: number, target: Element) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+<tr><td><code>created</code></td><td>event</td><td>Object</td><td>yes</td><td>candidate: typed event; payload and browser gesture proof required</td></tr>
+<tr><td><code>createTooltip</code></td><td>method</td><td>) =&gt; void</td><td>no</td><td>candidate: runtime method or method return source; raw EJ2 visible effect proof required</td></tr>
+        </tbody>
+    </table>
+
+    <pre id="trace"></pre>
+
+    <script>
+        const trace = [];
+        const target = document.getElementById("grid");
+
+        function clean(value, seen = new WeakSet(), depth = 0) {
+            if (value === null || typeof value !== "object") return value;
+            if (value instanceof Element) return "[Element#" + (value.id || value.tagName) + "]";
+            if (depth > 4) return "[MaxDepth]";
+            if (seen.has(value)) return "[Circular]";
+            seen.add(value);
+            if (Array.isArray(value)) return value.slice(0, 20).map(item => clean(item, seen, depth + 1));
+            const output = {};
+            Object.keys(value).sort().slice(0, 120).forEach(key => {
+                const item = value[key];
+                output[key] = typeof item === "function" ? "[Function]" : clean(item, seen, depth + 1);
+            });
+            return output;
+        }
+
+        function functionNames(value) {
+            const names = new Set();
+            let current = value;
+            while (current && current !== Object.prototype) {
+                Object.getOwnPropertyNames(current).forEach(name => {
+                    if (name !== "constructor" && typeof value[name] === "function") names.add(name);
+                });
+                current = Object.getPrototypeOf(current);
+            }
+            return Array.from(names).sort();
+        }
+
+        function describePayload(args) {
+            const own = Object.keys(args).sort();
+            const properties = {};
+            own.forEach(key => {
+                const item = args[key];
+                properties[key] = {
+                    type: item === null ? "null" : Array.isArray(item) ? "array" : typeof item,
+                    sample: clean(item)
+                };
+            });
+            return { ownKeys: own, functions: functionNames(args), properties };
+        }
+
+        function record(label, value) {
+            trace.push({ at: new Date().toISOString(), label, value: clean(value) });
+            document.getElementById("trace").textContent = JSON.stringify(trace, null, 2);
+        }
+
+        const probe = {
+            target,
+            trace,
+            record,
+            event: (label, args) => record(label, describePayload(args)),
+            member: (label, read) => record(label, read()),
+            call: (label, invoke) => record(label, invoke())
+        };
+        window.__fusionProbe = probe;
+
+        const ej2 = new ej.grids.Grid({
+            dataSource: [
+                { id: 1, name: "Alpha", status: "Open" },
+                { id: 2, name: "Beta", status: "Closed" },
+                { id: 3, name: "Gamma", status: "Open" }
+            ],
+            columns: [
+                { field: "id", headerText: "ID", width: 90, textAlign: "Right" },
+                { field: "name", headerText: "Name", width: 160 },
+                { field: "status", headerText: "Status", width: 140 }
+            ],
+            allowPaging: true,
+            allowSorting: true,
+            allowFiltering: true,
+            pageSettings: { pageSize: 2 },
+            actionBegin: args => probe.event("actionBegin", args),
+                actionComplete: args => probe.event("actionComplete", args),
+                actionFailure: args => probe.event("actionFailure", args),
+                batchAdd: args => probe.event("batchAdd", args),
+                batchCancel: args => probe.event("batchCancel", args),
+                batchDelete: args => probe.event("batchDelete", args),
+                beforeAutoFill: args => probe.event("beforeAutoFill", args),
+                beforeBatchAdd: args => probe.event("beforeBatchAdd", args),
+                beforeBatchDelete: args => probe.event("beforeBatchDelete", args),
+                beforeBatchSave: args => probe.event("beforeBatchSave", args),
+                beforeCopy: args => probe.event("beforeCopy", args),
+                beforeCustomFilterOpen: args => probe.event("beforeCustomFilterOpen", args),
+                beforeDataBound: args => probe.event("beforeDataBound", args),
+                beforeDetailTemplateDetach: args => probe.event("beforeDetailTemplateDetach", args),
+                beforeExcelExport: args => probe.event("beforeExcelExport", args),
+                beforeOpenAdaptiveDialog: args => probe.event("beforeOpenAdaptiveDialog", args),
+                beforeOpenColumnChooser: args => probe.event("beforeOpenColumnChooser", args),
+                beforePaste: args => probe.event("beforePaste", args),
+                beforePdfExport: args => probe.event("beforePdfExport", args),
+                beforePrint: args => probe.event("beforePrint", args),
+                beginEdit: args => probe.event("beginEdit", args),
+                cellDeselected: args => probe.event("cellDeselected", args),
+                cellDeselecting: args => probe.event("cellDeselecting", args),
+                cellEdit: args => probe.event("cellEdit", args),
+                cellSave: args => probe.event("cellSave", args),
+                cellSaved: args => probe.event("cellSaved", args),
+                cellSelected: args => probe.event("cellSelected", args),
+                cellSelecting: args => probe.event("cellSelecting", args),
+                checkBoxChange: args => probe.event("checkBoxChange", args),
+                columnDataStateChange: args => probe.event("columnDataStateChange", args),
+                columnDeselected: args => probe.event("columnDeselected", args),
+                columnDeselecting: args => probe.event("columnDeselecting", args),
+                columnDrag: args => probe.event("columnDrag", args),
+                columnDragStart: args => probe.event("columnDragStart", args),
+                columnDrop: args => probe.event("columnDrop", args),
+                columnMenuClick: args => probe.event("columnMenuClick", args),
+                columnMenuClose: args => probe.event("columnMenuClose", args),
+                columnMenuOpen: args => probe.event("columnMenuOpen", args),
+                columnSelected: args => probe.event("columnSelected", args),
+                columnSelecting: args => probe.event("columnSelecting", args),
+                commandClick: args => probe.event("commandClick", args),
+                contextMenuClick: args => probe.event("contextMenuClick", args),
+                contextMenuClose: args => probe.event("contextMenuClose", args),
+                contextMenuOpen: args => probe.event("contextMenuOpen", args),
+                created: args => probe.event("created", args),
+                dataBound: args => probe.event("dataBound", args),
+                dataSourceChanged: args => probe.event("dataSourceChanged", args),
+                dataStateChange: args => probe.event("dataStateChange", args),
+                destroyed: args => probe.event("destroyed", args),
+                detailCollapse: args => probe.event("detailCollapse", args),
+                detailDataBound: args => probe.event("detailDataBound", args),
+                detailExpand: args => probe.event("detailExpand", args),
+                excelAggregateQueryCellInfo: args => probe.event("excelAggregateQueryCellInfo", args),
+                excelExportComplete: args => probe.event("excelExportComplete", args),
+                excelHeaderQueryCellInfo: args => probe.event("excelHeaderQueryCellInfo", args),
+                excelQueryCellInfo: args => probe.event("excelQueryCellInfo", args),
+                exportDetailDataBound: args => probe.event("exportDetailDataBound", args),
+                exportDetailTemplate: args => probe.event("exportDetailTemplate", args),
+                exportGroupCaption: args => probe.event("exportGroupCaption", args),
+                headerCellInfo: args => probe.event("headerCellInfo", args),
+                keyPressed: args => probe.event("keyPressed", args),
+                lazyLoadGroupCollapse: args => probe.event("lazyLoadGroupCollapse", args),
+                lazyLoadGroupExpand: args => probe.event("lazyLoadGroupExpand", args),
+                load: args => probe.event("load", args),
+                pdfAggregateQueryCellInfo: args => probe.event("pdfAggregateQueryCellInfo", args),
+                pdfExportComplete: args => probe.event("pdfExportComplete", args),
+                pdfHeaderQueryCellInfo: args => probe.event("pdfHeaderQueryCellInfo", args),
+                pdfQueryCellInfo: args => probe.event("pdfQueryCellInfo", args),
+                printComplete: args => probe.event("printComplete", args),
+                queryCellInfo: args => probe.event("queryCellInfo", args),
+                recordClick: args => probe.event("recordClick", args),
+                recordDoubleClick: args => probe.event("recordDoubleClick", args),
+                resizeStart: args => probe.event("resizeStart", args),
+                resizeStop: args => probe.event("resizeStop", args),
+                resizing: args => probe.event("resizing", args),
+                rowDataBound: args => probe.event("rowDataBound", args),
+                rowDeselected: args => probe.event("rowDeselected", args),
+                rowDeselecting: args => probe.event("rowDeselecting", args),
+                rowDrag: args => probe.event("rowDrag", args),
+                rowDragStart: args => probe.event("rowDragStart", args),
+                rowDragStartHelper: args => probe.event("rowDragStartHelper", args),
+                rowDrop: args => probe.event("rowDrop", args),
+                rowSelected: args => probe.event("rowSelected", args),
+                rowSelecting: args => probe.event("rowSelecting", args),
+                toolbarClick: args => probe.event("toolbarClick", args)
+        });
+
+        ej2.appendTo(target);
+        probe.ej2 = ej2;
+        record("ready", {
+            component: "grid",
+            apiSet: "core",
+            namespace: "ej.grids",
+            className: "Grid"
+        });
+
+        document.getElementById("dump").addEventListener("click", () => {
+            record("own keys", Object.keys(ej2).sort());
+            record("prototype methods", functionNames(ej2));
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+            trace.length = 0;
+            document.getElementById("trace").textContent = "[]";
+        });
+    </script>
+</body>
+</html>

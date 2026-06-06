@@ -22,3 +22,24 @@ node .claude/skills/onboard-fusion-component/scripts/inventory-fusion-components
 
 Inventory artifacts are not API proof. They only record current repo surfaces
 before raw EJ2 discovery, primitive mapping, implementation, and behavior proof.
+
+Write component-scoped static discovery artifacts from exact current Syncfusion
+d.ts/JS/XML evidence with:
+
+```bash
+node .claude/skills/onboard-fusion-component/scripts/write-fusion-discovery-artifacts.mjs \
+  --component grid \
+  --fusion-type FusionGrid \
+  --class Grid \
+  --namespace grids \
+  --dts node_modules/@syncfusion/ej2-grids/src/grid/base/grid.d.ts \
+  --js node_modules/@syncfusion/ej2-grids/src/grid/base/grid.js \
+  --xml ~/.nuget/packages/syncfusion.ej2.aspnet.core/33.2.10/lib/net10.0/Syncfusion.EJ2.xml \
+  --blazor-package Syncfusion.Blazor.Grids \
+  --blazor-version 33.2.10 \
+  --write
+```
+
+Static discovery artifacts are not runtime proof. Raw EJ2 traces, primitive
+mapping, vertical slice design, Playwright proof, and audit closeout remain
+separate required stages.
