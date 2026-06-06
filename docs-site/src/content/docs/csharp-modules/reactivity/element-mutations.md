@@ -51,7 +51,7 @@ pipeline.Element("alert").RemoveClass("bg-red-100");   // Removes it
 pipeline.Element("sidebar").ToggleClass("collapsed");   // Adds if absent, removes if present
 ```
 
-All three return the pipeline, so you continue with the next command through `Element()` again:
+All three return the pipeline, so you continue with the next element reaction through `Element()` again:
 
 ```csharp
 pipeline.Element("card").RemoveClass("border-gray-200");

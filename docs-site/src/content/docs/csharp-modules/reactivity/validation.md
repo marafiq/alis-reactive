@@ -354,7 +354,7 @@ WhenFields(c => c.Field(x => x.Status).Eq("Discharged").Not(), () =>
 });
 ```
 
-> **Relationship to runtime conditions:** `WhenField` and `WhenFields` conditions use the same operator set as [runtime conditions](../conditions/). The difference is scope: runtime conditions branch pipeline actions, while validation conditions guard which rules apply to a form submission.
+> **Relationship to runtime conditions:** `WhenField` and `WhenFields` conditions use the same operator set as [runtime conditions](../conditions/). The difference is scope: runtime conditions branch pipeline reactions, while validation conditions guard which rules apply to a form submission.
 
 ## How do nested validators handle conditions?
 

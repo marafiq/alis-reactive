@@ -270,7 +270,7 @@ When the server returns a 400 response with validation errors, `ValidationErrors
 .OnError(400, e => e.ValidationErrors("resident-form"))
 ```
 
-This command reads the 400 response body, finds the matching form by ID, and displays errors at each field's validation slot.
+This reaction reads the 400 response body, finds the matching form by ID, and displays errors at each field's validation slot.
 
 ### What is Into?
 
