@@ -55,7 +55,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the text content from an event payload property.</summary>
-        /// <typeparam name="TPayload">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
         /// <param name="path">Expression selecting the event payload property to display.</param>
         public PipelineBuilder<TModel> SetText<TPayload>(TPayload source, Expression<Func<TPayload, object>> path)
@@ -65,7 +65,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the text content from an HTTP response body property.</summary>
-        /// <typeparam name="TResponse">The response body type.</typeparam>
+        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
         /// <param name="source">The typed response body scope from <c>OnSuccess</c> or <c>OnError</c>.</param>
         /// <param name="path">Expression selecting the response body property to display.</param>
         public PipelineBuilder<TModel> SetText<TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, object>> path)
@@ -76,8 +76,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the text content from a typed source (component, plugin, or URL value).</summary>
-        /// <typeparam name="TProp">The source value type.</typeparam>
-        /// <param name="source">Source evaluated when the reaction executes.</param>
+        /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
+        /// <param name="source">The typed value source evaluated when the reaction executes.</param>
         /// <returns>This element builder for chaining additional element mutations.</returns>
         public ElementBuilder<TModel> SetText<TProp>(TypedSource<TProp> source)
         {
@@ -93,7 +93,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the inner HTML from an event payload property.</summary>
-        /// <typeparam name="TPayload">The event payload type.</typeparam>
+        /// <typeparam name="TPayload">The event payload contract supplied by the trigger callback.</typeparam>
         /// <param name="source">The typed event payload marker supplied by the trigger callback.</param>
         /// <param name="path">Expression selecting the event payload property containing HTML.</param>
         public PipelineBuilder<TModel> SetHtml<TPayload>(TPayload source, Expression<Func<TPayload, object>> path)
@@ -103,8 +103,8 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Sets the inner HTML from a typed source.</summary>
-        /// <typeparam name="TProp">The source value type.</typeparam>
-        /// <param name="source">Source evaluated when the reaction executes.</param>
+        /// <typeparam name="TProp">The CLR type carried by the typed value source.</typeparam>
+        /// <param name="source">The typed value source evaluated when the reaction executes.</param>
         /// <returns>This element builder for chaining additional element mutations.</returns>
         public ElementBuilder<TModel> SetHtml<TProp>(TypedSource<TProp> source)
         {
