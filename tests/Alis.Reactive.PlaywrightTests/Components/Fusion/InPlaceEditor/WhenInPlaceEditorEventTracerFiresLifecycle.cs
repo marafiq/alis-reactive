@@ -31,17 +31,13 @@ public class WhenInPlaceEditorEventTracerFiresLifecycle : PlaywrightTestBase
         await inner.FillAsync("world");
         await inner.PressAsync("Enter");
 
-        // Change carries args.Value (the new value)
         await Expect(Page.Locator("#trace-change")).ToHaveTextAsync("world", new() { Timeout = 5000 });
 
-        // EndEdit carries args.Action ("submit" when the user confirmed)
         await Expect(Page.Locator("#trace-endedit")).ToHaveTextAsync("submit", new() { Timeout = 3000 });
 
-        // ActionBegin + ActionSuccess both fire; ActionSuccess carries args.Value
         await Expect(Page.Locator("#trace-actionbegin")).ToHaveTextAsync("fired", new() { Timeout = 3000 });
         await Expect(Page.Locator("#trace-actionsuccess")).ToHaveTextAsync("world", new() { Timeout = 3000 });
 
-        // SubmitClick carries args.Name (the Syncfusion event name)
         await Expect(Page.Locator("#trace-submitclick")).Not.ToHaveTextAsync("", new() { Timeout = 3000 });
 
         AssertNoConsoleErrors();

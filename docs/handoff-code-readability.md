@@ -86,6 +86,10 @@ Examples and current status:
   Playwright test summaries were collapsed or deleted. The kept comments now
   name component-registration/gather, validation slots, lifecycle args,
   Syncfusion wrapper behavior, commit paths, and TODO flakiness notes.
+- Resolved on `tiny-safe-but-important-refactorings`: the InPlaceEditor
+  lifecycle trace test no longer comments every asserted event field; the
+  test name and trace-cell assertions carry the flow, while the class-level
+  boundary note remains.
 - Resolved on `tiny-safe-but-important-refactorings`: CoreBehaviors event and
   payload tests no longer use XML summaries for test-class navigation. Concise
   comments remain only for dispatch-chain intent, payload casing, trace/order
