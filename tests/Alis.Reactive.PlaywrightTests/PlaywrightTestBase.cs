@@ -12,9 +12,9 @@ public abstract class PlaywrightTestBase : PageTest
     private const int NavigationTimeoutBootRecoveryMs = 1000;
     private const string ReactiveBootedTrace = "[alis:boot] booted";
     private const string ReactiveBootedMarkerSelector = "html[data-alis-booted='true']";
-    private const string ReactiveBootedBrowserPredicate =
+    private const string ReactiveBootedPagePredicate =
         "() => document.documentElement.dataset.alisBooted === 'true' || window.__alisReactiveBoot?.booted === true";
-    private static readonly string[] IgnoredBrowserNavigationErrors =
+    private static readonly string[] IgnoredNavigationErrors =
     [
         "ERR_NETWORK_CHANGED",
         "net::ERR_NETWORK_CHANGED",
@@ -123,7 +123,7 @@ public abstract class PlaywrightTestBase : PageTest
             var messages = SnapshotConsoleMessages();
             if (messages.Count > 0)
             {
-                TestContext.Out.WriteLine("=== Browser Console Output ===");
+                TestContext.Out.WriteLine("=== Page Console Output ===");
                 foreach (var msg in messages)
                     TestContext.Out.WriteLine(msg);
                 TestContext.Out.WriteLine("=== End Console Output ===");
@@ -275,7 +275,7 @@ public abstract class PlaywrightTestBase : PageTest
 
     private List<string> SnapshotUnexpectedConsoleErrors() =>
         SnapshotConsoleErrors()
-            .Where(error => !IgnoredBrowserNavigationErrors.Any(error.Contains))
+            .Where(error => !IgnoredNavigationErrors.Any(error.Contains))
             .ToList();
 
     private void ClearConsoleState()
@@ -293,24 +293,24 @@ public abstract class PlaywrightTestBase : PageTest
         if (ConsoleContains(ReactiveBootedTrace))
             return;
 
-        if (await BrowserReportsReactiveBoot(bootTimeoutMs))
+        if (await PageReportsReactiveBoot(bootTimeoutMs))
             return;
 
         if (ConsoleContains(ReactiveBootedTrace) || await PageHasReactiveBootMarker())
             return;
 
         WriteConsoleMessages(
-            "=== Browser Console Output While Waiting For Boot ===",
+            "=== Page Console Output While Waiting For Boot ===",
             SnapshotConsoleMessages());
         throw new TimeoutException($"Timed out waiting {bootTimeoutMs}ms for reactive boot.");
     }
 
-    private async Task<bool> BrowserReportsReactiveBoot(int timeoutMs)
+    private async Task<bool> PageReportsReactiveBoot(int timeoutMs)
     {
         try
         {
             await Page.WaitForFunctionAsync(
-                ReactiveBootedBrowserPredicate,
+                ReactiveBootedPagePredicate,
                 null,
                 new() { Timeout = timeoutMs, PollingInterval = BootPollIntervalMs });
             return true;
@@ -319,7 +319,7 @@ public abstract class PlaywrightTestBase : PageTest
         {
             return false;
         }
-        catch (PlaywrightException ex) when (BrowserContextChangedWhileWaiting(ex))
+        catch (PlaywrightException ex) when (PageExecutionContextChangedWhileWaiting(ex))
         {
             return false;
         }
@@ -333,10 +333,10 @@ public abstract class PlaywrightTestBase : PageTest
         if (await PageHasReactiveBootMarker())
             return true;
 
-        return await BrowserReportsReactiveBoot(NavigationTimeoutBootRecoveryMs);
+        return await PageReportsReactiveBoot(NavigationTimeoutBootRecoveryMs);
     }
 
-    private static bool BrowserContextChangedWhileWaiting(PlaywrightException ex) =>
+    private static bool PageExecutionContextChangedWhileWaiting(PlaywrightException ex) =>
         ex.Message.Contains("Execution context was destroyed", StringComparison.OrdinalIgnoreCase)
         || ex.Message.Contains("Target page, context or browser has been closed", StringComparison.OrdinalIgnoreCase);
 
