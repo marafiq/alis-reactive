@@ -38,7 +38,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Selects the button <c>type</c> attribute.
         /// </summary>
-        /// <param name="type">The HTML button type. Defaults to <c>button</c>.</param>
+        /// <param name="type">HTML button type. Defaults to <c>button</c>.</param>
         public NativeButtonBuilder<TModel> Type(string type)
         {
             _buttonType = type;

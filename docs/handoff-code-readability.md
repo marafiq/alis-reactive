@@ -596,6 +596,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeCheckList` XML tags
   now use concise model, option-list, field-wrapper, Reactive Plan, and
   event-payload wording. Container, CSV, `NameFor`, and inline-sync notes remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeButton` XML tags
+  now use concise element-ID, button-type, and Reactive Plan wording. No-gather
+  and no-payload boundary notes remain.
 
 ### Implementation Inline Comments
 

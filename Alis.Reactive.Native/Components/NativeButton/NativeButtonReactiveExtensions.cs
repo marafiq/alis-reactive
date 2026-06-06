@@ -16,7 +16,7 @@ namespace Alis.Reactive.Native.Components
         /// Adds a component event trigger for the selected DOM event.
         /// </summary>
         /// <typeparam name="TArgs">Payload type selected by <paramref name="eventSelector"/>.</typeparam>
-        /// <param name="plan">The Reactive Plan that receives the component event trigger.</param>
+        /// <param name="plan">Reactive Plan that receives the component event trigger.</param>
         /// <param name="eventSelector">Selects which event to listen for, such as <c>evt => evt.Click</c>.</param>
         /// <param name="pipeline">Defines the reaction graph that runs when the event fires.</param>
         public static NativeButtonBuilder<TModel> Reactive<TModel, TArgs>(
