@@ -43,8 +43,8 @@ namespace Alis.Reactive.Native.Extensions
         /// after all triggers for the view have been declared.
         /// </para>
         /// </remarks>
-        /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
-        /// <param name="plan">The Reactive Plan that receives the trigger declarations.</param>
+        /// <typeparam name="TModel">View model used to author typed expression paths.</typeparam>
+        /// <param name="plan">Reactive Plan that receives the trigger declarations.</param>
         /// <param name="trigger">
         /// Configures one or more triggers via the fluent <see cref="TriggerBuilder{TModel}"/> API.
         /// Triggers can be chained, for example <c>t.DomReady(...).CustomEvent(...)</c>.

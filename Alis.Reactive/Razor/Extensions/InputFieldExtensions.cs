@@ -23,10 +23,10 @@ namespace Alis.Reactive.Native.Extensions
         /// Chain a component extension on the result to choose the rendered control.
         /// The field wrapper owns label display and validation error placement.
         /// </remarks>
-        /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-        /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
-        /// <param name="plan">The Reactive Plan that owns this field registration.</param>
-        /// <param name="expression">The model property to bind the field to.</param>
+        /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+        /// <typeparam name="TProp">Model property type the field is bound to.</typeparam>
+        /// <param name="plan">Reactive Plan that owns this field registration.</param>
+        /// <param name="expression">Model property to bind the field to.</param>
         /// <returns>A bound field ready to receive a component extension.</returns>
         public static InputBoundField<TModel, TProp> InputField<TModel, TProp>(
 #if NET48
@@ -43,10 +43,10 @@ namespace Alis.Reactive.Native.Extensions
         /// Starts a model-bound input field for <paramref name="expression"/>, with label
         /// and required marker configuration.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-        /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
-        /// <param name="plan">The Reactive Plan that owns this field registration.</param>
-        /// <param name="expression">The model property to bind the field to.</param>
+        /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+        /// <typeparam name="TProp">Model property type the field is bound to.</typeparam>
+        /// <param name="plan">Reactive Plan that owns this field registration.</param>
+        /// <param name="expression">Model property to bind the field to.</param>
         /// <param name="configure">Configures label text and required marker.</param>
         /// <returns>A bound field ready to receive a component extension.</returns>
         public static InputBoundField<TModel, TProp> InputField<TModel, TProp>(

@@ -13,9 +13,9 @@ namespace Alis.Reactive.InputField
     /// platform-specific subclass (<c>InputBoundField&lt;TModel, TProp&gt;</c> for ASP.NET Core)
     /// returned by <c>Html.InputField()</c>.
     /// </remarks>
-    /// <typeparam name="THelper">The platform-specific HTML helper type.</typeparam>
-    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
+    /// <typeparam name="THelper">Platform-specific HTML helper type.</typeparam>
+    /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+    /// <typeparam name="TProp">Model property type the field is bound to.</typeparam>
     public class InputBoundFieldBase<THelper, TModel, TProp> where TModel : class
     {
         /// <summary>HTML helper used by component render factories.</summary>

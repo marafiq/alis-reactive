@@ -21,8 +21,8 @@ namespace Alis.Reactive.Native
     /// Component extensions choose the concrete rendered control. The field
     /// wrapper owns label markup and validation message placement.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
+    /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+    /// <typeparam name="TProp">Model property type the field is bound to.</typeparam>
     public class InputBoundField<TModel, TProp>
 #if NET48
         : InputBoundFieldBase<HtmlHelper<TModel>, TModel, TProp>

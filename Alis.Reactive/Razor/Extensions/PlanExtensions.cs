@@ -27,7 +27,7 @@ namespace Alis.Reactive.Native.Extensions
         /// <see cref="HtmlExtensions.On{TModel}"/> while authoring behavior, then pass the same plan to
         /// <see cref="RenderPlan{TModel}"/> at the end of the view.
         /// </remarks>
-        /// <typeparam name="TModel">The view model type, providing compile-time expression paths.</typeparam>
+        /// <typeparam name="TModel">View model type, providing compile-time expression paths.</typeparam>
         /// <returns>A new plan instance scoped to this view.</returns>
 #if NET48
         public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
@@ -52,7 +52,7 @@ namespace Alis.Reactive.Native.Extensions
         /// The returned plan's behaviors merge into the owning view's Active Plan state.
         /// </para>
         /// </remarks>
-        /// <typeparam name="TModel">The view model type must match the view's model.</typeparam>
+        /// <typeparam name="TModel">View model type must match the view's model.</typeparam>
         /// <returns>A plan instance that merges into the owning view's Active Plan.</returns>
 #if NET48
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this HtmlHelper<TModel> html)
@@ -86,8 +86,8 @@ namespace Alis.Reactive.Native.Extensions
         /// This must be the last call in every view. A plan that is not rendered
         /// produces no runtime behavior.
         /// </remarks>
-        /// <typeparam name="TModel">The view model used to author typed expression paths.</typeparam>
-        /// <param name="plan">The Reactive Plan whose generated JSON should be embedded.</param>
+        /// <typeparam name="TModel">View model used to author typed expression paths.</typeparam>
+        /// <param name="plan">Reactive Plan whose generated JSON should be embedded.</param>
         /// <returns>HTML content containing the plan JSON consumed by the runtime.</returns>
 #if NET48
         public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html,

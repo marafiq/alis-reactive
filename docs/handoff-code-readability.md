@@ -565,6 +565,10 @@ Candidate cleanup:
   member/source/registration XML tags now use concise CLR type, response-route,
   plugin registration, and configured-builder wording without weakening the
   public plugin contract.
+- Resolved on `tiny-safe-but-important-refactorings`: Razor and InputField XML
+  tags now use concise view-model, property, and Reactive Plan wording. The
+  `net48` `NameFor`, component-slot ownership, and render-plan boundary comments
+  remain because they prevent real integration mistakes.
 
 ### Implementation Inline Comments
 
