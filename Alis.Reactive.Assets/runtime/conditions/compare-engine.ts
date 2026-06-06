@@ -55,7 +55,7 @@ const missingText: TextOperand = { kind: "missing" };
 const missingOrderedConditionValue: OrderedConditionValue = { kind: "missing" };
 const noRightOperandTrace = { kind: "none" } as const;
 
-/** Validation conditions intentionally exclude confirm, so this path stays synchronous. */
+// Validation conditions intentionally exclude confirm, so this path stays synchronous.
 export function evaluateSyncCondition(
   condition: ValidationCondition,
   planDocument: PlanDocument,

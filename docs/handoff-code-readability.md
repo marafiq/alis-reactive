@@ -132,6 +132,10 @@ sequencing, or why a test must be non-parallel.
   now use plain comments instead of JSDoc blocks. The kept comments still name
   partial-unmount validation behavior, DOM/value boundaries, array normalization,
   and two-phase page-ready wiring.
+- Resolved on `tiny-safe-but-important-refactorings`: condition-runtime sync-lane
+  invariants now use plain comments instead of JSDoc blocks. The comments remain
+  because validation and branch execution depend on sync behavior until confirm
+  crosses the async boundary.
 
 ### Builder XML Documentation
 

@@ -21,7 +21,7 @@ interface WindowWithConfirm {
   };
 }
 
-/** Validation conditions cannot contain confirm, so evaluation is always sync. */
+// Validation conditions cannot contain confirm, so evaluation is always sync.
 export function evaluateCondition(
   condition: ValidationCondition,
   planDocument: PlanDocument,
@@ -35,7 +35,7 @@ export function evaluateCondition(
   );
 }
 
-/** Branch execution depends on sync results staying sync until confirm is reached. */
+// Branch execution depends on sync results staying sync until confirm is reached.
 export function evaluateConditionInCurrentLane(
   condition: ConditionGraph,
   planDocument: PlanDocument,
