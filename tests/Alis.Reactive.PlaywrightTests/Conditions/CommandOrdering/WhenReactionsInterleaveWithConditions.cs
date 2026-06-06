@@ -1,8 +1,8 @@
 namespace Alis.Reactive.PlaywrightTests.Conditions.CommandOrdering;
 
-// Post-condition commands must run after the selected condition branch.
+// Post-condition reactions must run after the selected condition branch.
 [TestFixture]
-public class WhenCommandsInterleaveWithConditions : PlaywrightTestBase
+public class WhenReactionsInterleaveWithConditions : PlaywrightTestBase
 {
     private async Task NavigateAndBoot()
     {
@@ -11,7 +11,7 @@ public class WhenCommandsInterleaveWithConditions : PlaywrightTestBase
     }
 
     [Test]
-    public async Task post_condition_command_overwrites_conditional_text_when_condition_matches()
+    public async Task post_condition_reaction_overwrites_conditional_text_when_condition_matches()
     {
         await NavigateAndBoot();
 
@@ -23,7 +23,7 @@ public class WhenCommandsInterleaveWithConditions : PlaywrightTestBase
     }
 
     [Test]
-    public async Task post_condition_command_fires_even_when_condition_does_not_match()
+    public async Task post_condition_reaction_fires_even_when_condition_does_not_match()
     {
         await NavigateAndBoot();
 

@@ -365,7 +365,7 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     }
 
     [Test]
-    public async Task single_command_condition_via_when_then()
+    public async Task unguarded_reaction_still_runs_when_guarded_branch_matches()
     {
         await NavigateAndBoot();
         var always = Page.Locator("#single-command-condition-result");
@@ -375,7 +375,7 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
         await Expect(always).ToHaveTextAsync("Always runs");
         await Expect(bonus).ToHaveTextAsync("Bonus!");
 
-        // A failed guard skips only the guarded command; unguarded commands still run.
+        // A failed guard skips only the guarded reaction; unguarded reactions still run.
         await Page.Locator("#btn-single-command-condition-low").ClickAsync();
         await Expect(always).ToHaveTextAsync("Always runs");
         // Bonus keeps the previous successful branch value; the fresh-page test covers the default state.
@@ -570,7 +570,7 @@ public class WhenGuardsControlExecution : PlaywrightTestBase
     }
 
     [Test]
-    public async Task single_command_condition_skips_guarded_branch_on_fresh_page()
+    public async Task unguarded_reaction_still_runs_when_guarded_branch_fails_on_fresh_page()
     {
         await NavigateAndBoot();
         var always = Page.Locator("#single-command-condition-result");

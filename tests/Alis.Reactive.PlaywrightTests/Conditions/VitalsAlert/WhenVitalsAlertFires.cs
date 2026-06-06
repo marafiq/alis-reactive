@@ -4,7 +4,7 @@ namespace Alis.Reactive.PlaywrightTests.Conditions.VitalsAlert;
 
 /// <summary>
 /// Exercises condition branches that mix FusionNumericTextBox input with HTTP
-/// requests, severity tiers, and before/after command sequencing.
+/// requests, severity tiers, and before/after reaction sequencing.
 /// </summary>
 [TestFixture]
 public class WhenVitalsAlertFires : PlaywrightTestBase
@@ -68,7 +68,7 @@ public class WhenVitalsAlertFires : PlaywrightTestBase
     }
 
     [Test]
-    public async Task commands_before_condition_always_execute_regardless_of_branch()
+    public async Task reactions_before_condition_always_execute_regardless_of_branch()
     {
         await NavigateAndBoot();
 
@@ -82,7 +82,7 @@ public class WhenVitalsAlertFires : PlaywrightTestBase
     }
 
     [Test]
-    public async Task commands_after_condition_always_execute_regardless_of_branch()
+    public async Task reactions_after_condition_always_execute_regardless_of_branch()
     {
         await NavigateAndBoot();
 
@@ -96,7 +96,7 @@ public class WhenVitalsAlertFires : PlaywrightTestBase
     }
 
     [Test]
-    public async Task commands_before_and_after_execute_when_then_branch_posts()
+    public async Task reactions_before_and_after_execute_when_then_branch_posts()
     {
         await NavigateAndBoot();
 
