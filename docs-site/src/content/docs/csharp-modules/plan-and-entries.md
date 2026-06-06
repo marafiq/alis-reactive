@@ -27,9 +27,9 @@ Every method takes `plan` as its first argument — the plan is the thread that 
 
 Every view that uses Reactive must have a strongly-typed `@model` — no `dynamic`, no `ViewBag`. `Html.ReactivePlan<TModel>()` creates a plan scoped to that model. `TModel` is inferred from `@model`, so every expression — `m => m.Name`, `m => m.Country` — is type-checked at compile time. Partials use `Html.ResolvePlan<TModel>()` to merge into the parent. Both require `@Html.RenderPlan(plan)` at the bottom.
 
-Every `Html.On`, `Html.InputField`, and `.Reactive()` call adds entries to the plan. Nothing executes at this point — it's all plan models collected into a list.
+Every `Html.On`, `Html.InputField`, and `.Reactive()` call adds behavior or component registrations to the plan. Nothing executes at this point — the plan is collecting the model the runtime will execute later.
 
-`Html.RenderPlan(plan)` serializes the collected entries to JSON and emits a `<script type="application/json">` element into the page. The runtime reads it and executes the described behavior.
+`Html.RenderPlan(plan)` serializes the collected behavior to JSON and emits a `<script type="application/json">` element into the page. The runtime reads it and executes the described behavior.
 
 ## The standard view shape
 

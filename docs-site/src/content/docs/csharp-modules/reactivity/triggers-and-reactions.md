@@ -9,13 +9,13 @@ A trigger defines *when* a pipeline executes. Every reactive behavior starts wit
 
 ### Placement — anywhere in the view
 
-`Html.On()` builds a **plan model** and adds it to the plan. It does not execute anything. You can call it anywhere in the `.cshtml` — top, middle, bottom, inside conditionals, in loops. Order doesn't matter. The calls just accumulate entries in the plan object, and `@Html.RenderPlan(plan)` serializes them all to JSON when Razor evaluates that expression.
+`Html.On()` builds a **plan behavior** and adds it to the plan. It does not execute anything. You can call it anywhere in the `.cshtml` — top, middle, bottom, inside conditionals, in loops. Order doesn't matter. The calls just accumulate behaviors in the plan object, and `@Html.RenderPlan(plan)` serializes them all to JSON when Razor evaluates that expression.
 
 ```csharp
 @{
     var plan = Html.ReactivePlan<MyModel>();
 
-    // These three calls can appear in any order — they all just add entries to `plan`
+    // These three calls can appear in any order — they all just add behaviors to `plan`
     Html.On(plan, t => t.DomReady(p => p.Dispatch("init")));
     Html.On(plan, t => t.SignalR("/hubs/alerts", "Receive", p => p.Element("x").Show()));
     Html.On(plan, t => t.CustomEvent("init", p => p.Element("status").SetText("ready")));
@@ -23,7 +23,7 @@ A trigger defines *when* a pipeline executes. Every reactive behavior starts wit
 
 <!-- HTML here — the triggers above don't care about their position relative to markup -->
 
-@Html.RenderPlan(plan)  @* Serializes all entries to JSON — nothing connects until the browser boots *@
+@Html.RenderPlan(plan)  @* Serializes all behaviors to JSON — nothing connects until the browser boots *@
 ```
 
 ### Lazy connections — no connection until the browser boots

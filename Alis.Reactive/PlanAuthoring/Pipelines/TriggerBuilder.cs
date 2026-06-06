@@ -8,7 +8,7 @@ namespace Alis.Reactive.Builders
     /// </summary>
     /// <remarks>
     /// Accessed via <c>Html.On(plan, t =&gt; t.DomReady(...).CustomEvent(...))</c>.
-    /// Trigger methods record plan entries; the generated runtime wires the DOM,
+    /// Trigger methods record plan behaviors; the generated runtime wires the DOM,
     /// EventSource, or SignalR listener when the plan boots.
     /// Each trigger call appends an independent behavior; chaining does not combine
     /// multiple triggers into one reaction.
