@@ -885,6 +885,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: custom-header Playwright
   tests now name the DomReady data-load wait helper and the chained second
   request ordering proof, so the two inline timing/order comments were removed.
+- Resolved on `tiny-safe-but-important-refactorings`: payload-flow tests now
+  name the PascalCase expression path to camelCase payload JSON proof directly.
+  The payload-status ordering comment remains because it protects reaction order.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by

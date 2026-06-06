@@ -58,9 +58,8 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     }
 
     [Test]
-    public async Task nested_three_level_path_resolves_street_city_zip()
+    public async Task pascal_case_expression_path_resolves_camel_case_payload_json()
     {
-        // The PascalCase expression path must resolve against camelCase payload JSON.
         await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 
