@@ -91,6 +91,8 @@ Loose typing in Syncfusion contracts is not permission to add loose typing in Al
    - If a member is only static configuration and the builder already exposes it, do not add a Fusion reactive extension for it.
 
 7. **Map traced API to the current model**
+   - Read [JS object DSL primitive matrix](references/js-object-dsl-primitive-matrix.md)
+     before designing the public C# API.
    - JS property read: `ComponentProperty<T>.Named/Mapped(...)` + `self.Read(property)`.
    - JS property write: `ComponentProperty<T>` + `self.EmitSet(property, ValueExpression...)`.
    - JS void method: `ComponentMethod.Named/Mapped(...).WithArgs<...>()` + `self.EmitCall(method, args)`.
@@ -169,5 +171,6 @@ Loose typing in Syncfusion contracts is not permission to add loose typing in Al
 - `scripts/create-fusion-probe.mjs` - creates a temporary raw HTML probe.
 - `references/source-discovery.md` - deterministic source-finding workflow.
 - `references/blazor-metadata.md` - how to use Blazor packages as typed candidate maps without copying bridge-only behavior.
+- `references/js-object-dsl-primitive-matrix.md` - authoritative JS object to DSL primitive mapping for component members, events, event payloads, methods, arrays, and stop conditions.
 - `references/event-payload-contracts.md` - event payload property/method tracing and C# mapping.
 - `references/automation-gates.md` - done criteria for a fully onboarded member/component.

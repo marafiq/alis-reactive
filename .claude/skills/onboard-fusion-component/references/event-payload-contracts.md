@@ -2,7 +2,14 @@
 
 Use this before adding any `FusionXxxEvents` or `Events/FusionXxxOn*.cs` type.
 
-Event payloads are separate JS objects. They can have readable properties, writable properties, and callable methods. Treat them like component objects, but with `PayloadSource.Event()` as the runtime root.
+Event payloads are separate JS objects. They can have readable properties,
+writable properties, and callable methods. Treat them as first-class JS object
+surfaces, but use payload primitives with `PayloadSource.Event()` as the runtime
+root, not component-instance primitives such as `ComponentProperty<T>` or
+`ComponentMethod`.
+
+For the full component-instance vs. event-payload mapping, read
+[JS object DSL primitive matrix](js-object-dsl-primitive-matrix.md).
 
 ## Required Matrix
 
