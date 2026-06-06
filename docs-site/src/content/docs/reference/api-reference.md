@@ -34,7 +34,7 @@ Binds client-side validation rules declared by request validation gates
 
 ### ComponentEventOnboarding
 
-Shared component-event onboarding path for vertical slices.
+Shared component event onboarding path for vertical slices.
             The slice selects a typed event and a rendered component id; this helper builds the
             reaction pipeline and wires the event against the plan-registered component.
 

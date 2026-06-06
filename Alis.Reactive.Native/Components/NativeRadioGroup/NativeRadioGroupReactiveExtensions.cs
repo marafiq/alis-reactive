@@ -9,7 +9,7 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Creates one component-event trigger per radio option so each radio button
+    /// Creates one component event trigger per radio option so each radio button
     /// can start the same reaction graph. <c>.Reactive()</c> returns the same
     /// builder so it can stay at the end of the fluent render chain.
     /// </para>
@@ -17,13 +17,13 @@ namespace Alis.Reactive.Native.Components
     public static class NativeRadioGroupReactiveExtensions
     {
         /// <summary>
-        /// Adds component-event triggers for the selected DOM event on each radio option.
+        /// Adds component event triggers for the selected DOM event on each radio option.
         /// </summary>
         /// <typeparam name="TModel">Model that owns the bound component value.</typeparam>
         /// <typeparam name="TProp">Bound value type for the component.</typeparam>
         /// <typeparam name="TArgs">Payload type selected by <paramref name="eventSelector"/>.</typeparam>
         /// <param name="builder">The NativeRadioGroup builder being wired.</param>
-        /// <param name="plan">The Reactive Plan that receives the component-event triggers.</param>
+        /// <param name="plan">The Reactive Plan that receives the component event triggers.</param>
         /// <param name="eventSelector">Selects which event to listen for, such as <c>evt => evt.Changed</c>.</param>
         /// <param name="pipeline">Defines the reaction graph that runs when the event fires.</param>
         public static NativeRadioGroupBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(
