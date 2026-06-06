@@ -14,9 +14,9 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Registers the textarea with the Reactive Plan and renders it inside the field wrapper.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-        /// <typeparam name="TProp">The model value type registered as the textarea value.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+        /// <typeparam name="TProp">Model value type registered as the textarea value.</typeparam>
+        /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Configures the textarea (rows, placeholder, CSS, reactive events).</param>
         public static void NativeTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,

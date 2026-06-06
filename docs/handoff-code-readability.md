@@ -584,6 +584,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeTextBox` XML tags
   now use concise model, field-wrapper, HTML attribute, placeholder, Reactive
   Plan, and event-args wording. The two-example input-type note remains.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeTextArea` XML tags
+  now use concise model, field-wrapper, placeholder, Reactive Plan, and
+  event-args wording. Event payload and component-reference examples remain.
 
 ### Implementation Inline Comments
 

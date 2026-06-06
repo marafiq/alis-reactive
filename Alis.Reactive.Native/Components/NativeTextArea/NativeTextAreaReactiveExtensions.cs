@@ -15,10 +15,10 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Wires a <see cref="NativeTextArea"/> DOM event into a Reactive Plan pipeline.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-        /// <typeparam name="TProp">The model value type associated with the textarea component.</typeparam>
-        /// <typeparam name="TArgs">The event args type selected by <paramref name="eventSelector"/>.</typeparam>
-        /// <param name="plan">The Reactive Plan that receives the component event trigger.</param>
+        /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+        /// <typeparam name="TProp">Model value type associated with the textarea component.</typeparam>
+        /// <typeparam name="TArgs">Event args type selected by <paramref name="eventSelector"/>.</typeparam>
+        /// <param name="plan">Reactive Plan that receives the component event trigger.</param>
         /// <param name="eventSelector">Selects which event to listen for, such as <c>evt => evt.Changed</c>.</param>
         /// <param name="pipeline">Builds the pipeline that runs when the event fires.</param>
         public static NativeTextAreaBuilder<TModel, TProp> Reactive<TModel, TProp, TArgs>(

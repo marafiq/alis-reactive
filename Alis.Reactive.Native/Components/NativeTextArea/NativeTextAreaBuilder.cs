@@ -21,8 +21,8 @@ namespace Alis.Reactive.Native.Components
     /// Created by the <c>.NativeTextArea()</c> factory on
     /// <see cref="InputBoundField{TModel,TProp}"/>.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The model value type rendered through the textarea.</typeparam>
+    /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+    /// <typeparam name="TProp">Model value type rendered through the textarea.</typeparam>
     public class NativeTextAreaBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
@@ -88,7 +88,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Replaces the placeholder text shown when the textarea is empty.
         /// </summary>
-        /// <param name="placeholder">The placeholder text.</param>
+        /// <param name="placeholder">Placeholder text.</param>
         public NativeTextAreaBuilder<TModel, TProp> Placeholder(string placeholder)
         {
             _placeholder = placeholder;
