@@ -18,16 +18,16 @@ namespace Alis.Reactive.InputField
     /// <typeparam name="TProp">The model property type the field is bound to.</typeparam>
     public class InputBoundFieldBase<THelper, TModel, TProp> where TModel : class
     {
-        /// <summary>Gets the platform-specific HTML helper for rendering.</summary>
+        /// <summary>HTML helper used by component render factories.</summary>
         public THelper Helper { get; }
 
-        /// <summary>Gets the Reactive Plan that owns this field registration.</summary>
+        /// <summary>Reactive Plan that receives this field's component registration.</summary>
         public ReactivePlan<TModel> Plan { get; }
 
-        /// <summary>Gets the model property expression this field is bound to.</summary>
+        /// <summary>Model expression used to derive the field binding path and component ID.</summary>
         public Expression<Func<TModel, TProp>> Expression { get; }
 
-        /// <summary>Gets the label and required options for this field.</summary>
+        /// <summary>Field wrapper options used for label and required markup.</summary>
         public InputFieldOptions Options { get; }
 
         internal string ElementId => _componentSlot.ElementId;

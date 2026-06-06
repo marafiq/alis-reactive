@@ -267,6 +267,10 @@ Candidate cleanup:
   primitive type. Summaries still name the literal DSL action, and response,
   event-payload, source, and DateTime formatting docs remain where they carry
   contract or runtime meaning.
+- Resolved on `tiny-safe-but-important-refactorings`: `InputBoundFieldBase`
+  public property summaries now explain their component-rendering and
+  registration roles instead of repeating "Gets the..." boilerplate. The render
+  invariant comment remains because it protects validation/gather behavior.
 
 ### Implementation Inline Comments
 

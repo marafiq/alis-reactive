@@ -605,10 +605,10 @@ Framework-agnostic base for a model-bound input field.
 
 ```csharp
 // Properties
-Expression { get; }  // Gets the model property expression this field is bound to.
-Helper { get; }  // Gets the platform-specific HTML helper for rendering.
-Options { get; }  // Gets the label and required options for this field.
-Plan { get; }  // Gets the Reactive Plan that owns this field registration.
+Expression { get; }  // Model expression used to derive the field binding path and component ID.
+Helper { get; }  // HTML helper used by component render factories.
+Options { get; }  // Field wrapper options used for label and required markup.
+Plan { get; }  // Reactive Plan that receives this field's component registration.
 ```
 
 ### InputFieldOptions
