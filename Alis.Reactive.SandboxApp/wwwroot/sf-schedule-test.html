@@ -139,7 +139,6 @@
 
         function clearLog() { logEl.innerHTML = ''; }
 
-        // === SENIOR LIVING DOMAIN DATA ===
         var today = new Date();
         var year = today.getFullYear();
         var month = today.getMonth();
@@ -207,7 +206,6 @@
               FacilityId: 'mystery-manor', CareItems: 2, EstimatedMinutes: 30, CategoryColor: '#dc3545' },
         ];
 
-        // === SCHEDULE INSTANCE ===
         var scheduleObj = new ej.schedule.Schedule({
             width: '100%',
             height: '100%',
@@ -252,7 +250,6 @@
             showTimeIndicator: true,
             allowDragAndDrop: true,
 
-            // === ALL EVENTS ===
             cellClick: function(args) { log('cellClick', args); },
             cellDoubleClick: function(args) { log('cellDoubleClick', args); },
             eventClick: function(args) { log('eventClick', args); },
@@ -282,7 +279,6 @@
         });
         scheduleObj.appendTo('#schedule');
 
-        // === FILTER HANDLERS ===
         function onFacilityChange() {
             var facility = document.getElementById('facility-filter').value;
             log('FILTER: facility', { value: facility });
@@ -313,7 +309,6 @@
             scheduleObj.dataBind();
         }
 
-        // === METHOD CALLS ===
         function callMethod(method) {
             log('METHOD: ' + method, {});
             switch(method) {
