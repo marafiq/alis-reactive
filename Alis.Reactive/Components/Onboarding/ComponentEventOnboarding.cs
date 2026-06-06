@@ -14,23 +14,23 @@ namespace Alis.Reactive
             ReactivePlan<TModel> plan,
             string componentId,
             string vendor,
-            TypedEvent<TArgs> descriptor,
+            TypedEvent<TArgs> typedEvent,
             Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TModel : class
         {
             if (plan == null) throw new ArgumentNullException(nameof(plan));
             if (componentId == null) throw new ArgumentNullException(nameof(componentId));
             if (vendor == null) throw new ArgumentNullException(nameof(vendor));
-            if (descriptor == null) throw new ArgumentNullException(nameof(descriptor));
+            if (typedEvent == null) throw new ArgumentNullException(nameof(typedEvent));
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
 
             var target = ComponentObjectTarget.For(componentId, vendor);
             var pipelineBuilder = new PipelineBuilder<TModel>(plan.Context);
-            pipeline(descriptor.Args, pipelineBuilder);
+            pipeline(typedEvent.Args, pipelineBuilder);
             plan.Context.WireComponentEvent(
                 target.IdForJson,
                 target.Vendor.Value,
-                descriptor.ObjectEvent,
+                typedEvent.ObjectEvent,
                 pipelineBuilder.BuildReaction());
         }
     }
