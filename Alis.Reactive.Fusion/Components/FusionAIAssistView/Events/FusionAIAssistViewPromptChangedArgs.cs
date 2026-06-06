@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionAIAssistViewPromptChangedArgs
     {
-        /// <summary>Current prompt text.</summary>
+        /// <summary>Prompt text after the change.</summary>
         public string Value { get; set; } = "";
 
         /// <summary>Prompt text before the change.</summary>

@@ -125,13 +125,13 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Sort direction for sorting actions.</summary>
         public string? Direction { get; set; }
 
-        /// <summary>Current page number after the action.</summary>
+        /// <summary>Page number after the data-state action.</summary>
         public int CurrentPage { get; set; }
 
         /// <summary>Previous page number before the action.</summary>
         public int PreviousPage { get; set; }
 
-        /// <summary>Current page size.</summary>
+        /// <summary>Page size after the data-state action.</summary>
         public int PageSize { get; set; }
     }
 }

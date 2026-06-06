@@ -1417,7 +1417,7 @@ Carries the current and previous prompt text when the prompt changes.
 ```csharp
 // Properties
 PreviousValue { get; }  // Prompt text before the change.
-Value { get; }  // Current prompt text.
+Value { get; }  // Prompt text after the change.
 ```
 
 ### FusionAIAssistViewPromptRequestArgs
@@ -1761,7 +1761,7 @@ Event payload delivered after a Carousel slide changes.
 
 ```csharp
 // Properties
-CurrentIndex { get; }  // Current slide index.
+CurrentIndex { get; }  // Slide index after the transition.
 IsSwiped { get; }  // Whether the slide change was triggered by swipe.
 PreviousIndex { get; }  // Previous slide index.
 SlideDirection { get; }  // Slide direction: Previous or Next.
@@ -1774,7 +1774,7 @@ Event payload delivered before a Carousel slide changes.
 ```csharp
 // Properties
 Cancel { get; }  // Whether the slide change should be cancelled.
-CurrentIndex { get; }  // Current slide index.
+CurrentIndex { get; }  // Slide index before the pending transition.
 IsSwiped { get; }  // Whether the slide change was triggered by swipe.
 NextIndex { get; }  // Next slide index.
 SlideDirection { get; }  // Slide direction: Previous or Next.
@@ -2588,9 +2588,9 @@ Contains `requestType` plus context-specific parameters.
 ```csharp
 // Properties
 ColumnName { get; }  // Column name for sorting actions.
-CurrentPage { get; }  // Current page number after the action.
+CurrentPage { get; }  // Page number after the data-state action.
 Direction { get; }  // Sort direction for sorting actions.
-PageSize { get; }  // Current page size.
+PageSize { get; }  // Page size after the data-state action.
 PreviousPage { get; }  // Previous page number before the action.
 RequestType { get; }  // Syncfusion request type, such as `sorting` or `paging`.
 ```
@@ -2748,7 +2748,7 @@ Event args for the Syncfusion Grid "recordClick" event.
 // Properties
 CellIndex { get; }  // Zero-based cell index.
 Name { get; }  // Syncfusion event name.
-RowData { get; }  // Current row data.
+RowData { get; }  // Row data for the clicked record.
 RowIndex { get; }  // Zero-based row index.
 ```
 
@@ -3677,8 +3677,8 @@ Event payload delivered by ProgressButton begin, progress, and end events.
 
 ```csharp
 // Properties
-CurrentDuration { get; }  // Current progress duration in milliseconds.
-Percent { get; }  // Current progress percentage.
+CurrentDuration { get; }  // Progress duration reported by the event, in milliseconds.
+Percent { get; }  // Progress percentage reported by the event.
 Step { get; }  // Progress step interval.
 ```
 

@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionCarouselSlideChangingArgs
     {
-        /// <summary>Current slide index.</summary>
+        /// <summary>Slide index before the pending transition.</summary>
         public int CurrentIndex { get; set; }
 
         /// <summary>Next slide index.</summary>

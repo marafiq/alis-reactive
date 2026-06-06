@@ -283,6 +283,10 @@ Candidate cleanup:
   TextArea, and OtpInput event payload `Value` summaries now say when the
   value is captured by the event instead of repeating "Current ... value."
   Payload shape and event wiring remain unchanged.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining Fusion event
+  payload summaries with vague "Current..." wording now name the event moment
+  or Syncfusion action context for Grid, Carousel, ProgressButton, and
+  AIAssistView payloads. Payload shape and wiring remain unchanged.
 
 ### Implementation Inline Comments
 

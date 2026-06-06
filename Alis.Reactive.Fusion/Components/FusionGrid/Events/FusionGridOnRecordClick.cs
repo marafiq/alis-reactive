@@ -7,7 +7,7 @@ namespace Alis.Reactive.Fusion.Components
     public class FusionGridRecordClickArgs<TRow>
         where TRow : class
     {
-        /// <summary>Current row data.</summary>
+        /// <summary>Row data for the clicked record.</summary>
         public TRow RowData { get; set; } = default!;
 
         /// <summary>Zero-based row index.</summary>
