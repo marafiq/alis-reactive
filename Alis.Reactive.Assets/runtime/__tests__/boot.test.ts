@@ -23,7 +23,7 @@ afterEach(() => {
 });
 
 describe("runtime boot state", () => {
-  it("resets Reactive Plan runtime singletons so native action links initialize on the next boot", () => {
+  it("resets runtime singletons so native action links initialize on the next boot", () => {
     const addEventListener = vi.spyOn(document, "addEventListener");
 
     initNativeActionLinks();
