@@ -19,7 +19,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         /// <typeparam name="TProp">Model value type rendered by the slider.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the FusionSlider initial configuration.</param>
+        /// <param name="build">Configures initial Slider options before rendering.</param>
         public static void FusionSlider<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<SliderBuilder> build)

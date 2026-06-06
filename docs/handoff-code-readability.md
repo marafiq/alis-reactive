@@ -589,6 +589,10 @@ Candidate cleanup:
   summaries now describe rendered content, disabled state, CSS classes, and
   styling/state flags directly instead of using vague "current/currently"
   wording.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining Fusion
+  input-style HTML factory `build` parameter docs now use concise
+  "configures initial options before rendering" wording. Longer setup examples
+  remain in remarks where they help public DSL users.
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
   selected-value parameter docs now use the same concise selected-option wording
   as the other Native value-write helpers.

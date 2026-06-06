@@ -23,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         /// <typeparam name="TProp">Model value type rendered by the masked input.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the MaskedTextBox (mask format, placeholder, etc.).</param>
+        /// <param name="build">Configures initial masked-input options before rendering.</param>
         public static void FusionInputMask<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<MaskedTextBoxBuilder> build)

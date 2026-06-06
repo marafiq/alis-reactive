@@ -23,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         /// <typeparam name="TProp">Model value type rendered by the date-time picker.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the FusionDateTimePicker (min/max, format, step, etc.).</param>
+        /// <param name="build">Configures initial DateTimePicker options before rendering.</param>
         public static void FusionDateTimePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<DateTimePickerBuilder> build)

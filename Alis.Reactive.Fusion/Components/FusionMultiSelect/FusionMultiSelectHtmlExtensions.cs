@@ -65,7 +65,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         /// <typeparam name="TProp">Model value type rendered by the multi-select.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the FusionMultiSelect (data source, fields, mode, etc.).</param>
+        /// <param name="build">Configures initial MultiSelect options before rendering.</param>
         public static void FusionMultiSelect<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<MultiSelectBuilder> build)

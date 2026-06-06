@@ -23,7 +23,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </summary>
         /// <typeparam name="TProp">Model value type rendered by the drop-down tree.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
-        /// <param name="build">Callback to build the Syncfusion DropDownTree.</param>
+        /// <param name="build">Configures initial DropDownTree options before rendering.</param>
         public static void FusionDropDownTree<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<DropDownTreeBuilder> build)
