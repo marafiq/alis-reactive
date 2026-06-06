@@ -90,14 +90,13 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
     }
 
     [Test]
-    public async Task dialog_editing_uses_the_builder_template_and_typed_begin_event()
+    public async Task dialog_editing_renders_builder_template_fields_and_typed_begin_event()
     {
         await NavigateEditing();
 
         await ClickWhenStable(Page.Locator("#dialog-select-first"));
         await ClickWhenStable(Page.Locator("#dialog-start-edit"));
 
-        // The typed DialogForm rendered its labeled fields (Resident / Risk / Open tasks).
         await Expect(Page.Locator("input[name='residentName']"))
             .ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Page.Locator("select[name='riskLevel']"))

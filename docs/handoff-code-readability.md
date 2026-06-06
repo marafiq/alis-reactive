@@ -867,6 +867,9 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: the route-param encoding
   test now names the server decode proof, so the inline URL-decoding narration
   was removed without changing the expected value.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion grid dialog editing
+  now names the builder-template field proof in the test name, so the inline
+  DialogForm field narration was removed without adding helper indirection.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
