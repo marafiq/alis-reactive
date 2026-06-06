@@ -1,10 +1,7 @@
 namespace Alis.Reactive.PlaywrightTests.Patterns.ReactiveWiring;
 
-/// <summary>
-/// Verifies condition branches inside .Reactive() pipelines across native and Fusion components.
-/// Syncfusion numeric controls render duplicate generated-ID inputs and formatted display text;
-/// these tests target .First and use regex values where that page output matters.
-/// </summary>
+// Syncfusion numeric controls render duplicate generated-ID inputs and formatted display text;
+// these tests target .First and use regex values where that page output matters.
 [TestFixture]
 public class WhenGuardsControlReactiveFlow : PlaywrightTestBase
 {

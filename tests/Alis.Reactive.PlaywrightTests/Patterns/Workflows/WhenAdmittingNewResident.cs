@@ -4,10 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
 
-/// <summary>
-/// Exercises resident admission across physician search, reactive echo panels,
-/// validation, and submit status.
-/// </summary>
 [TestFixture]
 public class WhenAdmittingNewResident : PlaywrightTestBase
 {

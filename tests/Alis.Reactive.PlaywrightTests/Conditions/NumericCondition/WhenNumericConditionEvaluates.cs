@@ -2,10 +2,6 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.NumericCondition;
 
-/// <summary>
-/// Exercises FusionNumericTextBox conditions for numeric thresholds, ElseIf ordering,
-/// compound ranges, and source-vs-source comparisons.
-/// </summary>
 [TestFixture]
 public class WhenNumericConditionEvaluates : PlaywrightTestBase
 {

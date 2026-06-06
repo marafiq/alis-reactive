@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Conditions.HttpMixing;
 
-/// <summary>
-/// Playwright coverage that Active Plan trigger pipelines compose conditions,
-/// HTTP blocks, response routes, dispatches, plugins, and chained route gathers.
-/// </summary>
 [TestFixture]
 public class WhenTriggerDrivenConditionsMixWithHttp : PlaywrightTestBase
 {

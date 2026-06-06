@@ -2,12 +2,8 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.MultiSelect;
 
-/// <summary>
-/// Exercises FusionMultiSelect page behavior: array-valued selections, builder
-/// preselection, Changed events, gather, typed fields, GroupBy, and server filtering.
-/// Tests use real popup gestures through MultiSelectLocator rather than direct EJ2
-/// instance manipulation.
-/// </summary>
+// Tests use real popup gestures through MultiSelectLocator rather than direct
+// EJ2 instance manipulation.
 [TestFixture]
 public class WhenMultipleItemsSelected : PlaywrightTestBase
 {

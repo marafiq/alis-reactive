@@ -2,14 +2,7 @@ using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DateRangePicker;
 
-/// <summary>
-/// Exercises FusionDateRangePicker changed-event conditions, component-read conditions,
-/// and resident stay period reads.
-/// </summary>
-/// <remarks>
-/// The component exposes both <c>startDate</c> and <c>endDate</c> from the Syncfusion instance.
-/// DateRangePickerLocator uses calendar popup and Apply-button gestures so Syncfusion commits the range.
-/// </remarks>
+// DateRangePickerLocator uses calendar popup and Apply-button gestures so Syncfusion commits the range.
 [TestFixture]
 public class WhenDateRangeSelected : PlaywrightTestBase
 {

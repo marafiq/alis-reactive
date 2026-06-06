@@ -2,9 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.AppLevel;
 
-/// <summary>
-/// Exercises app-level drawer open, close, partial-load, and form-submit behavior.
-/// </summary>
 [TestFixture]
 public class WhenDrawerOpensAndCloses : PlaywrightTestBase
 {

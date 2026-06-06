@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Patterns.ReactiveWiring;
 
-/// <summary>
-/// Playwright coverage for PlaygroundSyntax .Reactive() component event pipelines
-/// across Fusion and Native components.
-/// </summary>
 [TestFixture]
 public class WhenComponentEventsFireCrossVendor : PlaywrightTestBase
 {

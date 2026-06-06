@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// Exercises a multi-select ChipList filter whose selected chip objects drive array DSL conditions
-/// and server-side resident grid filtering.
-/// </summary>
 [TestFixture]
 public class WhenFilteringWithChips : PlaywrightTestBase
 {

@@ -3,9 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
 
-/// <summary>
-/// Exercises todo form validation, conditional due-date visibility, and save feedback.
-/// </summary>
 [TestFixture]
 public class WhenManagingTodoItems : PlaywrightTestBase
 {

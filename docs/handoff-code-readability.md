@@ -93,6 +93,10 @@ Examples and current status:
 - Resolved on `tiny-safe-but-important-refactorings`: cascading dropdown tests
   now use plain comments for DSL gather/load/save intent and Syncfusion
   user-gesture change behavior instead of XML summary scaffolding.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining Playwright
+  class-level coverage inventories were trimmed from selected condition,
+  reactive-wiring, workflow, drawer, grid, date-range, and multiselect tests.
+  Syncfusion gesture and duplicate-input notes were kept as plain comments.
 - `WhenAllComponentsGatherIntoOnePost.cs` has long form-fill flows, but helper
   extraction should happen only if it names a reusable domain action. Do not add
   private helper indirection that hides a one-off behavior proof.
