@@ -1,6 +1,6 @@
 // Request input writing is where gathered body-field assignments cross into query string,
-// JSON body, or FormData. File inputs may arrive as FileList or Syncfusion
-// items carrying the browser File in rawFile.
+// JSON body, or FormData. File inputs may arrive as FileList values or Syncfusion
+// items carrying a File in rawFile.
 
 import type { RequestPayloadTarget, HttpMethod, PathSegment, RequestBodyFormat } from "../../types/index";
 import { toString } from "../../shared/shape-convert";
@@ -67,10 +67,10 @@ export function writeRequestPayloadValue(
   shape: RuntimeShape,
   writer: RequestInputWriter,
 ): void {
-  const browserFileListItems = filesFromBrowserFileList(gatheredValue);
-  if (browserFileListItems !== undefined) {
-    writer.emitArray(target, browserFileListItems, shape);
-    log.trace("file.emitted", { name: target.name, count: browserFileListItems.length });
+  const fileListItems = filesFromFileList(gatheredValue);
+  if (fileListItems !== undefined) {
+    writer.emitArray(target, fileListItems, shape);
+    log.trace("file.emitted", { name: target.name, count: fileListItems.length });
     return;
   }
 
@@ -123,9 +123,9 @@ function createJsonBodyWriter(body: Record<string, unknown>): RequestInputWriter
   };
 }
 
-function filesFromBrowserFileList(value: unknown): File[] | undefined {
-  const hasBrowserFileListConstructor = typeof FileList !== "undefined";
-  if (!hasBrowserFileListConstructor) return undefined;
+function filesFromFileList(value: unknown): File[] | undefined {
+  const hasFileListConstructor = typeof FileList !== "undefined";
+  if (!hasFileListConstructor) return undefined;
 
   const valueIsFileList = value instanceof FileList;
   if (!valueIsFileList) return undefined;
