@@ -8,7 +8,7 @@ namespace Alis.Reactive
     /// event name into the Reactive Plan and expose a typed payload placeholder to the
     /// authoring lambda.
     /// </remarks>
-    /// <typeparam name="TArgs">The event payload type available to the reaction pipeline.</typeparam>
+    /// <typeparam name="TArgs">Event payload type available to the reaction pipeline.</typeparam>
     public sealed class TypedEvent<TArgs>
     {
         /// <summary>Event name emitted into the Reactive Plan.</summary>

@@ -12,7 +12,7 @@ namespace Alis.Reactive.Builders.Requests
     /// Created by HTTP entry points such as <c>p.Get("/url")</c> and
     /// <c>p.Post("/url")</c>. Branches inside <c>p.Parallel(...)</c> use the same builder.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns model-bound component IDs.</typeparam>
+    /// <typeparam name="TModel">View model that owns model-bound component IDs.</typeparam>
     public class HttpRequestBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
@@ -31,16 +31,16 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Uses GET for this request builder's endpoint.</summary>
-        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         public HttpRequestBuilder<TModel> Get(string url) { SelectEndpoint(HttpMethodName.Get, url); return this; }
         /// <summary>Uses POST for this request builder's endpoint.</summary>
-        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         public HttpRequestBuilder<TModel> Post(string url) { SelectEndpoint(HttpMethodName.Post, url); return this; }
         /// <summary>Uses PUT for this request builder's endpoint.</summary>
-        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         public HttpRequestBuilder<TModel> Put(string url) { SelectEndpoint(HttpMethodName.Put, url); return this; }
         /// <summary>Uses DELETE for this request builder's endpoint.</summary>
-        /// <param name="url">The request URL, which may contain <c>{placeholder}</c> template parameters.</param>
+        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
         public HttpRequestBuilder<TModel> Delete(string url) { SelectEndpoint(HttpMethodName.Delete, url); return this; }
 
         /// <summary>Configures request body fields, headers, and route template parameters.</summary>

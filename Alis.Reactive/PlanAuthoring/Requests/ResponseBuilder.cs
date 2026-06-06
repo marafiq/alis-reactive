@@ -11,7 +11,7 @@ namespace Alis.Reactive.Builders.Requests
     /// Created by <c>request.Response(r =&gt; ...)</c>.
     /// Exact error-status routes are matched before any-status error routes.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns model-bound component IDs.</typeparam>
+    /// <typeparam name="TModel">View model that owns model-bound component IDs.</typeparam>
     public class ResponseBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
@@ -38,7 +38,7 @@ namespace Alis.Reactive.Builders.Requests
         /// Adds a route for any successful 2xx HTTP response with typed
         /// response-body access.
         /// </summary>
-        /// <typeparam name="TResponse">The response body type exposed to downstream value sources.</typeparam>
+        /// <typeparam name="TResponse">Response body type exposed to downstream value sources.</typeparam>
         /// <param name="pipeline">Builds the reaction graph using the success body scope.</param>
         public ResponseBuilder<TModel> OnSuccess<TResponse>(
             Action<ResponseBody<TResponse>, PipelineBuilder<TModel>> pipeline)
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Adds a route for a non-2xx response with a specific status code.</summary>
-        /// <param name="statusCode">The HTTP status code to match.</param>
+        /// <param name="statusCode">HTTP status code to match.</param>
         /// <param name="pipeline">Builds the reaction graph to execute for the matching status code.</param>
         public ResponseBuilder<TModel> OnError(int statusCode, Action<PipelineBuilder<TModel>> pipeline)
         {
@@ -77,7 +77,7 @@ namespace Alis.Reactive.Builders.Requests
         /// Adds a route for any error outcome with typed error-body access when
         /// a response body is available.
         /// </summary>
-        /// <typeparam name="TError">The error body type exposed to downstream value sources.</typeparam>
+        /// <typeparam name="TError">Error body type exposed to downstream value sources.</typeparam>
         /// <param name="pipeline">Builds the reaction graph using the error body scope.</param>
         public ResponseBuilder<TModel> OnError<TError>(
             Action<ResponseBody<TError>, PipelineBuilder<TModel>> pipeline)
@@ -95,8 +95,8 @@ namespace Alis.Reactive.Builders.Requests
         /// Adds a route for a non-2xx response with a specific status code and
         /// typed error-body access.
         /// </summary>
-        /// <typeparam name="TError">The error body type exposed to downstream value sources.</typeparam>
-        /// <param name="statusCode">The HTTP status code to match.</param>
+        /// <typeparam name="TError">Error body type exposed to downstream value sources.</typeparam>
+        /// <param name="statusCode">HTTP status code to match.</param>
         /// <param name="pipeline">Builds the reaction graph using the error body scope.</param>
         public ResponseBuilder<TModel> OnError<TError>(int statusCode,
             Action<ResponseBody<TError>, PipelineBuilder<TModel>> pipeline)

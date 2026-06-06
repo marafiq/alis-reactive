@@ -12,7 +12,7 @@ namespace Alis.Reactive.Builders.Requests
     /// the optional all-settled reaction runs after every branch has completed
     /// or failed.
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns model-bound component IDs.</typeparam>
+    /// <typeparam name="TModel">View model that owns model-bound component IDs.</typeparam>
     public class ParallelBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;

@@ -553,6 +553,10 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: condition builder XML
   tags now use concise literal, range, branch, and active response-route wording
   while preserving the Reactive Plan runtime-evaluation remarks.
+- Resolved on `tiny-safe-but-important-refactorings`: request/response route XML
+  tags now use concise event payload, response-body, URL-template, and status-code
+  wording. The `ResponseBody` usage example remains because it explains a common
+  authoring-handle-to-Reactive-Plan-read workflow.
 
 ### Implementation Inline Comments
 
