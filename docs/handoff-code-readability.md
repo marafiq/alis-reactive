@@ -587,6 +587,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeTextArea` XML tags
   now use concise model, field-wrapper, placeholder, Reactive Plan, and
   event-args wording. Event payload and component-reference examples remain.
+- Resolved on `tiny-safe-but-important-refactorings`: `NativeRadioGroup` XML
+  tags now use concise model, option-list, Reactive Plan, and event-payload
+  wording. Hidden-input target, `net48`, layout, and inline-init notes remain.
 
 ### Implementation Inline Comments
 

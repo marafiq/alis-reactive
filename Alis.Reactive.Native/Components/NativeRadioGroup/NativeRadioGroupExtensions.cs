@@ -34,7 +34,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Writes the selected radio value from the triggering event payload.
         /// </summary>
-        /// <typeparam name="TSource">The event payload type containing the value.</typeparam>
+        /// <typeparam name="TSource">Event payload type containing the value.</typeparam>
         /// <param name="source">Trigger payload placeholder.</param>
         /// <param name="path">Expression selecting the event payload property to read.</param>
         public static ComponentRef<NativeRadioGroup, TModel> SetValue<TModel, TSource>(

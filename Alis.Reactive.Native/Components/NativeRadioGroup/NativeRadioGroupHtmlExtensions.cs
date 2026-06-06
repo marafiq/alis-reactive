@@ -14,9 +14,9 @@ namespace Alis.Reactive.Native.Components
         /// <summary>
         /// Registers the radio group with the Reactive Plan and renders it inside the field wrapper.
         /// </summary>
-        /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-        /// <typeparam name="TProp">The model value type registered as the selected radio value.</typeparam>
-        /// <param name="setup">The field wrapper created by <c>Html.InputField()</c>.</param>
+        /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+        /// <typeparam name="TProp">Model value type registered as the selected radio value.</typeparam>
+        /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Configures the radio group (items, CSS, reactive events).</param>
         public static void NativeRadioGroup<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,

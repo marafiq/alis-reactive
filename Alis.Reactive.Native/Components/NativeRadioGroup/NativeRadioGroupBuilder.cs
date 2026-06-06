@@ -26,8 +26,8 @@ namespace Alis.Reactive.Native.Components
     /// radio buttons keep MVC form submission and model binding.
     /// </para>
     /// </remarks>
-    /// <typeparam name="TModel">The view model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">The model value type represented by the selected radio option.</typeparam>
+    /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
+    /// <typeparam name="TProp">Model value type represented by the selected radio option.</typeparam>
     public class NativeRadioGroupBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
@@ -72,7 +72,7 @@ namespace Alis.Reactive.Native.Components
         /// Adds radio options supplied outside the fluent builder, such as controller
         /// or view-model option lists.
         /// </summary>
-        /// <param name="items">The radio button items to display.</param>
+        /// <param name="items">Radio button items to display.</param>
         public NativeRadioGroupBuilder<TModel, TProp> Items(IEnumerable<RadioButtonItem> items)
         {
             foreach (var item in items)
@@ -106,7 +106,7 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <param name="value">Submitted option value.</param>
         /// <param name="text">Radio button display text.</param>
-        /// <param name="description">A secondary description shown below the text.</param>
+        /// <param name="description">Secondary description shown below the text.</param>
         public NativeRadioGroupBuilder<TModel, TProp> Option(string value, string text, string description)
         {
             _options.Add(new RadioButtonItem(value, text, description));
