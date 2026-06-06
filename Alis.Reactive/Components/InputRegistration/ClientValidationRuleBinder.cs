@@ -38,7 +38,6 @@ namespace Alis.Reactive
             _ruleSource = ruleSource ?? throw new ArgumentNullException(nameof(ruleSource));
         }
 
-        /// <summary>Binds every validation rule job declared during plan construction.</summary>
         internal void BindQueuedJobs()
         {
             foreach (var validationJob in _context.ValidationJobs)
