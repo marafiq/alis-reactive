@@ -577,6 +577,9 @@ Candidate cleanup:
 - Resolved on `tiny-safe-but-important-refactorings`: `FusionMultiSelect`
   typed field-mapping helpers now document the receiver as the builder that
   receives typed field mappings instead of repeating "builder being configured."
+- Resolved on `tiny-safe-but-important-refactorings`: Native checklist,
+  dropdown, and radio-group `Value()` summaries now name the value read
+  directly instead of repeating "for use in conditions or gather."
 - Resolved on `tiny-safe-but-important-refactorings`: `NativeDropDown`
   selected-value parameter docs now use the same concise selected-option wording
   as the other Native value-write helpers.

@@ -40,7 +40,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Reads the currently selected value for use in conditions or gather.
+        /// Reads the selected option value.
         /// </summary>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeDropDown, TModel> self)

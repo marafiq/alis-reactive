@@ -57,7 +57,7 @@ namespace Alis.Reactive.Native.Components
         }
 
         /// <summary>
-        /// Reads the currently selected value for use in conditions or gather.
+        /// Reads the selected radio value.
         /// </summary>
         public static TypedComponentSource<string> Value<TModel>(
             this ComponentRef<NativeRadioGroup, TModel> self)
