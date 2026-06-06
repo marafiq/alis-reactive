@@ -13,8 +13,8 @@ namespace Alis.Reactive.Builders
 
         internal HttpRequestBuilder<TModel> BeginHttp(PlanBuildContext context)
         {
-            FlushPendingAsyncReaction();
-            FlushPendingBranch();
+            AppendPendingAsyncReaction();
+            AppendPendingBranch();
             var builder = new HttpRequestBuilder<TModel>(context);
             _pendingAsyncReaction = PendingAsyncReaction<TModel>.Request(builder);
             return builder;
@@ -22,8 +22,8 @@ namespace Alis.Reactive.Builders
 
         internal ParallelBuilder<TModel> BeginParallel(PlanBuildContext context)
         {
-            FlushPendingAsyncReaction();
-            FlushPendingBranch();
+            AppendPendingAsyncReaction();
+            AppendPendingBranch();
             var builder = new ParallelBuilder<TModel>(context);
             _pendingAsyncReaction = PendingAsyncReaction<TModel>.Parallel(builder);
             return builder;
@@ -31,8 +31,8 @@ namespace Alis.Reactive.Builders
 
         internal void BeginBranch()
         {
-            FlushPendingAsyncReaction();
-            FlushPendingBranch();
+            AppendPendingAsyncReaction();
+            AppendPendingBranch();
         }
 
         internal void SetConditionalBranches(List<BranchCase> branches)
@@ -42,16 +42,16 @@ namespace Alis.Reactive.Builders
                 _pendingSyncReactions.Count);
         }
 
-        internal void FlushSegment()
+        internal void AppendPendingSegment()
         {
-            FlushPendingAsyncReaction();
-            FlushPendingBranch();
-            FlushPendingSyncReactions();
+            AppendPendingAsyncReaction();
+            AppendPendingBranch();
+            AppendPendingSyncReactions();
         }
 
         internal ReactionGraph BuildReaction()
         {
-            FlushSegment();
+            AppendPendingSegment();
             return _orderedBlocks.Count == 1
                 ? _orderedBlocks[0]
                 : ReactionGraph.Sequence(_orderedBlocks);
@@ -59,17 +59,17 @@ namespace Alis.Reactive.Builders
 
         internal void AddReaction(ReactionGraph reaction)
         {
-            FlushPendingAsyncReaction();
+            AppendPendingAsyncReaction();
             _pendingSyncReactions.Add(reaction);
         }
 
-        private void FlushPendingAsyncReaction()
+        private void AppendPendingAsyncReaction()
         {
-            _pendingAsyncReaction.AppendTo(_orderedBlocks, FlushPendingSyncReactions);
+            _pendingAsyncReaction.AppendTo(_orderedBlocks, AppendPendingSyncReactions);
             _pendingAsyncReaction = PendingAsyncReaction<TModel>.None;
         }
 
-        private void FlushPendingBranch()
+        private void AppendPendingBranch()
         {
             if (!_pendingBranch.HasCases)
                 return;
@@ -79,7 +79,7 @@ namespace Alis.Reactive.Builders
             _pendingBranch = PendingBranch.None;
         }
 
-        private void FlushPendingSyncReactions()
+        private void AppendPendingSyncReactions()
         {
             if (_pendingSyncReactions.Count == 0)
                 return;
@@ -105,11 +105,11 @@ namespace Alis.Reactive.Builders
             internal static PendingAsyncReaction<T> Parallel(ParallelBuilder<T> parallelRequests) =>
                 new PendingParallelReaction(parallelRequests);
 
-            internal abstract void AppendTo(List<ReactionGraph> orderedBlocks, System.Action flushPendingSyncReactions);
+            internal abstract void AppendTo(List<ReactionGraph> orderedBlocks, System.Action appendPendingSyncReactions);
 
             private sealed class NoPendingAsyncReaction : PendingAsyncReaction<T>
             {
-                internal override void AppendTo(List<ReactionGraph> orderedBlocks, System.Action flushPendingSyncReactions)
+                internal override void AppendTo(List<ReactionGraph> orderedBlocks, System.Action appendPendingSyncReactions)
                 {
                 }
             }
@@ -123,9 +123,9 @@ namespace Alis.Reactive.Builders
                     _request = request;
                 }
 
-                internal override void AppendTo(List<ReactionGraph> orderedBlocks, System.Action flushPendingSyncReactions)
+                internal override void AppendTo(List<ReactionGraph> orderedBlocks, System.Action appendPendingSyncReactions)
                 {
-                    flushPendingSyncReactions();
+                    appendPendingSyncReactions();
                     orderedBlocks.Add(ReactionGraph.Request(_request.BuildRequest()));
                 }
             }
@@ -139,9 +139,9 @@ namespace Alis.Reactive.Builders
                     _parallelRequests = parallelRequests;
                 }
 
-                internal override void AppendTo(List<ReactionGraph> orderedBlocks, System.Action flushPendingSyncReactions)
+                internal override void AppendTo(List<ReactionGraph> orderedBlocks, System.Action appendPendingSyncReactions)
                 {
-                    flushPendingSyncReactions();
+                    appendPendingSyncReactions();
                     orderedBlocks.Add(_parallelRequests.BuildReaction());
                 }
             }

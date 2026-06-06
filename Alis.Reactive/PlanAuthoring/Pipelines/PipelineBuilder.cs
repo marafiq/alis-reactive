@@ -299,11 +299,6 @@ namespace Alis.Reactive.Builders
             _draft.SetConditionalBranches(branches);
         }
 
-        internal void FlushSegment()
-        {
-            _draft.FlushSegment();
-        }
-
         internal ReactionGraph BuildReaction()
         {
             return _draft.BuildReaction();

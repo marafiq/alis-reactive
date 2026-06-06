@@ -458,6 +458,12 @@ Candidate cleanup:
 Some implementation comments are useful because they describe real compatibility
 or runtime constraints. Others narrate obvious writes.
 
+- Resolved on `tiny-safe-but-important-refactorings`: `ReactionPipelineDraft`
+  now uses append-pending names for internal reaction ordering work instead of
+  "flush" terminology, and the unused `PipelineBuilder.FlushSegment()` forwarder
+  was deleted. This keeps the sync/async ordering concept visible without
+  changing reaction behavior.
+
 Keep:
 
 - `net48` comments that explain MVC `ValueFor` encoding behavior.
