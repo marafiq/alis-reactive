@@ -147,12 +147,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         /// <summary>
         /// Returns the edit assignment form partial.
         /// Loaded into the NativeDrawer when user clicks an event on the schedule.
-        /// The partial has its own ReactivePlan that merges into the page.
+        /// The partial has its own Reactive Plan that merges into the page's Active Plan.
         /// </summary>
         [HttpGet("EditForm")]
         public IActionResult EditForm(int assignmentId)
         {
-            // Look up current assignment to pre-populate the form
             var assignment = FakeScheduleData.FindAssignment(assignmentId);
             var currentStaffId = assignment?.StaffName != null
                 ? FakeScheduleData.Staff.FirstOrDefault(s => s.Name == assignment.StaffName)?.Id
