@@ -50,7 +50,7 @@ namespace Alis.Reactive
         internal PlanBuildContext Context => _context;
 
         /// <summary>Registers a plugin contract in the plan before pipelines reference it.</summary>
-        /// <param name="pluginName">The plugin registration name used by <c>p.Plugin(...)</c>.</param>
+        /// <param name="pluginName">Plugin registration name used by <c>p.Plugin(...)</c>.</param>
         /// <param name="configure">Declares the functions, properties, and commands the plan can reference.</param>
         public void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder> configure)
         {
@@ -64,7 +64,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Registers a typed plugin contract in the plan.</summary>
-        /// <param name="plugin">The plugin instance whose name and members define the contract.</param>
+        /// <param name="plugin">Plugin instance whose name and members define the contract.</param>
         public void RegisterPlugin(Plugin plugin)
         {
             if (plugin == null) throw new ArgumentNullException(nameof(plugin));
@@ -72,8 +72,8 @@ namespace Alis.Reactive
         }
 
         /// <summary>Creates and registers a typed plugin contract in the plan.</summary>
-        /// <typeparam name="TPlugin">The plugin type to instantiate and register.</typeparam>
-        /// <returns>The registered plugin instance for use in pipeline calls.</returns>
+        /// <typeparam name="TPlugin">Plugin type to instantiate and register.</typeparam>
+        /// <returns>Registered plugin instance for use in pipeline calls.</returns>
         public TPlugin RegisterPlugin<TPlugin>()
             where TPlugin : Plugin, new()
         {

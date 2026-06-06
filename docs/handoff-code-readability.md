@@ -561,6 +561,10 @@ Candidate cleanup:
   entrypoint XML tags now use concise HTTP URL-template, CustomEvent, SSE,
   SignalR, component, plugin, and array-source wording while preserving the
   runtime boundary terms developers need.
+- Resolved on `tiny-safe-but-important-refactorings`: remaining plugin
+  member/source/registration XML tags now use concise CLR type, response-route,
+  plugin registration, and configured-builder wording without weakening the
+  public plugin contract.
 
 ### Implementation Inline Comments
 

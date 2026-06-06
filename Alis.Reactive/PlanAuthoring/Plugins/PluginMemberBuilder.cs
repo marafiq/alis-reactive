@@ -30,8 +30,8 @@ namespace Alis.Reactive.Builders
     /// Collects arguments for a value-returning plan-registered plugin method or root function.
     /// Use the builder where a <see cref="TypedPluginSource{TReturn}"/> is expected.
     /// </summary>
-    /// <typeparam name="TReturn">The CLR type returned by the plugin call and exposed to downstream value expressions.</typeparam>
-    /// <typeparam name="TModel">The model type for the pipeline that owns the plugin read.</typeparam>
+    /// <typeparam name="TReturn">CLR type returned by the plugin call and exposed to downstream value expressions.</typeparam>
+    /// <typeparam name="TModel">Model type for the pipeline that owns the plugin read.</typeparam>
     public sealed class PluginMemberBuilder<TReturn, TModel> where TModel : class
     {
         private readonly PluginOperationId _operation;
@@ -49,9 +49,9 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a value from an HTTP response body as a plugin argument.</summary>
-        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">Selected response-body argument type.</typeparam>
-        /// <param name="body">The success or error response body scope.</param>
+        /// <param name="body">Success or error response body scope.</param>
         /// <param name="path">Response property path.</param>
         public PluginMemberBuilder<TReturn, TModel> Arg<TResponse, TProp>(
             ResponseBody<TResponse> body, Expression<Func<TResponse, TProp>> path)
@@ -140,7 +140,7 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Creates the typed value source represented by the configured plugin method call.</summary>
-        /// <param name="builder">The configured plugin member builder.</param>
+        /// <param name="builder">Configured plugin member builder.</param>
         /// <returns>A typed plugin value source that captures the configured arguments.</returns>
         public static implicit operator TypedPluginSource<TReturn>(PluginMemberBuilder<TReturn, TModel> builder) =>
             new TypedPluginSource<TReturn>(
@@ -152,7 +152,7 @@ namespace Alis.Reactive.Builders
     /// Collects arguments for a Reactive Plan plugin command. Call <see cref="Fire"/>
     /// to append the plugin-call reaction to the owning Reactive Plan pipeline.
     /// </summary>
-    /// <typeparam name="TModel">The model type for the pipeline that owns the plugin command.</typeparam>
+    /// <typeparam name="TModel">Model type for the pipeline that owns the plugin command.</typeparam>
     public sealed class PluginCallBuilder<TModel> where TModel : class
     {
         private readonly PluginOperationId _operation;
@@ -175,9 +175,9 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>Adds a value from an HTTP response body as a plugin argument.</summary>
-        /// <typeparam name="TResponse">The response body contract for the active response route.</typeparam>
+        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
         /// <typeparam name="TProp">Selected response-body argument type.</typeparam>
-        /// <param name="body">The success or error response body scope.</param>
+        /// <param name="body">Success or error response body scope.</param>
         /// <param name="path">Response property path.</param>
         public PluginCallBuilder<TModel> Arg<TResponse, TProp>(
             ResponseBody<TResponse> body, Expression<Func<TResponse, TProp>> path)
