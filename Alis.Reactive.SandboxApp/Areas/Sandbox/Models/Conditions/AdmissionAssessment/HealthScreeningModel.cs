@@ -38,7 +38,7 @@ public class HealthScreeningModel
 
     public string EmergencyContact { get; set; } = "";
 
-    // Set by plan reactions and HTTP responses.
+    // Decision/result fields written by Reactive Plan branches and HTTP responses.
     public string RiskTier { get; set; } = "";
     public string CareUnit { get; set; } = "";
     public string MonitoringLevel { get; set; } = "";

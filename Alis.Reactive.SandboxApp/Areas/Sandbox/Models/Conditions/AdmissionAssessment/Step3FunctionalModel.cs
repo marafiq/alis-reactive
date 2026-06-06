@@ -2,7 +2,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAsse
 
 public class Step3FunctionalModel
 {
-    // Populated from the Step 1 draft when the page loads.
+    // Step 1 snapshot fields copied before the functional partial renders.
     public string ScreeningId { get; set; } = "";
     public decimal Age { get; set; }
     public string ResidentName { get; set; } = "";
@@ -20,6 +20,6 @@ public class Step3FunctionalModel
     public decimal PainLevel { get; set; }
     public string PainLocation { get; set; } = "";
 
-    // Set by plan reactions.
+    // Monitoring result written by Reactive Plan branches.
     public string MonitoringLevel { get; set; } = "";
 }

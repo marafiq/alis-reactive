@@ -2,7 +2,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAsse
 
 public class Step2ClinicalModel
 {
-    // Populated from the Step 1 draft when the page loads.
+    // Step 1 snapshot fields copied before the clinical partial renders.
     public string ScreeningId { get; set; } = "";
     public string PrimaryDiagnosis { get; set; } = "";
     public string ResidentName { get; set; } = "";
@@ -21,7 +21,7 @@ public class Step2ClinicalModel
     public bool InsulinDependent { get; set; }
     public string InsulinSchedule { get; set; } = "";
 
-    // Set by plan reactions and section-save responses.
+    // Assessment result fields written by Reactive Plan branches and save responses.
     public string CareUnit { get; set; } = "";
     public string CognitiveAssessmentId { get; set; } = "";
     public string CardiacAssessmentId { get; set; } = "";

@@ -958,6 +958,10 @@ Rewrite or delete:
 - Resolved on `tiny-safe-but-important-refactorings`: VitalsAlert sandbox
   controller XML docs now describe the condition-gated HTTP branch contracts
   instead of narrating which endpoint is called for each heart-rate tier.
+- Resolved on `tiny-safe-but-important-refactorings`: AdmissionAssessment model
+  comments now name Step 1 snapshot copying, Reactive Plan branch/save-result
+  fields, and review-summary rebuilds instead of generic "populated" or
+  "set by" narration.
 - Active docs under `docs-site/src/content/docs/architecture/` still include
   `descriptors-and-plan.mdx` and related links that explain an older plan model
   shape with `Command`, `Mutation`, and `BindSource` terms. Do not drive-by
