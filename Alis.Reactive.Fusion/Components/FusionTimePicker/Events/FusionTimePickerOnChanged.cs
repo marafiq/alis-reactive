@@ -10,7 +10,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionTimePickerChangeArgs
     {
-        /// <summary>New time value.</summary>
+        /// <summary>Time value after the change event.</summary>
         public DateTime? Value { get; set; }
 
         /// <summary>Whether user interaction triggered the change.</summary>

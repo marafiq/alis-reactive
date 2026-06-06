@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionNumericTextBoxChangeArgs
     {
-        /// <summary>New numeric value.</summary>
+        /// <summary>Numeric value after the change event.</summary>
         public decimal Value { get; set; }
 
         /// <summary>Previous numeric value.</summary>

@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public sealed class FusionListBoxChangeArgs
     {
-        /// <summary>Selected values.</summary>
+        /// <summary>Selected values after the change event.</summary>
         public string[]? Value { get; set; }
     }
 }

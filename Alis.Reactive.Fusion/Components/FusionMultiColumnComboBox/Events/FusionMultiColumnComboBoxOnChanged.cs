@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionMultiColumnComboBoxChangeArgs
     {
-        /// <summary>Selected value.</summary>
+        /// <summary>Selected value after the change event.</summary>
         public string? Value { get; set; }
 
         /// <summary>Whether user interaction triggered the change.</summary>

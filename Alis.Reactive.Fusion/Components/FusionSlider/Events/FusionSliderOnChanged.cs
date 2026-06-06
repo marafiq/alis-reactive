@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionSliderChangeArgs
     {
-        /// <summary>New slider value.</summary>
+        /// <summary>Slider value after the change event.</summary>
         public double Value { get; set; }
 
         /// <summary>Previous slider value.</summary>

@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionDropDownTreeChangeArgs
     {
-        /// <summary>Selected value IDs.</summary>
+        /// <summary>Selected value IDs after the change event.</summary>
         public string[]? Value { get; set; }
 
         /// <summary>Previous selected value IDs.</summary>

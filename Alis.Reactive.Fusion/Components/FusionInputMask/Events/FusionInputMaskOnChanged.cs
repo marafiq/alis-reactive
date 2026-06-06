@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionInputMaskChangeArgs
     {
-        /// <summary>New masked value.</summary>
+        /// <summary>Masked value after the change event.</summary>
         public string? Value { get; set; }
 
         /// <summary>Whether user interaction triggered the change.</summary>

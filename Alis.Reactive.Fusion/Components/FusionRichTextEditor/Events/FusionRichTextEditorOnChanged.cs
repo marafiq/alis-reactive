@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionRichTextEditorChangeArgs
     {
-        /// <summary>New HTML content value.</summary>
+        /// <summary>HTML content after the change event.</summary>
         public string? Value { get; set; }
 
         /// <summary>Whether user interaction triggered the change.</summary>

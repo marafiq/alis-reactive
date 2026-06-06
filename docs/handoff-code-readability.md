@@ -287,6 +287,10 @@ Candidate cleanup:
   payload summaries with vague "Current..." wording now name the event moment
   or Syncfusion action context for Grid, Carousel, ProgressButton, and
   AIAssistView payloads. Payload shape and wiring remain unchanged.
+- Resolved on `tiny-safe-but-important-refactorings`: Fusion change-event
+  payload `Value` summaries now identify the after-change value instead of
+  terse "Selected value" or "New value" wording. `PreviousValue` and
+  interaction metadata docs remain unchanged.
 
 ### Implementation Inline Comments
 

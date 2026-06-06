@@ -1469,7 +1469,7 @@ Event payload delivered when a `FusionAutoComplete` selection changes.
 ```csharp
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
-Value { get; }  // Selected value.
+Value { get; }  // Selected value after the change event.
 ```
 
 ### FusionAutoCompleteEvents
@@ -1879,7 +1879,7 @@ Event payload delivered when a `FusionColorPicker` color changes.
 
 ```csharp
 // Properties
-Value { get; }  // Selected color value.
+Value { get; }  // Selected color value after the change event.
 ```
 
 ### FusionColorPickerEvents
@@ -1938,7 +1938,7 @@ Event payload delivered when a `FusionComboBox` selection changes.
 ```csharp
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
-Value { get; }  // Selected value.
+Value { get; }  // Selected value after the change event.
 ```
 
 ### FusionComboBoxEvents
@@ -2083,7 +2083,7 @@ Event payload delivered when a `FusionDatePicker` date changes.
 ```csharp
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
-Value { get; }  // New date value.
+Value { get; }  // Date value after the change event.
 ```
 
 ### FusionDatePickerEvents
@@ -2194,7 +2194,7 @@ Event payload delivered when a `FusionDateTimePicker` value changes.
 ```csharp
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
-Value { get; }  // New date-time value.
+Value { get; }  // Date-time value after the change event.
 ```
 
 ### FusionDateTimePickerEvents
@@ -2409,7 +2409,7 @@ Event payload delivered when a `FusionDropDownList` selection changes.
 ```csharp
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
-Value { get; }  // Selected value.
+Value { get; }  // Selected value after the change event.
 ```
 
 ### FusionDropDownListEvents
@@ -2480,7 +2480,7 @@ Event payload delivered when a `FusionDropDownTree` selection changes.
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
 OldValue { get; }  // Previous selected value IDs.
-Value { get; }  // Selected value IDs.
+Value { get; }  // Selected value IDs after the change event.
 ```
 
 ### FusionDropDownTreeEvents
@@ -3016,7 +3016,7 @@ Event payload delivered when a `FusionInputMask` value changes.
 ```csharp
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
-Value { get; }  // New masked value.
+Value { get; }  // Masked value after the change event.
 ```
 
 ### FusionInputMaskEvents
@@ -3101,7 +3101,7 @@ Event payload delivered when a `FusionListBox` selection changes.
 
 ```csharp
 // Properties
-Value { get; }  // Selected values.
+Value { get; }  // Selected values after the change event.
 ```
 
 ### FusionListBoxEvents
@@ -3292,7 +3292,7 @@ Event payload delivered when a `FusionMultiColumnComboBox` selection changes.
 ```csharp
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
-Value { get; }  // Selected value.
+Value { get; }  // Selected value after the change event.
 ```
 
 ### FusionMultiColumnComboBoxEvents
@@ -3356,7 +3356,7 @@ Event payload delivered when a `FusionMultiSelect` selection changes.
 ```csharp
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
-Value { get; }  // Selected values.
+Value { get; }  // Selected values after the change event.
 ```
 
 ### FusionMultiSelectEvents
@@ -3441,7 +3441,7 @@ Event payload delivered when a `FusionNumericTextBox` value changes.
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
 PreviousValue { get; }  // Previous numeric value.
-Value { get; }  // New numeric value.
+Value { get; }  // Numeric value after the change event.
 ```
 
 ### FusionNumericTextBoxEvents
@@ -3578,7 +3578,7 @@ Event payload delivered when a complete `FusionOtpInput` value changes.
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
 PreviousValue { get; }  // Previous committed OTP value.
-Value { get; }  // New OTP value.
+Value { get; }  // Full OTP value after the value-changed event.
 ```
 
 ### FusionPivotView
@@ -3803,7 +3803,7 @@ Event payload delivered when a `FusionRating` value changes.
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
 PreviousValue { get; }  // Previous rating value.
-Value { get; }  // New rating value.
+Value { get; }  // Rating value after the value-changed event.
 ```
 
 ### FusionRichTextEditor
@@ -3822,7 +3822,7 @@ Event payload delivered when a `FusionRichTextEditor` content changes.
 ```csharp
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
-Value { get; }  // New HTML content value.
+Value { get; }  // HTML content after the change event.
 ```
 
 ### FusionRichTextEditorEvents
@@ -4142,7 +4142,7 @@ Action { get; }  // Syncfusion action name for the change.
 IsInteracted { get; }  // Whether user interaction triggered the change.
 PreviousValue { get; }  // Previous slider value.
 Text { get; }  // Formatted slider value text.
-Value { get; }  // New slider value.
+Value { get; }  // Slider value after the change event.
 ```
 
 ### FusionSliderEvents
@@ -4664,7 +4664,7 @@ Event payload delivered when a `FusionTimePicker` time changes.
 ```csharp
 // Properties
 IsInteracted { get; }  // Whether user interaction triggered the change.
-Value { get; }  // New time value.
+Value { get; }  // Time value after the change event.
 ```
 
 ### FusionTimePickerEvents

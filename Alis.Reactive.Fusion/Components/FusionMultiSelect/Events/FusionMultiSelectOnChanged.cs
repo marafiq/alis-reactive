@@ -8,7 +8,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionMultiSelectChangeArgs
     {
-        /// <summary>Selected values.</summary>
+        /// <summary>Selected values after the change event.</summary>
         public string[]? Value { get; set; }
 
         /// <summary>Whether user interaction triggered the change.</summary>

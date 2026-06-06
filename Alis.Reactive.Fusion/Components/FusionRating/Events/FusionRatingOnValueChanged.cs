@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     public class FusionRatingValueChangedArgs
     {
-        /// <summary>New rating value.</summary>
+        /// <summary>Rating value after the value-changed event.</summary>
         public double Value { get; set; }
 
         /// <summary>Previous rating value.</summary>
