@@ -7,10 +7,10 @@ namespace Alis.Reactive.Fusion.Components
     /// </remarks>
     public class FusionInPlaceEditorChangeArgs
     {
-        /// <summary>The current value of the inner integrated component (surfaced as string).</summary>
+        /// <summary>Inner editor value reported by the change event, surfaced as a string.</summary>
         public string? Value { get; set; }
 
-        /// <summary>The previous value of the inner integrated component.</summary>
+        /// <summary>Inner editor value before this change event.</summary>
         public string? PreviousValue { get; set; }
 
         /// <summary>Syncfusion event token exposed as <c>args.name</c>.</summary>

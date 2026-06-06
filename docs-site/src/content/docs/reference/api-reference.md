@@ -2838,7 +2838,7 @@ Event payload delivered before a `FusionInPlaceEditor` enters edit mode.
 // Properties
 Cancel { get; }  // Whether opening the editor is cancelled.
 CancelFocus { get; }  // Whether focusing the inner input is cancelled.
-Mode { get; }  // The current editor mode ("Inline" or "Popup").
+Mode { get; }  // Editor display mode for this begin-edit event: `"Inline"` or `"Popup"`.
 Name { get; }  // Syncfusion event token exposed as `args.name`.
 ```
 
@@ -2866,8 +2866,8 @@ Event payload delivered when the inner editor's value changes.
 ```csharp
 // Properties
 Name { get; }  // Syncfusion event token exposed as `args.name`.
-PreviousValue { get; }  // The previous value of the inner integrated component.
-Value { get; }  // The current value of the inner integrated component (surfaced as string).
+PreviousValue { get; }  // Inner editor value before this change event.
+Value { get; }  // Inner editor value reported by the change event, surfaced as a string.
 ```
 
 ### FusionInPlaceEditorEndEditArgs
@@ -2878,7 +2878,7 @@ Event payload delivered when a `FusionInPlaceEditor` leaves edit mode.
 // Properties
 Action { get; }  // What ended the edit: `"submit"` on save, `"cancel"` on cancel click.
 Cancel { get; }  // Whether leaving edit mode is cancelled.
-Mode { get; }  // The current editor mode ("Inline" or "Popup").
+Mode { get; }  // Editor display mode for this end-edit event: `"Inline"` or `"Popup"`.
 Name { get; }  // Syncfusion event token exposed as `args.name`.
 ```
 

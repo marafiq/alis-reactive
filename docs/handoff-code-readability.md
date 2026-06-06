@@ -379,6 +379,10 @@ Candidate cleanup:
   `sortColumn`, `addRecord`, or `getSelectedRecords` in public
   IntelliSense text. The docs now describe the rendered Grid behavior while
   preserving public builder prerequisites such as export and column chooser flags.
+- Resolved on `tiny-safe-but-important-refactorings`: InPlaceEditor event
+  payload XML docs now describe the event moment for change and edit-mode
+  values instead of vague "current/previous inner integrated component"
+  wording. The public payload shape remains unchanged.
 
 ### Implementation Inline Comments
 

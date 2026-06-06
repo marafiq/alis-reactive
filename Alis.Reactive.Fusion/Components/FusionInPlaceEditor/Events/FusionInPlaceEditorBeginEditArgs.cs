@@ -12,7 +12,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether focusing the inner input is cancelled.</summary>
         public bool CancelFocus { get; set; }
 
-        /// <summary>The current editor mode ("Inline" or "Popup").</summary>
+        /// <summary>Editor display mode for this begin-edit event: <c>"Inline"</c> or <c>"Popup"</c>.</summary>
         public string? Mode { get; set; }
 
         /// <summary>Syncfusion event token exposed as <c>args.name</c>.</summary>

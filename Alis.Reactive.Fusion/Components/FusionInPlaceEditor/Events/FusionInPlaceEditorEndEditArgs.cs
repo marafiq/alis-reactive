@@ -12,7 +12,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Whether leaving edit mode is cancelled.</summary>
         public bool Cancel { get; set; }
 
-        /// <summary>The current editor mode ("Inline" or "Popup").</summary>
+        /// <summary>Editor display mode for this end-edit event: <c>"Inline"</c> or <c>"Popup"</c>.</summary>
         public string? Mode { get; set; }
 
         /// <summary>Syncfusion event token exposed as <c>args.name</c>.</summary>
