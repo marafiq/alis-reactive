@@ -19,13 +19,13 @@ methods cannot bind (no collision) and lambdas are captured, not invoked. Folds
 chain in a `ReactiveValue<T>`, which is itself a `TypedSource<T>` — so a fold plugs
 straight into `SetText`, `When`, a dispatch field, or anywhere a value is read.
 
-The runtime engine is `Alis.Reactive.Assets/runtime/value/array-op-engine.ts`:
+The runtime engine is `Alis.Reactive.Assets/runtime/values/array-op-engine.ts`:
 eight pure, sync ops (`count·filter·map·sum·any·all·find·orderBy/orderByDescending`,
-plus the new numeric folds `min·max·average`). It normalizes array-like browser
-values (DOMTokenList, HTMLCollection, NodeList, iterables) to a JS array at the
-input boundary, sorts deterministically (numeric when both keys are numbers, else
-lexicographic; non-finite keys sort last), and returns `null` on empty for
-first/fold ops.
+plus the new numeric folds `min·max·average`). It normalizes DOM array-like values
+and JavaScript iterables (DOMTokenList, HTMLCollection, NodeList, Set, etc.) to a
+JS array at the input boundary, sorts deterministically (numeric when both keys
+are numbers, else lexicographic; non-finite keys sort last), and returns `null`
+on empty for first/fold ops.
 
 Domain throughout: senior-living — residents, care levels, facilities, billing,
 assessments, shift assignments.
@@ -1016,8 +1016,8 @@ Html.On(plan, t => t.PageLoad())
 - **Empty / null contract.** `FindFirst`, `Min`, `Max`, and `Average` return
   `null` on empty input; `Sum` returns 0; `Count` returns 0; `Any()` returns
   false; `All()` returns true (vacuous).
-- **Boundary normalization.** The engine normalizes array-like and iterable
-  browser values to a JS array at the input boundary (the same category as
+- **Boundary normalization.** The engine normalizes DOM array-like values and
+  JavaScript iterables to a JS array at the input boundary (the same category as
   `getElementById` returning null) — not a plan validator or fallback. A
   non-iterable object (e.g. `DOMStringMap`) fails fast, keeping it in the plugin
   escape hatch's domain.
